@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.8" transformSequenceNumber="10">
-  <directoryPresets config="../bin/JHelioviewer.jar" />
+<install4j version="11.0.1" transformSequenceNumber="11">
+  <directoryPresets config="../../../../AuthKey_865FMBWJ27.p8" />
   <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="https://www.jhelioviewer.org" version="4.7.1" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="21" javaMaxVersion="22" jdkMode="jdk">
-    <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" appleId="bogdan@nicula.net" />
+    <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" macApiIssuer="69a6de86-af15-47e3-e053-5b8c7c11a4d1" macApiKey="865FMBWJ27" macApiPrivateKey="../../../../AuthKey_865FMBWJ27.p8">
+      <macAdditionalBinaries>
+        <entry>*.dylib</entry>
+        <entry>*.so</entry>
+        <entry>*.jnilib</entry>
+        <entry>ffmpeg</entry>
+      </macAdditionalBinaries>
+      <macSearchedJars>
+        <entry>JHelioviewer.jar</entry>
+        <entry>natives-macos.jar</entry>
+      </macSearchedJars>
+    </codeSigning>
     <jreBundles jdkProviderId="JBR" release="21/latest">
       <modules>
         <module name="java.desktop" />
@@ -1092,7 +1103,7 @@ return true;</property>
     </styles>
   </installerGui>
   <mediaSets>
-    <macosArchive name="Mac OS X Single Bundle Archive" id="68" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}" launcherId="24">
+    <macosArchive name="Mac OS X Single Bundle Archive" id="68" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}" architecture="amd64" launcherId="24">
       <exclude>
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-windows.jar" />
@@ -1132,7 +1143,7 @@ return true;</property>
       </exclude>
       <postInstallScript>${compiler:file("./resources/linux-post-install.sh")}</postInstallScript>
     </linuxRPM>
-    <macosArchive name="Mac OS X Single Bundle Archive ARM64" id="1003" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_arm64" architecture="aarch64" launcherId="24">
+    <macosArchive name="Mac OS X Single Bundle Archive ARM64" id="1003" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_arm64" launcherId="24">
       <exclude>
         <entry location="classes/natives-linux.jar" />
         <entry location="classes/natives-windows.jar" />
