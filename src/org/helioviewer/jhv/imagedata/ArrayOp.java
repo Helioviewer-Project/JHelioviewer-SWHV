@@ -7,9 +7,9 @@ interface ArrayOp {
 
     void accept(float[] op1, float[] op2, float[] dest, int start, int end);
 
-    static final int THRESHOLD = 64; // Adjust based on image size and system
+    int THRESHOLD = 64; // Adjust based on image size and system
 
-    static class TaskTwo extends RecursiveAction {
+    class TaskTwo extends RecursiveAction {
 
         private final float[] op1;
         private final float[] op2;

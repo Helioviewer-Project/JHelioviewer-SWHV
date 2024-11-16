@@ -51,7 +51,7 @@ public class Camera {
         listeners.remove(listener);
     }
 
-    ////
+    /// /
     private static final float clipNarrow = (float) (32 * Sun.Radius); // bit more than LASCO C3
     private static final float clipWide = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
 
@@ -71,7 +71,7 @@ public class Camera {
         Transform.cacheMVP();
     }
 
-////
+    /// /
 
     private void updateCamera(JHVTime time) {
         Position v = updateViewpoint.update(time);
