@@ -119,7 +119,7 @@ public class Spice {
         return null;
     }
 
-////
+    /// /
 
     private static double milli2et(long milli) throws SpiceErrorException {
         double sec = (milli - TimeUtils.J2000.milli) / 1000.;
