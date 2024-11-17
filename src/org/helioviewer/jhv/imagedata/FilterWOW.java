@@ -14,6 +14,7 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
     private static final float SIGMA_E0 = 8.907e-1f;
     private static final float SIGMA_E1 = 2.0072e-1f;
+    private static final float BOOST = 1.5f; // restore some crispness after denoising
 
     private static final ArrayOp opSubtract = (op1, op2, dest, start, end) -> {
         for (int i = start; i < end; i++) {
@@ -24,7 +25,7 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static final ArrayOp opDenoise = (op1, op2, dest, start, end) -> {
         for (int i = start; i < end; i++) {
             float x = Math.abs(dest[i]) * op1[0];
-            dest[i] *= x / (1 + x);
+            dest[i] *= BOOST * x / (1 + x);
         }
     };
 
