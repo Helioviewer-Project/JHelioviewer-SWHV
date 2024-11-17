@@ -44,27 +44,25 @@ class FilterWOW implements ImageFilter.Algorithm {
     @Override
     public float[] filter(float[] data, int width, int height) {
         float[] image = data.clone();
-        float[] temp = data.clone();
 
         int length = data.length;
         float[] coeff = new float[length];
-        float[] wtemp1 = new float[length];
-        float[] wtemp2 = new float[length];
+        float[] temp1 = new float[length];
+        float[] temp2 = new float[length];
         float[] synth = new float[length];
 
         float noise = 0; // computed for scale 0
         ForkJoinPool pool = ForkJoinPool.commonPool();
         for (int scale = 0; scale < SCALES; scale++) {
             int step = 1 << scale;
-            // Calculate wavelet coefficients
-            pool.invoke(new ConvolutionTask(temp, coeff, width, height, true, step)); // Horizontal pass
-            pool.invoke(new ConvolutionTask(coeff, temp, width, height, false, step)); // Vertical pass
-            pool.invoke(new ArrayOp.TaskTwo(image, temp, coeff, 0, length, opSubtract)); // Coefficients
-            // Update image for next scale
-            System.arraycopy(temp, 0, image, 0, length);
+            // A trous transform
+            pool.invoke(new ConvolutionTask(image, coeff, width, height, true, step)); // Horizontal pass
+            pool.invoke(new ConvolutionTask(coeff, temp1, width, height, false, step)); // Vertical pass
+            pool.invoke(new ArrayOp.TaskTwo(image, temp1, coeff, 0, length, opSubtract)); // Coefficients
+            System.arraycopy(temp1, 0, image, 0, length); // Update image for next scale
             // Whiten coefficients
-            pool.invoke(new ConvolutionTask2(coeff, wtemp1, width, height, true, step)); // Squared src horizontal pass
-            pool.invoke(new ConvolutionTask(wtemp1, wtemp2, width, height, false, step)); // Vertical pass
+            pool.invoke(new ConvolutionTask2(coeff, temp1, width, height, true, step)); // Squared src horizontal pass
+            pool.invoke(new ConvolutionTask(temp1, temp2, width, height, false, step)); // Vertical pass
             // Denoise stage
             if (scale == 0) {
                 noise = computeNoise(coeff, length);
@@ -75,7 +73,7 @@ class FilterWOW implements ImageFilter.Algorithm {
                 pool.invoke(new ArrayOp.TaskTwo(div, null, coeff, 0, length, opDenoise));
             }
             // Whitened synthesis
-            pool.invoke(new ArrayOp.TaskTwo(wtemp2, coeff, synth, 0, length, opSynthesis));
+            pool.invoke(new ArrayOp.TaskTwo(temp2, coeff, synth, 0, length, opSynthesis));
         }
         pool.invoke(new ArrayOp.TaskTwo(image, data, synth, 0, length, opMix));
         return synth;
