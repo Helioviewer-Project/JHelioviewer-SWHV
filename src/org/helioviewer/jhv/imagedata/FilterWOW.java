@@ -43,10 +43,6 @@ class FilterWOW implements ImageFilter.Algorithm {
 
     @Override
     public float[] filter(float[] data, int width, int height) {
-        return filter(data, width, height, false);
-    }
-
-    protected float[] filter(float[] data, int width, int height, boolean denoise) {
         float[] image = data.clone();
         float[] temp = data.clone();
 
@@ -69,18 +65,17 @@ class FilterWOW implements ImageFilter.Algorithm {
             // Whiten coefficients
             pool.invoke(new ConvolutionTask2(coeff, wtemp1, width, height, true, step)); // Squared src horizontal pass
             pool.invoke(new ConvolutionTask(wtemp1, wtemp2, width, height, false, step)); // Vertical pass
-
-            if (denoise) {
-                if (scale == 0) {
-                    noise = computeNoise(coeff, length);
-                    float[] div = new float[]{1 / (3 * SIGMA_E0 * noise)};
-                    pool.invoke(new ArrayOp.TaskTwo(div, null, coeff, 0, length, opDenoise));
-                } else if (scale == 1) {
-                    float[] div = new float[]{1 / (1 * SIGMA_E1 * noise)};
-                    pool.invoke(new ArrayOp.TaskTwo(div, null, coeff, 0, length, opDenoise));
-                }
+            // Denoise stage
+            if (scale == 0) {
+                noise = computeNoise(coeff, length);
+                float[] div = new float[]{1 / (3 * SIGMA_E0 * noise)};
+                pool.invoke(new ArrayOp.TaskTwo(div, null, coeff, 0, length, opDenoise));
+            } else if (scale == 1) {
+                float[] div = new float[]{1 / (1 * SIGMA_E1 * noise)};
+                pool.invoke(new ArrayOp.TaskTwo(div, null, coeff, 0, length, opDenoise));
             }
-            pool.invoke(new ArrayOp.TaskTwo(wtemp2, coeff, synth, 0, length, opSynthesis)); // Whitened synthesis
+            // Whitened synthesis
+            pool.invoke(new ArrayOp.TaskTwo(wtemp2, coeff, synth, 0, length, opSynthesis));
         }
         pool.invoke(new ArrayOp.TaskTwo(image, data, synth, 0, length, opMix));
         return synth;
