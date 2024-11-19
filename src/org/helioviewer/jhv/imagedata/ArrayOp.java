@@ -5,37 +5,37 @@ import java.util.concurrent.RecursiveAction;
 @SuppressWarnings("serial")
 interface ArrayOp {
 
-    void accept(float[] op1, float[] op2, float[] dest, int start, int end);
+    void accept(float[] arg1, float[] arg2, float[] arg3, int start, int end);
 
     int THRESHOLD = 64; // Adjust based on image size and system
 
-    class TaskTwo extends RecursiveAction {
+    class Task3 extends RecursiveAction {
 
-        private final float[] op1;
-        private final float[] op2;
-        private final float[] dest;
+        private final float[] arg1;
+        private final float[] arg2;
+        private final float[] arg3;
         private final int start;
         private final int end;
-        private final ArrayOp operation;
+        private final ArrayOp op;
 
-        TaskTwo(float[] op1, float[] op2, float[] dest, int start, int end, ArrayOp operation) {
-            this.op1 = op1;
-            this.op2 = op2;
-            this.dest = dest;
+        Task3(float[] arg1, float[] arg2, float[] arg3, int start, int end, ArrayOp op) {
+            this.arg1 = arg1;
+            this.arg2 = arg2;
+            this.arg3 = arg3;
             this.start = start;
             this.end = end;
-            this.operation = operation;
+            this.op = op;
         }
 
         @Override
         protected void compute() {
             if (end - start <= THRESHOLD) {
-                operation.accept(op1, op2, dest, start, end);
+                op.accept(arg1, arg2, arg3, start, end);
             } else {
                 int mid = (start + end) / 2;
                 invokeAll(
-                        new TaskTwo(op1, op2, dest, start, mid, operation),
-                        new TaskTwo(op1, op2, dest, mid, end, operation));
+                        new Task3(arg1, arg2, arg3, start, mid, op),
+                        new Task3(arg1, arg2, arg3, mid, end, op));
             }
         }
 
