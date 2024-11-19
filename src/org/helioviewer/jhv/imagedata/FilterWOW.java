@@ -58,7 +58,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             // A trous transform
             pool.invoke(new ConvolutionTask(image, coeff, width, height, true, step)); // Horizontal pass
             pool.invoke(new ConvolutionTask(coeff, temp1, width, height, false, step)); // Vertical pass
-            pool.invoke(new ArrayOp.TaskTwo(image, temp1, coeff, 0, length, opSubtract)); // Coefficients
+            pool.invoke(new ArrayOp.Task3(image, temp1, coeff, 0, length, opSubtract)); // Coefficients
             System.arraycopy(temp1, 0, image, 0, length); // Update image for next scale
             // Whiten coefficients
             pool.invoke(new ConvolutionTask2(coeff, temp1, width, height, true, step)); // Squared src horizontal pass
@@ -67,15 +67,15 @@ class FilterWOW implements ImageFilter.Algorithm {
             if (scale == 0) {
                 noise = computeNoise(coeff, length);
                 float[] div = new float[]{1 / (3 * SIGMA_E0 * noise)};
-                pool.invoke(new ArrayOp.TaskTwo(div, null, coeff, 0, length, opDenoise));
+                pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
             } else if (scale == 1) {
                 float[] div = new float[]{1 / (1 * SIGMA_E1 * noise)};
-                pool.invoke(new ArrayOp.TaskTwo(div, null, coeff, 0, length, opDenoise));
+                pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
             }
             // Whitened synthesis
-            pool.invoke(new ArrayOp.TaskTwo(temp2, coeff, synth, 0, length, opSynthesis));
+            pool.invoke(new ArrayOp.Task3(temp2, coeff, synth, 0, length, opSynthesis));
         }
-        pool.invoke(new ArrayOp.TaskTwo(image, data, synth, 0, length, opMix));
+        pool.invoke(new ArrayOp.Task3(image, data, synth, 0, length, opMix));
         return synth;
     }
 
