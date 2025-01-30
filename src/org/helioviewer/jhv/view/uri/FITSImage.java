@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.ForkJoinTask;
+import java.util.stream.IntStream;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -109,27 +109,6 @@ class FITSImage implements URIImageReader {
         return Floats.toArray(sampleData);
     }
 
-    /*
-        private static float[] getMinMax(PixType pixType, int width, int height, Object[] pixData, long blank, double bzero, double bscale) {
-            float min = Float.MAX_VALUE;
-            float max = -Float.MAX_VALUE;
-
-            for (int j = 0; j < height; j++) {
-                Object lineData = pixData[j];
-                for (int i = 0; i < width; i++) {
-                    float v = getValue(pixType, lineData, i, blank, bzero, bscale);
-                    if (v != ImageBuffer.BAD_PIXEL) {
-                        if (v > max)
-                            max = v;
-                        if (v < min)
-                            min = v;
-                    }
-                }
-            }
-            return new float[]{min, max};
-        }
-    */
-
     // private static final double MIN_MULT = 0.0005;
     // private static final double MAX_MULT = 0.9995;
     private static final double MIN_MULT = 0.00001;
@@ -159,47 +138,67 @@ class FITSImage implements URIImageReader {
         double bzero = header.getDoubleValue(Standard.BZERO, 0);
         double bscale = header.getDoubleValue(Standard.BSCALE, 1);
 
-        float[] minMax = new float[]{header.getFloatValue("HV_DMIN", Float.MAX_VALUE), header.getFloatValue("HV_DMAX", Float.MAX_VALUE)};
-        if (minMax[0] == Float.MAX_VALUE || minMax[1] == Float.MAX_VALUE) {
+        float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
+        float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
+        if (min == Float.MAX_VALUE || max == Float.MAX_VALUE) {
             float[] sampleData = sampleImage(pixType, width, height, pixData, blank, bzero, bscale);
             int sampleLen = sampleData.length;
             if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                 return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
 
-            Arrays.sort(sampleData);
-            minMax = new float[]{
-                    sampleData[(int) (MIN_MULT * sampleLen)],
-                    sampleData[(int) (MAX_MULT * sampleLen)]};
-            // minMax = getMinMax(pixType, width, height, pixData, blank, bzero, bscale);
+            Arrays.parallelSort(sampleData);
+            min = sampleData[(int) (MIN_MULT * sampleLen)];
+            max = sampleData[(int) (MAX_MULT * sampleLen)];
         }
-        if (minMax[0] == minMax[1]) {
-            minMax[1] = minMax[0] + 1;
+        if (min == max) {
+            max = min + 1;
         }
-        // System.out.println(">>> " + minMax[0] + ' ' + minMax[1]);
+        // System.out.println(">>> " + min + ' ' + max);
 
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
 
-        //Stopwatch sw = Stopwatch.createStarted();
-        ArrayList<ForkJoinTask<?>> tasks = new ArrayList<>(height);
-        for (int j = 0; j < height; j++) {
-            Object lineData = pixData[j];
-            int outLine = width * (height - 1 - j);
+        double scale = switch (FITSSettings.conversionMode) {
+            case Gamma -> 65535. / fn_gamma(max - min);
+            case Beta -> 65535. / fn_beta(max - min);
+        };
+        final float[] minMax = new float[]{min, max};
 
-            switch (FITSSettings.conversionMode) {
-                case Gamma: {
-                    double scale = 65535. / fn_gamma(minMax[1] - minMax[0]);
-                    tasks.add(ForkJoinTask.adapt(new convert_gamma(pixType, width, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
-                    break;
+        //Stopwatch sw = Stopwatch.createStarted();
+        switch (FITSSettings.conversionMode) {
+            case Gamma -> IntStream.range(0, height).parallel().forEach(j -> {
+                Object lineData = pixData[j];
+                int outLine = width * (height - 1 - j);
+
+                for (int i = 0; i < width; i++) {
+                    float v = getValue(pixType, lineData, i, blank, bzero, bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outLine + i] = 0;
+                    } else {
+                        v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                        int p = (int) MathUtils.clip(scale * fn_gamma(v - minMax[0]) + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outLine + i] = (short) p;
+                    }
                 }
-                case Beta: {
-                    double scale = 65535. / fn_beta(minMax[1] - minMax[0]);
-                    tasks.add(ForkJoinTask.adapt(new convert_beta(pixType, width, lineData, blank, bzero, bscale, scale, minMax, lut, outData, outLine)).fork());
-                    break;
+            });
+            case Beta -> IntStream.range(0, height).parallel().forEach(j -> {
+                Object lineData = pixData[j];
+                int outLine = width * (height - 1 - j);
+
+                for (int i = 0; i < width; i++) {
+                    float v = getValue(pixType, lineData, i, blank, bzero, bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outLine + i] = 0;
+                    } else {
+                        v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                        int p = (int) MathUtils.clip(scale * fn_beta(v - minMax[0]) + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outLine + i] = (short) p;
+                    }
                 }
-            }
+            });
         }
-        tasks.forEach(ForkJoinTask::join);
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
     }
@@ -227,44 +226,6 @@ class FITSImage implements URIImageReader {
 
     private static double fn_beta(double x) {
         return MathUtils.asinh(x * FITSSettings.BETA);
-    }
-
-    private record convert_gamma(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
-                                 double scale, float[] minMax, float[] lut, short[] outData,
-                                 int outLine) implements Runnable {
-        @Override
-        public void run() {
-            for (int i = 0; i < width; i++) {
-                float v = getValue(pixType, lineData, i, blank, bzero, bscale);
-                if (v == ImageBuffer.BAD_PIXEL) {
-                    outData[outLine + i] = 0;
-                } else {
-                    v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                    int p = (int) MathUtils.clip(scale * fn_gamma(v - minMax[0]) + .5, 0, 65535);
-                    lut[p] = v;
-                    outData[outLine + i] = (short) p;
-                }
-            }
-        }
-    }
-
-    private record convert_beta(PixType pixType, int width, Object lineData, long blank, double bzero, double bscale,
-                                double scale, float[] minMax, float[] lut, short[] outData,
-                                int outLine) implements Runnable {
-        @Override
-        public void run() {
-            for (int i = 0; i < width; i++) {
-                float v = getValue(pixType, lineData, i, blank, bzero, bscale);
-                if (v == ImageBuffer.BAD_PIXEL) {
-                    outData[outLine + i] = 0;
-                } else {
-                    v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                    int p = (int) MathUtils.clip(scale * fn_beta(v - minMax[0]) + .5, 0, 65535);
-                    lut[p] = v;
-                    outData[outLine + i] = (short) p;
-                }
-            }
-        }
     }
 
     private static final String nl = System.lineSeparator();
