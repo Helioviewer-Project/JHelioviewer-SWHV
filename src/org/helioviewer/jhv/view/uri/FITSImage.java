@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import nom.tam.fits.BasicHDU;
@@ -20,7 +20,6 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.math.MathUtils;
 
 //import com.google.common.base.Stopwatch;
-import com.google.common.primitives.Floats;
 import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
@@ -93,10 +92,10 @@ class FITSImage implements URIImageReader {
     private static final int SAMPLE = 4;
     private static final int MIN_SAMPLES = 10;
 
-    private static float[] sampleImage(PixType pixType, int width, int height, Object[] pixData, long blank, double bzero, double bscale) {
+    private static List<Float> sampleImage(PixType pixType, int width, int height, Object[] pixData, long blank, double bzero, double bscale) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
-        ArrayList<Float> sampleData = new ArrayList<>((width / stepW) * (height / stepH));
+        List<Float> sampleData = new ArrayList<>((width / stepW) * (height / stepH));
 
         for (int j = 0; j < height; j += stepH) {
             Object lineData = pixData[j];
@@ -106,7 +105,8 @@ class FITSImage implements URIImageReader {
                     sampleData.add(v);
             }
         }
-        return Floats.toArray(sampleData);
+        sampleData.sort(null); // need only percentiles
+        return sampleData;
     }
 
     // private static final double MIN_MULT = 0.0005;
@@ -141,14 +141,13 @@ class FITSImage implements URIImageReader {
         float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
         float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
         if (min == Float.MAX_VALUE || max == Float.MAX_VALUE) {
-            float[] sampleData = sampleImage(pixType, width, height, pixData, blank, bzero, bscale);
-            int sampleLen = sampleData.length;
+            List<Float> sampleData = sampleImage(pixType, width, height, pixData, blank, bzero, bscale);
+            int sampleLen = sampleData.size();
             if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                 return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
 
-            Arrays.parallelSort(sampleData);
-            min = sampleData[(int) (MIN_MULT * sampleLen)];
-            max = sampleData[(int) (MAX_MULT * sampleLen)];
+            min = sampleData.get((int) (MIN_MULT * sampleLen));
+            max = sampleData.get((int) (MAX_MULT * sampleLen));
         }
         if (min == max) {
             max = min + 1;

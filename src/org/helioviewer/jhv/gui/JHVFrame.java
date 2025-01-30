@@ -149,19 +149,19 @@ public class JHVFrame {
         minSize.height = Math.min(minSize.height, maxSize.height);
 
         frame.setMinimumSize(minSize);
-        
+
         int preferredWidth = Optional.ofNullable(System.getenv("JHV_PREFERRED_WIDTH"))
                 .map(Integer::parseInt)
                 .filter(w -> w > 0)
                 .orElse(maxSize.width - 100);
-                
+
         int preferredHeight = Optional.ofNullable(System.getenv("JHV_PREFERRED_HEIGHT"))
                 .map(Integer::parseInt)
                 .filter(h -> h > 0)
                 .orElse(maxSize.height - 100);
-        
+
         frame.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
-        
+
         frame.setIconImage(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL).getImage());
 
         return frame;
