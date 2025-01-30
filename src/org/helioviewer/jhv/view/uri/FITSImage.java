@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import nom.tam.fits.BasicHDU;
@@ -95,18 +96,24 @@ class FITSImage implements URIImageReader {
     private static List<Float> sampleImage(PixType pixType, int width, int height, Object[] pixData, long blank, double bzero, double bscale) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
-        List<Float> sampleData = new ArrayList<>((width / stepW) * (height / stepH));
 
-        for (int j = 0; j < height; j += stepH) {
-            Object lineData = pixData[j];
-            for (int i = 0; i < width; i += stepW) {
-                float v = getValue(pixType, lineData, i, blank, bzero, bscale);
-                if (v != ImageBuffer.BAD_PIXEL)
-                    sampleData.add(v);
-            }
-        }
-        sampleData.sort(null); // need only percentiles
-        return sampleData;
+        return IntStream.range(0, height)
+                .filter(j -> j % stepH == 0)
+                .parallel()
+                .mapToObj(j -> {
+                    Object lineData = pixData[j];
+                    List<Float> rowSamples = new ArrayList<>();
+                    for (int i = 0; i < width; i += stepW) {
+                        float v = getValue(pixType, lineData, i, blank, bzero, bscale);
+                        if (v != ImageBuffer.BAD_PIXEL) {
+                            rowSamples.add(v);
+                        }
+                    }
+                    return rowSamples;
+                })
+                .flatMap(List::stream)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     // private static final double MIN_MULT = 0.0005;
