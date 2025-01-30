@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ForkJoinTask;
-import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.List;
 
 import org.helioviewer.jhv.math.MathUtils;
 
@@ -106,47 +106,45 @@ class FilterMGN implements ImageFilter.Algorithm {
     private static final float[] sigmas = {1, 4, 16, 64};
     private static final float[] weights = {0.125f, 0.25f, 0.5f, 1f};
 
-    private record ScaleTask(float[] data, int width, int height, float sigma, float weight)
-            implements Callable<float[]> {
-        @Override
-        public float[] call() {
-            GaussFilter filter = new GaussFilter(sigma, K, Math.max(width, height));
+    private float[] gaussNorm(float[] data, int width, int height, float sigma, float weight) {
+        GaussFilter filter = new GaussFilter(sigma, K, Math.max(width, height));
 
-            int size = width * height;
-            float[] conv = new float[size];
-            float[] conv2 = new float[size];
+        int size = width * height;
+        float[] conv = new float[size];
+        float[] conv2 = new float[size];
 
-            filter.gaussianConvImage(conv, data, width, height);
-            for (int i = 0; i < size; ++i) {
-                float v = data[i] - conv[i];
-                conv[i] = v;
-                conv2[i] = v * v;
-            }
-            filter.gaussianConvImage(conv2, conv2, width, height);
-
-            for (int i = 0; i < size; ++i)
-                conv[i] = conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
-
-            return conv;
+        filter.gaussianConvImage(conv, data, width, height);
+        for (int i = 0; i < size; ++i) {
+            float v = data[i] - conv[i];
+            conv[i] = v;
+            conv2[i] = v * v;
         }
+        filter.gaussianConvImage(conv2, conv2, width, height);
+
+        for (int i = 0; i < size; ++i)
+            conv[i] = conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
+
+        return conv;
     }
 
     @Override
     public float[] filter(float[] data, int width, int height) {
-        ArrayList<ForkJoinTask<float[]>> tasks = new ArrayList<>(sigmas.length);
-        for (int i = 0; i < sigmas.length; ++i)
-            tasks.add(ForkJoinTask.adapt(new ScaleTask(data, width, height, sigmas[i], weights[i])).fork());
+        // Process each sigma in parallel and collect results
+        List<float[]> results = IntStream.range(0, sigmas.length)
+                .parallel()
+                .mapToObj(i -> gaussNorm(data, width, height, sigmas[i], weights[i]))
+                .collect(Collectors.toList());
 
         int size = width * height;
         float[] image = new float[size];
-        for (ForkJoinTask<float[]> task : tasks) {
-            float[] res = task.join();
-            for (int i = 0; i < size; ++i)
-                image[i] += res[i];
-        }
-
-        for (int i = 0; i < size; ++i)
-            image[i] = (1 - MIX_FACTOR) * image[i] + MIX_FACTOR * data[i];
+        // Combine accumulation and blending in a single parallel pass
+        IntStream.range(0, size).parallel().forEach(i -> {
+            float sum = 0;
+            for (float[] res : results) {
+                sum += res[i];
+            }
+            image[i] = sum * (1 - MIX_FACTOR) + data[i] * MIX_FACTOR;
+        });
         return image;
     }
 
