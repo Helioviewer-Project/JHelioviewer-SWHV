@@ -174,10 +174,21 @@ class FilterWOW implements ImageFilter.Algorithm {
             for (int y = start; y < end; y++) {
                 for (int x = 0; x < width; x++) {
                     float sum = 0;
-                    for (int i = -2; i <= 2; i++) {
-                        int idx = mirroredIdx(x + i * step, width);
-                        sum += src[y * width + idx] * FILTER[i + 2];
-                    }
+                    // Unrolled loop for i = -2 to 2
+                    int idx_m2 = mirroredIdx(x - 2 * step, width);
+                    sum += src[y * width + idx_m2] * FILTER[0];
+
+                    int idx_m1 = mirroredIdx(x - step, width);
+                    sum += src[y * width + idx_m1] * FILTER[1];
+
+                    sum += src[y * width + x] * FILTER[2];
+
+                    int idx_p1 = mirroredIdx(x + step, width);
+                    sum += src[y * width + idx_p1] * FILTER[3];
+
+                    int idx_p2 = mirroredIdx(x + 2 * step, width);
+                    sum += src[y * width + idx_p2] * FILTER[4];
+
                     dest[y * width + x] = sum;
                 }
             }
@@ -187,10 +198,21 @@ class FilterWOW implements ImageFilter.Algorithm {
             for (int x = start; x < end; x++) {
                 for (int y = 0; y < height; y++) {
                     float sum = 0;
-                    for (int i = -2; i <= 2; i++) {
-                        int idx = mirroredIdx(y + i * step, height);
-                        sum += src[idx * width + x] * FILTER[i + 2];
-                    }
+                    // Unrolled loop for i = -2 to 2
+                    int idx_m2 = mirroredIdx(y - 2 * step, height);
+                    sum += src[idx_m2 * width + x] * FILTER[0];
+
+                    int idx_m1 = mirroredIdx(y - step, height);
+                    sum += src[idx_m1 * width + x] * FILTER[1];
+
+                    sum += src[y * width + x] * FILTER[2];
+
+                    int idx_p1 = mirroredIdx(y + step, height);
+                    sum += src[idx_p1 * width + x] * FILTER[3];
+
+                    int idx_p2 = mirroredIdx(y + 2 * step, height);
+                    sum += src[idx_p2 * width + x] * FILTER[4];
+
                     dest[y * width + x] = sum;
                 }
             }
@@ -229,11 +251,26 @@ class FilterWOW implements ImageFilter.Algorithm {
             for (int y = start; y < end; y++) {
                 for (int x = 0; x < width; x++) {
                     float sum = 0;
-                    for (int i = -2; i <= 2; i++) {
-                        int idx = mirroredIdx(x + i * step, width);
-                        float v = src[y * width + idx];
-                        sum += v * v * FILTER[i + 2];
-                    }
+                    // Unrolled loop for i = -2 to 2
+                    int idx_m2 = mirroredIdx(x - 2 * step, width);
+                    float v_m2 = src[y * width + idx_m2];
+                    sum += v_m2 * v_m2 * FILTER[0];
+
+                    int idx_m1 = mirroredIdx(x - step, width);
+                    float v_m1 = src[y * width + idx_m1];
+                    sum += v_m1 * v_m1 * FILTER[1];
+
+                    float v0 = src[y * width + x];
+                    sum += v0 * v0 * FILTER[2];
+
+                    int idx_p1 = mirroredIdx(x + step, width);
+                    float v_p1 = src[y * width + idx_p1];
+                    sum += v_p1 * v_p1 * FILTER[3];
+
+                    int idx_p2 = mirroredIdx(x + 2 * step, width);
+                    float v_p2 = src[y * width + idx_p2];
+                    sum += v_p2 * v_p2 * FILTER[4];
+
                     dest[y * width + x] = sum;
                 }
             }
