@@ -9,8 +9,49 @@ import org.helioviewer.jhv.math.MathUtils;
 @SuppressWarnings("serial")
 class FilterWOW implements ImageFilter.Algorithm {
 
+    private interface ArrayOp {
+
+        void accept(float[] arg1, float[] arg2, float[] arg3, int start, int end);
+
+        int THRESHOLD = 64; // Adjust based on image size and system
+
+        class Task3 extends RecursiveAction {
+
+            private final float[] arg1;
+            private final float[] arg2;
+            private final float[] arg3;
+            private final int start;
+            private final int end;
+            private final ArrayOp op;
+
+            Task3(float[] arg1, float[] arg2, float[] arg3, int start, int end, ArrayOp op) {
+                this.arg1 = arg1;
+                this.arg2 = arg2;
+                this.arg3 = arg3;
+                this.start = start;
+                this.end = end;
+                this.op = op;
+            }
+
+            @Override
+            protected void compute() {
+                if (end - start <= THRESHOLD) {
+                    op.accept(arg1, arg2, arg3, start, end);
+                } else {
+                    int mid = (start + end) / 2;
+                    invokeAll(
+                            new Task3(arg1, arg2, arg3, start, mid, op),
+                            new Task3(arg1, arg2, arg3, mid, end, op));
+                }
+            }
+
+        }
+
+    }
+
     private static final int SCALES = 6;
     private static final float MIX_FACTOR = 0.99f;
+    private static final float ONE_MINUS_MIX_FACTOR = 1f - MIX_FACTOR;
     private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
     private static final float SIGMA_E0 = 8.907e-1f;
     private static final float SIGMA_E1 = 2.0072e-1f;
@@ -37,7 +78,7 @@ class FilterWOW implements ImageFilter.Algorithm {
 
     private static final ArrayOp opMix = (op1, op2, dest, start, end) -> {
         for (int i = start; i < end; i++) {
-            dest[i] = (1 - MIX_FACTOR) * (dest[i] + op1[i]) + MIX_FACTOR * op2[i];
+            dest[i] = (dest[i] + op1[i]) * ONE_MINUS_MIX_FACTOR + op2[i] * MIX_FACTOR;
         }
     };
 

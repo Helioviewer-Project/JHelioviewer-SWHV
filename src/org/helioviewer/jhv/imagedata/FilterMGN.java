@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.List;
 
@@ -103,6 +102,7 @@ class FilterMGN implements ImageFilter.Algorithm {
 
     private static final int K = 3;
     private static final float MIX_FACTOR = 0.97f;
+    private static final float ONE_MINUS_MIX_FACTOR = 1f - MIX_FACTOR;
     private static final float[] sigmas = {1, 4, 16, 64};
     private static final float[] weights = {0.125f, 0.25f, 0.5f, 1f};
 
@@ -133,7 +133,7 @@ class FilterMGN implements ImageFilter.Algorithm {
         List<float[]> results = IntStream.range(0, sigmas.length)
                 .parallel()
                 .mapToObj(i -> gaussNorm(data, width, height, sigmas[i], weights[i]))
-                .collect(Collectors.toList());
+                .toList();
 
         int size = width * height;
         float[] image = new float[size];
@@ -143,7 +143,7 @@ class FilterMGN implements ImageFilter.Algorithm {
             for (float[] res : results) {
                 sum += res[i];
             }
-            image[i] = sum * (1 - MIX_FACTOR) + data[i] * MIX_FACTOR;
+            image[i] = sum * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
         });
         return image;
     }

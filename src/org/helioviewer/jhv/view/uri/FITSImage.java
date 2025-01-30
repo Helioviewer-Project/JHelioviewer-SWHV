@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import nom.tam.fits.BasicHDU;
@@ -113,7 +112,7 @@ class FITSImage implements URIImageReader {
                 })
                 .flatMap(List::stream)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // private static final double MIN_MULT = 0.0005;
