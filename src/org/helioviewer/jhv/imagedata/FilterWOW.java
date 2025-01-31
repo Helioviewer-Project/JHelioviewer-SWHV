@@ -2,6 +2,7 @@ package org.helioviewer.jhv.imagedata;
 
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.IntStream;
 import java.util.Arrays;
 
 import org.helioviewer.jhv.math.MathUtils;
@@ -76,12 +77,6 @@ class FilterWOW implements ImageFilter.Algorithm {
         }
     };
 
-    private static final ArrayOp opMix = (op1, op2, dest, start, end) -> {
-        for (int i = start; i < end; i++) {
-            dest[i] = (dest[i] + op1[i]) * ONE_MINUS_MIX_FACTOR + op2[i] * MIX_FACTOR;
-        }
-    };
-
     @Override
     public float[] filter(float[] data, int width, int height) {
         float[] image = data.clone();
@@ -116,15 +111,14 @@ class FilterWOW implements ImageFilter.Algorithm {
             // Whitened synthesis
             pool.invoke(new ArrayOp.Task3(temp2, coeff, synth, 0, length, opSynthesis));
         }
-        pool.invoke(new ArrayOp.Task3(image, data, synth, 0, length, opMix));
+        IntStream.range(0, length).parallel().forEach(i -> synth[i] = (synth[i] + image[i]) * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR);
         return synth;
     }
 
     private static float computeNoise(float[] c, int length) {
         float[] w = new float[length];
-        for (int i = 0; i < length; i++)
-            w[i] = Math.abs(c[i]);
-        Arrays.parallelSort(w);
+        IntStream.range(0, length).parallel().forEach(i -> w[i] = Math.abs(c[i]));
+        Arrays.parallelSort(w); // can be faster than serial quickSelect
         return w[length / 2] * 1.48260221850560f / SIGMA_E0;
     }
 
