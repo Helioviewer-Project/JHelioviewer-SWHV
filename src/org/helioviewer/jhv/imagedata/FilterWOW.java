@@ -101,7 +101,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             pool.invoke(new ConvolutionTask(temp1, temp2, width, height, false, step)); // Vertical pass
             // Denoise stage
             if (scale == 0) {
-                noise = computeNoise(coeff, length);
+                noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
                 float[] div = new float[]{1 / (3 * SIGMA_E0 * noise)};
                 pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
             } else if (scale == 1) {
@@ -115,11 +115,21 @@ class FilterWOW implements ImageFilter.Algorithm {
         return synth;
     }
 
-    private static float computeNoise(float[] c, int length) {
+    private static float median(float[] c, int length) {
         float[] w = new float[length];
         IntStream.range(0, length).parallel().forEach(i -> w[i] = Math.abs(c[i]));
         Arrays.parallelSort(w); // can be faster than serial quickSelect
-        return w[length / 2] * 1.48260221850560f / SIGMA_E0;
+        return w[length / 2];
+    }
+
+    private static float medianStream(float[] c, int length) {
+        return (float) IntStream.range(0, length)
+                .parallel()
+                .mapToDouble(i -> Math.abs(c[i]))
+                .sorted()
+                .skip(length / 2)
+                .findFirst()
+                .getAsDouble();
     }
 
     private static class ConvolutionTask extends RecursiveAction {
