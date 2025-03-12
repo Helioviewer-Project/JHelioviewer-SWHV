@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="11.0.2" transformSequenceNumber="11">
   <directoryPresets config="../../../../AuthKey_865FMBWJ27.p8" />
-  <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="https://www.jhelioviewer.org" version="4.7.1" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="21" javaMaxVersion="22" jdkMode="jdk">
+  <application name="JHelioviewer" applicationId="6448-7333-6138-9110" mediaDir="./builds" compression="9" lzmaCompression="true" shortName="JHelioviewer" publisher="ESA JHelioviewer Team" publisherWeb="https://www.jhelioviewer.org" version="4.7.2" allPathsRelative="true" macVolumeId="7ed177551bd348bc" javaMinVersion="21" javaMaxVersion="22" jdkMode="jdk">
     <codeSigning macEnabled="true" macPkcs12File="~/Certificates.p12" macNotarize="true" macApiIssuer="69a6de86-af15-47e3-e053-5b8c7c11a4d1" macApiKey="865FMBWJ27" macApiPrivateKey="../../../../AuthKey_865FMBWJ27.p8">
       <macAdditionalBinaries>
         <entry>*.dylib</entry>
