@@ -20,6 +20,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.math.MathUtils;
 
 //import com.google.common.base.Stopwatch;
+import com.google.common.primitives.Floats;
 import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
@@ -152,8 +153,17 @@ class FITSImage implements URIImageReader {
             if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                 return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
 
-            min = sampleData.get((int) (MIN_MULT * sampleLen));
-            max = sampleData.get((int) (MAX_MULT * sampleLen));
+            if (FITSSettings.ZScale) {
+                float[] zLow = {0};
+                float[] zHigh = {0};
+                float[] zMax = {0};
+                ZScale.zscale(Floats.toArray(sampleData), sampleLen, zLow, zHigh, zMax);
+                min = zLow[0];
+                max = zHigh[0];
+            } else {
+                min = sampleData.get((int) (MIN_MULT * sampleLen));
+                max = sampleData.get((int) (MAX_MULT * sampleLen));
+            }
         }
         if (min == max) {
             max = min + 1;
