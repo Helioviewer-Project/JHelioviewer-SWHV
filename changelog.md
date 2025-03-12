@@ -3,6 +3,8 @@
 
 ## JHelioviewer 4.7.2 (pending)
 
+- Add option of ZScale scaling algorithm for FITS data
+
 ## JHelioviewer 4.7.1 (2025-03-12)
 
 - Add wavelet-optimized whitening (WOW, <https://doi.org/10.1051/0004-6361/202245345>) image enhancement

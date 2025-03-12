@@ -6,6 +6,7 @@ import java.awt.Window;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,6 +32,7 @@ public class FITSSettings {
     static ConversionMode conversionMode = ConversionMode.Gamma;
     static double GAMMA = 1. / 2.2;
     static double BETA = 1. / (1 << 6);
+    static boolean ZScale = false;
 
     public static final class SettingsDialog extends JDialog implements Interfaces.ShowableDialog {
 
@@ -86,6 +88,15 @@ public class FITSSettings {
                 }
             });
 
+            JCheckBox scaleCheck = new JCheckBox("ZScale", false);
+            scaleCheck.addActionListener(e -> {
+                ZScale = scaleCheck.isSelected();
+                refresh();
+            });
+
+            JPanel scalePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+            scalePanel.add(scaleCheck);
+
             JPanel gammaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
             gammaPanel.add(gammaButton);
             gammaPanel.add(gammaSlider);
@@ -98,7 +109,8 @@ public class FITSSettings {
 
             JPanel content = new JPanel(new BorderLayout());
             content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-            content.add(gammaPanel, BorderLayout.NORTH);
+            content.add(scalePanel, BorderLayout.NORTH);
+            content.add(gammaPanel, BorderLayout.CENTER);
             content.add(betaPanel, BorderLayout.SOUTH);
             add(content);
         }
