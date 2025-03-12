@@ -1,7 +1,7 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7.1 (pending)
+## JHelioviewer 4.7.1 (2025-03-12)
 
 - Add wavelet-optimized whitening (WOW, <https://doi.org/10.1051/0004-6361/202245345>) image enhancement
 - Adjust the parameters of MGN image enhancement to bring it closer to WOW results
