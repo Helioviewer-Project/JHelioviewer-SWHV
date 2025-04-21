@@ -22,9 +22,8 @@ public class JHVThread {
     }
 
     public static void afterExecute(Runnable r, Throwable t) {
-        if (t == null && r instanceof Future<?>) {
+        if (t == null && r instanceof Future<?> future) {
             try {
-                Future<?> future = (Future<?>) r;
                 if (future.isDone()) {
                     future.get();
                 }
