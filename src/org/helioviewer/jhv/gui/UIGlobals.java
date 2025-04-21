@@ -18,6 +18,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 //import javax.swing.plaf.FontUIResource;
 
+import org.helioviewer.jhv.DisplaySettings;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
@@ -27,7 +28,7 @@ public class UIGlobals {
 
     public static void setLaf() {
         try {
-            com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme.setup();
+            DisplaySettings.enableUITheme();
             com.jidesoft.plaf.LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             Log.error(e);
