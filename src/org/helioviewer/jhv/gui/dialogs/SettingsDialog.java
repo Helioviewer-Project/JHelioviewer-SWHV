@@ -144,7 +144,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         settings.add(normalizeRadius, c);
 
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        timePanel.add(new JLabel("Use time at", JLabel.RIGHT));
+        timePanel.add(new JLabel("Use time at ", JLabel.RIGHT));
         ButtonGroup timeModeGroup = new ButtonGroup();
         DisplaySettings.TimeMode timeMode = DisplaySettings.getTimeMode();
         for (DisplaySettings.TimeMode mode : DisplaySettings.TimeMode.values()) {
