@@ -236,7 +236,7 @@ class FITSImage implements URIImageReader {
     }
 
     private static double fn_gamma(double x) {
-        return MathUtils.pow(x, FITSSettings.GAMMA);
+        return Math.pow(x, FITSSettings.GAMMA);
     }
 
     private static double fn_beta(double x) {
