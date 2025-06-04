@@ -16,10 +16,10 @@ public class InnerMaskPanel implements FilterDetails {
     private final JLabel title = new JLabel("Mask ", JLabel.RIGHT);
 
     public InnerMaskPanel(ImageLayer layer) {
-        slider = new JHVSlider(0, GLImage.MAX_INNER * 10, (int) (layer.getGLImage().getInnerMask() * 10));
-        label = new JLabel(formatFloat(slider.getValue() / 10.), JLabel.RIGHT);
+        slider = new JHVSlider(0, GLImage.MAX_INNER * 100, (int) (layer.getGLImage().getInnerMask() * 100));
+        label = new JLabel(formatFloat(slider.getValue() / 100.), JLabel.RIGHT);
         slider.addChangeListener(e -> {
-            double value = slider.getValue() / 10.;
+            double value = slider.getValue() / 100.;
             layer.getGLImage().setInnerMask(value);
             label.setText(formatFloat(value));
             MovieDisplay.display();
@@ -27,7 +27,7 @@ public class InnerMaskPanel implements FilterDetails {
     }
 
     private static String formatFloat(double value) {
-        return "<html><p align='right'>" + String.format("%.1f", value) + "R\u2609</p>";
+        return "<html><p align='right'>" + String.format("%.2f", value) + "R\u2609</p>";
     }
 
     @Override
