@@ -143,13 +143,13 @@ class ImageLayerOptions extends JPanel {
         add(details.getFirst(), c);
 
         c.gridx = 1;
-        c.weightx = 1;
+        c.weightx = 0;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.HORIZONTAL;
         add(details.getSecond(), c);
 
         c.gridx = 2;
-        c.weightx = 0;
+        c.weightx = 1;
         c.anchor = GridBagConstraints.LINE_END;
         c.fill = GridBagConstraints.NONE;
         add(details.getThird(), c);
