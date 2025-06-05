@@ -49,7 +49,7 @@ uniform float cutOffValue;
 #define FSIZE 3 * 3
 uniform vec3 sharpen;
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
-// http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+// https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 const float[] bc = float[](.30613, .38774, .30613);
 const float[] blurKernel = float[](
     bc[0] * bc[0], bc[0] * bc[1], bc[0] * bc[2],
@@ -66,6 +66,15 @@ const vec2[] blurOffset = vec2[](
 
 float fetch(const sampler2D tex, const vec2 coord, const vec3 bright) {
     return /*pow(texture2D(tex, coord).r, bright.z)*/ texture(tex, coord).r * bright.y + bright.x;
+}
+
+// https://shader-tutorial.dev/advanced/color-banding-dithering/
+const float NOISE_GRANULARITY = 1. / 255.;
+const vec2 nvec = vec2(12.9898, 78.233);
+
+float dither(const vec2 coord) {
+    float random = fract(sin(dot(coord, nvec)) * 43758.5453);
+    return mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random);
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
