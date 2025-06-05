@@ -3,6 +3,7 @@ package org.helioviewer.jhv;
 public class DisplaySettings {
 
     public enum TimeMode {Observer, Sun, Earth}
+
     public enum UITheme {Dark, Light}
 
     private static boolean normalizeAIA;
