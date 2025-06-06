@@ -60,7 +60,7 @@ public class FITSSettings {
 
             int gammaDefault = (int) (10. / GAMMA);
             int betaDefault = (int) (Math.log(1 / BETA) / Math.log(2));
-            int alphaDefault = 3;
+            int alphaDefault = (int) (Math.log10(ALPHA));
             JHVSlider gammaSlider = new JHVSlider(10, 40, gammaDefault);
             JLabel gammaLabel = new JLabel(String.valueOf(gammaDefault / 10.), JLabel.RIGHT);
             JHVSlider betaSlider = new JHVSlider(1, 12, betaDefault);
