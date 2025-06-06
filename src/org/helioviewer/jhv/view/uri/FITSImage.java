@@ -253,9 +253,7 @@ class FITSImage implements URIImageReader {
             String key = headerCard.getKey().trim();
             if ("END".equals(key))
                 continue;
-            if (key.isEmpty())
-                key = "COMMENT";
-            key = key.replace("$", "-"); // allow illegal keyword character in FITS saved by IDL
+            key = key.isEmpty() ? "COMMENT" : key.replace("$", "-"); // allow illegal keyword character in FITS saved by IDL
 
             String value = headerCard.getValue();
             String val = value == null ? "" : XmlEscapers.xmlContentEscaper().escape(value);

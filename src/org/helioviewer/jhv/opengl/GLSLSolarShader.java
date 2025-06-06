@@ -178,7 +178,7 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(sharpenRef, 1, floatArr, 0);
     }
 
-    public void bindEnhanced(GL2 gl, boolean enhanced) {
+    public void bindDitherEnhanced(GL2 gl, boolean dither, boolean enhanced) {
         intArr[0] = enhanced ? 1 : 0;
         gl.glUniform1iv(enhancedRef, 1, intArr, 0);
     }

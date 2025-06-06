@@ -25,14 +25,22 @@ public class LUTPanel implements FilterDetails {
         lutCombo = new LUTComboBox();
         JideToggleButton invertButton = new JideToggleButton(Buttons.invert, layer.getGLImage().getInvertLUT());
         invertButton.setToolTipText("Invert color table");
-
         ActionListener listener = e -> {
             layer.getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
             MovieDisplay.display();
         };
         lutCombo.addActionListener(listener);
         invertButton.addActionListener(listener);
-        buttonPanel.add(invertButton, BorderLayout.LINE_END);
+
+        JideToggleButton ditherButton = new JideToggleButton(Buttons.dither, layer.getGLImage().getDither());
+        ditherButton.setToolTipText("Dither");
+        ditherButton.addActionListener(e -> {
+            layer.getGLImage().setDither(ditherButton.isSelected());
+            MovieDisplay.display();
+        });
+
+        buttonPanel.add(invertButton, BorderLayout.LINE_START);
+        buttonPanel.add(ditherButton, BorderLayout.LINE_END);
     }
 
     public void setLUT(LUT lut) {

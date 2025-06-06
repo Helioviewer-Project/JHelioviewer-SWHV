@@ -49,6 +49,7 @@ public class Buttons {
     public static final String mgn = button(MaterialDesign.IMAGE_FILTER_HDR);
 
     public static final String invert = button(MaterialDesign.INVERT_COLORS);
+    public static final String dither = button(MaterialDesign.BLUR);
     public static final String corona = button(MaterialDesign.WHITE_BALANCE_SUNNY);
 
     public static final String calendar = button(MaterialDesign.CALENDAR);
