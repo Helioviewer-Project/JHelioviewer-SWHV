@@ -17,7 +17,7 @@ out vec4 outColor;
 uniform sampler2D image;
 uniform int calculateDepth;
 uniform int isdifference;
-uniform int enhanced;
+uniform int ditherEnhanced[2];
 uniform sampler2D diffImage;
 
 uniform sampler1D lut;
@@ -79,7 +79,7 @@ float dither(const vec2 coord) {
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
     vec3 b = brightness;
-    if (enhanced == 1) {
+    if (ditherEnhanced[1] == 1) {
         b.y *= factor * factor * factor;
     }
 
@@ -100,6 +100,9 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
         conv = conv * BOOST + 0.5;
     }
     v = mix(v, conv, sharpen.z);
+    if (ditherEnhanced[0] == 1) {
+        v += dither(texcoord);
+    }
 
     return texture(lut, v) * color;
 }
