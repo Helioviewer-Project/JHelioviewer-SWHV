@@ -21,7 +21,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 public class FITSSettings {
 
     enum ConversionMode {
-        Gamma, Beta
+        Gamma, Beta, Alpha
     }
 
     private static void refresh() {
@@ -32,6 +32,7 @@ public class FITSSettings {
     static ConversionMode conversionMode = ConversionMode.Gamma;
     static double GAMMA = 1. / 2.2;
     static double BETA = 1. / (1 << 6);
+    static double ALPHA = Math.pow(10, 3);
     static boolean ZScale = false;
 
     public static final class SettingsDialog extends JDialog implements Interfaces.ShowableDialog {
@@ -48,17 +49,24 @@ public class FITSSettings {
             JRadioButton betaButton = new JRadioButton("\u03B2");
             betaButton.setToolTipText("<html><body>asinh( pixel / 2<sup>\u03B2</sup> )");
             betaButton.setSelected(false);
+            JRadioButton alphaButton = new JRadioButton("\u03B1");
+            alphaButton.setToolTipText("<html><body>log<sub>10<sup>alpha</sup></sub>(pixel)");
+            alphaButton.setSelected(false);
 
             ButtonGroup functionGroup = new ButtonGroup();
             functionGroup.add(gammaButton);
             functionGroup.add(betaButton);
+            functionGroup.add(alphaButton);
 
             int gammaDefault = (int) (10. / GAMMA);
             int betaDefault = (int) (Math.log(1 / BETA) / Math.log(2));
+            int alphaDefault = 3;
             JHVSlider gammaSlider = new JHVSlider(10, 40, gammaDefault);
             JLabel gammaLabel = new JLabel(String.valueOf(gammaDefault / 10.), JLabel.RIGHT);
             JHVSlider betaSlider = new JHVSlider(1, 12, betaDefault);
             JLabel betaLabel = new JLabel(String.valueOf(betaDefault), JLabel.RIGHT);
+            JHVSlider alphaSlider = new JHVSlider(1, 5, alphaDefault);
+            JLabel alphaLabel = new JLabel(String.valueOf(alphaDefault), JLabel.RIGHT);
 
             gammaSlider.addChangeListener(e -> {
                 int value = gammaSlider.getValue();
@@ -74,6 +82,13 @@ public class FITSSettings {
                 if (betaButton.isSelected())
                     refresh();
             });
+            alphaSlider.addChangeListener(e -> {
+                int value = alphaSlider.getValue();
+                ALPHA = Math.pow(10, value);
+                alphaLabel.setText(String.valueOf(value));
+                if (alphaButton.isSelected())
+                    refresh();
+            });
 
             gammaButton.addItemListener(e -> {
                 if (gammaButton.isSelected()) {
@@ -84,6 +99,12 @@ public class FITSSettings {
             betaButton.addItemListener(e -> {
                 if (betaButton.isSelected()) {
                     conversionMode = ConversionMode.Beta;
+                    refresh();
+                }
+            });
+            alphaButton.addItemListener(e -> {
+                if (alphaButton.isSelected()) {
+                    conversionMode = ConversionMode.Alpha;
                     refresh();
                 }
             });
@@ -101,17 +122,24 @@ public class FITSSettings {
             gammaPanel.add(gammaButton);
             gammaPanel.add(gammaSlider);
             gammaPanel.add(gammaLabel);
-
             JPanel betaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
             betaPanel.add(betaButton);
             betaPanel.add(betaSlider);
             betaPanel.add(betaLabel);
+            JPanel alphaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+            alphaPanel.add(alphaButton);
+            alphaPanel.add(alphaSlider);
+            alphaPanel.add(alphaLabel);
+
+            JPanel radios = new JPanel(new BorderLayout());
+            radios.add(gammaPanel, BorderLayout.NORTH);
+            radios.add(betaPanel, BorderLayout.CENTER);
+            radios.add(alphaPanel, BorderLayout.SOUTH);
 
             JPanel content = new JPanel(new BorderLayout());
             content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
             content.add(scalePanel, BorderLayout.NORTH);
-            content.add(gammaPanel, BorderLayout.CENTER);
-            content.add(betaPanel, BorderLayout.SOUTH);
+            content.add(radios, BorderLayout.CENTER);
             add(content);
         }
 
