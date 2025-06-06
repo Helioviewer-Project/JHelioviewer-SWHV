@@ -37,7 +37,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int brightRef;
     private int colorRef;
     private int sharpenRef;
-    private int enhancedRef;
+    private int ditherEnhancedRef;
     private int calculateDepthRef;
 
     private int viewportRef;
@@ -46,7 +46,7 @@ public class GLSLSolarShader extends GLSLShader {
     private int cameraTransformationInverseRef;
     private int cameraDifferenceRef;
 
-    private final int[] intArr = new int[1];
+    private final int[] intArr = new int[2];
     private final float[] floatArr = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
@@ -83,7 +83,7 @@ public class GLSLSolarShader extends GLSLShader {
         slitRef = gl.glGetUniformLocation(id, "slit");
         brightRef = gl.glGetUniformLocation(id, "brightness");
         colorRef = gl.glGetUniformLocation(id, "color");
-        enhancedRef = gl.glGetUniformLocation(id, "enhanced");
+        ditherEnhancedRef = gl.glGetUniformLocation(id, "ditherEnhanced");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         rectRef = gl.glGetUniformLocation(id, "rect");
@@ -179,8 +179,9 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindDitherEnhanced(GL2 gl, boolean dither, boolean enhanced) {
-        intArr[0] = enhanced ? 1 : 0;
-        gl.glUniform1iv(enhancedRef, 1, intArr, 0);
+        intArr[0] = dither ? 1 : 0;
+        intArr[1] = enhanced ? 1 : 0;
+        gl.glUniform1iv(ditherEnhancedRef, 2, intArr, 0);
     }
 
     public void bindCalculateDepth(GL2 gl, boolean calculateDepth) {
