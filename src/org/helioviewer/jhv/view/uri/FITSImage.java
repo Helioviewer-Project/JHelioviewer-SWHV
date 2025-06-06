@@ -176,6 +176,7 @@ class FITSImage implements URIImageReader {
         double scale = switch (FITSSettings.conversionMode) {
             case Gamma -> 65535. / fn_gamma(max - min);
             case Beta -> 65535. / fn_beta(max - min);
+            case Alpha -> 65535. / fn_alpha(1);
         };
         final float[] minMax = new float[]{min, max};
 
@@ -213,6 +214,22 @@ class FITSImage implements URIImageReader {
                     }
                 }
             });
+            case Alpha -> IntStream.range(0, height).parallel().forEach(j -> {
+                Object lineData = pixData[j];
+                int outLine = width * (height - 1 - j);
+
+                for (int i = 0; i < width; i++) {
+                    float v = getValue(pixType, lineData, i, blank, bzero, bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outLine + i] = 0;
+                    } else {
+                        v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                        int p = (int) MathUtils.clip(scale * fn_alpha((v - minMax[0]) / (minMax[1] - minMax[0])) + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outLine + i] = (short) p;
+                    }
+                }
+            });
         }
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
@@ -241,6 +258,10 @@ class FITSImage implements URIImageReader {
 
     private static double fn_beta(double x) {
         return MathUtils.asinh(x * FITSSettings.BETA);
+    }
+
+    private static double fn_alpha(double x) {
+        return Math.log1p(x * FITSSettings.ALPHA);
     }
 
     private static final String nl = System.lineSeparator();
