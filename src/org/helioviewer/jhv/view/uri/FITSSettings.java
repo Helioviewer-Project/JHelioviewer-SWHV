@@ -50,7 +50,7 @@ public class FITSSettings {
             betaButton.setToolTipText("<html><body>asinh( pixel / 2<sup>\u03B2</sup> )");
             betaButton.setSelected(false);
             JRadioButton alphaButton = new JRadioButton("\u03B1");
-            alphaButton.setToolTipText("<html><body>log<sub>10<sup>alpha</sup></sub>(pixel)");
+            alphaButton.setToolTipText("<html><body>log<sub>10<sup>\u03B1</sup></sub>(pixel)");
             alphaButton.setSelected(false);
 
             ButtonGroup functionGroup = new ButtonGroup();
