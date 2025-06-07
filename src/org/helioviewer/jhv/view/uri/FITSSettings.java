@@ -47,10 +47,10 @@ public class FITSSettings {
             gammaButton.setToolTipText("<html><body>pixel<sup>1/\u03B3</sup>");
             gammaButton.setSelected(true);
             JRadioButton betaButton = new JRadioButton("\u03B2");
-            betaButton.setToolTipText("<html><body>asinh( pixel / 2<sup>\u03B2</sup> )");
+            betaButton.setToolTipText("<html><body>asinh(pixel / 2<sup>\u03B2</sup>)");
             betaButton.setSelected(false);
             JRadioButton alphaButton = new JRadioButton("\u03B1");
-            alphaButton.setToolTipText("<html><body>log<sub>10<sup>\u03B1</sup></sub>(pixel)");
+            alphaButton.setToolTipText("<html><body>log1p(10<sup>\u03B1</sup>\u22C5pixel) / log1p(10<sup>\u03B1</sup>)");
             alphaButton.setSelected(false);
 
             ButtonGroup functionGroup = new ButtonGroup();
