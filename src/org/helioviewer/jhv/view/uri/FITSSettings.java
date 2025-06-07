@@ -109,7 +109,7 @@ public class FITSSettings {
                 }
             });
 
-            JCheckBox scaleCheck = new JCheckBox("ZScale", false);
+            JCheckBox scaleCheck = new JCheckBox("ZScale clipping", false);
             scaleCheck.addActionListener(e -> {
                 ZScale = scaleCheck.isSelected();
                 refresh();
