@@ -3,7 +3,8 @@
 
 ## JHelioviewer 4.7.2 (pending)
 
-- Add option of ZScale scaling algorithm for FITS data
+- Add option of ZScale clipping algorithm for FITS data
+- Add logarithmic scaling for FITS data
 
 ## JHelioviewer 4.7.1 (2025-03-12)
 
