@@ -5,7 +5,7 @@ import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class GLSLSolarShader extends GLSLShader {
 
@@ -54,7 +54,7 @@ public class GLSLSolarShader extends GLSLShader {
         hasCommon = _hasCommon;
     }
 
-    public static void init(GL2 gl) {
+    public static void init(GL3 gl) {
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
         lati._init(gl, lati.hasCommon);
@@ -63,7 +63,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     @Override
-    protected void initUniforms(GL2 gl, int id) {
+    protected void initUniforms(GL3 gl, int id) {
         isDiffRef = gl.glGetUniformLocation(id, "isdifference");
 
         gridRef = gl.glGetUniformLocation(id, "grid");
@@ -100,7 +100,7 @@ public class GLSLSolarShader extends GLSLShader {
         }
     }
 
-    public static void dispose(GL2 gl) {
+    public static void dispose(GL3 gl) {
         sphere._dispose(gl);
         ortho._dispose(gl);
         lati._dispose(gl);
@@ -108,17 +108,17 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._dispose(gl);
     }
 
-    public void bindInverseCamera(GL2 gl) {
+    public void bindInverseCamera(GL3 gl) {
         gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, Transform.getInverse());
     }
 
-    public void bindCameraDifference(GL2 gl, Quat quat, Quat quatDiff) {
+    public void bindCameraDifference(GL3 gl, Quat quat, Quat quatDiff) {
         quat.setFloatArray(floatArr, 0);
         quatDiff.setFloatArray(floatArr, 4);
         gl.glUniform4fv(cameraDifferenceRef, 2, floatArr, 0);
     }
 
-    public void bindCRVAL(GL2 gl, Vec2 vec, Vec2 vecDiff) {
+    public void bindCRVAL(GL3 gl, Vec2 vec, Vec2 vecDiff) {
         floatArr[0] = (float) vec.x;
         floatArr[1] = (float) vec.y;
         floatArr[2] = (float) vecDiff.x;
@@ -126,13 +126,13 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform2fv(crvalRef, 2, floatArr, 0);
     }
 
-    public void bindCROTA(GL2 gl, Quat quat, Quat quatDiff) {
+    public void bindCROTA(GL3 gl, Quat quat, Quat quatDiff) {
         quat.setFloatArray(floatArr, 0);
         quatDiff.setFloatArray(floatArr, 4);
         gl.glUniform4fv(crotaRef, 2, floatArr, 0);
     }
 
-    public void bindRect(GL2 gl, Region r, Region dr) {
+    public void bindRect(GL3 gl, Region r, Region dr) {
         floatArr[0] = (float) r.llx;
         floatArr[1] = (float) r.lly;
         floatArr[2] = (float) (1. / r.width);
@@ -144,13 +144,13 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(rectRef, 2, floatArr, 0);
     }
 
-    public void bindDeltaT(GL2 gl, double deltaT, double deltaTDiff) {
+    public void bindDeltaT(GL3 gl, double deltaT, double deltaTDiff) {
         floatArr[0] = (float) deltaT;
         floatArr[1] = (float) deltaTDiff;
         gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
     }
 
-    public void bindColor(GL2 gl, float red, float green, float blue, double alpha, double blend) {
+    public void bindColor(GL3 gl, float red, float green, float blue, double alpha, double blend) {
         floatArr[0] = (float) (red * alpha);
         floatArr[1] = (float) (green * alpha);
         floatArr[2] = (float) (blue * alpha);
@@ -158,43 +158,43 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform4fv(colorRef, 1, floatArr, 0);
     }
 
-    public void bindSlit(GL2 gl, double left, double right) {
+    public void bindSlit(GL3 gl, double left, double right) {
         floatArr[0] = (float) left;
         floatArr[1] = (float) right;
         gl.glUniform1fv(slitRef, 2, floatArr, 0);
     }
 
-    public void bindBrightness(GL2 gl, double offset, double scale, double gamma) {
+    public void bindBrightness(GL3 gl, double offset, double scale, double gamma) {
         floatArr[0] = (float) offset;
         floatArr[1] = (float) scale;
         floatArr[2] = (float) gamma;
         gl.glUniform3fv(brightRef, 1, floatArr, 0);
     }
 
-    public void bindSharpen(GL2 gl, double weight, double pixelWidth, double pixelHeight) {
+    public void bindSharpen(GL3 gl, double weight, double pixelWidth, double pixelHeight) {
         floatArr[0] = (float) pixelWidth;
         floatArr[1] = (float) pixelHeight;
         floatArr[2] = -2 * (float) weight; // used for mix
         gl.glUniform3fv(sharpenRef, 1, floatArr, 0);
     }
 
-    public void bindDitherEnhanced(GL2 gl, boolean dither, boolean enhanced) {
+    public void bindDitherEnhanced(GL3 gl, boolean dither, boolean enhanced) {
         intArr[0] = dither ? 1 : 0;
         intArr[1] = enhanced ? 1 : 0;
         gl.glUniform1iv(ditherEnhancedRef, 2, intArr, 0);
     }
 
-    public void bindCalculateDepth(GL2 gl, boolean calculateDepth) {
+    public void bindCalculateDepth(GL3 gl, boolean calculateDepth) {
         intArr[0] = calculateDepth ? 1 : 0;
         gl.glUniform1iv(calculateDepthRef, 1, intArr, 0);
     }
 
-    public void bindIsDiff(GL2 gl, int isDiff) {
+    public void bindIsDiff(GL3 gl, int isDiff) {
         intArr[0] = isDiff;
         gl.glUniform1iv(isDiffRef, 1, intArr, 0);
     }
 
-    public void bindViewport(GL2 gl, float offsetX, float offsetY, float width, float height) {
+    public void bindViewport(GL3 gl, float offsetX, float offsetY, float width, float height) {
         floatArr[0] = offsetX;
         floatArr[1] = offsetY;
         gl.glUniform2fv(viewportOffsetRef, 1, floatArr, 0);
@@ -204,18 +204,18 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(viewportRef, 1, floatArr, 0);
     }
 
-    public void bindCutOffValue(GL2 gl, float val) {
+    public void bindCutOffValue(GL3 gl, float val) {
         floatArr[0] = val;
         gl.glUniform1fv(cutOffValueRef, 1, floatArr, 0);
     }
 
-    public void bindCutOffDirection(GL2 gl, float x, float y) {
+    public void bindCutOffDirection(GL3 gl, float x, float y) {
         floatArr[0] = x;
         floatArr[1] = y;
         gl.glUniform2fv(cutOffDirectionRef, 1, floatArr, 0);
     }
 
-    public void bindAnglesLatiGrid(GL2 gl, double lon, double lat, double hglt, double dlon, double dlat, double dhglt) {
+    public void bindAnglesLatiGrid(GL3 gl, double lon, double lat, double hglt, double dlon, double dlat, double dhglt) {
         floatArr[0] = (float) lon;
         floatArr[1] = (float) lat;
         floatArr[2] = (float) hglt;
@@ -225,20 +225,20 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(gridRef, 2, floatArr, 0);
     }
 
-    public void bindSector(GL2 gl, double sector0, double sector1) {
+    public void bindSector(GL3 gl, double sector0, double sector1) {
         floatArr[0] = /*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1; // common case
         floatArr[1] = (float) sector0;
         floatArr[2] = (float) sector1;
         gl.glUniform1fv(sectorRef, 3, floatArr, 0);
     }
 
-    public void bindRadii(GL2 gl, float innerRadius, float outerRadius) {
+    public void bindRadii(GL3 gl, float innerRadius, float outerRadius) {
         floatArr[0] = innerRadius;
         floatArr[1] = outerRadius;
         gl.glUniform1fv(radiiRef, 2, floatArr, 0);
     }
 
-    public void bindPolarRadii(GL2 gl, double start, double stop) {
+    public void bindPolarRadii(GL3 gl, double start, double stop) {
         floatArr[0] = (float) start;
         floatArr[1] = (float) stop;
         gl.glUniform1fv(polarRadiiRef, 2, floatArr, 0);

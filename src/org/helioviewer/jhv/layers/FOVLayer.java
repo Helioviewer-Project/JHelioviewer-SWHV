@@ -7,7 +7,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class FOVLayer extends AbstractLayer {
 
@@ -23,24 +23,24 @@ public class FOVLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
         treePane.render(camera, vp, gl);
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         treePane.init(gl);
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         treePane.dispose(gl);
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         dispose(gl);
     }
 

@@ -9,7 +9,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
@@ -18,7 +18,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLHelper {
 
-    public static void initCircleFront(GL2 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
+    public static void initCircleFront(GL3 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
         int no_points = 2 * (segments + 1);
         BufVertex vexBuf = new BufVertex(no_points * GLSLShape.stride);
         for (int i = 0; i <= segments; ++i) {
@@ -29,7 +29,7 @@ public class GLHelper {
         circle.setVertex(gl, vexBuf);
     }
 
-    public static void initRectangleFront(GL2 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
+    public static void initRectangleFront(GL3 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
         BufVertex vexBuf = new BufVertex(4 * GLSLShape.stride);
         float x1 = (float) (x0 + w);
         float y1 = (float) (y0 + h);

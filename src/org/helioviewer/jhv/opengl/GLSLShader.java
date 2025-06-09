@@ -5,13 +5,13 @@ import java.nio.charset.StandardCharsets;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLException;
 
 abstract class GLSLShader {
 
     private enum ShaderType {
-        vertex(GL2.GL_VERTEX_SHADER), fragment(GL2.GL_FRAGMENT_SHADER);
+        vertex(GL3.GL_VERTEX_SHADER), fragment(GL3.GL_FRAGMENT_SHADER);
 
         final int glType;
 
@@ -34,7 +34,7 @@ abstract class GLSLShader {
         fragment = _fragment;
     }
 
-    protected final void _init(GL2 gl, boolean common) {
+    protected final void _init(GL3 gl, boolean common) {
         try {
             String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
             vertexID = attachShader(gl, ShaderType.vertex, vertexText);
@@ -51,22 +51,22 @@ abstract class GLSLShader {
         }
     }
 
-    protected final void _dispose(GL2 gl) {
+    protected final void _dispose(GL3 gl) {
         gl.glDeleteShader(vertexID);
         gl.glDeleteShader(fragmentID);
         gl.glDeleteProgram(progID);
     }
 
-    public final void use(GL2 gl) {
+    public final void use(GL3 gl) {
         if (progID != usedID) {
             usedID = progID;
             gl.glUseProgram(progID);
         }
     }
 
-    protected abstract void initUniforms(GL2 gl, int id);
+    protected abstract void initUniforms(GL3 gl, int id);
 
-    protected static void setTextureUnit(GL2 gl, int id, String texname, GLTexture.Unit unit) {
+    protected static void setTextureUnit(GL3 gl, int id, String texname, GLTexture.Unit unit) {
         int loc = gl.glGetUniformLocation(id, texname);
         if (loc != -1)
             gl.glUniform1i(loc, unit.ordinal());
@@ -74,7 +74,7 @@ abstract class GLSLShader {
             Log.error("Invalid texture " + texname);
     }
 
-    private static int attachShader(GL2 gl, ShaderType type, String text) {
+    private static int attachShader(GL3 gl, ShaderType type, String text) {
         int id = gl.glCreateShader(type.glType);
 
         String[] akProgramText = new String[1];
@@ -88,10 +88,10 @@ abstract class GLSLShader {
         gl.glCompileShader(id);
 
         int[] params = {0};
-        gl.glGetShaderiv(id, GL2.GL_COMPILE_STATUS, params, 0);
+        gl.glGetShaderiv(id, GL3.GL_COMPILE_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("Shader compile status: " + params[0]);
-            gl.glGetShaderiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
+            gl.glGetShaderiv(id, GL3.GL_INFO_LOG_LENGTH, params, 0);
             if (params[0] > 0) {
                 byte[] infoLog = new byte[params[0]];
                 gl.glGetShaderInfoLog(id, params[0], params, 0, infoLog, 0);
@@ -105,7 +105,7 @@ abstract class GLSLShader {
         return id;
     }
 
-    private int initializeProgram(GL2 gl, boolean cleanUp) {
+    private int initializeProgram(GL3 gl, boolean cleanUp) {
         int id = gl.glCreateProgram();
         gl.glAttachShader(id, vertexID);
         gl.glAttachShader(id, fragmentID);
@@ -113,10 +113,10 @@ abstract class GLSLShader {
         gl.glLinkProgram(id);
 
         int[] params = {0};
-        gl.glGetProgramiv(id, GL2.GL_LINK_STATUS, params, 0);
+        gl.glGetProgramiv(id, GL3.GL_LINK_STATUS, params, 0);
         if (params[0] != 1) {
             Log.error("Shader link status: " + params[0]);
-            gl.glGetProgramiv(id, GL2.GL_INFO_LOG_LENGTH, params, 0);
+            gl.glGetProgramiv(id, GL3.GL_INFO_LOG_LENGTH, params, 0);
             if (params[0] > 0) {
                 byte[] infoLog = new byte[params[0]];
                 gl.glGetProgramInfoLog(id, params[0], params, 0, infoLog, 0);

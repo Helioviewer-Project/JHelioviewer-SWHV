@@ -9,7 +9,7 @@ import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.opengl.GLTexture;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLContext;
 
 /**
@@ -55,16 +55,16 @@ class JhvTextureRenderer {
         image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
         imageBuffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
 
-        GL2 gl = (GL2) GLContext.getCurrentGL();
-        tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.THREE);
+        GL3 gl = (GL3) GLContext.getCurrentGL();
+        tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.THREE);
         tex.bind(gl);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 15);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
-        gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, imageWidth, imageHeight, 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, null);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_BASE_LEVEL, 0);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAX_LEVEL, 15);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR_MIPMAP_LINEAR);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_CLAMP_TO_EDGE);
+        gl.glTexImage2D(GL3.GL_TEXTURE_2D, 0, GL3.GL_RGBA, imageWidth, imageHeight, 0, GL3.GL_BGRA, GL3.GL_UNSIGNED_INT_8_8_8_8_REV, null);
     }
 
     int getWidth() {
@@ -121,7 +121,7 @@ class JhvTextureRenderer {
         }
     }
 
-    void bind(GL2 gl) {
+    void bind(GL3 gl) {
         tex.bind(gl);
         if (dirtyRegion != null) {
             upload(gl, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
@@ -134,7 +134,7 @@ class JhvTextureRenderer {
      * valid to use this renderer after calling this method.
      */
     void dispose() {
-        tex.delete((GL2) GLContext.getCurrentGL());
+        tex.delete((GL3) GLContext.getCurrentGL());
         imageBuffer = null;
         image = null;
     }
@@ -152,11 +152,11 @@ class JhvTextureRenderer {
      * @param width  the width of the region to update
      * @param height the height of the region to update
      */
-    private void upload(GL2 gl, int x, int y, int width, int height) {
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
-        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, imageWidth);
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, x, y, width, height, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer.position(y * imageWidth + x));
-        gl.glGenerateMipmap(GL2.GL_TEXTURE_2D);
+    private void upload(GL3 gl, int x, int y, int width, int height) {
+        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, 4);
+        gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, imageWidth);
+        gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, x, y, width, height, GL3.GL_BGRA, GL3.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer.position(y * imageWidth + x));
+        gl.glGenerateMipmap(GL3.GL_TEXTURE_2D);
     }
 
 }

@@ -14,7 +14,7 @@ import java.nio.ShortBuffer;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class GLTexture {
 
@@ -31,35 +31,35 @@ public class GLTexture {
     private int prev_inputGLFormat = -1;
     private int prev_bppGLType = -1;
 
-    public GLTexture(GL2 gl, int _target, Unit _unit) {
+    public GLTexture(GL3 gl, int _target, Unit _unit) {
         int[] tmp = new int[1];
         gl.glGenTextures(1, tmp, 0);
         texID = tmp[0];
         target = _target;
-        unit = GL2.GL_TEXTURE0 + _unit.ordinal();
+        unit = GL3.GL_TEXTURE0 + _unit.ordinal();
     }
 
-    public void bind(GL2 gl) {
+    public void bind(GL3 gl) {
         gl.glActiveTexture(unit);
         gl.glBindTexture(target, texID);
     }
 
-    public void delete(GL2 gl) {
+    public void delete(GL3 gl) {
         gl.glDeleteTextures(1, new int[]{texID}, 0);
         texID = prev_width = -1;
     }
 
-    private static void genTexture2D(GL2 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 0);
-        gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
+    private static void genTexture2D(GL3 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_BASE_LEVEL, 0);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAX_LEVEL, 0);
+        gl.glTexImage2D(GL3.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, buffer);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_CLAMP_TO_EDGE);
     }
 
-    public void copyImageBuffer(GL2 gl, ImageBuffer imageBuffer) {
+    public void copyImageBuffer(GL3 gl, ImageBuffer imageBuffer) {
         int w = imageBuffer.width;
         int h = imageBuffer.height;
         if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
@@ -81,12 +81,12 @@ public class GLTexture {
             prev_bppGLType = bppGLType;
         }
 
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, format.bytes);
-        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
-        gl.glTexSubImage2D(GL2.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, imageBuffer.buffer);
+        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, format.bytes);
+        gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, w);
+        gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, imageBuffer.buffer);
     }
 
-    public static void copyBufferedImage(GL2 gl, BufferedImage source) {
+    public static void copyBufferedImage(GL3 gl, BufferedImage source) {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
@@ -103,33 +103,33 @@ public class GLTexture {
             default -> null;
         };
 
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
-        gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, w);
+        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
+        gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, w);
         genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
     }
 
-    public static void copyBuffer1D(GL2 gl, IntBuffer source) {
-        gl.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4);
-        gl.glTexImage1D(GL2.GL_TEXTURE_1D, 0, GL2.GL_RGBA, source.capacity(), 0, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, source);
-        gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
-        gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-        gl.glTexParameteri(GL2.GL_TEXTURE_1D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+    public static void copyBuffer1D(GL3 gl, IntBuffer source) {
+        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, 4);
+        gl.glTexImage1D(GL3.GL_TEXTURE_1D, 0, GL3.GL_RGBA, source.capacity(), 0, GL3.GL_BGRA, GL3.GL_UNSIGNED_INT_8_8_8_8_REV, source);
+        gl.glTexParameteri(GL3.GL_TEXTURE_1D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_NEAREST);
+        gl.glTexParameteri(GL3.GL_TEXTURE_1D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_NEAREST);
+        gl.glTexParameteri(GL3.GL_TEXTURE_1D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
     }
 
     // Map application image format to OpenGL memory image format
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
         return switch (format) {
-            case Gray8 -> GL2.GL_R8;
-            case Gray16 -> GL2.GL_R16;
-            case ARGB32 -> GL2.GL_RGBA;
+            case Gray8 -> GL3.GL_R8;
+            case Gray16 -> GL3.GL_R16;
+            case ARGB32 -> GL3.GL_RGBA;
         };
     }
 
     // Map application image format to OpenGL input image format
     private static int mapImageFormatToInputGLFormat(ImageBuffer.Format format) {
         return switch (format) {
-            case Gray8, Gray16 -> GL2.GL_RED;
-            case ARGB32 -> GL2.GL_BGRA;
+            case Gray8, Gray16 -> GL3.GL_RED;
+            case ARGB32 -> GL3.GL_BGRA;
         };
     }
 
@@ -141,7 +141,7 @@ public class GLTexture {
      * @return OpenGL memory image format
      */
     private static int mapTypeToInternalGLFormat(int type) {
-        return type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED ? GL2.GL_R8 : GL2.GL_RGBA;
+        return type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED ? GL3.GL_R8 : GL3.GL_RGBA;
     }
 
     /**
@@ -153,9 +153,9 @@ public class GLTexture {
      */
     private static int mapTypeToInputGLFormat(int type) {
         return switch (type) {
-            case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> GL2.GL_RED;
-            case BufferedImage.TYPE_4BYTE_ABGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_ARGB -> GL2.GL_BGRA;
-            default -> GL2.GL_RGBA;
+            case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> GL3.GL_RED;
+            case BufferedImage.TYPE_4BYTE_ABGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_ARGB -> GL3.GL_BGRA;
+            default -> GL3.GL_RGBA;
         };
     }
 
@@ -165,9 +165,9 @@ public class GLTexture {
      */
     private static int mapBytesPerPixelToGLType(int bytesPerPixel) {
         return switch (bytesPerPixel) {
-            case 1 -> GL2.GL_UNSIGNED_BYTE;
-            case 2 -> GL2.GL_UNSIGNED_SHORT;
-            case 4 -> GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
+            case 1 -> GL3.GL_UNSIGNED_BYTE;
+            case 2 -> GL3.GL_UNSIGNED_SHORT;
+            case 4 -> GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
             default -> 0;
         };
     }
@@ -181,10 +181,10 @@ public class GLTexture {
      */
     private static int mapDataBufferTypeToGLType(int dataBufferType) {
         return switch (dataBufferType) {
-            case DataBuffer.TYPE_BYTE -> GL2.GL_UNSIGNED_BYTE;
-            case DataBuffer.TYPE_SHORT -> GL2.GL_SHORT;
-            case DataBuffer.TYPE_USHORT -> GL2.GL_UNSIGNED_SHORT;
-            case DataBuffer.TYPE_INT -> GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
+            case DataBuffer.TYPE_BYTE -> GL3.GL_UNSIGNED_BYTE;
+            case DataBuffer.TYPE_SHORT -> GL3.GL_SHORT;
+            case DataBuffer.TYPE_USHORT -> GL3.GL_UNSIGNED_SHORT;
+            case DataBuffer.TYPE_INT -> GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
             default -> 0;
         };
     }

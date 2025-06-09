@@ -45,7 +45,7 @@ import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 // has to be public for state
 public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
@@ -87,7 +87,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         jo.put("icons", icons);
     }
 
-    private static void bindTexture(GL2 gl, SWEKGroup group) {
+    private static void bindTexture(GL3 gl, SWEKGroup group) {
         String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
@@ -97,7 +97,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             icon.paintIcon(null, graph, 0, 0);
             graph.dispose();
 
-            tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.THREE);
+            tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.THREE);
             tex.bind(gl);
 
             GLTexture.copyBufferedImage(gl, bi);
@@ -345,14 +345,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         GLText.drawTextFloat(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
-    private void renderEvents(Viewport vp, GL2 gl) {
+    private void renderEvents(Viewport vp, GL3 gl) {
         lineEvent.setVertex(gl, bufEvent);
         lineThick.setVertex(gl, bufThick);
         lineEvent.renderLine(gl, vp.aspect, LINEWIDTH);
         lineThick.renderLine(gl, vp.aspect, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(GL2 gl, List<JHVRelatedEvents> evs) {
+    private void renderIcons(GL3 gl, List<JHVRelatedEvents> evs) {
         glslTexture.setCoord(gl, texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
@@ -360,13 +360,13 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             if (Display.mode == Display.ProjectionMode.Latitudinal && evt.isCactus())
                 continue;
             bindTexture(gl, evtr.getSupplier().getGroup());
-            glslTexture.renderTexture(gl, GL2.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
+            glslTexture.renderTexture(gl, GL3.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
         List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
@@ -392,7 +392,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    public void renderScale(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
         List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
@@ -418,14 +418,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
         if (SWEKPopupController.mouseOverJHVEvent != null) {
             drawText(vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
         }
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         setEnabled(false);
         dispose(gl);
     }
@@ -456,14 +456,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         lineEvent.init(gl);
         lineThick.init(gl);
         glslTexture.init(gl);
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         lineEvent.dispose(gl);
         lineThick.dispose(gl);
         iconCacheId.values().forEach(el -> el.delete(gl));

@@ -61,7 +61,7 @@ import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.util.packrect.BackingStoreManager;
 import com.jogamp.opengl.util.packrect.Rect;
@@ -330,7 +330,7 @@ public class JhvTextRenderer {
      * Disposes of all resources this TextRenderer is using. It is not
      * valid to use the TextRenderer after this method is called.
      */
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         packer.dispose();
         packer = null;
         cachedBackingStore = null;
@@ -431,8 +431,8 @@ public class JhvTextRenderer {
 
     private static void internal_beginRendering(boolean ortho, int width, int height) {
         if (ortho) {
-            GL2 gl = (GL2) GLContext.getCurrentGL();
-            gl.glDisable(GL2.GL_DEPTH_TEST);
+            GL3 gl = (GL3) GLContext.getCurrentGL();
+            gl.glDisable(GL3.GL_DEPTH_TEST);
 
             Transform.pushProjection();
             Transform.setOrtho2DProjection(0, width, 0, height);
@@ -443,8 +443,8 @@ public class JhvTextRenderer {
 
     private static void internal_endRendering(boolean ortho) {
         if (ortho) {
-            GL2 gl = (GL2) GLContext.getCurrentGL();
-            gl.glEnable(GL2.GL_DEPTH_TEST);
+            GL3 gl = (GL3) GLContext.getCurrentGL();
+            gl.glEnable(GL3.GL_DEPTH_TEST);
 
             Transform.popView();
             Transform.popProjection();
@@ -947,12 +947,12 @@ public class JhvTextRenderer {
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
-            GL2 gl = (GL2) GLContext.getCurrentGL();
+            GL3 gl = (GL3) GLContext.getCurrentGL();
             getBackingStore().bind(gl);
 
             glslTexture.init(gl);
             glslTexture.setCoord(gl, coordBuf);
-            glslTexture.renderTexture(gl, GL2.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
+            glslTexture.renderTexture(gl, GL3.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }

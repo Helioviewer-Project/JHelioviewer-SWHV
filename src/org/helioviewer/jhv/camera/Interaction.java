@@ -24,7 +24,7 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class Interaction implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
@@ -179,15 +179,15 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         interactionAnnotate.zoom();
     }
 
-    public void initAnnotations(GL2 gl) {
+    public void initAnnotations(GL3 gl) {
         interactionAnnotate.init(gl);
     }
 
-    public void disposeAnnotations(GL2 gl) {
+    public void disposeAnnotations(GL3 gl) {
         interactionAnnotate.dispose(gl);
     }
 
-    public void drawAnnotations(Viewport vp, GL2 gl) {
+    public void drawAnnotations(Viewport vp, GL3 gl) {
         interactionAnnotate.draw(vp, gl);
     }
 

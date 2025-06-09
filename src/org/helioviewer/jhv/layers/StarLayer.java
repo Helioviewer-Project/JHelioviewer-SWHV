@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public final class StarLayer extends AbstractLayer implements Camera.Listener, GaiaClient.Receiver {
 
@@ -45,7 +45,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -73,17 +73,17 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         points.init(gl);
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         points.dispose(gl);
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         dispose(gl);
     }
 

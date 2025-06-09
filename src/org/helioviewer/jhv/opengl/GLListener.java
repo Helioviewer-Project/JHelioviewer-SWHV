@@ -12,7 +12,7 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.Movie;
 //import org.helioviewer.jhv.layers.MovieDisplay;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -34,30 +34,29 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
+        GL3 gl = (GL3) drawable.getGL();
         GLInfo.get(gl);
         GLInfo.updatePixelScale(canvas);
 
-        gl.glDisable(GL2.GL_TEXTURE_1D);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glDisable(GL3.GL_TEXTURE_1D);
+        gl.glDisable(GL3.GL_TEXTURE_2D);
 
-        gl.glEnable(GL2.GL_MULTISAMPLE);
+        gl.glEnable(GL3.GL_MULTISAMPLE);
 
-        gl.glEnable(GL2.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL2.GL_FUNC_ADD);
+        gl.glEnable(GL3.GL_BLEND);
+        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL3.GL_FUNC_ADD);
 
-        gl.glEnable(GL2.GL_DEPTH_TEST);
-        gl.glDepthFunc(GL2.GL_LEQUAL);
+        gl.glEnable(GL3.GL_DEPTH_TEST);
+        gl.glDepthFunc(GL3.GL_LEQUAL);
 
-        gl.glEnable(GL2.GL_CULL_FACE);
-        gl.glCullFace(GL2.GL_BACK);
+        gl.glEnable(GL3.GL_CULL_FACE);
+        gl.glCullFace(GL3.GL_BACK);
 
         gl.glClearColor(0, 0, 0, 0);
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
-        gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE);
-        gl.glEnable(GL2.GL_POINT_SPRITE);
+        gl.glEnable(GL3.GL_VERTEX_PROGRAM_POINT_SIZE);
 
         glslSolar.init(gl);
         GLSLSolarShader.init(gl);
@@ -70,7 +69,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
+        GL3 gl = (GL3) drawable.getGL();
         Layers.dispose(gl);
         JHVFrame.getInteraction().disposeAnnotations(gl);
         GLText.dispose(gl);
@@ -94,8 +93,8 @@ public class GLListener implements GLEventListener {
         // MovieDisplay.render(1);
     }
 
-    public static void renderScene(Camera camera, GL2 gl) {
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    public static void renderScene(Camera camera, GL3 gl) {
+        gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp.aspect);
@@ -111,14 +110,14 @@ public class GLListener implements GLEventListener {
         }
     }
 
-    public static void renderSceneScale(Camera camera, GL2 gl) {
+    public static void renderSceneScale(Camera camera, GL3 gl) {
         if (Display.mode == Display.ProjectionMode.Polar) {
             GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
         } else if (Display.mode == Display.ProjectionMode.LogPolar) {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
@@ -129,14 +128,14 @@ public class GLListener implements GLEventListener {
         }
     }
 
-    private static void renderFullFloatScene(Camera camera, GL2 gl) {
+    private static void renderFullFloatScene(Camera camera, GL3 gl) {
         Viewport vp = Display.fullViewport;
         gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
         // camera.projectionOrtho2D(vp.aspect); not needed currently
         Layers.renderFullFloat(camera, vp, gl);
     }
 
-    private static void renderMiniview(GL2 gl) {
+    private static void renderMiniview(GL3 gl) {
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null && miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
@@ -146,17 +145,17 @@ public class GLListener implements GLEventListener {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
 
-            gl.glDisable(GL2.GL_DEPTH_TEST);
+            gl.glDisable(GL3.GL_DEPTH_TEST);
             miniview.renderBackground(gl);
             Layers.renderMiniview(miniCamera, vp, gl);
-            gl.glEnable(GL2.GL_DEPTH_TEST);
+            gl.glEnable(GL3.GL_DEPTH_TEST);
         }
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
         GLInfo.updatePixelScale(canvas);
-        GL2 gl = (GL2) drawable.getGL();
+        GL3 gl = (GL3) drawable.getGL();
         gl.glFinish();
 
         if (whiteBack)

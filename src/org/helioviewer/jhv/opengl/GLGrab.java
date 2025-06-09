@@ -8,7 +8,7 @@ import org.helioviewer.jhv.display.Display;
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment;
 import com.jogamp.opengl.FBObject.TextureAttachment;
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class GLGrab {
 
@@ -22,17 +22,17 @@ public class GLGrab {
         h = _h;
     }
 
-    private void init(GL2 gl) {
+    private void init(GL3 gl) {
         fbo = new FBObject();
         fbo.init(gl, w, h, 0);
-        fboTex = fbo.attachTexture2D(gl, 0, true, GL2.GL_LINEAR, GL2.GL_LINEAR, GL2.GL_CLAMP_TO_EDGE, GL2.GL_CLAMP_TO_EDGE);
+        fboTex = fbo.attachTexture2D(gl, 0, true, GL3.GL_LINEAR, GL3.GL_LINEAR, GL3.GL_CLAMP_TO_EDGE, GL3.GL_CLAMP_TO_EDGE);
 
         fbo.attachRenderbuffer(gl, Attachment.Type.DEPTH, FBObject.CHOSEN_BITS);
         fbo.reset(gl, fbo.getWidth(), fbo.getHeight(), GLInfo.GLSAMPLES);
         fbo.unbind(gl);
     }
 
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         if (fbo != null) {
             fbo.detachAll(gl);
             fbo.destroy(gl);
@@ -40,7 +40,7 @@ public class GLGrab {
         }
     }
 
-    public void renderFrame(Camera camera, GL2 gl, Buffer buffer) {
+    public void renderFrame(Camera camera, GL3 gl, Buffer buffer) {
         if (fbo == null)
             init(gl);
 
@@ -62,10 +62,10 @@ public class GLGrab {
 
         fbo.use(gl, fboTex);
 
-        gl.glBindFramebuffer(GL2.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-        gl.glPixelStorei(GL2.GL_PACK_ALIGNMENT, 1);
-        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL2.GL_BGR, GL2.GL_UNSIGNED_BYTE, buffer);
-        gl.glBindFramebuffer(GL2.GL_FRAMEBUFFER, 0);
+        gl.glBindFramebuffer(GL3.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
+        gl.glPixelStorei(GL3.GL_PACK_ALIGNMENT, 1);
+        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL3.GL_BGR, GL3.GL_UNSIGNED_BYTE, buffer);
+        gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, 0);
 
         fbo.unuse(gl);
 

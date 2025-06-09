@@ -15,7 +15,7 @@ import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 @SuppressWarnings("serial")
 public final class FOVTreePane extends JScrollPane {
@@ -76,15 +76,15 @@ public final class FOVTreePane extends JScrollPane {
         setPreferredSize(new Dimension(-1, 120));
     }
 
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         root.children().asIterator().forEachRemaining(c -> ((FOVPlatform) c).init(gl));
     }
 
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         root.children().asIterator().forEachRemaining(c -> ((FOVPlatform) c).dispose(gl));
     }
 
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         root.children().asIterator().forEachRemaining(c -> ((FOVPlatform) c).render(camera, vp, gl));
     }
 

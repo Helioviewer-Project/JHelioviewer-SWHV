@@ -30,7 +30,7 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class ViewpointLayer extends AbstractLayer implements MouseListener, MouseMotionListener {
 
@@ -78,7 +78,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
         if (!optionsPanel.isHeliospheric())
@@ -110,9 +110,9 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
-            gl.glDisable(GL2.GL_DEPTH_TEST);
+            gl.glDisable(GL3.GL_DEPTH_TEST);
             renderPlanets(gl, vp, positionLoads, pixFactor);
-            gl.glEnable(GL2.GL_DEPTH_TEST);
+            gl.glEnable(GL3.GL_DEPTH_TEST);
         }
 
         Transform.popView();
@@ -124,7 +124,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     private int mouseX, mouseY;
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
         GLText.drawTextFloat(vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
 
@@ -216,7 +216,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         dispose(gl);
         JHVFrame.getInputController().removePlugin(this);
         optionsPanel.deactivate();
@@ -253,14 +253,14 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         orbits.init(gl);
         planets.init(gl);
         spiral.init(gl);
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         orbits.dispose(gl);
         planets.dispose(gl);
         spiral.dispose(gl);
@@ -277,7 +277,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     private final float[] xyzw = {0, 0, 0, 1};
 
-    private void renderPlanets(GL2 gl, Viewport vp, List<PositionLoad> positionLoads, double pointFactor) {
+    private void renderPlanets(GL3 gl, Viewport vp, List<PositionLoad> positionLoads, double pointFactor) {
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
@@ -318,7 +318,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         spiralBuf.putVertex(x, y, z, 1, color);
     }
 
-    private void renderSpiral(GL2 gl, Viewport vp, double[] spiralLati, int speed) {
+    private void renderSpiral(GL3 gl, Viewport vp, double[] spiralLati, int speed) {
         double rad0 = spiralLati[0];
         double lon0 = spiralLati[1];
         double lat0 = spiralLati[2];

@@ -8,29 +8,29 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public interface Layer {
 
-    default void render(Camera camera, Viewport vp, GL2 gl) {
+    default void render(Camera camera, Viewport vp, GL3 gl) {
     }
 
-    default void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    default void renderScale(Camera camera, Viewport vp, GL3 gl) {
     }
 
-    default void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    default void renderFloat(Camera camera, Viewport vp, GL3 gl) {
     }
 
-    default void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    default void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
     }
 
-    default void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
+    default void renderMiniview(Camera camera, Viewport vp, GL3 gl) {
     }
 
-    default void prerender(GL2 gl) {
+    default void prerender(GL3 gl) {
     }
 
-    void remove(GL2 gl);
+    void remove(GL3 gl);
 
     Component getOptionsPanel();
 
@@ -63,9 +63,9 @@ public interface Layer {
         return false;
     }
 
-    void init(GL2 gl);
+    void init(GL3 gl);
 
-    void dispose(GL2 gl);
+    void dispose(GL3 gl);
 
     void serialize(JSONObject jo);
 
