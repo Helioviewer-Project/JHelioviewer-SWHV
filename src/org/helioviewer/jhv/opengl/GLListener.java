@@ -32,6 +32,8 @@ public class GLListener implements GLEventListener {
         whiteBack = b;
     }
 
+    private static int uboID;
+
     @Override
     public void init(GLAutoDrawable drawable) {
         GL3 gl = (GL3) drawable.getGL();
@@ -58,8 +60,16 @@ public class GLListener implements GLEventListener {
 
         gl.glEnable(GL3.GL_VERTEX_PROGRAM_POINT_SIZE);
 
+        int[] tmp = new int[1];
+        gl.glGenBuffers(1, tmp, 0);
+        uboID = tmp[0];
+
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 2 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
+
         glslSolar.init(gl);
-        GLSLSolarShader.init(gl);
+        GLSLSolarShader.init(gl, uboID);
         GLSLLineShader.init(gl);
         GLSLShapeShader.init(gl);
         GLSLTextureShader.init(gl);
@@ -79,6 +89,7 @@ public class GLListener implements GLEventListener {
         GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
+        gl.glDeleteBuffers(1, new int[]{uboID}, 0);
 
         GLInfo.checkGLErrors(gl, "GLListener.dispose()");
     }
@@ -99,9 +110,9 @@ public class GLListener implements GLEventListener {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp.aspect);
 
+            GLSLSolarShader.bindScreen(gl, uboID, vp.x, vp.yGL, vp.width, vp.height);
+
             GLSLSolarShader.sphere.use(gl);
-            GLSLSolarShader.sphere.bindInverseCamera(gl);
-            GLSLSolarShader.sphere.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
             glslSolar.render(gl);
 
             Layers.render(camera, vp, gl);
@@ -121,6 +132,8 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
+
+            GLSLSolarShader.bindScreen(gl, uboID, vp.x, vp.yGL, vp.width, vp.height);
 
             Layers.renderScale(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
@@ -144,6 +157,8 @@ public class GLListener implements GLEventListener {
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
+
+            GLSLSolarShader.bindScreen(gl, uboID, vp.x, vp.yGL, vp.width, vp.height);
 
             gl.glDisable(GL3.GL_DEPTH_TEST);
             miniview.renderBackground(gl);

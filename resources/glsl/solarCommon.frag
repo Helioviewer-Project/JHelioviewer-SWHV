@@ -14,6 +14,17 @@
 
 out vec4 outColor;
 
+struct Screen {
+    mat4 cameraTransformationInverse;
+    vec3 viewport;
+    float padding;
+    vec2 viewportOffset;
+};
+
+layout(std140) uniform ScreenBlock {
+    Screen screen;
+};
+
 uniform sampler2D image;
 uniform int calculateDepth;
 uniform int isdifference;
@@ -24,8 +35,6 @@ uniform sampler1D lut;
 uniform vec3 brightness;
 uniform vec4 color;
 
-uniform float slit[2];
-
 uniform vec3 grid[2];
 
 uniform vec2 crval[2];
@@ -34,12 +43,9 @@ uniform vec4 rect[2];
 
 uniform float deltaT[2];
 
-uniform mat4 cameraTransformationInverse;
 uniform vec4 cameraDifference[2];
 
-uniform vec3 viewport;
-uniform vec2 viewportOffset;
-
+uniform float slit[2];
 uniform float sector[3];
 uniform float radii[2];
 uniform float polarRadii[2];
@@ -123,9 +129,9 @@ void clamp_value(const float value, const float low, const float high) {
 }
 
 vec2 getScrPos(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
-    vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    vec2 scrpos = vec2(viewport.z * up1.x, up1.y) + .5;
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewportOffset) / screen.viewport.xy - 1.;
+    vec4 up1 = screen.cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 scrpos = vec2(screen.viewport.z * up1.x, up1.y) + .5;
     clamp_coord(scrpos);
     return scrpos;
 }

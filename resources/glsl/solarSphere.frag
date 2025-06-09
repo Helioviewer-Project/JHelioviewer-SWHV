@@ -4,15 +4,22 @@
 
 out vec4 outColor;
 
-uniform mat4 cameraTransformationInverse;
-uniform vec3 viewport;
-uniform vec2 viewportOffset;
+struct Screen {
+    mat4 cameraTransformationInverse;
+    vec3 viewport;
+    float padding;
+    vec2 viewportOffset;
+};
+
+layout(std140) uniform ScreenBlock {
+    Screen screen;
+};
 
 const vec4 black = vec4(0, 0, 0, 1);
 
 void main(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - viewportOffset) / viewport.xy - 1.;
-    vec4 up1 = cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewportOffset) / screen.viewport.xy - 1.;
+    vec4 up1 = screen.cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
 
     if (dot(up1.xy, up1.xy) > 1.)
         discard;

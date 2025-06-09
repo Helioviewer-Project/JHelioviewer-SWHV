@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
+import java.nio.FloatBuffer;
+
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.math.Quat;
@@ -40,10 +42,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int ditherEnhancedRef;
     private int calculateDepthRef;
 
-    private int viewportRef;
-    private int viewportOffsetRef;
-
-    private int cameraTransformationInverseRef;
     private int cameraDifferenceRef;
 
     private final int[] intArr = new int[2];
@@ -54,12 +52,33 @@ public class GLSLSolarShader extends GLSLShader {
         hasCommon = _hasCommon;
     }
 
-    public static void init(GL3 gl) {
-        sphere._init(gl, sphere.hasCommon);
-        ortho._init(gl, ortho.hasCommon);
-        lati._init(gl, lati.hasCommon);
-        polar._init(gl, polar.hasCommon);
-        logpolar._init(gl, logpolar.hasCommon);
+    public static void init(GL3 gl, int uboID) {
+        int programID, blockIndex;
+
+        programID = sphere._init(gl, sphere.hasCommon);
+        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
+        gl.glUniformBlockBinding(programID, blockIndex, 0);
+        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
+
+        programID = ortho._init(gl, ortho.hasCommon);
+        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
+        gl.glUniformBlockBinding(programID, blockIndex, 0);
+        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
+
+        programID = lati._init(gl, lati.hasCommon);
+        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
+        gl.glUniformBlockBinding(programID, blockIndex, 0);
+        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
+
+        programID = polar._init(gl, polar.hasCommon);
+        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
+        gl.glUniformBlockBinding(programID, blockIndex, 0);
+        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
+
+        programID = logpolar._init(gl, logpolar.hasCommon);
+        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
+        gl.glUniformBlockBinding(programID, blockIndex, 0);
+        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
     }
 
     @Override
@@ -87,10 +106,7 @@ public class GLSLSolarShader extends GLSLShader {
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         rectRef = gl.glGetUniformLocation(id, "rect");
-        viewportRef = gl.glGetUniformLocation(id, "viewport");
-        viewportOffsetRef = gl.glGetUniformLocation(id, "viewportOffset");
 
-        cameraTransformationInverseRef = gl.glGetUniformLocation(id, "cameraTransformationInverse");
         cameraDifferenceRef = gl.glGetUniformLocation(id, "cameraDifference");
 
         if (hasCommon) {
@@ -108,8 +124,22 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._dispose(gl);
     }
 
-    public void bindInverseCamera(GL3 gl) {
-        gl.glUniformMatrix4fv(cameraTransformationInverseRef, 1, false, Transform.getInverse());
+    public static void bindScreen(GL3 gl, int uboID, float offsetX, float offsetY, float width, float height) {
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
+
+        FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
+        FloatBuffer inv = Transform.getInverse();
+        buffer.put(inv);
+        inv.flip();
+        buffer.put(width);
+        buffer.put(height);
+        buffer.put(height / width);
+        buffer.put(0f); // padding
+        buffer.put(offsetX);
+        buffer.put(offsetY);
+        //buffer.flip();
+
+        gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
     }
 
     public void bindCameraDifference(GL3 gl, Quat quat, Quat quatDiff) {
@@ -192,16 +222,6 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindIsDiff(GL3 gl, int isDiff) {
         intArr[0] = isDiff;
         gl.glUniform1iv(isDiffRef, 1, intArr, 0);
-    }
-
-    public void bindViewport(GL3 gl, float offsetX, float offsetY, float width, float height) {
-        floatArr[0] = offsetX;
-        floatArr[1] = offsetY;
-        gl.glUniform2fv(viewportOffsetRef, 1, floatArr, 0);
-        floatArr[0] = width;
-        floatArr[1] = height;
-        floatArr[2] = height / width;
-        gl.glUniform3fv(viewportRef, 1, floatArr, 0);
     }
 
     public void bindCutOffValue(GL3 gl, float val) {
