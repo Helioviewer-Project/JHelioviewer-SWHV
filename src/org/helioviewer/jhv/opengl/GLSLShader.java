@@ -110,7 +110,6 @@ abstract class GLSLShader {
         int id = gl.glCreateProgram();
         gl.glAttachShader(id, vertexID);
         gl.glAttachShader(id, fragmentID);
-
         gl.glLinkProgram(id);
 
         int[] params = {0};
