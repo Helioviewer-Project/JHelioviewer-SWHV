@@ -16,7 +16,7 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class PfssLayer extends AbstractLayer implements TimeListener.Change, TimeListener.Range { // has to be public for state
 
@@ -51,7 +51,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -63,7 +63,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         setEnabled(false);
         dispose(gl);
     }
@@ -110,12 +110,12 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         glslLine.init(gl);
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         glslLine.dispose(gl);
     }
 
@@ -128,7 +128,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     private boolean lastFixedColor;
     private double lastRadius;
 
-    private void renderData(GL2 gl, Viewport vp, PfssLoader.Data data) {
+    private void renderData(GL3 gl, Viewport vp, PfssLoader.Data data) {
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();

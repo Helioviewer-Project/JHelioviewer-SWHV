@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 class VAO {
 
@@ -17,7 +17,7 @@ class VAO {
         vaa = _vaa;
     }
 
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         if (!inited) {
             inited = true;
 
@@ -26,7 +26,7 @@ class VAO {
             vaoID = tmpId[0];
 
             for (int i = 0; i < vbo.length; i++) {
-                vbo[i] = new VBO(gl, GL2.GL_ARRAY_BUFFER, dynamic);
+                vbo[i] = new VBO(gl, GL3.GL_ARRAY_BUFFER, dynamic);
             }
 
             gl.glBindVertexArray(vaoID);
@@ -37,7 +37,7 @@ class VAO {
         }
     }
 
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         if (inited) {
             inited = false;
             gl.glDeleteVertexArrays(1, new int[]{vaoID}, 0);
@@ -50,7 +50,7 @@ class VAO {
         }
     }
 
-    protected void bind(GL2 gl) {
+    protected void bind(GL3 gl) {
         gl.glBindVertexArray(vaoID);
     }
 

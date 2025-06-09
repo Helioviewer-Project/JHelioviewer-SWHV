@@ -22,7 +22,7 @@ import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 class InteractionAnnotate implements Interaction.Type {
 
@@ -51,7 +51,7 @@ class InteractionAnnotate implements Interaction.Type {
         }
     }
 
-    void draw(Viewport vp, GL2 gl) {
+    void draw(Viewport vp, GL3 gl) {
         if (newAnnotateable == null && anns.isEmpty())
             return;
 
@@ -180,13 +180,13 @@ class InteractionAnnotate implements Interaction.Type {
         }
     }
 
-    void init(GL2 gl) {
+    void init(GL3 gl) {
         annsLine.init(gl);
         transLine.init(gl);
         center.init(gl);
     }
 
-    void dispose(GL2 gl) {
+    void dispose(GL3 gl) {
         annsLine.dispose(gl);
         transLine.dispose(gl);
         center.dispose(gl);

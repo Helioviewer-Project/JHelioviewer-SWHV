@@ -6,7 +6,7 @@ import java.awt.geom.AffineTransform;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.glu.GLU;
 
 import com.jogamp.opengl.awt.GLCanvas;
@@ -25,16 +25,16 @@ public class GLInfo {
         Message.fatalErr("OpenGL fatal error. JHelioviewer is not able to run:\n" + err);
     }
 
-    public static void get(GL2 gl) {
-        glVersion = "OpenGL " + gl.glGetString(GL2.GL_VERSION);
+    public static void get(GL3 gl) {
+        glVersion = "OpenGL " + gl.glGetString(GL3.GL_VERSION);
         Log.info(glVersion);
-        // Log.info("Extensions: " + gl.glGetString(GL2.GL_EXTENSIONS));
+        // Log.info("Extensions: " + gl.glGetString(GL3.GL_EXTENSIONS));
         if (!gl.isExtensionAvailable("GL_VERSION_3_3")) {
             glVersionError("OpenGL 3.3 not supported.");
         }
 
         int[] out = {0};
-        gl.glGetIntegerv(GL2.GL_MAX_TEXTURE_SIZE, out, 0);
+        gl.glGetIntegerv(GL3.GL_MAX_TEXTURE_SIZE, out, 0);
         maxTextureSize = out[0];
     }
 
@@ -47,11 +47,11 @@ public class GLInfo {
         }
     }
 
-    public static boolean checkGLErrors(GL2 gl, String message) {
+    public static boolean checkGLErrors(GL3 gl, String message) {
         GLU glu = new GLU();
         int glErrorCode, errors = 0;
 
-        while ((glErrorCode = gl.glGetError()) != GL2.GL_NO_ERROR) {
+        while ((glErrorCode = gl.glGetError()) != GL3.GL_NO_ERROR) {
             Log.error("GL Error (" + glErrorCode + "): " + glu.gluErrorString(glErrorCode) + " - @" + message);
             errors++;
         }

@@ -35,7 +35,7 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public final class GridLayer extends AbstractLayer {
 
@@ -119,7 +119,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
@@ -168,7 +168,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    public void renderScale(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
         int pixelsPerSolarRadius = (int) (textScale * CameraHelper.getPixelFactor(camera, vp));
@@ -180,7 +180,7 @@ public final class GridLayer extends AbstractLayer {
 
     private double previousAspect = -1;
 
-    private void drawGridFlat(GL2 gl, Viewport vp) {
+    private void drawGridFlat(GL3 gl, Viewport vp) {
         if (previousAspect != vp.aspect) {
             GridMath.initFlatGrid(gl, flatLine, vp.aspect);
             previousAspect = vp.aspect;
@@ -215,7 +215,7 @@ public final class GridLayer extends AbstractLayer {
         renderer.end3DRendering();
     }
 
-    private void drawEarthCircles(GL2 gl, Viewport vp, double factor, Position p) {
+    private void drawEarthCircles(GL3 gl, Viewport vp, double factor, Position p) {
         Transform.pushView();
         Transform.rotateViewInverse(p.toQuat());
 
@@ -225,9 +225,9 @@ public final class GridLayer extends AbstractLayer {
         Transform.popView();
     }
 
-    private static void drawRadialGridText(GL2 gl, List<GridLabel> labels, double size, float z, float[] labelPos) {
+    private static void drawRadialGridText(GL3 gl, List<GridLabel> labels, double size, float z, float[] labelPos) {
         float fuzz = 0.75f;
-        gl.glDisable(GL2.GL_CULL_FACE);
+        gl.glDisable(GL3.GL_CULL_FACE);
         for (float rsize : labelPos) {
             JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             renderer.setColor(Colors.MiddleGrayFloat);
@@ -237,10 +237,10 @@ public final class GridLayer extends AbstractLayer {
             labels.forEach(label -> renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
             renderer.end3DRendering();
         }
-        gl.glEnable(GL2.GL_CULL_FACE);
+        gl.glEnable(GL3.GL_CULL_FACE);
     }
 
-    private void drawGridText(GL2 gl, int size, float z) {
+    private void drawGridText(GL3 gl, int size, float z) {
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
@@ -248,10 +248,10 @@ public final class GridLayer extends AbstractLayer {
 
         renderer.begin3DRendering();
 
-        gl.glDisable(GL2.GL_CULL_FACE);
+        gl.glDisable(GL3.GL_CULL_FACE);
         latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
         renderer.flush();
-        gl.glEnable(GL2.GL_CULL_FACE);
+        gl.glEnable(GL3.GL_CULL_FACE);
 
         lonLabels.forEach(lonLabel -> {
             Transform.pushView();
@@ -266,7 +266,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         gridLine.init(gl);
         GridMath.initGrid(gl, gridLine, lonStep, latStep);
         gridNeedsInit = false;
@@ -290,7 +290,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         gridLine.dispose(gl);
         axesLine.dispose(gl);
         earthCircleLine.dispose(gl);
@@ -303,7 +303,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         dispose(gl);
     }
 

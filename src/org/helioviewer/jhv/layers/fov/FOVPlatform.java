@@ -30,7 +30,7 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 @SuppressWarnings("serial")
 class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
@@ -86,7 +86,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         return panel;
     }
 
-    private void initHemiLine(GL2 gl) {
+    private void initHemiLine(GL3 gl) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
         Vec3 rotv = new Vec3(), v = new Vec3();
@@ -133,19 +133,19 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         hemiLine.setVertex(gl, vexBuf);
     }
 
-    void init(GL2 gl) {
+    void init(GL3 gl) {
         hemiLine.init(gl);
         initHemiLine(gl);
 
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init(gl));
     }
 
-    void dispose(GL2 gl) {
+    void dispose(GL3 gl) {
         hemiLine.dispose(gl);
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose(gl));
     }
 
-    void render(Camera camera, Viewport vp, GL2 gl) {
+    void render(Camera camera, Viewport vp, GL3 gl) {
         if (!hasEnabled())
             return;
 

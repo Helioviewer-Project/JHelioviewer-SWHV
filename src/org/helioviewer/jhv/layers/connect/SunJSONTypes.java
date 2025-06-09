@@ -15,7 +15,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimaps;
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class SunJSONTypes {
 
@@ -46,7 +46,7 @@ public class SunJSONTypes {
             return time;
         }
 
-        public void render(GL2 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
+        public void render(GL3 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
             linesMap.forEach((thickness, vexBuf) -> {
                 lines.setVertexRepeatable(gl, vexBuf);
                 lines.renderLine(gl, aspect, thickness * factor * 0.5e-2 /* TBD */);

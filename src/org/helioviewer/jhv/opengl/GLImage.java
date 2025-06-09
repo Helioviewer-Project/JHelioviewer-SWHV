@@ -9,7 +9,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class GLImage {
 
@@ -50,7 +50,7 @@ public class GLImage {
 
     private static final LUT gray = LUT.get("Gray");
 
-    public void streamImage(GL2 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
+    public void streamImage(GL3 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
             tex.bind(gl);
@@ -64,7 +64,7 @@ public class GLImage {
         }
     }
 
-    public void applyFilters(GL2 gl, MetaData metaData, ImageData imageData, GLSLSolarShader shader) {
+    public void applyFilters(GL3 gl, MetaData metaData, ImageData imageData, GLSLSolarShader shader) {
         shader.bindSlit(gl, slitLeft, slitRight);
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
         shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
@@ -81,7 +81,7 @@ public class GLImage {
             diffTex.bind(gl);
     }
 
-    private void applyLUT(GL2 gl) {
+    private void applyLUT(GL3 gl) {
         lutTex.bind(gl);
 
         LUT currlut = diffMode == DifferenceMode.None ? lut : gray;
@@ -96,15 +96,15 @@ public class GLImage {
         lutChanged = false;
     }
 
-    public void init(GL2 gl) {
-        tex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
-        lutTex = new GLTexture(gl, GL2.GL_TEXTURE_1D, GLTexture.Unit.ONE);
-        diffTex = new GLTexture(gl, GL2.GL_TEXTURE_2D, GLTexture.Unit.TWO);
+    public void init(GL3 gl) {
+        tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
+        lutTex = new GLTexture(gl, GL3.GL_TEXTURE_1D, GLTexture.Unit.ONE);
+        diffTex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.TWO);
 
         lutChanged = true;
     }
 
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         if (tex != null)
             tex.delete(gl);
         if (lutTex != null)

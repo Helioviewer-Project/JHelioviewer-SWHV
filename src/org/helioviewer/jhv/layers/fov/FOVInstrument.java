@@ -20,7 +20,7 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 @SuppressWarnings("serial")
 class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell {
@@ -70,12 +70,12 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         return panel;
     }
 
-    void init(GL2 gl) {
+    void init(GL3 gl) {
         fovLine.init(gl);
         center.init(gl);
     }
 
-    void dispose(GL2 gl) {
+    void dispose(GL3 gl) {
         fovLine.dispose(gl);
         center.dispose(gl);
     }
@@ -88,7 +88,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         centerY = _centerY;
     }
 
-    void render(Viewport vp, GL2 gl, double distance, double pixFactor, byte[] color) {
+    void render(Viewport vp, GL3 gl, double distance, double pixFactor, byte[] color) {
         if (!checkBox.isSelected())
             return;
 

@@ -29,7 +29,7 @@ import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
@@ -107,7 +107,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         glImage.init(gl);
     }
 
@@ -155,7 +155,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         if (worker != null) {
             worker.cancel(true);
             worker = null;
@@ -171,7 +171,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void prerender(GL2 gl) {
+    public void prerender(GL3 gl) {
         if (imageData == null) {
             return;
         }
@@ -179,17 +179,17 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void renderMiniview(Camera camera, Viewport vp, GL2 gl) {
+    public void renderMiniview(Camera camera, Viewport vp, GL3 gl) {
         render(camera, vp, gl);
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    public void renderScale(Camera camera, Viewport vp, GL3 gl) {
         render(camera, vp, gl);
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (imageData == null) {
             return;
         }
@@ -273,7 +273,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         glImage.dispose(gl);
     }
 

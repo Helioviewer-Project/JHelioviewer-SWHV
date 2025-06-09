@@ -39,7 +39,7 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public final class ConnectionLayer extends AbstractLayer implements LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver, LoadSunJSON.Receiver {
 
@@ -88,7 +88,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL2 gl) {
+    public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
         if (connectivity != null)
@@ -106,11 +106,11 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    public void renderScale(Camera camera, Viewport vp, GL3 gl) {
         render(camera, vp, gl);
     }
 
-    private void drawConnectivity(Camera camera, Viewport vp, GL2 gl) {
+    private void drawConnectivity(Camera camera, Viewport vp, GL3 gl) {
         Quat q = Display.gridType.toGrid(camera.getViewpoint());
         putConnectivity(q, vp, connectivity.SSW, connectivityBuf, sswColor);
         putConnectivity(q, vp, connectivity.FSW, connectivityBuf, fswColor);
@@ -134,7 +134,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             points.scale.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
     }
 
-    private void drawHCS(Camera camera, Viewport vp, GL2 gl) {
+    private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
         if (hcs.size == 0)
             return;
         if (Display.mode == Display.ProjectionMode.Orthographic) {
@@ -174,7 +174,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         return new Vec3(1, Math.acos(y), Math.atan2(x, z));
     }
 
-    private void drawFootpointInterpolated(Camera camera, Viewport vp, GL2 gl) {
+    private void drawFootpointInterpolated(Camera camera, Viewport vp, GL3 gl) {
         Position viewpoint = camera.getViewpoint();
         updateTimestamp(viewpoint.time);
 
@@ -187,7 +187,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         connectivityCenter.init(gl);
         hcsLine.init(gl);
         footpointLine.init(gl);
@@ -197,7 +197,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         connectivityCenter.dispose(gl);
         hcsLine.dispose(gl);
         footpointLine.dispose(gl);
@@ -207,7 +207,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         dispose(gl);
     }
 

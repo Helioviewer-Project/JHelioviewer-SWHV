@@ -17,7 +17,7 @@ import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public final class MiniviewLayer extends AbstractLayer {
 
@@ -54,13 +54,13 @@ public final class MiniviewLayer extends AbstractLayer {
         miniViewport = new Viewport(0, offset, offset, size, size);
     }
 
-    public void renderBackground(GL2 gl) {
-        rectangle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
-        circle.renderShape(gl, GL2.GL_TRIANGLE_STRIP);
+    public void renderBackground(GL3 gl) {
+        rectangle.renderShape(gl, GL3.GL_TRIANGLE_STRIP);
+        circle.renderShape(gl, GL3.GL_TRIANGLE_STRIP);
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         dispose(gl);
     }
 
@@ -75,7 +75,7 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
         circle.init(gl);
         GLHelper.initCircleFront(gl, circle, 0, 0, 1, 18, colorCircle);
         rectangle.init(gl);
@@ -83,7 +83,7 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
         circle.dispose(gl);
         rectangle.dispose(gl);
     }

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 class VAA {
 
@@ -15,14 +15,14 @@ class VAA {
     VAA(int _index, int _size, boolean _normalized, int _stride, long _offset, int _divisor) {
         index = _index;
         size = _size;
-        type = _normalized ? GL2.GL_UNSIGNED_BYTE : GL2.GL_FLOAT;
+        type = _normalized ? GL3.GL_UNSIGNED_BYTE : GL3.GL_FLOAT;
         normalized = _normalized;
         stride = _stride;
         offset = _offset;
         divisor = _divisor;
     }
 
-    void enable(GL2 gl) {
+    void enable(GL3 gl) {
         gl.glEnableVertexAttribArray(index);
         gl.glVertexAttribPointer(index, size, type, normalized, stride, offset);
         gl.glVertexAttribDivisor(index, divisor);

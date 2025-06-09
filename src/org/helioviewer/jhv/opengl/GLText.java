@@ -8,7 +8,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class GLText {
 
@@ -39,7 +39,7 @@ public class GLText {
         return renderers[idx];
     }
 
-    public static void dispose(GL2 gl) {
+    public static void dispose(GL3 gl) {
         for (int i = 0; i < SIZE; i++) {
             if (renderers[i] != null) {
                 renderers[i].dispose(gl);

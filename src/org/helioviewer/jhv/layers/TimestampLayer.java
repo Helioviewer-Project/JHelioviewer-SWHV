@@ -23,7 +23,7 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class TimestampLayer extends AbstractLayer {
 
@@ -56,7 +56,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    public void renderFloat(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
 
@@ -102,11 +102,11 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void init(GL2 gl) {
+    public void init(GL3 gl) {
     }
 
     @Override
-    public void remove(GL2 gl) {
+    public void remove(GL3 gl) {
         dispose(gl);
     }
 
@@ -121,7 +121,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose(GL2 gl) {
+    public void dispose(GL3 gl) {
     }
 
     private JPanel optionsPanel() {

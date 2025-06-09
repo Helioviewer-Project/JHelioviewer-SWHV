@@ -18,7 +18,7 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.NullView;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 @SuppressWarnings({"serial", "unchecked"})
 public class Layers extends AbstractTableModel implements Reorderable, TimeListener.Selection {
@@ -148,38 +148,38 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         MovieDisplay.display();
     }
 
-    public static void prerender(GL2 gl) {
+    public static void prerender(GL3 gl) {
         removeLayers(gl);
         initLayers(gl);
         layers.forEach(layer -> layer.prerender(gl));
     }
 
-    public static void render(Camera camera, Viewport vp, GL2 gl) {
+    public static void render(Camera camera, Viewport vp, GL3 gl) {
         layers.forEach(layer -> layer.render(camera, vp, gl));
     }
 
-    public static void renderScale(Camera camera, Viewport vp, GL2 gl) {
+    public static void renderScale(Camera camera, Viewport vp, GL3 gl) {
         layers.forEach(layer -> layer.renderScale(camera, vp, gl));
     }
 
-    public static void renderFloat(Camera camera, Viewport vp, GL2 gl) {
+    public static void renderFloat(Camera camera, Viewport vp, GL3 gl) {
         layers.forEach(layer -> layer.renderFloat(camera, vp, gl));
     }
 
-    public static void renderFullFloat(Camera camera, Viewport vp, GL2 gl) {
+    public static void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
         layers.forEach(layer -> layer.renderFullFloat(camera, vp, gl));
     }
 
-    public static void renderMiniview(Camera camera, Viewport miniview, GL2 gl) {
+    public static void renderMiniview(Camera camera, Viewport miniview, GL3 gl) {
         layers.forEach(layer -> layer.renderMiniview(camera, miniview, gl));
     }
 
-    private static void initLayers(GL2 gl) {
+    private static void initLayers(GL3 gl) {
         newLayers.forEach(layer -> layer.init(gl));
         newLayers.clear();
     }
 
-    private static void removeLayers(GL2 gl) {
+    private static void removeLayers(GL3 gl) {
         removedLayers.forEach(layer -> layer.remove(gl));
         removedLayers.clear();
     }
@@ -244,7 +244,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         updateCell(layers.indexOf(layer), LayersPanel.TIME_COL);
     }
 
-    public static void dispose(GL2 gl) {
+    public static void dispose(GL3 gl) {
         layers.forEach(layer -> layer.dispose(gl));
         newLayers = layers;
         layers = new LayerList();

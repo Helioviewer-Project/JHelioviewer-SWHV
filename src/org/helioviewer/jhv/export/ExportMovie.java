@@ -16,7 +16,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.threads.JHVThread;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 public class ExportMovie implements Movie.Listener {
 
@@ -43,7 +43,7 @@ public class ExportMovie implements Movie.Listener {
         }
     }
 
-    public static void handleMovieExport(Camera camera, GL2 gl) {
+    public static void handleMovieExport(Camera camera, GL3 gl) {
         try {
             BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, grabber.h, BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
