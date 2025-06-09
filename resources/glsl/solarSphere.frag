@@ -1,19 +1,3 @@
-#version 330 core
-
-//precision mediump float;
-
-out vec4 outColor;
-
-struct Screen {
-    mat4 cameraTransformationInverse;
-    vec3 viewport;
-    float padding;
-    vec2 viewportOffset;
-};
-
-layout(std140) uniform ScreenBlock {
-    Screen screen;
-};
 
 const vec4 black = vec4(0, 0, 0, 1);
 
