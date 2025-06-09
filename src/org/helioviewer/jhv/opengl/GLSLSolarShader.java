@@ -63,29 +63,15 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 2 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
 
-        int programID, blockIndex;
-        programID = sphere._init(gl, sphere.hasCommon);
-        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
-        gl.glUniformBlockBinding(programID, blockIndex, 0);
-        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
+        setupUBO(gl, sphere._init(gl, sphere.hasCommon));
+        setupUBO(gl, ortho._init(gl, ortho.hasCommon));
+        setupUBO(gl, lati._init(gl, lati.hasCommon));
+        setupUBO(gl, polar._init(gl, polar.hasCommon));
+        setupUBO(gl, logpolar._init(gl, logpolar.hasCommon));
+    }
 
-        programID = ortho._init(gl, ortho.hasCommon);
-        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
-        gl.glUniformBlockBinding(programID, blockIndex, 0);
-        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
-
-        programID = lati._init(gl, lati.hasCommon);
-        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
-        gl.glUniformBlockBinding(programID, blockIndex, 0);
-        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
-
-        programID = polar._init(gl, polar.hasCommon);
-        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
-        gl.glUniformBlockBinding(programID, blockIndex, 0);
-        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
-
-        programID = logpolar._init(gl, logpolar.hasCommon);
-        blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
+    private static void setupUBO(GL3 gl, int programID) {
+        int blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
         gl.glUniformBlockBinding(programID, blockIndex, 0);
         gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
     }
