@@ -202,8 +202,6 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         MetaData metaData = imageData.getMetaData();
         glImage.applyFilters(gl, metaData, imageData, shader);
 
-        shader.bindInverseCamera(gl);
-        shader.bindViewport(gl, vp.x, vp.yGL, vp.width, vp.height);
         shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop());
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
