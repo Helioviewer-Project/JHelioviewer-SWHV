@@ -52,9 +52,18 @@ public class GLSLSolarShader extends GLSLShader {
         hasCommon = _hasCommon;
     }
 
-    public static void init(GL3 gl, int uboID) {
-        int programID, blockIndex;
+    private static int uboID;
 
+    public static void init(GL3 gl) {
+        int[] tmp = new int[1];
+        gl.glGenBuffers(1, tmp, 0);
+        uboID = tmp[0];
+
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 2 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
+
+        int programID, blockIndex;
         programID = sphere._init(gl, sphere.hasCommon);
         blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
         gl.glUniformBlockBinding(programID, blockIndex, 0);
@@ -122,9 +131,10 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
+        gl.glDeleteBuffers(1, new int[]{uboID}, 0);
     }
 
-    public static void bindScreen(GL3 gl, int uboID, float offsetX, float offsetY, float width, float height) {
+    public static void bindScreen(GL3 gl, float offsetX, float offsetY, float width, float height) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
 
         FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
