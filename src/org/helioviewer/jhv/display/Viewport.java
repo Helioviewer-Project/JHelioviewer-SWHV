@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.display;
 
+import java.nio.FloatBuffer;
+
 public class Viewport {
 
     public final double aspect;
@@ -10,6 +12,7 @@ public class Viewport {
     public final int x;
     public final int yGL; // GL direction
     public final int yAWT; // AWT direction
+    public final FloatBuffer toGLSL;
 
     public Viewport(int _idx, int _x, int _y, int _w, int _h) {
         idx = _idx;
@@ -19,6 +22,8 @@ public class Viewport {
         x = _x;
         yGL = Display.glHeight - height - _y;
         yAWT = _y;
+
+        toGLSL = FloatBuffer.wrap(new float[]{width, height, height / width, 0, x, yGL});
     }
 
     public boolean contains(int px, int py) {
