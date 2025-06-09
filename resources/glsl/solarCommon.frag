@@ -17,8 +17,11 @@ out vec4 outColor;
 struct Screen {
     mat4 cameraTransformationInverse;
     vec3 viewport;
-    float padding;
+    float padding1;
     vec2 viewportOffset;
+    float padding2;
+    float padding3;
+    vec2 polarRadii;
 };
 
 layout(std140) uniform ScreenBlock {
@@ -48,7 +51,6 @@ uniform vec4 cameraDifference[2];
 uniform float slit[2];
 uniform float sector[3];
 uniform float radii[2];
-uniform float polarRadii[2];
 uniform vec2 cutOffDirection;
 uniform float cutOffValue;
 

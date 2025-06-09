@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Transform;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 
@@ -31,7 +32,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int sectorRef;
     private int radiiRef;
-    private int polarRadiiRef;
     private int cutOffDirectionRef;
     private int cutOffValueRef;
 
@@ -60,7 +60,7 @@ public class GLSLSolarShader extends GLSLShader {
         uboID = tmp[0];
 
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 2 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 3 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
 
         setupUBO(gl, sphere._init(gl, sphere.hasCommon));
@@ -89,7 +89,6 @@ public class GLSLSolarShader extends GLSLShader {
 
         sectorRef = gl.glGetUniformLocation(id, "sector");
         radiiRef = gl.glGetUniformLocation(id, "radii");
-        polarRadiiRef = gl.glGetUniformLocation(id, "polarRadii");
         cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
 
@@ -127,13 +126,9 @@ public class GLSLSolarShader extends GLSLShader {
         FloatBuffer inv = Transform.getInverse();
         buffer.put(inv);
         inv.flip();
-        buffer.put(width);
-        buffer.put(height);
-        buffer.put(height / width);
-        buffer.put(0f); // padding
-        buffer.put(offsetX);
-        buffer.put(offsetY);
-        //buffer.flip();
+        buffer.put(width).put(height).put(height / width).put(0f); // padding
+        buffer.put(offsetX).put(offsetY).put(0f).put(0f); // padding
+        buffer.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
 
         gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
     }
@@ -252,12 +247,6 @@ public class GLSLSolarShader extends GLSLShader {
         floatArr[0] = innerRadius;
         floatArr[1] = outerRadius;
         gl.glUniform1fv(radiiRef, 2, floatArr, 0);
-    }
-
-    public void bindPolarRadii(GL3 gl, double start, double stop) {
-        floatArr[0] = (float) start;
-        floatArr[1] = (float) stop;
-        gl.glUniform1fv(polarRadiiRef, 2, floatArr, 0);
     }
 
 }
