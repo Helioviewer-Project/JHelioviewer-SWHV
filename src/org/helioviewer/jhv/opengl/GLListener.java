@@ -98,8 +98,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp.aspect);
-
-            GLSLSolarShader.bindScreen(gl, vp.x, vp.yGL, vp.width, vp.height);
+            GLSLSolarShader.bindScreen(gl, vp);
 
             GLSLSolarShader.sphere.use(gl);
             glslSolar.render(gl);
@@ -121,8 +120,7 @@ public class GLListener implements GLEventListener {
         for (Viewport vp : Display.getViewports()) {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
-
-            GLSLSolarShader.bindScreen(gl, vp.x, vp.yGL, vp.width, vp.height);
+            GLSLSolarShader.bindScreen(gl, vp);
 
             Layers.renderScale(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
@@ -146,8 +144,7 @@ public class GLListener implements GLEventListener {
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
-
-            GLSLSolarShader.bindScreen(gl, vp.x, vp.yGL, vp.width, vp.height);
+            GLSLSolarShader.bindScreen(gl, vp);
 
             gl.glDisable(GL3.GL_DEPTH_TEST);
             miniview.renderBackground(gl);
