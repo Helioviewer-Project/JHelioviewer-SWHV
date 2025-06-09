@@ -202,8 +202,6 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         MetaData metaData = imageData.getMetaData();
         glImage.applyFilters(gl, metaData, imageData, shader);
 
-        shader.bindPolarRadii(gl, Display.mode.scale.getYstart(), Display.mode.scale.getYstop());
-
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
 
