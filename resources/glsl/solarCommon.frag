@@ -16,7 +16,8 @@ out vec4 outColor;
 
 struct Screen {
     mat4 cameraTransformationInverse;
-    vec3 viewport;
+    vec2 viewport;
+    float iaspect;
     float padding;
     vec2 viewportOffset;
     float yStart;
@@ -132,7 +133,7 @@ void clamp_value(const float value, const float low, const float high) {
 vec2 getScrPos(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewportOffset) / screen.viewport.xy - 1.;
     vec4 up1 = screen.cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    vec2 scrpos = vec2(screen.viewport.z * up1.x, up1.y) + .5;
+    vec2 scrpos = vec2(screen.iaspect * up1.x, up1.y) + .5;
     clamp_coord(scrpos);
     return scrpos;
 }
