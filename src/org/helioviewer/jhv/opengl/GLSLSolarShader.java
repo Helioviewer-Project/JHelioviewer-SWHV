@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 
@@ -119,15 +120,15 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glDeleteBuffers(1, new int[]{uboID}, 0);
     }
 
-    public static void bindScreen(GL3 gl, float offsetX, float offsetY, float width, float height) {
+    public static void bindScreen(GL3 gl, Viewport vp) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
 
         FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
         FloatBuffer inv = Transform.getInverse();
         buffer.put(inv);
         inv.flip();
-        buffer.put(width).put(height).put(height / width).put(0f); // padding
-        buffer.put(offsetX).put(offsetY);
+        buffer.put(vp.width).put(vp.height).put((float) (1 / vp.aspect)).put(0f); // padding
+        buffer.put(vp.x).put(vp.yGL);
         buffer.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
 
         gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
