@@ -38,7 +38,6 @@ public class GLImage {
     private double blend = .5;
     private double sharpen = 0;
     private boolean enhanced = false;
-    private boolean dither = false;
     private DifferenceMode diffMode = DifferenceMode.None;
 
     private LUT lut = gray;
@@ -71,7 +70,7 @@ public class GLImage {
         shader.bindRadii(gl, Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
         shader.bindBrightness(gl, brightOffset, brightScale * metaData.getResponseFactor(), 1);
         shader.bindColor(gl, red, green, blue, opacity, blend);
-        shader.bindDitherEnhanced(gl, dither, enhanced);
+        shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1. / imageData.getImageBuffer().width, 1. / imageData.getImageBuffer().height);
 
         applyLUT(gl);
@@ -196,10 +195,6 @@ public class GLImage {
         enhanced = _enhanced;
     }
 
-    public void setDither(boolean _dither) {
-        dither = _dither;
-    }
-
     public void setDifferenceMode(DifferenceMode mode) {
         diffMode = mode;
     }
@@ -214,10 +209,6 @@ public class GLImage {
 
     public boolean getEnhanced() {
         return enhanced;
-    }
-
-    public boolean getDither() {
-        return dither;
     }
 
     public double getOpacity() {
@@ -253,7 +244,6 @@ public class GLImage {
         setInnerMask(jo.optDouble("innerMask", innerMask));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         enhanced = jo.optBoolean("enhanced", false);
-        dither = jo.optBoolean("dither", false);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
         try {
             diffMode = DifferenceMode.valueOf(strDiffMode);
@@ -281,7 +271,6 @@ public class GLImage {
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
         jo.put("enhanced", enhanced);
-        jo.put("dither", dither);
         jo.put("differenceMode", diffMode);
 
         JSONObject colorObject = new JSONObject();

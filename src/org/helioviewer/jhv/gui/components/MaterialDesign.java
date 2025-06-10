@@ -4,7 +4,6 @@ enum MaterialDesign {
 
     // https://github.com/aalmiray/ikonli
     BACKUP_RESTORE("mdi-backup-restore", '\uf06f'),
-    BLUR("mdi-blur", '\uf0b5'),
     BORDER_ALL("mdi-border-all", '\uf0c7'),
     // BRIGHTNESS_AUTO("mdi-brightness-auto", '\uf0e1'),
     CALENDAR("mdi-calendar", '\uf0ed'),
