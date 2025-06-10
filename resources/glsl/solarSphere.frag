@@ -6,7 +6,8 @@ out vec4 outColor;
 
 struct Screen {
     mat4 cameraTransformationInverse;
-    vec3 viewport;
+    vec2 viewport;
+    float iaspect;
     float padding;
     vec2 viewportOffset;
 };
