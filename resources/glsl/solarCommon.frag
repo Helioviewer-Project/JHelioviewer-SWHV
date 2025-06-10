@@ -17,11 +17,10 @@ out vec4 outColor;
 struct Screen {
     mat4 cameraTransformationInverse;
     vec3 viewport;
-    float padding1;
+    float padding;
     vec2 viewportOffset;
-    float padding2;
-    float padding3;
-    vec2 polarRadii;
+    float yStart;
+    float yStop;
 };
 
 layout(std140) uniform ScreenBlock {

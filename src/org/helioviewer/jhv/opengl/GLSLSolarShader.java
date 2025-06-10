@@ -60,7 +60,7 @@ public class GLSLSolarShader extends GLSLShader {
         uboID = tmp[0];
 
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 3 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 2 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
 
         setupUBO(gl, sphere._init(gl, sphere.hasCommon));
@@ -127,7 +127,7 @@ public class GLSLSolarShader extends GLSLShader {
         buffer.put(inv);
         inv.flip();
         buffer.put(width).put(height).put(height / width).put(0f); // padding
-        buffer.put(offsetX).put(offsetY).put(0f).put(0f); // padding
+        buffer.put(offsetX).put(offsetY);
         buffer.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
 
         gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
