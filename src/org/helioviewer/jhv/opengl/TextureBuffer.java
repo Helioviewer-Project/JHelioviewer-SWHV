@@ -4,12 +4,12 @@ import java.nio.Buffer;
 
 import com.jogamp.opengl.GL3;
 
-class BufferTexture {
+class TextureBuffer {
 
     private final int bufferID;
     private final int texBufferID;
 
-    BufferTexture(GL3 gl, Buffer buf) {
+    TextureBuffer(GL3 gl, Buffer buf) {
         int[] tmpId = new int[1];
         // Generate and bind buffer
         gl.glGenBuffers(1, tmpId, 0);
