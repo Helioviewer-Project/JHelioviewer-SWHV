@@ -128,7 +128,7 @@ public class GLSLSolarShader extends GLSLShader {
         FloatBuffer inv = Transform.getInverse();
         buffer.put(inv);
         inv.flip();
-        buffer.put(vp.x).put(vp.yGL).put(vp.width).put(vp.height).put((float) (1 / vp.aspect));
+        buffer.put(vp.glslArray).put((float) (1 / vp.aspect));
         buffer.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
 
         gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);

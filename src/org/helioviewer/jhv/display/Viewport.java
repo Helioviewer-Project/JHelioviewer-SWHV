@@ -10,6 +10,7 @@ public class Viewport {
     public final int x;
     public final int yGL; // GL direction
     public final int yAWT; // AWT direction
+    public final float[] glslArray;
 
     public Viewport(int _idx, int _x, int _y, int _w, int _h) {
         idx = _idx;
@@ -19,6 +20,7 @@ public class Viewport {
         x = _x;
         yGL = Display.glHeight - height - _y;
         yAWT = _y;
+        glslArray = new float[]{x, yGL, width, height};
     }
 
     public boolean contains(int px, int py) {
