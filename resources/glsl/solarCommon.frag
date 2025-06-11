@@ -15,13 +15,12 @@
 out vec4 outColor;
 
 struct Screen {
-    mat4 cameraTransformationInverse;
-    vec2 viewport;
+    mat4 inverseMVP;
+    vec4 viewport;
     float iaspect;
-    float padding;
-    vec2 viewportOffset;
     float yStart;
     float yStop;
+    float padding;
 };
 
 layout(std140) uniform ScreenBlock {
@@ -128,8 +127,8 @@ void clamp_value(const float value, const float low, const float high) {
 }
 
 vec2 getScrPos(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewportOffset) / screen.viewport.xy - 1.;
-    vec4 up1 = screen.cameraTransformationInverse * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
+    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 scrpos = vec2(screen.iaspect * up1.x, up1.y) + .5;
     clamp_coord(scrpos);
     return scrpos;
