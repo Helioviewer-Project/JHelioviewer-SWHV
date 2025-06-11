@@ -1,10 +1,11 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7.2 (pending)
+## JHelioviewer 4.7.2 (2025-06-11)
 
 - Add option of ZScale clipping algorithm for FITS data
 - Add logarithmic scaling for FITS data
+- Add subtle dithering to reduce color banding of smooth gradient image data
 
 ## JHelioviewer 4.7.1 (2025-03-12)
 
