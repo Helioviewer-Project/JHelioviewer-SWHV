@@ -34,7 +34,7 @@ abstract class GLSLShader {
         fragment = _fragment;
     }
 
-    protected final int _init(GL3 gl, boolean common) {
+    protected final void _init(GL3 gl, boolean common) {
         try {
             String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
             vertexID = attachShader(gl, ShaderType.vertex, vertexText);
@@ -46,7 +46,6 @@ abstract class GLSLShader {
             progID = initializeProgram(gl, true);
             use(gl);
             initUniforms(gl, progID);
-            return progID;
         } catch (Exception e) {
             throw new GLException("Cannot load shader", e);
         }
