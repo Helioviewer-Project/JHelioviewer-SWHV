@@ -27,13 +27,15 @@ abstract class J2KSource {
 
     private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
+    private boolean isJP2;
 
     static class Local extends J2KSource {
 
         private final String path;
 
-        Local(String _path) {
+        Local(String _path, boolean isJP2) {
             path = _path;
+            super.isJP2 = isJP2;
         }
 
         @Override
@@ -69,6 +71,10 @@ abstract class J2KSource {
 
     Jpx_source jpxSource() {
         return jpxSrc;
+    }
+
+    boolean isJP2() {
+        return isJP2;
     }
 
     int getNumberLayers() throws KduException {
