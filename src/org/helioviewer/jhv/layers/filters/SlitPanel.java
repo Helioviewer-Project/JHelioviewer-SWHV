@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 
@@ -19,17 +17,7 @@ public class SlitPanel implements FilterDetails {
     public SlitPanel(ImageLayer layer) {
         int left = (int) (layer.getGLImage().getSlitLeft() * 100);
         int right = (int) (layer.getGLImage().getSlitRight() * 100);
-
         slider = new JHVRangeSlider(0, 100, left, right);
-        slider.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    slider.setLowValue(0);
-                    slider.setHighValue(100);
-                }
-            }
-        });
 
         label = new JLabel(LevelsPanel.formatPercent(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {

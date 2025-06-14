@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 
@@ -19,17 +17,7 @@ public class SectorPanel implements FilterDetails {
     public SectorPanel(ImageLayer layer) {
         int left = 0; // (int) (layer.getGLImage().getSector0() + .5);
         int right = 0; // (int) (layer.getGLImage().getSector1() + .5);
-
         slider = new JHVRangeSlider(-180, 180, left, right);
-        slider.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    slider.setLowValue(-180);
-                    slider.setHighValue(180);
-                }
-            }
-        });
 
         label = new JLabel(LevelsPanel.formatDegree(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
