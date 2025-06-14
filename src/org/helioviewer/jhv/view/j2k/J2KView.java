@@ -52,7 +52,6 @@ public class J2KView extends BaseView {
 
     protected final CompletionLevel completionLevel;
     protected final J2KReader reader;
-    private final boolean isJP2;
 
     private static int incrementSerial() {
         while (true) {
@@ -70,6 +69,7 @@ public class J2KView extends BaseView {
         request = _request;
 
         try {
+            boolean isJP2 = dataUri.format() == Image.JP2;
             switch (dataUri.format()) {
                 case Image.JPIP -> {
                     reader = new J2KReader(dataUri.uri());
@@ -77,11 +77,10 @@ public class J2KView extends BaseView {
                 }
                 case Image.JP2, Image.JPX -> {
                     reader = null;
-                    source = new J2KSource.Local(dataUri.file().toString());
+                    source = new J2KSource.Local(dataUri.file().toString(), isJP2);
                 }
                 default -> throw new Exception("Unknown image type");
             }
-            isJP2 = dataUri.format() == Image.JP2;
             source.open();
 
             int[] lut = source.getLUT();
@@ -289,7 +288,7 @@ public class J2KView extends BaseView {
         if (imageBuffer == null) {
             int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
             try {
-                executor.decode(new J2KDecoder(source().jpxSource(), decodeParams, numComps, filterType), new J2KCallback(decodeParams));
+                executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(decodeParams));
             } catch (Exception e) {
                 Log.error(e);
             }
@@ -310,13 +309,6 @@ public class J2KView extends BaseView {
         public void onSuccess(ImageBuffer result) {
             if (params.complete) {
                 decodeCache.put(params, result);
-                if (isJP2) { // JP2, close asap
-                    try {
-                        source.close();
-                    } catch (KduException e) {
-                        Log.error(e);
-                    }
-                }
             }
             sendDataToHandler(params, result);
         }
@@ -356,13 +348,6 @@ public class J2KView extends BaseView {
 
     public ResolutionSet.Level getResolutionLevel(int frame, int level) {
         return completionLevel.getResolutionSet(frame).getLevel(level);
-    }
-
-    J2KSource source() throws KduException {
-        if (isJP2) { // JP2, reopen
-            source.open();
-        }
-        return source;
     }
 
     CompletionLevel completionLevel() {

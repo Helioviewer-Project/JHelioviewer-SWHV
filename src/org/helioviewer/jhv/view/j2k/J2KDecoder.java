@@ -26,7 +26,7 @@ import org.lwjgl.system.MemoryUtil;
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 
-record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps, ImageFilter.Type filterType)
+record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFilter.Type filterType)
         implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
@@ -43,6 +43,10 @@ record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps, Imag
     @Nonnull
     @Override
     public ImageBuffer call() throws Exception {
+        if (src.isJP2())
+            src.open();
+        Jpx_source source = src.jpxSource();
+
         SubImage subImage = params.subImage;
         int frame = params.frame;
         Kdu_region_compositor compositor = createCompositor(source, params.factor < 1 ? qualityLow : qualityHigh);
@@ -105,8 +109,10 @@ record J2KDecoder(Jpx_source source, J2KParams.Decode params, int numComps, Imag
                 }
             }
         }
-
         destroyCompositor(compositor);
+
+        if (src.isJP2())
+            src.close();
 /*
         StatsAccumulator acc = localAcc.get();
         acc.add(sw.elapsed().toNanos() / 1e9);
