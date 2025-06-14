@@ -32,8 +32,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
     private String measurement = "";
     private String observatory = "";
 
-    private double sunPositionX = 0;
-    private double sunPositionY = 0;
+    private double centerX = 0;
+    private double centerY = 0;
 
     public HelioviewerMetaData(@Nonnull MetaDataContainer m) {
         identifyObservation(m);
@@ -299,12 +299,12 @@ public final class HelioviewerMetaData extends BaseMetaData {
             unitPerPixelY = Math.abs(arcsecPerPixelY * unitPerArcsec);
 
             // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
-            double sunX = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
-            double sunY = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
-            sunPositionX = unitPerPixelX * sunX;
-            sunPositionY = unitPerPixelY * (pixelH - sunY);
+            double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
+            double crpix2 = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
+            centerX = unitPerPixelX * crpix1;
+            centerY = unitPerPixelY * (pixelH - crpix2);
 
-            region = new Region(-sunX * unitPerPixelX, -sunY * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
+            region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
             crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
             crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
@@ -358,7 +358,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     @Nonnull
     @Override
     public Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
-        return new Region(roiX * factorX * unitPerPixelX - sunPositionX, roiY * factorY * unitPerPixelY - sunPositionY,
+        return new Region(roiX * factorX * unitPerPixelX - centerX, roiY * factorY * unitPerPixelY - centerY,
                 roiWidth * factorX * unitPerPixelX, roiHeight * factorY * unitPerPixelY);
     }
 
