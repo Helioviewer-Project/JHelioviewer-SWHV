@@ -32,8 +32,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
     private String measurement = "";
     private String observatory = "";
 
-    private double centerX = 0;
-    private double centerY = 0;
+    private double referenceX = 0;
+    private double referenceY = 0;
 
     public HelioviewerMetaData(@Nonnull MetaDataContainer m) {
         identifyObservation(m);
@@ -301,8 +301,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
             // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
             double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
             double crpix2 = m.getDouble("CRPIX2").orElseGet(() -> (pixelH + 1) / 2.) - .5;
-            centerX = unitPerPixelX * crpix1;
-            centerY = unitPerPixelY * (pixelH - crpix2);
+            referenceX = unitPerPixelX * crpix1;
+            referenceY = unitPerPixelY * (pixelH - crpix2);
 
             region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
@@ -358,7 +358,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     @Nonnull
     @Override
     public Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
-        return new Region(roiX * factorX * unitPerPixelX - centerX, roiY * factorY * unitPerPixelY - centerY,
+        return new Region(roiX * factorX * unitPerPixelX - referenceX, roiY * factorY * unitPerPixelY - referenceY,
                 roiWidth * factorX * unitPerPixelX, roiHeight * factorY * unitPerPixelY);
     }
 

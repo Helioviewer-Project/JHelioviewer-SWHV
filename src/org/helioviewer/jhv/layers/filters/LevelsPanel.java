@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 
@@ -32,17 +30,7 @@ public class LevelsPanel implements FilterDetails {
         double offset = layer.getGLImage().getBrightOffset();
         double scale = layer.getGLImage().getBrightScale();
         int high = (int) (100 * (offset + scale));
-
         slider = new JHVRangeSlider(-101, 201, (int) (offset * 100), high);
-        slider.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    slider.setLowValue(0);
-                    slider.setHighValue(100);
-                }
-            }
-        });
 
         label = new JLabel(formatPercent(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
