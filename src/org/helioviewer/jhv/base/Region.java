@@ -13,6 +13,7 @@ public class Region {
     public final double ury;
     public final double ulx;
     // public final double uly;
+    public final float[] glslArray;
 
     public Region(double newLLX, double newLLY, double newWidth, double newHeight) {
         width = newWidth;
@@ -26,6 +27,7 @@ public class Region {
 
         ulx = llx;
         // uly = lly + height;
+        glslArray = new float[]{(float) llx, (float) lly, (float) (1. / width), (float) (1. / height)};
     }
 
     public static Region scale(Region r, double f) {
