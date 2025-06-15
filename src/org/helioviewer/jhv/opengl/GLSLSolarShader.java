@@ -54,9 +54,11 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static int screenID;
+    private static int wcsID;
 
     public static void init(GL3 gl) {
-        screenID = generateUBO(gl, 16 * 4 + 2 * 4 * 4);
+        screenID = generateUBO(gl, (16 + 2 * 4 ) * 4);
+        wcsID = generateUBO(gl, 2 * (4 + 4 + 2) * 4);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -76,10 +78,10 @@ public class GLSLSolarShader extends GLSLShader {
         return uboID;
     }
 
-    private static void setupScreen(GL3 gl, int programID, String blockName, int uboID) {
+    private static void setupUBO(GL3 gl, int programID, String blockName, int uboID, int binding) {
         int blockIndex = gl.glGetUniformBlockIndex(programID, blockName);
-        gl.glUniformBlockBinding(programID, blockIndex, 0);
-        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
+        gl.glUniformBlockBinding(programID, blockIndex, binding);
+        gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, binding, uboID);
     }
 
     @Override
@@ -109,7 +111,8 @@ public class GLSLSolarShader extends GLSLShader {
 
         cameraDifferenceRef = gl.glGetUniformLocation(id, "cameraDifference");
 
-        setupScreen(gl, id, "ScreenBlock", screenID);
+        setupUBO(gl, id, "ScreenBlock", screenID, 0);
+        setupUBO(gl, id, "WCSBlock", wcsID, 1);
 
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
@@ -124,7 +127,7 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
-        gl.glDeleteBuffers(1, new int[]{screenID}, 0);
+        gl.glDeleteBuffers(1, new int[]{screenID, wcsID}, 0);
     }
 
     public static void bindScreen(GL3 gl, Viewport vp) {
@@ -140,36 +143,32 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
     }
 
-    public void bindCameraDifference(GL3 gl, Quat quat, Quat quatDiff) {
-        quat.setFloatArray(floatArr, 0);
-        quatDiff.setFloatArray(floatArr, 4);
-        gl.glUniform4fv(cameraDifferenceRef, 2, floatArr, 0);
-    }
-
-    public void bindCRVAL(GL3 gl, Vec2 vec, Vec2 vecDiff) {
-        floatArr[0] = (float) vec.x;
-        floatArr[1] = (float) vec.y;
-        floatArr[2] = (float) vecDiff.x;
-        floatArr[3] = (float) vecDiff.y;
-        gl.glUniform2fv(crvalRef, 2, floatArr, 0);
-    }
-
-    public void bindCROTA(GL3 gl, Quat quat, Quat quatDiff) {
-        quat.setFloatArray(floatArr, 0);
-        quatDiff.setFloatArray(floatArr, 4);
-        gl.glUniform4fv(crotaRef, 2, floatArr, 0);
-    }
-
-    public void bindRect(GL3 gl, Region r, Region dr) {
+    public void bindWCS(GL3 gl, Region r, Quat crota, Vec2 crval, Region rDiff, Quat crotaDiff, Vec2 crvalDiff) {
         floatArr[0] = (float) r.llx;
         floatArr[1] = (float) r.lly;
         floatArr[2] = (float) (1. / r.width);
         floatArr[3] = (float) (1. / r.height);
-        floatArr[4] = (float) dr.llx;
-        floatArr[5] = (float) dr.lly;
-        floatArr[6] = (float) (1. / dr.width);
-        floatArr[7] = (float) (1. / dr.height);
+        floatArr[4] = (float) rDiff.llx;
+        floatArr[5] = (float) rDiff.lly;
+        floatArr[6] = (float) (1. / rDiff.width);
+        floatArr[7] = (float) (1. / rDiff.height);
         gl.glUniform4fv(rectRef, 2, floatArr, 0);
+
+        crota.setFloatArray(floatArr, 0);
+        crotaDiff.setFloatArray(floatArr, 4);
+        gl.glUniform4fv(crotaRef, 2, floatArr, 0);
+
+        floatArr[0] = (float) crval.x;
+        floatArr[1] = (float) crval.y;
+        floatArr[2] = (float) crvalDiff.x;
+        floatArr[3] = (float) crvalDiff.y;
+        gl.glUniform2fv(crvalRef, 2, floatArr, 0);
+    }
+
+    public void bindCameraDifference(GL3 gl, Quat quat, Quat quatDiff) {
+        quat.setFloatArray(floatArr, 0);
+        quatDiff.setFloatArray(floatArr, 4);
+        gl.glUniform4fv(cameraDifferenceRef, 2, floatArr, 0);
     }
 
     public void bindDeltaT(GL3 gl, double deltaT, double deltaTDiff) {
