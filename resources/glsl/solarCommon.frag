@@ -49,10 +49,6 @@ uniform vec4 color;
 
 uniform vec3 grid[2];
 
-uniform vec2 crval[2];
-uniform vec4 crota[2];
-uniform vec4 rect[2];
-
 uniform float deltaT[2];
 
 uniform vec4 cameraDifference[2];
