@@ -210,10 +210,12 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         MetaData metaDataDiff = imageDataDiff.getMetaData();
         Position metaViewpointDiff = metaDataDiff.getViewpoint();
 
-        shader.bindCameraDifference(gl, Quat.rotateWithConjugate(q, metaViewpoint.toQuat()), Quat.rotateWithConjugate(q, metaViewpointDiff.toQuat()));
+        Quat cameraDiff = Quat.rotateWithConjugate(q, metaViewpoint.toQuat());
+        Quat cameraDiffDiff = Quat.rotateWithConjugate(q, metaViewpointDiff.toQuat());
 
-        shader.bindWCS(gl, imageData.getRegion(), metaData.getCROTA(), metaData.getCRVAL(),
-                imageDataDiff.getRegion(), metaDataDiff.getCROTA(), metaDataDiff.getCRVAL());
+        shader.bindWCS(gl,
+                cameraDiff, imageData.getRegion(), metaData.getCROTA(), metaData.getCRVAL(),
+                cameraDiffDiff, imageDataDiff.getRegion(), metaDataDiff.getCROTA(), metaDataDiff.getCRVAL());
 
         shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
         if (metaData.getCutOffValue() > 0) {
