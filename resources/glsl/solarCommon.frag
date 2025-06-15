@@ -30,9 +30,7 @@ layout(std140) uniform ScreenBlock {
 struct WCS {
     vec4 rect;
     vec4 crota;
-    vec4 crotaAdj;
     vec2 crval;
-    vec2 crvalAdj;
 };
 
 layout(std140) uniform WCSBlock {
