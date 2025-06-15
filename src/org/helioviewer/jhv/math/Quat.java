@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.math;
 
+import java.nio.FloatBuffer;
+
 import org.json.JSONArray;
 
 public class Quat {
@@ -177,6 +179,10 @@ public class Quat {
         arr[idx + 1] = (float) y;
         arr[idx + 2] = (float) z;
         arr[idx + 3] = (float) w;
+    }
+
+    public void setFloatBuffer(FloatBuffer buf) {
+        buf.put((float) x).put((float) y).put((float) z).put((float) w);
     }
 
     public JSONArray toJson() {
