@@ -53,16 +53,10 @@ public class GLSLSolarShader extends GLSLShader {
         hasCommon = _hasCommon;
     }
 
-    private static int uboID;
+    private static int screenID;
 
     public static void init(GL3 gl) {
-        int[] tmp = new int[1];
-        gl.glGenBuffers(1, tmp, 0);
-        uboID = tmp[0];
-
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, 16 * 4 + 2 * 4 * 4, null, GL3.GL_DYNAMIC_DRAW);
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
+        screenID = generateUBO(gl, 16 * 4 + 2 * 4 * 4);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -71,8 +65,19 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._init(gl, logpolar.hasCommon);
     }
 
-    private static void setupScreen(GL3 gl, int programID) {
-        int blockIndex = gl.glGetUniformBlockIndex(programID, "ScreenBlock");
+    private static int generateUBO(GL3 gl, int size) {
+        int[] tmp = new int[1];
+        gl.glGenBuffers(1, tmp, 0);
+        int uboID = tmp[0];
+
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, size, null, GL3.GL_DYNAMIC_DRAW);
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
+        return uboID;
+    }
+
+    private static void setupScreen(GL3 gl, int programID, String blockName, int uboID) {
+        int blockIndex = gl.glGetUniformBlockIndex(programID, blockName);
         gl.glUniformBlockBinding(programID, blockIndex, 0);
         gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, 0, uboID);
     }
@@ -104,7 +109,8 @@ public class GLSLSolarShader extends GLSLShader {
 
         cameraDifferenceRef = gl.glGetUniformLocation(id, "cameraDifference");
 
-        setupScreen(gl, id);
+        setupScreen(gl, id, "ScreenBlock", screenID);
+
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
             setTextureUnit(gl, id, "lut", GLTexture.Unit.ONE);
@@ -118,11 +124,11 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
-        gl.glDeleteBuffers(1, new int[]{uboID}, 0);
+        gl.glDeleteBuffers(1, new int[]{screenID}, 0);
     }
 
     public static void bindScreen(GL3 gl, Viewport vp) {
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, screenID);
 
         FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
         FloatBuffer inv = Transform.getInverse();
