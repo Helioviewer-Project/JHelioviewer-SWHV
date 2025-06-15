@@ -27,6 +27,18 @@ layout(std140) uniform ScreenBlock {
     Screen screen;
 };
 
+struct WCS {
+    vec4 rect;
+    vec4 crota;
+    vec4 crotaAdj;
+    vec2 crval;
+    vec2 crvalAdj;
+};
+
+layout(std140) uniform WCSBlock {
+    WCS wcs[2];
+};
+
 uniform sampler2D image;
 uniform int calculateDepth;
 uniform int isdifference;
