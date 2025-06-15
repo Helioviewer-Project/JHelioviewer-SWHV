@@ -31,11 +31,11 @@ void main(void) {
 
     if (onDisk) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
-        rotatedHitPoint      = differential(deltaT[0], rotate_vector_inverse(cameraDifference[0], hitPoint));
+        rotatedHitPoint      = differential(deltaT[0], rotate_vector_inverse(wcs[0].cameraDiff, hitPoint));
         centeredHitPoint     = apply_center(rotatedHitPoint, wcs[0].crval, wcs[0].crota);
 
         if (isdifference != NODIFFERENCE) {
-            diffRotatedHitPoint  = differential(deltaT[1], rotate_vector_inverse(cameraDifference[1], hitPoint));
+            diffRotatedHitPoint  = differential(deltaT[1], rotate_vector_inverse(wcs[1].cameraDiff, hitPoint));
             diffCenteredHitPoint = apply_center(diffRotatedHitPoint, wcs[1].crval, wcs[1].crota);
         }
 
@@ -47,11 +47,11 @@ void main(void) {
     }
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
-        hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifference[0], up1, onDisk));
+        hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
         if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
 
-        rotatedHitPoint = rotate_vector_inverse(cameraDifference[0], hitPoint);
+        rotatedHitPoint = rotate_vector_inverse(wcs[0].cameraDiff, hitPoint);
         if (length(rotatedHitPoint) <= 1.) // differential: central disk
             discard;
 
@@ -84,8 +84,8 @@ void main(void) {
     vec2 difftexcoord;
     if (isdifference != NODIFFERENCE) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
-            hitPoint = vec3(up1.x, up1.y, intersectPlane(cameraDifference[1], up1, onDisk));
-            diffRotatedHitPoint  = rotate_vector_inverse(cameraDifference[1], hitPoint);
+            hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
+            diffRotatedHitPoint  = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);
             diffCenteredHitPoint = apply_center(diffRotatedHitPoint, wcs[1].crval, wcs[1].crota);
         }
 

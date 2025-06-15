@@ -28,6 +28,7 @@ layout(std140) uniform ScreenBlock {
 };
 
 struct WCS {
+    vec4 cameraDiff; // not strictly WCS
     vec4 rect;
     vec4 crota;
     vec2 crval;
@@ -50,8 +51,6 @@ uniform vec4 color;
 uniform vec3 grid[2];
 
 uniform float deltaT[2];
-
-uniform vec4 cameraDifference[2];
 
 uniform float slit[2];
 uniform float sector[3];

@@ -39,8 +39,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int enhancedRef;
     private int calculateDepthRef;
 
-    private int cameraDifferenceRef;
-
     private final int[] intArr = new int[1];
     private final float[] floatArr = new float[8];
 
@@ -54,7 +52,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     public static void init(GL3 gl) {
         screenID = generateUBO(gl, (16 + 2 * 4) * 4);
-        wcsID = generateUBO(gl, 2 * (4 + 4 + 4) * 4);
+        wcsID = generateUBO(gl, 2 * (4 + 4 + 4 + 4) * 4);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -100,8 +98,6 @@ public class GLSLSolarShader extends GLSLShader {
         enhancedRef = gl.glGetUniformLocation(id, "enhanced");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
-        cameraDifferenceRef = gl.glGetUniformLocation(id, "cameraDifference");
-
         setupUBO(gl, id, "ScreenBlock", screenID, 0);
         setupUBO(gl, id, "WCSBlock", wcsID, 1);
 
@@ -136,10 +132,15 @@ public class GLSLSolarShader extends GLSLShader {
 
     private static final float[] quatArray = new float[4];
 
-    public void bindWCS(GL3 gl, Region r, Quat crota, Vec2 crval, Region rDiff, Quat crotaDiff, Vec2 crvalDiff) {
+    public void bindWCS(GL3 gl,
+            Quat cameraDiff, Region r, Quat crota, Vec2 crval,
+            Quat cameraDiffDiff, Region rDiff, Quat crotaDiff, Vec2 crvalDiff) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, wcsID);
 
         FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
+
+        cameraDiff.setFloatArray(quatArray, 0);
+        buffer.put(quatArray);
 
         buffer.put((float) r.llx).put((float) r.lly).put((float) (1. / r.width)).put((float) (1. / r.height));
 
@@ -149,6 +150,9 @@ public class GLSLSolarShader extends GLSLShader {
         buffer.put((float) crval.x).put((float) crval.y);
         buffer.put(0).put(0);
 
+        cameraDiffDiff.setFloatArray(quatArray, 0);
+        buffer.put(quatArray);
+
         buffer.put((float) rDiff.llx).put((float) rDiff.lly).put((float) (1. / rDiff.width)).put((float) (1. / rDiff.height));
 
         crotaDiff.setFloatArray(quatArray, 0);
@@ -157,12 +161,6 @@ public class GLSLSolarShader extends GLSLShader {
         buffer.put((float) crvalDiff.x).put((float) crvalDiff.y);
 
         gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
-    }
-
-    public void bindCameraDifference(GL3 gl, Quat quat, Quat quatDiff) {
-        quat.setFloatArray(floatArr, 0);
-        quatDiff.setFloatArray(floatArr, 4);
-        gl.glUniform4fv(cameraDifferenceRef, 2, floatArr, 0);
     }
 
     public void bindDeltaT(GL3 gl, double deltaT, double deltaTDiff) {
