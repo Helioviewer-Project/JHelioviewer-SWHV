@@ -34,13 +34,13 @@ void main(void) {
     float radius;
 
     vec2 scrpos = getScrPos();
-    get_polar_texcoord(crval[0], crota[0], rect[0], scrpos, texcoord, radius);
+    get_polar_texcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, texcoord, radius);
     if (isdifference == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, radius);
     } else {
         vec2 difftexcoord;
         float diffradius;
-        get_polar_texcoord(crval[1], crota[1], rect[1], scrpos, difftexcoord, diffradius);
+        get_polar_texcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, difftexcoord, diffradius);
         color = getColor(texcoord, difftexcoord, radius);
     }
     outColor = color;
