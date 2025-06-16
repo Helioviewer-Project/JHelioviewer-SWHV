@@ -25,6 +25,7 @@ public class GLTexture {
     private int texID;
     private final int unit;
     private final int target;
+    private final int pbo;
 
     private int prev_width = -1;
     private int prev_height = -1;
@@ -35,6 +36,8 @@ public class GLTexture {
         int[] tmp = new int[1];
         gl.glGenTextures(1, tmp, 0);
         texID = tmp[0];
+        gl.glGenBuffers(1, tmp, 0);
+        pbo = tmp[0];
         target = _target;
         unit = GL3.GL_TEXTURE0 + _unit.ordinal();
     }
@@ -46,6 +49,7 @@ public class GLTexture {
 
     public void delete(GL3 gl) {
         gl.glDeleteTextures(1, new int[]{texID}, 0);
+        gl.glDeleteBuffers(1, new int[]{pbo}, 0);
         texID = prev_width = -1;
     }
 
@@ -83,7 +87,13 @@ public class GLTexture {
 
         gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, format.bytes);
         gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, w);
-        gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, imageBuffer.buffer);
+
+        int size = format.bytes * imageBuffer.buffer.capacity();
+        gl.glBindBuffer(GL3.GL_PIXEL_UNPACK_BUFFER, pbo);
+        gl.glBufferData(GL3.GL_PIXEL_UNPACK_BUFFER, size, null, GL3.GL_STREAM_DRAW);
+        gl.glBufferSubData(GL3.GL_PIXEL_UNPACK_BUFFER, 0, size, imageBuffer.buffer);
+        gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0);
+        gl.glBindBuffer(GL3.GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
     public static void copyBufferedImage(GL3 gl, BufferedImage source) {
