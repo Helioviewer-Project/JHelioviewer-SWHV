@@ -131,23 +131,23 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindWCS(GL3 gl,
-            Quat cameraDiff, Region r, Quat crota, Vec2 crval,
-            Quat cameraDiffDiff, Region rDiff, Quat crotaDiff, Vec2 crvalDiff) {
+                        Quat cameraDiff0, Region r0, Quat crota0, Vec2 crval0,
+                        Quat cameraDiff1, Region r1, Quat crota1, Vec2 crval1) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, wcsID);
 
         FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
 
-        cameraDiff.setFloatBuffer(buffer);
-        buffer.put(r.glslArray);
-        crota.setFloatBuffer(buffer);
-        buffer.put((float) crval.x).put((float) crval.y);
+        cameraDiff0.setFloatBuffer(buffer);
+        buffer.put(r0.glslArray);
+        crota0.setFloatBuffer(buffer);
+        buffer.put((float) crval0.x).put((float) crval0.y);
 
-        buffer.put(0).put(0);
+        buffer.put(0).put(0); // padding
 
-        cameraDiffDiff.setFloatBuffer(buffer);
-        buffer.put(rDiff.glslArray);
-        crotaDiff.setFloatBuffer(buffer);
-        buffer.put((float) crvalDiff.x).put((float) crvalDiff.y);
+        cameraDiff1.setFloatBuffer(buffer);
+        buffer.put(r1.glslArray);
+        crota1.setFloatBuffer(buffer);
+        buffer.put((float) crval1.x).put((float) crval1.y);
 
         gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
     }
