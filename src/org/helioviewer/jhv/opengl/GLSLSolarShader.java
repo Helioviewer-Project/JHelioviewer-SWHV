@@ -48,11 +48,16 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static int screenID;
+    private static final int SCREEN_SIZE = (16 + 2 * 4) * 4;
+    private static final FloatBuffer screenBuf = FloatBuffer.wrap(new float[SCREEN_SIZE]);
+
     private static int wcsID;
+    private static final int WCS_SIZE = 2 * (4 + 4 + 4 + 4) * 4;
+    private static final FloatBuffer wcsBuf = FloatBuffer.wrap(new float[WCS_SIZE]);
 
     public static void init(GL3 gl) {
-        screenID = generateUBO(gl, (16 + 2 * 4) * 4);
-        wcsID = generateUBO(gl, 2 * (4 + 4 + 4 + 4) * 4);
+        screenID = generateUBO(gl, SCREEN_SIZE);
+        wcsID = generateUBO(gl, WCS_SIZE);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -120,14 +125,14 @@ public class GLSLSolarShader extends GLSLShader {
     public static void bindScreen(GL3 gl, Viewport vp) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, screenID);
 
-        FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
         FloatBuffer inv = Transform.getInverse();
-        buffer.put(inv);
+        screenBuf.put(inv);
         inv.flip();
-        buffer.put(vp.glslArray).put((float) (1 / vp.aspect));
-        buffer.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
+        screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
+        screenBuf.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
 
-        gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
+        screenBuf.flip();
+        gl.glBufferSubData(GL3.GL_UNIFORM_BUFFER, 0, SCREEN_SIZE, screenBuf);
     }
 
     public void bindWCS(GL3 gl,
@@ -135,21 +140,20 @@ public class GLSLSolarShader extends GLSLShader {
                         Quat cameraDiff1, Region r1, Quat crota1, Vec2 crval1) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, wcsID);
 
-        FloatBuffer buffer = gl.glMapBuffer(GL3.GL_UNIFORM_BUFFER, GL3.GL_WRITE_ONLY).asFloatBuffer();
+        cameraDiff0.setFloatBuffer(wcsBuf);
+        wcsBuf.put(r0.glslArray);
+        crota0.setFloatBuffer(wcsBuf);
+        wcsBuf.put((float) crval0.x).put((float) crval0.y);
 
-        cameraDiff0.setFloatBuffer(buffer);
-        buffer.put(r0.glslArray);
-        crota0.setFloatBuffer(buffer);
-        buffer.put((float) crval0.x).put((float) crval0.y);
+        wcsBuf.put(0).put(0); // padding
 
-        buffer.put(0).put(0); // padding
+        cameraDiff1.setFloatBuffer(wcsBuf);
+        wcsBuf.put(r1.glslArray);
+        crota1.setFloatBuffer(wcsBuf);
+        wcsBuf.put((float) crval1.x).put((float) crval1.y);
 
-        cameraDiff1.setFloatBuffer(buffer);
-        buffer.put(r1.glslArray);
-        crota1.setFloatBuffer(buffer);
-        buffer.put((float) crval1.x).put((float) crval1.y);
-
-        gl.glUnmapBuffer(GL3.GL_UNIFORM_BUFFER);
+        wcsBuf.flip();
+        gl.glBufferSubData(GL3.GL_UNIFORM_BUFFER, 0, WCS_SIZE, wcsBuf);
     }
 
     public void bindDeltaT(GL3 gl, double deltaT, double deltaTDiff) {
