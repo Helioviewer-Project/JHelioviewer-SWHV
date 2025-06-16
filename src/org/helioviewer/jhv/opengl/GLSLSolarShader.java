@@ -124,6 +124,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     public static void bindScreen(GL3 gl, Viewport vp) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, screenID);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, SCREEN_SIZE, null, GL3.GL_DYNAMIC_DRAW);
 
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
@@ -139,6 +140,7 @@ public class GLSLSolarShader extends GLSLShader {
                         Quat cameraDiff0, Region r0, Quat crota0, Vec2 crval0,
                         Quat cameraDiff1, Region r1, Quat crota1, Vec2 crval1) {
         gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, wcsID);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, WCS_SIZE, null, GL3.GL_DYNAMIC_DRAW);
 
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
