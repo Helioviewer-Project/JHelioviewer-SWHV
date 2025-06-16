@@ -174,13 +174,6 @@ public class Quat {
         return new Vec3(vvx, vvy, vvz);
     }
 
-    public void setFloatArray(float[] arr, int idx) {
-        arr[idx] = (float) x;
-        arr[idx + 1] = (float) y;
-        arr[idx + 2] = (float) z;
-        arr[idx + 3] = (float) w;
-    }
-
     public void setFloatBuffer(FloatBuffer buf) {
         buf.put((float) x).put((float) y).put((float) z).put((float) w);
     }
