@@ -56,8 +56,8 @@ public class GLSLSolarShader extends GLSLShader {
     private static final FloatBuffer wcsBuf = FloatBuffer.wrap(new float[WCS_SIZE]);
 
     public static void init(GL3 gl) {
-        screenID = generateUBO(gl, SCREEN_SIZE);
-        wcsID = generateUBO(gl, WCS_SIZE);
+        screenID = genBuffer(gl);
+        wcsID = genBuffer(gl);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -66,15 +66,10 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._init(gl, logpolar.hasCommon);
     }
 
-    private static int generateUBO(GL3 gl, int size) {
+    private static int genBuffer(GL3 gl) {
         int[] tmp = new int[1];
         gl.glGenBuffers(1, tmp, 0);
-        int uboID = tmp[0];
-
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, uboID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, size, null, GL3.GL_DYNAMIC_DRAW);
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, 0);
-        return uboID;
+        return tmp[0];
     }
 
     private static void setupUBO(GL3 gl, int programID, String blockName, int uboID, int binding) {
@@ -123,24 +118,21 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindScreen(GL3 gl, Viewport vp) {
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, screenID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, SCREEN_SIZE, null, GL3.GL_DYNAMIC_DRAW);
-
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
         screenBuf.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
-
         screenBuf.flip();
+
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, screenID);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, SCREEN_SIZE, null, GL3.GL_STREAM_DRAW); // orphan: avoid implicit driver synchronization
         gl.glBufferSubData(GL3.GL_UNIFORM_BUFFER, 0, SCREEN_SIZE, screenBuf);
     }
 
     public void bindWCS(GL3 gl,
                         Quat cameraDiff0, Region r0, Quat crota0, Vec2 crval0,
                         Quat cameraDiff1, Region r1, Quat crota1, Vec2 crval1) {
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, wcsID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, WCS_SIZE, null, GL3.GL_DYNAMIC_DRAW);
 
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
@@ -155,6 +147,9 @@ public class GLSLSolarShader extends GLSLShader {
         wcsBuf.put((float) crval1.x).put((float) crval1.y);
 
         wcsBuf.flip();
+
+        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, wcsID);
+        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, WCS_SIZE, null, GL3.GL_STREAM_DRAW); // orphan: avoid implicit driver synchronization
         gl.glBufferSubData(GL3.GL_UNIFORM_BUFFER, 0, WCS_SIZE, wcsBuf);
     }
 
