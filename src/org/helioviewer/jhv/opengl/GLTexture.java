@@ -90,7 +90,7 @@ public class GLTexture {
 
         int size = format.bytes * imageBuffer.buffer.capacity();
         gl.glBindBuffer(GL3.GL_PIXEL_UNPACK_BUFFER, pbo);
-        gl.glBufferData(GL3.GL_PIXEL_UNPACK_BUFFER, size, null, GL3.GL_STREAM_DRAW);
+        gl.glBufferData(GL3.GL_PIXEL_UNPACK_BUFFER, size, null, GL3.GL_STREAM_DRAW); // orphan
         gl.glBufferSubData(GL3.GL_PIXEL_UNPACK_BUFFER, 0, size, imageBuffer.buffer);
         gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0);
         gl.glBindBuffer(GL3.GL_PIXEL_UNPACK_BUFFER, 0);
