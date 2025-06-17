@@ -9,25 +9,25 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLImage;
 
-public class DeltaCROTAPanel implements FilterDetails {
+public class DeltaCRVAL2Panel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("\u03B4CROTA", JLabel.RIGHT);
+    private final JLabel title = new JLabel("\u03B4CRVAL2", JLabel.RIGHT);
 
-    public DeltaCROTAPanel(ImageLayer layer) {
-        slider = new JHVSlider(GLImage.MIN_DCROTA * 10, GLImage.MAX_DCROTA * 10, (int) (layer.getGLImage().getDeltaCROTA() * 10));
-        label = new JLabel(formatFloat(slider.getValue() / 10.), JLabel.RIGHT);
+    public DeltaCRVAL2Panel(ImageLayer layer) {
+        slider = new JHVSlider(GLImage.MIN_DCRVAL2, GLImage.MAX_DCRVAL2, layer.getGLImage().getDeltaCRVAL2());
+        label = new JLabel(formatInt(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
-            double value = slider.getValue() / 10.;
-            layer.getGLImage().setDeltaCROTA(value);
-            label.setText(formatFloat(value));
+            int value = slider.getValue();
+            layer.getGLImage().setDeltaCRVAL2(value);
+            label.setText(formatInt(value));
             MovieDisplay.display();
         });
     }
 
-    private static String formatFloat(double value) {
-        return "<html><p align='right'>" + String.format("%.1f", value) + "\u00B0</p>";
+    private static String formatInt(int value) {
+        return "<html><p align='right'>" + value + "\u2033</p>";
     }
 
     @Override
