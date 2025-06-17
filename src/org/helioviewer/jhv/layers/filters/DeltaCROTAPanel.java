@@ -13,7 +13,7 @@ public class DeltaCROTAPanel implements FilterDetails {
 
     private final JHVSlider slider;
     private final JLabel label;
-    private final JLabel title = new JLabel("\u03B4CROTA ", JLabel.RIGHT);
+    private final JLabel title = new JLabel("\u03B4CROTA", JLabel.RIGHT);
 
     public DeltaCROTAPanel(ImageLayer layer) {
         slider = new JHVSlider(GLImage.MIN_DCROTA * 10, GLImage.MAX_DCROTA * 10, (int) (layer.getGLImage().getDeltaCROTA() * 10));
