@@ -202,22 +202,22 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         GLSLSolarShader shader = Display.mode.shader;
         shader.use(gl);
 
-        MetaData metaData = imageData.getMetaData();
-        glImage.applyFilters(gl, metaData, imageData, shader);
+        MetaData meta0 = imageData.getMetaData();
+        glImage.applyFilters(gl, meta0, imageData, shader);
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
 
-        Position metaViewpoint = metaData.getViewpoint();
+        Position metaViewpoint0 = meta0.getViewpoint();
         ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
-        MetaData metaDataDiff = imageDataDiff.getMetaData();
-        Position metaViewpointDiff = metaDataDiff.getViewpoint();
+        MetaData meta1 = imageDataDiff.getMetaData();
+        Position metaViewpoint1 = meta1.getViewpoint();
 
-        Quat cameraDiff0 = Quat.rotateWithConjugate(q, metaViewpoint.toQuat());
-        Quat cameraDiff1 = Quat.rotateWithConjugate(q, metaViewpointDiff.toQuat());
+        Quat cameraDiff0 = Quat.rotateWithConjugate(q, metaViewpoint0.toQuat());
+        Quat cameraDiff1 = Quat.rotateWithConjugate(q, metaViewpoint1.toQuat());
 
-        Quat crota0 = metaData.getCROTA();
-        Quat crota1 = metaDataDiff.getCROTA();
+        Quat crota0 = meta0.getCROTA();
+        Quat crota1 = meta1.getCROTA();
         double deltaCROTA = glImage.getDeltaCROTA();
         if (deltaCROTA != 0) {
             Quat dquat = Quat.createAxisZ(Math.toRadians(deltaCROTA));
@@ -225,36 +225,49 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             crota1 = Quat.rotate(dquat, crota1);
         }
 
-        crval0[0] = (float) (metaData.getCRVAL().x);
-        crval0[1] = (float) (metaData.getCRVAL().x);
-        crval1[0] = (float) (metaDataDiff.getCRVAL().x);
-        crval1[1] = (float) (metaDataDiff.getCRVAL().y);
+        int deltaCRVAL1 = glImage.getDeltaCRVAL1();
+        if (deltaCRVAL1 == 0) {
+            crval0[0] = (float) (meta0.getCRVAL().x);
+            crval1[0] = (float) (meta1.getCRVAL().x);
+        } else {
+            crval0[0] = (float) (meta0.getCRVAL().x + deltaCRVAL1 * meta0.getUnitPerArcsec());
+            crval1[0] = (float) (meta1.getCRVAL().x + deltaCRVAL1 * meta1.getUnitPerArcsec());
+        }
+
+        int deltaCRVAL2 = glImage.getDeltaCRVAL2();
+        if (deltaCRVAL2 == 0) {
+            crval0[1] = (float) (meta0.getCRVAL().y);
+            crval1[1] = (float) (meta1.getCRVAL().y);
+        } else {
+            crval0[1] = (float) (meta0.getCRVAL().y + deltaCRVAL2 * meta0.getUnitPerArcsec());
+            crval1[1] = (float) (meta1.getCRVAL().y + deltaCRVAL2 * meta1.getUnitPerArcsec());
+        }
 
         shader.bindWCS(gl,
                 cameraDiff0, imageData.getRegion(), crota0, crval0,
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1);
 
-        shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
-        if (metaData.getCutOffValue() > 0) {
-            shader.bindCutOffDirection(gl, metaData.getCutOffX(), metaData.getCutOffY());
-            shader.bindCutOffValue(gl, metaData.getCutOffValue());
+        shader.bindCalculateDepth(gl, meta0.getCalculateDepth());
+        if (meta0.getCutOffValue() > 0) {
+            shader.bindCutOffDirection(gl, meta0.getCutOffX(), meta0.getCutOffY());
+            shader.bindCutOffValue(gl, meta0.getCutOffValue());
         } else
             shader.bindCutOffValue(gl, -1);
 
         boolean diffRot = ImageLayers.getDiffRotationMode();
-        double deltaT = diffRot ? (cameraViewpoint.time.milli - metaViewpoint.time.milli) * 1e-9 : 0;
-        double deltaTDiff = diffRot ? (cameraViewpoint.time.milli - metaViewpointDiff.time.milli) * 1e-9 : 0;
-        shader.bindDeltaT(gl, deltaT, deltaTDiff);
+        double deltaT0 = diffRot ? (cameraViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9 : 0;
+        double deltaT1 = diffRot ? (cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9 : 0;
+        shader.bindDeltaT(gl, deltaT0, deltaT1);
 
         if (Display.mode == Display.ProjectionMode.Latitudinal) {
             GridType gridType = Display.gridType;
             shader.bindAnglesLatiGrid(gl,
-                    latiLongitude(gridType, cameraViewpoint, metaViewpoint),
-                    gridType.toLatitude(metaViewpoint),
-                    metaViewpoint.lat,
-                    latiLongitude(gridType, cameraViewpoint, metaViewpointDiff),
-                    gridType.toLatitude(metaViewpointDiff),
-                    metaViewpointDiff.lat);
+                    latiLongitude(gridType, cameraViewpoint, metaViewpoint0),
+                    gridType.toLatitude(metaViewpoint0),
+                    metaViewpoint0.lat,
+                    latiLongitude(gridType, cameraViewpoint, metaViewpoint1),
+                    gridType.toLatitude(metaViewpoint1),
+                    metaViewpoint1.lat);
         }
 
         GLListener.glslSolar.render(gl);

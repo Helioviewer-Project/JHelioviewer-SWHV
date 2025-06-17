@@ -17,9 +17,13 @@ public class GLImage {
         None, Running, Base
     }
 
+    public static final int MIN_DCROTA = -15;
+    public static final int MAX_DCROTA = 15;
+    public static final int MIN_DCRVAL1 = -120;
+    public static final int MAX_DCRVAL1 = 120;
+    public static final int MIN_DCRVAL2 = -120;
+    public static final int MAX_DCRVAL2 = 120;
     public static final int MAX_INNER = 5;
-    public static final int MIN_DCROTA = -10;
-    public static final int MAX_DCROTA = 10;
 
     private GLTexture tex;
     private GLTexture lutTex;
@@ -30,6 +34,8 @@ public class GLImage {
     private float blue = 1;
 
     private double deltaCROTA = 0;
+    private int deltaCRVAL1 = 0;
+    private int deltaCRVAL2 = 0;
 
     private double innerMask = 0;
     private double slitLeft = 0;
@@ -120,6 +126,14 @@ public class GLImage {
         deltaCROTA = MathUtils.clip(delta, MIN_DCROTA, MAX_DCROTA);
     }
 
+    public void setDeltaCRVAL1(int delta) {
+        deltaCRVAL1 = MathUtils.clip(delta, MIN_DCRVAL1, MAX_DCRVAL1);
+    }
+
+    public void setDeltaCRVAL2(int delta) {
+        deltaCRVAL2 = MathUtils.clip(delta, MIN_DCRVAL2, MAX_DCRVAL2);
+    }
+
     public void setInnerMask(double mask) {
         innerMask = MathUtils.clip(mask, 0, MAX_INNER);
     }
@@ -142,6 +156,14 @@ public class GLImage {
 
     public double getDeltaCROTA() {
         return deltaCROTA;
+    }
+
+    public int getDeltaCRVAL1() {
+        return deltaCRVAL1;
+    }
+
+    public int getDeltaCRVAL2() {
+        return deltaCRVAL2;
     }
 
     public double getInnerMask() {
