@@ -19,10 +19,8 @@ public class GLImage {
 
     public static final int MIN_DCROTA = -15;
     public static final int MAX_DCROTA = 15;
-    public static final int MIN_DCRVAL1 = -180;
-    public static final int MAX_DCRVAL1 = 180;
-    public static final int MIN_DCRVAL2 = -180;
-    public static final int MAX_DCRVAL2 = 180;
+    public static final int MIN_DCRVAL = -180;
+    public static final int MAX_DCRVAL = 180;
     public static final int MAX_INNER = 5;
 
     private GLTexture tex;
@@ -127,11 +125,11 @@ public class GLImage {
     }
 
     public void setDeltaCRVAL1(int delta) {
-        deltaCRVAL1 = MathUtils.clip(delta, MIN_DCRVAL1, MAX_DCRVAL1);
+        deltaCRVAL1 = MathUtils.clip(delta, MIN_DCRVAL, MAX_DCRVAL);
     }
 
     public void setDeltaCRVAL2(int delta) {
-        deltaCRVAL2 = MathUtils.clip(delta, MIN_DCRVAL2, MAX_DCRVAL2);
+        deltaCRVAL2 = MathUtils.clip(delta, MIN_DCRVAL, MAX_DCRVAL);
     }
 
     public void setInnerMask(double mask) {
