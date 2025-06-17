@@ -133,7 +133,6 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindWCS(GL3 gl,
                         Quat cameraDiff0, Region r0, Quat crota0, Vec2 crval0,
                         Quat cameraDiff1, Region r1, Quat crota1, Vec2 crval1) {
-
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
