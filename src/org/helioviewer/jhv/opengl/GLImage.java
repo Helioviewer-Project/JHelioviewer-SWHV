@@ -19,10 +19,10 @@ public class GLImage {
 
     public static final int MIN_DCROTA = -15;
     public static final int MAX_DCROTA = 15;
-    public static final int MIN_DCRVAL1 = -120;
-    public static final int MAX_DCRVAL1 = 120;
-    public static final int MIN_DCRVAL2 = -120;
-    public static final int MAX_DCRVAL2 = 120;
+    public static final int MIN_DCRVAL1 = -180;
+    public static final int MAX_DCRVAL1 = 180;
+    public static final int MIN_DCRVAL2 = -180;
+    public static final int MAX_DCRVAL2 = 180;
     public static final int MAX_INNER = 5;
 
     private GLTexture tex;
