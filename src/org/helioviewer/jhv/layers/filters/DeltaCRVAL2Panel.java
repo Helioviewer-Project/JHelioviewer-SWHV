@@ -16,7 +16,7 @@ public class DeltaCRVAL2Panel implements FilterDetails {
     private final JLabel title = new JLabel("\u03B4CRVAL2", JLabel.RIGHT);
 
     public DeltaCRVAL2Panel(ImageLayer layer) {
-        slider = new JHVSlider(GLImage.MIN_DCRVAL2, GLImage.MAX_DCRVAL2, layer.getGLImage().getDeltaCRVAL2());
+        slider = new JHVSlider(GLImage.MIN_DCRVAL, GLImage.MAX_DCRVAL, layer.getGLImage().getDeltaCRVAL2());
         label = new JLabel(formatInt(slider.getValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int value = slider.getValue();
