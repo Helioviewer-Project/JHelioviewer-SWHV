@@ -7,7 +7,6 @@ import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec2;
 
 import com.jogamp.opengl.GL3;
 
@@ -131,19 +130,17 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindWCS(GL3 gl,
-                        Quat cameraDiff0, Region r0, Quat crota0, Vec2 crval0,
-                        Quat cameraDiff1, Region r1, Quat crota1, Vec2 crval1) {
+                        Quat cameraDiff0, Region r0, Quat crota0, float[] crval0,
+                        Quat cameraDiff1, Region r1, Quat crota1, float[] crval1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
-        wcsBuf.put((float) crval0.x).put((float) crval0.y);
-
-        wcsBuf.put(0).put(0); // padding
+        wcsBuf.put(crval0); // has padding
 
         cameraDiff1.setFloatBuffer(wcsBuf);
         wcsBuf.put(r1.glslArray);
         crota1.setFloatBuffer(wcsBuf);
-        wcsBuf.put((float) crval1.x).put((float) crval1.y);
+        wcsBuf.put(crval1);
 
         wcsBuf.flip();
 
