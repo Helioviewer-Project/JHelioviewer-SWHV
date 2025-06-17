@@ -188,6 +188,9 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         render(camera, vp, gl);
     }
 
+    private final float[] crval0 = new float[4]; // includes 2 elements padding
+    private final float[] crval1 = new float[4];
+
     @Override
     public void render(Camera camera, Viewport vp, GL3 gl) {
         if (imageData == null) {
@@ -222,9 +225,14 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             crota1 = Quat.rotate(dquat, crota1);
         }
 
+        crval0[0] = (float) (metaData.getCRVAL().x);
+        crval0[1] = (float) (metaData.getCRVAL().x);
+        crval1[0] = (float) (metaDataDiff.getCRVAL().x);
+        crval1[1] = (float) (metaDataDiff.getCRVAL().y);
+
         shader.bindWCS(gl,
-                cameraDiff0, imageData.getRegion(), crota0, metaData.getCRVAL(),
-                cameraDiff1, imageDataDiff.getRegion(), crota1, metaDataDiff.getCRVAL());
+                cameraDiff0, imageData.getRegion(), crota0, crval0,
+                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1);
 
         shader.bindCalculateDepth(gl, metaData.getCalculateDepth());
         if (metaData.getCutOffValue() > 0) {
