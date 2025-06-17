@@ -18,6 +18,8 @@ public class GLImage {
     }
 
     public static final int MAX_INNER = 5;
+    public static final int MIN_DCROTA = -10;
+    public static final int MAX_DCROTA = 10;
 
     private GLTexture tex;
     private GLTexture lutTex;
@@ -26,6 +28,8 @@ public class GLImage {
     private float red = 1;
     private float green = 1;
     private float blue = 1;
+
+    private double deltaCROTA = 0;
 
     private double innerMask = 0;
     private double slitLeft = 0;
@@ -112,6 +116,10 @@ public class GLImage {
             diffTex.delete(gl);
     }
 
+    public void setDeltaCROTA(double delta) {
+        deltaCROTA = MathUtils.clip(delta, MIN_DCROTA, MAX_DCROTA);
+    }
+
     public void setInnerMask(double mask) {
         innerMask = MathUtils.clip(mask, 0, MAX_INNER);
     }
@@ -130,6 +138,10 @@ public class GLImage {
     public void setBrightness(double offset, double scale) {
         brightOffset = MathUtils.clip(offset, -1, 2);
         brightScale = MathUtils.clip(scale, 0, 2 - brightOffset);
+    }
+
+    public double getDeltaCROTA() {
+        return deltaCROTA;
     }
 
     public double getInnerMask() {

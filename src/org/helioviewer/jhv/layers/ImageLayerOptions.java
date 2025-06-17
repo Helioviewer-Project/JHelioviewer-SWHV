@@ -26,6 +26,7 @@ class ImageLayerOptions extends JPanel {
     private final SlitPanel slitPanel;
     // private final SectorPanel sectorPanel;
     private final InnerMaskPanel innerMaskPanel;
+    private final DeltaCROTAPanel deltaCROTAPanel;
 
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
@@ -43,6 +44,7 @@ class ImageLayerOptions extends JPanel {
         slitPanel = new SlitPanel(layer);
         innerMaskPanel = new InnerMaskPanel(layer);
         // sectorPanel = new SectorPanel(layer);
+        deltaCROTAPanel = new DeltaCROTAPanel(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -130,6 +132,8 @@ class ImageLayerOptions extends JPanel {
         addToGridBag(c, innerMaskPanel);
         // c.gridy++;
         // addToGridBag(c, sectorPanel);
+        c.gridy++;
+        addToGridBag(c, deltaCROTAPanel);
     }
 
     private void addToGridBag(GridBagConstraints c, FilterDetails details) {
@@ -159,6 +163,7 @@ class ImageLayerOptions extends JPanel {
         slitPanel.setVisible(visibility);
         innerMaskPanel.setVisible(visibility);
         // sectorPanel.setVisible(visibility);
+        deltaCROTAPanel.setVisible(visibility);
     }
 
     void setLUT(LUT lut) {
