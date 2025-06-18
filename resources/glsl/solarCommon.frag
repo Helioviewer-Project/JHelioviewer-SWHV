@@ -45,8 +45,8 @@ uniform int enhanced;
 uniform sampler2D diffImage;
 
 uniform sampler1D lut;
-uniform vec3 brightness;
 uniform vec4 color;
+uniform float brightness[2];
 
 uniform vec3 grid[2];
 
@@ -76,8 +76,8 @@ const vec2[] blurOffset = vec2[](
     vec2(bo[0], bo[2]), vec2(bo[1], bo[2]), vec2(bo[2], bo[2])
 );
 
-float fetch(const sampler2D tex, const vec2 coord, const vec3 bright) {
-    return /*pow(texture2D(tex, coord).r, bright.z)*/ texture(tex, coord).r * bright.y + bright.x;
+float fetch(const sampler2D tex, const vec2 coord, const float bright[2]) {
+    return texture(tex, coord).r * bright[1] + bright[0];
 }
 
 // https://shader-tutorial.dev/advanced/color-banding-dithering/
@@ -90,9 +90,9 @@ float dither(const vec2 coord) {
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
-    vec3 b = brightness;
+    float b[2] = brightness;
     if (enhanced == 1) {
-        b.y *= factor * factor * factor;
+        b[1] *= factor * factor * factor;
     }
 
     float v;
