@@ -20,7 +20,7 @@ struct Screen {
     float iaspect;
     float yStart;
     float yStop;
-    float padding;
+    //float padding;
 };
 
 layout(std140) uniform ScreenBlock {
@@ -32,6 +32,7 @@ struct WCS {
     vec4 rect;
     vec4 crota;
     vec2 crval;
+    // padding 2
 };
 
 layout(std140) uniform WCSBlock {

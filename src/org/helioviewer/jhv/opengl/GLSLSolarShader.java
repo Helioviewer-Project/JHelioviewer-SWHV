@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
@@ -47,12 +48,12 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static GLBO screenBO;
-    private static final int SCREEN_SIZE = (16 + 2 * 4) * 4;
-    private static final FloatBuffer screenBuf = FloatBuffer.wrap(new float[SCREEN_SIZE]);
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4);
+    private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO wcsBO;
-    private static final int WCS_SIZE = 2 * (4 + 4 + 4 + 4) * 4;
-    private static final FloatBuffer wcsBuf = FloatBuffer.wrap(new float[WCS_SIZE]);
+    private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4));
+    private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
         screenBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
@@ -137,9 +138,9 @@ public class GLSLSolarShader extends GLSLShader {
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
 
-    public void bindDeltaT(GL3 gl, double deltaT, double deltaTDiff) {
-        floatArr[0] = (float) deltaT;
-        floatArr[1] = (float) deltaTDiff;
+    public void bindDeltaT(GL3 gl, double deltaT0, double deltaT1) {
+        floatArr[0] = (float) deltaT0;
+        floatArr[1] = (float) deltaT1;
         gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
     }
 
