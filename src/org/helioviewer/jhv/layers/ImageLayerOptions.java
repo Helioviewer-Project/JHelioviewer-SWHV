@@ -80,7 +80,6 @@ class ImageLayerOptions extends JPanel {
         c.gridy++;
 
         JideToggleButton adjButton = new JideToggleButton(Buttons.adjustmentsRight);
-        adjButton.setToolTipText("Options to control the shape of the image");
         adjButton.addActionListener(e -> {
             boolean selected = adjButton.isSelected();
             setAdjustmentsVisibility(selected);

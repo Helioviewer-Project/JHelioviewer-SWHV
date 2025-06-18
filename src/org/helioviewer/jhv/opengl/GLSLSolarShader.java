@@ -46,29 +46,23 @@ public class GLSLSolarShader extends GLSLShader {
         hasCommon = _hasCommon;
     }
 
-    private static int screenID;
+    private static GLBO screenBO;
     private static final int SCREEN_SIZE = (16 + 2 * 4) * 4;
     private static final FloatBuffer screenBuf = FloatBuffer.wrap(new float[SCREEN_SIZE]);
 
-    private static int wcsID;
+    private static GLBO wcsBO;
     private static final int WCS_SIZE = 2 * (4 + 4 + 4 + 4) * 4;
     private static final FloatBuffer wcsBuf = FloatBuffer.wrap(new float[WCS_SIZE]);
 
     public static void init(GL3 gl) {
-        screenID = genBuffer(gl);
-        wcsID = genBuffer(gl);
+        screenBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
+        wcsBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
         lati._init(gl, lati.hasCommon);
         polar._init(gl, polar.hasCommon);
         logpolar._init(gl, logpolar.hasCommon);
-    }
-
-    private static int genBuffer(GL3 gl) {
-        int[] tmp = new int[1];
-        gl.glGenBuffers(1, tmp, 0);
-        return tmp[0];
     }
 
     private static void setupUBO(GL3 gl, int programID, String blockName, int uboID, int binding) {
@@ -97,8 +91,8 @@ public class GLSLSolarShader extends GLSLShader {
         enhancedRef = gl.glGetUniformLocation(id, "enhanced");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
-        setupUBO(gl, id, "ScreenBlock", screenID, 0);
-        setupUBO(gl, id, "WCSBlock", wcsID, 1);
+        setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
+        setupUBO(gl, id, "WCSBlock", wcsBO.getID(), 1);
 
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
@@ -113,7 +107,8 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
-        gl.glDeleteBuffers(1, new int[]{screenID, wcsID}, 0);
+        screenBO.delete(gl);
+        wcsBO.delete(gl);
     }
 
     public static void bindScreen(GL3 gl, Viewport vp) {
@@ -122,11 +117,8 @@ public class GLSLSolarShader extends GLSLShader {
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
         screenBuf.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
-        screenBuf.flip();
 
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, screenID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, SCREEN_SIZE, null, GL3.GL_STREAM_DRAW); // orphan: avoid implicit driver synchronization
-        gl.glBufferSubData(GL3.GL_UNIFORM_BUFFER, 0, SCREEN_SIZE, screenBuf);
+        screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
     }
 
     public void bindWCS(GL3 gl,
@@ -142,11 +134,7 @@ public class GLSLSolarShader extends GLSLShader {
         crota1.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval1);
 
-        wcsBuf.flip();
-
-        gl.glBindBuffer(GL3.GL_UNIFORM_BUFFER, wcsID);
-        gl.glBufferData(GL3.GL_UNIFORM_BUFFER, WCS_SIZE, null, GL3.GL_STREAM_DRAW); // orphan: avoid implicit driver synchronization
-        gl.glBufferSubData(GL3.GL_UNIFORM_BUFFER, 0, WCS_SIZE, wcsBuf);
+        wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
 
     public void bindDeltaT(GL3 gl, double deltaT, double deltaTDiff) {
