@@ -5,16 +5,16 @@ import com.jogamp.opengl.GL3;
 class VAO {
 
     private final VAA[] vaa;
-    protected final VBO[] vbo;
+    protected final GLBO[] vbo;
+    private final int usage;
 
-    private final boolean dynamic;
     private int vaoID = -1;
     private boolean inited;
 
-    VAO(int nvbo, boolean _dynamic, VAA[] _vaa) {
-        vbo = new VBO[nvbo];
-        dynamic = _dynamic;
+    VAO(int nvbo, boolean dynamic, VAA[] _vaa) {
+        vbo = new GLBO[nvbo];
         vaa = _vaa;
+        usage = dynamic ? GL3.GL_DYNAMIC_DRAW : GL3.GL_STATIC_DRAW;
     }
 
     public void init(GL3 gl) {
@@ -26,7 +26,7 @@ class VAO {
             vaoID = tmpId[0];
 
             for (int i = 0; i < vbo.length; i++) {
-                vbo[i] = new VBO(gl, GL3.GL_ARRAY_BUFFER, dynamic);
+                vbo[i] = new GLBO(gl, GL3.GL_ARRAY_BUFFER, usage);
             }
 
             gl.glBindVertexArray(vaoID);
