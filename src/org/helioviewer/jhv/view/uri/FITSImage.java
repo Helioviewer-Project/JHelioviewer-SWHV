@@ -76,16 +76,24 @@ class FITSImage implements URIImageReader {
                 return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
             }
             case FLOAT -> {
-                float v = ((float[]) lineData)[i];
-                return Float.isFinite(v) ? (float) (bzero + v * bscale) : ImageBuffer.BAD_PIXEL;
+                return floatPixel(((float[]) lineData)[i], bzero, bscale);
             }
             case DOUBLE -> {
-                double v = ((double[]) lineData)[i];
-                return Double.isFinite(v) ? (float) (bzero + v * bscale) : ImageBuffer.BAD_PIXEL;
+                return floatPixel(((double[]) lineData)[i], bzero, bscale);
             }
             default -> {
                 return ImageBuffer.BAD_PIXEL;
             }
+        }
+    }
+
+    private static float floatPixel(double v, double bzero, double bscale) {
+        if (Double.isNaN(v)) {
+            return ImageBuffer.BAD_PIXEL;
+        } else if (Double.isInfinite(v)) {
+            return Float.MAX_VALUE;
+        } else {
+            return (float) (bzero + v * bscale);
         }
     }
 
@@ -105,7 +113,7 @@ class FITSImage implements URIImageReader {
                     List<Float> rowSamples = new ArrayList<>();
                     for (int i = 0; i < width; i += stepW) {
                         float v = getValue(pixType, lineData, i, blank, bzero, bscale);
-                        if (v != ImageBuffer.BAD_PIXEL) {
+                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
                             rowSamples.add(v);
                         }
                     }
