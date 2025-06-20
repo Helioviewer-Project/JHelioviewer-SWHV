@@ -39,6 +39,16 @@ layout(std140) uniform WCSBlock {
     WCS wcs[2];
 };
 
+struct Display {
+    vec4 color;
+    float bOffset;
+    float bScale;
+};
+
+layout(std140) uniform DisplayBlock {
+    Display display;
+};
+
 uniform sampler2D image;
 uniform int calculateDepth;
 uniform int isdifference;
@@ -46,8 +56,6 @@ uniform int enhanced;
 uniform sampler2D diffImage;
 
 uniform sampler1D lut;
-uniform vec4 color;
-uniform float brightness[2];
 
 uniform vec3 grid[2];
 
@@ -91,7 +99,7 @@ float dither(const vec2 coord) {
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
-    float b[2] = brightness;
+    float b[2] = float[](display.bOffset, display.bScale);
     if (enhanced == 1) {
         b[1] *= factor * factor * factor;
     }
@@ -114,7 +122,7 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     }
     v = mix(v, conv, sharpen.z) + dither(texcoord);
 
-    return texture(lut, v) * color;
+    return texture(lut, v) * display.color;
 }
 
 void clamp_texture(const vec2 texcoord) {
