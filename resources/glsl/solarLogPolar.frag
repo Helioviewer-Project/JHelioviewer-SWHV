@@ -35,7 +35,7 @@ void main(void) {
 
     vec2 scrpos = getScrPos();
     get_polar_texcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, texcoord, radius);
-    if (isdifference == NODIFFERENCE) {
+    if (display.isDiff == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, radius);
     } else {
         vec2 difftexcoord;

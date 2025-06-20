@@ -43,6 +43,8 @@ struct Display {
     vec4 color;
     float bOffset;
     float bScale;
+    float enhanced;
+    float isDiff;
 };
 
 layout(std140) uniform DisplayBlock {
@@ -51,8 +53,6 @@ layout(std140) uniform DisplayBlock {
 
 uniform sampler2D image;
 uniform int calculateDepth;
-uniform int isdifference;
-uniform int enhanced;
 uniform sampler2D diffImage;
 
 uniform sampler1D lut;
@@ -100,13 +100,13 @@ float dither(const vec2 coord) {
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
     float b[2] = float[](display.bOffset, display.bScale);
-    if (enhanced == 1) {
+    if (display.enhanced == 1) {
         b[1] *= factor * factor * factor;
     }
 
     float v;
     float conv = 0.;
-    if (isdifference == NODIFFERENCE) {
+    if (display.isDiff == NODIFFERENCE) {
         v = fetch(image, texcoord, b);
         for (int i = 0; i < FSIZE; i++) {
             conv += fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) * blurKernel[i];
