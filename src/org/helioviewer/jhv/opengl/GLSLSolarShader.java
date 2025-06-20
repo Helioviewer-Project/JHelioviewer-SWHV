@@ -33,8 +33,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int cutOffValueRef;
 
     private int slitRef;
-    private int brightRef;
-    private int colorRef;
     private int sharpenRef;
     private int enhancedRef;
     private int calculateDepthRef;
@@ -55,9 +53,14 @@ public class GLSLSolarShader extends GLSLShader {
     private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4));
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
+    private static GLBO displayBO;
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4);
+    private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
+
     public static void init(GL3 gl) {
         screenBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
         wcsBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
+        displayBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -87,13 +90,12 @@ public class GLSLSolarShader extends GLSLShader {
 
         sharpenRef = gl.glGetUniformLocation(id, "sharpen");
         slitRef = gl.glGetUniformLocation(id, "slit");
-        brightRef = gl.glGetUniformLocation(id, "brightness");
-        colorRef = gl.glGetUniformLocation(id, "color");
         enhancedRef = gl.glGetUniformLocation(id, "enhanced");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
         setupUBO(gl, id, "WCSBlock", wcsBO.getID(), 1);
+        setupUBO(gl, id, "DisplayBlock", displayBO.getID(), 2);
 
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
@@ -110,6 +112,7 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._dispose(gl);
         screenBO.delete(gl);
         wcsBO.delete(gl);
+        displayBO.delete(gl);
     }
 
     public static void bindScreen(GL3 gl, Viewport vp) {
@@ -138,30 +141,26 @@ public class GLSLSolarShader extends GLSLShader {
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
 
+    public void bindDisplay(GL3 gl,
+                            float red, float green, float blue, double alpha, double blend,
+                            double bOffset, double bScale) {
+        // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
+        displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
+        displayBuf.put((float) bOffset).put((float) bScale);
+
+        displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
+    }
+
     public void bindDeltaT(GL3 gl, double deltaT0, double deltaT1) {
         floatArr[0] = (float) deltaT0;
         floatArr[1] = (float) deltaT1;
         gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
     }
 
-    public void bindColor(GL3 gl, float red, float green, float blue, double alpha, double blend) {
-        floatArr[0] = (float) (red * alpha);
-        floatArr[1] = (float) (green * alpha);
-        floatArr[2] = (float) (blue * alpha);
-        floatArr[3] = (float) (alpha * blend); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
-        gl.glUniform4fv(colorRef, 1, floatArr, 0);
-    }
-
     public void bindSlit(GL3 gl, double left, double right) {
         floatArr[0] = (float) left;
         floatArr[1] = (float) right;
         gl.glUniform1fv(slitRef, 2, floatArr, 0);
-    }
-
-    public void bindBrightness(GL3 gl, double offset, double scale) {
-        floatArr[0] = (float) offset;
-        floatArr[1] = (float) scale;
-        gl.glUniform1fv(brightRef, 2, floatArr, 0);
     }
 
     public void bindSharpen(GL3 gl, double weight, double pixelWidth, double pixelHeight) {
