@@ -21,8 +21,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private final boolean hasCommon;
 
-    private int isDiffRef;
-
     private int gridRef;
 
     private int deltaTRef;
@@ -34,7 +32,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int slitRef;
     private int sharpenRef;
-    private int enhancedRef;
     private int calculateDepthRef;
 
     private final int[] intArr = new int[1];
@@ -77,8 +74,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void initUniforms(GL3 gl, int id) {
-        isDiffRef = gl.glGetUniformLocation(id, "isdifference");
-
         gridRef = gl.glGetUniformLocation(id, "grid");
 
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
@@ -90,7 +85,6 @@ public class GLSLSolarShader extends GLSLShader {
 
         sharpenRef = gl.glGetUniformLocation(id, "sharpen");
         slitRef = gl.glGetUniformLocation(id, "slit");
-        enhancedRef = gl.glGetUniformLocation(id, "enhanced");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
@@ -143,10 +137,10 @@ public class GLSLSolarShader extends GLSLShader {
 
     public void bindDisplay(GL3 gl,
                             float red, float green, float blue, double alpha, double blend,
-                            double bOffset, double bScale) {
+                            double bOffset, double bScale, int enhanced, int isDiff) {
         // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
-        displayBuf.put((float) bOffset).put((float) bScale);
+        displayBuf.put((float) bOffset).put((float) bScale).put(enhanced).put(isDiff);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
@@ -170,19 +164,9 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform3fv(sharpenRef, 1, floatArr, 0);
     }
 
-    public void bindEnhanced(GL3 gl, boolean enhanced) {
-        intArr[0] = enhanced ? 1 : 0;
-        gl.glUniform1iv(enhancedRef, 1, intArr, 0);
-    }
-
     public void bindCalculateDepth(GL3 gl, boolean calculateDepth) {
         intArr[0] = calculateDepth ? 1 : 0;
         gl.glUniform1iv(calculateDepthRef, 1, intArr, 0);
-    }
-
-    public void bindIsDiff(GL3 gl, int isDiff) {
-        intArr[0] = isDiff;
-        gl.glUniform1iv(isDiffRef, 1, intArr, 0);
     }
 
     public void bindCutOffValue(GL3 gl, float val) {

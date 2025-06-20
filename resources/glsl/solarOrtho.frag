@@ -34,7 +34,7 @@ void main(void) {
         rotatedHitPoint      = differential(deltaT[0], rotate_vector_inverse(wcs[0].cameraDiff, hitPoint));
         centeredHitPoint     = apply_center(rotatedHitPoint, wcs[0].crval, wcs[0].crota);
 
-        if (isdifference != NODIFFERENCE) {
+        if (display.isDiff != NODIFFERENCE) {
             diffRotatedHitPoint  = differential(deltaT[1], rotate_vector_inverse(wcs[1].cameraDiff, hitPoint));
             diffCenteredHitPoint = apply_center(diffRotatedHitPoint, wcs[1].crval, wcs[1].crota);
         }
@@ -82,7 +82,7 @@ void main(void) {
     }
 
     vec2 difftexcoord;
-    if (isdifference != NODIFFERENCE) {
+    if (display.isDiff != NODIFFERENCE) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
             hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
             diffRotatedHitPoint  = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);

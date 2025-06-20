@@ -40,7 +40,7 @@ void main(void) {
 
     vec2 scrpos = getScrPos();
     vec2 texcoord = get_lati_texcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, deltaT[0], grid[0]);
-    if (isdifference == NODIFFERENCE) {
+    if (display.isDiff == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
         vec2 difftexcoord = get_lati_texcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, deltaT[1], grid[1]);
