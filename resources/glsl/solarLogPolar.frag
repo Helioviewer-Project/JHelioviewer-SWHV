@@ -1,7 +1,7 @@
 
 void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, const vec2 scrpos, out vec2 texcoord, out float radius) {
     float interpolated = exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart));
-    if (interpolated > radii[1] || interpolated < radii[0])
+    if (interpolated > display.outeR || interpolated < display.inneR)
         discard;
 
     float theta = -(scrpos.x * TWOPI + HALFPI /* - cr TBD */);

@@ -26,7 +26,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int deltaTRef;
 
     private int sectorRef;
-    private int radiiRef;
     private int cutOffDirectionRef;
     private int cutOffValueRef;
 
@@ -51,7 +50,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO displayBO;
-    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4);
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
@@ -79,7 +78,6 @@ public class GLSLSolarShader extends GLSLShader {
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
 
         sectorRef = gl.glGetUniformLocation(id, "sector");
-        radiiRef = gl.glGetUniformLocation(id, "radii");
         cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
 
@@ -137,10 +135,12 @@ public class GLSLSolarShader extends GLSLShader {
 
     public void bindDisplay(GL3 gl,
                             float red, float green, float blue, double alpha, double blend,
-                            double bOffset, double bScale, int enhanced, int isDiff) {
+                            double bOffset, double bScale, int enhanced, int isDiff,
+                            float innerRadius, float outerRadius) {
         // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
         displayBuf.put((float) bOffset).put((float) bScale).put(enhanced).put(isDiff);
+        displayBuf.put(innerRadius).put(outerRadius);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
@@ -195,12 +195,6 @@ public class GLSLSolarShader extends GLSLShader {
         floatArr[1] = (float) sector0;
         floatArr[2] = (float) sector1;
         gl.glUniform1fv(sectorRef, 3, floatArr, 0);
-    }
-
-    public void bindRadii(GL3 gl, float innerRadius, float outerRadius) {
-        floatArr[0] = innerRadius;
-        floatArr[1] = outerRadius;
-        gl.glUniform1fv(radiiRef, 2, floatArr, 0);
     }
 
 }
