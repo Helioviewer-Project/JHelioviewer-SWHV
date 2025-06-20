@@ -29,7 +29,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int cutOffDirectionRef;
     private int cutOffValueRef;
 
-    private int slitRef;
     private int sharpenRef;
     private int calculateDepthRef;
 
@@ -82,7 +81,6 @@ public class GLSLSolarShader extends GLSLShader {
         cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
 
         sharpenRef = gl.glGetUniformLocation(id, "sharpen");
-        slitRef = gl.glGetUniformLocation(id, "slit");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
@@ -136,11 +134,11 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindDisplay(GL3 gl,
                             float red, float green, float blue, double alpha, double blend,
                             double bOffset, double bScale, int enhanced, int isDiff,
-                            float innerRadius, float outerRadius) {
+                            float innerRadius, float outerRadius, double slitLeft, double slitRight) {
         // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
         displayBuf.put((float) bOffset).put((float) bScale).put(enhanced).put(isDiff);
-        displayBuf.put(innerRadius).put(outerRadius);
+        displayBuf.put(innerRadius).put(outerRadius).put((float) slitLeft).put((float) slitRight);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
@@ -149,12 +147,6 @@ public class GLSLSolarShader extends GLSLShader {
         floatArr[0] = (float) deltaT0;
         floatArr[1] = (float) deltaT1;
         gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
-    }
-
-    public void bindSlit(GL3 gl, double left, double right) {
-        floatArr[0] = (float) left;
-        floatArr[1] = (float) right;
-        gl.glUniform1fv(slitRef, 2, floatArr, 0);
     }
 
     public void bindSharpen(GL3 gl, double weight, double pixelWidth, double pixelHeight) {
