@@ -47,6 +47,8 @@ struct Display {
     float isDiff;
     float inneR;
     float outeR;
+    float slitL;
+    float slitR;
 };
 
 layout(std140) uniform DisplayBlock {
@@ -63,7 +65,6 @@ uniform vec3 grid[2];
 
 uniform float deltaT[2];
 
-uniform float slit[2];
 uniform float sector[3];
 uniform vec2 cutOffDirection;
 uniform float cutOffValue;
@@ -132,7 +133,7 @@ void clamp_texture(const vec2 texcoord) {
 }
 
 void clamp_coord(const vec2 coord) {
-    if (coord.x < slit[0] || coord.y < 0. || coord.x > slit[1] || coord.y > 1.)
+    if (coord.x < display.slitL || coord.y < 0. || coord.x > display.slitR || coord.y > 1.)
         discard;
 }
 
