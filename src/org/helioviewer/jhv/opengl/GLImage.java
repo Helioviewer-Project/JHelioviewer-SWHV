@@ -76,15 +76,13 @@ public class GLImage {
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
         shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
         shader.bindRadii(gl, Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1);
-        shader.bindEnhanced(gl, enhanced);
         shader.bindSharpen(gl, sharpen, 1. / imageData.getImageBuffer().width, 1. / imageData.getImageBuffer().height);
 
         shader.bindDisplay(gl, red, green, blue, opacity, blend,
-                           brightOffset, brightScale * metaData.getResponseFactor());
+                           brightOffset, brightScale * metaData.getResponseFactor(), enhanced ? 1 : 0, diffMode.ordinal());
 
         applyLUT(gl);
         tex.bind(gl);
-        shader.bindIsDiff(gl, diffMode.ordinal());
         if (diffMode != DifferenceMode.None)
             diffTex.bind(gl);
     }
