@@ -45,6 +45,8 @@ struct Display {
     float bScale;
     float enhanced;
     float isDiff;
+    float inneR;
+    float outeR;
 };
 
 layout(std140) uniform DisplayBlock {
@@ -63,7 +65,6 @@ uniform float deltaT[2];
 
 uniform float slit[2];
 uniform float sector[3];
-uniform float radii[2];
 uniform vec2 cutOffDirection;
 uniform float cutOffValue;
 
