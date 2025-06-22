@@ -41,11 +41,12 @@ layout(std140) uniform WCSBlock {
 
 struct Display {
     vec4 color;
+    vec3 sharpen;
+    float isDiff;
     vec2 brightness;
     vec2 radii;
     vec2 slit;
     float enhanced;
-    float isDiff;
 };
 
 layout(std140) uniform DisplayBlock {
@@ -66,8 +67,7 @@ uniform float sector[3];
 uniform vec2 cutOffDirection;
 uniform float cutOffValue;
 
-#define FSIZE 3 * 3
-uniform vec3 sharpen;
+#define FSIZE (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
 // https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 const float[] bc = float[](.30613, .38774, .30613);
@@ -108,18 +108,18 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     if (display.isDiff == NODIFFERENCE) {
         v = fetch(image, texcoord, b);
         for (int i = 0; i < FSIZE; i++) {
-            conv += fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) * blurKernel[i];
+            conv += fetch(image, texcoord + blurOffset[i] * display.sharpen.xy, b) * blurKernel[i];
         }
     } else {
         v = fetch(image, texcoord, b) - fetch(diffImage, difftexcoord, b);
         v = v * BOOST + 0.5;
 
         for (int i = 0; i < FSIZE; i++) {
-            conv += (fetch(image, texcoord + blurOffset[i] * sharpen.xy, b) - fetch(diffImage, difftexcoord + blurOffset[i] * sharpen.xy, b)) * blurKernel[i];
+            conv += (fetch(image, texcoord + blurOffset[i] * display.sharpen.xy, b) - fetch(diffImage, difftexcoord + blurOffset[i] * display.sharpen.xy, b)) * blurKernel[i];
         }
         conv = conv * BOOST + 0.5;
     }
-    v = mix(v, conv, sharpen.z) + dither(texcoord);
+    v = mix(v, conv, display.sharpen.z) + dither(texcoord);
 
     return texture(lut, v) * display.color;
 }
