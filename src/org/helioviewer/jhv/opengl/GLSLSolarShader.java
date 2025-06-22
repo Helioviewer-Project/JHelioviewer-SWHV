@@ -25,7 +25,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int deltaTRef;
 
-    private int sectorRef;
     private int cutOffDirectionRef;
     private int cutOffValueRef;
 
@@ -48,7 +47,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO displayBO;
-    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4);
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 4);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
@@ -75,7 +74,6 @@ public class GLSLSolarShader extends GLSLShader {
 
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
 
-        sectorRef = gl.glGetUniformLocation(id, "sector");
         cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
 
@@ -132,16 +130,16 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindDisplay(GL3 gl,
                             float red, float green, float blue, double alpha, double blend,
                             double weight, double pixelWidth, double pixelHeight, int isDiff,
+                            double sector0, double sector1, int enhanced,
                             double bOffset, double bScale,
                             float innerRadius, float outerRadius,
-                            double slitLeft, double slitRight,
-                            int enhanced) {
+                            double slitLeft, double slitRight) {
         // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
         displayBuf.put((float) pixelWidth).put((float) pixelHeight).put(-2 * (float) weight).put(isDiff); // used
+        displayBuf.put((float) sector0).put((float) sector1).put(/*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1).put(enhanced);
         displayBuf.put((float) bOffset).put((float) bScale);
         displayBuf.put(innerRadius).put(outerRadius).put((float) slitLeft).put((float) slitRight);
-        displayBuf.put(enhanced);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
@@ -176,13 +174,6 @@ public class GLSLSolarShader extends GLSLShader {
         floatArr[4] = (float) dlat;
         floatArr[5] = (float) dhglt;
         gl.glUniform3fv(gridRef, 2, floatArr, 0);
-    }
-
-    public void bindSector(GL3 gl, double sector0, double sector1) {
-        floatArr[0] = /*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1; // common case
-        floatArr[1] = (float) sector0;
-        floatArr[2] = (float) sector1;
-        gl.glUniform1fv(sectorRef, 3, floatArr, 0);
     }
 
 }

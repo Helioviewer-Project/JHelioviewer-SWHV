@@ -61,9 +61,9 @@ void main(void) {
             gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
 
-    if (sector[0] != 0.) {
+    if (display.sector.z != 0.) {
         float theta = atan(centeredHitPoint.y, centeredHitPoint.x);
-        if (theta < sector[1] || theta > sector[2])
+        if (theta < display.sector.x || theta > display.sector.y)
             discard;
     }
 

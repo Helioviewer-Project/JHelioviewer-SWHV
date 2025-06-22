@@ -43,10 +43,11 @@ struct Display {
     vec4 color;
     vec3 sharpen;
     float isDiff;
+    vec3 sector;
+    float enhanced;
     vec2 brightness;
     vec2 radii;
     vec2 slit;
-    float enhanced;
 };
 
 layout(std140) uniform DisplayBlock {
@@ -63,7 +64,6 @@ uniform vec3 grid[2];
 
 uniform float deltaT[2];
 
-uniform float sector[3];
 uniform vec2 cutOffDirection;
 uniform float cutOffValue;
 
