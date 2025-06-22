@@ -116,20 +116,20 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindDisplay(GL3 gl,
-                            float red, float green, float blue, double alpha, double blend,
-                            double weight, double pixelWidth, double pixelHeight, int isDiff,
-                            double sector0, double sector1, int enhanced,
+                            float red, float green, float blue, float alpha,
+                            float shWeight, float shWidth, float shHeight, int isDiff,
+                            float sector0, float sector1, int enhanced,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
-                            double bOffset, double bScale,
+                            float bOffset, float bScale,
                             float innerRadius, float outerRadius,
-                            double slitLeft, double slitRight) {
+                            float slitLeft, float slitRight) {
         // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
-        displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
-        displayBuf.put((float) pixelWidth).put((float) pixelHeight).put(-2 * (float) weight).put(isDiff); // used
-        displayBuf.put((float) sector0).put((float) sector1).put(/*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1).put(enhanced);
+        displayBuf.put(red).put(green).put(blue).put(alpha);
+        displayBuf.put(shWidth).put(shHeight).put(-2 * shWeight).put(isDiff); // used
+        displayBuf.put(sector0).put(sector1).put(/*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1).put(enhanced);
         displayBuf.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
-        displayBuf.put((float) bOffset).put((float) bScale);
-        displayBuf.put(innerRadius).put(outerRadius).put((float) slitLeft).put((float) slitRight);
+        displayBuf.put(bOffset).put(bScale);
+        displayBuf.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }

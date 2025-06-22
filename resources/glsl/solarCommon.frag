@@ -59,7 +59,6 @@ layout(std140) uniform DisplayBlock {
 
 uniform sampler2D image;
 uniform sampler2D diffImage;
-
 uniform sampler1D lut;
 
 uniform vec3 grid[2];
