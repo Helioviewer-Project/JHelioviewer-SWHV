@@ -23,7 +23,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int gridRef;
 
-    private final int[] intArr = new int[1];
     private final float[] floatArr = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
