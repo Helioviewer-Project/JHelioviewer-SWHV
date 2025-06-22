@@ -23,8 +23,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int gridRef;
     private int deltaTRef;
-    private int cutOffRef;
-    private int calculateDepthRef;
 
     private final int[] intArr = new int[1];
     private final float[] floatArr = new float[8];
@@ -43,7 +41,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO displayBO;
-    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 4);
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 4 + 4);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
@@ -67,10 +65,7 @@ public class GLSLSolarShader extends GLSLShader {
     @Override
     protected void initUniforms(GL3 gl, int id) {
         gridRef = gl.glGetUniformLocation(id, "grid");
-
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
-        cutOffRef = gl.glGetUniformLocation(id, "cutOff");
-        calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
         setupUBO(gl, id, "WCSBlock", wcsBO.getID(), 1);
@@ -124,6 +119,7 @@ public class GLSLSolarShader extends GLSLShader {
                             float red, float green, float blue, double alpha, double blend,
                             double weight, double pixelWidth, double pixelHeight, int isDiff,
                             double sector0, double sector1, int enhanced,
+                            float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
                             double bOffset, double bScale,
                             float innerRadius, float outerRadius,
                             double slitLeft, double slitRight) {
@@ -131,6 +127,7 @@ public class GLSLSolarShader extends GLSLShader {
         displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
         displayBuf.put((float) pixelWidth).put((float) pixelHeight).put(-2 * (float) weight).put(isDiff); // used
         displayBuf.put((float) sector0).put((float) sector1).put(/*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1).put(enhanced);
+        displayBuf.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
         displayBuf.put((float) bOffset).put((float) bScale);
         displayBuf.put(innerRadius).put(outerRadius).put((float) slitLeft).put((float) slitRight);
 
@@ -141,18 +138,6 @@ public class GLSLSolarShader extends GLSLShader {
         floatArr[0] = (float) deltaT0;
         floatArr[1] = (float) deltaT1;
         gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
-    }
-
-    public void bindCalculateDepth(GL3 gl, boolean calculateDepth) {
-        intArr[0] = calculateDepth ? 1 : 0;
-        gl.glUniform1iv(calculateDepthRef, 1, intArr, 0);
-    }
-
-    public void bindCutOff(GL3 gl, float x, float y, float val) {
-        floatArr[0] = x;
-        floatArr[1] = y;
-        floatArr[2] = val;
-        gl.glUniform3fv(cutOffRef, 1, floatArr, 0);
     }
 
     public void bindAnglesLatiGrid(GL3 gl, double lon, double lat, double hglt, double dlon, double dlat, double dhglt) {

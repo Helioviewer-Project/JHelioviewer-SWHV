@@ -45,6 +45,8 @@ struct Display {
     float isDiff;
     vec3 sector;
     float enhanced;
+    vec3 cutOff;
+    float calculateDepth;
     vec2 brightness;
     vec2 radii;
     vec2 slit;
@@ -55,7 +57,6 @@ layout(std140) uniform DisplayBlock {
 };
 
 uniform sampler2D image;
-uniform int calculateDepth;
 uniform sampler2D diffImage;
 
 uniform sampler1D lut;
@@ -63,8 +64,6 @@ uniform sampler1D lut;
 uniform vec3 grid[2];
 
 uniform float deltaT[2];
-
-uniform vec3 cutOff;
 
 #define FSIZE (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
