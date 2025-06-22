@@ -74,13 +74,15 @@ public class GLImage {
     public void applyFilters(GL3 gl, MetaData metaData, ImageData imageData, GLSLSolarShader shader) {
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
 
-        shader.bindDisplay(gl, red, green, blue, opacity, blend,
-                           sharpen, 1. / imageData.getImageBuffer().width, 1. / imageData.getImageBuffer().height, diffMode.ordinal(),
+        shader.bindDisplay(gl,
+                           // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
+                           (float) (red * opacity), (float) (green * opacity), (float) (blue * opacity), (float) (opacity * blend),
+                           (float) sharpen, 1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, diffMode.ordinal(),
                            metaData.getSector0(), metaData.getSector1(), enhanced ? 1 : 0,
                            metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
-                           brightOffset, brightScale * metaData.getResponseFactor(),
+                           (float) brightOffset, (float) (brightScale * metaData.getResponseFactor()),
                            Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1, 
-                           slitLeft, slitRight);
+                           (float) slitLeft, (float) slitRight);
 
         applyLUT(gl);
         tex.bind(gl);
