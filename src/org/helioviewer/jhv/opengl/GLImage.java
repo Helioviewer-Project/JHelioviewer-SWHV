@@ -77,7 +77,7 @@ public class GLImage {
         shader.bindDisplay(gl,
                            // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
                            (float) (red * opacity), (float) (green * opacity), (float) (blue * opacity), (float) (opacity * blend),
-                           (float) sharpen, 1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, diffMode.ordinal(),
+                           1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
                            metaData.getSector0(), metaData.getSector1(), enhanced ? 1 : 0,
                            metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                            (float) brightOffset, (float) (brightScale * metaData.getResponseFactor()),
