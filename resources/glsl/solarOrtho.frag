@@ -57,7 +57,7 @@ void main(void) {
 
         centeredHitPoint = apply_center(rotatedHitPoint, wcs[0].crval, wcs[0].crota);
 
-        if (calculateDepth != 0) // intersecting Euhforia planes
+        if (display.calculateDepth != 0) // intersecting Euhforia planes
             gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
 
@@ -71,13 +71,13 @@ void main(void) {
     vec2 texcoord = rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y);
     clamp_coord(texcoord);
 
-    float geometryFlatDist = abs(dot(rotatedHitPoint.xy, cutOff.xy));
-    vec2 cutOffAlt = vec2(-cutOff.y, cutOff.x);
+    float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
+    vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
     float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
 
     float rotatedHitPointRad = length(rotatedHitPoint.xy);
     if (rotatedHitPointRad > display.radii.y || rotatedHitPointRad < display.radii.x ||
-        (cutOff.z >= 0. && (geometryFlatDist > cutOff.z || geometryFlatDistAlt > cutOff.z))) {
+        (display.cutOff.z >= 0. && (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z))) {
         discard;
     }
 
