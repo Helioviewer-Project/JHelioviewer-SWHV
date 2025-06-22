@@ -22,7 +22,6 @@ public class GLSLSolarShader extends GLSLShader {
     private final boolean hasCommon;
 
     private int gridRef;
-    private int deltaTRef;
 
     private final int[] intArr = new int[1];
     private final float[] floatArr = new float[8];
@@ -65,7 +64,6 @@ public class GLSLSolarShader extends GLSLShader {
     @Override
     protected void initUniforms(GL3 gl, int id) {
         gridRef = gl.glGetUniformLocation(id, "grid");
-        deltaTRef = gl.glGetUniformLocation(id, "deltaT");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
         setupUBO(gl, id, "WCSBlock", wcsBO.getID(), 1);
@@ -100,17 +98,19 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindWCS(GL3 gl,
-                        Quat cameraDiff0, Region r0, Quat crota0, float[] crval0,
-                        Quat cameraDiff1, Region r1, Quat crota1, float[] crval1) {
+                        Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
+                        Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
-        wcsBuf.put(crval0); // has padding
+        wcsBuf.put(crval0);
+        wcsBuf.put(deltaT0).put(0);
 
         cameraDiff1.setFloatBuffer(wcsBuf);
         wcsBuf.put(r1.glslArray);
         crota1.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval1);
+        wcsBuf.put(deltaT1).put(0);
 
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
@@ -132,12 +132,6 @@ public class GLSLSolarShader extends GLSLShader {
         displayBuf.put(innerRadius).put(outerRadius).put((float) slitLeft).put((float) slitRight);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
-    }
-
-    public void bindDeltaT(GL3 gl, double deltaT0, double deltaT1) {
-        floatArr[0] = (float) deltaT0;
-        floatArr[1] = (float) deltaT1;
-        gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
     }
 
     public void bindAnglesLatiGrid(GL3 gl, double lon, double lat, double hglt, double dlon, double dlat, double dhglt) {
