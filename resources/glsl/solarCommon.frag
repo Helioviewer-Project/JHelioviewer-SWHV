@@ -41,14 +41,11 @@ layout(std140) uniform WCSBlock {
 
 struct Display {
     vec4 color;
-    float bOffset;
-    float bScale;
+    vec2 brightness;
+    vec2 radii;
+    vec2 slit;
     float enhanced;
     float isDiff;
-    float inneR;
-    float outeR;
-    float slitL;
-    float slitR;
 };
 
 layout(std140) uniform DisplayBlock {
@@ -87,8 +84,8 @@ const vec2[] blurOffset = vec2[](
     vec2(bo[0], bo[2]), vec2(bo[1], bo[2]), vec2(bo[2], bo[2])
 );
 
-float fetch(const sampler2D tex, const vec2 coord, const float bright[2]) {
-    return texture(tex, coord).r * bright[1] + bright[0];
+float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
+    return texture(tex, coord).r * bright.y + bright.x;
 }
 
 // https://shader-tutorial.dev/advanced/color-banding-dithering/
@@ -101,9 +98,9 @@ float dither(const vec2 coord) {
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
-    float b[2] = float[](display.bOffset, display.bScale);
+    vec2 b = display.brightness;
     if (display.enhanced == 1) {
-        b[1] *= factor * factor * factor;
+        b.y *= factor * factor * factor;
     }
 
     float v;
@@ -133,7 +130,7 @@ void clamp_texture(const vec2 texcoord) {
 }
 
 void clamp_coord(const vec2 coord) {
-    if (coord.x < display.slitL || coord.y < 0. || coord.x > display.slitR || coord.y > 1.)
+    if (coord.x < display.slit.x || coord.y < 0. || coord.x > display.slit.y || coord.y > 1.)
         discard;
 }
 

@@ -137,8 +137,9 @@ public class GLSLSolarShader extends GLSLShader {
                             float innerRadius, float outerRadius, double slitLeft, double slitRight) {
         // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
-        displayBuf.put((float) bOffset).put((float) bScale).put(enhanced).put(isDiff);
+        displayBuf.put((float) bOffset).put((float) bScale);
         displayBuf.put(innerRadius).put(outerRadius).put((float) slitLeft).put((float) slitRight);
+        displayBuf.put(enhanced).put(isDiff);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
