@@ -80,10 +80,6 @@ const vec2[] blurOffset = vec2[](
     vec2(bo[0], bo[2]), vec2(bo[1], bo[2]), vec2(bo[2], bo[2])
 );
 
-float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
-    return texture(tex, coord).r * bright.y + bright.x;
-}
-
 // https://shader-tutorial.dev/advanced/color-banding-dithering/
 const float NOISE_GRANULARITY = 1. / 255.;
 const vec2 nvec = vec2(12.9898, 78.233);
@@ -91,6 +87,10 @@ const vec2 nvec = vec2(12.9898, 78.233);
 float dither(const vec2 coord) {
     float random = fract(sin(dot(coord, nvec)) * 43758.5453);
     return mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random);
+}
+
+float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
+    return texture(tex, coord).r * bright.y + bright.x;
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
