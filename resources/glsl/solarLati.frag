@@ -33,7 +33,7 @@ vec2 get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, cons
 }
 
 void main(void) {
-    if (display.inneR > 1.) // coronagraphs
+    if (display.radii.x > 1.) // coronagraphs
         discard;
 
     vec4 color;
