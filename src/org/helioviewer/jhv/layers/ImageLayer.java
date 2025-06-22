@@ -188,8 +188,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         render(camera, vp, gl);
     }
 
-    private final float[] crval0 = new float[4]; // includes 2 elements padding
-    private final float[] crval1 = new float[4];
+    private final float[] crval0 = new float[2];
+    private final float[] crval1 = new float[2];
 
     @Override
     public void render(Camera camera, Viewport vp, GL3 gl) {
@@ -243,14 +243,13 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             crval1[1] = (float) (meta1.getCRVAL().y + deltaCRVAL2 * meta1.getUnitPerArcsec());
         }
 
-        shader.bindWCS(gl,
-                cameraDiff0, imageData.getRegion(), crota0, crval0,
-                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1);
-
         boolean diffRot = ImageLayers.getDiffRotationMode();
-        double deltaT0 = diffRot ? (cameraViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9 : 0;
-        double deltaT1 = diffRot ? (cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9 : 0;
-        shader.bindDeltaT(gl, deltaT0, deltaT1);
+        float deltaT0 = diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9) : 0;
+        float deltaT1 = diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9) : 0;
+
+        shader.bindWCS(gl,
+                cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
+                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
 
         if (Display.mode == Display.ProjectionMode.Latitudinal) {
             GridType gridType = Display.gridType;

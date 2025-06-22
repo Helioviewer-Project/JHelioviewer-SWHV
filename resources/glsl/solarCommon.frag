@@ -20,7 +20,7 @@ struct Screen {
     float iaspect;
     float yStart;
     float yStop;
-    //float padding;
+    // float padding;
 };
 
 layout(std140) uniform ScreenBlock {
@@ -32,7 +32,8 @@ struct WCS {
     vec4 rect;
     vec4 crota;
     vec2 crval;
-    // padding 2
+    float deltaT; // not strictly WCS
+    // float padding;
 };
 
 layout(std140) uniform WCSBlock {
@@ -62,8 +63,6 @@ uniform sampler2D diffImage;
 uniform sampler1D lut;
 
 uniform vec3 grid[2];
-
-uniform float deltaT[2];
 
 #define FSIZE (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
