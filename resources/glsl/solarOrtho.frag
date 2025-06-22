@@ -71,13 +71,13 @@ void main(void) {
     vec2 texcoord = rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y);
     clamp_coord(texcoord);
 
-    float geometryFlatDist = abs(dot(rotatedHitPoint.xy, cutOffDirection));
-    vec2 cutOffDirectionAlt = vec2(-cutOffDirection.y, cutOffDirection.x);
-    float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffDirectionAlt));
+    float geometryFlatDist = abs(dot(rotatedHitPoint.xy, cutOff.xy));
+    vec2 cutOffAlt = vec2(-cutOff.y, cutOff.x);
+    float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
 
     float rotatedHitPointRad = length(rotatedHitPoint.xy);
     if (rotatedHitPointRad > display.radii.y || rotatedHitPointRad < display.radii.x ||
-        (cutOffValue >= 0. && (geometryFlatDist > cutOffValue || geometryFlatDistAlt > cutOffValue))) {
+        (cutOff.z >= 0. && (geometryFlatDist > cutOff.z || geometryFlatDistAlt > cutOff.z))) {
         discard;
     }
 

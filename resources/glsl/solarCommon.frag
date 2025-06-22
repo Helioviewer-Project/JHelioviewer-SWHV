@@ -64,8 +64,7 @@ uniform vec3 grid[2];
 
 uniform float deltaT[2];
 
-uniform vec2 cutOffDirection;
-uniform float cutOffValue;
+uniform vec3 cutOff;
 
 #define FSIZE (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
