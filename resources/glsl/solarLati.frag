@@ -39,11 +39,11 @@ void main(void) {
     vec4 color;
 
     vec2 scrpos = getScrPos();
-    vec2 texcoord = get_lati_texcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, deltaT[0], grid[0]);
+    vec2 texcoord = get_lati_texcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, wcs[0].deltaT, grid[0]);
     if (display.isDiff == NODIFFERENCE) {
         color = getColor(texcoord, texcoord, 1);
     } else {
-        vec2 difftexcoord = get_lati_texcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, deltaT[1], grid[1]);
+        vec2 difftexcoord = get_lati_texcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, wcs[1].deltaT, grid[1]);
         color = getColor(texcoord, difftexcoord, 1);
     }
     outColor = color;
