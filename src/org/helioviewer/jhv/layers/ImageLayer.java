@@ -243,9 +243,11 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             crval1[1] = (float) (meta1.getCRVAL().y + deltaCRVAL2 * meta1.getUnitPerArcsec());
         }
 
-        boolean diffRot = ImageLayers.getDiffRotationMode();
-        float deltaT0 = diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9) : 0;
-        float deltaT1 = diffRot ? (float) ((cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9) : 0;
+        float deltaT0 = 0, deltaT1 = 0;
+        if (ImageLayers.getDiffRotationMode()) {
+            deltaT0 = (float) ((cameraViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9);
+            deltaT1 = (float) ((cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
+        }
 
         shader.bindWCS(gl,
                 cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
