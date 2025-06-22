@@ -117,15 +117,14 @@ public class GLSLSolarShader extends GLSLShader {
 
     public void bindDisplay(GL3 gl,
                             float red, float green, float blue, float alpha,
-                            float shWeight, float shWidth, float shHeight, int isDiff,
+                            float shWidth, float shHeight, float shWeight, int isDiff,
                             float sector0, float sector1, int enhanced,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
                             float bOffset, float bScale,
                             float innerRadius, float outerRadius,
                             float slitLeft, float slitRight) {
-        // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         displayBuf.put(red).put(green).put(blue).put(alpha);
-        displayBuf.put(shWidth).put(shHeight).put(-2 * shWeight).put(isDiff); // used
+        displayBuf.put(shWidth).put(shHeight).put(shWeight).put(isDiff);
         displayBuf.put(sector0).put(sector1).put(/*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1).put(enhanced);
         displayBuf.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
         displayBuf.put(bOffset).put(bScale);
