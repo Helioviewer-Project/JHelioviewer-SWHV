@@ -29,7 +29,6 @@ public class GLSLSolarShader extends GLSLShader {
     private int cutOffDirectionRef;
     private int cutOffValueRef;
 
-    private int sharpenRef;
     private int calculateDepthRef;
 
     private final int[] intArr = new int[1];
@@ -49,7 +48,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO displayBO;
-    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4);
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
@@ -80,7 +79,6 @@ public class GLSLSolarShader extends GLSLShader {
         cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
         cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
 
-        sharpenRef = gl.glGetUniformLocation(id, "sharpen");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
@@ -133,13 +131,17 @@ public class GLSLSolarShader extends GLSLShader {
 
     public void bindDisplay(GL3 gl,
                             float red, float green, float blue, double alpha, double blend,
-                            double bOffset, double bScale, int enhanced, int isDiff,
-                            float innerRadius, float outerRadius, double slitLeft, double slitRight) {
+                            double weight, double pixelWidth, double pixelHeight, int isDiff,
+                            double bOffset, double bScale,
+                            float innerRadius, float outerRadius,
+                            double slitLeft, double slitRight,
+                            int enhanced) {
         // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         displayBuf.put((float) (red * alpha)).put((float) (green * alpha)).put((float) (blue * alpha)).put((float) (alpha * blend));
+        displayBuf.put((float) pixelWidth).put((float) pixelHeight).put(-2 * (float) weight).put(isDiff); // used
         displayBuf.put((float) bOffset).put((float) bScale);
         displayBuf.put(innerRadius).put(outerRadius).put((float) slitLeft).put((float) slitRight);
-        displayBuf.put(enhanced).put(isDiff);
+        displayBuf.put(enhanced);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
@@ -148,13 +150,6 @@ public class GLSLSolarShader extends GLSLShader {
         floatArr[0] = (float) deltaT0;
         floatArr[1] = (float) deltaT1;
         gl.glUniform1fv(deltaTRef, 2, floatArr, 0);
-    }
-
-    public void bindSharpen(GL3 gl, double weight, double pixelWidth, double pixelHeight) {
-        floatArr[0] = (float) pixelWidth;
-        floatArr[1] = (float) pixelHeight;
-        floatArr[2] = -2 * (float) weight; // used for mix
-        gl.glUniform3fv(sharpenRef, 1, floatArr, 0);
     }
 
     public void bindCalculateDepth(GL3 gl, boolean calculateDepth) {

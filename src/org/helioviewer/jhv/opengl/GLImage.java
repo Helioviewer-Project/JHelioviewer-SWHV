@@ -74,11 +74,13 @@ public class GLImage {
     public void applyFilters(GL3 gl, MetaData metaData, ImageData imageData, GLSLSolarShader shader) {
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
         shader.bindSector(gl, metaData.getSector0(), metaData.getSector1());
-        shader.bindSharpen(gl, sharpen, 1. / imageData.getImageBuffer().width, 1. / imageData.getImageBuffer().height);
 
         shader.bindDisplay(gl, red, green, blue, opacity, blend,
-                           brightOffset, brightScale * metaData.getResponseFactor(), enhanced ? 1 : 0, diffMode.ordinal(),
-                           Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1, slitLeft, slitRight);
+                           sharpen, 1. / imageData.getImageBuffer().width, 1. / imageData.getImageBuffer().height, diffMode.ordinal(),
+                           brightOffset, brightScale * metaData.getResponseFactor(),
+                           Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1, 
+                           slitLeft, slitRight,
+                           enhanced ? 1 : 0);
 
         applyLUT(gl);
         tex.bind(gl);
