@@ -9,12 +9,12 @@ void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, con
     // if (interpolated < 1.)
     //     pos.z = interpolated;
 
-    if (cutOffValue >= 0.) {
+    if (cutOff.z >= 0.) {
         vec2 dpos = pos.yx;
-        vec2 cutOffDirectionAlt = vec2(-cutOffDirection.y, cutOffDirection.x);
-        float geometryFlatDist = abs(dot(dpos, cutOffDirection));
-        float geometryFlatDistAlt = abs(dot(dpos, cutOffDirectionAlt));
-        if (geometryFlatDist > cutOffValue || geometryFlatDistAlt > cutOffValue)
+        vec2 cutOffAlt = vec2(-cutOff.y, cutOff.x);
+        float geometryFlatDist = abs(dot(dpos, cutOff.xy));
+        float geometryFlatDistAlt = abs(dot(dpos, cutOffAlt));
+        if (geometryFlatDist > cutOff.z || geometryFlatDistAlt > cutOff.z)
             discard;
     }
 

@@ -22,12 +22,8 @@ public class GLSLSolarShader extends GLSLShader {
     private final boolean hasCommon;
 
     private int gridRef;
-
     private int deltaTRef;
-
-    private int cutOffDirectionRef;
-    private int cutOffValueRef;
-
+    private int cutOffRef;
     private int calculateDepthRef;
 
     private final int[] intArr = new int[1];
@@ -73,10 +69,7 @@ public class GLSLSolarShader extends GLSLShader {
         gridRef = gl.glGetUniformLocation(id, "grid");
 
         deltaTRef = gl.glGetUniformLocation(id, "deltaT");
-
-        cutOffDirectionRef = gl.glGetUniformLocation(id, "cutOffDirection");
-        cutOffValueRef = gl.glGetUniformLocation(id, "cutOffValue");
-
+        cutOffRef = gl.glGetUniformLocation(id, "cutOff");
         calculateDepthRef = gl.glGetUniformLocation(id, "calculateDepth");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
@@ -155,15 +148,11 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glUniform1iv(calculateDepthRef, 1, intArr, 0);
     }
 
-    public void bindCutOffValue(GL3 gl, float val) {
-        floatArr[0] = val;
-        gl.glUniform1fv(cutOffValueRef, 1, floatArr, 0);
-    }
-
-    public void bindCutOffDirection(GL3 gl, float x, float y) {
+    public void bindCutOff(GL3 gl, float x, float y, float val) {
         floatArr[0] = x;
         floatArr[1] = y;
-        gl.glUniform2fv(cutOffDirectionRef, 1, floatArr, 0);
+        floatArr[2] = val;
+        gl.glUniform3fv(cutOffRef, 1, floatArr, 0);
     }
 
     public void bindAnglesLatiGrid(GL3 gl, double lon, double lat, double hglt, double dlon, double dlat, double dhglt) {
