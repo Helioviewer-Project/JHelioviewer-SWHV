@@ -75,14 +75,14 @@ public class GLImage {
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
 
         shader.bindDisplay(gl,
-                           // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
-                           (float) (red * opacity), (float) (green * opacity), (float) (blue * opacity), (float) (opacity * blend),
-                           1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
-                           metaData.getSector0(), metaData.getSector1(), enhanced ? 1 : 0,
-                           metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
-                           (float) brightOffset, (float) (brightScale * metaData.getResponseFactor()),
-                           Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1, 
-                           (float) slitLeft, (float) slitRight);
+                // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
+                (float) (red * opacity), (float) (green * opacity), (float) (blue * opacity), (float) (opacity * blend),
+                1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
+                metaData.getSector0(), metaData.getSector1(), enhanced ? 1 : 0,
+                metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
+                (float) brightOffset, (float) (brightScale * metaData.getResponseFactor()),
+                Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1,
+                (float) slitLeft, (float) slitRight);
 
         applyLUT(gl);
         tex.bind(gl);
