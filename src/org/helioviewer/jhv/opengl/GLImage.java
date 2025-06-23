@@ -71,12 +71,16 @@ public class GLImage {
         }
     }
 
-    public void applyFilters(GL3 gl, MetaData metaData, ImageData imageData, GLSLSolarShader shader) {
+    private final float[] color = new float[4];
+
+    public void applyFilters(GL3 gl, MetaData metaData, ImageData imageData) {
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
 
-        shader.bindDisplay(gl,
-                // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
-                (float) (red * opacity), (float) (green * opacity), (float) (blue * opacity), (float) (opacity * blend),
+        color[0] = (float) (red * opacity); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
+        color[1] = (float) (green * opacity);
+        color[2] = (float) (blue * opacity);
+        color[3] = (float) (opacity * blend);
+        GLSLSolarShader.bindDisplay(gl, color,
                 1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
                 metaData.getSector0(), metaData.getSector1(), enhanced ? 1 : 0,
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,

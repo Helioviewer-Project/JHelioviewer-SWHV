@@ -203,7 +203,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         shader.use(gl);
 
         MetaData meta0 = imageData.getMetaData();
-        glImage.applyFilters(gl, meta0, imageData, shader);
+        glImage.applyFilters(gl, meta0, imageData);
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
@@ -249,7 +249,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             deltaT1 = (float) ((cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
         }
 
-        shader.bindWCS(gl,
+        GLSLSolarShader.bindWCS(gl,
                 cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
 

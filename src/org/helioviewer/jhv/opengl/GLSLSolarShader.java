@@ -86,7 +86,7 @@ public class GLSLSolarShader extends GLSLShader {
         displayBO.delete(gl);
     }
 
-    public static void bindScreen(GL3 gl, Viewport vp) {
+    static void bindScreen(GL3 gl, Viewport vp) {
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
         inv.flip();
@@ -96,7 +96,7 @@ public class GLSLSolarShader extends GLSLShader {
         screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
     }
 
-    public void bindWCS(GL3 gl,
+    public static void bindWCS(GL3 gl,
                         Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
                         Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
@@ -114,15 +114,14 @@ public class GLSLSolarShader extends GLSLShader {
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
 
-    public void bindDisplay(GL3 gl,
-                            float red, float green, float blue, float alpha,
+    static void bindDisplay(GL3 gl, float[] color,
                             float shWidth, float shHeight, float shWeight, int isDiff,
                             float sector0, float sector1, int enhanced,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
                             float bOffset, float bScale,
                             float innerRadius, float outerRadius,
                             float slitLeft, float slitRight) {
-        displayBuf.put(red).put(green).put(blue).put(alpha);
+        displayBuf.put(color);
         displayBuf.put(shWidth).put(shHeight).put(shWeight).put(isDiff);
         displayBuf.put(sector0).put(sector1).put(/*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1).put(enhanced);
         displayBuf.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
