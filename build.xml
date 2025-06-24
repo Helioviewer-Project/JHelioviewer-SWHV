@@ -38,13 +38,17 @@
         </condition>
 
         <path id="processorpath.ref">
-            <pathelement location="extra/prone/error_prone_core-2.29.0-with-dependencies.jar"/>
-            <pathelement location="extra/prone/dataflow-errorprone-3.42.0-eisop4.jar"/>
+            <pathelement location="extra/prone/error_prone_core-2.38.0-with-dependencies.jar"/>
+            <pathelement location="extra/prone/dataflow-errorprone-3.49.3-eisop1.jar"/>
             <pathelement location="extra/prone/javax.inject-1.jar"/>
             <!-- Add annotation processors and Error Prone custom checks here if needed -->
         </path>
 
         <javac srcdir="${src}" destdir="${bin}" fork="yes" includeantruntime="no" xmlns:unless="ant:unless">
+            <compilerarg value="-XDcompilePolicy=simple"/>
+            <compilerarg value="--should-stop=ifError=FLOW"/>
+            <compilerarg value="-processorpath"/>
+            <compilerarg pathref="processorpath.ref"/>
             <compilerarg value="-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED"/>
             <compilerarg value="-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED"/>
             <compilerarg value="-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED"/>
@@ -56,9 +60,6 @@
             <compilerarg value="-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED"/>
             <compilerarg value="-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED"/>
             <compilerarg value="-J-Xbootclasspath/p:${javac.jar}" unless:set="jdk9orlater"/>
-            <compilerarg line="-XDcompilePolicy=simple"/>
-            <compilerarg value="-processorpath"/>
-            <compilerarg pathref="processorpath.ref"/>
             <!-- CatchAndPrintStackTrace - not interesting -->
             <compilerarg value="-Xplugin:ErrorProne
                                 -Xep:CatchAndPrintStackTrace:OFF

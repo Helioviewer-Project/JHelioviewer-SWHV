@@ -94,8 +94,8 @@ class InteractionAnnotate implements Interaction.Type {
 
     void zoom() {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
-        if (activeAnn instanceof AnnotateFOV)
-            ((AnnotateFOV) activeAnn).zoom(camera);
+        if (activeAnn instanceof AnnotateFOV annFOV)
+            annFOV.zoom(camera);
     }
 
     @Override
