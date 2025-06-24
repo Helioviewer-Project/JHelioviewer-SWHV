@@ -76,15 +76,7 @@ abstract class GLSLShader {
 
     private static int attachShader(GL3 gl, ShaderType type, String text) {
         int id = gl.glCreateShader(type.glType);
-
-        String[] akProgramText = new String[1];
-        akProgramText[0] = text;
-
-        int[] aiLength = new int[1];
-        aiLength[0] = akProgramText[0].length();
-        int iCount = 1;
-
-        gl.glShaderSource(id, iCount, akProgramText, aiLength, 0);
+        gl.glShaderSource(id, 1, new String[]{text}, new int[]{text.length()}, 0);
         gl.glCompileShader(id);
 
         int[] params = {0};
