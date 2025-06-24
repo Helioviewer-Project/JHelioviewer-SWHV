@@ -76,6 +76,10 @@ class MovieExporter {
                 "-hide_banner",
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
+                "-color_range", "2",
+                "-colorspace", "bt709",
+                "-color_primaries", "bt709",
+                "-color_trc", "iec61966-2-1",
                 "-r", format == VideoFormat.PNG ? "1" : String.valueOf(fps),
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()
@@ -88,9 +92,9 @@ class MovieExporter {
                 "-movflags", "+faststart",
                 "-movflags", "+write_colr", // may be useless
                 "-color_range", "2",
-                "-colorspace", "1",
-                "-color_primaries", "1",
-                "-color_trc", "1",
+                "-colorspace", "bt709",
+                "-color_primaries", "bt709",
+                "-color_trc", "bt709",
                 "-y", outPath
         );
         List<String> command = new ArrayList<>(ffmpeg);
