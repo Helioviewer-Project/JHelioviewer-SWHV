@@ -76,9 +76,9 @@ public class GLImage {
     public void applyFilters(GL3 gl, MetaData metaData, ImageData imageData) {
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
 
-        color[0] = (float) (red * opacity); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
-        color[1] = (float) (green * opacity);
-        color[2] = (float) (blue * opacity);
+        color[0] = (float) (opacity * red); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
+        color[1] = (float) (opacity * green);
+        color[2] = (float) (opacity * blue);
         color[3] = (float) (opacity * blend);
         GLSLSolarShader.bindDisplay(gl, color,
                 1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
