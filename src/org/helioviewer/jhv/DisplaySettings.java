@@ -65,6 +65,10 @@ public class DisplaySettings {
         }
     }
 
+    public static UITheme getUITheme() {
+        return uiTheme;
+    }
+
     public static void setUITheme(UITheme theme) {
         Settings.setProperty("display.theme", theme.toString());
         uiTheme = theme;
