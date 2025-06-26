@@ -127,18 +127,37 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         sampHub.addActionListener(e -> Settings.setProperty("startup.sampHub", Boolean.toString(sampHub.isSelected())));
         settings.add(sampHub, c);
 
-        c.gridx = 0;
-        c.gridy = 2;
-        settings.add(new JLabel("For new layers:", JLabel.RIGHT), c);
+        JPanel themePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        themePanel.add(new JLabel("Use theme ", JLabel.RIGHT));
+        ButtonGroup themeGroup = new ButtonGroup();
+        DisplaySettings.UITheme currentTheme = DisplaySettings.getUITheme();
+        for (DisplaySettings.UITheme theme : DisplaySettings.UITheme.values()) {
+            JRadioButton radio = new JRadioButton(theme.toString(), theme == currentTheme);
+            radio.addItemListener(e -> {
+                if (radio.isSelected()) {
+                    DisplaySettings.setUITheme(theme);
+                }
+            });
+            themePanel.add(radio);
+            themeGroup.add(radio);
+        }
 
         c.gridx = 1;
         c.gridy = 2;
+        settings.add(themePanel, c);
+
+        c.gridx = 0;
+        c.gridy = 3;
+        settings.add(new JLabel("For new layers:", JLabel.RIGHT), c);
+
+        c.gridx = 1;
+        c.gridy = 3;
         JCheckBox normalizeAIA = new JCheckBox("Normalize SDO/AIA brightness", DisplaySettings.getNormalizeAIA());
         normalizeAIA.addActionListener(e -> DisplaySettings.setNormalizeAIA(normalizeAIA.isSelected()));
         settings.add(normalizeAIA, c);
 
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = 4;
         JCheckBox normalizeRadius = new JCheckBox("Normalize solar radius", DisplaySettings.getNormalizeRadius());
         normalizeRadius.addActionListener(e -> DisplaySettings.setNormalizeRadius(normalizeRadius.isSelected()));
         settings.add(normalizeRadius, c);
@@ -158,15 +177,15 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         }
 
         c.gridx = 1;
-        c.gridy = 4;
+        c.gridy = 5;
         settings.add(timePanel, c);
 
         c.gridx = 0;
-        c.gridy = 5;
+        c.gridy = 6;
         settings.add(new JLabel("Record video as:", JLabel.RIGHT), c);
 
         c.gridx = 1;
-        c.gridy = 5;
+        c.gridy = 6;
         JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
         VideoFormat videoFormat = VideoFormat.H264;
         try {
@@ -178,7 +197,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         settings.add(comboVideo, c);
 
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 7;
         settings.add(new JLabel("Plugins:", JLabel.RIGHT), c);
 
         c.gridx = 1;
