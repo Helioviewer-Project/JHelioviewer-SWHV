@@ -28,7 +28,7 @@ import com.jogamp.opengl.GL3;
 public class TimestampLayer extends AbstractLayer {
 
     private static final int MIN_SCALE = 50;
-    private static final int MAX_SCALE = 200;
+    private static final int MAX_SCALE = 300;
 
     private int scale = 100;
     private boolean extra = false;
