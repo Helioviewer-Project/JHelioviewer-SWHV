@@ -76,10 +76,6 @@ class MovieExporter {
                 "-hide_banner",
                 "-f", "rawvideo",
                 "-pix_fmt", "bgr24",
-                "-color_range", "2",
-                "-colorspace", "bt709",
-                "-color_primaries", "bt709",
-                "-color_trc", "iec61966-2-1",
                 "-r", format == VideoFormat.PNG ? "1" : String.valueOf(fps),
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()
@@ -87,14 +83,14 @@ class MovieExporter {
         String outPath = prefix + format.extension;
         List<String> output = List.of(
                 "-pix_fmt", "yuv420p",
-                "-tune", "animation",
-                "-vf", "scale=in_range=full:out_range=full",
-                "-movflags", "+faststart",
-                "-movflags", "+write_colr", // may be useless
-                "-color_range", "2",
-                "-colorspace", "bt709",
+                "-vf", "colorspace=iall=bt709:itrc=iec61966-2-1:irange=pc:all=bt709:trc=bt709:range=pc:fast=0",
                 "-color_primaries", "bt709",
                 "-color_trc", "bt709",
+                "-colorspace", "bt709",
+                "-color_range", "2",
+                "-tune", "animation",
+                "-movflags", "+faststart",
+                "-movflags", "+write_colr", // may be useless
                 "-y", outPath
         );
         List<String> command = new ArrayList<>(ffmpeg);
