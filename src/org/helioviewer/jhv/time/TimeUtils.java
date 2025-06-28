@@ -95,7 +95,11 @@ public class TimeUtils {
     }
 
     public static long parse(String date) {
-        return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
+        try {
+            return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
+        } catch (Exception ignore) { // for Angelos
+            return LocalDateTime.parse(date.replace(' ', 'T'), DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
+        }
     }
 
     public static long parseDate(String date) {
