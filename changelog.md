@@ -1,7 +1,11 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7.3 (pending)
+## JHelioviewer 4.7.3 (2025-06-30)
+
+- Improve performance on ARM Macs
+- Add a light color UI theme
+- Allow adjustment of image pointing
 
 ## JHelioviewer 4.7.2 (2025-06-11)
 
