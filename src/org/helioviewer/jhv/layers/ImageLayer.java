@@ -250,8 +250,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         }
 
         GLSLSolarShader.bindWCS(gl,
-                cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
-                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
+                cameraDiff0, imageData.getRegion(), crota0, crval0, meta0.getDistortion(), deltaT0,
+                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, meta1.getDistortion(), deltaT1);
 
         if (Display.mode == Display.ProjectionMode.Latitudinal) {
             GridType gridType = Display.gridType;

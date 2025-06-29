@@ -35,6 +35,7 @@ class BaseMetaData implements MetaData {
     protected float sector0 = 0;
     protected float sector1 = 0;
 
+    protected float pv = 0;
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected float cutOffX = 0;
@@ -86,6 +87,11 @@ class BaseMetaData implements MetaData {
     @Override
     public float getOuterRadius() {
         return outerRadius;
+    }
+
+    @Override
+    public float getDistortion() {
+        return pv;
     }
 
     @Override
