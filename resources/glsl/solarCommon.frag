@@ -32,8 +32,8 @@ struct WCS {
     vec4 rect;
     vec4 crota;
     vec2 crval;
+    float pv;
     float deltaT; // not strictly WCS
-    // float padding;
 };
 
 layout(std140) uniform WCSBlock {

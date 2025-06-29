@@ -18,6 +18,18 @@ float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
+vec2 distort(const vec2 c, float mju) {
+    if (mju == 0)
+        return c;
+
+    clamp_coord(c);
+    vec2 v = c - 0.5;
+    float R = length(v);
+    float Z = cos(asin(R));
+    float Ra = (mju + 1) / (Z + mju);
+    return vec2(v.x * Ra, v.y * Ra) + 0.5;
+}
+
 void main(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
@@ -68,7 +80,7 @@ void main(void) {
     }
 
     vec4 rect = wcs[0].rect;
-    vec2 texcoord = rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y);
+    vec2 texcoord = distort(rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y), wcs[0].pv);
     clamp_coord(texcoord);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
@@ -90,7 +102,7 @@ void main(void) {
         }
 
         vec4 rect = wcs[1].rect;
-        difftexcoord = rect.zw * vec2(diffCenteredHitPoint.x - rect.x, -diffCenteredHitPoint.y - rect.y);
+        difftexcoord = distort(rect.zw * vec2(diffCenteredHitPoint.x - rect.x, -diffCenteredHitPoint.y - rect.y), wcs[1].pv);
         clamp_coord(difftexcoord);
 
         float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);
