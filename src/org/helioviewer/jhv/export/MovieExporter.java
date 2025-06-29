@@ -71,6 +71,21 @@ class MovieExporter {
         }
     }
 
+    private static final List<String> formatVideo = List.of(
+            "-pix_fmt", "yuv420p",
+            "-vf", "colorspace=iall=bt709:itrc=iec61966-2-1:irange=pc:all=bt709:trc=bt709:range=pc:fast=0",
+            "-color_primaries", "bt709",
+            "-color_trc", "bt709",
+            "-colorspace", "bt709",
+            "-color_range", "2",
+            "-tune", "animation",
+            "-movflags", "+faststart",
+            "-movflags", "+write_colr" // may be useless
+    );
+    private static final List<String> formatImage = List.of(
+            "-vf", "scale=in_range=pc:out_range=pc"
+    );
+
     void close() throws Exception {
         List<String> input = List.of(
                 "-hide_banner",
@@ -81,26 +96,13 @@ class MovieExporter {
                 "-i", tempFile.getPath()
         );
         String outPath = prefix + format.extension;
-        List<String> outputVideo = List.of(
-                "-pix_fmt", "yuv420p",
-                "-vf", "colorspace=iall=bt709:itrc=iec61966-2-1:irange=pc:all=bt709:trc=bt709:range=pc:fast=0",
-                "-color_primaries", "bt709",
-                "-color_trc", "bt709",
-                "-colorspace", "bt709",
-                "-color_range", "2",
-                "-tune", "animation",
-                "-movflags", "+faststart",
-                "-movflags", "+write_colr", // may be useless
-                "-y", outPath
-        );
-        List<String> outputImage = List.of(
-                "-vf", "scale=in_range=full:out_range=full",
-                "-y", outPath
-        );
+
         List<String> command = new ArrayList<>(ffmpeg);
         command.addAll(input);
         command.addAll(format.settings);
-        command.addAll(format == VideoFormat.PNG ? outputImage : outputVideo);
+        command.addAll(format == VideoFormat.PNG ? formatImage : formatVideo);
+        command.add("-y");
+        command.add(outPath);
 
         try {
             ProcessBuilder builder = new ProcessBuilder()
