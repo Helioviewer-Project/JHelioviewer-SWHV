@@ -309,6 +309,9 @@ public final class HelioviewerMetaData extends BaseMetaData {
             crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
             crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
 
+            double pv2_1 = m.getDouble("PV2_1").orElse(0.);
+            pv = (float) pv2_1;
+
             if (!CROTABlockSet.contains(instrument)) {
                 double c;
                 try {
