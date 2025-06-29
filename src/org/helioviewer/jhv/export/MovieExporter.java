@@ -81,7 +81,7 @@ class MovieExporter {
                 "-i", tempFile.getPath()
         );
         String outPath = prefix + format.extension;
-        List<String> output = List.of(
+        List<String> outputVideo = List.of(
                 "-pix_fmt", "yuv420p",
                 "-vf", "colorspace=iall=bt709:itrc=iec61966-2-1:irange=pc:all=bt709:trc=bt709:range=pc:fast=0",
                 "-color_primaries", "bt709",
@@ -93,10 +93,14 @@ class MovieExporter {
                 "-movflags", "+write_colr", // may be useless
                 "-y", outPath
         );
+        List<String> outputImage = List.of(
+                "-vf", "scale=in_range=full:out_range=full",
+                "-y", outPath
+        );
         List<String> command = new ArrayList<>(ffmpeg);
         command.addAll(input);
         command.addAll(format.settings);
-        command.addAll(output);
+        command.addAll(format == VideoFormat.PNG ? outputImage : outputVideo);
 
         try {
             ProcessBuilder builder = new ProcessBuilder()
