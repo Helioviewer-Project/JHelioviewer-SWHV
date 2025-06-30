@@ -11,14 +11,8 @@ vec3 differential(const float dt, const vec3 v) {
     return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
 }
 
-float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
-    vec3 altnormal = rotate_vector(quat, zAxis);
-    if (hideBack && altnormal.z <= 0.)
-        discard;
-    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
-}
-
-vec2 distort(const vec2 c, float mju) {
+vec2 distort(const vec2 c, const float[6] PV) {
+    float mju = PV[1];
     if (mju == 0)
         return c;
 
@@ -28,6 +22,13 @@ vec2 distort(const vec2 c, float mju) {
     float Z = cos(asin(R));
     float Ra = (mju + 1) / (Z + mju);
     return vec2(v.x * Ra, v.y * Ra) + 0.5;
+}
+
+float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
+    vec3 altnormal = rotate_vector(quat, zAxis);
+    if (hideBack && altnormal.z <= 0.)
+        discard;
+    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
 void main(void) {
@@ -80,7 +81,7 @@ void main(void) {
     }
 
     vec4 rect = wcs[0].rect;
-    vec2 texcoord = distort(rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y), pv0[1]);
+    vec2 texcoord = distort(rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y), pv0);
     clamp_coord(texcoord);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
@@ -102,7 +103,7 @@ void main(void) {
         }
 
         vec4 rect = wcs[1].rect;
-        difftexcoord = distort(rect.zw * vec2(diffCenteredHitPoint.x - rect.x, -diffCenteredHitPoint.y - rect.y), pv1[1]);
+        difftexcoord = distort(rect.zw * vec2(diffCenteredHitPoint.x - rect.x, -diffCenteredHitPoint.y - rect.y), pv1);
         clamp_coord(difftexcoord);
 
         float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);
