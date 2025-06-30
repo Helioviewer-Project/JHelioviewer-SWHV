@@ -22,6 +22,8 @@ public class GLSLSolarShader extends GLSLShader {
     private final boolean hasCommon;
 
     private int gridRef;
+    private int pv0Ref;
+    private int pv1Ref;
 
     private final float[] floatArr = new float[8];
 
@@ -63,6 +65,8 @@ public class GLSLSolarShader extends GLSLShader {
     @Override
     protected void initUniforms(GL3 gl, int id) {
         gridRef = gl.glGetUniformLocation(id, "grid");
+        pv0Ref = gl.glGetUniformLocation(id, "pv0");
+        pv1Ref = gl.glGetUniformLocation(id, "pv1");
 
         setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
         setupUBO(gl, id, "WCSBlock", wcsBO.getID(), 1);
@@ -97,19 +101,19 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindWCS(GL3 gl,
-                               Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float[] pv0, float deltaT0,
-                               Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float[] pv1, float deltaT1) {
+                               Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
+                               Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval0);
-        wcsBuf.put(pv0[1]).put(deltaT0);
+        wcsBuf.put(deltaT0).put(0);
 
         cameraDiff1.setFloatBuffer(wcsBuf);
         wcsBuf.put(r1.glslArray);
         crota1.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval1);
-        wcsBuf.put(pv1[1]).put(deltaT1);
+        wcsBuf.put(deltaT1).put(0);
 
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
@@ -129,6 +133,11 @@ public class GLSLSolarShader extends GLSLShader {
         displayBuf.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
 
         displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
+    }
+
+    public void bindPV(GL3 gl, float[] pv0, float[] pv1) {
+        gl.glUniform1fv(pv0Ref, pv0.length, pv0, 0);
+        gl.glUniform1fv(pv1Ref, pv1.length, pv1, 0);
     }
 
     public void bindAnglesLatiGrid(GL3 gl, double lon, double lat, double hglt, double dlon, double dlat, double dhglt) {

@@ -80,7 +80,7 @@ void main(void) {
     }
 
     vec4 rect = wcs[0].rect;
-    vec2 texcoord = distort(rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y), wcs[0].pv);
+    vec2 texcoord = distort(rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y), pv0[1]);
     clamp_coord(texcoord);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
@@ -102,7 +102,7 @@ void main(void) {
         }
 
         vec4 rect = wcs[1].rect;
-        difftexcoord = distort(rect.zw * vec2(diffCenteredHitPoint.x - rect.x, -diffCenteredHitPoint.y - rect.y), wcs[1].pv);
+        difftexcoord = distort(rect.zw * vec2(diffCenteredHitPoint.x - rect.x, -diffCenteredHitPoint.y - rect.y), pv1[1]);
         clamp_coord(difftexcoord);
 
         float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);

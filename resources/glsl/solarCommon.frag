@@ -32,8 +32,8 @@ struct WCS {
     vec4 rect;
     vec4 crota;
     vec2 crval;
-    float pv;
     float deltaT; // not strictly WCS
+    // float padding
 };
 
 layout(std140) uniform WCSBlock {
@@ -62,6 +62,9 @@ uniform sampler2D diffImage;
 uniform sampler1D lut;
 
 uniform vec3 grid[2];
+
+uniform float pv0[6]; // should be in WCS uniform block
+uniform float pv1[6];
 
 #define FSIZE (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
