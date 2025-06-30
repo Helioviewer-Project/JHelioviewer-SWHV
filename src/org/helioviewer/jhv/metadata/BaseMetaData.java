@@ -35,7 +35,7 @@ class BaseMetaData implements MetaData {
     protected float sector0 = 0;
     protected float sector1 = 0;
 
-    protected float pv = 0;
+    protected float[] pv2 = new float[6];
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected float cutOffX = 0;
@@ -90,8 +90,8 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public float getDistortion() {
-        return pv;
+    public float[] getPV2() {
+        return pv2;
     }
 
     @Override

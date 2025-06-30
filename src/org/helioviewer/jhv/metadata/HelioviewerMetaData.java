@@ -309,8 +309,14 @@ public final class HelioviewerMetaData extends BaseMetaData {
             crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
             crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
 
-            double pv2_1 = m.getDouble("PV2_1").orElse(0.);
-            pv = (float) pv2_1;
+            String ctype1 = m.getString("CTYPE1").orElse("");
+            String ctype2 = m.getString("CTYPE2").orElse("");
+            if (isZenital(ctype1) && isZenital(ctype2)) {
+                for (int i = 0; i < pv2.length; i++) {
+                    double pv = m.getDouble("PV2_" + i).orElse(0.);
+                    pv2[i] = (float) pv;
+                }
+            }
 
             if (!CROTABlockSet.contains(instrument)) {
                 double c;
@@ -325,6 +331,10 @@ public final class HelioviewerMetaData extends BaseMetaData {
                 crota = Quat.createAxisZ(c);
             }
         }
+    }
+
+    private boolean isZenital(String proj) {
+        return proj.endsWith("AZP") || proj.endsWith("ZPN");
     }
 
     private double getSolarRadiusFactor() {

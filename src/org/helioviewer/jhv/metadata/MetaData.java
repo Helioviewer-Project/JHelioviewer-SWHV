@@ -44,7 +44,8 @@ public interface MetaData {
 
     float getCutOffY();
 
-    float getDistortion();
+    @Nonnull
+    float[] getPV2();
 
     @Nonnull
     Position getViewpoint();
