@@ -11,6 +11,8 @@ vec3 differential(const float dt, const vec3 v) {
     return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
 }
 
+/*
+// DOI 10.1007/s11207-008-9277-6, §2.2.2, Eq.18-23
 vec2 distort(const vec2 c, const float[6] PV) {
     float mju = PV[1];
     if (mju == 0)
@@ -22,6 +24,22 @@ vec2 distort(const vec2 c, const float[6] PV) {
     float Z = cos(asin(R));
     float Ra = (mju + 1) / (Z + mju);
     return vec2(v.x * Ra, v.y * Ra) + 0.5;
+}
+*/
+
+vec2 distort(const vec2 c, const float[6] PV) { // DS
+    float mju = PV[1];
+    if (mju == 0)
+        return c;
+
+    clamp_coord(c);
+    vec2 v = c - 0.5;
+
+    float r = length(v);
+    float theta = atan(v.y, v.x);
+
+    float R = r * (1 + r * r * r * r * mju);
+    return vec2(R * cos(theta), R * sin(theta)) + 0.5;
 }
 
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
