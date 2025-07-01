@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.7.4 (pending)
+
 ## JHelioviewer 4.7.3 (2025-07-01)
 
 - Improve performance on ARM Macs
