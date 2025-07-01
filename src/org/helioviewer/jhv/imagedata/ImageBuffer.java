@@ -47,10 +47,10 @@ public class ImageBuffer {
             return BAD_PIXEL;
 
         int idx = x + y * width;
-        if (buffer instanceof ByteBuffer)
-            return (((ByteBuffer) buffer).get(idx) + 256) & 0xFF;
-        if (buffer instanceof ShortBuffer)
-            return (((ShortBuffer) buffer).get(idx) + 65536) & 0xFFFF;
+        if (buffer instanceof ByteBuffer bb)
+            return (bb.get(idx) + 256) & 0xFF;
+        if (buffer instanceof ShortBuffer sb)
+            return (sb.get(idx) + 65536) & 0xFFFF;
         return BAD_PIXEL;
     }
 
