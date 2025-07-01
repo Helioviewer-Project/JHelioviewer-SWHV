@@ -125,14 +125,14 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     private final HashSet<KeyListener> keyListeners = new HashSet<>();
 
     public void addPlugin(Object plugin) {
-        if (plugin instanceof MouseListener)
-            mouseListeners.add((MouseListener) plugin);
-        if (plugin instanceof MouseMotionListener)
-            mouseMotionListeners.add((MouseMotionListener) plugin);
-        if (plugin instanceof MouseWheelListener)
-            mouseWheelListeners.add((MouseWheelListener) plugin);
-        if (plugin instanceof KeyListener)
-            keyListeners.add((KeyListener) plugin);
+        if (plugin instanceof MouseListener ml)
+            mouseListeners.add(ml);
+        if (plugin instanceof MouseMotionListener mml)
+            mouseMotionListeners.add(mml);
+        if (plugin instanceof MouseWheelListener mwl)
+            mouseWheelListeners.add(mwl);
+        if (plugin instanceof KeyListener kl)
+            keyListeners.add(kl);
     }
 
     public void removePlugin(Object plugin) {

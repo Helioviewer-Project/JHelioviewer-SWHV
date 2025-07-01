@@ -121,12 +121,12 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         layers.add(layer);
         newLayers.add(layer);
 
-        if (layer instanceof ViewpointLayer)
-            viewpointLayer = (ViewpointLayer) layer;
-        else if (layer instanceof MiniviewLayer)
-            miniviewLayer = (MiniviewLayer) layer;
-        else if (layer instanceof ConnectionLayer)
-            connectionLayer = (ConnectionLayer) layer;
+        if (layer instanceof ViewpointLayer vl)
+            viewpointLayer = vl;
+        else if (layer instanceof MiniviewLayer ml)
+            miniviewLayer = ml;
+        else if (layer instanceof ConnectionLayer cl)
+            connectionLayer = cl;
 
         int row = layers.indexOf(layer);
         fireTableRowsInserted(row, row);

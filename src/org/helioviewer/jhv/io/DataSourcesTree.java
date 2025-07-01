@@ -91,8 +91,8 @@ public final class DataSourcesTree extends JTree {
                 TreePath path;
                 if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1 && (path = getPathForLocation(e.getX(), e.getY())) != null) {
                     Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                    if (obj instanceof SourceItem)
-                        selector.load(((SourceItem) obj).server, ((SourceItem) obj).sourceId);
+                    if (obj instanceof SourceItem si)
+                        selector.load(si.server, si.sourceId);
                 }
             }
         });
@@ -147,8 +147,8 @@ public final class DataSourcesTree extends JTree {
         boolean preferred = server.equals(Settings.getProperty("default.server"));
         if (preferred && parser.getDefault() != null) {
             Object obj = parser.getDefault().getUserObject();
-            if (obj instanceof SourceItem) {
-                setSelectedItem(((SourceItem) obj).server, ((SourceItem) obj).sourceId);
+            if (obj instanceof SourceItem si) {
+                setSelectedItem(si.server, si.sourceId);
             }
         }
         return preferred;
@@ -172,8 +172,8 @@ public final class DataSourcesTree extends JTree {
         TreePath path = getSelectionPath();
         if (path != null) {
             Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-            if (obj instanceof SourceItem)
-                return (SourceItem) obj;
+            if (obj instanceof SourceItem si)
+                return si;
         }
         return null; // only on source load error
     }
@@ -189,8 +189,8 @@ public final class DataSourcesTree extends JTree {
             return null;
 
         Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-        if (obj instanceof Item)
-            return ((Item) obj).description;
+        if (obj instanceof Item item)
+            return item.description;
         return null;
     }
 
