@@ -164,7 +164,6 @@ public class SampClient extends HubConnector {
                 URI uri = toURI(jo.optString("url"));
                 EventQueue.invokeLater(() -> BandReaderHapi.loadUri(uri));
             } else {
-                ArrayList<URI> uris = new ArrayList<>(ja.length());
                 for (Object obj : ja) {
                     URI uri = toURI(obj.toString());
                     EventQueue.invokeLater(() -> BandReaderHapi.loadUri(uri));

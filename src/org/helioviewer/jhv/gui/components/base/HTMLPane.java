@@ -13,7 +13,7 @@ public final class HTMLPane extends JTextPane {
     public HTMLPane() {
         setContentType("text/html");
         setEditable(false);
-        putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, true);
     }
 
     @Override
