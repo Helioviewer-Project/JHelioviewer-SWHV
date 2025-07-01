@@ -60,10 +60,10 @@ public class ImageFilter {
     }
 
     static Buffer filter(Buffer buf, int width, int height, Type type) throws Exception {
-        if (buf instanceof ByteBuffer)
-            return filter((ByteBuffer) buf, width, height, type.algorithm);
-        else if (buf instanceof ShortBuffer)
-            return filter((ShortBuffer) buf, width, height, type.algorithm);
+        if (buf instanceof ByteBuffer bb)
+            return filter(bb, width, height, type.algorithm);
+        else if (buf instanceof ShortBuffer sb)
+            return filter(sb, width, height, type.algorithm);
         else
             throw new Exception("Unimplemented data type filtering");
     }

@@ -56,11 +56,11 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 Position viewpoint = camera.getViewpoint();
 
                 Object annData = JHVFrame.getInteraction().getAnnotationData();
-                if (annData instanceof String) {
-                    annStr = (String) annData;
-                } else if (r > 1 && annData instanceof Vec3) {
+                if (annData instanceof String str) {
+                    annStr = str;
+                } else if (r > 1 && annData instanceof Vec3 annv) {
                     Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
-                    Vec3 vva = viewpoint.toQuat().rotateVector((Vec3) annData);
+                    Vec3 vva = viewpoint.toQuat().rotateVector(annv);
                     Vec3 v_a = v.x < 0 ?
                             Vec3.cross(Vec3.cross(vva, Vec3.YAxis), Vec3.cross(Vec3.ZAxis, v_m)) :
                             Vec3.cross(Vec3.cross(Vec3.ZAxis, v_m), Vec3.cross(vva, Vec3.YAxis));
