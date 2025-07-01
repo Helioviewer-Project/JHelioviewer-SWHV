@@ -126,7 +126,7 @@ class ZScale {
     private static int zFitLine(float[] sampleData, int npix, float[] zstart, float[] zslope, float krej, int ngrow, int maxiter) {
         float xscale;
         if (npix <= 0)
-            return (0);
+            return 0;
         else if (npix == 1) {
             zstart[0] = sampleData[0];
             zslope[0] = 0;
