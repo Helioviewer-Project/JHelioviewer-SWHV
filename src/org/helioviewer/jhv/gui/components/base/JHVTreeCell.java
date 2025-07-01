@@ -16,8 +16,8 @@ public class JHVTreeCell {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (value instanceof Interfaces.JHVCell) {
-                return ((Interfaces.JHVCell) value).getComponent();
+            if (value instanceof Interfaces.JHVCell cell) {
+                return cell.getComponent();
             } else
                 return super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         }
@@ -33,8 +33,8 @@ public class JHVTreeCell {
 
         @Override
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
-            if (value instanceof Interfaces.JHVCell) {
-                return ((Interfaces.JHVCell) value).getComponent();
+            if (value instanceof Interfaces.JHVCell cell) {
+                return cell.getComponent();
             } else
                 return super.getTreeCellEditorComponent(tree, value, selected, expanded, leaf, row);
         }

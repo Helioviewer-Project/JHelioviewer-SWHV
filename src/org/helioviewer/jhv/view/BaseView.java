@@ -78,7 +78,7 @@ public class BaseView implements View {
         if (builtinLUT != null)
             return builtinLUT;
         MetaData m = metaData[0];
-        return m instanceof HelioviewerMetaData ? LUT.get((HelioviewerMetaData) m) : null;
+        return m instanceof HelioviewerMetaData hm ? LUT.get(hm) : null;
     }
 
     protected ImageData.Handler dataHandler;
