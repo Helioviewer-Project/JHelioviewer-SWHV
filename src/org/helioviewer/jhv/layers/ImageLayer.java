@@ -227,8 +227,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
         int deltaCRVAL1 = glImage.getDeltaCRVAL1();
         if (deltaCRVAL1 == 0) {
-            crval0[0] = (float) (meta0.getCRVAL().x);
-            crval1[0] = (float) (meta1.getCRVAL().x);
+            crval0[0] = (float) meta0.getCRVAL().x;
+            crval1[0] = (float) meta1.getCRVAL().x;
         } else {
             crval0[0] = (float) (meta0.getCRVAL().x + deltaCRVAL1 * meta0.getUnitPerArcsec());
             crval1[0] = (float) (meta1.getCRVAL().x + deltaCRVAL1 * meta1.getUnitPerArcsec());
@@ -236,8 +236,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
         int deltaCRVAL2 = glImage.getDeltaCRVAL2();
         if (deltaCRVAL2 == 0) {
-            crval0[1] = (float) (meta0.getCRVAL().y);
-            crval1[1] = (float) (meta1.getCRVAL().y);
+            crval0[1] = (float) meta0.getCRVAL().y;
+            crval1[1] = (float) meta1.getCRVAL().y;
         } else {
             crval0[1] = (float) (meta0.getCRVAL().y + deltaCRVAL2 * meta0.getUnitPerArcsec());
             crval1[1] = (float) (meta1.getCRVAL().y + deltaCRVAL2 * meta1.getUnitPerArcsec());
