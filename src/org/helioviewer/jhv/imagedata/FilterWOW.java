@@ -3,7 +3,6 @@ package org.helioviewer.jhv.imagedata;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
-import java.util.Arrays;
 
 import org.helioviewer.jhv.math.MathUtils;
 
@@ -115,12 +114,14 @@ class FilterWOW implements ImageFilter.Algorithm {
         return synth;
     }
 
+/*
     private static float median(float[] c, int length) {
         float[] w = new float[length];
         IntStream.range(0, length).parallel().forEach(i -> w[i] = Math.abs(c[i]));
         Arrays.parallelSort(w); // can be faster than serial quickSelect
         return w[length / 2];
     }
+*/
 
     private static float medianStream(float[] c, int length) {
         return (float) IntStream.range(0, length)
