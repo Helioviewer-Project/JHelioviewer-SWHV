@@ -45,8 +45,8 @@ public class NIOImageFactory {
 
     public static ByteBuffer getByteBuffer(BufferedImage img) {
         DataBuffer buffer = img.getRaster().getDataBuffer();
-        if (buffer instanceof NIODataBuffer.DataBufferByte buf)
-            return (ByteBuffer) buf.getBuffer();
+        if (buffer instanceof NIODataBuffer.DataBufferByte dbb)
+            return (ByteBuffer) dbb.getBuffer();
         else
             throw new IncompatibleClassChangeError("Not a NIODataBuffer byte backed image");
     }
@@ -55,8 +55,8 @@ public class NIOImageFactory {
         if (img == null)
             return;
         DataBuffer buffer = img.getRaster().getDataBuffer();
-        if (buffer instanceof NIODataBuffer) {
-            ((NIODataBuffer) buffer).free();
+        if (buffer instanceof NIODataBuffer ndb) {
+            ndb.free();
         }
     }
 

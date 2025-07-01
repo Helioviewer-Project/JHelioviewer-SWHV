@@ -87,16 +87,16 @@ public class MappedImageFactory {
 
     public static ByteBuffer getByteBuffer(BufferedImage img) {
         DataBuffer buffer = img.getRaster().getDataBuffer();
-        if (buffer instanceof MappedFileBuffer.DataBufferByte)
-            return (ByteBuffer) ((MappedFileBuffer.DataBufferByte) buffer).getBuffer();
+        if (buffer instanceof MappedFileBuffer.DataBufferByte dbb)
+            return (ByteBuffer) dbb.getBuffer();
         else
             throw new IncompatibleClassChangeError("Not a MappedFileBuffer byte backed image");
     }
 
     public static void free(BufferedImage img) {
         DataBuffer buffer = img.getRaster().getDataBuffer();
-        if (buffer instanceof MappedFileBuffer) {
-            ((MappedFileBuffer) buffer).free();
+        if (buffer instanceof MappedFileBuffer mfb) {
+            mfb.free();
         }
     }
 
