@@ -287,8 +287,8 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
                 public TableCellEditor getCellEditor(int row, int column) {
                     if (row == 1 && column == 1) {
                         Object val = getValueAt(1, 1);
-                        if (val instanceof String)
-                            passField.setText((String) val);
+                        if (val instanceof String str)
+                            passField.setText(str);
                         return passEditor;
                     } else
                         return super.getCellEditor(row, column);
@@ -298,8 +298,8 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     if (row == 1 && column == 1) {
-                        if (value instanceof String)
-                            passField.setText((String) value);
+                        if (value instanceof String str)
+                            passField.setText(str);
                         return passField;
                     }
                     return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -320,11 +320,11 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
 
         void saveSettings() {
             Object val0 = model.getValueAt(0, 1);
-            if (val0 instanceof String)
-                Settings.setProperty("proxy.username", (String) val0);
+            if (val0 instanceof String str)
+                Settings.setProperty("proxy.username", str);
             Object val1 = model.getValueAt(1, 1);
-            if (val1 instanceof String) {
-                String s = Base64.getEncoder().withoutPadding().encodeToString(((String) val1).getBytes(StandardCharsets.UTF_8));
+            if (val1 instanceof String str) {
+                String s = Base64.getEncoder().withoutPadding().encodeToString(str.getBytes(StandardCharsets.UTF_8));
                 Settings.setProperty("proxy.password", s);
             }
         }

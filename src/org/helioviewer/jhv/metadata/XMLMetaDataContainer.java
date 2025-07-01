@@ -31,8 +31,8 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             return null;
 
         Node child = line.getFirstChild();
-        if (child instanceof CharacterData)
-            return ((CharacterData) child).getData();
+        if (child instanceof CharacterData cd)
+            return cd.getData();
         return null;
     }
 
