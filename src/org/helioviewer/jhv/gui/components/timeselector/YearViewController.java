@@ -62,8 +62,8 @@ class YearViewController implements CalendarViewController {
 
     @Override
     public void setTimeOfCellValue(Object value) {
-        if (value instanceof Integer) {
-            calendar.set(Calendar.YEAR, (Integer) value);
+        if (value instanceof Integer v) {
+            calendar.set(Calendar.YEAR, v);
         }
     }
 
