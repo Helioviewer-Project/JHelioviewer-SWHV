@@ -6,8 +6,8 @@ import java.awt.Container;
 public class ComponentUtils {
 
     public static void setVisible(Component container, boolean visible) {
-        if (container instanceof Container) {
-            for (Component component : ((Container) container).getComponents()) {
+        if (container instanceof Container cont) {
+            for (Component component : cont.getComponents()) {
                 component.setVisible(visible);
                 if (component instanceof Container) {
                     setVisible(component, visible);
