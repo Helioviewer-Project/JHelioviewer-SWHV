@@ -1,11 +1,13 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7.3 (2025-06-30)
+## JHelioviewer 4.7.3 (2025-07-01)
 
 - Improve performance on ARM Macs
 - Add a light color UI theme
 - Allow adjustment of image pointing
+- Apply PV2_1 distortion for AZP and ZPN projections
+- CCOR-1 dataset available from GSFC server
 
 ## JHelioviewer 4.7.2 (2025-06-11)
 
