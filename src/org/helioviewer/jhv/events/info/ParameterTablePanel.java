@@ -92,8 +92,8 @@ class ParameterTablePanel extends JPanel {
     @Nullable
     private static String extractURL(JTable table, int col, int row) {
         Object value = table.getValueAt(row, col);
-        if (value instanceof String) {
-            Matcher m = Regex.HREF.matcher((String) value);
+        if (value instanceof String str) {
+            Matcher m = Regex.HREF.matcher(str);
             return m.find() ? m.group(1) : null;
         }
         return null;
