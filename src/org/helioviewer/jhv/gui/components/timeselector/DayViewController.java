@@ -56,8 +56,8 @@ class DayViewController implements CalendarViewController {
 
     @Override
     public void setTimeOfCellValue(Object value) {
-        if (value instanceof Integer) {
-            calendar.set(Calendar.DAY_OF_MONTH, (Integer) value);
+        if (value instanceof Integer v) {
+            calendar.set(Calendar.DAY_OF_MONTH, v);
         }
     }
 

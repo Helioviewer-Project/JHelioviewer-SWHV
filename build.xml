@@ -69,6 +69,7 @@
                                 -Xep:StringCaseLocaleUsage:OFF
                                 -Xep:FutureReturnValueIgnored:OFF
                                 -Xep:MutablePublicArray:OFF
+                                -Xep:ArrayRecordComponent:OFF
                                 "/>
             <classpath>
                 <fileset refid="libfiles"/>
