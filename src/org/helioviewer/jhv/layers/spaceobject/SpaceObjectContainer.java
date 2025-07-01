@@ -73,10 +73,10 @@ public final class SpaceObjectContainer extends JScrollPane {
             @Override
             public void mouseClicked(MouseEvent e) {
                 TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
-                if (v == null || !(v.value instanceof SpaceObjectElement))
+                if (v == null || !(v.value instanceof SpaceObjectElement soe))
                     return;
 
-                highlighted = (SpaceObjectElement) v.value;
+                highlighted = soe;
                 if (v.col == SELECTED_COL)
                     selectElement(highlighted);
                 Display.getCamera().refresh(); // full camera refresh to update viewpoint for relative longitude

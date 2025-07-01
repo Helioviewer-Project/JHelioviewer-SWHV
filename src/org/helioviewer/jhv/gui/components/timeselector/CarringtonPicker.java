@@ -53,8 +53,8 @@ class CarringtonPicker extends JideButton implements PopupMenuListener {
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL);
         Component component = popup.getComponent(cr);
-        if (component instanceof JMenuItem) {
-            ((JMenuItem) component).setSelected(true);
+        if (component instanceof JMenuItem jmi) {
+            jmi.setSelected(true);
             setTimeFromCarrington(Carrington.CR_start[cr]);
         }
         scroller.keepVisible(cr + 1);

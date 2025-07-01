@@ -158,8 +158,8 @@ public final class LayersPanel extends JPanel {
                 if (v == null || !(v.value instanceof Layer layer))
                     return;
 
-                if ((v.col == TITLE_COL || v.col == TIME_COL) && layer instanceof ImageLayer && e.getClickCount() == 2) {
-                    ObservationDialog.getInstance().showDialog(false, (ImageLayer) layer);
+                if ((v.col == TITLE_COL || v.col == TIME_COL) && layer instanceof ImageLayer il && e.getClickCount() == 2) {
+                    ObservationDialog.getInstance().showDialog(false, il);
                     return;
                 }
 
@@ -169,8 +169,8 @@ public final class LayersPanel extends JPanel {
                     if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(layer);
                     MovieDisplay.render(1);
-                } else if (v.col == TITLE_COL && layer instanceof ImageLayer) {
-                    Layers.setActiveImageLayer((ImageLayer) layer);
+                } else if (v.col == TITLE_COL && layer instanceof ImageLayer il) {
+                    Layers.setActiveImageLayer(il);
                     grid.repaint(); // multiple rows involved
                 } else if (v.col == REMOVE_COL && layer.isDeletable()) {
                     model.remove(layer);
