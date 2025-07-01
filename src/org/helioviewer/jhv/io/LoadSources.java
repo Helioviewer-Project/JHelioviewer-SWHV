@@ -57,8 +57,8 @@ class LoadSources {
         public void onFailure(@Nonnull Throwable t) {
             DataSources.setupSources(null); // signal failure
             Log.error(server, t);
-            if (t instanceof ValidationException) {
-                ((ValidationException) t).getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
+            if (t instanceof ValidationException ve) {
+                ve.getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
             }
         }
 
