@@ -63,8 +63,8 @@ uniform sampler1D lut;
 
 uniform vec3 grid[2];
 
-uniform float pv0[6]; // should be in WCS uniform block
-uniform float pv1[6];
+uniform float pv0[7]; // should be in WCS uniform block
+uniform float pv1[7];
 
 #define FSIZE (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }

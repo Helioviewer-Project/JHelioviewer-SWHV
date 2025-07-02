@@ -13,7 +13,7 @@ vec3 differential(const float dt, const vec3 v) {
 
 /*
 // DOI 10.1007/s11207-008-9277-6, §2.2.2, Eq.18-23
-vec2 distort(const vec2 c, const float[6] PV) {
+vec2 distort(const vec2 c, const float[7] PV) {
     float mju = PV[1];
     if (mju == 0)
         return c;
@@ -27,7 +27,33 @@ vec2 distort(const vec2 c, const float[6] PV) {
 }
 */
 
-vec2 distort(const vec2 c, const float[6] PV) { // DS
+float azp(float r, float mju) {
+    float z = cos(asin(r));
+    return (mju + 1) / (mju + z);
+}
+
+vec2 distort(const vec2 c, const float[7] PV) {
+    if (PV[6] == 0) // tan
+        return c;
+
+    clamp_coord(c);
+    vec2 v = c - 0.5;
+    float r = length(v);
+
+    if (PV[6] == 1) { // azp
+        float R = azp(r, PV[1]) / azp(0.5, PV[1]);
+        return vec2(v.x * R, v.y * R) + 0.5;
+    } else { // zpn
+        float theta = atan(v.y, v.x);
+        float R = 0;
+        for (int i = 0; i < 6; i++)
+            R += PV[i] * pow(r, i);
+        return vec2(R * cos(theta), R * sin(theta)) + 0.5;
+    }
+}
+
+/*
+vec2 distort(const vec2 c, const float[7] PV) { // DS
     float mju = PV[1];
     if (mju == 0)
         return c;
@@ -41,6 +67,7 @@ vec2 distort(const vec2 c, const float[6] PV) { // DS
     float R = r * (1 + r * r * r * r * mju);
     return vec2(R * cos(theta), R * sin(theta)) + 0.5;
 }
+*/
 
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
     vec3 altnormal = rotate_vector(quat, zAxis);

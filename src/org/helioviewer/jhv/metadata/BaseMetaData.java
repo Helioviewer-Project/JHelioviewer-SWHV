@@ -35,7 +35,7 @@ class BaseMetaData implements MetaData {
     protected float sector0 = 0;
     protected float sector1 = 0;
 
-    protected final float[] pv2 = new float[6];
+    protected final float[] pv2 = new float[7];
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected float cutOffX = 0;

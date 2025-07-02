@@ -312,10 +312,14 @@ public final class HelioviewerMetaData extends BaseMetaData {
             String ctype1 = m.getString("CTYPE1").orElse("");
             String ctype2 = m.getString("CTYPE2").orElse("");
             if (isZenital(ctype1) && isZenital(ctype2)) {
-                for (int i = 0; i < pv2.length; i++) {
+                for (int i = 0; i < pv2.length - 1; i++) {
                     double pv = m.getDouble("PV2_" + i).orElse(0.);
                     pv2[i] = (float) pv;
                 }
+                if (ctype1.endsWith("AZP"))
+                    pv2[6] = 1;
+                else if (ctype1.endsWith("ZPN"))
+                    pv2[6] = 2;
             }
 
             if (!CROTABlockSet.contains(instrument)) {
