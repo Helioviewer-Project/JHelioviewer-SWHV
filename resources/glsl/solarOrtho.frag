@@ -49,6 +49,15 @@ float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
+vec2 world2pix(const vec2 w, const WCS wcs, const float[6] PV) {
+    vec2 c = apply_center(vec3(w, 0), wcs.crval, wcs.crota).xy;
+    vec4 rect = wcs.rect;
+    vec2 tc = distort(rect.zw * vec2(c.x - rect.x, -c.y - rect.y), PV);
+    clamp_coord(tc);
+
+    return tc;
+}
+
 void main(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
@@ -58,16 +67,12 @@ void main(void) {
 
     float factor;
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffRotatedHitPoint = vec3(0.);
-    vec3 centeredHitPoint = vec3(0.), diffCenteredHitPoint = vec3(0.);
 
     if (onDisk) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
-        rotatedHitPoint      = differential(wcs[0].deltaT, rotate_vector_inverse(wcs[0].cameraDiff, hitPoint));
-        centeredHitPoint     = apply_center(rotatedHitPoint, wcs[0].crval, wcs[0].crota);
-
+        rotatedHitPoint = differential(wcs[0].deltaT, rotate_vector_inverse(wcs[0].cameraDiff, hitPoint));
         if (display.isDiff != NODIFFERENCE) {
-            diffRotatedHitPoint  = differential(wcs[1].deltaT, rotate_vector_inverse(wcs[1].cameraDiff, hitPoint));
-            diffCenteredHitPoint = apply_center(diffRotatedHitPoint, wcs[1].crval, wcs[1].crota);
+            diffRotatedHitPoint = differential(wcs[1].deltaT, rotate_vector_inverse(wcs[1].cameraDiff, hitPoint));
         }
 
         factor = 1.;
@@ -86,21 +91,17 @@ void main(void) {
         if (length(rotatedHitPoint) <= 1.) // differential: central disk
             discard;
 
-        centeredHitPoint = apply_center(rotatedHitPoint, wcs[0].crval, wcs[0].crota);
-
         if (display.calculateDepth != 0) // intersecting Euhforia planes
             gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
 
     if (display.sector.z != 0.) {
-        float theta = atan(centeredHitPoint.y, centeredHitPoint.x);
+        float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x); // maybe WCSed?
         if (theta < display.sector.x || theta > display.sector.y)
             discard;
     }
 
-    vec4 rect = wcs[0].rect;
-    vec2 texcoord = distort(rect.zw * vec2(centeredHitPoint.x - rect.x, -centeredHitPoint.y - rect.y), pv0);
-    clamp_coord(texcoord);
+    vec2 texcoord = world2pix(vec2(rotatedHitPoint.x, -rotatedHitPoint.y), wcs[0], pv0);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
     vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
@@ -116,13 +117,10 @@ void main(void) {
     if (display.isDiff != NODIFFERENCE) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
             hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
-            diffRotatedHitPoint  = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);
-            diffCenteredHitPoint = apply_center(diffRotatedHitPoint, wcs[1].crval, wcs[1].crota);
+            diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);
         }
 
-        vec4 rect = wcs[1].rect;
-        difftexcoord = distort(rect.zw * vec2(diffCenteredHitPoint.x - rect.x, -diffCenteredHitPoint.y - rect.y), pv1);
-        clamp_coord(difftexcoord);
+        difftexcoord = world2pix(vec2(diffRotatedHitPoint.x, -diffRotatedHitPoint.y), wcs[1], pv1);
 
         float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);
         if (diffRotatedHitPointRad > display.radii.y || diffRotatedHitPointRad < display.radii.x) {
