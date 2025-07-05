@@ -50,7 +50,8 @@ float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
 }
 
 vec2 world2pix(const vec2 w, const WCS wcs, const float[6] PV) {
-    vec2 c = apply_center(vec3(w, 0), wcs.crval, wcs.crota).xy;
+    vec2 c = rotate_vector_inverse(wcs.crota, vec3(w - wcs.crval, 0)).xy;
+
     vec4 rect = wcs.rect;
     vec2 tc = distort(rect.zw * vec2(c.x - rect.x, -c.y - rect.y), PV);
     clamp_coord(tc);
@@ -101,7 +102,7 @@ void main(void) {
             discard;
     }
 
-    vec2 texcoord = world2pix(vec2(rotatedHitPoint.x, -rotatedHitPoint.y), wcs[0], pv0);
+    vec2 texcoord = world2pix(rotatedHitPoint.xy, wcs[0], pv0);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
     vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
@@ -120,7 +121,7 @@ void main(void) {
             diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);
         }
 
-        difftexcoord = world2pix(vec2(diffRotatedHitPoint.x, -diffRotatedHitPoint.y), wcs[1], pv1);
+        difftexcoord = world2pix(diffRotatedHitPoint.xy, wcs[1], pv1);
 
         float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);
         if (diffRotatedHitPointRad > display.radii.y || diffRotatedHitPointRad < display.radii.x) {
