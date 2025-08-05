@@ -514,7 +514,7 @@ public class EventDatabase {
                 String join = "LEFT JOIN " + type.getDatabaseName() + " AS tp ON tp.event_id=e.id";
                 StringBuilder and = new StringBuilder();
                 for (SWEK.Param p : params) {
-                    if (!p.name().equals("provider")) {
+                    if (!"provider".equals(p.name())) {
                         and.append("AND tp.").append(p.name()).append(p.operand().representation).append(p.value()).append(' ');
                     }
                 }

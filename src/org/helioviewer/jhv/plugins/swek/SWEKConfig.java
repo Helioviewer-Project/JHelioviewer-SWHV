@@ -114,7 +114,7 @@ class SWEKConfig {
         String eventIconValue = obj.getString("icon");
         try {
             URI eventIconURI = new URI(eventIconValue);
-            return eventIconURI.getScheme().equals("iconbank") ? SWEKIconBank.getIcon(eventIconURI.getHost()) : SWEKIconBank.getIcon("Other");
+            return "iconbank".equals(eventIconURI.getScheme()) ? SWEKIconBank.getIcon(eventIconURI.getHost()) : SWEKIconBank.getIcon("Other");
         } catch (URISyntaxException e) {
             Log.warn(eventIconValue, e);
         }
