@@ -101,10 +101,10 @@ class FilterWOW implements ImageFilter.Algorithm {
             // Denoise stage
             if (scale == 0) {
                 noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
-                float[] div = new float[]{1 / (3 * SIGMA_E0 * noise)};
+                float[] div = {1 / (3 * SIGMA_E0 * noise)};
                 pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
             } else if (scale == 1) {
-                float[] div = new float[]{1 / (1 * SIGMA_E1 * noise)};
+                float[] div = {1 / (1 * SIGMA_E1 * noise)};
                 pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
             }
             // Whitened synthesis

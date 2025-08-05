@@ -186,7 +186,7 @@ class FITSImage implements URIImageReader {
             case Beta -> 65535. / fn_beta(max - min);
             case Alpha -> 65535. / fn_alpha(1);
         };
-        final float[] minMax = new float[]{min, max};
+        float[] minMax = {min, max};
 
         //Stopwatch sw = Stopwatch.createStarted();
         switch (FITSSettings.conversionMode) {

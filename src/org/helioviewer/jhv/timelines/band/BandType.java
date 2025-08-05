@@ -5,8 +5,8 @@ import org.json.JSONObject;
 
 public class BandType {
 
-    private static final String[] xWarnLabels = new String[]{"B", "C", "M", "X"};
-    private static final double[] xWarnValues = new double[]{1e-7, 1e-6, 1e-5, 1e-4};
+    private static final String[] xWarnLabels = {"B", "C", "M", "X"};
+    private static final double[] xWarnValues = {1e-7, 1e-6, 1e-5, 1e-4};
 
     private final String name;
     private final String baseUrl;

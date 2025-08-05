@@ -84,7 +84,7 @@ public class BandReaderHapi {
             throw new Exception("Missing catalog object");
 
         int numIds = jaCatalog.length();
-        ArrayList<JSONObject> ids = new ArrayList<>(numIds);
+        List<JSONObject> ids = new ArrayList<>(numIds);
         for (Object o : jaCatalog) {
             if (o instanceof JSONObject jo)
                 ids.add(jo);
