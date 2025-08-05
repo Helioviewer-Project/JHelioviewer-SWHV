@@ -102,7 +102,7 @@ public class GaiaClient {
     private static BufVertex computePoints(Position viewpoint, List<Star> stars) throws SpiceErrorException {
         BufVertex pointsBuf = new BufVertex(500 * GLSLShape.stride);
         JHVTime time = viewpoint.time;
-        double[] sc = new double[]{viewpoint.distance, -viewpoint.lon, viewpoint.lat}; // lon was negated
+        double[] sc = {viewpoint.distance, -viewpoint.lon, viewpoint.lat}; // lon was negated
         double[] theta = new double[2];
 
         double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);

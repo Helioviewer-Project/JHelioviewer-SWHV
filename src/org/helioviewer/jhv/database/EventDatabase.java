@@ -596,7 +596,6 @@ public class EventDatabase {
             pstatement.setLong(2, event_id);
 
             StringBuilder idList = new StringBuilder();
-
             try (ResultSet rs = pstatement.executeQuery()) {
                 boolean next = rs.next();
                 while (next) {

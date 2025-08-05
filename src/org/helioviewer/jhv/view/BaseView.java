@@ -19,7 +19,7 @@ public class BaseView implements View {
 
     protected ImageFilter.Type filterType = ImageFilter.Type.None;
     protected LUT builtinLUT;
-    protected MetaData[] metaData = new MetaData[]{PixelBasedMetaData.EMPTY}; // paranoia
+    protected MetaData[] metaData = {PixelBasedMetaData.EMPTY}; // paranoia
 
     public BaseView(DecodeExecutor _executor, DataUri _dataUri) {
         executor = _executor;

@@ -92,7 +92,7 @@ public class Spice {
         return null;
     }
 
-    private static final int[] axes = new int[]{3, 2, 1};
+    private static final int[] axes = {3, 2, 1};
 
     @Nullable
     public static double[] getRotationEuler(String fromFrame, String toFrame, JHVTime time) {
