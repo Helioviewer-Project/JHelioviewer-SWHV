@@ -14,14 +14,14 @@ public class Settings {
     private static final Path userPath = Path.of(JHVDirectory.SETTINGS.getPath(), "user.properties");
     private static final Properties defaults = new Properties() {
         {
-            super.setProperty("startup.sampHub", "true");
-            super.setProperty("display.normalizeAIA", "true");
-            super.setProperty("display.normalizeRadius", "false");
-            super.setProperty("display.time", "Observer");
-            super.setProperty("timeout.read", "120000");
-            super.setProperty("timeout.connect", "30000");
-            super.setProperty("update.next", "0");
-            super.setProperty("video.format", "H264");
+            setProperty("startup.sampHub", "true");
+            setProperty("display.normalizeAIA", "true");
+            setProperty("display.normalizeRadius", "false");
+            setProperty("display.time", "Observer");
+            setProperty("timeout.read", "120000");
+            setProperty("timeout.connect", "30000");
+            setProperty("update.next", "0");
+            setProperty("video.format", "H264");
         }
     };
     private static final Properties settings = new Properties(defaults);
