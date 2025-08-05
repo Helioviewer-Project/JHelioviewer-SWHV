@@ -106,7 +106,7 @@ class FilterMGN implements ImageFilter.Algorithm {
     private static final float[] sigmas = {1, 4, 16, 64};
     private static final float[] weights = {0.125f, 0.25f, 0.5f, 1f};
 
-    private float[] gaussNorm(float[] data, int width, int height, float sigma, float weight) {
+    private static float[] gaussNorm(float[] data, int width, int height, float sigma, float weight) {
         GaussFilter filter = new GaussFilter(sigma, K, Math.max(width, height));
 
         int size = width * height;

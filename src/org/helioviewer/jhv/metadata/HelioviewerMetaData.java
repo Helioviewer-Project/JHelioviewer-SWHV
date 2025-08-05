@@ -333,7 +333,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
         }
     }
 
-    private boolean isZenital(String proj) {
+    private static boolean isZenital(String proj) {
         return proj.endsWith("AZP") || proj.endsWith("ZPN");
     }
 

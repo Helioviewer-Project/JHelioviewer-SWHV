@@ -51,7 +51,7 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         }
     }
 
-    private boolean transferData(Transferable transferable) {
+    private static boolean transferData(Transferable transferable) {
         try {
             if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 List<?> objects = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
@@ -107,7 +107,7 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         return transferData(support.getTransferable());
     }
 
-    public void readClipboard() {
+    public static void readClipboard() {
         Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
         if (contents != null) {
             transferData(contents);
