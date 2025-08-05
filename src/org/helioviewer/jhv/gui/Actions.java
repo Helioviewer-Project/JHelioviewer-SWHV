@@ -172,7 +172,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JHVTransferHandler.getInstance().readClipboard();
+            JHVTransferHandler.readClipboard();
         }
 
     }
