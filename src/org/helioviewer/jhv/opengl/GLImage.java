@@ -45,7 +45,7 @@ public class GLImage {
     private double opacity = 1;
     private double blend = .5;
     private double sharpen = 0;
-    private boolean enhanced = false;
+    private double enhanced = 0;
     private DifferenceMode diffMode = DifferenceMode.None;
 
     private LUT lut = gray;
@@ -82,7 +82,7 @@ public class GLImage {
         color[3] = (float) (opacity * blend);
         GLSLSolarShader.bindDisplay(gl, color,
                 1f / imageData.getImageBuffer().width, 1f / imageData.getImageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
-                metaData.getSector0(), metaData.getSector1(), enhanced ? 1 : 0,
+                metaData.getSector0(), metaData.getSector1(), (float) enhanced,
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 (float) brightOffset, (float) (brightScale * metaData.getResponseFactor()),
                 Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1,
@@ -229,7 +229,7 @@ public class GLImage {
         lutChanged = true;
     }
 
-    public void setEnhanced(boolean _enhanced) {
+    public void setEnhanced(double _enhanced) {
         enhanced = _enhanced;
     }
 
@@ -245,7 +245,7 @@ public class GLImage {
         return sharpen;
     }
 
-    public boolean getEnhanced() {
+    public double getEnhanced() {
         return enhanced;
     }
 
@@ -281,7 +281,7 @@ public class GLImage {
         // setSector(jo.optDouble("sector0", sector0), jo.optDouble("sector1", sector1));
         setInnerMask(jo.optDouble("innerMask", innerMask));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
-        enhanced = jo.optBoolean("enhanced", false);
+        enhanced = jo.optDouble("enhanced", enhanced);
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
         try {
             diffMode = DifferenceMode.valueOf(strDiffMode);

@@ -120,7 +120,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     static void bindDisplay(GL3 gl, float[] color,
                             float shWidth, float shHeight, float shWeight, int isDiff,
-                            float sector0, float sector1, int enhanced,
+                            float sector0, float sector1, float enhanced,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
                             float bOffset, float bScale,
                             float innerRadius, float outerRadius,
