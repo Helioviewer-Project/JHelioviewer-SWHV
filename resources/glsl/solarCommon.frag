@@ -98,9 +98,7 @@ float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
     vec2 b = display.brightness;
-    if (display.enhanced == 1) {
-        b.y *= factor * factor * factor;
-    }
+    b.y *= pow(factor, display.enhanced);
 
     float v;
     float conv = 0.;
