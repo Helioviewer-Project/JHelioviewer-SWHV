@@ -53,7 +53,7 @@ vec2 world2pix(const vec2 w, const WCS wcs, const float[6] PV) {
     vec2 c = rotate_vector_inverse(wcs.crota, vec3(w - wcs.crval, 0)).xy;
 
     vec4 rect = wcs.rect;
-    vec2 tc = distort(rect.zw * vec2(c.x, -c.y) - rect.xy, PV);
+    vec2 tc = distort(rect.zw * vec2(c.x - rect.x, -c.y - rect.y), PV);
     clamp_coord(tc);
 
     return tc;
