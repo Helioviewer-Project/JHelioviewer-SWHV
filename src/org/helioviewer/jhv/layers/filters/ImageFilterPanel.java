@@ -45,7 +45,7 @@ public class ImageFilterPanel implements FilterDetails {
 
         JHVSlider slider = new JHVSlider(0, 30, (int) (layer.getGLImage().getEnhanced() * 10));
         JLabel label = new JLabel(formatLabel(slider.getValue() / 10.), JLabel.RIGHT);
-        label.setToolTipText("<html><body>pixel\u22C5(R-R\u2609)<sup>v");
+        label.setToolTipText("<html><body>pixel\u22C5R<sup>v");
         slider.addChangeListener(e -> {
             double value = slider.getValue() / 10.;
             layer.getGLImage().setEnhanced(value);
