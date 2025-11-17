@@ -2,25 +2,33 @@ package org.helioviewer.jhv.view.uri;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Window;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
+import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
 public class FITSSettings {
 
-    enum ConversionMode {
+    enum ClippingMode {
+        Auto, ZScale, Range
+    }
+
+    enum ScalingMode {
         Gamma, Beta, Alpha
     }
 
@@ -29,11 +37,13 @@ public class FITSSettings {
         MovieDisplay.render(1);
     }
 
-    static ConversionMode conversionMode = ConversionMode.Gamma;
+    static double clippingMin = -500;
+    static double clippingMax = 500;
+    static ClippingMode clippingMode = ClippingMode.Auto;
+    static ScalingMode scalingMode = ScalingMode.Gamma;
     static double GAMMA = 1. / 2.2;
     static double BETA = 1. / (1 << 6);
     static double ALPHA = Math.pow(10, 3);
-    static boolean ZScale = false;
 
     public static final class SettingsDialog extends JDialog implements Interfaces.ShowableDialog {
 
@@ -53,10 +63,10 @@ public class FITSSettings {
             alphaButton.setToolTipText("<html><body>log1p(10<sup>\u03B1</sup>\u22C5pixel) / log1p(10<sup>\u03B1</sup>)");
             alphaButton.setSelected(false);
 
-            ButtonGroup functionGroup = new ButtonGroup();
-            functionGroup.add(gammaButton);
-            functionGroup.add(betaButton);
-            functionGroup.add(alphaButton);
+            ButtonGroup scalingGroup = new ButtonGroup();
+            scalingGroup.add(gammaButton);
+            scalingGroup.add(betaButton);
+            scalingGroup.add(alphaButton);
 
             int gammaDefault = (int) (10. / GAMMA);
             int betaDefault = (int) (Math.log(1 / BETA) / Math.log(2));
@@ -92,31 +102,22 @@ public class FITSSettings {
 
             gammaButton.addItemListener(e -> {
                 if (gammaButton.isSelected()) {
-                    conversionMode = ConversionMode.Gamma;
+                    scalingMode = ScalingMode.Gamma;
                     refresh();
                 }
             });
             betaButton.addItemListener(e -> {
                 if (betaButton.isSelected()) {
-                    conversionMode = ConversionMode.Beta;
+                    scalingMode = ScalingMode.Beta;
                     refresh();
                 }
             });
             alphaButton.addItemListener(e -> {
                 if (alphaButton.isSelected()) {
-                    conversionMode = ConversionMode.Alpha;
+                    scalingMode = ScalingMode.Alpha;
                     refresh();
                 }
             });
-
-            JCheckBox scaleCheck = new JCheckBox("ZScale clipping", false);
-            scaleCheck.addActionListener(e -> {
-                ZScale = scaleCheck.isSelected();
-                refresh();
-            });
-
-            JPanel scalePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-            scalePanel.add(scaleCheck);
 
             JPanel gammaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
             gammaPanel.add(gammaButton);
@@ -131,15 +132,70 @@ public class FITSSettings {
             alphaPanel.add(alphaSlider);
             alphaPanel.add(alphaLabel);
 
-            JPanel radios = new JPanel(new BorderLayout());
-            radios.add(gammaPanel, BorderLayout.NORTH);
-            radios.add(betaPanel, BorderLayout.CENTER);
-            radios.add(alphaPanel, BorderLayout.SOUTH);
+            JFormattedTextField minClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -1e12, 1e12));
+            minClip.setValue(clippingMin);
+            minClip.setColumns(10);
+            minClip.addPropertyChangeListener("value", e -> {
+                clippingMin = (Double) minClip.getValue();
+                refresh();
+            });
+            JFormattedTextField maxClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -1e12, 1e12));
+            maxClip.setValue(clippingMax);
+            maxClip.setColumns(10);
+            maxClip.addPropertyChangeListener("value", e -> {
+                clippingMax = (Double) maxClip.getValue();
+                refresh();
+            });
 
-            JPanel content = new JPanel(new BorderLayout());
+            JPanel rangePanel = new JPanel(new BorderLayout());
+            rangePanel.add(minClip, BorderLayout.LINE_START);
+            rangePanel.add(maxClip, BorderLayout.LINE_END);
+            ComponentUtils.setEnabled(rangePanel, false);
+
+            //
+            JPanel content = new JPanel(new GridBagLayout());
             content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-            content.add(scalePanel, BorderLayout.NORTH);
-            content.add(radios, BorderLayout.CENTER);
+
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.gridx = 0;
+            c.gridy = 0;
+            content.add(new JLabel("Clipping:", JLabel.RIGHT), c);
+
+            ButtonGroup clippingGroup = new ButtonGroup();
+            c.gridx = 1;
+            for (ClippingMode clipping : ClippingMode.values()) {
+                JRadioButton radio = new JRadioButton(clipping.toString(), clipping == clippingMode);
+                boolean rangeMode = clipping == ClippingMode.Range;
+                radio.addItemListener(e -> {
+                    if (radio.isSelected()) {
+                        clippingMode = clipping;
+                        ComponentUtils.setEnabled(rangePanel, rangeMode);
+                        refresh();
+                    }
+                });
+                clippingGroup.add(radio);
+
+                JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+                panel.add(radio, c);
+                if (rangeMode) {
+                    panel.add(rangePanel);
+                }
+                content.add(panel, c);
+                c.gridy++;
+            }
+
+            c.gridx = 0;
+            content.add(new JLabel("Scaling:", JLabel.RIGHT), c);
+
+            c.gridx = 1;
+            content.add(gammaPanel, c);
+            c.gridy++;
+            content.add(betaPanel, c);
+            c.gridy++;
+            content.add(alphaPanel, c);
+            c.gridy++;
+
             add(content);
         }
 
