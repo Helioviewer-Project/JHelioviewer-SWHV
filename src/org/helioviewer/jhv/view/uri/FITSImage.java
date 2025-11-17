@@ -161,19 +161,26 @@ class FITSImage implements URIImageReader {
             if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                 return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
 
-            if (FITSSettings.ZScale) {
-                float[] zLow = {0};
-                float[] zHigh = {0};
-                float[] zMax = {0};
-                ZScale.zscale(Floats.toArray(sampleData), sampleLen, zLow, zHigh, zMax);
-                min = zLow[0];
-                max = zHigh[0];
-            } else {
-                min = sampleData.get((int) (MIN_MULT * sampleLen));
-                max = sampleData.get((int) (MAX_MULT * sampleLen));
+            switch (FITSSettings.clippingMode) {
+                case Auto -> {
+                    min = sampleData.get((int) (MIN_MULT * sampleLen));
+                    max = sampleData.get((int) (MAX_MULT * sampleLen));
+                }
+                case ZScale -> {
+                    float[] zLow = {0};
+                    float[] zHigh = {0};
+                    float[] zMax = {0};
+                    ZScale.zscale(Floats.toArray(sampleData), sampleLen, zLow, zHigh, zMax);
+                    min = zLow[0];
+                    max = zHigh[0];
+                }
+                case Range -> {
+                    min = (float) FITSSettings.clippingMin;
+                    max = (float) FITSSettings.clippingMax;
+                }
             }
         }
-        if (min == max) {
+        if (min >= max) {
             max = min + 1;
         }
         // System.out.println(">>> " + min + ' ' + max);
@@ -181,7 +188,7 @@ class FITSImage implements URIImageReader {
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
 
-        double scale = switch (FITSSettings.conversionMode) {
+        double scale = switch (FITSSettings.scalingMode) {
             case Gamma -> 65535. / fn_gamma(max - min);
             case Beta -> 65535. / fn_beta(max - min);
             case Alpha -> 65535. / fn_alpha(1);
@@ -189,7 +196,7 @@ class FITSImage implements URIImageReader {
         float[] minMax = {min, max};
 
         //Stopwatch sw = Stopwatch.createStarted();
-        switch (FITSSettings.conversionMode) {
+        switch (FITSSettings.scalingMode) {
             case Gamma -> IntStream.range(0, height).parallel().forEach(j -> {
                 Object lineData = pixData[j];
                 int outLine = width * (height - 1 - j);
