@@ -20,7 +20,7 @@ class ZScale {
     // maximum number of fitline iterations
     private static final int ZSMAX_ITERATIONS = 5;
 
-    private static final float zContrast = 0.25f;
+    // private static final float zContrast = 0.25f;
 
     private static int ZSNINT(double a) {
         return (int) (a + 0.5);
@@ -233,7 +233,7 @@ class ZScale {
     // of the fitted line is divided by the user-supplied contrast factor and the
     // final Z1 and Z2 are computed, taking the origin of the fitted line at the
     // median value.
-    static void zscale(float[] sample, int npix, float[] zLow, float[] zHigh, float[] zMax) {
+    static void zscale(float[] sample, int npix, float[] zLow, float[] zHigh, float[] zMax, int zContrast) {
         int center_pixel = Math.max(1, (npix + 1) / 2);
 
         // Sort the sample, compute the minimum, maximum, and median pixel values
@@ -266,10 +266,11 @@ class ZScale {
             zLow[0] = zmin;
             zHigh[0] = zmax;
         } else {
-            /*if (zContrast > 0) */
-            {
+            /* if (zContrast > 0) {
                 zslope[0] = zslope[0] / zContrast;
-            }
+            } */
+            zslope[0] = zslope[0] * zContrast;
+
             zLow[0] = Math.max(zmin, median - (center_pixel - 1) * zslope[0]);
             zHigh[0] = Math.min(zmax, median + (npix - center_pixel) * zslope[0]);
         }

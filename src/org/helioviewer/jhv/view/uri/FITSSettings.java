@@ -37,9 +37,11 @@ public class FITSSettings {
         MovieDisplay.render(1);
     }
 
+    static int zContrast = 4;
     static double clippingMin = -500;
     static double clippingMax = 500;
     static ClippingMode clippingMode = ClippingMode.Auto;
+
     static ScalingMode scalingMode = ScalingMode.Gamma;
     static double GAMMA = 1. / 2.2;
     static double BETA = 1. / (1 << 6);
@@ -132,6 +134,12 @@ public class FITSSettings {
             alphaPanel.add(alphaSlider);
             alphaPanel.add(alphaLabel);
 
+            JHVSlider contrastSlider = new JHVSlider(1, 100, zContrast / 4);
+            contrastSlider.addChangeListener(e -> {
+                zContrast = 4 * contrastSlider.getValue();
+                refresh();
+            });
+
             JFormattedTextField minClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -1e12, 1e12));
             minClip.setValue(clippingMin);
             minClip.setColumns(10);
@@ -167,10 +175,12 @@ public class FITSSettings {
             for (ClippingMode clipping : ClippingMode.values()) {
                 JRadioButton radio = new JRadioButton(clipping.toString(), clipping == clippingMode);
                 boolean rangeMode = clipping == ClippingMode.Range;
+                boolean zscaleMode = clipping == ClippingMode.ZScale;
                 radio.addItemListener(e -> {
                     if (radio.isSelected()) {
                         clippingMode = clipping;
                         ComponentUtils.setEnabled(rangePanel, rangeMode);
+                        ComponentUtils.setEnabled(contrastSlider, zscaleMode);
                         refresh();
                     }
                 });
@@ -180,6 +190,9 @@ public class FITSSettings {
                 panel.add(radio, c);
                 if (rangeMode) {
                     panel.add(rangePanel);
+                }
+                if (zscaleMode) {
+                    panel.add(contrastSlider);
                 }
                 content.add(panel, c);
                 c.gridy++;
