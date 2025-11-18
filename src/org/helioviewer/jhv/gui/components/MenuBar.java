@@ -55,8 +55,6 @@ public final class MenuBar extends JMenuBar {
         viewMenu.add(new Actions.ZoomIn());
         viewMenu.add(new Actions.ZoomOut());
         viewMenu.addSeparator();
-        viewMenu.add(new Actions.ShowDialog("FITS Settings...", new FITSSettings.SettingsDialog()));
-        viewMenu.addSeparator();
         viewMenu.add(new Actions.ResetCameraAxis());
         viewMenu.add(new Actions.ResetCamera());
         viewMenu.addSeparator();
@@ -68,6 +66,9 @@ public final class MenuBar extends JMenuBar {
             MovieDisplay.display();
         });
         viewMenu.add(white);
+
+        viewMenu.addSeparator();
+        viewMenu.add(new Actions.ShowDialog("FITS Settings...", new FITSSettings.SettingsDialog()));
 
         add(viewMenu);
 
