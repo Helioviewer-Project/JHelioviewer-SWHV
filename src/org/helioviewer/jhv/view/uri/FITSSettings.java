@@ -134,12 +134,6 @@ public class FITSSettings {
             alphaPanel.add(alphaSlider);
             alphaPanel.add(alphaLabel);
 
-            JHVSlider contrastSlider = new JHVSlider(1, 100, zContrast / 4);
-            contrastSlider.addChangeListener(e -> {
-                zContrast = 4 * contrastSlider.getValue();
-                refresh();
-            });
-
             JFormattedTextField minClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -1e12, 1e12));
             minClip.setValue(clippingMin);
             minClip.setColumns(10);
@@ -159,6 +153,13 @@ public class FITSSettings {
             rangePanel.add(minClip, BorderLayout.LINE_START);
             rangePanel.add(maxClip, BorderLayout.LINE_END);
             ComponentUtils.setEnabled(rangePanel, false);
+
+            JHVSlider contrastSlider = new JHVSlider(1, 100, zContrast / 4);
+            contrastSlider.addChangeListener(e -> {
+                zContrast = 4 * contrastSlider.getValue();
+                refresh();
+            });
+            ComponentUtils.setEnabled(contrastSlider, false);
 
             //
             JPanel content = new JPanel(new GridBagLayout());
