@@ -170,7 +170,7 @@ class FITSImage implements URIImageReader {
                     float[] zLow = {0};
                     float[] zHigh = {0};
                     float[] zMax = {0};
-                    ZScale.zscale(Floats.toArray(sampleData), sampleLen, zLow, zHigh, zMax);
+                    ZScale.zscale(Floats.toArray(sampleData), sampleLen, zLow, zHigh, zMax, FITSSettings.zContrast);
                     min = zLow[0];
                     max = zHigh[0];
                 }
