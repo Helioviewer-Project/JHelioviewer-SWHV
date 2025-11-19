@@ -139,6 +139,8 @@
   "measurement":"VL total brightness",
   "color":"Metis VL total brightness"},
 
+ {"instrument":"CCOR1",
+  "color":"CCOR"},
 ]
 
 // {"instrument":"SJI",
