@@ -1,11 +1,9 @@
 package org.helioviewer.jhv.astronomy;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -20,7 +18,7 @@ public class Spice {
 
     public static void loadKernels(List<String> files) throws SpiceErrorException {
         for (String f : files) {
-            CSPICE.furnsh(Path.of(JHVGlobals.dataCacheDir, f).toString());
+            CSPICE.furnsh(f);
         }
     }
 
