@@ -68,7 +68,7 @@ public class Transform {
         proj.invertOrtho(invTrans).translateLocal(-x, -y, 0).get(inv);
     }
 
-    static void rotateView(Quat q) {
+    public static void rotateView(Quat q) {
         view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
     }
 
