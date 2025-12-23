@@ -112,7 +112,9 @@ class JHVInit {
                 Log.error("SPICE kernel copy error", e);
             }
         });
-        Spice.loadKernels(kernels);
+
+        List<String> builtinKernels = kernels.stream().map(k -> Path.of(JHVGlobals.dataCacheDir, k).toString()).toList();
+        Spice.loadKernels(builtinKernels);
     }
 
 }
