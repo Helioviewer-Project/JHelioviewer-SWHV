@@ -7,6 +7,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.gui.Message;
@@ -115,6 +116,12 @@ class JHVInit {
 
         List<String> builtinKernels = kernels.stream().map(k -> Path.of(JHVGlobals.dataCacheDir, k).toString()).toList();
         Spice.loadKernels(builtinKernels);
+
+        Path userKernelsPath = Path.of(JHVDirectory.KERNELS.getPath());
+        try (Stream<Path> stream = Files.find(userKernelsPath, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
+            List<String> userKernels = stream.map(Path::toString).sorted().toList();
+            Spice.loadKernels(userKernels);
+        }
     }
 
 }

@@ -50,6 +50,13 @@ public enum JHVDirectory {
             return HOME.getPath() + "Settings" + File.separator;
         }
     },
+    // The SPICE kernels directory
+    KERNELS {
+        @Override
+        public String getPath() {
+            return HOME.getPath() + "kernels" + File.separator;
+        }
+    },
     // The downloads directory
     DOWNLOADS {
         @Override
