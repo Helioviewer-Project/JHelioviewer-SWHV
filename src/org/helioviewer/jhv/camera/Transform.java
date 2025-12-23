@@ -60,16 +60,16 @@ public class Transform {
         view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) -q.w));
     }
 
+    public static void rotateView(Quat q) {
+        view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
+    }
+
     /// Only for Camera.java
 
     static void setup(float width, float height, float zNear, float zFar, float x, float y) {
         proj.setOrthoSymmetric(width, height, zNear, zFar);
         view.translation(x, y, 0);
         proj.invertOrtho(invTrans).translateLocal(-x, -y, 0).get(inv);
-    }
-
-    public static void rotateView(Quat q) {
-        view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
     }
 
     static void cacheMVP() {
