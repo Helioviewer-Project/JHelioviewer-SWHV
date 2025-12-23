@@ -160,7 +160,9 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         hemiLine.renderLine(gl, vp.aspect, LINEWIDTH_FOV);
         double[] rot;
         if (isSOLO && null != (rot = Spice.getRotationEuler("SOLO_EQUAT_NORM", "SOLO_ORBIT_NORM", time))) { // SOLO pointing normal to orbit
-            Transform.rotateViewInverse(Quat.createAxisZ(rot[2]));
+            double[] rotK = Spice.getRotationEuler("SOLO_SRF", "SOLO_IAU_SUN_2009", time);
+            System.out.println(">>> frame " + rot[2] + " kernel " + rotK[2]);
+            Transform.rotateView(Quat.createAxisZ(rotK[2]));
         }
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
