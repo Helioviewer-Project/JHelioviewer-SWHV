@@ -99,7 +99,7 @@ class JHVInit {
                 "de432s_reduced.bsp",
                 "ahead_2017_061_5295day_predict.epm.bsp",
                 /* SOLO */
-                "solo_ANC_soc-ops-fk_V02.tf",
+                "solo_ANC_soc-sc-fk_V09.tf",
                 "solo_ANC_soc-sci-fk_V08.tf",
                 "solo_ANC_soc-sclk_20251213_V01.tsc",
                 "solo_ANC_soc-orbit-stp_20200210-20301120_394_V1_00504_V01.bsp",
