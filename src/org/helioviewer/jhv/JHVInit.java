@@ -100,21 +100,21 @@ class JHVInit {
                 "ahead_2017_061_5295day_predict.epm.bsp",
                 /* SOLO */
                 "solo_ANC_soc-ops-fk_V02.tf",
-                "solo_ANC_soc-sc-fk_V09.tf",
                 "solo_ANC_soc-sci-fk_V08.tf",
                 "solo_ANC_soc-sclk_20251213_V01.tsc",
                 "solo_ANC_soc-orbit-stp_20200210-20301120_394_V1_00504_V01.bsp",
                 "solo_ANC_soc-default-att-stp_20200210-20301120_394_V1_00504_V01.bc");
 
-        kernels.parallelStream().forEach(k -> {
+        ArrayList<String> builtinKernels = new ArrayList<>(kernels.size());
+        kernels.parallelStream().forEach(k -> { // order does not matter
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
-                Files.copy(in, Path.of(JHVGlobals.dataCacheDir, k));
+                Path kp = Path.of(JHVGlobals.dataCacheDir, k);
+                Files.copy(in, kp);
+                builtinKernels.add(kp.toString());
             } catch (Exception e) {
                 Log.error("SPICE kernel copy error", e);
             }
         });
-
-        List<String> builtinKernels = kernels.stream().map(k -> Path.of(JHVGlobals.dataCacheDir, k).toString()).toList();
         Spice.loadKernels(builtinKernels);
 
         Path userKernelsPath = Path.of(JHVDirectory.KERNELS.getPath());

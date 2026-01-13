@@ -5,6 +5,7 @@
 
 - Make strength of radial enhancement configurable
 - Add ability to manually set the FITS data clipping range and to adjust the ZScale contrast
+- Load user SPICE kernels from `$HOME/JHelioviewer-SWHV/kernels`
 
 ## JHelioviewer 4.7.3 (2025-07-01)
 
