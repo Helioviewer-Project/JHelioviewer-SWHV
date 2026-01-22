@@ -64,8 +64,7 @@ public class Colors {
             new Color(106, 90, 205)
     };
 
-/*
-    private static final Color[] darkerColors = { -- former BandColors
+    private static final Color[] darkColors = { // former BandColors
             new Color(80, 80, 80),
             new Color(204, 51, 0),
             new Color(255, 0, 255),
@@ -90,19 +89,28 @@ public class Colors {
             new Color(190, 190, 190),
             new Color(106, 90, 205)
     };
-*/
 
     public static class BrightColors {
 
-        private final int[] used = new int[brightColors.length];
+        private final Color[] colors;
+        private final int[] used;
         private int minValue = 0;
+
+        public BrightColors() {
+            /* colors = switch (theme) {
+                case DARK -> brightColors;
+                case LIGHT -> darkColors;
+            }; */
+            colors = brightColors;
+            used = new int[colors.length];
+        }
 
         public Color getNextColor() {
             while (true) {
                 for (int i = 0; i < used.length; i++) {
                     if (used[i] == minValue) {
                         used[i]++;
-                        return brightColors[i];
+                        return colors[i];
                     }
                 }
                 minValue++;
@@ -111,7 +119,7 @@ public class Colors {
 /*
         public void resetColor(Color c) {
             for (int i = 0; i < used.length; i++) {
-                if (brightColors[i].equals(c)) {
+                if (colors[i].equals(c)) {
                     used[i]--;
                     minValue = used[i];
                 }
@@ -120,7 +128,7 @@ public class Colors {
 
         public void setColorUsed(Color c) {
             for (int i = 0; i < used.length; i++) {
-                if (brightColors[i].equals(c)) {
+                if (colors[i].equals(c)) {
                     used[i]++;
                 }
             }

@@ -58,13 +58,6 @@ public class DisplaySettings {
         timeMode = mode;
     }
 
-    public static void enableUITheme() {
-        switch (uiTheme) {
-            case Dark -> com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme.setup();
-            case Light -> com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme.setup();
-        }
-    }
-
     public static UITheme getUITheme() {
         return uiTheme;
     }

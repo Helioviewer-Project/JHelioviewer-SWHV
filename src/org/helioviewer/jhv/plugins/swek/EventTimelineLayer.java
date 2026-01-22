@@ -15,6 +15,7 @@ import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
+import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
@@ -200,9 +201,9 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
                 width = Math.max(width, g.getFontMetrics().stringWidth(str));
             }
         }
-        g.setColor(DrawConstants.TEXT_BACKGROUND_COLOR);
+        g.setColor(UIGlobals.TL_TEXT_BACKGROUND_COLOR);
         g.fillRect(mouseX + 5, y, width + 21 + 10, txts.size() * 10 + 11);
-        g.setColor(DrawConstants.TEXT_COLOR);
+        g.setColor(UIGlobals.TL_TEXT_COLOR);
 
         y += 5;
         ImageIcon icon = event.getIcon();

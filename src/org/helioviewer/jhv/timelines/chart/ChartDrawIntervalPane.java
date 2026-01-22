@@ -61,7 +61,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private void drawIntervalBackground(Graphics2D g) {
-        g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
+        g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(leftIntervalBorderPosition - 1, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() - 3);
     }
 
@@ -78,14 +78,14 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
     private void drawBackground(Graphics2D g) {
         int availableIntervalSpace = getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
-        g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
+        g.setColor(UIGlobals.TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 2, availableIntervalSpace, getHeight() - 3);
     }
 
     private void drawInterval(Graphics2D g) {
-        g.setColor(DrawConstants.INTERVAL_BORDER_COLOR);
+        g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
         g.fillRect(leftIntervalBorderPosition, getHeight() - 2, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
-        g.setColor(DrawConstants.BORDER_COLOR);
+        g.setColor(UIGlobals.TL_BORDER_COLOR);
         g.fillRect(leftIntervalBorderPosition, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, 1);
     }
 
@@ -112,7 +112,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         }
 
         int offset = 7;
-        g.setColor(DrawConstants.MOVIE_INTERVAL_COLOR);
+        g.setColor(UIGlobals.TL_MOVIE_INTERVAL_COLOR);
         g.drawLine(min, offset, max, offset);
         g.drawLine(min, offset + 2, max, offset + 2);
         g.drawLine(min, offset + 9, max, offset + 9);
@@ -135,13 +135,13 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private void drawIntervalGraspPoints(Graphics2D g) {
-        g.setColor(DrawConstants.INTERVAL_BORDER_COLOR);
+        g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
         g.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
         g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
     }
 
     private void drawIntervalHBar(Graphics2D g) {
-        g.setColor(DrawConstants.INTERVAL_BORDER_COLOR);
+        g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
         g.fill(new RoundRectangle2D.Double(DrawConstants.GRAPH_LEFT_SPACE, 0, leftIntervalBorderPosition - DrawConstants.GRAPH_LEFT_SPACE, 2, 5, 5));
         g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2, 5, 5));
     }
@@ -289,12 +289,12 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
         int x = DrawConstants.GRAPH_LEFT_SPACE + (int) ((date - availableInterval.start()) * ratioX);
         if (selectedInterval.start() <= date && date <= selectedInterval.end()) {
-            g.setColor(DrawConstants.AVAILABLE_INTERVAL_BACKGROUND_COLOR);
+            g.setColor(UIGlobals.TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
-            g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
+            g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
         }
         g.drawLine(x, 2, x, getHeight() - 1);
-        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+        g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
         if (x + textWidth > DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth) {
             if ((x - 2) < DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth) {
                 g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
