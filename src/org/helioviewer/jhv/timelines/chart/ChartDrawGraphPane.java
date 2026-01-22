@@ -171,7 +171,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     private static void drawBackground(Graphics2D g, int width, int height) {
-        g.setColor(DrawConstants.SELECTED_INTERVAL_BACKGROUND_COLOR);
+        g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
         g.fillRect(0, 0, width, height);
     }
 
@@ -208,7 +208,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         long ts = xAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
         String lbl = '(' + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts);
         int currWidth = 0;
-        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+        g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
         currWidth += (int) tickTextBounds.getWidth();
@@ -217,7 +217,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.isEnabled() && (value = tl.getStringValue(ts)) != null) {
                 lbl = ", ";
-                g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
                 g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
                 tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
                 currWidth += (int) tickTextBounds.getWidth();
@@ -228,7 +228,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 currWidth += (int) tickTextBounds.getWidth();
             }
         }
-        g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+        g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
         lbl = ")";
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
     }
@@ -270,9 +270,9 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             }
 
             if (tl == null) {
-                g.setColor(DrawConstants.TICK_LINE_COLOR);
+                g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
                 g.drawLine(x, graphArea.y, x, graphArea.y + graphArea.height + 3);
-                g.setColor(DrawConstants.LABEL_TEXT_COLOR);
+                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
             } else {
                 g.setColor(tl.getDataColor());
             }
@@ -382,7 +382,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         if (movieLinePosition < 0) {
             return;
         }
-        g.setColor(DrawConstants.MOVIE_FRAME_COLOR);
+        g.setColor(UIGlobals.TL_MOVIE_FRAME_COLOR);
         g.drawLine(movieLinePosition, 0, movieLinePosition, (int) DrawController.getGraphSize().getHeight());
     }
 

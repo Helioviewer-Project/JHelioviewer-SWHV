@@ -28,7 +28,10 @@ public class UIGlobals {
 
     public static void setLaf() {
         try {
-            DisplaySettings.enableUITheme();
+            switch (DisplaySettings.getUITheme()) {
+                case Dark -> com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme.setup();
+                case Light -> com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme.setup();
+            }
             com.jidesoft.plaf.LookAndFeelFactory.installJideExtension();
         } catch (Exception e) {
             Log.error(e);
@@ -94,6 +97,38 @@ public class UIGlobals {
             Log.warn("Font not loaded correctly, fallback to default", e);
             uiFontMDI = sansFont;
         }
+
+        // Set timeline panel colors
+        switch (DisplaySettings.getUITheme()) {
+            case Dark -> {
+                TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR = backColor.darker();
+                TL_SELECTED_INTERVAL_BACKGROUND_COLOR = TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR.darker();
+                TL_INTERVAL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.darker();
+                TL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.brighter();
+
+                TL_TICK_LINE_COLOR = foreColor;
+                TL_LABEL_TEXT_COLOR = foreColor;
+                TL_TEXT_COLOR = foreColor;
+                TL_TEXT_BACKGROUND_COLOR = backColor;
+
+                TL_MOVIE_FRAME_COLOR = foreColor;
+                TL_MOVIE_INTERVAL_COLOR = backColor;
+            }
+            case Light -> {
+                TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR = new Color(224, 224, 224);
+                TL_SELECTED_INTERVAL_BACKGROUND_COLOR = Color.WHITE;
+                TL_INTERVAL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.darker();
+                TL_BORDER_COLOR = new Color(182, 190, 206);
+
+                TL_TICK_LINE_COLOR = Color.LIGHT_GRAY;
+                TL_LABEL_TEXT_COLOR = Color.BLACK;
+                TL_TEXT_COLOR = Color.WHITE;
+                TL_TEXT_BACKGROUND_COLOR = Color.GRAY;
+
+                TL_MOVIE_FRAME_COLOR = Color.BLACK;
+                TL_MOVIE_INTERVAL_COLOR = Color.LIGHT_GRAY;
+            }
+        }
     }
 /*
     private static void setUIFont(Font font) {
@@ -151,5 +186,19 @@ public class UIGlobals {
 
     public static final boolean canBrowse = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+
+    // Timelines panel colors
+    public static Color TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR;
+    public static Color TL_SELECTED_INTERVAL_BACKGROUND_COLOR;
+    public static Color TL_INTERVAL_BORDER_COLOR;
+    public static Color TL_BORDER_COLOR;
+
+    public static Color TL_TICK_LINE_COLOR;
+    public static Color TL_LABEL_TEXT_COLOR;
+    public static Color TL_TEXT_COLOR;
+    public static Color TL_TEXT_BACKGROUND_COLOR;
+
+    public static Color TL_MOVIE_FRAME_COLOR;
+    public static Color TL_MOVIE_INTERVAL_COLOR;
 
 }
