@@ -2,6 +2,8 @@ package org.helioviewer.jhv.base;
 
 import java.awt.Color;
 
+import org.helioviewer.jhv.DisplaySettings;
+
 public class Colors {
 
     public static byte[] bytes(Color c) {
@@ -90,18 +92,17 @@ public class Colors {
             new Color(106, 90, 205)
     };
 
-    public static class BrightColors {
+    public static class DataColors {
 
         private final Color[] colors;
         private final int[] used;
         private int minValue = 0;
 
-        public BrightColors() {
-            /* colors = switch (theme) {
-                case DARK -> brightColors;
-                case LIGHT -> darkColors;
-            }; */
-            colors = brightColors;
+        public DataColors() {
+            colors = switch (DisplaySettings.getUITheme()) {
+                case Dark -> brightColors;
+                case Light -> darkColors;
+            };
             used = new int[colors.length];
         }
 

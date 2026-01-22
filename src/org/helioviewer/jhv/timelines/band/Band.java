@@ -36,7 +36,7 @@ public final class Band extends AbstractTimelineLayer {
         }
     }
 
-    private static final Colors.BrightColors bandColors = new Colors.BrightColors();
+    private static final Colors.DataColors bandColors = new Colors.DataColors();
     private static final HashMap<BandType, Band> bandMap = new HashMap<>();
 
     public static Band createFromType(BandType _bandType) {
