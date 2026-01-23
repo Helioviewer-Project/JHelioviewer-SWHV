@@ -20,7 +20,7 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class JHVRelatedEvents implements ClickableDrawable {
 
-    private static final Colors.DataColors eventColors = new Colors.DataColors();
+    private static final Colors.Data eventColors = new Colors.Data();
     private static final ArrayList<JHVEventListener.Highlight> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();

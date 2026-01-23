@@ -92,13 +92,13 @@ public class Colors {
             new Color(106, 90, 205)
     };
 
-    public static class DataColors {
+    public static class Data {
 
         private final Color[] colors;
         private final int[] used;
         private int minValue = 0;
 
-        public DataColors() {
+        public Data() {
             colors = switch (DisplaySettings.getUITheme()) {
                 case Dark -> brightColors;
                 case Light -> darkColors;
