@@ -1,6 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.io.InputStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
@@ -118,7 +119,7 @@ class JHVInit {
         Spice.loadKernels(builtinKernels);
 
         Path userKernelsPath = Path.of(JHVDirectory.KERNELS.getPath());
-        try (Stream<Path> stream = Files.find(userKernelsPath, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
+        try (Stream<Path> stream = Files.find(userKernelsPath, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile(), FileVisitOption.FOLLOW_LINKS)) {
             List<String> userKernels = stream.map(Path::toString).sorted().toList();
             Spice.loadKernels(userKernels);
         }
