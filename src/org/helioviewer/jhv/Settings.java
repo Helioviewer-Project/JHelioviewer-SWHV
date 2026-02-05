@@ -27,10 +27,12 @@ public class Settings {
     private static final Properties settings = new Properties(defaults);
 
     public static void load() {
-        try (BufferedReader reader = Files.newBufferedReader(userPath)) {
-            settings.load(reader);
-        } catch (Exception e) {
-            Log.warn(e);
+        if (Files.exists(userPath)) {
+            try (BufferedReader reader = Files.newBufferedReader(userPath)) {
+                settings.load(reader);
+            } catch (Exception e) {
+                Log.warn(e);
+            }
         }
 
         if (getProperty("path.local") == null)
