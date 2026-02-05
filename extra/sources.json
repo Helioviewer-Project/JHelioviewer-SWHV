@@ -1,0 +1,14 @@
+{
+  "org.helioviewer.jhv.source.image": [
+    {
+      "name": "GSFC Beta",
+      "label": "Goddard Space Flight Center Beta Server",
+      "api": "https://api.beta.helioviewer.org/v2/",
+    },
+    {
+      "name": "IAS Test",
+      "label": "Institut d'Astrophysique Spatiale Test Server",
+      "api": "https://inf-helio-test-api.ias.u-psud.fr/v2/",
+    },
+  ]
+}
