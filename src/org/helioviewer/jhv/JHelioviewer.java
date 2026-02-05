@@ -51,6 +51,8 @@ public class JHelioviewer {
 
         // Read the version and revision from the JAR metafile
         JHVGlobals.getVersion();
+
+        DataSources.initSources(); // sources must be initialized before settings
         Settings.load();
         System.setProperty("sun.awt.noerasebackground", "true");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir);

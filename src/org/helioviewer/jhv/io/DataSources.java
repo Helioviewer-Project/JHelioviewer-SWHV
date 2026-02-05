@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.io;
 
+import java.io.BufferedReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.Log;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import org.everit.json.schema.Validator;
 import com.google.common.collect.ImmutableMap;
@@ -19,7 +27,48 @@ public class DataSources {
 
     private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG,ROB,Kanzelhoehe,RHESSI,GOES,PUNCH]";
 
-    private static final ImmutableMap<String, Map<String, String>> serverSettings = new ImmutableMap.Builder<String, Map<String, String>>().
+    private static ImmutableMap<String, Map<String, String>> serverSettings;
+
+    private static void loadUserServers(JSONObject json, ImmutableMap.Builder<String, Map<String, String>> builder) {
+        JSONArray ja = json.optJSONArray("org.helioviewer.jhv.source.image");
+        if (ja != null) {
+            int len = ja.length();
+            for (int i = 0; i < len; i++) {
+                try {
+                    JSONObject jo = ja.getJSONObject(i);
+                    String name = jo.getString("name");
+                    String label = jo.getString("label");
+                    String api = jo.getString("api");
+
+                    Map<String, String> map = new ImmutableMap.Builder<String, String>().
+                            put("API.getDataSources", api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
+                            put("API.getJP2Image", api + "getJP2Image/?").
+                            put("API.getJPX", api + "getJPX/?").
+                            put("label", label).
+                            put("schema", "/data/sources_v1.0.json").
+                            build();
+                    builder.put(name, map);
+                } catch (Exception e) {
+                    Log.warn(e);
+                }
+            }
+        }
+    }
+
+    private static int toLoad;
+
+    public static void initSources() {
+        ImmutableMap.Builder<String, Map<String, String>> builder = new ImmutableMap.Builder<>();
+        Path userSources = Path.of(JHVDirectory.SETTINGS.getPath(), "sources.json");
+        if (Files.exists(userSources)) { // user servers
+            try (BufferedReader reader = Files.newBufferedReader(userSources)) {
+                loadUserServers(JSONUtils.get(reader), builder);
+            } catch (Exception e) {
+                Log.warn(e);
+            }
+        }
+
+        builder.
 /*    */
         put("ROB", new ImmutableMap.Builder<String, String>().
         put("API.getDataSources", "https://api.swhv.oma.be/hv_docpage/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
@@ -68,10 +117,13 @@ public class DataSources {
         put("API.getJPX", "https://soar.esac.esa.int/jpip-api/v2/getJPX/?").
         put("label", "European Space Astronomy Center").
         put("schema", "/data/sources_v1.0.json").
-        build()).
-            build();
+        build());
 
-    public static Set<String> getServers() {
+        serverSettings = builder.build();
+        toLoad = serverSettings.size();
+    }
+
+    static Set<String> getServers() {
         return serverSettings.keySet();
     }
 
@@ -80,8 +132,6 @@ public class DataSources {
         Map<String, String> settings = serverSettings.get(server);
         return settings == null ? null : settings.get(setting);
     }
-
-    private static int toLoad = serverSettings.size();
 
     public static void loadSources() {
         Validator validator = Validator.builder().failEarly().build();
