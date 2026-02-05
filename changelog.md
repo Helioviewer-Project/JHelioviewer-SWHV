@@ -1,7 +1,9 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7.4 (pending)
+## JHelioviewer 4.7.5 (pending)
+
+## JHelioviewer 4.7.4 (2026-02-05)
 
 - Make strength of radial enhancement configurable
 - Add ability to manually set the FITS data clipping range and to adjust the ZScale contrast
