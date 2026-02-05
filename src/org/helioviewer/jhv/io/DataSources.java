@@ -16,7 +16,6 @@ import org.helioviewer.jhv.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import org.everit.json.schema.Validator;
 import com.google.common.collect.ImmutableMap;
 
 public class DataSources {
@@ -91,8 +90,7 @@ public class DataSources {
     }
 
     public static void loadSources() {
-        Validator validator = Validator.builder().failEarly().build();
-        serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName, validator));
+        serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName));
     }
 
     private static final ArrayList<Listener> listeners = new ArrayList<>();

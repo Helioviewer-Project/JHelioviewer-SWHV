@@ -20,11 +20,11 @@ import com.google.common.util.concurrent.FutureCallback;
 
 class LoadSources {
 
-    static void submit(@Nonnull String server, @Nonnull Validator validator) {
-        EDTCallbackExecutor.pool.submit(new SourcesLoad(server, validator), new Callback(server));
+    static void submit(@Nonnull String server) {
+        EDTCallbackExecutor.pool.submit(new SourcesLoad(server), new Callback(server));
     }
 
-    private record SourcesLoad(String server, Validator validator) implements Callable<DataSourcesParser> {
+    private record SourcesLoad(String server) implements Callable<DataSourcesParser> {
         @Override
         public DataSourcesParser call() throws Exception {
             String serverUrl = DataSources.getServerSetting(server, "API.getDataSources");
@@ -40,7 +40,7 @@ class LoadSources {
             }
 
             JSONObject jo = JSONUtils.getUncached(new URI(serverUrl));
-            validator.performValidation(schema, jo);
+            Validator.builder().failEarly().build().performValidation(schema, jo);
 
             return new DataSourcesParser(server).parse(jo);
         }
