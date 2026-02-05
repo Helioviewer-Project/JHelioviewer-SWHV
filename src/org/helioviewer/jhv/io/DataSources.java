@@ -29,6 +29,20 @@ public class DataSources {
 
     private static ImmutableMap<String, Map<String, String>> serverSettings;
 
+    private static Map<String, String> getSourceMap(String api, String label, String availability) {
+        ImmutableMap.Builder<String, String> builder = new ImmutableMap.Builder<>();
+        if (availability != null)
+            builder.put("availability.images", availability);
+
+        return builder.
+            put("API.getDataSources", api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
+            put("API.getJP2Image", api + "getJP2Image/?").
+            put("API.getJPX", api + "getJPX/?").
+            put("label", label).
+            put("schema", "/data/sources_v1.0.json").
+            build();
+    }
+
     private static void loadUserServers(JSONObject json, ImmutableMap.Builder<String, Map<String, String>> builder) {
         JSONArray ja = json.optJSONArray("org.helioviewer.jhv.source.image");
         if (ja != null) {
@@ -36,18 +50,7 @@ public class DataSources {
             for (int i = 0; i < len; i++) {
                 try {
                     JSONObject jo = ja.getJSONObject(i);
-                    String name = jo.getString("name");
-                    String label = jo.getString("label");
-                    String api = jo.getString("api");
-
-                    Map<String, String> map = new ImmutableMap.Builder<String, String>().
-                            put("API.getDataSources", api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
-                            put("API.getJP2Image", api + "getJP2Image/?").
-                            put("API.getJPX", api + "getJPX/?").
-                            put("label", label).
-                            put("schema", "/data/sources_v1.0.json").
-                            build();
-                    builder.put(name, map);
+                    builder.put(jo.getString("name"), getSourceMap(jo.getString("api"), jo.getString("label"), jo.optString("availability")));
                 } catch (Exception e) {
                     Log.warn(e);
                 }
@@ -68,42 +71,12 @@ public class DataSources {
             }
         }
 
-        builder.
-/*    */
-        put("ROB", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "https://api.swhv.oma.be/hv_docpage/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
-        put("API.getJP2Image", "https://api.swhv.oma.be/hv_docpage/v2/getJP2Image/?").
-        put("API.getJPX", "https://api.swhv.oma.be/hv_docpage/v2/getJPX/?").
-        put("label", "Royal Observatory of Belgium").
-        put("schema", "/data/sources_v1.0.json").
-        put("availability.images", "https://swhv.oma.be/availability/?").
-        build()).
-/*    */
-        put("IAS", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "https://helioviewer-api.ias.u-psud.fr/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
-        put("API.getJP2Image", "https://helioviewer-api.ias.u-psud.fr/v2/getJP2Image/?").
-        put("API.getJPX", "https://helioviewer-api.ias.u-psud.fr/v2/getJPX/?").
-        put("label", "Institut d'Astrophysique Spatiale").
-        put("schema", "/data/sources_v1.0.json").
-        build()).
-/*    */
-        put("GSFC", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "https://api.helioviewer.org/v2/getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
-        put("API.getJP2Image", "https://api.helioviewer.org/v2/getJP2Image/?").
-        put("API.getJPX", "https://api.helioviewer.org/v2/getJPX/?").
-        put("label", "Goddard Space Flight Center").
-        put("schema", "/data/sources_v1.0.json").
-        build()).
-/*    */
-        put("ESAC", new ImmutableMap.Builder<String, String>().
-        put("API.getDataSources", "https://soar.esac.esa.int/jpip-api/v2/getDataSources/?verbose=true&enable=[SOLO]").
-        put("API.getJP2Image", "https://soar.esac.esa.int/jpip-api/v2/getJP2Image/?").
-        put("API.getJPX", "https://soar.esac.esa.int/jpip-api/v2/getJPX/?").
-        put("label", "European Space Astronomy Center").
-        put("schema", "/data/sources_v1.0.json").
-        build());
-
-        serverSettings = builder.build();
+        serverSettings = builder.
+            put("ROB", getSourceMap("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?")).
+            put("IAS", getSourceMap("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null)).
+            put("GSFC", getSourceMap("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null)).
+            put("ESAC", getSourceMap("https://soar.esac.esa.int/jpip-api/v2/", "European Space Astronomy Center", null)).
+            build();
         toLoad = serverSettings.size();
     }
 
