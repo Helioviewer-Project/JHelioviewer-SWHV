@@ -135,20 +135,20 @@ class FilterWOW implements ImageFilter.Algorithm {
 
     private static class ConvolutionTask extends RecursiveAction {
 
-        protected final float[] src;
-        protected final float[] dest;
-        protected final int width;
-        protected final int height;
-        protected final boolean isHorizontal;
-        protected final int step;
-        protected final int start;
-        protected final int end;
+        final float[] src;
+        final float[] dest;
+        final int width;
+        final int height;
+        final boolean isHorizontal;
+        final int step;
+        final int start;
+        final int end;
 
         ConvolutionTask(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step) {
             this(src, dest, width, height, isHorizontal, step, 0, isHorizontal ? height : width);
         }
 
-        protected ConvolutionTask(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step, int start, int end) {
+        ConvolutionTask(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step, int start, int end) {
             this.src = src;
             this.dest = dest;
             this.width = width;
@@ -175,7 +175,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             }
         }
 
-        protected void computeHorizontal() {
+        void computeHorizontal() {
             for (int y = start; y < end; y++) {
                 for (int x = 0; x < width; x++) {
                     float sum = 0;
@@ -199,7 +199,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             }
         }
 
-        protected void computeVertical() {
+        void computeVertical() {
             for (int x = start; x < end; x++) {
                 for (int y = 0; y < height; y++) {
                     float sum = 0;
@@ -231,7 +231,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             super(src, dest, width, height, isHorizontal, step);
         }
 
-        protected ConvolutionTask2(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step, int start, int end) {
+        ConvolutionTask2(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step, int start, int end) {
             super(src, dest, width, height, isHorizontal, step, start, end);
         }
 
@@ -252,7 +252,7 @@ class FilterWOW implements ImageFilter.Algorithm {
         }
 
         @Override
-        protected void computeHorizontal() {
+        void computeHorizontal() {
             for (int y = start; y < end; y++) {
                 for (int x = 0; x < width; x++) {
                     float sum = 0;
