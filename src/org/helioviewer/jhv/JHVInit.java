@@ -103,8 +103,8 @@ class JHVInit {
                 "solo_ANC_soc-sc-fk_V09.tf",
                 "solo_ANC_soc-sci-fk_V08.tf",
                 "solo_ANC_soc-sclk-fict_20000101_V01.tsc",
-                "solo_ANC_soc-orbit-stp_20200210-20301120_394_V1_00504_V01.bsp",
-                "solo_ANC_soc-default-att-stp_20200210-20301120_394_V1_00504_V01.bc");
+                "solo_ANC_soc-orbit-stp_20200210-20301120_397_V1_00507_V01.bsp",
+                "solo_ANC_soc-default-att-stp_20200210-20301120_397_V1_00507_V01.bc");
 
         ArrayList<String> builtinKernels = new ArrayList<>(kernels.size());
         kernels.parallelStream().forEach(k -> { // order does not matter
