@@ -23,7 +23,7 @@ public class UpdateChecker {
                 try {
                     int n = Integer.parseInt(Settings.getProperty("update.next"));
                     if (n > 0) {
-                        n -= 1;
+                        n--;
                         Settings.setProperty("update.next", Integer.toString(n));
                     }
                     if (n != 0) {
