@@ -78,12 +78,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             }
 
             @Override
-            protected Dimension getSize() {
+            Dimension getSize() {
                 return new Dimension(Display.fullViewport.width, Display.fullViewport.height);
             }
 
             @Override
-            protected boolean isInternal() {
+            boolean isInternal() {
                 return false;
             }
         },
@@ -94,12 +94,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             }
 
             @Override
-            protected Dimension getSize() {
+            Dimension getSize() {
                 return new Dimension(1024, 1024);
             }
 
             @Override
-            protected boolean isInternal() {
+            boolean isInternal() {
                 return true;
             }
         },
@@ -110,12 +110,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             }
 
             @Override
-            protected Dimension getSize() {
+            Dimension getSize() {
                 return new Dimension(1920, 1080);
             }
 
             @Override
-            protected boolean isInternal() {
+            boolean isInternal() {
                 return true;
             }
         },
@@ -126,12 +126,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             }
 
             @Override
-            protected Dimension getSize() {
+            Dimension getSize() {
                 return new Dimension(2048, 2048);
             }
 
             @Override
-            protected boolean isInternal() {
+            boolean isInternal() {
                 return true;
             }
         },
@@ -142,12 +142,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             }
 
             @Override
-            protected Dimension getSize() {
+            Dimension getSize() {
                 return new Dimension(3840, 2160);
             }
 
             @Override
-            protected boolean isInternal() {
+            boolean isInternal() {
                 return true;
             }
         },
@@ -158,19 +158,19 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             }
 
             @Override
-            protected Dimension getSize() {
+            Dimension getSize() {
                 return new Dimension(4096, 4096);
             }
 
             @Override
-            protected boolean isInternal() {
+            boolean isInternal() {
                 return true;
             }
         };
 
-        protected abstract boolean isInternal();
+        abstract boolean isInternal();
 
-        protected abstract Dimension getSize();
+        abstract Dimension getSize();
     }
 
     private static boolean isAdvanced;

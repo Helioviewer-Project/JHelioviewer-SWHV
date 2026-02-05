@@ -38,7 +38,7 @@
         </condition>
 
         <path id="processorpath.ref">
-            <pathelement location="extra/prone/error_prone_core-2.41.0-with-dependencies.jar"/>
+            <pathelement location="extra/prone/error_prone_core-2.47.0-with-dependencies.jar"/>
             <pathelement location="extra/prone/dataflow-errorprone-3.49.3-eisop1.jar"/>
             <pathelement location="extra/prone/checker-qual-3.49.3-eisop1.jar"/>
             <pathelement location="extra/prone/javax.inject-1.jar"/>

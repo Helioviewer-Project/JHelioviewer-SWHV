@@ -34,12 +34,12 @@ public class DataSources {
             builder.put("availability.images", availability);
 
         return builder.
-            put("API.getDataSources", api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
-            put("API.getJP2Image", api + "getJP2Image/?").
-            put("API.getJPX", api + "getJPX/?").
-            put("label", label).
-            put("schema", "/data/sources_v1.0.json").
-            build();
+                put("API.getDataSources", api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
+                put("API.getJP2Image", api + "getJP2Image/?").
+                put("API.getJPX", api + "getJPX/?").
+                put("label", label).
+                put("schema", "/data/sources_v1.0.json").
+                build();
     }
 
     private static void loadUserServers(JSONObject json, ImmutableMap.Builder<String, Map<String, String>> builder) {
@@ -71,11 +71,11 @@ public class DataSources {
         }
 
         serverSettings = builder.
-            put("ROB", getSourceMap("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?")).
-            put("IAS", getSourceMap("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null)).
-            put("GSFC", getSourceMap("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null)).
-            put("ESAC", getSourceMap("https://soar.esac.esa.int/jpip-api/v2/", "European Space Astronomy Center", null)).
-            build();
+                put("ROB", getSourceMap("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?")).
+                put("IAS", getSourceMap("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null)).
+                put("GSFC", getSourceMap("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null)).
+                put("ESAC", getSourceMap("https://soar.esac.esa.int/jpip-api/v2/", "European Space Astronomy Center", null)).
+                build();
         toLoad = serverSettings.size();
     }
 
