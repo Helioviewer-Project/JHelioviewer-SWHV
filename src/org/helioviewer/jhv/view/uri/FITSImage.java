@@ -156,27 +156,25 @@ class FITSImage implements URIImageReader {
         float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
         float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
         if (min == Float.MAX_VALUE || max == Float.MAX_VALUE) {
-            List<Float> sampleData = sampleImage(pixType, width, height, pixData, blank, bzero, bscale);
-            int sampleLen = sampleData.size();
-            if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
+            if (FITSSettings.clippingMode == FITSSettings.ClippingMode.Range) {
+                min = (float) FITSSettings.clippingMin;
+                max = (float) FITSSettings.clippingMax;
+            } else {
+                List<Float> sampleData = sampleImage(pixType, width, height, pixData, blank, bzero, bscale);
+                int sampleLen = sampleData.size();
+                if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
+                    return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
 
-            switch (FITSSettings.clippingMode) {
-                case Auto -> {
+                if (FITSSettings.clippingMode == FITSSettings.ClippingMode.Auto) {
                     min = sampleData.get((int) (MIN_MULT * sampleLen));
                     max = sampleData.get((int) (MAX_MULT * sampleLen));
-                }
-                case ZScale -> {
+                } else {
                     float[] zLow = {0};
                     float[] zHigh = {0};
                     float[] zMax = {0};
                     ZScale.zscale(Floats.toArray(sampleData), sampleLen, zLow, zHigh, zMax, FITSSettings.zContrast);
                     min = zLow[0];
                     max = zHigh[0];
-                }
-                case Range -> {
-                    min = (float) FITSSettings.clippingMin;
-                    max = (float) FITSSettings.clippingMax;
                 }
             }
         }
