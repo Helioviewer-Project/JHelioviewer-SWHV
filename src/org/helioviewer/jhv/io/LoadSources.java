@@ -28,12 +28,11 @@ class LoadSources {
         @Override
         public DataSourcesParser call() throws Exception {
             String serverUrl = DataSources.getServerSetting(server, "API.getDataSources");
-            String schemaName = DataSources.getServerSetting(server, "schema");
-            if (serverUrl == null || schemaName == null)
+            if (serverUrl == null) // can't happen
                 throw new Exception("Unknown server: " + server);
 
             Schema schema;
-            try (InputStream is = FileUtils.getResource(schemaName)) {
+            try (InputStream is = FileUtils.getResource("/data/sources_v1.0.json")) { // off-load main thread
                 JSONObject rawSchema = JSONUtils.get(is);
                 SchemaLoader schemaLoader = SchemaLoader.builder().schemaJson(rawSchema).addFormatValidator(new TimeUtils.SQLDateTimeFormatValidator()).build();
                 schema = schemaLoader.load().build();
