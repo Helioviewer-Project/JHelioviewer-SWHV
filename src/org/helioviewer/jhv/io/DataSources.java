@@ -38,7 +38,6 @@ public class DataSources {
                 put("API.getJP2Image", api + "getJP2Image/?").
                 put("API.getJPX", api + "getJPX/?").
                 put("label", label).
-                put("schema", "/data/sources_v1.0.json").
                 build();
     }
 
