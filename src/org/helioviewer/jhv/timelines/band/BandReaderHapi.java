@@ -300,13 +300,13 @@ public class BandReaderHapi {
     private static Band.Data getHapiUri(URI uri) throws Exception { // tbd
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
-            case DataUri.Format.Image.ZIP -> LoaderZIP(dataUri);
+            case DataUri.Format.Image.ZIP -> loadZIP(dataUri);
             case DataUri.Format.Timeline.CSV -> getHapiLocalCSV(dataUri);
             default -> throw new Exception("Unknown image type");
         };
     }
 
-    private static Band.Data LoaderZIP(DataUri dataUri) throws Exception {
+    private static Band.Data loadZIP(DataUri dataUri) throws Exception {
         List<URI> uriList = FileUtils.unZip(dataUri.uri());
         if (uriList.size() != 1)
             throw new Exception("Only one CSV file per zip supported");
