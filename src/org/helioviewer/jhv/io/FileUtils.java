@@ -40,8 +40,11 @@ public class FileUtils {
         PushbackInputStream pb = new PushbackInputStream(input, 2); // pushbackstream for looking ahead
         byte[] signature = new byte[2];
         int len = pb.read(signature); // read the signature
+        if (len <= 0) { // end of stream
+            return pb;
+        }
         pb.unread(signature, 0, len); // push back the signature to the stream
-        if (signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b) // check if matches standard gzip magic number
+        if (len >= 2 && signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b) // check if matches standard gzip magic number
             return new GZIPInputStream(pb);
         else
             return pb;
@@ -78,13 +81,15 @@ public class FileUtils {
                     public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
                         // Make sure that we conserve the hierachy of files and folders inside the zip
                         Path relativePathInZip = root.relativize(filePath);
-                        Path targetPath = targetDir.resolve(relativePathInZip.toString());
-                        Path parent = targetPath.getParent();
-                        if (parent != null)
-                            Files.createDirectories(parent);
-                        // And extract the file
-                        Files.copy(filePath, targetPath);
-                        uriList.add(targetPath.toUri());
+                        Path targetPath = targetDir.resolve(relativePathInZip.toString()).normalize();
+                        if (targetPath.startsWith(targetDir)) {
+                            Path parent = targetPath.getParent();
+                            if (parent != null)
+                                Files.createDirectories(parent);
+                            // And extract the file
+                            Files.copy(filePath, targetPath);
+                            uriList.add(targetPath.toUri());
+                        } // else attempted path traversal
 
                         return FileVisitResult.CONTINUE;
                     }
