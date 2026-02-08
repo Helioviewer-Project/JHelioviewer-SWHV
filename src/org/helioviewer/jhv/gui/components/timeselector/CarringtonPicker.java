@@ -14,6 +14,7 @@ import javax.swing.event.PopupMenuListener;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.base.MenuScroller;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -52,6 +53,8 @@ class CarringtonPicker extends JideButton implements PopupMenuListener {
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL);
+        cr = MathUtils.clip(cr, 0, Carrington.CR_start.length - 1);
+
         Component component = popup.getComponent(cr);
         if (component instanceof JMenuItem jmi) {
             jmi.setSelected(true);
