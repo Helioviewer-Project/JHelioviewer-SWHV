@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -106,16 +107,16 @@ class JHVInit {
                 "solo_ANC_soc-orbit-stp_20200210-20301120_397_V1_00507_V01.bsp",
                 "solo_ANC_soc-default-att-stp_20200210-20301120_397_V1_00507_V01.bc");
 
-        ArrayList<String> builtinKernels = new ArrayList<>(kernels.size());
-        kernels.parallelStream().forEach(k -> { // order does not matter
+        List<String> builtinKernels = kernels.parallelStream().map(k -> { // order does not matter
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
                 Path kp = Path.of(JHVGlobals.dataCacheDir, k);
                 Files.copy(in, kp);
-                builtinKernels.add(kp.toString());
+                return kp.toString();
             } catch (Exception e) {
                 Log.error("SPICE kernel copy error", e);
+                return null;
             }
-        });
+        }).filter(Objects::nonNull).toList();
         Spice.loadKernels(builtinKernels);
 
         Path userKernelsPath = Path.of(JHVDirectory.KERNELS.getPath());
