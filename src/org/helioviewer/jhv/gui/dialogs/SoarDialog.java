@@ -236,7 +236,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
     @Override
     public void setSoarResponseSoops(List<String> list) {
         soopCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
-        soopCombo.setSelectedIndex(0);
+        if (!list.isEmpty())
+            soopCombo.setSelectedIndex(0);
     }
 
 }
