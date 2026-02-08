@@ -125,6 +125,9 @@ class BandCacheMinute implements BandCache {
         if (cache != null) {
             long[] dates = cache.getDates(0);
             int len = dates.length;
+            if (len <= 1) { // avoid out of bounds and division by 0
+                return len == 1 ? cache.getValues(0)[0] : YAxis.BLANK;
+            }
             int idx = (int) ((len - 1) * 1. * (ts - dates[0]) / (dates[len - 1] - dates[0]) + 0.5);
 
             if (idx >= 0 && idx < len) {
