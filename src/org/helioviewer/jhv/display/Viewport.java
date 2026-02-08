@@ -16,7 +16,9 @@ public class Viewport {
         idx = _idx;
         width = _w;
         height = _h;
-        aspect = _w / (double) _h;
+        // prevent division by 0
+        int safeHeight = Math.max(1, _h);
+        aspect = _w / (double) safeHeight;
         x = _x;
         yGL = Display.glHeight - height - _y;
         yAWT = _y;
