@@ -58,16 +58,22 @@ class MovieExporter {
                 int pos = 3 * w * j;
                 mainData.position(pos);
                 mainData.limit(pos + 3 * w);
-                channel.write(mainData);
+                writeFully(channel, mainData);
             }
             if (eveData != null)
-                channel.write(eveData);
+                writeFully(channel, eveData);
         } catch (Exception e) {
             tempFile.delete();
             tempFile = null;
             throw e;
         } finally {
             NIOImageFactory.free(scaled);
+        }
+    }
+
+    private static void writeFully(FileChannel channel, ByteBuffer data) throws Exception {
+        while (data.hasRemaining()) {
+            channel.write(data);
         }
     }
 
