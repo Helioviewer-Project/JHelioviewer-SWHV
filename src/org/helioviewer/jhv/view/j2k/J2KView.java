@@ -39,6 +39,8 @@ public class J2KView extends BaseView {
     private static final Cleaner reaper = Cleaner.create();
 
     private final Cleaner.Cleanable abolishable;
+    // cleaner tracks reachability of this token
+    private final Object cleanerToken = new Object();
 
     private final APIRequest request;
     protected final int serial;
@@ -123,7 +125,7 @@ public class J2KView extends BaseView {
             if (isJP2)
                 source.close(); // JP2, close asap
 
-            abolishable = reaper.register(this, new J2KAbolisher(serial, reader, source));
+            abolishable = reaper.register(cleanerToken, new J2KAbolisher(serial, reader, source));
         } catch (Exception e) {
             String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
             throw new Exception(msg + ": " + dataUri, e);
