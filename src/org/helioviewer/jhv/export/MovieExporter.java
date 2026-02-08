@@ -87,6 +87,9 @@ class MovieExporter {
     );
 
     void close() throws Exception {
+        if (tempFile == null) // unlikely reach here on encode error
+            return;
+
         List<String> input = List.of(
                 "-hide_banner",
                 "-f", "rawvideo",
