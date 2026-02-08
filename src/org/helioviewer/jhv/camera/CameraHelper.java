@@ -13,11 +13,13 @@ import org.helioviewer.jhv.math.Vec3;
 public class CameraHelper {
 
     private static double computeNormalizedX(Viewport vp, double screenX) {
-        return (screenX - vp.x) / vp.width - 0.5;
+        int safeWidth = Math.max(1, vp.width);
+        return (screenX - vp.x) / safeWidth - 0.5;
     }
 
     private static double computeNormalizedY(Viewport vp, double screenY) {
-        return 0.5 - (screenY - vp.yAWT) / vp.height;
+        int safeHeight = Math.max(1, vp.height);
+        return 0.5 - (screenY - vp.yAWT) / safeHeight;
     }
 
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
