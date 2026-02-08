@@ -103,17 +103,22 @@ public class GLTexture {
         }
 
         DataBuffer rawBuffer = source.getRaster().getDataBuffer();
-        Buffer buffer = switch (rawBuffer.getDataType()) {
+        int dataType = rawBuffer.getDataType();
+        Buffer buffer = switch (dataType) {
             case DataBuffer.TYPE_BYTE -> ByteBuffer.wrap(((DataBufferByte) rawBuffer).getData());
             case DataBuffer.TYPE_USHORT -> ShortBuffer.wrap(((DataBufferUShort) rawBuffer).getData());
             case DataBuffer.TYPE_SHORT -> ShortBuffer.wrap(((DataBufferShort) rawBuffer).getData());
             case DataBuffer.TYPE_INT -> IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
             default -> null;
         };
+        if (buffer == null) {
+            Log.warn("Unsupported DataBuffer type: " + dataType);
+            return;
+        }
 
-        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(rawBuffer.getDataType()));
+        gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(dataType));
         gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, w);
-        genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(rawBuffer.getDataType()), buffer);
+        genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(dataType), buffer);
     }
 
     public static void copyBuffer1D(GL3 gl, IntBuffer source) {
@@ -124,7 +129,7 @@ public class GLTexture {
         gl.glTexParameteri(GL3.GL_TEXTURE_1D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
     }
 
-    // Map application image format to OpenGL memory image format
+    // map application image format to OpenGL memory image format
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
         return switch (format) {
             case Gray8 -> GL3.GL_R8;
