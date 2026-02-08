@@ -73,7 +73,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
         if (mZero.isPresent() && mScale.isPresent() && mDataMax.isPresent()) {
             double zero = mZero.get();
             double scale = mScale.get();
-            int size = MathUtils.clip((int) Math.ceil(mDataMax.get()) + 1, 0, 65535);
+            int size = MathUtils.clip((int) Math.ceil(mDataMax.get()) + 1, 0, 65536);
             physLUT = new float[size];
             for (int i = 0; i < size; i++)
                 physLUT[i] = (float) (zero + i * scale);
