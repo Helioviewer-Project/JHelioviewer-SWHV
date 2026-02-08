@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -64,7 +65,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
             System.exit(1);
     }
 
-    private boolean alreadySent;
+    private final AtomicBoolean alreadySent = new AtomicBoolean(false);
 
     // we do not use the logger here, since it should work even before logging initialization
     @Override
@@ -83,8 +84,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         msg += stackTrace + "\n";
         msg += "Log:\n" + Log.get();
 
-        if (!alreadySent) {
-            alreadySent = true;
+        if (alreadySent.compareAndSet(false, true)) {
             String errorMsg = msg;
             EventQueue.invokeLater(() -> showErrorDialog(errorMsg));
         }
