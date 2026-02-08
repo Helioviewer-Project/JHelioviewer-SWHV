@@ -70,15 +70,16 @@ public class PositionResponse {
             y = position[0].y();
             z = position[0].z();
         } else {
-            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * position.length;
+            int maxIndex = position.length - 1;
+            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
             int i = (int) interpolatedIndex;
-            i = MathUtils.clip(i, 0, position.length - 1);
-            int inext = Math.min(i + 1, position.length - 1);
+            i = MathUtils.clip(i, 0, maxIndex);
+            int inext = Math.min(i + 1, maxIndex);
 
             long tstart = position[i].milli();
             long tend = position[inext].milli();
 
-            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
+            double alpha = tend == tstart ? 1. : MathUtils.clip((time - tstart) / (double) (tend - tstart), 0, 1);
             x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
             y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
             z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
@@ -107,15 +108,16 @@ public class PositionResponse {
             y = position[0].y();
             z = position[0].z();
         } else {
-            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * position.length;
+            int maxIndex = position.length - 1;
+            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
             int i = (int) interpolatedIndex;
-            i = MathUtils.clip(i, 0, position.length - 1);
-            int inext = Math.min(i + 1, position.length - 1);
+            i = MathUtils.clip(i, 0, maxIndex);
+            int inext = Math.min(i + 1, maxIndex);
 
             long tstart = position[i].milli();
             long tend = position[inext].milli();
 
-            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
+            double alpha = tend == tstart ? 1. : MathUtils.clip((time - tstart) / (double) (tend - tstart), 0, 1);
             x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
             y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
             z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
@@ -144,15 +146,16 @@ public class PositionResponse {
             y = position[0].y();
             z = position[0].z();
         } else {
-            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * position.length;
+            int maxIndex = position.length - 1;
+            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
             int i = (int) interpolatedIndex;
-            i = MathUtils.clip(i, 0, position.length - 1);
-            int inext = Math.min(i + 1, position.length - 1);
+            i = MathUtils.clip(i, 0, maxIndex);
+            int inext = Math.min(i + 1, maxIndex);
 
             long tstart = position[i].milli();
             long tend = position[inext].milli();
 
-            double alpha = tend == tstart ? 1. : ((time - tstart) / (double) (tend - tstart)) % 1.;
+            double alpha = tend == tstart ? 1. : MathUtils.clip((time - tstart) / (double) (tend - tstart), 0, 1);
             x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
             y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
             z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
