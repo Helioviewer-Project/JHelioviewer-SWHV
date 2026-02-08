@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.dialogs;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -142,6 +143,9 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
             Path path = Path.of(JHVDirectory.EXPORTS.getPath(),
                     m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml");
             exportFitsButton.setEnabled(true);
+
+            for (ActionListener listener : exportFitsButton.getActionListeners())
+                exportFitsButton.removeActionListener(listener);
             exportFitsButton.addActionListener(e -> new Thread(() -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     writer.write(xml, 0, xml.length());
