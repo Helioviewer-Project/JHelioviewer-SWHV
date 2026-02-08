@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.imagedata;
 
+import java.util.OptionalDouble;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
@@ -56,6 +57,7 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static final float SIGMA_E0 = 8.907e-1f;
     private static final float SIGMA_E1 = 2.0072e-1f;
     private static final float BOOST = 1.5f; // restore some crispness after denoising
+    private static final float NOISE_THRESH = 1e-10f; // avoid denoising very low noise or blank images
 
     private static final ArrayOp opSubtract = (op1, op2, dest, start, end) -> {
         for (int i = start; i < end; i++) {
@@ -101,11 +103,15 @@ class FilterWOW implements ImageFilter.Algorithm {
             // Denoise stage
             if (scale == 0) {
                 noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
-                float[] div = {1 / (3 * SIGMA_E0 * noise)};
-                pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
+                if (noise > NOISE_THRESH) { // avoid division by 0
+                    float[] div = {1 / (3 * SIGMA_E0 * noise)};
+                    pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
+                }
             } else if (scale == 1) {
-                float[] div = {1 / (1 * SIGMA_E1 * noise)};
-                pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
+                if (noise > NOISE_THRESH) { // avoid division by 0
+                    float[] div = {1 / (1 * SIGMA_E1 * noise)};
+                    pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
+                }
             }
             // Whitened synthesis
             pool.invoke(new ArrayOp.Task3(temp2, coeff, synth, 0, length, opSynthesis));
@@ -124,13 +130,13 @@ class FilterWOW implements ImageFilter.Algorithm {
 */
 
     private static float medianStream(float[] c, int length) {
-        return (float) IntStream.range(0, length)
+        OptionalDouble od = IntStream.range(0, length)
                 .parallel()
                 .mapToDouble(i -> Math.abs(c[i]))
                 .sorted()
                 .skip(length / 2)
-                .findFirst()
-                .getAsDouble();
+                .findFirst();
+        return od.isEmpty() ? 0 : (float) od.getAsDouble();
     }
 
     private static class ConvolutionTask extends RecursiveAction {
