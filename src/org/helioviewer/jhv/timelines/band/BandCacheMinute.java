@@ -80,13 +80,13 @@ class BandCacheMinute implements BandCache {
         double factor = 1;
         double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
         long aWidth = end - start;
-        double noelements = aWidth / elsz;
+        double numElements = aWidth / elsz;
 
-        while (level < MAX_LEVEL - 1 && noelements > graphWidth) {
+        while (level < MAX_LEVEL - 1 && numElements > graphWidth) {
             level++;
             factor *= FACTOR_STEP;
             elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-            noelements = aWidth / elsz;
+            numElements = aWidth / elsz;
         }
 
         List<List<DateValue>> ret = new ArrayList<>();
@@ -158,11 +158,11 @@ class BandCacheMinute implements BandCache {
                 factor *= FACTOR_STEP;
             }
 
-            long startdate = key * MILLIS_PER_CHUNK;
+            long startDate = key * MILLIS_PER_CHUNK;
             factor = 1;
             for (int j = 0; j < values.length; j++) {
                 for (int i = 0; i < values[j].length; i++) {
-                    dates[j][i] = startdate + i * MILLIS_PER_TICK * factor;
+                    dates[j][i] = startDate + i * MILLIS_PER_TICK * factor;
                 }
                 factor *= FACTOR_STEP;
             }
