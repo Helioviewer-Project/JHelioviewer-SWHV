@@ -20,10 +20,15 @@ public class BandDataProvider {
 
     private static final ArrayListMultimap<Band, Future<Band.Data>> workers = ArrayListMultimap.create();
 
+    private static void pruneFinished(Band band) {
+        workers.get(band).removeIf(Future::isDone);
+    }
+
     static void addDownloads(Band band, List<Interval> intervals) {
         String baseUrl = band.getBandType().getBaseUrl();
         if ("".equals(baseUrl))
             return;
+        pruneFinished(band);
         intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(baseUrl, interval.start, interval.end)));
     }
 
@@ -33,11 +38,8 @@ public class BandDataProvider {
     }
 
     static boolean isDownloadActive(Band band) {
-        for (Future<?> worker : workers.get(band)) {
-            if (!worker.isDone())
-                return true;
-        }
-        return false;
+        pruneFinished(band);
+        return !workers.get(band).isEmpty();
     }
 
     public static void loadBand(JSONObject jo) {
