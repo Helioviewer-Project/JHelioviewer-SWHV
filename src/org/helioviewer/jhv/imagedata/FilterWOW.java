@@ -66,8 +66,9 @@ class FilterWOW implements ImageFilter.Algorithm {
     };
 
     private static final ArrayOp opDenoise = (op1, op2, dest, start, end) -> {
+        float factor = op1[0];
         for (int i = start; i < end; i++) {
-            float x = Math.abs(dest[i]) * op1[0];
+            float x = Math.abs(dest[i]) * factor;
             dest[i] *= BOOST * x / (1 + x);
         }
     };
@@ -96,6 +97,7 @@ class FilterWOW implements ImageFilter.Algorithm {
         float[] temp1 = new float[length];
         float[] temp2 = new float[length];
         float[] synth = new float[length];
+        float[] denoiseFactor = new float[1];
 
         float noise = 0; // computed for scale 0
         ForkJoinPool pool = ForkJoinPool.commonPool();
@@ -113,13 +115,13 @@ class FilterWOW implements ImageFilter.Algorithm {
             if (scale == 0) {
                 noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
                 if (noise > NOISE_THRESH) { // avoid division by 0
-                    float[] div = {1 / (3 * SIGMA_E0 * noise)};
-                    pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
+                    denoiseFactor[0] = 1 / (3 * SIGMA_E0 * noise);
+                    pool.invoke(new ArrayOp.Task3(denoiseFactor, null, coeff, 0, length, opDenoise));
                 }
             } else if (scale == 1) {
                 if (noise > NOISE_THRESH) { // avoid division by 0
-                    float[] div = {1 / (1 * SIGMA_E1 * noise)};
-                    pool.invoke(new ArrayOp.Task3(div, null, coeff, 0, length, opDenoise));
+                    denoiseFactor[0] = 1 / (SIGMA_E1 * noise);
+                    pool.invoke(new ArrayOp.Task3(denoiseFactor, null, coeff, 0, length, opDenoise));
                 }
             }
             // Whitened synthesis
