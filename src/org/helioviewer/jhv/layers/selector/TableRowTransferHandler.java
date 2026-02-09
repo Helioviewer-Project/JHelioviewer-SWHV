@@ -70,7 +70,7 @@ class TableRowTransferHandler extends TransferHandler {
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
-        boolean ours = isOurs(info);
+        boolean ours = isOurs(info) && image != null;
         grid.setCursor(ours ? Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(10, 10), "DnD") : DragSource.DefaultMoveNoDrop);
         return ours;
     }
@@ -106,6 +106,7 @@ class TableRowTransferHandler extends TransferHandler {
 
     @Override
     protected void exportDone(JComponent c, Transferable t, int act) {
+        image = null;
         if (act == TransferHandler.MOVE || act == TransferHandler.NONE) {
             grid.setCursor(Cursor.getDefaultCursor());
         }
