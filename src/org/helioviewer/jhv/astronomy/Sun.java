@@ -44,9 +44,9 @@ public class Sun {
     public static final Position StartEarth;
 
     private static final LoadingCache<JHVTime, Position> carringtonCache = Caffeine.newBuilder().maximumSize(10000)
-            .build(t -> Spice.getCarrington("EARTH", t).setLocation("EARTH"));
+            .build(Sun::loadEarthCarrington);
     private static final LoadingCache<JHVTime, Position> hciCache = Caffeine.newBuilder().maximumSize(10000)
-            .build(t -> Spice.getPositionLat("SUN", "EARTH", Frame.SOLO_HCI.toString(), t).setLocation("EARTH"));
+            .build(Sun::loadEarthHCI);
 
     static {
         StartEarth = getEarth(TimeUtils.START);
@@ -58,6 +58,22 @@ public class Sun {
 
     public static Position getEarthHCI(JHVTime time) {
         return hciCache.get(time);
+    }
+
+    // in case SPICE returns null
+    private static Position loadEarthCarrington(JHVTime time) {
+        Position position = Spice.getCarrington("EARTH", time);
+        if (position == null)
+            position = new Position(time, getEarthDistance(time.milli), 0, 0);
+        return position.setLocation("EARTH");
+    }
+
+    // in case SPICE returns null
+    private static Position loadEarthHCI(JHVTime time) {
+        Position position = Spice.getPositionLat("SUN", "EARTH", Frame.SOLO_HCI.toString(), time);
+        if (position == null)
+            position = new Position(time, getEarthDistance(time.milli), 0, 0);
+        return position.setLocation("EARTH");
     }
 
     public static double getEarthDistance(long milli) {
