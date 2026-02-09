@@ -1,15 +1,18 @@
 package org.helioviewer.jhv;
 
 import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.gui.Message;
@@ -120,10 +123,24 @@ class JHVInit {
         Spice.loadKernels(builtinKernels);
 
         Path userKernelsPath = Path.of(JHVDirectory.KERNELS.getPath());
-        try (Stream<Path> stream = Files.find(userKernelsPath, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile(), FileVisitOption.FOLLOW_LINKS)) {
-            List<String> userKernels = stream.map(Path::toString).sorted().toList();
-            Spice.loadKernels(userKernels);
-        }
+        List<String> userKernels = new ArrayList<>();
+        Files.walkFileTree(userKernelsPath, Set.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) {
+                if (attrs.isRegularFile() && Files.isReadable(filePath)) {
+                    userKernels.add(filePath.toString());
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path filePath, IOException exc) {
+                Log.warn("Skipping inaccessible kernel path: " + filePath, exc);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        userKernels.sort(String::compareTo);
+        Spice.loadKernels(userKernels);
     }
 
 }
