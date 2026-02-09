@@ -14,7 +14,7 @@ public final class CadencePanel extends JPanel {
 
     private static final String[] timeStepUnits = {"sec", "min", "hours", "days", "get all"};
 
-    private final JHVSpinner cadenceSpinner = new JHVSpinner(1, 1, 100000, 1);
+    private final JHVSpinner cadenceSpinner = new JHVSpinner(1, 1, 10000, 1);
     private final JComboBox<String> unitCombo = new JComboBox<>(timeStepUnits);
 
     public CadencePanel() {
