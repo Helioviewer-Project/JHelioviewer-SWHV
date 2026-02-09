@@ -137,7 +137,7 @@ class InteractionAnnotate implements Interaction.Type {
         if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
             remove();
             MovieDisplay.display();
-        } else if (code == KeyEvent.VK_N && activeIndex >= 0) {
+        } else if (code == KeyEvent.VK_N && activeIndex >= 0 && !anns.isEmpty()) {
             activeIndex++;
             activeIndex %= anns.size();
             MovieDisplay.display();
@@ -177,6 +177,10 @@ class InteractionAnnotate implements Interaction.Type {
             for (int i = 0; i < len; i++) {
                 anns.add(generate(ja.getJSONObject(i)));
             }
+            if (anns.isEmpty())
+                activeIndex = -1;
+            else if (activeIndex < 0 || activeIndex >= anns.size())
+                activeIndex = 0;
         }
     }
 
