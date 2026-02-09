@@ -31,7 +31,7 @@ public class EventDatabaseThread extends Thread {
             statement.executeUpdate("CREATE INDEX if not exists evt_start ON events (start)");
             statement.executeUpdate("CREATE TABLE if not exists event_link (id INTEGER PRIMARY KEY AUTOINCREMENT, left_id INTEGER, right_id INTEGER, FOREIGN KEY(left_id) REFERENCES events(id), FOREIGN KEY(right_id) REFERENCES events(id), UNIQUE(left_id, right_id) ON CONFLICT IGNORE)");
             statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (left_id)");
-            statement.executeUpdate("CREATE INDEX if not exists evt_left ON event_link (right_id)");
+            statement.executeUpdate("CREATE INDEX if not exists evt_right ON event_link (right_id)");
             statement.executeUpdate("CREATE TABLE if not exists date_range (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER, start BIGINTEGER, end BIGINTEGER, FOREIGN KEY(type_id) REFERENCES event_type(id))");
             statement.executeUpdate("CREATE TABLE if not exists version (version INTEGER PRIMARY KEY, hash INTEGER)");
         }
