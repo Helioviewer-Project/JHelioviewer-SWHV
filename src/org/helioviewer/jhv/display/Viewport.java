@@ -14,11 +14,10 @@ public class Viewport {
 
     public Viewport(int _idx, int _x, int _y, int _w, int _h) {
         idx = _idx;
-        width = _w;
-        height = _h;
-        // prevent division by 0
-        int safeHeight = Math.max(1, _h);
-        aspect = _w / (double) safeHeight;
+        width = Math.max(1, _w);
+        height = Math.max(1, _h);
+        aspect = width / (double) height;
+
         x = _x;
         yGL = Display.glHeight - height - _y;
         yAWT = _y;
