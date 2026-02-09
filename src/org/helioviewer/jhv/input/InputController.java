@@ -102,16 +102,16 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void keyPressed(KeyEvent e) {
+        KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
+        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), KeyEvent.KEY_PRESSED))
+            return;
+
         interaction.keyPressed(e);
         keyListeners.forEach(listener -> listener.keyPressed(e));
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiersEx());
-        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), KeyEvent.KEY_TYPED))
-            return;
-
         interaction.keyTyped(e);
         keyListeners.forEach(listener -> listener.keyTyped(e));
     }
