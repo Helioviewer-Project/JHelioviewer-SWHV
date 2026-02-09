@@ -76,7 +76,7 @@ class BandCacheAll implements BandCache {
         if (first == null || ts < first.milli || ts > last.milli) // if first is not null, last cannot be null
             return YAxis.BLANK;
         if (ts == last.milli) // avoid off-by-1
-            return dateVals.getLast().milli;
+            return dateVals.getLast().value;
 
         int low = 0, high = dateVals.size();
         while (low != high) {
