@@ -9,6 +9,14 @@ public class EDTQueue {
 
     // https://kotek.net/blog/swingutilities.invokeandwait_with_return_value
     public static <E> E invokeAndWait(Callable<E> r) throws InterruptedException, InvocationTargetException {
+        if (EventQueue.isDispatchThread()) {
+            try {
+                return r.call();
+            } catch (Exception e) {
+                throw new InvocationTargetException(e);
+            }
+        }
+
         AtomicReference<E> ret = new AtomicReference<>();
         AtomicReference<Exception> except = new AtomicReference<>();
 
@@ -23,7 +31,7 @@ public class EDTQueue {
 
         Exception e = except.get();
         if (e != null) // there was an exception on EDT thread, rethrow it
-            throw new RuntimeException(e);
+            throw new InvocationTargetException(e);
         else
             return ret.get();
     }
