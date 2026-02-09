@@ -49,28 +49,30 @@ public class GLGrab {
         int _w = Display.fullViewport.width;
         int _h = Display.fullViewport.height;
 
-        Display.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
-        Display.reshapeAll();
+        try {
+            Display.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
+            Display.reshapeAll();
 
-        fbo.bind(gl);
-        if (Display.mode == Display.ProjectionMode.Orthographic) {
-            GLListener.renderScene(camera, gl);
-        } else {
-            GLListener.renderSceneScale(camera, gl);
+            fbo.bind(gl);
+            if (Display.mode == Display.ProjectionMode.Orthographic) {
+                GLListener.renderScene(camera, gl);
+            } else {
+                GLListener.renderSceneScale(camera, gl);
+            }
+            fbo.unbind(gl);
+
+            fbo.use(gl, fboTex);
+
+            gl.glBindFramebuffer(GL3.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
+            gl.glPixelStorei(GL3.GL_PACK_ALIGNMENT, 1);
+            gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL3.GL_BGR, GL3.GL_UNSIGNED_BYTE, buffer);
+            gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, 0);
+
+            fbo.unuse(gl);
+        } finally {
+            Display.setGLSize(_x, _y, _w, _h);
+            Display.reshapeAll();
         }
-        fbo.unbind(gl);
-
-        fbo.use(gl, fboTex);
-
-        gl.glBindFramebuffer(GL3.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-        gl.glPixelStorei(GL3.GL_PACK_ALIGNMENT, 1);
-        gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL3.GL_BGR, GL3.GL_UNSIGNED_BYTE, buffer);
-        gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, 0);
-
-        fbo.unuse(gl);
-
-        Display.setGLSize(_x, _y, _w, _h);
-        Display.reshapeAll();
     }
 
 }
