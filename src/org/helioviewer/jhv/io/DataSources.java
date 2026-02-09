@@ -48,7 +48,7 @@ public class DataSources {
             for (int i = 0; i < len; i++) {
                 try {
                     JSONObject jo = ja.getJSONObject(i);
-                    builder.put(jo.getString("name"), getSourceMap(jo.getString("api"), jo.getString("label"), jo.optString("availability")));
+                    builder.put(jo.getString("name"), getSourceMap(jo.getString("api"), jo.getString("label"), jo.optString("availability", null)));
                 } catch (Exception e) {
                     Log.warn(e);
                 }
