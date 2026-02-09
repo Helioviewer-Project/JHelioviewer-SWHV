@@ -103,7 +103,7 @@ public class ComesepHandler extends SWEKHandler {
         while (keys.hasNext()) {
             String key = keys.next();
             if (result.isNull(key))
-                return;
+                continue;
 
             String lowKey = key.toLowerCase(Locale.ENGLISH);
             if (!(lowKey.equals("atearliest") || lowKey.equals("atlatest") ||
