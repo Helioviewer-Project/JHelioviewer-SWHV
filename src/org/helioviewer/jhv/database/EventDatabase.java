@@ -606,6 +606,8 @@ public class EventDatabase {
                     }
                 }
             }
+            if (idList.isEmpty())
+                return Collections.emptyList();
 
             String query = "SELECT distinct events.id, events.start, events.end, events.data, event_type.supplier FROM events LEFT JOIN event_type ON events.type_id = event_type.id WHERE events.id IN ( " + idList + ") AND events.id != " + event_id;
             List<JsonEvent> ret = new ArrayList<>();
