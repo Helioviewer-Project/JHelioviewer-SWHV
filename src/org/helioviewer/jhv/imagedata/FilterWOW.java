@@ -78,6 +78,12 @@ class FilterWOW implements ImageFilter.Algorithm {
         }
     };
 
+    private static final ArrayOp opBlend = (op1, op2, dest, start, end) -> {
+        for (int i = start; i < end; i++) {
+            dest[i] = (dest[i] + op1[i]) * ONE_MINUS_MIX_FACTOR + op2[i] * MIX_FACTOR;
+        }
+    };
+
     @Override
     public float[] filter(float[] data, int width, int height) {
         if (width <= 1 || height <= 1)
@@ -119,7 +125,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             // Whitened synthesis
             pool.invoke(new ArrayOp.Task3(temp2, coeff, synth, 0, length, opSynthesis));
         }
-        IntStream.range(0, length).parallel().forEach(i -> synth[i] = (synth[i] + image[i]) * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR);
+        pool.invoke(new ArrayOp.Task3(image, data, synth, 0, length, opBlend));
         return synth;
     }
 
