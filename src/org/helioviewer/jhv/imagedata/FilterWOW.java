@@ -80,6 +80,9 @@ class FilterWOW implements ImageFilter.Algorithm {
 
     @Override
     public float[] filter(float[] data, int width, int height) {
+        if (width <= 1 || height <= 1)
+            return data;
+
         float[] image = data.clone();
 
         int length = data.length;
