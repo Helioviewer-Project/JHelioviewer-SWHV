@@ -72,7 +72,12 @@ class NetClientRemote implements NetClient {
             response.close();
             throw new IOException(msg);
         }
+
         responseBody = response.body();
+        if (responseBody == null) { // unlikely, we only do GET
+            response.close();
+            throw new IOException("Empty response body for " + uri);
+        }
 
         //if (response.cacheResponse() != null)
         //    System.out.println(">>> cached response: " + url);
