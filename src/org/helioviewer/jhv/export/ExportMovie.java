@@ -21,7 +21,7 @@ import com.jogamp.opengl.GL3;
 public class ExportMovie implements Movie.Listener {
 
     private static final ExportMovie instance = new ExportMovie();
-    private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("Movie Encode"));
+    private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("JHV-EncodeMovie"));
 
     private static MovieExporter exporter;
     private static GLGrab grabber;
