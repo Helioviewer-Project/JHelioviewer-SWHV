@@ -79,11 +79,16 @@ public class SoarClient {
                 "level='" + level + "' ORDER BY begin_time";
     }
 
+    private static String adqlEscape(String value) {
+        return value.replace("'", "''");
+    }
+
     private static String adqlSearchSoop(List<String> descriptors, String level, String soop) {
         String desc = String.join("' OR descriptor='", descriptors);
+        String escapedSoop = adqlEscape(soop);
         return "SELECT data_item_id,file_format,filesize FROM v_sc_data_item WHERE " +
                 "(descriptor='" + desc + "') AND " +
-                "soop_name LIKE '%" + soop + "%' AND " +
+                "soop_name LIKE '%" + escapedSoop + "%' AND " +
                 "level='" + level + "' ORDER BY begin_time";
     }
 
