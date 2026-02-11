@@ -302,7 +302,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     private void setImageData(@Nonnull ImageData newImageData) {
         long newMilli = newImageData.getMetaData().getViewpoint().time.milli;
-        if (newMilli == view.getFirstTime().milli) {
+        if (baseImageData == null || newMilli == view.getFirstTime().milli) {
             baseImageData = newImageData;
         }
 
