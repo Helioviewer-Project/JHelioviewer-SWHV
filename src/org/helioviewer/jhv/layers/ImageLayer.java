@@ -88,6 +88,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     public void load(APIRequest req) {
+        if (removed)
+            return;
         if (req.equals(getAPIRequest()))
             return;
 
@@ -100,10 +102,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     public void unload() {
         if (view.getBaseName() == null)
             JHVFrame.getLayers().remove(this);
-        if (worker != null) {
-            worker.cancel(true);
-            worker = null;
-        }
+        stopWorker();
     }
 
     @Override
@@ -156,10 +155,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     @Override
     public void remove(GL3 gl) {
-        if (worker != null) {
-            worker.cancel(true);
-            worker = null;
-        }
+        removed = true;
+        stopWorker();
         executor.abolish();
         unsetView();
         if (Display.multiview) {
@@ -167,7 +164,6 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         }
         dispose(gl);
         //System.gc(); // reclaim memory asap
-        removed = true;
     }
 
     @Override
@@ -331,6 +327,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     @Override
     public void handleData(ImageData newImageData) {
+        if (removed)
+            return;
         setImageData(newImageData);
         JHVFrame.getLayers().fireTimeUpdated(this);
         ImageLayers.displaySynced(imageData.getViewpoint());
@@ -382,6 +380,13 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     public boolean isLoadedForState() {
         return worker == null && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
+    }
+
+    private void stopWorker() {
+        if (worker != null) {
+            worker.cancel(true);
+            worker = null;
+        }
     }
 
     private Future<?> downloadTask;
