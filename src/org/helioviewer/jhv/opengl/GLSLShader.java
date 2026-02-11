@@ -52,9 +52,18 @@ abstract class GLSLShader {
     }
 
     protected final void _dispose(GL3 gl) {
-        gl.glDeleteShader(vertexID);
-        gl.glDeleteShader(fragmentID);
-        gl.glDeleteProgram(progID);
+        if (vertexID != 0) {
+            gl.glDeleteShader(vertexID);
+            vertexID = 0;
+        }
+        if (fragmentID != 0) {
+            gl.glDeleteShader(fragmentID);
+            fragmentID = 0;
+        }
+        if (progID != 0) {
+            gl.glDeleteProgram(progID);
+            progID = 0;
+        }
     }
 
     public final void use(GL3 gl) {
@@ -124,8 +133,10 @@ abstract class GLSLShader {
         if (cleanUp) {
             gl.glDetachShader(id, vertexID);
             gl.glDeleteShader(vertexID);
+            vertexID = 0;
             gl.glDetachShader(id, fragmentID);
             gl.glDeleteShader(fragmentID);
+            fragmentID = 0;
         }
         return id;
     }
