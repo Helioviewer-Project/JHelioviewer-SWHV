@@ -51,47 +51,54 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         }
     }
 
+    private static void transferFileList(List<?> objects) {
+        List<URI> imageUris = new ArrayList<>(objects.size());
+        List<URI> jsonUris = new ArrayList<>(objects.size());
+        List<URI> cdfUris = new ArrayList<>(objects.size());
+        for (Object o : objects) {
+            if (o instanceof File file) {
+                classifyFile(file, imageUris, jsonUris, cdfUris);
+            }
+        }
+
+        // jsonUris.forEach(Load.request::get);
+        Load.SunJSON.getAll(jsonUris);
+        Load.CDF.getAll(cdfUris);
+        Load.Image.getAll(imageUris);
+    }
+
+    private static void transferStringArray(String loc) {
+        String[] words = Regex.MultiCommaSpace.split(loc);
+
+        List<URI> imageUris = new ArrayList<>(words.length);
+        List<URI> jsonUris = new ArrayList<>(words.length);
+        List<URI> cdfUris = new ArrayList<>(words.length);
+        for (String word : words) {
+            try {
+                URI uri = new URI(word); // attempt to check if it's a URI
+                if (uri.getScheme() == null) { // maybe on filesystem
+                    classifyFile(new File(word), imageUris, jsonUris, cdfUris);
+                } else
+                    classifyUri(uri, imageUris, jsonUris, cdfUris);
+            } catch (Exception e) {
+                Log.warn("Not found: " + word, e);
+            }
+        }
+
+        Load.SunJSON.getAll(jsonUris);
+        Load.CDF.getAll(cdfUris);
+        Load.Image.getAll(imageUris);
+    }
+
     private static boolean transferData(Transferable transferable) {
         try {
             if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 List<?> objects = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-
-                List<URI> imageUris = new ArrayList<>(objects.size());
-                List<URI> jsonUris = new ArrayList<>(objects.size());
-                List<URI> cdfUris = new ArrayList<>(objects.size());
-                for (Object o : objects) {
-                    if (o instanceof File file) {
-                        classifyFile(file, imageUris, jsonUris, cdfUris);
-                    }
-                }
-
-                // jsonUris.forEach(Load.request::get);
-                Load.SunJSON.getAll(jsonUris);
-                Load.CDF.getAll(cdfUris);
-                Load.Image.getAll(imageUris);
+                new Thread(() -> transferFileList(objects), "JHV-TransferFileList").start(); // avoid file system operations on EDT
                 return true;
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 String loc = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                String[] words = Regex.MultiCommaSpace.split(loc);
-
-                List<URI> imageUris = new ArrayList<>(words.length);
-                List<URI> jsonUris = new ArrayList<>(words.length);
-                List<URI> cdfUris = new ArrayList<>(words.length);
-                for (String word : words) {
-                    try {
-                        URI uri = new URI(word); // attempt to check if it's a URI
-                        if (uri.getScheme() == null) { // maybe on filesystem
-                            classifyFile(new File(word), imageUris, jsonUris, cdfUris);
-                        } else
-                            classifyUri(uri, imageUris, jsonUris, cdfUris);
-                    } catch (Exception e) {
-                        Log.warn("Not found: " + word, e);
-                    }
-                }
-
-                Load.SunJSON.getAll(jsonUris);
-                Load.CDF.getAll(cdfUris);
-                Load.Image.getAll(imageUris);
+                new Thread(() -> transferStringArray(loc), "JHV-TransferStringArray").start(); // avoid file system operations on EDT
                 return true;
             }
         } catch (Exception e) {
