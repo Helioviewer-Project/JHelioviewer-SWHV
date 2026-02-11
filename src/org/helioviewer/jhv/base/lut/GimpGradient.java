@@ -122,7 +122,7 @@ class GimpGradient {
                     default ->
                             throw new Exception("Unknown blending color " + blendingColor + " for gimp gradient file");
                 }
-                r = Color.HSBtoRGB(lHSV[0], lHSV[1], lHSV[1]);
+                r = Color.HSBtoRGB(lHSV[0], lHSV[1], lHSV[2]);
             }
             // Set alpha value
             r |= appD(al + (ar - al) * f) << 24;
