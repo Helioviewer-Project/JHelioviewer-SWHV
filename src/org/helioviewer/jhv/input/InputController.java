@@ -103,7 +103,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void keyPressed(KeyEvent e) {
         KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource(), KeyEvent.KEY_PRESSED))
+        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource()))
             return;
 
         interaction.keyPressed(e);
