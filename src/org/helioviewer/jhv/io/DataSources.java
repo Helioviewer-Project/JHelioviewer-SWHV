@@ -75,7 +75,6 @@ public class DataSources {
                 put("GSFC", getSourceMap("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null)).
                 put("ESAC", getSourceMap("https://soar.esac.esa.int/jpip-api/v2/", "European Space Astronomy Center", null)).
                 build();
-        toLoad = serverSettings.size();
     }
 
     static Set<String> getServers() {
@@ -89,6 +88,7 @@ public class DataSources {
     }
 
     public static void loadSources() {
+        toLoad = serverSettings.size();
         serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName));
     }
 
