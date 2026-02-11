@@ -52,7 +52,7 @@ public class SampClient extends HubConnector {
                 }
             }
             instance = new SampClient(DefaultClientProfile.getProfile());
-        }).start();
+        }, "JHV-StartSamp").start();
     }
 
     private static URI toURI(String url) throws Exception {

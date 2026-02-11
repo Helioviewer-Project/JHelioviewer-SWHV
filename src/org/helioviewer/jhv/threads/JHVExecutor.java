@@ -26,8 +26,7 @@ class JHVExecutor {
                             executorService.shutdown();
                     }
                 };
-
-        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "JHV-ShutdownHook"));
     }
 
 }

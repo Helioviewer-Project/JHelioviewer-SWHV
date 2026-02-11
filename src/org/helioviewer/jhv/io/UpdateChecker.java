@@ -62,7 +62,7 @@ public class UpdateChecker {
                 if (verbose)
                     Message.warn("Update check error", "While checking for a newer version got " + e.getMessage());
             }
-        }, "Update Checker").start();
+        }, "JHV-CheckUpdate").start();
     }
 
 }
