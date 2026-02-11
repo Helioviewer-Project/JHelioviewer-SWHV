@@ -58,6 +58,8 @@ public class GLSLSolarShader extends GLSLShader {
 
     private static void setupUBO(GL3 gl, int programID, String blockName, int uboID, int binding) {
         int blockIndex = gl.glGetUniformBlockIndex(programID, blockName);
+        if (blockIndex < 0)
+            return;
         gl.glUniformBlockBinding(programID, blockIndex, binding);
         gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, binding, uboID);
     }
