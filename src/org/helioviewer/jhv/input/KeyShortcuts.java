@@ -22,7 +22,7 @@ public class KeyShortcuts {
     static boolean handleKeyStroke(KeyStroke keyStroke, Object source, int id) {
         Action action = actionMap.get(keyStroke);
         if (action != null) {
-            EventQueue.invokeLater(() -> action.actionPerformed(new ActionEvent(source, id, null)));
+            EventQueue.invokeLater(() -> action.actionPerformed(new ActionEvent(source, ActionEvent.ACTION_PERFORMED, null)));
             return true;
         }
         return false;
