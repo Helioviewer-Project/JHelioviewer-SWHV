@@ -466,6 +466,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void dispose(GL3 gl) {
         lineEvent.dispose(gl);
         lineThick.dispose(gl);
+        glslTexture.dispose(gl);
         iconCacheId.values().forEach(el -> el.delete(gl));
         iconCacheId.clear();
     }
