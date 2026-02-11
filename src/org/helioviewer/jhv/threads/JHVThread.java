@@ -8,7 +8,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 
@@ -51,17 +50,17 @@ public class JHVThread {
     }
 
     public record NamedClassThreadFactory(Class<? extends Thread> clazz, String name) implements ThreadFactory {
-        @Nullable
         @Override
         public Thread newThread(@Nonnull Runnable r) {
+            Thread t;
             try {
-                Thread t = clazz.getConstructor(Runnable.class, String.class).newInstance(r, name);
-                t.setDaemon(true);
-                return t;
+                t = clazz.getConstructor(Runnable.class, String.class).newInstance(r, name);
             } catch (Exception e) {
                 Log.error(e);
+                t = new Thread(r, name);
             }
-            return null;
+            t.setDaemon(true);
+            return t;
         }
     }
 
