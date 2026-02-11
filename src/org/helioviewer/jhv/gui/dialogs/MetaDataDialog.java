@@ -153,7 +153,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 } catch (Exception ex) {
                     Log.error("Failed to write metadata", ex);
                 }
-            }).start());
+            }, "JHV-ExportMetadata").start());
         } catch (Exception e) {
             Log.error(e);
         }

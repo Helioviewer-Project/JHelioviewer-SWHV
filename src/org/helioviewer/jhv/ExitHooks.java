@@ -10,7 +10,7 @@ public class ExitHooks {
         } catch (Exception e) {
             Log.warn("Movie was not shut down properly");
         }
-    });
+    }, "JHV-FinishMovie");
 
     public static void attach() {
         // At the moment this runs, the EventQueue is blocked (by enforcing to run System.exit on it which is blocking)

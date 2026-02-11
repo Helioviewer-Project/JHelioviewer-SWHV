@@ -35,7 +35,7 @@ public class LocationChecker {
                 Settings.setProperty("default.server", "GSFC");
                 Log.warn(e);
             }
-        }, "Location Checker").start();
+        }, "JHV-CheckLocation").start();
     }
 
 }
