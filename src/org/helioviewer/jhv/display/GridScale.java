@@ -52,8 +52,12 @@ public interface GridScale {
         public void set(double _xStart, double _xStop, double _yStart, double _yStop) {
             xStart = _xStart;
             xStop = _xStop;
+            if (xStart == xStop)
+                xStop = Math.nextUp(xStart);
             yStart = scaleY(_yStart);
             yStop = scaleY(_yStop);
+            if (yStart == yStop)
+                yStop = Math.nextUp(yStart);
         }
 
         @Override
