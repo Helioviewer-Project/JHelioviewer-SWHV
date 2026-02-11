@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
@@ -20,6 +21,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 class MovieExporter {
 
+    private static final long FFMPEG_TIMEOUT_MINUTES = 30;
     private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
 
     private final String prefix;
@@ -120,7 +122,13 @@ class MovieExporter {
                     .redirectOutput(File.createTempFile("ffout", null, JHVGlobals.exportCacheDir))
                     .command(command);
 
-            int exitCode = builder.start().waitFor();
+            Process process = builder.start();
+            boolean finished = process.waitFor(FFMPEG_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+            if (!finished) {
+                process.destroyForcibly();
+                throw new Exception("FFmpeg timed out after " + FFMPEG_TIMEOUT_MINUTES + " minutes");
+            }
+            int exitCode = process.exitValue();
             if (exitCode != 0)
                 throw new Exception("FFmpeg exit code " + exitCode);
 
