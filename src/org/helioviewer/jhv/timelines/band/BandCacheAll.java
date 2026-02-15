@@ -75,13 +75,11 @@ class BandCacheAll implements BandCache {
     public float getValue(long ts) {
         if (first == null || ts < first.milli || ts > last.milli) // if first is not null, last cannot be null
             return YAxis.BLANK;
-        if (ts == last.milli) // avoid off-by-1
-            return dateVals.getLast().value;
 
         int low = 0, high = dateVals.size();
         while (low != high) {
             int mid = (low + high) / 2;
-            if (dateVals.get(mid).milli <= ts) {
+            if (dateVals.get(mid).milli < ts) {
                 low = mid + 1;
             } else {
                 high = mid;
