@@ -3,7 +3,6 @@ package org.helioviewer.jhv.time;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -106,10 +105,11 @@ public class TimeUtils {
         return LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).toEpochDay() * DAY_IN_MILLIS;
     }
 
-    public static long parseTime(String date) {
-        return LocalTime.parse(date, DateTimeFormatter.ISO_LOCAL_TIME).toSecondOfDay() * 1000L;
-    }
-
+    /*
+        public static long parseTime(String date) {
+            return LocalTime.parse(date, DateTimeFormatter.ISO_LOCAL_TIME).toSecondOfDay() * 1000L;
+        }
+    */
     public static long optParse(String date, long alt) {
         String spice = Spice.timeParse2UTC(date);
         if (spice != null) { // understood by SPICE, may still fail Java parser

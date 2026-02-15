@@ -31,7 +31,8 @@ class J2KParams {
             result = 31 * result + fr;
             result = 31 * result + si.hashCode();
             result = 31 * result + l;
-            return 31 * result + Float.floatToRawIntBits(f);
+            int factorHash = (f == 0f) ? 0 : Float.floatToRawIntBits(f); // collapse +0.0f and -0.0f
+            return 31 * result + factorHash;
         }
 
         @Override
