@@ -28,6 +28,7 @@ import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.OrthoScaleList;
 import org.helioviewer.jhv.layers.connect.SunJSONTypes;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -166,7 +167,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private static Vec3 interpolate(long t, Position.Cartesian prev, Position.Cartesian next) {
         long tprev = prev.milli();
         long tnext = next.milli();
-        double alpha = tnext == tprev ? 1. : ((t - tprev) / (double) (tnext - tprev)) % 1.;
+        double alpha = tnext == tprev ? 1. : MathUtils.clip((t - tprev) / (double) (tnext - tprev), 0, 1);
         double x = (1. - alpha) * prev.x() + alpha * next.x();
         double y = (1. - alpha) * prev.y() + alpha * next.y();
         double z = (1. - alpha) * prev.z() + alpha * next.z();
