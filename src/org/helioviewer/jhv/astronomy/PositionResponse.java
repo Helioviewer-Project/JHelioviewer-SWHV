@@ -92,7 +92,8 @@ public class PositionResponse {
             hglt = 0;
         } else {
             hgln = Math.atan2(y, x);
-            hglt = Math.asin(z / dist);
+            double sinLat = MathUtils.clip(z / dist, -1., 1.);
+            hglt = Math.asin(sinLat);
         }
         lati[0] = dist;
         lati[1] = hgln;
@@ -132,7 +133,8 @@ public class PositionResponse {
             hgln = Math.atan2(y, x);
             if (hgln < 0)
                 hgln += 2 * Math.PI;
-            hglt = Math.asin(z / dist);
+            double sinLat = MathUtils.clip(z / dist, -1., 1.);
+            hglt = Math.asin(sinLat);
         }
         return new Position(new JHVTime(time), dist, -hgln, hglt).setLocation(location);
     }
