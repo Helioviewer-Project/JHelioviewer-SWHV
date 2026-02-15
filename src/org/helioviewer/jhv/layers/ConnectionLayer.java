@@ -167,12 +167,13 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private static Vec3 interpolate(long t, Position.Cartesian prev, Position.Cartesian next) {
         long tprev = prev.milli();
         long tnext = next.milli();
-        double alpha = tnext == tprev ? 1. : MathUtils.clip((t - tprev) / (double) (tnext - tprev), 0, 1);
+        double alpha = tnext == tprev ? 1. : MathUtils.clip((t - tprev) / (double) (tnext - tprev), 0., 1.);
         double x = (1. - alpha) * prev.x() + alpha * next.x();
         double y = (1. - alpha) * prev.y() + alpha * next.y();
         double z = (1. - alpha) * prev.z() + alpha * next.z();
 
-        return new Vec3(1, Math.acos(y), Math.atan2(x, z));
+        double theta = Math.acos(MathUtils.clip(y, -1., 1.));
+        return new Vec3(1, theta, Math.atan2(x, z));
     }
 
     private void drawFootpointInterpolated(Camera camera, Viewport vp, GL3 gl) {
