@@ -101,15 +101,10 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         long aWidth = availableInterval.end() - availableInterval.start();
         double ratioX = availableIntervalWidth / (double) (aWidth == 0 ? 1 : aWidth);
 
-        int min = DrawConstants.GRAPH_LEFT_SPACE;
-        if (movieStart >= availableInterval.start()) {
-            min += (int) ((movieStart - availableInterval.start()) * ratioX);
-        }
-
-        int max = DrawConstants.GRAPH_LEFT_SPACE + availableIntervalWidth;
-        if (movieEnd >= availableInterval.start()) {
-            max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((movieEnd - availableInterval.start()) * ratioX);
-        }
+        long clampedStart = Math.max(movieStart, availableInterval.start());
+        long clampedEnd = Math.min(movieEnd, availableInterval.end());
+        int min = DrawConstants.GRAPH_LEFT_SPACE + (int) ((clampedStart - availableInterval.start()) * ratioX);
+        int max = DrawConstants.GRAPH_LEFT_SPACE + (int) ((clampedEnd - availableInterval.start()) * ratioX);
 
         int offset = 7;
         g.setColor(UIGlobals.TL_MOVIE_INTERVAL_COLOR);
