@@ -69,12 +69,12 @@ public class DataSources {
             }
         }
 
-        serverSettings = builder.
+        builder.
                 put("ROB", getSourceMap("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?")).
                 put("IAS", getSourceMap("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null)).
                 put("GSFC", getSourceMap("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null)).
-                put("ESAC", getSourceMap("https://soar.esac.esa.int/jpip-api/v2/", "European Space Astronomy Center", null)).
-                build();
+                put("ESAC", getSourceMap("https://soar.esac.esa.int/jpip-api/v2/", "European Space Astronomy Center", null));
+        serverSettings = builder.buildKeepingLast(); // Avoid crash on duplicated server names
     }
 
     static Set<String> getServers() {
