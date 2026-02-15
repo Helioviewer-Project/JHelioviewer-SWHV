@@ -228,7 +228,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (nrPropagatedAxes + 1));
         int nrRightAxes = Math.max(0, TimelineLayers.getNumberOfYAxes() - 1);
         int width = graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + nrRightAxes * DrawConstants.RIGHT_AXIS_WIDTH);
-        graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, width, height);
+        graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, Math.max(1, width), Math.max(1, height));
     }
 
     public static Rectangle getGraphArea() {
