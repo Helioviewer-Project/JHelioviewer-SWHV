@@ -215,7 +215,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int numberOfDays = (int) Math.round(diffMillis / (double) TimeUtils.DAY_IN_MILLIS);
         int tickCount = Math.min(numberOfDays, maxTicks);
         double ratioDays = Math.ceil(numberOfDays / (double) tickCount);
-        for (int i = 0; i < maxTicks; ++i) {
+        for (int i = 0; i < tickCount; ++i) {
             calendar.set(startYear, startMonth, startDay, 0, 0, 0);
             calendar.add(Calendar.DAY_OF_MONTH, (int) (i * ratioDays));
             long time = calendar.getTimeInMillis();
@@ -248,7 +248,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int tickCount = Math.min(numberOfMonths, maxTicks);
         double ratioMonth = Math.ceil(numberOfMonths / (double) tickCount);
 
-        for (int i = 0; i < maxTicks; ++i) {
+        for (int i = 0; i < tickCount; ++i) {
             calendar.set(startYear, startMonth, 1, 0, 0, 0);
             calendar.add(Calendar.MONTH, (int) (i * ratioMonth));
             long time = calendar.getTimeInMillis();
