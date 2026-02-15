@@ -108,7 +108,8 @@ public final class TimeSelectorPanel extends JPanel {
     private void carringtonChanged() {
         long time = carringtonPicker.getTime();
         int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL) + 1;
-        setTime(time, Carrington.CR_start[Math.min(cr, Carrington.CR_start.length - 1)]);
+        long end = cr < Carrington.CR_start.length ? Carrington.CR_start[cr] : TimeUtils.MAXIMAL_TIME.milli;
+        setTime(time, end);
     }
 
     public void setTime(long start, long end) {
