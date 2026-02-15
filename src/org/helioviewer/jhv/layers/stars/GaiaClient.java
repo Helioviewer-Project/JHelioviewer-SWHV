@@ -19,6 +19,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
@@ -190,10 +191,14 @@ public class GaiaClient {
     // big angles
     private static void calcProj3(double P, double alpha, double delta, double alpha0, double delta0, double[] theta) {
         double phi = Math.atan2(Math.sin(alpha - alpha0), Math.tan(delta) * Math.cos(delta0) - Math.sin(delta0) * Math.cos(alpha - alpha0));
-        double rho = Math.acos(Math.cos(delta) * Math.cos(delta0) * Math.cos(alpha - alpha0) + Math.sin(delta) * Math.sin(delta0));
+
+        double clamp = MathUtils.clip(Math.cos(delta) * Math.cos(delta0) * Math.cos(alpha - alpha0) + Math.sin(delta) * Math.sin(delta0), -1, 1);
+        double rho = Math.acos(clamp);
 
         theta[0] = Math.atan(-Math.tan(rho) * Math.sin(phi - P));
-        theta[1] = Math.asin(Math.sin(rho) * Math.cos(phi - P));
+
+        clamp = MathUtils.clip(Math.sin(rho) * Math.cos(phi - P), -1, 1);
+        theta[1] = Math.asin(clamp);
     }
 
 // --Commented out by Inspection START (23/06/2024, 23:15):
