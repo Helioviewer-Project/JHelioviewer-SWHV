@@ -244,9 +244,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int endYear = calendar.get(Calendar.YEAR);
         int endMonth = calendar.get(Calendar.MONTH);
 
-        int yearDifference = endYear - startYear;
-        int monthDifference = endMonth - startMonth;
-        int numberOfMonths = monthDifference > 0 ? yearDifference * 12 + monthDifference + 1 : yearDifference * 12 - monthDifference + 1;
+        int numberOfMonths = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
         int tickCount = Math.min(numberOfMonths, maxTicks);
         double ratioMonth = Math.ceil(numberOfMonths / (double) tickCount);
 
