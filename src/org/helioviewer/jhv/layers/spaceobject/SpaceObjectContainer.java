@@ -100,6 +100,8 @@ public final class SpaceObjectContainer extends JScrollPane {
     }
 
     private void selectTarget(SpaceObject target, ListSelectionModel selectionModel) {
+        if (target == null)
+            return;
         int idx = model.indexOf(target);
         if (idx != -1) { // found
             selectionModel.setSelectionInterval(idx, idx); // highlight in table
