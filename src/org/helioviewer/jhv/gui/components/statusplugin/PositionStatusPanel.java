@@ -64,6 +64,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                     Vec3 v_a = v.x < 0 ?
                             Vec3.cross(Vec3.cross(vva, Vec3.YAxis), Vec3.cross(Vec3.ZAxis, v_m)) :
                             Vec3.cross(Vec3.cross(Vec3.ZAxis, v_m), Vec3.cross(vva, Vec3.YAxis));
+                    v_a.normalize();
                     //System.out.println(">>> " + vva + " " + v_a);
 
                     double alpha = Math.atan2(r, viewpoint.distance);
