@@ -39,7 +39,7 @@ interface GridTransform {
     class GridTransformLatitudinal implements GridTransform {
         @Override
         public Vec2 transform(Vec3 v, GridScale scale) {
-            double theta = Math.asin(-v.y);
+            double theta = Math.asin(MathUtils.clip(-v.y, -1., 1.));
             double phi = Math.atan2(v.x, v.z);
             double scaledphi = scale.getXValueInv(phi * MathUtils.radeg);
             double scaledtheta = scale.getYValueInv(theta * MathUtils.radeg);
