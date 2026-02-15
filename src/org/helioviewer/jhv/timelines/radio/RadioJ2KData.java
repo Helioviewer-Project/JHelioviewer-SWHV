@@ -45,6 +45,9 @@ class RadioJ2KData implements ImageData.Handler {
             startFreq = hvMetaData.getRequiredDouble("END-FREQ");
             startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
             endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
+            if (endDate <= startDate || endFreq <= startFreq) {
+                throw new IllegalArgumentException("Invalid radio metadata range");
+            }
 
             view = _view;
             view.setDataHandler(this);
