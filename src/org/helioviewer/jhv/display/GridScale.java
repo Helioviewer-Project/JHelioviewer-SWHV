@@ -207,7 +207,7 @@ public interface GridScale {
                 p = q.rotateInverseVector(p);
             }
 
-            double theta = Math.asin(p.y) * MathUtils.radeg;
+            double theta = Math.asin(MathUtils.clip(p.y, -1., 1.)) * MathUtils.radeg;
             double phi = Math.atan2(p.x, p.z) * MathUtils.radeg;
 
             if (gridType == GridType.Carrington && phi < 0)
