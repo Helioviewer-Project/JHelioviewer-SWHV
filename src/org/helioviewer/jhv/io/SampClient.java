@@ -195,6 +195,11 @@ public class SampClient extends HubConnector {
     }
 
     public static void notifyRequestData() {
+        if (instance == null) {
+            Log.warn("SAMP client not initialized yet");
+            return;
+        }
+
         Message msg = new Message("jhv.vso.load");
         ImageLayers.getSAMPMessage(msg);
         try {
