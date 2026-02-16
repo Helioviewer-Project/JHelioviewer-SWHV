@@ -14,6 +14,9 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
     public static final int CallistoID = 5000;
 
     public APIRequest {
+        if (endTime < startTime)
+            endTime = startTime;
+
         long expand = (RANGE_EXPAND - (endTime - startTime)) / 2;
         if (startTime != endTime && expand > 0) {
             startTime = startTime - expand;
