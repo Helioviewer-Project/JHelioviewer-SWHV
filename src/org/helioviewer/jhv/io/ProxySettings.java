@@ -33,7 +33,8 @@ public class ProxySettings {
                 protected PasswordAuthentication getPasswordAuthentication() {
                     String[] vars = proxy.type() == Proxy.Type.HTTP ? httpVars : socksVars;
                     String host = System.getProperty(vars[0]);
-                    if (getRequestingHost().equalsIgnoreCase(host)) {
+                    String requestingHost = getRequestingHost();
+                    if (requestingHost != null && requestingHost.equalsIgnoreCase(host)) {
                         // if (getRequestorType() == RequestorType.PROXY)
                         String port = System.getProperty(vars[1]);
                         String user = System.getProperty(vars[2]);
