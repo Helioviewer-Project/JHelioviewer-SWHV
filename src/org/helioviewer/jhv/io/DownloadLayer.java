@@ -45,12 +45,15 @@ public class DownloadLayer {
                 while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
                     totalRead += bytesRead;
                     count++;
+                    // stream out buffered data during download to avoid large memory growth
+                    sink.emitCompleteSegments();
 
-                    if (count % 128 == 0) { // approx 1MB
+                    if (count % 8 == 0) { // approx 8MB with BUFSIZ=1MB
                         int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
                         EventQueue.invokeLater(() -> layer.progressDownload(percent));
                     }
                 }
+                sink.flush();
             }
             return null;
         }
