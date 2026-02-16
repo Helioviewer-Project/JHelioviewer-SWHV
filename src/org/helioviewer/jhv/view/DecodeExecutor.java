@@ -18,15 +18,13 @@ public class DecodeExecutor {
             MoreExecutors.listeningDecorator(
                     new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
                             new JHVThread.NamedThreadFactory("Decoder"),
-                            new ThreadPoolExecutor.DiscardPolicy())));
+                            new ThreadPoolExecutor.DiscardOldestPolicy())));
 
     public void decode(Callable<ImageBuffer> callable, DecodeCallback callback) {
-        blockingQueue.poll();
         executor.submit(callable, callback);
     }
 
     public void abolish() {
-        blockingQueue.poll();
         executor.shutdown();
     }
 
