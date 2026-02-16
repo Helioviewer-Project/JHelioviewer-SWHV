@@ -366,7 +366,7 @@ public class BandReaderHapi {
     private static long toMillis(String isoTime) throws Exception {
         double seconds = Times.isoToUnixSeconds(isoTime);
         if (Double.isFinite(seconds)) {
-            return (long) (seconds * 1000 + 0.0005);
+            return (long) (seconds * 1000 + 0.5);
         } else {
             throw new Exception("Could not parse ISO-8601 string: " + isoTime);
         }
