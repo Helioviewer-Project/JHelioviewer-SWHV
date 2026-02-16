@@ -14,6 +14,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,7 +88,7 @@ public class FileUtils {
                             if (parent != null)
                                 Files.createDirectories(parent);
                             // And extract the file
-                            Files.copy(filePath, targetPath);
+                            Files.copy(filePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                             uriList.add(targetPath.toUri());
                         } // else attempted path traversal
 
