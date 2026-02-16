@@ -109,9 +109,8 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e.getURL() == null) {
                 String res = e.getDescription();
-                String name = res.substring(Math.max(0, res.lastIndexOf('/') + 1));
                 try (InputStream is = FileUtils.getResource(res)) {
-                    new TextDialog("License - " + name.substring(0, name.indexOf('.')), FileUtils.streamToString(is), true).showDialog();
+                    new TextDialog("License", FileUtils.streamToString(is), true).showDialog();
                 } catch (Exception ex) {
                     Log.error(ex);
                 }
