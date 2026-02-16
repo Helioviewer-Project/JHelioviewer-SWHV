@@ -95,7 +95,13 @@ public class CommandLine {
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {
                 if (param.equals(arguments[i]) && arguments.length > i + 1) {
-                    values.add(arguments[i + 1]);
+                    String value = arguments[i + 1];
+                    if (value.startsWith("-")) {
+                        Log.warn("Missing value for command line option: " + param);
+                        continue;
+                    }
+                    values.add(value);
+                    i++; // consume option argument
                 }
             }
         }
