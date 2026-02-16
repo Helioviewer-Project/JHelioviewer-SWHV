@@ -62,6 +62,9 @@ class ChunkedInputStream extends InputStream implements TotalLength {
         if (closed) {
             throw new IOException("Attempt to read from closed stream");
         }
+        if (len == 0) {
+            return 0;
+        }
 
         while (true) {
             if (eof)
