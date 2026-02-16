@@ -183,7 +183,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
                 g.setColor(completeColor);
                 g.drawLine(trackRect.x, y, trackRect.x + trackRect.width, y);
             } else {
-                int len = view.getMaximumFrameNumber();
+                int len = view.getMaximumFrameNumber() + 1; // frames are 0..max inclusively
                 for (int i = 0; i < len; i++) {
                     int begin = (int) ((float) i / len * trackRect.width);
                     int end = (int) ((float) (i + 1) / len * trackRect.width);
