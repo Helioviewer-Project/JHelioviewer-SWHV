@@ -39,6 +39,9 @@ class FixedSizedInputStream extends InputStream implements TotalLength {
 
     @Override
     public int read(@Nonnull byte[] b, int off, int len) throws IOException {
+        if (len == 0) {
+            return 0;
+        }
         if (remainingBytes > 0) {
             int bytesRead = in.read(b, off, Math.min(len, remainingBytes));
             if (bytesRead == -1) {
