@@ -125,7 +125,7 @@ class TimeField extends JTextField {
     }
 
     void setTime(long time) {
-        if (time > TimeUtils.MINIMAL_TIME.milli && time < TimeUtils.MAXIMAL_TIME.milli)
+        if (time >= TimeUtils.MINIMAL_TIME.milli && time <= TimeUtils.MAXIMAL_TIME.milli)
             calendar.setTimeInMillis(TimeUtils.floorSec(time));
         setText(TimeUtils.formatShort(getTime()));
     }
