@@ -133,7 +133,6 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         soopQuery.addItemListener(e -> {
             boolean selected = soopQuery.isSelected();
             if (selected && !soopsDownloaded) {
-                soopsDownloaded = true;
                 SoarClient.submitGetSoops(this);
             }
             soopCombo.setEnabled(selected);
@@ -236,6 +235,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
     @Override
     public void setSoarResponseSoops(List<String> list) {
         soopCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
+        soopsDownloaded = true; // mark loaded only after successful callback
         if (!list.isEmpty())
             soopCombo.setSelectedIndex(0);
     }
