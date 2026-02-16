@@ -77,7 +77,7 @@ class CarringtonPicker extends JideButton implements PopupMenuListener {
     }
 
     void setTime(long _time) {
-        if (_time > TimeUtils.MINIMAL_TIME.milli && _time < TimeUtils.MAXIMAL_TIME.milli)
+        if (_time >= TimeUtils.MINIMAL_TIME.milli && _time <= TimeUtils.MAXIMAL_TIME.milli)
             time = _time;
     }
 
