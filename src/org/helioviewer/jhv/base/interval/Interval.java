@@ -31,7 +31,7 @@ public class Interval implements Comparable<Interval> {
     }
 
     @Nonnull
-    public static List<Interval> splitInterval(Interval interval, int days) {
+    public static List<Interval> splitInterval(Interval interval, int days) { // should check if days > 0
         List<Interval> intervals = new ArrayList<>();
         long startDate = interval.start;
 

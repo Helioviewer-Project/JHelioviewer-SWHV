@@ -31,21 +31,6 @@ public class JHVGlobals {
     public static final Tika tika = new Tika();
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 
-    private static int readTimeout = -1;
-    private static int connectTimeout = -1;
-
-    public static int getReadTimeout() {
-        if (readTimeout == -1)
-            readTimeout = Integer.parseInt(Settings.getProperty("timeout.read"));
-        return readTimeout;
-    }
-
-    public static int getConnectTimeout() {
-        if (connectTimeout == -1)
-            connectTimeout = Integer.parseInt(Settings.getProperty("timeout.connect"));
-        return connectTimeout;
-    }
-
     public static void getVersion() {
         try (InputStream is = JHVGlobals.class.getResourceAsStream("/version.properties")) {
             Properties p = new Properties();
