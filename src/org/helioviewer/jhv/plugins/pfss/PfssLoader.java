@@ -71,7 +71,11 @@ class PfssLoader {
                             Log.warn("Skipping invalid PFSS list line: " + line);
                             continue;
                         }
-                        uris.put(TimeUtils.parse(splitted[0]), new URI(PfssSettings.BASE_URL + splitted[1]));
+                        try {
+                            uris.put(TimeUtils.parse(splitted[0]), new URI(PfssSettings.BASE_URL + splitted[1]));
+                        } catch (Exception e) {
+                            Log.warn("Skipping malformed PFSS list entry: " + line, e);
+                        }
                     }
                 } catch (Exception e) { // continue in case of list error
                     Log.warn("PFSS list error", e);
