@@ -5,7 +5,7 @@ import java.io.File;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 
@@ -16,7 +16,7 @@ public class LoadStateDialog {
         FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
         // does not work on Windows
         fileDialog.setFilenameFilter(ExtensionFileFilter.JHV);
-        fileDialog.setDirectory(JHVDirectory.STATES.getPath());
+        fileDialog.setDirectory(Settings.getProperty("path.state"));
         fileDialog.setVisible(true);
 
         File[] fileNames = fileDialog.getFiles();
