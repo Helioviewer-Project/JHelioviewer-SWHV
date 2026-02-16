@@ -206,6 +206,8 @@ class J2KReader implements Runnable {
                     params.priority = false;
                     readerSignal.signal(params);
                 }
+                // retry limit applies to consecutive failures only
+                retries = 0;
             } catch (Exception e) {
                 view.setDownloading(false);
                 try {
