@@ -62,9 +62,15 @@ class PfssLoader {
                 try (NetClient nc = NetClient.of(listUri); BufferedSource source = nc.getSource()) {
                     String line;
                     while ((line = source.readUtf8Line()) != null) {
-                        String[] splitted = Regex.Space.split(line);
-                        if (splitted.length != 2)
-                            throw new Exception("Invalid line: " + line);
+                        String trimmed = line.trim();
+                        if (trimmed.isEmpty())
+                            continue;
+
+                        String[] splitted = Regex.MultiSpace.split(trimmed);
+                        if (splitted.length != 2) {
+                            Log.warn("Skipping invalid PFSS list line: " + line);
+                            continue;
+                        }
                         uris.put(TimeUtils.parse(splitted[0]), new URI(PfssSettings.BASE_URL + splitted[1]));
                     }
                 } catch (Exception e) { // continue in case of list error
