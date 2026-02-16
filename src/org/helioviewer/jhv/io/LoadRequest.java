@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -31,7 +32,7 @@ class LoadRequest {
 
     static void submitCDF(@Nonnull List<URI> uriList) {
         EDTCallbackExecutor.pool.submit(new LoadRequestCDF(uriList), new CallbackCDF());
-        Timelines.dc.setStatus("Loading...");
+        EventQueue.invokeLater(() -> Timelines.dc.setStatus("Loading...")); // May come via a background thread from JHVTransferHandler
     }
 
     private static void parseRequest(JSONObject jo) throws Exception {
