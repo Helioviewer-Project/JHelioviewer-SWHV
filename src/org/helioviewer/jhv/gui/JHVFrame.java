@@ -6,7 +6,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Optional;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -150,21 +149,30 @@ public class JHVFrame {
 
         frame.setMinimumSize(minSize);
 
-        int preferredWidth = Optional.ofNullable(System.getenv("JHV_PREFERRED_WIDTH"))
-                .map(Integer::parseInt)
-                .filter(w -> w > 0)
-                .orElse(maxSize.width - 100);
-
-        int preferredHeight = Optional.ofNullable(System.getenv("JHV_PREFERRED_HEIGHT"))
-                .map(Integer::parseInt)
-                .filter(h -> h > 0)
-                .orElse(maxSize.height - 100);
+        int preferredWidth = readPositiveEnv("JHV_PREFERRED_WIDTH", maxSize.width - 100);
+        int preferredHeight = readPositiveEnv("JHV_PREFERRED_HEIGHT", maxSize.height - 100);
+        preferredWidth = Math.min(preferredWidth, maxSize.width);
+        preferredHeight = Math.min(preferredHeight, maxSize.height);
 
         frame.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
 
         frame.setIconImage(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL).getImage());
 
         return frame;
+    }
+
+    private static int readPositiveEnv(String name, int fallback) {
+        String raw = System.getenv(name);
+        if (raw == null || raw.isBlank())
+            return fallback;
+
+        try {
+            int value = Integer.parseInt(raw.trim());
+            if (value > 0)
+                return value;
+        } catch (NumberFormatException ignore) {
+        }
+        return fallback;
     }
 
     public static JFrame getFrame() {
