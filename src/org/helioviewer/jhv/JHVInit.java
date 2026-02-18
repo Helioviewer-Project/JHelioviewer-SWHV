@@ -78,23 +78,23 @@ class JHVInit {
         libs.add(System.mapLibraryName("kdu_jni"));
         libs.add(System.mapLibraryName("JNISpice"));
 
-        List<String> xtract = new ArrayList<>(libs);
-        xtract.add("ffmpeg");
-
         String fullDir = "/jhv/" + pathlib;
-        xtract.parallelStream().forEach(x -> {
-            try (InputStream in = FileUtils.getResource(fullDir + x)) {
-                Files.copy(in, Path.of(JHVGlobals.libCacheDir, x));
+        libs.parallelStream().forEach(l -> {
+            try (InputStream in = FileUtils.getResource(fullDir + l)) {
+                Path libraryPath = Path.of(JHVGlobals.libCacheDir, l);
+                Files.copy(in, libraryPath);
+                System.load(libraryPath.toString());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
 
-        if (!Platform.isWindows())
-            Files.setPosixFilePermissions(Path.of(JHVGlobals.libCacheDir, "ffmpeg"), Set.of(PosixFilePermission.OWNER_EXECUTE));
-        for (String l : libs) {
-            System.load(Path.of(JHVGlobals.libCacheDir, l).toString());
+        Path ffmpegPath = Path.of(JHVGlobals.libCacheDir, "ffmpeg");
+        try (InputStream in = FileUtils.getResource(fullDir + "ffmpeg")) {
+            Files.copy(in, ffmpegPath);
         }
+        if (!Platform.isWindows())
+            Files.setPosixFilePermissions(ffmpegPath, Set.of(PosixFilePermission.OWNER_EXECUTE));
     }
 
     private static void loadKernels() throws Exception {
