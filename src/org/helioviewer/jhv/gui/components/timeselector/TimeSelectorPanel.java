@@ -117,7 +117,10 @@ public final class TimeSelectorPanel extends JPanel {
         carringtonPicker.setTime(start);
         startField.setTime(start);
         endField.setTime(finalEnd);
-        listeners.forEach(listener -> listener.timeSelectionChanged(start, finalEnd));
+
+        long realStart = startField.getTime();
+        long realEnd = endField.getTime();
+        listeners.forEach(listener -> listener.timeSelectionChanged(realStart, realEnd));
     }
 
     public long getStartTime() {
