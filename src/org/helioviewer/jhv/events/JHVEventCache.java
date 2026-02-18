@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
@@ -17,7 +16,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 public class JHVEventCache {
 
     private static final double FACTOR = 0.2;
-    private static final long MAX_EVENT_DURATION = TimeUtils.DAY_IN_MILLIS * 14; 
+    private static final long MAX_EVENT_DURATION = TimeUtils.DAY_IN_MILLIS * 14;
 
     private static final HashSet<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
     private static final HashMap<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> events = new HashMap<>();
@@ -120,9 +119,9 @@ public class JHVEventCache {
             TreeMap<Long, List<JHVRelatedEvents>> supplierMap = events.get(evt);
             if (supplierMap != null) {
                 // Find all events starting after (start - max duration)
-                SortedMap<Long, List<JHVRelatedEvents>> relevantRange = 
-                    supplierMap.tailMap(start - MAX_EVENT_DURATION);
-                
+                SortedMap<Long, List<JHVRelatedEvents>> relevantRange =
+                        supplierMap.tailMap(start - MAX_EVENT_DURATION);
+
                 for (List<JHVRelatedEvents> list : relevantRange.values()) {
                     for (JHVRelatedEvents event : list) {
                         if (event.getStart() <= end && event.getEnd() >= start) {
