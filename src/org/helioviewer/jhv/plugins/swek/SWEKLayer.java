@@ -445,13 +445,16 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         super.setEnabled(_enabled);
 
         if (enabled) {
+            JHVEventCache.registerHandler(this);
             Movie.addTimeRangeListener(this);
             Movie.addTimeListener(controller);
             JHVFrame.getInputController().addPlugin(controller);
+            requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
             JHVFrame.getInputController().removePlugin(controller);
             Movie.removeTimeListener(controller);
             Movie.removeTimeRangeListener(this);
+            JHVEventCache.unregisterHandler(this);
         }
     }
 
@@ -495,6 +498,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     @Override
     public void cacheUpdated() {
+        if (!enabled)
+            return;
         requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
     }
 
