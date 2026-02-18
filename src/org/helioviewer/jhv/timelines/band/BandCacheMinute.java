@@ -105,11 +105,12 @@ class BandCacheMinute implements BandCache {
             int i = 0;
             while (i < values.length) {
                 float value = values[i];
-                if (value == YAxis.BLANK) {
+                long date = dates[i];
+                if (date < start || date > end || value == YAxis.BLANK) {
                     ret.add(list);
                     list = new ArrayList<>();
                 } else {
-                    list.add(new DateValue(dates[i], value));
+                    list.add(new DateValue(date, value));
                 }
                 i++;
             }
