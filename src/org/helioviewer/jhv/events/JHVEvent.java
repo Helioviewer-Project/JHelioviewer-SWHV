@@ -3,6 +3,7 @@ package org.helioviewer.jhv.events;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+
 import org.apache.commons.validator.routines.UrlValidator;
 
 public class JHVEvent {
@@ -26,16 +27,36 @@ public class JHVEvent {
         id = _id;
     }
 
-    public JHVEventParameter[] getAllEventParameters() { return allParameters; }
-    public JHVEventParameter[] getVisibleEventParameters() { return visibleParameters; }
-    public JHVEventParameter[] getSimpleVisibleEventParameters() { return simpleVisibleParameters; }
-    public JHVPositionInformation getPositionInformation() { return positionInformation; }
-    public boolean isCactus() { return supplier.isCactus(); }
-    public int getUniqueID() { return id; }
-    public SWEKSupplier getSupplier() { return supplier; }
+    public JHVEventParameter[] getAllEventParameters() {
+        return allParameters;
+    }
+
+    public JHVEventParameter[] getVisibleEventParameters() {
+        return visibleParameters;
+    }
+
+    public JHVEventParameter[] getSimpleVisibleEventParameters() {
+        return simpleVisibleParameters;
+    }
+
+    public JHVPositionInformation getPositionInformation() {
+        return positionInformation;
+    }
+
+    public boolean isCactus() {
+        return supplier.isCactus();
+    }
+
+    public int getUniqueID() {
+        return id;
+    }
+
+    public SWEKSupplier getSupplier() {
+        return supplier;
+    }
 
     public void addPositionInformation(JHVPositionInformation pi) {
-        this.positionInformation = pi;
+        positionInformation = pi;
     }
 
     @Nullable
