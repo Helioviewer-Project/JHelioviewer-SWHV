@@ -6,21 +6,28 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
 
+import javax.annotation.Nonnull;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+
+import com.google.common.util.concurrent.FutureCallback;
 
 public class JHelioviewer {
 
@@ -60,7 +67,8 @@ public class JHelioviewer {
         // System.setProperty("flatlaf.nativeLibraryPath", JHVGlobals.libCacheDir);
         // System.setProperty("jsamp.nosystray", "true");
 
-        JHVInit.init();
+        ProxySettings.init();
+        JHVInit.loadSpice();
 
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
@@ -94,11 +102,33 @@ public class JHelioviewer {
             frame.setVisible(true);
             UITimer.start();
 
+            EDTCallbackExecutor.pool.submit(new Init(), new Callback());
+        });
+    }
+
+    private record Init() implements Callable<Void> {
+        @Override
+        public Void call() throws Exception {
+            JHVInit.init();
+            return null;
+        }
+    }
+
+    private static class Callback implements FutureCallback<Void> {
+
+        @Override
+        public void onSuccess(Void result) {
             DataSources.loadSources();
             CommandLine.load();
-
             UpdateChecker.check(false);
-        });
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            Log.error(t);
+            Message.err("An error occurred during initialization", t.getMessage());
+        }
+
     }
 
     private static boolean isHeadless() {
