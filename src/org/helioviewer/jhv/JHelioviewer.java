@@ -67,9 +67,6 @@ public class JHelioviewer {
         // System.setProperty("flatlaf.nativeLibraryPath", JHVGlobals.libCacheDir);
         // System.setProperty("jsamp.nosystray", "true");
 
-        ProxySettings.init();
-        JHVInit.loadSpice();
-
         // Prints the usage message
         if (args.length == 1 && (args[0].equals("-h") || args[0].equals("--help"))) {
             System.out.println(CommandLine.getUsageMessage());
@@ -77,6 +74,15 @@ public class JHelioviewer {
         }
         // Save command line arguments
         CommandLine.setArguments(args);
+
+        ProxySettings.init();
+        try {
+            JHVInit.loadSpice();
+        } catch (Exception e) {
+            Log.error("Failed to setup SPICE", e);
+            Message.fatalErr("Failed to setup SPICE:\n" + e.getMessage());
+            return;
+        }
 
         EventQueue.invokeLater(() -> {
             Log.info("Start main window");
