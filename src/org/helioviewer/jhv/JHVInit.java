@@ -35,7 +35,7 @@ class JHVInit {
         ExitHooks.attach();
 
         try {
-            loadLibs();
+            loadLibs(Platform.getResourceDir());
             KakaduMessageSystem.startKduMessageSystem();
             loadKernels();
         } catch (Exception e) {
@@ -57,40 +57,24 @@ class JHVInit {
         FitsFactory.setLongStringsEnabled(true);
     }
 
-    private static void loadLibs() throws Exception {
-        String pathlib = "";
-        ArrayList<String> libs = new ArrayList<>();
-
-        if (Platform.isMacOS()) {
-            if ("amd64".equals(Platform.getArch()))
-                pathlib = "macos-amd64/";
-            else if ("aarch64".equals(Platform.getArch()))
-                pathlib = "macos-arm64/";
-        } else if (Platform.isWindows() && "amd64".equals(Platform.getArch())) {
-            pathlib = "windows-amd64/";
-        } else if (Platform.isLinux() && "amd64".equals(Platform.getArch())) {
-            pathlib = "linux-amd64/";
+    private static void loadLib(String name, String resourceDir) throws Exception {
+        String libraryName = System.mapLibraryName(name);
+        try (InputStream in = FileUtils.getResource(resourceDir + libraryName)) {
+            Path libraryPath = Path.of(JHVGlobals.libCacheDir, libraryName);
+            Files.copy(in, libraryPath);
+            System.load(libraryPath.toString());
         }
+    }
 
+    private static void loadLibs(String resourceDir) throws Exception {
         if (Platform.isWindows()) {
-            libs.add(System.mapLibraryName("kdu_v7AR"));
+            loadLib("kdu_v7AR", resourceDir);
         }
-        libs.add(System.mapLibraryName("kdu_jni"));
-        libs.add(System.mapLibraryName("JNISpice"));
-
-        String fullDir = "/jhv/" + pathlib;
-        libs.parallelStream().forEach(l -> {
-            try (InputStream in = FileUtils.getResource(fullDir + l)) {
-                Path libraryPath = Path.of(JHVGlobals.libCacheDir, l);
-                Files.copy(in, libraryPath);
-                System.load(libraryPath.toString());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        loadLib("kdu_jni", resourceDir);
+        loadLib("JNISpice", resourceDir);
 
         Path ffmpegPath = Path.of(JHVGlobals.libCacheDir, "ffmpeg");
-        try (InputStream in = FileUtils.getResource(fullDir + "ffmpeg")) {
+        try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {
             Files.copy(in, ffmpegPath);
         }
         if (!Platform.isWindows())
