@@ -34,18 +34,21 @@ public class Platform {
 
         if (os.contains("windows"))
             isWindows = true;
-        else if (os.contains("linux"))
-            isLinux = true;
         else if (os.contains("mac os"))
             isMacOS = true;
+        else if (os.contains("linux"))
+            isLinux = true;
         else
             die("Could not determine platform. OS: " + os + " - arch: " + arch);
+
+        resourceDir = buildResourceDir();
     }
 
     private static boolean isLinux = false;
     private static boolean isMacOS = false;
     private static boolean isWindows = false;
     private static String jhvArch;
+    private static String resourceDir;
 
     public static boolean isLinux() {
         return isLinux;
@@ -59,8 +62,23 @@ public class Platform {
         return isWindows;
     }
 
-    static String getArch() {
-        return jhvArch;
+    static String getResourceDir() {
+        return resourceDir;
+    }
+
+    private static String buildResourceDir() {
+        String prefix = "/jhv/";
+        if (isMacOS) {
+            if ("amd64".equals(jhvArch))
+                return prefix + "macos-amd64/";
+            else if ("aarch64".equals(jhvArch))
+                return prefix + "macos-arm64/";
+        } else if (isWindows && "amd64".equals(jhvArch)) {
+            return prefix + "windows-amd64/";
+        } else if (isLinux && "amd64".equals(jhvArch)) {
+            return prefix + "linux-amd64/";
+        }
+        return prefix;
     }
 
 }
