@@ -43,84 +43,91 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
     @Nonnull
     @Override
     public ImageBuffer call() throws Exception {
-        if (src.isJP2())
-            src.open();
-        Jpx_source source = src.jpxSource();
+        boolean sourceOpened = false;
+        Kdu_region_compositor compositor = null;
+        try {
+            if (src.isJP2()) {
+                src.open();
+                sourceOpened = true;
+            }
+            Jpx_source source = src.jpxSource();
 
-        SubImage subImage = params.subImage;
-        int frame = params.frame;
-        Kdu_region_compositor compositor = createCompositor(source, params.factor < 1 ? qualityLow : qualityHigh);
+            SubImage subImage = params.subImage;
+            int frame = params.frame;
+            compositor = createCompositor(source, params.factor < 1 ? qualityLow : qualityHigh);
 
-        Kdu_dims empty = new Kdu_dims();
-        if (numComps < 3) {
-            // alpha tbd
-            compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
-        } else {
-            compositor.Add_ilayer(frame, empty, empty);
-        }
-
-        compositor.Set_scale(false, false, false, 1f / (1 << params.level), params.factor);
-
-        Kdu_dims requestedRegion = new Kdu_dims();
-        requestedRegion.From_u32(subImage.x, subImage.y, subImage.w, subImage.h);
-        compositor.Set_buffer_surface(requestedRegion);
-
-        Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(empty, true); // modifies empty
-        Kdu_dims actualRegion = compositorBuf.Get_rendering_region();
-
-        Kdu_coords actualPos = actualRegion.Access_pos();
-        int actualX = actualPos.Get_x(), actualY = actualPos.Get_y();
-
-        Kdu_coords actualSize = actualRegion.Access_size();
-        int actualWidth = actualSize.Get_x(), actualHeight = actualSize.Get_y();
-
-        int[] srcStride = new int[1];
-        long addr = compositorBuf.Get_buf(srcStride, false);
-        ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, 4 * srcStride[0] * actualHeight).order(ByteOrder.nativeOrder());
-
-        ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
-        byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
-
-        Kdu_dims newRegion = new Kdu_dims();
-        //sw.reset().start();
-        while (compositor.Process(MAX_RENDER_SAMPLES, newRegion)) {
-            Kdu_coords newSize = newRegion.Access_size();
-            int newWidth = newSize.Get_x();
-            int newHeight = newSize.Get_y();
-            if (newWidth * newHeight == 0)
-                continue;
-
-            Kdu_coords newOffset = newRegion.Access_pos();
-            int newX = newOffset.Get_x() - actualX;
-            int newY = newOffset.Get_y() - actualY;
-
-            int dstIdx = newX + newY * actualWidth;
-            int srcIdx = 0;
-
+            Kdu_dims empty = new Kdu_dims();
             if (numComps < 3) {
-                for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                    for (int i = 0; i < newWidth; ++i) {
-                        outBuffer[dstIdx + i] = nativeBuffer.get(4 * (srcIdx + i));
+                // alpha tbd
+                compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
+            } else {
+                compositor.Add_ilayer(frame, empty, empty);
+            }
+
+            compositor.Set_scale(false, false, false, 1f / (1 << params.level), params.factor);
+
+            Kdu_dims requestedRegion = new Kdu_dims();
+            requestedRegion.From_u32(subImage.x, subImage.y, subImage.w, subImage.h);
+            compositor.Set_buffer_surface(requestedRegion);
+
+            Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(empty, true); // modifies empty
+            Kdu_dims actualRegion = compositorBuf.Get_rendering_region();
+
+            Kdu_coords actualPos = actualRegion.Access_pos();
+            int actualX = actualPos.Get_x(), actualY = actualPos.Get_y();
+
+            Kdu_coords actualSize = actualRegion.Access_size();
+            int actualWidth = actualSize.Get_x(), actualHeight = actualSize.Get_y();
+
+            int[] srcStride = new int[1];
+            long addr = compositorBuf.Get_buf(srcStride, false);
+            ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, 4 * srcStride[0] * actualHeight).order(ByteOrder.nativeOrder());
+
+            ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
+            byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
+
+            Kdu_dims newRegion = new Kdu_dims();
+            //sw.reset().start();
+            while (compositor.Process(MAX_RENDER_SAMPLES, newRegion)) {
+                Kdu_coords newSize = newRegion.Access_size();
+                int newWidth = newSize.Get_x();
+                int newHeight = newSize.Get_y();
+                if (newWidth * newHeight == 0)
+                    continue;
+
+                Kdu_coords newOffset = newRegion.Access_pos();
+                int newX = newOffset.Get_x() - actualX;
+                int newY = newOffset.Get_y() - actualY;
+
+                int dstIdx = newX + newY * actualWidth;
+                int srcIdx = 0;
+
+                if (numComps < 3) {
+                    for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
+                        for (int i = 0; i < newWidth; ++i) {
+                            outBuffer[dstIdx + i] = nativeBuffer.get(4 * (srcIdx + i));
+                        }
+                    }
+                } else {
+                    for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
+                        nativeBuffer.get(4 * srcIdx, outBuffer, 4 * dstIdx, 4 * newWidth);
                     }
                 }
-            } else {
-                for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                    nativeBuffer.get(4 * srcIdx, outBuffer, 4 * dstIdx, 4 * newWidth);
-                }
             }
-        }
-        destroyCompositor(compositor);
-
-        if (src.isJP2())
-            src.close();
 /*
         StatsAccumulator acc = localAcc.get();
         acc.add(sw.elapsed().toNanos() / 1e9);
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-        ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(outBuffer).order(ByteOrder.nativeOrder()));
-        return ImageBuffer.filter(ib, filterType);
+            ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(outBuffer).order(ByteOrder.nativeOrder()));
+            return ImageBuffer.filter(ib, filterType);
+        } finally {
+            if (compositor != null)
+                destroyCompositor(compositor);
+            if (sourceOpened)
+                src.close();
+        }
     }
 
     @Nullable
