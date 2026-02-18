@@ -15,10 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Spice;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.LocationChecker;
-import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.view.j2k.KakaduMessageSystem;
@@ -28,31 +26,17 @@ import nom.tam.fits.FitsFactory;
 
 class JHVInit {
 
-    static void init() {
-        ProxySettings.init();
+    static void init() throws Exception {
         LocationChecker.setProximityServer();
         SampClient.init();
         ExitHooks.attach();
 
-        try {
-            loadLibs(Platform.getResourceDir());
-            KakaduMessageSystem.startKduMessageSystem();
-            loadKernels();
-        } catch (Exception e) {
-            Log.error("Failed to setup native libraries", e);
-            Message.fatalErr("Failed to setup native libraries:\n" + e.getMessage());
-            return;
-        }
-        try {
-            JPIPCacheManager.init();
-        } catch (Exception e) {
-            Log.error("JPIP cache initialization error", e);
-        }
-        try {
-            AIAResponse.load();
-        } catch (Exception e) {
-            Log.error("AIA response map load error", e);
-        }
+        loadLibs(Platform.getResourceDir());
+        KakaduMessageSystem.startKduMessageSystem();
+
+        JPIPCacheManager.init();
+        AIAResponse.load();
+
         FitsFactory.setUseHierarch(true);
         FitsFactory.setLongStringsEnabled(true);
     }
@@ -71,7 +55,6 @@ class JHVInit {
             loadLib("kdu_v7AR", resourceDir);
         }
         loadLib("kdu_jni", resourceDir);
-        loadLib("JNISpice", resourceDir);
 
         Path ffmpegPath = Path.of(JHVGlobals.libCacheDir, "ffmpeg");
         try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {
@@ -81,7 +64,9 @@ class JHVInit {
             Files.setPosixFilePermissions(ffmpegPath, Set.of(PosixFilePermission.OWNER_EXECUTE));
     }
 
-    private static void loadKernels() throws Exception {
+    static void loadSpice() throws Exception {
+        loadLib("JNISpice", Platform.getResourceDir());
+
         List<String> kernels = List.of(
                 "naif0012.tls",
                 "pck00011.tpc",
