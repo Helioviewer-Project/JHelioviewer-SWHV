@@ -149,11 +149,10 @@ public class JHVFrame {
 
         frame.setMinimumSize(minSize);
 
-        int preferredWidth = readPositiveEnv("JHV_PREFERRED_WIDTH", maxSize.width - 100);
-        int preferredHeight = readPositiveEnv("JHV_PREFERRED_HEIGHT", maxSize.height - 100);
+        int preferredWidth = readSizeEnv("JHV_PREFERRED_WIDTH", maxSize.width - 100);
+        int preferredHeight = readSizeEnv("JHV_PREFERRED_HEIGHT", maxSize.height - 100);
         preferredWidth = Math.min(preferredWidth, maxSize.width);
         preferredHeight = Math.min(preferredHeight, maxSize.height);
-
         frame.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
 
         frame.setIconImage(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL).getImage());
@@ -161,7 +160,7 @@ public class JHVFrame {
         return frame;
     }
 
-    private static int readPositiveEnv(String name, int fallback) {
+    private static int readSizeEnv(String name, int fallback) {
         String raw = System.getenv(name);
         if (raw == null || raw.isBlank())
             return fallback;
