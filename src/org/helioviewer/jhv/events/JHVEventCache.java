@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -79,7 +78,7 @@ public class JHVEventCache {
     private static void checkAssociation(JHVEvent event) {
         int uid = event.getUniqueID();
         JHVRelatedEvents rEvent = relEvents.get(uid);
-        Iterator<Pair<Integer, Integer>> iterator = assocs.iterator();
+        var iterator = assocs.iterator();
         while (iterator.hasNext()) {
             Pair<Integer, Integer> tocheck = iterator.next();
             if (tocheck.left() == uid && relEvents.containsKey(tocheck.right())) {
