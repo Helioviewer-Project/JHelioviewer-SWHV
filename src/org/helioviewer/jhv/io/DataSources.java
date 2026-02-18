@@ -123,7 +123,7 @@ public class DataSources {
     static int select(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
         for (Map.Entry<DatasetId, Source> entry : sourceMap.entrySet()) {
             DatasetId key = entry.getKey();
-            if (server.equals(key.server())) {
+            if (key.server().equals(server)) {
                 Source value = entry.getValue();
                 if (value.observatory().contains(observatory) && value.dataset().contains(dataset))
                     return key.sourceId();
