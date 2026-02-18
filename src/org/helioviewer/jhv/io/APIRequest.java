@@ -83,6 +83,8 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         String _server = jo.optString("server", "");
         if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
             _server = Settings.getProperty("default.server");
+        if (_server == null || DataSources.getServerSetting(_server, "API.getDataSources") == null) // very unlikely
+            throw new Exception("Unknown server");
 
         int _sourceId = DataSources.select(_server, observatory, dataset);
         if (_sourceId < 0)
