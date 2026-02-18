@@ -26,24 +26,15 @@ public class Interval implements Comparable<Interval> {
         return 31 * result + Long.hashCode(b);
     }
 
-    private boolean containsPointInclusive(long time) {
-        return time >= start && time <= end;
-    }
-
     @Nonnull
     public static List<Interval> splitInterval(Interval interval, int days) { // should check if days > 0
         List<Interval> intervals = new ArrayList<>();
-        long startDate = interval.start;
-
-        while (true) {
-            long newStartDate = startDate + TimeUtils.DAY_IN_MILLIS * days;
-            if (interval.containsPointInclusive(newStartDate)) {
-                intervals.add(new Interval(startDate, newStartDate));
-                startDate = newStartDate;
-            } else {
-                intervals.add(new Interval(startDate, interval.end));
-                break;
-            }
+        long chunkMillis = TimeUtils.DAY_IN_MILLIS * days;
+        long cursor = interval.start;
+        while (cursor < interval.end) {
+            long next = Math.min(cursor + chunkMillis, interval.end);
+            intervals.add(new Interval(cursor, next));
+            cursor = next;
         }
         return intervals;
     }
