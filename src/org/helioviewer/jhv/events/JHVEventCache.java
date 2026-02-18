@@ -27,10 +27,17 @@ public class JHVEventCache {
 
     private static JHVRelatedEvents lastHighlighted = null;
 
-    public static void requestForInterval(long start, long end, JHVEventListener.Handle handler) {
+    public static void registerHandler(JHVEventListener.Handle handler) {
         cacheEventHandlers.add(handler);
+    }
+
+    public static void requestForInterval(long start, long end, JHVEventListener.Handle handler) {
         downloadMissingIntervals(start, end);
         handler.newEventsReceived();
+    }
+
+    public static void unregisterHandler(JHVEventListener.Handle handler) {
+        cacheEventHandlers.remove(handler);
     }
 
     static void fireEventCacheChanged() {

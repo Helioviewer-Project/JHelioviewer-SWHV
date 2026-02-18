@@ -33,6 +33,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     private static EventPlotConfiguration eventUnderMouse;
 
     EventTimelineLayer() {
+        JHVEventCache.registerHandler(this);
         cacheUpdated();
     }
 
@@ -56,7 +57,19 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     }
 
     @Override
+    public void setEnabled(boolean _enabled) {
+        if (enabled == _enabled) return;
+        super.setEnabled(_enabled);
+        if (enabled) {
+            JHVEventCache.registerHandler(this);
+        } else {
+            JHVEventCache.unregisterHandler(this);
+        }
+    }
+
+    @Override
     public void cacheUpdated() {
+        if (!enabled) return;
         TimeAxis xAxis = DrawController.selectedAxis;
         JHVEventCache.requestForInterval(xAxis.start(), xAxis.end(), this);
         if (enabled)
@@ -112,6 +125,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
 
     @Override
     public void remove() {
+        JHVEventCache.unregisterHandler(this);
     }
 
     @Override
