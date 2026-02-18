@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
+
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
@@ -29,17 +31,17 @@ public class JHVRelatedEvents implements ClickableDrawable {
     private boolean highlighted;
 
     JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
-        this.supplier = event.getSupplier();
-        this.color = eventColors.getNextColor();
-        this.events.add(event);
-        this.interval = new Interval(event.start, event.end);
+        supplier = event.getSupplier();
+        color = eventColors.getNextColor();
+        events.add(event);
+        interval = new Interval(event.start, event.end);
         addToMap(eventsMap);
     }
 
     private void addToMap(Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         eventsMap.computeIfAbsent(supplier, k -> new TreeMap<>())
-                 .computeIfAbsent(interval.start, k -> new ArrayList<>())
-                 .add(this);
+                .computeIfAbsent(interval.start, k -> new ArrayList<>())
+                .add(this);
     }
 
     private void removeFromMap(Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
@@ -53,15 +55,34 @@ public class JHVRelatedEvents implements ClickableDrawable {
         }
     }
 
-    public List<JHVEvent> getEvents() { return events; }
-    public long getEnd() { return interval.end; }
-    public long getStart() { return interval.start; }
-    public Color getColor() { return color; }
-    public SWEKSupplier getSupplier() { return supplier; }
-    public boolean isHighlighted() { return highlighted; }
+    public List<JHVEvent> getEvents() {
+        return events;
+    }
+
+    public long getEnd() {
+        return interval.end;
+    }
+
+    public long getStart() {
+        return interval.start;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public SWEKSupplier getSupplier() {
+        return supplier;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
 
     @Nonnull
-    public ImageIcon getIcon() { return supplier.getGroup().getIcon(); }
+    public ImageIcon getIcon() {
+        return supplier.getGroup().getIcon();
+    }
 
     void highlight(boolean isHighlighted) {
         if (isHighlighted != highlighted) {
@@ -86,7 +107,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         for (JHVEvent event : events) {
             if (event.start <= timestamp && timestamp <= event.end) return event;
         }
-        return events.isEmpty() ? null : events.get(0);
+        return events.isEmpty() ? null : events.getFirst();
     }
 
     public List<JHVEvent> getNextEvents(JHVEvent event) {
