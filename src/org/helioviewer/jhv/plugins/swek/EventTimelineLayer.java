@@ -81,13 +81,15 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         if (!enabled)
             return;
 
+        eventUnderMouse = null;
         List<JHVRelatedEvents> events = JHVEventCache.getEvents(xAxis.start(), xAxis.end());
-        if (events.isEmpty())
+        if (events.isEmpty()) {
+            JHVEventCache.highlight(null);
             return;
+        }
 
         ArrayList<Long> endDates = new ArrayList<>();
         int nrLines = 0;
-        eventUnderMouse = null;
 
         for (JHVRelatedEvents event : events) {
             long eventStart = event.getStart();
@@ -115,6 +117,8 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         if (eventUnderMouse != null && mousePosition != null) {
             drawEvent(graphArea, eventUnderMouse.event, eventUnderMouse.x0, eventUnderMouse.x1, eventUnderMouse.yPosition, g, mousePosition);
             JHVEventCache.highlight(eventUnderMouse.event);
+        } else {
+            JHVEventCache.highlight(null);
         }
     }
 
