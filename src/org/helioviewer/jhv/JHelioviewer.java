@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -77,14 +76,10 @@ public class JHelioviewer {
             JFrame frame = JHVFrame.prepare();
 
             try {
-                if (Arrays.asList(args).contains("--exclude-plugins")) {
-                    Log.info("Do not load plugins");
-                } else {
-                    Log.info("Load bundled plugins");
-                    PluginManager.addPlugin(new EVEPlugin());
-                    PluginManager.addPlugin(new SWEKPlugin());
-                    PluginManager.addPlugin(new PfssPlugin());
-                }
+                Log.info("Load enabled plugins");
+                PluginManager.addPlugin(new EVEPlugin());
+                PluginManager.addPlugin(new SWEKPlugin());
+                PluginManager.addPlugin(new PfssPlugin());
             } catch (Exception e) {
                 Log.warn("Plugin load error", e);
             }
