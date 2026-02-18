@@ -102,6 +102,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     public void mouseExited(MouseEvent e) {
         mouseOverJHVEvent = null;
         JHVEventCache.highlight(null);
+        component.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
     }
 
     private double computeDistSun(JHVEvent evt) {
@@ -114,8 +115,11 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     @Override
     public void mouseMoved(MouseEvent e) {
         List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
-        if (activeEvents.isEmpty())
+        if (activeEvents.isEmpty()) {
+            mouseOverJHVEvent = null;
+            JHVEventCache.highlight(null);
             return;
+        }
 
         mouseOverJHVEvent = null;
 
@@ -188,7 +192,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
         if (mouseOverJHVEvent != null) {
             component.setCursor(helpCursor);
         } else {
-            component.setCursor(lastCursor);
+            component.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
         }
     }
 
