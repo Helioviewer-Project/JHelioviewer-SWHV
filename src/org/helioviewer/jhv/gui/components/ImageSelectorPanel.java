@@ -70,4 +70,14 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
         imageLayer.load(new APIRequest(item.server, item.sourceId, startTime, endTime, cadence));
     }
 
+    public void load(ImageLayer layer, String server, int sourceId, long startTime, long endTime, int cadence) {
+        sourcesTree.setSelectedItem(server, sourceId);
+        load(layer, startTime, endTime, cadence);
+    }
+
+    @Nullable
+    public DataSourcesTree.SourceItem getSelectedItem() {
+        return sourcesTree.getSelectedItem();
+    }
+
 }

@@ -18,6 +18,7 @@ import org.helioviewer.jhv.gui.components.CadencePanel;
 import org.helioviewer.jhv.gui.components.ImageSelectorPanel;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -29,7 +30,9 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            load("xxx", -1); // selection may not be good
+            DataSourcesTree.SourceItem selected = imageSelectorPanel.getSelectedItem();
+            if (selected != null)
+                load(selected.server, selected.sourceId);
         }
     };
     private final JButton okBtn = new JButton(load);
@@ -140,7 +143,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
     @Override
     public void load(String server, int sourceId) {
         setTime(getStartTime(), getEndTime());
-        imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence()); // time selector might have changed
+        imageSelectorPanel.load(layer, server, sourceId, getStartTime(), getEndTime(), getCadence()); // time selector might have changed
         layer = null;
         setVisible(false);
     }
