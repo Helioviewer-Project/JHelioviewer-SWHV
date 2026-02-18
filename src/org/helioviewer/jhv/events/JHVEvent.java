@@ -41,7 +41,7 @@ public class JHVEvent {
     @Nullable
     public JHVEventParameter getParameter(String key) {
         for (JHVEventParameter p : allParameters) {
-            if (p.getParameterName().equals(key)) return p;
+            if (p.getParameterName() == key) return p;
         }
         return null;
     }
@@ -49,7 +49,7 @@ public class JHVEvent {
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured, boolean full) {
         String key = parameter.getParameterName();
         if (!visible && !full) {
-            if (!"cme_radiallinvel".equals(key) && !"event_coord1".equals(key) && !"cme_angularwidth".equals(key)) {
+            if (key != "cme_radiallinvel" && key != "event_coord1" && key != "cme_angularwidth") {
                 return;
             }
         }
