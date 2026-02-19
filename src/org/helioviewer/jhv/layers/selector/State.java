@@ -222,7 +222,7 @@ public class State {
                 if (enabled != null) // user may have loaded a new layer in the meanwhile
                     layer.setEnabled(enabled);
             }
-            if (masterLayer != null)
+            if (masterLayer != null && Layers.getImageLayers().contains(masterLayer))
                 Layers.setActiveImageLayer(masterLayer);
             Movie.setTime(time);
             JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
