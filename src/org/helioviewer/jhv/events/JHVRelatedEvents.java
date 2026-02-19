@@ -168,6 +168,9 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     @Override
     public void clicked(Point loc, long ts) {
-        new SWEKEventInformationDialog(this, getClosestTo(ts)).setVisible(true);
+        SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(this, getClosestTo(ts));
+        dialog.pack();
+        dialog.setLocation(loc);
+        dialog.setVisible(true);
     }
 }
