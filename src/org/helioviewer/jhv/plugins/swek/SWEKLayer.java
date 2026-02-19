@@ -419,6 +419,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
+        if (!enabled)
+            return;
         if (SWEKPopupController.mouseOverJHVEvent != null) {
             drawText(vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
         }
@@ -451,6 +453,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             JHVFrame.getInputController().addPlugin(controller);
             requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
+            SWEKPopupController.mouseOverJHVEvent = null;
+            JHVEventCache.highlight(null);
             JHVFrame.getInputController().removePlugin(controller);
             Movie.removeTimeListener(controller);
             Movie.removeTimeRangeListener(this);

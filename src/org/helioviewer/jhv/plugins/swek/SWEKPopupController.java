@@ -118,6 +118,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
         if (activeEvents.isEmpty()) {
             mouseOverJHVEvent = null;
             JHVEventCache.highlight(null);
+            component.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
             return;
         }
 
