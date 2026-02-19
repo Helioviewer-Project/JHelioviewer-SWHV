@@ -30,7 +30,7 @@ import org.json.JSONObject;
 public final class EventTimelineLayer extends AbstractTimelineLayer implements JHVEventListener.Handle {
 
     private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
-    private static EventPlotConfiguration eventUnderMouse;
+    private EventPlotConfiguration eventUnderMouse;
 
     EventTimelineLayer() {
         JHVEventCache.registerHandler(this);
