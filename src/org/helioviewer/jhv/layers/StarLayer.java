@@ -84,6 +84,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
 
     @Override
     public void remove(GL3 gl) {
+        setEnabled(false);
         dispose(gl);
     }
 

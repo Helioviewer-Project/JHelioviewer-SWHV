@@ -230,9 +230,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     @Override
     public void remove(GL3 gl) {
+        setEnabled(false);
         dispose(gl);
-        JHVFrame.getInputController().removePlugin(this);
-        optionsPanel.deactivate();
     }
 
     @Override
