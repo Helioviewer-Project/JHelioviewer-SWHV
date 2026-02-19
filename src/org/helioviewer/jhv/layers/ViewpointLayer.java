@@ -125,24 +125,39 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
+        if (!enabled)
+            return;
         GLText.drawTextFloat(vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+    }
+
+    private void clearHoverTextIfNeeded() {
+        if (!text.isEmpty()) {
+            text.clear();
+            MovieDisplay.display();
+        }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (!optionsPanel.isHeliospheric())
+        if (!optionsPanel.isHeliospheric()) {
+            clearHoverTextIfNeeded();
             return;
+        }
 
         Camera camera = Display.getCamera();
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
-        if (positionLoads.isEmpty())
+        if (positionLoads.isEmpty()) {
+            clearHoverTextIfNeeded();
             return;
+        }
 
         mouseX = e.getX();
         mouseY = e.getY();
         Vec3 v = CameraHelper.getVectorFromPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
-        if (v == null)
+        if (v == null) {
+            clearHoverTextIfNeeded();
             return;
+        }
 
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
@@ -166,10 +181,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
                 name = positionLoad.target().toString();
             }
         }
-        if (!text.isEmpty()) {
-            text.clear();
-            MovieDisplay.display();
-        }
+        clearHoverTextIfNeeded();
         if (minDist < 0.01) {
             text.add(name);
             MovieDisplay.display();
@@ -186,6 +198,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
 
     @Override
     public void mouseExited(MouseEvent e) {
+        clearHoverTextIfNeeded();
     }
 
     @Override
