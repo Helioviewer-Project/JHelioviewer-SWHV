@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -60,11 +61,7 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
                 classifyFile(file, imageUris, jsonUris, cdfUris);
             }
         }
-
-        // jsonUris.forEach(Load.request::get);
-        Load.SunJSON.getAll(jsonUris);
-        Load.CDF.getAll(cdfUris);
-        Load.Image.getAll(imageUris);
+        loadData(imageUris, jsonUris, cdfUris);
     }
 
     private static void transferStringArray(String loc) {
@@ -84,10 +81,15 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
                 Log.warn("Not found: " + word, e);
             }
         }
+        loadData(imageUris, jsonUris, cdfUris);
+    }
 
-        Load.SunJSON.getAll(jsonUris);
-        Load.CDF.getAll(cdfUris);
-        Load.Image.getAll(imageUris);
+    private static void loadData(List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
+        EventQueue.invokeLater(() -> {
+            Load.Image.getAll(imageUris);
+            Load.SunJSON.getAll(jsonUris);
+            Load.CDF.getAll(cdfUris);
+        });
     }
 
     private static boolean transferData(Transferable transferable) {
