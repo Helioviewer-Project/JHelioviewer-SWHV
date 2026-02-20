@@ -56,8 +56,6 @@ public class DataSources {
         }
     }
 
-    private static int toLoad;
-
     public static void initSources() {
         ImmutableMap.Builder<String, Map<String, String>> builder = new ImmutableMap.Builder<>();
         Path userSources = Path.of(JHVDirectory.SETTINGS.getPath(), "sources.json");
@@ -87,8 +85,12 @@ public class DataSources {
         return settings == null ? null : settings.get(setting);
     }
 
-    public static void loadSources() {
+    private static int toLoad;
+    private static boolean loadCommandLineRequest;
+
+    public static void loadSources(boolean requestAfterLoad) {
         toLoad = serverSettings.size();
+        loadCommandLineRequest = requestAfterLoad;
         serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName));
     }
 
@@ -104,8 +106,10 @@ public class DataSources {
             listeners.forEach(listener -> listener.setupSources(parser));
 
         toLoad--;
-        if (toLoad == 0)
+        if (toLoad == 0 && loadCommandLineRequest) {
+            loadCommandLineRequest = false;
             CommandLine.loadRequest();
+        }
     }
 
     private record DatasetId(String server, int sourceId) {
