@@ -219,7 +219,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void setGraphInformation(Rectangle _graphSize) {
-        graphSize = _graphSize;
+        graphSize = new Rectangle(_graphSize.x, _graphSize.y, Math.max(1, _graphSize.width), Math.max(1, _graphSize.height));
         graphAreaChanged();
     }
 
