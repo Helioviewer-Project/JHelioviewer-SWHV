@@ -204,8 +204,8 @@ class FITSImage implements URIImageReader {
                     if (v == ImageBuffer.BAD_PIXEL) {
                         outData[outLine + i] = 0;
                     } else {
-                        v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                        int p = (int) MathUtils.clip(scale * fn_gamma(v - minMax[0]) + .5, 0, 65535);
+                        v = Math.clamp(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                        int p = (int) Math.clamp(scale * fn_gamma(v - minMax[0]) + .5, 0, 65535);
                         lut[p] = v;
                         outData[outLine + i] = (short) p;
                     }
@@ -220,8 +220,8 @@ class FITSImage implements URIImageReader {
                     if (v == ImageBuffer.BAD_PIXEL) {
                         outData[outLine + i] = 0;
                     } else {
-                        v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                        int p = (int) MathUtils.clip(scale * fn_beta(v - minMax[0]) + .5, 0, 65535);
+                        v = Math.clamp(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                        int p = (int) Math.clamp(scale * fn_beta(v - minMax[0]) + .5, 0, 65535);
                         lut[p] = v;
                         outData[outLine + i] = (short) p;
                     }
@@ -236,8 +236,8 @@ class FITSImage implements URIImageReader {
                     if (v == ImageBuffer.BAD_PIXEL) {
                         outData[outLine + i] = 0;
                     } else {
-                        v = MathUtils.clip(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                        int p = (int) MathUtils.clip(scale * fn_alpha((v - minMax[0]) / (minMax[1] - minMax[0])) + .5, 0, 65535);
+                        v = Math.clamp(v, minMax[0], minMax[1]); // sampling may have missed extremes
+                        int p = (int) Math.clamp(scale * fn_alpha((v - minMax[0]) / (minMax[1] - minMax[0])) + .5, 0, 65535);
                         lut[p] = v;
                         outData[outLine + i] = (short) p;
                     }

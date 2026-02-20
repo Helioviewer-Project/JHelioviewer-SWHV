@@ -267,7 +267,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         calendar.setTimeInMillis(availableInterval.end());
         int endYear = calendar.get(Calendar.YEAR);
 
-        int hticks = Math.min(Math.max(endYear - startYear + 1, 2), maxTicks);
+        int hticks = Math.clamp(endYear - startYear + 1, 2, maxTicks);
         int yearDifference = (endYear - startYear) / (hticks - 1);
         for (int i = 0; i < hticks; ++i) {
             calendar.set(startYear + i * yearDifference, Calendar.JANUARY, 1, 0, 0, 0);

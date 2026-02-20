@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
@@ -54,7 +53,7 @@ public class SunFastJSON {
             colors.add(SunJSONTypes.convertColor(c[0], c[1], c[2], c[3]));
         }
 
-        double thickness = MathUtils.clip(jg.thickness, 1e-5, 1e-1);
+        double thickness = Math.clamp(jg.thickness, 1e-5, 1e-1);
         return SunJSONTypes.getGeometryBuffer(jg.type, coords, colors, thickness);
     }
 

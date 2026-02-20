@@ -9,7 +9,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
@@ -36,9 +35,9 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
         double radius = PfssSettings.MAX_RADIUS;
 
         if (jo != null) {
-            detail = MathUtils.clip(jo.optInt("detail", detail), 0, PfssSettings.MAX_DETAIL);
+            detail = Math.clamp(jo.optInt("detail", detail), 0, PfssSettings.MAX_DETAIL);
             fixedColor = jo.optBoolean("fixedColor", fixedColor);
-            radius = MathUtils.clip(jo.optDouble("radius", radius), 1.1, PfssSettings.MAX_RADIUS);
+            radius = Math.clamp(jo.optDouble("radius", radius), 1.1, PfssSettings.MAX_RADIUS);
         }
         optionsPanel = new PfssLayerOptions(detail, fixedColor, radius);
     }

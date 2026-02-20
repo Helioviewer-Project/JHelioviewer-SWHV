@@ -59,26 +59,6 @@ public class MathUtils {
         return f;
     }
 
-    public static int clip(int val, int from, int to) {
-        return val < from ? from : (val > to ? to : val);
-    }
-
-    public static long clip(long val, long from, long to) {
-        return val < from ? from : (val > to ? to : val);
-    }
-
-    public static float clip(float val, float from, float to) {
-        return val < from ? from : (val > to ? to : val);
-    }
-
-    public static double clip(double val, double from, double to) {
-        return val < from ? from : (val > to ? to : val);
-    }
-
-    public static int clip(int val, int max) {
-        return val < max ? val : max;
-    }
-
     public static int nextPowerOfTwo(int n) {
         n--;
         n |= n >> 1;

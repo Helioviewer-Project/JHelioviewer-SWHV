@@ -13,7 +13,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -163,7 +162,7 @@ class PfssLoader {
                     lineX[i] = (float) (cphi * x + sphi * y);
                     lineY[i] = (float) (-sphi * x + cphi * y);
                     lineZ[i] = (float) z;
-                    lineS[i] = (float) MathUtils.clip(s, -1, 1);
+                    lineS[i] = (float) Math.clamp(s, -1, 1);
                 }
                 return new Data(dateObs, lineX, lineY, lineZ, lineS, points);
             }

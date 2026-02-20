@@ -5,8 +5,6 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.stream.IntStream;
 
-import org.helioviewer.jhv.math.MathUtils;
-
 @SuppressWarnings("serial")
 public class ImageFilter {
 
@@ -39,7 +37,7 @@ public class ImageFilter {
         float[] image = algorithm.filter(data, width, height);
 
         byte[] out = new byte[length];
-        IntStream.range(0, length).parallel().forEach(i -> out[i] = (byte) MathUtils.clip(image[i] * 255 + .5f, 0, 255));
+        IntStream.range(0, length).parallel().forEach(i -> out[i] = (byte) Math.clamp(image[i] * 255 + .5f, 0, 255));
 
         return ByteBuffer.wrap(out);
     }
@@ -54,7 +52,7 @@ public class ImageFilter {
         float[] image = algorithm.filter(data, width, height);
 
         short[] out = new short[length];
-        IntStream.range(0, length).parallel().forEach(i -> out[i] = (short) MathUtils.clip(image[i] * 65535 + .5f, 0, 65535));
+        IntStream.range(0, length).parallel().forEach(i -> out[i] = (short) Math.clamp(image[i] * 65535 + .5f, 0, 65535));
 
         return ShortBuffer.wrap(out);
     }

@@ -11,7 +11,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVTime;
 
@@ -73,7 +72,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
         if (mZero.isPresent() && mScale.isPresent() && mDataMax.isPresent()) {
             double zero = mZero.get();
             double scale = mScale.get();
-            int size = MathUtils.clip((int) Math.ceil(mDataMax.get()) + 1, 0, 65536);
+            int size = Math.clamp((int) Math.ceil(mDataMax.get()) + 1, 0, 65536);
             physLUT = new float[size];
             for (int i = 0; i < size; i++)
                 physLUT[i] = (float) (zero + i * scale);

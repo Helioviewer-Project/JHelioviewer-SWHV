@@ -14,7 +14,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -103,9 +102,9 @@ public final class Band extends AbstractTimelineLayer {
 
         JSONObject jcolor = jo.optJSONObject("color");
         if (jcolor != null) {
-            int r = MathUtils.clip(jcolor.optInt("r", 0), 0, 255);
-            int g = MathUtils.clip(jcolor.optInt("g", 0), 0, 255);
-            int b = MathUtils.clip(jcolor.optInt("b", 0), 0, 255);
+            int r = Math.clamp(jcolor.optInt("r", 0), 0, 255);
+            int g = Math.clamp(jcolor.optInt("g", 0), 0, 255);
+            int b = Math.clamp(jcolor.optInt("b", 0), 0, 255);
             band.setDataColor(new Color(r, g, b));
         }
         return band;

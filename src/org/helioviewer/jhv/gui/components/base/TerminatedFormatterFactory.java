@@ -7,8 +7,6 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatter;
 
-import org.helioviewer.jhv.math.MathUtils;
-
 @SuppressWarnings("serial")
 public class TerminatedFormatterFactory extends AbstractFormatterFactory {
 
@@ -55,7 +53,7 @@ public class TerminatedFormatterFactory extends AbstractFormatterFactory {
                     throw new ParseException("Could not parse number: " + string, 0);
                 }
             }
-            return MathUtils.clip(value, min, max);
+            return Math.clamp(value, min, max);
         }
 
         @Override

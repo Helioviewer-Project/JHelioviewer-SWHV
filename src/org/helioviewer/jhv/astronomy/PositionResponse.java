@@ -2,7 +2,6 @@ package org.helioviewer.jhv.astronomy;
 
 import java.util.Iterator;
 
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
@@ -57,7 +56,7 @@ public class PositionResponse {
         else {
             double f = (t - start) / (double) (end - start); //!
             long time = (long) (positionStart + f * (positionEnd - positionStart) + .5);
-            return MathUtils.clip(time, positionStart, positionEnd);
+            return Math.clamp(time, positionStart, positionEnd);
         }
     }
 
@@ -73,13 +72,13 @@ public class PositionResponse {
             int maxIndex = position.length - 1;
             double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
             int i = (int) interpolatedIndex;
-            i = MathUtils.clip(i, 0, maxIndex);
+            i = Math.clamp(i, 0, maxIndex);
             int inext = Math.min(i + 1, maxIndex);
 
             long tstart = position[i].milli();
             long tend = position[inext].milli();
 
-            double alpha = tend == tstart ? 1. : MathUtils.clip((time - tstart) / (double) (tend - tstart), 0, 1);
+            double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
             x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
             y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
             z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
@@ -92,7 +91,7 @@ public class PositionResponse {
             hglt = 0;
         } else {
             hgln = Math.atan2(y, x);
-            double sinLat = MathUtils.clip(z / dist, -1., 1.);
+            double sinLat = Math.clamp(z / dist, -1., 1.);
             hglt = Math.asin(sinLat);
         }
         lati[0] = dist;
@@ -112,13 +111,13 @@ public class PositionResponse {
             int maxIndex = position.length - 1;
             double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
             int i = (int) interpolatedIndex;
-            i = MathUtils.clip(i, 0, maxIndex);
+            i = Math.clamp(i, 0, maxIndex);
             int inext = Math.min(i + 1, maxIndex);
 
             long tstart = position[i].milli();
             long tend = position[inext].milli();
 
-            double alpha = tend == tstart ? 1. : MathUtils.clip((time - tstart) / (double) (tend - tstart), 0, 1);
+            double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
             x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
             y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
             z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
@@ -133,7 +132,7 @@ public class PositionResponse {
             hgln = Math.atan2(y, x);
             if (hgln < 0)
                 hgln += 2 * Math.PI;
-            double sinLat = MathUtils.clip(z / dist, -1., 1.);
+            double sinLat = Math.clamp(z / dist, -1., 1.);
             hglt = Math.asin(sinLat);
         }
         return new Position(new JHVTime(time), dist, -hgln, hglt).setLocation(location);
@@ -151,13 +150,13 @@ public class PositionResponse {
             int maxIndex = position.length - 1;
             double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
             int i = (int) interpolatedIndex;
-            i = MathUtils.clip(i, 0, maxIndex);
+            i = Math.clamp(i, 0, maxIndex);
             int inext = Math.min(i + 1, maxIndex);
 
             long tstart = position[i].milli();
             long tend = position[inext].milli();
 
-            double alpha = tend == tstart ? 1. : MathUtils.clip((time - tstart) / (double) (tend - tstart), 0, 1);
+            double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
             x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
             y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
             z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
