@@ -45,7 +45,7 @@ class RadioJ2KData implements ImageData.Handler {
             startFreq = hvMetaData.getRequiredDouble("END-FREQ");
             startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
             endDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-END"));
-            if (endDate <= startDate || endFreq <= startFreq) {
+            if (endDate <= startDate || startFreq <= endFreq) { // frequency is drawn upside down
                 throw new IllegalArgumentException("Invalid radio metadata range");
             }
 
@@ -200,7 +200,7 @@ class RadioJ2KData implements ImageData.Handler {
         if (hasData()) {
             BufferedImage old = bufferedImage;
             bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);
-            NIOImageFactory.free(old);
+            // NIOImageFactory.free(old); <- potentilly leads to use after free
         }
     }
 
