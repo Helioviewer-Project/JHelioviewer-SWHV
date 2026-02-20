@@ -205,7 +205,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
         } else if (instrument.equals("EUI")) {
             displayName = instrument + ' ' + detector.replace('_', '-') + ' ' + measurement;
         } else if (instrument.equals("PHI")) {
-            displayName = instrument + ' ' + detector; // TBD
+            String level = m.getString("LEVEL").orElse("");
+            displayName = instrument + ' ' + detector + (level.isEmpty() ? "" : ' ' + level);
             if (detector.equals("HRT")) {
                 measurement = m.getString("BTYPE").orElse("");
                 displayName += " " + measurement;
