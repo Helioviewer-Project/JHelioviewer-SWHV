@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Pair;
@@ -105,7 +104,7 @@ public class ComesepHandler extends SWEKHandler {
             if (result.isNull(key))
                 continue;
 
-            String lowKey = key.toLowerCase(Locale.ENGLISH);
+            String lowKey = key.toLowerCase();
             if (!(lowKey.equals("atearliest") || lowKey.equals("atlatest") ||
                     lowKey.equals("begin_time_value") || lowKey.equals("end_time_value") ||
                     lowKey.startsWith("liftoff"))) {

@@ -7,7 +7,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
@@ -268,7 +267,7 @@ public class Actions {
             String file = fileDialog.getFile();
             if (directory != null && file != null) {
                 Settings.setProperty("path.state", directory); // remember the current directory for future
-                if (!file.toLowerCase(Locale.ENGLISH).endsWith(".jhv"))
+                if (!file.toLowerCase().endsWith(".jhv"))
                     file += ".jhv";
                 State.save(directory, file);
             }
