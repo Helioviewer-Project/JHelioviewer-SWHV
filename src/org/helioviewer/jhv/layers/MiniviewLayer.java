@@ -12,7 +12,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONObject;
@@ -40,7 +39,7 @@ public final class MiniviewLayer extends AbstractLayer {
 
     public MiniviewLayer(JSONObject jo) {
         if (jo != null)
-            scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
+            scale = Math.clamp(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
         else
             setEnabled(true);
         optionsPanel = optionsPanel();

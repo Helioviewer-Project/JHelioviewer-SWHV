@@ -17,7 +17,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
@@ -44,7 +43,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     private void deserialize(JSONObject jo) {
-        scale = MathUtils.clip(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
+        scale = Math.clamp(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
         extra = jo.optBoolean("extra", extra);
         top = jo.optBoolean("top", top);
     }

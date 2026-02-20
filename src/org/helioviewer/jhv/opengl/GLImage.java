@@ -5,7 +5,6 @@ import java.nio.IntBuffer;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
 
@@ -127,35 +126,35 @@ public class GLImage {
     }
 
     public void setDeltaCROTA(double delta) {
-        deltaCROTA = MathUtils.clip(delta, MIN_DCROTA, MAX_DCROTA);
+        deltaCROTA = Math.clamp(delta, MIN_DCROTA, MAX_DCROTA);
     }
 
     public void setDeltaCRVAL1(int delta) {
-        deltaCRVAL1 = MathUtils.clip(delta, MIN_DCRVAL, MAX_DCRVAL);
+        deltaCRVAL1 = Math.clamp(delta, MIN_DCRVAL, MAX_DCRVAL);
     }
 
     public void setDeltaCRVAL2(int delta) {
-        deltaCRVAL2 = MathUtils.clip(delta, MIN_DCRVAL, MAX_DCRVAL);
+        deltaCRVAL2 = Math.clamp(delta, MIN_DCRVAL, MAX_DCRVAL);
     }
 
     public void setInnerMask(double mask) {
-        innerMask = MathUtils.clip(mask, 0, MAX_INNER);
+        innerMask = Math.clamp(mask, 0, MAX_INNER);
     }
 
     public void setSlit(double left, double right) {
-        slitLeft = MathUtils.clip(left, 0, 1);
-        slitRight = MathUtils.clip(right, slitLeft, 1);
+        slitLeft = Math.clamp(left, 0, 1);
+        slitRight = Math.clamp(right, slitLeft, 1);
     }
 
     /*
         public void setSector(double left, double right) {
-            sector0 = Math.toRadians(MathUtils.clip(left, -180, 0));
-            sector1 = Math.toRadians(MathUtils.clip(right, 0, 180));
+            sector0 = Math.toRadians(Math.clamp(left, -180, 0));
+            sector1 = Math.toRadians(Math.clamp(right, 0, 180));
         }
     */
     public void setBrightness(double offset, double scale) {
-        brightOffset = MathUtils.clip(offset, -1, 2);
-        brightScale = MathUtils.clip(scale, 0, 2 - brightOffset);
+        brightOffset = Math.clamp(offset, -1, 2);
+        brightScale = Math.clamp(scale, 0, 2 - brightOffset);
     }
 
     public double getDeltaCROTA() {
@@ -206,15 +205,15 @@ public class GLImage {
     }
 
     public void setOpacity(double _opacity) {
-        opacity = MathUtils.clip(_opacity, 0, 1);
+        opacity = Math.clamp(_opacity, 0, 1);
     }
 
     public void setBlend(double _blend) {
-        blend = MathUtils.clip(_blend, 0, 1);
+        blend = Math.clamp(_blend, 0, 1);
     }
 
     public void setSharpen(double _sharpen) {
-        sharpen = MathUtils.clip(_sharpen, -1, 1);
+        sharpen = Math.clamp(_sharpen, -1, 1);
     }
 
     public void setLUT(LUT newLUT, boolean invert) {

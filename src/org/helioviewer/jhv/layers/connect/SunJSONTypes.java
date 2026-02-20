@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -80,10 +79,10 @@ public class SunJSONTypes {
     /**/
     static byte[] convertColor(int r, int g, int b, int a) {
         return Colors.bytes(
-                MathUtils.clip(r, 0, 255),
-                MathUtils.clip(g, 0, 255),
-                MathUtils.clip(b, 0, 255),
-                MathUtils.clip(a, 0, 255));
+                Math.clamp(r, 0, 255),
+                Math.clamp(g, 0, 255),
+                Math.clamp(b, 0, 255),
+                Math.clamp(a, 0, 255));
     }
 
     private enum GeometryType {point, line, ellipse} // type in JSON

@@ -8,7 +8,6 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -147,7 +146,7 @@ public class Camera {
     }
 
     public void setFOV(double _fov) {
-        fov = MathUtils.clip(_fov, MIN_FOV, MAX_FOV);
+        fov = Math.clamp(_fov, MIN_FOV, MAX_FOV);
         updateWidth();
     }
 

@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.math.MathUtils;
 
 @SuppressWarnings("serial")
 public final class CadencePanel extends JPanel {
@@ -52,16 +51,16 @@ public final class CadencePanel extends JPanel {
 
         if (value / 86400 != 0) {
             unitCombo.setSelectedItem(timeStepUnits[3]);
-            cadenceSpinner.setValue(MathUtils.clip(value / 86400, CADENCE_MIN, CADENCE_MAX));
+            cadenceSpinner.setValue(Math.clamp(value / 86400, CADENCE_MIN, CADENCE_MAX));
         } else if (value / 3600 != 0) {
             unitCombo.setSelectedItem(timeStepUnits[2]);
-            cadenceSpinner.setValue(MathUtils.clip(value / 3600, CADENCE_MIN, CADENCE_MAX));
+            cadenceSpinner.setValue(Math.clamp(value / 3600, CADENCE_MIN, CADENCE_MAX));
         } else if (value / 60 != 0) {
             unitCombo.setSelectedItem(timeStepUnits[1]);
-            cadenceSpinner.setValue(MathUtils.clip(value / 60, CADENCE_MIN, CADENCE_MAX));
+            cadenceSpinner.setValue(Math.clamp(value / 60, CADENCE_MIN, CADENCE_MAX));
         } else {
             unitCombo.setSelectedItem(timeStepUnits[0]);
-            cadenceSpinner.setValue(MathUtils.clip(value, CADENCE_MIN, CADENCE_MAX));
+            cadenceSpinner.setValue(Math.clamp(value, CADENCE_MIN, CADENCE_MAX));
         }
     }
 

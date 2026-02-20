@@ -2,7 +2,6 @@ package org.helioviewer.jhv.timelines.band;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
 interface PropagationModel {
@@ -19,7 +18,7 @@ interface PropagationModel {
         private final double delayMilli;
 
         Delay(double _delay) { // days
-            delayMilli = MathUtils.clip(_delay * TimeUtils.DAY_IN_MILLIS, 0, 100 * TimeUtils.DAY_IN_MILLIS); // millis
+            delayMilli = Math.clamp(_delay * TimeUtils.DAY_IN_MILLIS, 0, 100 * TimeUtils.DAY_IN_MILLIS); // millis
             isPropagated = delayMilli > 0;
         }
 
@@ -46,7 +45,7 @@ interface PropagationModel {
         private final double radiusMilli;
 
         Radial(double _speed) { // km/s
-            double speed = MathUtils.clip(_speed * 1e3, 0, Sun.CLIGHT); // m/s
+            double speed = Math.clamp(_speed * 1e3, 0, Sun.CLIGHT); // m/s
             isPropagated = speed > 0;
             radiusMilli = isPropagated ? Sun.RadiusMeter / speed * 1e3 : 0;
         }

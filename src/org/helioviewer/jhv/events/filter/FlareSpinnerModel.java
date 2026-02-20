@@ -3,7 +3,6 @@ package org.helioviewer.jhv.events.filter;
 import javax.swing.AbstractSpinnerModel;
 
 import org.helioviewer.jhv.base.GOESLevel;
-import org.helioviewer.jhv.math.MathUtils;
 
 @SuppressWarnings("serial")
 class FlareSpinnerModel extends AbstractSpinnerModel {
@@ -17,7 +16,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         min = _min;
         max = _max;
         step = _step;
-        curval = GOESLevel.getStringValue(MathUtils.clip(start, min, max));
+        curval = GOESLevel.getStringValue(Math.clamp(start, min, max));
     }
 
     @Override
@@ -36,7 +35,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         double v = GOESLevel.getFloatValue(curval);
         double p = Math.log10(v);
         v += step * Math.pow(10., (int) (p == (int) p ? p : p - 1));
-        return GOESLevel.getStringValue(MathUtils.clip(v, min, max));
+        return GOESLevel.getStringValue(Math.clamp(v, min, max));
     }
 
     @Override
@@ -44,7 +43,7 @@ class FlareSpinnerModel extends AbstractSpinnerModel {
         double v = GOESLevel.getFloatValue(curval);
         double p = Math.log10(v);
         v -= step * Math.pow(10., (int) (p - 1));
-        return GOESLevel.getStringValue(MathUtils.clip(v, min, max));
+        return GOESLevel.getStringValue(Math.clamp(v, min, max));
     }
 
 }

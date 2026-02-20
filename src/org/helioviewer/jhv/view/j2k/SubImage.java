@@ -19,13 +19,13 @@ class SubImage {
         ww = MathUtils.roundUpTo(ww + QUANTA, QUANTA);
         hh = MathUtils.roundUpTo(hh + QUANTA, QUANTA);
 
-        xx = MathUtils.clip(xx, 0, fwidth - 1);
-        yy = MathUtils.clip(yy, 0, fheight - 1);
-        ww = MathUtils.clip(ww, 1, fwidth);
-        hh = MathUtils.clip(hh, 1, fheight);
+        xx = Math.clamp(xx, 0, fwidth - 1);
+        yy = Math.clamp(yy, 0, fheight - 1);
+        ww = Math.clamp(ww, 1, fwidth);
+        hh = Math.clamp(hh, 1, fheight);
 
-        ww = MathUtils.clip(ww, fwidth - xx);
-        hh = MathUtils.clip(hh, fheight - yy);
+        ww = Math.min(ww, fwidth - xx);
+        hh = Math.min(hh, fheight - yy);
 
         x = xx;
         y = yy;
