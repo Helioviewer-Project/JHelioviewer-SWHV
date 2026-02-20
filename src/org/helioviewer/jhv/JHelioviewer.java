@@ -124,7 +124,7 @@ public class JHelioviewer {
 
         @Override
         public void onSuccess(Void result) {
-            DataSources.loadSources();
+            DataSources.loadSources(true);
             CommandLine.load();
             UpdateChecker.check(false);
         }

@@ -198,7 +198,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            DataSources.loadSources();
+            DataSources.loadSources(false);
             BandReaderHapi.requestCatalog();
         }
 
