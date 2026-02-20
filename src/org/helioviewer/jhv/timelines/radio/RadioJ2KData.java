@@ -200,7 +200,7 @@ class RadioJ2KData implements ImageData.Handler {
         if (hasData()) {
             BufferedImage old = bufferedImage;
             bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);
-            // NIOImageFactory.free(old); <- potentilly leads to use after free
+            // NIOImageFactory.free(old); <- potentially leads to use after free
         }
     }
 

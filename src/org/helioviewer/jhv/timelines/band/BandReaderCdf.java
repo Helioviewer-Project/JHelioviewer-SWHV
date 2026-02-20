@@ -226,6 +226,8 @@ public class BandReaderCdf {
         if ("SWA-PAS".equals(instrumentName) && "V_RTN".equals(variableName)) { // replace with velocity modulus
             int rNumPoints = rebinned.dates().length;
             float[][] rValues = rebinned.values();
+            if (rValues.length < 3)
+                throw new IOException("Expected at least 3 axes for " + datasetId + ", got " + rValues.length + ": " + uri);
 
             float[][] modValues = new float[1][rNumPoints];
             for (int i = 0; i < rNumPoints; i++) {
@@ -256,6 +258,8 @@ public class BandReaderCdf {
         } else if ("MAG".equals(instrumentName) && variableName.startsWith("B_")) { // prepend column with modulus
             int rNumPoints = rebinned.dates().length;
             float[][] rValues = rebinned.values();
+            if (rValues.length < 3)
+                throw new IOException("Expected at least 3 axes for " + datasetId + ", got " + rValues.length + ": " + uri);
 
             int rNumAxes = rValues.length;
             float[][] modValues = new float[rNumAxes + 1][];
