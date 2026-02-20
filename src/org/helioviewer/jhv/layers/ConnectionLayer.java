@@ -259,6 +259,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     @Override
     public void setGeometry(List<SunJSONTypes.GeometryCollection> geometry) {
+        if (geometry.isEmpty()) return;
+
         geometry.forEach(g -> geometryMap.put(g.time(), g));
         geometryMap.buildIndex();
         MovieDisplay.display();

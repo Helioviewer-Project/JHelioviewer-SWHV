@@ -12,6 +12,9 @@ public class TimeMap<V> extends TreeMap<JHVTime, V> {
     private int maxIdx;
 
     public void buildIndex() {
+        if (isEmpty())
+            throw new RuntimeException("Attempt to call buildIndex() on empty TimeMap");
+
         Set<JHVTime> keySet = navigableKeySet();
         timeSet = new HashSet<>(keySet);
         timeArray = keySet.toArray(JHVTime[]::new);
