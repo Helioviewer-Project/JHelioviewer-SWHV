@@ -52,7 +52,10 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
     @Nullable
     public String getAvailabilityURL() {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        return item == null ? null : DataSources.getServerSetting(item.server, "availability.images") + "ID=" + item.sourceId;
+        if (item == null) return null;
+
+        String availability = DataSources.getServerSetting(item.server, "availability.images");
+        return availability == null ? null : availability + "ID=" + item.sourceId;
     }
 
     public void setupLayer(APIRequest req) {
