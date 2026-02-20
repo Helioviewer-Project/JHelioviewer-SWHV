@@ -130,7 +130,10 @@ public class BandReaderCdf {
         if (epoch == null)
             throw new IOException("Epoch not found: " + uri);
 
-        List<String> timeFillVal = List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", epoch.attributes.get("FILLVAL")); // FILLVAL may be duplicate
+        String fillVal = epoch.attributes.get("FILLVAL");
+        List<String> timeFillVal = fillVal == null ?
+                List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000") :
+                List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", fillVal); // FILLVAL may be duplicate
         String[][] epochVals = readCDFVariableString(epoch.variable);
         // dumpVariableAttrs(epoch);
         // dumpValues(epochVals);
