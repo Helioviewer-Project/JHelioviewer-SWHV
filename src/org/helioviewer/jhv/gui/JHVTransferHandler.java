@@ -11,7 +11,6 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.TransferHandler;
 
@@ -31,7 +30,7 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
     }
 
     private static void classifyUri(URI uri, List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
-        String loc = uri.toString().toLowerCase(Locale.ENGLISH);
+        String loc = uri.toString().toLowerCase();
         if (loc.endsWith(".json"))
             jsonUris.add(uri);
         else if (loc.endsWith(".cdf"))

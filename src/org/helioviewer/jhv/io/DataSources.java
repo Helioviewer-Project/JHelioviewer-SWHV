@@ -85,6 +85,13 @@ public class DataSources {
         return settings == null ? null : settings.get(setting);
     }
 
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
+
+    public static void addListener(Listener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
+    }
+
     private static int toLoad;
     private static boolean loadCommandLineRequest;
 
@@ -92,13 +99,6 @@ public class DataSources {
         toLoad = serverSettings.size();
         loadCommandLineRequest = requestAfterLoad;
         serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName));
-    }
-
-    private static final ArrayList<Listener> listeners = new ArrayList<>();
-
-    public static void addListener(Listener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
     }
 
     static void setupSources(@Nullable DataSourcesParser parser) {

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 import javax.annotation.Nullable;
@@ -45,7 +44,7 @@ class HEKParser {
         Iterator<String> keys = result.keys();
         while (paramIterator.hasNext() || keys.hasNext()) {
             String key = paramIterator.hasNext() ? paramIterator.next().name() : keys.next();
-            String lowKey = key.toLowerCase(Locale.ENGLISH);
+            String lowKey = key.toLowerCase();
             if (insertedKeys.contains(lowKey))
                 continue;
             insertedKeys.add(lowKey);
@@ -113,9 +112,9 @@ class HEKParser {
             String key = keys.next();
             String value = ref.getString(key);
 
-            String lowerKey = key.toLowerCase(Locale.ENGLISH);
+            String lowerKey = key.toLowerCase();
             if (lowerKey.equals("ref_type")) {
-                String lvalue = value.toLowerCase(Locale.ENGLISH);
+                String lvalue = value.toLowerCase();
                 switch (lvalue) {
                     case "movie" -> {
                         type = "Reference Movie";
@@ -150,7 +149,7 @@ class HEKParser {
      */
     private static List<Vec3> parsePolygon(String value) {
         List<Vec3> polygonPoints = new ArrayList<>();
-        if (value.toLowerCase(Locale.ENGLISH).contains("polygon")) {
+        if (value.toLowerCase().contains("polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
             String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
 
@@ -175,7 +174,7 @@ class HEKParser {
      */
     @Nullable
     private static Vec3 parsePoint(String value) {
-        if (value.toLowerCase(Locale.ENGLISH).contains("point")) {
+        if (value.toLowerCase().contains("point")) {
             return parseCoordinates(value.substring(value.indexOf('(') + 1, value.indexOf(')')));
         }
         return null;

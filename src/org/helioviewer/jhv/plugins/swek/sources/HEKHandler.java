@@ -6,7 +6,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.helioviewer.jhv.Log;
@@ -90,7 +89,7 @@ public class HEKHandler extends SWEKHandler {
                 for (Map.Entry<String, String> fieldEntry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
                     String dbType = fieldEntry.getValue();
                     String fieldName = fieldEntry.getKey();
-                    String lfieldName = fieldName.toLowerCase(Locale.ENGLISH);
+                    String lfieldName = fieldName.toLowerCase();
                     if (!result.isNull(lfieldName)) {
                         switch (dbType) {
                             case JHVDatabaseParam.DBINTTYPE ->
