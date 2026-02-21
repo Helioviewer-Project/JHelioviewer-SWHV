@@ -45,6 +45,9 @@ public final class GridLayer extends AbstractLayer {
     private static final double RADIAL_STEP_FAR = 45;
     private static final float[] R_LABEL_POS = {(float) (2 * RADIAL_UNIT), (float) (8 * RADIAL_UNIT), (float) (24 * RADIAL_UNIT)};
     private static final float[] R_LABEL_POS_FAR = {(float) (2 * RADIAL_UNIT_FAR), (float) (8 * RADIAL_UNIT_FAR), (float) (24 * RADIAL_UNIT_FAR)};
+    private static final double GRID_STEP_MIN = 5;
+    private static final double GRID_STEP_MAX = 90;
+    private static final double GRID_STEP = 0.1;
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
@@ -92,8 +95,9 @@ public final class GridLayer extends AbstractLayer {
     }
 
     private void deserialize(JSONObject jo) {
-        lonStep = jo.optDouble("lonStep", lonStep);
-        latStep = jo.optDouble("latStep", latStep);
+        lonStep = Math.clamp(jo.optDouble("lonStep", lonStep), GRID_STEP_MIN, GRID_STEP_MAX);
+        latStep = Math.clamp(jo.optDouble("latStep", latStep), GRID_STEP_MIN, GRID_STEP_MAX);
+
         showAxis = jo.optBoolean("showAxis", showAxis);
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
@@ -320,8 +324,6 @@ public final class GridLayer extends AbstractLayer {
     @SuppressWarnings("serial")
     private class GridLayerOptions extends JPanel {
 
-        private static final double min = 5, max = 90, step = 0.1;
-
         GridLayerOptions() {
             setLayout(new GridBagLayout());
 
@@ -403,7 +405,7 @@ public final class GridLayer extends AbstractLayer {
         }
 
         private JHVSpinner createGridResolutionX() {
-            JHVSpinner spinner = new JHVSpinner(lonStep, min, max, step);
+            JHVSpinner spinner = new JHVSpinner(lonStep, GRID_STEP_MIN, GRID_STEP_MAX, GRID_STEP);
             spinner.addChangeListener(e -> {
                 lonStep = (Double) spinner.getValue();
                 lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
@@ -411,12 +413,12 @@ public final class GridLayer extends AbstractLayer {
                 MovieDisplay.display();
             });
             JFormattedTextField fx = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-            fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
+            fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", GRID_STEP_MIN, GRID_STEP_MAX));
             return spinner;
         }
 
         private JHVSpinner createGridResolutionY() {
-            JHVSpinner spinner = new JHVSpinner(latStep, min, max, step);
+            JHVSpinner spinner = new JHVSpinner(latStep, GRID_STEP_MIN, GRID_STEP_MAX, GRID_STEP);
             spinner.addChangeListener(e -> {
                 latStep = (Double) spinner.getValue();
                 latLabels = GridLabel.makeLatLabels(latStep);
@@ -424,7 +426,7 @@ public final class GridLayer extends AbstractLayer {
                 MovieDisplay.display();
             });
             JFormattedTextField fy = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-            fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", min, max));
+            fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", GRID_STEP_MIN, GRID_STEP_MAX));
             return spinner;
         }
 
