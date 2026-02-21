@@ -67,7 +67,7 @@ public class GaiaClient {
     private record StarRequest(int ra, int dec, int cone, int mag) {
     }
 
-    private record Star(int id, double ra, double dec, double pmra, double pmdec, double px, double rv, double mag) {
+    private record Star(long id, double ra, double dec, double pmra, double pmdec, double px, double rv, double mag) {
     }
 
     private static StarRequest computeRequest(Position viewpoint) {
@@ -232,21 +232,25 @@ public class GaiaClient {
             List<Star> stars = new ArrayList<>();
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
-                    // https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/sec_dm_main_source_catalogue/ssec_dm_gaia_source.html
-                    int source_id = ((Number) rseq.getCell(0)).intValue();
-                    double ra = Math.toRadians(((Number) rseq.getCell(1)).doubleValue()); // [rad]
-                    double dec = Math.toRadians(((Number) rseq.getCell(2)).doubleValue()); // [rad]
-                    double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
-                    double pmdec = Math.toRadians(((Number) rseq.getCell(4)).doubleValue() / (1000. * 3600.)); // [rad/yr]
-                    double px = ((Number) rseq.getCell(5)).doubleValue() / 1000.; // [arcsec]
-                    double rv = ((Number) rseq.getCell(6)).doubleValue(); // [km/s]
-                    double mag = ((Number) rseq.getCell(7)).doubleValue();
+                    try {
+                        // https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/sec_dm_main_source_catalogue/ssec_dm_gaia_source.html
+                        long source_id = ((Number) rseq.getCell(0)).longValue();
+                        double ra = Math.toRadians(((Number) rseq.getCell(1)).doubleValue()); // [rad]
+                        double dec = Math.toRadians(((Number) rseq.getCell(2)).doubleValue()); // [rad]
+                        double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
+                        double pmdec = Math.toRadians(((Number) rseq.getCell(4)).doubleValue() / (1000. * 3600.)); // [rad/yr]
+                        double px = ((Number) rseq.getCell(5)).doubleValue() / 1000.; // [arcsec]
+                        double rv = ((Number) rseq.getCell(6)).doubleValue(); // [km/s]
+                        double mag = ((Number) rseq.getCell(7)).doubleValue();
 
-                    pmra = Double.isFinite(pmra) ? pmra : 0;
-                    pmdec = Double.isFinite(pmdec) ? pmdec : 0;
-                    px = Double.isFinite(px) ? px : 0;
-                    rv = Double.isFinite(rv) ? rv : 0;
-                    stars.add(new Star(source_id, ra, dec, pmra, pmdec, px, rv, mag));
+                        pmra = Double.isFinite(pmra) ? pmra : 0;
+                        pmdec = Double.isFinite(pmdec) ? pmdec : 0;
+                        px = Double.isFinite(px) ? px : 0;
+                        rv = Double.isFinite(rv) ? rv : 0;
+                        stars.add(new Star(source_id, ra, dec, pmra, pmdec, px, rv, mag));
+                    } catch (Exception e) {
+                        Log.warn("Skipping malformed Gaia row", e);
+                    }
                 }
             }
             Log.info("Found " + stars.size() + " stars with " + adql);
