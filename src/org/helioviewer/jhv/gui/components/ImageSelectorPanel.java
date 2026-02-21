@@ -62,6 +62,10 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
         sourcesTree.setSelectedItem(req.server(), req.sourceId());
     }
 
+    public void setSelectedItem(String server, int sourceId) {
+        sourcesTree.setSelectedItem(server, sourceId);
+    }
+
     public void load(ImageLayer layer, long startTime, long endTime, int cadence) {
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) { // not valid
