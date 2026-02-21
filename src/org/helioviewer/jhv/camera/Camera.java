@@ -190,7 +190,7 @@ public class Camera {
             dragRotation = Quat.fromJson(ja);
         translation.x = jo.optDouble("translationX", translation.x);
         translation.y = jo.optDouble("translationY", translation.y);
-        fov = jo.optDouble("fov", fov);
+        setFOV(jo.optDouble("fov", fov));
     }
 
 }
