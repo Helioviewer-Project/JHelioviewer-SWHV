@@ -384,6 +384,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     @Override
     public void load(String server, int sourceId) {
         addLayerButton.doClickOnMenu();
+        imageSelectorPanel.setSelectedItem(server, sourceId);
         if (checkSanity())
             imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
     }

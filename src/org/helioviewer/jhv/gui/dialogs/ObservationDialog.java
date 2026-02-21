@@ -140,6 +140,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
     @Override
     public void load(String server, int sourceId) {
         setTime(getStartTime(), getEndTime());
+        imageSelectorPanel.setSelectedItem(server, sourceId);
         imageSelectorPanel.load(layer, getStartTime(), getEndTime(), getCadence()); // time selector might have changed
         layer = null;
         setVisible(false);
