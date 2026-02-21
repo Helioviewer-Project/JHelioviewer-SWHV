@@ -116,15 +116,21 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
     }
 
     public static void readClipboard() {
-        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        if (contents != null) {
-            transferData(contents);
+        try {
+            Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+            if (contents != null) transferData(contents);
+        } catch (IllegalStateException e) {
+            Log.warn("Clipboard temporarily unavailable", e);
         }
     }
 
     public void toClipboard(String data) {
-        Transferable stringSelection = new StringSelection(data);
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, this);
+        try {
+            Transferable stringSelection = new StringSelection(data);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, this);
+        } catch (IllegalStateException e) {
+            Log.warn("Clipboard temporarily unavailable", e);
+        }
     }
 
     @Override
