@@ -19,6 +19,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
@@ -73,14 +74,16 @@ public class GaiaClient {
     private static StarRequest computeRequest(Position viewpoint) {
         double[] sc = SpiceMath.radrec(-1, -viewpoint.lon, viewpoint.lat); // sc to Sun, lon was negated
         double[] search = SpiceMath.recrad(SpiceMath.mtxv(Spice.j2000ToSun.get(viewpoint.time), sc)); // Sun -> J2000
-        double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
+        double ra = MathUtils.mapTo0To360(Math.toDegrees(search[1]));
+        double dec = Math.toDegrees(search[2]);
         // reduce number of calls to catalog: divide the sky in 1x1deg bins, increase cone by 1deg
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
     }
 
     private static StarRequest computeRequestPrecise(String location, JHVTime time) throws SpiceErrorException {
         double[] search = SpiceMath.recrad(Spice.getPosition(location, "SUN", "J2000", time)); // HCRS
-        double ra = Math.toDegrees(search[1]), dec = Math.toDegrees(search[2]);
+        double ra = MathUtils.mapTo0To360(Math.toDegrees(search[1]));
+        double dec = Math.toDegrees(search[2]);
         // reduce number of calls to catalog: divide the sky in 1x1deg bins, increase cone by 1deg
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
     }
