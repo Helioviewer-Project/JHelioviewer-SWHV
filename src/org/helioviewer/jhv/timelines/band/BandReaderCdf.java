@@ -71,7 +71,12 @@ public class BandReaderCdf {
             }
         }
         // dumpGlobalAttrs(globalAttrs);
-        String instrumentName = Regex.GT.split(String.join(" ", globalAttrs.get("Descriptor")))[0];
+        String descriptor = String.join(" ", globalAttrs.get("Descriptor")).trim();
+        String[] descriptorParts = Regex.GT.split(descriptor);
+        if (descriptorParts.length == 0 || descriptorParts[0].isBlank()) {
+            throw new IOException("Missing or invalid Descriptor global attribute: " + uri);
+        }
+        String instrumentName = descriptorParts[0];
 
         Variable[] cdfVars = cdf.getVariables();
         VariableAttribute[] cdfAttrs = cdf.getVariableAttributes();
@@ -141,6 +146,9 @@ public class BandReaderCdf {
         // Refuse to fill timestamps
         long[] dates = new long[epochVals.length];
         for (int i = 0; i < dates.length; i++) {
+            if (epochVals[i].length == 0) {
+                throw new IOException("Empty epoch entry at index " + i + ": " + uri);
+            }
             String epochStr = epochVals[i][0];
             if (timeFillVal.contains(epochStr)) {
                 throw new IOException("Filled timestamp (" + epochStr + "): " + uri);
@@ -148,6 +156,14 @@ public class BandReaderCdf {
             dates[i] = TimeUtils.parse(epochStr);
         }
         return dates;
+    }
+
+    private static float parseFloatAttr(String attrName, String value, String variableName, URI uri) throws IOException {
+        try {
+            return Float.parseFloat(value);
+        } catch (Exception e) {
+            throw new IOException("Invalid " + attrName + " for variable " + variableName + ": " + value + " (" + uri + ")", e);
+        }
     }
 
     private static CDFData readData(CDFVariable data, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
@@ -166,11 +182,14 @@ public class BandReaderCdf {
             throw new IOException("Missing attributes for variable " + variableName + ": " + uri);
         }
 
-        float[][] values = readCDFVariableFloat(data.variable, Float.parseFloat(dataFillVal));
+        float[][] values = readCDFVariableFloat(data.variable, parseFloatAttr("FILLVAL", dataFillVal, variableName, uri));
         // dumpVariableAttrs(data);
         // dumpValues(dataVals);
 
         int numAxes = values.length;
+        if (numAxes == 0) {
+            throw new IOException("No data axes for variable " + variableName + ": " + uri);
+        }
         int numPoints = values[0].length;
         if (dates.length != numPoints) {
             throw new IOException("Inconsistent lengths of epoch (" + dates.length + ") and data (" + numPoints + ") variables: " + uri);
@@ -198,6 +217,9 @@ public class BandReaderCdf {
             String[][] labelVals = readCDFVariableString(label.variable);
             // dumpVariableAttrs(label);
             // dumpValues(labelVals);
+            if (labelVals.length == 0) {
+                throw new IOException("No labels found for variable " + variableName + ": " + uri);
+            }
             if (labelVals[0].length != numAxes) {
                 throw new IOException("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
             }
@@ -212,14 +234,14 @@ public class BandReaderCdf {
             case "SWA-PAS_V_RTN" -> 200;
             case "SWA-PAS_N" -> 1; // log
             case "SWA-PAS_T" -> 1e3f; // log
-            default -> Float.parseFloat(dataScaleMin);
+            default -> parseFloatAttr("SCALEMIN/VALIDMIN", dataScaleMin, variableName, uri);
         };
         float scaleMax = switch (datasetId) {
             case "MAG_B_RTN", "MAG_B_VSO", "MAG_B_SRF" -> +30;
             case "SWA-PAS_V_RTN" -> 600;
             case "SWA-PAS_N" -> 1e10f; // log
             case "SWA-PAS_T" -> 1e7f; // log
-            default -> Float.parseFloat(dataScaleMax);
+            default -> parseFloatAttr("SCALEMAX/VALIDMAX", dataScaleMax, variableName, uri);
         };
 
         DatesValues rebinned = new DatesValues(dates, values).rebin();
@@ -312,7 +334,6 @@ public class BandReaderCdf {
     private static float[][] readCDFVariableFloat(Variable v, float fillVal) throws IOException {
         DataType dataType = v.getDataType();
         Object abuf = v.createRawValueArray();
-        v.readRawRecord(0, abuf); // read first record to get number of axes
         int numAxes = Array.getLength(abuf);
         int numPoints = v.getRecordCount();
 
@@ -320,6 +341,7 @@ public class BandReaderCdf {
         if (numPoints == 0)
             return ret;
 
+        v.readRawRecord(0, abuf);
         for (int i = 0; i < numAxes; i++)
             ret[i][0] = fill(dataType.getScalar(abuf, i), fillVal);
 
