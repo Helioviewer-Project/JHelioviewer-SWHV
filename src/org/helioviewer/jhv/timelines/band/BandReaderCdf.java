@@ -336,14 +336,20 @@ public class BandReaderCdf {
         Object abuf = v.createRawValueArray();
         int numAxes = Array.getLength(abuf);
         int numPoints = v.getRecordCount();
+        String variableName = v.getName();
 
         float[][] ret = new float[numAxes][numPoints];
         if (numPoints == 0)
             return ret;
 
         v.readRawRecord(0, abuf);
-        for (int i = 0; i < numAxes; i++)
-            ret[i][0] = fill(dataType.getScalar(abuf, i), fillVal);
+        for (int i = 0; i < numAxes; i++) {
+            try {
+                ret[i][0] = fill(dataType.getScalar(abuf, i), fillVal);
+            } catch (Exception e) {
+                throw new IOException("Invalid numeric value for variable " + variableName, e);
+            }
+        }
 
         for (int j = 1; j < numPoints; j++) {
             v.readRawRecord(j, abuf);
@@ -351,8 +357,13 @@ public class BandReaderCdf {
             if (len != numAxes)
                 throw new IOException("Inconsistent number of elements: expected " + numAxes + ", got " + len);
 
-            for (int i = 0; i < numAxes; i++)
-                ret[i][j] = fill(dataType.getScalar(abuf, i), fillVal);
+            for (int i = 0; i < numAxes; i++) {
+                try {
+                    ret[i][j] = fill(dataType.getScalar(abuf, i), fillVal);
+                } catch (Exception e) {
+                    throw new IOException("Invalid numeric value for variable " + variableName, e);
+                }
+            }
         }
 
         return ret;
