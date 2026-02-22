@@ -7,6 +7,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ class JHVInit {
         String libraryName = System.mapLibraryName(name);
         try (InputStream in = FileUtils.getResource(resourceDir + libraryName)) {
             Path libraryPath = Path.of(JHVGlobals.libCacheDir, libraryName);
-            Files.copy(in, libraryPath);
+            Files.copy(in, libraryPath, StandardCopyOption.REPLACE_EXISTING);
             System.load(libraryPath.toString());
         }
     }
@@ -58,10 +59,12 @@ class JHVInit {
 
         Path ffmpegPath = Path.of(JHVGlobals.libCacheDir, "ffmpeg");
         try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {
-            Files.copy(in, ffmpegPath);
+            Files.copy(in, ffmpegPath, StandardCopyOption.REPLACE_EXISTING);
         }
-        if (!Platform.isWindows())
-            Files.setPosixFilePermissions(ffmpegPath, Set.of(PosixFilePermission.OWNER_EXECUTE));
+        if (!Platform.isWindows()) {
+            Files.setPosixFilePermissions(ffmpegPath,
+                    Set.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE));
+        }
     }
 
     static void loadSpice() throws Exception {
@@ -82,7 +85,7 @@ class JHVInit {
         List<String> builtinKernels = kernels.parallelStream().map(k -> { // order does not matter
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
                 Path kp = Path.of(JHVGlobals.dataCacheDir, k);
-                Files.copy(in, kp);
+                Files.copy(in, kp, StandardCopyOption.REPLACE_EXISTING);
                 return kp.toString();
             } catch (Exception e) {
                 Log.error("SPICE kernel copy error", e);
