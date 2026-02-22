@@ -152,9 +152,6 @@ public class BandReaderHapi {
         HapiInfo info = HapiInfo.fromJson(jo);
         HapiParam[] params = info.getParameters();
 
-        HapiParam[] typeParams = new HapiParam[2];
-        typeParams[0] = params[0];
-
         int numAxes = parameters.size() - 1;
         List<BandReader> readers = new ArrayList<>(numAxes);
         for (int i = 1; i <= numAxes; i++) {
@@ -172,7 +169,7 @@ public class BandReaderHapi {
                     put("scale", p.scale).
                     put("label", title == null ? p.name : title + ' ' + p.name);
 
-            typeParams[1] = params[i];
+            HapiParam[] typeParams = new HapiParam[]{params[0], params[i]};
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
         }
         return new Dataset(id, readers, start, stop);
