@@ -27,7 +27,10 @@ public class Interval implements Comparable<Interval> {
     }
 
     @Nonnull
-    public static List<Interval> splitInterval(Interval interval, int days) { // should check if days > 0
+    public static List<Interval> splitInterval(Interval interval, int days) {
+        if (days <= 0)
+            throw new RuntimeException("Attempt to call splitInterval() with negative or 0 days: " + days);
+
         List<Interval> intervals = new ArrayList<>();
         long chunkMillis = TimeUtils.DAY_IN_MILLIS * days;
         long cursor = interval.start;
