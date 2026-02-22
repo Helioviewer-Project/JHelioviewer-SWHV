@@ -96,6 +96,7 @@ public class DataSources {
     private static boolean loadCommandLineRequest;
 
     public static void loadSources(boolean requestAfterLoad) {
+        sourceMap.clear(); // clear stale datasets on reload of DataSources
         toLoad = serverSettings.size();
         loadCommandLineRequest = requestAfterLoad;
         serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName));
