@@ -21,10 +21,6 @@ class PfssCache {
         map.putAll(uris);
     }
 
-    void putData(URI uri, PfssLoader.Data data) {
-        cache.put(uri, data);
-    }
-
     void markLoaded(URI uri, PfssLoader.Data data) {
         cache.put(uri, data);
         inFlight.remove(uri);
