@@ -84,49 +84,60 @@ abstract class J2KSource {
     }
 
     ResolutionSet getResolutionSet(int frame) throws KduException {
-        Jpx_codestream_source xstream = jpxSrc.Access_codestream(frame);
-        Jpx_input_box inputBox = xstream.Open_stream();
-        Kdu_codestream stream = new Kdu_codestream();
-        stream.Create(inputBox);
-        if (!stream.Exists()) {
-            throw new KduException(">> stream does not exist " + frame);
-        }
+        Jpx_input_box inputBox = null;
+        Kdu_codestream stream = null;
+        try {
+            Jpx_codestream_source xstream = jpxSrc.Access_codestream(frame);
+            inputBox = xstream.Open_stream();
+            stream = new Kdu_codestream();
+            stream.Create(inputBox);
+            if (!stream.Exists()) {
+                throw new KduException(">> stream does not exist " + frame);
+            }
 
-        // Since it gets tricky here I am just grabbing a bunch of values
-        // and taking the max of them. It is acceptable to think that an
-        // image is color when it's not monochromatic, but not the other way
-        // around... so this is just playing it safe.
-        Kdu_channel_mapping cmap = new Kdu_channel_mapping();
-        cmap.Configure(stream);
+            // Since it gets tricky here I am just grabbing a bunch of values
+            // and taking the max of them. It is acceptable to think that an
+            // image is color when it's not monochromatic, but not the other way
+            // around... so this is just playing it safe.
+            Kdu_channel_mapping cmap = new Kdu_channel_mapping();
+            cmap.Configure(stream);
 
-        int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
-        // numComponents = maxComponents == 1 ? 1 : 3;
-        // With new file formats we may have 2 components
-        cmap.Clear();
-        cmap.Native_destroy();
+            int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
+            // numComponents = maxComponents == 1 ? 1 : 3;
+            // With new file formats we may have 2 components
+            cmap.Clear();
+            cmap.Native_destroy();
 
-        int maxDWT = stream.Get_min_dwt_levels();
-        ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
+            int maxDWT = stream.Get_min_dwt_levels();
+            ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
 
-        Kdu_dims dims = new Kdu_dims();
-        stream.Get_dims(0, dims);
-        Kdu_coords siz = dims.Access_size();
-        int width0 = siz.Get_x(), height0 = siz.Get_y();
-        res.addLevel(0, width0, height0, 1, 1);
-
-        for (int i = 1; i <= maxDWT; i++) {
-            stream.Apply_input_restrictions(0, 0, i, 0, null, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS);
+            Kdu_dims dims = new Kdu_dims();
             stream.Get_dims(0, dims);
-            siz = dims.Access_size();
-            int width = siz.Get_x(), height = siz.Get_y();
-            res.addLevel(i, width, height, width0 / (double) width, height0 / (double) height);
+            Kdu_coords siz = dims.Access_size();
+            int width0 = siz.Get_x(), height0 = siz.Get_y();
+            res.addLevel(0, width0, height0, 1, 1);
+
+            for (int i = 1; i <= maxDWT; i++) {
+                stream.Apply_input_restrictions(0, 0, i, 0, null, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS);
+                stream.Get_dims(0, dims);
+                siz = dims.Access_size();
+                int width = siz.Get_x(), height = siz.Get_y();
+                res.addLevel(i, width, height, width0 / (double) width, height0 / (double) height);
+            }
+
+            return res;
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.Destroy();
+                } catch (KduException ignore) {
+                }
+            }
+            if (inputBox != null) {
+                inputBox.Close();
+                inputBox.Native_destroy();
+            }
         }
-
-        stream.Destroy();
-        inputBox.Close();
-        inputBox.Native_destroy();
-
-        return res;
     }
 
     @Nullable
