@@ -71,11 +71,11 @@ public class URIView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(new DecodeKey(dataUri, filterType));
-        if (imageBuffer == null) {
-            executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint, filterType));
-        } else {
+        if (imageBuffer != null) {
             sendDataToHandler(imageBuffer, viewpoint);
+            return;
         }
+        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint, filterType));
     }
 
     private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {

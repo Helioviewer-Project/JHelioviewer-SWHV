@@ -36,12 +36,12 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class J2KView extends BaseView {
 
-    private static final AtomicInteger global_serial = new AtomicInteger(0);
     private record DecodeKey(J2KParams.Decode params, ImageFilter.Type filter) {
     }
 
     private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
     private static final Cleaner reaper = Cleaner.create();
+    private static final AtomicInteger globalSerial = new AtomicInteger();
 
     private final Cleaner.Cleanable abolishable;
     // cleaner tracks reachability of this token
@@ -60,19 +60,9 @@ public class J2KView extends BaseView {
     protected final CompletionLevel completionLevel;
     protected final J2KReader reader;
 
-    private static int incrementSerial() {
-        while (true) {
-            int existingValue = global_serial.get();
-            int newValue = existingValue + 1;
-            if (global_serial.compareAndSet(existingValue, newValue)) {
-                return newValue;
-            }
-        }
-    }
-
     public J2KView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
-        serial = incrementSerial();
+        serial = globalSerial.incrementAndGet();
         request = _request;
 
         try {
@@ -292,16 +282,12 @@ public class J2KView extends BaseView {
 
     private void executeDecode(J2KParams.Decode decodeParams) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(new DecodeKey(decodeParams, filterType));
-        if (imageBuffer == null) {
-            int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
-            try {
-                executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(decodeParams, filterType));
-            } catch (Exception e) {
-                Log.error(e);
-            }
-        } else {
+        if (imageBuffer != null) {
             sendDataToHandler(decodeParams, imageBuffer);
+            return;
         }
+        int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
+        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(decodeParams, filterType));
     }
 
     private class J2KCallback extends DecodeCallback {
