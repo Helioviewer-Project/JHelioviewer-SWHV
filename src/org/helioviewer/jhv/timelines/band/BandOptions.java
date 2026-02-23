@@ -19,6 +19,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
@@ -73,7 +74,7 @@ class BandOptions extends JPanel {
                     band.getBandType().getName().replace(' ', '_') + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json");
             JSONObject jo = band.toJson();
 
-            new Thread(() -> {
+            JHVThread.create(() -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     jo.write(writer);
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path.toString()));

@@ -27,6 +27,7 @@ import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -146,7 +147,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
 
             for (ActionListener listener : exportFitsButton.getActionListeners())
                 exportFitsButton.removeActionListener(listener);
-            exportFitsButton.addActionListener(e -> new Thread(() -> {
+            exportFitsButton.addActionListener(e -> JHVThread.create(() -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     writer.write(xml, 0, xml.length());
                     EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path.toString()));

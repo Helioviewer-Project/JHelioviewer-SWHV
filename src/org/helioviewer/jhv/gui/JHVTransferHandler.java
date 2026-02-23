@@ -18,6 +18,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
+import org.helioviewer.jhv.threads.JHVThread;
 
 @SuppressWarnings("serial")
 public class JHVTransferHandler extends TransferHandler implements ClipboardOwner {
@@ -95,11 +96,11 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         try {
             if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 List<?> objects = (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                new Thread(() -> transferFileList(objects), "JHV-TransferFileList").start(); // avoid file system operations on EDT
+                JHVThread.create(() -> transferFileList(objects), "JHV-TransferFileList").start(); // avoid file system operations on EDT
                 return true;
             } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 String loc = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                new Thread(() -> transferStringArray(loc), "JHV-TransferStringArray").start(); // avoid file system operations on EDT
+                JHVThread.create(() -> transferStringArray(loc), "JHV-TransferStringArray").start(); // avoid file system operations on EDT
                 return true;
             }
         } catch (Exception e) {

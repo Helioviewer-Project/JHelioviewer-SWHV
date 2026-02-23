@@ -39,6 +39,10 @@ public class JHVThread {
         }
     }
 
+    public static Thread create(Runnable task, String name) {
+        return new NamedThreadFactory(name).newThread(task);
+    }
+
     // this creates daemon threads
     public record NamedThreadFactory(String name) implements ThreadFactory {
         @Override
