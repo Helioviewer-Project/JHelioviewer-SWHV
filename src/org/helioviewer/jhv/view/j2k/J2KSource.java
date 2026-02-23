@@ -182,14 +182,22 @@ abstract class J2KSource {
         int i = 0;
 
         Jp2_input_box xmlBox = new Jp2_input_box();
-        while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
-            if (i == xmlMetaData.length)
-                break;
-            if (node.Open_existing(xmlBox)) {
-                xmlMetaData[i] = xmlBox2String(xmlBox);
-                xmlBox.Close();
+        try {
+            while ((node = metaManager.Peek_and_clear_touched_nodes(1, xmlFilter, node)).Exists()) {
+                if (i == xmlMetaData.length)
+                    break;
+                if (node.Open_existing(xmlBox)) {
+                    try {
+                        xmlMetaData[i] = xmlBox2String(xmlBox);
+                    } finally {
+                        xmlBox.Close();
+                    }
+                }
+                i++;
             }
-            i++;
+        } finally {
+            xmlBox.Close(); // harmless if already closed
+            xmlBox.Native_destroy();
         }
     }
 
