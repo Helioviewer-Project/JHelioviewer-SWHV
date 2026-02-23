@@ -68,7 +68,7 @@ public class URIView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         ImageBuffer imageBuffer = decodeCache.getIfPresent(dataUri);
         if (imageBuffer == null) {
-            executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint, filterType));
+            executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
@@ -88,18 +88,13 @@ public class URIView extends BaseView {
     private class Callback extends DecodeCallback {
 
         private final Position viewpoint;
-        private final ImageFilter.Type requestedFilter;
 
-        Callback(Position _viewpoint, ImageFilter.Type _requestedFilter) {
+        Callback(Position _viewpoint) {
             viewpoint = _viewpoint;
-            requestedFilter = _requestedFilter;
         }
 
         @Override
         public void onSuccess(ImageBuffer result) {
-            // drop stale in-flight decode results after a filter change
-            if (requestedFilter != filterType)
-                return;
             decodeCache.put(dataUri, result);
             sendDataToHandler(result, viewpoint);
         }
