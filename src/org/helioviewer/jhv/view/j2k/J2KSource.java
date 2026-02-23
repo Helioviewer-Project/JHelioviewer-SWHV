@@ -99,14 +99,20 @@ abstract class J2KSource {
             // and taking the max of them. It is acceptable to think that an
             // image is color when it's not monochromatic, but not the other way
             // around... so this is just playing it safe.
+            int maxComponents;
             Kdu_channel_mapping cmap = new Kdu_channel_mapping();
-            cmap.Configure(stream);
+            try {
+                cmap.Configure(stream);
 
-            int maxComponents = MathUtils.max(cmap.Get_num_channels(), cmap.Get_num_colour_channels(), stream.Get_num_components(true), stream.Get_num_components(false));
-            // numComponents = maxComponents == 1 ? 1 : 3;
-            // With new file formats we may have 2 components
-            cmap.Clear();
-            cmap.Native_destroy();
+                maxComponents = MathUtils.max(
+                        cmap.Get_num_channels(), cmap.Get_num_colour_channels(),
+                        stream.Get_num_components(true), stream.Get_num_components(false));
+                // numComponents = maxComponents == 1 ? 1 : 3;
+                // With new file formats we may have 2 components
+            } finally {
+                cmap.Clear();
+                cmap.Native_destroy();
+            }
 
             int maxDWT = stream.Get_min_dwt_levels();
             ResolutionSet res = new ResolutionSet(maxDWT + 1, maxComponents);
