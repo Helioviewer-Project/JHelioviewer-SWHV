@@ -207,8 +207,9 @@ public class BandReaderCdf {
         }
         if (label == null) {
             String labelAxis = dataAttrs.get("LABLAXIS");
-            if (numAxes == 1)
-                labels[0] = labelAxis;
+            if (labelAxis == null || labelAxis.isBlank()) labelAxis = variableName;
+
+            if (numAxes == 1) labels[0] = labelAxis;
             else {
                 for (int i = 0; i < numAxes; i++)
                     labels[i] = labelAxis + String.format(" ch_%d", i);
