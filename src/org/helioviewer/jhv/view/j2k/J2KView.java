@@ -281,34 +281,31 @@ public class J2KView extends BaseView {
     }
 
     private void executeDecode(J2KParams.Decode decodeParams) {
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(new DecodeKey(decodeParams, filterType));
+        DecodeKey key = new DecodeKey(decodeParams, filterType);
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(key);
         if (imageBuffer != null) {
             sendDataToHandler(decodeParams, imageBuffer);
             return;
         }
         int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
-        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(decodeParams, filterType));
+        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key));
     }
 
     private class J2KCallback extends DecodeCallback {
 
-        private final J2KParams.Decode params;
-        private final ImageFilter.Type requestedFilter;
+        private final DecodeKey key;
 
-        J2KCallback(J2KParams.Decode _params, ImageFilter.Type _requestedFilter) {
-            params = _params;
-            requestedFilter = _requestedFilter;
+        J2KCallback(DecodeKey _key) {
+            key = _key;
         }
 
         @Override
         public void onSuccess(ImageBuffer result) {
-            if (requestedFilter != filterType) {
-                return;
-            }
-            if (params.complete) {
-                decodeCache.put(new DecodeKey(params, requestedFilter), result);
-            }
-            sendDataToHandler(params, result);
+            if (key.filter() != filterType) return; // filter changed in-flight
+
+            if (key.params().complete) decodeCache.put(key, result);
+
+            sendDataToHandler(key.params(), result);
         }
 
     }

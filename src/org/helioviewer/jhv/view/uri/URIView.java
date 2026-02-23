@@ -70,12 +70,13 @@ public class URIView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(new DecodeKey(dataUri, filterType));
+        DecodeKey key = new DecodeKey(dataUri, filterType);
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(key);
         if (imageBuffer != null) {
             sendDataToHandler(imageBuffer, viewpoint);
             return;
         }
-        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint, filterType));
+        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint, key));
     }
 
     private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
@@ -92,18 +93,18 @@ public class URIView extends BaseView {
     private class Callback extends DecodeCallback {
 
         private final Position viewpoint;
-        private final ImageFilter.Type requestedFilter;
+        private final DecodeKey key;
 
-        Callback(Position _viewpoint, ImageFilter.Type _requestedFilter) {
+        Callback(Position _viewpoint, DecodeKey _key) {
             viewpoint = _viewpoint;
-            requestedFilter = _requestedFilter;
+            key = _key;
         }
 
         @Override
         public void onSuccess(ImageBuffer result) {
-            if (requestedFilter != filterType)
-                return;
-            decodeCache.put(new DecodeKey(dataUri, requestedFilter), result);
+            if (key.filter() != filterType) return; // filter changed in-flight
+
+            decodeCache.put(key, result);
             sendDataToHandler(result, viewpoint);
         }
 
