@@ -6,6 +6,7 @@ import java.net.URI;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.threads.JHVThread;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CountryResponse;
@@ -14,7 +15,7 @@ import okio.BufferedSource;
 public class LocationChecker {
 
     public static void setProximityServer() {
-        new Thread(() -> {
+        JHVThread.create(() -> {
             try (NetClient nc = NetClient.of(new URI("https://api.ipify.org")); BufferedSource source = nc.getSource()) {
                 String address = source.readUtf8Line();
                 if (address == null || address.isEmpty()) {

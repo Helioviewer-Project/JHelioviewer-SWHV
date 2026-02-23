@@ -39,7 +39,6 @@ public class MathUtils {
         x %= 360.;
         if (x < 0)
             x += 360.;
-
         return x;
     }
 
@@ -49,7 +48,6 @@ public class MathUtils {
             x -= 360.;
         else if (x < -180.)
             x += 360;
-
         return x;
     }
 

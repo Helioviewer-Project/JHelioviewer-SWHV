@@ -27,6 +27,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,7 +42,7 @@ public class SampClient extends HubConnector {
     private static SampClient instance; // keep instance built at startup
 
     public static void init() {
-        new Thread(() -> {
+        JHVThread.create(() -> {
             if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
                 try {
                     if (Hub.getRunningHubs().length == 0) {

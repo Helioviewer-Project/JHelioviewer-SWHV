@@ -10,6 +10,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
+import org.helioviewer.jhv.threads.JHVThread;
 
 import okio.BufferedSource;
 
@@ -18,7 +19,7 @@ import okio.BufferedSource;
 public class UpdateChecker {
 
     public static void check(boolean verbose) {
-        new Thread(() -> {
+        JHVThread.create(() -> {
             if (!verbose) {
                 try {
                     int n = Integer.parseInt(Settings.getProperty("update.next"));

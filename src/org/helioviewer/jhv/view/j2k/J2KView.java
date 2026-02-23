@@ -23,6 +23,7 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
@@ -140,7 +141,7 @@ public class J2KView extends BaseView {
                     decodeCache.invalidate(params);
             }
             // reader abolish may take too long in stressed conditions
-            new Thread(() -> {
+            JHVThread.create(() -> {
                 try {
                     if (aReader != null) {
                         aReader.abolish();
