@@ -86,7 +86,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         if (_server == null || DataSources.getServerSetting(_server, "API.getDataSources") == null) // very unlikely
             throw new Exception("Unknown server");
 
-        int _sourceId = DataSources.select(_server, observatory, dataset);
+        int _sourceId = DataSources.selectDataset(_server, observatory, dataset);
         if (_sourceId < 0)
             throw new Exception("Empty request result");
 
