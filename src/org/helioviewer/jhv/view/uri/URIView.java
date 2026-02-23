@@ -46,10 +46,11 @@ public class URIView extends BaseView {
         try {
             MetaData m;
             URIImageReader.Image image = reader.readImage(dataUri.file());
+            ImageBuffer buffer = image.buffer();
             String readXml = image.xml();
             if (readXml == null) {
                 xml = EMPTY_METAXML;
-                m = new PixelBasedMetaData(100, 100, dataUri.baseName());
+                m = new PixelBasedMetaData(buffer.width, buffer.height, dataUri.baseName());
             } else {
                 xml = readXml;
                 m = new XMLMetaDataContainer(xml).getHVMetaData();
@@ -57,7 +58,7 @@ public class URIView extends BaseView {
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
             metaData[0] = m;
-            decodeCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), image.buffer());
+            decodeCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), buffer);
 
             int[] lut = image.lut();
             if (lut != null)
