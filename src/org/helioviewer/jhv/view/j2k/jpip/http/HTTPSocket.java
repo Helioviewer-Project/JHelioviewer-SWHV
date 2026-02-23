@@ -31,11 +31,15 @@ public class HTTPSocket {
     protected HTTPSocket(URI uri) throws IOException {
         try {
             String host = uri.getHost();
-            int port = uri.getPort() <= 0 ? 80 : uri.getPort();
 
+            int port;
             switch (uri.getScheme().toLowerCase()) {
-                case "jpip" -> socket = new Socket(ProxySettings.proxy);
+                case "jpip" -> {
+                    port = uri.getPort() <= 0 ? 80 : uri.getPort();
+                    socket = new Socket(ProxySettings.proxy);
+                }
                 case "jpips" -> {
+                    port = uri.getPort() <= 0 ? 443 : uri.getPort();
                     socket = SSLSocketFactory.getDefault().createSocket();
                     if (socket instanceof SSLSocket sslSocket) { // obviously
                         SSLParameters parameters = sslSocket.getSSLParameters();
