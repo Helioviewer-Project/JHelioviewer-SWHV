@@ -96,7 +96,7 @@ public class DataSources {
     private static boolean loadCommandLineRequest;
 
     public static void loadSources(boolean requestAfterLoad) {
-        sourceMap.clear(); // clear stale datasets on reload of DataSources
+        datasetMap.clear(); // clear stale datasets on reload of DataSources
         toLoad = serverSettings.size();
         loadCommandLineRequest = requestAfterLoad;
         serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName));
@@ -119,14 +119,14 @@ public class DataSources {
     private record Source(String observatory, String dataset) {
     }
 
-    private static final Map<DatasetId, Source> sourceMap = new ConcurrentHashMap<>();
+    private static final Map<DatasetId, Source> datasetMap = new ConcurrentHashMap<>();
 
-    static void insert(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
-        sourceMap.put(new DatasetId(server, sourceId), new Source(observatory, dataset));
+    static void insertDataset(int sourceId, @Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
+        datasetMap.put(new DatasetId(server, sourceId), new Source(observatory, dataset));
     }
 
-    static int select(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
-        for (Map.Entry<DatasetId, Source> entry : sourceMap.entrySet()) {
+    static int selectDataset(@Nonnull String server, @Nonnull String observatory, @Nonnull String dataset) {
+        for (Map.Entry<DatasetId, Source> entry : datasetMap.entrySet()) {
             DatasetId key = entry.getKey();
             if (key.server().equals(server)) {
                 Source value = entry.getValue();
