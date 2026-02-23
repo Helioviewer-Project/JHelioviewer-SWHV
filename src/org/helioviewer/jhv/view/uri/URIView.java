@@ -25,7 +25,10 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class URIView extends BaseView {
 
-    private static final Cache<DataUri, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
+    private record DecodeKey(DataUri uri, ImageFilter.Type filter) {
+    }
+
+    private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
 
     static void clearURICache() {
         decodeCache.invalidateAll();
@@ -54,7 +57,7 @@ public class URIView extends BaseView {
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
             metaData[0] = m;
-            decodeCache.put(dataUri, image.buffer());
+            decodeCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), image.buffer());
 
             int[] lut = image.lut();
             if (lut != null)
@@ -66,9 +69,9 @@ public class URIView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(dataUri);
+        ImageBuffer imageBuffer = decodeCache.getIfPresent(new DecodeKey(dataUri, filterType));
         if (imageBuffer == null) {
-            executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint));
+            executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint, filterType));
         } else {
             sendDataToHandler(imageBuffer, viewpoint);
         }
@@ -88,14 +91,18 @@ public class URIView extends BaseView {
     private class Callback extends DecodeCallback {
 
         private final Position viewpoint;
+        private final ImageFilter.Type requestedFilter;
 
-        Callback(Position _viewpoint) {
+        Callback(Position _viewpoint, ImageFilter.Type _requestedFilter) {
             viewpoint = _viewpoint;
+            requestedFilter = _requestedFilter;
         }
 
         @Override
         public void onSuccess(ImageBuffer result) {
-            decodeCache.put(dataUri, result);
+            if (requestedFilter != filterType)
+                return;
+            decodeCache.put(new DecodeKey(dataUri, requestedFilter), result);
             sendDataToHandler(result, viewpoint);
         }
 
@@ -117,7 +124,7 @@ public class URIView extends BaseView {
 
     @Override
     public void abolish() {
-        decodeCache.invalidate(dataUri);
+        decodeCache.asMap().keySet().removeIf(k -> k.uri().equals(dataUri));
     }
 
     @Override
