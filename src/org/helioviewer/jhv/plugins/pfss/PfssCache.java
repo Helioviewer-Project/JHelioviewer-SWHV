@@ -2,7 +2,9 @@ package org.helioviewer.jhv.plugins.pfss;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -13,6 +15,7 @@ class PfssCache {
 
     private final TreeMap<Long, URI> map = new TreeMap<>();
     private final Cache<URI, PfssLoader.Data> cache = Caffeine.newBuilder().softValues().build();
+    private final Set<URI> inFlight = ConcurrentHashMap.newKeySet();
 
     void put(Map<Long, URI> uris) {
         map.putAll(uris);
@@ -22,9 +25,18 @@ class PfssCache {
         cache.put(uri, data);
     }
 
+    void markLoaded(URI uri, PfssLoader.Data data) {
+        cache.put(uri, data);
+        inFlight.remove(uri);
+    }
+
+    void markFailed(URI uri) {
+        inFlight.remove(uri);
+    }
+
     private PfssLoader.Data get(long time, URI uri) {
         PfssLoader.Data ret = cache.getIfPresent(uri);
-        if (ret == null) {
+        if (ret == null && inFlight.add(uri)) {
             PfssLoader.submitData(time, uri);
         }
         return ret;
@@ -47,6 +59,7 @@ class PfssCache {
     void clear() {
         map.clear();
         cache.invalidateAll();
+        inFlight.clear();
     }
 
 }

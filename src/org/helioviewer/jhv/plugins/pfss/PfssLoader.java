@@ -173,13 +173,14 @@ class PfssLoader {
         @Override
         public void onSuccess(Data result) {
             PfssPlugin.downloads--;
-            PfssPlugin.getPfsscache().putData(uri, result);
+            PfssPlugin.getPfsscache().markLoaded(uri, result);
             MovieDisplay.display(); //!
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
             PfssPlugin.downloads--;
+            PfssPlugin.getPfsscache().markFailed(uri);
             Log.error(t);
         }
     }
