@@ -19,14 +19,18 @@ public class SectorPanel implements FilterDetails {
         int right = 0; // (int) (layer.getGLImage().getSector1() + .5);
         slider = new JHVRangeSlider(-180, 180, left, right);
 
-        label = new JLabel(LevelsPanel.formatDegree(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
+        label = new JLabel(formatDegree(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
         slider.addChangeListener(e -> {
             int lo = slider.getLowValue();
             int hi = slider.getHighValue();
             // layer.getGLImage().setSector(lo, hi);
-            label.setText(LevelsPanel.formatDegree(lo, hi));
+            label.setText(formatDegree(lo, hi));
             MovieDisplay.display();
         });
+    }
+
+    private static String formatDegree(int low, int high) {
+        return "<html><p align='right'>" + low + "\u00B0</p><p align='right'>" + high + "\u00B0</p>";
     }
 
     @Override
