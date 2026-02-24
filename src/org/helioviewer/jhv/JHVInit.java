@@ -35,8 +35,16 @@ class JHVInit {
         loadLibs(Platform.getResourceDir());
         KakaduMessageSystem.startKduMessageSystem();
 
-        JPIPCacheManager.init();
-        AIAResponse.load();
+        try {
+            JPIPCacheManager.init();
+        } catch (Exception e) {
+            Log.error("JPIP cache initialization error", e);
+        }
+        try {
+            AIAResponse.load();
+        } catch (Exception e) {
+            Log.error("AIA response map load error", e);
+        }
 
         FitsFactory.setUseHierarch(true);
         FitsFactory.setLongStringsEnabled(true);
