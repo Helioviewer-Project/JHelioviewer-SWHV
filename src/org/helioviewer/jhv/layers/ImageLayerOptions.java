@@ -26,29 +26,29 @@ class ImageLayerOptions extends JPanel {
     private final SlitPanel slitPanel;
     // private final SectorPanel sectorPanel;
     private final InnerMaskPanel innerMaskPanel;
-    private final DeltaCROTAPanel deltaCROTAPanel;
-    private final DeltaCRVAL1Panel deltaCRVAL1Panel;
-    private final DeltaCRVAL2Panel deltaCRVAL2Panel;
+    private final SliderFilterPanel.DeltaCROTA deltaCROTAPanel;
+    private final SliderFilterPanel.DeltaCRVAL1 deltaCRVAL1Panel;
+    private final SliderFilterPanel.DeltaCRVAL2 deltaCRVAL2Panel;
 
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
 
     ImageLayerOptions(ImageLayer layer) {
         DifferencePanel differencePanel = new DifferencePanel(layer);
-        FilterDetails opacityPanel = new OpacityPanel(layer);
-        FilterDetails blendPanel = new BlendPanel(layer);
+        FilterDetails opacityPanel = new SliderFilterPanel.Opacity(layer);
+        FilterDetails blendPanel = new SliderFilterPanel.Blend(layer);
         FilterDetails channelMixerPanel = new ChannelMixerPanel(layer);
         lutPanel = new LUTPanel(layer);
         FilterDetails levelsPanel = new LevelsPanel(layer);
-        FilterDetails sharpenPanel = new SharpenPanel(layer);
+        FilterDetails sharpenPanel = new SliderFilterPanel.Sharpen(layer);
         FilterDetails imageFilterPanel = new ImageFilterPanel(layer);
 
         slitPanel = new SlitPanel(layer);
         innerMaskPanel = new InnerMaskPanel(layer);
         // sectorPanel = new SectorPanel(layer);
-        deltaCROTAPanel = new DeltaCROTAPanel(layer);
-        deltaCRVAL1Panel = new DeltaCRVAL1Panel(layer);
-        deltaCRVAL2Panel = new DeltaCRVAL2Panel(layer);
+        deltaCROTAPanel = new SliderFilterPanel.DeltaCROTA(layer);
+        deltaCRVAL1Panel = new SliderFilterPanel.DeltaCRVAL1(layer);
+        deltaCRVAL2Panel = new SliderFilterPanel.DeltaCRVAL2(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
