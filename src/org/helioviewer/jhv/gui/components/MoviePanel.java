@@ -71,106 +71,39 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     }
 
     private enum RecordSize {
-        ORIGINAL {
-            @Override
-            public String toString() {
-                return "On screen";
-            }
+        ORIGINAL("On screen", 0, 0, false),
+        H1024("1024×1024", 1024, 1024, true),
+        H1080("1920×1080", 1920, 1080, true),
+        H2048("2048×2048", 2048, 2048, true),
+        H2160("3840×2160", 3840, 2160, true),
+        H4096("4096×4096", 4096, 4096, true);
 
-            @Override
-            Dimension getSize() {
+        private final String label;
+        private final int width;
+        private final int height;
+        private final boolean internal;
+
+        RecordSize(String _label, int _width, int _height, boolean _internal) {
+            label = _label;
+            width = _width;
+            height = _height;
+            internal = _internal;
+        }
+
+        boolean isInternal() {
+            return internal;
+        }
+
+        Dimension getSize() {
+            if (this == ORIGINAL)
                 return new Dimension(Display.fullViewport.width, Display.fullViewport.height);
-            }
+            return new Dimension(width, height);
+        }
 
-            @Override
-            boolean isInternal() {
-                return false;
-            }
-        },
-        H1024 {
-            @Override
-            public String toString() {
-                return "1024×1024";
-            }
-
-            @Override
-            Dimension getSize() {
-                return new Dimension(1024, 1024);
-            }
-
-            @Override
-            boolean isInternal() {
-                return true;
-            }
-        },
-        H1080 {
-            @Override
-            public String toString() {
-                return "1920×1080";
-            }
-
-            @Override
-            Dimension getSize() {
-                return new Dimension(1920, 1080);
-            }
-
-            @Override
-            boolean isInternal() {
-                return true;
-            }
-        },
-        H2048 {
-            @Override
-            public String toString() {
-                return "2048×2048";
-            }
-
-            @Override
-            Dimension getSize() {
-                return new Dimension(2048, 2048);
-            }
-
-            @Override
-            boolean isInternal() {
-                return true;
-            }
-        },
-        H2160 {
-            @Override
-            public String toString() {
-                return "3840×2160";
-            }
-
-            @Override
-            Dimension getSize() {
-                return new Dimension(3840, 2160);
-            }
-
-            @Override
-            boolean isInternal() {
-                return true;
-            }
-        },
-        H4096 {
-            @Override
-            public String toString() {
-                return "4096×4096";
-            }
-
-            @Override
-            Dimension getSize() {
-                return new Dimension(4096, 4096);
-            }
-
-            @Override
-            boolean isInternal() {
-                return true;
-            }
-        };
-
-        abstract boolean isInternal();
-
-        abstract Dimension getSize();
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 
     private static boolean isAdvanced;
