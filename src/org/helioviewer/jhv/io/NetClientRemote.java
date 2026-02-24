@@ -40,8 +40,8 @@ class NetClientRemote implements NetClient {
     private static final int cacheSize = 1024 * 1024 * 1024;
     private static final CacheControl noStore = new CacheControl.Builder().noStore().build();
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(30000, TimeUnit.MILLISECONDS)
-            .readTimeout(30000, TimeUnit.MILLISECONDS)
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .cache(new Cache(JHVGlobals.clientCacheDir, cacheSize))
             .dispatcher(dispatcher)
             //.addInterceptor(logging)
