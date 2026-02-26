@@ -279,8 +279,8 @@ public class J2KView extends BaseView {
 
     void signalDecoderFromReader(J2KParams.Read readParams) {
         EventQueue.invokeLater(() -> {
-            if (readParams.decodeParams.frame() == targetFrame) {
-                executeDecode(readParams.decodeParams, readParams.viewpoint, false);
+            if (readParams.decodeParams().frame() == targetFrame) {
+                executeDecode(readParams.decodeParams(), readParams.viewpoint(), false);
             }
         });
     }
