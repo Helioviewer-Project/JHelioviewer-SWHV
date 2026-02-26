@@ -5,7 +5,7 @@ import org.helioviewer.jhv.math.MathUtils;
 
 class J2KParams {
 
-    static record SubImage(int x, int y, int w, int h) {
+    record SubImage(int x, int y, int w, int h) {
 
         private static final int QUANTA = 32;
 
@@ -29,35 +29,7 @@ class J2KParams {
 
     }
 
-    static record Decode(int serial, int frame, SubImage subImage, int level, float factor) {
-        private static int computeHash(int s, int fr, SubImage si, int l, float f) {
-            int result = s;
-            result = 31 * result + fr;
-            result = 31 * result + si.hashCode();
-            result = 31 * result + l;
-            int factorHash = (f == 0f) ? 0 : Float.floatToRawIntBits(f); // collapse +0.0f and -0.0f
-            return 31 * result + factorHash;
-        }
-
-        @Override
-        public final boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o instanceof Decode p)
-                return serial == p.serial() && frame == p.frame() && level == p.level() && factor == p.factor() && subImage.equals(p.subImage());
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return computeHash(serial, frame, subImage, level, factor);
-        }
-
-        @Override
-        public String toString() {
-            return "[Frame=" + frame + ' ' + subImage + " Level=" + level + " Factor=" + factor + ']';
-        }
-
+    record Decode(int serial, int frame, SubImage subImage, int level, float factor) {
     }
 
     static class Read {
