@@ -53,11 +53,17 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static final int SCALES = 6;
     private static final float MIX_FACTOR = 0.99f;
     private static final float ONE_MINUS_MIX_FACTOR = 1f - MIX_FACTOR;
-    private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
     private static final float SIGMA_E0 = 8.907e-1f;
     private static final float SIGMA_E1 = 2.0072e-1f;
     private static final float BOOST = 1.5f; // restore some crispness after denoising
     private static final float NOISE_THRESH = 1e-10f; // avoid denoising very low noise or blank images
+
+    // private static final float[] FILTER = {1f / 16, 4f / 16, 6f / 16, 4f / 16, 1f / 16};
+    private static final float FILTER0 = 1f / 16;
+    private static final float FILTER1 = 4f / 16;
+    private static final float FILTER2 = 6f / 16;
+    private static final float FILTER3 = 4f / 16;
+    private static final float FILTER4 = 1f / 16;
 
     private static final ArrayOp opSubtract = (op1, op2, dest, start, end) -> {
         for (int i = start; i < end; i++) {
@@ -156,14 +162,14 @@ class FilterWOW implements ImageFilter.Algorithm {
             for (int x = 0; x < width; x++) {
                 float sum = 0;
                 int idx_m2 = mirroredIdx(x - 2 * step, width);
-                sum += src[rowBase + idx_m2] * FILTER[0];
+                sum += src[rowBase + idx_m2] * FILTER0;
                 int idx_m1 = mirroredIdx(x - step, width);
-                sum += src[rowBase + idx_m1] * FILTER[1];
-                sum += src[rowBase + x] * FILTER[2];
+                sum += src[rowBase + idx_m1] * FILTER1;
+                sum += src[rowBase + x] * FILTER2;
                 int idx_p1 = mirroredIdx(x + step, width);
-                sum += src[rowBase + idx_p1] * FILTER[3];
+                sum += src[rowBase + idx_p1] * FILTER3;
                 int idx_p2 = mirroredIdx(x + 2 * step, width);
-                sum += src[rowBase + idx_p2] * FILTER[4];
+                sum += src[rowBase + idx_p2] * FILTER4;
                 dest[rowBase + x] = sum;
             }
         });
@@ -176,18 +182,18 @@ class FilterWOW implements ImageFilter.Algorithm {
                 float sum = 0;
                 int idx_m2 = mirroredIdx(x - 2 * step, width);
                 float v_m2 = src[rowBase + idx_m2];
-                sum += v_m2 * v_m2 * FILTER[0];
+                sum += v_m2 * v_m2 * FILTER0;
                 int idx_m1 = mirroredIdx(x - step, width);
                 float v_m1 = src[rowBase + idx_m1];
-                sum += v_m1 * v_m1 * FILTER[1];
+                sum += v_m1 * v_m1 * FILTER1;
                 float v0 = src[rowBase + x];
-                sum += v0 * v0 * FILTER[2];
+                sum += v0 * v0 * FILTER2;
                 int idx_p1 = mirroredIdx(x + step, width);
                 float v_p1 = src[rowBase + idx_p1];
-                sum += v_p1 * v_p1 * FILTER[3];
+                sum += v_p1 * v_p1 * FILTER3;
                 int idx_p2 = mirroredIdx(x + 2 * step, width);
                 float v_p2 = src[rowBase + idx_p2];
-                sum += v_p2 * v_p2 * FILTER[4];
+                sum += v_p2 * v_p2 * FILTER4;
                 dest[rowBase + x] = sum;
             }
         });
@@ -202,11 +208,11 @@ class FilterWOW implements ImageFilter.Algorithm {
             int rowP2 = mirroredIdx(y + 2 * step, height) * width;
             for (int x = 0; x < width; x++) {
                 float sum = 0;
-                sum += src[rowM2 + x] * FILTER[0];
-                sum += src[rowM1 + x] * FILTER[1];
-                sum += src[rowBase + x] * FILTER[2];
-                sum += src[rowP1 + x] * FILTER[3];
-                sum += src[rowP2 + x] * FILTER[4];
+                sum += src[rowM2 + x] * FILTER0;
+                sum += src[rowM1 + x] * FILTER1;
+                sum += src[rowBase + x] * FILTER2;
+                sum += src[rowP1 + x] * FILTER3;
+                sum += src[rowP2 + x] * FILTER4;
                 dest[rowBase + x] = sum;
             }
         });
