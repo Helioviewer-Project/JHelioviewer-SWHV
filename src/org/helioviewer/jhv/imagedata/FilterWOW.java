@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.util.OptionalDouble;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import org.helioviewer.jhv.math.MathUtils;
@@ -52,7 +52,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             convolveVertical(smooth, variance, width, height, step); // Vertical pass
             // Denoise stage
             if (scale == 0) {
-                noise = (1.48260221850560f / SIGMA_E0) * medianStream(detail, length);
+                noise = (1.48260221850560f / SIGMA_E0) * median(detail, width, height);
                 if (noise > NOISE_THRESH) { // avoid division by 0
                     float denoiseFactor = 1 / (3 * SIGMA_E0 * noise);
                     denoiseParallel(denoiseFactor, detail, width, height);
@@ -63,30 +63,24 @@ class FilterWOW implements ImageFilter.Algorithm {
                     denoiseParallel(denoiseFactor, detail, width, height);
                 }
             }
-            // Whitened synthesis
-            synthesisParallel(variance, detail, output, width, height);
+            synthesisParallel(variance, detail, output, width, height); // Whitened synthesis
         }
-        blendParallel(base, data, output, width, height);
+        blendParallel(base, data, output, width, height); // Blend with input
         return output;
     }
 
-/*
-    private static float median(float[] c, int length) {
+    private static float median(float[] c, int width, int height) {
+        int length = width * height;
         float[] w = new float[length];
-        IntStream.range(0, length).parallel().forEach(i -> w[i] = Math.abs(c[i]));
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
+                w[idx] = Math.abs(c[idx]);
+            }
+        });
         Arrays.parallelSort(w); // can be faster than serial quickSelect
         return w[length / 2];
-    }
-*/
-
-    private static float medianStream(float[] c, int length) {
-        OptionalDouble od = IntStream.range(0, length)
-                .parallel()
-                .mapToDouble(i -> Math.abs(c[i]))
-                .sorted()
-                .skip(length / 2)
-                .findFirst();
-        return od.isEmpty() ? 0 : (float) od.getAsDouble();
     }
 
     private static void subtractParallel(float[] base, float[] smooth, float[] detail, int width, int height) {
