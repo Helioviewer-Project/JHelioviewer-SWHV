@@ -34,9 +34,9 @@ public class ImageFilter {
         float[] data = new float[length];
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int i = rowBase + x;
-                data[i] = ((array[i] + 256) & 0xFF) * BDIV;
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
+                data[idx] = ((array[idx] + 256) & 0xFF) * BDIV;
             }
         });
 
@@ -45,9 +45,9 @@ public class ImageFilter {
         byte[] out = new byte[length];
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int i = rowBase + x;
-                out[i] = (byte) Math.clamp(image[i] * 255 + .5f, 0, 255);
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
+                out[idx] = (byte) Math.clamp(image[idx] * 255 + .5f, 0, 255);
             }
         });
 
@@ -61,9 +61,9 @@ public class ImageFilter {
         float[] data = new float[length];
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int i = rowBase + x;
-                data[i] = ((array[i] + 65536) & 0xFFFF) * SDIV;
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
+                data[idx] = ((array[idx] + 65536) & 0xFFFF) * SDIV;
             }
         });
 
@@ -72,9 +72,9 @@ public class ImageFilter {
         short[] out = new short[length];
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int i = rowBase + x;
-                out[i] = (short) Math.clamp(image[i] * 65535 + .5f, 0, 65535);
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
+                out[idx] = (short) Math.clamp(image[idx] * 65535 + .5f, 0, 65535);
             }
         });
 

@@ -140,6 +140,7 @@ class FilterMGN implements ImageFilter.Algorithm {
         float[] accum = new float[size];
         float[] conv = new float[size];
         float[] conv2 = new float[size];
+
         int maxDim = Math.max(width, height);
         GaussFilter[] filters = new GaussFilter[sigmas.length];
         for (int i = 0; i < sigmas.length; i++) {
