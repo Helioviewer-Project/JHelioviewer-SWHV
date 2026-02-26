@@ -71,6 +71,20 @@ class FITSImage implements URIImageReader {
         }
     }
 
+    private static void storeMappedPixel(short[] outData, int outIdx, float[] lut, float v, double scale, double mapped) {
+        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+        lut[p] = v;
+        outData[outIdx] = (short) p;
+    }
+
+    private static double mapScaled(FITSSettings.ScalingMode scalingMode, float d, float range) {
+        return switch (scalingMode) {
+            case Gamma -> fn_gamma(d);
+            case Beta -> fn_beta(d);
+            case Alpha -> fn_alpha(d / range);
+        };
+    }
+
     // private static final int SAMPLE = 8;
     private static final int SAMPLE = 4;
     private static final int MIN_SAMPLES = 10;
@@ -242,14 +256,8 @@ class FITSImage implements URIImageReader {
                     } else {
                         v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
                         float d = v - minV;
-                        double mapped = switch (scalingMode) {
-                            case Gamma -> fn_gamma(d);
-                            case Beta -> fn_beta(d);
-                            case Alpha -> fn_alpha(d / range);
-                        };
-                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outIdx] = (short) p;
+                        double mapped = mapScaled(scalingMode, d, range);
+                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
                     }
                 }
             });
@@ -265,14 +273,8 @@ class FITSImage implements URIImageReader {
                     } else {
                         v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
                         float d = v - minV;
-                        double mapped = switch (scalingMode) {
-                            case Gamma -> fn_gamma(d);
-                            case Beta -> fn_beta(d);
-                            case Alpha -> fn_alpha(d / range);
-                        };
-                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outIdx] = (short) p;
+                        double mapped = mapScaled(scalingMode, d, range);
+                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
                     }
                 }
             });
@@ -288,14 +290,8 @@ class FITSImage implements URIImageReader {
                     } else {
                         v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
                         float d = v - minV;
-                        double mapped = switch (scalingMode) {
-                            case Gamma -> fn_gamma(d);
-                            case Beta -> fn_beta(d);
-                            case Alpha -> fn_alpha(d / range);
-                        };
-                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outIdx] = (short) p;
+                        double mapped = mapScaled(scalingMode, d, range);
+                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
                     }
                 }
             });
@@ -310,14 +306,8 @@ class FITSImage implements URIImageReader {
                     } else {
                         v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
                         float d = v - minV;
-                        double mapped = switch (scalingMode) {
-                            case Gamma -> fn_gamma(d);
-                            case Beta -> fn_beta(d);
-                            case Alpha -> fn_alpha(d / range);
-                        };
-                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outIdx] = (short) p;
+                        double mapped = mapScaled(scalingMode, d, range);
+                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
                     }
                 }
             });
@@ -332,14 +322,8 @@ class FITSImage implements URIImageReader {
                     } else {
                         v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
                         float d = v - minV;
-                        double mapped = switch (scalingMode) {
-                            case Gamma -> fn_gamma(d);
-                            case Beta -> fn_beta(d);
-                            case Alpha -> fn_alpha(d / range);
-                        };
-                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outIdx] = (short) p;
+                        double mapped = mapScaled(scalingMode, d, range);
+                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
                     }
                 }
             });
