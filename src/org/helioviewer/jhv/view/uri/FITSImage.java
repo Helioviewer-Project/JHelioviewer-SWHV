@@ -201,28 +201,122 @@ class FITSImage implements URIImageReader {
         float range = maxV - minV;
 
         //Stopwatch sw = Stopwatch.createStarted();
-        IntStream.range(0, height).parallel().forEach(j -> {
-            Object lineData = pixData[j];
-            int outLine = width * (height - 1 - j);
+        switch (pixType) {
+            case SHORT -> IntStream.range(0, height).parallel().forEach(j -> {
+                short[] lineData = (short[]) pixData[j];
+                int outLine = width * (height - 1 - j);
 
-            for (int i = 0; i < width; i++) {
-                float v = px.get(lineData, i);
-                if (v == ImageBuffer.BAD_PIXEL) {
-                    outData[outLine + i] = 0;
-                } else {
-                    v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-                    float d = v - minV;
-                    double mapped = switch (scalingMode) {
-                        case Gamma -> fn_gamma(d);
-                        case Beta -> fn_beta(d);
-                        case Alpha -> fn_alpha(d / range);
-                    };
-                    int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-                    lut[p] = v;
-                    outData[outLine + i] = (short) p;
+                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                    short raw = lineData[i];
+                    float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outIdx] = 0;
+                    } else {
+                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+                        float d = v - minV;
+                        double mapped = switch (scalingMode) {
+                            case Gamma -> fn_gamma(d);
+                            case Beta -> fn_beta(d);
+                            case Alpha -> fn_alpha(d / range);
+                        };
+                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outIdx] = (short) p;
+                    }
                 }
-            }
-        });
+            });
+            case INT -> IntStream.range(0, height).parallel().forEach(j -> {
+                int[] lineData = (int[]) pixData[j];
+                int outLine = width * (height - 1 - j);
+
+                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                    int raw = lineData[i];
+                    float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outIdx] = 0;
+                    } else {
+                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+                        float d = v - minV;
+                        double mapped = switch (scalingMode) {
+                            case Gamma -> fn_gamma(d);
+                            case Beta -> fn_beta(d);
+                            case Alpha -> fn_alpha(d / range);
+                        };
+                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outIdx] = (short) p;
+                    }
+                }
+            });
+            case LONG -> IntStream.range(0, height).parallel().forEach(j -> {
+                long[] lineData = (long[]) pixData[j];
+                int outLine = width * (height - 1 - j);
+
+                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                    long raw = lineData[i];
+                    float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outIdx] = 0;
+                    } else {
+                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+                        float d = v - minV;
+                        double mapped = switch (scalingMode) {
+                            case Gamma -> fn_gamma(d);
+                            case Beta -> fn_beta(d);
+                            case Alpha -> fn_alpha(d / range);
+                        };
+                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outIdx] = (short) p;
+                    }
+                }
+            });
+            case FLOAT -> IntStream.range(0, height).parallel().forEach(j -> {
+                float[] lineData = (float[]) pixData[j];
+                int outLine = width * (height - 1 - j);
+
+                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                    float v = floatPixel(lineData[i], bzero, bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outIdx] = 0;
+                    } else {
+                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+                        float d = v - minV;
+                        double mapped = switch (scalingMode) {
+                            case Gamma -> fn_gamma(d);
+                            case Beta -> fn_beta(d);
+                            case Alpha -> fn_alpha(d / range);
+                        };
+                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outIdx] = (short) p;
+                    }
+                }
+            });
+            case DOUBLE -> IntStream.range(0, height).parallel().forEach(j -> {
+                double[] lineData = (double[]) pixData[j];
+                int outLine = width * (height - 1 - j);
+
+                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                    float v = floatPixel(lineData[i], bzero, bscale);
+                    if (v == ImageBuffer.BAD_PIXEL) {
+                        outData[outIdx] = 0;
+                    } else {
+                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+                        float d = v - minV;
+                        double mapped = switch (scalingMode) {
+                            case Gamma -> fn_gamma(d);
+                            case Beta -> fn_beta(d);
+                            case Alpha -> fn_alpha(d / range);
+                        };
+                        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+                        lut[p] = v;
+                        outData[outIdx] = (short) p;
+                    }
+                }
+            });
+            case BYTE -> throw new Exception("Unexpected BYTE path in non-byte conversion");
+        }
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
     }
