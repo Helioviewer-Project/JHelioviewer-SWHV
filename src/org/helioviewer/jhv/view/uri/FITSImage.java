@@ -190,64 +190,39 @@ class FITSImage implements URIImageReader {
         short[] outData = new short[width * height];
         float[] lut = new float[65536];
 
-        double scale = switch (FITSSettings.scalingMode) {
+        FITSSettings.ScalingMode scalingMode = FITSSettings.scalingMode;
+        double scale = switch (scalingMode) {
             case Gamma -> 65535. / fn_gamma(max - min);
             case Beta -> 65535. / fn_beta(max - min);
             case Alpha -> 65535. / fn_alpha(1);
         };
-        float[] minMax = {min, max};
+        float minV = min;
+        float maxV = max;
+        float range = maxV - minV;
 
         //Stopwatch sw = Stopwatch.createStarted();
-        switch (FITSSettings.scalingMode) {
-            case Gamma -> IntStream.range(0, height).parallel().forEach(j -> {
-                Object lineData = pixData[j];
-                int outLine = width * (height - 1 - j);
+        IntStream.range(0, height).parallel().forEach(j -> {
+            Object lineData = pixData[j];
+            int outLine = width * (height - 1 - j);
 
-                for (int i = 0; i < width; i++) {
-                    float v = px.get(lineData, i);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outLine + i] = 0;
-                    } else {
-                        v = Math.clamp(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                        int p = (int) Math.clamp(scale * fn_gamma(v - minMax[0]) + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outLine + i] = (short) p;
-                    }
+            for (int i = 0; i < width; i++) {
+                float v = px.get(lineData, i);
+                if (v == ImageBuffer.BAD_PIXEL) {
+                    outData[outLine + i] = 0;
+                } else {
+                    v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+                    float d = v - minV;
+                    double mapped = switch (scalingMode) {
+                        case Gamma -> fn_gamma(d);
+                        case Beta -> fn_beta(d);
+                        case Alpha -> fn_alpha(d / range);
+                    };
+                    int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+                    lut[p] = v;
+                    outData[outLine + i] = (short) p;
                 }
-            });
-            case Beta -> IntStream.range(0, height).parallel().forEach(j -> {
-                Object lineData = pixData[j];
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0; i < width; i++) {
-                    float v = px.get(lineData, i);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outLine + i] = 0;
-                    } else {
-                        v = Math.clamp(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                        int p = (int) Math.clamp(scale * fn_beta(v - minMax[0]) + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outLine + i] = (short) p;
-                    }
-                }
-            });
-            case Alpha -> IntStream.range(0, height).parallel().forEach(j -> {
-                Object lineData = pixData[j];
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0; i < width; i++) {
-                    float v = px.get(lineData, i);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outLine + i] = 0;
-                    } else {
-                        v = Math.clamp(v, minMax[0], minMax[1]); // sampling may have missed extremes
-                        int p = (int) Math.clamp(scale * fn_alpha((v - minMax[0]) / (minMax[1] - minMax[0])) + .5, 0, 65535);
-                        lut[p] = v;
-                        outData[outLine + i] = (short) p;
-                    }
-                }
-            });
-        }
+            }
+        });
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
         return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
     }
