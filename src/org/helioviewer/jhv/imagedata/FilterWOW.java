@@ -5,7 +5,6 @@ import java.util.stream.IntStream;
 
 import org.helioviewer.jhv.math.MathUtils;
 
-@SuppressWarnings("serial")
 class FilterWOW implements ImageFilter.Algorithm {
 
     private static final int SCALES = 6;
@@ -35,7 +34,6 @@ class FilterWOW implements ImageFilter.Algorithm {
         float[] temp1 = new float[length];
         float[] temp2 = new float[length];
         float[] synth = new float[length];
-        float[] denoiseFactor = new float[1];
 
         float noise = 0; // computed for scale 0
         for (int scale = 0; scale < SCALES; scale++) {
@@ -52,13 +50,13 @@ class FilterWOW implements ImageFilter.Algorithm {
             if (scale == 0) {
                 noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
                 if (noise > NOISE_THRESH) { // avoid division by 0
-                    denoiseFactor[0] = 1 / (3 * SIGMA_E0 * noise);
-                    denoiseParallel(denoiseFactor[0], coeff, width, height);
+                    float denoiseFactor = 1 / (3 * SIGMA_E0 * noise);
+                    denoiseParallel(denoiseFactor, coeff, width, height);
                 }
             } else if (scale == 1) {
                 if (noise > NOISE_THRESH) { // avoid division by 0
-                    denoiseFactor[0] = 1 / (SIGMA_E1 * noise);
-                    denoiseParallel(denoiseFactor[0], coeff, width, height);
+                    float denoiseFactor = 1 / (SIGMA_E1 * noise);
+                    denoiseParallel(denoiseFactor, coeff, width, height);
                 }
             }
             // Whitened synthesis
