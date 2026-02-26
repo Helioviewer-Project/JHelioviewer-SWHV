@@ -131,7 +131,7 @@ public class J2KView extends BaseView {
         @Override
         public void run() {
             for (DecodeKey key : decodeCache.asMap().keySet()) {
-                if (key.params().serial == aSerial)
+                if (key.params().serial() == aSerial)
                     decodeCache.invalidate(key);
             }
             // reader abolish may take too long in stressed conditions
@@ -258,7 +258,7 @@ public class J2KView extends BaseView {
     private int currentLevel = 10000;
 
     protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint, boolean complete) {
-        int level = decodeParams.level;
+        int level = decodeParams.level();
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
@@ -270,7 +270,7 @@ public class J2KView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
-        boolean complete = isDecodeComplete(decodeParams.frame, decodeParams.level);
+        boolean complete = isDecodeComplete(decodeParams.frame(), decodeParams.level());
         if (reader != null && !complete) {
             signalReader(decodeParams, viewpoint, complete);
         }
@@ -279,7 +279,7 @@ public class J2KView extends BaseView {
 
     void signalDecoderFromReader(J2KParams.Read readParams) {
         EventQueue.invokeLater(() -> {
-            if (readParams.decodeParams.frame == targetFrame) {
+            if (readParams.decodeParams.frame() == targetFrame) {
                 executeDecode(readParams.decodeParams, readParams.viewpoint, readParams.complete);
             }
         });
@@ -292,7 +292,7 @@ public class J2KView extends BaseView {
             sendDataToHandler(decodeParams, viewpoint, imageBuffer);
             return;
         }
-        int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
+        int numComps = completionLevel.getResolutionSet(decodeParams.frame()).numComps;
         executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, complete));
     }
 
@@ -319,11 +319,11 @@ public class J2KView extends BaseView {
     }
 
     private void sendDataToHandler(J2KParams.Decode decodeParams, Position viewpoint, ImageBuffer imageBuffer) {
-        int frame = decodeParams.frame;
+        int frame = decodeParams.frame();
         MetaData m = metaData[frame];
-        SubImage roi = decodeParams.subImage;
-        ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level);
-        Region r = m.roiToRegion(roi.x, roi.y, roi.w, roi.h, resolution.factorX, resolution.factorY);
+        SubImage roi = decodeParams.subImage();
+        ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level());
+        Region r = m.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX, resolution.factorY);
         ImageData data = new ImageData(imageBuffer, m, r, viewpoint);
 
         EventQueue.invokeLater(() -> {

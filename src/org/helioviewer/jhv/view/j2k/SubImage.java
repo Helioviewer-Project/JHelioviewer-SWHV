@@ -2,18 +2,20 @@ package org.helioviewer.jhv.view.j2k;
 
 import org.helioviewer.jhv.math.MathUtils;
 
-class SubImage {
-
-    final int x;
-    final int y;
-    final int w;
-    final int h;
-    private final int hash;
+record SubImage(int x, int y, int w, int h) {
 
     private static final int QUANTA = 32;
 
+    private SubImage(int[] n) {
+        this(n[0], n[1], n[2], n[3]);
+    }
+
     // roundoff to quanta, minimum 1 pixel, clip to full image size
     SubImage(int xx, int yy, int ww, int hh, int fwidth, int fheight) {
+        this(normalize(xx, yy, ww, hh, fwidth, fheight));
+    }
+
+    private static int[] normalize(int xx, int yy, int ww, int hh, int fwidth, int fheight) {
         xx = MathUtils.roundDownTo(xx, QUANTA);
         yy = MathUtils.roundDownTo(yy, QUANTA);
         ww = MathUtils.roundUpTo(ww + QUANTA, QUANTA);
@@ -27,11 +29,7 @@ class SubImage {
         ww = Math.min(ww, fwidth - xx);
         hh = Math.min(hh, fheight - yy);
 
-        x = xx;
-        y = yy;
-        w = ww;
-        h = hh;
-        hash = computeHash(x, y, w, h);
+        return new int[]{xx, yy, ww, hh};
     }
 
     private static int computeHash(int _x, int _y, int _w, int _h) {
@@ -46,13 +44,13 @@ class SubImage {
         if (this == o)
             return true;
         if (o instanceof SubImage s)
-            return x == s.x && y == s.y && w == s.w && h == s.h;
+            return x == s.x() && y == s.y() && w == s.w() && h == s.h();
         return false;
     }
 
     @Override
     public int hashCode() {
-        return hash;
+        return computeHash(x, y, w, h);
     }
 
     @Override

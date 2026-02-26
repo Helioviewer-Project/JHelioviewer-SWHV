@@ -4,24 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 
 class J2KParams {
 
-    static class Decode {
-
-        final int serial;
-        final int frame;
-        final SubImage subImage;
-        final int level;
-        final float factor;
-        private final int hash;
-
-        Decode(int _serial, int _frame, SubImage _subImage, int _level, float _factor) {
-            serial = _serial;
-            frame = _frame;
-            subImage = _subImage;
-            level = _level;
-            factor = _factor;
-            hash = computeHash(serial, frame, subImage, level, factor);
-        }
-
+    static record Decode(int serial, int frame, SubImage subImage, int level, float factor) {
         private static int computeHash(int s, int fr, SubImage si, int l, float f) {
             int result = s;
             result = 31 * result + fr;
@@ -36,13 +19,13 @@ class J2KParams {
             if (this == o)
                 return true;
             if (o instanceof Decode p)
-                return serial == p.serial && frame == p.frame && level == p.level && factor == p.factor && subImage.equals(p.subImage);
+                return serial == p.serial() && frame == p.frame() && level == p.level() && factor == p.factor() && subImage.equals(p.subImage());
             return false;
         }
 
         @Override
         public int hashCode() {
-            return hash;
+            return computeHash(serial, frame, subImage, level, factor);
         }
 
         @Override

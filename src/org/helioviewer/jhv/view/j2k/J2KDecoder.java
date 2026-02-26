@@ -52,9 +52,9 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             }
             Jpx_source source = src.jpxSource();
 
-            SubImage subImage = params.subImage;
-            int frame = params.frame;
-            compositor = createCompositor(source, params.factor < 1 ? qualityLow : qualityHigh);
+            SubImage subImage = params.subImage();
+            int frame = params.frame();
+            compositor = createCompositor(source, params.factor() < 1 ? qualityLow : qualityHigh);
 
             Kdu_dims empty = new Kdu_dims();
             if (numComps < 3) {
@@ -64,10 +64,10 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 compositor.Add_ilayer(frame, empty, empty);
             }
 
-            compositor.Set_scale(false, false, false, 1f / (1 << params.level), params.factor);
+            compositor.Set_scale(false, false, false, 1f / (1 << params.level()), params.factor());
 
             Kdu_dims requestedRegion = new Kdu_dims();
-            requestedRegion.From_u32(subImage.x, subImage.y, subImage.w, subImage.h);
+            requestedRegion.From_u32(subImage.x(), subImage.y(), subImage.w(), subImage.h());
             compositor.Set_buffer_surface(requestedRegion);
 
             Kdu_compositor_buf compositorBuf = compositor.Get_composition_buffer(empty, true); // modifies empty
