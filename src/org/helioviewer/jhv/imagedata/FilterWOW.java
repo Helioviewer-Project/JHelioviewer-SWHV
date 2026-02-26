@@ -1,54 +1,12 @@
 package org.helioviewer.jhv.imagedata;
 
 import java.util.OptionalDouble;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
 
 import org.helioviewer.jhv.math.MathUtils;
 
 @SuppressWarnings("serial")
 class FilterWOW implements ImageFilter.Algorithm {
-
-    private interface ArrayOp {
-
-        void accept(float[] arg1, float[] arg2, float[] arg3, int start, int end);
-
-        int THRESHOLD = 64; // Adjust based on image size and system
-
-        class Task3 extends RecursiveAction {
-
-            private final float[] arg1;
-            private final float[] arg2;
-            private final float[] arg3;
-            private final int start;
-            private final int end;
-            private final ArrayOp op;
-
-            Task3(float[] arg1, float[] arg2, float[] arg3, int start, int end, ArrayOp op) {
-                this.arg1 = arg1;
-                this.arg2 = arg2;
-                this.arg3 = arg3;
-                this.start = start;
-                this.end = end;
-                this.op = op;
-            }
-
-            @Override
-            protected void compute() {
-                if (end - start <= THRESHOLD) {
-                    op.accept(arg1, arg2, arg3, start, end);
-                } else {
-                    int mid = (start + end) / 2;
-                    invokeAll(
-                            new Task3(arg1, arg2, arg3, start, mid, op),
-                            new Task3(arg1, arg2, arg3, mid, end, op));
-                }
-            }
-
-        }
-
-    }
 
     private static final int SCALES = 6;
     private static final float MIX_FACTOR = 0.99f;
@@ -65,32 +23,6 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static final float FILTER3 = 4f / 16;
     private static final float FILTER4 = 1f / 16;
 
-    private static final ArrayOp opSubtract = (op1, op2, dest, start, end) -> {
-        for (int i = start; i < end; i++) {
-            dest[i] = op1[i] - op2[i];
-        }
-    };
-
-    private static final ArrayOp opDenoise = (op1, op2, dest, start, end) -> {
-        float factor = op1[0];
-        for (int i = start; i < end; i++) {
-            float x = Math.abs(dest[i]) * factor;
-            dest[i] *= BOOST * x / (1 + x);
-        }
-    };
-
-    private static final ArrayOp opSynthesis = (op1, op2, dest, start, end) -> {
-        for (int i = start; i < end; i++) {
-            dest[i] += MathUtils.invSqrt(op1[i]) * op2[i];
-        }
-    };
-
-    private static final ArrayOp opBlend = (op1, op2, dest, start, end) -> {
-        for (int i = start; i < end; i++) {
-            dest[i] = (dest[i] + op1[i]) * ONE_MINUS_MIX_FACTOR + op2[i] * MIX_FACTOR;
-        }
-    };
-
     @Override
     public float[] filter(float[] data, int width, int height) {
         if (width < 128 || height < 128)
@@ -106,13 +38,12 @@ class FilterWOW implements ImageFilter.Algorithm {
         float[] denoiseFactor = new float[1];
 
         float noise = 0; // computed for scale 0
-        ForkJoinPool pool = ForkJoinPool.commonPool();
         for (int scale = 0; scale < SCALES; scale++) {
             int step = 1 << scale;
             // A trous transform
             convolveHorizontal(image, coeff, width, height, step); // Horizontal pass
             convolveVertical(coeff, temp1, width, height, step); // Vertical pass
-            pool.invoke(new ArrayOp.Task3(image, temp1, coeff, 0, length, opSubtract)); // Coefficients
+            subtractParallel(image, temp1, coeff, width, height); // Coefficients
             System.arraycopy(temp1, 0, image, 0, length); // Update image for next scale
             // Whiten coefficients
             convolveHorizontalSquared(coeff, temp1, width, height, step); // Squared src horizontal pass
@@ -122,18 +53,18 @@ class FilterWOW implements ImageFilter.Algorithm {
                 noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
                 if (noise > NOISE_THRESH) { // avoid division by 0
                     denoiseFactor[0] = 1 / (3 * SIGMA_E0 * noise);
-                    pool.invoke(new ArrayOp.Task3(denoiseFactor, null, coeff, 0, length, opDenoise));
+                    denoiseParallel(denoiseFactor[0], coeff, width, height);
                 }
             } else if (scale == 1) {
                 if (noise > NOISE_THRESH) { // avoid division by 0
                     denoiseFactor[0] = 1 / (SIGMA_E1 * noise);
-                    pool.invoke(new ArrayOp.Task3(denoiseFactor, null, coeff, 0, length, opDenoise));
+                    denoiseParallel(denoiseFactor[0], coeff, width, height);
                 }
             }
             // Whitened synthesis
-            pool.invoke(new ArrayOp.Task3(temp2, coeff, synth, 0, length, opSynthesis));
+            synthesisParallel(temp2, coeff, synth, width, height);
         }
-        pool.invoke(new ArrayOp.Task3(image, data, synth, 0, length, opBlend));
+        blendParallel(image, data, synth, width, height);
         return synth;
     }
 
@@ -154,6 +85,47 @@ class FilterWOW implements ImageFilter.Algorithm {
                 .skip(length / 2)
                 .findFirst();
         return od.isEmpty() ? 0 : (float) od.getAsDouble();
+    }
+
+    private static void subtractParallel(float[] src1, float[] src2, float[] dest, int width, int height) {
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int idx = rowBase + x;
+                dest[idx] = src1[idx] - src2[idx];
+            }
+        });
+    }
+
+    private static void denoiseParallel(float factor, float[] dest, int width, int height) {
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int idx = rowBase + x;
+                float w = Math.abs(dest[idx]) * factor;
+                dest[idx] *= BOOST * w / (1 + w);
+            }
+        });
+    }
+
+    private static void synthesisParallel(float[] weight, float[] detail, float[] dest, int width, int height) {
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int idx = rowBase + x;
+                dest[idx] += MathUtils.invSqrt(weight[idx]) * detail[idx];
+            }
+        });
+    }
+
+    private static void blendParallel(float[] image, float[] data, float[] dest, int width, int height) {
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int idx = rowBase + x;
+                dest[idx] = (dest[idx] + image[idx]) * ONE_MINUS_MIX_FACTOR + data[idx] * MIX_FACTOR;
+            }
+        });
     }
 
     private static void convolveHorizontal(float[] src, float[] dest, int width, int height, int step) {
