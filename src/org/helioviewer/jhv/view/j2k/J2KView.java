@@ -247,18 +247,22 @@ public class J2KView extends BaseView {
             res = completionLevel.getResolutionSet(frame).getNextLevel(reqHeight, reqHeight);
         }
 
-        AtomicBoolean status = completionLevel.getFrameStatus(frame, res.level); // before signalling to reader
-        return new J2KParams.Decode(serial, frame, res.subImage, res.level, factor, status != null && status.get());
+        return new J2KParams.Decode(serial, frame, res.subImage, res.level, factor);
+    }
+
+    private boolean isDecodeComplete(int frame, int level) {
+        AtomicBoolean status = completionLevel.getFrameStatus(frame, level); // before signalling to reader
+        return status != null && status.get();
     }
 
     private int currentLevel = 10000;
 
-    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
+    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint, boolean complete) {
         int level = decodeParams.level;
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
-            reader.signal(new J2KParams.Read(this, decodeParams, viewpoint, priority));
+            reader.signal(new J2KParams.Read(this, decodeParams, viewpoint, complete, priority));
         }
         currentLevel = level;
     }
@@ -266,21 +270,22 @@ public class J2KView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
-        if (reader != null && !decodeParams.complete) {
-            signalReader(decodeParams, viewpoint);
+        boolean complete = isDecodeComplete(decodeParams.frame, decodeParams.level);
+        if (reader != null && !complete) {
+            signalReader(decodeParams, viewpoint, complete);
         }
-        executeDecode(decodeParams, viewpoint);
+        executeDecode(decodeParams, viewpoint, complete);
     }
 
     void signalDecoderFromReader(J2KParams.Read readParams) {
         EventQueue.invokeLater(() -> {
             if (readParams.decodeParams.frame == targetFrame) {
-                executeDecode(readParams.decodeParams, readParams.viewpoint);
+                executeDecode(readParams.decodeParams, readParams.viewpoint, readParams.complete);
             }
         });
     }
 
-    private void executeDecode(J2KParams.Decode decodeParams, Position viewpoint) {
+    private void executeDecode(J2KParams.Decode decodeParams, Position viewpoint, boolean complete) {
         DecodeKey key = new DecodeKey(decodeParams, filterType);
         ImageBuffer imageBuffer = decodeCache.getIfPresent(key);
         if (imageBuffer != null) {
@@ -288,24 +293,25 @@ public class J2KView extends BaseView {
             return;
         }
         int numComps = completionLevel.getResolutionSet(decodeParams.frame).numComps;
-        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint));
+        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, complete));
     }
 
     private class J2KCallback extends DecodeCallback {
 
         private final DecodeKey key;
         private final Position viewpoint;
+        private final boolean complete;
 
-        J2KCallback(DecodeKey _key, Position _viewpoint) {
+        J2KCallback(DecodeKey _key, Position _viewpoint, boolean _complete) {
             key = _key;
             viewpoint = _viewpoint;
+            complete = _complete;
         }
 
         @Override
         public void onSuccess(ImageBuffer result) {
             if (key.filter() != filterType) return; // filter changed in-flight
-
-            if (key.params().complete) decodeCache.put(key, result);
+            if (complete) decodeCache.put(key, result);
 
             sendDataToHandler(key.params(), viewpoint, result);
         }

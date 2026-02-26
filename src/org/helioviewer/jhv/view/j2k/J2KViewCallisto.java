@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.awt.Rectangle;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
@@ -25,12 +24,11 @@ public class J2KViewCallisto extends J2KView {
     protected J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
         ResolutionSet.Level res = getResolutionLevel(frame, 0);
         SubImage subImage = new SubImage(region.x, region.y, region.width, region.height, res.width, res.height);
-        AtomicBoolean status = completionLevel.getFrameStatus(frame, res.level);
-        return new J2KParams.Decode(serial, frame, subImage, res.level, factor, status != null && status.get());
+        return new J2KParams.Decode(serial, frame, subImage, res.level, factor);
     }
 
     @Override
-    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) { // not used
+    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint, boolean complete) { // not used
         Log.warn("J2KViewCallisto.signalReader called: should not happen");
         //reader.signalReader(new ReadParams(this, decodeParams, true));
     }
