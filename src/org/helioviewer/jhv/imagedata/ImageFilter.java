@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.stream.IntStream;
 
+//import com.google.common.base.Stopwatch;
+
 @SuppressWarnings("serial")
 public class ImageFilter {
 
@@ -18,7 +20,6 @@ public class ImageFilter {
             description = _description;
             algorithm = _algorithm;
         }
-
     }
 
     interface Algorithm {
@@ -34,7 +35,9 @@ public class ImageFilter {
         float[] data = new float[length];
         IntStream.range(0, length).parallel().forEach(i -> data[i] = ((array[i] + 256) & 0xFF) * BDIV);
 
+        //Stopwatch sw = Stopwatch.createStarted();
         float[] image = algorithm.filter(data, width, height);
+        //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
 
         byte[] out = new byte[length];
         IntStream.range(0, length).parallel().forEach(i -> out[i] = (byte) Math.clamp(image[i] * 255 + .5f, 0, 255));
@@ -49,7 +52,9 @@ public class ImageFilter {
         float[] data = new float[length];
         IntStream.range(0, length).parallel().forEach(i -> data[i] = ((array[i] + 65536) & 0xFFFF) * SDIV);
 
+        //Stopwatch sw = Stopwatch.createStarted();
         float[] image = algorithm.filter(data, width, height);
+        //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
 
         short[] out = new short[length];
         IntStream.range(0, length).parallel().forEach(i -> out[i] = (short) Math.clamp(image[i] * 65535 + .5f, 0, 65535));
