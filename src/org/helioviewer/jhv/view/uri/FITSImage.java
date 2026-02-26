@@ -6,6 +6,7 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+import com.google.common.escape.Escaper;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -351,6 +352,8 @@ class FITSImage implements URIImageReader {
     }
 
     private static final String nl = System.lineSeparator();
+    private static final Escaper XML_CONTENT_ESCAPER = XmlEscapers.xmlContentEscaper();
+    private static final Escaper XML_ATTRIBUTE_ESCAPER = XmlEscapers.xmlAttributeEscaper();
 
     private static String getHeaderAsXML(ImageHDU hdu) {
         StringBuilder builder = new StringBuilder("<meta>" + nl + "<fits>" + nl);
@@ -363,9 +366,9 @@ class FITSImage implements URIImageReader {
             key = key.isEmpty() ? "COMMENT" : key.replace("$", "-"); // allow illegal keyword character in FITS saved by IDL
 
             String value = headerCard.getValue();
-            String val = value == null ? "" : XmlEscapers.xmlContentEscaper().escape(value);
+            String val = value == null ? "" : XML_CONTENT_ESCAPER.escape(value);
             String comment = headerCard.getComment();
-            String com = comment == null ? "" : " comment=\"" + XmlEscapers.xmlAttributeEscaper().escape(comment) + "\"";
+            String com = comment == null ? "" : " comment=\"" + XML_ATTRIBUTE_ESCAPER.escape(comment) + "\"";
 
             builder.append('<').append(key).append(com).append('>').append(val).append("</").append(key).append('>').append(nl);
         }
