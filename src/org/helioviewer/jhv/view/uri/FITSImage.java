@@ -6,7 +6,6 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import com.google.common.escape.Escaper;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.math.MathUtils;
 
 //import com.google.common.base.Stopwatch;
+import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
@@ -68,32 +68,6 @@ class FITSImage implements URIImageReader {
             return Float.MAX_VALUE;
         } else {
             return (float) (bzero + v * bscale);
-        }
-    }
-
-    private static void storeMappedPixel(short[] outData, int outIdx, float[] lut, float v, double scale, double mapped) {
-        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-        lut[p] = v;
-        outData[outIdx] = (short) p;
-    }
-
-    private static double mapScaled(FITSSettings.ScalingMode scalingMode, float d, float range) {
-        return switch (scalingMode) {
-            case Gamma -> fn_gamma(d);
-            case Beta -> fn_beta(d);
-            case Alpha -> fn_alpha(d / range);
-        };
-    }
-
-    private static void processPixel(short[] outData, int outIdx, float[] lut, float v, float minV, float maxV, float range,
-                                     FITSSettings.ScalingMode scalingMode, double scale) {
-        if (v == ImageBuffer.BAD_PIXEL) {
-            outData[outIdx] = 0;
-        } else {
-            v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-            float d = v - minV;
-            double mapped = mapScaled(scalingMode, d, range);
-            storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
         }
     }
 
@@ -175,6 +149,32 @@ class FITSImage implements URIImageReader {
             }
         }
         return new SampleBuffer(samples, sampleLen);
+    }
+
+    private static double mapScaled(FITSSettings.ScalingMode scalingMode, float d, float range) {
+        return switch (scalingMode) {
+            case Gamma -> fn_gamma(d);
+            case Beta -> fn_beta(d);
+            case Alpha -> fn_alpha(d / range);
+        };
+    }
+
+    private static void storeMappedPixel(short[] outData, int outIdx, float[] lut, float v, double scale, double mapped) {
+        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
+        lut[p] = v;
+        outData[outIdx] = (short) p;
+    }
+
+    private static void processPixel(short[] outData, int outIdx, float[] lut, float v, float minV, float maxV, float range,
+                                     FITSSettings.ScalingMode scalingMode, double scale) {
+        if (v == ImageBuffer.BAD_PIXEL) {
+            outData[outIdx] = 0;
+        } else {
+            v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+            float d = v - minV;
+            double mapped = mapScaled(scalingMode, d, range);
+            storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
+        }
     }
 
     // private static final double MIN_MULT = 0.0005;
