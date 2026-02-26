@@ -88,8 +88,8 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static void subtractParallel(float[] src1, float[] src2, float[] dest, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int idx = rowBase + x;
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
                 dest[idx] = src1[idx] - src2[idx];
             }
         });
@@ -98,8 +98,8 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static void denoiseParallel(float factor, float[] dest, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int idx = rowBase + x;
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
                 float w = Math.abs(dest[idx]) * factor;
                 dest[idx] *= BOOST * w / (1 + w);
             }
@@ -109,8 +109,8 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static void synthesisParallel(float[] weight, float[] detail, float[] dest, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int idx = rowBase + x;
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
                 dest[idx] += MathUtils.invSqrt(weight[idx]) * detail[idx];
             }
         });
@@ -119,8 +119,8 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static void blendParallel(float[] image, float[] data, float[] dest, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                int idx = rowBase + x;
+            int rowEnd = rowBase + width;
+            for (int idx = rowBase; idx < rowEnd; idx++) {
                 dest[idx] = (dest[idx] + image[idx]) * ONE_MINUS_MIX_FACTOR + data[idx] * MIX_FACTOR;
             }
         });
