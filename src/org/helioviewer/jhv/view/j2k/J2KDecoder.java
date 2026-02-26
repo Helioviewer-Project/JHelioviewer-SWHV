@@ -36,9 +36,17 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
     private static final Kdu_quality_limiter qualityHigh = new Kdu_quality_limiter(1f / 256);
 
     private static final ThreadLocal<Kdu_thread_env> localThread = ThreadLocal.withInitial(J2KDecoder::createThreadEnv);
+    private static final ThreadLocal<DecodeScratch> localScratch = ThreadLocal.withInitial(DecodeScratch::new);
 
     //private final Stopwatch sw = Stopwatch.createUnstarted();
     //private static final ThreadLocal<StatsAccumulator> localAcc = ThreadLocal.withInitial(StatsAccumulator::new);
+
+    private static final class DecodeScratch {
+        final Kdu_dims empty = new Kdu_dims();
+        final Kdu_dims requestedRegion = new Kdu_dims();
+        final Kdu_dims newRegion = new Kdu_dims();
+        final int[] srcStride = new int[1];
+    }
 
     @Nonnull
     @Override
@@ -55,8 +63,10 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             J2KParams.SubImage subImage = params.subImage();
             int frame = params.frame();
             compositor = createCompositor(source, params.factor() < 1 ? qualityLow : qualityHigh);
+            DecodeScratch scratch = localScratch.get();
 
-            Kdu_dims empty = new Kdu_dims();
+            Kdu_dims empty = scratch.empty;
+            empty.From_u32(0, 0, 0, 0);
             if (numComps < 3) {
                 // alpha tbd
                 compositor.Add_primitive_ilayer(frame, firstComponent, Kdu_global.KDU_WANT_CODESTREAM_COMPONENTS, empty, empty);
@@ -66,7 +76,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 
             compositor.Set_scale(false, false, false, 1f / (1 << params.level()), params.factor());
 
-            Kdu_dims requestedRegion = new Kdu_dims();
+            Kdu_dims requestedRegion = scratch.requestedRegion;
             requestedRegion.From_u32(subImage.x(), subImage.y(), subImage.w(), subImage.h());
             compositor.Set_buffer_surface(requestedRegion);
 
@@ -79,14 +89,15 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             Kdu_coords actualSize = actualRegion.Access_size();
             int actualWidth = actualSize.Get_x(), actualHeight = actualSize.Get_y();
 
-            int[] srcStride = new int[1];
+            int[] srcStride = scratch.srcStride;
             long addr = compositorBuf.Get_buf(srcStride, false);
             ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, 4 * srcStride[0] * actualHeight).order(ByteOrder.nativeOrder());
 
             ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
             byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
 
-            Kdu_dims newRegion = new Kdu_dims();
+            Kdu_dims newRegion = scratch.newRegion;
+            newRegion.From_u32(0, 0, 0, 0);
             //sw.reset().start();
             while (compositor.Process(MAX_RENDER_SAMPLES, newRegion)) {
                 Kdu_coords newSize = newRegion.Access_size();
