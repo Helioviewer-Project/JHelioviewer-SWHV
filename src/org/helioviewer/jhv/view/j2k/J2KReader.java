@@ -70,7 +70,7 @@ class J2KReader implements Runnable {
         cache.Native_destroy();
     }
 
-    void signal(J2KParams.Read params) {
+    synchronized void signal(J2KParams.Read params) {
         signalQueue.poll(); // latest wins
         signalQueue.offer(params);
     }
