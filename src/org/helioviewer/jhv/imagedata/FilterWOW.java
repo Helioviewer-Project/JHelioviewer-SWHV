@@ -42,7 +42,11 @@ class FilterWOW implements ImageFilter.Algorithm {
             convolveHorizontal(base, detail, width, height, step); // Horizontal pass
             convolveVertical(detail, smooth, width, height, step); // Vertical pass
             subtractParallel(base, smooth, detail, width, height); // Coefficients
-            System.arraycopy(smooth, 0, base, 0, length); // Update image for next scale
+
+            float[] swap = base;
+            base = smooth;
+            smooth = swap;
+
             // Whiten coefficients
             convolveHorizontalSquared(detail, smooth, width, height, step); // Squared src horizontal pass
             convolveVertical(smooth, variance, width, height, step); // Vertical pass
