@@ -3,8 +3,7 @@ package org.helioviewer.jhv.view.uri;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import nom.tam.fits.BasicHDU;
@@ -20,7 +19,6 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.math.MathUtils;
 
 //import com.google.common.base.Stopwatch;
-import com.google.common.primitives.Floats;
 import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
@@ -100,27 +98,31 @@ class FITSImage implements URIImageReader {
     private static final int SAMPLE = 4;
     private static final int MIN_SAMPLES = 10;
 
-    private static List<Float> sampleImage(PixelAccessor px, int width, int height, Object[] pixData) {
+    private record SampleBuffer(float[] values, int length) {
+    }
+
+    private static SampleBuffer sampleImage(PixelAccessor px, int width, int height, Object[] pixData, boolean sortValues) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
+        int sampleRows = (height + stepH - 1) / stepH;
+        int sampleCols = (width + stepW - 1) / stepW;
+        float[] samples = new float[sampleRows * sampleCols];
+        int sampleLen = 0;
 
-        return IntStream.range(0, height)
-                .filter(j -> j % stepH == 0)
-                .parallel()
-                .mapToObj(j -> {
-                    Object lineData = pixData[j];
-                    List<Float> rowSamples = new ArrayList<>();
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = px.get(lineData, i);
-                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
-                            rowSamples.add(v);
-                        }
-                    }
-                    return rowSamples;
-                })
-                .flatMap(List::stream)
-                .sorted()
-                .toList();
+        for (int j = 0; j < height; j += stepH) {
+            Object lineData = pixData[j];
+            for (int i = 0; i < width; i += stepW) {
+                float v = px.get(lineData, i);
+                if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                    samples[sampleLen++] = v;
+                }
+            }
+        }
+
+        if (sortValues) {
+            Arrays.sort(samples, 0, sampleLen);
+        }
+        return new SampleBuffer(samples, sampleLen);
     }
 
     // private static final double MIN_MULT = 0.0005;
@@ -160,19 +162,20 @@ class FITSImage implements URIImageReader {
                 min = (float) FITSSettings.clippingMin;
                 max = (float) FITSSettings.clippingMax;
             } else {
-                List<Float> sampleData = sampleImage(px, width, height, pixData);
-                int sampleLen = sampleData.size();
+                boolean autoMode = FITSSettings.clippingMode == FITSSettings.ClippingMode.Auto;
+                SampleBuffer sampleData = sampleImage(px, width, height, pixData, autoMode);
+                int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                     return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
 
-                if (FITSSettings.clippingMode == FITSSettings.ClippingMode.Auto) {
-                    min = sampleData.get((int) (MIN_MULT * sampleLen));
-                    max = sampleData.get((int) (MAX_MULT * sampleLen));
+                if (autoMode) {
+                    min = sampleData.values()[(int) (MIN_MULT * sampleLen)];
+                    max = sampleData.values()[(int) (MAX_MULT * sampleLen)];
                 } else {
                     float[] zLow = {0};
                     float[] zHigh = {0};
                     float[] zMax = {0};
-                    ZScale.zscale(Floats.toArray(sampleData), sampleLen, zLow, zHigh, zMax, FITSSettings.zContrast);
+                    ZScale.zscale(sampleData.values(), sampleLen, zLow, zHigh, zMax, FITSSettings.zContrast);
                     min = zLow[0];
                     max = zHigh[0];
                 }
