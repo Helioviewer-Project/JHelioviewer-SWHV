@@ -6,16 +6,8 @@ record SubImage(int x, int y, int w, int h) {
 
     private static final int QUANTA = 32;
 
-    private SubImage(int[] n) {
-        this(n[0], n[1], n[2], n[3]);
-    }
-
     // roundoff to quanta, minimum 1 pixel, clip to full image size
     SubImage(int xx, int yy, int ww, int hh, int fwidth, int fheight) {
-        this(normalize(xx, yy, ww, hh, fwidth, fheight));
-    }
-
-    private static int[] normalize(int xx, int yy, int ww, int hh, int fwidth, int fheight) {
         xx = MathUtils.roundDownTo(xx, QUANTA);
         yy = MathUtils.roundDownTo(yy, QUANTA);
         ww = MathUtils.roundUpTo(ww + QUANTA, QUANTA);
@@ -29,33 +21,7 @@ record SubImage(int x, int y, int w, int h) {
         ww = Math.min(ww, fwidth - xx);
         hh = Math.min(hh, fheight - yy);
 
-        return new int[]{xx, yy, ww, hh};
-    }
-
-    private static int computeHash(int _x, int _y, int _w, int _h) {
-        int result = _x;
-        result = 31 * result + _y;
-        result = 31 * result + _w;
-        return 31 * result + _h;
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o instanceof SubImage s)
-            return x == s.x() && y == s.y() && w == s.w() && h == s.h();
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return computeHash(x, y, w, h);
-    }
-
-    @Override
-    public String toString() {
-        return "[x=" + x + " y=" + y + " w=" + w + " h=" + h + ']';
+        this(xx, yy, ww, hh);
     }
 
 }
