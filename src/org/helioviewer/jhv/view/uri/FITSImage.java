@@ -101,7 +101,35 @@ class FITSImage implements URIImageReader {
     private record SampleBuffer(float[] values, int length) {
     }
 
-    private static SampleBuffer sampleImage(PixelAccessor px, int width, int height, Object[] pixData, boolean sortValues) {
+    private static float selectKth(float[] data, int len, int k) {
+        int left = 0;
+        int right = len - 1;
+        while (left < right) {
+            int pivotIndex = (left + right) >>> 1;
+            float pivot = data[pivotIndex];
+            int i = left;
+            int j = right;
+            while (i <= j) {
+                while (data[i] < pivot) i++;
+                while (data[j] > pivot) j--;
+                if (i <= j) {
+                    float tmp = data[i];
+                    data[i++] = data[j];
+                    data[j--] = tmp;
+                }
+            }
+            if (k <= j) {
+                right = j;
+            } else if (k >= i) {
+                left = i;
+            } else {
+                return data[k];
+            }
+        }
+        return data[left];
+    }
+
+    private static SampleBuffer sampleImage(PixelAccessor px, int width, int height, Object[] pixData) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
         int sampleRows = (height + stepH - 1) / stepH;
@@ -117,10 +145,6 @@ class FITSImage implements URIImageReader {
                     samples[sampleLen++] = v;
                 }
             }
-        }
-
-        if (sortValues) {
-            Arrays.sort(samples, 0, sampleLen);
         }
         return new SampleBuffer(samples, sampleLen);
     }
@@ -163,15 +187,19 @@ class FITSImage implements URIImageReader {
                 max = (float) FITSSettings.clippingMax;
             } else {
                 boolean autoMode = FITSSettings.clippingMode == FITSSettings.ClippingMode.Auto;
-                SampleBuffer sampleData = sampleImage(px, width, height, pixData, autoMode);
+                SampleBuffer sampleData = sampleImage(px, width, height, pixData);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                     return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
 
                 if (autoMode) {
-                    min = sampleData.values()[(int) (MIN_MULT * sampleLen)];
-                    max = sampleData.values()[(int) (MAX_MULT * sampleLen)];
+                    int kMin = Math.clamp((int) (MIN_MULT * sampleLen), 0, sampleLen - 1);
+                    int kMax = Math.clamp((int) (MAX_MULT * sampleLen), 0, sampleLen - 1);
+                    float[] values = sampleData.values();
+                    min = selectKth(values, sampleLen, kMin);
+                    max = selectKth(values, sampleLen, kMax);
                 } else {
+                    Arrays.sort(sampleData.values(), 0, sampleLen);
                     float[] zLow = {0};
                     float[] zHigh = {0};
                     float[] zMax = {0};
