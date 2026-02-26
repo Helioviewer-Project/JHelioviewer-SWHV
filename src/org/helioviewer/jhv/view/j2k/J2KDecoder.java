@@ -52,7 +52,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             }
             Jpx_source source = src.jpxSource();
 
-            SubImage subImage = params.subImage();
+            J2KParams.SubImage subImage = params.subImage();
             int frame = params.frame();
             compositor = createCompositor(source, params.factor() < 1 ? qualityLow : qualityHigh);
 

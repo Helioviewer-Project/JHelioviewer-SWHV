@@ -62,7 +62,7 @@ public class ResolutionSet {
 
         public final int width;
         public final int height;
-        final SubImage subImage;
+        final J2KParams.SubImage subImage;
 
         final double factorX;
         final double factorY;
@@ -71,7 +71,7 @@ public class ResolutionSet {
             level = _level;
             width = _width;
             height = _height;
-            subImage = new SubImage(0, 0, width, height, width, height);
+            subImage = new J2KParams.SubImage(0, 0, width, height, width, height);
 
             factorX = _factorX;
             factorY = _factorY;
