@@ -61,31 +61,6 @@ class FITSImage implements URIImageReader {
 
     private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
 
-    @FunctionalInterface
-    private interface PixelAccessor {
-        float get(Object rowData, int x);
-    }
-
-    private static PixelAccessor accessor(PixType pixType, long blank, double bzero, double bscale) {
-        return switch (pixType) {
-            case SHORT -> (rowData, x) -> {
-                short v = ((short[]) rowData)[x];
-                return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
-            };
-            case INT -> (rowData, x) -> {
-                int v = ((int[]) rowData)[x];
-                return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
-            };
-            case LONG -> (rowData, x) -> {
-                long v = ((long[]) rowData)[x];
-                return (blank != BLANK && v == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + v * bscale);
-            };
-            case FLOAT -> (rowData, x) -> floatPixel(((float[]) rowData)[x], bzero, bscale);
-            case DOUBLE -> (rowData, x) -> floatPixel(((double[]) rowData)[x], bzero, bscale);
-            case BYTE -> (rowData, x) -> ImageBuffer.BAD_PIXEL; // byte path handled separately
-        };
-    }
-
     private static float floatPixel(double v, double bzero, double bscale) {
         if (Double.isNaN(v)) {
             return ImageBuffer.BAD_PIXEL;
@@ -103,7 +78,7 @@ class FITSImage implements URIImageReader {
     private record SampleBuffer(float[] values, int length) {
     }
 
-    private static SampleBuffer sampleImage(PixelAccessor px, int width, int height, Object[] pixData) {
+    private static SampleBuffer sampleImage(PixType pixType, long blank, double bzero, double bscale, int width, int height, Object[] pixData) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
         int sampleRows = (height + stepH - 1) / stepH;
@@ -111,13 +86,66 @@ class FITSImage implements URIImageReader {
         float[] samples = new float[sampleRows * sampleCols];
         int sampleLen = 0;
 
-        for (int j = 0; j < height; j += stepH) {
-            Object lineData = pixData[j];
-            for (int i = 0; i < width; i += stepW) {
-                float v = px.get(lineData, i);
-                if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
-                    samples[sampleLen++] = v;
+        switch (pixType) {
+            case SHORT -> {
+                for (int j = 0; j < height; j += stepH) {
+                    short[] lineData = (short[]) pixData[j];
+                    for (int i = 0; i < width; i += stepW) {
+                        short raw = lineData[i];
+                        float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
+                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                            samples[sampleLen++] = v;
+                        }
+                    }
                 }
+            }
+            case INT -> {
+                for (int j = 0; j < height; j += stepH) {
+                    int[] lineData = (int[]) pixData[j];
+                    for (int i = 0; i < width; i += stepW) {
+                        int raw = lineData[i];
+                        float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
+                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                            samples[sampleLen++] = v;
+                        }
+                    }
+                }
+            }
+            case LONG -> {
+                for (int j = 0; j < height; j += stepH) {
+                    long[] lineData = (long[]) pixData[j];
+                    for (int i = 0; i < width; i += stepW) {
+                        long raw = lineData[i];
+                        float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
+                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                            samples[sampleLen++] = v;
+                        }
+                    }
+                }
+            }
+            case FLOAT -> {
+                for (int j = 0; j < height; j += stepH) {
+                    float[] lineData = (float[]) pixData[j];
+                    for (int i = 0; i < width; i += stepW) {
+                        float v = floatPixel(lineData[i], bzero, bscale);
+                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                            samples[sampleLen++] = v;
+                        }
+                    }
+                }
+            }
+            case DOUBLE -> {
+                for (int j = 0; j < height; j += stepH) {
+                    double[] lineData = (double[]) pixData[j];
+                    for (int i = 0; i < width; i += stepW) {
+                        float v = floatPixel(lineData[i], bzero, bscale);
+                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                            samples[sampleLen++] = v;
+                        }
+                    }
+                }
+            }
+            case BYTE -> {
             }
         }
         return new SampleBuffer(samples, sampleLen);
@@ -151,7 +179,6 @@ class FITSImage implements URIImageReader {
         long blank = header.getLongValue(Standard.BLANK, BLANK);
         double bzero = header.getDoubleValue(Standard.BZERO, 0);
         double bscale = header.getDoubleValue(Standard.BSCALE, 1);
-        PixelAccessor px = accessor(pixType, blank, bzero, bscale);
 
         float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
         float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
@@ -161,7 +188,7 @@ class FITSImage implements URIImageReader {
                 max = (float) FITSSettings.clippingMax;
             } else {
                 boolean autoMode = FITSSettings.clippingMode == FITSSettings.ClippingMode.Auto;
-                SampleBuffer sampleData = sampleImage(px, width, height, pixData);
+                SampleBuffer sampleData = sampleImage(pixType, blank, bzero, bscale, width, height, pixData);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                     return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
