@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.astronomy;
 
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.JulianDay;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -87,13 +86,14 @@ public class Sun {
         // Eccentricity of orbit
         double e = 0.01675104 - 0.0000418 * t - 0.000000126 * t * t;
         // Sun's equation of center (deg)
-        double c = (1.919460 - 0.004789 * t - 0.000014 * t * t) * Math.sin(mna * MathUtils.degra) + (0.020094 - 0.000100 * t) * Math.sin(2 * mna * MathUtils.degra) + 0.000293 * Math.sin(3 * mna * MathUtils.degra);
+        double mna_rad = Math.toRadians(mna);
+        double c = (1.919460 - 0.004789 * t - 0.000014 * t * t) * Math.sin(mna_rad) + (0.020094 - 0.000100 * t) * Math.sin(2 * mna_rad) + 0.000293 * Math.sin(3 * mna_rad);
         // Sun's true geometric longitude (deg)
         // double true_long = mnl + c;
         // Sun's true anomaly (deg):
         double ta = mna + c;
         // Sun's radius vector (AU)
-        double dist = 1.0000002 * (1. - e * e) / (1. + e * Math.cos(ta * MathUtils.degra));
+        double dist = 1.0000002 * (1. - e * e) / (1. + e * Math.cos(Math.toRadians(ta)));
 
         return dist * MeanEarthDistance;
     }
