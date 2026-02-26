@@ -107,8 +107,8 @@ class J2KReader implements Runnable {
             CompletionLevel completionLevel = view.completionLevel();
             int numFrames = cacheKey.length;
 
-            int frame = params.decodeParams.frame;
-            int level = params.decodeParams.level;
+            int frame = params.decodeParams.frame();
+            int level = params.decodeParams.level();
 
             ResolutionSet.Level resLevel = view.getResolutionLevel(frame, level);
             int width = resLevel.width;
