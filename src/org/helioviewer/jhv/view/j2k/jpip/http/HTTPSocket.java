@@ -21,8 +21,8 @@ import org.helioviewer.jhv.io.ProxySettings;
 
 public class HTTPSocket {
 
-    private static final int TIMEOUT_CONNECT = 30000;
-    private static final int TIMEOUT_READ = 30000;
+    private static final int TIMEOUT_CONNECT = 60000;
+    private static final int TIMEOUT_READ = 60000;
 
     private final Socket socket;
     private final InputStream inputStream;
