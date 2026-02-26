@@ -12,17 +12,15 @@ class J2KParams {
         final int level;
         final float factor;
         final boolean complete; // cache the decoded data
-        final Position viewpoint; // sync with camera & between layers
         private final int hash;
 
-        Decode(int _serial, int _frame, SubImage _subImage, int _level, float _factor, boolean _complete, Position _viewpoint) {
+        Decode(int _serial, int _frame, SubImage _subImage, int _level, float _factor, boolean _complete) {
             serial = _serial;
             frame = _frame;
             subImage = _subImage;
             level = _level;
             factor = _factor;
             complete = _complete;
-            viewpoint = _viewpoint;
             hash = computeHash(serial, frame, subImage, level, factor);
         }
 
@@ -60,11 +58,13 @@ class J2KParams {
 
         final J2KView view;
         final Decode decodeParams;
+        final Position viewpoint; // sync with camera & between layers
         boolean priority;
 
-        Read(J2KView _view, Decode _decodeParams, boolean _priority) {
+        Read(J2KView _view, Decode _decodeParams, Position _viewpoint, boolean _priority) {
             view = _view;
             decodeParams = _decodeParams;
+            viewpoint = _viewpoint;
             priority = _priority;
         }
 

@@ -76,7 +76,7 @@ public class URIView extends BaseView {
             sendDataToHandler(imageBuffer, viewpoint);
             return;
         }
-        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(viewpoint, key));
+        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(key, viewpoint));
     }
 
     private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
@@ -92,12 +92,12 @@ public class URIView extends BaseView {
 
     private class Callback extends DecodeCallback {
 
-        private final Position viewpoint;
         private final DecodeKey key;
+        private final Position viewpoint;
 
-        Callback(Position _viewpoint, DecodeKey _key) {
-            viewpoint = _viewpoint;
+        Callback(DecodeKey _key, Position _viewpoint) {
             key = _key;
+            viewpoint = _viewpoint;
         }
 
         @Override
