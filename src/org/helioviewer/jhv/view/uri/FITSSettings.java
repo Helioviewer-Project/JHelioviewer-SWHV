@@ -84,21 +84,21 @@ public class FITSSettings {
                 int value = gammaSlider.getValue();
                 GAMMA = 10. / value;
                 gammaLabel.setText(String.valueOf(value / 10.));
-                if (gammaButton.isSelected())
+                if (gammaButton.isSelected() && !gammaSlider.getValueIsAdjusting())
                     refresh();
             });
             betaSlider.addChangeListener(e -> {
                 int value = betaSlider.getValue();
                 BETA = 1. / (1 << value);
                 betaLabel.setText(String.valueOf(value));
-                if (betaButton.isSelected())
+                if (betaButton.isSelected() && !betaSlider.getValueIsAdjusting())
                     refresh();
             });
             alphaSlider.addChangeListener(e -> {
                 int value = alphaSlider.getValue();
                 ALPHA = Math.pow(10, value);
                 alphaLabel.setText(String.valueOf(value));
-                if (alphaButton.isSelected())
+                if (alphaButton.isSelected() && !alphaSlider.getValueIsAdjusting())
                     refresh();
             });
 
@@ -157,7 +157,8 @@ public class FITSSettings {
             JHVSlider contrastSlider = new JHVSlider(1, 100, zContrast / 4);
             contrastSlider.addChangeListener(e -> {
                 zContrast = 4 * contrastSlider.getValue();
-                refresh();
+                if (!contrastSlider.getValueIsAdjusting())
+                    refresh();
             });
             ComponentUtils.setEnabled(contrastSlider, false);
 
