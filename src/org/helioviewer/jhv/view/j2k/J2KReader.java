@@ -113,8 +113,8 @@ class J2KReader implements Runnable {
             int level = params.decodeParams().level();
 
             ResolutionSet.Level resLevel = view.getResolutionLevel(frame, level);
-            int width = resLevel.width;
-            int height = resLevel.height;
+            int width = resLevel.width();
+            int height = resLevel.height();
 
             view.setDownloading(true);
 

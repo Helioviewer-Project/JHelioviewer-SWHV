@@ -37,8 +37,8 @@ class RadioJ2KData implements ImageData.Handler {
     RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor) throws Exception {
         try {
             ResolutionSet.Level resLevel = _view.getResolutionLevel(0, 0);
-            j2kWidth = resLevel.width;
-            j2kHeight = resLevel.height;
+            j2kWidth = resLevel.width();
+            j2kHeight = resLevel.height();
 
             XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(_view.getXMLMetaData());
             endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
