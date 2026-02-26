@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import kdu_jni.KduException;
 
@@ -15,7 +16,7 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 
 class J2KReader implements Runnable {
 
-    private final BooleanSignal readerSignal = new BooleanSignal();
+    private final ArrayBlockingQueue<J2KParams.Read> signalQueue = new ArrayBlockingQueue<>(1);
     private final JPIPCache cache = new JPIPCache();
     private final URI uri;
     private final Thread myThread;
@@ -70,7 +71,8 @@ class J2KReader implements Runnable {
     }
 
     void signal(J2KParams.Read params) {
-        readerSignal.signal(params);
+        signalQueue.poll(); // latest wins
+        signalQueue.offer(params);
     }
 
     private void initCloseSocket() {
@@ -98,17 +100,17 @@ class J2KReader implements Runnable {
             J2KParams.Read params;
             // wait for signal
             try {
-                params = readerSignal.waitForSignal();
+                params = signalQueue.take();
             } catch (InterruptedException e) {
                 continue;
             }
 
-            J2KView view = params.view;
+            J2KView view = params.view();
             CompletionLevel completionLevel = view.completionLevel();
             int numFrames = cacheKey.length;
 
-            int frame = params.decodeParams.frame();
-            int level = params.decodeParams.level();
+            int frame = params.decodeParams().frame();
+            int level = params.decodeParams().level();
 
             ResolutionSet.Level resLevel = view.getResolutionLevel(frame, level);
             int width = resLevel.width;
@@ -122,7 +124,7 @@ class J2KReader implements Runnable {
                     socket = new JPIPSocket(uri, cache);
                 }
                 // choose cache strategy
-                boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority;
+                boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority();
 
                 // build query based on strategy
                 int currentStep;
@@ -186,7 +188,7 @@ class J2KReader implements Runnable {
                     if (!singleFrame)
                         currentStep++;
                     // check whether caching has to be interrupted
-                    if (readerSignal.isSignaled() || Thread.interrupted()) {
+                    if (!signalQueue.isEmpty() || Thread.interrupted()) {
                         stopReading = true;
                     }
                 }
@@ -203,8 +205,7 @@ class J2KReader implements Runnable {
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && !stopReading && !completionLevel.isComplete(level)) {
-                    params.priority = false;
-                    readerSignal.signal(params);
+                    signal(new J2KParams.Read(params.view(), params.decodeParams(), params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;
@@ -217,7 +218,7 @@ class J2KReader implements Runnable {
                 }
 
                 if (retries++ < 13)
-                    readerSignal.signal(params); // signal to retry
+                    signal(params); // signal to retry
                 else
                     Log.error("Retry limit reached: " + uri); // something may be terribly wrong
             }

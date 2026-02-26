@@ -32,20 +32,7 @@ class J2KParams {
     record Decode(int serial, int frame, SubImage subImage, int level, float factor) {
     }
 
-    static class Read {
-
-        final J2KView view;
-        final Decode decodeParams;
-        final Position viewpoint; // sync with camera & between layers
-        boolean priority;
-
-        Read(J2KView _view, Decode _decodeParams, Position _viewpoint, boolean _priority) {
-            view = _view;
-            decodeParams = _decodeParams;
-            viewpoint = _viewpoint;
-            priority = _priority;
-        }
-
+    record Read(J2KView view, Decode decodeParams, Position viewpoint, boolean priority) {
     }
 
 }
