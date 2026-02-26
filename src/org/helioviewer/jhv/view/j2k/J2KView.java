@@ -321,7 +321,7 @@ public class J2KView extends BaseView {
     private void sendDataToHandler(J2KParams.Decode decodeParams, Position viewpoint, ImageBuffer imageBuffer) {
         int frame = decodeParams.frame();
         MetaData m = metaData[frame];
-        SubImage roi = decodeParams.subImage();
+        J2KParams.SubImage roi = decodeParams.subImage();
         ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level());
         Region r = m.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX, resolution.factorY);
         ImageData data = new ImageData(imageBuffer, m, r, viewpoint);
