@@ -7,7 +7,6 @@ import java.util.stream.IntStream;
 
 //import com.google.common.base.Stopwatch;
 
-@SuppressWarnings("serial")
 public class ImageFilter {
 
     public enum Type {
@@ -33,14 +32,24 @@ public class ImageFilter {
         byte[] array = buf.array(); // always backed by array
 
         float[] data = new float[length];
-        IntStream.range(0, length).parallel().forEach(i -> data[i] = ((array[i] + 256) & 0xFF) * BDIV);
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int i = rowBase + x;
+                data[i] = ((array[i] + 256) & 0xFF) * BDIV;
+            }
+        });
 
-        //Stopwatch sw = Stopwatch.createStarted();
         float[] image = algorithm.filter(data, width, height);
-        //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
 
         byte[] out = new byte[length];
-        IntStream.range(0, length).parallel().forEach(i -> out[i] = (byte) Math.clamp(image[i] * 255 + .5f, 0, 255));
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int i = rowBase + x;
+                out[i] = (byte) Math.clamp(image[i] * 255 + .5f, 0, 255);
+            }
+        });
 
         return ByteBuffer.wrap(out);
     }
@@ -50,25 +59,40 @@ public class ImageFilter {
         short[] array = buf.array(); // always backed by array
 
         float[] data = new float[length];
-        IntStream.range(0, length).parallel().forEach(i -> data[i] = ((array[i] + 65536) & 0xFFFF) * SDIV);
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int i = rowBase + x;
+                data[i] = ((array[i] + 65536) & 0xFFFF) * SDIV;
+            }
+        });
 
-        //Stopwatch sw = Stopwatch.createStarted();
         float[] image = algorithm.filter(data, width, height);
-        //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
 
         short[] out = new short[length];
-        IntStream.range(0, length).parallel().forEach(i -> out[i] = (short) Math.clamp(image[i] * 65535 + .5f, 0, 65535));
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                int i = rowBase + x;
+                out[i] = (short) Math.clamp(image[i] * 65535 + .5f, 0, 65535);
+            }
+        });
 
         return ShortBuffer.wrap(out);
     }
 
     static Buffer filter(Buffer buf, int width, int height, Type type) throws Exception {
+        //Stopwatch sw = Stopwatch.createStarted();
+        //try {
         if (buf instanceof ByteBuffer bb)
             return filter(bb, width, height, type.algorithm);
         else if (buf instanceof ShortBuffer sb)
             return filter(sb, width, height, type.algorithm);
         else
             throw new Exception("Unimplemented data type filtering");
+        //} finally {
+        //    System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
+        //}
     }
 
 }
