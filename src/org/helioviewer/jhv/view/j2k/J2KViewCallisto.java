@@ -28,7 +28,7 @@ public class J2KViewCallisto extends J2KView {
     }
 
     @Override
-    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint, boolean complete) { // not used
+    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) { // not used
         Log.warn("J2KViewCallisto.signalReader called: should not happen");
         //reader.signalReader(new ReadParams(this, decodeParams, true));
     }

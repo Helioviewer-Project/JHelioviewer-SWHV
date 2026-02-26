@@ -65,14 +65,12 @@ class J2KParams {
         final J2KView view;
         final Decode decodeParams;
         final Position viewpoint; // sync with camera & between layers
-        final boolean complete; // cache the decoded data
         boolean priority;
 
-        Read(J2KView _view, Decode _decodeParams, Position _viewpoint, boolean _complete, boolean _priority) {
+        Read(J2KView _view, Decode _decodeParams, Position _viewpoint, boolean _priority) {
             view = _view;
             decodeParams = _decodeParams;
             viewpoint = _viewpoint;
-            complete = _complete;
             priority = _priority;
         }
 
