@@ -250,11 +250,6 @@ public class J2KView extends BaseView {
         return new J2KParams.Decode(serial, frame, res.subImage(), res.level(), factor);
     }
 
-    private boolean isDecodeComplete(int frame, int level) {
-        AtomicBoolean status = completionLevel.getFrameStatus(frame, level); // before signalling to reader
-        return status != null && status.get();
-    }
-
     private int currentLevel = 10000;
 
     protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
@@ -270,7 +265,8 @@ public class J2KView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
-        boolean shouldCache = isDecodeComplete(decodeParams.frame(), decodeParams.level());
+        AtomicBoolean status = completionLevel.getFrameStatus(decodeParams.frame(), decodeParams.level()); // before signalling to reader
+        boolean shouldCache = status != null && status.get();
         if (reader != null && !shouldCache) {
             signalReader(decodeParams, viewpoint);
         }
