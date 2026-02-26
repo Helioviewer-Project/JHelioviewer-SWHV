@@ -56,32 +56,10 @@ public class ResolutionSet {
         return resolutions[numLevels - 1];
     }
 
-    public static class Level {
-
-        final int level;
-
-        public final int width;
-        public final int height;
-        final J2KParams.SubImage subImage;
-
-        final double factorX;
-        final double factorY;
-
+    public record Level(int level, int width, int height, double factorX, double factorY, J2KParams.SubImage subImage) {
         Level(int _level, int _width, int _height, double _factorX, double _factorY) {
-            level = _level;
-            width = _width;
-            height = _height;
-            subImage = new J2KParams.SubImage(0, 0, width, height, width, height);
-
-            factorX = _factorX;
-            factorY = _factorY;
+            this(_level, _width, _height, _factorX, _factorY, new J2KParams.SubImage(0, 0, _width, _height, _width, _height));
         }
-
-        @Override
-        public String toString() {
-            return "[Discard=" + level + " ScaleFactor=" + factorX + ',' + factorY + " ZoomDims=" + width + ',' + height + ']';
-        }
-
     }
 
 }
