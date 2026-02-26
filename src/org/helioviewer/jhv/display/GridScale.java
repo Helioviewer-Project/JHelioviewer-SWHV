@@ -5,7 +5,6 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -207,8 +206,8 @@ public interface GridScale {
                 p = q.rotateInverseVector(p);
             }
 
-            double theta = Math.asin(Math.clamp(p.y, -1., 1.)) * MathUtils.radeg;
-            double phi = Math.atan2(p.x, p.z) * MathUtils.radeg;
+            double theta = Math.toDegrees(Math.asin(Math.clamp(p.y, -1., 1.)));
+            double phi = Math.toDegrees(Math.atan2(p.x, p.z));
 
             if (gridType == GridType.Carrington && phi < 0)
                 phi += 360;

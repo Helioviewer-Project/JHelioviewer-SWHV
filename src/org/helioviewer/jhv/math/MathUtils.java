@@ -4,9 +4,6 @@ import java.text.DecimalFormat;
 
 public class MathUtils {
 
-    public static final double radeg = 180 / Math.PI;
-    public static final double degra = Math.PI / 180;
-
     /**
      * Takes and returns the maximum value from the given args.
      *
