@@ -177,7 +177,7 @@ class J2KReader implements Runnable {
 
                         completionLevel.setFrameComplete(currentStep, level); // tell the completion level
                         if (singleFrame)
-                            view.signalDecoderFromReader(params); // refresh current image
+                            view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
                     } else {
                         completionLevel.setFramePartial(currentStep); // tell the completion level
                     }
