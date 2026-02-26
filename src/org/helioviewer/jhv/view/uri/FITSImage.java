@@ -85,6 +85,18 @@ class FITSImage implements URIImageReader {
         };
     }
 
+    private static void processPixel(short[] outData, int outIdx, float[] lut, float v, float minV, float maxV, float range,
+                                     FITSSettings.ScalingMode scalingMode, double scale) {
+        if (v == ImageBuffer.BAD_PIXEL) {
+            outData[outIdx] = 0;
+        } else {
+            v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
+            float d = v - minV;
+            double mapped = mapScaled(scalingMode, d, range);
+            storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
+        }
+    }
+
     // private static final int SAMPLE = 8;
     private static final int SAMPLE = 4;
     private static final int MIN_SAMPLES = 10;
@@ -251,14 +263,7 @@ class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     short raw = lineData[i];
                     float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outIdx] = 0;
-                    } else {
-                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-                        float d = v - minV;
-                        double mapped = mapScaled(scalingMode, d, range);
-                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
-                    }
+                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case INT -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -268,14 +273,7 @@ class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     int raw = lineData[i];
                     float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outIdx] = 0;
-                    } else {
-                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-                        float d = v - minV;
-                        double mapped = mapScaled(scalingMode, d, range);
-                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
-                    }
+                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case LONG -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -285,14 +283,7 @@ class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     long raw = lineData[i];
                     float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outIdx] = 0;
-                    } else {
-                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-                        float d = v - minV;
-                        double mapped = mapScaled(scalingMode, d, range);
-                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
-                    }
+                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case FLOAT -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -301,14 +292,7 @@ class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(lineData[i], bzero, bscale);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outIdx] = 0;
-                    } else {
-                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-                        float d = v - minV;
-                        double mapped = mapScaled(scalingMode, d, range);
-                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
-                    }
+                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case DOUBLE -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -317,14 +301,7 @@ class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(lineData[i], bzero, bscale);
-                    if (v == ImageBuffer.BAD_PIXEL) {
-                        outData[outIdx] = 0;
-                    } else {
-                        v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-                        float d = v - minV;
-                        double mapped = mapScaled(scalingMode, d, range);
-                        storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
-                    }
+                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case BYTE -> throw new Exception("Unexpected BYTE path in non-byte conversion");
