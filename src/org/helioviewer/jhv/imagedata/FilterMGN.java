@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.imagedata;
 
 import java.util.stream.IntStream;
-import java.util.List;
 
 import org.helioviewer.jhv.math.MathUtils;
 
@@ -30,7 +29,7 @@ class FilterMGN implements ImageFilter.Algorithm {
         // Number of boxes
         private final int K;
 
-        private final float[] buffer;
+        private final ThreadLocal<float[]> buffer;
 
         GaussFilter(float sigma, int _K, int N) {
             K = _K;
@@ -47,7 +46,8 @@ class FilterMGN implements ImageFilter.Algorithm {
                 weights[k] = weights0[i][k] / sum;
 
             int pad = radii[0] + 1;
-            buffer = new float[N + 2 * pad];
+            int bufferLength = N + 2 * pad;
+            buffer = ThreadLocal.withInitial(() -> new float[bufferLength]);
         }
 
         private static int extension(int N, int n) {
@@ -62,40 +62,42 @@ class FilterMGN implements ImageFilter.Algorithm {
             return n;
         }
 
-        private void gaussianConv(float[] dst, float[] src, int N, int stride, int offset) {
+        private void gaussianConv(float[] dst, float[] src, int N, int stride, int offset, float[] scratch) {
             int pad = radii[0] + 1;
             float accum = 0;
 
             // Compute cumulative sum of src over n = -pad,..., N + pad - 1
             for (int n = -pad; n < 0; ++n) {
                 accum += src[offset + stride * extension(N, n)];
-                buffer[pad + n] = accum;
+                scratch[pad + n] = accum;
             }
+            int srcPos = offset;
             for (int n = 0; n < N; ++n) {
-                accum += src[offset + stride * n];
-                buffer[pad + n] = accum;
+                accum += src[srcPos];
+                scratch[pad + n] = accum;
+                srcPos += stride;
             }
             for (int n = N; n < N + pad; ++n) {
                 accum += src[offset + stride * extension(N, n)];
-                buffer[pad + n] = accum;
+                scratch[pad + n] = accum;
             }
 
             // Compute stacked box filters
+            int dstPos = offset;
             for (int n = 0; n < N; ++n) {
-                accum = weights[0] * (buffer[pad + n + radii[0]] - buffer[pad + n - radii[0] - 1]);
+                accum = weights[0] * (scratch[pad + n + radii[0]] - scratch[pad + n - radii[0] - 1]);
                 for (int k = 1; k < K; ++k)
-                    accum += weights[k] * (buffer[pad + n + radii[k]] - buffer[pad + n - radii[k] - 1]);
-                dst[offset + stride * n] = accum;
+                    accum += weights[k] * (scratch[pad + n + radii[k]] - scratch[pad + n - radii[k] - 1]);
+                dst[dstPos] = accum;
+                dstPos += stride;
             }
         }
 
         void gaussianConvImage(float[] dst, float[] src, int width, int height) {
-            // Filter each row
-            for (int y = 0; y < height; ++y)
-                gaussianConv(dst, src, width, 1, width * y);
-            // Filter each column
-            for (int x = 0; x < width; ++x)
-                gaussianConv(dst, dst, height, width, x);
+            IntStream.range(0, height).parallel().forEach(y ->
+                    gaussianConv(dst, src, width, 1, width * y, buffer.get()));
+            IntStream.range(0, width).parallel().forEach(x ->
+                    gaussianConv(dst, dst, height, width, x, buffer.get()));
         }
 
     }
@@ -106,44 +108,57 @@ class FilterMGN implements ImageFilter.Algorithm {
     private static final float[] sigmas = {1, 4, 16, 64};
     private static final float[] weights = {0.125f, 0.25f, 0.5f, 1f};
 
-    private static float[] gaussNorm(float[] data, int width, int height, float sigma, float weight) {
-        GaussFilter filter = new GaussFilter(sigma, K, Math.max(width, height));
-
-        int size = width * height;
-        float[] conv = new float[size];
-        float[] conv2 = new float[size];
-
+    private static void gaussNormAccumulate(float[] data, int width, int height, float weight, GaussFilter filter,
+                                            float[] conv, float[] conv2, float[] accum) {
         filter.gaussianConvImage(conv, data, width, height);
-        for (int i = 0; i < size; ++i) {
-            float v = data[i] - conv[i];
-            conv[i] = v;
-            conv2[i] = v * v;
-        }
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            int i = rowBase;
+            int rowEnd = rowBase + width;
+            while (i < rowEnd) {
+                float v = data[i] - conv[i];
+                conv[i] = v;
+                conv2[i] = v * v;
+                i++;
+            }
+        });
         filter.gaussianConvImage(conv2, conv2, width, height);
-
-        for (int i = 0; i < size; ++i)
-            conv[i] = conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
-
-        return conv;
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            int i = rowBase;
+            int rowEnd = rowBase + width;
+            while (i < rowEnd) {
+                accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
+                i++;
+            }
+        });
     }
 
     @Override
     public float[] filter(float[] data, int width, int height) {
-        // Process each sigma in parallel and collect results
-        List<float[]> results = IntStream.range(0, sigmas.length)
-                .parallel()
-                .mapToObj(i -> gaussNorm(data, width, height, sigmas[i], weights[i]))
-                .toList();
-
         int size = width * height;
+        float[] accum = new float[size];
+        float[] conv = new float[size];
+        float[] conv2 = new float[size];
+        int maxDim = Math.max(width, height);
+        GaussFilter[] filters = new GaussFilter[sigmas.length];
+        for (int i = 0; i < sigmas.length; i++) {
+            filters[i] = new GaussFilter(sigmas[i], K, maxDim);
+        }
+
+        for (int i = 0; i < sigmas.length; i++) {
+            gaussNormAccumulate(data, width, height, weights[i], filters[i], conv, conv2, accum);
+        }
+
         float[] image = new float[size];
-        // Combine accumulation and blending in a single parallel pass
-        IntStream.range(0, size).parallel().forEach(i -> {
-            float sum = 0;
-            for (float[] res : results) {
-                sum += res[i];
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            int i = rowBase;
+            int rowEnd = rowBase + width;
+            while (i < rowEnd) {
+                image[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
+                i++;
             }
-            image[i] = sum * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
         });
         return image;
     }
