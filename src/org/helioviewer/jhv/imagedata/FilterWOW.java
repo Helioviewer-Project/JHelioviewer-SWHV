@@ -27,43 +27,43 @@ class FilterWOW implements ImageFilter.Algorithm {
         if (width < 128 || height < 128)
             return data;
 
-        float[] image = data.clone();
+        float[] base = data.clone();
 
         int length = data.length;
-        float[] coeff = new float[length];
-        float[] temp1 = new float[length];
-        float[] temp2 = new float[length];
-        float[] synth = new float[length];
+        float[] detail = new float[length];
+        float[] smooth = new float[length];
+        float[] variance = new float[length];
+        float[] output = new float[length];
 
         float noise = 0; // computed for scale 0
         for (int scale = 0; scale < SCALES; scale++) {
             int step = 1 << scale;
             // A trous transform
-            convolveHorizontal(image, coeff, width, height, step); // Horizontal pass
-            convolveVertical(coeff, temp1, width, height, step); // Vertical pass
-            subtractParallel(image, temp1, coeff, width, height); // Coefficients
-            System.arraycopy(temp1, 0, image, 0, length); // Update image for next scale
+            convolveHorizontal(base, detail, width, height, step); // Horizontal pass
+            convolveVertical(detail, smooth, width, height, step); // Vertical pass
+            subtractParallel(base, smooth, detail, width, height); // Coefficients
+            System.arraycopy(smooth, 0, base, 0, length); // Update image for next scale
             // Whiten coefficients
-            convolveHorizontalSquared(coeff, temp1, width, height, step); // Squared src horizontal pass
-            convolveVertical(temp1, temp2, width, height, step); // Vertical pass
+            convolveHorizontalSquared(detail, smooth, width, height, step); // Squared src horizontal pass
+            convolveVertical(smooth, variance, width, height, step); // Vertical pass
             // Denoise stage
             if (scale == 0) {
-                noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
+                noise = (1.48260221850560f / SIGMA_E0) * medianStream(detail, length);
                 if (noise > NOISE_THRESH) { // avoid division by 0
                     float denoiseFactor = 1 / (3 * SIGMA_E0 * noise);
-                    denoiseParallel(denoiseFactor, coeff, width, height);
+                    denoiseParallel(denoiseFactor, detail, width, height);
                 }
             } else if (scale == 1) {
                 if (noise > NOISE_THRESH) { // avoid division by 0
                     float denoiseFactor = 1 / (SIGMA_E1 * noise);
-                    denoiseParallel(denoiseFactor, coeff, width, height);
+                    denoiseParallel(denoiseFactor, detail, width, height);
                 }
             }
             // Whitened synthesis
-            synthesisParallel(temp2, coeff, synth, width, height);
+            synthesisParallel(variance, detail, output, width, height);
         }
-        blendParallel(image, data, synth, width, height);
-        return synth;
+        blendParallel(base, data, output, width, height);
+        return output;
     }
 
 /*
@@ -85,43 +85,43 @@ class FilterWOW implements ImageFilter.Algorithm {
         return od.isEmpty() ? 0 : (float) od.getAsDouble();
     }
 
-    private static void subtractParallel(float[] src1, float[] src2, float[] dest, int width, int height) {
+    private static void subtractParallel(float[] base, float[] smooth, float[] detail, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
             int rowEnd = rowBase + width;
             for (int idx = rowBase; idx < rowEnd; idx++) {
-                dest[idx] = src1[idx] - src2[idx];
+                detail[idx] = base[idx] - smooth[idx];
             }
         });
     }
 
-    private static void denoiseParallel(float factor, float[] dest, int width, int height) {
+    private static void denoiseParallel(float factor, float[] detail, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
             int rowEnd = rowBase + width;
             for (int idx = rowBase; idx < rowEnd; idx++) {
-                float w = Math.abs(dest[idx]) * factor;
-                dest[idx] *= BOOST * w / (1 + w);
+                float w = Math.abs(detail[idx]) * factor;
+                detail[idx] *= BOOST * w / (1 + w);
             }
         });
     }
 
-    private static void synthesisParallel(float[] weight, float[] detail, float[] dest, int width, int height) {
+    private static void synthesisParallel(float[] variance, float[] detail, float[] output, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
             int rowEnd = rowBase + width;
             for (int idx = rowBase; idx < rowEnd; idx++) {
-                dest[idx] += MathUtils.invSqrt(weight[idx]) * detail[idx];
+                output[idx] += MathUtils.invSqrt(variance[idx]) * detail[idx];
             }
         });
     }
 
-    private static void blendParallel(float[] image, float[] data, float[] dest, int width, int height) {
+    private static void blendParallel(float[] base, float[] original, float[] output, int width, int height) {
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
             int rowEnd = rowBase + width;
             for (int idx = rowBase; idx < rowEnd; idx++) {
-                dest[idx] = (dest[idx] + image[idx]) * ONE_MINUS_MIX_FACTOR + data[idx] * MIX_FACTOR;
+                output[idx] = (output[idx] + base[idx]) * ONE_MINUS_MIX_FACTOR + original[idx] * MIX_FACTOR;
             }
         });
     }
