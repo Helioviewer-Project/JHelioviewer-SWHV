@@ -104,13 +104,13 @@ class FilterWOW implements ImageFilter.Algorithm {
         for (int scale = 0; scale < SCALES; scale++) {
             int step = 1 << scale;
             // A trous transform
-            pool.invoke(new ConvolutionTask(image, coeff, width, height, true, step)); // Horizontal pass
-            pool.invoke(new ConvolutionTask(coeff, temp1, width, height, false, step)); // Vertical pass
+            convolveHorizontal(image, coeff, width, height, step); // Horizontal pass
+            convolveVertical(coeff, temp1, width, height, step); // Vertical pass
             pool.invoke(new ArrayOp.Task3(image, temp1, coeff, 0, length, opSubtract)); // Coefficients
             System.arraycopy(temp1, 0, image, 0, length); // Update image for next scale
             // Whiten coefficients
-            pool.invoke(new ConvolutionTask2(coeff, temp1, width, height, true, step)); // Squared src horizontal pass
-            pool.invoke(new ConvolutionTask(temp1, temp2, width, height, false, step)); // Vertical pass
+            convolveHorizontalSquared(coeff, temp1, width, height, step); // Squared src horizontal pass
+            convolveVertical(temp1, temp2, width, height, step); // Vertical pass
             // Denoise stage
             if (scale == 0) {
                 noise = (1.48260221850560f / SIGMA_E0) * medianStream(coeff, length);
@@ -150,154 +150,66 @@ class FilterWOW implements ImageFilter.Algorithm {
         return od.isEmpty() ? 0 : (float) od.getAsDouble();
     }
 
-    private static class ConvolutionTask extends RecursiveAction {
-
-        final float[] src;
-        final float[] dest;
-        final int width;
-        final int height;
-        final boolean isHorizontal;
-        final int step;
-        final int start;
-        final int end;
-
-        ConvolutionTask(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step) {
-            this(src, dest, width, height, isHorizontal, step, 0, isHorizontal ? height : width);
-        }
-
-        ConvolutionTask(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step, int start, int end) {
-            this.src = src;
-            this.dest = dest;
-            this.width = width;
-            this.height = height;
-            this.isHorizontal = isHorizontal;
-            this.step = step;
-            this.start = start;
-            this.end = end;
-        }
-
-        @Override
-        protected void compute() {
-            if (end - start <= ArrayOp.THRESHOLD) {
-                if (isHorizontal) {
-                    computeHorizontal();
-                } else {
-                    computeVertical();
-                }
-            } else {
-                int mid = (start + end) / 2;
-                invokeAll(
-                        new ConvolutionTask(src, dest, width, height, isHorizontal, step, start, mid),
-                        new ConvolutionTask(src, dest, width, height, isHorizontal, step, mid, end));
+    private static void convolveHorizontal(float[] src, float[] dest, int width, int height, int step) {
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                float sum = 0;
+                int idx_m2 = mirroredIdx(x - 2 * step, width);
+                sum += src[rowBase + idx_m2] * FILTER[0];
+                int idx_m1 = mirroredIdx(x - step, width);
+                sum += src[rowBase + idx_m1] * FILTER[1];
+                sum += src[rowBase + x] * FILTER[2];
+                int idx_p1 = mirroredIdx(x + step, width);
+                sum += src[rowBase + idx_p1] * FILTER[3];
+                int idx_p2 = mirroredIdx(x + 2 * step, width);
+                sum += src[rowBase + idx_p2] * FILTER[4];
+                dest[rowBase + x] = sum;
             }
-        }
-
-        void computeHorizontal() {
-            for (int y = start; y < end; y++) {
-                for (int x = 0; x < width; x++) {
-                    float sum = 0;
-                    // Unrolled loop for i = -2 to 2
-                    int idx_m2 = mirroredIdx(x - 2 * step, width);
-                    sum += src[y * width + idx_m2] * FILTER[0];
-
-                    int idx_m1 = mirroredIdx(x - step, width);
-                    sum += src[y * width + idx_m1] * FILTER[1];
-
-                    sum += src[y * width + x] * FILTER[2];
-
-                    int idx_p1 = mirroredIdx(x + step, width);
-                    sum += src[y * width + idx_p1] * FILTER[3];
-
-                    int idx_p2 = mirroredIdx(x + 2 * step, width);
-                    sum += src[y * width + idx_p2] * FILTER[4];
-
-                    dest[y * width + x] = sum;
-                }
-            }
-        }
-
-        void computeVertical() {
-            for (int x = start; x < end; x++) {
-                for (int y = 0; y < height; y++) {
-                    float sum = 0;
-                    // Unrolled loop for i = -2 to 2
-                    int idx_m2 = mirroredIdx(y - 2 * step, height);
-                    sum += src[idx_m2 * width + x] * FILTER[0];
-
-                    int idx_m1 = mirroredIdx(y - step, height);
-                    sum += src[idx_m1 * width + x] * FILTER[1];
-
-                    sum += src[y * width + x] * FILTER[2];
-
-                    int idx_p1 = mirroredIdx(y + step, height);
-                    sum += src[idx_p1 * width + x] * FILTER[3];
-
-                    int idx_p2 = mirroredIdx(y + 2 * step, height);
-                    sum += src[idx_p2 * width + x] * FILTER[4];
-
-                    dest[y * width + x] = sum;
-                }
-            }
-        }
-
+        });
     }
 
-    private static class ConvolutionTask2 extends ConvolutionTask {
-
-        ConvolutionTask2(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step) {
-            super(src, dest, width, height, isHorizontal, step);
-        }
-
-        ConvolutionTask2(float[] src, float[] dest, int width, int height, boolean isHorizontal, int step, int start, int end) {
-            super(src, dest, width, height, isHorizontal, step, start, end);
-        }
-
-        @Override
-        protected void compute() {
-            if (end - start <= ArrayOp.THRESHOLD) {
-                if (isHorizontal) {
-                    computeHorizontal();
-                } else {
-                    super.computeVertical();
-                }
-            } else {
-                int mid = (start + end) / 2;
-                invokeAll(
-                        new ConvolutionTask2(src, dest, width, height, isHorizontal, step, start, mid),
-                        new ConvolutionTask2(src, dest, width, height, isHorizontal, step, mid, end));
+    private static void convolveHorizontalSquared(float[] src, float[] dest, int width, int height, int step) {
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            for (int x = 0; x < width; x++) {
+                float sum = 0;
+                int idx_m2 = mirroredIdx(x - 2 * step, width);
+                float v_m2 = src[rowBase + idx_m2];
+                sum += v_m2 * v_m2 * FILTER[0];
+                int idx_m1 = mirroredIdx(x - step, width);
+                float v_m1 = src[rowBase + idx_m1];
+                sum += v_m1 * v_m1 * FILTER[1];
+                float v0 = src[rowBase + x];
+                sum += v0 * v0 * FILTER[2];
+                int idx_p1 = mirroredIdx(x + step, width);
+                float v_p1 = src[rowBase + idx_p1];
+                sum += v_p1 * v_p1 * FILTER[3];
+                int idx_p2 = mirroredIdx(x + 2 * step, width);
+                float v_p2 = src[rowBase + idx_p2];
+                sum += v_p2 * v_p2 * FILTER[4];
+                dest[rowBase + x] = sum;
             }
-        }
+        });
+    }
 
-        @Override
-        void computeHorizontal() {
-            for (int y = start; y < end; y++) {
-                for (int x = 0; x < width; x++) {
-                    float sum = 0;
-                    // Unrolled loop for i = -2 to 2
-                    int idx_m2 = mirroredIdx(x - 2 * step, width);
-                    float v_m2 = src[y * width + idx_m2];
-                    sum += v_m2 * v_m2 * FILTER[0];
-
-                    int idx_m1 = mirroredIdx(x - step, width);
-                    float v_m1 = src[y * width + idx_m1];
-                    sum += v_m1 * v_m1 * FILTER[1];
-
-                    float v0 = src[y * width + x];
-                    sum += v0 * v0 * FILTER[2];
-
-                    int idx_p1 = mirroredIdx(x + step, width);
-                    float v_p1 = src[y * width + idx_p1];
-                    sum += v_p1 * v_p1 * FILTER[3];
-
-                    int idx_p2 = mirroredIdx(x + 2 * step, width);
-                    float v_p2 = src[y * width + idx_p2];
-                    sum += v_p2 * v_p2 * FILTER[4];
-
-                    dest[y * width + x] = sum;
-                }
+    private static void convolveVertical(float[] src, float[] dest, int width, int height, int step) {
+        IntStream.range(0, height).parallel().forEach(y -> {
+            int rowBase = y * width;
+            int rowM2 = mirroredIdx(y - 2 * step, height) * width;
+            int rowM1 = mirroredIdx(y - step, height) * width;
+            int rowP1 = mirroredIdx(y + step, height) * width;
+            int rowP2 = mirroredIdx(y + 2 * step, height) * width;
+            for (int x = 0; x < width; x++) {
+                float sum = 0;
+                sum += src[rowM2 + x] * FILTER[0];
+                sum += src[rowM1 + x] * FILTER[1];
+                sum += src[rowBase + x] * FILTER[2];
+                sum += src[rowP1 + x] * FILTER[3];
+                sum += src[rowP2 + x] * FILTER[4];
+                dest[rowBase + x] = sum;
             }
-        }
-
+        });
     }
 
     private static int mirroredIdx(int idx, int size) {
