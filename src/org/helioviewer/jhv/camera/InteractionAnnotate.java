@@ -126,6 +126,10 @@ class InteractionAnnotate implements Interaction.Type {
         MovieDisplay.display();
     }
 
+    boolean hasPendingAnnotateable() {
+        return newAnnotateable != null;
+    }
+
     @Override
     public void mouseReleased(MouseEvent e) {
         finishAnnotateable();
