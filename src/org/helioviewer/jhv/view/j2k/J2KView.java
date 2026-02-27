@@ -161,7 +161,7 @@ public class J2KView extends BaseView {
 
     @Override
     public void clearCache() {
-        decodeCache.invalidateAll();
+        decodeCache.asMap().keySet().removeIf(key -> key.params().serial() == serial);
     }
 
     @Override

@@ -131,7 +131,7 @@ public class URIView extends BaseView {
 
     @Override
     public void clearCache() {
-        decodeCache.invalidateAll();
+        decodeCache.asMap().keySet().removeIf(k -> k.uri().equals(dataUri));
     }
 
 }
