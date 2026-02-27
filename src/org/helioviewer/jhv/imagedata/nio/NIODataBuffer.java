@@ -8,6 +8,7 @@ import org.lwjgl.system.MemoryUtil;
 abstract class NIODataBuffer extends DataBuffer {
 
     private Buffer buffer;
+    private ByteBuffer allocatedBuffer;
 
     private NIODataBuffer(int type, int size, int numBanks) {
         super(type, size, numBanks);
@@ -16,6 +17,7 @@ abstract class NIODataBuffer extends DataBuffer {
         long length = ((long) size) * componentSize * numBanks;
 
         ByteBuffer byteBuffer = MemoryUtil.memAlloc((int) length).order(ByteOrder.nativeOrder());
+        allocatedBuffer = byteBuffer;
         switch (type) {
             case DataBuffer.TYPE_BYTE -> buffer = byteBuffer;
             case DataBuffer.TYPE_USHORT -> buffer = byteBuffer.asShortBuffer();
@@ -29,7 +31,8 @@ abstract class NIODataBuffer extends DataBuffer {
     }
 
     void free() {
-        MemoryUtil.memFree(buffer);
+        MemoryUtil.memFree(allocatedBuffer);
+        allocatedBuffer = null;
         buffer = null;
     }
 
