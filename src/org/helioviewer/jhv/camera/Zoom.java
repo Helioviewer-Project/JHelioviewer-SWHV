@@ -25,13 +25,12 @@ class Zoom {
         if (wheelDelta == 0)
             return;
 
-        boolean sameDirection = mLastWheelDelta * wheelDelta > 0.0;
-        mLastWheelDelta = wheelDelta;
-
+        boolean hasPreviousDirection = mLastWheelDelta != 0.0;
+        boolean sameDirection = !hasPreviousDirection || mLastWheelDelta * wheelDelta > 0.0;
         if (!sameDirection) {  // changed direction
             zeroVelocity();
-            return;
         }
+        mLastWheelDelta = wheelDelta;
 
         // calculate new velocity increment
         double deltaV = wheelDelta / MILLIS_PER_FRAME;
