@@ -306,6 +306,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     private void load(BiConsumer<URI, ConnectionLayer> consumer) {
         FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
+        fileDialog.setMultipleMode(false);
         fileDialog.setVisible(true);
 
         File[] fileNames = fileDialog.getFiles();

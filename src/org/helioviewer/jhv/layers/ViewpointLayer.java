@@ -182,7 +182,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             }
         }
         clearHoverTextIfNeeded();
-        if (minDist < 0.01) {
+        if (name != null && minDist < 0.01) {
             text.add(name);
             MovieDisplay.display();
         }
@@ -222,6 +222,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
             optionsPanel.activate();
             optionsPanel.syncViewpoint();
         } else {
+            text.clear();
             JHVFrame.getInputController().removePlugin(this);
             optionsPanel.deactivate();
             Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer);
