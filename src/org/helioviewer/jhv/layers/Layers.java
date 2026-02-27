@@ -249,6 +249,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         layers.forEach(layer -> layer.dispose(gl));
         newLayers = layers;
         layers = new LayerList();
+        setActiveImageLayer(null);
     }
 
     public static void forEachImageLayer(Consumer<? super ImageLayer> action) {

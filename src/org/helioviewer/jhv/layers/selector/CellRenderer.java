@@ -76,6 +76,7 @@ class CellRenderer {
                     setFont(UIGlobals.uiFontBold);
                 } else {
                     setToolTipText(null);
+                    setFont(UIGlobals.uiFont);
                 }
             }
         }
