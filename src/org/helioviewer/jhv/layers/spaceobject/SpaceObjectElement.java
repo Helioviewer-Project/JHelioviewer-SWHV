@@ -28,6 +28,8 @@ class SpaceObjectElement implements Interfaces.StatusReceiver {
 
     void load(UpdateViewpoint uv, SpaceObject observer, Frame frame, long startTime, long endTime) {
         selected = true;
+        status = null;
+        model.refresh(this);
 
         if (load != null) {
             PositionLoad.remove(uv, load);

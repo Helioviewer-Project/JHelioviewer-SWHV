@@ -91,8 +91,8 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
     public void add(MutableTreeNode newChild) {
         super.add(newChild);
         if (newChild instanceof FOVInstrument instrument) {
-            instrument.setCenterX(control2Center((Double) spinnerX.getValue()));
-            instrument.setCenterY(control2Center((Double) spinnerY.getValue()));
+            instrument.setCenterX(control2Center(((Number) spinnerX.getValue()).doubleValue()));
+            instrument.setCenterY(control2Center(((Number) spinnerY.getValue()).doubleValue()));
         }
     }
 
