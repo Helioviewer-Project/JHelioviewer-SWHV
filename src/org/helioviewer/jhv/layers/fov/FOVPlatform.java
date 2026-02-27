@@ -9,6 +9,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -84,6 +85,15 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
     @Override
     public Component getComponent() {
         return panel;
+    }
+
+    @Override
+    public void add(MutableTreeNode newChild) {
+        super.add(newChild);
+        if (newChild instanceof FOVInstrument instrument) {
+            instrument.setCenterX(control2Center((Double) spinnerX.getValue()));
+            instrument.setCenterY(control2Center((Double) spinnerY.getValue()));
+        }
     }
 
     private void initHemiLine(GL3 gl) {
