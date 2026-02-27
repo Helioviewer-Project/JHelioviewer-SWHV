@@ -59,10 +59,10 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
     }
 
     public void setupLayer(APIRequest req) {
-        sourcesTree.setSelectedItem(req.server(), req.sourceId());
+        setSelected(req.server(), req.sourceId());
     }
 
-    public void setSelectedItem(String server, int sourceId) {
+    public void setSelected(String server, int sourceId) {
         sourcesTree.setSelectedItem(server, sourceId);
     }
 
