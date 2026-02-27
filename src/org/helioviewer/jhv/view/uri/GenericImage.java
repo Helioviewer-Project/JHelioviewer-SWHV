@@ -6,6 +6,7 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.IndexColorModel;
+import java.awt.Graphics;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.Buffer;
@@ -111,7 +112,12 @@ class GenericImage implements URIImageReader {
             }
             default -> {
                 BufferedImage conv = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
-                conv.getGraphics().drawImage(image, 0, 0, null);
+                Graphics g = conv.getGraphics();
+                try {
+                    g.drawImage(image, 0, 0, null);
+                } finally {
+                    g.dispose();
+                }
                 buffer = IntBuffer.wrap(((DataBufferInt) conv.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.ARGB32;
             }
