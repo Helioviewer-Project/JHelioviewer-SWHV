@@ -28,6 +28,7 @@ abstract class J2KSource {
     private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
     private boolean isJP2;
+    private boolean isClosed = true;
 
     static class Local extends J2KSource {
 
@@ -42,6 +43,7 @@ abstract class J2KSource {
         void open() throws KduException {
             super.jp2Src.Open(path, true);
             super.jpxSrc.Open(super.jp2Src, false);
+            super.isClosed = false;
         }
 
     }
@@ -58,6 +60,7 @@ abstract class J2KSource {
         void open() throws KduException {
             super.jp2Src.Open(cache);
             super.jpxSrc.Open(super.jp2Src, false);
+            super.isClosed = false;
         }
 
     }
@@ -65,8 +68,11 @@ abstract class J2KSource {
     abstract void open() throws KduException;
 
     void close() throws KduException {
+        if (isClosed)
+            return;
         jpxSrc.Close();
         jp2Src.Close();
+        isClosed = true;
     }
 
     Jpx_source jpxSource() {
