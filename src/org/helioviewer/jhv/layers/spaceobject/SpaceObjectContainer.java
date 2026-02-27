@@ -135,6 +135,8 @@ public final class SpaceObjectContainer extends JScrollPane {
 
     private void selectElement(SpaceObjectElement element) {
         if (exclusive) {
+            if (element.isSelected()) // avoid reload on re-clicking same
+                return;
             model.getSelected().forEach(e -> e.unload(uv));
             element.load(uv, observer, frame, startTime, endTime);
         } else {

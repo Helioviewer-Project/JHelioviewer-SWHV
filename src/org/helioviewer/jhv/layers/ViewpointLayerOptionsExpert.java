@@ -86,7 +86,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         }
         JCheckBox relativeCheckBox = new JCheckBox("Relative longitude", relative);
         relativeCheckBox.addActionListener(e -> {
-            relative = !relative;
+            relative = relativeCheckBox.isSelected();
             Display.getCamera().refresh(); // full camera refresh to update viewpoint
         });
         framePanel.add(relativeCheckBox);

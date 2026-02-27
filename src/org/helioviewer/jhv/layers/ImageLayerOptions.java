@@ -182,12 +182,16 @@ class ImageLayerOptions extends JPanel {
     void downloadProgress(int value) {
         if (value < 0)
             progressBar.setIndeterminate(true);
-        else
+        else {
+            progressBar.setIndeterminate(false);
             progressBar.setValue(value);
+        }
     }
 
     void downloadDone() {
         downloadButton.remove(progressBar);
+        progressBar.setIndeterminate(false);
+        progressBar.setValue(0);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.setText(Buttons.download);
         downloadButton.setSelected(false);
