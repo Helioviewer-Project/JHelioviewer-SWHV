@@ -18,7 +18,7 @@ public class SingleExecutor {
     }
 
     public void invokeLater(Runnable runnable) {
-        executor.submit(runnable);
+        executor.execute(runnable);
     }
 
 }

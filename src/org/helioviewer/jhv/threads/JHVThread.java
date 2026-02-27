@@ -35,7 +35,9 @@ public class JHVThread {
             }
         }
         if (t != null) {
-            t.printStackTrace();
+            if (isInterrupted(t))
+                return;
+            Log.error(t);
         }
     }
 

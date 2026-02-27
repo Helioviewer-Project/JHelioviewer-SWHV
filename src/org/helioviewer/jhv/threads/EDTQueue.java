@@ -18,22 +18,23 @@ public class EDTQueue {
         }
 
         AtomicReference<E> ret = new AtomicReference<>();
-        AtomicReference<Exception> except = new AtomicReference<>();
+        AtomicReference<Throwable> thrown = new AtomicReference<>();
 
         EventQueue.invokeAndWait(() -> {
             try {
                 ret.set(r.call());
-            } catch (Exception e) {
+            } catch (Throwable t) {
                 // pass exception to original thread
-                except.set(e);
+                thrown.set(t);
             }
         });
 
-        Exception e = except.get();
-        if (e != null) // there was an exception on EDT thread, rethrow it
-            throw new InvocationTargetException(e);
-        else
+        Throwable t = thrown.get();
+        if (t == null)
             return ret.get();
+        if (t instanceof Error error)
+            throw error;
+        throw new InvocationTargetException(t);
     }
 
 }
