@@ -84,7 +84,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public boolean beingDragged() {
-        return true;
+        return startPoint != null;
     }
 
     @Override
