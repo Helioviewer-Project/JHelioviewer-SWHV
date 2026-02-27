@@ -76,7 +76,6 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
         panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
         panel.add(cancelBtn, ButtonPanel.CANCEL_BUTTON);
         panel.add(availabilityBtn, ButtonPanel.OTHER_BUTTON);
-
         return panel;
     }
 
