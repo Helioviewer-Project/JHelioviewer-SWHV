@@ -157,7 +157,7 @@ public class GLListener implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         GLInfo.updatePixelScale(canvas);
         GL3 gl = (GL3) drawable.getGL();
-        gl.glFinish();
+        // gl.glFinish(); - hard stalls the GPU pipeline
 
         if (whiteBack)
             gl.glClearColor(1, 1, 1, 0);
