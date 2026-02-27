@@ -69,6 +69,7 @@ class RadioJ2KData implements ImageData.Handler {
             view = null;
         }
         NIOImageFactory.free(bufferedImage);
+        bufferedImage = null;
     }
 
     @Override
