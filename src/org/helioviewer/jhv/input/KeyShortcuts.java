@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.input;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 
@@ -21,8 +20,8 @@ public class KeyShortcuts {
 
     static boolean handleKeyStroke(KeyStroke keyStroke, Object source) {
         Action action = actionMap.get(keyStroke);
-        if (action != null) {
-            EventQueue.invokeLater(() -> action.actionPerformed(new ActionEvent(source, ActionEvent.ACTION_PERFORMED, null)));
+        if (action != null && action.isEnabled()) {
+            action.actionPerformed(new ActionEvent(source, ActionEvent.ACTION_PERFORMED, null));
             return true;
         }
         return false;
