@@ -44,6 +44,9 @@ public class GLInfo {
             AffineTransform tx = gc.getDefaultTransform();
             pixelScale[0] = tx.getScaleX();
             pixelScale[1] = tx.getScaleY();
+        } else {
+            pixelScale[0] = 1;
+            pixelScale[1] = 1;
         }
     }
 

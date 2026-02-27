@@ -334,6 +334,8 @@ public class JhvTextRenderer {
         packer.dispose();
         packer = null;
         cachedBackingStore = null;
+        if (cachedGraphics != null)
+            cachedGraphics.dispose();
         cachedGraphics = null;
         cachedFontRenderContext = null;
         glslTexture.dispose(gl);
