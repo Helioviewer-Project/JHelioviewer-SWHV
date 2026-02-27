@@ -12,6 +12,8 @@ import org.helioviewer.jhv.math.Vec3;
 
 public class CameraHelper {
 
+    private static final double PLANE_Z_EPS = 1e-8;
+
     private static double computeNormalizedX(Viewport vp, double screenX) {
         return (screenX - vp.x) / vp.width - 0.5;
     }
@@ -98,12 +100,13 @@ public class CameraHelper {
         if (correctDrag)
             altnormal = dragRotation.rotateVector(Vec3.ZAxis);
 
-        if (altnormal.z == 0)
+        double denom = altnormal.z;
+        if (Math.abs(denom) < PLANE_Z_EPS)
             return null;
 
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
-        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / altnormal.z;
+        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / denom;
 
         Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
         if (correctDrag)
