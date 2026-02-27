@@ -198,17 +198,18 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
             return;
         }
         Layer toMove = layers.get(fromIndex);
-        Layer moveTo = layers.get(Math.max(0, toIndex - 1));
-
-        if (!(toMove instanceof ImageLayer) || !(moveTo instanceof ImageLayer)) {
+        if (!(toMove instanceof ImageLayer)) {
             return;
         }
+
+        int target = Math.clamp(toIndex, 0, layers.imageLayersCount);
+        if (fromIndex < target)
+            target--; // adjust insertion index after removal
+        if (fromIndex == target)
+            return;
+
         layers.remove(fromIndex);
-        if (fromIndex < toIndex) {
-            insertRow(toIndex - 1, toMove);
-        } else {
-            insertRow(toIndex, toMove);
-        }
+        insertRow(target, toMove);
 
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
