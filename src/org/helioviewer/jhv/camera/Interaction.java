@@ -123,7 +123,10 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        getType().mouseReleased(e);
+        if (interactionAnnotate.hasPendingAnnotateable())
+            interactionAnnotate.mouseReleased(e);
+        else
+            getType().mouseReleased(e);
         annotate = false;
     }
 
