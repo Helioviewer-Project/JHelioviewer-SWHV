@@ -26,6 +26,7 @@ class TableRowTransferHandler extends TransferHandler {
 
     private final JTable grid;
     private BufferedImage image;
+    private Cursor dragCursor;
 
     TableRowTransferHandler(JTable table) {
         grid = table;
@@ -65,13 +66,14 @@ class TableRowTransferHandler extends TransferHandler {
             return null;
 
         createImageOfRow(row);
+        dragCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(10, 10), "DnD");
         return new StringSelection(Integer.toString(row));
     }
 
     @Override
     public boolean canImport(TransferHandler.TransferSupport info) {
         boolean ours = isOurs(info) && image != null;
-        grid.setCursor(ours ? Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(10, 10), "DnD") : DragSource.DefaultMoveNoDrop);
+        grid.setCursor(ours ? dragCursor : DragSource.DefaultMoveNoDrop);
         return ours;
     }
 
@@ -107,6 +109,7 @@ class TableRowTransferHandler extends TransferHandler {
     @Override
     protected void exportDone(JComponent c, Transferable t, int act) {
         image = null;
+        dragCursor = null;
         if (act == TransferHandler.MOVE || act == TransferHandler.NONE) {
             grid.setCursor(Cursor.getDefaultCursor());
         }
