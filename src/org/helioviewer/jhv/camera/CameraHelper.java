@@ -41,14 +41,39 @@ public class CameraHelper {
         return vp.height / camera.getCameraWidth();
     }
 
-    static Vec3 getVectorFromSphereTrackball(Camera camera, Viewport vp, double screenX, double screenY, double refRadius2) {
+    static double selectTrackballRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
+        if (radius2 > 0.5 * Sun.Radius2) {
+            double r = 0.5 * camera.getCameraWidth();
+            return r * r;
+        }
+        return Sun.Radius2;
+    }
 
-        double z = radius2 <= 0.5 * refRadius2 ? Math.sqrt(refRadius2 - radius2) : 0.5 * refRadius2 / Math.sqrt(radius2);
-        Vec3 hitPoint = new Vec3(up1x, up1y, z);
-        return camera.getDragRotation().rotateInverseVector(hitPoint);
+    static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
+        double width = camera.getCameraWidth();
+        Vec2 translation = camera.getTranslation();
+        double tx = translation.x;
+        double ty = translation.y;
+        double widthAspect = width * vp.aspect;
+        double halfRadius2 = 0.5 * refRadius2;
+
+        double startUpX = ((startX - vp.x) / vp.width - 0.5) * widthAspect - tx;
+        double startUpY = (0.5 - (startY - vp.yAWT) / vp.height) * width - ty;
+        double startRadius2 = startUpX * startUpX + startUpY * startUpY;
+        double startZ = startRadius2 <= halfRadius2 ? Math.sqrt(refRadius2 - startRadius2) : halfRadius2 / Math.sqrt(startRadius2);
+
+        double endUpX = ((endX - vp.x) / vp.width - 0.5) * widthAspect - tx;
+        double endUpY = (0.5 - (endY - vp.yAWT) / vp.height) * width - ty;
+        double endRadius2 = endUpX * endUpX + endUpY * endUpY;
+        double endZ = endRadius2 <= halfRadius2 ? Math.sqrt(refRadius2 - endRadius2) : halfRadius2 / Math.sqrt(endRadius2);
+
+        Quat dragRotation = camera.getDragRotation();
+        Vec3 start = dragRotation.rotateInverseVector(new Vec3(startUpX, startUpY, startZ));
+        Vec3 end = dragRotation.rotateInverseVector(new Vec3(endUpX, endUpY, endZ));
+        return Quat.calcRotation(start, end);
     }
 
     @Nullable
