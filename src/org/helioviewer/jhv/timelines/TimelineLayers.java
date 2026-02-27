@@ -40,11 +40,11 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public void remove(TimelineLayer tl) {
-        tl.remove();
         int row = layers.indexOf(tl);
         if (row == -1)
             return;
 
+        tl.remove();
         layers.remove(tl);
         fireTableRowsDeleted(row, row);
         DrawController.graphAreaChanged();
