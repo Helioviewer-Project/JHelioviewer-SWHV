@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -23,6 +24,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -279,6 +282,20 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         addLayerButton = new JideSplitButton(Buttons.newLayer);
         addLayerButton.setAlwaysDropdown(true);
         addLayerButton.add(imageSelectorPanel);
+        addLayerButton.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                EventQueue.invokeLater(() -> imageSelectorPanel.getFocused().grabFocus());
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        });
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Synchronize time intervals of all layers");
@@ -317,7 +334,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     @Override
     public void load(String server, int sourceId) {
         addLayerButton.doClickOnMenu();
-        imageSelectorPanel.setSelectedItem(server, sourceId);
+        imageSelectorPanel.setSelected(server, sourceId);
         if (checkSanity())
             imageSelectorPanel.load(null, getStartTime(), getEndTime(), getCadence());
     }
