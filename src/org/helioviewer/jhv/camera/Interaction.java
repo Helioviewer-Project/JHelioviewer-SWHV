@@ -167,7 +167,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     @Override
     public void keyReleased(KeyEvent e) {
-        annotate = false;
+        annotate = e.isShiftDown();
     }
 
     @Override
