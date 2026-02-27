@@ -36,7 +36,10 @@ public class GLGrab {
         if (fbo != null) {
             fbo.detachAll(gl);
             fbo.destroy(gl);
-            fboTex.free(gl);
+            if (fboTex != null)
+                fboTex.free(gl);
+            fboTex = null;
+            fbo = null;
         }
     }
 

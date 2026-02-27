@@ -52,6 +52,10 @@ abstract class GLSLShader {
     }
 
     protected final void _dispose(GL3 gl) {
+        if (progID != 0 && usedID == progID) {
+            usedID = 0;
+            gl.glUseProgram(0);
+        }
         if (vertexID != 0) {
             gl.glDeleteShader(vertexID);
             vertexID = 0;
