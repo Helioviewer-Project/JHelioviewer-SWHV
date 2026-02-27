@@ -15,6 +15,10 @@ public class PluginManager {
     }
 
     public static void addPlugin(Plugin plugin) {
+        for (Plugin existing : plugins) {
+            if (existing.getClass() == plugin.getClass())
+                return;
+        }
         plugins.add(plugin);
         if (plugin.isActive())
             plugin.install();
