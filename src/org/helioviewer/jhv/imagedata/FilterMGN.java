@@ -113,23 +113,19 @@ class FilterMGN implements ImageFilter.Algorithm {
         filter.gaussianConvImage(conv, data, width, height);
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            int i = rowBase;
             int rowEnd = rowBase + width;
-            while (i < rowEnd) {
+            for (int i = rowBase; i < rowEnd; i++) {
                 float v = data[i] - conv[i];
                 conv[i] = v;
                 conv2[i] = v * v;
-                i++;
             }
         });
         filter.gaussianConvImage(conv2, conv2, width, height);
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            int i = rowBase;
             int rowEnd = rowBase + width;
-            while (i < rowEnd) {
+            for (int i = rowBase; i < rowEnd; i++) {
                 accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
-                i++;
             }
         });
     }
@@ -154,11 +150,9 @@ class FilterMGN implements ImageFilter.Algorithm {
         float[] image = new float[size];
         IntStream.range(0, height).parallel().forEach(y -> {
             int rowBase = y * width;
-            int i = rowBase;
             int rowEnd = rowBase + width;
-            while (i < rowEnd) {
+            for (int i = rowBase; i < rowEnd; i++) {
                 image[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
-                i++;
             }
         });
         return image;
