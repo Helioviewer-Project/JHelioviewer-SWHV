@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ class JHVInit {
         try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {
             Files.copy(in, ffmpegPath, StandardCopyOption.REPLACE_EXISTING);
         }
-        if (!Platform.isWindows()) {
+        if (Files.getFileAttributeView(ffmpegPath, PosixFileAttributeView.class) != null) {
             Files.setPosixFilePermissions(ffmpegPath,
                     Set.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE));
         }

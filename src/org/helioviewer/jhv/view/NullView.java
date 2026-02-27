@@ -14,8 +14,10 @@ import javax.annotation.Nullable;
 public class NullView implements View {
 
     public static ManyView create(long start, long end, int cadence) {
-        ArrayList<View> list = new ArrayList<>();
+        if (end < start)
+            throw new IllegalArgumentException("End cannot be earlier than start");
 
+        ArrayList<View> list = new ArrayList<>();
         list.add(new NullView(start));
         if (cadence > 0) {
             long t = start;
