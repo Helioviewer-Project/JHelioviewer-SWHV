@@ -41,6 +41,8 @@ abstract class J2KSource {
 
         @Override
         void open() throws KduException {
+            if (!super.isClosed)
+                return;
             super.jp2Src.Open(path, true);
             super.jpxSrc.Open(super.jp2Src, false);
             super.isClosed = false;
@@ -58,6 +60,8 @@ abstract class J2KSource {
 
         @Override
         void open() throws KduException {
+            if (!super.isClosed)
+                return;
             super.jp2Src.Open(cache);
             super.jpxSrc.Open(super.jp2Src, false);
             super.isClosed = false;
