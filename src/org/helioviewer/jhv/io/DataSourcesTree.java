@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -204,7 +205,7 @@ public final class DataSourcesTree extends JTree {
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         }
 
-        private void setSelectionPathInternal(TreePath path) {
+        private void setSelectionPathInternal(@Nonnull TreePath path) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
             if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 super.setSelectionPath(path);
@@ -215,11 +216,15 @@ public final class DataSourcesTree extends JTree {
 
         @Override
         public void setSelectionPath(TreePath path) {
+            if (path == null)
+                return;
             setSelectionPathInternal(path);
         }
 
         @Override
         public void addSelectionPath(TreePath path) {
+            if (path == null)
+                return;
             setSelectionPathInternal(path);
         }
 
