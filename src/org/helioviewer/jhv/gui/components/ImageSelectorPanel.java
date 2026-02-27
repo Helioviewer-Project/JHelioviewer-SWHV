@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
@@ -51,7 +50,7 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
 
     @Nullable
     public String getAvailabilityURL() {
-        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
+        DataSourcesTree.SourceItem item = getSelected();
         if (item == null) return null;
 
         String availability = DataSources.getServerSetting(item.server, "availability.images");
@@ -66,15 +65,18 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
         sourcesTree.setSelectedItem(server, sourceId);
     }
 
-    public void load(ImageLayer layer, long startTime, long endTime, int cadence) {
-        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item == null) { // not valid
-            Message.err("Data is not selected", "There is no information on what to add.");
-            return;
-        }
-
-        ImageLayer imageLayer = layer == null ? ImageLayer.create(null) : layer;
-        imageLayer.load(new APIRequest(item.server, item.sourceId, startTime, endTime, cadence));
+    @Nullable
+    public DataSourcesTree.SourceItem getSelected() {
+        return sourcesTree.getSelectedItem();
     }
 
+    public void load(ImageLayer layer, String server, int sourceId, long startTime, long endTime, int cadence) {
+        setSelected(server, sourceId);
+        load(layer, new APIRequest(server, sourceId, startTime, endTime, cadence));
+    }
+
+    private static void load(ImageLayer layer, APIRequest req) {
+        ImageLayer imageLayer = layer == null ? ImageLayer.create(null) : layer;
+        imageLayer.load(req);
+    }
 }
