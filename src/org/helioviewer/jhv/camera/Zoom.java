@@ -12,6 +12,7 @@ class Zoom {
 
     private double mVelocity = 0;
     private double mLastWheelDelta = 0;
+    private double mVelocitySum = 0;
 
     private final ArrayList<Double> mVelocities = new ArrayList<>();
     private static final int MAX_VELOCITIES = 10;
@@ -39,10 +40,11 @@ class Zoom {
 
         // calculate average velocity over last several mouse wheel events
         if (mVelocities.size() == MAX_VELOCITIES) {
-            mVelocities.removeFirst();
+            mVelocitySum -= mVelocities.removeFirst();
         }
         mVelocities.add(newVelocity);
-        mVelocity = getAverage(mVelocities);
+        mVelocitySum += newVelocity;
+        mVelocity = mVelocitySum / mVelocities.size();
 
         // limit acceleration
         double acc = (mVelocity - oldVelocity) / MILLIS_PER_FRAME;
@@ -70,18 +72,8 @@ class Zoom {
 
     private void zeroVelocity() {
         mVelocity = 0;
+        mVelocitySum = 0;
         mVelocities.clear();
-    }
-
-    private static double getAverage(ArrayList<Double> array) {
-        int size = array.size();
-        if (size == 0)
-            return 0;
-
-        double sum = 0;
-        for (double item : array)
-            sum += item;
-        return sum / size;
     }
 
 }
