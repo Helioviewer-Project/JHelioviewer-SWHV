@@ -6,9 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.Callable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
@@ -49,7 +46,6 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         final int[] srcStride = new int[1];
     }
 
-    @Nonnull
     @Override
     public ImageBuffer call() throws Exception {
         boolean sourceOpened = false;
@@ -175,7 +171,6 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         }
     }
 
-    @Nullable
     private static Kdu_thread_env createThreadEnv() {
         try {
             Kdu_thread_env kte = new Kdu_thread_env();
@@ -196,13 +191,11 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         localThread.remove();
 
         Kdu_thread_env replacement = createThreadEnv();
-        if (replacement != null)
-            localThread.set(replacement);
+        if (replacement != null) localThread.set(replacement);
     }
 
-    private static void destroyThreadEnv(@Nullable Kdu_thread_env kte) {
-        if (kte == null)
-            return;
+    private static void destroyThreadEnv(Kdu_thread_env kte) {
+        if (kte == null) return;
         try {
             kte.Destroy();
             kte.Native_destroy();
