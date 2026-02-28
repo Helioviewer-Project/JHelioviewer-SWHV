@@ -9,7 +9,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
+import org.helioviewer.jhv.imagedata.IndexedImageFactory;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -68,7 +68,6 @@ class RadioJ2KData implements ImageData.Handler {
             executor = null;
             view = null;
         }
-        NIOImageFactory.free(bufferedImage);
         bufferedImage = null;
     }
 
@@ -87,7 +86,7 @@ class RadioJ2KData implements ImageData.Handler {
         }
 
         region = imageData.getRegion();
-        bufferedImage = NIOImageFactory.createIndexed(imageBuffer.buffer, w, h, RadioData.getColorModel());
+        bufferedImage = IndexedImageFactory.createIndexed(imageBuffer.buffer, w, h, RadioData.getColorModel());
         DrawController.drawRequest();
     }
 
@@ -199,9 +198,7 @@ class RadioJ2KData implements ImageData.Handler {
 
     void changeColormap(ColorModel cm) {
         if (hasData()) {
-            BufferedImage old = bufferedImage;
-            bufferedImage = new BufferedImage(cm, old.getRaster(), false, null);
-            // NIOImageFactory.free(old); <- potentially leads to use after free
+            bufferedImage = new BufferedImage(cm, bufferedImage.getRaster(), false, null);
         }
     }
 
