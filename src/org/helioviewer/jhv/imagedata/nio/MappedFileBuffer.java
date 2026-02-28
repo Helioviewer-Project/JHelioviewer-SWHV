@@ -30,6 +30,8 @@ package org.helioviewer.jhv.imagedata.nio;
 
 import java.awt.image.DataBuffer;
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -55,24 +57,33 @@ import org.helioviewer.jhv.JHVGlobals;
 abstract class MappedFileBuffer extends DataBuffer {
 
     private Buffer buffer;
+    private final Path tempPath;
+    private Arena arena;
 
     private MappedFileBuffer(int type, int size, int numBanks) throws IOException {
         super(type, size, numBanks);
 
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
 
-        Path temp = Files.createTempFile(JHVGlobals.exportCacheDir.toPath(), "mbuf", null);
-        try (FileChannel channel = FileChannel.open(temp, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.DELETE_ON_CLOSE)) {
+        tempPath = Files.createTempFile(JHVGlobals.exportCacheDir.toPath(), "mbuf", null);
+        arena = Arena.ofShared();
+        try (FileChannel channel = FileChannel.open(tempPath, StandardOpenOption.READ, StandardOpenOption.WRITE)) {
             long length = ((long) size) * componentSize * numBanks;
             channel.truncate(length);
 
-            ByteBuffer byteBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length).order(ByteOrder.nativeOrder());
+            MemorySegment segment = channel.map(FileChannel.MapMode.READ_WRITE, 0, length, arena);
+            ByteBuffer byteBuffer = segment.asByteBuffer().order(ByteOrder.nativeOrder());
             switch (type) {
                 case DataBuffer.TYPE_BYTE -> buffer = byteBuffer;
                 case DataBuffer.TYPE_USHORT -> buffer = byteBuffer.asShortBuffer();
                 case DataBuffer.TYPE_INT -> buffer = byteBuffer.asIntBuffer();
                 default -> throw new IllegalArgumentException("Unsupported data type: " + type);
             }
+        } catch (Throwable t) {
+            arena.close();
+            arena = null;
+            Files.deleteIfExists(tempPath);
+            throw t;
         }
     }
 
@@ -81,7 +92,17 @@ abstract class MappedFileBuffer extends DataBuffer {
     }
 
     void free() {
+        if (arena == null)
+            return;
+
+        arena.close();
+        arena = null;
         buffer = null;
+        try {
+            Files.deleteIfExists(tempPath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete mapped buffer file: " + tempPath, e);
+        }
     }
 
     @Override
