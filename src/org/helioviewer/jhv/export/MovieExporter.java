@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
-import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -51,7 +51,7 @@ class MovieExporter {
         ByteBuffer eveData = null;
         if (eveImage != null) {
             scaled = ExportUtils.scaleImage(eveImage, w, h - mainH, movieLinePosition);
-            eveData = NIOImageFactory.getByteBuffer(scaled).flip().limit(3 * w * scaled.getHeight());
+            eveData = NativeImageFactory.getByteBuffer(scaled).flip().limit(3 * w * scaled.getHeight());
         }
 
         ByteBuffer mainData = MappedImageFactory.getByteBuffer(mainImage);
@@ -69,7 +69,7 @@ class MovieExporter {
             tempFile = null;
             throw e;
         } finally {
-            NIOImageFactory.free(scaled);
+            NativeImageFactory.free(scaled);
         }
     }
 

@@ -10,7 +10,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
-import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLGrab;
@@ -39,7 +39,7 @@ public class ExportMovie implements Movie.Listener {
             } else {
                 for (Runnable runnable : encodeExecutor.shutdownNow()) {
                     if (runnable instanceof FrameConsumer frameConsumer) {
-                        NIOImageFactory.free(frameConsumer.eveImage());
+                        NativeImageFactory.free(frameConsumer.eveImage());
                         MappedImageFactory.free(frameConsumer.mainImage());
                     }
                 }
@@ -55,14 +55,14 @@ public class ExportMovie implements Movie.Listener {
         try {
             screen = MappedImageFactory.createCompatible(grabber.w, grabber.h, BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
-            eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
+            eve = EVEImage == null ? null : NativeImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
             submitted = true;
         } catch (Exception e) {
             Log.error(e);
         } finally {
             if (!submitted) {
-                NIOImageFactory.free(eve);
+                NativeImageFactory.free(eve);
                 MappedImageFactory.free(screen);
             }
         }
@@ -153,7 +153,7 @@ public class ExportMovie implements Movie.Listener {
             } catch (Exception e) {
                 Log.error(e);
             } finally {
-                NIOImageFactory.free(eveImage);
+                NativeImageFactory.free(eveImage);
                 MappedImageFactory.free(mainImage);
             }
         }
