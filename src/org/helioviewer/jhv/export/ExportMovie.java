@@ -37,20 +37,34 @@ public class ExportMovie implements Movie.Listener {
             if (keep) {
                 encodeExecutor.execute(new CloseWriter(exporter));
             } else {
-                encodeExecutor.shutdownNow();
+                for (Runnable runnable : encodeExecutor.shutdownNow()) {
+                    if (runnable instanceof FrameConsumer frameConsumer) {
+                        NIOImageFactory.free(frameConsumer.eveImage());
+                        MappedImageFactory.free(frameConsumer.mainImage());
+                    }
+                }
             }
             exporter = null;
         }
     }
 
     public static void handleMovieExport(Camera camera, GL3 gl) {
+        BufferedImage screen = null;
+        BufferedImage eve = null;
+        boolean submitted = false;
         try {
-            BufferedImage screen = MappedImageFactory.createCompatible(grabber.w, grabber.h, BufferedImage.TYPE_3BYTE_BGR);
+            screen = MappedImageFactory.createCompatible(grabber.w, grabber.h, BufferedImage.TYPE_3BYTE_BGR);
             grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
-            BufferedImage eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
+            eve = EVEImage == null ? null : NIOImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
+            submitted = true;
         } catch (Exception e) {
             Log.error(e);
+        } finally {
+            if (!submitted) {
+                NIOImageFactory.free(eve);
+                MappedImageFactory.free(screen);
+            }
         }
         Movie.grabDone();
 

@@ -14,8 +14,13 @@ public class NIOImageFactory {
 
     public static BufferedImage copyImage(BufferedImage bi) {
         BufferedImage ret = createCompatible(bi.getWidth(), bi.getHeight(), bi.getType());
-        bi.copyData(ret.getRaster());
-        return ret;
+        try {
+            bi.copyData(ret.getRaster());
+            return ret;
+        } catch (RuntimeException | Error e) {
+            free(ret);
+            throw e;
+        }
     }
 
     public static BufferedImage createIndexed(Buffer buffer, int width, int height, IndexColorModel cm) {
