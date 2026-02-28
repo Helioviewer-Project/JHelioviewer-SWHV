@@ -3,8 +3,10 @@ package org.helioviewer.jhv.imagedata.nio;
 //import java.awt.GraphicsConfiguration;
 
 import java.awt.Point;
-import java.awt.image.*;
-import java.nio.Buffer;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.SampleModel;
 import java.nio.ByteBuffer;
 
 public class NIOImageFactory {
@@ -21,12 +23,6 @@ public class NIOImageFactory {
             free(ret);
             throw e;
         }
-    }
-
-    public static BufferedImage createIndexed(Buffer buffer, int width, int height, IndexColorModel cm) {
-        BufferedImage temp = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_INDEXED, cm);
-        SampleModel sm = temp.getSampleModel().createCompatibleSampleModel(width, height);
-        return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, NIODataBuffer.create(buffer), new Point()), false, null);
     }
 
     public static BufferedImage createCompatible(int width, int height, int type) {
