@@ -89,12 +89,15 @@ public class J2KView extends BaseView {
             xmlMetaData = new String[maxFrame + 1];
             source.extractMetaData(xmlMetaData);
             for (int i = 0; i <= maxFrame; i++) {
-                if (xmlMetaData[i] == null) {
+                try {
+                    if (xmlMetaData[i] == null)
+                        throw new Exception("Missing XML metadata");
+                    metaData[i] = new XMLMetaDataContainer(xmlMetaData[i]).getHVMetaData();
+                } catch (Exception e) {
                     xmlMetaData[i] = EMPTY_METAXML;
                     metaData[i] = new PixelBasedMetaData(100, 100, dataUri.baseName());
-                    Log.warn("Helioviewer metadata missing for layer " + i);
-                } else
-                    metaData[i] = new XMLMetaDataContainer(xmlMetaData[i]).getHVMetaData();
+                    Log.warn("Helioviewer metadata missing for layer " + i, e);
+                }
                 frameMap.put(metaData[i].getViewpoint().time, i);
             }
             frameMap.buildIndex();

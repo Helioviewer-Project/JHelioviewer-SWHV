@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
@@ -47,14 +48,18 @@ public class URIView extends BaseView {
             MetaData m;
             URIImageReader.Image image = reader.readImage(dataUri.file());
             ImageBuffer buffer = image.buffer();
+
             String readXml = image.xml();
-            if (readXml == null) {
-                xml = EMPTY_METAXML;
+            try {
+                if (readXml == null)
+                    throw new Exception("Missing XML metadata");
+                m = new XMLMetaDataContainer(readXml).getHVMetaData();
+            } catch (Exception e) {
+                readXml = EMPTY_METAXML;
                 m = new PixelBasedMetaData(buffer.width, buffer.height, dataUri.baseName());
-            } else {
-                xml = readXml;
-                m = new XMLMetaDataContainer(xml).getHVMetaData();
+                Log.warn("Helioviewer metadata missing for " + dataUri.baseName(), e);
             }
+            xml = readXml;
 
             imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
             metaData[0] = m;
