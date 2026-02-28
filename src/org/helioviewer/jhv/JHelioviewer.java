@@ -63,7 +63,6 @@ public class JHelioviewer {
         Settings.load();
         System.setProperty("sun.awt.noerasebackground", "true");
         System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir);
-        System.setProperty("org.lwjgl.system.SharedLibraryExtractPath", JHVGlobals.libCacheDir);
         // System.setProperty("flatlaf.nativeLibraryPath", JHVGlobals.libCacheDir);
         // System.setProperty("jsamp.nosystray", "true");
 
