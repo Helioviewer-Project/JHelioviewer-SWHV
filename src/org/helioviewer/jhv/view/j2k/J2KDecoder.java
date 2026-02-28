@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.view.j2k;
 
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.Callable;
@@ -20,8 +22,6 @@ import kdu_jni.Kdu_thread_env;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageFilter;
-
-import org.lwjgl.system.MemoryUtil;
 
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
@@ -91,10 +91,11 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 
             int[] srcStride = scratch.srcStride;
             long addr = compositorBuf.Get_buf(srcStride, false);
-            ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, 4 * srcStride[0] * actualHeight).order(ByteOrder.nativeOrder());
+            MemorySegment nativeBuffer = wrapNativeBuffer(addr, 4L * srcStride[0] * actualHeight);
 
             ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
             byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
+            MemorySegment outSegment = MemorySegment.ofArray(outBuffer);
 
             Kdu_dims newRegion = scratch.newRegion;
             newRegion.From_u32(0, 0, 0, 0);
@@ -116,12 +117,13 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 if (numComps < 3) {
                     for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
                         for (int i = 0; i < newWidth; ++i) {
-                            outBuffer[dstIdx + i] = nativeBuffer.get(4 * (srcIdx + i));
+                            outBuffer[dstIdx + i] = nativeBuffer.get(ValueLayout.JAVA_BYTE, 4L * (srcIdx + i));
                         }
                     }
                 } else {
                     for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                        nativeBuffer.get(4 * srcIdx, outBuffer, 4 * dstIdx, 4 * newWidth);
+                        outSegment.asSlice(4L * dstIdx, 4L * newWidth)
+                                .copyFrom(nativeBuffer.asSlice(4L * srcIdx, 4L * newWidth));
                     }
                 }
             }
@@ -163,6 +165,11 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         krc.Set_quality_limiting(quality, -1, -1);
         krc.Set_thread_env(localThread.get(), null);
         return krc;
+    }
+
+    @SuppressWarnings("restricted")
+    private static MemorySegment wrapNativeBuffer(long addr, long bytes) {
+        return MemorySegment.ofAddress(addr).reinterpret(bytes);
     }
 
     private static void destroyCompositor(Kdu_region_compositor krc) {
