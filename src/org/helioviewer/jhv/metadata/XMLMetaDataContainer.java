@@ -24,6 +24,10 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             throw new Exception("XML metadata without meta tag");
     }
 
+    public HelioviewerMetaData getHVMetaData() {
+        return new HelioviewerMetaData(this);
+    }
+
     @Nullable
     private String getValueFromXML(String key) {
         Element line = (Element) meta.getElementsByTagName(key).item(0);
@@ -34,10 +38,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
         if (child instanceof CharacterData cd)
             return cd.getData();
         return null;
-    }
-
-    public HelioviewerMetaData getHVMetaData() {
-        return new HelioviewerMetaData(this);
     }
 
     @Nonnull
