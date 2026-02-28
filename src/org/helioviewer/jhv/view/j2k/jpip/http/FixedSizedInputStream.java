@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.j2k.jpip.http;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,9 +29,8 @@ class FixedSizedInputStream extends InputStream implements TotalLength {
     public int read() throws IOException {
         if (remainingBytes > 0) {
             int b = in.read();
-            if (b == -1) {
-                return -1;
-            }
+            if (b == -1)
+                throw new EOFException("Unexpected EOF");
             --remainingBytes;
             return b;
         }
@@ -44,9 +44,8 @@ class FixedSizedInputStream extends InputStream implements TotalLength {
         }
         if (remainingBytes > 0) {
             int bytesRead = in.read(b, off, Math.min(len, remainingBytes));
-            if (bytesRead == -1) {
-                return -1;
-            }
+            if (bytesRead == -1)
+                throw new EOFException("Unexpected EOF");
             remainingBytes -= bytesRead;
             return bytesRead;
         }
