@@ -1,14 +1,18 @@
 package org.helioviewer.jhv.imagedata.nio;
 
 import java.awt.image.DataBuffer;
-import java.nio.*;
-
-import org.lwjgl.system.MemoryUtil;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 abstract class NIODataBuffer extends DataBuffer {
 
     private Buffer buffer;
-    private ByteBuffer allocatedBuffer;
+    private Arena arena;
 
     private NIODataBuffer(int type, int size, int numBanks) {
         super(type, size, numBanks);
@@ -16,8 +20,9 @@ abstract class NIODataBuffer extends DataBuffer {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         long length = ((long) size) * componentSize * numBanks;
 
-        ByteBuffer byteBuffer = MemoryUtil.memAlloc((int) length).order(ByteOrder.nativeOrder());
-        allocatedBuffer = byteBuffer;
+        arena = Arena.ofShared();
+        MemorySegment segment = arena.allocate(length, componentSize);
+        ByteBuffer byteBuffer = segment.asByteBuffer().order(ByteOrder.nativeOrder());
         switch (type) {
             case DataBuffer.TYPE_BYTE -> buffer = byteBuffer;
             case DataBuffer.TYPE_USHORT -> buffer = byteBuffer.asShortBuffer();
@@ -31,8 +36,11 @@ abstract class NIODataBuffer extends DataBuffer {
     }
 
     void free() {
-        MemoryUtil.memFree(allocatedBuffer);
-        allocatedBuffer = null;
+        if (arena == null)
+            return;
+
+        arena.close();
+        arena = null;
         buffer = null;
     }
 
