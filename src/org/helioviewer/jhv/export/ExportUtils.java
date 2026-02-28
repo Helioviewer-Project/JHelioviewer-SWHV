@@ -7,7 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.imagedata.nio.NIOImageFactory;
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 class ExportUtils {
@@ -15,7 +15,7 @@ class ExportUtils {
     static BufferedImage scaleImage(BufferedImage img, int newW, int newH, int movieLinePosition) {
         int oldW = img.getWidth(), oldH = img.getHeight();
         Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-        BufferedImage simg = NIOImageFactory.createCompatible(newW, newH, BufferedImage.TYPE_3BYTE_BGR);
+        BufferedImage simg = NativeImageFactory.createCompatible(newW, newH, BufferedImage.TYPE_3BYTE_BGR);
 
         Graphics2D g = simg.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
