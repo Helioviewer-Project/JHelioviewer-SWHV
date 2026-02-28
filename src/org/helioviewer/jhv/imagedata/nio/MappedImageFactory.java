@@ -20,14 +20,14 @@ public class MappedImageFactory {
         return AbstractOwnedDataBuffer.createCompatibleImageOrThrow(width, height, type, MappedFileBuffer::create);
     }
 
-    public static ByteBuffer getByteBuffer(BufferedImage img) {
-        return MappedFileBuffer.getByteBuffer(img.getRaster().getDataBuffer());
+    public static ByteBuffer getByteBuffer(BufferedImage bi) {
+        return MappedFileBuffer.getByteBuffer(bi.getRaster().getDataBuffer());
     }
 
-    public static void free(BufferedImage img) {
-        if (img == null)
+    public static void free(BufferedImage bi) {
+        if (bi == null)
             return;
-        MappedFileBuffer.free(img.getRaster().getDataBuffer());
+        MappedFileBuffer.free(bi.getRaster().getDataBuffer());
     }
 
 }

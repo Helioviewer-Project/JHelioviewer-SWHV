@@ -23,14 +23,14 @@ public class NativeImageFactory {
         return AbstractOwnedDataBuffer.createCompatibleImage(width, height, type, NativeDataBuffer::create);
     }
 
-    public static ByteBuffer getByteBuffer(BufferedImage img) {
-        return NativeDataBuffer.getByteBuffer(img.getRaster().getDataBuffer());
+    public static ByteBuffer getByteBuffer(BufferedImage bi) {
+        return NativeDataBuffer.getByteBuffer(bi.getRaster().getDataBuffer());
     }
 
-    public static void free(BufferedImage img) {
-        if (img == null)
+    public static void free(BufferedImage bi) {
+        if (bi == null)
             return;
-        NativeDataBuffer.free(img.getRaster().getDataBuffer());
+        NativeDataBuffer.free(bi.getRaster().getDataBuffer());
     }
 
 }
