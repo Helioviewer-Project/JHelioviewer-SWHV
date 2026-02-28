@@ -20,6 +20,7 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 
@@ -52,6 +53,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
     @Override
     public ImageBuffer call() throws Exception {
         boolean sourceOpened = false;
+        boolean recreateThreadEnv = false;
         Kdu_region_compositor compositor = null;
         try {
             if (src.isJP2()) {
@@ -135,11 +137,41 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 */
             ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(outBuffer).order(ByteOrder.nativeOrder()));
             return ImageBuffer.filter(ib, filterType);
+        } catch (KduException e) {
+            recreateThreadEnv = true;
+            throw e;
         } finally {
             if (compositor != null)
                 destroyCompositor(compositor);
             if (sourceOpened)
                 src.close();
+            if (recreateThreadEnv)
+                resetThreadEnv();
+        }
+    }
+
+    @SuppressWarnings("restricted")
+    private static MemorySegment wrapNativeBuffer(long addr, long bytes) {
+        return MemorySegment.ofAddress(addr).reinterpret(bytes);
+    }
+
+    private static Kdu_region_compositor createCompositor(Jpx_source source, Kdu_quality_limiter quality) throws KduException {
+        Kdu_region_compositor krc = new Kdu_region_compositor();
+        krc.Create(source);
+        krc.Set_surface_initialization_mode(false);
+        krc.Set_quality_limiting(quality, -1, -1);
+        krc.Set_thread_env(localThread.get(), null);
+        return krc;
+    }
+
+    private static void destroyCompositor(Kdu_region_compositor krc) {
+        try {
+            krc.Halt_processing();
+            krc.Remove_ilayer(new Kdu_ilayer_ref(), true);
+            krc.Set_thread_env(null, null);
+            krc.Native_destroy();
+        } catch (KduException e) {
+            Log.warn("Failed to destroy Kakadu compositor", e);
         }
     }
 
@@ -153,33 +185,29 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 kte.Add_thread();
             return kte;
         } catch (KduException e) {
-            e.printStackTrace();
+            Log.warn("Failed to create Kakadu thread environment", e);
         }
         return null;
     }
 
-    private static Kdu_region_compositor createCompositor(Jpx_source source, Kdu_quality_limiter quality) throws KduException {
-        Kdu_region_compositor krc = new Kdu_region_compositor();
-        krc.Create(source);
-        krc.Set_surface_initialization_mode(false);
-        krc.Set_quality_limiting(quality, -1, -1);
-        krc.Set_thread_env(localThread.get(), null);
-        return krc;
+    private static void resetThreadEnv() {
+        Kdu_thread_env current = localThread.get();
+        destroyThreadEnv(current);
+        localThread.remove();
+
+        Kdu_thread_env replacement = createThreadEnv();
+        if (replacement != null)
+            localThread.set(replacement);
     }
 
-    @SuppressWarnings("restricted")
-    private static MemorySegment wrapNativeBuffer(long addr, long bytes) {
-        return MemorySegment.ofAddress(addr).reinterpret(bytes);
-    }
-
-    private static void destroyCompositor(Kdu_region_compositor krc) {
+    private static void destroyThreadEnv(@Nullable Kdu_thread_env kte) {
+        if (kte == null)
+            return;
         try {
-            krc.Halt_processing();
-            krc.Remove_ilayer(new Kdu_ilayer_ref(), true);
-            krc.Set_thread_env(null, null);
-            krc.Native_destroy();
+            kte.Destroy();
+            kte.Native_destroy();
         } catch (KduException e) {
-            e.printStackTrace();
+            Log.warn("Failed to destroy Kakadu thread environment", e);
         }
     }
 
