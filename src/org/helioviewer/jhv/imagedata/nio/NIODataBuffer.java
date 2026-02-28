@@ -58,27 +58,6 @@ abstract class NIODataBuffer extends DataBuffer {
         };
     }
 
-    public static DataBuffer create(Buffer buffer) {
-        switch (buffer) {
-            case ByteBuffer byteBuffer -> {
-                ByteDataBuffer ret = new ByteDataBuffer();
-                ret.setBuffer(byteBuffer);
-                return ret;
-            }
-            case ShortBuffer shortBuffer -> {
-                UShortDataBuffer ret = new UShortDataBuffer();
-                ret.setBuffer(shortBuffer);
-                return ret;
-            }
-            case IntBuffer intBuffer -> {
-                IntDataBuffer ret = new IntDataBuffer();
-                ret.setBuffer(intBuffer);
-                return ret;
-            }
-            case null, default -> throw new IllegalArgumentException("Unsupported data type: " + buffer);
-        }
-    }
-
     static class DataBufferByte extends NIODataBuffer {
         private final ByteBuffer buffer;
 
@@ -133,72 +112,6 @@ abstract class NIODataBuffer extends DataBuffer {
         @Override
         public void setElem(int bank, int i, int val) {
             buffer.put(bank * size + i, val);
-        }
-    }
-
-    static class ByteDataBuffer extends DataBuffer {
-        private ByteBuffer buffer;
-
-        ByteDataBuffer() {
-            super(DataBuffer.TYPE_BYTE, 0, 0);
-        }
-
-        void setBuffer(ByteBuffer _buffer) {
-            buffer = _buffer;
-        }
-
-        @Override
-        public int getElem(int bank, int i) {
-            return buffer.get(i) & 0xff;
-        }
-
-        @Override
-        public void setElem(int bank, int i, int val) {
-            buffer.put(i, (byte) val);
-        }
-    }
-
-    static class UShortDataBuffer extends DataBuffer {
-        private ShortBuffer buffer;
-
-        UShortDataBuffer() {
-            super(DataBuffer.TYPE_USHORT, 0, 0);
-        }
-
-        void setBuffer(ShortBuffer _buffer) {
-            buffer = _buffer;
-        }
-
-        @Override
-        public int getElem(int bank, int i) {
-            return buffer.get(i) & 0xffff;
-        }
-
-        @Override
-        public void setElem(int bank, int i, int val) {
-            buffer.put(i, (short) val);
-        }
-    }
-
-    static class IntDataBuffer extends DataBuffer {
-        private IntBuffer buffer;
-
-        IntDataBuffer() {
-            super(DataBuffer.TYPE_INT, 0, 0);
-        }
-
-        void setBuffer(IntBuffer _buffer) {
-            buffer = _buffer;
-        }
-
-        @Override
-        public int getElem(int bank, int i) {
-            return buffer.get(i);
-        }
-
-        @Override
-        public void setElem(int bank, int i, int val) {
-            buffer.put(i, val);
         }
     }
 
