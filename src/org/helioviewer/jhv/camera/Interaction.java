@@ -7,12 +7,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
@@ -31,23 +30,61 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     public enum Mode {PAN, ROTATE, AXIS}
 
     public enum AnnotationMode {
-        Rectangle(AnnotateRectangle.class), Circle(AnnotateCircle.class), Cross(AnnotateCross.class),
-        FOV(AnnotateFOV.class), Line(AnnotateLine.class), Loop(AnnotateLoop.class);
-
-        private final Class<? extends Annotateable> clazz;
-        public static final Map<Class<? extends Annotateable>, String> modes = Arrays.stream(values()).collect(Collectors.toMap(m -> m.clazz, Enum::toString));
-
-        AnnotationMode(Class<? extends Annotateable> _clazz) {
-            clazz = _clazz;
-        }
-
-        Annotateable generate(JSONObject jo) {
-            try {
-                return clazz.getConstructor(JSONObject.class).newInstance(jo);
-            } catch (Exception e) {
-                e.printStackTrace();
+        Rectangle {
+            @Override
+            Annotateable generate(JSONObject jo) {
+                return new AnnotateRectangle(jo);
             }
-            return new AnnotateRectangle(jo);
+        },
+        Circle {
+            @Override
+            Annotateable generate(JSONObject jo) {
+                return new AnnotateCircle(jo);
+            }
+        },
+        Cross {
+            @Override
+            Annotateable generate(JSONObject jo) {
+                return new AnnotateCross(jo);
+            }
+        },
+        FOV {
+            @Override
+            Annotateable generate(JSONObject jo) {
+                return new AnnotateFOV(jo);
+            }
+        },
+        Line {
+            @Override
+            Annotateable generate(JSONObject jo) {
+                return new AnnotateLine(jo);
+            }
+        },
+        Loop {
+            @Override
+            Annotateable generate(JSONObject jo) {
+                return new AnnotateLoop(jo);
+            }
+        };
+
+        public static final Map<Class<? extends Annotateable>, String> modes = Map.of(
+                AnnotateRectangle.class, Rectangle.toString(),
+                AnnotateCircle.class, Circle.toString(),
+                AnnotateCross.class, Cross.toString(),
+                AnnotateFOV.class, FOV.toString(),
+                AnnotateLine.class, Line.toString(),
+                AnnotateLoop.class, Loop.toString()
+        );
+
+        abstract Annotateable generate(JSONObject jo);
+
+        static Annotateable generate(String type, JSONObject jo) {
+            try {
+                return valueOf(type).generate(jo);
+            } catch (IllegalArgumentException e) {
+                Log.warn("Unknown annotation type: " + type, e);
+                return Rectangle.generate(jo);
+            }
         }
     }
 

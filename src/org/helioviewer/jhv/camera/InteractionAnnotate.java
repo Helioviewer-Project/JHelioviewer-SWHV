@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
-import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -155,12 +154,7 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     private static Annotateable generate(JSONObject jo) {
-        try {
-            return Interaction.AnnotationMode.valueOf(jo.getString("type")).generate(jo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new AnnotateRectangle(jo);
+        return Interaction.AnnotationMode.generate(jo.optString("type", Interaction.AnnotationMode.Rectangle.toString()), jo);
     }
 
     JSONObject toJson() {
