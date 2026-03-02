@@ -14,18 +14,19 @@ import com.google.common.util.concurrent.MoreExecutors;
 public class DecodeExecutor {
 
     private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
+    private final ThreadPoolExecutor worker = new ThreadPoolExecutor(
+            1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
+            new JHVThread.NamedThreadFactory("Decoder"),
+            new ThreadPoolExecutor.DiscardOldestPolicy());
     private final EDTCallbackExecutor executor = new EDTCallbackExecutor(
-            MoreExecutors.listeningDecorator(
-                    new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, blockingQueue,
-                            new JHVThread.NamedThreadFactory("Decoder"),
-                            new ThreadPoolExecutor.DiscardOldestPolicy())));
+            MoreExecutors.listeningDecorator(worker));
 
     public void decode(Callable<ImageBuffer> callable, DecodeCallback callback) {
         executor.submit(callable, callback);
     }
 
     public void abolish() {
-        executor.shutdown();
+        worker.shutdown();
     }
 
 }
