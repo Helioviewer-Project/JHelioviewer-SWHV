@@ -24,10 +24,6 @@ public class XMLMetaDataContainer implements MetaDataContainer {
             throw new Exception("XML metadata without meta tag");
     }
 
-    public HelioviewerMetaData getHVMetaData() {
-        return new HelioviewerMetaData(this);
-    }
-
     @Nullable
     private String getValueFromXML(String key) {
         Element line = (Element) meta.getElementsByTagName(key).item(0);
