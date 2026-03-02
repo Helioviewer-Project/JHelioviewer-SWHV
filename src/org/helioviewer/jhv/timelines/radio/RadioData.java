@@ -7,30 +7,61 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.concurrent.Callable;
+
+import javax.annotation.Nonnull;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.DataUri;
+import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.view.DecodeExecutor;
+import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.json.JSONObject;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.google.common.base.Throwables;
+import com.google.common.util.concurrent.FutureCallback;
 
 public final class RadioData extends AbstractTimelineLayer {
 
-    static final int MAX_AMOUNT_OF_DAYS = 3;
+    static final YAxis yAxis = new YAxis(400, 20, new YAxisPositiveIdentityScale("MHz"));
+
+    private static final int MAX_AMOUNT_OF_DAYS = 3;
+    private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
+
+    private static final Cache<Long, RadioJ2KData> cache = Caffeine.newBuilder().maximumSize(DAYS_IN_CACHE)
+            .removalListener((Long k, RadioJ2KData v, RemovalCause c) -> {
+                if (v != null)
+                    v.removeData();
+            }).build();
+    private static final HashSet<Long> downloading = new HashSet<>();
 
     private final LUTComboBox lutCombo;
     private final JPanel optionsPanel;
-    private final RadioState state = RadioState.INSTANCE;
-    private final RadioCache cache = new RadioCache(this, state);
+    private final DecodeExecutor executor = new DecodeExecutor();
+    private static IndexColorModel colorModel;
 
     public RadioData(JSONObject jo) {
         String cm = "Spectral";
@@ -40,7 +71,7 @@ public final class RadioData extends AbstractTimelineLayer {
                 cm = "Spectral";
         }
 
-        state.setLUT(LUT.get(cm));
+        colorModel = createIndexColorModelFromLUT(LUT.get(cm));
 
         lutCombo = new LUTComboBox();
         lutCombo.setSelectedItem(cm);
@@ -59,15 +90,88 @@ public final class RadioData extends AbstractTimelineLayer {
         jo.put("colormap", lutCombo.getColormap());
     }
 
-    private void setLUT(LUT lut) {
-        state.setLUT(lut);
-        cache.changeColormap();
+    private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
+        int[] source = lut2.lut8();
+        return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
+    }
+
+    private static void setLUT(LUT lut) {
+        colorModel = createIndexColorModelFromLUT(lut);
+        cache.asMap().values().forEach(data -> data.changeColormap(colorModel));
         DrawController.drawRequest();
+    }
+
+    static IndexColorModel getColorModel() {
+        return colorModel;
+    }
+
+    private static void clearCache() {
+        cache.invalidateAll();
+    }
+
+    private void requestAndOpenIntervals(long start) {
+        long end = Math.min(TimeUtils.floorDay(start) + (DAYS_IN_CACHE - 2) * TimeUtils.DAY_IN_MILLIS, TimeUtils.floorDay(System.currentTimeMillis()));
+        for (int i = 0; i < DAYS_IN_CACHE; i++) {
+            long date = end - i * TimeUtils.DAY_IN_MILLIS;
+            if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
+                EDTCallbackExecutor.pool.submit(new RadioJPXDownload(date), new RadioJPXCallback(date));
+            }
+        }
+    }
+
+    private class RadioJPXDownload implements Callable<RadioJ2KData> {
+
+        private final long date;
+
+        RadioJPXDownload(long _date) {
+            date = _date;
+            downloading.add(date);
+            Timelines.getLayers().downloadStarted(RadioData.this);
+        }
+
+        @Override
+        public RadioJ2KData call() throws Exception {
+            APIRequest req = new APIRequest("ROB", APIRequest.CallistoID, date, date, APIRequest.CADENCE_ALL);
+            DataUri dataUri = NetFileCache.get(new URI(req.toFileRequest()));
+            if (dataUri.format() != DataUri.Format.Image.JP2) // paranoia
+                throw new Exception("Invalid data format");
+
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime());
+        }
+
+    }
+
+    private class RadioJPXCallback implements FutureCallback<RadioJ2KData> {
+
+        private final long date;
+
+        RadioJPXCallback(long _date) {
+            date = _date;
+        }
+
+        private void done() {
+            downloading.remove(date);
+            Timelines.getLayers().downloadFinished(RadioData.this);
+        }
+
+        @Override
+        public void onSuccess(@Nonnull RadioJ2KData result) {
+            done();
+            cache.put(date, result);
+            result.requestData(DrawController.selectedAxis);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t) {
+            done();
+            Log.error(Throwables.getStackTraceAsString(t));
+        }
+
     }
 
     @Override
     public YAxis getYAxis() {
-        return state.yAxis();
+        return yAxis;
     }
 
     @Override
@@ -77,14 +181,15 @@ public final class RadioData extends AbstractTimelineLayer {
 
     @Override
     public void remove() {
-        cache.abolish();
+        clearCache();
+        executor.abolish();
     }
 
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
         if (!enabled)
-            cache.invalidateAll();
+            clearCache();
     }
 
     @Override
@@ -99,7 +204,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
     @Override
     public boolean isDownloading() {
-        return cache.isDownloading();
+        return !downloading.isEmpty();
     }
 
     @Override
@@ -109,7 +214,12 @@ public final class RadioData extends AbstractTimelineLayer {
 
     @Override
     public boolean hasData() {
-        return cache.hasData();
+        for (RadioJ2KData data : cache.asMap().values()) {
+            if (data.hasData()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -120,7 +230,8 @@ public final class RadioData extends AbstractTimelineLayer {
     @Override
     public void fetchData(TimeAxis selectedAxis) {
         if (enabled && selectedAxis.end() - selectedAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
-            cache.requestVisible(selectedAxis);
+            cache.asMap().values().forEach(data -> data.requestData(selectedAxis));
+            requestAndOpenIntervals(selectedAxis.start());
         }
     }
 
@@ -131,7 +242,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
         if (xAxis.end() - xAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
             drawString(g, graphArea, xAxis, "No data available");
-            cache.forEachData(data -> data.draw(g, graphArea, xAxis));
+            cache.asMap().values().forEach(data -> data.draw(g, graphArea, xAxis));
         } else {
             drawString(g, graphArea, xAxis, "Reduce the time interval to see the radio spectrograms.");
         }
@@ -139,12 +250,12 @@ public final class RadioData extends AbstractTimelineLayer {
 
     @Override
     public void zoomToFitAxis() {
-        state.yAxis().reset(400, 20);
+        yAxis.reset(400, 20);
     }
 
     @Override
     public void resetAxis() {
-        state.yAxis().reset(400, 20);
+        yAxis.reset(400, 20);
     }
 
     static void drawString(Graphics2D g, Rectangle ga, TimeAxis xAxis, String text) {
