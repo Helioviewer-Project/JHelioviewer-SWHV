@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.imagedata.nio;
 
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.io.IOException;
 
@@ -33,6 +33,6 @@ final class CompatibleImageUtils {
                 sampleModel.getTransferType(),
                 width * height * sampleModel.getNumDataElements(),
                 1);
-        return new BufferedImage(colorModel, new GenericWritableRaster(sampleModel, buffer, new Point()), colorModel.isAlphaPremultiplied(), null);
+        return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), colorModel.isAlphaPremultiplied(), null);
     }
 }
