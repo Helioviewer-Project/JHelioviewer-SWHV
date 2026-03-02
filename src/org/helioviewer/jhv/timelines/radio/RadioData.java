@@ -60,6 +60,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
     private final LUTComboBox lutCombo;
     private final JPanel optionsPanel;
+    private final DecodeExecutor executor = new DecodeExecutor();
     private static IndexColorModel colorModel;
 
     public RadioData(JSONObject jo) {
@@ -135,8 +136,7 @@ public final class RadioData extends AbstractTimelineLayer {
             if (dataUri.format() != DataUri.Format.Image.JP2) // paranoia
                 throw new Exception("Invalid data format");
 
-            DecodeExecutor executor = new DecodeExecutor();
-            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime(), executor);
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime());
         }
 
     }
@@ -182,6 +182,7 @@ public final class RadioData extends AbstractTimelineLayer {
     @Override
     public void remove() {
         clearCache();
+        executor.abolish();
     }
 
     @Override
