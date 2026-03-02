@@ -120,7 +120,7 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
         SampleModel sampleModel = temp.getSampleModel().createCompatibleSampleModel(width, height);
         ColorModel colorModel = temp.getColorModel();
         DataBuffer buffer = dataBufferFactory.create(sampleModel.getTransferType(), width * height * sampleModel.getNumDataElements(), 1);
-        return new BufferedImage(colorModel, RasterFactory.factory.createRaster(sampleModel, buffer, new Point()), colorModel.isAlphaPremultiplied(), null);
+        return new BufferedImage(colorModel, new GenericWritableRaster(sampleModel, buffer, new Point()), colorModel.isAlphaPremultiplied(), null);
     }
 
     private abstract static class ByteDataBuffer extends AbstractOwnedDataBuffer {
