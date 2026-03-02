@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera.annotate;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -36,7 +37,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = p2;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.ProjectionMode.Orthographic) {
+            if (Display.mode == ProjectionMode.Orthographic) {
                 if (i == 0) { // first
                     putSphere(pc, buf, Colors.Null);
                 }
@@ -54,7 +55,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = ep;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.ProjectionMode.Orthographic) {
+            if (Display.mode == ProjectionMode.Orthographic) {
                 putSphere(pc, buf, color);
             } else {
                 pc.y = -pc.y;
@@ -66,7 +67,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = p4;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.ProjectionMode.Orthographic) {
+            if (Display.mode == ProjectionMode.Orthographic) {
                 putSphere(pc, buf, color);
             } else {
                 pc.y = -pc.y;
@@ -78,7 +79,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = bp;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            if (Display.mode == Display.ProjectionMode.Orthographic) {
+            if (Display.mode == ProjectionMode.Orthographic) {
                 putSphere(pc, buf, color);
                 if (i == SUBDIVISIONS) { // last
                     putSphere(pc, buf, Colors.Null);

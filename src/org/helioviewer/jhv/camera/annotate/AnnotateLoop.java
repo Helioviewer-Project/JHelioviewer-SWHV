@@ -6,6 +6,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -47,7 +48,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
             vx.x = center.x + cosr * v.x + sinr * bp.x;
             vx.y = center.y + cosr * v.y + sinr * bp.y;
             vx.z = center.z + cosr * v.z + sinr * bp.z;
-            if (Display.mode == Display.ProjectionMode.Orthographic) {
+            if (Display.mode == ProjectionMode.Orthographic) {
                 if (i == 0) {
                     putSphere(vx, buf, Colors.Null);
                 }

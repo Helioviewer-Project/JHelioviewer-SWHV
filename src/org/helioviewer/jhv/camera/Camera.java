@@ -6,6 +6,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
@@ -74,7 +75,7 @@ public class Camera {
 
     private void updateCamera(JHVTime time) {
         Position v = updateViewpoint.update(time);
-        viewpoint = Display.mode == Display.ProjectionMode.Orthographic ? v : new Position(v.time, Sun.MeanEarthDistance, v.lon, v.lat);
+        viewpoint = Display.mode == ProjectionMode.Orthographic ? v : new Position(v.time, Sun.MeanEarthDistance, v.lon, v.lat);
         updateRotation();
         updateWidth();
         //listeners.forEach(l -> l.viewpointChanged(viewpoint));

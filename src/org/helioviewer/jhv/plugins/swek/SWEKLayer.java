@@ -18,6 +18,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
@@ -195,7 +196,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
 
-                    if (Display.mode == Display.ProjectionMode.Orthographic) {
+                    if (Display.mode == ProjectionMode.Orthographic) {
                         float x = (float) (xnew / r);
                         float y = -(float) (ynew / r);
                         float z = (float) (znew / r);
@@ -358,7 +359,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-            if (Display.mode == Display.ProjectionMode.Latitudinal && evt.isCactus())
+            if (Display.mode == ProjectionMode.Latitudinal && evt.isCactus())
                 continue;
             bindTexture(gl, evtr.getSupplier().getGroup());
             glslTexture.renderTexture(gl, GL3.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
@@ -403,7 +404,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         Quat q = Display.gridType.toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-            if (evt.isCactus() && (Display.mode == Display.ProjectionMode.LogPolar || Display.mode == Display.ProjectionMode.Polar)) {
+            if (evt.isCactus() && (Display.mode == ProjectionMode.LogPolar || Display.mode == ProjectionMode.Polar)) {
                 drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
             } else {
                 drawPolygon(q, vp, evtr, evt);

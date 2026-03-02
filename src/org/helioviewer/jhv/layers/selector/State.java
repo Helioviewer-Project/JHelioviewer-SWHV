@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
@@ -242,7 +243,7 @@ public class State {
         try {
             // to be loaded before viewpoint
             try {
-                Display.ProjectionMode.valueOf(jo.optString("projection")).radio.doClick();
+                ProjectionMode.valueOf(jo.optString("projection")).radio.doClick();
             } catch (Exception ignore) {
             }
             loadTimelines(jo);

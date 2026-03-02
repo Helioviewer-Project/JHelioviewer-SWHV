@@ -12,6 +12,7 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.JHVTransferHandler;
@@ -41,9 +42,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         Viewport vp = Display.getActiveViewport();
         Vec2 coord = Display.mode.scale.mouseToGrid(x, y, vp, camera, Display.gridType);
 
-        if (Display.mode == Display.ProjectionMode.Latitudinal) {
+        if (Display.mode == ProjectionMode.Latitudinal) {
             setText(formatLati(coord));
-        } else if (Display.mode == Display.ProjectionMode.Polar || Display.mode == Display.ProjectionMode.LogPolar) {
+        } else if (Display.mode == ProjectionMode.Polar || Display.mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
             String valueStr = ImageData.nanValue;

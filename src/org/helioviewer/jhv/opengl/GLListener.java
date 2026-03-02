@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -110,9 +111,9 @@ public class GLListener implements GLEventListener {
     }
 
     public static void renderSceneScale(Camera camera, GL3 gl) {
-        if (Display.mode == Display.ProjectionMode.Polar) {
+        if (Display.mode == ProjectionMode.Polar) {
             GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
-        } else if (Display.mode == Display.ProjectionMode.LogPolar) {
+        } else if (Display.mode == ProjectionMode.LogPolar) {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
@@ -171,7 +172,7 @@ public class GLListener implements GLEventListener {
         if (Movie.isRecording())
             ExportMovie.handleMovieExport(camera, gl);
 
-        if (Display.mode == Display.ProjectionMode.Orthographic) {
+        if (Display.mode == ProjectionMode.Orthographic) {
             renderScene(camera, gl);
             renderMiniview(gl);
         } else
