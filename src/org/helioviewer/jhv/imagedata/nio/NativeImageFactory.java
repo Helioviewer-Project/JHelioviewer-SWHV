@@ -1,6 +1,11 @@
 package org.helioviewer.jhv.imagedata.nio;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.SampleModel;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class NativeImageFactory {
@@ -11,9 +16,7 @@ public class NativeImageFactory {
     }
 
     public static BufferedImage copyImage(BufferedImage bi) {
-        BufferedImage ret = AbstractOwnedDataBuffer.createCompatibleImage(
-                bi.getWidth(), bi.getHeight(), bi.getType(),
-                (type, size, numBanks) -> AbstractOwnedDataBuffer.create(type, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
+        BufferedImage ret = createCompatible(bi.getWidth(), bi.getHeight(), bi.getType());
         try {
             bi.copyData(ret.getRaster());
             return ret;
@@ -24,9 +27,11 @@ public class NativeImageFactory {
     }
 
     public static BufferedImage createCompatible(int width, int height, int type) {
-        return AbstractOwnedDataBuffer.createCompatibleImage(
-                width, height, type,
-                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
+        try {
+            return createCompatibleOrThrow(width, height, type);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unexpected I/O creating image", e);
+        }
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
@@ -37,6 +42,19 @@ public class NativeImageFactory {
         if (bi == null)
             return;
         AbstractOwnedDataBuffer.free(bi.getRaster().getDataBuffer(), BACKEND_KIND);
+    }
+
+    private static BufferedImage createCompatibleOrThrow(int width, int height, int type) throws IOException {
+        BufferedImage temp = new BufferedImage(1, 1, type);
+        SampleModel sampleModel = temp.getSampleModel().createCompatibleSampleModel(width, height);
+        ColorModel colorModel = temp.getColorModel();
+        DataBuffer buffer = AbstractOwnedDataBuffer.create(
+                sampleModel.getTransferType(),
+                width * height * sampleModel.getNumDataElements(),
+                1,
+                BACKEND_KIND,
+                BufferBacking::allocate);
+        return new BufferedImage(colorModel, new GenericWritableRaster(sampleModel, buffer, new Point()), colorModel.isAlphaPremultiplied(), null);
     }
 
 }
