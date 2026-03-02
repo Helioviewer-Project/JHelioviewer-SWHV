@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -86,16 +84,6 @@ class NetClientRemote implements NetClient {
     @Override
     public boolean isSuccessful() {
         return isSuccessful;
-    }
-
-    @Override
-    public InputStream getStream() {
-        return responseBody.byteStream();
-    }
-
-    @Override
-    public Reader getReader() {
-        return responseBody.charStream();
     }
 
     @Override
