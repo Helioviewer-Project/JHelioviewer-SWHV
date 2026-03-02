@@ -73,10 +73,6 @@ class RadioJ2KData implements ImageData.Handler {
 
     @Override
     public void handleData(ImageData imageData) {
-        if (bufferedImage != null) {
-            Log.warn("Already handled data");
-            return;
-        }
         ImageBuffer imageBuffer = imageData.getImageBuffer();
         int w = imageBuffer.width;
         int h = imageBuffer.height;
