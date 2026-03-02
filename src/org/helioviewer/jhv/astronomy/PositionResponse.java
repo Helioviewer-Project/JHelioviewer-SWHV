@@ -60,29 +60,43 @@ public class PositionResponse {
         }
     }
 
+    private Position.Cartesian getInterpolatedPosition(long time) {
+        if (positionStart == positionEnd) {
+            return position[0];
+        }
+
+        int maxIndex = position.length - 1;
+        double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
+        int i = Math.clamp((int) interpolatedIndex, 0, maxIndex);
+        int inext = Math.min(i + 1, maxIndex);
+
+        long tstart = position[i].milli();
+        long tend = position[inext].milli();
+
+        double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
+        double x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
+        double y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
+        double z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
+
+        return new Position.Cartesian(time, x, y, z);
+    }
+
+    public double interpolateRectangular(long t, long start, long end, float[] xyz) {
+        long time = interpolateTime(t, start, end);
+        Position.Cartesian p = getInterpolatedPosition(time);
+        double x = p.x(), y = p.y(), z = p.z();
+
+        xyz[0] = (float) x;
+        xyz[1] = (float) y;
+        xyz[2] = (float) z;
+
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
     public void interpolateLatitudinal(long t, long start, long end, double[] lati) {
         long time = interpolateTime(t, start, end);
-
-        double x, y, z;
-        if (positionStart == positionEnd) {
-            x = position[0].x();
-            y = position[0].y();
-            z = position[0].z();
-        } else {
-            int maxIndex = position.length - 1;
-            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
-            int i = (int) interpolatedIndex;
-            i = Math.clamp(i, 0, maxIndex);
-            int inext = Math.min(i + 1, maxIndex);
-
-            long tstart = position[i].milli();
-            long tend = position[inext].milli();
-
-            double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
-            x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
-            y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
-            z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
-        }
+        Position.Cartesian p = getInterpolatedPosition(time);
+        double x = p.x(), y = p.y(), z = p.z();
 
         double dist, hgln, hglt;
         dist = Math.sqrt(x * x + y * y + z * z);
@@ -101,27 +115,8 @@ public class PositionResponse {
 
     Position interpolateCarrington(long t, long start, long end) {
         long time = interpolateTime(t, start, end);
-
-        double x, y, z;
-        if (positionStart == positionEnd) {
-            x = position[0].x();
-            y = position[0].y();
-            z = position[0].z();
-        } else {
-            int maxIndex = position.length - 1;
-            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
-            int i = (int) interpolatedIndex;
-            i = Math.clamp(i, 0, maxIndex);
-            int inext = Math.min(i + 1, maxIndex);
-
-            long tstart = position[i].milli();
-            long tend = position[inext].milli();
-
-            double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
-            x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
-            y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
-            z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
-        }
+        Position.Cartesian p = getInterpolatedPosition(time);
+        double x = p.x(), y = p.y(), z = p.z();
 
         double dist, hgln, hglt;
         dist = Math.sqrt(x * x + y * y + z * z);
@@ -136,36 +131,6 @@ public class PositionResponse {
             hglt = Math.asin(sinLat);
         }
         return new Position(new JHVTime(time), dist, -hgln, hglt).setLocation(location);
-    }
-
-    public double interpolateRectangular(long t, long start, long end, float[] xyz) {
-        long time = interpolateTime(t, start, end);
-
-        double x, y, z;
-        if (positionStart == positionEnd) {
-            x = position[0].x();
-            y = position[0].y();
-            z = position[0].z();
-        } else {
-            int maxIndex = position.length - 1;
-            double interpolatedIndex = (time - positionStart) / (double) (positionEnd - positionStart) * maxIndex;
-            int i = (int) interpolatedIndex;
-            i = Math.clamp(i, 0, maxIndex);
-            int inext = Math.min(i + 1, maxIndex);
-
-            long tstart = position[i].milli();
-            long tend = position[inext].milli();
-
-            double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
-            x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
-            y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
-            z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
-        }
-        xyz[0] = (float) x;
-        xyz[1] = (float) y;
-        xyz[2] = (float) z;
-
-        return Math.sqrt(x * x + y * y + z * z);
     }
 
 }
