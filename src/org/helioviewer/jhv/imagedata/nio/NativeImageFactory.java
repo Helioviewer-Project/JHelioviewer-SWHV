@@ -5,11 +5,15 @@ import java.nio.ByteBuffer;
 
 public class NativeImageFactory {
 
+    private static final AbstractOwnedDataBuffer.BackendKind BACKEND_KIND = AbstractOwnedDataBuffer.BackendKind.NATIVE;
+
     private NativeImageFactory() {
     }
 
     public static BufferedImage copyImage(BufferedImage bi) {
-        BufferedImage ret = AbstractOwnedDataBuffer.createCompatibleImage(bi.getWidth(), bi.getHeight(), bi.getType(), NativeDataBuffer::create);
+        BufferedImage ret = AbstractOwnedDataBuffer.createCompatibleImage(
+                bi.getWidth(), bi.getHeight(), bi.getType(),
+                (type, size, numBanks) -> AbstractOwnedDataBuffer.create(type, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
         try {
             bi.copyData(ret.getRaster());
             return ret;
@@ -20,17 +24,19 @@ public class NativeImageFactory {
     }
 
     public static BufferedImage createCompatible(int width, int height, int type) {
-        return AbstractOwnedDataBuffer.createCompatibleImage(width, height, type, NativeDataBuffer::create);
+        return AbstractOwnedDataBuffer.createCompatibleImage(
+                width, height, type,
+                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
-        return NativeDataBuffer.getByteBuffer(bi.getRaster().getDataBuffer());
+        return AbstractOwnedDataBuffer.getByteBuffer(bi.getRaster().getDataBuffer(), BACKEND_KIND);
     }
 
     public static void free(BufferedImage bi) {
         if (bi == null)
             return;
-        NativeDataBuffer.free(bi.getRaster().getDataBuffer());
+        AbstractOwnedDataBuffer.free(bi.getRaster().getDataBuffer(), BACKEND_KIND);
     }
 
 }
