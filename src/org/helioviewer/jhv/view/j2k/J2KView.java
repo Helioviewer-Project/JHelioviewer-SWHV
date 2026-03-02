@@ -21,6 +21,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
@@ -92,7 +93,7 @@ public class J2KView extends BaseView {
                 try {
                     if (xmlMetaData[i] == null)
                         throw new Exception("Missing XML metadata");
-                    metaData[i] = new XMLMetaDataContainer(xmlMetaData[i]).getHVMetaData();
+                    metaData[i] = new HelioviewerMetaData(new XMLMetaDataContainer(xmlMetaData[i]));
                 } catch (Exception e) {
                     xmlMetaData[i] = EMPTY_METAXML;
                     metaData[i] = new PixelBasedMetaData(100, 100, dataUri.baseName());

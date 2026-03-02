@@ -14,6 +14,7 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
+import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.PixelBasedMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
@@ -53,7 +54,7 @@ public class URIView extends BaseView {
             try {
                 if (readXml == null)
                     throw new Exception("Missing XML metadata");
-                m = new XMLMetaDataContainer(readXml).getHVMetaData();
+                m = new HelioviewerMetaData(new XMLMetaDataContainer(readXml));
             } catch (Exception e) {
                 readXml = EMPTY_METAXML;
                 m = new PixelBasedMetaData(buffer.width, buffer.height, dataUri.baseName());
