@@ -6,6 +6,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 
 public class Display {
+
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
 
@@ -99,5 +100,4 @@ public class Display {
     public static boolean getShowCorona() {
         return showCorona;
     }
-
 }
