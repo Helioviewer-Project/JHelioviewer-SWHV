@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.imagedata.nio.RasterFactory;
+import org.helioviewer.jhv.imagedata.nio.GenericWritableRaster;
 
 public class IndexedImageFactory {
 
@@ -20,7 +20,7 @@ public class IndexedImageFactory {
     public static BufferedImage createIndexed(Buffer buffer, int width, int height, IndexColorModel cm) {
         BufferedImage temp = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_INDEXED, cm);
         SampleModel sm = temp.getSampleModel().createCompatibleSampleModel(width, height);
-        return new BufferedImage(cm, RasterFactory.factory.createRaster(sm, createDataBuffer(buffer), new Point()), false, null);
+        return new BufferedImage(cm, new GenericWritableRaster(sm, createDataBuffer(buffer), new Point()), false, null);
     }
 
     private static DataBuffer createDataBuffer(Buffer buffer) {
