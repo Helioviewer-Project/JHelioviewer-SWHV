@@ -6,7 +6,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
@@ -95,6 +94,11 @@ abstract class AbstractAnnotateable implements Annotateable {
         return null;
     }
 
+    @Nullable
+    protected Vec3 computeDragPoint(Camera camera, int x, int y) {
+        return null;
+    }
+
     @Override
     public void draw(Quat q, Viewport vp, boolean active, BufVertex buf) {
     }
@@ -104,13 +108,61 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
+    public void mousePressed(Camera camera, int x, int y) {
+        if (!isDraggable())
+            return;
+
+        Vec3 pt = computeDragPoint(camera, x, y);
+        if (pt != null)
+            dragStartPoint = pt;
+    }
+
+    @Override
+    public void mouseDragged(Camera camera, int x, int y) {
+        if (!isDraggable())
+            return;
+
+        Vec3 pt = computeDragPoint(camera, x, y);
+        if (pt != null)
+            dragEndPoint = pt;
+    }
+
+    @Override
+    public void mouseReleased() {
+        if (!isDraggable())
+            return;
+
+        if (beingDragged()) {
+            startPoint = dragStartPoint;
+            endPoint = dragEndPoint;
+        }
+        dragStartPoint = null;
+        dragEndPoint = null;
+    }
+
+    @Override
+    public boolean beingDragged() {
+        return dragEndPoint != null && dragStartPoint != null;
+    }
+
+    @Override
+    public boolean isDraggable() {
+        return true;
+    }
+
+    @Override
     public JSONObject toJson() {
-        JSONObject jo = new JSONObject().put("type", Interaction.AnnotationMode.modes.get(this.getClass()));
+        JSONObject jo = new JSONObject().put("type", getTypeName());
         if (startPoint != null)
             jo.put("startPoint", toPointJson(startPoint));
         if (endPoint != null)
             jo.put("endPoint", toPointJson(endPoint));
         return jo;
+    }
+
+    private String getTypeName() {
+        String className = getClass().getSimpleName();
+        return className.startsWith("Annotate") ? className.substring("Annotate".length()) : className;
     }
 
 }

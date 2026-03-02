@@ -46,37 +46,8 @@ public class AnnotateLine extends AbstractAnnotateable {
     }
 
     @Override
-    public void mousePressed(Camera camera, int x, int y) {
-        Vec3 pt = computePointSky(camera, x, y);
-        if (pt != null)
-            dragStartPoint = pt;
-    }
-
-    @Override
-    public void mouseDragged(Camera camera, int x, int y) {
-        Vec3 pt = computePointSky(camera, x, y);
-        if (pt != null)
-            dragEndPoint = pt;
-    }
-
-    @Override
-    public void mouseReleased() {
-        if (beingDragged()) {
-            startPoint = dragStartPoint;
-            endPoint = dragEndPoint;
-        }
-        dragStartPoint = null;
-        dragEndPoint = null;
-    }
-
-    @Override
-    public boolean beingDragged() {
-        return dragEndPoint != null && dragStartPoint != null;
-    }
-
-    @Override
-    public boolean isDraggable() {
-        return true;
+    protected Vec3 computeDragPoint(Camera camera, int x, int y) {
+        return computePointSky(camera, x, y);
     }
 
 }
