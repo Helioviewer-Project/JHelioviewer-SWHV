@@ -5,8 +5,8 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+//import org.w3c.dom.NamedNodeMap;
+//import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 public class XMLUtils {
@@ -15,6 +15,7 @@ public class XMLUtils {
         return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
     }
 
+/*
     private static void indent(int level) {
         for (int i = 0; i < level; i++)
             System.out.print("    ");
@@ -54,5 +55,5 @@ public class XMLUtils {
         indent(level);
         System.out.println("</" + node.getNodeName() + ">");
     }
-
+*/
 }
