@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.Quat;
@@ -125,7 +126,7 @@ public class CameraHelper {
 
     public static void zoomToFit(Camera camera) {
         double size = 1;
-        if (Display.mode == Display.ProjectionMode.Orthographic) {
+        if (Display.mode == ProjectionMode.Orthographic) {
             size = ImageLayers.getLargestPhysicalHeight();
         }
 

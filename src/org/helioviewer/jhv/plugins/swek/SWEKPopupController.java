@@ -18,6 +18,7 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -134,7 +135,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
             if (pi == null)
                 continue;
 
-            if (Display.mode == Display.ProjectionMode.Orthographic) {
+            if (Display.mode == ProjectionMode.Orthographic) {
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
@@ -162,7 +163,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 }
             } else {
                 Vec2 tf = null;
-                if ((Display.mode == Display.ProjectionMode.LogPolar || Display.mode == Display.ProjectionMode.Polar) && evt.isCactus()) {
+                if ((Display.mode == ProjectionMode.LogPolar || Display.mode == ProjectionMode.Polar) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
                     double distSun = computeDistSun(evt);
                     tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle), Display.mode.scale.getYValueInv(distSun));

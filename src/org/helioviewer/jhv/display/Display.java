@@ -1,52 +1,15 @@
 package org.helioviewer.jhv.display;
 
-import javax.swing.JRadioButtonMenuItem;
-
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
-//import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public class Display {
-
-    public enum ProjectionMode {
-        Orthographic(GLSLSolarShader.ortho, GridScale.ortho, null),
-        Latitudinal(GLSLSolarShader.lati, GridScale.lati, GridTransform.xformLati),
-        LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, GridTransform.xformPolar),
-        Polar(GLSLSolarShader.polar, GridScale.polar, GridTransform.xformPolar);
-
-        public final GLSLSolarShader shader;
-        public final GridScale scale;
-        private final GridTransform xform;
-        public final JRadioButtonMenuItem radio;
-
-        ProjectionMode(GLSLSolarShader _shader, GridScale _scale, GridTransform _xform) {
-            shader = _shader;
-            scale = _scale;
-            xform = _xform;
-            radio = new JRadioButtonMenuItem(toString());
-            radio.addActionListener(e -> setProjectionMode(this));
-        }
-
-        public Vec2 transform(Quat q, Vec3 v) {
-            return xform.transform(q.rotateVector(v), scale);
-        }
-
-        public Vec3 transformInverse(Quat q, Vec2 pt) {
-            return q.rotateInverseVector(xform.transformInverse(pt));
-        }
-
-    }
-
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
 
-    private static void setProjectionMode(ProjectionMode _mode) {
+    static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
         //CameraHelper.zoomToFit(miniCamera);
         miniCamera.reset();

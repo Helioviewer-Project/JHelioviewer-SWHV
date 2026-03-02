@@ -19,6 +19,7 @@ import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.SampClient;
@@ -242,11 +243,11 @@ public final class ToolBar extends JToolBar {
 
         JPopupMenu projectionPopup = new JPopupMenu();
         ButtonGroup projectionGroup = new ButtonGroup();
-        for (Display.ProjectionMode el : Display.ProjectionMode.values()) {
+        for (ProjectionMode el : ProjectionMode.values()) {
             projectionPopup.add(el.radio);
             projectionGroup.add(el.radio);
         }
-        Display.ProjectionMode.Orthographic.radio.setSelected(true);
+        ProjectionMode.Orthographic.radio.setSelected(true);
 
         projectionButton.addMouseListener(new MouseAdapter() {
             @Override

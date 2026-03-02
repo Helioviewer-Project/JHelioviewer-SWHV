@@ -10,6 +10,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -250,7 +251,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
         shader.bindPV(gl, meta0.getPV2(), meta1.getPV2());
 
-        if (Display.mode == Display.ProjectionMode.Latitudinal) {
+        if (Display.mode == ProjectionMode.Latitudinal) {
             GridType gridType = Display.gridType;
             shader.bindAnglesLatiGrid(gl,
                     latiLongitude(gridType, cameraViewpoint, metaViewpoint0),

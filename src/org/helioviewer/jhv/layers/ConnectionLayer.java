@@ -19,6 +19,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
@@ -128,7 +129,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private static void putConnectivity(Quat q, Viewport vp, OrthoScaleList points, BufVertex vexBuf, byte[] color) {
-        if (Display.mode == Display.ProjectionMode.Orthographic)
+        if (Display.mode == ProjectionMode.Orthographic)
             points.ortho.forEach(v -> vexBuf.putVertex((float) v.x, (float) v.y, (float) v.z, 2 * SIZE_POINT, color));
         else
             points.scale.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
@@ -137,7 +138,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
         if (hcs.size == 0)
             return;
-        if (Display.mode == Display.ProjectionMode.Orthographic) {
+        if (Display.mode == ProjectionMode.Orthographic) {
             Vec3 first = hcs.ortho.getFirst();
             hcsBuf.putVertex(first, Colors.Null);
             hcs.ortho.forEach(v -> hcsBuf.putVertex(v, hcsColor));
