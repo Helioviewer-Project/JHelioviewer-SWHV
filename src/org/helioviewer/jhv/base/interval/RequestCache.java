@@ -9,20 +9,14 @@ public class RequestCache {
     private List<Interval> cache = new ArrayList<>();
 
     public List<Interval> adaptRequestCache(long start, long end) {
-        List<Interval> missingIntervals = new ArrayList<>();
-        if (cache.isEmpty()) {
-            Interval interval = new Interval(start, end);
-            missingIntervals.add(interval);
-            cache.add(interval);
-        } else {
-            missingIntervals = getMissingIntervals(start, end);
+        List<Interval> missingIntervals = getMissingIntervals(start, end);
+        if (!missingIntervals.isEmpty())
             updateRequestCache(start, end);
-        }
         return missingIntervals;
     }
 
     public void removeRequestedInterval(long start, long end) {
-        cache = remove(cache, new Interval(start, end));
+        cache = subtract(cache, new Interval(start, end));
     }
 
     public List<Interval> getAllRequestIntervals() {
@@ -30,43 +24,31 @@ public class RequestCache {
     }
 
     public List<Interval> getMissingIntervals(long start, long end) {
-        List<Interval> localCache = getInvertedCache(cache);
-        localCache = remove(localCache, new Interval(Long.MIN_VALUE, start));
-        localCache = remove(localCache, new Interval(end, Long.MAX_VALUE));
-        return localCache;
+        Interval requested = new Interval(start, end);
+        List<Interval> missing = new ArrayList<>();
+
+        long cursor = requested.start();
+        for (Interval interval : cache) {
+            if (interval.end() <= cursor)
+                continue;
+            if (interval.start() >= requested.end())
+                break;
+
+            if (cursor < interval.start())
+                missing.add(new Interval(cursor, interval.start()));
+            cursor = interval.end();
+            if (cursor >= requested.end())
+                break;
+        }
+        if (cursor < requested.end()) {
+            missing.add(new Interval(cursor, requested.end()));
+        }
+        return missing;
     }
 
     private void updateRequestCache(long start, long end) {
         cache.add(new Interval(start, end));
         cache = merge(cache);
-    }
-
-    private static List<Interval> getInvertedCache(List<Interval> toInvert) {
-        List<Interval> newCache = new ArrayList<>();
-        int len = toInvert.size();
-        if (len == 0) {
-            newCache.add(new Interval(Long.MIN_VALUE, Long.MAX_VALUE));
-            return newCache;
-        }
-
-        Interval interval = toInvert.getFirst();
-        if (Long.MIN_VALUE != interval.start()) {
-            newCache.add(new Interval(Long.MIN_VALUE, interval.start()));
-        }
-
-        long currend = interval.end();
-        int i = 1;
-        while (i < len) {
-            interval = toInvert.get(i);
-            newCache.add(new Interval(currend, interval.start()));
-            currend = interval.end();
-            i++;
-        }
-
-        if (currend != Long.MAX_VALUE) {
-            newCache.add(new Interval(currend, Long.MAX_VALUE));
-        }
-        return newCache;
     }
 
     private static List<Interval> merge(List<Interval> intervals) {
@@ -91,11 +73,21 @@ public class RequestCache {
         return result;
     }
 
-    private static List<Interval> remove(List<Interval> cache, Interval ri) {
-        List<Interval> icache = getInvertedCache(cache);
-        icache.add(ri);
-        icache = merge(icache);
-        return getInvertedCache(icache);
+    private static List<Interval> subtract(List<Interval> intervals, Interval removed) {
+        List<Interval> result = new ArrayList<>(intervals.size());
+        for (Interval interval : intervals) {
+            if (interval.end() <= removed.start() || interval.start() >= removed.end()) {
+                result.add(interval);
+                continue;
+            }
+            if (interval.start() < removed.start()) {
+                result.add(new Interval(interval.start(), removed.start()));
+            }
+            if (removed.end() < interval.end()) {
+                result.add(new Interval(removed.end(), interval.end()));
+            }
+        }
+        return result;
     }
 
 }
