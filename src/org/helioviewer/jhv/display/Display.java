@@ -65,7 +65,7 @@ public class Display {
     public static void setGLSize(int x, int y, int w, int h) {
         glWidth = w;
         glHeight = h;
-        fullViewport = new Viewport(-1, x, y, w, h);
+        fullViewport = DisplayLayout.fullViewport(x, y, w, h);
     }
 
     private static final Camera camera = new Camera(UpdateViewpoint.observer);
@@ -124,60 +124,7 @@ public class Display {
 
     public static void reshapeAll() {
         activeViewport = 0;
-
-        int ct = countEnabledLayers();
-        switch (ct) {
-            case 2 -> reshape2();
-            case 3 -> reshape3();
-            case 4 -> reshape4();
-            case 5 -> reshape5();
-            case 6 -> reshape6();
-            default -> reshape();
-        }
-    }
-
-    private static void reshape() {
-        viewports = new Viewport[]{new Viewport(0, 0, 0, glWidth, glHeight)};
-    }
-
-    private static void reshape2() {
-        viewports = new Viewport[]{
-                new Viewport(0, 0, 0, glWidth / 2, glHeight),
-                new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight)};
-    }
-
-    private static void reshape3() {
-        viewports = new Viewport[]{
-                new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
-                new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
-                new Viewport(2, 0, glHeight / 2, glWidth, glHeight / 2)};
-    }
-
-    private static void reshape4() {
-        viewports = new Viewport[]{
-                new Viewport(0, 0, 0, glWidth / 2, glHeight / 2),
-                new Viewport(1, glWidth / 2, 0, glWidth / 2, glHeight / 2),
-                new Viewport(2, 0, glHeight / 2, glWidth / 2, glHeight / 2),
-                new Viewport(3, glWidth / 2, glHeight / 2, glWidth / 2, glHeight / 2)};
-    }
-
-    private static void reshape5() {
-        viewports = new Viewport[]{
-                new Viewport(0, 0, 0, glWidth / 3, glHeight / 2),
-                new Viewport(1, glWidth / 3, 0, glWidth / 3, glHeight / 2),
-                new Viewport(2, 2 * glWidth / 3, 0, glWidth / 3, glHeight / 2),
-                new Viewport(3, 0, glHeight / 2, glWidth / 2, glHeight / 2),
-                new Viewport(4, glWidth / 2, glHeight / 2, glWidth / 2, glHeight / 2)};
-    }
-
-    private static void reshape6() {
-        viewports = new Viewport[]{
-                new Viewport(0, 0, 0, glWidth / 3, glHeight / 2),
-                new Viewport(1, glWidth / 3, 0, glWidth / 3, glHeight / 2),
-                new Viewport(2, 2 * glWidth / 3, 0, glWidth / 3, glHeight / 2),
-                new Viewport(3, 0, glHeight / 2, glWidth / 3, glHeight / 2),
-                new Viewport(4, glWidth / 3, glHeight / 2, glWidth / 3, glHeight / 2),
-                new Viewport(5, 2 * glWidth / 3, glHeight / 2, glWidth / 3, glHeight / 2)};
+        viewports = DisplayLayout.viewports(glWidth, glHeight, countEnabledLayers());
     }
 
     private static boolean showCorona = true;
