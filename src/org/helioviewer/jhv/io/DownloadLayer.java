@@ -27,56 +27,60 @@ import com.google.common.util.concurrent.FutureCallback;
 public class DownloadLayer {
 
     @Nullable
-    public static Future<Void> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName) {
+    public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName) {
         Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), baseName);
-        return EDTCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstPath), new Callback(layer, dstPath));
+        return EDTCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstPath), new Callback(layer));
     }
 
     private static final int BUFSIZ = 1024 * 1024;
 
-    private record LayerDownload(APIRequest req, ImageLayer layer, Path dstPath) implements Callable<Void> {
+    private record LayerDownload(APIRequest req, ImageLayer layer, Path dstPath) implements Callable<Path> {
         @Override
-        public Void call() throws Exception {
+        public Path call() throws Exception {
             URI uri = new URI(req.toFileRequest());
-            try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstPath))) {
-                long count = 0, contentLength = nc.getContentLength();
-                long bytesRead, totalRead = 0;
-                Buffer sinkBuffer = sink.getBuffer();
-                while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
-                    totalRead += bytesRead;
-                    count++;
-                    // stream out buffered data during download to avoid large memory growth
-                    sink.emitCompleteSegments();
+            try {
+                try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstPath))) {
+                    long count = 0, contentLength = nc.getContentLength();
+                    long bytesRead, totalRead = 0;
+                    Buffer sinkBuffer = sink.getBuffer();
+                    while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
+                        // stream out buffered data during download to avoid large memory growth
+                        sink.emitCompleteSegments();
 
-                    if (count % 8 == 0) { // approx 8MB with BUFSIZ=1MB
-                        int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
-                        EventQueue.invokeLater(() -> layer.progressDownload(percent));
+                        totalRead += bytesRead;
+                        count++;
+                        if (count % 8 == 0) { // approx 8MB with BUFSIZ=1MB
+                            int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
+                            EventQueue.invokeLater(() -> layer.progressDownload(percent));
+                        }
                     }
+                    sink.flush();
                 }
-                sink.flush();
+                return dstPath;
+            } catch (Exception e) {
+                try {
+                    Files.deleteIfExists(dstPath);
+                } catch (Exception e2) {
+                    Log.error(e2);
+                }
+                throw e;
             }
-            return null;
         }
     }
 
-    private record Callback(ImageLayer layer, Path dstPath) implements FutureCallback<Void> {
+    private record Callback(ImageLayer layer) implements FutureCallback<Path> {
 
         @Override
-        public void onSuccess(Void result) {
+        public void onSuccess(Path result) {
             layer.doneDownload();
-            LoadLayer.submit(layer, List.of(dstPath.toUri()));
-            JHVGlobals.displayNotification(dstPath.toString());
+            LoadLayer.submit(layer, List.of(result.toUri()));
+            JHVGlobals.displayNotification(result.toString());
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
             layer.doneDownload();
             Log.error(t);
-            try {
-                Files.delete(dstPath);
-            } catch (Exception e) {
-                Log.error(e);
-            }
         }
 
     }
