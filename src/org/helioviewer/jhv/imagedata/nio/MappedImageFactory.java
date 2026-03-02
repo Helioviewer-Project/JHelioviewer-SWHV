@@ -1,6 +1,10 @@
 package org.helioviewer.jhv.imagedata.nio;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.SampleModel;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -19,9 +23,16 @@ public class MappedImageFactory {
         }
     */
     public static BufferedImage createCompatible(int width, int height, int type) throws IOException {
-        return AbstractOwnedDataBuffer.createCompatibleImageOrThrow(
-                width, height, type,
-                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, numBanks, BACKEND_KIND, BufferBacking::mapFile));
+        BufferedImage temp = new BufferedImage(1, 1, type);
+        SampleModel sampleModel = temp.getSampleModel().createCompatibleSampleModel(width, height);
+        ColorModel colorModel = temp.getColorModel();
+        DataBuffer buffer = AbstractOwnedDataBuffer.createOrThrow(
+                sampleModel.getTransferType(),
+                width * height * sampleModel.getNumDataElements(),
+                1,
+                BACKEND_KIND,
+                BufferBacking::mapFile);
+        return new BufferedImage(colorModel, new GenericWritableRaster(sampleModel, buffer, new Point()), colorModel.isAlphaPremultiplied(), null);
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
