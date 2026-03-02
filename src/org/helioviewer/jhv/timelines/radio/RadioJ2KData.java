@@ -20,6 +20,7 @@ import org.helioviewer.jhv.view.j2k.ResolutionSet;
 class RadioJ2KData implements ImageData.Handler {
 
     private J2KViewCallisto view;
+    private final RadioState state;
 
     private final long startDate;
     private final long endDate;
@@ -32,7 +33,8 @@ class RadioJ2KData implements ImageData.Handler {
     private BufferedImage bufferedImage;
     private Region region;
 
-    RadioJ2KData(J2KViewCallisto _view, long start) throws Exception {
+    RadioJ2KData(J2KViewCallisto _view, long start, RadioState _state) throws Exception {
+        state = _state;
         try {
             ResolutionSet.Level resLevel = _view.getResolutionLevel(0, 0);
             j2kWidth = resLevel.width();
@@ -63,6 +65,7 @@ class RadioJ2KData implements ImageData.Handler {
             view = null;
         }
         bufferedImage = null;
+        region = null;
     }
 
     @Override
@@ -80,7 +83,7 @@ class RadioJ2KData implements ImageData.Handler {
         }
 
         region = imageData.getRegion();
-        bufferedImage = IndexedImageFactory.createIndexed(imageBuffer.buffer, w, h, RadioData.getColorModel());
+        bufferedImage = IndexedImageFactory.createIndexed(imageBuffer.buffer, w, h, state.colorModel());
         DrawController.drawRequest();
     }
 
@@ -122,8 +125,8 @@ class RadioJ2KData implements ImageData.Handler {
     private int last_height = -1;
 
     private Rectangle getROI(TimeAxis xAxis) {
-        double visibleStartFreq = Math.max(startFreq, RadioData.yAxis.start());
-        double visibleEndFreq = Math.min(endFreq, RadioData.yAxis.end());
+        double visibleStartFreq = Math.max(startFreq, state.yAxis().start());
+        double visibleEndFreq = Math.min(endFreq, state.yAxis().end());
 
         double pixPerFreq = j2kHeight / (endFreq - startFreq);
         int y0 = (int) ((endFreq - visibleEndFreq) * pixPerFreq + 0.5);
@@ -168,7 +171,7 @@ class RadioJ2KData implements ImageData.Handler {
         if (!willDraw)
             return;
 
-        if (hasData()) {
+        if (hasImage()) {
             int sx0 = 0;
             int sy0 = 0;
             int sx1 = bufferedImage.getWidth();
@@ -182,8 +185,8 @@ class RadioJ2KData implements ImageData.Handler {
             int dx0 = xAxis.value2pixel(ga.x, ga.width, imStart);
             int dx1 = xAxis.value2pixel(ga.x, ga.width, imEnd);
 
-            int dy0 = RadioData.yAxis.value2pixel(ga.y, ga.height, freqimStart);
-            int dy1 = RadioData.yAxis.value2pixel(ga.y, ga.height, freqimEnd);
+            int dy0 = state.yAxis().value2pixel(ga.y, ga.height, freqimStart);
+            int dy1 = state.yAxis().value2pixel(ga.y, ga.height, freqimEnd);
 
             g.drawImage(bufferedImage, dx0, dy0, dx1, dy1, sx0, sy0, sx1, sy1, null);
         } else
@@ -191,12 +194,12 @@ class RadioJ2KData implements ImageData.Handler {
     }
 
     void changeColormap(ColorModel cm) {
-        if (hasData()) {
+        if (hasImage()) {
             bufferedImage = new BufferedImage(cm, bufferedImage.getRaster(), false, null);
         }
     }
 
-    public boolean hasData() {
+    public boolean hasImage() {
         return bufferedImage != null;
     }
 
