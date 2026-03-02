@@ -4,8 +4,10 @@ import java.awt.EventQueue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import okio.BufferedSource;
 
@@ -13,9 +15,13 @@ public interface NetClient extends AutoCloseable {
 
     boolean isSuccessful();
 
-    InputStream getStream();
+    default InputStream getStream() {
+        return getSource().inputStream();
+    }
 
-    Reader getReader();
+    default Reader getReader() {
+        return new InputStreamReader(getStream(), StandardCharsets.UTF_8);
+    }
 
     BufferedSource getSource();
 
