@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 
 public class MappedImageFactory {
 
+    private static final AbstractOwnedDataBuffer.BackendKind BACKEND_KIND = AbstractOwnedDataBuffer.BackendKind.MAPPED_FILE;
+
     private MappedImageFactory() {
     }
 
@@ -17,17 +19,19 @@ public class MappedImageFactory {
         }
     */
     public static BufferedImage createCompatible(int width, int height, int type) throws IOException {
-        return AbstractOwnedDataBuffer.createCompatibleImageOrThrow(width, height, type, MappedFileBuffer::create);
+        return AbstractOwnedDataBuffer.createCompatibleImageOrThrow(
+                width, height, type,
+                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, numBanks, BACKEND_KIND, BufferBacking::mapFile));
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
-        return MappedFileBuffer.getByteBuffer(bi.getRaster().getDataBuffer());
+        return AbstractOwnedDataBuffer.getByteBuffer(bi.getRaster().getDataBuffer(), BACKEND_KIND);
     }
 
     public static void free(BufferedImage bi) {
         if (bi == null)
             return;
-        MappedFileBuffer.free(bi.getRaster().getDataBuffer());
+        AbstractOwnedDataBuffer.free(bi.getRaster().getDataBuffer(), BACKEND_KIND);
     }
 
 }
