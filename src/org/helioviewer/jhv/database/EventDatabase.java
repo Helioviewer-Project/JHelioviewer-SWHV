@@ -427,8 +427,8 @@ public class EventDatabase {
                     if (typeId != -1) {
                         PreparedStatement pstatement = getPreparedStatement(INSERT_DATERANGE);
                         pstatement.setInt(1, typeId);
-                        pstatement.setLong(2, interval.start);
-                        pstatement.setLong(3, interval.end);
+                        pstatement.setLong(2, interval.start());
+                        pstatement.setLong(3, interval.end());
                         pstatement.executeUpdate();
                     }
                 }

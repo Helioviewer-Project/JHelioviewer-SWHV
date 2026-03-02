@@ -50,16 +50,16 @@ public class RequestCache {
         }
 
         Interval interval = toInvert.getFirst();
-        if (Long.MIN_VALUE != interval.start) {
-            newCache.add(new Interval(Long.MIN_VALUE, interval.start));
+        if (Long.MIN_VALUE != interval.start()) {
+            newCache.add(new Interval(Long.MIN_VALUE, interval.start()));
         }
 
-        long currend = interval.end;
+        long currend = interval.end();
         int i = 1;
         while (i < len) {
             interval = toInvert.get(i);
-            newCache.add(new Interval(currend, interval.start));
-            currend = interval.end;
+            newCache.add(new Interval(currend, interval.start()));
+            currend = interval.end();
             i++;
         }
 
@@ -80,8 +80,8 @@ public class RequestCache {
         Interval prev = intervals.getFirst();
         for (int i = 1; i < size; i++) {
             Interval curr = intervals.get(i);
-            if (prev.end >= curr.start) {
-                prev = new Interval(prev.start, Math.max(prev.end, curr.end));
+            if (prev.end() >= curr.start()) {
+                prev = new Interval(prev.start(), Math.max(prev.end(), curr.end()));
             } else {
                 result.add(prev);
                 prev = curr;

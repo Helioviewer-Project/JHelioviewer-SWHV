@@ -40,17 +40,17 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     private void addToMap(Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         eventsMap.computeIfAbsent(supplier, k -> new TreeMap<>())
-                .computeIfAbsent(interval.start, k -> new ArrayList<>())
+                .computeIfAbsent(interval.start(), k -> new ArrayList<>())
                 .add(this);
     }
 
     private void removeFromMap(Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         TreeMap<Long, List<JHVRelatedEvents>> supplierMap = eventsMap.get(supplier);
         if (supplierMap != null) {
-            List<JHVRelatedEvents> list = supplierMap.get(interval.start);
+            List<JHVRelatedEvents> list = supplierMap.get(interval.start());
             if (list != null) {
                 list.remove(this);
-                if (list.isEmpty()) supplierMap.remove(interval.start);
+                if (list.isEmpty()) supplierMap.remove(interval.start());
             }
         }
     }
@@ -60,11 +60,11 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     public long getEnd() {
-        return interval.end;
+        return interval.end();
     }
 
     public long getStart() {
-        return interval.start;
+        return interval.start();
     }
 
     public Color getColor() {
@@ -162,7 +162,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
         found.removeFromMap(eventsMap);
         events.addAll(found.events);
         associations.addAll(found.associations);
-        interval = new Interval(Math.min(interval.start, found.interval.start), Math.max(interval.end, found.interval.end));
+        interval = new Interval(Math.min(interval.start(), found.interval.start()), Math.max(interval.end(), found.interval.end()));
         addToMap(eventsMap);
     }
 
