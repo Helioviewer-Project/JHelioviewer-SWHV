@@ -41,7 +41,7 @@ public class LoadLayer {
         @Override
         public View call() throws Exception {
             URI uri = requestAPI(req.toJpipUrl());
-            return uri == null ? null : loadView(layer.getExecutor(), req, uri);
+            return uri == null ? null : createView(layer.getExecutor(), req, uri);
         }
     }
 
@@ -79,11 +79,11 @@ public class LoadLayer {
 
     private static View loadUri(DecodeExecutor executor, List<URI> uriList) throws Exception {
         if (uriList.size() == 1) {
-            return loadView(executor, null, uriList.getFirst());
+            return createView(executor, null, uriList.getFirst());
         } else {
             List<View> views = uriList.parallelStream().map(uri -> {
                 try {
-                    return loadView(executor, null, uri);
+                    return createView(executor, null, uri);
                 } catch (Exception e) {
                     Log.warn(uri.toString(), e);
                     return null;
@@ -93,7 +93,7 @@ public class LoadLayer {
         }
     }
 
-    private static View loadView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
+    private static View createView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
             case Image.JPIP, Image.JP2, Image.JPX -> new J2KView(executor, req, dataUri);
@@ -111,26 +111,7 @@ public class LoadLayer {
     @Nullable
     private static URI requestAPI(String url) throws Exception {
         try {
-            // Log.info(url);
-            JSONObject data = JSONUtils.get(new URI(url));
-
-            if (!data.isNull("frames")) {
-                JSONArray arr = data.getJSONArray("frames");
-                data.put("frames", arr.length()); // don't log timestamps, modifies input
-            }
-            Log.info(data.toString());
-
-            String message = data.optString("message", null);
-            if (message != null) {
-                Message.warn("Warning", message);
-            }
-            String error = data.optString("error", null);
-            if (error != null) {
-                Log.error(error);
-                Message.err("Error getting the data", error);
-                return null;
-            }
-            return new URI(data.getString("uri"));
+            return parseAPIResponse(url, JSONUtils.get(new URI(url)));
         } catch (SocketTimeoutException e) {
             Log.error("Socket timeout while requesting JPIP URL", e);
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL.");
@@ -138,6 +119,27 @@ public class LoadLayer {
             throw new Exception("Invalid response for " + url, e);
         }
         return null;
+    }
+
+    @Nullable
+    private static URI parseAPIResponse(String url, JSONObject data) throws Exception {
+        if (!data.isNull("frames")) {
+            JSONArray arr = data.getJSONArray("frames");
+            data.put("frames", arr.length()); // don't log timestamps, modifies input
+        }
+        Log.info(data.toString());
+
+        String message = data.optString("message", null);
+        if (message != null) {
+            Message.warn("Warning", message);
+        }
+        String error = data.optString("error", null);
+        if (error != null) {
+            Log.error(error);
+            Message.err("Error getting the data", error);
+            return null;
+        }
+        return new URI(data.getString("uri"));
     }
 
 }
