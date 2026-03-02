@@ -29,7 +29,7 @@ public class BandDataProvider {
         if ("".equals(baseUrl))
             return;
         pruneFinished(band);
-        intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(baseUrl, interval.start, interval.end)));
+        intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(baseUrl, interval.start(), interval.end())));
     }
 
     static void stopDownloads(Band band) {

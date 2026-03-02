@@ -7,23 +7,11 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.time.TimeUtils;
 
-public class Interval implements Comparable<Interval> {
+public record Interval(long start, long end) implements Comparable<Interval> {
 
-    public final long start;
-    public final long end;
-    private final int hash;
-
-    public Interval(long _start, long _end) {
-        if (_end < _start)
+    public Interval {
+        if (end < start)
             throw new IllegalArgumentException("End cannot be earlier than start");
-        start = _start;
-        end = _end;
-        hash = computeHash(start, end);
-    }
-
-    private static int computeHash(long a, long b) {
-        int result = Long.hashCode(a);
-        return 31 * result + Long.hashCode(b);
     }
 
     @Nonnull
@@ -40,25 +28,6 @@ public class Interval implements Comparable<Interval> {
             cursor = next;
         }
         return intervals;
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o instanceof Interval i)
-            return start == i.start && end == i.end;
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return hash;
-    }
-
-    @Override
-    public String toString() {
-        return "[" + start + ',' + end + ')';
     }
 
     @Override

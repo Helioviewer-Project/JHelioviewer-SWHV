@@ -110,8 +110,8 @@ class SWEKDownloader implements FilterManager.Listener {
         List<SWEK.Param> params = defineParameters(supplier);
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
-                if (intt.start < System.currentTimeMillis() + SIXHOURS) {
-                    Worker worker = new Worker(supplier, params, intt.start, intt.end);
+                if (intt.start() < System.currentTimeMillis() + SIXHOURS) {
+                    Worker worker = new Worker(supplier, params, intt.start(), intt.end());
                     downloadPool.execute(worker);
                     workerMap.put(supplier, worker);
                     supplier.getGroup().startedDownload();

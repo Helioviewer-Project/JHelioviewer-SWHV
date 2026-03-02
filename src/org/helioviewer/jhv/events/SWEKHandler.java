@@ -14,7 +14,7 @@ public abstract class SWEKHandler {
 
     public boolean remote2db(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params) {
         for (Interval interval : EventDatabase.db2daterange(supplier)) {
-            if (interval.start <= start && interval.end >= end) {
+            if (interval.start() <= start && interval.end() >= end) {
                 return true;
             }
         }
