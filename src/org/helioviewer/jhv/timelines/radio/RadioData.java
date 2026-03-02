@@ -72,7 +72,8 @@ public final class RadioData extends AbstractTimelineLayer {
 
         colorModel = createIndexColorModelFromLUT(LUT.get(cm));
 
-        lutCombo = new LUTComboBox(cm);
+        lutCombo = new LUTComboBox();
+        lutCombo.setSelectedItem(cm);
         lutCombo.addActionListener(e -> setLUT(lutCombo.getLUT()));
         optionsPanel = optionsPanel(lutCombo);
 

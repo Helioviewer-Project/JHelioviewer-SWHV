@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.base.lut;
 
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
 
 import javax.swing.DefaultComboBoxModel;
@@ -9,22 +9,18 @@ import javax.swing.JComboBox;
 @SuppressWarnings("serial")
 public final class LUTComboBox extends JComboBox<String> {
 
-    private final Map<String, LUT> lutMap;
+    private final HashMap<String, LUT> customLuts = new HashMap<>();
 
     public LUTComboBox() {
-        lutMap = LUT.copyMap(); // duplicate
-        setModel(new DefaultComboBoxModel<>(lutMap.keySet().toArray(String[]::new)));
+        setModel(new DefaultComboBoxModel<>(LUT.names()));
         setToolTipText("Choose a color table");
         com.jidesoft.swing.SearchableUtils.installSearchable(this);
     }
 
-    public LUTComboBox(String selected) {
-        this();
-        setSelectedItem(selected);
-    }
-
     public LUT getLUT() {
-        return lutMap.get(Objects.requireNonNull(getSelectedItem()).toString());
+        String name = Objects.requireNonNull(getSelectedItem()).toString();
+        LUT lut = customLuts.get(name);
+        return lut == null ? LUT.get(name) : lut;
     }
 
     public String getColormap() {
@@ -37,8 +33,7 @@ public final class LUTComboBox extends JComboBox<String> {
             name = "Gray";
         else {
             name = lut.name();
-            if (lutMap.get(name) == null) {
-                lutMap.put(name, lut);
+            if (LUT.get(name) == null && customLuts.putIfAbsent(name, lut) == null) {
                 addItem(name);
             }
         }
