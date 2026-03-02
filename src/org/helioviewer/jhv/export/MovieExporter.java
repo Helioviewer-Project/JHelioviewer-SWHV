@@ -98,6 +98,20 @@ class MovieExporter {
         if (tempFile == null) // unlikely reach here on encode error
             return;
 
+        try {
+            String outPath = prefix + format.extension;
+            runFFmpeg(buildCommand(outPath));
+            notifyFinished(outPath);
+        } catch (Exception e) {
+            deleteOutputs();
+            throw e;
+        } finally {
+            tempFile.delete();
+            tempFile = null;
+        }
+    }
+
+    private List<String> buildCommand(String outPath) {
         List<String> input = List.of(
                 "-hide_banner",
                 "-f", "rawvideo",
@@ -106,7 +120,6 @@ class MovieExporter {
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()
         );
-        String outPath = prefix + format.extension;
 
         List<String> command = new ArrayList<>(ffmpeg);
         command.addAll(input);
@@ -114,37 +127,38 @@ class MovieExporter {
         command.addAll(format == VideoFormat.PNG ? formatImage : formatVideo);
         command.add("-y");
         command.add(outPath);
+        return command;
+    }
 
-        try {
-            ProcessBuilder builder = new ProcessBuilder()
-                    .directory(JHVGlobals.exportCacheDir)
-                    .redirectError(File.createTempFile("fferr", null, JHVGlobals.exportCacheDir))
-                    .redirectOutput(File.createTempFile("ffout", null, JHVGlobals.exportCacheDir))
-                    .command(command);
+    private void runFFmpeg(List<String> command) throws Exception {
+        ProcessBuilder builder = new ProcessBuilder()
+                .directory(JHVGlobals.exportCacheDir)
+                .redirectError(File.createTempFile("fferr", null, JHVGlobals.exportCacheDir))
+                .redirectOutput(File.createTempFile("ffout", null, JHVGlobals.exportCacheDir))
+                .command(command);
 
-            Process process = builder.start();
-            boolean finished = process.waitFor(FFMPEG_TIMEOUT_MINUTES, TimeUnit.MINUTES);
-            if (!finished) {
-                process.destroyForcibly();
-                throw new Exception("FFmpeg timed out after " + FFMPEG_TIMEOUT_MINUTES + " minutes");
-            }
-            int exitCode = process.exitValue();
-            if (exitCode != 0)
-                throw new Exception("FFmpeg exit code " + exitCode);
-
-            String ready = " is ready in " + JHVGlobals.urify(JHVDirectory.EXPORTS.getPath()) + '.';
-            if (format == VideoFormat.PNG) // don't know name and how many
-                EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording" + ready));
-            else
-                EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording " + JHVGlobals.urify(outPath) + ready));
-        } catch (Exception e) {
-            DirectoryStream.Filter<Path> filter = p -> p.toString().startsWith(prefix);
-            FileUtils.deleteFromDir(Path.of(JHVDirectory.EXPORTS.getPath()), filter);
-            throw e;
-        } finally {
-            tempFile.delete();
-            tempFile = null;
+        Process process = builder.start();
+        boolean finished = process.waitFor(FFMPEG_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+        if (!finished) {
+            process.destroyForcibly();
+            throw new Exception("FFmpeg timed out after " + FFMPEG_TIMEOUT_MINUTES + " minutes");
         }
+        int exitCode = process.exitValue();
+        if (exitCode != 0)
+            throw new Exception("FFmpeg exit code " + exitCode);
+    }
+
+    private void notifyFinished(String outPath) {
+        String ready = " is ready in " + JHVGlobals.urify(JHVDirectory.EXPORTS.getPath()) + '.';
+        if (format == VideoFormat.PNG) // don't know name and how many
+            EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording" + ready));
+        else
+            EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording " + JHVGlobals.urify(outPath) + ready));
+    }
+
+    private void deleteOutputs() throws Exception {
+        DirectoryStream.Filter<Path> filter = p -> p.toString().startsWith(prefix);
+        FileUtils.deleteFromDir(Path.of(JHVDirectory.EXPORTS.getPath()), filter);
     }
 
 }
