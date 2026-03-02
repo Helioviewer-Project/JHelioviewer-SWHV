@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.TreeMap;
 
 import javax.annotation.Nullable;
@@ -112,8 +111,8 @@ public record LUT(String name, int[] lut8) {
         }
     }
 
-    public static Map<String, LUT> copyMap() {
-        return new TreeMap<>(standardList);
+    public static String[] names() {
+        return standardList.keySet().toArray(String[]::new);
     }
 
     public static LUT get(String name) {
