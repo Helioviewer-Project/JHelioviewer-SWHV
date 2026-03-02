@@ -14,14 +14,12 @@ import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
 class RadioJ2KData implements ImageData.Handler {
 
     private J2KViewCallisto view;
-    private DecodeExecutor executor;
 
     private final long startDate;
     private final long endDate;
@@ -34,7 +32,7 @@ class RadioJ2KData implements ImageData.Handler {
     private BufferedImage bufferedImage;
     private Region region;
 
-    RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor) throws Exception {
+    RadioJ2KData(J2KViewCallisto _view, long start) throws Exception {
         try {
             ResolutionSet.Level resLevel = _view.getResolutionLevel(0, 0);
             j2kWidth = resLevel.width();
@@ -51,10 +49,8 @@ class RadioJ2KData implements ImageData.Handler {
 
             view = _view;
             view.setDataHandler(this);
-            executor = _executor;
             willDraw = startDate == start; // didn't get closest
         } catch (Exception e) {
-            _executor.abolish();
             _view.abolish();
             throw e;
         }
@@ -62,10 +58,8 @@ class RadioJ2KData implements ImageData.Handler {
 
     void removeData() {
         if (view != null) {
-            executor.abolish();
             view.setDataHandler(null);
             view.abolish();
-            executor = null;
             view = null;
         }
         bufferedImage = null;
