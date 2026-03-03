@@ -1,9 +1,8 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,7 @@ import org.json.JSONObject;
 
 import com.jogamp.opengl.GL3;
 
-public class ViewpointLayer extends AbstractLayer implements MouseListener, MouseMotionListener {
+public class ViewpointLayer extends AbstractLayer {
 
     private static final double DELTA_ORBIT = 2 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
@@ -56,6 +55,17 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
     private final double[] lati = new double[3];
 
     private final ViewpointLayerOptions optionsPanel;
+    private final MouseAdapter hoverListener = new MouseAdapter() {
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            handleMouseMoved(e);
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            handleMouseExited();
+        }
+    };
 
     private JHVTime viewpointTime = Sun.StartEarth.time;
 
@@ -137,8 +147,7 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         }
     }
 
-    @Override
-    public void mouseMoved(MouseEvent e) {
+    private void handleMouseMoved(MouseEvent e) {
         if (!optionsPanel.isHeliospheric()) {
             clearHoverTextIfNeeded();
             return;
@@ -188,29 +197,8 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         }
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
+    private void handleMouseExited() {
         clearHoverTextIfNeeded();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
     }
 
     @Override
@@ -218,12 +206,12 @@ public class ViewpointLayer extends AbstractLayer implements MouseListener, Mous
         super.setEnabled(_enabled);
 
         if (enabled) {
-            JHVFrame.getInputController().addPlugin(this);
+            JHVFrame.getInputController().addPlugin(hoverListener);
             optionsPanel.activate();
             optionsPanel.syncViewpoint();
         } else {
             text.clear();
-            JHVFrame.getInputController().removePlugin(this);
+            JHVFrame.getInputController().removePlugin(hoverListener);
             optionsPanel.deactivate();
             Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer);
         }
