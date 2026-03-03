@@ -26,7 +26,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
     private final Calendar calendar = Calendar.getInstance();
 
-    private boolean mouseOverInterval = true;
+    private boolean mouseOverInterval;
     private Point mousePressed;
 
     private int leftIntervalBorderPosition = -10;
@@ -38,6 +38,12 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         addMouseListener(this);
         addMouseMotionListener(this);
         DrawController.addDrawListener(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        DrawController.removeDrawListener(this);
+        super.removeNotify();
     }
 
     @Override

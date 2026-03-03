@@ -73,6 +73,12 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     @Override
+    public void removeNotify() {
+        DrawController.removeDrawListener(this);
+        super.removeNotify();
+    }
+
+    @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {

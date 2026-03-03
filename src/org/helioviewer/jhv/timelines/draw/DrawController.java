@@ -101,6 +101,10 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             listeners.add(listener);
     }
 
+    public static void removeDrawListener(Listener listener) {
+        listeners.remove(listener);
+    }
+
     public static void setSelectedInterval(long start, long end) {
         if (start != selectedAxis.start() || end != selectedAxis.end()) {
             selectedAxis.set(start, end);
