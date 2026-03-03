@@ -70,10 +70,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
             if (jc != null)
                 Display.getCamera().fromJson(jc);
         }
-        switchOptionsPanel(switch (cameraMode) {
-            case Location -> locationOptionPanel;
-            case Heliosphere -> equatorialOptionPanel;
-        });
+        syncViewpoint();
 
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 0));
         ButtonGroup modeGroup = new ButtonGroup();
@@ -167,15 +164,15 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
 
     @Nullable
     PositionLoad getHighlightedLoad() {
-        return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getHighlightedLoad() : null;
+        return isHeliospheric() ? equatorialOptionPanel.getHighlightedLoad() : null;
     }
 
     int getSpiralSpeed() {
-        return currentOptionPanel == equatorialOptionPanel ? equatorialOptionPanel.getSpiralSpeed() : 0;
+        return isHeliospheric() ? equatorialOptionPanel.getSpiralSpeed() : 0;
     }
 
     boolean isRelative() {
-        return currentOptionPanel == equatorialOptionPanel && equatorialOptionPanel.isRelative();
+        return isHeliospheric() && equatorialOptionPanel.isRelative();
     }
 
 }
