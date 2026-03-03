@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -336,35 +338,17 @@ public final class GridLayer extends AbstractLayer {
 
             c0.gridx = 1;
             c0.anchor = GridBagConstraints.LINE_END;
-            JCheckBox axis = new JCheckBox("Solar axis", showAxis);
-            axis.setHorizontalTextPosition(SwingConstants.LEFT);
-            axis.addActionListener(e -> {
-                showAxis = axis.isSelected();
-                MovieDisplay.display();
-            });
-            add(axis, c0);
+            add(createToggle("Solar axis", showAxis, selected -> showAxis = selected), c0);
 
             c0.gridx = 3;
             c0.anchor = GridBagConstraints.LINE_END;
-            JCheckBox labels = new JCheckBox("Grid labels", showLabels);
-            labels.setHorizontalTextPosition(SwingConstants.LEFT);
-            labels.addActionListener(e -> {
-                showLabels = labels.isSelected();
-                MovieDisplay.display();
-            });
-            add(labels, c0);
+            add(createToggle("Grid labels", showLabels, selected -> showLabels = selected), c0);
 
             c0.gridy = 1;
 
             c0.gridx = 1;
             c0.anchor = GridBagConstraints.LINE_END;
-            JCheckBox radial = new JCheckBox("Radial grid", showRadial);
-            radial.setHorizontalTextPosition(SwingConstants.LEFT);
-            radial.addActionListener(e -> {
-                showRadial = radial.isSelected();
-                MovieDisplay.display();
-            });
-            add(radial, c0);
+            add(createToggle("Radial grid", showRadial, selected -> showRadial = selected), c0);
 
             c0.gridx = 2;
             c0.anchor = GridBagConstraints.LINE_END;
@@ -381,7 +365,7 @@ public final class GridLayer extends AbstractLayer {
 
             c0.gridx = 1;
             c0.anchor = GridBagConstraints.LINE_START;
-            add(createGridResolutionX(), c0);
+            add(createGridResolutionSpinner(lonStep, value -> lonStep = value, () -> lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep)), c0);
 
             c0.gridx = 2;
             c0.anchor = GridBagConstraints.LINE_END;
@@ -389,7 +373,17 @@ public final class GridLayer extends AbstractLayer {
 
             c0.gridx = 3;
             c0.anchor = GridBagConstraints.LINE_START;
-            add(createGridResolutionY(), c0);
+            add(createGridResolutionSpinner(latStep, value -> latStep = value, () -> latLabels = GridLabel.makeLatLabels(latStep)), c0);
+        }
+
+        private JCheckBox createToggle(String text, boolean initialValue, Consumer<Boolean> onChange) {
+            JCheckBox checkBox = new JCheckBox(text, initialValue);
+            checkBox.setHorizontalTextPosition(SwingConstants.LEFT);
+            checkBox.addActionListener(e -> {
+                onChange.accept(checkBox.isSelected());
+                MovieDisplay.display();
+            });
+            return checkBox;
         }
 
         private JComboBox<GridType> createGridTypeBox() {
@@ -404,29 +398,16 @@ public final class GridLayer extends AbstractLayer {
             return comboBox;
         }
 
-        private JHVSpinner createGridResolutionX() {
-            JHVSpinner spinner = new JHVSpinner(lonStep, GRID_STEP_MIN, GRID_STEP_MAX, GRID_STEP);
+        private JHVSpinner createGridResolutionSpinner(double initialValue, DoubleConsumer valueSetter, Runnable onChange) {
+            JHVSpinner spinner = new JHVSpinner(initialValue, GRID_STEP_MIN, GRID_STEP_MAX, GRID_STEP);
             spinner.addChangeListener(e -> {
-                lonStep = (Double) spinner.getValue();
-                lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
+                valueSetter.accept((Double) spinner.getValue());
+                onChange.run();
                 gridNeedsInit = true;
                 MovieDisplay.display();
             });
-            JFormattedTextField fx = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-            fx.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", GRID_STEP_MIN, GRID_STEP_MAX));
-            return spinner;
-        }
-
-        private JHVSpinner createGridResolutionY() {
-            JHVSpinner spinner = new JHVSpinner(latStep, GRID_STEP_MIN, GRID_STEP_MAX, GRID_STEP);
-            spinner.addChangeListener(e -> {
-                latStep = (Double) spinner.getValue();
-                latLabels = GridLabel.makeLatLabels(latStep);
-                gridNeedsInit = true;
-                MovieDisplay.display();
-            });
-            JFormattedTextField fy = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-            fy.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", GRID_STEP_MIN, GRID_STEP_MAX));
+            JFormattedTextField textField = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+            textField.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", GRID_STEP_MIN, GRID_STEP_MAX));
             return spinner;
         }
 
