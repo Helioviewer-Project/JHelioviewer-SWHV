@@ -1,7 +1,11 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7.7 (pending)
+## JHelioviewer 4.7.8 (pending)
+
+## JHelioviewer 4.7.7 (2026-03-03)
+
+- Various bug fixes and performance improvements
 
 ## JHelioviewer 4.7.6 (2026-02-20)
 
