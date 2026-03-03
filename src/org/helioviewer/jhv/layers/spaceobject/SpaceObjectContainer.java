@@ -36,6 +36,7 @@ public final class SpaceObjectContainer extends JScrollPane {
     private final UpdateViewpoint uv;
     private final SpaceObject observer;
     private final SpaceObjectModel model;
+    private final JTable grid;
 
     private SpaceObjectElement highlighted;
     private Frame frame;
@@ -52,7 +53,7 @@ public final class SpaceObjectContainer extends JScrollPane {
 
         model = new SpaceObjectModel(observer);
 
-        JTable grid = new JTable(model);
+        grid = new JTable(model);
         grid.setTableHeader(null);
         grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
@@ -72,6 +73,8 @@ public final class SpaceObjectContainer extends JScrollPane {
         grid.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (!isEnabled())
+                    return;
                 TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
                 if (v == null || !(v.value instanceof SpaceObjectElement soe))
                     return;
@@ -97,6 +100,15 @@ public final class SpaceObjectContainer extends JScrollPane {
         int len = ja.length();
         for (int i = 0; i < len; i++)
             selectTarget(SpaceObject.get(ja.optString(i, "Earth")), selectionModel);
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        grid.setEnabled(enabled);
+        setWheelScrollingEnabled(enabled);
+        getHorizontalScrollBar().setEnabled(enabled);
+        getVerticalScrollBar().setEnabled(enabled);
     }
 
     private void selectTarget(SpaceObject target, ListSelectionModel selectionModel) {
