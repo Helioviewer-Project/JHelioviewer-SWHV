@@ -39,6 +39,7 @@ class SpaceObjectElement implements Interfaces.StatusReceiver {
 
     void unload(UpdateViewpoint uv) {
         selected = false;
+        status = null;
         model.refresh(this);
 
         if (load != null) {
@@ -46,10 +47,6 @@ class SpaceObjectElement implements Interfaces.StatusReceiver {
             load = null;
             MovieDisplay.display();
         }
-    }
-
-    boolean isTarget(SpaceObject _target) {
-        return target.equals(_target);
     }
 
     boolean isDownloading() {
