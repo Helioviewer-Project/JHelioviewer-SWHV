@@ -49,6 +49,23 @@ public class FITSSettings {
 
     public static final class SettingsDialog extends JDialog implements Interfaces.ShowableDialog {
 
+        private static JPanel createScalingPanel(JRadioButton button, JHVSlider slider, JLabel label) {
+            JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+            panel.add(button);
+            panel.add(slider);
+            panel.add(label);
+            return panel;
+        }
+
+        private static void bindScalingMode(JRadioButton button, ScalingMode mode) {
+            button.addItemListener(e -> {
+                if (button.isSelected()) {
+                    scalingMode = mode;
+                    refresh();
+                }
+            });
+        }
+
         public SettingsDialog() {
             super(JHVFrame.getFrame(), "FITS Settings", false);
             setLocationRelativeTo(JHVFrame.getFrame());
@@ -102,37 +119,13 @@ public class FITSSettings {
                     refresh();
             });
 
-            gammaButton.addItemListener(e -> {
-                if (gammaButton.isSelected()) {
-                    scalingMode = ScalingMode.Gamma;
-                    refresh();
-                }
-            });
-            betaButton.addItemListener(e -> {
-                if (betaButton.isSelected()) {
-                    scalingMode = ScalingMode.Beta;
-                    refresh();
-                }
-            });
-            alphaButton.addItemListener(e -> {
-                if (alphaButton.isSelected()) {
-                    scalingMode = ScalingMode.Alpha;
-                    refresh();
-                }
-            });
+            bindScalingMode(gammaButton, ScalingMode.Gamma);
+            bindScalingMode(betaButton, ScalingMode.Beta);
+            bindScalingMode(alphaButton, ScalingMode.Alpha);
 
-            JPanel gammaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-            gammaPanel.add(gammaButton);
-            gammaPanel.add(gammaSlider);
-            gammaPanel.add(gammaLabel);
-            JPanel betaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-            betaPanel.add(betaButton);
-            betaPanel.add(betaSlider);
-            betaPanel.add(betaLabel);
-            JPanel alphaPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
-            alphaPanel.add(alphaButton);
-            alphaPanel.add(alphaSlider);
-            alphaPanel.add(alphaLabel);
+            JPanel gammaPanel = createScalingPanel(gammaButton, gammaSlider, gammaLabel);
+            JPanel betaPanel = createScalingPanel(betaButton, betaSlider, betaLabel);
+            JPanel alphaPanel = createScalingPanel(alphaButton, alphaSlider, alphaLabel);
 
             JFormattedTextField minClip = new JFormattedTextField(new TerminatedFormatterFactory("%g", "", -1e12, 1e12));
             minClip.setValue(clippingMin);
