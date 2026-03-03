@@ -33,8 +33,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     private EventPlotConfiguration eventUnderMouse;
 
     EventTimelineLayer() {
-        JHVEventCache.registerHandler(this);
-        cacheUpdated();
+        registerAndRefresh();
     }
 
     public static AbstractTimelineLayer deserialize(JSONObject ignore) { // has to be implemented for state
@@ -61,10 +60,15 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         if (enabled == _enabled) return;
         super.setEnabled(_enabled);
         if (enabled) {
-            JHVEventCache.registerHandler(this);
+            registerAndRefresh();
         } else {
             JHVEventCache.unregisterHandler(this);
         }
+    }
+
+    private void registerAndRefresh() {
+        JHVEventCache.registerHandler(this);
+        cacheUpdated();
     }
 
     @Override

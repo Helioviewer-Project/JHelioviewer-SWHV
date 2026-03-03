@@ -455,8 +455,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             JHVFrame.getInputController().addPlugin(controller);
             requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
-            SWEKPopupController.mouseOverJHVEvent = null;
-            JHVEventCache.highlight(null);
+            controller.resetHover();
             JHVFrame.getInputController().removePlugin(controller);
             Movie.removeTimeListener(controller);
             Movie.removeTimeRangeListener(this);
