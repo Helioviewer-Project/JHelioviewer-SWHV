@@ -371,16 +371,16 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         return view.getAPIRequest();
     }
 
+    public boolean isLoadingForTimespan() {
+        return worker != null;
+    }
+
     public long getStartTime() {
-        if (worker != null) // don't use for timespan calculation
-            return Long.MAX_VALUE;
         APIRequest req = getAPIRequest(); // for locked timelines
         return req == null ? view.getFirstTime().milli : req.startTime();
     }
 
     public long getEndTime() {
-        if (worker != null) // don't use for timespan calculation
-            return Long.MIN_VALUE;
         APIRequest req = getAPIRequest(); // for locked timelines
         return req == null ? view.getLastTime().milli : req.endTime();
     }

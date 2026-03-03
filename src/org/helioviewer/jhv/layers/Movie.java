@@ -82,12 +82,16 @@ public class Movie {
 
     private static long getMovieStart() {
         ImageLayer layer = Layers.getActiveImageLayer();
-        return layer == null ? lastTimestamp.milli : layer.getStartTime();
+        if (layer == null || layer.isLoadingForTimespan())
+            return lastTimestamp.milli;
+        return layer.getStartTime();
     }
 
     private static long getMovieEnd() {
         ImageLayer layer = Layers.getActiveImageLayer();
-        return layer == null ? lastTimestamp.milli : layer.getEndTime();
+        if (layer == null || layer.isLoadingForTimespan())
+            return lastTimestamp.milli;
+        return layer.getEndTime();
     }
 
     static void timeRangeChanged() {
