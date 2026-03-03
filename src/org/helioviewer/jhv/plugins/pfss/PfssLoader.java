@@ -26,17 +26,21 @@ import okio.BufferedSource;
 
 class PfssLoader {
 
+    private static PfssCache cache() {
+        return PfssPlugin.getPfsscache();
+    }
+
     record Data(JHVTime dateObs, float[] lineX, float[] lineY, float[] lineZ, float[] lineS, int points) {
     }
 
     static void submitList(long start, long end) {
+        cache().beginDownload();
         EDTCallbackExecutor.pool.submit(new ListLoader(start, end), new CallbackList(start));
-        PfssPlugin.downloads++;
     }
 
     static void submitData(long time, URI uri) {
+        cache().beginDownload();
         EDTCallbackExecutor.pool.submit(new DataLoader(time, uri), new CallbackData(uri));
-        PfssPlugin.downloads++;
     }
 
     private record ListLoader(long start, long end) implements Callable<Void> {
@@ -79,7 +83,7 @@ class PfssLoader {
                 } catch (Exception e) { // continue in case of list error
                     Log.warn("PFSS list error", e);
                 }
-                EventQueue.invokeLater(() -> PfssPlugin.getPfsscache().put(uris));
+                EventQueue.invokeLater(() -> cache().put(uris));
 
                 if (startMonth == 11) {
                     startMonth = 0;
@@ -95,13 +99,13 @@ class PfssLoader {
     private record CallbackList(long start) implements FutureCallback<Void> {
         @Override
         public void onSuccess(Void result) {
-            PfssPlugin.downloads--;
-            PfssPlugin.getPfsscache().getNearestData(start); // preload first
+            cache().endDownload();
+            cache().getNearestData(start); // preload first
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            PfssPlugin.downloads--;
+            cache().endDownload();
             Log.error(t);
         }
     }
@@ -171,15 +175,15 @@ class PfssLoader {
     private record CallbackData(URI uri) implements FutureCallback<Data> {
         @Override
         public void onSuccess(Data result) {
-            PfssPlugin.downloads--;
-            PfssPlugin.getPfsscache().markLoaded(uri, result);
+            cache().endDownload();
+            cache().markLoaded(uri, result);
             MovieDisplay.display(); //!
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
-            PfssPlugin.downloads--;
-            PfssPlugin.getPfsscache().markFailed(uri);
+            cache().endDownload();
+            cache().markFailed(uri);
             Log.error(t);
         }
     }

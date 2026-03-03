@@ -9,8 +9,6 @@ public class PfssPlugin extends Plugin {
     private static final PfssCache pfssCache = new PfssCache();
     private static final PfssLayer layer = new PfssLayer(null);
 
-    public static int downloads;
-
     public PfssPlugin() {
         super("PFSS", "Visualize PFSS model data");
     }
@@ -21,7 +19,6 @@ public class PfssPlugin extends Plugin {
 
     @Override
     public void install() {
-        downloads = 0;
         JHVFrame.getLayers().add(layer);
     }
 

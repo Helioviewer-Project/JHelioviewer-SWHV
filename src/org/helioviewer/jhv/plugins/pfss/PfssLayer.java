@@ -21,6 +21,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
+    private final PfssCache cache = PfssPlugin.getPfsscache();
     private final PfssLayerOptions optionsPanel;
     private final GLSLLine glslLine = new GLSLLine(true);
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
@@ -54,7 +55,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
         if (!isVisible[vp.idx])
             return;
 
-        PfssLoader.Data data = PfssPlugin.getPfsscache().getNearestData(currentTime);
+        PfssLoader.Data data = cache.getNearestData(currentTime);
         if (data != null) {
             renderData(gl, vp, data);
             lastData = data;
@@ -120,7 +121,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     @Override
     public boolean isDownloading() {
-        return PfssPlugin.downloads != 0;
+        return cache.isDownloading();
     }
 
     private int lastDetail;
