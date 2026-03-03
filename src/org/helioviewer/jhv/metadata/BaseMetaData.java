@@ -11,6 +11,8 @@ import org.helioviewer.jhv.math.Vec2;
 
 class BaseMetaData implements MetaData {
 
+    private static final double DEFAULT_UNIT_PER_ARCSEC = Sun.Radius / (Math.toDegrees(Math.atan2(Sun.Radius, Sun.MeanEarthDistance)) * 3600);
+
     protected Region region = Region.DEFAULT;
     protected String displayName = "unknown";
     protected String unit = "";
@@ -22,7 +24,7 @@ class BaseMetaData implements MetaData {
     protected int pixelH;
     protected double unitPerPixelX = 1;
     protected double unitPerPixelY = 1;
-    protected double unitPerArcsec = Double.NaN;
+    protected double unitPerArcsec = DEFAULT_UNIT_PER_ARCSEC;
     protected float responseFactor = 1;
 
     protected Position viewpoint = Sun.StartEarth;
