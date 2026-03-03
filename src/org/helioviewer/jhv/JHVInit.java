@@ -51,6 +51,7 @@ class JHVInit {
         FitsFactory.setLongStringsEnabled(true);
     }
 
+    @SuppressWarnings("restricted")
     private static void loadLib(String name, String resourceDir) throws Exception {
         String libraryName = System.mapLibraryName(name);
         try (InputStream in = FileUtils.getResource(resourceDir + libraryName)) {
