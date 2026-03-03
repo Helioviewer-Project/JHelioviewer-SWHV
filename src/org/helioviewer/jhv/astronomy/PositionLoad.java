@@ -66,7 +66,6 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
                 //    System.out.println((sw.elapsed().toNanos() / 1e9));
             }
         }
-
     }
 
     private record Callback(Interfaces.StatusReceiver receiver) implements FutureCallback<PositionResponse> {
@@ -80,11 +79,6 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
             if (!JHVThread.isInterrupted(t))
                 receiver.setStatus(t.getMessage());
         }
-    }
-
-    private void stop() {
-        future.cancel(true);
-        receiver.setStatus(null);
     }
 
     public boolean isDownloading() {
@@ -102,10 +96,16 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
 
     private static final ArrayListMultimap<UpdateViewpoint, PositionLoad> loads = ArrayListMultimap.create();
 
+    private static void pruneFailedLoads(UpdateViewpoint uv) {
+        loads.get(uv).removeIf(load -> load.future.isCancelled() || (load.future.isDone() && load.getResponse() == null));
+    }
+
     public static PositionLoad submit(UpdateViewpoint uv, Interfaces.StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
+        pruneFailedLoads(uv);
         receiver.setStatus("Loading...");
-        PositionLoad load = new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, EDTCallbackExecutor.pool.submit(
-                new LoadPosition(observer, target, frame, start, end), new Callback(receiver)));
+
+        Future<PositionResponse> future = EDTCallbackExecutor.pool.submit(new LoadPosition(observer, target, frame, start, end), new Callback(receiver));
+        PositionLoad load = new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, future);
         loads.put(uv, load);
 
         return load;
@@ -117,12 +117,12 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
 
     public static void remove(UpdateViewpoint uv, PositionLoad load) {
         loads.remove(uv, load);
-        load.stop();
+        if (load.future.cancel(true)) load.receiver.setStatus(null);
     }
 
     public static void removeAll(UpdateViewpoint uv) {
         for (PositionLoad load : loads.removeAll(uv)) {
-            load.stop();
+            if (load.future.cancel(true)) load.receiver.setStatus(null);
         }
     }
 

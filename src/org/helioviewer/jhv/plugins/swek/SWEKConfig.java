@@ -64,9 +64,11 @@ class SWEKConfig {
     private static SWEK.Source parseSource(JSONObject obj) {
         String name = obj.getString("name");
         return switch (name) {
-            case "COMESEP" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
+            case "COMESEP" ->
+                    new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
             //case "FHNW" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler());
-            case "HEK" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler());
+            case "HEK" ->
+                    new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler());
             default -> null;
         };
     }
