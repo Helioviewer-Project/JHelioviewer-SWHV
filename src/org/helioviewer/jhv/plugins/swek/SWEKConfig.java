@@ -64,15 +64,14 @@ class SWEKConfig {
     private static SWEK.Source parseSource(JSONObject obj) {
         String name = obj.getString("name");
         return switch (name) {
-            case "COMESEP" -> new SWEK.Source(name, parseGeneralParameters(obj), new ComesepHandler());
-            //case "FHNW" -> new SWEK.Source(name, parseGeneralParameters(obj), new FHNWHandler());
-            case "HEK" -> new SWEK.Source(name, parseGeneralParameters(obj), new HEKHandler());
+            case "COMESEP" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
+            //case "FHNW" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler());
+            case "HEK" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler());
             default -> null;
         };
     }
 
-    private static List<SWEK.Parameter> parseGeneralParameters(JSONObject obj) {
-        JSONArray parameterArray = obj.getJSONArray("general_parameters");
+    private static List<SWEK.Parameter> parseParameters(JSONArray parameterArray) {
         int len = parameterArray.length();
         List<SWEK.Parameter> parameterList = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
@@ -100,7 +99,7 @@ class SWEKConfig {
     }
 
     private static SWEKGroup parseGroup(JSONObject obj, DefaultTreeModel dtm) {
-        SWEKGroup group = new SWEKGroup(parseEventName(obj), parseParameterList(obj), parseEventIcon(obj), dtm);
+        SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIcon(obj), dtm);
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         int len = suppliersArray.length();
         for (int i = 0; i < len; i++) {
@@ -121,50 +120,12 @@ class SWEKConfig {
         return IconBank.getBlank();
     }
 
-    private static String parseEventName(JSONObject obj) {
-        return obj.getString("event_name");
-    }
-
     private static SWEKSupplier parseSupplier(JSONObject obj, SWEKGroup group) {
-        return new SWEKSupplier(parseSupplierName(obj), parseSupplierDisplayName(obj), parseSupplierSource(obj), parseDbName(obj), group);
-    }
-
-    private static String parseSupplierName(JSONObject obj) {
-        return obj.getString("supplier_name");
-    }
-
-    private static String parseSupplierDisplayName(JSONObject obj) {
-        return obj.getString("supplier_display_name");
-    }
-
-    private static SWEK.Source parseSupplierSource(JSONObject obj) {
-        return sources.get(obj.getString("source"));
-    }
-
-    private static String parseDbName(JSONObject obj) {
-        return obj.getString("db");
-    }
-
-    private static List<SWEK.Parameter> parseParameterList(JSONObject obj) {
-        JSONArray parameterListArray = obj.getJSONArray("parameter_list");
-        int len = parameterListArray.length();
-        List<SWEK.Parameter> parameterList = new ArrayList<>(len);
-        for (int i = 0; i < len; i++) {
-            parameterList.add(parseParameter((JSONObject) parameterListArray.get(i)));
-        }
-        return parameterList;
+        return new SWEKSupplier(obj.getString("supplier_name"), obj.getString("supplier_display_name"), sources.get(obj.getString("source")), obj.getString("db"), group);
     }
 
     private static SWEK.Parameter parseParameter(JSONObject obj) {
-        return new SWEK.Parameter(parseParameterName(obj), parseParameterDisplayName(obj), parseParameterFilter(obj), parseDefaultVisible(obj));
-    }
-
-    private static String parseParameterName(JSONObject obj) {
-        return obj.getString("parameter_name");
-    }
-
-    private static String parseParameterDisplayName(JSONObject obj) {
-        return obj.getString("parameter_display_name");
+        return new SWEK.Parameter(obj.getString("parameter_name"), obj.getString("parameter_display_name"), parseParameterFilter(obj), obj.optBoolean("default_visible"));
     }
 
     @Nullable
@@ -172,51 +133,7 @@ class SWEKConfig {
         JSONObject filterobj = obj.optJSONObject("filter");
         if (filterobj == null)
             return null;
-        return new SWEK.ParameterFilter(parseFilterType(filterobj), parseMin(filterobj), parseMax(filterobj), parseStartValue(filterobj), parseStepSize(filterobj), parseUnits(filterobj), parseDbType(filterobj));
-    }
-
-    private static String parseDbType(JSONObject obj) {
-        return obj.getString("dbtype");
-    }
-
-    private static String parseUnits(JSONObject obj) {
-        return obj.getString("units");
-    }
-
-    private static String parseFilterType(JSONObject obj) {
-        return obj.getString("filter_type");
-    }
-
-    private static double parseMin(JSONObject obj) {
-        return obj.getDouble("min");
-    }
-
-    private static double parseMax(JSONObject obj) {
-        return obj.getDouble("max");
-    }
-
-    private static double parseStepSize(JSONObject obj) {
-        return obj.getDouble("step_size");
-    }
-
-    private static double parseStartValue(JSONObject obj) {
-        return obj.getDouble("start_value");
-    }
-
-    private static boolean parseDefaultVisible(JSONObject obj) {
-        return obj.optBoolean("default_visible");
-    }
-
-    private static SWEK.RelatedEvents parseRelatedEvent(JSONObject obj) {
-        return new SWEK.RelatedEvents(parseRelatedEventName(obj), parseRelatedWith(obj), parseRelatedOnList(obj));
-    }
-
-    private static SWEKGroup parseRelatedEventName(JSONObject obj) {
-        return groups.get(obj.getString("event_name"));
-    }
-
-    private static SWEKGroup parseRelatedWith(JSONObject obj) {
-        return groups.get(obj.getString("related_with"));
+        return new SWEK.ParameterFilter(filterobj.getString("filter_type"), filterobj.getDouble("min"), filterobj.getDouble("max"), filterobj.getDouble("start_value"), filterobj.getDouble("step_size"), filterobj.getString("units"), filterobj.getString("dbtype"));
     }
 
     private static List<SWEK.RelatedEvents> parseRelatedEvents(JSONObject obj) {
@@ -224,7 +141,8 @@ class SWEKConfig {
         int len = relatedEventsArray.length();
         List<SWEK.RelatedEvents> relatedEventsList = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
-            relatedEventsList.add(parseRelatedEvent(relatedEventsArray.getJSONObject(i)));
+            JSONObject relatedEvent = relatedEventsArray.getJSONObject(i);
+            relatedEventsList.add(new SWEK.RelatedEvents(groups.get(relatedEvent.getString("event_name")), groups.get(relatedEvent.getString("related_with")), parseRelatedOnList(relatedEvent)));
         }
         return relatedEventsList;
     }
@@ -234,23 +152,12 @@ class SWEKConfig {
         int len = relatedOnArray.length();
         List<SWEK.RelatedOn> relatedOnList = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
-            relatedOnList.add(parseRelatedOn(relatedOnArray.getJSONObject(i)));
+            JSONObject relatedOn = relatedOnArray.getJSONObject(i);
+            String parameterFrom = relatedOn.getString("parameter_from");
+            String parameterWith = relatedOn.getString("parameter_with");
+            relatedOnList.add(new SWEK.RelatedOn(new SWEK.Parameter(parameterFrom, parameterFrom, null, false), new SWEK.Parameter(parameterWith, parameterWith, null, false), relatedOn.getString("dbtype")));
         }
         return relatedOnList;
-    }
-
-    private static SWEK.RelatedOn parseRelatedOn(JSONObject obj) {
-        return new SWEK.RelatedOn(parseParameterFrom(obj), parseParameterWith(obj), parseDbType(obj));
-    }
-
-    private static SWEK.Parameter parseParameterFrom(JSONObject obj) {
-        String parameterName = obj.getString("parameter_from");
-        return new SWEK.Parameter(parameterName, parameterName, null, false);
-    }
-
-    private static SWEK.Parameter parseParameterWith(JSONObject obj) {
-        String parameterName = obj.getString("parameter_with");
-        return new SWEK.Parameter(parameterName, parameterName, null, false);
     }
 
 }
