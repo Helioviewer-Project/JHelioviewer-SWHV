@@ -57,8 +57,10 @@ public class FITSSettings {
             return panel;
         }
 
-        private static void bindScalingMode(JRadioButton button, ScalingMode mode) {
+        private static void bindScalingMode(JRadioButton button, JHVSlider slider, ScalingMode mode) {
+            slider.setEnabled(button.isSelected());
             button.addItemListener(e -> {
+                slider.setEnabled(button.isSelected());
                 if (button.isSelected()) {
                     scalingMode = mode;
                     refresh();
@@ -119,9 +121,9 @@ public class FITSSettings {
                     refresh();
             });
 
-            bindScalingMode(gammaButton, ScalingMode.Gamma);
-            bindScalingMode(betaButton, ScalingMode.Beta);
-            bindScalingMode(alphaButton, ScalingMode.Alpha);
+            bindScalingMode(gammaButton, gammaSlider, ScalingMode.Gamma);
+            bindScalingMode(betaButton, betaSlider, ScalingMode.Beta);
+            bindScalingMode(alphaButton, alphaSlider, ScalingMode.Alpha);
 
             JPanel gammaPanel = createScalingPanel(gammaButton, gammaSlider, gammaLabel);
             JPanel betaPanel = createScalingPanel(betaButton, betaSlider, betaLabel);
