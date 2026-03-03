@@ -47,6 +47,10 @@ class SpaceObjectModel extends AbstractTableModel {
         return targetRows.getOrDefault(object, -1);
     }
 
+    SpaceObjectElement elementAt(int row) {
+        return elements.get(row);
+    }
+
     void refresh(SpaceObjectElement element) {
         Integer idx = elementRows.get(element);
         if (idx >= 0)

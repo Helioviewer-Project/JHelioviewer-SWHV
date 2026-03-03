@@ -117,7 +117,7 @@ public final class SpaceObjectContainer extends JScrollPane {
         int idx = model.indexOf(target);
         if (idx != -1) { // found
             selectionModel.setSelectionInterval(idx, idx); // highlight in table
-            SpaceObjectElement element = (SpaceObjectElement) model.getValueAt(idx, 0);
+            SpaceObjectElement element = model.elementAt(idx);
             selectElement(element);
             highlighted = element;
         }
