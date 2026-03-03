@@ -8,7 +8,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -16,7 +15,6 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
@@ -88,17 +86,12 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         centerY = _centerY;
     }
 
-    void render(Viewport vp, GL3 gl, double distance, double pixFactor, byte[] color) {
+    void render(Viewport vp, GL3 gl, double distance, double pixFactor, byte[] color, JhvTextRenderer renderer) {
         if (!checkBox.isSelected())
             return;
 
         fov.setCenter(centerX * distance, centerY * distance);
         fov.putCenter(centerBuf, color);
-
-        JhvTextRenderer renderer = GLText.getRenderer(48);
-        renderer.setColor(Colors.WhiteFloat);
-        renderer.begin3DRendering();
-        renderer.setSurfacePut();
 
         if (inner > 0)
             fov.putCircLine(inner * distance, lineBuf, color);
@@ -110,9 +103,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
             double halfSide = wide / Math.sqrt(2);
             FOVText.drawLabel(renderer, name, (centerX - halfSide) * distance, (centerY - halfSide) * distance, halfSide * distance);
         }
-
-        renderer.setDirectPut();
-        renderer.end3DRendering();
 
         center.setVertex(gl, centerBuf);
         center.renderPoints(gl, pixFactor);
