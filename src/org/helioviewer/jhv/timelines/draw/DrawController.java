@@ -39,6 +39,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
     private static boolean locked;
     private static final Timer layersUpdater = new Timer(1000 / 2, e -> syncLockedLayers());
+
     static {
         layersUpdater.setRepeats(false);
     }
