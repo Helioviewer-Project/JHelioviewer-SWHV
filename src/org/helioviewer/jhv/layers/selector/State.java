@@ -215,6 +215,15 @@ public class State {
     private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time, boolean tracking,
                             boolean refresh, boolean play) implements FutureCallback<Void> {
 
+        private void applyRestoredPlaybackState() {
+            Movie.setTime(time);
+            JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
+            JHVFrame.getToolBar().getRefreshButton().setSelected(refresh);
+            Display.getCamera().refresh();
+            if (play)
+                Movie.play();
+        }
+
         @Override
         public void onSuccess(Void result) {
             newLayers.keySet().forEach(ImageLayer::unload); // prune failed layers
@@ -225,11 +234,7 @@ public class State {
             }
             if (masterLayer != null && Layers.getImageLayers().contains(masterLayer))
                 Layers.setActiveImageLayer(masterLayer);
-            Movie.setTime(time);
-            JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
-            JHVFrame.getToolBar().getRefreshButton().setSelected(refresh);
-            if (play)
-                Movie.play();
+            applyRestoredPlaybackState();
         }
 
         @Override

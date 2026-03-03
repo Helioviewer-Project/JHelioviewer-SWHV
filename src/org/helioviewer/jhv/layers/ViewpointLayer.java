@@ -203,17 +203,19 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void setEnabled(boolean _enabled) {
+        boolean wasEnabled = enabled;
         super.setEnabled(_enabled);
 
         if (enabled) {
             JHVFrame.getInputController().addPlugin(hoverListener);
             optionsPanel.activate();
-            optionsPanel.syncViewpoint();
+            optionsPanel.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             text.clear();
             JHVFrame.getInputController().removePlugin(hoverListener);
             optionsPanel.deactivate();
-            Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer);
+            if (wasEnabled && Layers.getViewpointLayer() == this)
+                Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer, Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         }
     }
 

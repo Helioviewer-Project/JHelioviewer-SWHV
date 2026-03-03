@@ -14,6 +14,7 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
@@ -70,7 +71,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
             if (jc != null)
                 Display.getCamera().fromJson(jc);
         }
-        syncViewpoint();
+        switchOptionsPanel(optionPanelForCurrentMode());
 
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 0));
         ButtonGroup modeGroup = new ButtonGroup();
@@ -80,7 +81,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     cameraMode = mode;
-                    syncViewpoint();
+                    applyCurrentViewpoint(Camera.ViewpointApplyMode.RESET);
                 }
             });
             radioPanel.add(radio);
@@ -136,12 +137,16 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
         return locationOptionPanel.isDownloading() || equatorialOptionPanel.isDownloading();
     }
 
-    void syncViewpoint() {
-        switchOptionsPanel(switch (cameraMode) {
+    private ViewpointLayerOptionsExpert optionPanelForCurrentMode() {
+        return switch (cameraMode) {
             case Location -> locationOptionPanel;
             case Heliosphere -> equatorialOptionPanel;
-        });
-        Display.getCamera().setViewpointUpdate(cameraMode.update);
+        };
+    }
+
+    void applyCurrentViewpoint(Camera.ViewpointApplyMode mode) {
+        switchOptionsPanel(optionPanelForCurrentMode());
+        Display.getCamera().setViewpointUpdate(cameraMode.update, mode);
     }
 
     void activate() {
