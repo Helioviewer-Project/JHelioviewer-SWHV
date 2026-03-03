@@ -30,17 +30,20 @@ class PfssLoader {
         return PfssPlugin.getPfsscache();
     }
 
+    private static <T> void submit(Callable<T> task, FutureCallback<T> callback) {
+        cache().beginDownload();
+        EDTCallbackExecutor.pool.submit(task, callback);
+    }
+
     record Data(JHVTime dateObs, float[] lineX, float[] lineY, float[] lineZ, float[] lineS, int points) {
     }
 
     static void submitList(long start, long end) {
-        cache().beginDownload();
-        EDTCallbackExecutor.pool.submit(new ListLoader(start, end), new CallbackList(start));
+        submit(new ListLoader(start, end), new CallbackList(start));
     }
 
     static void submitData(long time, URI uri) {
-        cache().beginDownload();
-        EDTCallbackExecutor.pool.submit(new DataLoader(time, uri), new CallbackData(uri));
+        submit(new DataLoader(time, uri), new CallbackData(uri));
     }
 
     private record ListLoader(long start, long end) implements Callable<Void> {
