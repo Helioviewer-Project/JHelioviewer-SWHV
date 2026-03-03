@@ -133,7 +133,7 @@ public final class SpaceObjectContainer extends JScrollPane {
             return;
 
         frame = _frame;
-        model.getSelected().forEach(element -> element.load(uv, observer, frame, startTime, endTime));
+        model.forEachSelected(element -> element.load(uv, observer, frame, startTime, endTime));
     }
 
     public void setTime(long _startTime, long _endTime) {
@@ -142,14 +142,14 @@ public final class SpaceObjectContainer extends JScrollPane {
 
         startTime = _startTime;
         endTime = _endTime;
-        model.getSelected().forEach(element -> element.load(uv, observer, frame, startTime, endTime));
+        model.forEachSelected(element -> element.load(uv, observer, frame, startTime, endTime));
     }
 
     private void selectElement(SpaceObjectElement element) {
         if (exclusive) {
             if (element.isSelected()) // avoid reload on re-clicking same
                 return;
-            model.getSelected().forEach(e -> e.unload(uv));
+            model.forEachSelected(e -> e.unload(uv));
             element.load(uv, observer, frame, startTime, endTime);
         } else {
             if (element.isSelected())
@@ -160,16 +160,12 @@ public final class SpaceObjectContainer extends JScrollPane {
     }
 
     public boolean isDownloading() {
-        for (SpaceObjectElement element : model.getSelected()) {
-            if (element.isDownloading())
-                return true;
-        }
-        return false;
+        return model.anySelected(SpaceObjectElement::isDownloading);
     }
 
     public JSONArray toJson() {
         JSONArray ja = new JSONArray();
-        model.getSelected().forEach(ja::put);
+        model.forEachSelected(ja::put);
         return ja;
     }
 
