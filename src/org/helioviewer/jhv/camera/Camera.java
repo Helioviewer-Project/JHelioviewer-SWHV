@@ -18,6 +18,11 @@ import org.json.JSONObject;
 
 public class Camera {
 
+    public enum ViewpointApplyMode {
+        RESET,
+        KEEP_TRANSFORM
+    }
+
     public static final double ZOOM_MULTIPLIER_WHEEL = 2.;
     public static final double ZOOM_MULTIPLIER_BUTTON = 2.;
 
@@ -112,9 +117,12 @@ public class Camera {
         return updateViewpoint;
     }
 
-    public void setViewpointUpdate(UpdateViewpoint _updateViewpoint) {
+    public void setViewpointUpdate(UpdateViewpoint _updateViewpoint, ViewpointApplyMode mode) {
         updateViewpoint = _updateViewpoint;
-        reset();
+        switch (mode) {
+            case RESET -> reset();
+            case KEEP_TRANSFORM -> updateCamera(Movie.getTime());
+        }
     }
 
     public Vec2 getTranslation() {
@@ -192,6 +200,7 @@ public class Camera {
         translation.x = jo.optDouble("translationX", translation.x);
         translation.y = jo.optDouble("translationY", translation.y);
         setFOV(jo.optDouble("fov", fov));
+        updateRotation();
     }
 
 }
