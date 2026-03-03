@@ -27,7 +27,7 @@ import okio.BufferedSource;
 class PfssLoader {
 
     private static PfssCache cache() {
-        return PfssPlugin.getPfsscache();
+        return PfssPlugin.getPfssCache();
     }
 
     private static <T> void submit(Callable<T> task, FutureCallback<T> callback) {
