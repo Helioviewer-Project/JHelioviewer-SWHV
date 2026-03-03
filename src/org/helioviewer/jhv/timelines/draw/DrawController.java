@@ -2,8 +2,6 @@ package org.helioviewer.jhv.timelines.draw;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -38,34 +36,19 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     private static Rectangle graphArea = new Rectangle();
     private static Rectangle graphSize = new Rectangle();
     private static long currentTime;
+
     private static boolean locked;
-
-    private static class LockedLayersUpdater {
-
-        private final Timer timer;
-
-        LockedLayersUpdater() {
-            ActionListener syncLayers = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent evt) {
-                    timer.stop();
-                    long start = TimeUtils.ceilSec(selectedAxis.start());
-                    long end = TimeUtils.floorSec(selectedAxis.end());
-                    MoviePanel.getInstance().syncLayersSpan(start, end);
-                }
-            };
-
-            timer = new Timer(1000 / 2, syncLayers);
-            timer.setRepeats(false);
-        }
-
-        void update() {
-            timer.restart();
-        }
-
+    private static final Timer layersUpdater = new Timer(1000 / 2, e -> syncLockedLayers());
+    static {
+        layersUpdater.setRepeats(false);
     }
 
-    private static final LockedLayersUpdater layersUpdater = new LockedLayersUpdater();
+    private static void syncLockedLayers() {
+        layersUpdater.stop();
+        long start = TimeUtils.ceilSec(selectedAxis.start());
+        long end = TimeUtils.floorSec(selectedAxis.end());
+        MoviePanel.getInstance().syncLayersSpan(start, end);
+    }
 
     public DrawController() {
         long t = System.currentTimeMillis();
@@ -211,7 +194,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
     private static void setAvailableInterval() {
         if (locked)
-            layersUpdater.update();
+            layersUpdater.restart();
 
         long diff = selectedAxis.end() - selectedAxis.start();
         long availableStart = selectedAxis.start() - diff;
