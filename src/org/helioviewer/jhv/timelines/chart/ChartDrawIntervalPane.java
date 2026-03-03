@@ -332,15 +332,19 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         DrawController.moveXAvailableBased(point.x, (int) middle);
     }
 
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        Point p = e.getPoint();
-        if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
+    private void updateCursor(Point p) {
+        mouseOverInterval = p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition;
+        if (mouseOverInterval) {
+            setCursor(UIGlobals.openHandCursor);
+        } else if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else {
             setCursor(Cursor.getDefaultCursor());
         }
-        // repaint();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
     }
 
     @Override
@@ -377,22 +381,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Point p = e.getPoint();
-
-        mouseOverInterval = false;
-        // is mouse cursor above selected interval?
-        if (p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition) {
-            mouseOverInterval = true;
-            setCursor(UIGlobals.openHandCursor);
-        }
-        // reset cursor if it does not point to the interval area
-        if (!mouseOverInterval) {
-            if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
-                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            } else {
-                setCursor(Cursor.getDefaultCursor());
-            }
-        }
+        updateCursor(e.getPoint());
     }
 
     @Override
