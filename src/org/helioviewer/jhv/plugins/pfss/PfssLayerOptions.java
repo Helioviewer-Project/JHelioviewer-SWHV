@@ -38,14 +38,6 @@ class PfssLayerOptions extends JPanel {
             MovieDisplay.display();
         });
 
-        JPanel detailPanel = new JPanel();
-        detailPanel.add(new JLabel("Detail", JLabel.RIGHT));
-        detailPanel.add(levelSpinner);
-
-        JPanel radiusPanel = new JPanel();
-        radiusPanel.add(new JLabel("Radius", JLabel.RIGHT));
-        radiusPanel.add(radiusSpinner);
-
         GridBagConstraints c0 = new GridBagConstraints();
         c0.weightx = 1.;
         c0.weighty = 1.;
@@ -53,11 +45,11 @@ class PfssLayerOptions extends JPanel {
 
         c0.gridx = 0;
         c0.anchor = GridBagConstraints.LINE_START;
-        add(detailPanel, c0);
+        add(createSpinnerPanel("Detail", levelSpinner), c0);
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.LINE_START;
-        add(radiusPanel, c0);
+        add(createSpinnerPanel("Radius", radiusSpinner), c0);
 
         JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
         fixedColors.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -78,6 +70,13 @@ class PfssLayerOptions extends JPanel {
         c0.anchor = GridBagConstraints.LINE_START;
         c0.gridx = 0;
         add(availabilityButton, c0);
+    }
+
+    private static JPanel createSpinnerPanel(String label, JHVSpinner spinner) {
+        JPanel panel = new JPanel();
+        panel.add(new JLabel(label, JLabel.RIGHT));
+        panel.add(spinner);
+        return panel;
     }
 
     int getDetail() {

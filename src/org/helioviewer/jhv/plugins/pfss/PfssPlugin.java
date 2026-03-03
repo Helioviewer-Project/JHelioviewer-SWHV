@@ -13,7 +13,7 @@ public class PfssPlugin extends Plugin {
         super("PFSS", "Visualize PFSS model data");
     }
 
-    static PfssCache getPfsscache() {
+    static PfssCache getPfssCache() {
         return pfssCache;
     }
 
