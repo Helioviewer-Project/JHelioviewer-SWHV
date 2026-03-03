@@ -123,17 +123,24 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         if (removed) //!
             return;
 
+        replaceView(_view);
+        activateView();
+    }
+
+    private void replaceView(View newView) {
         ImageFilter.Type filterType = view.getFilter();
         unsetView();
-        view = _view;
+        view = newView;
         worker = null; // drop reference
         view.setFilter(filterType);
+        view.setDataHandler(this);
+    }
 
+    private void activateView() {
         optionsPanel.downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
         JHVFrame.getLayersPanel().setOptionsPanel(this);
 
-        view.setDataHandler(this);
         CameraHelper.zoomToFit(Display.getMiniCamera());
         Layers.setActiveImageLayer(this);
         Movie.setFrame(0); //!
