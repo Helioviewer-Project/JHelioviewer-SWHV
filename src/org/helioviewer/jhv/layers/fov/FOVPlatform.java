@@ -28,6 +28,8 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
 
@@ -175,8 +177,16 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
             Transform.rotateView(Quat.createAxisZ(rot[2]));
         }
 
+        JhvTextRenderer renderer = GLText.getRenderer(48);
+        renderer.setColor(Colors.WhiteFloat);
+        renderer.begin3DRendering();
+        renderer.setSurfacePut();
+
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color));
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color, renderer));
+
+        renderer.setDirectPut();
+        renderer.end3DRendering();
 
         Transform.popView();
     }
