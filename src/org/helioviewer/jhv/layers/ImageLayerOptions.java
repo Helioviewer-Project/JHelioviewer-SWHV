@@ -106,7 +106,7 @@ class ImageLayerOptions extends JPanel {
 
                 layer.startDownload();
             } else
-                layer.stopDownload();
+                layer.cancelDownloadTask();
         });
 
         progressBar.setUI(new CircularProgressUI());

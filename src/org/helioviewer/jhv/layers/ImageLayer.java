@@ -94,8 +94,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         if (req.equals(getAPIRequest()))
             return;
 
-        if (worker != null)
-            worker.cancel(true);
+        cancelLoadTask();
         worker = LoadLayer.submit(this, req);
         JHVFrame.getLayersPanel().refresh(); // give feedback asap
     }
@@ -103,7 +102,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     public void unload() {
         if (view.getBaseName() == null)
             JHVFrame.getLayers().remove(this);
-        stopWorker();
+        cancelLoadTask();
     }
 
     @Override
@@ -152,7 +151,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     private void unsetView() {
-        stopDownload();
+        cancelDownloadTask();
 
         CameraHelper.zoomToFit(Display.getMiniCamera());
         view.setDataHandler(null);
@@ -164,7 +163,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     @Override
     public void remove(GL3 gl) {
         removed = true;
-        stopWorker();
+        cancelAsyncTasks();
         executor.abolish();
         unsetView();
         if (Display.multiview) {
@@ -390,7 +389,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         return worker == null && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
     }
 
-    private void stopWorker() {
+    private void cancelLoadTask() {
         if (worker != null) {
             worker.cancel(true);
             worker = null;
@@ -399,19 +398,23 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     private Future<?> downloadTask;
 
-    public void startDownload() {
-        if (downloadTask != null)
-            downloadTask.cancel(true);
-        APIRequest req = view.getAPIRequest();
-        if (req != null && view.getBaseName() != null) // should not happen
-            downloadTask = DownloadLayer.submit(req, this, view.getBaseName());
-    }
-
-    public void stopDownload() {
+    void cancelDownloadTask() {
         if (downloadTask != null) {
             downloadTask.cancel(true);
             downloadTask = null;
         }
+    }
+
+    private void cancelAsyncTasks() {
+        cancelLoadTask();
+        cancelDownloadTask();
+    }
+
+    public void startDownload() {
+        cancelDownloadTask();
+        APIRequest req = view.getAPIRequest();
+        if (req != null && view.getBaseName() != null) // should not happen
+            downloadTask = DownloadLayer.submit(req, this, view.getBaseName());
     }
 
     public void doneDownload() {
