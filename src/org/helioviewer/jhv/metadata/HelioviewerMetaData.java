@@ -12,6 +12,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
 
 public final class HelioviewerMetaData extends BaseMetaData {
@@ -306,8 +307,9 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
             region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            crval.x = m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
-            crval.y = m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
+            double crval1 = m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
+            double crval2 = m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
+            crval = new Vec2(crval1, crval2);
 
             String ctype1 = m.getString("CTYPE1").orElse("");
             String ctype2 = m.getString("CTYPE2").orElse("");
