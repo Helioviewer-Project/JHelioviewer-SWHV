@@ -248,7 +248,7 @@ public final class ToolBar extends JToolBar {
         ProjectionMode.Orthographic.radio.setSelected(true);
         addButton(projectionButton);
 
-        JideSplitButton anotationButton = toolSplitButton(ANNOTATION);
+        JideSplitButton annotationButton = toolSplitButton(ANNOTATION);
         ButtonGroup annotationGroup = new ButtonGroup();
         for (Interaction.AnnotationMode mode : Interaction.AnnotationMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
@@ -256,13 +256,13 @@ public final class ToolBar extends JToolBar {
                 item.setSelected(true);
             item.addActionListener(e -> JHVFrame.getInteraction().setAnnotationMode(mode));
             annotationGroup.add(item);
-            anotationButton.add(item);
+            annotationButton.add(item);
         }
-        anotationButton.addSeparator();
-        anotationButton.add(new Actions.ClearAnnotations());
-        anotationButton.addSeparator();
-        anotationButton.add(new Actions.ZoomFOVAnnotation());
-        addButton(anotationButton);
+        annotationButton.addSeparator();
+        annotationButton.add(new Actions.ClearAnnotations());
+        annotationButton.addSeparator();
+        annotationButton.add(new Actions.ZoomFOVAnnotation());
+        addButton(annotationButton);
 
         addSeparator(dim);
 
