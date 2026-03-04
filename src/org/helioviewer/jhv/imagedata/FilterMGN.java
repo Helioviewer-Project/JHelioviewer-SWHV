@@ -132,6 +132,9 @@ class FilterMGN implements ImageFilter.Algorithm {
 
     @Override
     public float[] filter(float[] data, int width, int height) {
+        if (width < 1 || height < 1)
+            return data;
+
         int size = width * height;
         float[] accum = new float[size];
         float[] conv = new float[size];
