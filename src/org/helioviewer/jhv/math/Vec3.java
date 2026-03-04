@@ -48,12 +48,16 @@ public class Vec3 {
         z = 0;
     }
 
-    public static Vec3 add(Vec3 u, Vec3 v) {
-        return new Vec3(u.x + v.x, u.y + v.y, u.z + v.z);
+    public void plus(Vec3 vec) {
+        x += vec.x;
+        y += vec.y;
+        z += vec.z;
     }
 
-    public static Vec3 subtract(Vec3 u, Vec3 v) {
-        return new Vec3(u.x - v.x, u.y - v.y, u.z - v.z);
+    public void minus(Vec3 vec) {
+        x -= vec.x;
+        y -= vec.y;
+        z -= vec.z;
     }
 
     public static Vec3 multiply(Vec3 vec1, double s) {

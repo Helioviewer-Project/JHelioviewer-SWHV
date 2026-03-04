@@ -174,8 +174,8 @@ public class SunJSONTypes {
         Vec3 v = coordinates.get(2);
         byte[] color = colors.getFirst();
 
-        u = Vec3.subtract(u, c);
-        v = Vec3.subtract(v, c);
+        u.minus(c);
+        v.minus(c);
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double a = 2 * Math.PI * i / SUBDIVISIONS;
             double cost = Math.cos(a);
