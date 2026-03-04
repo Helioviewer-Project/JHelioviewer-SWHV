@@ -14,6 +14,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
+import javax.swing.AbstractButton;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
@@ -29,6 +30,7 @@ import org.helioviewer.jhv.math.Quat;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
 
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
@@ -72,6 +74,13 @@ public final class ToolBar extends JToolBar {
     private static JideButton toolButton(ButtonText text) {
         JideButton b = new JideButton(text.toString());
         b.setToolTipText(text.tip);
+        return b;
+    }
+
+    private static JideSplitButton toolSplitButton(ButtonText text) {
+        JideSplitButton b = new JideSplitButton(text.toString());
+        b.setToolTipText(text.tip);
+        b.setAlwaysDropdown(true);
         return b;
     }
 
@@ -158,28 +167,20 @@ public final class ToolBar extends JToolBar {
         JideButton resetCameraAxis = toolButton(RESETCAMERAAXIS);
         resetCameraAxis.addActionListener(new Actions.ResetCameraAxis());
 
-        JideButton rotate90Button = toolButton(ROTATE90);
-        JPopupMenu rotate90Popup = new JPopupMenu();
-        rotate90Popup.add(new Actions.Rotate90Camera("X Axis", Quat.X90));
-        rotate90Popup.add(new Actions.Rotate90Camera("Y Axis", Quat.Y90));
-        rotate90Popup.add(new Actions.Rotate90Camera("Z Axis", Quat.Z90));
-
-        rotate90Button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                rotate90Popup.show(e.getComponent(), 0, e.getComponent().getHeight());
-            }
-        });
+        JideSplitButton rotate90Button = toolSplitButton(ROTATE90);
+        rotate90Button.add(new Actions.Rotate90Camera("X Axis", Quat.X90));
+        rotate90Button.add(new Actions.Rotate90Camera("Y Axis", Quat.Y90));
+        rotate90Button.add(new Actions.Rotate90Camera("Z Axis", Quat.Z90));
 
         addButton(zoomIn);
         addButton(zoomOut);
         addButton(zoomFit);
         addButton(zoomOne);
-        add(new JToolBar.Separator(dim));
-        addButton(rotate90Button);
-        addButton(resetCameraAxis);
+        addSeparator(dim);
         addButton(resetCamera);
-        add(new JToolBar.Separator(dim));
+        addButton(resetCameraAxis);
+        addButton(rotate90Button);
+        addSeparator(dim);
 
         // Interaction
         ButtonGroup group = new ButtonGroup();
@@ -198,7 +199,7 @@ public final class ToolBar extends JToolBar {
         addButton(pan);
         addButton(rotate);
         addButton(axis);
-        add(new JToolBar.Separator(dim));
+        addSeparator(dim);
 
         switch (interactionMode) {
             case PAN -> pan.setSelected(true);
@@ -236,30 +237,18 @@ public final class ToolBar extends JToolBar {
         addButton(diffRotationButton);
         addButton(coronaButton);
         addButton(multiviewButton);
-        add(new JToolBar.Separator(dim));
+        addSeparator(dim);
 
-        JideButton projectionButton = toolButton(PROJECTION);
-        addButton(projectionButton);
-
-        JPopupMenu projectionPopup = new JPopupMenu();
+        JideSplitButton projectionButton = toolSplitButton(PROJECTION);
         ButtonGroup projectionGroup = new ButtonGroup();
         for (ProjectionMode el : ProjectionMode.values()) {
-            projectionPopup.add(el.radio);
             projectionGroup.add(el.radio);
+            projectionButton.add(el.radio);
         }
         ProjectionMode.Orthographic.radio.setSelected(true);
+        addButton(projectionButton);
 
-        projectionButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                projectionPopup.show(e.getComponent(), 0, e.getComponent().getHeight());
-            }
-        });
-
-        JideButton anotationButton = toolButton(ANNOTATION);
-        addButton(anotationButton);
-
-        JPopupMenu annotationPopup = new JPopupMenu();
+        JideSplitButton anotationButton = toolSplitButton(ANNOTATION);
         ButtonGroup annotationGroup = new ButtonGroup();
         for (Interaction.AnnotationMode mode : Interaction.AnnotationMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
@@ -267,29 +256,22 @@ public final class ToolBar extends JToolBar {
                 item.setSelected(true);
             item.addActionListener(e -> JHVFrame.getInteraction().setAnnotationMode(mode));
             annotationGroup.add(item);
-            annotationPopup.add(item);
+            anotationButton.add(item);
         }
+        anotationButton.addSeparator();
+        anotationButton.add(new Actions.ClearAnnotations());
+        anotationButton.addSeparator();
+        anotationButton.add(new Actions.ZoomFOVAnnotation());
+        addButton(anotationButton);
 
-        annotationPopup.addSeparator();
-        annotationPopup.add(new Actions.ClearAnnotations());
-        annotationPopup.addSeparator();
-        annotationPopup.add(new Actions.ZoomFOVAnnotation());
-
-        anotationButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                annotationPopup.show(e.getComponent(), 0, e.getComponent().getHeight());
-            }
-        });
-
-        add(new JToolBar.Separator(dim));
+        addSeparator(dim);
 
         refreshButton = toolToggleButton(REFRESH);
         refreshButton.setSelected(ImageLayers.getRefreshMode());
         refreshButton.addItemListener(e -> ImageLayers.setRefreshMode(refreshButton.isSelected()));
         addButton(refreshButton);
 
-        add(new JToolBar.Separator(dim));
+        addSeparator(dim);
 
         JideButton cutOut = toolButton(CUTOUT);
         cutOut.addActionListener(new Actions.SDOCutOut());
@@ -301,7 +283,7 @@ public final class ToolBar extends JToolBar {
             addButton(samp);
         }
 
-        add(new JToolBar.Separator(dim));
+        addSeparator(dim);
 /*
         ButtonText hText = new ButtonText("HAPI", "HAPI", "HAPI");
         JideButton hButton = toolButton(hText);
@@ -317,7 +299,7 @@ public final class ToolBar extends JToolBar {
 */
     }
 
-    private void addButton(JideButton b) {
+    private void addButton(AbstractButton b) {
         b.setFocusPainted(false);
         add(b);
     }
