@@ -8,13 +8,13 @@ import java.awt.event.MouseEvent;
 //import java.util.LinkedHashMap;
 //import java.util.Map;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
-import javax.swing.AbstractButton;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;

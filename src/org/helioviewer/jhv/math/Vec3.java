@@ -48,16 +48,12 @@ public class Vec3 {
         z = 0;
     }
 
-    public void plus(Vec3 vec) {
-        x += vec.x;
-        y += vec.y;
-        z += vec.z;
+    public static Vec3 add(Vec3 u, Vec3 v) {
+        return new Vec3(u.x + v.x, u.y + v.y, u.z + v.z);
     }
 
-    public void minus(Vec3 vec) {
-        x -= vec.x;
-        y -= vec.y;
-        z -= vec.z;
+    public static Vec3 subtract(Vec3 u, Vec3 v) {
+        return new Vec3(u.x - v.x, u.y - v.y, u.z - v.z);
     }
 
     public static Vec3 multiply(Vec3 vec1, double s) {
@@ -101,7 +97,7 @@ public class Vec3 {
             return;
 
         // errors up to 2ulp found in testing
-        len = Math.nextAfter(len, len + 1.0);
+        len = Math.nextUp(len);
         x /= len;
         y /= len;
         z /= len;
