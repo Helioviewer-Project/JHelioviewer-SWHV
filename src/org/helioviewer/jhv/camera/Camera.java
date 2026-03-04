@@ -23,7 +23,6 @@ public class Camera {
         KEEP_TRANSFORM
     }
 
-    public static final double ZOOM_MULTIPLIER_WHEEL = 2.;
     public static final double ZOOM_MULTIPLIER_BUTTON = 2.;
 
     public static final double INITFOV = Math.PI / 180.;
@@ -31,8 +30,8 @@ public class Camera {
     private static final double MAX_FOV = INITFOV * 120;
     private double fov = INITFOV;
 
+    private Vec2 translation = Vec2.ZERO;
     private Quat rotation = Quat.ZERO;
-    private final Vec2 translation = new Vec2(0, 0);
     private Quat dragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
@@ -100,8 +99,7 @@ public class Camera {
     }
 
     public void reset() {
-        translation.x = 0;
-        translation.y = 0;
+        translation = Vec2.ZERO;
         dragRotation = Quat.ZERO;
 
         updateCamera(Movie.getTime());
@@ -130,8 +128,7 @@ public class Camera {
     }
 
     public void setTranslation(double x, double y) {
-        translation.x = x;
-        translation.y = y;
+        translation = new Vec2(x, y);
     }
 
     public Quat getDragRotation() {
@@ -186,19 +183,18 @@ public class Camera {
 
     public JSONObject toJson() {
         JSONObject jo = new JSONObject();
+        jo.put("translation", translation.toJson());
         jo.put("dragRotation", dragRotation.toJson());
-        jo.put("translationX", translation.x);
-        jo.put("translationY", translation.y);
         jo.put("fov", fov);
         return jo;
     }
 
     public void fromJson(JSONObject jo) {
-        JSONArray ja = jo.optJSONArray("dragRotation");
-        if (ja != null)
-            dragRotation = Quat.fromJson(ja);
-        translation.x = jo.optDouble("translationX", translation.x);
-        translation.y = jo.optDouble("translationY", translation.y);
+        JSONArray ja;
+        ja = jo.optJSONArray("translation");
+        if (ja != null) translation = Vec2.fromJson(ja);
+        ja = jo.optJSONArray("dragRotation");
+        if (ja != null) dragRotation = Quat.fromJson(ja);
         setFOV(jo.optDouble("fov", fov));
         updateRotation();
     }
