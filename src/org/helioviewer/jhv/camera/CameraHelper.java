@@ -8,7 +8,6 @@ import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
 public class CameraHelper {
@@ -25,14 +24,12 @@ public class CameraHelper {
 
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
         double width = camera.getCameraWidth();
-        Vec2 translation = camera.getTranslation();
-        return computeNormalizedX(vp, screenX) * width * vp.aspect - translation.x;
+        return computeNormalizedX(vp, screenX) * width * vp.aspect - camera.getTranslationX();
     }
 
     public static double computeUpY(Camera camera, Viewport vp, double screenY) {
         double width = camera.getCameraWidth();
-        Vec2 translation = camera.getTranslation();
-        return computeNormalizedY(vp, screenY) * width - translation.y;
+        return computeNormalizedY(vp, screenY) * width - camera.getTranslationY();
     }
 
     public static double getPixelFactor(Camera camera, Viewport vp) {
@@ -57,9 +54,8 @@ public class CameraHelper {
 
     static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
         double width = camera.getCameraWidth();
-        Vec2 translation = camera.getTranslation();
-        double tx = translation.x;
-        double ty = translation.y;
+        double tx = camera.getTranslationX();
+        double ty = camera.getTranslationY();
         double widthAspect = width * vp.aspect;
         double halfRadius2 = 0.5 * refRadius2;
 

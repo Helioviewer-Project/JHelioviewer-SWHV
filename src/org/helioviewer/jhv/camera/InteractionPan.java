@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.Vec2;
 
 class InteractionPan implements Interaction.Type {
 
@@ -34,9 +33,8 @@ class InteractionPan implements Interaction.Type {
         lastX = e.getX();
         lastY = e.getY();
 
-        Vec2 pan = camera.getTranslation();
         double m = 1 / CameraHelper.getImagePixelFactor(camera, Display.getActiveViewport());
-        camera.setTranslation(pan.x + x * m, pan.y - y * m);
+        camera.setTranslation(camera.getTranslationX() + x * m, camera.getTranslationY() - y * m);
         MovieDisplay.display();
     }
 
