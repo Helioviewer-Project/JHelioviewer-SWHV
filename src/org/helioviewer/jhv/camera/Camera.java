@@ -124,8 +124,12 @@ public class Camera {
         }
     }
 
-    public Vec2 getTranslation() {
-        return translation;
+    double getTranslationX() {
+        return translation.x;
+    }
+
+    double getTranslationY() {
+        return translation.y;
     }
 
     public void setTranslation(double x, double y) {
