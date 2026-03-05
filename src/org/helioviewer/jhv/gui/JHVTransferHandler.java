@@ -86,9 +86,9 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
 
     private static void loadData(List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
         EventQueue.invokeLater(() -> {
-            Load.Image.getAll(imageUris);
-            Load.SunJSON.getAll(jsonUris);
-            Load.CDF.getAll(cdfUris);
+            Load.getAllCDF(cdfUris);
+            Load.getAllImage(imageUris);
+            Load.getAllSunJSON(jsonUris);
         });
     }
 

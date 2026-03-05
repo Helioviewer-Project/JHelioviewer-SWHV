@@ -10,45 +10,41 @@ import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 
 public interface Load {
 
+    static void getAllCDF(@Nonnull List<URI> uris) {
+        if (!uris.isEmpty()) {
+            LoadRequest.submitCDF(uris);
+        }
+    }
+
+    static void getCDF(@Nonnull URI uri) {
+        getAllCDF(List.of(uri));
+    }
+
+    static void getAllImage(@Nonnull List<URI> uris) {
+        if (!uris.isEmpty()) {
+            LoadLayer.submit(ImageLayer.create(null), uris);
+        }
+    }
+
+    static void getImage(@Nonnull URI uri) {
+        getAllImage(List.of(uri));
+    }
+
+    static void getAllSunJSON(@Nonnull List<URI> uris) {
+        if (!uris.isEmpty()) {
+            LoadSunJSON.submit(uris);
+        }
+    }
+
     void get(@Nonnull URI uri);
 
-    interface LoadString extends Load {
-        void get(@Nonnull String string);
-    }
+    void get(@Nonnull String string);
 
-    Load cdf = new CDF();
-    Load image = new Image();
-    LoadString request = new Request();
-    LoadString state = new State();
-    LoadString sunJSON = new SunJSON();
+    Load request = new Request();
+    Load state = new State();
+    Load sunJSON = new SunJSON();
 
-    class Image implements Load {
-        @Override
-        public void get(@Nonnull URI uri) {
-            FileUtils.listDirOrSingleOffEDT(uri, "JHV-LoadDirectory", Image::getAll);
-        }
-
-        public static void getAll(@Nonnull List<URI> uris) {
-            if (!uris.isEmpty()) {
-                LoadLayer.submit(ImageLayer.create(null), uris);
-            }
-        }
-    }
-
-    class CDF implements Load {
-        @Override
-        public void get(@Nonnull URI uri) {
-            FileUtils.listDirOrSingleOffEDT(uri, "JHV-LoadDirectory", CDF::getAll);
-        }
-
-        public static void getAll(@Nonnull List<URI> uris) {
-            if (!uris.isEmpty()) {
-                LoadRequest.submitCDF(uris);
-            }
-        }
-    }
-
-    class Request implements LoadString {
+    class Request implements Load {
         @Override
         public void get(@Nonnull URI uri) {
             LoadRequest.submit(uri);
@@ -60,7 +56,7 @@ public interface Load {
         }
     }
 
-    class State implements LoadString {
+    class State implements Load {
         @Override
         public void get(@Nonnull URI uri) {
             LoadState.submit(uri);
@@ -72,17 +68,12 @@ public interface Load {
         }
     }
 
-    class SunJSON implements LoadString {
+    class SunJSON implements Load {
         @Override
         public void get(@Nonnull URI uri) {
-            getAll(List.of(uri));
+            getAllSunJSON(List.of(uri));
         }
 
-        public static void getAll(@Nonnull List<URI> uris) {
-            if (!uris.isEmpty()) {
-                LoadSunJSON.submit(uris);
-            }
-        }
 
         @Override
         public void get(@Nonnull String json) {

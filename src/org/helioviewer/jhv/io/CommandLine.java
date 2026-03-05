@@ -43,7 +43,7 @@ public class CommandLine {
     public static void load() {
         // -load
         for (URI uri : getURIOptionValues("-load")) {
-            Load.image.get(uri);
+            Load.getImage(uri);
         }
     }
 
