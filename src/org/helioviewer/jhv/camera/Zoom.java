@@ -9,10 +9,10 @@ class Zoom {
 
     private static final double SPEED_TOLERANCE = 0.0005;
     private static final double SPEED_LIMIT = 25;
-    private static final double ACCELERATION_LIMIT = 8;
-    private static final double VELOCITY_SMOOTHING = 0.66;
-    private static final double WHEEL_NOISE_TOLERANCE = 0.08;
-    private static final double REVERSE_WHEEL_TOLERANCE = 0.18;
+    private static final double ACCELERATION_LIMIT = 4;
+    private static final double VELOCITY_SMOOTHING = 0.75;
+    private static final double WHEEL_NOISE_TOLERANCE = 0.04;
+    private static final double REVERSE_WHEEL_TOLERANCE = 0.14;
     private static final double ZERO_CROSS_VELOCITY_TOLERANCE = 0.12;
 
     private double velocity = 0;
@@ -38,15 +38,16 @@ class Zoom {
         }
 
         double absWheel = Math.abs(wheel);
-        // Input denoising: drop tiny deltas and weak opposite-sign spikes from touchpads.
-        if (absWheel < WHEEL_NOISE_TOLERANCE ||
-                (lastWheelDelta != 0 && wheel * lastWheelDelta < 0 && absWheel < REVERSE_WHEEL_TOLERANCE)) {
+        // Input denoising: soften tiny deltas and drop weak opposite-sign spikes from touchpads.
+        if (absWheel < WHEEL_NOISE_TOLERANCE) {
+            wheel *= absWheel / WHEEL_NOISE_TOLERANCE;
+        } else if (lastWheelDelta != 0 && wheel * lastWheelDelta < 0 && absWheel < REVERSE_WHEEL_TOLERANCE) {
             wheel = 0;
         }
 
         // No wheel impulse: apply decay so zoom naturally comes to rest.
         if (wheel == 0) {
-            velocity *= 0.5;
+            velocity *= 0.68;
             if (Math.abs(velocity) < SPEED_TOLERANCE) {
                 velocity = 0;
                 lastWheelDelta = 0;
