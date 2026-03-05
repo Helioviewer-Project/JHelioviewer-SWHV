@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -26,11 +25,7 @@ public interface Load {
     class Image implements Load {
         @Override
         public void get(@Nonnull URI uri) {
-            try {
-                getAll(FileUtils.listDir(Path.of(uri)));
-            } catch (Exception e) { // remote
-                getAll(List.of(uri));
-            }
+            FileUtils.listDirOrSingleOffEDT(uri, "JHV-LoadDirectory", Image::getAll);
         }
 
         public static void getAll(@Nonnull List<URI> uris) {
@@ -43,7 +38,7 @@ public interface Load {
     class CDF implements Load {
         @Override
         public void get(@Nonnull URI uri) {
-            getAll(List.of(uri));
+            FileUtils.listDirOrSingleOffEDT(uri, "JHV-LoadDirectory", CDF::getAll);
         }
 
         public static void getAll(@Nonnull List<URI> uris) {

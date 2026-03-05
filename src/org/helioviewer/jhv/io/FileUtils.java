@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -20,10 +21,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.threads.JHVThread;
 
 import okio.Okio;
 import okio.BufferedSource;
@@ -155,6 +158,31 @@ public class FileUtils {
         try (Stream<Path> stream = Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
             return stream.map(Path::toUri).toList();
         }
+    }
+
+    private static List<URI> listDirOrSingle(URI uri) throws IOException {
+        Path path;
+        try {
+            path = Path.of(uri);
+        } catch (Exception e) {
+            return List.of(uri);
+        }
+
+        if (!Files.isDirectory(path))
+            return List.of(uri);
+        return listDir(path);
+    }
+
+    public static void listDirOrSingleOffEDT(URI uri, String threadName, Consumer<List<URI>> callback) {
+        JHVThread.create(() -> {
+            List<URI> uris = List.of(uri);
+            try {
+                uris = listDirOrSingle(uri);
+            } catch (Exception ignore) {
+            }
+            List<URI> loadUris = uris;
+            EventQueue.invokeLater(() -> callback.accept(loadUris));
+        }, threadName).start();
     }
 
     private static final String lockSuffix = ".lck";
