@@ -23,8 +23,8 @@ public class Camera {
         KEEP_TRANSFORM
     }
 
-    public static final double ZOOM_MULTIPLIER_BUTTON = 2.;
-    private static final double ZOOM_STEP = 0.015;
+    public static final double ZOOM_MULTIPLIER_BUTTON = 1;
+    private static final double ZOOM_STEP = 0.005;
 
     public static final double INITFOV = Math.PI / 180.;
     private static final double MIN_FOV = INITFOV / 360;

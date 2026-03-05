@@ -9,11 +9,8 @@ class Zoom {
 
     private static final double SPEED_TOLERANCE = 0.0005;
     private static final double SPEED_LIMIT = 25;
-    private static final double ACCELERATION_LIMIT = 4;
-    private static final double VELOCITY_SMOOTHING = 0.75;
-    private static final double WHEEL_NOISE_TOLERANCE = 0.04;
-    private static final double REVERSE_WHEEL_TOLERANCE = 0.14;
-    private static final double ZERO_CROSS_VELOCITY_TOLERANCE = 0.12;
+    private static final double ACCELERATION_LIMIT = 2;
+    private static final double VELOCITY_SMOOTHING = 0.80;
 
     private double velocity = 0;
     private double lastWheelDelta = 0;
@@ -22,40 +19,7 @@ class Zoom {
         if (wheelDelta == 0) {
             return;
         }
-
-        double wheel = wheelDelta;
-        // Reversal guard: brake or reset first so we do not "coast" in the old direction.
-        if (velocity != 0 && wheel * velocity < 0) {
-            if (Math.abs(wheel) < REVERSE_WHEEL_TOLERANCE) {
-                velocity *= 0.2;
-                if (Math.abs(velocity) < SPEED_TOLERANCE) {
-                    velocity = 0;
-                }
-                lastWheelDelta = 0;
-                return;
-            }
-            velocity = 0;
-        }
-
-        double absWheel = Math.abs(wheel);
-        // Input denoising: soften tiny deltas and drop weak opposite-sign spikes from touchpads.
-        if (absWheel < WHEEL_NOISE_TOLERANCE) {
-            wheel *= absWheel / WHEEL_NOISE_TOLERANCE;
-        } else if (lastWheelDelta != 0 && wheel * lastWheelDelta < 0 && absWheel < REVERSE_WHEEL_TOLERANCE) {
-            wheel = 0;
-        }
-
-        // No wheel impulse: apply decay so zoom naturally comes to rest.
-        if (wheel == 0) {
-            velocity *= 0.68;
-            if (Math.abs(velocity) < SPEED_TOLERANCE) {
-                velocity = 0;
-                lastWheelDelta = 0;
-                return;
-            }
-        } else if (applyWheel(wheel)) return;
-
-        if (velocity == 0) return;
+        if (applyWheel(wheelDelta)) return;
 
         camera.zoom(velocity);
         if (velocity < 0)
@@ -83,13 +47,13 @@ class Zoom {
             velocity = lastVelocity + ACCELERATION_LIMIT * MILLIS_PER_FRAME * Math.signum(acceleration);
         }
 
-        // Clamp speed and snap tiny near-zero sign flips to rest.
+        // Clamp speed and snap tiny values to rest.
         double absVelocity = Math.abs(velocity);
         if (absVelocity > SPEED_LIMIT) {
             velocity = SPEED_LIMIT * Math.signum(velocity);
             return false;
         }
-        if ((Math.signum(velocity) != Math.signum(lastVelocity) && absVelocity < ZERO_CROSS_VELOCITY_TOLERANCE) || absVelocity < SPEED_TOLERANCE) {
+        if (absVelocity < SPEED_TOLERANCE) {
             velocity = 0;
             return true;
         }
