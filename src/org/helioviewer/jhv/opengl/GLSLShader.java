@@ -20,8 +20,6 @@ abstract class GLSLShader {
         }
     }
 
-    private static int usedID; // track state
-
     private int progID;
     private int vertexID;
     private int fragmentID;
@@ -52,8 +50,7 @@ abstract class GLSLShader {
     }
 
     protected final void _dispose(GL3 gl) {
-        if (progID != 0 && usedID == progID) {
-            usedID = 0;
+        if (progID != 0) {
             gl.glUseProgram(0);
         }
         if (vertexID != 0) {
@@ -71,10 +68,7 @@ abstract class GLSLShader {
     }
 
     public final void use(GL3 gl) {
-        if (progID != usedID) {
-            usedID = progID;
-            gl.glUseProgram(progID);
-        }
+        gl.glUseProgram(progID);
     }
 
     protected abstract void initUniforms(GL3 gl, int id);
