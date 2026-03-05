@@ -31,13 +31,14 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
                 e.getClickCount(), e.isPopupTrigger(), e.getButton());
     }
 
+    /* Could be useful if pointer position would matter
     private static MouseWheelEvent synthesizeMouseWheel(MouseWheelEvent e) {
         return new MouseWheelEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
                 (int) (e.getX() * GLInfo.pixelScale[0] + .5),
                 (int) (e.getY() * GLInfo.pixelScale[1] + .5),
                 e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
     }
-
+    */
 
     @Override
     public void mouseClicked(MouseEvent e1) {
@@ -94,10 +95,10 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e1) {
-        MouseWheelEvent e = synthesizeMouseWheel(e1);
-        Display.setActiveViewport(e.getX(), e.getY());
-        interaction.mouseWheelMoved(e);
-        mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e));
+        // MouseWheelEvent e = synthesizeMouseWheel(e1);
+        // Display.setActiveViewport(e.getX(), e.getY());
+        interaction.mouseWheelMoved(e1);
+        mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e1));
     }
 
     @Override
