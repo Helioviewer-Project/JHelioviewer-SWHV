@@ -59,10 +59,12 @@ public class ImageBuffer {
         if (p == BAD_PIXEL)
             return BAD_PIXEL;
 
-        if (lut != null)
-            return lut[p];
-        if (metaLUT != null)
-            return metaLUT[p];
+        if (lut != null) {
+            return lut[Math.clamp(p, 0, lut.length - 1)];
+        }
+        if (metaLUT != null) {
+            return metaLUT[Math.clamp(p, 0, metaLUT.length - 1)];
+        }
         return p;
     }
 
