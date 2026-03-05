@@ -23,11 +23,6 @@ public class Vec3 {
         }
 
         @Override
-        public double length2() {
-            return 1;
-        }
-
-        @Override
         public void normalize() {
         }
     }
@@ -83,12 +78,8 @@ public class Vec3 {
         return absmax * Math.sqrt(tmpx * tmpx + tmpy * tmpy + tmpz * tmpz);
     }
 
-    public double length2() {
-        return x * x + y * y + z * z;
-    }
-
     public void normalize() {
-        double len = Math.sqrt(x * x + y * y + z * z);
+        double len = Math.sqrt(x * x + y * y + z * z); // length();
         if (len == 0.0)
             return;
 

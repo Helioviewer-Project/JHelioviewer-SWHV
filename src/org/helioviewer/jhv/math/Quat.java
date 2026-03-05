@@ -79,7 +79,7 @@ public class Quat {
                 q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z,
                 q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
                 q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z,
-                q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x);
+                q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x); // .normalize();
     }
 
     public static Quat rotateWithConjugate(Quat q1, Quat q2) {
@@ -87,7 +87,7 @@ public class Quat {
                 q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z,
                 -q1.w * q2.x + q1.x * q2.w - q1.y * q2.z + q1.z * q2.y,
                 -q1.w * q2.y + q1.y * q2.w - q1.z * q2.x + q1.x * q2.z,
-                -q1.w * q2.z + q1.z * q2.w - q1.x * q2.y + q1.y * q2.x);
+                -q1.w * q2.z + q1.z * q2.w - q1.x * q2.y + q1.y * q2.x); // .normalize();
     }
 
     /*
@@ -121,14 +121,15 @@ public class Quat {
             return result;
         }
     */
-    private Quat normalize() {
+
+    public Quat normalize() {
         double l = Math.sqrt(w * w + x * x + y * y + z * z);
         return l == 0 ? this : new Quat(w / l, x / l, y / l, z / l);
     }
 
     public Quat twist(Vec3 v) {
         double m = x * v.x + y * v.y + z * v.z; // / v.length(); assume v normalized
-        return new Quat(w, m * v.x, m * v.y, m * v.z).normalize();
+        return new Quat(w, m * v.x, m * v.y, m * v.z).normalize(); // required
         // swing = rotateWithConjugate(q, twist(q))
     }
 
