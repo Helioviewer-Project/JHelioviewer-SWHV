@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 
 import okio.Okio;
@@ -178,7 +179,8 @@ public class FileUtils {
             List<URI> uris = List.of(uri);
             try {
                 uris = listDirOrSingle(uri);
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                Log.warn("Error reading directory: " + uri, e);
             }
             List<URI> loadUris = uris;
             EventQueue.invokeLater(() -> callback.accept(loadUris));

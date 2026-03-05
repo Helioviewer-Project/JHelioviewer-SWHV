@@ -111,7 +111,7 @@ public class SampClient extends HubConnector {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> Load.image.get(uri));
+                EventQueue.invokeLater(() -> Load.getImage(uri));
             }
         }));
         // load VOTable only from SOAR
@@ -130,7 +130,7 @@ public class SampClient extends HubConnector {
                 Object url = msg.getParam("url");
                 if (url != null) {
                     URI uri = toURI(url.toString());
-                    EventQueue.invokeLater(() -> Load.image.get(uri));
+                    EventQueue.invokeLater(() -> Load.getImage(uri));
                 }
             }
         }));
@@ -139,7 +139,7 @@ public class SampClient extends HubConnector {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> Load.cdf.get(uri));
+                EventQueue.invokeLater(() -> Load.getCDF(uri));
             }
         }));
         addMessageHandler(new JHVSampHandler("jhv.load.image", (sender, msg) -> {
@@ -147,13 +147,13 @@ public class SampClient extends HubConnector {
             JSONArray ja = jo.optJSONArray("url");
             if (ja == null) {
                 URI uri = toURI(jo.optString("url"));
-                EventQueue.invokeLater(() -> Load.image.get(uri));
+                EventQueue.invokeLater(() -> Load.getImage(uri));
             } else {
                 ArrayList<URI> uris = new ArrayList<>(ja.length());
                 for (Object obj : ja) {
                     uris.add(toURI(obj.toString()));
                 }
-                EventQueue.invokeLater(() -> Load.Image.getAll(uris));
+                EventQueue.invokeLater(() -> Load.getAllImage(uris));
             }
         }));
         // Add handler for the HAPI csv files
@@ -179,7 +179,7 @@ public class SampClient extends HubConnector {
         setAutoconnect(10);
     }
 
-    private static AbstractMessageHandler inlineHandler(String type, Load.LoadString loader) {
+    private static AbstractMessageHandler inlineHandler(String type, Load loader) {
         return new JHVSampHandler(type, (sender, msg) -> {
             Object url = msg.getParam("url");
             if (url != null) {

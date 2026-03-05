@@ -63,8 +63,8 @@ public class SoarClient {
                 Log.warn(e);
             }
         }
-        Load.CDF.getAll(cdfUris);
-        Load.Image.getAll(imageUris);
+        Load.getAllCDF(cdfUris);
+        Load.getAllImage(imageUris);
     }
 
     static void submitTable(@Nonnull URI uri) {
