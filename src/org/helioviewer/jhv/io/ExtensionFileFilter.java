@@ -12,7 +12,7 @@ public class ExtensionFileFilter {
             "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".fits.gz\", \".jp2\", \".jpx\", \".zip\")"));
     public static final FilenameFilter Timeline = new Filter(new ExtensionFilter(
             new String[]{"json", "cdf"},
-            "All supported files (\".jpg\", \".cdf\")"));
+            "All supported files (\".json\", \".cdf\")"));
     public static final FilenameFilter JHV = new Filter(new ExtensionFilter(
             new String[]{"jhv"},
             "State files (\".jhv\")"));
