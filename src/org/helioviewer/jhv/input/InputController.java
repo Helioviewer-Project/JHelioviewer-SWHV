@@ -36,7 +36,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         return new MouseWheelEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
                 (int) (e.getX() * GLInfo.pixelScale[0] + .5),
                 (int) (e.getY() * GLInfo.pixelScale[1] + .5),
-                e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
+                e.getXOnScreen(), e.getYOnScreen(),
+                e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(),
+                e.getWheelRotation(), e.getPreciseWheelRotation());
     }
     */
 

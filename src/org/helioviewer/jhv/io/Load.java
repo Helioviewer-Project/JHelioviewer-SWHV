@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.io;
 
+import java.awt.EventQueue;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
+import org.helioviewer.jhv.threads.JHVThread;
 
 public interface Load {
 
@@ -27,10 +30,23 @@ public interface Load {
         @Override
         public void get(@Nonnull URI uri) {
             try {
-                getAll(FileUtils.listDir(Path.of(uri)));
-            } catch (Exception e) { // remote
-                getAll(List.of(uri));
+                Path path = Path.of(uri);
+                if (Files.isDirectory(path)) {
+                    JHVThread.create(() -> {
+                        List<URI> uris = List.of(uri);
+                        try {
+                            uris = FileUtils.listDir(path);
+                        } catch (Exception ignore) {
+                        }
+                        List<URI> loadUris = uris;
+                        EventQueue.invokeLater(() -> getAll(loadUris));
+                    }, "JHV-LoadImageDir").start();
+                    return;
+                }
+            } catch (Exception ignore) { // remote
             }
+
+            getAll(List.of(uri));
         }
 
         public static void getAll(@Nonnull List<URI> uris) {
