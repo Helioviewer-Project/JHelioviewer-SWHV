@@ -24,6 +24,7 @@ public class Camera {
     }
 
     public static final double ZOOM_MULTIPLIER_BUTTON = 2.;
+    private static final double ZOOM_STEP = 0.015;
 
     public static final double INITFOV = Math.PI / 180.;
     private static final double MIN_FOV = INITFOV / 360;
@@ -172,7 +173,7 @@ public class Camera {
     }
 
     public void zoom(double wr) {
-        setFOV(fov * (1 + 0.015 * wr));
+        setFOV(fov * Math.exp(ZOOM_STEP * wr)); // smoother, direction-symmetric zooming via exponential scaling
     }
 
     public void timeChanged(JHVTime date) {
