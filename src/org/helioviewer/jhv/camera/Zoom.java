@@ -63,9 +63,9 @@ class Zoom {
 
         if (mVelocity != 0) {
             camera.zoom(mVelocity);
-            if (mVelocity > 0) {
+            if (mVelocity < 0)
                 MovieDisplay.render(1);
-            } else
+            else
                 MovieDisplay.display();
         }
     }
