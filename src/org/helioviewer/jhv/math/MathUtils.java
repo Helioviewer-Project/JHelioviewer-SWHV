@@ -96,25 +96,30 @@ public class MathUtils {
         return x;
     }
 
-    // https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
-    public static double pow(double a, double b) {
-        // exponentiation by squaring
-        double r = 1.0;
-        int exp = (int) b;
-        double base = a;
-        while (exp != 0) {
-            if ((exp & 1) != 0) {
-                r *= base;
+    /*
+        // https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
+        public static double pow(double a, double b) {
+            if (b < 0)
+                throw new RuntimeException("Attempt to call pow() with negative exponent: " + b);
+
+            // exponentiation by squaring
+            double r = 1.0;
+            int exp = (int) b;
+            double base = a;
+            while (exp != 0) {
+                if ((exp & 1) != 0) {
+                    r *= base;
+                }
+                base *= base;
+                exp >>= 1;
             }
-            base *= base;
-            exp >>= 1;
+            // use the IEEE 754 trick for the fraction of the exponent, 1065307417 for float
+            double b_faction = b - (int) b;
+            long tmp = Double.doubleToLongBits(a);
+            long tmp2 = (long) (b_faction * (tmp - 4606921280493453312L)) + 4606921280493453312L;
+            return r * Double.longBitsToDouble(tmp2);
         }
-        // use the IEEE 754 trick for the fraction of the exponent, 1065307417 for float
-        double b_faction = b - (int) b;
-        long tmp = Double.doubleToLongBits(a);
-        long tmp2 = (long) (b_faction * (tmp - 4606921280493453312L)) + 4606921280493453312L;
-        return r * Double.longBitsToDouble(tmp2);
-    }
+    */
 
     public static double asinh(double x) {
         return Math.log(x + Math.sqrt(x * x + 1));

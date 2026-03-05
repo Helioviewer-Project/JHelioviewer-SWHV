@@ -194,7 +194,7 @@ public class Camera {
         ja = jo.optJSONArray("translation");
         if (ja != null) translation = Vec2.fromJson(ja);
         ja = jo.optJSONArray("dragRotation");
-        if (ja != null) dragRotation = Quat.fromJson(ja);
+        if (ja != null) dragRotation = Quat.fromJson(ja).normalize();
         setFOV(jo.optDouble("fov", fov));
         updateRotation();
     }
