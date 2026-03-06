@@ -4,12 +4,12 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.json.JSONObject;
 
 public class AnnotateCircle extends AbstractAnnotateable {
@@ -44,7 +44,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.x = center.x + cosr * u.x + sinr * v.x;
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
-            previous = GLHelper.drawProjectedVertex(q, vp, vx, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
+            previous = Display.mode.drawProjectedVertex(q, vp, vx, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
         }
     }
 

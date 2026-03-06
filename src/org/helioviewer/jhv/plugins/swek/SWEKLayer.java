@@ -38,7 +38,6 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
@@ -197,7 +196,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     pt.x = xnew / r;
                     pt.y = ynew / r;
                     pt.z = znew / r;
-                    previous = GLHelper.drawProjectedVertex(q, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
+                    previous = Display.mode.drawProjectedVertex(q, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
