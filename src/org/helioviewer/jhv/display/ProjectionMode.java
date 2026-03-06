@@ -41,6 +41,21 @@ public enum ProjectionMode {
             }
             return previous;
         }
+
+        @Override
+        public Position projectionViewpoint(Position viewpoint) {
+            return viewpoint;
+        }
+
+        @Override
+        public Quat mouseRotation(Camera camera, GridType gridType) {
+            return camera.getViewpoint().toQuat();
+        }
+
+        @Override
+        public Vec3 unprojectMousePoint(Camera camera, Viewport vp, double x, double y, Quat rotation, GridType gridType, boolean correctDrag) {
+            return CameraHelper.getVectorFromSphere(camera, vp, x, y, rotation, correctDrag);
+        }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
         @Override
@@ -102,12 +117,14 @@ public enum ProjectionMode {
     }
 
     public Position projectionViewpoint(Position viewpoint) {
-        return this == Orthographic ? viewpoint : new Position(viewpoint.time, Sun.MeanEarthDistance, viewpoint.lon, viewpoint.lat);
+        return new Position(viewpoint.time, Sun.MeanEarthDistance, viewpoint.lon, viewpoint.lat);
+    }
+
+    public Quat mouseRotation(Camera camera, GridType gridType) {
+        return gridType.toCarrington(camera.getViewpoint());
     }
 
     public Vec3 unprojectMousePoint(Camera camera, Viewport vp, double x, double y, Quat rotation, GridType gridType, boolean correctDrag) {
-        if (this == Orthographic)
-            return CameraHelper.getVectorFromSphere(camera, vp, x, y, rotation, correctDrag);
         return transformInverse(rotation, scale.mouseToGrid((int) x, (int) y, vp, camera, gridType));
     }
 
