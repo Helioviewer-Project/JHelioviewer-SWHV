@@ -7,7 +7,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
@@ -71,13 +70,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 computePointSun(Camera camera, int x, int y) {
-        if (Display.mode == ProjectionMode.Orthographic) {
-            Quat q = camera.getViewpoint().toQuat();
-            return CameraHelper.getVectorFromSphere(camera, Display.getActiveViewport(), x, y, q, true);
-        } else {
-            Quat q = Display.gridType.toCarrington(camera.getViewpoint()); //!
-            return Display.mode.transformInverse(q, Display.mode.scale.mouseToGrid(x, y, Display.getActiveViewport(), camera, Display.gridType));
-        }
+        return Display.mouseToWorld(camera, x, y, true);
     }
 
     @Nullable

@@ -2,6 +2,10 @@ package org.helioviewer.jhv.display;
 
 import javax.swing.JRadioButtonMenuItem;
 
+import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -71,6 +75,17 @@ public enum ProjectionMode {
     public abstract Vec2 transform(Quat q, Vec3 v);
 
     public abstract Vec3 transformInverse(Quat q, Vec2 pt);
+
+    public Position projectionViewpoint(Position viewpoint) {
+        return this == Orthographic ? viewpoint : new Position(viewpoint.time, Sun.MeanEarthDistance, viewpoint.lon, viewpoint.lat);
+    }
+
+    public Vec3 unprojectMousePoint(Camera camera, Viewport vp, double x, double y, Quat rotation, GridType gridType, boolean correctDrag) {
+        if (this == Orthographic)
+            return CameraHelper.getVectorFromSphere(camera, vp, x, y, rotation, correctDrag);
+
+        return transformInverse(rotation, scale.mouseToGrid((int) x, (int) y, vp, camera, gridType));
+    }
 
     private static Vec2 transformPolar(Vec3 v, GridScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
