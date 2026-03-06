@@ -11,7 +11,6 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -151,8 +150,7 @@ public class Camera {
     }
 
     public void resetDragRotationAxis() {
-        Vec3 axis = updateViewpoint == UpdateViewpoint.equatorial ? Vec3.ZAxis : Vec3.YAxis;
-        dragRotation = dragRotation.twist(axis);
+        dragRotation = dragRotation.twist(updateViewpoint.dragAxis());
         updateRotation();
     }
 
