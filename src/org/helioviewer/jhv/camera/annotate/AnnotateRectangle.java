@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.json.JSONObject;
 
 public class AnnotateRectangle extends AbstractAnnotateable {
@@ -34,28 +34,28 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         point2 = p2;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            previous = GLHelper.drawProjectedVertex(q, vp, pc, previous, buf, color, i == 0, false, radius);
+            previous = Display.mode.drawProjectedVertex(q, vp, pc, previous, buf, color, i == 0, false, radius);
         }
 
         point1 = p2;
         point2 = ep;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            previous = GLHelper.drawProjectedVertex(q, vp, pc, previous, buf, color, false, false, radius);
+            previous = Display.mode.drawProjectedVertex(q, vp, pc, previous, buf, color, false, false, radius);
         }
 
         point1 = ep;
         point2 = p4;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            previous = GLHelper.drawProjectedVertex(q, vp, pc, previous, buf, color, false, false, radius);
+            previous = Display.mode.drawProjectedVertex(q, vp, pc, previous, buf, color, false, false, radius);
         }
 
         point1 = p4;
         point2 = bp;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
-            previous = GLHelper.drawProjectedVertex(q, vp, pc, previous, buf, color, false, i == SUBDIVISIONS, radius);
+            previous = Display.mode.drawProjectedVertex(q, vp, pc, previous, buf, color, false, i == SUBDIVISIONS, radius);
         }
     }
 

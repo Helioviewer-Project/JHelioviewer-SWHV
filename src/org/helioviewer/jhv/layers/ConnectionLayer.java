@@ -32,7 +32,6 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
@@ -144,11 +143,11 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
         Vec2 previous = null;
         Vec3 first = hcs.getFirst();
-        previous = GLHelper.drawProjectedVertex(q, vp, first, previous, hcsBuf, Colors.Null, true, false, ORTHO_RADIUS);
+        previous = Display.mode.drawProjectedVertex(q, vp, first, previous, hcsBuf, Colors.Null, true, false, ORTHO_RADIUS);
         for (Vec3 v : hcs) {
-            previous = GLHelper.drawProjectedVertex(q, vp, v, previous, hcsBuf, hcsColor, false, false, ORTHO_RADIUS);
+            previous = Display.mode.drawProjectedVertex(q, vp, v, previous, hcsBuf, hcsColor, false, false, ORTHO_RADIUS);
         }
-        GLHelper.drawProjectedVertex(q, vp, first, previous, hcsBuf, hcsColor, false, true, ORTHO_RADIUS);
+        Display.mode.drawProjectedVertex(q, vp, first, previous, hcsBuf, hcsColor, false, true, ORTHO_RADIUS);
 
         hcsLine.setVertex(gl, hcsBuf);
         hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);

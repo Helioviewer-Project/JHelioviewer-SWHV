@@ -3,12 +3,12 @@ package org.helioviewer.jhv.camera.annotate;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.json.JSONObject;
 
 public class AnnotateCross extends AbstractAnnotateable {
@@ -34,7 +34,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
-            previous = GLHelper.drawProjectedVertex(q, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
+            previous = Display.mode.drawProjectedVertex(q, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
         }
     }
 
