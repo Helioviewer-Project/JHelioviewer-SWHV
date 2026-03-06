@@ -27,7 +27,6 @@ import org.helioviewer.jhv.layers.connect.LoadConnectivity.Connectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
-import org.helioviewer.jhv.layers.connect.OrthoScaleList;
 import org.helioviewer.jhv.layers.connect.SunJSONTypes;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -67,7 +66,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private final JPanel optionsPanel;
 
     private Connectivity connectivity;
-    private OrthoScaleList hcs;
+    private List<Vec3> hcs;
     private TimeMap<Position.Cartesian> footpointMap;
     private final TimeMap<SunJSONTypes.GeometryCollection> geometryMap = new TimeMap<>();
 
@@ -124,41 +123,32 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private static void putPointScale(Quat q, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
         Vec2 tf = Display.mode.transform(q, vertex);
         float x = (float) (tf.x * vp.aspect);
-        float y = (float) tf.y;
+        float y = (float) -tf.y; //!
         vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
     }
 
-    private static void putConnectivity(Quat q, Viewport vp, OrthoScaleList points, BufVertex vexBuf, byte[] color) {
+    private static void putConnectivity(Quat q, Viewport vp, List<Vec3> points, BufVertex vexBuf, byte[] color) {
         if (Display.mode == ProjectionMode.Orthographic)
-            points.ortho.forEach(v -> vexBuf.putVertex((float) v.x, (float) v.y, (float) v.z, 2 * SIZE_POINT, color));
+            points.forEach(v -> vexBuf.putVertex((float) v.x, (float) v.y, (float) v.z, 2 * SIZE_POINT, color));
         else
-            points.scale.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
+            points.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
     }
 
+    private static final double ORTHO_RADIUS = 1.01;
+
     private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
-        if (hcs.size == 0)
+        if (hcs.isEmpty())
             return;
-        if (Display.mode == ProjectionMode.Orthographic) {
-            Vec3 first = hcs.ortho.getFirst();
-            hcsBuf.putVertex(first, Colors.Null);
-            hcs.ortho.forEach(v -> hcsBuf.putVertex(v, hcsColor));
-            hcsBuf.putVertex(first, hcsColor);
-            hcsBuf.putVertex(first, Colors.Null);
-        } else {
-            Quat q = Display.gridType.toGrid(camera.getViewpoint());
-            Vec2 previous = null;
 
-            Vec3 first = hcs.scale.getFirst();
-            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
+        Quat q = Display.gridType.toGrid(camera.getViewpoint());
 
-            int size = hcs.scale.size();
-            for (int i = 0; i < size; i++) {
-                Vec3 v = hcs.scale.get(i);
-                previous = GLHelper.drawVertex(q, vp, v, previous, hcsBuf, hcsColor);
-            }
-            previous = GLHelper.drawVertex(q, vp, first, previous, hcsBuf, hcsColor);
-            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
+        Vec2 previous = null;
+        Vec3 first = hcs.getFirst();
+        previous = GLHelper.drawProjectedVertex(q, vp, first, previous, hcsBuf, Colors.Null, true, false, ORTHO_RADIUS);
+        for (Vec3 v : hcs) {
+            previous = GLHelper.drawProjectedVertex(q, vp, v, previous, hcsBuf, hcsColor, false, false, ORTHO_RADIUS);
         }
+        GLHelper.drawProjectedVertex(q, vp, first, previous, hcsBuf, hcsColor, false, true, ORTHO_RADIUS);
 
         hcsLine.setVertex(gl, hcsBuf);
         hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);
@@ -240,7 +230,6 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     @Override
     public void setConnectivity(Connectivity _connectivity) {
         connectivity = _connectivity;
-        // System.out.println(">>> SSW: " + connectivity.SSW.ortho.size() + " FSW: " + connectivity.FSW.ortho.size() + " M: " + connectivity.M.ortho.size());
         MovieDisplay.display();
     }
 
@@ -251,9 +240,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void setHCS(OrthoScaleList _hcs) {
+    public void setHCS(List<Vec3> _hcs) {
         hcs = _hcs;
-        // System.out.println(">>> HCS: " + hcs.ortho.size());
         MovieDisplay.display();
     }
 
