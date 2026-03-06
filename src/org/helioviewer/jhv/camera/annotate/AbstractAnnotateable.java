@@ -69,10 +69,6 @@ abstract class AbstractAnnotateable implements Annotateable {
         return toCart(y, z);
     }
 
-    static void putSphere(Vec3 v, BufVertex buf, byte[] color) {
-        buf.putVertex((float) (v.x * radius), (float) (v.y * radius), (float) (v.z * radius), 1, color);
-    }
-
     @Nullable
     static Vec3 computePointSun(Camera camera, int x, int y) {
         if (Display.mode == ProjectionMode.Orthographic) {
