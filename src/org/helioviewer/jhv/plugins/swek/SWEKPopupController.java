@@ -172,7 +172,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = Display.mode.transform(camera.getViewpoint().toQuat(), pt);
+                        tf = Display.mode.transform(camera.getViewpoint().toQuat(), new Vec3(pt.x, -pt.y, pt.z));
                     }
                 }
 
@@ -202,10 +202,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
 
     @Nullable
     private Vec3 getHitPoint(Viewport vp, int x, int y) {
-        Vec3 hp = CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().toQuat(), true);
-        if (hp != null)
-            hp.y = -hp.y;
-        return hp;
+        return CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().toQuat(), true);
     }
 
 }

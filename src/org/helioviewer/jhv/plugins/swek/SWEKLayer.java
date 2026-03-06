@@ -127,6 +127,10 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         buf.repeatVertex(Colors.Null);
     }
 
+    private static Vec3 toProjected(Vec3 pt) {
+        return new Vec3(pt.x, -pt.y, pt.z);
+    }
+
     private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -198,7 +202,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
                     if (Display.mode == ProjectionMode.Orthographic) {
                         float x = (float) (xnew / r);
-                        float y = -(float) (ynew / r);
+                        float y = (float) (ynew / r);
                         float z = (float) (znew / r);
                         if (j == 0) {
                             buf.putVertex(x, y, z, 1, Colors.Null);
@@ -206,7 +210,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                         buf.putVertex(x, y, z, 1, color);
                     } else {
                         pt.x = xnew / r;
-                        pt.y = ynew / r;
+                        pt.y = -(ynew / r);
                         pt.z = znew / r;
                         if (j == 0) {
                             previous = GLHelper.drawVertex(q, vp, pt, previous, buf, Colors.Null);
@@ -221,8 +225,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     private void drawImage3d(double x, double y, double z, double width, double height) {
-        y = -y;
-
         Vec3 targetDir = new Vec3(x, y, z);
         Quat q = Quat.rotate(Quat.createAxisY(Math.atan2(x, z)), Quat.createAxisX(-Math.asin(y / targetDir.length())));
 
@@ -272,7 +274,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.transform(q, pt);
+            Vec2 tf = Display.mode.transform(q, toProjected(pt));
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
