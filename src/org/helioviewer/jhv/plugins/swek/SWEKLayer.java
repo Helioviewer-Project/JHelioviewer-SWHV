@@ -127,10 +127,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         buf.repeatVertex(Colors.Null);
     }
 
-    private static Vec3 toProjected(Vec3 pt) {
-        return new Vec3(pt.x, -pt.y, pt.z);
-    }
-
     private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -258,7 +254,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.transform(q, toProjected(pt));
+            Vec2 tf = Display.mode.transform(q, new Vec3(pt.x, -pt.y, pt.z));
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
