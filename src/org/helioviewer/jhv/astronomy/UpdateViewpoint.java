@@ -5,11 +5,16 @@ import java.util.List;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
 public interface UpdateViewpoint {
 
     Position update(JHVTime time);
+
+    default Vec3 dragAxis() {
+        return Vec3.YAxis;
+    }
 
     UpdateViewpoint observer = new Observer();
     UpdateViewpoint earthFixedDistance = new EarthFixedDistance();
@@ -32,7 +37,12 @@ public interface UpdateViewpoint {
     }
 
     class Equatorial implements UpdateViewpoint {
-        private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(0.5 * Math.PI / 180);
+        private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(Math.toRadians(0.5));
+
+        @Override
+        public Vec3 dragAxis() {
+            return Vec3.ZAxis;
+        }
 
         @Override
         public Position update(JHVTime time) {
