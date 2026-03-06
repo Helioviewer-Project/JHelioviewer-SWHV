@@ -83,7 +83,6 @@ public enum ProjectionMode {
     public Vec3 unprojectMousePoint(Camera camera, Viewport vp, double x, double y, Quat rotation, GridType gridType, boolean correctDrag) {
         if (this == Orthographic)
             return CameraHelper.getVectorFromSphere(camera, vp, x, y, rotation, correctDrag);
-
         return transformInverse(rotation, scale.mouseToGrid((int) x, (int) y, vp, camera, gridType));
     }
 
