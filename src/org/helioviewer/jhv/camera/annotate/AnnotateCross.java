@@ -2,10 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -37,25 +34,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
-
-            if (Display.mode == ProjectionMode.Orthographic) {
-                if (i == 0) {
-                    putSphere(pc, buf, Colors.Null);
-                }
-                putSphere(pc, buf, color);
-                if (i == SUBDIVISIONS) {
-                    putSphere(pc, buf, Colors.Null);
-                }
-            } else {
-                pc.y = -pc.y;
-                if (i == 0) {
-                    GLHelper.drawVertex(q, vp, pc, previous, buf, Colors.Null);
-                }
-                previous = GLHelper.drawVertex(q, vp, pc, previous, buf, color);
-                if (i == SUBDIVISIONS) {
-                    GLHelper.drawVertex(q, vp, pc, previous, buf, Colors.Null);
-                }
-            }
+            previous = GLHelper.drawProjectedVertex(q, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
         }
     }
 

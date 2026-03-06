@@ -4,6 +4,7 @@ import java.awt.Point;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -71,6 +72,25 @@ public class GLHelper {
         x = (float) (tf.x * vp.aspect);
         vexBuf.putVertex(x, y, 0, 1, color);
         return tf;
+    }
+
+    public static Vec2 drawProjectedVertex(Quat q, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+        if (Display.mode == ProjectionMode.Orthographic) {
+            if (first)
+                vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
+            vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, color);
+            if (last)
+                vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
+            return previous;
+        }
+
+        Vec3 projected = new Vec3(vertex.x, -vertex.y, vertex.z);
+        if (first)
+            drawVertex(q, vp, projected, previous, vexBuf, Colors.Null);
+        Vec2 current = drawVertex(q, vp, projected, previous, vexBuf, color);
+        if (last)
+            drawVertex(q, vp, projected, current, vexBuf, Colors.Null);
+        return current;
     }
 
     public static GLCanvas createGLCanvas() {
