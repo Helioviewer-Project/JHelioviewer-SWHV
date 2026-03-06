@@ -282,7 +282,7 @@ class HEKParser {
 
         double x = Math.cos(theta) * Math.sin(phi);
         double z = Math.cos(theta) * Math.cos(phi);
-        double y = -Math.sin(theta);
+        double y = Math.sin(theta);
         return new Vec3(x, y, z);
     }
 
