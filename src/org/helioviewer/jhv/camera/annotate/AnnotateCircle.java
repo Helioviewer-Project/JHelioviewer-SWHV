@@ -37,7 +37,6 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
         Vec3 vx = new Vec3();
         Vec2 previous = null;
-
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double t = i * 2. * Math.PI / SUBDIVISIONS;
             double cosr = Math.cos(t) * r;
