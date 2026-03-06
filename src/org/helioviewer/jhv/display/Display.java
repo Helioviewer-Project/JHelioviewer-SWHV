@@ -55,7 +55,7 @@ public class Display {
 
     @Nullable
     public static Vec3 mouseToWorld(Camera camera, Viewport vp, int x, int y, boolean correctDrag) {
-        Quat rotation = mode == ProjectionMode.Orthographic ? camera.getViewpoint().toQuat() : gridType.toCarrington(camera.getViewpoint());
+        Quat rotation = mode.mouseRotation(camera, gridType);
         return mode.unprojectMousePoint(camera, vp, x, y, rotation, gridType, correctDrag);
     }
 
