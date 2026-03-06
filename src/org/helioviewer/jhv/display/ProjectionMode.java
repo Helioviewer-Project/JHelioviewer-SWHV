@@ -4,11 +4,14 @@ import javax.swing.JRadioButtonMenuItem;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 public enum ProjectionMode {
@@ -25,6 +28,18 @@ public enum ProjectionMode {
             double y = -pt.y;
             double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
             return q.rotateInverseVector(new Vec3(x, y, z));
+        }
+
+        @Override
+        public Vec2 drawProjectedVertex(Quat q, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+            if (first) {
+                vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
+            }
+            vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, color);
+            if (last) {
+                vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
+            }
+            return previous;
         }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
@@ -75,6 +90,16 @@ public enum ProjectionMode {
     public abstract Vec2 transform(Quat q, Vec3 v);
 
     public abstract Vec3 transformInverse(Quat q, Vec2 pt);
+
+    public Vec2 drawProjectedVertex(Quat q, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+        Vec3 projected = new Vec3(vertex.x, -vertex.y, vertex.z);
+        if (first)
+            GLHelper.drawVertex(q, vp, projected, previous, vexBuf, Colors.Null);
+        Vec2 current = GLHelper.drawVertex(q, vp, projected, previous, vexBuf, color);
+        if (last)
+            GLHelper.drawVertex(q, vp, projected, current, vexBuf, Colors.Null);
+        return current;
+    }
 
     public Position projectionViewpoint(Position viewpoint) {
         return this == Orthographic ? viewpoint : new Position(viewpoint.time, Sun.MeanEarthDistance, viewpoint.lon, viewpoint.lat);
