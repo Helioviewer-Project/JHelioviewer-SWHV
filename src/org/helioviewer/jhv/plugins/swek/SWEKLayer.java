@@ -187,7 +187,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = new Vec3();
         Vec2 previous = null;
-
         // draw bounds
         float[] oldBoundaryPoint3d = new float[0];
         int plen = points.length / 3;
@@ -199,26 +198,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double ynew = alpha * oldBoundaryPoint3d[1] + (1 - alpha) * points[3 * i + 1];
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
-
-                    if (Display.mode == ProjectionMode.Orthographic) {
-                        float x = (float) (xnew / r);
-                        float y = (float) (ynew / r);
-                        float z = (float) (znew / r);
-                        if (j == 0) {
-                            buf.putVertex(x, y, z, 1, Colors.Null);
-                        }
-                        buf.putVertex(x, y, z, 1, color);
-                    } else {
-                        pt.x = xnew / r;
-                        pt.y = -(ynew / r);
-                        pt.z = znew / r;
-                        if (j == 0) {
-                            previous = GLHelper.drawVertex(q, vp, pt, previous, buf, Colors.Null);
-                        }
-                        previous = GLHelper.drawVertex(q, vp, pt, previous, buf, color);
-                    }
+                    pt.x = xnew / r;
+                    pt.y = ynew / r;
+                    pt.z = znew / r;
+                    previous = GLHelper.drawProjectedVertex(q, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
                 }
-                buf.repeatVertex(Colors.Null);
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
         }
