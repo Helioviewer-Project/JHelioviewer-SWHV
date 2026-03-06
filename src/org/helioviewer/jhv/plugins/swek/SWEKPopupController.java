@@ -7,8 +7,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -150,7 +148,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                         hitpoint = q.rotateInverseVector(hitpoint);
                     }
                 } else {
-                    hitpoint = getHitPoint(vp, mouseOverX, mouseOverY);
+                    hitpoint = CameraHelper.getVectorFromSphere(camera, vp, mouseOverX, mouseOverY, camera.getViewpoint().toQuat(), true);
                     pt = pi.centralPoint();
                 }
 
@@ -198,11 +196,6 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
         } else {
             component.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
         }
-    }
-
-    @Nullable
-    private Vec3 getHitPoint(Viewport vp, int x, int y) {
-        return CameraHelper.getVectorFromSphere(camera, vp, x, y, camera.getViewpoint().toQuat(), true);
     }
 
 }

@@ -277,12 +277,12 @@ class HEKParser {
     }
 
     private static Vec3 convertHGSJHV(Vec3 el, double elon) {
-        double theta = Math.PI / 180 * el.y;
-        double phi = Math.PI / 180 * el.x - elon;
+        double theta = Math.toRadians(el.y);
+        double phi = Math.toRadians(el.x) - elon;
 
         double x = Math.cos(theta) * Math.sin(phi);
-        double z = Math.cos(theta) * Math.cos(phi);
         double y = Math.sin(theta);
+        double z = Math.cos(theta) * Math.cos(phi);
         return new Vec3(x, y, z);
     }
 
