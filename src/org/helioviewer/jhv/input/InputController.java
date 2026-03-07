@@ -53,14 +53,12 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseEntered(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        interaction.mouseEntered(e);
         mouseListeners.forEach(listener -> listener.mouseEntered(e));
     }
 
     @Override
     public void mouseExited(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        interaction.mouseExited(e);
         mouseListeners.forEach(listener -> listener.mouseExited(e));
     }
 
@@ -94,7 +92,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         MouseEvent e = synthesizeMouse(e1);
         Viewport vp = Display.findViewport(e.getX(), e.getY());
         Display.setActiveViewport(vp);
-        interaction.mouseMoved(e);
         mouseMotionListeners.forEach(listener -> listener.mouseMoved(e));
     }
 
@@ -118,7 +115,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void keyTyped(KeyEvent e) {
-        interaction.keyTyped(e);
         keyListeners.forEach(listener -> listener.keyTyped(e));
     }
 

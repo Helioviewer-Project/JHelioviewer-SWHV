@@ -1,12 +1,8 @@
 package org.helioviewer.jhv.camera;
 
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -20,13 +16,12 @@ import org.helioviewer.jhv.camera.annotate.AnnotateLine;
 import org.helioviewer.jhv.camera.annotate.AnnotateLoop;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL3;
 
-public class Interaction implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public class Interaction {
 
     public enum Mode {PAN, ROTATE, AXIS}
 
@@ -149,21 +144,14 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         };
     }
 
-    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         zoom.zoom(camera, e.getPreciseWheelRotation());
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        mouseDragged(e, Display.getActiveViewport());
     }
 
     public void mouseDragged(MouseEvent e, Viewport vp) {
         getType().mouseDragged(e, vp);
     }
 
-    @Override
     public void mouseReleased(MouseEvent e) {
         if (interactionAnnotate.hasPendingAnnotateable())
             interactionAnnotate.mouseReleased(e);
@@ -172,28 +160,10 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         annotate = false;
     }
 
-    @Override
-    public void mouseMoved(MouseEvent e) {
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
             camera.reset();
         }
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        mousePressed(e, Display.getActiveViewport());
     }
 
     public void mousePressed(MouseEvent e, Viewport vp) {
@@ -203,7 +173,6 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         getType().mousePressed(e, vp);
     }
 
-    @Override
     public void keyPressed(KeyEvent e) {
         if (e.isShiftDown()) {
             annotate = true;
@@ -211,13 +180,8 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         getType().keyPressed(e);
     }
 
-    @Override
     public void keyReleased(KeyEvent e) {
         annotate = e.isShiftDown();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
     }
 
     public void clearAnnotations() {
