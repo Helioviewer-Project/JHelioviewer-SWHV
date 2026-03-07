@@ -59,10 +59,10 @@ public class Display {
         return mode.unprojectMousePoint(camera, vp, x, y, rotation, gridType, correctDrag);
     }
 
-    private static Viewport[] viewports = {new Viewport(0, 0, 0, 100, 100)};
+    private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100)};
     private static int activeViewport = 0;
 
-    public static Viewport fullViewport = new Viewport(-1, 0, 0, 100, 100);
+    public static Viewport fullViewport = DisplayLayout.fullViewport(0, 0, 100, 100);
 
     public static void setActiveViewport(int x, int y) {
         if (multiview) {

@@ -1,12 +1,16 @@
 package org.helioviewer.jhv.display;
 
-final class DisplayLayout {
+public class DisplayLayout {
 
     private DisplayLayout() {
     }
 
     static Viewport fullViewport(int x, int y, int width, int height) {
-        return new Viewport(-1, x, y, width, height);
+        return viewport(-1, x, y, width, height);
+    }
+
+    public static Viewport viewport(int idx, int x, int y, int width, int height) {
+        return new Viewport(idx, x, y, width, height);
     }
 
     static Viewport[] viewports(int width, int height, int count) {
