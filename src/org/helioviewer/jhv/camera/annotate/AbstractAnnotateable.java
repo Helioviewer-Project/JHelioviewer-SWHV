@@ -70,7 +70,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 computePointSun(Camera camera, int x, int y) {
-        return Display.mouseToWorld(camera, x, y, true);
+        return Display.mouseToWorld(camera, Display.getActiveViewport(), x, y, true);
     }
 
     @Nullable
