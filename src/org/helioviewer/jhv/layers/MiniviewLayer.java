@@ -31,7 +31,7 @@ public final class MiniviewLayer extends AbstractLayer {
     private final GLSLShape rectangle = new GLSLShape(false);
 
     private final JPanel optionsPanel;
-    private Viewport miniViewport = DisplayLayout.viewport(0, 0, 0, 100, 100);
+    private Viewport miniViewport = DisplayLayout.viewport(0, 0, 0, 100, 100, 100);
 
     @Override
     public void serialize(JSONObject jo) {
@@ -51,7 +51,7 @@ public final class MiniviewLayer extends AbstractLayer {
         int vpw = Display.fullViewport.width;
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * 0.01 * scale);
-        miniViewport = DisplayLayout.viewport(0, offset, offset, size, size);
+        miniViewport = DisplayLayout.viewport(0, offset, offset, size, size, vpw);
     }
 
     public void renderBackground(GL3 gl) {
