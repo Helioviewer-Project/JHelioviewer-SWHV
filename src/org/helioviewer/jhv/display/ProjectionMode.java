@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.display;
 
-import javax.swing.JRadioButtonMenuItem;
-
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
@@ -93,13 +91,10 @@ public enum ProjectionMode {
 
     public final GLSLSolarShader shader;
     public final GridScale scale;
-    public final JRadioButtonMenuItem radio;
 
     ProjectionMode(GLSLSolarShader _shader, GridScale _scale) {
         shader = _shader;
         scale = _scale;
-        radio = new JRadioButtonMenuItem(toString());
-        radio.addActionListener(e -> Display.setProjectionMode(this));
     }
 
     public abstract Vec2 transform(Quat q, Vec3 v);
