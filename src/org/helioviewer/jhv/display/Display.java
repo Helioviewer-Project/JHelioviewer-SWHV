@@ -59,16 +59,25 @@ public class Display {
 
     public static Viewport fullViewport = DisplayLayout.fullViewport(0, 0, 100, 100, glHeight);
 
-    public static void setActiveViewport(int x, int y) {
-        if (multiview) {
-            int len = viewports.length;
-            for (int i = 0; i < len; ++i) {
-                if (viewports[i].contains(x, y)) {
-                    activeViewport = i;
-                    break;
-                }
+    public static Viewport findViewport(int x, int y) {
+        if (!multiview)
+            return viewports[0];
+
+        int len = viewports.length;
+        for (int i = 0; i < len; ++i) {
+            if (viewports[i].contains(x, y)) {
+                return viewports[i];
             }
         }
+        return viewports[activeViewport];
+    }
+
+    public static void setActiveViewport(Viewport vp) {
+        activeViewport = Math.max(0, vp.idx);
+    }
+
+    public static void setActiveViewport(int x, int y) {
+        setActiveViewport(findViewport(x, y));
     }
 
     public static Viewport getActiveViewport() {
