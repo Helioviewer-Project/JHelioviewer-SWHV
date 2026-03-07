@@ -51,11 +51,11 @@ public class CommandLine {
     public static void loadRequest() {
         // -request: works only for default server
         for (URI uri : getURIOptionValues("-request")) {
-            Load.request.get(uri);
+            Load.request(uri);
         }
         // -state
         for (URI uri : getURIOptionValues("-state")) {
-            Load.state.get(uri);
+            Load.state(uri);
             break;
         }
     }
