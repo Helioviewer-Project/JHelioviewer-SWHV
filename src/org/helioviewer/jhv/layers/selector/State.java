@@ -248,7 +248,7 @@ public class State {
         try {
             // to be loaded before viewpoint
             try {
-                ProjectionMode.valueOf(jo.optString("projection")).radio.doClick();
+                Display.setProjectionMode(ProjectionMode.valueOf(jo.optString("projection")));
             } catch (Exception ignore) {
             }
             loadTimelines(jo);
