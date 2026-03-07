@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayLayout;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.opengl.GLHelper;
@@ -30,7 +31,7 @@ public final class MiniviewLayer extends AbstractLayer {
     private final GLSLShape rectangle = new GLSLShape(false);
 
     private final JPanel optionsPanel;
-    private Viewport miniViewport = new Viewport(0, 0, 0, 100, 100);
+    private Viewport miniViewport = DisplayLayout.viewport(0, 0, 0, 100, 100);
 
     @Override
     public void serialize(JSONObject jo) {
@@ -50,7 +51,7 @@ public final class MiniviewLayer extends AbstractLayer {
         int vpw = Display.fullViewport.width;
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * 0.01 * scale);
-        miniViewport = new Viewport(0, offset, offset, size, size);
+        miniViewport = DisplayLayout.viewport(0, offset, offset, size, size);
     }
 
     public void renderBackground(GL3 gl) {
