@@ -116,7 +116,6 @@ public class CameraHelper {
         Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, cameraDifferenceRotation, false);
         if (rotatedHitPoint != null && rotatedHitPoint.z > 0.)
             return rotatedHitPoint;
-
         return getVectorFromPlane(camera, vp, x, y, cameraDifferenceRotation, false);
     }
 

@@ -102,7 +102,7 @@ public enum ProjectionMode {
     public abstract Vec3 transformInverse(Quat q, Vec2 pt);
 
     public Vec2 drawProjectedVertex(Quat q, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-        Vec3 projected = new Vec3(vertex.x, -vertex.y, vertex.z);
+        Vec3 projected = new Vec3(vertex.x, -vertex.y, vertex.z); // TBD
         if (first)
             GLHelper.drawVertex(q, vp, projected, previous, vexBuf, Colors.Null);
         Vec2 current = GLHelper.drawVertex(q, vp, projected, previous, vexBuf, color);
