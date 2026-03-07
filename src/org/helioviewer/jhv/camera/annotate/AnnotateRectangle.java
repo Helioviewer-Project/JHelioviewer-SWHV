@@ -73,8 +73,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    protected Vec3 computeDragPoint(Camera camera, int x, int y) {
-        return computePointSun(camera, x, y);
+    protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
+        return computePointSun(camera, vp, x, y);
     }
 
 }

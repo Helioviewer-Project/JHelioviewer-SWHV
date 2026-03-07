@@ -17,9 +17,9 @@ public interface Annotateable {
 
     void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf);
 
-    void mousePressed(Camera camera, int x, int y);
+    void mousePressed(Camera camera, Viewport vp, int x, int y);
 
-    void mouseDragged(Camera camera, int x, int y);
+    void mouseDragged(Camera camera, Viewport vp, int x, int y);
 
     void mouseReleased();
 

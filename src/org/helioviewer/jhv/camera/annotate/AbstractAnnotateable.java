@@ -69,13 +69,13 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    static Vec3 computePointSun(Camera camera, int x, int y) {
-        return Display.mouseToWorld(camera, Display.getActiveViewport(), x, y, true);
+    static Vec3 computePointSun(Camera camera, Viewport vp, int x, int y) {
+        return Display.mouseToWorld(camera, vp, x, y, true);
     }
 
     @Nullable
-    static Vec3 computePointSky(Camera camera, int x, int y) {
-        return CameraHelper.getVectorFromSphereOrPlane(camera, Display.getActiveViewport(), x, y, camera.getDragRotation());
+    static Vec3 computePointSky(Camera camera, Viewport vp, int x, int y) {
+        return CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getDragRotation());
     }
 
     @Nullable
@@ -85,7 +85,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    protected Vec3 computeDragPoint(Camera camera, int x, int y) {
+    protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
         return null;
     }
 
@@ -98,21 +98,21 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void mousePressed(Camera camera, int x, int y) {
+    public void mousePressed(Camera camera, Viewport vp, int x, int y) {
         if (!isDraggable())
             return;
 
-        Vec3 pt = computeDragPoint(camera, x, y);
+        Vec3 pt = computeDragPoint(camera, vp, x, y);
         if (pt != null)
             dragStartPoint = pt;
     }
 
     @Override
-    public void mouseDragged(Camera camera, int x, int y) {
+    public void mouseDragged(Camera camera, Viewport vp, int x, int y) {
         if (!isDraggable())
             return;
 
-        Vec3 pt = computeDragPoint(camera, x, y);
+        Vec3 pt = computeDragPoint(camera, vp, x, y);
         if (pt != null)
             dragEndPoint = pt;
     }
