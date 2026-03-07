@@ -15,7 +15,7 @@ public class Display {
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
 
-    static void setProjectionMode(ProjectionMode _mode) {
+    public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
         //CameraHelper.zoomToFit(miniCamera);
         miniCamera.reset();

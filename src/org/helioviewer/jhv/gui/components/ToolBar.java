@@ -280,10 +280,13 @@ public final class ToolBar extends JToolBar {
         JideSplitButton projectionButton = toolSplitButton(PROJECTION);
         ButtonGroup projectionGroup = new ButtonGroup();
         for (ProjectionMode el : ProjectionMode.values()) {
-            projectionGroup.add(el.radio);
-            projectionButton.add(el.radio);
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(el.toString());
+            if (el == Display.mode)
+                item.setSelected(true);
+            item.addActionListener(e -> Display.setProjectionMode(el));
+            projectionGroup.add(item);
+            projectionButton.add(item);
         }
-        ProjectionMode.Orthographic.radio.setSelected(true);
         addButton(projectionButton);
 
         JideSplitButton annotationButton = toolSplitButton(ANNOTATION);
