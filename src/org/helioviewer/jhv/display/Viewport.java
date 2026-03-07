@@ -12,14 +12,14 @@ public class Viewport {
     public final int yAWT; // AWT direction
     public final float[] glslArray;
 
-    Viewport(int _idx, int _x, int _y, int _w, int _h) {
+    Viewport(int _idx, int _x, int _y, int _w, int _h, int fullHeight) {
         idx = _idx;
         width = Math.max(1, _w);
         height = Math.max(1, _h);
         aspect = width / (double) height;
 
         x = _x;
-        yGL = Display.glHeight - height - _y;
+        yGL = fullHeight - height - _y;
         yAWT = _y;
         glslArray = new float[]{x, yGL, width, height};
     }
