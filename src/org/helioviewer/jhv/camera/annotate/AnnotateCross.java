@@ -48,14 +48,14 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void mousePressed(Camera camera, int x, int y) {
-        Vec3 pt = computePointSun(camera, x, y);
+    public void mousePressed(Camera camera, Viewport vp, int x, int y) {
+        Vec3 pt = computePointSun(camera, vp, x, y);
         if (pt != null)
             startPoint = pt;
     }
 
     @Override
-    public void mouseDragged(Camera camera, int x, int y) {
+    public void mouseDragged(Camera camera, Viewport vp, int x, int y) {
     }
 
     @Override

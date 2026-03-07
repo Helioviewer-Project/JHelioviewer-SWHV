@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
@@ -46,8 +47,8 @@ public class AnnotateLine extends AbstractAnnotateable {
     }
 
     @Override
-    protected Vec3 computeDragPoint(Camera camera, int x, int y) {
-        return computePointSky(camera, x, y);
+    protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
+        return computePointSky(camera, vp, x, y);
     }
 
 }
