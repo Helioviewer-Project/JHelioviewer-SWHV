@@ -86,7 +86,7 @@ public class Actions {
         public void actionPerformed(ActionEvent e) {
             File state = LoadStateDialog.get();
             if (state != null)
-                Load.state.get(state.toURI());
+                Load.state(state.toURI());
         }
 
     }

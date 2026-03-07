@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -111,7 +113,7 @@ public class SampClient extends HubConnector {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> Load.getImage(uri));
+                EventQueue.invokeLater(() -> Load.getAllImage(List.of(uri)));
             }
         }));
         // load VOTable only from SOAR
@@ -130,7 +132,7 @@ public class SampClient extends HubConnector {
                 Object url = msg.getParam("url");
                 if (url != null) {
                     URI uri = toURI(url.toString());
-                    EventQueue.invokeLater(() -> Load.getImage(uri));
+                    EventQueue.invokeLater(() -> Load.getAllImage(List.of(uri)));
                 }
             }
         }));
@@ -139,7 +141,7 @@ public class SampClient extends HubConnector {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> Load.getCDF(uri));
+                EventQueue.invokeLater(() -> Load.getAllCDF(List.of(uri)));
             }
         }));
         addMessageHandler(new JHVSampHandler("jhv.load.image", (sender, msg) -> {
@@ -147,7 +149,7 @@ public class SampClient extends HubConnector {
             JSONArray ja = jo.optJSONArray("url");
             if (ja == null) {
                 URI uri = toURI(jo.optString("url"));
-                EventQueue.invokeLater(() -> Load.getImage(uri));
+                EventQueue.invokeLater(() -> Load.getAllImage(List.of(uri)));
             } else {
                 ArrayList<URI> uris = new ArrayList<>(ja.length());
                 for (Object obj : ja) {
@@ -171,25 +173,25 @@ public class SampClient extends HubConnector {
                 }
             }
         }));
-        addMessageHandler(inlineHandler("jhv.load.request", Load.request));
-        addMessageHandler(inlineHandler("jhv.load.state", Load.state));
-        addMessageHandler(inlineHandler("jhv.load.sunjson", Load.sunJSON));
+        addMessageHandler(inlineHandler("jhv.load.request", Load::request, Load::request));
+        addMessageHandler(inlineHandler("jhv.load.state", Load::state, Load::state));
+        addMessageHandler(inlineHandler("jhv.load.sunjson", uri -> Load.getAllSunJSON(List.of(uri)), Load::sunJSON));
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
     }
 
-    private static AbstractMessageHandler inlineHandler(String type, Load loader) {
+    private static AbstractMessageHandler inlineHandler(String type, Consumer<URI> uriLoader, Consumer<String> valueLoader) {
         return new JHVSampHandler(type, (sender, msg) -> {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> loader.get(uri));
+                EventQueue.invokeLater(() -> uriLoader.accept(uri));
             } else {
                 Object value = msg.getParam("value");
                 if (value != null) {
                     String json = value.toString();
-                    EventQueue.invokeLater(() -> loader.get(json));
+                    EventQueue.invokeLater(() -> valueLoader.accept(json));
                 }
             }
         });

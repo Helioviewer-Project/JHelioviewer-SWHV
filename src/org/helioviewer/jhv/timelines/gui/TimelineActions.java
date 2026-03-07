@@ -54,7 +54,7 @@ public class TimelineActions {
                 Settings.setProperty("path.local", directory);
                 for (File fileName : fileNames) {
                     if (fileName.isFile())
-                        Load.request.get(fileName.toURI());
+                        Load.request(fileName.toURI());
                 }
             }
         }
