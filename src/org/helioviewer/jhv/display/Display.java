@@ -34,7 +34,7 @@ public class Display {
     public static void setGLSize(int x, int y, int w, int h) {
         glWidth = w;
         glHeight = h;
-        fullViewport = DisplayLayout.fullViewport(x, y, w, h);
+        fullViewport = DisplayLayout.fullViewport(x, y, w, h, glHeight);
     }
 
     private static final Camera camera = new Camera(UpdateViewpoint.observer);
@@ -59,10 +59,10 @@ public class Display {
         return mode.unprojectMousePoint(camera, vp, x, y, rotation, gridType, correctDrag);
     }
 
-    private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100)};
+    private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};
     private static int activeViewport = 0;
 
-    public static Viewport fullViewport = DisplayLayout.fullViewport(0, 0, 100, 100);
+    public static Viewport fullViewport = DisplayLayout.fullViewport(0, 0, 100, 100, glHeight);
 
     public static void setActiveViewport(int x, int y) {
         if (multiview) {
