@@ -20,7 +20,7 @@ abstract class InteractionTrackball implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(MouseEvent e, Viewport vp) {
+    public void mousePressed(MouseEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
         trackballRadius2 = CameraHelper.selectTrackballRadius2(camera, vp, e.getX(), e.getY());
         lastMouseX = e.getX();
         lastMouseY = e.getY();

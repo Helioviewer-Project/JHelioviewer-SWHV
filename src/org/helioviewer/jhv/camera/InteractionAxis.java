@@ -15,8 +15,8 @@ class InteractionAxis extends InteractionTrackball {
     }
 
     @Override
-    public void mousePressed(MouseEvent e, Viewport vp) {
-        super.mousePressed(e, vp);
+    public void mousePressed(MouseEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
+        super.mousePressed(e, vp, annotationMode);
         dragAxis = camera.getUpdateViewpoint().dragAxis();
     }
 
