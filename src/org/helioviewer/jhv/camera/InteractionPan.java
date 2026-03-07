@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import java.awt.event.MouseEvent;
 
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 class InteractionPan implements Interaction.Type {
@@ -17,14 +17,14 @@ class InteractionPan implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e, Viewport vp) {
         lastX = e.getX();
         lastY = e.getY();
         dragStartSet = true;
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(MouseEvent e, Viewport vp) {
         if (!dragStartSet)
             return;
 
@@ -33,7 +33,7 @@ class InteractionPan implements Interaction.Type {
         lastX = e.getX();
         lastY = e.getY();
 
-        double m = 1 / CameraHelper.getImagePixelFactor(camera, Display.getActiveViewport());
+        double m = 1 / CameraHelper.getImagePixelFactor(camera, vp);
         camera.setTranslation(camera.getTranslationX() + x * m, camera.getTranslationY() - y * m);
         MovieDisplay.display();
     }
