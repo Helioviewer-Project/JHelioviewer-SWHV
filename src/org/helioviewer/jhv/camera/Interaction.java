@@ -156,7 +156,11 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        getType().mouseDragged(e, Display.getActiveViewport());
+        mouseDragged(e, Display.getActiveViewport());
+    }
+
+    public void mouseDragged(MouseEvent e, Viewport vp) {
+        getType().mouseDragged(e, vp);
     }
 
     @Override
@@ -189,10 +193,14 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     @Override
     public void mousePressed(MouseEvent e) {
+        mousePressed(e, Display.getActiveViewport());
+    }
+
+    public void mousePressed(MouseEvent e, Viewport vp) {
         if (e.isShiftDown()) {
             annotate = true;
         }
-        getType().mousePressed(e, Display.getActiveViewport());
+        getType().mousePressed(e, vp);
     }
 
     @Override

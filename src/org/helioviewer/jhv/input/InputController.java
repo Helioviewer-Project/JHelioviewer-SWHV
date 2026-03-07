@@ -14,6 +14,7 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GLInfo;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
@@ -43,7 +44,8 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseClicked(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Display.setActiveViewport(e.getX(), e.getY());
+        Viewport vp = Display.findViewport(e.getX(), e.getY());
+        Display.setActiveViewport(vp);
         interaction.mouseClicked(e);
         mouseListeners.forEach(listener -> listener.mouseClicked(e));
     }
@@ -65,8 +67,9 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mousePressed(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Display.setActiveViewport(e.getX(), e.getY());
-        interaction.mousePressed(e);
+        Viewport vp = Display.findViewport(e.getX(), e.getY());
+        Display.setActiveViewport(vp);
+        interaction.mousePressed(e, vp);
         mouseListeners.forEach(listener -> listener.mousePressed(e));
     }
 
@@ -80,15 +83,17 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseDragged(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Display.setActiveViewport(e.getX(), e.getY());
-        interaction.mouseDragged(e);
+        Viewport vp = Display.findViewport(e.getX(), e.getY());
+        Display.setActiveViewport(vp);
+        interaction.mouseDragged(e, vp);
         mouseMotionListeners.forEach(listener -> listener.mouseDragged(e));
     }
 
     @Override
     public void mouseMoved(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Display.setActiveViewport(e.getX(), e.getY());
+        Viewport vp = Display.findViewport(e.getX(), e.getY());
+        Display.setActiveViewport(vp);
         interaction.mouseMoved(e);
         mouseMotionListeners.forEach(listener -> listener.mouseMoved(e));
     }
