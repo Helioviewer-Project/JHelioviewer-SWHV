@@ -85,7 +85,7 @@ public class Interaction {
     }
 
     interface Type {
-        void mousePressed(MouseEvent e, Viewport vp);
+        void mousePressed(MouseEvent e, Viewport vp, AnnotationMode annotationMode);
 
         void mouseDragged(MouseEvent e, Viewport vp);
 
@@ -170,7 +170,7 @@ public class Interaction {
         if (e.isShiftDown()) {
             annotate = true;
         }
-        getType().mousePressed(e, vp);
+        getType().mousePressed(e, vp, annotationMode);
     }
 
     public void keyPressed(KeyEvent e) {
