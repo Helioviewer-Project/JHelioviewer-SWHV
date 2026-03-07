@@ -17,7 +17,7 @@ class InteractionPan implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(MouseEvent e, Viewport vp) {
+    public void mousePressed(MouseEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
         lastX = e.getX();
         lastY = e.getY();
         dragStartSet = true;

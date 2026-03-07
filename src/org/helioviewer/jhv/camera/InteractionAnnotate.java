@@ -12,7 +12,6 @@ import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -98,8 +97,8 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(MouseEvent e, Viewport vp) {
-        newAnnotateable = JHVFrame.getInteraction().getAnnotationMode().generate(null);
+    public void mousePressed(MouseEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
+        newAnnotateable = annotationMode.generate(null);
         newAnnotateable.mousePressed(camera, vp, e.getX(), e.getY());
         if (!newAnnotateable.isDraggable()) {
             finishAnnotateable();
