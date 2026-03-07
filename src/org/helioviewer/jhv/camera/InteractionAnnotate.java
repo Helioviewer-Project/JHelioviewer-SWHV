@@ -98,7 +98,7 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e, Viewport vp) {
         newAnnotateable = JHVFrame.getInteraction().getAnnotationMode().generate(null);
         newAnnotateable.mousePressed(camera, e.getX(), e.getY());
         if (!newAnnotateable.isDraggable()) {
@@ -108,7 +108,7 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(MouseEvent e, Viewport vp) {
         if (newAnnotateable != null && newAnnotateable.isDraggable()) {
             newAnnotateable.mouseDragged(camera, e.getX(), e.getY());
             MovieDisplay.display();

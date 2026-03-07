@@ -20,6 +20,7 @@ import org.helioviewer.jhv.camera.annotate.AnnotateLine;
 import org.helioviewer.jhv.camera.annotate.AnnotateLoop;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
 
@@ -89,9 +90,9 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
     }
 
     interface Type {
-        void mousePressed(MouseEvent e);
+        void mousePressed(MouseEvent e, Viewport vp);
 
-        void mouseDragged(MouseEvent e);
+        void mouseDragged(MouseEvent e, Viewport vp);
 
         default void mouseReleased(MouseEvent e) {
         }
@@ -155,7 +156,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        getType().mouseDragged(e);
+        getType().mouseDragged(e, Display.getActiveViewport());
     }
 
     @Override
@@ -191,7 +192,7 @@ public class Interaction implements MouseListener, MouseMotionListener, MouseWhe
         if (e.isShiftDown()) {
             annotate = true;
         }
-        getType().mousePressed(e);
+        getType().mousePressed(e, Display.getActiveViewport());
     }
 
     @Override
