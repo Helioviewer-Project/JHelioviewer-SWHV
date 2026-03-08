@@ -49,9 +49,9 @@ public class Display {
     }
 
     @Nullable
-    public static Vec3 mouseToWorld(Camera camera, Viewport vp, int x, int y, boolean correctDrag) {
+    public static Vec3 mouseToSun(Camera camera, Viewport vp, int x, int y) {
         Quat rotation = mode.mouseRotation(camera, gridType);
-        return mode.unprojectMousePoint(camera, vp, x, y, rotation, gridType, correctDrag);
+        return mode.unprojectMousePoint(camera, vp, x, y, rotation, gridType);
     }
 
     private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};
