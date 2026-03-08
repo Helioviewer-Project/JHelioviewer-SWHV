@@ -28,9 +28,4 @@ public class Viewport {
         return px >= x && px < x + width && py >= yAWT && py < yAWT + height;
     }
 
-    @Override
-    public String toString() {
-        return "Offset: " + x + ',' + yGL + " Size: " + width + ',' + height;
-    }
-
 }
