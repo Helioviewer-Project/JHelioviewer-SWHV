@@ -44,8 +44,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseClicked(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Viewport vp = Display.findViewport(e.getX(), e.getY());
-        Display.setActiveViewport(vp);
+        Display.setActiveViewport(e.getX(), e.getY());
         interaction.mouseClicked(e);
         mouseListeners.forEach(listener -> listener.mouseClicked(e));
     }
@@ -65,8 +64,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mousePressed(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Viewport vp = Display.findViewport(e.getX(), e.getY());
-        Display.setActiveViewport(vp);
+        Viewport vp = Display.setActiveViewport(e.getX(), e.getY());
         interaction.mousePressed(e, vp);
         mouseListeners.forEach(listener -> listener.mousePressed(e));
     }
@@ -81,8 +79,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseDragged(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Viewport vp = Display.findViewport(e.getX(), e.getY());
-        Display.setActiveViewport(vp);
+        Viewport vp = Display.setActiveViewport(e.getX(), e.getY());
         interaction.mouseDragged(e, vp);
         mouseMotionListeners.forEach(listener -> listener.mouseDragged(e));
     }
@@ -90,8 +87,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     @Override
     public void mouseMoved(MouseEvent e1) {
         MouseEvent e = synthesizeMouse(e1);
-        Viewport vp = Display.findViewport(e.getX(), e.getY());
-        Display.setActiveViewport(vp);
+        Display.setActiveViewport(e.getX(), e.getY());
         mouseMotionListeners.forEach(listener -> listener.mouseMoved(e));
     }
 
