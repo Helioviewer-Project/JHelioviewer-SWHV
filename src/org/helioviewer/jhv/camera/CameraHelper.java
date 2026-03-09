@@ -86,14 +86,6 @@ public class CameraHelper {
         return new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
     }
 
-    private static Vec3 toCurrentViewFrame(Vec3 v, Quat dragRotation, Quat outputRotation) {
-        return Quat.rotate(dragRotation, outputRotation).rotateVector(v);
-    }
-
-    private static Vec3 toOutputFrame(Vec3 v, Quat dragRotation, Quat outputRotation) {
-        return Quat.rotate(dragRotation, outputRotation).rotateInverseVector(v);
-    }
-
     @Nullable
     private static Vec3 intersectPlane(Camera camera, Viewport vp, double screenX, double screenY, Vec3 planeNormal) {
         double denom = planeNormal.z;
@@ -109,19 +101,21 @@ public class CameraHelper {
     @Nullable
     public static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
         Quat dragRotation = camera.getDragRotation();
+        Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
         Vec3 hitPoint = intersectSphere(camera, vp, screenX, screenY);
         if (hitPoint == null)
             return null;
-        return toOutputFrame(hitPoint, dragRotation, outputRotation);
+        return frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
     public static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
         Quat dragRotation = camera.getDragRotation();
-        Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, toCurrentViewFrame(Vec3.ZAxis, dragRotation, outputRotation));
+        Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
+        Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
         if (hitPoint == null)
             return null;
-        return toOutputFrame(hitPoint, dragRotation, outputRotation);
+        return frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
