@@ -202,7 +202,7 @@ public interface GridScale {
                 rotation = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
             }
 
-            Vec3 p = CameraHelper.unprojectToSphere(camera, vp, px, py, rotation);
+            Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, px, py, rotation);
             if (p == null)
                 return Vec2.NAN;
 

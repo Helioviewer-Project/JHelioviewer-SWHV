@@ -143,12 +143,12 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                     Quat q = pi.getEarth().toQuat();
                     pt = q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
 
-                    hitpoint = CameraHelper.unprojectToPlane(camera, vp, mouseOverX, mouseOverY, Quat.ZERO);
+                    hitpoint = CameraHelper.unprojectToOutputPlane(camera, vp, mouseOverX, mouseOverY, Quat.ZERO);
                     if (hitpoint != null) {
                         hitpoint = q.rotateInverseVector(hitpoint);
                     }
                 } else {
-                    hitpoint = CameraHelper.unprojectToSphere(camera, vp, mouseOverX, mouseOverY, camera.getViewpoint().toQuat());
+                    hitpoint = CameraHelper.unprojectToOutputSphere(camera, vp, mouseOverX, mouseOverY, camera.getViewpoint().toQuat());
                     pt = pi.centralPoint();
                 }
 
