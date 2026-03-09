@@ -131,7 +131,16 @@ public enum ProjectionMode {
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return scale.mouseToGrid(x, y, vp, camera, gridType);
+        Vec2 pt = mouseToViewPlane(camera, vp, x, y);
+        return new Vec2(
+                scale.getInterpolatedXValue(pt.x + 0.5, gridType),
+                scale.getInterpolatedYValue(pt.y + 0.5));
+    }
+
+    public Vec2 mouseToViewPlane(Camera camera, Viewport vp, int x, int y) {
+        double gx = CameraHelper.computeUpX(camera, vp, x) / vp.aspect;
+        double gy = CameraHelper.computeUpY(camera, vp, y);
+        return new Vec2(gx, gy);
     }
 
     public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
