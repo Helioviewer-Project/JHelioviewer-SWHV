@@ -110,6 +110,10 @@ public enum ProjectionMode {
         return new Position(viewpoint.time, Sun.MeanEarthDistance, viewpoint.lon, viewpoint.lat);
     }
 
+    public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        return scale.mouseToGrid(x, y, vp, camera, gridType);
+    }
+
     public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
         Quat rotation = gridType.toCarrington(camera.getViewpoint());
         return transformInverse(rotation, scale.mouseToGrid(x, y, vp, camera, gridType));
