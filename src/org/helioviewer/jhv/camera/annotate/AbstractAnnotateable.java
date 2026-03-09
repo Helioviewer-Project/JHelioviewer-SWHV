@@ -75,7 +75,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 computePointSky(Camera camera, Viewport vp, int x, int y) {
-        return CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getDragRotation());
+        return CameraHelper.unprojectMouseToCurrentViewSphereOrPlane(camera, vp, x, y);
     }
 
     @Nullable

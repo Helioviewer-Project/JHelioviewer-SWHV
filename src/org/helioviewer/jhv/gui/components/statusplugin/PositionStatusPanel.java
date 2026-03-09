@@ -48,7 +48,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
             setText(formatPolar(coord));
         } else {
             String valueStr = ImageData.nanValue;
-            Vec3 v = CameraHelper.getVectorFromSphereOrPlane(camera, vp, x, y, camera.getDragRotation());
+            Vec3 v = CameraHelper.unprojectMouseToCurrentViewSphereOrPlane(camera, vp, x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, "", 0, 0, 0, 0, valueStr));
             } else {
