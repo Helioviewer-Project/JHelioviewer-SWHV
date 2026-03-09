@@ -52,7 +52,7 @@ public enum ProjectionMode {
 
         @Override
         public Vec3 unprojectMouse(Camera camera, Viewport vp, double x, double y, Quat rotation, GridType gridType) {
-            return CameraHelper.unprojectToSphere(camera, vp, x, y, rotation);
+            return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, rotation);
         }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {

@@ -86,9 +86,14 @@ public class CameraHelper {
         return new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
     }
 
-    private static Vec3 currentViewPlaneNormal(Camera camera, Quat outputRotation) {
-        Vec3 outputPlaneNormal = outputRotation.rotateVector(Vec3.ZAxis);
-        return camera.getDragRotation().rotateVector(outputPlaneNormal);
+    private static Vec3 toCurrentViewFrame(Vec3 v, Quat dragRotation, Quat outputRotation) {
+        v = outputRotation.rotateVector(v);
+        return dragRotation.rotateVector(v);
+    }
+
+    private static Vec3 toOutputFrame(Vec3 v, Quat dragRotation, Quat outputRotation) {
+        v = dragRotation.rotateInverseVector(v);
+        return outputRotation.rotateInverseVector(v);
     }
 
     @Nullable
@@ -100,28 +105,25 @@ public class CameraHelper {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double zvalue = -(planeNormal.x * up1x + planeNormal.y * up1y) / denom;
-
         return new Vec3(up1x, up1y, zvalue);
     }
 
     @Nullable
-    public static Vec3 unprojectToSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
+    public static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
+        Quat dragRotation = camera.getDragRotation();
         Vec3 hitPoint = intersectSphere(camera, vp, screenX, screenY);
         if (hitPoint == null)
             return null;
-
-        hitPoint = camera.getDragRotation().rotateInverseVector(hitPoint);
-        return outputRotation.rotateInverseVector(hitPoint);
+        return toOutputFrame(hitPoint, dragRotation, outputRotation);
     }
 
     @Nullable
-    public static Vec3 unprojectToPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
-        Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, currentViewPlaneNormal(camera, outputRotation));
+    public static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
+        Quat dragRotation = camera.getDragRotation();
+        Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, toCurrentViewFrame(Vec3.ZAxis, dragRotation, outputRotation));
         if (hitPoint == null)
             return null;
-
-        hitPoint = camera.getDragRotation().rotateInverseVector(hitPoint);
-        return outputRotation.rotateInverseVector(hitPoint);
+        return toOutputFrame(hitPoint, dragRotation, outputRotation);
     }
 
     @Nullable
