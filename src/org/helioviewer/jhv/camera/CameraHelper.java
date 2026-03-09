@@ -87,13 +87,11 @@ public class CameraHelper {
     }
 
     private static Vec3 toCurrentViewFrame(Vec3 v, Quat dragRotation, Quat outputRotation) {
-        v = outputRotation.rotateVector(v);
-        return dragRotation.rotateVector(v);
+        return Quat.rotate(dragRotation, outputRotation).rotateVector(v);
     }
 
     private static Vec3 toOutputFrame(Vec3 v, Quat dragRotation, Quat outputRotation) {
-        v = dragRotation.rotateInverseVector(v);
-        return outputRotation.rotateInverseVector(v);
+        return Quat.rotate(dragRotation, outputRotation).rotateInverseVector(v);
     }
 
     @Nullable
