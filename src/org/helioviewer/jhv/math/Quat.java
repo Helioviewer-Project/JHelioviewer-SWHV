@@ -152,17 +152,14 @@ public class Quat {
     }
 
     // rotateVector for array
-    public double[] qxv(double[] vec) {
-        //q'vq = vec + 2.0 * cross(q.xyz,cross(  q.xyz, vec ) + q.w * vec)
+    public void qxv(double[] vec, double[] out) {
         double vx = vec[2] * y - vec[1] * z + w * vec[0];
         double vy = vec[0] * z - vec[2] * x + w * vec[1];
         double vz = vec[1] * x - vec[0] * y + w * vec[2];
 
-        return new double[]{
-                (vz * y - vy * z) * 2. + vec[0],
-                (vx * z - vz * x) * 2. + vec[1],
-                (vy * x - vx * y) * 2. + vec[2]};
-        //18 mul + 12 add
+        out[0] = (vz * y - vy * z) * 2. + vec[0];
+        out[1] = (vx * z - vz * x) * 2. + vec[1];
+        out[2] = (vy * x - vx * y) * 2. + vec[2];
     }
 
     public Vec3 rotateInverseVector(Vec3 vec) {
