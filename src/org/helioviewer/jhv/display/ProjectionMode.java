@@ -46,13 +46,8 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Quat mouseRotation(Camera camera, GridType gridType) {
-            return camera.getViewpoint().toQuat();
-        }
-
-        @Override
-        public Vec3 unprojectMouse(Camera camera, Viewport vp, double x, double y, Quat rotation, GridType gridType) {
-            return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, rotation);
+        public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+            return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
         }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
@@ -115,12 +110,9 @@ public enum ProjectionMode {
         return new Position(viewpoint.time, Sun.MeanEarthDistance, viewpoint.lon, viewpoint.lat);
     }
 
-    public Quat mouseRotation(Camera camera, GridType gridType) {
-        return gridType.toCarrington(camera.getViewpoint());
-    }
-
-    public Vec3 unprojectMouse(Camera camera, Viewport vp, double x, double y, Quat rotation, GridType gridType) {
-        return transformInverse(rotation, scale.mouseToGrid((int) x, (int) y, vp, camera, gridType));
+    public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        Quat rotation = gridType.toCarrington(camera.getViewpoint());
+        return transformInverse(rotation, scale.mouseToGrid(x, y, vp, camera, gridType));
     }
 
     private static Vec2 transformPolar(Vec3 v, GridScale scale) {
