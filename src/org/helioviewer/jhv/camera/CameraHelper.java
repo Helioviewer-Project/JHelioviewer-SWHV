@@ -80,10 +80,7 @@ public class CameraHelper {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
-        if (radius2 > Sun.Radius2)
-            return null;
-
-        return new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
+        return radius2 > Sun.Radius2 ? null : new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
     }
 
     @Nullable
