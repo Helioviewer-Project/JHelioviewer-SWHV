@@ -2,12 +2,9 @@ package org.helioviewer.jhv.display;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.math.Vec3;
 
 public interface GridScale {
 
@@ -31,7 +28,7 @@ public interface GridScale {
     @Nonnull
     Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
-    GridScale ortho = new GridScaleOrtho(0, 0, 0, 0);
+    GridScale ortho = new GridScaleIdentity(0, 0, 0, 0);
     GridScale lati = new GridScaleLati(-180, 180, -90, 90);
     GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
     GridScale logpolar = new GridScaleLogY(0, 360, 0, 0);
@@ -186,34 +183,4 @@ public interface GridScale {
         }
 
     }
-
-    class GridScaleOrtho extends GridScaleIdentity {
-
-        GridScaleOrtho(double _xStart, double _xStop, double _yStart, double _yStop) {
-            super(_xStart, _xStop, _yStart, _yStop);
-        }
-
-        @Nonnull
-        @Override
-        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
-            Quat rotation = Quat.ZERO; // final frame to unproject into
-            if (gridType != GridType.Viewpoint) {
-                Position viewpoint = camera.getViewpoint();
-                rotation = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
-            }
-
-            Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, px, py, rotation);
-            if (p == null)
-                return Vec2.NAN;
-
-            double theta = Math.toDegrees(Math.asin(Math.clamp(p.y, -1., 1.)));
-            double phi = Math.toDegrees(Math.atan2(p.x, p.z));
-
-            if (gridType == GridType.Carrington && phi < 0)
-                phi += 360;
-            return new Vec2(phi, theta);
-        }
-
-    }
-
 }
