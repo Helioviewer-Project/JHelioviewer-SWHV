@@ -21,7 +21,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -53,6 +52,8 @@ public class ViewpointLayer extends AbstractLayer {
     private final byte[] spiralColor = Colors.ReducedGreen;
 
     private final double[] lati = new double[3];
+    private final double[] hoverPoint = new double[3];
+    private final double[] rotatedHoverPoint = new double[3];
 
     private final ViewpointLayerOptions optionsPanel;
     private final MouseAdapter hoverListener = new MouseAdapter() {
@@ -189,13 +190,13 @@ public class ViewpointLayer extends AbstractLayer {
             double sinLat = Math.sin(lat);
             double cosLon = Math.cos(lon);
             double sinLon = Math.sin(lon);
-            Vec3 currentViewPoint = dragRotation.rotateVector(new Vec3(
-                    rad * cosLat * cosLon,
-                    rad * cosLat * sinLon,
-                    rad * sinLat));
+            hoverPoint[0] = rad * cosLat * cosLon;
+            hoverPoint[1] = rad * cosLat * sinLon;
+            hoverPoint[2] = rad * sinLat;
+            dragRotation.qxv(hoverPoint, rotatedHoverPoint);
 
-            double deltaX = currentViewPoint.x - mousePlaneX;
-            double deltaY = currentViewPoint.y - mousePlaneY;
+            double deltaX = rotatedHoverPoint[0] - mousePlaneX;
+            double deltaY = rotatedHoverPoint[1] - mousePlaneY;
             double dist2 = deltaX * deltaX + deltaY * deltaY;
             if (dist2 < minDist2) {
                 minDist2 = dist2;
