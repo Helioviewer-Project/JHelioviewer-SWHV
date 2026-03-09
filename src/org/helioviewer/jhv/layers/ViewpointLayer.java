@@ -130,19 +130,19 @@ public class ViewpointLayer extends AbstractLayer {
 
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
-    private final List<String> text = new ArrayList<>();
+    private final List<String> hoverText = new ArrayList<>();
     private int mouseX, mouseY;
 
     @Override
     public void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
         if (!enabled)
             return;
-        GLText.drawTextFloat(vp, text, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
 
     private void clearHoverTextIfNeeded() {
-        if (!text.isEmpty()) {
-            text.clear();
+        if (!hoverText.isEmpty()) {
+            hoverText.clear();
             MovieDisplay.display();
         }
     }
@@ -160,18 +160,18 @@ public class ViewpointLayer extends AbstractLayer {
             return;
         }
 
-        mouseX = e.getX();
-        mouseY = e.getY();
-        Vec3 v = CameraHelper.unprojectToOutputPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO);
-        if (v == null) {
-            clearHoverTextIfNeeded();
-            return;
-        }
-
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
-        double width = camera.getCameraWidth() / 2, minDist = 5; // TBD
+        mouseX = e.getX();
+        mouseY = e.getY();
+
+        Viewport vp = Display.getActiveViewport();
+        double mousePlaneX = CameraHelper.computeUpX(camera, vp, mouseX);
+        double mousePlaneY = CameraHelper.computeUpY(camera, vp, mouseY);
+        Quat dragRotation = camera.getDragRotation();
+
+        double halfWidth = camera.getCameraWidth() / 2, minDist = 5; // TBD
         String name = null;
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
@@ -182,9 +182,15 @@ public class ViewpointLayer extends AbstractLayer {
 
             double rad = lati[0];
             double lon = lati[1] - relativeLon;
-            double deltaX = Math.abs(rad * Math.cos(lon) - v.x);
-            double deltaY = Math.abs(rad * Math.sin(lon) - v.y);
-            double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / width;
+            double lat = lati[2];
+            Vec3 currentViewPoint = dragRotation.rotateVector(new Vec3(
+                    rad * Math.cos(lat) * Math.cos(lon),
+                    rad * Math.cos(lat) * Math.sin(lon),
+                    rad * Math.sin(lat)));
+
+            double deltaX = currentViewPoint.x - mousePlaneX;
+            double deltaY = currentViewPoint.y - mousePlaneY;
+            double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / halfWidth;
             if (dist < minDist) {
                 minDist = dist;
                 name = positionLoad.target().toString();
@@ -192,7 +198,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
         clearHoverTextIfNeeded();
         if (name != null && minDist < 0.01) {
-            text.add(name);
+            hoverText.add(name);
             MovieDisplay.display();
         }
     }
@@ -211,7 +217,7 @@ public class ViewpointLayer extends AbstractLayer {
             optionsPanel.activate();
             optionsPanel.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
-            text.clear();
+            hoverText.clear();
             JHVFrame.getInputController().removePlugin(hoverListener);
             optionsPanel.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
