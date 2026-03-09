@@ -49,6 +49,26 @@ public enum ProjectionMode {
         public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
             return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
         }
+
+        @Override
+        public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+            Quat rotation = Quat.ZERO; // final frame to unproject into
+            if (gridType != GridType.Viewpoint) {
+                Position viewpoint = camera.getViewpoint();
+                rotation = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
+            }
+
+            Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, x, y, rotation);
+            if (p == null)
+                return Vec2.NAN;
+
+            double theta = Math.toDegrees(Math.asin(Math.clamp(p.y, -1., 1.)));
+            double phi = Math.toDegrees(Math.atan2(p.x, p.z));
+
+            if (gridType == GridType.Carrington && phi < 0)
+                phi += 360;
+            return new Vec2(phi, theta);
+        }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
         @Override
