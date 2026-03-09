@@ -51,7 +51,7 @@ public final class MiniviewLayer extends AbstractLayer {
         int vpw = Display.fullViewport.width;
         int offset = (int) (vpw * 0.01);
         int size = (int) (vpw * 0.01 * scale);
-        miniViewport = DisplayLayout.viewport(0, offset, offset, size, size, vpw);
+        miniViewport = DisplayLayout.viewport(0, offset, offset, size, size, Display.fullViewport.height);
     }
 
     public void renderBackground(GL3 gl) {
