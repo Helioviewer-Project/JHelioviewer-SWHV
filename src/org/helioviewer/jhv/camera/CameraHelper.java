@@ -76,57 +76,66 @@ public class CameraHelper {
     }
 
     @Nullable
-    private static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
+    private static Vec3 intersectSphere(Camera camera, Viewport vp, double screenX, double screenY) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 > Sun.Radius2)
             return null;
 
-        Vec3 hitPoint = new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
-        if (correctDrag)
-            hitPoint = camera.getDragRotation().rotateInverseVector(hitPoint);
-        return rotation.rotateInverseVector(hitPoint);
+        return new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
+    }
+
+    private static Vec3 currentViewPlaneNormal(Camera camera, Quat outputRotation) {
+        Vec3 outputPlaneNormal = outputRotation.rotateVector(Vec3.ZAxis);
+        return camera.getDragRotation().rotateVector(outputPlaneNormal);
     }
 
     @Nullable
-    public static Vec3 unprojectToSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation) {
-        return getVectorFromSphere(camera, vp, screenX, screenY, rotation, true);
-    }
-
-    @Nullable
-    private static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
-        Quat dragRotation = camera.getDragRotation();
-        Vec3 altnormal = rotation.rotateVector(Vec3.ZAxis);
-        if (correctDrag)
-            altnormal = dragRotation.rotateVector(Vec3.ZAxis);
-
-        double denom = altnormal.z;
+    private static Vec3 intersectPlane(Camera camera, Viewport vp, double screenX, double screenY, Vec3 planeNormal) {
+        double denom = planeNormal.z;
         if (Math.abs(denom) < PLANE_Z_EPS)
             return null;
 
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
-        double zvalue = -(altnormal.x * up1x + altnormal.y * up1y) / denom;
+        double zvalue = -(planeNormal.x * up1x + planeNormal.y * up1y) / denom;
 
-        Vec3 hitPoint = new Vec3(up1x, up1y, zvalue);
-        if (correctDrag)
-            hitPoint = dragRotation.rotateInverseVector(hitPoint);
-        return rotation.rotateInverseVector(hitPoint);
+        return new Vec3(up1x, up1y, zvalue);
     }
 
     @Nullable
-    public static Vec3 unprojectToPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation) {
-        return getVectorFromPlane(camera, vp, screenX, screenY, rotation, true);
+    public static Vec3 unprojectToSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
+        Vec3 hitPoint = intersectSphere(camera, vp, screenX, screenY);
+        if (hitPoint == null)
+            return null;
+
+        hitPoint = camera.getDragRotation().rotateInverseVector(hitPoint);
+        return outputRotation.rotateInverseVector(hitPoint);
+    }
+
+    @Nullable
+    public static Vec3 unprojectToPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
+        Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, currentViewPlaneNormal(camera, outputRotation));
+        if (hitPoint == null)
+            return null;
+
+        hitPoint = camera.getDragRotation().rotateInverseVector(hitPoint);
+        return outputRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
     public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double x, double y) {
         Quat dragRotation = camera.getDragRotation();
-        Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, dragRotation, false);
-        if (rotatedHitPoint != null && rotatedHitPoint.z > 0.)
-            return rotatedHitPoint;
-        return getVectorFromPlane(camera, vp, x, y, dragRotation, false);
+        Vec3 hitPoint = intersectSphere(camera, vp, x, y);
+        if (hitPoint != null) {
+            Vec3 currentViewHitPoint = dragRotation.rotateInverseVector(hitPoint);
+            if (currentViewHitPoint.z > 0.)
+                return currentViewHitPoint;
+        }
+
+        Vec3 planeHitPoint = intersectPlane(camera, vp, x, y, dragRotation.rotateVector(Vec3.ZAxis));
+        return planeHitPoint == null ? null : dragRotation.rotateInverseVector(planeHitPoint);
     }
 
     public static void zoomToFit(Camera camera) {
