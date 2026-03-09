@@ -1,11 +1,5 @@
 package org.helioviewer.jhv.display;
 
-import javax.annotation.Nonnull;
-
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.math.Vec2;
-
 public interface GridScale {
 
     double getInterpolatedXValue(double v, GridType gridType);
@@ -21,12 +15,6 @@ public interface GridScale {
     double getYstop();
 
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
-
-    @Nonnull
-    Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType);
-
-    @Nonnull
-    Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera);
 
     GridScale ortho = new GridScaleIdentity(0, 0, 0, 0);
     GridScale lati = new GridScaleLati(-180, 180, -90, 90);
@@ -84,22 +72,6 @@ public interface GridScale {
         @Override
         public double getYstop() {
             return yStop;
-        }
-
-        @Nonnull
-        @Override
-        public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
-            double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect + 0.5;
-            double y = CameraHelper.computeUpY(camera, vp, py) + 0.5;
-            return new Vec2(getInterpolatedXValue(x, gridType), getInterpolatedYValue(y));
-        }
-
-        @Nonnull
-        @Override
-        public Vec2 mouseToGridInv(int px, int py, Viewport vp, Camera camera) {
-            double x = CameraHelper.computeUpX(camera, vp, px) / vp.aspect;
-            double y = CameraHelper.computeUpY(camera, vp, py);
-            return new Vec2(x, y);
         }
 
         protected abstract double scaleX(double val);
