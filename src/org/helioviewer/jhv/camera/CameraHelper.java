@@ -112,11 +112,12 @@ public class CameraHelper {
     }
 
     @Nullable
-    public static Vec3 getVectorFromSphereOrPlane(Camera camera, Viewport vp, double x, double y, Quat cameraDifferenceRotation) {
-        Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, cameraDifferenceRotation, false);
+    public static Vec3 unprojectMouseToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double x, double y) {
+        Quat dragRotation = camera.getDragRotation();
+        Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, dragRotation, false);
         if (rotatedHitPoint != null && rotatedHitPoint.z > 0.)
             return rotatedHitPoint;
-        return getVectorFromPlane(camera, vp, x, y, cameraDifferenceRotation, false);
+        return getVectorFromPlane(camera, vp, x, y, dragRotation, false);
     }
 
     public static void zoomToFit(Camera camera) {
