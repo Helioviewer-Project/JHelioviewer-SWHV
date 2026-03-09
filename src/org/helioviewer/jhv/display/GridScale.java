@@ -196,15 +196,15 @@ public interface GridScale {
         @Nonnull
         @Override
         public Vec2 mouseToGrid(int px, int py, Viewport vp, Camera camera, GridType gridType) {
-            Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, px, py, Quat.ZERO, true);
-            if (p == null)
-                return Vec2.NAN;
-
+            Quat rotation = Quat.ZERO; // final frame to unproject into
             if (gridType != GridType.Viewpoint) {
                 Position viewpoint = camera.getViewpoint();
-                Quat q = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
-                p = q.rotateInverseVector(p);
+                rotation = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
             }
+
+            Vec3 p = CameraHelper.getVectorFromSphere(camera, vp, px, py, rotation, true);
+            if (p == null)
+                return Vec2.NAN;
 
             double theta = Math.toDegrees(Math.asin(Math.clamp(p.y, -1., 1.)));
             double phi = Math.toDegrees(Math.atan2(p.x, p.z));
