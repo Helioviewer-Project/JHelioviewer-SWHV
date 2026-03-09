@@ -103,9 +103,7 @@ public class CameraHelper {
         Quat dragRotation = camera.getDragRotation();
         Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
         Vec3 hitPoint = intersectSphere(camera, vp, screenX, screenY);
-        if (hitPoint == null)
-            return null;
-        return frameRotation.rotateInverseVector(hitPoint);
+        return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
@@ -113,9 +111,7 @@ public class CameraHelper {
         Quat dragRotation = camera.getDragRotation();
         Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
         Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
-        if (hitPoint == null)
-            return null;
-        return frameRotation.rotateInverseVector(hitPoint);
+        return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
@@ -128,8 +124,8 @@ public class CameraHelper {
                 return currentViewHitPoint;
         }
 
-        Vec3 planeHitPoint = intersectPlane(camera, vp, x, y, dragRotation.rotateVector(Vec3.ZAxis));
-        return planeHitPoint == null ? null : dragRotation.rotateInverseVector(planeHitPoint);
+        hitPoint = intersectPlane(camera, vp, x, y, dragRotation.rotateVector(Vec3.ZAxis));
+        return hitPoint == null ? null : dragRotation.rotateInverseVector(hitPoint);
     }
 
     public static void zoomToFit(Camera camera) {
