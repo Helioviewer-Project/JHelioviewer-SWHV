@@ -171,7 +171,8 @@ public class ViewpointLayer extends AbstractLayer {
         double mousePlaneY = CameraHelper.computeUpY(camera, vp, mouseY);
         Quat dragRotation = camera.getDragRotation();
 
-        double halfWidth = camera.getCameraWidth() / 2, minDist = 5; // TBD
+        double halfWidth = camera.getCameraWidth() / 2;
+        double minDist2 = Double.MAX_VALUE;
         String name = null;
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
@@ -183,21 +184,28 @@ public class ViewpointLayer extends AbstractLayer {
             double rad = lati[0];
             double lon = lati[1] - relativeLon;
             double lat = lati[2];
+
+            double cosLat = Math.cos(lat);
+            double sinLat = Math.sin(lat);
+            double cosLon = Math.cos(lon);
+            double sinLon = Math.sin(lon);
             Vec3 currentViewPoint = dragRotation.rotateVector(new Vec3(
-                    rad * Math.cos(lat) * Math.cos(lon),
-                    rad * Math.cos(lat) * Math.sin(lon),
-                    rad * Math.sin(lat)));
+                    rad * cosLat * cosLon,
+                    rad * cosLat * sinLon,
+                    rad * sinLat));
 
             double deltaX = currentViewPoint.x - mousePlaneX;
             double deltaY = currentViewPoint.y - mousePlaneY;
-            double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / halfWidth;
-            if (dist < minDist) {
-                minDist = dist;
+            double dist2 = deltaX * deltaX + deltaY * deltaY;
+            if (dist2 < minDist2) {
+                minDist2 = dist2;
                 name = positionLoad.target().toString();
             }
         }
         clearHoverTextIfNeeded();
-        if (name != null && minDist < 0.01) {
+        double hoverThreshold2 = 0.01 * halfWidth;
+        hoverThreshold2 *= hoverThreshold2;
+        if (name != null && minDist2 < hoverThreshold2) {
             hoverText.add(name);
             MovieDisplay.display();
         }
