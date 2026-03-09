@@ -162,7 +162,7 @@ public class ViewpointLayer extends AbstractLayer {
 
         mouseX = e.getX();
         mouseY = e.getY();
-        Vec3 v = CameraHelper.getVectorFromPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO, true);
+        Vec3 v = CameraHelper.unprojectToPlane(camera, Display.getActiveViewport(), mouseX, mouseY, Quat.ZERO);
         if (v == null) {
             clearHoverTextIfNeeded();
             return;

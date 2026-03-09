@@ -76,11 +76,10 @@ public class CameraHelper {
     }
 
     @Nullable
-    public static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
+    private static Vec3 getVectorFromSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
         double up1x = computeUpX(camera, vp, screenX);
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
-
         if (radius2 > Sun.Radius2)
             return null;
 
@@ -91,7 +90,12 @@ public class CameraHelper {
     }
 
     @Nullable
-    public static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
+    public static Vec3 unprojectToSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation) {
+        return getVectorFromSphere(camera, vp, screenX, screenY, rotation, true);
+    }
+
+    @Nullable
+    private static Vec3 getVectorFromPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation, boolean correctDrag) {
         Quat dragRotation = camera.getDragRotation();
         Vec3 altnormal = rotation.rotateVector(Vec3.ZAxis);
         if (correctDrag)
@@ -112,7 +116,12 @@ public class CameraHelper {
     }
 
     @Nullable
-    public static Vec3 unprojectMouseToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double x, double y) {
+    public static Vec3 unprojectToPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat rotation) {
+        return getVectorFromPlane(camera, vp, screenX, screenY, rotation, true);
+    }
+
+    @Nullable
+    public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double x, double y) {
         Quat dragRotation = camera.getDragRotation();
         Vec3 rotatedHitPoint = getVectorFromSphere(camera, vp, x, y, dragRotation, false);
         if (rotatedHitPoint != null && rotatedHitPoint.z > 0.)
