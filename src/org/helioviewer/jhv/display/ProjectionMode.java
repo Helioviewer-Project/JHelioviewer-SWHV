@@ -136,7 +136,7 @@ public enum ProjectionMode {
 
     public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
         Quat rotation = gridType.toCarrington(camera.getViewpoint());
-        return transformInverse(rotation, scale.mouseToGrid(x, y, vp, camera, gridType));
+        return transformInverse(rotation, mouseToGrid(camera, vp, x, y, gridType));
     }
 
     private static Vec2 transformPolar(Vec3 v, GridScale scale) {
