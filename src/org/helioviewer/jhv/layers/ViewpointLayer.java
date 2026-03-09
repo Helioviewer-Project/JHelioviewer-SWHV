@@ -173,26 +173,24 @@ public class ViewpointLayer extends AbstractLayer {
         Quat dragRotation = camera.getDragRotation();
 
         double halfWidth = camera.getCameraWidth() / 2;
+        double hoverThreshold2 = (0.01 * halfWidth) * (0.01 * halfWidth);
+        double cosRelativeLon = Math.cos(-relativeLon);
+        double sinRelativeLon = Math.sin(-relativeLon);
         double minDist2 = Double.MAX_VALUE;
+
         String name = null;
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
             if (response == null)
                 continue;
 
-            response.interpolateLatitudinal(time, start, end, lati);
-
-            double rad = lati[0];
-            double lon = lati[1] - relativeLon;
-            double lat = lati[2];
-
-            double cosLat = Math.cos(lat);
-            double sinLat = Math.sin(lat);
-            double cosLon = Math.cos(lon);
-            double sinLon = Math.sin(lon);
-            hoverPoint[0] = rad * cosLat * cosLon;
-            hoverPoint[1] = rad * cosLat * sinLon;
-            hoverPoint[2] = rad * sinLat;
+            response.interpolateRectangular(time, start, end, hoverPoint); // should be shared with the one in renderPlanets
+            if (relativeLon != 0) {
+                double x = hoverPoint[0];
+                double y = hoverPoint[1];
+                hoverPoint[0] = x * cosRelativeLon - y * sinRelativeLon;
+                hoverPoint[1] = x * sinRelativeLon + y * cosRelativeLon;
+            }
             dragRotation.qxv(hoverPoint, rotatedHoverPoint);
 
             double deltaX = rotatedHoverPoint[0] - mousePlaneX;
@@ -204,8 +202,6 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
         clearHoverTextIfNeeded();
-        double hoverThreshold2 = 0.01 * halfWidth;
-        hoverThreshold2 *= hoverThreshold2;
         if (name != null && minDist2 < hoverThreshold2) {
             hoverText.add(name);
             MovieDisplay.display();

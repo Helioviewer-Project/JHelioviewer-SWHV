@@ -93,6 +93,18 @@ public class PositionResponse {
         return Math.sqrt(x * x + y * y + z * z);
     }
 
+    public double interpolateRectangular(long t, long start, long end, double[] xyz) {
+        long time = interpolateTime(t, start, end);
+        Position.Cartesian p = getInterpolatedPosition(time);
+        double x = p.x(), y = p.y(), z = p.z();
+
+        xyz[0] = x;
+        xyz[1] = y;
+        xyz[2] = z;
+
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
     public void interpolateLatitudinal(long t, long start, long end, double[] lati) {
         long time = interpolateTime(t, start, end);
         Position.Cartesian p = getInterpolatedPosition(time);
