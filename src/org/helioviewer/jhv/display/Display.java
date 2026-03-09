@@ -2,9 +2,6 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.math.Vec3;
-
-import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -45,11 +42,6 @@ public class Display {
 
     public static Camera getMiniCamera() {
         return miniCamera;
-    }
-
-    @Nullable
-    public static Vec3 mouseToSun(Camera camera, Viewport vp, int x, int y) {
-        return mode.unprojectMouse(camera, vp, x, y, gridType);
     }
 
     private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};
