@@ -47,7 +47,7 @@ public class GLHelper {
         return new Point((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
     }
 
-    public static Vec2 drawVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
+    public static Vec2 emitProjectedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
         Vec2 tf = Display.mode.project(viewpoint, gridType, vertex);
 
         float x;
