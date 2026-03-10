@@ -141,7 +141,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
                     double distSun = computeDistSun(evt);
                     Quat q = pi.getEarth().toQuat();
-                    pt = q.rotateInverseVector(new Vec3(distSun * Math.cos(principalAngle), distSun * Math.sin(principalAngle), 0));
+                    pt = q.rotateInverseVector(SWEKData.polarVector(distSun, principalAngle));
 
                     hitpoint = CameraHelper.unprojectToOutputPlane(camera, vp, mouseOverX, mouseOverY, Quat.ZERO);
                     if (hitpoint != null) {
