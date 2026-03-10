@@ -39,10 +39,7 @@ final class NonOrthoProjection {
 
     private static Vec2 projectPolar(Vec3 v, GridScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
-        // Polar angle is defined as 0 at north and increasing anti-clockwise.
-        double theta = Math.atan2(-v.x, v.y);
-        theta += 2 * Math.PI;
-        theta %= 2 * Math.PI;
+        double theta = polarAngleRadians(v);
         double scaledr = scale.getYValueInv(r);
         double scaledtheta = scale.getXValueInv(Math.toDegrees(theta));
         return new Vec2(scaledtheta, scaledr);
@@ -50,10 +47,9 @@ final class NonOrthoProjection {
 
     private static Vec3 unprojectPolar(Vec2 pt) {
         double r = pt.y;
-        // Positive map angles rotate anti-clockwise from north.
-        double theta = -Math.toRadians(pt.x);
-        double y = r * Math.cos(theta);
-        double x = r * Math.sin(theta);
+        Vec2 polarBasis = polarBasis(Math.toRadians(pt.x), r);
+        double x = polarBasis.x;
+        double y = polarBasis.y;
         double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
         return new Vec3(x, y, z);
     }
@@ -84,5 +80,18 @@ final class NonOrthoProjection {
                 Math.cos(latitude) * Math.sin(longitude),
                 Math.sin(latitude),
                 Math.cos(latitude) * Math.cos(longitude));
+    }
+
+    private static double polarAngleRadians(Vec3 v) {
+        // Polar angle is defined as 0 at north and increasing anti-clockwise.
+        double theta = Math.atan2(-v.x, v.y);
+        theta += 2 * Math.PI;
+        theta %= 2 * Math.PI;
+        return theta;
+    }
+
+    private static Vec2 polarBasis(double angleRadians, double radius) {
+        // Positive map angles rotate anti-clockwise from north.
+        return new Vec2(-radius * Math.sin(angleRadians), radius * Math.cos(angleRadians));
     }
 }
