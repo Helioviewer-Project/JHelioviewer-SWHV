@@ -1,35 +1,33 @@
 
-// grid = (map longitude offset, map colatitude offset, heliographic latitude)
+// grid = (map longitude offset, map latitude offset, heliographic latitude)
 vec2 get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, const vec2 scrpos, const float dt, const vec3 grid) {
-    float phi   = grid.x + scrpos.x * TWOPI;
-    // theta is colatitude here: 0 at north pole, PI at south pole.
-    float theta = grid.y + scrpos.y * PI;
+    float longitude = grid.x + scrpos.x * TWOPI;
+    float latitude = grid.y + (scrpos.y - 0.5) * PI;
 
     if (dt != 0) {
-        phi -= differentialRotation(dt, theta - HALFPI); // difference from rigid rotation
+        longitude -= differentialRotation(dt, latitude); // difference from rigid rotation
     }
 
-    clamp_value(theta, 0, PI);
+    clamp_value(latitude, -HALFPI, HALFPI);
 
-    vec3 xcart;
-    xcart.x = sin(theta) * cos(phi);
-    xcart.y = sin(theta) * sin(phi);
-    xcart.z = cos(theta);
+    vec3 spherical;
+    spherical.x = cos(latitude) * cos(longitude);
+    spherical.y = cos(latitude) * sin(longitude);
+    spherical.z = sin(latitude);
 
-    float slt = sin(grid.z);
+    float slt = -sin(grid.z);
     float clt = cos(grid.z);
     mat3 rot = mat3(
           clt, 0., slt,
            0., 1.,  0.,
          -slt, 0., clt);
 
-    vec3 xcartrot = rot * xcart;
-    if (xcartrot.x < 0.)
+    vec3 sphericalRot = rot * spherical;
+    if (sphericalRot.x < 0.)
         discard;
 
-    // The map itself is expressed in latitude, but image sampling still uses the
-    // legacy image-space vertical convention via -xcartrot.z and -centered.y.
-    vec3 centered = apply_center(vec3(xcartrot.y, -xcartrot.z, 0.), CRVAL, CROTA);
+    // The map uses latitude directly; texture-space still uses -centered.y.
+    vec3 centered = apply_center(vec3(sphericalRot.y, sphericalRot.z, 0.), CRVAL, CROTA);
     vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_texture(texcoord);
 
