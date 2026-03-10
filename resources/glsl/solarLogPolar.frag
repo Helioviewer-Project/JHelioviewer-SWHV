@@ -4,6 +4,7 @@ void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, con
     if (interpolated > display.radii.y || interpolated < display.radii.x)
         discard;
 
+    // Polar angle is defined as 0 at north and increasing anti-clockwise.
     float theta = -(scrpos.x * TWOPI + HALFPI /* - cr TBD */);
     vec3 pos = vec3(cos(theta), sin(theta), 0.) * interpolated;
     // if (interpolated < 1.)

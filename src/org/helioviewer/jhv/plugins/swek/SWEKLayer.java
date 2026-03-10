@@ -261,7 +261,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
-        double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt) - 90;
+        double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
         double speed = SWEKData.readCMESpeed(evt);
         double factor = Sun.RadiusMeter;
         double distSunBegin = 2.4;
