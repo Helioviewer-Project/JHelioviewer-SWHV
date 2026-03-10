@@ -7,7 +7,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -46,7 +45,7 @@ public class AnnotateCross extends AbstractAnnotateable {
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        Vec3 spherical = new Vec3(SphericalCoords.radius(startPoint), SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint));
+        Vec3 spherical = annotationSpherical(startPoint);
         drawCross(viewpoint, gridType, vp, spherical, buf, color);
     }
 
