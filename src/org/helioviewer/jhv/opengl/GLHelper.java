@@ -48,7 +48,7 @@ public class GLHelper {
     }
 
     public static Vec2 drawVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
-        Vec2 tf = Display.mode.transform(viewpoint, gridType, vertex);
+        Vec2 tf = Display.mode.project(viewpoint, gridType, vertex);
 
         float x;
         float y = (float) tf.y;

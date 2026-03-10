@@ -122,7 +122,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private static void putPointScale(Position viewpoint, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
-        Vec2 tf = Display.mode.transform(viewpoint, Display.gridType, vertex);
+        Vec2 tf = Display.mode.project(viewpoint, Display.gridType, vertex);
         float x = (float) (tf.x * vp.aspect);
         float y = (float) tf.y;
         vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
