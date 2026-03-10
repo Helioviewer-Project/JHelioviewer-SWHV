@@ -3,6 +3,7 @@ package org.helioviewer.jhv.display;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -53,20 +54,15 @@ final class NonOrthoProjection {
 
     private static Vec2 projectLatitudinal(Vec3 v, GridScale scale) {
         // Positive latitude corresponds to positive Y in the non-ortho map basis.
-        double latitude = Math.asin(Math.clamp(v.y, -1., 1.));
-        double longitude = Math.atan2(v.x, v.z);
+        double latitude = SphericalCoords.latitude(v);
+        double longitude = SphericalCoords.longitude(v);
         double scaledphi = scale.getXValueInv(Math.toDegrees(longitude));
         double scaledtheta = scale.getYValueInv(Math.toDegrees(latitude));
         return new Vec2(scaledphi, scaledtheta);
     }
 
     private static Vec3 unprojectLatitudinal(Vec2 pt) {
-        double longitude = Math.toRadians(pt.x);
-        double latitude = Math.toRadians(pt.y);
-        return new Vec3(
-                Math.cos(latitude) * Math.sin(longitude),
-                Math.sin(latitude),
-                Math.cos(latitude) * Math.cos(longitude));
+        return SphericalCoords.unit(Math.toRadians(pt.x), Math.toRadians(pt.y));
     }
 
     private static double polarAngleRadians(Vec3 v) {

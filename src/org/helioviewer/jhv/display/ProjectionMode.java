@@ -6,6 +6,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -60,8 +61,8 @@ public enum ProjectionMode {
             if (p == null)
                 return Vec2.NAN;
 
-            double theta = Math.toDegrees(Math.asin(Math.clamp(p.y, -1., 1.)));
-            double phi = Math.toDegrees(Math.atan2(p.x, p.z));
+            double theta = Math.toDegrees(SphericalCoords.latitude(p));
+            double phi = Math.toDegrees(SphericalCoords.longitude(p));
 
             if (gridType == GridType.Carrington && phi < 0)
                 phi += 360;
