@@ -143,15 +143,15 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindLatitudinalGrid(GL3 gl,
-                                    double baseLongitude, double baseColatitudeOffset, double heliographicLatitude,
-                                    double diffLongitude, double diffColatitudeOffset, double diffHeliographicLatitude) {
+                                    double baseLongitude, double baseLatitudeOffset, double heliographicLatitude,
+                                    double diffLongitude, double diffLatitudeOffset, double diffHeliographicLatitude) {
         // Latitudinal shader grid triples are:
-        // (map longitude offset, map colatitude offset, heliographic latitude).
+        // (map longitude offset, map latitude offset, heliographic latitude).
         floatArr[0] = (float) baseLongitude;
-        floatArr[1] = (float) baseColatitudeOffset;
+        floatArr[1] = (float) baseLatitudeOffset;
         floatArr[2] = (float) heliographicLatitude;
         floatArr[3] = (float) diffLongitude;
-        floatArr[4] = (float) diffColatitudeOffset;
+        floatArr[4] = (float) diffLatitudeOffset;
         floatArr[5] = (float) diffHeliographicLatitude;
         gl.glUniform3fv(gridRef, 2, floatArr, 0);
     }
