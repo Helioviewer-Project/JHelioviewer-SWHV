@@ -27,7 +27,7 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec2 drawProjectedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+        public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
             if (first) {
                 vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
             }
@@ -122,12 +122,12 @@ public enum ProjectionMode {
 
     protected abstract Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt);
 
-    public Vec2 drawProjectedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+    public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
         if (first)
-            GLHelper.drawVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, Colors.Null);
-        Vec2 current = GLHelper.drawVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, color);
+            GLHelper.emitProjectedMapVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, Colors.Null);
+        Vec2 current = GLHelper.emitProjectedMapVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, color);
         if (last)
-            GLHelper.drawVertex(viewpoint, gridType, vp, vertex, current, vexBuf, Colors.Null);
+            GLHelper.emitProjectedMapVertex(viewpoint, gridType, vp, vertex, current, vexBuf, Colors.Null);
         return current;
     }
 
