@@ -261,10 +261,10 @@ class HEKParser {
             Position p = Sun.getEarth(new JHVTime(currentEvent.start));
             double elon = p.lon;
 
-            ArrayList<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());
+            List<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());
             localHGSBoundedBox.forEach(el -> jhvBoundedBox.add(convertHGSJHV(el, elon)));
 
-            ArrayList<Vec3> jhvBoundCC = new ArrayList<>(localHGSBoundCC.size());
+            List<Vec3> jhvBoundCC = new ArrayList<>(localHGSBoundCC.size());
             localHGSBoundCC.forEach(el -> jhvBoundCC.add(convertHGSJHV(el, elon)));
 
             Vec3 jhvCentralPoint = null;
