@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -68,12 +69,7 @@ public class SunJSONTypes {
     static Vec3 convertCoord(double r, double lon, double lat) {
         if (r < 1)
             Log.warn("Radius < 1: " + r + ' ' + lon + ' ' + lat);
-        lon = Math.toRadians(lon);
-        lat = Math.toRadians(lat);
-        return new Vec3(
-                r * Math.cos(lat) * Math.sin(lon),
-                r * Math.sin(lat),
-                r * Math.cos(lat) * Math.cos(lon));
+        return SphericalCoords.vec3(r, Math.toRadians(lon), Math.toRadians(lat));
     }
 
     /**/
