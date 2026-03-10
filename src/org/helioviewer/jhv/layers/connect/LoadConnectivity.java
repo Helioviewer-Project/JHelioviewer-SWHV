@@ -25,15 +25,15 @@ public class LoadConnectivity {
     public static class Connectivity {
 
         public final JHVTime time;
-        public final OrthoScaleList SSW;
-        public final OrthoScaleList FSW;
-        public final OrthoScaleList M;
+        public final List<Vec3> SSW;
+        public final List<Vec3> FSW;
+        public final List<Vec3> M;
 
-        Connectivity(JHVTime _time, List<Vec3> cartSSW, List<Vec3> cartFSW, List<Vec3> cartM) {
+        Connectivity(JHVTime _time, List<Vec3> _SSW, List<Vec3> _FSW, List<Vec3> _M) {
             time = _time;
-            SSW = new OrthoScaleList(cartSSW);
-            FSW = new OrthoScaleList(cartFSW);
-            M = new OrthoScaleList(cartM);
+            SSW = _SSW;
+            FSW = _FSW;
+            M = _M;
         }
 
     }
