@@ -114,9 +114,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             double r = alpha * r_start + (1 - alpha) * r_end;
             double theta = alpha * t_start + (1 - alpha) * t_end;
 
-            v.x = r * Math.cos(theta);
-            v.y = r * Math.sin(theta);
-            Vec3 res = q.rotateInverseVector(v);
+            Vec3 res = q.rotateInverseVector(SWEKData.polarVector(r, theta));
 
             if (i == 0) {
                 buf.putVertex(res, Colors.Null);
@@ -158,11 +156,9 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                 double deltatheta = sz / distSun * (el[0] * 2 - 1);
                 double deltar = sz * (el[1] * 2 - 1);
                 double r = distSun - deltar;
-                double theta = principalAngle - deltatheta;
+                double theta = principalAngle + deltatheta;
 
-                v.x = r * Math.cos(theta);
-                v.y = r * Math.sin(theta);
-                texBuf.putCoord(q.rotateInverseVector(v), el);
+                texBuf.putCoord(q.rotateInverseVector(SWEKData.polarVector(r, theta)), el);
             }
         }
     }

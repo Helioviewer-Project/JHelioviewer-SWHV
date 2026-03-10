@@ -10,6 +10,7 @@ final class NonOrthoProjection {
     private NonOrthoProjection() {
     }
 
+    // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectLatitudinal(rotateToMapBasis(viewpoint, gridType, v), scale);
     }
