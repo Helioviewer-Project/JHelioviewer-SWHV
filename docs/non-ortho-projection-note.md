@@ -18,6 +18,7 @@ This note documents the current convention used by the non-orthographic display 
 - Latitudinal projection is expressed as:
   - `x = longitude`
   - `y = latitude`
+- The GLSL latitudinal shader still parameterizes the source sphere using colatitude internally (`0` at north pole, `π` at south pole), but the exposed map convention remains positive latitude up.
 - Polar and log-polar projection use a polar angle with `0°` at north and increasing anti-clockwise.
 
 ## Important consequence
