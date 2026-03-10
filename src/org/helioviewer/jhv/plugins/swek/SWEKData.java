@@ -9,6 +9,7 @@ import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.math.Vec3;
 
 class SWEKData {
 
@@ -41,7 +42,7 @@ class SWEKData {
         JHVEventParameter p = evt.getParameter("event_coord1");
         try {
             if (p != null) {
-                return Double.parseDouble(p.getParameterValue()) + 90;
+                return Double.parseDouble(p.getParameterValue());
             }
         } catch (Exception ignore) {
         }
@@ -57,6 +58,11 @@ class SWEKData {
         } catch (Exception ignore) {
         }
         return 0;
+    }
+
+    static Vec3 polarVector(double radius, double angleRadians) {
+        // Polar basis: 0 at north, increasing anti-clockwise.
+        return new Vec3(-radius * Math.sin(angleRadians), radius * Math.cos(angleRadians), 0);
     }
 
 }
