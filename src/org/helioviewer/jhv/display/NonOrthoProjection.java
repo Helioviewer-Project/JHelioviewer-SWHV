@@ -38,6 +38,7 @@ final class NonOrthoProjection {
 
     private static Vec2 projectPolar(Vec3 v, GridScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
+        // Polar angle is defined as 0 at north and increasing anti-clockwise.
         double theta = Math.atan2(-v.x, v.y);
         theta += 2 * Math.PI;
         theta %= 2 * Math.PI;
@@ -48,6 +49,7 @@ final class NonOrthoProjection {
 
     private static Vec3 unprojectPolar(Vec2 pt) {
         double r = pt.y;
+        // Positive map angles rotate anti-clockwise from north.
         double theta = -Math.toRadians(pt.x);
         double y = r * Math.cos(theta);
         double x = r * Math.sin(theta);
