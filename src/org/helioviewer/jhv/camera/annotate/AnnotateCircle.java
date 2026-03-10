@@ -45,7 +45,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.x = center.x + cosr * u.x + sinr * v.x;
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
-            previous = Display.mode.drawProjectedMapVertex(viewpoint, gridType, vp, vx, previous, buf, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vx, previous, buf, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS);
         }
     }
 
