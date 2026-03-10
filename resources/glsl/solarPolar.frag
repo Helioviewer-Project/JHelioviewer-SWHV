@@ -1,12 +1,16 @@
 
+// Polar basis: 0 at north, increasing anti-clockwise.
+vec2 polar_basis(const float angle) {
+    return vec2(-sin(angle), cos(angle));
+}
+
 void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, const vec2 scrpos, out vec2 texcoord, out float radius) {
     float interpolated = screen.yStart + scrpos.y * (screen.yStop - screen.yStart);
     if (interpolated > display.radii.y || interpolated < display.radii.x)
         discard;
 
-    // Polar basis: 0 at north, increasing anti-clockwise.
-    float theta = -(scrpos.x * TWOPI + HALFPI /* - cr TBD */);
-    vec3 pos = vec3(cos(theta), sin(theta), 0.) * interpolated;
+    float angle = scrpos.x * TWOPI;
+    vec3 pos = vec3(polar_basis(angle) * interpolated, 0.);
     // if (interpolated < 1.)
     //     pos.z = interpolated;
 
