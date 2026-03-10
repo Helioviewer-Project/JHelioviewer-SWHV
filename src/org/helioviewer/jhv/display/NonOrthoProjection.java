@@ -28,8 +28,8 @@ final class NonOrthoProjection {
     }
 
     private static Quat mapRotation(GridType gridType, Position viewpoint) {
-        // Non-ortho maps use the same longitude as GridType.toGrid(), but the reflected
-        // flat-map basis makes the effective viewpoint latitude rotation positive.
+        // Non-ortho maps use GridType.toGrid() longitude, but Viewpoint latitude is
+        // rotated with a positive sign to match the shared non-ortho map basis.
         return Quat.createXY(gridType == GridType.Viewpoint ? viewpoint.lat : 0, gridType.toLongitude(viewpoint));
     }
 
@@ -60,10 +60,8 @@ final class NonOrthoProjection {
     }
 
     private static Vec3 unprojectLatitudinal(Vec2 pt) {
-        return latitudinalVector(Math.toRadians(pt.x), Math.toRadians(pt.y));
-    }
-
-    private static Vec3 latitudinalVector(double longitude, double latitude) {
+        double longitude = Math.toRadians(pt.x);
+        double latitude = Math.toRadians(pt.y);
         return new Vec3(
                 Math.cos(latitude) * Math.sin(longitude),
                 Math.sin(latitude),
