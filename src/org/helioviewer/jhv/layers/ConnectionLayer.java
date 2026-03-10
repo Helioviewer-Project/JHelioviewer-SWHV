@@ -28,7 +28,7 @@ import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.SunJSONTypes;
-import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -175,8 +175,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         double y = (1. - alpha) * prev.y() + alpha * next.y();
         double z = (1. - alpha) * prev.z() + alpha * next.z();
 
-        double theta = Math.acos(Math.clamp(y, -1., 1.));
-        return new Vec3(1, theta, Math.atan2(x, z));
+        Vec3 cart = new Vec3(x, y, z);
+        return new Vec3(1, SphericalCoords.colatitude(cart), SphericalCoords.longitude(cart));
     }
 
     private void drawFootpointInterpolated(Camera camera, Viewport vp, GL3 gl) {
