@@ -45,9 +45,9 @@ final class NonOrthoProjection {
 
     private static Vec3 unprojectPolar(Vec2 pt) {
         double r = pt.y;
-        Vec2 polarBasis = PolarBasis.vec2(r, Math.toRadians(pt.x));
-        double x = polarBasis.x;
-        double y = polarBasis.y;
+        double theta = Math.toRadians(pt.x);
+        double x = PolarBasis.x(r, theta);
+        double y = PolarBasis.y(r, theta);
         double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
         return new Vec3(x, y, z);
     }
@@ -62,7 +62,12 @@ final class NonOrthoProjection {
     }
 
     private static Vec3 unprojectLatitudinal(Vec2 pt) {
-        return SphericalCoords.unit(Math.toRadians(pt.x), Math.toRadians(pt.y));
+        double longitude = Math.toRadians(pt.x);
+        double latitude = Math.toRadians(pt.y);
+        return new Vec3(
+                SphericalCoords.x(1, longitude, latitude),
+                SphericalCoords.y(1, longitude, latitude),
+                SphericalCoords.z(1, longitude, latitude));
     }
 
     private static double polarAngleRadians(Vec3 v) {
