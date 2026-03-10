@@ -12,7 +12,7 @@ final class NonOrthoProjection {
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectLatitudinal(rotateToMapBasis(viewpoint, gridType, v), scale);
+        return projectLatitudinal(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
     static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
@@ -20,15 +20,11 @@ final class NonOrthoProjection {
     }
 
     static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectPolar(rotateToMapBasis(viewpoint, gridType, v), scale);
+        return projectPolar(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
     static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
         return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolar(pt));
-    }
-
-    private static Vec3 rotateToMapBasis(Position viewpoint, GridType gridType, Vec3 v) {
-        return mapRotation(gridType, viewpoint).rotateVector(v);
     }
 
     private static Quat mapRotation(GridType gridType, Position viewpoint) {
@@ -55,8 +51,9 @@ final class NonOrthoProjection {
     }
 
     private static Vec2 projectLatitudinal(Vec3 v, GridScale scale) {
-        double latitude = latitudeRadians(v);
-        double longitude = longitudeRadians(v);
+        // Positive latitude corresponds to positive Y in the non-ortho map basis.
+        double latitude = Math.asin(Math.clamp(v.y, -1., 1.));
+        double longitude = Math.atan2(v.x, v.z);
         double scaledphi = scale.getXValueInv(Math.toDegrees(longitude));
         double scaledtheta = scale.getYValueInv(Math.toDegrees(latitude));
         return new Vec2(scaledphi, scaledtheta);
@@ -64,15 +61,6 @@ final class NonOrthoProjection {
 
     private static Vec3 unprojectLatitudinal(Vec2 pt) {
         return latitudinalVector(Math.toRadians(pt.x), Math.toRadians(pt.y));
-    }
-
-    private static double latitudeRadians(Vec3 v) {
-        // Positive latitude corresponds to positive Y in the non-ortho map basis.
-        return Math.asin(Math.clamp(v.y, -1., 1.));
-    }
-
-    private static double longitudeRadians(Vec3 v) {
-        return Math.atan2(v.x, v.z);
     }
 
     private static Vec3 latitudinalVector(double longitude, double latitude) {
