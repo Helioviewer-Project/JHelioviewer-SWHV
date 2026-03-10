@@ -44,6 +44,7 @@ import com.jogamp.opengl.GL3;
 public final class ConnectionLayer extends AbstractLayer implements LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver, LoadSunJSON.Receiver {
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
+    private static final double ORTHO_RADIUS = 1.01;
     private static final float SIZE_POINT = 0.01f;
 
     private final byte[] sswColor = Colors.bytes(164, 48, 42);
@@ -127,9 +128,16 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
     }
 
+    private static Vec3 increaseOrthoRadius(Vec3 v) {
+        return new Vec3(ORTHO_RADIUS * v.x, ORTHO_RADIUS * v.y, ORTHO_RADIUS * v.z);
+    }
+
     private static void putConnectivity(Quat q, Viewport vp, List<Vec3> points, BufVertex vexBuf, byte[] color) {
         if (Display.mode == ProjectionMode.Orthographic)
-            points.forEach(v -> vexBuf.putVertex((float) v.x, (float) v.y, (float) v.z, 2 * SIZE_POINT, color));
+            points.forEach(v -> {
+                Vec3 ortho = increaseOrthoRadius(v);
+                vexBuf.putVertex((float) ortho.x, (float) ortho.y, (float) ortho.z, 2 * SIZE_POINT, color);
+            });
         else
             points.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
     }
@@ -138,9 +146,9 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (hcs.isEmpty())
             return;
         if (Display.mode == ProjectionMode.Orthographic) {
-            Vec3 first = hcs.getFirst();
+            Vec3 first = increaseOrthoRadius(hcs.getFirst());
             hcsBuf.putVertex(first, Colors.Null);
-            hcs.forEach(v -> hcsBuf.putVertex(v, hcsColor));
+            hcs.forEach(v -> hcsBuf.putVertex(increaseOrthoRadius(v), hcsColor));
             hcsBuf.putVertex(first, hcsColor);
             hcsBuf.putVertex(first, Colors.Null);
         } else {
