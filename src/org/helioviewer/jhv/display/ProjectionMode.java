@@ -73,7 +73,7 @@ public enum ProjectionMode {
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
         @Override
         public Vec2 transform(Quat q, Vec3 v) {
-            return transformLatitudinal(q.rotateVector(v), scale);
+            return transformLatitudinal(q.rotateVector(projectScale(v)), scale);
         }
 
         @Override
@@ -84,7 +84,7 @@ public enum ProjectionMode {
     LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar) {
         @Override
         public Vec2 transform(Quat q, Vec3 v) {
-            return transformPolar(q.rotateVector(v), scale);
+            return transformPolar(q.rotateVector(projectScale(v)), scale);
         }
 
         @Override
@@ -95,7 +95,7 @@ public enum ProjectionMode {
     Polar(GLSLSolarShader.polar, GridScale.polar) {
         @Override
         public Vec2 transform(Quat q, Vec3 v) {
-            return transformPolar(q.rotateVector(v), scale);
+            return transformPolar(q.rotateVector(projectScale(v)), scale);
         }
 
         @Override
@@ -117,13 +117,16 @@ public enum ProjectionMode {
     public abstract Vec3 transformInverse(Quat q, Vec2 pt);
 
     public Vec2 drawProjectedVertex(Quat q, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-        Vec3 projected = new Vec3(vertex.x, -vertex.y, vertex.z); // TBD
         if (first)
-            GLHelper.drawVertex(q, vp, projected, previous, vexBuf, Colors.Null);
-        Vec2 current = GLHelper.drawVertex(q, vp, projected, previous, vexBuf, color);
+            GLHelper.drawVertex(q, vp, vertex, previous, vexBuf, Colors.Null);
+        Vec2 current = GLHelper.drawVertex(q, vp, vertex, previous, vexBuf, color);
         if (last)
-            GLHelper.drawVertex(q, vp, projected, current, vexBuf, Colors.Null);
+            GLHelper.drawVertex(q, vp, vertex, current, vexBuf, Colors.Null);
         return current;
+    }
+
+    private static Vec3 projectScale(Vec3 v) {
+        return new Vec3(v.x, -v.y, v.z);
     }
 
     public Position projectionViewpoint(Position viewpoint) {

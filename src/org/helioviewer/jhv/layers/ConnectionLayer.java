@@ -32,6 +32,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
@@ -122,7 +123,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private static void putPointScale(Quat q, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
         Vec2 tf = Display.mode.transform(q, vertex);
         float x = (float) (tf.x * vp.aspect);
-        float y = (float) -tf.y; //!
+        float y = (float) tf.y;
         vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
     }
 
@@ -133,21 +134,26 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             points.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
     }
 
-    private static final double ORTHO_RADIUS = 1.01;
-
     private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
         if (hcs.isEmpty())
             return;
-
-        Quat q = Display.gridType.toGrid(camera.getViewpoint());
-
-        Vec2 previous = null;
-        Vec3 first = hcs.getFirst();
-        previous = Display.mode.drawProjectedVertex(q, vp, first, previous, hcsBuf, Colors.Null, true, false, ORTHO_RADIUS);
-        for (Vec3 v : hcs) {
-            previous = Display.mode.drawProjectedVertex(q, vp, v, previous, hcsBuf, hcsColor, false, false, ORTHO_RADIUS);
+        if (Display.mode == ProjectionMode.Orthographic) {
+            Vec3 first = hcs.getFirst();
+            hcsBuf.putVertex(first, Colors.Null);
+            hcs.forEach(v -> hcsBuf.putVertex(v, hcsColor));
+            hcsBuf.putVertex(first, hcsColor);
+            hcsBuf.putVertex(first, Colors.Null);
+        } else {
+            Quat q = Display.gridType.toGrid(camera.getViewpoint());
+            Vec2 previous = null;
+            Vec3 first = hcs.getFirst();
+            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
+            for (Vec3 v : hcs) {
+                previous = GLHelper.drawVertex(q, vp, v, previous, hcsBuf, hcsColor);
+            }
+            previous = GLHelper.drawVertex(q, vp, first, previous, hcsBuf, hcsColor);
+            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
         }
-        Display.mode.drawProjectedVertex(q, vp, first, previous, hcsBuf, hcsColor, false, true, ORTHO_RADIUS);
 
         hcsLine.setVertex(gl, hcsBuf);
         hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);
