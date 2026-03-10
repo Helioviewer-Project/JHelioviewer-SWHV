@@ -16,6 +16,7 @@ import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONArray;
@@ -277,13 +278,7 @@ class HEKParser {
     }
 
     private static Vec3 convertHGSJHV(Vec3 el, double elon) {
-        double theta = Math.toRadians(el.y);
-        double phi = Math.toRadians(el.x) - elon;
-
-        double x = Math.cos(theta) * Math.sin(phi);
-        double y = Math.sin(theta);
-        double z = Math.cos(theta) * Math.cos(phi);
-        return new Vec3(x, y, z);
+        return SphericalCoords.unit(Math.toRadians(el.x) - elon, Math.toRadians(el.y));
     }
 
 }
