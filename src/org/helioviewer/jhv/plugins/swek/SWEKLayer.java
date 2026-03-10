@@ -33,6 +33,7 @@ import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -115,7 +116,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             double r = alpha * r_start + (1 - alpha) * r_end;
             double theta = alpha * t_start + (1 - alpha) * t_end;
 
-            Vec3 res = q.rotateInverseVector(SWEKData.polarVector(r, theta));
+            Vec3 res = q.rotateInverseVector(PolarBasis.vec3(r, theta));
 
             if (i == 0) {
                 buf.putVertex(res, Colors.Null);
@@ -159,7 +160,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                 double r = distSun - deltar;
                 double theta = principalAngle + deltatheta;
 
-                texBuf.putCoord(q.rotateInverseVector(SWEKData.polarVector(r, theta)), el);
+                texBuf.putCoord(q.rotateInverseVector(PolarBasis.vec3(r, theta)), el);
             }
         }
     }

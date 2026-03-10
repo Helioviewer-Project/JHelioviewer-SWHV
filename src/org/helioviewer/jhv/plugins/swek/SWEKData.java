@@ -9,8 +9,6 @@ import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.math.PolarBasis;
-import org.helioviewer.jhv.math.Vec3;
 
 class SWEKData {
 
@@ -59,10 +57,6 @@ class SWEKData {
         } catch (Exception ignore) {
         }
         return 0;
-    }
-
-    static Vec3 polarVector(double radius, double angleRadians) {
-        return PolarBasis.vec3(radius, angleRadians);
     }
 
 }
