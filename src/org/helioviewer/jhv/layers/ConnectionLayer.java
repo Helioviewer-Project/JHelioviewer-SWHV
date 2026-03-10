@@ -155,12 +155,12 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             Position viewpoint = camera.getViewpoint();
             Vec2 previous = null;
             Vec3 first = hcs.getFirst();
-            GLHelper.drawVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
+            GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
             for (Vec3 v : hcs) {
-                previous = GLHelper.drawVertex(viewpoint, Display.gridType, vp, v, previous, hcsBuf, hcsColor);
+                previous = GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, v, previous, hcsBuf, hcsColor);
             }
-            previous = GLHelper.drawVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, hcsColor);
-            GLHelper.drawVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
+            previous = GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, hcsColor);
+            GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
         }
 
         hcsLine.setVertex(gl, hcsBuf);
