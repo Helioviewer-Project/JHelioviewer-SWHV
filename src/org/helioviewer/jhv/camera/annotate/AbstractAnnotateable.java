@@ -60,6 +60,13 @@ abstract class AbstractAnnotateable implements Annotateable {
         return SphericalCoords.unit(longitude, latitude);
     }
 
+    static Vec3 annotationSpherical(Vec3 point) {
+        return new Vec3(
+                SphericalCoords.radius(point),
+                SphericalCoords.longitude(point),
+                SphericalCoords.latitude(point));
+    }
+
     @Nullable
     static Vec3 computePointSun(Camera camera, Viewport vp, int x, int y) {
         return Display.mode.unprojectMouse(camera, vp, x, y, Display.gridType);
