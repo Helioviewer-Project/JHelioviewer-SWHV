@@ -259,7 +259,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
         if (Display.mode == ProjectionMode.Latitudinal) {
             GridType gridType = Display.gridType;
-            shader.bindAnglesLatiGrid(gl,
+            shader.bindLatitudinalGrid(gl,
                     latiLongitude(gridType, cameraViewpoint, metaViewpoint0),
                     gridType.toLatitude(metaViewpoint0),
                     metaViewpoint0.lat,

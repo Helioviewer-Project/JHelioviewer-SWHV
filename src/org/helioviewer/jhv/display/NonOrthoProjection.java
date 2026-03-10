@@ -59,16 +59,30 @@ final class NonOrthoProjection {
     }
 
     private static Vec2 projectLatitudinal(Vec3 v, GridScale scale) {
-        double theta = Math.asin(Math.clamp(v.y, -1., 1.));
-        double phi = Math.atan2(v.x, v.z);
-        double scaledphi = scale.getXValueInv(Math.toDegrees(phi));
-        double scaledtheta = scale.getYValueInv(Math.toDegrees(theta));
+        double latitude = latitudeRadians(v);
+        double longitude = longitudeRadians(v);
+        double scaledphi = scale.getXValueInv(Math.toDegrees(longitude));
+        double scaledtheta = scale.getYValueInv(Math.toDegrees(latitude));
         return new Vec2(scaledphi, scaledtheta);
     }
 
     private static Vec3 unprojectLatitudinal(Vec2 pt) {
-        double phi = Math.toRadians(pt.x);
-        double theta = Math.toRadians(pt.y);
-        return new Vec3(Math.cos(theta) * Math.sin(phi), Math.sin(theta), Math.cos(theta) * Math.cos(phi));
+        return latitudinalVector(Math.toRadians(pt.x), Math.toRadians(pt.y));
+    }
+
+    private static double latitudeRadians(Vec3 v) {
+        // Positive latitude corresponds to positive Y in the non-ortho map basis.
+        return Math.asin(Math.clamp(v.y, -1., 1.));
+    }
+
+    private static double longitudeRadians(Vec3 v) {
+        return Math.atan2(v.x, v.z);
+    }
+
+    private static Vec3 latitudinalVector(double longitude, double latitude) {
+        return new Vec3(
+                Math.cos(latitude) * Math.sin(longitude),
+                Math.sin(latitude),
+                Math.cos(latitude) * Math.cos(longitude));
     }
 }
