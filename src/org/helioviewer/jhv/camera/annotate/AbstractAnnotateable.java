@@ -10,6 +10,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.json.JSONArray;
@@ -36,20 +37,10 @@ abstract class AbstractAnnotateable implements Annotateable {
         }
     }
 
-    static Vec3 toSpherical(Vec3 p) {
-        double len = p.length();
-        return new Vec3(len, Math.acos(p.y / len), Math.atan2(p.x, p.z));
-    }
-
     private static JSONObject toPointJson(Vec3 p) {
-        double len = p.length();
-        double lon = Math.atan2(p.x, p.z);
-        double lat = Math.asin(p.y / len);
+        double lon = SphericalCoords.longitude(p);
+        double lat = SphericalCoords.latitude(p);
         return new JSONObject().put("lon", Math.toDegrees(lon < 0 ? lon + 2 * Math.PI : lon)).put("lat", Math.toDegrees(lat));
-    }
-
-    private static Vec3 toCart(double y, double z) {
-        return new Vec3(Math.sin(y) * Math.sin(z), Math.cos(y), Math.sin(y) * Math.cos(z));
     }
 
     private static Vec3 fromPointJson(JSONObject jo, String name) {
@@ -60,13 +51,13 @@ abstract class AbstractAnnotateable implements Annotateable {
         if (obj == null || !obj.has("lon") || !obj.has("lat"))
             return null;
         double lon = Math.toRadians(obj.getDouble("lon")), lat = Math.toRadians(obj.getDouble("lat"));
-        return new Vec3(Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon));
+        return SphericalCoords.unit(lon, lat);
     }
 
     static Vec3 interpolate(double t, Vec3 point1, Vec3 point2) {
-        double y = (1 - t) * point1.y + t * point2.y;
-        double z = (1 - t) * point1.z + t * point2.z;
-        return toCart(y, z);
+        double longitude = (1 - t) * point1.y + t * point2.y;
+        double latitude = (1 - t) * point1.z + t * point2.z;
+        return SphericalCoords.unit(longitude, latitude);
     }
 
     @Nullable

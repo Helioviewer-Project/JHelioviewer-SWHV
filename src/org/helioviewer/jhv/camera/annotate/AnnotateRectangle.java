@@ -5,6 +5,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -19,11 +20,11 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     private static void drawRectangle(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
-        if (bp.z * ep.z < 0) {
-            if (ep.z < bp.z && bp.z > Math.PI / 2)
-                ep.z += 2 * Math.PI;
-            else if (ep.z > bp.z && bp.z < -Math.PI / 2)
-                bp.z += 2 * Math.PI;
+        if (bp.y * ep.y < 0) {
+            if (ep.y < bp.y && bp.y > Math.PI / 2)
+                ep.y += 2 * Math.PI;
+            else if (ep.y > bp.y && bp.y < -Math.PI / 2)
+                bp.y += 2 * Math.PI;
         }
 
         Vec3 p2 = new Vec3(1, ep.y, bp.z);
@@ -70,7 +71,9 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawRectangle(viewpoint, gridType, vp, toSpherical(p0), toSpherical(p1), buf, color);
+        Vec3 spherical0 = new Vec3(SphericalCoords.radius(p0), SphericalCoords.longitude(p0), SphericalCoords.latitude(p0));
+        Vec3 spherical1 = new Vec3(SphericalCoords.radius(p1), SphericalCoords.longitude(p1), SphericalCoords.latitude(p1));
+        drawRectangle(viewpoint, gridType, vp, spherical0, spherical1, buf, color);
     }
 
     @Override
