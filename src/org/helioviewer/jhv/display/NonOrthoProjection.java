@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -43,7 +44,7 @@ final class NonOrthoProjection {
 
     private static Vec3 unprojectPolar(Vec2 pt) {
         double r = pt.y;
-        Vec2 polarBasis = polarBasis(Math.toRadians(pt.x), r);
+        Vec2 polarBasis = PolarBasis.vec2(r, Math.toRadians(pt.x));
         double x = polarBasis.x;
         double y = polarBasis.y;
         double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
@@ -74,10 +75,5 @@ final class NonOrthoProjection {
         theta += 2 * Math.PI;
         theta %= 2 * Math.PI;
         return theta;
-    }
-
-    private static Vec2 polarBasis(double angleRadians, double radius) {
-        // Positive map angles rotate anti-clockwise from north.
-        return new Vec2(-radius * Math.sin(angleRadians), radius * Math.cos(angleRadians));
     }
 }
