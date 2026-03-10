@@ -21,7 +21,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     static final byte[] dragColor = Colors.Green;
     static final byte[] baseColor = Colors.Blue;
 
-    protected static final double radius = Sun.Radius * 1.01;
+    protected static final double ANNOTATION_RADIUS = Sun.Radius * 1.01;
 
     Vec3 startPoint;
     Vec3 endPoint;
