@@ -56,6 +56,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private static final int DIVPOINTS = 10;
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
+    private static final double POLYGON_RADIUS = Sun.Radius * 1.01;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_ALPHA = 0.7;
@@ -192,7 +193,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     pt.x = xnew / r;
                     pt.y = ynew / r;
                     pt.z = znew / r;
-                    previous = Display.mode.drawProjectedMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
+                    previous = Display.mode.drawProjectedMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, POLYGON_RADIUS);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};

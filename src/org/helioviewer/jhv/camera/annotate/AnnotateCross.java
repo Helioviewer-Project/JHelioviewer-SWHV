@@ -35,7 +35,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
-            previous = Display.mode.drawProjectedMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
+            previous = Display.mode.drawProjectedMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS);
         }
     }
 
