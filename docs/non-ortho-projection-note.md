@@ -18,8 +18,10 @@ This note documents the current convention used by the non-orthographic display 
 - Latitudinal projection is expressed as:
   - `x = longitude`
   - `y = latitude`
-- The GLSL latitudinal shader now uses explicit latitude internally as well: `0` at the equator, positive toward solar north.
+- The GLSL latitudinal shader uses explicit latitude internally as well: `0` at the equator, positive toward solar north.
 - Polar and log-polar projection use a polar angle with `0°` at north and increasing anti-clockwise.
+- The Java polar projection expresses that convention directly.
+- The GLSL polar/log-polar shaders intentionally keep the legacy internal `theta = -(...) - HALFPI` style basis expression, because that is the form that matches the image reprojection path after `apply_center(..., vec3(pos.x, -pos.y, 0.), ...)`.
 - Remaining sign flips in the GLSL code, such as final texture-space Y inversion, belong to image/WCS sampling space and should not be confused with the map convention itself.
 
 ## Important consequence
