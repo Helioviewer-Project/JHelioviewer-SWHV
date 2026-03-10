@@ -1,6 +1,8 @@
 
+// grid = (map longitude offset, map colatitude offset, heliographic latitude)
 vec2 get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, const vec2 scrpos, const float dt, const vec3 grid) {
     float phi   = grid.x + scrpos.x * TWOPI;
+    // theta is colatitude here: 0 at north pole, PI at south pole.
     float theta = grid.y + scrpos.y * PI;
 
     if (dt != 0) {
@@ -25,6 +27,8 @@ vec2 get_lati_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, cons
     if (xcartrot.x < 0.)
         discard;
 
+    // The map itself is expressed in latitude, but image sampling still uses the
+    // legacy image-space vertical convention via -xcartrot.z and -centered.y.
     vec3 centered = apply_center(vec3(xcartrot.y, -xcartrot.z, 0.), CRVAL, CROTA);
     vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_texture(texcoord);
