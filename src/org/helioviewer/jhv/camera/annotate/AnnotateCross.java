@@ -2,10 +2,11 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -19,32 +20,32 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    public static void drawCross(Quat q, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
+    public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
         Vec3 p1 = new Vec3(1, bp.y + delta, bp.z);
         Vec3 p2 = new Vec3(1, bp.y - delta, bp.z);
         Vec3 p3 = new Vec3(1, bp.y, bp.z + delta);
         Vec3 p4 = new Vec3(1, bp.y, bp.z - delta);
 
-        interpolatedDraw(q, vp, p1, p2, buf, color);
-        interpolatedDraw(q, vp, p3, p4, buf, color);
+        interpolatedDraw(viewpoint, gridType, vp, p1, p2, buf, color);
+        interpolatedDraw(viewpoint, gridType, vp, p3, p4, buf, color);
     }
 
-    private static void interpolatedDraw(Quat q, Viewport vp, Vec3 p1s, Vec3 p2s, BufVertex buf, byte[] color) {
+    private static void interpolatedDraw(Position viewpoint, GridType gridType, Viewport vp, Vec3 p1s, Vec3 p2s, BufVertex buf, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
-            previous = Display.mode.drawProjectedVertex(q, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
+            previous = Display.mode.drawProjectedVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, radius);
         }
     }
 
     @Override
-    public void draw(Quat q, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex buf) {
         if (startPoint == null)
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        drawCross(q, vp, toSpherical(startPoint), buf, color);
+        drawCross(viewpoint, gridType, vp, toSpherical(startPoint), buf, color);
     }
 
     @Override

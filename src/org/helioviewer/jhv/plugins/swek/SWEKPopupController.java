@@ -170,8 +170,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        Quat q = Display.gridType.toGrid(camera.getViewpoint());
-                        tf = Display.mode.transform(q, pt);
+                        tf = Display.mode.transform(camera.getViewpoint(), Display.gridType, pt);
                     }
                 }
 
