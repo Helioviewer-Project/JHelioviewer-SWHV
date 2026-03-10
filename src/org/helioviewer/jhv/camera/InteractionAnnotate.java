@@ -13,7 +13,6 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
