@@ -16,16 +16,12 @@ public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, GridScale.ortho) {
         @Override
         public Vec2 transform(Quat q, Vec3 v) {
-            Vec3 rotated = q.rotateVector(v);
-            return new Vec2(rotated.x, -rotated.y);
+            throw new UnsupportedOperationException("Orthographic mode does not use transform()");
         }
 
         @Override
         public Vec3 transformInverse(Quat q, Vec2 pt) {
-            double x = pt.x;
-            double y = -pt.y;
-            double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
-            return q.rotateInverseVector(new Vec3(x, y, z));
+            throw new UnsupportedOperationException("Orthographic mode does not use transformInverse()");
         }
 
         @Override
