@@ -167,7 +167,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawPolygon(Quat q, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -196,7 +196,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     pt.x = xnew / r;
                     pt.y = ynew / r;
                     pt.z = znew / r;
-                    previous = Display.mode.drawProjectedVertex(q, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
+                    previous = Display.mode.drawProjectedVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
@@ -246,14 +246,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(Quat q, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIconScale(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.transform(q, pt);
+            Vec2 tf = Display.mode.transform(camera.getViewpoint(), Display.gridType, pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
@@ -356,13 +356,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (evs.isEmpty())
             return;
 
-        Quat q = Display.gridType.toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus()) {
                 drawCactusArc(evtr, evt, controller.currentTime);
             } else {
-                drawPolygon(q, vp, evtr, evt);
+                drawPolygon(camera, vp, evtr, evt);
                 if (icons) {
                     drawIcon(evtr, evt);
                 }
@@ -382,15 +381,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (evs.isEmpty())
             return;
 
-        Quat q = Display.gridType.toGrid(camera.getViewpoint());
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus() && (Display.mode == ProjectionMode.LogPolar || Display.mode == ProjectionMode.Polar)) {
                 drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
             } else {
-                drawPolygon(q, vp, evtr, evt);
+                drawPolygon(camera, vp, evtr, evt);
                 if (icons) {
-                    drawIconScale(q, vp, evtr, evt);
+                    drawIconScale(camera, vp, evtr, evt);
                 }
             }
         }
