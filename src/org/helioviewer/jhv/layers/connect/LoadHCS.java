@@ -20,16 +20,16 @@ import com.google.common.util.concurrent.FutureCallback;
 public class LoadHCS {
 
     public interface Receiver {
-        void setHCS(List<Vec3> hcs);
+        void setHCS(OrthoScaleList hcs);
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
         EDTCallbackExecutor.pool.submit(new HCS(uri), new Callback(receiver));
     }
 
-    private record HCS(URI uri) implements Callable<List<Vec3>> {
+    private record HCS(URI uri) implements Callable<OrthoScaleList> {
         @Override
-        public List<Vec3> call() throws Exception {
+        public OrthoScaleList call() throws Exception {
             List<Vec3> hcsList = new ArrayList<>();
             try (NetClient nc = NetClient.of(uri); BufferedReader br = new BufferedReader(nc.getReader())) {
                 int lineNo = 0;
@@ -52,14 +52,14 @@ public class LoadHCS {
                     }
                 }
             }
-            return hcsList;
+            return new OrthoScaleList(hcsList);
         }
     }
 
-    private record Callback(Receiver receiver) implements FutureCallback<List<Vec3>> {
+    private record Callback(Receiver receiver) implements FutureCallback<OrthoScaleList> {
 
         @Override
-        public void onSuccess(List<Vec3> result) {
+        public void onSuccess(OrthoScaleList result) {
             receiver.setHCS(result);
         }
 
