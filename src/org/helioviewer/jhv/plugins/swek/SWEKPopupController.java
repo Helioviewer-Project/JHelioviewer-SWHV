@@ -18,6 +18,7 @@ import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -141,7 +142,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
                     double distSun = computeDistSun(evt);
                     Quat q = pi.getEarth().toQuat();
-                    pt = q.rotateInverseVector(SWEKData.polarVector(distSun, principalAngle));
+                    pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
 
                     hitpoint = CameraHelper.unprojectToOutputPlane(camera, vp, mouseOverX, mouseOverY, Quat.ZERO);
                     if (hitpoint != null) {

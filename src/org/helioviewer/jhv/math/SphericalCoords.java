@@ -23,11 +23,23 @@ public final class SphericalCoords {
         return r == 0 ? 0 : Math.acos(Math.clamp(v.y / r, -1., 1.));
     }
 
+    public static double x(double radius, double longitude, double latitude) {
+        return radius * Math.cos(latitude) * Math.sin(longitude);
+    }
+
+    public static double y(double radius, double longitude, double latitude) {
+        return radius * Math.sin(latitude);
+    }
+
+    public static double z(double radius, double longitude, double latitude) {
+        return radius * Math.cos(latitude) * Math.cos(longitude);
+    }
+
     public static Vec3 vec3(double radius, double longitude, double latitude) {
         return new Vec3(
-                radius * Math.cos(latitude) * Math.sin(longitude),
-                radius * Math.sin(latitude),
-                radius * Math.cos(latitude) * Math.cos(longitude));
+                x(radius, longitude, latitude),
+                y(radius, longitude, latitude),
+                z(radius, longitude, latitude));
     }
 
     public static Vec3 unit(double longitude, double latitude) {

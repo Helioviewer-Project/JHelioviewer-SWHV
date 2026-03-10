@@ -15,8 +15,11 @@ class ConnectUtils {
     static Position.Cartesian toCartesian(long milli, String lonStr, String latStr) {
         double lon = Math.toRadians(Double.parseDouble(lonStr));
         double lat = Math.toRadians(Double.parseDouble(latStr));
-        Vec3 v = SphericalCoords.unit(lon, lat);
-        return new Position.Cartesian(milli, v.x, v.y, v.z);
+        return new Position.Cartesian(
+                milli,
+                SphericalCoords.x(1, lon, lat),
+                SphericalCoords.y(1, lon, lat),
+                SphericalCoords.z(1, lon, lat));
     }
 
 }
