@@ -112,17 +112,17 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private void drawConnectivity(Camera camera, Viewport vp, GL3 gl) {
-        Quat q = Display.gridType.toGrid(camera.getViewpoint());
-        putConnectivity(q, vp, connectivity.SSW, connectivityBuf, sswColor);
-        putConnectivity(q, vp, connectivity.FSW, connectivityBuf, fswColor);
-        putConnectivity(q, vp, connectivity.M, connectivityBuf, mColor);
+        Position viewpoint = camera.getViewpoint();
+        putConnectivity(viewpoint, vp, connectivity.SSW, connectivityBuf, sswColor);
+        putConnectivity(viewpoint, vp, connectivity.FSW, connectivityBuf, fswColor);
+        putConnectivity(viewpoint, vp, connectivity.M, connectivityBuf, mColor);
 
         connectivityCenter.setVertex(gl, connectivityBuf);
         connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
     }
 
-    private static void putPointScale(Quat q, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
-        Vec2 tf = Display.mode.transform(q, vertex);
+    private static void putPointScale(Position viewpoint, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
+        Vec2 tf = Display.mode.transform(viewpoint, Display.gridType, vertex);
         float x = (float) (tf.x * vp.aspect);
         float y = (float) tf.y;
         vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
@@ -132,14 +132,14 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         return new Vec3(ORTHO_RADIUS * v.x, ORTHO_RADIUS * v.y, ORTHO_RADIUS * v.z);
     }
 
-    private static void putConnectivity(Quat q, Viewport vp, List<Vec3> points, BufVertex vexBuf, byte[] color) {
+    private static void putConnectivity(Position viewpoint, Viewport vp, List<Vec3> points, BufVertex vexBuf, byte[] color) {
         if (Display.mode == ProjectionMode.Orthographic)
             points.forEach(v -> {
                 Vec3 ortho = increaseOrthoRadius(v);
                 vexBuf.putVertex((float) ortho.x, (float) ortho.y, (float) ortho.z, 2 * SIZE_POINT, color);
             });
         else
-            points.forEach(v -> putPointScale(q, vp, v, vexBuf, color));
+            points.forEach(v -> putPointScale(viewpoint, vp, v, vexBuf, color));
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
@@ -152,15 +152,15 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             hcsBuf.putVertex(first, hcsColor);
             hcsBuf.putVertex(first, Colors.Null);
         } else {
-            Quat q = Display.gridType.toGrid(camera.getViewpoint());
+            Position viewpoint = camera.getViewpoint();
             Vec2 previous = null;
             Vec3 first = hcs.getFirst();
-            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
+            GLHelper.drawVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
             for (Vec3 v : hcs) {
-                previous = GLHelper.drawVertex(q, vp, v, previous, hcsBuf, hcsColor);
+                previous = GLHelper.drawVertex(viewpoint, Display.gridType, vp, v, previous, hcsBuf, hcsColor);
             }
-            previous = GLHelper.drawVertex(q, vp, first, previous, hcsBuf, hcsColor);
-            GLHelper.drawVertex(q, vp, first, previous, hcsBuf, Colors.Null);
+            previous = GLHelper.drawVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, hcsColor);
+            GLHelper.drawVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
         }
 
         hcsLine.setVertex(gl, hcsBuf);
@@ -184,9 +184,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         updateTimestamp(viewpoint.time);
 
         Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-        Quat q = Display.gridType.toGrid(viewpoint);
 
-        AnnotateCross.drawCross(q, vp, v, footpointBuf, footpointColor);
+        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, v, footpointBuf, footpointColor);
         footpointLine.setVertex(gl, footpointBuf);
         footpointLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }

@@ -56,14 +56,13 @@ class InteractionAnnotate implements Interaction.Type {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         Position viewpoint = camera.getViewpoint();
-        Quat q = Display.gridType.toGrid(viewpoint);
         anns.forEach(annotateable -> {
             boolean active = annotateable == activeAnn;
-            annotateable.draw(q, vp, active, annsBuf);
+            annotateable.draw(viewpoint, Display.gridType, vp, active, annsBuf);
             annotateable.drawTransformed(active, transBuf, centerBuf);
         });
         if (newAnnotateable != null) {
-            newAnnotateable.draw(q, vp, false, annsBuf);
+            newAnnotateable.draw(viewpoint, Display.gridType, vp, false, annsBuf);
             newAnnotateable.drawTransformed(false, transBuf, centerBuf);
         }
         annsLine.setVertex(gl, annsBuf);
