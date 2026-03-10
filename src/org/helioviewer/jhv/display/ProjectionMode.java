@@ -12,20 +12,22 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
+// Orthographic mode renders directly in 3D, while non-orthographic modes project
+// through an explicit map basis shared by rendering and mouse unprojection.
 public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, GridScale.ortho) {
         @Override
-        protected Vec2 transformFlat(Position viewpoint, GridType gridType, Vec3 v) {
-            throw new UnsupportedOperationException("Orthographic mode does not use transform()");
+        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
+            throw new UnsupportedOperationException("Orthographic mode does not use project()");
         }
 
         @Override
-        protected Vec3 transformInverseFlat(Position viewpoint, GridType gridType, Vec2 pt) {
-            throw new UnsupportedOperationException("Orthographic mode does not use transformInverse()");
+        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
+            throw new UnsupportedOperationException("Orthographic mode does not use unproject()");
         }
 
         @Override
-        public Vec2 drawProjectedVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+        public Vec2 drawProjectedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
             if (first) {
                 vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
             }
@@ -68,35 +70,35 @@ public enum ProjectionMode {
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
         @Override
-        protected Vec2 transformFlat(Position viewpoint, GridType gridType, Vec3 v) {
-            return transformLatitudinal(flatMapRotation(gridType, viewpoint).rotateVector(v), scale);
+        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
+            return projectLatitudinal(nonOrthoMapRotation(gridType, viewpoint).rotateVector(v), scale);
         }
 
         @Override
-        protected Vec3 transformInverseFlat(Position viewpoint, GridType gridType, Vec2 pt) {
-            return flatMapRotation(gridType, viewpoint).rotateInverseVector(transformInverseLatitudinal(pt));
+        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
+            return nonOrthoMapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinal(pt));
         }
     },
     LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar) {
         @Override
-        protected Vec2 transformFlat(Position viewpoint, GridType gridType, Vec3 v) {
-            return transformPolar(flatMapRotation(gridType, viewpoint).rotateVector(v), scale);
+        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
+            return projectPolar(nonOrthoMapRotation(gridType, viewpoint).rotateVector(v), scale);
         }
 
         @Override
-        protected Vec3 transformInverseFlat(Position viewpoint, GridType gridType, Vec2 pt) {
-            return flatMapRotation(gridType, viewpoint).rotateInverseVector(transformInversePolar(pt));
+        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
+            return nonOrthoMapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolar(pt));
         }
     },
     Polar(GLSLSolarShader.polar, GridScale.polar) {
         @Override
-        protected Vec2 transformFlat(Position viewpoint, GridType gridType, Vec3 v) {
-            return transformPolar(flatMapRotation(gridType, viewpoint).rotateVector(v), scale);
+        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
+            return projectPolar(nonOrthoMapRotation(gridType, viewpoint).rotateVector(v), scale);
         }
 
         @Override
-        protected Vec3 transformInverseFlat(Position viewpoint, GridType gridType, Vec2 pt) {
-            return flatMapRotation(gridType, viewpoint).rotateInverseVector(transformInversePolar(pt));
+        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
+            return nonOrthoMapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolar(pt));
         }
     };
 
@@ -108,19 +110,19 @@ public enum ProjectionMode {
         scale = _scale;
     }
 
-    public final Vec2 transform(Position viewpoint, GridType gridType, Vec3 v) {
-        return transformFlat(viewpoint, gridType, v);
+    public final Vec2 project(Position viewpoint, GridType gridType, Vec3 v) {
+        return projectMap(viewpoint, gridType, v);
     }
 
-    public final Vec3 transformInverse(Position viewpoint, GridType gridType, Vec2 pt) {
-        return transformInverseFlat(viewpoint, gridType, pt);
+    public final Vec3 unproject(Position viewpoint, GridType gridType, Vec2 pt) {
+        return unprojectMap(viewpoint, gridType, pt);
     }
 
-    protected abstract Vec2 transformFlat(Position viewpoint, GridType gridType, Vec3 v);
+    protected abstract Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v);
 
-    protected abstract Vec3 transformInverseFlat(Position viewpoint, GridType gridType, Vec2 pt);
+    protected abstract Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt);
 
-    public Vec2 drawProjectedVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+    public Vec2 drawProjectedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
         if (first)
             GLHelper.drawVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, Colors.Null);
         Vec2 current = GLHelper.drawVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, color);
@@ -129,7 +131,7 @@ public enum ProjectionMode {
         return current;
     }
 
-    private static Quat flatMapRotation(GridType gridType, Position viewpoint) {
+    private static Quat nonOrthoMapRotation(GridType gridType, Position viewpoint) {
         // Non-ortho maps use the same longitude as GridType.toGrid(), but the reflected
         // flat-map basis makes the effective viewpoint latitude rotation positive.
         return Quat.createXY(gridType == GridType.Viewpoint ? viewpoint.lat : 0, gridType.toLongitude(viewpoint));
@@ -153,10 +155,10 @@ public enum ProjectionMode {
     }
 
     public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return transformInverse(camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
+        return unproject(camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
     }
 
-    private static Vec2 transformPolar(Vec3 v, GridScale scale) {
+    private static Vec2 projectPolar(Vec3 v, GridScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
         double theta = Math.atan2(-v.x, v.y);
         theta += 2 * Math.PI;
@@ -166,7 +168,7 @@ public enum ProjectionMode {
         return new Vec2(scaledtheta, scaledr);
     }
 
-    private static Vec3 transformInversePolar(Vec2 pt) {
+    private static Vec3 unprojectPolar(Vec2 pt) {
         double r = pt.y;
         double theta = -Math.toRadians(pt.x);
         double y = r * Math.cos(theta);
@@ -175,7 +177,7 @@ public enum ProjectionMode {
         return new Vec3(x, y, z);
     }
 
-    private static Vec2 transformLatitudinal(Vec3 v, GridScale scale) {
+    private static Vec2 projectLatitudinal(Vec3 v, GridScale scale) {
         double theta = Math.asin(Math.clamp(v.y, -1., 1.));
         double phi = Math.atan2(v.x, v.z);
         double scaledphi = scale.getXValueInv(Math.toDegrees(phi));
@@ -183,7 +185,7 @@ public enum ProjectionMode {
         return new Vec2(scaledphi, scaledtheta);
     }
 
-    private static Vec3 transformInverseLatitudinal(Vec2 pt) {
+    private static Vec3 unprojectLatitudinal(Vec2 pt) {
         double phi = Math.toRadians(pt.x);
         double theta = Math.toRadians(pt.y);
         return new Vec3(Math.cos(theta) * Math.sin(phi), Math.sin(theta), Math.cos(theta) * Math.cos(phi));

@@ -196,7 +196,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     pt.x = xnew / r;
                     pt.y = ynew / r;
                     pt.z = znew / r;
-                    previous = Display.mode.drawProjectedVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
+                    previous = Display.mode.drawProjectedMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, 1);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
@@ -253,7 +253,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.transform(camera.getViewpoint(), Display.gridType, pt);
+            Vec2 tf = Display.mode.project(camera.getViewpoint(), Display.gridType, pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x * vp.aspect, tf.y, sz, sz);
         }
