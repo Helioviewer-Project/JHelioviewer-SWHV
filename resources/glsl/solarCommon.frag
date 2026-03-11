@@ -12,6 +12,10 @@
 
 #define BOOST 1. / (0.2 * 2.)
 
+const int WCS_PROJECTION_TAN = 0;
+const int WCS_PROJECTION_AZP = 1;
+const int WCS_PROJECTION_ZPN = 2;
+
 out vec4 outColor;
 
 struct Screen {
@@ -33,7 +37,8 @@ struct WCS {
     vec4 crota;
     vec2 crval;
     float deltaT; // not strictly WCS
-    // float padding
+    float padding;
+    vec4 projectionMeta; // x = projection code, y = plane units per radian, z = observer distance
 };
 
 layout(std140) uniform WCSBlock {
@@ -162,4 +167,51 @@ float differentialRotation(const float dt, const float theta) {
     sin2l *= sin2l;
     // Snodgrass, Table 1 Magnetic - http://articles.adsabs.harvard.edu/pdf/1990ApJ...351..309S
     return dt * (0.01367 - 0.339 * sin2l - 0.485 * sin2l * sin2l); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
+}
+
+vec2 worldToHelioprojective(const vec3 world, const float observerDistance) {
+    float zeta = observerDistance - world.z;
+    return vec2(
+        atan(world.x, zeta),
+        atan(world.y, sqrt(world.x * world.x + zeta * zeta)));
+}
+
+vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
+    float phi = helioprojective.x;
+    float theta = helioprojective.y;
+    vec2 reference = crval / planeUnitsPerRad;
+    float phi0 = reference.x;
+    float theta0 = reference.y;
+
+    float sinLat = sin(theta);
+    float cosLat = cos(theta);
+    float sinLat0 = sin(theta0);
+    float cosLat0 = cos(theta0);
+    float deltaLon = phi - phi0;
+    float sinDeltaLon = sin(deltaLon);
+    float cosDeltaLon = cos(deltaLon);
+
+    float cosC = sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon;
+    if (cosC <= 0.)
+        discard;
+
+    return planeUnitsPerRad * vec2(
+        cosLat * sinDeltaLon / cosC,
+        (cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon) / cosC);
+}
+
+vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const float[6] PV) {
+    int projection = int(wcs.projectionMeta.x);
+    if (projection == WCS_PROJECTION_TAN)
+        return projectTanToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y);
+
+    return helioprojective - wcs.crval;
+}
+
+vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
+    vec2 centered = rotate_vector_inverse(wcs.crota, vec3(plane, 0)).xy;
+    vec4 rect = wcs.rect;
+    vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+    clamp_coord(texcoord);
+    return texcoord;
 }

@@ -34,14 +34,10 @@ float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
-vec2 world2pix(const vec2 w, const WCS wcs, const float[6] PV) {
-    vec2 c = rotate_vector_inverse(wcs.crota, vec3(w - wcs.crval, 0)).xy;
-
-    vec4 rect = wcs.rect;
-    vec2 tc = rect.zw * vec2(c.x - rect.x, -c.y - rect.y);
-    clamp_coord(tc);
-
-    return tc;
+vec2 worldToTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
+    vec2 helioprojective = worldToHelioprojective(world, wcs.projectionMeta.z);
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, PV);
+    return wcsPlaneToTexcoord(plane, wcs);
 }
 
 void main(void) {
@@ -87,7 +83,7 @@ void main(void) {
             discard;
     }
 
-    vec2 texcoord = world2pix(rotatedHitPoint.xy, wcs[0], pv0);
+    vec2 texcoord = worldToTexcoord(rotatedHitPoint, wcs[0], pv0);
 
     float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
     vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
@@ -106,7 +102,7 @@ void main(void) {
             diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);
         }
 
-        difftexcoord = world2pix(diffRotatedHitPoint.xy, wcs[1], pv1);
+        difftexcoord = worldToTexcoord(diffRotatedHitPoint, wcs[1], pv1);
 
         float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);
         if (diffRotatedHitPointRad > display.radii.y || diffRotatedHitPointRad < display.radii.x) {
