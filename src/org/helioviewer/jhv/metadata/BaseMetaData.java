@@ -38,6 +38,8 @@ class BaseMetaData implements MetaData {
     protected float sector1 = 0;
 
     protected final float[] pv2 = new float[6];
+    protected MetaData.WCSProjection wcsProjection = MetaData.WCSProjection.TAN;
+    protected float wcsPlaneUnitsPerRad = (float) Sun.MeanEarthDistance;
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected float cutOffX = 0;
@@ -94,6 +96,16 @@ class BaseMetaData implements MetaData {
     @Override
     public float[] getPV2() {
         return pv2;
+    }
+
+    @Override
+    public MetaData.WCSProjection getWCSProjection() {
+        return wcsProjection;
+    }
+
+    @Override
+    public float getWCSPlaneUnitsPerRad() {
+        return wcsPlaneUnitsPerRad;
     }
 
     @Override
