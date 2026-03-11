@@ -27,21 +27,6 @@ vec2 distort(const vec2 c, const float[6] PV) {
 }
 */
 
-vec2 distort(const vec2 c, const float[6] PV) { // DS
-    float mju = PV[1];
-    if (mju == 0)
-        return c;
-
-    clamp_coord(c);
-    vec2 v = c - 0.5;
-
-    float r = length(v);
-    float theta = atan(v.y, v.x);
-
-    float R = r * (1 + r * r * r * r * mju);
-    return vec2(R * cos(theta), R * sin(theta)) + 0.5;
-}
-
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
     vec3 altnormal = rotate_vector(quat, zAxis);
     if (hideBack && altnormal.z <= 0.)
@@ -53,7 +38,7 @@ vec2 world2pix(const vec2 w, const WCS wcs, const float[6] PV) {
     vec2 c = rotate_vector_inverse(wcs.crota, vec3(w - wcs.crval, 0)).xy;
 
     vec4 rect = wcs.rect;
-    vec2 tc = distort(rect.zw * vec2(c.x - rect.x, -c.y - rect.y), PV);
+    vec2 tc = rect.zw * vec2(c.x - rect.x, -c.y - rect.y);
     clamp_coord(tc);
 
     return tc;
