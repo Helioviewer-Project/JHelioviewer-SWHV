@@ -200,10 +200,51 @@ vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
         (cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon) / cosC);
 }
 
+vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
+    float phi = helioprojective.x;
+    float theta = helioprojective.y;
+    vec2 reference = crval / planeUnitsPerRad;
+    float phi0 = reference.x;
+    float theta0 = reference.y;
+    float mu = PV[1];
+    float gamma = radians(PV[2]);
+
+    float sinLat = sin(theta);
+    float cosLat = cos(theta);
+    float sinLat0 = sin(theta0);
+    float cosLat0 = cos(theta0);
+    float deltaLon = phi - phi0;
+    float sinDeltaLon = sin(deltaLon);
+    float cosDeltaLon = cos(deltaLon);
+
+    float a = cosLat * sinDeltaLon;
+    float b = cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon;
+    float cosNativeDistance = sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon;
+    float c = length(vec2(a, b));
+    if (c == 0.)
+        return vec2(0.);
+
+    // For the non-slanted AZP case, mu > 1 folds back once dR/dtheta changes sign.
+    // Keep only the primary forward branch.
+    if (gamma == 0. && mu > 1. && mu * cosNativeDistance + 1. <= 0.)
+        discard;
+
+    float denom = mu + cosNativeDistance - b * tan(gamma);
+    if (denom <= 0.)
+        discard;
+
+    float radial = (mu + 1.) * c / denom;
+    return planeUnitsPerRad * vec2(
+        radial * a / c,
+        radial * b / (c * cos(gamma)));
+}
+
 vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const float[6] PV) {
     int projection = int(wcs.projectionMeta.x);
     if (projection == WCS_PROJECTION_TAN)
         return projectTanToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y);
+    if (projection == WCS_PROJECTION_AZP)
+        return projectAzpToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y, PV);
 
     return helioprojective - wcs.crval;
 }
