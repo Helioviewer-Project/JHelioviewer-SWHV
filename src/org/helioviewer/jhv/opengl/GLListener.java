@@ -5,6 +5,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -118,7 +119,13 @@ public class GLListener implements GLEventListener {
         }
 
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
+        Vec2 hpcExtent = Display.mode == ProjectionMode.HPC ? ImageLayers.getLargestHpcExtentsDegrees() : null;
         for (Viewport vp : Display.getViewports()) {
+            if (Display.mode == ProjectionMode.HPC) {
+                double halfHeight = Math.max(hpcExtent.y, hpcExtent.x / vp.aspect);
+                double halfWidth = halfHeight * vp.aspect;
+                GridScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
+            }
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
             GLSLSolarShader.bindScreen(gl, vp);
