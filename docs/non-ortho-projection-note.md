@@ -20,10 +20,13 @@ This note documents the current convention used by the non-orthographic display 
 - The current `HPC` display convention is:
   - `x = Tx` (helioprojective longitude / west-east angular offset)
   - `y = Ty` (helioprojective latitude / south-north angular offset)
-- The current `HPC` visible bounds are derived from the actual image footprint in
-  `Tx,Ty`, not forced to be symmetric around `0`.
-- Aspect-ratio padding is added around the footprint center so angular scale
-  stays isotropic on screen.
+- The current `HPC` visible scale is derived from the actual image footprint in
+  `Tx,Ty`, but the displayed bounds stay centered on `(Tx, Ty) = (0, 0)`.
+- Aspect-ratio padding is added around `(0, 0)` so angular scale stays
+  isotropic on screen.
+- During playback, the `HPC` scale is sticky for the current enabled image-layer
+  set instead of being recomputed from every frame, so the Sun-centered grid
+  remains visually stable.
 - In Java, `HPC` projection is expressed with the observer-distance-dependent formulas:
   - `Tx = atan2(x, D - z)`
   - `Ty = atan2(y, sqrt(x^2 + (D - z)^2))`
