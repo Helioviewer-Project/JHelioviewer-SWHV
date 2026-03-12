@@ -50,6 +50,11 @@ public enum ProjectionMode {
         }
 
         @Override
+        public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+            return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+        }
+
+        @Override
         public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
             Quat rotation = Quat.ZERO; // final frame to unproject into
             if (gridType != GridType.Viewpoint) {
@@ -67,6 +72,30 @@ public enum ProjectionMode {
             if (gridType == GridType.Carrington && phi < 0)
                 phi += 360;
             return new Vec2(phi, theta);
+        }
+    },
+    HPC(GLSLSolarShader.hpc, GridScale.hpc) {
+        @Override
+        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
+            return NonOrthoProjection.projectHpc(viewpoint, v, scale);
+        }
+
+        @Override
+        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
+            return NonOrthoProjection.unprojectHpc(viewpoint, pt);
+        }
+
+        @Override
+        public Position projectionViewpoint(Position viewpoint) {
+            return viewpoint;
+        }
+
+        @Override
+        public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+            return new Vec3(
+                    CameraHelper.computeUpX(camera, vp, x),
+                    CameraHelper.computeUpY(camera, vp, y),
+                    0);
         }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
@@ -151,5 +180,9 @@ public enum ProjectionMode {
 
     public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
         return unproject(camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
+    }
+
+    public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        return null;
     }
 }

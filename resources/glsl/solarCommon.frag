@@ -22,9 +22,10 @@ struct Screen {
     mat4 inverseMVP;
     vec4 viewport;
     float iaspect;
+    float xStart;
+    float xStop;
     float yStart;
     float yStop;
-    // float padding;
 };
 
 layout(std140) uniform ScreenBlock {
@@ -169,11 +170,38 @@ float differentialRotation(const float dt, const float theta) {
     return dt * (0.01367 - 0.339 * sin2l - 0.485 * sin2l * sin2l); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
 }
 
+vec3 differential(const float dt, const vec3 v) {
+    if (dt == 0.)
+        return v;
+
+    float phi = atan(v.x, v.z);
+    float theta = asin(v.y);
+    phi -= differentialRotation(dt, theta); // difference from rigid rotation
+    return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
+}
+
 vec2 worldToHelioprojective(const vec3 world, const float observerDistance) {
     float zeta = observerDistance - world.z;
     return vec2(
         atan(world.x, zeta),
         atan(world.y, sqrt(world.x * world.x + zeta * zeta)));
+}
+
+vec3 observerPosition(const float observerDistance) {
+    return vec3(0., 0., observerDistance);
+}
+
+vec3 helioprojectiveToObserverRay(const vec2 helioprojective) {
+    float phi = helioprojective.x;
+    float theta = helioprojective.y;
+    return normalize(vec3(tan(phi), tan(theta) / cos(phi), -1.));
+}
+
+vec3 helioprojectiveToHpcPlanePoint(const vec2 helioprojective, const float observerDistance) {
+    vec3 ray = helioprojectiveToObserverRay(helioprojective);
+    if (ray.z >= 0.)
+        discard;
+    return observerPosition(observerDistance) - observerDistance * ray / ray.z;
 }
 
 vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {

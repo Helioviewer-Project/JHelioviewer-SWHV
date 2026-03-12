@@ -16,6 +16,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     public static final GLSLSolarShader sphere = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarSphere.frag", false);
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag", true);
+    public static final GLSLSolarShader hpc = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarHpc.frag", true);
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag", true);
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag", true);
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag", true);
@@ -34,7 +35,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static GLBO screenBO;
-    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4);
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4 + 4);
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO wcsBO;
@@ -52,6 +53,7 @@ public class GLSLSolarShader extends GLSLShader {
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
+        hpc._init(gl, hpc.hasCommon);
         lati._init(gl, lati.hasCommon);
         polar._init(gl, polar.hasCommon);
         logpolar._init(gl, logpolar.hasCommon);
@@ -65,15 +67,19 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, binding, uboID);
     }
 
+    static void setupCommonBlocks(GL3 gl, int programID) {
+        setupUBO(gl, programID, "ScreenBlock", screenBO.getID(), 0);
+        setupUBO(gl, programID, "WCSBlock", wcsBO.getID(), 1);
+        setupUBO(gl, programID, "DisplayBlock", displayBO.getID(), 2);
+    }
+
     @Override
     protected void initUniforms(GL3 gl, int id) {
         gridRef = gl.glGetUniformLocation(id, "grid");
         pv0Ref = gl.glGetUniformLocation(id, "pv0");
         pv1Ref = gl.glGetUniformLocation(id, "pv1");
 
-        setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
-        setupUBO(gl, id, "WCSBlock", wcsBO.getID(), 1);
-        setupUBO(gl, id, "DisplayBlock", displayBO.getID(), 2);
+        setupCommonBlocks(gl, id);
 
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
@@ -85,6 +91,7 @@ public class GLSLSolarShader extends GLSLShader {
     public static void dispose(GL3 gl) {
         sphere._dispose(gl);
         ortho._dispose(gl);
+        hpc._dispose(gl);
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
@@ -98,6 +105,8 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
+        screenBuf.put((float) Display.mode.scale.getInterpolatedXValue(0, Display.gridType));
+        screenBuf.put((float) Display.mode.scale.getInterpolatedXValue(1, Display.gridType));
         screenBuf.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
 
         screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
