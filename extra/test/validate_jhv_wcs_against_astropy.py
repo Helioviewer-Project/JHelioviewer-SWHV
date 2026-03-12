@@ -131,8 +131,8 @@ def ensure_supported_projection(header) -> None:
     ctype2 = str(header.get("CTYPE2", ""))
     if ctype1[-3:] != ctype2[-3:]:
         raise ValueError(f"Mismatched projection types: {ctype1!r} / {ctype2!r}")
-    if not (ctype1.endswith("TAN") or ctype1.endswith("AZP")):
-        raise ValueError(f"Only TAN and AZP FITS files are supported right now, got {ctype1!r} / {ctype2!r}")
+    if not (ctype1.endswith("TAN") or ctype1.endswith("AZP") or ctype1.endswith("ZPN")):
+        raise ValueError(f"Only TAN, AZP, and ZPN FITS files are supported right now, got {ctype1!r} / {ctype2!r}")
 
 
 def world2helioprojective(point_xyz: tuple[float, float, float], observer_distance: float) -> tuple[float, float]:
@@ -199,6 +199,81 @@ def azp_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -
     )
 
 
+def zpn_radial(meta: JHVMeta, eta_rad: float) -> float:
+    radial = 0.0
+    power = 1.0
+    for coefficient in meta.pv2:
+        radial += coefficient * power
+        power *= eta_rad
+    return radial
+
+
+def zpn_radial_derivative(meta: JHVMeta, eta_rad: float) -> float:
+    derivative = 0.0
+    power = 1.0
+    for index, coefficient in enumerate(meta.pv2[1:], start=1):
+        derivative += index * coefficient * power
+        power *= eta_rad
+    return derivative
+
+
+def zpn_primary_branch_upper_eta(meta: JHVMeta) -> float:
+    max_eta = math.pi
+    prev_eta = 0.0
+    prev_derivative = zpn_radial_derivative(meta, prev_eta)
+    if prev_derivative <= 0.0:
+        return 0.0
+
+    for step in range(1, 513):
+        eta = max_eta * step / 512.0
+        derivative = zpn_radial_derivative(meta, eta)
+        if derivative <= 0.0:
+            lo = prev_eta
+            hi = eta
+            for _ in range(64):
+                mid = 0.5 * (lo + hi)
+                if zpn_radial_derivative(meta, mid) > 0.0:
+                    lo = mid
+                else:
+                    hi = mid
+            return 0.5 * (lo + hi)
+        prev_eta = eta
+        prev_derivative = derivative
+    return max_eta
+
+
+def zpn_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    lon, lat = world_rad
+    lon0 = meta.crval_internal_x / meta.plane_units_per_rad
+    lat0 = meta.crval_internal_y / meta.plane_units_per_rad
+
+    sin_lat = math.sin(lat)
+    cos_lat = math.cos(lat)
+    sin_lat0 = math.sin(lat0)
+    cos_lat0 = math.cos(lat0)
+    delta_lon = lon - lon0
+    sin_delta_lon = math.sin(delta_lon)
+    cos_delta_lon = math.cos(delta_lon)
+
+    a = cos_lat * sin_delta_lon
+    b = cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon
+    c = math.hypot(a, b)
+    if c == 0.0:
+        return (0.0, 0.0)
+
+    cos_native_distance = sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon
+    eta = math.acos(max(-1.0, min(1.0, cos_native_distance)))
+    radial = zpn_radial(meta, eta)
+    derivative = zpn_radial_derivative(meta, eta)
+    if radial < 0.0 or derivative <= 0.0:
+        raise ValueError("Point is outside the primary forward ZPN branch")
+
+    return (
+        meta.plane_units_per_rad * radial * a / c,
+        meta.plane_units_per_rad * radial * b / c,
+    )
+
+
 def azp_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     gamma = math.radians(meta.pv2[2])
     if abs(gamma) > 1e-12:
@@ -238,17 +313,55 @@ def azp_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMe
     return (lon, lat)
 
 
+def zpn_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    x = plane_internal[0] / meta.plane_units_per_rad
+    y = plane_internal[1] / meta.plane_units_per_rad
+    radial_target = math.hypot(x, y)
+
+    lon0 = meta.crval_internal_x / meta.plane_units_per_rad
+    lat0 = meta.crval_internal_y / meta.plane_units_per_rad
+    upper = zpn_primary_branch_upper_eta(meta)
+    lo = 0.0
+    hi = upper
+    target = min(max(radial_target, zpn_radial(meta, lo)), zpn_radial(meta, hi))
+    for _ in range(64):
+        mid = 0.5 * (lo + hi)
+        if zpn_radial(meta, mid) < target:
+            lo = mid
+        else:
+            hi = mid
+    eta = 0.5 * (lo + hi)
+    if eta == 0.0:
+        return (lon0, lat0)
+
+    alpha = math.atan2(x, y)
+    sin_eta = math.sin(eta)
+    cos_eta = math.cos(eta)
+    a = sin_eta * math.sin(alpha)
+    b = sin_eta * math.cos(alpha)
+
+    sin_lat0 = math.sin(lat0)
+    cos_lat0 = math.cos(lat0)
+    lat = math.asin(cos_eta * sin_lat0 + b * cos_lat0)
+    lon = lon0 + math.atan2(a, cos_eta * cos_lat0 - b * sin_lat0)
+    return (lon, lat)
+
+
 def project_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     if meta.projection == "TAN":
         return tan_world_to_plane_internal(world_rad, meta)
     if meta.projection == "AZP":
         return azp_world_to_plane_internal(world_rad, meta)
+    if meta.projection == "ZPN":
+        return zpn_world_to_plane_internal(world_rad, meta)
     raise ValueError(f"Unsupported projection {meta.projection!r}")
 
 
 def project_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     if meta.projection == "AZP":
         return azp_plane_internal_to_world(plane_internal, meta)
+    if meta.projection == "ZPN":
+        return zpn_plane_internal_to_world(plane_internal, meta)
     raise ValueError(f"Inverse projection is unsupported for {meta.projection!r}")
 
 
@@ -349,6 +462,22 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         y = np.where(c == 0.0, 0.0, y)
         return np.column_stack((x, y))
 
+    if meta.projection == "ZPN":
+        a = cos_lat * sin_delta_lon
+        b = cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon
+        c = np.hypot(a, b)
+        eta = np.arccos(np.clip(sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon, -1.0, 1.0))
+        radial = np.zeros_like(eta)
+        power = np.ones_like(eta)
+        for coefficient in meta.pv2:
+            radial += coefficient * power
+            power *= eta
+        x = meta.plane_units_per_rad * radial * a / c
+        y = meta.plane_units_per_rad * radial * b / c
+        x = np.where(c == 0.0, 0.0, x)
+        y = np.where(c == 0.0, 0.0, y)
+        return np.column_stack((x, y))
+
     raise ValueError(f"Unsupported projection {meta.projection!r}")
 
 
@@ -395,8 +524,8 @@ def build_projection_only_wcs(header) -> WCS:
     wcs.wcs.crpix = [1.0, 1.0]
     wcs.wcs.cdelt = [1.0, 1.0]
     wcs.wcs.pc = [[1.0, 0.0], [0.0, 1.0]]
-    if projection == "AZP":
-        wcs.wcs.set_pv([(2, 1, float(header.get("PV2_1", 0.0))), (2, 2, float(header.get("PV2_2", 0.0)))])
+    if projection in {"AZP", "ZPN"}:
+        wcs.wcs.set_pv([(2, i, float(header.get(f"PV2_{i}", 0.0))) for i in range(6) if f"PV2_{i}" in header])
     return wcs
 
 
@@ -418,12 +547,12 @@ def build_jhv_equivalent_astropy_wcs(header, meta: JHVMeta) -> WCS:
         [c * sx, s * sy],
         [s * sx, -c * sy],
     ])
-    if projection == "AZP":
-        wcs.wcs.set_pv([(2, 1, float(header.get("PV2_1", 0.0))), (2, 2, float(header.get("PV2_2", 0.0)))])
+    if projection in {"AZP", "ZPN"}:
+        wcs.wcs.set_pv([(2, i, float(header.get(f"PV2_{i}", 0.0))) for i in range(6) if f"PV2_{i}" in header])
     return wcs
 
 
-def hpc_extent_degrees(meta: JHVMeta) -> float:
+def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, float, float]:
     samples = [
         (-meta.crpix1_gl * meta.unit_per_pixel_x, -meta.crpix2_gl * meta.unit_per_pixel_y),
         ((meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x, -meta.crpix2_gl * meta.unit_per_pixel_y),
@@ -434,15 +563,29 @@ def hpc_extent_degrees(meta: JHVMeta) -> float:
         (-meta.crpix1_gl * meta.unit_per_pixel_x, 0.0),
         ((meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x, 0.0),
     ]
-    extent = 0.0
+    min_x = math.inf
+    max_x = -math.inf
+    min_y = math.inf
+    max_y = -math.inf
     c = math.cos(meta.crota_rad)
     s = math.sin(meta.crota_rad)
     for x, y in samples:
         plane_x = c * x - s * y
         plane_y = s * x + c * y
-        world_rad = project_plane_internal_to_world((plane_x, plane_y), meta) if meta.projection == "AZP" else project_plane_internal_to_world_tan((plane_x, plane_y), meta)
-        extent = max(extent, abs(math.degrees(world_rad[0])), abs(math.degrees(world_rad[1])))
-    return extent
+        world_rad = project_plane_internal_to_world((plane_x, plane_y), meta) if meta.projection != "TAN" else project_plane_internal_to_world_tan((plane_x, plane_y), meta)
+        lon_deg = math.degrees(world_rad[0])
+        lat_deg = math.degrees(world_rad[1])
+        min_x = min(min_x, lon_deg)
+        max_x = max(max_x, lon_deg)
+        min_y = min(min_y, lat_deg)
+        max_y = max(max_y, lat_deg)
+
+    center_x = 0.5 * (min_x + max_x)
+    center_y = 0.5 * (min_y + max_y)
+    half_width = 0.5 * (max_x - min_x)
+    half_height = max(0.5 * (max_y - min_y), half_width / aspect)
+    half_width = half_height * aspect
+    return (center_x - half_width, center_x + half_width, center_y - half_height, center_y + half_height)
 
 
 def project_plane_internal_to_world_tan(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
@@ -462,11 +605,12 @@ def project_plane_internal_to_world_tan(plane_internal: tuple[float, float], met
     )
 
 
-def hpc_screen_to_world_rad(scrpos: tuple[float, float], extent_deg: float) -> tuple[float, float]:
+def hpc_screen_to_world_rad(scrpos: tuple[float, float], bounds_deg: tuple[float, float, float, float]) -> tuple[float, float]:
     sx, sy = scrpos
+    x0, x1, y0, y1 = bounds_deg
     return (
-        math.radians(-extent_deg + sx * 2.0 * extent_deg),
-        math.radians(-extent_deg + sy * 2.0 * extent_deg),
+        math.radians(x0 + sx * (x1 - x0)),
+        math.radians(y0 + sy * (y1 - y0)),
     )
 
 
@@ -550,6 +694,19 @@ def sample_points(sample_count: int, seed: int) -> list[tuple[float, float, floa
     return points
 
 
+def sample_worlds_from_pixels(pixel_wcs: WCS, meta: JHVMeta, sample_count: int) -> list[tuple[float, float]]:
+    grid = max(2, int(math.ceil(math.sqrt(sample_count))))
+    xs = np.linspace(1.0, float(meta.pixel_width), grid)
+    ys = np.linspace(1.0, float(meta.pixel_height), grid)
+    worlds: list[tuple[float, float]] = []
+    for y in ys:
+        points = np.column_stack((xs, np.full(xs.shape, y, dtype=np.float64)))
+        world_deg = pixel_wcs.wcs_pix2world(points, 1)
+        for lon_deg, lat_deg in world_deg:
+            worlds.append((math.radians(float(lon_deg)), math.radians(float(lat_deg))))
+    return worlds
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate the JHV WCS orthographic code path against astropy.wcs.")
     parser.add_argument("fits_file", type=Path)
@@ -559,6 +716,7 @@ def main() -> int:
     parser.add_argument("--report-worst", type=int, default=5, help="How many worst samples to print")
     parser.add_argument("--all-pixels", action="store_true", help="Validate all pixel centers instead of random 3D samples")
     parser.add_argument("--inverse-azp", action="store_true", help="Validate the non-slanted AZP inverse plane->world mapping")
+    parser.add_argument("--inverse-zpn", action="store_true", help="Validate the primary-branch ZPN inverse plane->world mapping")
     parser.add_argument("--observer-hpc-prototype", action="store_true", help="Prototype the deterministic intermediate HPC image plane recovered from inverse WCS")
     parser.add_argument("--hpc-render-compare", action="store_true", help="Render a bounded HPC screen through JHV and Astropy mappings and write diagnostic PNGs")
     parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare ortho on-disk sampling against HPC sampling at the same displayed screen radius")
@@ -584,7 +742,7 @@ def main() -> int:
         if image_data.ndim != 2:
             raise ValueError(f"HPC render compare expects 2D image data, got shape {image_data.shape!r}")
 
-        extent_deg = hpc_extent_degrees(meta)
+        bounds_deg = hpc_bounds_degrees(meta, 1.0)
         size = args.render_size
         jhv_img = np.full((size, size), np.nan, dtype=np.float64)
         astro_img = np.full((size, size), np.nan, dtype=np.float64)
@@ -597,10 +755,16 @@ def main() -> int:
             sy = iy / (size - 1) if size > 1 else 0.5
             for ix in range(size):
                 sx = ix / (size - 1) if size > 1 else 0.5
-                world_rad = hpc_screen_to_world_rad((sx, sy), extent_deg)
+                world_rad = hpc_screen_to_world_rad((sx, sy), bounds_deg)
                 world_deg = [math.degrees(world_rad[0]), math.degrees(world_rad[1])]
 
-                jhv_px = jhv_hpc_world_to_pixel_center(world_rad, meta)
+                try:
+                    jhv_px = jhv_hpc_world_to_pixel_center(world_rad, meta)
+                except ValueError:
+                    diff_px[iy, ix] = math.nan
+                    jhv_img[iy, ix] = math.nan
+                    astro_img[iy, ix] = math.nan
+                    continue
                 astro_px_raw = pixel_wcs.wcs_world2pix([world_deg], 1)[0]
                 astro_px = (float(astro_px_raw[0] - 0.5), float(astro_px_raw[1] - 0.5))
 
@@ -629,7 +793,7 @@ def main() -> int:
 
         print(f"file={args.fits_file}")
         print(f"mode=hpc_render_compare size={size}")
-        print(f"extent_deg={extent_deg:.12f}")
+        print(f"bounds_deg=({bounds_deg[0]:.12f}, {bounds_deg[1]:.12f}, {bounds_deg[2]:.12f}, {bounds_deg[3]:.12f})")
         print(f"pixel_center_max_error_px={max_px_err:.6e}")
         print(f"pixel_center_rms_error_px={math.sqrt(sum_px_err2 / count):.6e}" if count > 0 else "pixel_center_rms_error_px=nan")
         print(f"jhv_png={jhv_path}")
@@ -927,18 +1091,33 @@ def main() -> int:
             print(f"  pixel=({px}, {py}) point=({point[0]:.12e}, {point[1]:.12e}, {point[2]:.12e})")
         return 0
 
-    if args.inverse_azp:
+    if args.inverse_azp or args.inverse_zpn:
+        expected_projection = "AZP" if args.inverse_azp else "ZPN"
         if meta.projection != "AZP":
-            raise ValueError("--inverse-azp requires an AZP FITS file")
+            if args.inverse_azp:
+                raise ValueError("--inverse-azp requires an AZP FITS file")
+        if meta.projection != "ZPN":
+            if args.inverse_zpn:
+                raise ValueError("--inverse-zpn requires a ZPN FITS file")
 
         inverse_err_max_deg = 0.0
         roundtrip_err_max_internal = 0.0
+        valid_inverse_samples = 0
+        skipped_inverse_samples = 0
         worst_inverse: list[tuple[float, tuple[float, float], tuple[float, float], tuple[float, float]]] = []
-        for point_xyz in sample_points(args.samples, args.seed):
-            world_rad = world2helioprojective(point_xyz, meta.observer_distance)
-            plane_internal = azp_world_to_plane_internal(world_rad, meta)
+        if expected_projection == "ZPN":
+            inverse_samples = sample_worlds_from_pixels(pixel_wcs, meta, args.samples)
+        else:
+            inverse_samples = [world2helioprojective(point_xyz, meta.observer_distance) for point_xyz in sample_points(args.samples, args.seed)]
 
-            inverse_world_rad = azp_plane_internal_to_world(plane_internal, meta)
+        for world_rad in inverse_samples:
+            try:
+                plane_internal = project_world_to_plane_internal(world_rad, meta)
+            except ValueError:
+                skipped_inverse_samples += 1
+                continue
+
+            inverse_world_rad = project_plane_internal_to_world(plane_internal, meta)
             inverse_world_deg = (math.degrees(inverse_world_rad[0]), math.degrees(inverse_world_rad[1]))
 
             plane_deg = (
@@ -952,7 +1131,7 @@ def main() -> int:
             )
             inverse_err_max_deg = max(inverse_err_max_deg, inverse_err_deg)
 
-            roundtrip_plane_internal = azp_world_to_plane_internal(inverse_world_rad, meta)
+            roundtrip_plane_internal = project_world_to_plane_internal(inverse_world_rad, meta)
             roundtrip_err_internal = max(
                 abs(roundtrip_plane_internal[0] - plane_internal[0]),
                 abs(roundtrip_plane_internal[1] - plane_internal[1]),
@@ -965,10 +1144,13 @@ def main() -> int:
                 inverse_world_deg,
                 (float(astro_world_deg[0]), float(astro_world_deg[1])),
             ))
+            valid_inverse_samples += 1
 
         worst_inverse.sort(key=lambda item: item[0], reverse=True)
         print(f"file={args.fits_file}")
-        print(f"mode=inverse_azp samples={args.samples} seed={args.seed}")
+        print(f"mode={'inverse_azp' if expected_projection == 'AZP' else 'inverse_zpn'} samples={args.samples} seed={args.seed}")
+        print(f"valid_samples={valid_inverse_samples}")
+        print(f"skipped_samples={skipped_inverse_samples}")
         print(f"inverse_world_max_error_deg={inverse_err_max_deg:.6e}")
         print(f"roundtrip_plane_max_error_internal={roundtrip_err_max_internal:.6e}")
         print("worst_inverse_samples:")
@@ -981,7 +1163,7 @@ def main() -> int:
 
     proj_err_max = 0.0
     pixel_err_max = 0.0
-    worst: list[tuple[float, tuple[float, float, float], tuple[float, float], tuple[float, float]]] = []
+    worst: list[tuple[float, str, tuple[float, float], tuple[float, float]]] = []
 
     if args.all_pixels:
         pixel_err_max = 0.0
@@ -1016,12 +1198,29 @@ def main() -> int:
             )
         return 0
 
-    for point_xyz in sample_points(args.samples, args.seed):
-        world_rad = world2helioprojective(point_xyz, meta.observer_distance)
+    valid_samples = 0
+    skipped_samples = 0
+    if meta.projection == "ZPN":
+        world_samples = sample_worlds_from_pixels(pixel_wcs, meta, args.samples)
+    else:
+        world_samples = [world2helioprojective(point_xyz, meta.observer_distance) for point_xyz in sample_points(args.samples, args.seed)]
+
+    for world_rad in world_samples:
         world_deg = [math.degrees(world_rad[0]), math.degrees(world_rad[1])]
 
-        jhv_plane_internal = project_world_to_plane_internal(world_rad, meta)
+        try:
+            jhv_plane_internal = project_world_to_plane_internal(world_rad, meta)
+        except ValueError:
+            skipped_samples += 1
+            continue
+
+        jhv_pixel_center_array = jhv_world_array_to_pixel_center(np.array([world_deg], dtype=np.float64), meta)
+        jhv_pixel_center = (float(jhv_pixel_center_array[0, 0]), float(jhv_pixel_center_array[0, 1]))
+
         astro_plane_deg = projection_wcs.wcs_world2pix([world_deg], 0)[0]
+        if not np.all(np.isfinite(astro_plane_deg)):
+            skipped_samples += 1
+            continue
         astro_plane_internal = (
             astro_plane_deg[0] * meta.plane_units_per_rad / (180.0 / math.pi),
             astro_plane_deg[1] * meta.plane_units_per_rad / (180.0 / math.pi),
@@ -1032,8 +1231,10 @@ def main() -> int:
         )
         proj_err_max = max(proj_err_max, proj_err)
 
-        jhv_pixel_center = jhv_world_to_pixel_center(point_xyz, meta)
         astro_pixel_center = pixel_wcs.wcs_world2pix([world_deg], 1)[0]
+        if not np.all(np.isfinite(astro_pixel_center)):
+            skipped_samples += 1
+            continue
         astro_pixel_center = (astro_pixel_center[0] - 0.5, astro_pixel_center[1] - 0.5)
         pixel_err = max(
             abs(jhv_pixel_center[0] - astro_pixel_center[0]),
@@ -1041,18 +1242,26 @@ def main() -> int:
         )
         pixel_err_max = max(pixel_err_max, pixel_err)
 
-        worst.append((pixel_err, point_xyz, jhv_pixel_center, astro_pixel_center))
+        worst.append((
+            pixel_err,
+            f"world_deg=({world_deg[0]:.12f}, {world_deg[1]:.12f})",
+            jhv_pixel_center,
+            astro_pixel_center,
+        ))
+        valid_samples += 1
 
     worst.sort(key=lambda item: item[0], reverse=True)
 
     print(f"file={args.fits_file}")
     print(f"samples={args.samples} seed={args.seed}")
+    print(f"valid_samples={valid_samples}")
+    print(f"skipped_samples={skipped_samples}")
     print(f"projection_max_error_internal={proj_err_max:.6e}")
     print(f"pixel_center_max_error_px={pixel_err_max:.6e}")
     print("worst_samples:")
-    for pixel_err, point_xyz, jhv_pixel_center, astro_pixel_center in worst[: args.report_worst]:
+    for pixel_err, sample_desc, jhv_pixel_center, astro_pixel_center in worst[: args.report_worst]:
         print(
-            f"  err={pixel_err:.6e} point={point_xyz!r} "
+            f"  err={pixel_err:.6e} {sample_desc} "
             f"jhv={jhv_pixel_center!r} astropy={astro_pixel_center!r}"
         )
 
