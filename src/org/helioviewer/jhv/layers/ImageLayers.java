@@ -107,24 +107,26 @@ public class ImageLayers {
         return size;
     }
 
-    public static Vec2 getLargestHpcExtentsDegrees() {
-        double extentX = 0;
-        double extentY = 0;
+    public static Region getLargestHpcBoundsDegrees() {
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled()) {
-                Vec2 extent = hpcExtentsDegrees(layer.getMetaData());
-                extentX = Math.max(extentX, extent.x);
-                extentY = Math.max(extentY, extent.y);
+                Region bounds = hpcBoundsDegrees(layer.getMetaData());
+                minX = Math.min(minX, bounds.llx);
+                maxX = Math.max(maxX, bounds.urx);
+                minY = Math.min(minY, bounds.lly);
+                maxY = Math.max(maxY, bounds.ury);
             }
         }
-        if (extentX <= 0)
-            extentX = 5;
-        if (extentY <= 0)
-            extentY = 5;
-        return new Vec2(extentX, extentY);
+        if (!Double.isFinite(minX) || !Double.isFinite(maxX) || !Double.isFinite(minY) || !Double.isFinite(maxY))
+            return new Region(-5, -5, 10, 10);
+        return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
     }
 
-    private static Vec2 hpcExtentsDegrees(MetaData metaData) {
+    private static Region hpcBoundsDegrees(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
         double x0 = region.llx;
         double x1 = region.llx + region.width;
@@ -132,26 +134,33 @@ public class ImageLayers {
         double y1 = region.lly + region.height;
         double xm = 0.5 * (x0 + x1);
         double ym = 0.5 * (y0 + y1);
-        Vec2 extent = Vec2.ZERO;
-        extent = maxExtent(extent, hpcExtentAt(metaData, x0, y0));
-        extent = maxExtent(extent, hpcExtentAt(metaData, x1, y0));
-        extent = maxExtent(extent, hpcExtentAt(metaData, x0, y1));
-        extent = maxExtent(extent, hpcExtentAt(metaData, x1, y1));
-        extent = maxExtent(extent, hpcExtentAt(metaData, xm, y0));
-        extent = maxExtent(extent, hpcExtentAt(metaData, xm, y1));
-        extent = maxExtent(extent, hpcExtentAt(metaData, x0, ym));
-        extent = maxExtent(extent, hpcExtentAt(metaData, x1, ym));
-        return extent;
+        Vec2[] samples = new Vec2[]{
+                hpcBoundsAt(metaData, x0, y0),
+                hpcBoundsAt(metaData, x1, y0),
+                hpcBoundsAt(metaData, x0, y1),
+                hpcBoundsAt(metaData, x1, y1),
+                hpcBoundsAt(metaData, xm, y0),
+                hpcBoundsAt(metaData, xm, y1),
+                hpcBoundsAt(metaData, x0, ym),
+                hpcBoundsAt(metaData, x1, ym)
+        };
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        for (Vec2 sample : samples) {
+            minX = Math.min(minX, sample.x);
+            maxX = Math.max(maxX, sample.x);
+            minY = Math.min(minY, sample.y);
+            maxY = Math.max(maxY, sample.y);
+        }
+        return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
     }
 
-    private static Vec2 maxExtent(Vec2 a, Vec2 b) {
-        return new Vec2(Math.max(a.x, b.x), Math.max(a.y, b.y));
-    }
-
-    private static Vec2 hpcExtentAt(MetaData metaData, double x, double y) {
+    private static Vec2 hpcBoundsAt(MetaData metaData, double x, double y) {
         Vec3 plane = metaData.getCROTA().rotateVector(new Vec3(x, y, 0));
         Vec2 helioprojective = inverseWcsPlaneToHpc(metaData, plane.x, plane.y);
-        return new Vec2(Math.abs(Math.toDegrees(helioprojective.x)), Math.abs(Math.toDegrees(helioprojective.y)));
+        return new Vec2(Math.toDegrees(helioprojective.x), Math.toDegrees(helioprojective.y));
     }
 
     private static Vec2 inverseWcsPlaneToHpc(MetaData metaData, double planeX, double planeY) {
@@ -188,6 +197,24 @@ public class ImageLayers {
                     Math.asin(cosEta * Math.sin(theta0) + b * Math.cos(theta0)));
         }
 
+        if (metaData.getWCSProjection() == MetaData.WCSProjection.ZPN) {
+            double x = planeX / unitsPerRad;
+            double y = planeY / unitsPerRad;
+            double radial = Math.hypot(x, y);
+            double eta = inverseZpnPrimaryBranch(metaData.getPV2(), radial);
+            if (eta == 0)
+                return new Vec2(phi0, theta0);
+
+            double sinEta = Math.sin(eta);
+            double cosEta = Math.cos(eta);
+            double alpha = Math.atan2(x, y);
+            double a = sinEta * Math.sin(alpha);
+            double b = sinEta * Math.cos(alpha);
+            return new Vec2(
+                    phi0 + Math.atan2(a, cosEta * Math.cos(theta0) - b * Math.sin(theta0)),
+                    Math.asin(cosEta * Math.sin(theta0) + b * Math.cos(theta0)));
+        }
+
         double x = planeX / unitsPerRad;
         double y = planeY / unitsPerRad;
         double rho = Math.hypot(x, y);
@@ -199,6 +226,69 @@ public class ImageLayers {
         return new Vec2(
                 phi0 + Math.atan2(x * sinc, rho * Math.cos(theta0) * cosc - y * Math.sin(theta0) * sinc),
                 Math.asin(cosc * Math.sin(theta0) + y * sinc * Math.cos(theta0) / rho));
+    }
+
+    private static double inverseZpnPrimaryBranch(float[] pv2, double radial) {
+        double upper = zpnPrimaryBranchUpperEta(pv2);
+        double lo = 0;
+        double hi = upper;
+        double target = Math.clamp(radial, zpnRadial(pv2, lo), zpnRadial(pv2, hi));
+        for (int i = 0; i < 64; i++) {
+            double mid = 0.5 * (lo + hi);
+            if (zpnRadial(pv2, mid) < target)
+                lo = mid;
+            else
+                hi = mid;
+        }
+        return 0.5 * (lo + hi);
+    }
+
+    private static double zpnPrimaryBranchUpperEta(float[] pv2) {
+        double maxEta = Math.PI;
+        double prevEta = 0;
+        double prevDerivative = zpnRadialDerivative(pv2, prevEta);
+        if (prevDerivative <= 0)
+            return 0;
+
+        for (int i = 1; i <= 512; i++) {
+            double eta = maxEta * i / 512.;
+            double derivative = zpnRadialDerivative(pv2, eta);
+            if (derivative <= 0) {
+                double lo = prevEta;
+                double hi = eta;
+                for (int j = 0; j < 64; j++) {
+                    double mid = 0.5 * (lo + hi);
+                    if (zpnRadialDerivative(pv2, mid) > 0)
+                        lo = mid;
+                    else
+                        hi = mid;
+                }
+                return 0.5 * (lo + hi);
+            }
+            prevEta = eta;
+            prevDerivative = derivative;
+        }
+        return maxEta;
+    }
+
+    private static double zpnRadial(float[] pv2, double eta) {
+        double radial = 0;
+        double power = 1;
+        for (float coefficient : pv2) {
+            radial += coefficient * power;
+            power *= eta;
+        }
+        return radial;
+    }
+
+    private static double zpnRadialDerivative(float[] pv2, double eta) {
+        double derivative = 0;
+        double power = 1;
+        for (int i = 1; i < pv2.length; i++) {
+            derivative += i * pv2[i] * power;
+            power *= eta;
+        }
+        return derivative;
     }
 
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {

@@ -6,8 +6,9 @@ Status
 
 This note reflects the current state of the work after:
 
-- validating the forward `TAN` and `AZP` WCS math against Astropy
+- validating the forward `TAN`, `AZP`, and six-term `ZPN` WCS math against Astropy
 - validating the non-slanted `AZP` inverse mapping against Astropy
+- validating the primary-branch six-term `ZPN` inverse mapping against Astropy
 - correcting the local embedding prototypes to use the actual JHV observer
   frame
 - trying and rejecting multiple 3D embedding experiments in `solarOrtho.frag`
@@ -75,6 +76,22 @@ These parts are already on solid ground.
 - implemented and validated in
   [extra/test/validate_jhv_wcs_against_astropy.py](extra/test/validate_jhv_wcs_against_astropy.py)
 - matches Astropy to numerical precision
+
+4. Forward six-term `ZPN` is correct for the current PSP/WISPR files.
+
+- JHV `world -> helioprojective -> ZPN plane -> pixel`
+- currently implemented with `PV2_0..PV2_5`
+- matches Astropy to numerical precision on:
+  - `extra/test/data/psp_L3_wispr_20231227T150508_V1_1211.fits`
+  - `extra/test/data/psp_L3_wispr_20231227T150704_V1_2222.fits`
+
+5. Inverse primary-branch six-term `ZPN` direction recovery is correct for the
+   current PSP/WISPR files.
+
+- `ZPN plane -> helioprojective angles`
+- validated against Astropy on the same PSP/WISPR files
+- the current implementation keeps only the primary monotonic branch of the
+  radial polynomial
 
 So the unresolved part is not the projection formulas. It is what 3D surface
 JHV should render for HI/AZP/ZPN in orthographic mode.
@@ -144,7 +161,9 @@ embedding problem for very wide fields.
 Current native `HPC` status:
 
 - a bounded `HPC` display mode with symmetric extent on both axes was implemented in JHV
-- the display extent is derived from the enabled image footprints
+- the display bounds are derived from the enabled image footprints
+- the visible screen domain is padded around the footprint center to preserve
+  isotropic angular scale, but it is not forced to be symmetric around `0`
 - the `HPC` render sampling map has been validated directly against Astropy on
   the current test files
 
@@ -154,6 +173,9 @@ Current direct `HPC` validation results:
 - HI1 (`AZP`): pixel-center error at machine precision
 - HI2 (`AZP`): pixel-center error still extremely small (`~3e-5 px` max) over
   the finite valid rendered domain
+- PSP/WISPR 1211 (`ZPN`): pixel-center error at machine precision
+- PSP/WISPR 2222 (`ZPN`): pixel-center error at machine precision over the
+  finite primary-branch rendered domain
 
 Current direct `Orthographic`-vs-`HPC` screen comparison result:
 
@@ -228,6 +250,7 @@ In the current GLSL/validator conventions:
 - `phi0, theta0` come from `CRVAL`
 - `mu = PV2_1`
 - `gamma = PV2_2` in degrees in FITS, converted to radians for trig
+- current `ZPN` support uses `PV2_0..PV2_5`
 
 Forward `AZP` uses:
 
@@ -243,6 +266,19 @@ For `gamma = 0`:
 
 The inverse non-slanted `AZP` radial law is therefore solved first, then the
 native spherical rotation about `CRVAL` is inverted.
+
+Current `ZPN` uses:
+
+- `eta = acos(sin(theta0) * sin(theta) + cos(theta0) * cos(theta) * cos(phi - phi0))`
+- `R(eta) = sum(PV2_m * eta^m)` for `m = 0..5`
+- `eta` is in radians
+- `R` is therefore also in radians before the usual `planeUnitsPerRad` scaling
+
+For inversion, the current JHV/validator implementation:
+
+- keeps the primary forward branch only
+- defines that branch by `dR/deta > 0`
+- inverts `R(eta)` by bisection on that branch
 
 
 Projection-agnostic decomposition
@@ -580,6 +616,19 @@ This validates:
 - `AZP plane -> helioprojective`
 - round-trip error
 
+4. Inverse primary-branch `ZPN`
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/psp_L3_wispr_20231227T150704_V1_2222.fits \
+  --inverse-zpn
+```
+
+This validates:
+
+- `ZPN plane -> helioprojective`
+- round-trip error on the primary monotonic branch
+
 4. `HPC` render comparison
 
 ```bash
@@ -607,7 +656,7 @@ under:
 
 The script also reports:
 
-- `extent_deg`
+- `bounds_deg`
 - `pixel_center_max_error_px`
 - `pixel_center_rms_error_px`
 
@@ -684,8 +733,9 @@ Yes, Astropy can validate:
 
 - WCS plane plus linear terms (`CRVAL`, `PC`/`CROTA`, `CDELT`, `CRPIX`)
 
-That is exactly what the current validator already does for forward `TAN`/`AZP`
-and inverse non-slanted `AZP`.
+That is exactly what the current validator already does for forward
+`TAN`/`AZP`/six-term `ZPN`, inverse non-slanted `AZP`, and inverse
+primary-branch six-term `ZPN`.
 
 
 What Astropy cannot test

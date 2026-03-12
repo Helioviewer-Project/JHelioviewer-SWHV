@@ -20,11 +20,19 @@ This note documents the current convention used by the non-orthographic display 
 - The current `HPC` display convention is:
   - `x = Tx` (helioprojective longitude / west-east angular offset)
   - `y = Ty` (helioprojective latitude / south-north angular offset)
+- The current `HPC` visible bounds are derived from the actual image footprint in
+  `Tx,Ty`, not forced to be symmetric around `0`.
+- Aspect-ratio padding is added around the footprint center so angular scale
+  stays isotropic on screen.
 - In Java, `HPC` projection is expressed with the observer-distance-dependent formulas:
   - `Tx = atan2(x, D - z)`
   - `Ty = atan2(y, sqrt(x^2 + (D - z)^2))`
 - In GLSL, `solarHpc.frag` starts from the displayed `Tx,Ty` map coordinates, optionally intersects the observer ray with the unit solar sphere for on-disk differential rotation, and then reprojects through the source-image WCS.
 - `HPC` display coordinates are angular coordinates in degrees. They are not orthographic scene coordinates, and they are not guaranteed to match `Orthographic` at the same on-screen radius.
+- Because `HPC` is angular, its visible grid scale changes with observer distance:
+  - a closer observer sees the same solar structure under a larger angle
+  - a more distant observer sees it under a smaller angle
+  - this is expected behavior for the current `HPC` mode, not a rendering bug
 - Java picking now distinguishes between:
   - solar-point unprojection
   - display-surface unprojection
@@ -54,7 +62,8 @@ Changing only one side will usually produce one or more of:
 
 ## Current validation boundary
 
-- `HPC` render sampling is validated against Astropy for the current `TAN` and non-slanted `AZP` test files.
+- `HPC` render sampling is validated against Astropy for the current `TAN`,
+  non-slanted `AZP`, and six-term primary-branch `ZPN` test files.
 - Direct screen comparison also shows that `HPC` and `Orthographic` are not identical display geometries, even with the same observer viewpoint and `dragRotation = 0`.
 - `HPC` mouse unprojection is still incomplete off-disk, because the current Java path intersects only the unit solar sphere.
 - `HPC` display-surface picking is defined separately from solar-point picking and is intended for flat display annotations such as line/FOV.
@@ -62,7 +71,13 @@ Changing only one side will usually produce one or more of:
   - those tools use flat display-plane points while dragging/drawing
   - but `AbstractAnnotateable` still serializes points as spherical `lon/lat`
   - so saving and reloading those `HPC` annotations is not yet a stable operation
-- `HPC` extent inversion is currently exact for `TAN` and non-slanted `AZP`; slanted `AZP` and `ZPN` are not documented as supported yet.
+- `HPC` extent inversion is currently exact for:
+  - `TAN`
+  - non-slanted `AZP`
+  - six-term `ZPN` on its primary monotonic branch
+- slanted `AZP` is still not documented as supported
+- current `ZPN` support uses only `PV2_0..PV2_5`, which matches the current
+  solar test files
 
 ## Practical rule
 
