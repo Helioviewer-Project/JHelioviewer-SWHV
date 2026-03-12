@@ -204,7 +204,14 @@ vec3 helioprojectiveToHpcPlanePoint(const vec2 helioprojective, const float obse
     return observerPosition(observerDistance) - observerDistance * ray / ray.z;
 }
 
-vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
+void nativeZenithalCoordinates(
+    const vec2 helioprojective,
+    const vec2 crval,
+    const float planeUnitsPerRad,
+    out float a,
+    out float b,
+    out float cosNativeDistance
+) {
     float phi = helioprojective.x;
     float theta = helioprojective.y;
     vec2 reference = crval / planeUnitsPerRad;
@@ -219,35 +226,32 @@ vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     float sinDeltaLon = sin(deltaLon);
     float cosDeltaLon = cos(deltaLon);
 
-    float cosC = sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon;
+    a = cosLat * sinDeltaLon;
+    b = cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon;
+    cosNativeDistance = sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon;
+}
+
+vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
+    float a;
+    float b;
+    float cosC;
+    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, a, b, cosC);
     if (cosC <= 0.)
         discard;
 
     return planeUnitsPerRad * vec2(
-        cosLat * sinDeltaLon / cosC,
-        (cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon) / cosC);
+        a / cosC,
+        b / cosC);
 }
 
 vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
-    float phi = helioprojective.x;
-    float theta = helioprojective.y;
-    vec2 reference = crval / planeUnitsPerRad;
-    float phi0 = reference.x;
-    float theta0 = reference.y;
     float mu = PV[1];
     float gamma = radians(PV[2]);
 
-    float sinLat = sin(theta);
-    float cosLat = cos(theta);
-    float sinLat0 = sin(theta0);
-    float cosLat0 = cos(theta0);
-    float deltaLon = phi - phi0;
-    float sinDeltaLon = sin(deltaLon);
-    float cosDeltaLon = cos(deltaLon);
-
-    float a = cosLat * sinDeltaLon;
-    float b = cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon;
-    float cosNativeDistance = sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon;
+    float a;
+    float b;
+    float cosNativeDistance;
+    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, a, b, cosNativeDistance);
     float c = length(vec2(a, b));
     if (c == 0.)
         return vec2(0.);
@@ -267,12 +271,45 @@ vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
         radial * b / (c * cos(gamma)));
 }
 
+void zpnRadialAndDerivative(const float eta, const float[6] PV, out float radial, out float derivative) {
+    radial = PV[5];
+    derivative = 5. * PV[5];
+    for (int i = 4; i >= 1; --i) {
+        radial = radial * eta + PV[i];
+        derivative = derivative * eta + float(i) * PV[i];
+    }
+    radial = radial * eta + PV[0];
+}
+
+vec2 projectZpnToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
+    float a;
+    float b;
+    float cosNativeDistance;
+    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, a, b, cosNativeDistance);
+    float c = length(vec2(a, b));
+    if (c == 0.)
+        return vec2(0.);
+
+    float eta = acos(clamp(cosNativeDistance, -1., 1.));
+    float radial;
+    float derivative;
+    zpnRadialAndDerivative(eta, PV, radial, derivative);
+    if (radial < 0. || derivative <= 0.)
+        discard;
+
+    return planeUnitsPerRad * vec2(
+        radial * a / c,
+        radial * b / c);
+}
+
 vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const float[6] PV) {
     int projection = int(wcs.projectionMeta.x);
     if (projection == WCS_PROJECTION_TAN)
         return projectTanToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y);
     if (projection == WCS_PROJECTION_AZP)
         return projectAzpToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y, PV);
+    if (projection == WCS_PROJECTION_ZPN)
+        return projectZpnToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y, PV);
 
     return helioprojective - wcs.crval;
 }
