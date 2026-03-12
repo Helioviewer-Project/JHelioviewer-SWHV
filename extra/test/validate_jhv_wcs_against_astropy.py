@@ -358,6 +358,8 @@ def project_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMet
 
 
 def project_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    if meta.projection == "TAN":
+        return project_plane_internal_to_world_tan(plane_internal, meta)
     if meta.projection == "AZP":
         return azp_plane_internal_to_world(plane_internal, meta)
     if meta.projection == "ZPN":
@@ -713,6 +715,7 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=0, help="Random seed")
     parser.add_argument("--report-worst", type=int, default=5, help="How many worst samples to print")
     parser.add_argument("--all-pixels", action="store_true", help="Validate all pixel centers instead of random 3D samples")
+    parser.add_argument("--inverse-tan", action="store_true", help="Validate the TAN inverse plane->world mapping")
     parser.add_argument("--inverse-azp", action="store_true", help="Validate the non-slanted AZP inverse plane->world mapping")
     parser.add_argument("--inverse-zpn", action="store_true", help="Validate the primary-branch ZPN inverse plane->world mapping")
     parser.add_argument("--observer-hpc-prototype", action="store_true", help="Prototype the deterministic intermediate HPC image plane recovered from inverse WCS")
@@ -1089,14 +1092,23 @@ def main() -> int:
             print(f"  pixel=({px}, {py}) point=({point[0]:.12e}, {point[1]:.12e}, {point[2]:.12e})")
         return 0
 
-    if args.inverse_azp or args.inverse_zpn:
-        expected_projection = "AZP" if args.inverse_azp else "ZPN"
-        if meta.projection != "AZP":
-            if args.inverse_azp:
-                raise ValueError("--inverse-azp requires an AZP FITS file")
-        if meta.projection != "ZPN":
-            if args.inverse_zpn:
-                raise ValueError("--inverse-zpn requires a ZPN FITS file")
+    if args.inverse_tan or args.inverse_azp or args.inverse_zpn:
+        inverse_mode_count = sum(1 for enabled in (args.inverse_tan, args.inverse_azp, args.inverse_zpn) if enabled)
+        if inverse_mode_count > 1:
+            raise ValueError("Choose at most one of --inverse-tan, --inverse-azp, or --inverse-zpn")
+
+        if args.inverse_tan:
+            expected_projection = "TAN"
+            mode_name = "inverse_tan"
+        elif args.inverse_azp:
+            expected_projection = "AZP"
+            mode_name = "inverse_azp"
+        else:
+            expected_projection = "ZPN"
+            mode_name = "inverse_zpn"
+
+        if meta.projection != expected_projection:
+            raise ValueError(f"--{mode_name.replace('_', '-')} requires a {expected_projection} FITS file")
 
         inverse_err_max_deg = 0.0
         roundtrip_err_max_internal = 0.0
@@ -1146,7 +1158,7 @@ def main() -> int:
 
         worst_inverse.sort(key=lambda item: item[0], reverse=True)
         print(f"file={args.fits_file}")
-        print(f"mode={'inverse_azp' if expected_projection == 'AZP' else 'inverse_zpn'} samples={args.samples} seed={args.seed}")
+        print(f"mode={mode_name} samples={args.samples} seed={args.seed}")
         print(f"valid_samples={valid_inverse_samples}")
         print(f"skipped_samples={skipped_inverse_samples}")
         print(f"inverse_world_max_error_deg={inverse_err_max_deg:.6e}")
