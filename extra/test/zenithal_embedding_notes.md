@@ -1,12 +1,23 @@
-Zenithal Embedding Notes for JHV
-================================
+---
+title: |
+   | SWHV CCN4
+   |
+   | Zenithal WCS Validation and Display Notes for JHV
+subtitle: SWHV-ROB-TN-001-CCN4 v0
+subject: SWHV CCN4 
+date: SWHV-ROB-TN-001-CCN4 - Version 0 - 2026-03-xx
+lof: false
+lot: false
+---
 
-Status
-------
+`id: \exec{git hash-object \file}`
+
+# Status
 
 This note reflects the current state of the work after:
 
 - validating the forward `TAN`, `AZP`, and six-term `ZPN` WCS math against Astropy
+- validating the `TAN` inverse mapping against Astropy
 - validating the non-slanted `AZP` inverse mapping against Astropy
 - validating the primary-branch six-term `ZPN` inverse mapping against Astropy
 - correcting the local embedding prototypes to use the actual JHV observer
@@ -25,8 +36,7 @@ Current conclusion:
 - FITS/WCS does not uniquely determine that embedding
 
 
-Primary design criterion
-------------------------
+# Primary design criterion
 
 The main criterion for orthographic embedding should be:
 
@@ -54,8 +64,7 @@ This does not determine the embedding by itself, but it is an additional sign
 check on whether a candidate viewer convention is visually plausible.
 
 
-What is already proven
-----------------------
+# What is already proven
 
 These parts are already on solid ground.
 
@@ -64,20 +73,27 @@ These parts are already on solid ground.
 - JHV `world -> helioprojective -> TAN plane -> pixel`
 - matches Astropy to numerical precision
 
-2. Forward `AZP` is correct for the current HI files.
+2. Inverse `TAN` direction recovery is correct.
+
+- `TAN plane -> helioprojective angles`
+- implemented and validated in
+  [extra/test/validate_jhv_wcs_against_astropy.py](extra/test/validate_jhv_wcs_against_astropy.py)
+- matches Astropy to numerical precision
+
+3. Forward `AZP` is correct for the current HI files.
 
 - JHV `world -> helioprojective -> AZP plane -> pixel`
 - matches Astropy to numerical precision
 - current HI files are non-slanted: `PV2_2` is absent, so `gamma = 0`
 
-3. Inverse `AZP` direction recovery is correct for the current HI files.
+4. Inverse `AZP` direction recovery is correct for the current HI files.
 
 - `AZP plane -> helioprojective angles`
 - implemented and validated in
   [extra/test/validate_jhv_wcs_against_astropy.py](extra/test/validate_jhv_wcs_against_astropy.py)
 - matches Astropy to numerical precision
 
-4. Forward six-term `ZPN` is correct for the current PSP/WISPR files.
+5. Forward six-term `ZPN` is correct for the current PSP/WISPR files.
 
 - JHV `world -> helioprojective -> ZPN plane -> pixel`
 - currently implemented with `PV2_0..PV2_5`
@@ -85,7 +101,7 @@ These parts are already on solid ground.
   - `extra/test/data/psp_L3_wispr_20231227T150508_V1_1211.fits`
   - `extra/test/data/psp_L3_wispr_20231227T150704_V1_2222.fits`
 
-5. Inverse primary-branch six-term `ZPN` direction recovery is correct for the
+6. Inverse primary-branch six-term `ZPN` direction recovery is correct for the
    current PSP/WISPR files.
 
 - `ZPN plane -> helioprojective angles`
@@ -93,12 +109,11 @@ These parts are already on solid ground.
 - the current implementation keeps only the primary monotonic branch of the
   radial polynomial
 
-So the unresolved part is not the projection formulas. It is what 3D surface
+The unresolved part is therefore not the projection formulas. It is what 3D surface
 JHV should render for HI/AZP/ZPN in orthographic mode.
 
 
-What FITS/WCS actually gives
-----------------------------
+# What FITS/WCS actually gives
 
 For zenithal projections, FITS/WCS gives:
 
@@ -115,8 +130,7 @@ It does not give:
 That missing degree of freedom is the core reason the remaining problem exists.
 
 
-HPC intermediate representation
--------------------------------
+# HPC intermediate representation
 
 The cleanest way to factor this work is to introduce an explicit intermediate
 `HPC` representation between WCS and any final JHV display mode.
@@ -138,7 +152,7 @@ That gives a cleaner separation:
 - orthographic mode can then apply a separate viewer embedding to the same `HPC`
   ray field
 
-So the unresolved question is no longer “how should `AZP` be embedded?” but:
+The unresolved question is therefore no longer “how should `AZP` be embedded?” but:
 
 - “given an `HPC` ray field, how should ortho place it in 3D?”
 
@@ -154,7 +168,7 @@ Current prototype result:
 - for HI2 it becomes extremely extended near the horizon, because the pure `HPC`
   plane itself has a native singular blow-up there
 
-So `HPC` is a good intermediate representation and is also the basis of a
+`HPC` is therefore a good intermediate representation and is also the basis of a
 native bounded JHV display mode, but it does not by itself solve the ortho
 embedding problem for very wide fields.
 
@@ -190,7 +204,7 @@ Current direct `Orthographic`-vs-`HPC` screen comparison result:
   - `pixel_center_max_error_px ~ 3.67`
   - `pixel_center_rms_error_px ~ 2.71`
 
-So the current evidence supports:
+The current evidence supports the following conclusions:
 
 - both modes are WCS-correct in their own sampling logic
 - they are not the same display geometry
@@ -198,8 +212,7 @@ So the current evidence supports:
   geometry difference, not from an Astropy/WCS mismatch
 
 
-What Thompson 2006 clarifies
-----------------------------
+# What Thompson 2006 clarifies
 
 Thompson (2006) helps, but only on the WCS side of the boundary.
 
@@ -217,14 +230,13 @@ It does not provide:
   orthographic scene
 - a unique line-of-sight distance for off-limb image samples
 
-So Thompson reinforces the current state rather than changing it:
+Thompson therefore reinforces the current state rather than changing it:
 
 - forward/inverse WCS is constrained and testable
 - orthographic 3D embedding remains a viewer convention
 
 
-Current HI header facts
------------------------
+# Current HI header facts
 
 For the current STEREO-A HI test files:
 
@@ -245,8 +257,7 @@ Current JHV metadata agrees with this:
 - it does not define an extra image-surface placement scalar
 
 
-Projection formulas in current JHV conventions
-----------------------------------------------
+# Projection formulas in current JHV conventions
 
 In the current GLSL/validator conventions:
 
@@ -255,6 +266,21 @@ In the current GLSL/validator conventions:
 - `mu = PV2_1`
 - `gamma = PV2_2` in degrees in FITS, converted to radians for trig
 - current `ZPN` support uses `PV2_0..PV2_5`
+
+Forward `TAN` uses:
+
+- `a = cos(theta) * sin(phi - phi0)`
+- `b = cos(theta0) * sin(theta) - sin(theta0) * cos(theta) * cos(phi - phi0)`
+- `cos(eta) = sin(theta0) * sin(theta) + cos(theta0) * cos(theta) * cos(phi - phi0)`
+- `R = tan(eta)`
+- `x = R * sin(alpha) = a / cos(eta)`
+- `y = R * cos(alpha) = b / cos(eta)`
+
+The inverse `TAN` radial law therefore uses:
+
+- `eta = atan(R)`
+
+followed by inversion of the same native spherical rotation about `CRVAL`.
 
 Forward `AZP` uses:
 
@@ -285,10 +311,9 @@ For inversion, the current JHV/validator implementation:
 - inverts `R(eta)` by bisection on that branch
 
 
-Projection-agnostic decomposition
----------------------------------
+# Projection-agnostic decomposition
 
-The clean way to think about zenithal embedding is to separate two problems.
+A useful formulation of zenithal embedding is to separate two problems.
 
 Part 1: recover an observer-frame ray direction
 
@@ -306,7 +331,7 @@ In JHV's current helioprojective convention, this observer frame is:
 - image observer at `(0, 0, D)`
 - center line of sight toward `-z`
 
-So the recovered direction is an observer-to-scene direction, not an
+The recovered direction is therefore an observer-to-scene direction, not an
 origin-centered direction.
 
 Part 2: choose a viewer placement rule
@@ -319,8 +344,7 @@ Part 1 is constrained by WCS.
 Part 2 is not.
 
 
-What failed and why
--------------------
+# What failed and why
 
 1. Sun-centered plane
 
@@ -380,11 +404,10 @@ Result for HI2:
 - changing `k` does not remove the excluded image domain
 - the same subset of pixels remains outside the forward-plane hemisphere
 
-So the constant-plane family is not a viable full-image embedding for HI2.
+The constant-plane family is therefore not a viable full-image embedding for HI2.
 
 
-Embedding constraints
----------------------
+# Embedding constraints
 
 Any acceptable HI/AZP/ZPN orthographic embedding must satisfy:
 
@@ -397,8 +420,7 @@ Any acceptable HI/AZP/ZPN orthographic embedding must satisfy:
    pincushion-like.
 
 
-Admissible model families
--------------------------
+# Admissible model families
 
 Only a few model families are defensible.
 
@@ -450,10 +472,9 @@ Cons:
 - must be documented as a JHV viewer convention, not as WCS
 
 
-Most plausible next implementation direction
---------------------------------------------
+# Most plausible next implementation direction
 
-The best next candidate is now the observer shell model, not the observer plane.
+The preferred next candidate is the observer shell model, not the observer plane.
 
 Reason:
 
@@ -482,7 +503,7 @@ Current prototype result:
 - these results hold after correcting the prototype to use the actual JHV
   observer frame `(0, 0, D)` with line of sight toward `-z`
 
-So the shell family is now the practical baseline for ortho HI rendering work.
+The shell family is therefore the practical baseline for ortho HI rendering work.
 
 At this point there is no evidence that `S` can be derived from current FITS/WCS
 for HI. It must come from:
@@ -499,8 +520,7 @@ This should be treated as a JHV viewer convention, not as a FITS/WCS-derived
 physical truth.
 
 
-Exact visibility criterion for an observer-centered shell
----------------------------------------------------------
+# Exact visibility criterion for an observer-centered shell
 
 For the shell model, after inverse WCS the embedded point is
 
@@ -549,8 +569,7 @@ heuristic. It is exactly the front hemisphere of the observer-centered sphere in
 current eye space.
 
 
-Architectural consequence
--------------------------
+# Architectural consequence
 
 The current fragment-only full-screen-quad ortho path is a poor fit for this.
 
@@ -569,8 +588,7 @@ solution for HI/AZP/ZPN:
 - let the fragment shader do sampling and clipping only
 
 
-How to use the validator
-------------------------
+# How to use the validator
 
 The main script is:
 
@@ -582,7 +600,7 @@ Run it with:
 python3 extra/test/validate_jhv_wcs_against_astropy.py <fits-file> [mode]
 ```
 
-Useful modes:
+Validator modes:
 
 1. Forward WCS random-sample validation
 
@@ -607,7 +625,21 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
 This checks the full image grid against Astropy and reports the worst pixel
 center error.
 
-3. Inverse non-slanted `AZP`
+3. Inverse `TAN`
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/sample.171.fits \
+  --hdu 1 \
+  --inverse-tan
+```
+
+This validates:
+
+- `TAN plane -> helioprojective`
+- round-trip error
+
+4. Inverse non-slanted `AZP`
 
 ```bash
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -620,7 +652,7 @@ This validates:
 - `AZP plane -> helioprojective`
 - round-trip error
 
-4. Inverse primary-branch `ZPN`
+5. Inverse primary-branch `ZPN`
 
 ```bash
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -633,7 +665,7 @@ This validates:
 - `ZPN plane -> helioprojective`
 - round-trip error on the primary monotonic branch
 
-4. `HPC` render comparison
+6. `HPC` render comparison
 
 ```bash
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -669,7 +701,29 @@ Interpretation:
 - near-black diff image means the JHV `HPC` render mapping matches Astropy
 - bright areas indicate a mapping mismatch or a domain/singularity issue
 
-5. Direct `Orthographic` vs `HPC` screen comparison
+Interpretation of the reported max error:
+
+- the reported `pixel_center_max_error_px` is an absolute source-pixel difference
+- for most current `TAN`, `AZP`, and `ZPN` test files, that absolute error stays
+  near machine precision
+- for STEREO-A HI2 (`AZP`), the reported max can be noticeably larger in
+  absolute pixels (around `3e-5 px`) while still representing essentially the
+  same numerical agreement
+
+Why HI2 is different:
+
+- HI2 reaches much closer to the finite valid edge of the `AZP` domain
+- near that edge, the `AZP` radial magnification becomes extremely large
+- the validator therefore compares JHV and Astropy at source-pixel coordinates
+  of order `1e7 px`
+- tiny floating-point differences in the angular/plane conversion then appear as
+  larger absolute pixel-coordinate differences
+
+For HI2, a max error around `3e-5 px` still corresponds to a relative error
+of order `1e-12`, which is consistent with the machine-precision-level agreement
+seen in the other tests.
+
+7. Direct `Orthographic` vs `HPC` screen comparison
 
 ```bash
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -695,7 +749,7 @@ Interpretation:
 - it measures whether `Orthographic` and `HPC` are the same on-screen geometry
 - for the current AIA 171 sample they are not
 
-6. Embedding prototypes
+8. Embedding prototypes
 
 There are also experimental geometry modes:
 
@@ -706,13 +760,95 @@ There are also experimental geometry modes:
 These are for reasoning about ortho embedding, not for validating the production
 JHV render path.
 
+## What the validator models from current JHV
 
-What Astropy can test
----------------------
+For the production validation modes above, the script models the stable
+Java/GLSL reprojection and sampling path, not the full interactive renderer.
 
-Astropy can test all WCS-defined parts.
+Included:
 
-Yes, Astropy can validate:
+- FITS metadata parsing into the same effective quantities JHV uses:
+  - `CRPIX`
+  - `CRVAL`
+  - `CDELT`
+  - `PC`/`CROTA`
+  - `DSUN_OBS`
+  - `PV2_0..PV2_5`
+- the current shared WCS projection math for:
+  - `TAN`
+  - non-slanted `AZP`
+  - six-term primary-branch `ZPN`
+- the current `HPC` image sampling path:
+  - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
+- the bounded `HPC` display domain used for validation
+- direct `Orthographic` vs `HPC` on-screen pixel-choice comparison for the
+  specific no-rotation comparison mode
+
+Excluded:
+
+- `dragRotation`
+- `cameraDiff`
+- differential diff-image alignment between two arbitrary live layers beyond the
+  specific per-image `deltaT` reprojection modeled in the shader path
+- `deltaCROTA`, `deltaCRVAL1`, `deltaCRVAL2`
+- annotation picking/drawing
+- playback/view policy effects such as dynamic refitting of the visible `HPC`
+  box
+- ortho off-limb embedding experiments except in the explicit prototype modes
+- full OpenGL rasterization state, blending, and UI behavior
+
+The validator therefore answers:
+
+- whether the current reprojection/sampling math matches Astropy
+- whether the bounded `HPC` sampling map matches Astropy
+- whether `Orthographic` and `HPC` choose the same source pixels at the same
+  displayed on-disk screen radius
+
+It does not answer:
+
+- whether transient user-driven viewing state produces the desired playback
+  behavior
+- whether annotation tools behave correctly
+- whether an ortho embedding convention is visually acceptable
+
+## What is compared against Astropy
+
+The validator uses Astropy as the external reference for these checks:
+
+- forward sample validation
+  - JHV-style world/helioprojective -> WCS plane -> pixel
+  - compared against `astropy.wcs.WCS.wcs_world2pix(...)`
+- all-pixels validation
+  - every source-image pixel center is mapped through the JHV path and compared
+    against Astropy pixel-center results
+- inverse `TAN`
+  - JHV plane -> helioprojective inversion is checked by round-trip comparison
+    against Astropy's forward WCS
+- inverse `AZP`
+  - JHV plane -> helioprojective inversion is checked by round-trip comparison
+    against Astropy's forward WCS
+- inverse primary-branch `ZPN`
+  - same round-trip strategy on the supported primary monotonic branch
+- bounded `HPC` render comparison
+  - the same `HPC` screen grid is run through:
+    - the JHV sampling path
+    - Astropy `world -> pixel`
+  - the script compares the resulting source pixel centers and also writes diff
+    images
+
+Not compared against Astropy:
+
+- direct `Orthographic` vs `HPC` screen comparison
+  - this is an internal JHV-to-JHV comparison only
+- observer plane/shell/HPC embedding prototypes
+  - these are geometry experiments, not Astropy validations
+
+
+# What Astropy can test
+
+Astropy can validate all parts that are fully defined by WCS.
+
+Specifically, Astropy can validate:
 
 1. Forward projection
 
@@ -738,12 +874,11 @@ Yes, Astropy can validate:
 - WCS plane plus linear terms (`CRVAL`, `PC`/`CROTA`, `CDELT`, `CRPIX`)
 
 That is exactly what the current validator already does for forward
-`TAN`/`AZP`/six-term `ZPN`, inverse non-slanted `AZP`, and inverse
-primary-branch six-term `ZPN`.
+`TAN`/`AZP`/six-term `ZPN`, inverse `TAN`, inverse non-slanted `AZP`, and
+inverse primary-branch six-term `ZPN`.
 
 
-What Astropy cannot test
-------------------------
+# What Astropy cannot test
 
 Astropy cannot test the unresolved orthographic HI problem directly.
 
@@ -757,14 +892,13 @@ This remains true even when Thompson 2006 is taken into account: the paper
 constrains the solar-image coordinate formalism, not the 3D viewer placement
 rule.
 
-So the answer is:
+The conclusion is:
 
 - WCS part: yes, fully testable against Astropy
 - 3D embedding part: no, not from Astropy alone
 
 
-Practical testing strategy
---------------------------
+# Practical testing strategy
 
 The right testing split is:
 
@@ -780,8 +914,7 @@ If a new embedding model is implemented, it should first be tested in the local
 validator as a pure geometry model before going back into GLSL.
 
 
-Bottom line
------------
+# Bottom line
 
 The unresolved problem is not “how to implement `AZP`”.
 
