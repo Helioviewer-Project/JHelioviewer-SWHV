@@ -161,9 +161,13 @@ embedding problem for very wide fields.
 Current native `HPC` status:
 
 - a bounded `HPC` display mode with symmetric extent on both axes was implemented in JHV
-- the display bounds are derived from the enabled image footprints
-- the visible screen domain is padded around the footprint center to preserve
-  isotropic angular scale, but it is not forced to be symmetric around `0`
+- the display scale is derived from the enabled image footprints
+- the visible screen domain stays centered on `(Tx, Ty) = (0, 0)`, so the Sun
+  center remains at the grid center
+- aspect-ratio padding is applied around `(0, 0)` to preserve isotropic angular
+  scale on screen
+- during playback, the fitted `HPC` scale is sticky for the enabled layer set
+  instead of being recomputed from every frame
 - the `HPC` render sampling map has been validated directly against Astropy on
   the current test files
 

@@ -580,12 +580,10 @@ def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, floa
         min_y = min(min_y, lat_deg)
         max_y = max(max_y, lat_deg)
 
-    center_x = 0.5 * (min_x + max_x)
-    center_y = 0.5 * (min_y + max_y)
-    half_width = 0.5 * (max_x - min_x)
-    half_height = max(0.5 * (max_y - min_y), half_width / aspect)
+    half_width = max(abs(min_x), abs(max_x))
+    half_height = max(abs(min_y), abs(max_y), half_width / aspect)
     half_width = half_height * aspect
-    return (center_x - half_width, center_x + half_width, center_y - half_height, center_y + half_height)
+    return (-half_width, half_width, -half_height, half_height)
 
 
 def project_plane_internal_to_world_tan(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
