@@ -9,6 +9,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.Movie;
@@ -23,6 +24,8 @@ public class GLListener implements GLEventListener {
 
     private final GLCanvas canvas;
     private boolean whiteBack;
+    private static Region hpcScaleBoundsCache;
+    private static int hpcScaleSignature;
 
     public static final GLSLSolar glslSolar = new GLSLSolar();
 
@@ -119,15 +122,13 @@ public class GLListener implements GLEventListener {
         }
 
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
-        Region hpcBounds = Display.mode == ProjectionMode.HPC ? ImageLayers.getLargestHpcBoundsDegrees() : null;
+        Region hpcBounds = Display.mode == ProjectionMode.HPC ? getStableHpcScaleBoundsDegrees() : null;
         for (Viewport vp : Display.getViewports()) {
             if (Display.mode == ProjectionMode.HPC) {
-                double centerX = hpcBounds.llx + 0.5 * hpcBounds.width;
-                double centerY = hpcBounds.lly + 0.5 * hpcBounds.height;
                 double halfWidth = 0.5 * hpcBounds.width;
                 double halfHeight = Math.max(0.5 * hpcBounds.height, halfWidth / vp.aspect);
                 halfWidth = halfHeight * vp.aspect;
-                GridScale.hpc.set(centerX - halfWidth, centerX + halfWidth, centerY - halfHeight, centerY + halfHeight);
+                GridScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
             }
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
@@ -137,6 +138,33 @@ public class GLListener implements GLEventListener {
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
             Layers.renderFloat(camera, vp, gl);
         }
+    }
+
+    public static void resetHpcScaleBounds() {
+        hpcScaleBoundsCache = null;
+        hpcScaleSignature = 0;
+    }
+
+    private static Region getStableHpcScaleBoundsDegrees() {
+        int signature = 1;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+            signature = 31 * signature + System.identityHashCode(layer);
+        }
+
+        if (hpcScaleBoundsCache == null || hpcScaleSignature != signature) {
+            Region bounds = ImageLayers.getLargestHpcBoundsDegrees();
+            double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
+            double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
+            if (halfWidth <= 0)
+                halfWidth = 5;
+            if (halfHeight <= 0)
+                halfHeight = 5;
+            hpcScaleBoundsCache = new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
+            hpcScaleSignature = signature;
+        }
+        return hpcScaleBoundsCache;
     }
 
     private static void renderFullFloatScene(Camera camera, GL3 gl) {
