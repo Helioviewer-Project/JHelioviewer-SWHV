@@ -57,11 +57,14 @@ void main(void) {
     float factor;
     texcoord = get_hpc_texcoord(wcs[0], scrpos, wcs[0].deltaT, pv0, factor);
     if (display.isDiff == NODIFFERENCE) {
+        clamp_texture(texcoord);
         color = getColor(texcoord, texcoord, factor);
     } else {
         vec2 difftexcoord;
         float difffactor;
         difftexcoord = get_hpc_texcoord(wcs[1], scrpos, wcs[1].deltaT, pv1, difffactor);
+        clamp_texture(texcoord);
+        clamp_texture(difftexcoord);
         color = getColor(texcoord, difftexcoord, max(factor, difffactor));
     }
     outColor = color;
