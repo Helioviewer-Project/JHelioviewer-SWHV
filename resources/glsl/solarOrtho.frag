@@ -1,16 +1,6 @@
 
 const vec3 zAxis = vec3(0, 0, 1);
 
-vec3 differential(const float dt, const vec3 v) {
-    if (dt == 0.)
-        return v;
-
-    float phi = atan(v.x, v.z);
-    float theta = asin(v.y);
-    phi -= differentialRotation(dt, theta); // difference from rigid rotation
-    return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
-}
-
 /*
 // DOI 10.1007/s11207-008-9277-6, §2.2.2, Eq.18-23
 vec2 distort(const vec2 c, const float[6] PV) {

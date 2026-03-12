@@ -8,11 +8,17 @@ This note reflects the current state of the work after:
 
 - validating the forward `TAN` and `AZP` WCS math against Astropy
 - validating the non-slanted `AZP` inverse mapping against Astropy
+- correcting the local embedding prototypes to use the actual JHV observer
+  frame
 - trying and rejecting multiple 3D embedding experiments in `solarOrtho.frag`
 
 Current conclusion:
 
 - the WCS math is correct
+- a bounded native JHV `HPC` mode was implemented and its render mapping is
+  validated against Astropy for the current test files
+- direct `Orthographic`-vs-`HPC` screen comparison shows they are not identical
+  even with the same observer viewpoint and `dragRotation = 0`
 - the remaining HI rendering problem is not a WCS problem
 - it is a 3D embedding problem
 - FITS/WCS does not uniquely determine that embedding
@@ -90,6 +96,80 @@ It does not give:
 - a unique rule for where along a recovered observer ray a rendered point should sit
 
 That missing degree of freedom is the core reason the remaining problem exists.
+
+
+HPC intermediate representation
+-------------------------------
+
+The cleanest way to factor this work is to introduce an explicit intermediate
+`HPC` representation between WCS and any final JHV display mode.
+
+For zenithal image data, the deterministic part is:
+
+1. image pixel / WCS plane coordinate
+2. inverse WCS (`TAN`, `AZP`, later `ZPN`)
+3. helioprojective angles
+4. observer-frame `HPC` ray
+
+This intermediate `HPC` ray field is fully determined by FITS/WCS and observer
+geometry. No viewer convention enters yet.
+
+That gives a cleaner separation:
+
+- zenithal WCS chooses how to recover the `HPC` ray
+- a native JHV `HPC` mode can render that result directly on an `HPC` image plane
+- orthographic mode can then apply a separate viewer embedding to the same `HPC`
+  ray field
+
+So the unresolved question is no longer “how should `AZP` be embedded?” but:
+
+- “given an `HPC` ray field, how should ortho place it in 3D?”
+
+That is a much better long-term split because a future pure JHV `HPC`
+projection should then be deterministic, while ortho remains a viewer
+convention layered on top.
+
+Current prototype result:
+
+- the deterministic `HPC` image plane is easy to define and validate
+- it preserves native observer-view angular appearance by construction
+- for HI1 it remains well-behaved over the full image
+- for HI2 it becomes extremely extended near the horizon, because the pure `HPC`
+  plane itself has a native singular blow-up there
+
+So `HPC` is a good intermediate representation and is also the basis of a
+native bounded JHV display mode, but it does not by itself solve the ortho
+embedding problem for very wide fields.
+
+Current native `HPC` status:
+
+- a bounded `HPC` display mode with symmetric extent on both axes was implemented in JHV
+- the display extent is derived from the enabled image footprints
+- the `HPC` render sampling map has been validated directly against Astropy on
+  the current test files
+
+Current direct `HPC` validation results:
+
+- COR2 (`TAN`): pixel-center error at machine precision
+- HI1 (`AZP`): pixel-center error at machine precision
+- HI2 (`AZP`): pixel-center error still extremely small (`~3e-5 px` max) over
+  the finite valid rendered domain
+
+Current direct `Orthographic`-vs-`HPC` screen comparison result:
+
+- this is a different test from the Astropy validation above
+- it compares what source pixel `Orthographic` and `HPC` choose at the same
+  displayed on-disk screen radius
+- for the retained AIA 171 sample, the mismatch is real and visible:
+  - `pixel_center_max_error_px ~ 3.67`
+  - `pixel_center_rms_error_px ~ 2.71`
+
+So the current evidence supports:
+
+- both modes are WCS-correct in their own sampling logic
+- they are not the same display geometry
+- the small on-disk “bulging” when switching between them is expected from that
+  geometry difference, not from an Astropy/WCS mismatch
 
 
 What Thompson 2006 clarifies
@@ -180,10 +260,20 @@ Part 1: recover an observer-frame ray direction
 - invert the native spherical rotation around `CRVAL`
 - convert the resulting helioprojective angles to an observer-frame ray direction `d`
 
+In JHV's current helioprojective convention, this observer frame is:
+
+- Sun center at `(0, 0, 0)`
+- image observer at `(0, 0, D)`
+- center line of sight toward `-z`
+
+So the recovered direction is an observer-to-scene direction, not an
+origin-centered direction.
+
 Part 2: choose a viewer placement rule
 
 - choose where along that ray the rendered point sits
-- mathematically: choose `lambda(d)` and place `p_obs = lambda(d) * d`
+- mathematically: choose `lambda(d)` and place
+  `p_scene = p_observer + lambda(d) * d`
 
 Part 1 is constrained by WCS.
 Part 2 is not.
@@ -294,7 +384,8 @@ Cons:
 2. Observer angular shell
 
 - recover only directions
-- place all points on a shell of chosen radius `S` around the observer
+- place all points on a shell of chosen radius `S` around the observer:
+  `p_scene = p_observer + S * d`
 
 Pros:
 
@@ -342,12 +433,80 @@ But this still has one unavoidable free parameter:
 
 - shell radius `S`
 
+Current prototype result:
+
+- for HI2, the shell family is the only currently tested full-domain viable
+  family
+- it preserves native observer-view angular appearance
+- its sampled edge-curvature diagnostic bows outward rather than inward
+- these results hold after correcting the prototype to use the actual JHV
+  observer frame `(0, 0, D)` with line of sight toward `-z`
+
+So the shell family is now the practical baseline for ortho HI rendering work.
+
 At this point there is no evidence that `S` can be derived from current FITS/WCS
 for HI. It must come from:
 
 - external instrument geometry
 - an existing JHV convention
 - or a new explicit viewer convention
+
+The first explicit candidate convention should be:
+
+- `S = observerDistance`
+
+This should be treated as a JHV viewer convention, not as a FITS/WCS-derived
+physical truth.
+
+
+Exact visibility criterion for an observer-centered shell
+---------------------------------------------------------
+
+For the shell model, after inverse WCS the embedded point is
+
+- `p_scene = p_observer + S * d`
+
+with:
+
+- `p_observer` the image observer position in scene coordinates
+- `S > 0` the chosen shell radius
+- `d` the unit observer-ray direction recovered from inverse WCS
+
+Now consider the current rendering camera in orthographic mode.
+Let:
+
+- `p_eye` be the shell point transformed into current eye space
+- `o_eye` be the shell center (`p_observer`) transformed into current eye space
+- `n_eye = normalize(p_eye - o_eye)` be the shell normal in eye space
+
+OpenGL eye space looks along `-z`, so the current-camera viewing direction into
+the scene is:
+
+- `u_eye = (0, 0, -1)`
+
+For a convex sphere, the exact visible hemisphere is the front-facing one:
+
+- `dot(n_eye, u_eye) < 0`
+
+Equivalently, because `n_eye` is proportional to `p_eye - o_eye`:
+
+- `p_eye.z > o_eye.z`
+
+The silhouette is the equality case:
+
+- `p_eye.z = o_eye.z`
+
+Consequences:
+
+- the back hemisphere `p_eye.z < o_eye.z` must not be rendered
+- any triangle that crosses `p_eye.z = o_eye.z` must be clipped or split at the
+  silhouette
+- simple mesh rendering without this test produces the kind of overlapping
+  hourglass geometry seen in the failed HI2 shell experiment
+
+So for a shell-based ortho renderer, current-camera visibility is not a
+heuristic. It is exactly the front hemisphere of the observer-centered sphere in
+current eye space.
 
 
 Architectural consequence
@@ -368,6 +527,131 @@ solution for HI/AZP/ZPN:
 - generate a sheet in observer-plane coordinates
 - convert vertices with inverse WCS
 - let the fragment shader do sampling and clipping only
+
+
+How to use the validator
+------------------------
+
+The main script is:
+
+- [extra/test/validate_jhv_wcs_against_astropy.py](extra/test/validate_jhv_wcs_against_astropy.py)
+
+Run it with:
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py <fits-file> [mode]
+```
+
+Useful modes:
+
+1. Forward WCS random-sample validation
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/20241224_194245_d4c2A.fts
+```
+
+This reports:
+
+- `projection_max_error_internal`
+- `pixel_center_max_error_px`
+
+2. Full pixel-center validation
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/20250622_000831_s4h1A.fts \
+  --all-pixels
+```
+
+This checks the full image grid against Astropy and reports the worst pixel
+center error.
+
+3. Inverse non-slanted `AZP`
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/20250622_000831_s4h1A.fts \
+  --inverse-azp
+```
+
+This validates:
+
+- `AZP plane -> helioprojective`
+- round-trip error
+
+4. `HPC` render comparison
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/20241224_194245_d4c2A.fts \
+  --hpc-render-compare \
+  --render-size 512
+```
+
+This uses the bounded native `HPC` display domain, renders the same screen grid
+through:
+
+- the JHV `HPC` sampling path
+- Astropy `world -> pixel`
+
+and writes:
+
+- `*_hpc_jhv.png`
+- `*_hpc_astropy.png`
+- `*_hpc_diff.png`
+
+under:
+
+- [extra/test/out](extra/test/out)
+
+The script also reports:
+
+- `extent_deg`
+- `pixel_center_max_error_px`
+- `pixel_center_rms_error_px`
+
+Interpretation:
+
+- near-black diff image means the JHV `HPC` render mapping matches Astropy
+- bright areas indicate a mapping mismatch or a domain/singularity issue
+
+5. Direct `Orthographic` vs `HPC` screen comparison
+
+```bash
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/sample.171.fits \
+  --ortho-vs-hpc-screen-compare \
+  --render-size 512
+```
+
+This compares:
+
+- `Orthographic`: screen point -> sphere point -> helioprojective -> source pixel
+- `HPC`: same screen point -> linear helioprojective angle -> source pixel
+
+and writes:
+
+- `*_ortho_screen.png`
+- `*_hpc_screen.png`
+- `*_ortho_vs_hpc_diff.png`
+
+Interpretation:
+
+- this is not an Astropy comparison
+- it measures whether `Orthographic` and `HPC` are the same on-screen geometry
+- for the current AIA 171 sample they are not
+
+6. Embedding prototypes
+
+There are also experimental geometry modes:
+
+- `--observer-hpc-prototype`
+- `--observer-plane-prototype`
+- `--observer-shell-prototype`
+
+These are for reasoning about ortho embedding, not for validating the production
+JHV render path.
 
 
 What Astropy can test

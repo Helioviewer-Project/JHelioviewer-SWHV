@@ -15,6 +15,8 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.astrogrid.samp.Message;
@@ -103,6 +105,100 @@ public class ImageLayers {
             }
         }
         return size;
+    }
+
+    public static Vec2 getLargestHpcExtentsDegrees() {
+        double extentX = 0;
+        double extentY = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (layer.isEnabled()) {
+                Vec2 extent = hpcExtentsDegrees(layer.getMetaData());
+                extentX = Math.max(extentX, extent.x);
+                extentY = Math.max(extentY, extent.y);
+            }
+        }
+        if (extentX <= 0)
+            extentX = 5;
+        if (extentY <= 0)
+            extentY = 5;
+        return new Vec2(extentX, extentY);
+    }
+
+    private static Vec2 hpcExtentsDegrees(MetaData metaData) {
+        Region region = metaData.getPhysicalRegion();
+        double x0 = region.llx;
+        double x1 = region.llx + region.width;
+        double y0 = region.lly;
+        double y1 = region.lly + region.height;
+        double xm = 0.5 * (x0 + x1);
+        double ym = 0.5 * (y0 + y1);
+        Vec2 extent = Vec2.ZERO;
+        extent = maxExtent(extent, hpcExtentAt(metaData, x0, y0));
+        extent = maxExtent(extent, hpcExtentAt(metaData, x1, y0));
+        extent = maxExtent(extent, hpcExtentAt(metaData, x0, y1));
+        extent = maxExtent(extent, hpcExtentAt(metaData, x1, y1));
+        extent = maxExtent(extent, hpcExtentAt(metaData, xm, y0));
+        extent = maxExtent(extent, hpcExtentAt(metaData, xm, y1));
+        extent = maxExtent(extent, hpcExtentAt(metaData, x0, ym));
+        extent = maxExtent(extent, hpcExtentAt(metaData, x1, ym));
+        return extent;
+    }
+
+    private static Vec2 maxExtent(Vec2 a, Vec2 b) {
+        return new Vec2(Math.max(a.x, b.x), Math.max(a.y, b.y));
+    }
+
+    private static Vec2 hpcExtentAt(MetaData metaData, double x, double y) {
+        Vec3 plane = metaData.getCROTA().rotateVector(new Vec3(x, y, 0));
+        Vec2 helioprojective = inverseWcsPlaneToHpc(metaData, plane.x, plane.y);
+        return new Vec2(Math.abs(Math.toDegrees(helioprojective.x)), Math.abs(Math.toDegrees(helioprojective.y)));
+    }
+
+    private static Vec2 inverseWcsPlaneToHpc(MetaData metaData, double planeX, double planeY) {
+        double unitsPerRad = metaData.getWCSPlaneUnitsPerRad();
+        Vec2 crval = metaData.getCRVAL();
+        double phi0 = crval.x / unitsPerRad;
+        double theta0 = crval.y / unitsPerRad;
+
+        if (metaData.getWCSProjection() == MetaData.WCSProjection.AZP && Math.abs(metaData.getPV2()[2]) < 1e-6f) {
+            double x = planeX / unitsPerRad;
+            double y = planeY / unitsPerRad;
+            double r = Math.hypot(x, y);
+            if (r == 0)
+                return new Vec2(phi0, theta0);
+
+            double mu = metaData.getPV2()[1];
+            double muPlus1 = mu + 1;
+            double t;
+            if (mu == 1) {
+                t = 0.5 * r;
+            } else {
+                double discriminant = muPlus1 * muPlus1 - r * r * (mu * mu - 1);
+                discriminant = Math.max(discriminant, 0);
+                t = r * muPlus1 / (muPlus1 + Math.sqrt(discriminant));
+            }
+            double eta = 2 * Math.atan(t);
+            double alpha = Math.atan2(x, y);
+            double sinEta = Math.sin(eta);
+            double cosEta = Math.cos(eta);
+            double a = sinEta * Math.sin(alpha);
+            double b = sinEta * Math.cos(alpha);
+            return new Vec2(
+                    phi0 + Math.atan2(a, cosEta * Math.cos(theta0) - b * Math.sin(theta0)),
+                    Math.asin(cosEta * Math.sin(theta0) + b * Math.cos(theta0)));
+        }
+
+        double x = planeX / unitsPerRad;
+        double y = planeY / unitsPerRad;
+        double rho = Math.hypot(x, y);
+        if (rho == 0)
+            return new Vec2(phi0, theta0);
+        double c = Math.atan(rho);
+        double sinc = Math.sin(c);
+        double cosc = Math.cos(c);
+        return new Vec2(
+                phi0 + Math.atan2(x * sinc, rho * Math.cos(theta0) * cosc - y * Math.sin(theta0) * sinc),
+                Math.asin(cosc * Math.sin(theta0) + y * sinc * Math.cos(theta0) / rho));
     }
 
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {

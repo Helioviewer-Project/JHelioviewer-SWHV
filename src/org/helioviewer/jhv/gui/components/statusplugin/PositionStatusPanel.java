@@ -28,6 +28,7 @@ import org.helioviewer.jhv.math.Vec3;
 public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener, MouseMotionListener {
 
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
+    private static final String nanHpc = String.format("%7s,%7s", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanPolar = String.format("%7s\u00B0,%7s\u2609", "--", "--");
 
@@ -42,7 +43,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         Viewport vp = Display.getActiveViewport();
         Vec2 coord = Display.mode.mouseToGrid(camera, vp, x, y, Display.gridType);
 
-        if (Display.mode == ProjectionMode.Latitudinal) {
+        if (Display.mode == ProjectionMode.HPC) {
+            setText(formatHpc(coord));
+        } else if (Display.mode == ProjectionMode.Latitudinal) {
             setText(formatLati(coord));
         } else if (Display.mode == ProjectionMode.Polar || Display.mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
@@ -108,6 +111,11 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     private static String formatLati(@Nonnull Vec2 coord) {
         String coordStr = coord == Vec2.NAN ? nanLati : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
         return String.format("(\u03C6,\u03B8):(%s)", coordStr);
+    }
+
+    private static String formatHpc(@Nonnull Vec2 coord) {
+        String coordStr = coord == Vec2.NAN ? nanHpc : String.format("%s,%s", formatXY(coord.x), formatXY(coord.y));
+        return String.format("(Tx,Ty):(%s)", coordStr);
     }
 
     private static String formatPolar(@Nonnull Vec2 coord) {
