@@ -17,6 +17,7 @@ public interface GridScale {
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
     GridScale ortho = new GridScaleIdentity(0, 0, 0, 0);
+    GridScale hpc = new GridScaleIdentity(-5, 5, -5, 5);
     GridScale lati = new GridScaleLati(-180, 180, -90, 90);
     GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
     GridScale logpolar = new GridScaleLogY(0, 360, 0, 0);

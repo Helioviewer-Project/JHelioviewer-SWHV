@@ -29,6 +29,45 @@ final class NonOrthoProjection {
         return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolar(pt));
     }
 
+    static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
+        double zeta = viewpoint.distance - v.z;
+        double longitude = Math.atan2(v.x, zeta);
+        double latitude = Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
+        return new Vec2(
+                scale.getXValueInv(Math.toDegrees(longitude)),
+                scale.getYValueInv(Math.toDegrees(latitude)));
+    }
+
+    static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
+        Vec3 ray = helioprojectiveRayDegrees(pt);
+
+        double b = viewpoint.distance * ray.z;
+        double c = viewpoint.distance * viewpoint.distance - 1;
+        double discriminant = b * b - c;
+        if (discriminant < 0)
+            return null;
+
+        double root = Math.sqrt(discriminant);
+        double tNear = -b - root;
+        double tFar = -b + root;
+        double t = tNear > 0 ? tNear : tFar;
+        if (t <= 0)
+            return null;
+
+        return new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+    }
+
+    private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
+        double longitude = Math.toRadians(pt.x);
+        double latitude = Math.toRadians(pt.y);
+        Vec3 ray = new Vec3(
+                Math.tan(longitude),
+                Math.tan(latitude) / Math.cos(longitude),
+                -1);
+        ray.normalize();
+        return ray;
+    }
+
     private static Quat mapRotation(GridType gridType, Position viewpoint) {
         // Non-ortho maps use GridType.toGrid() longitude, but Viewpoint latitude is
         // rotated with a positive sign to match the shared non-ortho map basis.
