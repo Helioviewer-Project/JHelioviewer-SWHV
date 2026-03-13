@@ -31,13 +31,20 @@ then feeds those coordinates directly into the linear image transform, instead o
 first converting the 3D point to helioprojective angles and then applying the
 `formal-TAN` world-to-plane projection.
 
-A native JHV `HPC` projection was also implemented and validated as part of the
+A native JHV `HPC` projection mode was also implemented and validated as part of the
 same work; its solar-coordinate interpretation follows Thompson, "Coordinate
 systems for solar image data"
 ([A&A 449, 791-803,
 2006](https://www.aanda.org/articles/aa/abs/2006/14/aa4262-05/aa4262-05.html)).
 Because `HPC` is fundamentally tied to a specific observer viewpoint, it is
 not a natural fit for the multi-viewpoint aspect of JHV.
+
+Heliospheric imager datasets often use `AZP` or `ZPN` projections. For these
+datasets, the validation in this note supports the correctness of the `HPC`
+WCS and sampling path. That conclusion does not extend automatically to
+`Orthographic` mode, where wide-angle heliospheric images may still not display
+satisfactorily because their integration into the JHV 3D viewing model remains
+a separate problem.
 
 A dedicated validator was built in:
 
@@ -70,13 +77,19 @@ Main conclusions:
 - the measured discrepancies between `formal-TAN` in `Orthographic` mode and
   `HPC` are consistent with the theoretical geometric discrepancy derived in
   Appendix A
-- on the sample TAN files, `simple-TAN` remains very
-  close to the JHV `HPC` display geometry, which suggests it may be a
-  better visual match for JHV orthographic display than the `formal-TAN`
-  implementation
+- on the sample TAN files, `simple-TAN` remains very close to the `HPC`
+  display geometry, which suggests it is be a better choice than
+  `formal-TAN` for the JHV `Orthographic` mode for which visual consistency with
+  `HPC` is preferred
 - this note is therefore a validation/testing note, not a design note for
   `Orthographic` embedding, playback policy, mouse-position reporting, or
   synthetic overdrawing
+
+Bottom line:
+
+- `simple-TAN` will be kept for JHV `Orthographic` mode
+- `HPC` mode was added (with the noted caveat about the viewpoint)
+- support for `AZP` and `ZPN` data was added (with the noted caveat about the heliospheric imagers)
 
 # The validator
 
@@ -102,7 +115,7 @@ Included:
   - `TAN`
   - non-slanted `AZP`
   - six-term `ZPN` (primary branch only)
-- the JHV `HPC` image sampling path:
+- the `HPC` image sampling path:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
 - the bounded `HPC` display domain used by the current validation path
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
@@ -275,7 +288,7 @@ Interpretation:
 - HI2 can show a slightly larger absolute `px` error because `AZP`
   magnification near the finite valid edge becomes extremely large
 
-### Internal JHV comparison mode
+### Internal JHV comparison modes
 
 1. `formal-TAN` vs JHV `HPC`
 
@@ -319,7 +332,7 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
 This mode compares, for TAN data:
 
 - `simple-TAN`
-- the JHV `HPC` display sampling path
+- the `HPC` display sampling path
 
 over the on-disk orthographic domain, using a comparison grid at the native
 image resolution of the tested file.
@@ -338,8 +351,8 @@ It also reports:
 Interpretation:
 
 - this is an internal JHV comparison for `TAN`
-- it quantifies how closely `simple-TAN` behaves like the JHV `HPC`
-  display geometry
+- it measures how closely `simple-TAN` in `Orthographic` mode matches the
+  `HPC` display geometry
 
 3. `simple-TAN` vs `formal-TAN`
 
@@ -487,8 +500,9 @@ These results support the following conclusions:
     - `370 mas` max, `116 mas` RMS
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
     - `9.32 mas` max, `3.65 mas` RMS
-- this confirms that `simple-TAN` behaves much more like the JHV `HPC`
-  display than like `formal-TAN`
+- this confirms that `simple-TAN` is much closer to the `HPC` display
+  geometry than `formal-TAN`, which supports its use in `Orthographic` mode
+  when visual consistency with `HPC` is preferred
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
@@ -500,7 +514,7 @@ This appendix records a purely theoretical geometric discrepancy between:
 with both images scaled so that the apparent solar limb radius is the same.
 
 This result is not derived from JHV. It follows directly from the ideal
-orthographic and helioprojective (`HPC`) projection formulas for a unit solar
+orthographic and `HPC` projection formulas for a unit solar
 sphere observed from distance $D$.
 
 Assumptions:
