@@ -2,8 +2,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INPUT="${1:-$SCRIPT_DIR/zenithal_embedding_notes.md}"
+INPUT="${1:-$SCRIPT_DIR/zenithal_wcs_validation_notes.md}"
 OUTPUT="${INPUT%.md}.pdf"
+INPUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
+INPUT_BASENAME="$(basename "$INPUT")"
 CCN4_ROOT="${CCN4_ROOT:-$HOME/jhv/ccn4.wiki}"
 IMAGE_NAME="ccn4.doc"
 
@@ -20,13 +22,16 @@ fi
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/jhv_pdf_XXXXXX")"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-cp "$INPUT" "$TMP_DIR/input.md"
+mkdir -p "$TMP_DIR/doc"
+cp -R "$INPUT_DIR"/. "$TMP_DIR/doc/"
 
 if command -v docker >/dev/null 2>&1 && docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
     cat >"$TMP_DIR/wrapper.md" <<'EOF'
 \include{/ccn4.wiki/templates/preamble.md}
-\include{/work/input.md}
+\include{/work/doc/INPUT_BASENAME_PLACEHOLDER}
 EOF
+    sed -i.bak "s|INPUT_BASENAME_PLACEHOLDER|$INPUT_BASENAME|" "$TMP_DIR/wrapper.md"
+    rm -f "$TMP_DIR/wrapper.md.bak"
 
     docker run --rm \
         -v "$CCN4_ROOT":/ccn4.wiki \
@@ -44,6 +49,7 @@ EOF
                 --number-sections \
                 --toc \
                 --top-level-division=chapter \
+                --resource-path=/work/doc:/ccn4.wiki/RP:/ccn4.wiki \
                 -V classoption=oneside \
                 --template /ccn4.wiki/templates/eisvogel.latex \
                 --pdf-engine=xelatex \
@@ -52,7 +58,7 @@ EOF
 else
     cat >"$TMP_DIR/wrapper.md" <<EOF
 \include{$CCN4_ROOT/templates/preamble.md}
-\include{$TMP_DIR/input.md}
+\include{$TMP_DIR/doc/$INPUT_BASENAME}
 EOF
 
     if ! command -v gpp >/dev/null 2>&1; then
@@ -76,6 +82,7 @@ EOF
             --number-sections \
             --toc \
             --top-level-division=chapter \
+            --resource-path="$TMP_DIR/doc:$CCN4_ROOT/RP:$CCN4_ROOT" \
             -V classoption=oneside \
             --template "$CCN4_ROOT/templates/eisvogel.latex" \
             --pdf-engine=xelatex \
