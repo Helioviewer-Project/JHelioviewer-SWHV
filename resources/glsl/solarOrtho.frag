@@ -1,33 +1,26 @@
 
 const vec3 zAxis = vec3(0, 0, 1);
 
-/*
-// DOI 10.1007/s11207-008-9277-6, §2.2.2, Eq.18-23
-vec2 distort(const vec2 c, const float[6] PV) {
-    float mju = PV[1];
-    if (mju == 0)
-        return c;
+// TAN choice for ortho only
+// 0 = formal-TAN
+// 1 = simple-TAN
+#define SIMPLE_TAN 1
 
-    clamp_coord(c);
-    vec2 v = c - 0.5;
-    float R = length(v);
-    float Z = cos(asin(R));
-    float Ra = (mju + 1) / (Z + mju);
-    return vec2(v.x * Ra, v.y * Ra) + 0.5;
+vec2 worldToTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
+#if SIMPLE_TAN
+    if (int(wcs.projectionMeta.x) == WCS_PROJECTION_TAN)
+        return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);
+#endif
+    vec2 helioprojective = worldToHelioprojective(world, wcs.projectionMeta.z);
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, PV);
+    return wcsPlaneToTexcoord(plane, wcs);
 }
-*/
 
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
     vec3 altnormal = rotate_vector(quat, zAxis);
     if (hideBack && altnormal.z <= 0.)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
-}
-
-vec2 worldToTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
-    vec2 helioprojective = worldToHelioprojective(world, wcs.projectionMeta.z);
-    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, PV);
-    return wcsPlaneToTexcoord(plane, wcs);
 }
 
 void main(void) {
