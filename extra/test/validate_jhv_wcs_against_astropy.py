@@ -462,6 +462,29 @@ def jhv_world_array_to_pixel_center(world_deg: np.ndarray, meta: JHVMeta) -> np.
     ))
 
 
+def old_tan_world_to_pixel_center(point_xyz: tuple[float, float, float], meta: JHVMeta) -> tuple[float, float]:
+    dx = point_xyz[0] - meta.crval_internal_x
+    dy = point_xyz[1] - meta.crval_internal_y
+    cx, cy = rotate_inverse_z((dx, dy), meta.crota_rad)
+    return (
+        cx / meta.unit_per_pixel_x + meta.crpix1_gl,
+        -cy / meta.unit_per_pixel_y + meta.crpix2_gl,
+    )
+
+
+def old_tan_world_array_to_pixel_center(world_xyz: np.ndarray, meta: JHVMeta) -> np.ndarray:
+    dx = world_xyz[:, 0] - meta.crval_internal_x
+    dy = world_xyz[:, 1] - meta.crval_internal_y
+    c = math.cos(meta.crota_rad)
+    s = math.sin(meta.crota_rad)
+    rotated_x = c * dx + s * dy
+    rotated_y = -s * dx + c * dy
+    return np.column_stack((
+        rotated_x / meta.unit_per_pixel_x + meta.crpix1_gl,
+        -rotated_y / meta.unit_per_pixel_y + meta.crpix2_gl,
+    ))
+
+
 def build_projection_only_wcs(header) -> WCS:
     crval1_deg = angular_header_value_to_deg(header.get("CRVAL1", 0.0), header.get("CUNIT1"))
     crval2_deg = angular_header_value_to_deg(header.get("CRVAL2", 0.0), header.get("CUNIT2"))
@@ -666,7 +689,9 @@ def main() -> int:
     parser.add_argument("--inverse-azp", action="store_true", help="Validate the non-slanted AZP inverse plane->world mapping")
     parser.add_argument("--inverse-zpn", action="store_true", help="Validate the primary-branch ZPN inverse plane->world mapping")
     parser.add_argument("--hpc-render-compare", action="store_true", help="Render a bounded HPC screen through JHV and Astropy mappings and write diagnostic PNGs")
-    parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare ortho on-disk sampling against HPC sampling at the same displayed screen radius")
+    parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare formal-TAN in Orthographic mode against JHV HPC at the same displayed on-disk screen radius")
+    parser.add_argument("--compare-initial-tan", action="store_true", help="Compare simple-TAN against formal-TAN")
+    parser.add_argument("--compare-initial-tan-vs-hpc", action="store_true", help="Compare simple-TAN against the JHV HPC display sampling on the same on-disk screen domain")
     parser.add_argument("--render-size", type=int, default=512, help="Square output size for HPC diagnostic renderings")
     parser.add_argument("--output-dir", type=Path, default=Path("extra/test/out"), help="Directory for diagnostic PNGs")
     args = parser.parse_args()
@@ -794,6 +819,159 @@ def main() -> int:
         print(f"ortho_png={ortho_path}")
         print(f"hpc_png={hpc_path}")
         print(f"diff_png={diff_path}")
+        return 0
+
+    if args.compare_initial_tan:
+        if image_data.ndim != 2:
+            raise ValueError(f"--compare-initial-tan expects 2D image data, got shape {image_data.shape!r}")
+        if meta.projection != "TAN":
+            raise ValueError("--compare-initial-tan requires a TAN FITS file")
+
+        size = max(meta.pixel_width, meta.pixel_height)
+        max_old = 0.0
+        max_new = 0.0
+        max_old_new = 0.0
+        sum_old2 = 0.0
+        sum_new2 = 0.0
+        sum_old_new2 = 0.0
+        count = 0
+        old_img = np.full((size, size), np.nan, dtype=np.float64)
+        new_img = np.full((size, size), np.nan, dtype=np.float64)
+        diff_img = np.full((size, size), np.nan, dtype=np.float64)
+
+        xs = np.linspace(-1.0, 1.0, size, dtype=np.float64)
+        ys = np.linspace(-1.0, 1.0, size, dtype=np.float64)
+
+        for iy, y in enumerate(ys):
+            radius2 = xs * xs + y * y
+            mask = radius2 <= 1.0
+            if not np.any(mask):
+                continue
+
+            valid_indices = np.flatnonzero(mask)
+            x_valid = xs[mask]
+            z_valid = np.sqrt(np.maximum(0.0, 1.0 - radius2[mask]))
+            world_xyz = np.column_stack((x_valid, np.full(x_valid.shape, y, dtype=np.float64), z_valid))
+
+            world_deg = np.rad2deg(np.column_stack((
+                np.arctan2(world_xyz[:, 0], meta.observer_distance - world_xyz[:, 2]),
+                np.arctan2(world_xyz[:, 1], np.sqrt(world_xyz[:, 0] * world_xyz[:, 0] + (meta.observer_distance - world_xyz[:, 2]) ** 2)),
+            )))
+            astro_raw = pixel_wcs.wcs_world2pix(world_deg, 1)
+            astro_px = np.column_stack((astro_raw[:, 0] - 0.5, astro_raw[:, 1] - 0.5))
+
+            new_px = jhv_world_array_to_pixel_center(world_deg, meta)
+            old_px = old_tan_world_array_to_pixel_center(world_xyz, meta)
+
+            old_err = np.maximum(np.abs(old_px[:, 0] - astro_px[:, 0]), np.abs(old_px[:, 1] - astro_px[:, 1]))
+            new_err = np.maximum(np.abs(new_px[:, 0] - astro_px[:, 0]), np.abs(new_px[:, 1] - astro_px[:, 1]))
+            old_new_err = np.maximum(np.abs(old_px[:, 0] - new_px[:, 0]), np.abs(old_px[:, 1] - new_px[:, 1]))
+
+            max_old = max(max_old, float(np.max(old_err)))
+            max_new = max(max_new, float(np.max(new_err)))
+            max_old_new = max(max_old_new, float(np.max(old_new_err)))
+            sum_old2 += float(np.sum(old_err * old_err))
+            sum_new2 += float(np.sum(new_err * new_err))
+            sum_old_new2 += float(np.sum(old_new_err * old_new_err))
+            count += int(old_err.size)
+
+            old_samples = np.array([sample_nearest(image_data, px, py) for px, py in old_px], dtype=np.float64)
+            new_samples = np.array([sample_nearest(image_data, px, py) for px, py in new_px], dtype=np.float64)
+            diff_samples = np.abs(old_samples - new_samples)
+            old_img[iy, valid_indices] = old_samples
+            new_img[iy, valid_indices] = new_samples
+            diff_img[iy, valid_indices] = diff_samples
+
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        stem = args.fits_file.stem
+        old_path = args.output_dir / f"{stem}_initial_tan.png"
+        new_path = args.output_dir / f"{stem}_formal_tan.png"
+        diff_path = args.output_dir / f"{stem}_initial_vs_formal_tan_diff.png"
+        Image.fromarray(normalize_image_for_png(old_img), mode="L").save(old_path)
+        Image.fromarray(normalize_image_for_png(new_img), mode="L").save(new_path)
+        Image.fromarray(normalize_image_for_png(diff_img), mode="L").save(diff_path)
+
+        print(f"file={args.fits_file}")
+        print(f"mode=compare_initial_tan size={size}")
+        print(f"observer_distance={meta.observer_distance:.12f}")
+        print(f"samples={count}")
+        print(f"old_max_px_vs_astropy={max_old:.6e}")
+        print(f"old_rms_px_vs_astropy={math.sqrt(sum_old2 / count):.6e}")
+        print(f"new_max_px_vs_astropy={max_new:.6e}")
+        print(f"new_rms_px_vs_astropy={math.sqrt(sum_new2 / count):.6e}")
+        print(f"old_new_max_px={max_old_new:.6e}")
+        print(f"old_new_rms_px={math.sqrt(sum_old_new2 / count):.6e}")
+        print(f"initial_tan_png={old_path}")
+        print(f"formal_tan_png={new_path}")
+        print(f"initial_vs_formal_diff_png={diff_path}")
+        return 0
+
+    if args.compare_initial_tan_vs_hpc:
+        if image_data.ndim != 2:
+            raise ValueError(f"--compare-initial-tan-vs-hpc expects 2D image data, got shape {image_data.shape!r}")
+        if meta.projection != "TAN":
+            raise ValueError("--compare-initial-tan-vs-hpc requires a TAN FITS file")
+
+        size = max(meta.pixel_width, meta.pixel_height)
+        old_img = np.full((size, size), np.nan, dtype=np.float64)
+        hpc_img = np.full((size, size), np.nan, dtype=np.float64)
+        diff_img = np.full((size, size), np.nan, dtype=np.float64)
+        max_px_err = 0.0
+        sum_px_err2 = 0.0
+        count = 0
+
+        xs = np.linspace(-1.0, 1.0, size, dtype=np.float64)
+        ys = np.linspace(-1.0, 1.0, size, dtype=np.float64)
+        solar_limb_angle = math.atan2(1.0, meta.observer_distance)
+
+        for iy, y in enumerate(ys):
+            radius2 = xs * xs + y * y
+            mask = radius2 <= 1.0
+            if not np.any(mask):
+                continue
+
+            valid_indices = np.flatnonzero(mask)
+            x_valid = xs[mask]
+            z_valid = np.sqrt(np.maximum(0.0, 1.0 - radius2[mask]))
+            world_xyz = np.column_stack((x_valid, np.full(x_valid.shape, y, dtype=np.float64), z_valid))
+
+            old_px = old_tan_world_array_to_pixel_center(world_xyz, meta)
+            hpc_world_deg = np.rad2deg(np.column_stack((
+                x_valid * solar_limb_angle,
+                np.full(x_valid.shape, y * solar_limb_angle, dtype=np.float64),
+            )))
+            hpc_px = jhv_world_array_to_pixel_center(hpc_world_deg, meta)
+
+            px_err = np.maximum(np.abs(old_px[:, 0] - hpc_px[:, 0]), np.abs(old_px[:, 1] - hpc_px[:, 1]))
+            max_px_err = max(max_px_err, float(np.max(px_err)))
+            sum_px_err2 += float(np.sum(px_err * px_err))
+            count += int(px_err.size)
+
+            old_samples = np.array([sample_nearest(image_data, px, py) for px, py in old_px], dtype=np.float64)
+            hpc_samples = np.array([sample_nearest(image_data, px, py) for px, py in hpc_px], dtype=np.float64)
+            diff_samples = np.abs(old_samples - hpc_samples)
+            old_img[iy, valid_indices] = old_samples
+            hpc_img[iy, valid_indices] = hpc_samples
+            diff_img[iy, valid_indices] = diff_samples
+
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        stem = args.fits_file.stem
+        old_path = args.output_dir / f"{stem}_initial_tan_screen.png"
+        hpc_path = args.output_dir / f"{stem}_hpc_screen_from_initial_tan_compare.png"
+        diff_path = args.output_dir / f"{stem}_initial_tan_vs_hpc_diff.png"
+        Image.fromarray(normalize_image_for_png(old_img), mode="L").save(old_path)
+        Image.fromarray(normalize_image_for_png(hpc_img), mode="L").save(hpc_path)
+        Image.fromarray(normalize_image_for_png(diff_img), mode="L").save(diff_path)
+
+        print(f"file={args.fits_file}")
+        print(f"mode=compare_initial_tan_vs_hpc size={size}")
+        print(f"observer_distance={meta.observer_distance:.12f}")
+        print(f"samples={count}")
+        print(f"initial_tan_vs_hpc_max_px={max_px_err:.6e}")
+        print(f"initial_tan_vs_hpc_rms_px={math.sqrt(sum_px_err2 / count):.6e}")
+        print(f"initial_tan_screen_png={old_path}")
+        print(f"hpc_screen_png={hpc_path}")
+        print(f"initial_tan_vs_hpc_diff_png={diff_path}")
         return 0
 
     if args.inverse_tan or args.inverse_azp or args.inverse_zpn:
