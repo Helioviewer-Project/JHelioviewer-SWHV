@@ -79,7 +79,8 @@ Main conclusions:
 - on the sample TAN files, `simple-TAN` remains very close to the `HPC`
   display geometry, which suggests it may be a better choice than
   `formal-TAN` for JHV `Orthographic` mode when visual consistency with `HPC`
-  is preferred
+  is preferred; Appendix B gives the same small-angle `TAN` effect in its
+  idealized centered-disk form
 - this note is therefore a validation/testing note, not a design note for
   `Orthographic` embedding, playback policy, mouse-position reporting, or
   synthetic overdrawing
@@ -93,27 +94,28 @@ Bottom line:
 
 # The validator
 
-## JHV behavior modeled by the validator
-
-For the validation modes in this note, the script provides a Python/CPU model
+For the validation modes in this note, the validator script provides a Python/CPU model
 of the relevant JHV reprojection and sampling logic. It does not execute the
 actual JHV renderer. In particular, major parts of the corresponding code in
 JHV run in GLSL on the GPU, whereas the validator re-expresses that logic in
 Python for comparison and testing. It therefore models the reprojection and
 sampling path, not the full interactive renderer.
 
+## JHV behavior modeled by the validator
+
 For each screen pixel, JHV first determines the corresponding point on the
 display geometry. In `HPC` mode, that geometry is the `HPC` display plane; in
-`Orthographic` mode, it is the 3D solar scene used by the ortho renderer. From that
-display point, JHV derives the helioprojective coordinates needed to evaluate
-the image WCS. For zenithal FITS data in the formal WCS paths, this means using the inverse form of
-the relevant projection model, such as `TAN`, `AZP`, or `ZPN`, and then
-applying the linear WCS terms (`CRVAL`, `CRPIX`, `CDELT`, and `PC`/`CROTA`) to
-obtain the source-image coordinates. The screen pixel is then produced by
-sampling the source image at those coordinates with interpolation. In this sense, the WCS projection
-determines how image coordinates relate to observer geometry, while the JHV
-rendering mode determines which display geometry is sampled before that WCS
-mapping is evaluated.
+`Orthographic` mode, it is the 3D solar scene used by the ortho renderer. From
+that display point, JHV derives the helioprojective coordinates needed to
+evaluate the image WCS. For zenithal FITS data in the formal WCS paths, this
+means using the inverse form of the relevant projection model, such as `TAN`,
+`AZP`, or `ZPN`, and then applying the linear WCS terms (`CRVAL`, `CRPIX`,
+`CDELT`, and `PC`/`CROTA`) to obtain the source-image coordinates. The screen
+pixel is then produced by sampling the source image at those coordinates with
+interpolation. In this sense, the WCS projection determines how image
+coordinates relate to observer geometry, while the JHV rendering mode
+determines which display geometry is sampled before that WCS mapping is
+evaluated.
 
 The sampling pipeline described above, and the point at which `simple-TAN`
 departs from the formal WCS path, can be summarized as follows:
@@ -138,11 +140,11 @@ screen pixel
 ```
 
 In `simple-TAN`, the `(x,y)` pair refers to the display point's coordinates in
-the image-view plane, i.e. the plane perpendicular to the viewing direction in
-the image observer frame. Those coordinates are used directly as an
-approximation to the helioprojective viewing angles, instead of first
-converting the 3D point to helioprojective coordinates and then applying the
-`formal-TAN` projection step.
+the image-view plane, i.e., the plane perpendicular to the viewing direction in
+the image observer frame. Those coordinates are used directly as a
+small-angle approximation to the helioprojective viewing angles, instead of
+first converting the 3D point to helioprojective coordinates and then applying
+the `formal-TAN` projection step.
 
 \newpage
 
@@ -437,7 +439,7 @@ quantities reported directly by the validator.
 
 ## FITS projections
 
-1. `TAN` is correct.
+1. `formal-TAN` is correct.
 
 - JHV `world -> helioprojective -> TAN plane -> pixel`
 - `TAN plane -> helioprojective angles`
@@ -536,17 +538,31 @@ These results support the following conclusions:
 
 - it compares the source pixels sampled by `simple-TAN` in `Orthographic`
   mode and by `HPC` at the same displayed on-disk screen radius
-- native-resolution comparison between `simple-TAN` and `HPC` on the TAN
-  samples gives:
+- native-resolution comparison between `simple-TAN` and `HPC` over the
+  displayed on-disk domain of the TAN samples gives:
   - `sample.171.fits` (`1.009 AU`):
     - `6.73 mas` max, `3.09 mas` RMS
+    - theoretical max from Appendix B: `6.73 mas`
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
     - `370 mas` max, `116 mas` RMS
+    - theoretical max from Appendix B: `76.9 mas`
+    - with `CRVALi = 0` in the same header: `76.5 mas` max
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
     - `9.32 mas` max, `3.65 mas` RMS
+    - theoretical max from Appendix B: `7.65 mas`
+    - with `CRVALi = 0` in the same header: `7.63 mas` max
 - this confirms that `simple-TAN` is much closer to the `HPC` display
   geometry than `formal-TAN`, which supports its use in `Orthographic` mode
   when visual consistency with `HPC` is preferred
+- because `simple-TAN` replaces the exact `TAN` plane coordinate by the same
+  small-angle approximation analyzed in Appendix B, the measured real-data
+  discrepancies are very likely showing that same effect in real data
+- Appendix B gives the centered-disk form, which is the lower bound for this
+  effect. Nonzero `CRVALi` moves the solar disk away from the instrument
+  boresight and increases the discrepancy. AIA already has `CRVALi = 0`, so
+  it matches Appendix B directly. For EUI, setting `CRVALi = 0` reduces the
+  measured maximum from `370 mas` to `76.5 mas`, very close to the Appendix B
+  value `76.9 mas`. COR2 shows the same effect more mildly.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
@@ -616,3 +632,60 @@ The following figure shows the maximum discrepancy as a function of observer
 distance between `0.2 AU` and `1.1 AU`.
 
 ![Maximum Orthographic vs HPC discrepancy versus observer distance](ortho_vs_hpc_discrepancy_vs_distance.pdf){ width=85% }
+
+# Appendix B: Idealized `TAN` small-angle discrepancy relative to `HPC`
+
+This appendix records a different theoretical discrepancy from Appendix A. It
+isolates only the small-angle approximation for an idealized centered solar
+disk. It is not derived from JHV.
+
+Assumptions:
+
+- the solar disk is centered in the field of view
+- the relevant radial image coordinate is measured from the instrument
+  boresight
+- `HPC` is displayed linearly in helioprojective angle
+- the exact `TAN` plane coordinate is replaced by its small-angle
+  approximation
+
+Let $a$ be the helioprojective angular distance from the instrument boresight.
+In linear `HPC`, the radial coordinate is proportional to $a$. In `TAN`, the
+radial coordinate on the projection plane is proportional to $\tan(a)$. The
+small-angle approximation is therefore:
+
+- $\tan(a) \approx a$
+
+and the corresponding continuous discrepancy is:
+
+- $\Delta(a) = \tan(a) - a$
+
+Unlike Appendix A, this discrepancy is monotonic in $a$: the function
+$\tan(a) - a$ keeps increasing as $a$ increases. The
+discrepancy therefore grows with angular distance from the instrument
+boresight.
+
+In the centered-disk case treated in this appendix, disk center coincides with
+the boresight, so the discrepancy increases continuously from solar disk center
+to the limb, where the on-disk maximum occurs. If the solar disk is offset from
+the boresight, the same monotonic behavior implies a larger on-disk maximum,
+because part of the disk lies at larger boresight angles.
+
+For an observer distance $D$ expressed in solar radii, the limb angle is:
+
+- $a_{\mathrm{limb}} = \sin^{-1}(1 / D)$
+
+so the maximum discrepancy is:
+
+- $\Delta_{\mathrm{max}}(D) = \tan(\sin^{-1}(1 / D)) - \sin^{-1}(1 / D)$
+
+At 1 AU, with $D \approx 215.03215567$, this gives:
+
+- $\Delta_{\mathrm{max}} \approx 3.35 \times 10^{-8} \ \mathrm{rad}$
+- about `6.92 mas`
+
+At `0.2 AU`, the same idealized discrepancy rises to about `865 mas`.
+
+The following figure shows this idealized maximum discrepancy as a function of
+observer distance between `0.2 AU` and `1.1 AU`.
+
+![Maximum idealized TAN small-angle discrepancy relative to HPC versus observer distance](simple_tan_vs_hpc_small_angle_discrepancy_vs_distance.pdf){ width=85% }
