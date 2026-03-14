@@ -61,7 +61,7 @@ examples.
 The work reported here includes:
 
 - validating `formal-TAN`, non-slanted `AZP`, and six-term `ZPN` (primary
-  branch only) against Astropy, including inverse round-trip checks
+  branch only) against Astropy, including round-trip checks
 - validating the `HPC` sampling path against Astropy
 
 Main conclusions:
@@ -86,7 +86,8 @@ Main conclusions:
 
 Bottom line:
 
-- `simple-TAN` will be kept for JHV `Orthographic` mode
+- `simple-TAN` will be kept in JHV `Orthographic` mode for data designated as
+  `TAN` in the metadata
 - `HPC` mode was added (with the noted caveat about the viewpoint)
 - support for `AZP` and `ZPN` data was added (with the noted caveat about the heliospheric imagers)
 
@@ -101,7 +102,51 @@ JHV run in GLSL on the GPU, whereas the validator re-expresses that logic in
 Python for comparison and testing. It therefore models the reprojection and
 sampling path, not the full interactive renderer.
 
-Included:
+For each screen pixel, JHV first determines the corresponding point on the
+display geometry. In `HPC` mode, that geometry is the `HPC` display plane; in
+`Orthographic` mode, it is the 3D solar scene used by the ortho renderer. From that
+display point, JHV derives the helioprojective coordinates needed to evaluate
+the image WCS. For zenithal FITS data in the formal WCS paths, this means using the inverse form of
+the relevant projection model, such as `TAN`, `AZP`, or `ZPN`, and then
+applying the linear WCS terms (`CRVAL`, `CRPIX`, `CDELT`, and `PC`/`CROTA`) to
+obtain the source-image coordinates. The screen pixel is then produced by
+sampling the source image at those coordinates with interpolation. In this sense, the WCS projection
+determines how image coordinates relate to observer geometry, while the JHV
+rendering mode determines which display geometry is sampled before that WCS
+mapping is evaluated.
+
+The sampling pipeline described above, and the point at which `simple-TAN`
+departs from the formal WCS path, can be summarized as follows:
+
+```text
+formal WCS:
+screen pixel
+  -> display geometry point
+  -> helioprojective coordinates
+  -> WCS world-to-plane step
+  -> linear WCS terms
+  -> source-image coordinates
+  -> interpolated image sample
+
+simple-TAN:
+screen pixel
+  -> display geometry point
+  -> (x,y) coordinates in the image-view plane
+  -> linear WCS terms
+  -> source-image coordinates
+  -> interpolated image sample
+```
+
+In `simple-TAN`, the `(x,y)` pair refers to the display point's coordinates in
+the image-view plane, i.e. the plane perpendicular to the viewing direction in
+the image observer frame. Those coordinates are used directly as an
+approximation to the helioprojective viewing angles, instead of first
+converting the 3D point to helioprojective coordinates and then applying the
+`formal-TAN` projection step.
+
+\newpage
+
+Included in the validator:
 
 - FITS metadata parsing into the same effective quantities JHV uses:
   - `CRPIX`
@@ -153,10 +198,10 @@ In this validator, Astropy is the external reference for:
   - every source-image pixel center is mapped through the JHV path and checked
     against Astropy
 - inverse `TAN`
-  - plane -> helioprojective, checked by round trip against Astropy's forward
+  - plane -> helioprojective, checked by round-trip against Astropy's forward
     WCS
 - inverse `AZP`
-  - plane -> helioprojective, checked by round trip against Astropy's forward
+  - plane -> helioprojective, checked by round-trip against Astropy's forward
     WCS
 - inverse `ZPN` (primary branch only)
   - plane -> helioprojective, checked by the same round-trip strategy on the
