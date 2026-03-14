@@ -555,14 +555,13 @@ These results support the following conclusions:
   geometry than `formal-TAN`, which supports its use in `Orthographic` mode
   when visual consistency with `HPC` is preferred
 - because `simple-TAN` replaces the exact `TAN` plane coordinate by the same
-  small-angle approximation analyzed in Appendix B, the measured real-data
-  discrepancies are very likely showing that same effect in real data
-- Appendix B gives the centered-disk form, which is the lower bound for this
-  effect. Nonzero `CRVALi` moves the solar disk away from the instrument
-  boresight and increases the discrepancy. AIA already has `CRVALi = 0`, so
-  it matches Appendix B directly. For EUI, setting `CRVALi = 0` reduces the
-  measured maximum from `370 mas` to `76.5 mas`, very close to the Appendix B
-  value `76.9 mas`. COR2 shows the same effect more mildly.
+  small-angle approximation analyzed in Appendix B, the measured
+  discrepancies are very likely caused by that effect. The appendix gives the
+  centered-disk lower bound. If `CRVALi` is nonzero, the solar disk is offset
+  from the instrument boresight and the discrepancy becomes larger. AIA
+  already has the Sun centered, so it matches that lower bound directly. For
+  EUI, setting `CRVALi = 0` brings the measured maximum down to nearly the
+  theoretical value. COR2 shows the same effect more mildly.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
@@ -636,7 +635,7 @@ distance between `0.2 AU` and `1.1 AU`.
 # Appendix B: Idealized `TAN` small-angle discrepancy relative to `HPC`
 
 This appendix records a different theoretical discrepancy from Appendix A. It
-isolates only the small-angle approximation for an idealized centered solar
+isolates only the small-angle approximation in an idealized centered solar
 disk. It is not derived from JHV.
 
 Assumptions:
@@ -660,15 +659,8 @@ and the corresponding continuous discrepancy is:
 - $\Delta(a) = \tan(a) - a$
 
 Unlike Appendix A, this discrepancy is monotonic in $a$: the function
-$\tan(a) - a$ keeps increasing as $a$ increases. The
-discrepancy therefore grows with angular distance from the instrument
-boresight.
-
-In the centered-disk case treated in this appendix, disk center coincides with
-the boresight, so the discrepancy increases continuously from solar disk center
-to the limb, where the on-disk maximum occurs. If the solar disk is offset from
-the boresight, the same monotonic behavior implies a larger on-disk maximum,
-because part of the disk lies at larger boresight angles.
+$\tan(a) - a$ increases as $a$ increases. The discrepancy therefore grows with
+angular distance from the instrument boresight.
 
 For an observer distance $D$ expressed in solar radii, the limb angle is:
 
@@ -683,9 +675,15 @@ At 1 AU, with $D \approx 215.03215567$, this gives:
 - $\Delta_{\mathrm{max}} \approx 3.35 \times 10^{-8} \ \mathrm{rad}$
 - about `6.92 mas`
 
-At `0.2 AU`, the same idealized discrepancy rises to about `865 mas`.
+At `0.2 AU`, the same idealized discrepancy is about `865 mas`.
 
 The following figure shows this idealized maximum discrepancy as a function of
 observer distance between `0.2 AU` and `1.1 AU`.
 
 ![Maximum idealized TAN small-angle discrepancy relative to HPC versus observer distance](simple_tan_vs_hpc_small_angle_discrepancy_vs_distance.pdf){ width=85% }
+
+In the centered-disk case treated here, disk center coincides with the
+boresight, so the discrepancy increases continuously from solar disk center to
+the limb, where the on-disk maximum occurs. If the solar disk is offset from
+the boresight, the on-disk maximum is larger because part of the disk lies at
+larger boresight angles.
