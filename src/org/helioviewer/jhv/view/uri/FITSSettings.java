@@ -1,10 +1,13 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -14,7 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
@@ -57,10 +59,22 @@ public class FITSSettings {
             return panel;
         }
 
+        private static void bindSelectionControls(JRadioButton button, Component... components) {
+            for (Component component : components) {
+                component.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (!button.isSelected()) {
+                            button.setSelected(true);
+                        }
+                    }
+                });
+            }
+        }
+
         private static void bindScalingMode(JRadioButton button, JHVSlider slider, ScalingMode mode) {
-            slider.setEnabled(button.isSelected());
+            bindSelectionControls(button, slider);
             button.addItemListener(e -> {
-                slider.setEnabled(button.isSelected());
                 if (button.isSelected()) {
                     scalingMode = mode;
                     refresh();
@@ -147,7 +161,8 @@ public class FITSSettings {
             JPanel rangePanel = new JPanel(new BorderLayout());
             rangePanel.add(minClip, BorderLayout.LINE_START);
             rangePanel.add(maxClip, BorderLayout.LINE_END);
-            ComponentUtils.setEnabled(rangePanel, false);
+            minClip.setEditable(false);
+            maxClip.setEditable(false);
 
             JHVSlider contrastSlider = new JHVSlider(1, 100, zContrast / 4);
             contrastSlider.addChangeListener(e -> {
@@ -155,7 +170,6 @@ public class FITSSettings {
                 if (!contrastSlider.getValueIsAdjusting())
                     refresh();
             });
-            ComponentUtils.setEnabled(contrastSlider, false);
 
             //
             JPanel content = new JPanel(new GridBagLayout());
@@ -173,11 +187,17 @@ public class FITSSettings {
                 JRadioButton radio = new JRadioButton(clipping.toString(), clipping == clippingMode);
                 boolean rangeMode = clipping == ClippingMode.Range;
                 boolean zscaleMode = clipping == ClippingMode.ZScale;
+                if (zscaleMode) {
+                    bindSelectionControls(radio, contrastSlider);
+                }
+                if (rangeMode) {
+                    bindSelectionControls(radio, minClip, maxClip);
+                }
                 radio.addItemListener(e -> {
                     if (radio.isSelected()) {
                         clippingMode = clipping;
-                        ComponentUtils.setEnabled(rangePanel, rangeMode);
-                        ComponentUtils.setEnabled(contrastSlider, zscaleMode);
+                        minClip.setEditable(rangeMode);
+                        maxClip.setEditable(rangeMode);
                         refresh();
                     }
                 });
