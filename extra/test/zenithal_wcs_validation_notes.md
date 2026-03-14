@@ -1,7 +1,7 @@
 ---
 title: |
    | SWHV CCN4
-   | Zenithal WCS Validation Test Notes
+   | Zenithal WCS and HPC Validation Notes
 subtitle: SWHV-ROB-TN-001-CCN4 v0.9
 subject: SWHV CCN4 
 date: SWHV-ROB-TN-001-CCN4 - Version 0.9 - 2026-03-xx
@@ -11,7 +11,7 @@ lot: false
 
 `id: \exec{git hash-object \file}`
 
-# Introduction
+# Summary
 
 This note describes the zenithal WCS and `HPC` work implemented in JHV, and
 the corresponding validation against Astropy and direct internal comparison
@@ -25,14 +25,14 @@ Hereafter, `formal-TAN` denotes this Greisen & Calabretta `TAN` formulation in
 JHV.
 
 The JHV `TAN` implementation of previous versions is hereafter denoted as
-`simple-TAN`. It treats the orthographic surface point's planar `x/y`
+`simple-TAN`. It treats the orthographic surface point's planar `(x,y)`
 coordinates as a small-angle approximation to helioprojective coordinates. It
 then feeds those coordinates directly into the linear image transform, instead of
 first converting the 3D point to helioprojective angles and then applying the
 `formal-TAN` world-to-plane projection.
 
-A native JHV `HPC` projection mode was also implemented and validated as part of the
-same work; its solar-coordinate interpretation follows Thompson, "Coordinate
+An `HPC` projection mode was also implemented in JHV and validated as part of
+the same work; its solar-coordinate interpretation follows Thompson, "Coordinate
 systems for solar image data"
 ([A&A 449, 791-803,
 2006](https://www.aanda.org/articles/aa/abs/2006/14/aa4262-05/aa4262-05.html)).
@@ -51,7 +51,7 @@ A dedicated validator was built in:
 - [extra/test/validate_jhv_wcs_against_astropy.py](extra/test/validate_jhv_wcs_against_astropy.py)
 
 Outside the renderer, it reproduces the parts of the JHV WCS/HPC mapping path
-covered by this validation and compares them directly against Astropy wherever
+covered by this note and compares them directly against Astropy wherever
 the result is fully defined by WCS.
 
 The validator was applied to a variety of real instrument FITS files and
@@ -60,15 +60,14 @@ examples.
 
 The work reported here includes:
 
-- validating the forward WCS mappings and inverse round-trip consistency of
-  `formal-TAN`, non-slanted `AZP`, and six-term `ZPN` (primary branch only) against
-  Astropy
-- validating the bounded native `HPC` sampling path against Astropy
+- validating `formal-TAN`, non-slanted `AZP`, and six-term `ZPN` (primary
+  branch only) against Astropy, including inverse round-trip checks
+- validating the `HPC` sampling path against Astropy
 
 Main conclusions:
 
-- `formal-TAN`, `AZP`, and `ZPN` are validated against
-  Astropy, including inverse round-trip consistency for the mappings tested here
+- `formal-TAN`, `AZP`, and `ZPN` are validated against Astropy, including the
+  tested inverse mappings
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
   path covered by this note
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
@@ -78,9 +77,9 @@ Main conclusions:
   `HPC` are consistent with the theoretical geometric discrepancy derived in
   Appendix A
 - on the sample TAN files, `simple-TAN` remains very close to the `HPC`
-  display geometry, which suggests it is be a better choice than
-  `formal-TAN` for the JHV `Orthographic` mode for which visual consistency with
-  `HPC` is preferred
+  display geometry, which suggests it may be a better choice than
+  `formal-TAN` for JHV `Orthographic` mode when visual consistency with `HPC`
+  is preferred
 - this note is therefore a validation/testing note, not a design note for
   `Orthographic` embedding, playback policy, mouse-position reporting, or
   synthetic overdrawing
@@ -117,7 +116,7 @@ Included:
   - six-term `ZPN` (primary branch only)
 - the `HPC` image sampling path:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
-- the bounded `HPC` display domain used by the current validation path
+- the `HPC` display domain used in the validation runs reported here
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` for the specific no-rotation comparison mode
 
@@ -260,7 +259,7 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   --render-size 2048
 ```
 
-This mode uses the bounded native `HPC` display domain and renders the same
+This mode uses the `HPC` display domain and runs the same
 screen grid through:
 
 - the JHV `HPC` sampling path
@@ -386,10 +385,10 @@ Interpretation:
 
 # Results
 
-The primary discrepancy unit reported in this note is the angular sky error
-derived from `CDELT` and expressed in milliarcseconds. Pixel errors are kept as
-secondary units because they are the quantities reported directly by the
-validator.
+The primary discrepancy units reported in this note are angular sky errors
+derived from `CDELT`, expressed in milliarcseconds or arcseconds as
+appropriate. Pixel errors are kept as secondary units because they are the
+quantities reported directly by the validator.
 
 ## FITS projections
 
@@ -444,8 +443,8 @@ For zenithal image data, the deterministic part of the mapping is:
 That intermediate `HPC` ray field is fully determined by FITS/WCS and the
 observer geometry.
 
-For testing purposes, the validator models the bounded native `HPC` sampling
-map and compares it directly against Astropy.
+For testing purposes, the validator models this `HPC` sampling map and compares
+it directly against Astropy.
 
 Measured `HPC` validation results:
 
@@ -467,8 +466,8 @@ difference corresponds to a relative disagreement of about `1e-12`.
 Measured comparison result:
 
 - this is a different test from the Astropy validation above
-- it compares the sampled source pixels from `formal-TAN` in `Orthographic`
-  mode and from `HPC` at the same displayed on-disk screen radius
+- it compares the source pixels sampled by `formal-TAN` in `Orthographic`
+  mode and by `HPC` at the same displayed on-disk screen radius
 - native-resolution comparison between `formal-TAN` in `Orthographic` mode and
   `HPC` on the TAN samples gives:
   - `sample.171.fits` (`1.009 AU`):
@@ -490,8 +489,8 @@ These results support the following conclusions:
 
 ## `Simple-TAN` versus JHV `HPC`
 
-- it compares the sampled source pixels from `simple-TAN` in `Orthographic`
-  mode and from `HPC` at the same displayed on-disk screen radius
+- it compares the source pixels sampled by `simple-TAN` in `Orthographic`
+  mode and by `HPC` at the same displayed on-disk screen radius
 - native-resolution comparison between `simple-TAN` and `HPC` on the TAN
   samples gives:
   - `sample.171.fits` (`1.009 AU`):
