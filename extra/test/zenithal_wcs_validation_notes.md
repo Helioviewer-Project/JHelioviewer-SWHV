@@ -2,9 +2,9 @@
 title: |
    | SWHV CCN4
    | Zenithal WCS and HPC Validation Notes
-subtitle: SWHV-ROB-TN-001-CCN4 v0.9
+subtitle: SWHV-ROB-TN-001-CCN4 v0.99
 subject: SWHV CCN4 
-date: SWHV-ROB-TN-001-CCN4 - Version 0.9 - 2026-03-xx
+date: SWHV-ROB-TN-001-CCN4 - Version 0.99 - 2026-03-15
 lof: true
 lot: false
 ---
@@ -468,6 +468,9 @@ quantities reported directly by the validator.
 
 ## FITS projections
 
+These tests compare the implemented JHV projection paths directly against
+Astropy as the external WCS reference.
+
 1. `formal-TAN` is correct.
 
 - JHV `world -> helioprojective -> TAN plane -> pixel`
@@ -493,14 +496,14 @@ quantities reported directly by the validator.
   used by the `Orthographic` renderer outside the solar disk. `formal-TAN`
   remains at numerical precision across the full frame.
 - this does not contradict Appendix B. The `simple-TAN`
-  small-angle-approximation error $\tan(a) - a$ keeps growing with boresight
-  angle, but the JHV full-frame comparison does not measure that error
+  small-angle-approximation error $\tan(a) - a$ keeps growing with angular
+  distance from the boresight, but the JHV full-frame comparison does not
+  measure that error
   directly everywhere. On the solar
   disk, `Orthographic` samples from the solar sphere. Outside the solar disk,
-  `Orthographic` uses a flat image-view plane before the
-  projection-specific sampling is applied. The off-limb part of the comparison is
-  therefore not a direct measurement of the pure `simple-TAN`
-  small-angle-approximation error.
+  `Orthographic` samples all WCS projections from the same flat image-view
+  plane. The off-limb part of the comparison is therefore not a direct
+  measurement of the pure `simple-TAN` small-angle-approximation error.
 
 3. `AZP` is correct for the current HI files.
 
@@ -521,6 +524,9 @@ quantities reported directly by the validator.
   radial polynomial
 
 ## Astropy validation of JHV HPC rendering
+
+This subsection also compares JHV directly against Astropy, but for the `HPC`
+sampling path rather than for the FITS projection formulas alone.
 
 For zenithal image data, the deterministic part of the mapping is:
 
@@ -552,9 +558,11 @@ difference corresponds to a relative disagreement of about `1e-12`.
 
 ## `Formal-TAN` versus JHV `HPC`
 
+This is not an Astropy correctness test. It is an internal JHV comparison
+between two different display modes.
+
 Measured comparison result:
 
-- this is a different test from the Astropy validation above
 - it compares the source pixels sampled by `formal-TAN` in `Orthographic`
   mode and by `HPC` over the same full rendered comparison frame
 - native-resolution full-frame comparison between `formal-TAN` in
@@ -580,6 +588,10 @@ These results support the following conclusions:
 
 ## `Simple-TAN` versus JHV `HPC`
 
+This is again an internal JHV comparison. Its purpose is to show whether
+`simple-TAN` behaves more like `HPC` or like `formal-TAN` in JHV
+`Orthographic` mode.
+
 - it compares the source pixels sampled by `simple-TAN` in `Orthographic`
   mode and by `HPC` over the same full rendered comparison frame
 - native-resolution full-frame comparison between `simple-TAN` and `HPC` gives:
@@ -599,11 +611,11 @@ These results support the following conclusions:
   when visual consistency with `HPC` is preferred.
 - Appendix B gives an idealized on-disk lower bound for the small-angle
   approximation effect. The measured full-frame maxima are larger, but they
-  should not be read as a stronger version of the same term. Outside the solar
-  disk, `Orthographic` samples all WCS projections from the same flat
-  image-view plane, so the off-limb part of the comparison reflects the
-  remaining mismatch between that shared `Orthographic` plane and the `HPC`
-  display geometry.
+  should not be read as a stronger version of the on-disk
+  small-angle-approximation error. Outside the solar disk, `Orthographic`
+  samples all WCS projections from the same flat image-view plane, so the
+  off-limb part of the comparison reflects the difference between that flat
+  `Orthographic` construction and the `HPC` display geometry.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
@@ -677,13 +689,14 @@ distance between `0.2 AU` and `1.1 AU`.
 # Appendix B: Idealized `TAN` small-angle discrepancy relative to `HPC`
 
 This appendix records a different theoretical discrepancy from Appendix A. It
-isolates only the small-angle approximation as a purely angular effect. It is
-not derived from JHV. The centered solar-disk case considered below is only
-one example of that angular error.
+isolates one effect only: the error introduced when `TAN` is approximated by
+the small-angle relation $\tan(a) \approx a$. This is a purely angular error.
+It is not derived from JHV. The centered solar-disk case considered below is
+only one example of it.
 
 Assumptions:
 
-- the relevant radial image coordinate is measured from the instrument
+- the relevant angular distance is measured from the instrument
   boresight
 - `HPC` is displayed linearly in helioprojective angle
 - the exact `TAN` plane coordinate is replaced by its small-angle
@@ -692,11 +705,7 @@ Assumptions:
 Let $a$ be the helioprojective angular distance from the instrument boresight.
 In linear `HPC`, the radial coordinate is proportional to $a$. In `TAN`, the
 radial coordinate on the projection plane is proportional to $\tan(a)$. The
-small-angle approximation is therefore:
-
-- $\tan(a) \approx a$
-
-and the corresponding continuous discrepancy is:
+corresponding continuous discrepancy is therefore:
 
 - $\Delta(a) = \tan(a) - a$
 
@@ -721,7 +730,7 @@ At 1 AU, with $D \approx 215.03215567$, this gives:
 
 At `0.2 AU`, the same idealized discrepancy is about `865 mas`.
 
-The following figure shows that centered-disk example of the idealized maximum
+The following figure shows this centered-disk example of the idealized maximum
 discrepancy as a function of observer distance between `0.2 AU` and `1.1 AU`.
 
 ![Maximum idealized TAN small-angle discrepancy relative to HPC versus observer distance](simple_tan_vs_hpc_small_angle_discrepancy_vs_distance.pdf){ width=85% }
@@ -733,5 +742,5 @@ the boresight, the on-disk maximum is larger because part of the disk lies at
 larger boresight angles.
 
 For coronagraph images, where the field of view extends to much larger angles
-than the solar disk, the same small-angle discrepancy can reach
+than the solar disk, the same angular small-angle-approximation error can reach
 hundreds of arcseconds near the image-frame edge.
