@@ -79,8 +79,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                     annStr = String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
                 }
 
-                double px = (180 / Math.PI) * Math.atan2(v.x, viewpoint.distance);
-                double py = (180 / Math.PI) * Math.atan2(v.y, viewpoint.distance);
+                double zeta = viewpoint.distance - v.z;
+                double px = (180 / Math.PI) * Math.atan2(v.x, zeta);
+                double py = (180 / Math.PI) * Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
 
                 ImageLayer layer = Layers.getActiveImageLayer();
