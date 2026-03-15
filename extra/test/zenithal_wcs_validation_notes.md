@@ -61,40 +61,48 @@ examples.
 The work reported here includes:
 
 - validating `formal-TAN`, non-slanted `AZP`, and six-term `ZPN` (primary
-  branch only) against Astropy, including round-trip checks
-- validating the `HPC` sampling path against Astropy
+  branch only) against Astropy, including round-trip checks.
+- validating the `HPC` sampling path against Astropy.
 
 Main conclusions:
 
 - `formal-TAN`, `AZP`, and `ZPN` are validated against Astropy, including the
-  tested inverse mappings
+  tested inverse mappings.
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
-  path covered by this note
+  path covered by this note.
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` shows that the two display geometries are not identical even with the
-  same observer viewpoint and `dragRotation = 0`
+  same observer viewpoint and `dragRotation = 0`.
 - the measured discrepancies between `formal-TAN` in `Orthographic` mode and
   `HPC` are consistent with the theoretical geometric discrepancy derived in
-  Appendix A
+  Appendix A.
 - on the sample TAN files, `simple-TAN` remains very close to the `HPC`
   display geometry, which suggests it may be a better choice than
   `formal-TAN` for JHV `Orthographic` mode when visual consistency with `HPC`
-  is preferred; Appendix B gives the same small-angle `TAN` effect in its
-  idealized centered-disk form
+  is preferred.
 - this note is therefore a validation/testing note, not a design note for
   `Orthographic` embedding, playback policy, mouse-position reporting, or
-  synthetic overdrawing
+  synthetic overdrawing.
 
 Bottom line:
 
 - `simple-TAN` will be kept in JHV `Orthographic` mode for data designated as
-  `TAN` in the metadata
-- `HPC` mode was added (with the noted caveat about the viewpoint)
-- support for `AZP` and `ZPN` data was added (with the noted caveat about the heliospheric imagers)
+  `TAN` in the metadata.
+- `HPC` mode was added (with the noted caveat about the viewpoint).
+- support for `AZP` and `ZPN` data was added (with the noted caveat about the
+  heliospheric imagers).
+- the position numbers reported in the panel at the bottom of the JHV window
+  are display-geometry numbers derived from the mouse pointer position, not
+  coordinates read back from the active image WCS. In `HPC`, `Latitudinal`,
+  `Polar`, and `LogPolar`, they follow the corresponding JHV display
+  projection. In `Orthographic`, they are derived purely from the inferred 3D
+  scene point and therefore do not, in general, reflect the image `TAN`,
+  `AZP`, or `ZPN` WCS.
 
 # The validator
 
-For the validation modes in this note, the validator script provides a Python/CPU model
+For the validation modes in this note, the validator script provides a
+Python/CPU model
 of the relevant JHV reprojection and sampling logic. It does not execute the
 actual JHV renderer. In particular, major parts of the corresponding code in
 JHV run in GLSL on the GPU, whereas the validator re-expresses that logic in
@@ -165,7 +173,7 @@ Included in the validator:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
 - the `HPC` display domain used in the validation runs reported here
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
-  `HPC` for the specific no-rotation comparison mode
+  `HPC` for the specific no-rotation comparison mode.
 
 Excluded:
 
@@ -185,7 +193,7 @@ The validator therefore establishes:
 - whether the implemented reprojection and sampling math matches Astropy
 - whether the implemented `HPC` sampling map matches Astropy
 - whether the `formal-TAN` path in `Orthographic` mode and `HPC` sample the
-  same source pixels at the same displayed on-disk screen radius
+  same source pixels over the same rendered comparison frame.
 
 ## Astropy-based validation scope
 
@@ -232,6 +240,16 @@ Run it with:
 python3 extra/test/validate_jhv_wcs_against_astropy.py <fits-file> [mode]
 ```
 
+The validator uses three different comparison domains:
+
+- full image frame:
+  - the actual FITS image pixel grid
+- full rendered comparison frame:
+  - the full square comparison grid used by the internal `Orthographic`/`HPC`
+    tests
+- bounded `HPC` screen domain:
+  - a finite rendered `HPC` box chosen for the validation run
+
 ### Astropy-based validation modes
 
 1. Forward WCS random-sample validation
@@ -241,7 +259,10 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   extra/test/data/20241224_194245_d4c2A.fts
 ```
 
-This mode reports:
+This mode reports forward WCS errors on sampled world points. It is not tied to
+the displayed solar disk or to the full image frame.
+
+It reports:
 
 - `projection_max_error_internal`
 - `pixel_center_max_error_px`
@@ -254,7 +275,7 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   --all-pixels
 ```
 
-This mode checks the full image grid against Astropy and reports the worst
+This mode checks the full FITS image grid against Astropy and reports the worst
 pixel-center error.
 
 3. Inverse `TAN`
@@ -266,7 +287,10 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   --inverse-tan
 ```
 
-This mode validates:
+This mode validates inverse `TAN` on sampled projection-plane points. It is not
+an on-disk or full-image-grid test.
+
+It validates:
 
 - `TAN plane -> helioprojective`
 - round-trip error
@@ -279,7 +303,10 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   --inverse-azp
 ```
 
-This mode validates:
+This mode validates inverse `AZP` on sampled projection-plane points. It is not
+an on-disk or full-image-grid test.
+
+It validates:
 
 - `AZP plane -> helioprojective`
 - round-trip error
@@ -292,7 +319,10 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   --inverse-zpn
 ```
 
-This mode validates:
+This mode validates inverse `ZPN` on sampled projection-plane points. It is not
+an on-disk or full-image-grid test.
+
+It validates:
 
 - `ZPN plane -> helioprojective`
 - round-trip error on the primary monotonic branch
@@ -306,7 +336,7 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   --render-size 2048
 ```
 
-This mode uses the `HPC` display domain and runs the same
+This mode runs over a bounded `HPC` screen domain and sends the same rendered
 screen grid through:
 
 - the JHV `HPC` sampling path
@@ -351,7 +381,7 @@ This mode compares, for TAN data:
 - the `formal-TAN` path in `Orthographic` mode
 - the JHV `HPC` display sampling path
 
-over the on-disk orthographic domain, using a comparison grid at the native
+over the full rendered comparison frame, using a comparison grid at the native
 image resolution of the tested file.
 
 It writes:
@@ -364,7 +394,7 @@ Interpretation:
 
 - this is not an Astropy comparison
 - it measures whether the `formal-TAN` path in `Orthographic` mode and `HPC`
-  define the same on-screen geometry
+  define the same on-screen geometry over that full rendered frame
 
 2. `simple-TAN` vs JHV `HPC`
 
@@ -380,7 +410,7 @@ This mode compares, for TAN data:
 - `simple-TAN`
 - the `HPC` display sampling path
 
-over the on-disk orthographic domain, using a comparison grid at the native
+over the full rendered comparison frame, using a comparison grid at the native
 image resolution of the tested file.
 
 It writes:
@@ -398,15 +428,15 @@ Interpretation:
 
 - this is an internal JHV comparison for `TAN`
 - it measures how closely `simple-TAN` in `Orthographic` mode matches the
-  `HPC` display geometry
+  `HPC` display geometry over that full rendered frame
 
-3. `simple-TAN` vs `formal-TAN`
+3. `simple-TAN` vs `formal-TAN` over the full image frame
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
   extra/test/data/sample.171.fits \
   --hdu 1 \
-  --compare-initial-tan
+  --compare-initial-tan-image-frame
 ```
 
 This mode compares:
@@ -415,20 +445,19 @@ This mode compares:
 - `formal-TAN`
 - Astropy as the WCS reference
 
-over the on-disk orthographic domain, using a comparison grid at the native
-image resolution of the tested file.
+over the full FITS image frame at native image resolution.
 
 It writes:
 
-- `*_initial_tan.png`
-- `*_formal_tan.png`
-- `*_initial_vs_formal_tan_diff.png`
+- `*_initial_tan_image_frame.png`
+- `*_formal_tan_image_frame.png`
+- `*_initial_vs_formal_tan_image_frame_diff.png`
 
 Interpretation:
 
 - this is an implementation-comparison mode for `TAN` only
-- it quantifies how far `simple-TAN` and `formal-TAN` each are from Astropy,
-  and how far `simple-TAN` is from `formal-TAN`
+- it compares `simple-TAN` and `formal-TAN` against Astropy over the actual
+  FITS image frame and shows where the two JHV paths diverge
 
 # Results
 
@@ -447,18 +476,31 @@ quantities reported directly by the validator.
 
 2. `formal-TAN` is substantially more accurate than `simple-TAN`.
 
-- native-resolution comparison against Astropy on the TAN samples gives:
+- native-resolution full-image-frame comparison against Astropy on the same TAN
+  samples gives:
   - `sample.171.fits` (`1.009 AU`):
-    - `simple-TAN`: `2.20 arcsec` max, `1.63 arcsec` RMS
-    - `formal-TAN`: `9.40e-11 arcsec` max, `3.04e-11 arcsec` RMS
+    - `simple-TAN`: `2.20 arcsec` max, `1.12 arcsec` RMS
+    - `formal-TAN`: `2.81e-7 mas` max, `6.35e-8 mas` RMS
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
-    - `simple-TAN`: `11.42 arcsec` max, `8.36 arcsec` RMS
-    - `formal-TAN`: `8.99e-11 arcsec` max, `2.88e-11 arcsec` RMS
+    - `simple-TAN`: `11.42 arcsec` max, `2.46 arcsec` RMS
+    - `formal-TAN`: `3.41e-7 mas` max, `7.73e-8 mas` RMS
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
-    - `simple-TAN`: `2.40 arcsec` max, `1.77 arcsec` RMS
-    - `formal-TAN`: `1.02e-10 arcsec` max, `3.40e-11 arcsec` RMS
-- in all three cases, `formal-TAN` matches Astropy to numerical precision,
-  while `simple-TAN` shows a visible geometric error
+    - `simple-TAN`: `2.40 arcsec` max, `0.252 arcsec` RMS
+    - `formal-TAN`: `2.62e-7 mas` max, `6.26e-8 mas` RMS
+- for `simple-TAN`, the maximum is set by the on-disk region in all three
+  cases. The RMS values are calculated over the full image frame, which
+  includes both the on-disk sphere region and the off-limb flat-plane region
+  used by the `Orthographic` renderer outside the solar disk. `formal-TAN`
+  remains at numerical precision across the full frame.
+- this does not contradict Appendix B. The `simple-TAN`
+  small-angle-approximation error $\tan(a) - a$ keeps growing with boresight
+  angle, but the JHV full-frame comparison does not measure that error
+  directly everywhere. On the solar
+  disk, `Orthographic` samples from the solar sphere. Outside the solar disk,
+  `Orthographic` uses a flat image-view plane before the
+  projection-specific sampling is applied. The off-limb part of the comparison is
+  therefore not a direct measurement of the pure `simple-TAN`
+  small-angle-approximation error.
 
 3. `AZP` is correct for the current HI files.
 
@@ -490,8 +532,8 @@ For zenithal image data, the deterministic part of the mapping is:
 That intermediate `HPC` ray field is fully determined by FITS/WCS and the
 observer geometry.
 
-For testing purposes, the validator models this `HPC` sampling map and compares
-it directly against Astropy.
+For testing purposes, the validator models this `HPC` sampling map over a
+bounded rendered `HPC` screen domain and compares it directly against Astropy.
 
 Measured `HPC` validation results:
 
@@ -514,54 +556,54 @@ Measured comparison result:
 
 - this is a different test from the Astropy validation above
 - it compares the source pixels sampled by `formal-TAN` in `Orthographic`
-  mode and by `HPC` at the same displayed on-disk screen radius
-- native-resolution comparison between `formal-TAN` in `Orthographic` mode and
-  `HPC` on the TAN samples gives:
+  mode and by `HPC` over the same full rendered comparison frame
+- native-resolution full-frame comparison between `formal-TAN` in
+  `Orthographic` mode and `HPC` on the TAN samples gives:
   - `sample.171.fits` (`1.009 AU`):
-    - `2.20 arcsec` max, `1.62 arcsec` RMS
+    - `2.20 arcsec` max, `1.44 arcsec` RMS
     - theoretical max from Appendix A: `2.19 arcsec`
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
-    - `11.2 arcsec` max, `8.28 arcsec` RMS
+    - `11.22 arcsec` max, `7.34 arcsec` RMS
     - theoretical max from Appendix A: `11.05 arcsec`
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
-    - `2.40 arcsec` max, `1.77 arcsec` RMS
+    - `2.40 arcsec` max, `1.57 arcsec` RMS
     - theoretical max from Appendix A: `2.29 arcsec`
 
 These results support the following conclusions:
 
 - the `formal-TAN` path in `Orthographic` mode and `HPC` are not the same
   display geometry
-- the small on-disk “bulging” when switching between them is expected from that
+- the maximum discrepancy is set by the on-disk part of the frame, so it
+  remains close to the Appendix A prediction
+- the visible “bulging” when switching between them is expected from that
   geometry difference, not from an Astropy/WCS mismatch
 
 ## `Simple-TAN` versus JHV `HPC`
 
 - it compares the source pixels sampled by `simple-TAN` in `Orthographic`
-  mode and by `HPC` at the same displayed on-disk screen radius
-- native-resolution comparison between `simple-TAN` and `HPC` over the
-  displayed on-disk domain of the TAN samples gives:
+  mode and by `HPC` over the same full rendered comparison frame
+- native-resolution full-frame comparison between `simple-TAN` and `HPC` gives:
   - `sample.171.fits` (`1.009 AU`):
-    - `6.73 mas` max, `3.09 mas` RMS
-    - theoretical max from Appendix B: `6.73 mas`
+    - `16.8 mas` max, `4.96 mas` RMS
+    - theoretical on-disk max from Appendix B: `6.73 mas`
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
-    - `370 mas` max, `116 mas` RMS
-    - theoretical max from Appendix B: `76.9 mas`
-    - with `CRVALi = 0` in the same header: `76.5 mas` max
+    - `518 mas` max, `145 mas` RMS
+    - theoretical on-disk max from Appendix B: `76.9 mas`
+    - large nonzero `CRVALi` offset the solar disk from boresight and likely
+      contribute to the higher value
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
-    - `9.32 mas` max, `3.65 mas` RMS
-    - theoretical max from Appendix B: `7.65 mas`
-    - with `CRVALi = 0` in the same header: `7.63 mas` max
+    - `21.1 mas` max, `5.77 mas` RMS
+    - theoretical on-disk max from Appendix B: `7.65 mas`
 - this confirms that `simple-TAN` is much closer to the `HPC` display
   geometry than `formal-TAN`, which supports its use in `Orthographic` mode
-  when visual consistency with `HPC` is preferred
-- because `simple-TAN` replaces the exact `TAN` plane coordinate by the same
-  small-angle approximation analyzed in Appendix B, the measured
-  discrepancies are very likely caused by that effect. The appendix gives the
-  centered-disk lower bound. If `CRVALi` is nonzero, the solar disk is offset
-  from the instrument boresight and the discrepancy becomes larger. AIA
-  already has the Sun centered, so it matches that lower bound directly. For
-  EUI, setting `CRVALi = 0` brings the measured maximum down to nearly the
-  theoretical value. COR2 shows the same effect more mildly.
+  when visual consistency with `HPC` is preferred.
+- Appendix B gives an idealized on-disk lower bound for the small-angle
+  approximation effect. The measured full-frame maxima are larger, but they
+  should not be read as a stronger version of the same term. Outside the solar
+  disk, `Orthographic` samples all WCS projections from the same flat
+  image-view plane, so the off-limb part of the comparison reflects the
+  remaining mismatch between that shared `Orthographic` plane and the `HPC`
+  display geometry.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
@@ -635,12 +677,12 @@ distance between `0.2 AU` and `1.1 AU`.
 # Appendix B: Idealized `TAN` small-angle discrepancy relative to `HPC`
 
 This appendix records a different theoretical discrepancy from Appendix A. It
-isolates only the small-angle approximation in an idealized centered solar
-disk. It is not derived from JHV.
+isolates only the small-angle approximation as a purely angular effect. It is
+not derived from JHV. The centered solar-disk case considered below is only
+one example of that angular error.
 
 Assumptions:
 
-- the solar disk is centered in the field of view
 - the relevant radial image coordinate is measured from the instrument
   boresight
 - `HPC` is displayed linearly in helioprojective angle
@@ -662,7 +704,9 @@ Unlike Appendix A, this discrepancy is monotonic in $a$: the function
 $\tan(a) - a$ increases as $a$ increases. The discrepancy therefore grows with
 angular distance from the instrument boresight.
 
-For an observer distance $D$ expressed in solar radii, the limb angle is:
+To relate this purely angular error to a solar image, consider the special case
+of a centered solar disk observed from distance $D$ expressed in solar radii.
+Then the solar-limb angle is:
 
 - $a_{\mathrm{limb}} = \sin^{-1}(1 / D)$
 
@@ -677,13 +721,17 @@ At 1 AU, with $D \approx 215.03215567$, this gives:
 
 At `0.2 AU`, the same idealized discrepancy is about `865 mas`.
 
-The following figure shows this idealized maximum discrepancy as a function of
-observer distance between `0.2 AU` and `1.1 AU`.
+The following figure shows that centered-disk example of the idealized maximum
+discrepancy as a function of observer distance between `0.2 AU` and `1.1 AU`.
 
 ![Maximum idealized TAN small-angle discrepancy relative to HPC versus observer distance](simple_tan_vs_hpc_small_angle_discrepancy_vs_distance.pdf){ width=85% }
 
-In the centered-disk case treated here, disk center coincides with the
+In the centered-disk example treated here, disk center coincides with the
 boresight, so the discrepancy increases continuously from solar disk center to
 the limb, where the on-disk maximum occurs. If the solar disk is offset from
 the boresight, the on-disk maximum is larger because part of the disk lies at
 larger boresight angles.
+
+For coronagraph images, where the field of view extends to much larger angles
+than the solar disk, the same small-angle discrepancy can reach
+hundreds of arcseconds near the image-frame edge.
