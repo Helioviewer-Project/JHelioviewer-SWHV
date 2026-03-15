@@ -29,7 +29,7 @@ bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDist
 }
 
 float hpcEnhancementFactor(const vec2 helioprojective, const float observerDistance) {
-    return max(1., length(helioprojectiveToHpcPlanePoint(helioprojective, observerDistance).xy) / observerDistance);
+    return max(1., length(helioprojectiveToHpcPlanePoint(helioprojective, observerDistance).xy));
 }
 
 vec2 get_hpc_texcoord(const WCS wcs, const vec2 scrpos, const float dt, const float[6] PV, out float factor) {
