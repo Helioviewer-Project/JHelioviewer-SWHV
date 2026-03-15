@@ -172,7 +172,7 @@ public class ImageLayers {
         if (metaData.getWCSProjection() == MetaData.WCSProjection.AZP && Math.abs(metaData.getPV2()[2]) < 1e-6f) {
             double x = planeX / unitsPerRad;
             double y = planeY / unitsPerRad;
-            double r = Math.hypot(x, y);
+            double r = Math.sqrt(x * x + y * y);
             if (r == 0)
                 return new Vec2(phi0, theta0);
 
@@ -200,7 +200,7 @@ public class ImageLayers {
         if (metaData.getWCSProjection() == MetaData.WCSProjection.ZPN) {
             double x = planeX / unitsPerRad;
             double y = planeY / unitsPerRad;
-            double radial = Math.hypot(x, y);
+            double radial = Math.sqrt(x * x + y * y);
             double eta = inverseZpnPrimaryBranch(metaData.getPV2(), radial);
             if (eta == 0)
                 return new Vec2(phi0, theta0);
@@ -217,7 +217,7 @@ public class ImageLayers {
 
         double x = planeX / unitsPerRad;
         double y = planeY / unitsPerRad;
-        double rho = Math.hypot(x, y);
+        double rho = Math.sqrt(x * x + y * y);
         if (rho == 0)
             return new Vec2(phi0, theta0);
         double c = Math.atan(rho);
