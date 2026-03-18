@@ -18,10 +18,10 @@ public final class SphericalCoords {
         return r == 0 ? 0 : Math.asin(Math.clamp(v.y / r, -1., 1.));
     }
 
-    public static double colatitude(Vec3 v) {
-        double r = radius(v);
-        return r == 0 ? 0 : Math.acos(Math.clamp(v.y / r, -1., 1.));
-    }
+    // public static double colatitude(Vec3 v) {
+    //    double r = radius(v);
+    //    return r == 0 ? 0 : Math.acos(Math.clamp(v.y / r, -1., 1.));
+    // }
 
     public static double x(double radius, double longitude, double latitude) {
         return radius * Math.cos(latitude) * Math.sin(longitude);
