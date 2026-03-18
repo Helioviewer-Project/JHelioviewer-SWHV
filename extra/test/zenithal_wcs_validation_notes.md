@@ -496,14 +496,13 @@ Astropy as the external WCS reference.
   used by the `Orthographic` renderer outside the solar disk. `formal-TAN`
   remains at numerical precision across the full frame.
 - this does not contradict Appendix B. The `simple-TAN`
-  small-angle-approximation error $\tan(a) - a$ keeps growing with angular
-  distance from the boresight, but the JHV full-frame comparison does not
-  measure that error
-  directly everywhere. On the solar
-  disk, `Orthographic` samples from the solar sphere. Outside the solar disk,
-  `Orthographic` samples all WCS projections from the same flat image-view
-  plane. The off-limb part of the comparison is therefore not a direct
-  measurement of the pure `simple-TAN` small-angle-approximation error.
+  small-angle-approximation error $\tan(a) - a$ grows with angular distance
+  from the boresight, but this comparison does not measure that error directly
+  everywhere. On the solar disk, `Orthographic` samples from the solar sphere.
+  Outside the solar disk, `Orthographic` uses a flat image-view plane to
+  sample the WCS projection instead. The off-limb part of the comparison is
+  therefore not a direct measurement of the `simple-TAN`
+  small-angle-approximation error alone.
 
 3. `AZP` is correct for the current HI files.
 
@@ -615,7 +614,7 @@ This is again an internal JHV comparison. Its purpose is to show whether
   small-angle-approximation error. Outside the solar disk, `Orthographic`
   samples all WCS projections from the same flat image-view plane, so the
   off-limb part of the comparison reflects the difference between that flat
-  `Orthographic` construction and the `HPC` display geometry.
+  `Orthographic` off-limb geometry and the `HPC` display geometry.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
