@@ -176,7 +176,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         double z = (1. - alpha) * prev.z() + alpha * next.z();
 
         Vec3 cart = new Vec3(x, y, z);
-        return new Vec3(1, SphericalCoords.colatitude(cart), SphericalCoords.longitude(cart));
+        return new Vec3(1, SphericalCoords.longitude(cart), SphericalCoords.latitude(cart));
     }
 
     private void drawFootpointInterpolated(Camera camera, Viewport vp, GL3 gl) {
