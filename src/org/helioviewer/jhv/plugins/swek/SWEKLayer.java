@@ -158,7 +158,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                 double deltatheta = sz / distSun * (el[0] * 2 - 1);
                 double deltar = sz * (el[1] * 2 - 1);
                 double r = distSun - deltar;
-                double theta = principalAngle + deltatheta;
+                double theta = principalAngle - deltatheta;
 
                 texBuf.putCoord(q.rotateInverseVector(PolarBasis.vec3(r, theta)), el);
             }
