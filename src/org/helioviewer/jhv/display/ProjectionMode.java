@@ -147,6 +147,11 @@ public enum ProjectionMode {
         return unprojectMap(viewpoint, gridType, pt);
     }
 
+    public final Vec2 projectToScreenCoords(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
+        Vec2 projected = projectMap(viewpoint, gridType, v);
+        return new Vec2(projected.x * vp.aspect, projected.y);
+    }
+
     protected abstract Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v);
 
     protected abstract Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt);

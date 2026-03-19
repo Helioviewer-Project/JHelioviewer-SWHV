@@ -127,8 +127,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             });
         else
             points.forEach(v -> {
-                Vec2 tf = Display.mode.project(viewpoint, Display.gridType, v);
-                vexBuf.putVertex((float) (tf.x * vp.aspect), (float) tf.y, 0, SIZE_POINT, color);
+                Vec2 tf = Display.mode.projectToScreenCoords(viewpoint, Display.gridType, vp, v);
+                vexBuf.putVertex((float) tf.x, (float) tf.y, 0, SIZE_POINT, color);
             });
     }
 
