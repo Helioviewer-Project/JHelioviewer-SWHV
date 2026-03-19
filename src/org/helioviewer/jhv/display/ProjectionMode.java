@@ -39,6 +39,11 @@ public enum ProjectionMode {
         }
 
         @Override
+        public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
+            vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), (float) size, color);
+        }
+
+        @Override
         public Position projectionViewpoint(Position viewpoint) {
             return viewpoint;
         }
@@ -164,6 +169,11 @@ public enum ProjectionMode {
         if (last)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
         return current;
+    }
+
+    public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
+        Vec2 projected = projectToScreenCoords(viewpoint, gridType, vp, vertex);
+        vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
     }
 
     private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
