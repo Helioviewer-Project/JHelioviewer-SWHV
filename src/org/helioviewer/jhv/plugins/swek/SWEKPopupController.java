@@ -171,12 +171,12 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = Display.mode.projectToScreenCoords(camera.getViewpoint(), Display.gridType, vp, pt);
+                        tf = Display.mode.projectToScreen(camera.getViewpoint(), Display.gridType, vp, pt);
                     }
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = Display.mode.mouseToViewPlane(camera, vp, mouseOverX, mouseOverY);
+                    Vec2 mousepos = Display.mode.mouseToScreen(camera, vp, mouseOverX, mouseOverY);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {

@@ -251,7 +251,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.projectToScreenCoords(camera.getViewpoint(), Display.gridType, vp, pt);
+            Vec2 tf = Display.mode.projectToScreen(camera.getViewpoint(), Display.gridType, vp, pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x, tf.y, sz, sz);
         }
