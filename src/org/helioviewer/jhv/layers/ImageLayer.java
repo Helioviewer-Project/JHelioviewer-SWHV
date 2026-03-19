@@ -113,7 +113,6 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
-        GLListener.resetHpcScaleBounds();
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
@@ -137,7 +136,6 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     private void activateView() {
-        GLListener.resetHpcScaleBounds();
         optionsPanel.downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
         JHVFrame.getLayersPanel().setOptionsPanel(this);

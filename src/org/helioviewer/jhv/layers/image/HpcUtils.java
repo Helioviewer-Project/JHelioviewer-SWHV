@@ -1,63 +1,66 @@
 package org.helioviewer.jhv.layers.image;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 
 public class HpcUtils {
 
-    public static Region hpcBoundsDegrees(MetaData metaData) {
+    public static Region hpcBounds(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
+        HpcInverseContext context = new HpcInverseContext(metaData);
         double x0 = region.llx;
         double x1 = region.llx + region.width;
         double y0 = region.lly;
         double y1 = region.lly + region.height;
         double xm = 0.5 * (x0 + x1);
         double ym = 0.5 * (y0 + y1);
-        Vec2[] samples = new Vec2[]{
-                hpcBoundsAt(metaData, x0, y0),
-                hpcBoundsAt(metaData, x1, y0),
-                hpcBoundsAt(metaData, x0, y1),
-                hpcBoundsAt(metaData, x1, y1),
-                hpcBoundsAt(metaData, xm, y0),
-                hpcBoundsAt(metaData, xm, y1),
-                hpcBoundsAt(metaData, x0, ym),
-                hpcBoundsAt(metaData, x1, ym)
-        };
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY;
         double maxY = Double.NEGATIVE_INFINITY;
-        for (Vec2 sample : samples) {
-            minX = Math.min(minX, sample.x);
-            maxX = Math.max(maxX, sample.x);
-            minY = Math.min(minY, sample.y);
-            maxY = Math.max(maxY, sample.y);
-        }
+        double[] bounds = {minX, maxX, minY, maxY};
+        updateHpcBounds(bounds, context, x0, y0);
+        updateHpcBounds(bounds, context, x1, y0);
+        updateHpcBounds(bounds, context, x0, y1);
+        updateHpcBounds(bounds, context, x1, y1);
+        updateHpcBounds(bounds, context, xm, y0);
+        updateHpcBounds(bounds, context, xm, y1);
+        updateHpcBounds(bounds, context, x0, ym);
+        updateHpcBounds(bounds, context, x1, ym);
+        minX = bounds[0];
+        maxX = bounds[1];
+        minY = bounds[2];
+        maxY = bounds[3];
         return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
     }
 
-    private static Vec2 hpcBoundsAt(MetaData metaData, double x, double y) {
-        Vec3 plane = metaData.getCROTA().rotateVector(new Vec3(x, y, 0));
-        Vec2 helioprojective = inverseWcsPlaneToHpc(metaData, plane.x, plane.y);
-        return new Vec2(Math.toDegrees(helioprojective.x), Math.toDegrees(helioprojective.y));
+    private static void updateHpcBounds(double[] bounds, HpcInverseContext context, double x, double y) {
+        Vec3 plane = context.crota.rotateVector(new Vec3(x, y, 0));
+        Vec2 helioprojective = inverseWcsPlaneToHpc(context, plane.x, plane.y);
+        double hpcX = Math.toDegrees(helioprojective.x);
+        double hpcY = Math.toDegrees(helioprojective.y);
+        bounds[0] = Math.min(bounds[0], hpcX);
+        bounds[1] = Math.max(bounds[1], hpcX);
+        bounds[2] = Math.min(bounds[2], hpcY);
+        bounds[3] = Math.max(bounds[3], hpcY);
     }
 
-    private static Vec2 inverseWcsPlaneToHpc(MetaData metaData, double planeX, double planeY) {
-        double unitsPerRad = metaData.getWCSPlaneUnitsPerRad();
-        Vec2 crval = metaData.getCRVAL();
-        double phi0 = crval.x / unitsPerRad;
-        double theta0 = crval.y / unitsPerRad;
+    private static Vec2 inverseWcsPlaneToHpc(HpcInverseContext context, double planeX, double planeY) {
+        double unitsPerRad = context.unitsPerRad;
+        double phi0 = context.phi0;
+        double theta0 = context.theta0;
 
-        if (metaData.getWCSProjection() == MetaData.WCSProjection.AZP && Math.abs(metaData.getPV2()[2]) < 1e-6f) {
+        if (context.projection == MetaData.WCSProjection.AZP && Math.abs(context.pv2[2]) < 1e-6f) {
             double x = planeX / unitsPerRad;
             double y = planeY / unitsPerRad;
             double r = Math.sqrt(x * x + y * y);
             if (r == 0)
                 return new Vec2(phi0, theta0);
 
-            double mu = metaData.getPV2()[1];
+            double mu = context.pv2[1];
             double muPlus1 = mu + 1;
             double t;
             if (mu == 1) {
@@ -78,11 +81,11 @@ public class HpcUtils {
                     Math.asin(cosEta * Math.sin(theta0) + b * Math.cos(theta0)));
         }
 
-        if (metaData.getWCSProjection() == MetaData.WCSProjection.ZPN) {
+        if (context.projection == MetaData.WCSProjection.ZPN) {
             double x = planeX / unitsPerRad;
             double y = planeY / unitsPerRad;
             double radial = Math.sqrt(x * x + y * y);
-            double eta = inverseZpnPrimaryBranch(metaData.getPV2(), radial);
+            double eta = inverseZpnPrimaryBranch(context.pv2, radial);
             if (eta == 0)
                 return new Vec2(phi0, theta0);
 
@@ -107,6 +110,25 @@ public class HpcUtils {
         return new Vec2(
                 phi0 + Math.atan2(x * sinc, rho * Math.cos(theta0) * cosc - y * Math.sin(theta0) * sinc),
                 Math.asin(cosc * Math.sin(theta0) + y * sinc * Math.cos(theta0) / rho));
+    }
+
+    private static final class HpcInverseContext {
+        private final Quat crota;
+        private final MetaData.WCSProjection projection;
+        private final float[] pv2;
+        private final double unitsPerRad;
+        private final double phi0;
+        private final double theta0;
+
+        private HpcInverseContext(MetaData metaData) {
+            crota = metaData.getCROTA();
+            projection = metaData.getWCSProjection();
+            pv2 = metaData.getPV2();
+            unitsPerRad = metaData.getWCSPlaneUnitsPerRad();
+            Vec2 crval = metaData.getCRVAL();
+            phi0 = crval.x / unitsPerRad;
+            theta0 = crval.y / unitsPerRad;
+        }
     }
 
     private static double inverseZpnPrimaryBranch(float[] pv2, double radial) {
