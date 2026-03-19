@@ -10,7 +10,6 @@ import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
@@ -153,12 +152,44 @@ public enum ProjectionMode {
     protected abstract Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt);
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+        Vec2 current = projectMap(viewpoint, gridType, vertex);
         if (first)
-            GLHelper.emitProjectedMapVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, Colors.Null);
-        Vec2 current = GLHelper.emitProjectedMapVertex(viewpoint, gridType, vp, vertex, previous, vexBuf, color);
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        emitWrappedVertex(vp, previous, current, vexBuf, color);
         if (last)
-            GLHelper.emitProjectedMapVertex(viewpoint, gridType, vp, vertex, current, vexBuf, Colors.Null);
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
         return current;
+    }
+
+    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
+        if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
+            emitHorizontalWrap(vp, current, previous, vexBuf, color);
+        }
+        emitProjectedVertex(vp, current, vexBuf, color);
+    }
+
+    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, BufVertex vexBuf, byte[] color) {
+        float y = (float) current.y;
+        float x;
+        if (current.x <= 0 && previous.x >= 0) {
+            x = (float) (0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        } else if (current.x >= 0 && previous.x <= 0) {
+            x = (float) (-0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        }
+    }
+
+    private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
+        vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
     public Position projectionViewpoint(Position viewpoint) {

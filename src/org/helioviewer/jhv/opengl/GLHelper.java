@@ -2,14 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Point;
 
-import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.math.Vec3;
-
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -45,33 +37,6 @@ public class GLHelper {
 
     public static Point GL2AWTPoint(int x, int y) {
         return new Point((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
-    }
-
-    public static Vec2 emitProjectedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color) {
-        Vec2 tf = Display.mode.project(viewpoint, gridType, vertex);
-
-        float x;
-        float y = (float) tf.y;
-        if (previous != null && Math.abs(previous.x - tf.x) > 0.5) {
-            if (tf.x <= 0 && previous.x >= 0) {
-                x = (float) (0.5 * vp.aspect);
-                vexBuf.putVertex(x, y, 0, 1, color);
-                vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-
-                vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
-                vexBuf.putVertex(-x, y, 0, 1, color);
-            } else if (tf.x >= 0 && previous.x <= 0) {
-                x = (float) (-0.5 * vp.aspect);
-                vexBuf.putVertex(x, y, 0, 1, color);
-                vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-
-                vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
-                vexBuf.putVertex(-x, y, 0, 1, color);
-            }
-        }
-        x = (float) (tf.x * vp.aspect);
-        vexBuf.putVertex(x, y, 0, 1, color);
-        return tf;
     }
 
     public static GLCanvas createGLCanvas() {
