@@ -24,6 +24,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     private final Cache<Position, BufVertex> cache = Caffeine.newBuilder().softValues().build();
     private final Set<Position> pending = new HashSet<>();
     private final GLSLShape points = new GLSLShape(true);
+    private BufVertex uploadedBuf;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -63,7 +64,10 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
         if (buf == null)
             return;
 
-        points.setVertexRepeatable(gl, buf);
+        if (buf != uploadedBuf) {
+            points.setVertexRepeatable(gl, buf);
+            uploadedBuf = buf;
+        }
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
@@ -88,6 +92,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
 
     @Override
     public void dispose(GL3 gl) {
+        uploadedBuf = null;
         points.dispose(gl);
     }
 
