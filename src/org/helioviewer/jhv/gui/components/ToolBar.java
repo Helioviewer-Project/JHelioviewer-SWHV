@@ -141,6 +141,11 @@ public final class ToolBar extends JToolBar {
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                maybeShowPopup(e);
+            }
         });
 
         try {

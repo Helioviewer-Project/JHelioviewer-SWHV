@@ -141,10 +141,12 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        maybeCopyToClipboard(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        maybeCopyToClipboard(e);
     }
 
     @Override
@@ -157,7 +159,11 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON3)
+        maybeCopyToClipboard(e);
+    }
+
+    private void maybeCopyToClipboard(MouseEvent e) {
+        if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
             JHVTransferHandler.getInstance().toClipboard(camera.getViewpoint().time.toString() + getText());
     }
 
