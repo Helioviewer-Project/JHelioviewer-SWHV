@@ -2,7 +2,6 @@ package org.helioviewer.jhv.layers.stars;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -220,7 +219,13 @@ public class GaiaClient {
 // --Commented out by Inspection STOP (23/06/2024, 23:15)
 
     private static final LoadingCache<String, List<Star>> starCache = Caffeine.newBuilder().maximumSize(1000)
-            .build(adql -> requestStars(adql));
+            .build(adql -> {
+                try {
+                    return requestStars(adql);
+                } catch (Exception e) {
+                    throw new RuntimeException("Gaia query failed for " + adql, e);
+                }
+            });
 
     private static final UriTemplate queryTemplate = new UriTemplate("https://gea.esac.esa.int/tap-server/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "fits"));
@@ -230,7 +235,7 @@ public class GaiaClient {
                 String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%d,%d,%d)) AND phot_g_mean_mag<%d", ra, dec, cone, mag);
     }
 
-    private static List<Star> requestStars(String adql) {
+    private static List<Star> requestStars(String adql) throws Exception {
         String uri = queryTemplate.expand(UriTemplate.vars().set("QUERY", adql));
         try (NetClient nc = NetClient.of(new URI(uri));
              StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new FitsTableBuilder())) {
@@ -260,10 +265,7 @@ public class GaiaClient {
             }
             Log.info("Found " + stars.size() + " stars with " + adql);
             return stars;
-        } catch (Exception e) {
-            Log.error(adql + e);
         }
-        return Collections.emptyList();
     }
 
     private record Query(Position viewpoint) implements Callable<BufVertex> {
