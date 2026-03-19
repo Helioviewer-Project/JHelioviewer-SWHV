@@ -25,6 +25,7 @@ import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.GridType;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
@@ -180,41 +181,80 @@ public final class GridLayer extends AbstractLayer {
         int pixelsPerSolarRadius = (int) (textScale * CameraHelper.getPixelFactor(camera, vp));
         drawGridFlat(gl, vp);
         if (showLabels) {
-            drawGridTextFlat(pixelsPerSolarRadius, Display.mode.scale, vp);
+            drawGridTextFlat(pixelsPerSolarRadius, vp);
         }
     }
 
     private double previousAspect = -1;
+    private ProjectionMode previousFlatMode;
+    private GridType previousFlatGridType;
+    private GridMath.AxisSignature previousFlatXSignature;
+    private GridMath.AxisSignature previousFlatYSignature;
+
+    private double[] flatGridXPositions = new double[0];
+    private double[] flatGridYPositions = new double[0];
+    private double[] flatGridXLabels = new double[0];
+    private double[] flatGridYLabels = new double[0];
 
     private void drawGridFlat(GL3 gl, Viewport vp) {
-        if (previousAspect != vp.aspect) {
-            GridMath.initFlatGrid(gl, flatLine, vp.aspect);
+        GridScale scale = Display.mode.scale;
+        boolean angularVertical = isAngularFlatVerticalAxis();
+        double xStart = scale.getInterpolatedXValue(0);
+        double xStop = scale.getInterpolatedXValue(1);
+        double yStart = scale.getInterpolatedYValue(0);
+        double yStop = scale.getInterpolatedYValue(1);
+        GridMath.AxisSignature xSignature = GridMath.buildFlatAxisSignature(true, xStart, xStop);
+        GridMath.AxisSignature ySignature = GridMath.buildFlatAxisSignature(angularVertical, yStart, yStop);
+        if (needsFlatGridRebuild(vp, xSignature, ySignature)) {
+            boolean wrap0to360 = Display.gridType == GridType.Carrington;
+            GridMath.FlatAxis xAxis = GridMath.buildFlatAxis(scale, true, wrap0to360, xSignature);
+            GridMath.FlatAxis yAxis = GridMath.buildFlatAxis(scale, false, false, ySignature);
+            flatGridXPositions = xAxis.positions();
+            flatGridYPositions = yAxis.positions();
+            flatGridXLabels = xAxis.labels();
+            flatGridYLabels = yAxis.labels();
+            GridMath.initFlatGrid(gl, flatLine, vp.aspect, flatGridXPositions, flatGridYPositions);
             previousAspect = vp.aspect;
+            previousFlatMode = Display.mode;
+            previousFlatGridType = Display.gridType;
+            previousFlatXSignature = xSignature;
+            previousFlatYSignature = ySignature;
         }
         flatLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
 
-    private static void drawGridTextFlat(int size, GridScale scale, Viewport vp) {
+    private static boolean isAngularFlatVerticalAxis() {
+        return Display.mode == ProjectionMode.HPC || Display.mode == ProjectionMode.Latitudinal;
+    }
+
+    private boolean needsFlatGridRebuild(Viewport vp, GridMath.AxisSignature xSignature, GridMath.AxisSignature ySignature) {
+        return previousAspect != vp.aspect ||
+                previousFlatMode != Display.mode ||
+                previousFlatGridType != Display.gridType ||
+                !Objects.equals(previousFlatXSignature, xSignature) ||
+                !Objects.equals(previousFlatYSignature, ySignature);
+    }
+
+    private void drawGridTextFlat(int size, Viewport vp) {
         float w = (float) vp.aspect;
         float h = 1;
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
-        float textScaleFactor = textScale / renderer.getFont().getSize2D() * w / GridMath.FLAT_STEPS_THETA * 5;
+        float textScaleFactor = 0.3f * textScale / renderer.getFont().getSize2D();
 
         renderer.begin3DRendering();
         {
-            for (int i = 0; i <= GridMath.FLAT_STEPS_THETA; i++) {
-                if (i == GridMath.FLAT_STEPS_THETA / 2) {
+            for (int i = 0; i < flatGridXLabels.length; i++) {
+                if (Math.abs(flatGridXPositions[i]) < 1e-9) {
                     continue;
                 }
-                double lon = scale.getInterpolatedXValue(1. / GridMath.FLAT_STEPS_THETA * i, Display.gridType);
-                String txt = formatter2.format(lon);
-                float x = i / (float) GridMath.FLAT_STEPS_THETA - 0.5f;
+                String txt = formatter2.format(flatGridXLabels[i]);
+                float x = (float) flatGridXPositions[i];
                 renderer.draw3D(txt, w * x, 0, 0, textScaleFactor);
             }
-            for (int i = 0; i <= GridMath.FLAT_STEPS_RADIAL; i++) {
-                String txt = formatter2.format(scale.getInterpolatedYValue(1. / GridMath.FLAT_STEPS_RADIAL * i));
-                float y = i / (float) GridMath.FLAT_STEPS_RADIAL - 0.5f;
+            for (int i = 0; i < flatGridYLabels.length; i++) {
+                String txt = formatter2.format(flatGridYLabels[i]);
+                float y = (float) flatGridYPositions[i];
                 renderer.draw3D(txt, 0, h * y, 0, textScaleFactor);
             }
         }

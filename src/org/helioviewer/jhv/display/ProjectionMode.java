@@ -168,7 +168,7 @@ public enum ProjectionMode {
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
         Vec2 pt = mouseToViewPlane(camera, vp, x, y);
         return new Vec2(
-                scale.getInterpolatedXValue(pt.x + 0.5, gridType),
+                scale.getInterpolatedXDisplayValue(pt.x + 0.5, gridType),
                 scale.getInterpolatedYValue(pt.y + 0.5));
     }
 
