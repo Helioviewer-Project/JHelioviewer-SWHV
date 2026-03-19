@@ -49,6 +49,8 @@ public class GaiaClient {
 
     public interface Receiver {
         void setStars(Position viewpoint, BufVertex pointBuf);
+
+        void setStarsFailed(Position viewpoint);
     }
 
     private static final float SIZE_STAR = 0.08f;
@@ -289,6 +291,7 @@ public class GaiaClient {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
+            receiver.setStarsFailed(viewpoint);
             Log.error(t);
             Message.err("An error occurred querying the server", t.getMessage());
         }
