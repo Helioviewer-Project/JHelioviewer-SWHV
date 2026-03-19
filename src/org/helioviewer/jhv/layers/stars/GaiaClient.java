@@ -36,10 +36,13 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.FutureCallback;
 
-public class GaiaClient {
+public final class GaiaClient {
 
     static {
         Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING); // shut-up info logs
+    }
+
+    private GaiaClient() {
     }
 
     public static void submitSearch(Receiver receiver, Position viewpoint) {
@@ -243,15 +246,16 @@ public class GaiaClient {
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
                     try {
+                        Object[] row = rseq.getRow();
                         // https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/sec_dm_main_source_catalogue/ssec_dm_gaia_source.html
-                        long source_id = ((Number) rseq.getCell(0)).longValue();
-                        double ra = Math.toRadians(((Number) rseq.getCell(1)).doubleValue()); // [rad]
-                        double dec = Math.toRadians(((Number) rseq.getCell(2)).doubleValue()); // [rad]
-                        double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
-                        double pmdec = Math.toRadians(((Number) rseq.getCell(4)).doubleValue() / (1000. * 3600.)); // [rad/yr]
-                        double px = ((Number) rseq.getCell(5)).doubleValue() / 1000.; // [arcsec]
-                        double rv = ((Number) rseq.getCell(6)).doubleValue(); // [km/s]
-                        double mag = ((Number) rseq.getCell(7)).doubleValue();
+                        long source_id = ((Number) row[0]).longValue();
+                        double ra = Math.toRadians(((Number) row[1]).doubleValue()); // [rad]
+                        double dec = Math.toRadians(((Number) row[2]).doubleValue()); // [rad]
+                        double pmra = Math.toRadians(((Number) row[3]).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
+                        double pmdec = Math.toRadians(((Number) row[4]).doubleValue() / (1000. * 3600.)); // [rad/yr]
+                        double px = ((Number) row[5]).doubleValue() / 1000.; // [arcsec]
+                        double rv = ((Number) row[6]).doubleValue(); // [km/s]
+                        double mag = ((Number) row[7]).doubleValue();
 
                         pmra = Double.isFinite(pmra) ? pmra : 0;
                         pmdec = Double.isFinite(pmdec) ? pmdec : 0;
