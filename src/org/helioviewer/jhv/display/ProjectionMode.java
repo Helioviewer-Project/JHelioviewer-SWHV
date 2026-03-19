@@ -152,7 +152,7 @@ public enum ProjectionMode {
         return unprojectMap(viewpoint, gridType, pt);
     }
 
-    public final Vec2 projectToScreenCoords(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
+    public final Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
         Vec2 projected = projectMap(viewpoint, gridType, v);
         return new Vec2(projected.x * vp.aspect, projected.y);
     }
@@ -172,7 +172,7 @@ public enum ProjectionMode {
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
-        Vec2 projected = projectToScreenCoords(viewpoint, gridType, vp, vertex);
+        Vec2 projected = projectToScreen(viewpoint, gridType, vp, vertex);
         vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
     }
 
@@ -212,13 +212,13 @@ public enum ProjectionMode {
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        Vec2 pt = mouseToViewPlane(camera, vp, x, y);
+        Vec2 pt = mouseToScreen(camera, vp, x, y);
         return new Vec2(
                 scale.getInterpolatedXDisplayValue(pt.x + 0.5, gridType),
                 scale.getInterpolatedYValue(pt.y + 0.5));
     }
 
-    public Vec2 mouseToViewPlane(Camera camera, Viewport vp, int x, int y) {
+    public Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
         double gx = CameraHelper.computeUpX(camera, vp, x) / vp.aspect;
         double gy = CameraHelper.computeUpY(camera, vp, y);
         return new Vec2(gx, gy);
