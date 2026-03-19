@@ -19,7 +19,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
@@ -121,15 +120,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private static void putConnectivity(Position viewpoint, Viewport vp, List<Vec3> points, BufVertex vexBuf, byte[] color) {
-        if (Display.mode == ProjectionMode.Orthographic)
-            points.forEach(v -> {
-                vexBuf.putVertex((float) (ORTHO_RADIUS * v.x), (float) (ORTHO_RADIUS * v.y), (float) (ORTHO_RADIUS * v.z), 2 * SIZE_POINT, color);
-            });
-        else
-            points.forEach(v -> {
-                Vec2 tf = Display.mode.projectToScreenCoords(viewpoint, Display.gridType, vp, v);
-                vexBuf.putVertex((float) tf.x, (float) tf.y, 0, SIZE_POINT, color);
-            });
+        points.forEach(v -> Display.mode.emitMapPoint(viewpoint, Display.gridType, vp, v, vexBuf, color, 2 * SIZE_POINT, ORTHO_RADIUS));
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
