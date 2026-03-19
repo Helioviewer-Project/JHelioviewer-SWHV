@@ -45,7 +45,7 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
             return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
         }
 
@@ -178,7 +178,7 @@ public enum ProjectionMode {
         return new Vec2(gx, gy);
     }
 
-    public Vec3 unprojectMouse(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+    public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
         return unproject(camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
     }
 

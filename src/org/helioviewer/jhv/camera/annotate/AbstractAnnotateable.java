@@ -67,8 +67,8 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    static Vec3 computePointSun(Camera camera, Viewport vp, int x, int y) {
-        return Display.mode.unprojectMouse(camera, vp, x, y, Display.gridType);
+    static Vec3 computePointSurface(Camera camera, Viewport vp, int x, int y) {
+        return Display.mode.unprojectSurfacePoint(camera, vp, x, y, Display.gridType);
     }
 
     @Nullable
