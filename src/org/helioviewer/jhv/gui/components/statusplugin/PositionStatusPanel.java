@@ -140,16 +140,6 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeCopyToClipboard(e);
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        maybeCopyToClipboard(e);
-    }
-
-    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
@@ -159,6 +149,16 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        maybeCopyToClipboard(e);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        maybeCopyToClipboard(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
         maybeCopyToClipboard(e);
     }
 

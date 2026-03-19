@@ -2,7 +2,9 @@ package org.helioviewer.jhv.display;
 
 public interface GridScale {
 
-    double getInterpolatedXValue(double v, GridType gridType);
+    double getInterpolatedXDisplayValue(double v, GridType gridType);
+
+    double getInterpolatedXValue(double v);
 
     double getInterpolatedYValue(double v);
 
@@ -46,7 +48,12 @@ public interface GridScale {
         }
 
         @Override
-        public double getInterpolatedXValue(double v, GridType gridType) {
+        public double getInterpolatedXDisplayValue(double v, GridType gridType) {
+            return getInterpolatedXValue(v);
+        }
+
+        @Override
+        public double getInterpolatedXValue(double v) {
             return invScaleX(xStart + v * (xStop - xStart));
         }
 
@@ -148,8 +155,8 @@ public interface GridScale {
         }
 
         @Override
-        public double getInterpolatedXValue(double v, GridType gridType) {
-            double ix = super.getInterpolatedXValue(v, gridType);
+        public double getInterpolatedXDisplayValue(double v, GridType gridType) {
+            double ix = getInterpolatedXValue(v);
             if (gridType == GridType.Carrington && ix < 0)
                 ix += 360;
             return ix;
