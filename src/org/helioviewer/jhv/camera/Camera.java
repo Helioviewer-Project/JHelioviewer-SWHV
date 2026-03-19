@@ -5,7 +5,6 @@ import java.util.HashSet;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
@@ -77,8 +76,7 @@ public class Camera {
     /// /
 
     private void updateCamera(JHVTime time) {
-        Position v = updateViewpoint.update(time);
-        viewpoint = Display.mode.projectionViewpoint(v);
+        viewpoint = updateViewpoint.update(time);
         updateRotation();
         updateWidth();
         //listeners.forEach(l -> l.viewpointChanged(viewpoint));

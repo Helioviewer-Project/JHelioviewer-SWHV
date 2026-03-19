@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -41,11 +40,6 @@ public enum ProjectionMode {
         @Override
         public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), (float) size, color);
-        }
-
-        @Override
-        public Position projectionViewpoint(Position viewpoint) {
-            return viewpoint;
         }
 
         @Override
@@ -90,16 +84,8 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Position projectionViewpoint(Position viewpoint) {
-            return viewpoint;
-        }
-
-        @Override
         public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-            return new Vec3(
-                    CameraHelper.computeUpX(camera, vp, x),
-                    CameraHelper.computeUpY(camera, vp, y),
-                    0);
+            return new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
         }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
@@ -205,10 +191,6 @@ public enum ProjectionMode {
 
     private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
-    }
-
-    public Position projectionViewpoint(Position viewpoint) {
-        return new Position(viewpoint.time, Sun.MeanEarthDistance, viewpoint.lon, viewpoint.lat);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
