@@ -5,7 +5,6 @@ import org.helioviewer.jhv.camera.Camera;
 
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.opengl.GLListener;
 
 public class Display {
 
@@ -14,7 +13,6 @@ public class Display {
 
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
-        GLListener.resetHpcScaleBounds();
         //CameraHelper.zoomToFit(miniCamera);
         miniCamera.reset();
         camera.reset();

@@ -106,19 +106,20 @@ public class ImageLayers {
         return size;
     }
 
-    public static Region getLargestHpcBoundsDegrees() {
+    public static Region getLargestHpcBounds() {
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY;
         double maxY = Double.NEGATIVE_INFINITY;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled()) {
-                Region bounds = HpcUtils.hpcBoundsDegrees(layer.getMetaData());
-                minX = Math.min(minX, bounds.llx);
-                maxX = Math.max(maxX, bounds.urx);
-                minY = Math.min(minY, bounds.lly);
-                maxY = Math.max(maxY, bounds.ury);
-            }
+            if (!layer.isEnabled())
+                continue;
+
+            Region bounds = HpcUtils.hpcBounds(layer.getMetaData());
+            minX = Math.min(minX, bounds.llx);
+            maxX = Math.max(maxX, bounds.urx);
+            minY = Math.min(minY, bounds.lly);
+            maxY = Math.max(maxY, bounds.ury);
         }
         if (!Double.isFinite(minX) || !Double.isFinite(maxX) || !Double.isFinite(minY) || !Double.isFinite(maxY))
             return new Region(-5, -5, 10, 10);
