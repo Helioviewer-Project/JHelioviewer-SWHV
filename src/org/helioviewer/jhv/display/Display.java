@@ -53,7 +53,6 @@ public class Display {
         if (!multiview)
             return viewports[0];
 
-        int len = viewports.length;
         for (Viewport viewport : viewports) {
             if (viewport.contains(x, y)) {
                 return viewport;
