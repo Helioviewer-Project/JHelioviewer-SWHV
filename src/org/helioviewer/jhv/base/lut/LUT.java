@@ -6,8 +6,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.Nullable;
@@ -29,6 +31,13 @@ public record LUT(String name, int[] lut8) {
 
     private record ColorRule(@Nullable String observatory, @Nullable String instrument, @Nullable String detector,
                              @Nullable String measurement, LUT lut) {
+        private ColorRule {
+            observatory = normalize(observatory);
+            instrument = normalize(instrument);
+            detector = normalize(detector);
+            measurement = normalize(measurement);
+        }
+
         boolean matches(HelioviewerMetaData meta) {
             return matches(observatory, meta.getObservatory())
                     && matches(instrument, meta.getInstrument())
@@ -39,10 +48,15 @@ public record LUT(String name, int[] lut8) {
         private static boolean matches(@Nullable String expected, @Nullable String actual) {
             return expected == null || expected.equalsIgnoreCase(actual);
         }
+
+        @Nullable
+        private static String normalize(@Nullable String value) {
+            return value == null || value.isBlank() ? null : value;
+        }
     }
 
-    private static final Map<String, LUT> standardList = loadStandardLuts();
-    private static final List<ColorRule> colorRules = readColors(standardList);
+    private static final Map<String, LUT> standardLuts = loadStandardLuts();
+    private static final List<ColorRule> colorRules = readColorRules(standardLuts);
 
     public int[] lut8Inv() {
         int len = lut8.length;
@@ -77,54 +91,58 @@ public record LUT(String name, int[] lut8) {
         return new LUT(gg.getName(), lut8);
     }
 
-    private static List<ColorRule> readColors(Map<String, LUT> standardList) {
+    private static List<ColorRule> readColorRules(Map<String, LUT> standardLuts) {
         try (InputStream is = FileUtils.getResource("/settings/colors.js");
              BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             JSONArray rules = new JSONArray(new JSONTokener(in));
-            List<ColorRule> parsedRules = new ArrayList<>(rules.length());
+            Set<ColorRule> parsedRules = new LinkedHashSet<>(rules.length());
             for (int i = 0; i < rules.length(); ++i) {
                 try {
                     JSONObject rule = rules.getJSONObject(i);
                     String colorName = rule.getString("color");
-                    LUT lut = standardList.get(colorName);
+                    LUT lut = standardLuts.get(colorName);
                     if (lut == null) {
                         Log.warn("Rule " + i + " for the default color table references missing LUT " + colorName);
                         continue;
                     }
-                    parsedRules.add(new ColorRule(
+                    ColorRule colorRule = new ColorRule(
                             rule.optString("observatory", null),
                             rule.optString("instrument", null),
                             rule.optString("detector", null),
                             rule.optString("measurement", null),
-                            lut));
+                            lut);
+                    if (!parsedRules.add(colorRule)) {
+                        Log.warn("Ignoring duplicate default color rule " + i);
+                    }
                 } catch (JSONException e) {
                     Log.warn("Rule " + i + " for the default color table is invalid", e);
                 }
             }
-            return parsedRules;
+            return new ArrayList<>(parsedRules);
         } catch (IOException | JSONException e) {
             Log.warn("Error reading the configuration for the default color tables", e);
             return List.of();
         }
     }
 
-    public static String[] names() {
-        return standardList.keySet().toArray(String[]::new);
-    }
-
-    @Nullable
-    public static LUT get(String name) {
-        return standardList.get(name);
-    }
-
     @Nonnull
     public static LUT gray() { // invariant default for images
-        return standardList.get("Gray");
+        return standardLuts.get("Gray");
     }
 
     @Nonnull
     public static LUT spectral() { // invariant default for radio
-        return standardList.get("Spectral");
+        return standardLuts.get("Spectral");
+    }
+
+    @Nonnull
+    public static String[] names() {
+        return standardLuts.keySet().toArray(String[]::new);
+    }
+
+    @Nullable
+    public static LUT get(String name) {
+        return standardLuts.get(name);
     }
 
     @Nullable
