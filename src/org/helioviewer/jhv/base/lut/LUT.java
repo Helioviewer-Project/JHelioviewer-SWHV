@@ -82,6 +82,10 @@ public record LUT(String name, int[] lut8) {
         return standardList.get(name);
     }
 
+    public static LUT gray() {
+        return standardList.get("Gray");
+    }
+
     @Nullable
     public static LUT get(HelioviewerMetaData hvMetaData) {
         int length = colorRules.length();
