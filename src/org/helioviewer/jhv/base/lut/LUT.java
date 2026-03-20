@@ -77,8 +77,12 @@ public record LUT(String name, int[] lut8) {
         return standardList.get(name);
     }
 
-    public static LUT gray() {
+    public static LUT gray() { // invariant default for images
         return standardList.get("Gray");
+    }
+
+    public static LUT spectral() { // invariant default for radio
+        return standardList.get("Spectral");
     }
 
     @Nullable
