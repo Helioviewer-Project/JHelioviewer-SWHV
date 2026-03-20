@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
@@ -30,12 +29,12 @@ public record LUT(String name, int[] lut8) {
         return inv;
     }
 
-    private static final TreeMap<String, LUT> standardList = new TreeMap<>(JHVGlobals.alphanumComparator);
+    private static final TreeMap<String, LUT> standardList;
     // List of rules to apply
     private static JSONArray colorRules;
 
     static {
-        LUTData.loadStandardLuts();
+        standardList = LUTReader.read("/data/standard-luts.txt");
 
         // From the resources
         String[] ggrFiles = {"AIA94", "AIA131", "AIA171", "AIA193", "AIA211", "AIA304", "AIA335", "AIA1600", "AIA1700", "AIA4500"};
@@ -58,10 +57,6 @@ public record LUT(String name, int[] lut8) {
             lut8[i] = gg.getGradientColor(i / 255.);
         }
         return new LUT(gg.getName(), lut8);
-    }
-
-    static void addStdLut(String name, int... lookup8) {
-        standardList.put(name, new LUT(name, lookup8));
     }
 
     private static void readColors() {
