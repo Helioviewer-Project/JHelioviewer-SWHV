@@ -81,7 +81,7 @@ final class LUTReader {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String name = null;
             int nameLine = 0;
-            ArrayList<String> dataLines = new ArrayList<>();
+            List<String> dataLines = new ArrayList<>();
             String line;
             int lineNo = 0;
 
@@ -137,7 +137,7 @@ final class LUTReader {
         }
 
         try {
-            ArrayList<Integer> data = new ArrayList<>(256);
+            List<Integer> data = new ArrayList<>(256);
             for (int i = 0; i < dataLines.size(); i++) {
                 parseDataLine(dataLines.get(i), data, nameLine + i + 1);
             }
@@ -153,7 +153,7 @@ final class LUTReader {
         }
     }
 
-    private static void parseDataLine(String line, ArrayList<Integer> data, int lineNo) throws IOException {
+    private static void parseDataLine(String line, List<Integer> data, int lineNo) throws IOException {
         String[] parts = Regex.Comma.split(line);
         for (String part : parts) {
             String value = part.trim();
