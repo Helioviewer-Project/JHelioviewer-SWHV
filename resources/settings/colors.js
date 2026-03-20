@@ -12,10 +12,16 @@
   "color":"STEREO EUVI 304 Å"},
  {"instrument":"SECCHI",
   "detector": "COR1", 
-  "color":"Red Temperature"},
+  "color":"STEREO COR1"},
  {"instrument":"SECCHI",
   "detector": "COR2", 
   "color":"Red Temperature"},
+ {"instrument":"SECCHI",
+  "detector": "HI1", 
+  "color":"STEREO HI1"},
+ {"instrument":"SECCHI",
+  "detector": "HI2", 
+  "color":"STEREO HI2"},
 
  {"instrument":"EIT",
   "measurement":"171",
@@ -141,11 +147,23 @@
 
  {"instrument":"CCOR1",
   "color":"CCOR"},
+
+ {"instrument":"WFI-1",
+  "color":"PUNCH"},
+ {"instrument":"WFI-2",
+  "color":"PUNCH"},
+ {"instrument":"WFI-3",
+  "color":"PUNCH"},
+ {"instrument":"NFI-0",
+  "color":"PUNCH"},
+
 ]
 
 // {"instrument":"SJI",
 //  "measurement":"1600",
 //  "color":"IRIS SJI 1600 Å"},
+
+// STEREO COR2 colormap bleeds too much white
 
 // Configuration about the used default color tables
 // This must be an array and the fist matching rule will be used
