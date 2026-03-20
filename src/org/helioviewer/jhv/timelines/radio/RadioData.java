@@ -63,17 +63,17 @@ public final class RadioData extends AbstractTimelineLayer {
     private static IndexColorModel colorModel;
 
     public RadioData(JSONObject jo) {
-        String cm = "Spectral";
+        LUT lut = LUT.get("Spectral");
         if (jo != null) {
-            cm = jo.optString("colormap", cm);
-            if (LUT.get(cm) == null)
-                cm = "Spectral";
+            lut = LUT.get(jo.optString("colormap", lut.name()));
         }
+        if (lut == null)
+            lut = LUT.gray();
 
-        colorModel = createIndexColorModelFromLUT(LUT.get(cm));
+        colorModel = createIndexColorModelFromLUT(lut);
 
         lutCombo = new LUTComboBox();
-        lutCombo.setSelectedItem(cm);
+        lutCombo.setSelectedItem(lut.name());
         lutCombo.addActionListener(e -> setLUT(lutCombo.getLUT()));
         optionsPanel = optionsPanel(lutCombo);
 
