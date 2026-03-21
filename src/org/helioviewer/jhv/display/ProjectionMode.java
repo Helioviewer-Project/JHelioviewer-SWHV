@@ -2,6 +2,7 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -10,7 +11,12 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
 // through an explicit map basis shared by rendering and mouse unprojection.
 public enum ProjectionMode {
-    Orthographic(GLSLSolarShader.ortho, GridScale.ortho, NonOrthoProjection.Kind.NONE) {
+    Orthographic(GLSLSolarShader.ortho, GridScale.ortho, null) {
+        @Override
+        public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
+            throw new UnsupportedOperationException("Orthographic mode does not use projectToScreen()");
+        }
+
         @Override
         public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
             return OrthoProjection.emitMapVertex(vertex, previous, vexBuf, color, first, last, radius);
@@ -22,6 +28,11 @@ public enum ProjectionMode {
         }
 
         @Override
+        public Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
+            throw new UnsupportedOperationException("Orthographic mode does not use non-ortho mouseToScreen()");
+        }
+
+        @Override
         public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
             return OrthoProjection.unprojectSurfacePoint(camera, vp, x, y);
         }
@@ -29,6 +40,11 @@ public enum ProjectionMode {
         @Override
         public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
             return OrthoProjection.mouseToGrid(camera, vp, x, y, gridType);
+        }
+
+        @Override
+        public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+            return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
         }
     },
     HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoProjection.Kind.HPC),
@@ -46,7 +62,7 @@ public enum ProjectionMode {
         nonOrthoKind = _nonOrthoKind;
     }
 
-    public final Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
+    public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
         return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
     }
 
