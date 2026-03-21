@@ -79,21 +79,14 @@ final class NonOrthoProjection {
         return new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
     }
 
-    static Vec2 emitWrappedMapVertex(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+    static Vec2 emitMapVertex(ProjectionMode.NonOrthoKind kind, ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
         Vec2 current = mode.project(viewpoint, gridType, vertex);
         if (first)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        emitWrappedVertex(vp, previous, current, vexBuf, color);
-        if (last)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        return current;
-    }
-
-    static Vec2 emitUnwrappedMapVertex(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
-        Vec2 current = mode.project(viewpoint, gridType, vertex);
-        if (first)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        emitProjectedVertex(vp, current, vexBuf, color);
+        if (kind == ProjectionMode.NonOrthoKind.HPC)
+            emitProjectedVertex(vp, current, vexBuf, color);
+        else
+            emitWrappedVertex(vp, previous, current, vexBuf, color);
         if (last)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
         return current;
