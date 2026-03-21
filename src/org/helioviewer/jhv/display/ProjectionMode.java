@@ -210,7 +210,7 @@ public enum ProjectionMode {
         return unproject(camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
     }
 
-    public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return null;
+    public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) { // doesn't work well for Lati/*Polar
+        return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
     }
 }
