@@ -4,7 +4,6 @@ import java.nio.Buffer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment;
