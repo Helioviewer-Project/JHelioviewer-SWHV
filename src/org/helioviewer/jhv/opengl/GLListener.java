@@ -194,7 +194,7 @@ public class GLListener implements GLEventListener {
         if (Movie.isRecording())
             ExportMovie.handleMovieExport(camera, gl);
 
-        if (Display.mode == ProjectionMode.Orthographic) {
+        if (Display.mode.isOrthographic()) {
             renderScene(camera, gl);
             renderMiniview(gl);
         } else
