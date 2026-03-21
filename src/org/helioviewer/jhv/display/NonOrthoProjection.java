@@ -119,7 +119,7 @@ final class NonOrthoProjection {
         return new Vec2(gx, gy);
     }
 
-    static Vec2 mouseToGrid(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+    static Vec2 mouseToGrid(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
         Vec2 pt = mouseToScreen(camera, vp, x, y);
         return new Vec2(
                 scale.getInterpolatedXDisplayValue(pt.x + 0.5, gridType),

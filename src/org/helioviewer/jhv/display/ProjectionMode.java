@@ -78,7 +78,7 @@ public enum ProjectionMode {
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return NonOrthoProjection.mouseToGrid(nonOrthoKind, scale, camera, vp, x, y, gridType);
+        return NonOrthoProjection.mouseToGrid(scale, camera, vp, x, y, gridType);
     }
 
     public Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
