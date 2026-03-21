@@ -117,6 +117,19 @@ final class NonOrthoProjection {
         };
     }
 
+    static Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
+        double gx = CameraHelper.computeUpX(camera, vp, x) / vp.aspect;
+        double gy = CameraHelper.computeUpY(camera, vp, y);
+        return new Vec2(gx, gy);
+    }
+
+    static Vec2 mouseToGrid(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        Vec2 pt = mouseToScreen(camera, vp, x, y);
+        return new Vec2(
+                scale.getInterpolatedXDisplayValue(pt.x + 0.5, gridType),
+                scale.getInterpolatedYValue(pt.y + 0.5));
+    }
+
     private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
         double longitude = Math.toRadians(pt.x);
         double latitude = Math.toRadians(pt.y);

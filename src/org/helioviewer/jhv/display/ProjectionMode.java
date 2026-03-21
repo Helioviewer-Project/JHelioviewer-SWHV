@@ -2,7 +2,6 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -60,16 +59,11 @@ public enum ProjectionMode {
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        Vec2 pt = mouseToScreen(camera, vp, x, y);
-        return new Vec2(
-                scale.getInterpolatedXDisplayValue(pt.x + 0.5, gridType),
-                scale.getInterpolatedYValue(pt.y + 0.5));
+        return NonOrthoProjection.mouseToGrid(nonOrthoKind, scale, camera, vp, x, y, gridType);
     }
 
     public Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
-        double gx = CameraHelper.computeUpX(camera, vp, x) / vp.aspect;
-        double gy = CameraHelper.computeUpY(camera, vp, y);
-        return new Vec2(gx, gy);
+        return NonOrthoProjection.mouseToScreen(camera, vp, x, y);
     }
 
     public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
