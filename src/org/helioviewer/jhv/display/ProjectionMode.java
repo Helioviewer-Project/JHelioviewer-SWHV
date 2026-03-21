@@ -73,10 +73,6 @@ public enum ProjectionMode {
             return NonOrthoProjection.emitUnwrappedMapVertex(this, viewpoint, gridType, vp, vertex, vexBuf, color, first, last);
         }
 
-        @Override
-        public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-            return new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
-        }
     },
     Latitudinal(GLSLSolarShader.lati, GridScale.lati, NonOrthoKind.LATITUDINAL),
     LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, NonOrthoKind.POLAR),
@@ -145,6 +141,6 @@ public enum ProjectionMode {
     }
 
     public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) { // doesn't work well for Lati/*Polar
-        return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+        return NonOrthoProjection.unprojectDisplayPoint(nonOrthoKind, camera, vp, x, y);
     }
 }

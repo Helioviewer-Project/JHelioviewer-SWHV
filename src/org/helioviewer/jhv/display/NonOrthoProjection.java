@@ -2,6 +2,8 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
@@ -105,6 +107,14 @@ final class NonOrthoProjection {
     static void emitMapPoint(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
         Vec2 projected = projectToScreen(mode, viewpoint, gridType, vp, vertex);
         vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
+    }
+
+    static Vec3 unprojectDisplayPoint(ProjectionMode.NonOrthoKind kind, Camera camera, Viewport vp, int x, int y) {
+        return switch (kind) {
+            case HPC -> new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
+            case LATITUDINAL, POLAR -> CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use non-ortho display unprojection()");
+        };
     }
 
     private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
