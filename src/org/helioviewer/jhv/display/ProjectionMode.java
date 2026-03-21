@@ -16,16 +16,6 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, GridScale.ortho, NonOrthoKind.NONE) {
         @Override
-        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
-            throw new UnsupportedOperationException("Orthographic mode does not use project()");
-        }
-
-        @Override
-        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
-            throw new UnsupportedOperationException("Orthographic mode does not use unproject()");
-        }
-
-        @Override
         public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
             if (first) {
                 vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
@@ -101,11 +91,11 @@ public enum ProjectionMode {
         return NonOrthoProjection.projectToScreen(this, viewpoint, gridType, vp, v);
     }
 
-    protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
+    private Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
         return NonOrthoProjection.project(nonOrthoKind, viewpoint, gridType, v, scale);
     }
 
-    protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
+    private Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
         return NonOrthoProjection.unproject(nonOrthoKind, viewpoint, gridType, pt);
     }
 
