@@ -14,7 +14,6 @@ import org.helioviewer.jhv.opengl.BufVertex;
 final class NonOrthoProjection {
 
     enum Kind {
-        NONE,
         HPC,
         LATITUDINAL,
         POLAR
@@ -25,7 +24,6 @@ final class NonOrthoProjection {
 
     static Vec2 project(Kind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return switch (kind) {
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use non-ortho projection()");
             case HPC -> projectHpc(viewpoint, v, scale);
             case LATITUDINAL -> projectLatitudinal(viewpoint, gridType, v, scale);
             case POLAR -> projectPolar(viewpoint, gridType, v, scale);
@@ -34,7 +32,6 @@ final class NonOrthoProjection {
 
     static Vec3 unproject(Kind kind, Position viewpoint, GridType gridType, Vec2 pt) {
         return switch (kind) {
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use non-ortho unprojection()");
             case HPC -> unprojectHpc(viewpoint, pt);
             case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt);
             case POLAR -> unprojectPolar(viewpoint, gridType, pt);
@@ -111,7 +108,6 @@ final class NonOrthoProjection {
 
     static Vec3 unprojectDisplayPoint(Kind kind, Camera camera, Viewport vp, int x, int y) {
         return switch (kind) {
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use non-ortho display unprojection()");
             case HPC -> new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
             case LATITUDINAL, POLAR -> CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
         };
