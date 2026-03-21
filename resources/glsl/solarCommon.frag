@@ -171,9 +171,6 @@ float differentialRotation(const float dt, const float theta) {
 }
 
 vec3 differential(const float dt, const vec3 v) {
-    if (dt == 0.)
-        return v;
-
     float phi = atan(v.x, v.z);
     float theta = asin(v.y);
     phi -= differentialRotation(dt, theta); // difference from rigid rotation

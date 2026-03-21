@@ -16,11 +16,23 @@ vec2 worldToTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
     return wcsPlaneToTexcoord(plane, wcs);
 }
 
-float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
+float intersectPlane(const vec4 quat, const vec4 vecin, const bool discardBackFacing) {
     vec3 altnormal = rotate_vector(quat, zAxis);
-    if (hideBack && altnormal.z <= 0.)
+    if (discardBackFacing && altnormal.z <= 0.)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
+}
+
+vec3 rotateOnDiskPoint(const WCS wcs, const vec3 hitPoint) {
+    vec3 rotated = rotate_vector_inverse(wcs.cameraDiff, hitPoint);
+    if (wcs.deltaT != 0.)
+        rotated = differential(wcs.deltaT, rotated);
+    return rotated;
+}
+
+vec3 sampleOffLimbPoint(const WCS wcs, const vec4 up1, const bool discardBackFacing, out vec3 hitPoint) {
+    hitPoint = vec3(up1.xy, intersectPlane(wcs.cameraDiff, up1, discardBackFacing));
+    return rotate_vector_inverse(wcs.cameraDiff, hitPoint);
 }
 
 void main(void) {
@@ -35,10 +47,9 @@ void main(void) {
 
     if (onDisk) {
         hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
-        rotatedHitPoint = differential(wcs[0].deltaT, rotate_vector_inverse(wcs[0].cameraDiff, hitPoint));
-        if (display.isDiff != NODIFFERENCE) {
-            diffRotatedHitPoint = differential(wcs[1].deltaT, rotate_vector_inverse(wcs[1].cameraDiff, hitPoint));
-        }
+        rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
+        if (display.isDiff != NODIFFERENCE)
+            diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], hitPoint);
 
         factor = 1.;
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
@@ -48,12 +59,10 @@ void main(void) {
     }
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
-        hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
+        rotatedHitPoint = sampleOffLimbPoint(wcs[0], up1, onDisk, hitPoint);
         if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
-
-        rotatedHitPoint = rotate_vector_inverse(wcs[0].cameraDiff, hitPoint);
-        if (length(rotatedHitPoint) <= 1.) // differential: central disk
+        if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
             discard;
 
         if (display.calculateDepth != 0) // intersecting Euhforia planes
@@ -61,7 +70,7 @@ void main(void) {
     }
 
     if (display.sector.z != 0.) {
-        float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x); // maybe WCSed?
+        float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x);
         if (theta < display.sector.x || theta > display.sector.y)
             discard;
     }
@@ -72,8 +81,10 @@ void main(void) {
     vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
     float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
 
-    float rotatedHitPointRad = length(rotatedHitPoint.xy);
-    if (rotatedHitPointRad > display.radii.y || rotatedHitPointRad < display.radii.x ||
+    float rotatedHitPointRad2 = dot(rotatedHitPoint.xy, rotatedHitPoint.xy);
+    float minRadius2 = display.radii.x * display.radii.x;
+    float maxRadius2 = display.radii.y * display.radii.y;
+    if (rotatedHitPointRad2 > maxRadius2 || rotatedHitPointRad2 < minRadius2 ||
         (display.cutOff.z >= 0. && (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z))) {
         discard;
     }
@@ -81,14 +92,13 @@ void main(void) {
     vec2 difftexcoord;
     if (display.isDiff != NODIFFERENCE) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
-            hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
-            diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);
+            diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
 
         difftexcoord = worldToTexcoord(diffRotatedHitPoint, wcs[1], pv1);
 
-        float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);
-        if (diffRotatedHitPointRad > display.radii.y || diffRotatedHitPointRad < display.radii.x) {
+        float diffRotatedHitPointRad2 = dot(diffRotatedHitPoint.xy, diffRotatedHitPoint.xy);
+        if (diffRotatedHitPointRad2 > maxRadius2 || diffRotatedHitPointRad2 < minRadius2) {
             discard;
         }
     }
