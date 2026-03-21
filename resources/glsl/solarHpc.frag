@@ -28,13 +28,15 @@ bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDist
     return true;
 }
 
-float hpcEnhancementFactor(const vec2 helioprojective, const float observerDistance) {
-    return max(1., length(helioprojectiveToHpcPlanePoint(helioprojective, observerDistance).xy));
+vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDistance) {
+    return helioprojectiveToHpcPlanePoint(helioprojective, observerDistance).xy;
 }
 
-void clipHpcGeometry(const vec2 helioprojective, const float observerDistance) {
-    vec2 hpcXY = helioprojectiveToHpcPlanePoint(helioprojective, observerDistance).xy;
+float hpcEnhancementFactor(const vec2 hpcXY) {
+    return max(1., length(hpcXY));
+}
 
+void clipHpcGeometry(const vec2 hpcXY) {
     if (display.sector.z != 0.) {
         float theta = atan(hpcXY.y, hpcXY.x);
         if (theta < display.sector.x || theta > display.sector.y)
@@ -56,18 +58,18 @@ void clipHpcGeometry(const vec2 helioprojective, const float observerDistance) {
     }
 }
 
-vec2 get_hpc_texcoord(const WCS wcs, const vec2 scrpos, const float dt, const float[6] PV, out float factor) {
-    vec2 helioprojective = screenToHelioprojective(scrpos);
-    factor = 1.;
+vec2 sampleHpcTexcoord(const WCS wcs, vec2 helioprojective, const vec2 hpcXY, const float dt, const float[6] PV, out float enhancementFactor) {
+    enhancementFactor = 1.;
+    float observerDistance = wcs.projectionMeta.z;
 
     vec3 world;
-    if (helioprojectiveToWorld(helioprojective, wcs.projectionMeta.z, world)) {
+    if (helioprojectiveToWorld(helioprojective, observerDistance, world)) {
         if (dt != 0.) {
             vec3 rotatedWorld = differential(dt, world);
-            helioprojective = worldToHelioprojective(rotatedWorld, wcs.projectionMeta.z);
+            helioprojective = worldToHelioprojective(rotatedWorld, observerDistance);
         }
     } else {
-        factor = hpcEnhancementFactor(helioprojective, wcs.projectionMeta.z);
+        enhancementFactor = hpcEnhancementFactor(hpcXY);
     }
 
     vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, PV);
@@ -78,21 +80,26 @@ void main(void) {
     vec4 color;
     vec2 scrpos = getScrPos();
     vec2 helioprojective = screenToHelioprojective(scrpos);
+    bool diffMode = display.isDiff != NODIFFERENCE;
+    float observerDistance = wcs[0].projectionMeta.z;
+    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, observerDistance);
     vec2 texcoord;
-    float factor;
-    clipHpcGeometry(helioprojective, wcs[0].projectionMeta.z);
-    texcoord = get_hpc_texcoord(wcs[0], scrpos, wcs[0].deltaT, pv0, factor);
-    if (display.isDiff == NODIFFERENCE) {
+    float enhancementFactor;
+    clipHpcGeometry(hpcXY);
+    texcoord = sampleHpcTexcoord(wcs[0], helioprojective, hpcXY, wcs[0].deltaT, pv0, enhancementFactor);
+    if (!diffMode) {
         clamp_texture(texcoord);
-        color = getColor(texcoord, texcoord, factor);
+        color = getColor(texcoord, texcoord, enhancementFactor);
     } else {
+        float diffObserverDistance = wcs[1].projectionMeta.z;
+        vec2 diffHpcXY = helioprojectiveToHpcXY(helioprojective, diffObserverDistance);
         vec2 difftexcoord;
-        float difffactor;
-        clipHpcGeometry(helioprojective, wcs[1].projectionMeta.z);
-        difftexcoord = get_hpc_texcoord(wcs[1], scrpos, wcs[1].deltaT, pv1, difffactor);
+        float diffEnhancementFactor;
+        clipHpcGeometry(diffHpcXY);
+        difftexcoord = sampleHpcTexcoord(wcs[1], helioprojective, diffHpcXY, wcs[1].deltaT, pv1, diffEnhancementFactor);
         clamp_texture(texcoord);
         clamp_texture(difftexcoord);
-        color = getColor(texcoord, difftexcoord, max(factor, difffactor));
+        color = getColor(texcoord, difftexcoord, max(enhancementFactor, diffEnhancementFactor));
     }
     outColor = color;
 }
