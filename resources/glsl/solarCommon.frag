@@ -72,7 +72,7 @@ uniform vec3 grid[2];
 uniform float pv0[6]; // should be in WCS uniform block
 uniform float pv1[6];
 
-#define FSIZE (3 * 3)
+#define BLUR_TAP_COUNT (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
 // https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 const float[] bc = float[](.30613, .38774, .30613);
@@ -103,28 +103,41 @@ float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
-    vec2 b = display.brightness;
-    b.y *= pow(factor, display.enhanced);
+    vec2 brightness = display.brightness;
+    if (display.enhanced != 0. && factor != 1.)
+        brightness.y *= pow(factor, display.enhanced);
 
-    float v;
-    float conv = 0.;
-    if (display.isDiff == NODIFFERENCE) {
-        v = fetch(image, texcoord, b);
-        for (int i = 0; i < FSIZE; i++) {
-            conv += fetch(image, texcoord + blurOffset[i] * display.sharpen.xy, b) * blurKernel[i];
-        }
+    float value;
+    bool diffMode = display.isDiff != NODIFFERENCE;
+    if (!diffMode) {
+        value = fetch(image, texcoord, brightness);
     } else {
-        v = fetch(image, texcoord, b) - fetch(diffImage, difftexcoord, b);
-        v = v * BOOST + 0.5;
-
-        for (int i = 0; i < FSIZE; i++) {
-            conv += (fetch(image, texcoord + blurOffset[i] * display.sharpen.xy, b) - fetch(diffImage, difftexcoord + blurOffset[i] * display.sharpen.xy, b)) * blurKernel[i];
-        }
-        conv = conv * BOOST + 0.5;
+        value = fetch(image, texcoord, brightness) - fetch(diffImage, difftexcoord, brightness);
+        value = value * BOOST + 0.5;
     }
-    v = mix(v, conv, display.sharpen.z) + dither(texcoord);
 
-    return texture(lut, v) * display.color;
+    vec2 sharpenStep = display.sharpen.xy;
+    float sharpenMix = display.sharpen.z;
+    if (sharpenMix != 0.) {
+        float blurredValue = 0.;
+        if (!diffMode) {
+            for (int i = 0; i < BLUR_TAP_COUNT; i++) {
+                vec2 offset = blurOffset[i] * sharpenStep;
+                blurredValue += fetch(image, texcoord + offset, brightness) * blurKernel[i];
+            }
+        } else {
+            for (int i = 0; i < BLUR_TAP_COUNT; i++) {
+                vec2 offset = blurOffset[i] * sharpenStep;
+                blurredValue += (fetch(image, texcoord + offset, brightness) - fetch(diffImage, difftexcoord + offset, brightness)) * blurKernel[i];
+            }
+            blurredValue = blurredValue * BOOST + 0.5;
+        }
+        value = mix(value, blurredValue, sharpenMix);
+    }
+
+    value += dither(texcoord);
+
+    return texture(lut, value) * display.color;
 }
 
 void clamp_texture(const vec2 texcoord) {
@@ -163,11 +176,12 @@ vec3 apply_center(const vec3 v, const vec2 shift, const vec4 quat) {
     return rotate_vector_inverse(quat, r);
 }
 
+// Differential solar rotation.
 float differentialRotation(const float dt, const float theta) {
-    float sin2l = sin(theta);
-    sin2l *= sin2l;
+    float sinLat2 = sin(theta);
+    sinLat2 *= sinLat2;
     // Snodgrass, Table 1 Magnetic - http://articles.adsabs.harvard.edu/pdf/1990ApJ...351..309S
-    return dt * (0.01367 - 0.339 * sin2l - 0.485 * sin2l * sin2l); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
+    return dt * (0.01367 - 0.339 * sinLat2 - 0.485 * sinLat2 * sinLat2); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
 }
 
 vec3 differential(const float dt, const vec3 v) {
@@ -177,6 +191,7 @@ vec3 differential(const float dt, const vec3 v) {
     return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
 }
 
+// Observer-centred helioprojective geometry.
 vec2 worldToHelioprojective(const vec3 world, const float observerDistance) {
     float zeta = observerDistance - world.z;
     return vec2(
@@ -201,19 +216,20 @@ vec3 helioprojectiveToHpcPlanePoint(const vec2 helioprojective, const float obse
     return observerPosition(observerDistance) - observerDistance * ray / ray.z;
 }
 
+// Native zenithal coordinates for TAN/AZP/ZPN forward projection.
 void nativeZenithalCoordinates(
     const vec2 helioprojective,
     const vec2 crval,
     const float planeUnitsPerRad,
-    out float a,
-    out float b,
+    out float nativeX,
+    out float nativeY,
     out float cosNativeDistance
 ) {
     float phi = helioprojective.x;
     float theta = helioprojective.y;
-    vec2 reference = crval / planeUnitsPerRad;
-    float phi0 = reference.x;
-    float theta0 = reference.y;
+    vec2 referenceAngles = crval / planeUnitsPerRad;
+    float phi0 = referenceAngles.x;
+    float theta0 = referenceAngles.y;
 
     float sinLat = sin(theta);
     float cosLat = cos(theta);
@@ -223,34 +239,34 @@ void nativeZenithalCoordinates(
     float sinDeltaLon = sin(deltaLon);
     float cosDeltaLon = cos(deltaLon);
 
-    a = cosLat * sinDeltaLon;
-    b = cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon;
+    nativeX = cosLat * sinDeltaLon;
+    nativeY = cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon;
     cosNativeDistance = sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon;
 }
 
 vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
-    float a;
-    float b;
-    float cosC;
-    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, a, b, cosC);
-    if (cosC <= 0.)
+    float nativeX;
+    float nativeY;
+    float cosNativeDistance;
+    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
+    if (cosNativeDistance <= 0.)
         discard;
 
     return planeUnitsPerRad * vec2(
-        a / cosC,
-        b / cosC);
+        nativeX / cosNativeDistance,
+        nativeY / cosNativeDistance);
 }
 
 vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
     float mu = PV[1];
     float gamma = radians(PV[2]);
 
-    float a;
-    float b;
+    float nativeX;
+    float nativeY;
     float cosNativeDistance;
-    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, a, b, cosNativeDistance);
-    float c = length(vec2(a, b));
-    if (c == 0.)
+    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
+    float nativeRadius = length(vec2(nativeX, nativeY));
+    if (nativeRadius == 0.)
         return vec2(0.);
 
     // For the non-slanted AZP case, mu > 1 folds back once dR/dtheta changes sign.
@@ -258,16 +274,17 @@ vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     if (gamma == 0. && mu > 1. && mu * cosNativeDistance + 1. <= 0.)
         discard;
 
-    float denom = mu + cosNativeDistance - b * tan(gamma);
+    float denom = mu + cosNativeDistance - nativeY * tan(gamma);
     if (denom <= 0.)
         discard;
 
-    float radial = (mu + 1.) * c / denom;
+    float radial = (mu + 1.) * nativeRadius / denom;
     return planeUnitsPerRad * vec2(
-        radial * a / c,
-        radial * b / (c * cos(gamma)));
+        radial * nativeX / nativeRadius,
+        radial * nativeY / (nativeRadius * cos(gamma)));
 }
 
+// Six-term ZPN forward projection on the primary monotone branch.
 void zpnRadialAndDerivative(const float eta, const float[6] PV, out float radial, out float derivative) {
     radial = PV[5];
     derivative = 5. * PV[5];
@@ -279,26 +296,27 @@ void zpnRadialAndDerivative(const float eta, const float[6] PV, out float radial
 }
 
 vec2 projectZpnToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
-    float a;
-    float b;
+    float nativeX;
+    float nativeY;
     float cosNativeDistance;
-    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, a, b, cosNativeDistance);
-    float c = length(vec2(a, b));
-    if (c == 0.)
+    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
+    float nativeRadius = length(vec2(nativeX, nativeY));
+    if (nativeRadius == 0.)
         return vec2(0.);
 
-    float eta = acos(clamp(cosNativeDistance, -1., 1.));
+    float nativeDistance = acos(clamp(cosNativeDistance, -1., 1.));
     float radial;
     float derivative;
-    zpnRadialAndDerivative(eta, PV, radial, derivative);
+    zpnRadialAndDerivative(nativeDistance, PV, radial, derivative);
     if (radial < 0. || derivative <= 0.)
         discard;
 
     return planeUnitsPerRad * vec2(
-        radial * a / c,
-        radial * b / c);
+        radial * nativeX / nativeRadius,
+        radial * nativeY / nativeRadius);
 }
 
+// Projection-space to texture-space mapping.
 vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const float[6] PV) {
     int projection = int(wcs.projectionMeta.x);
     if (projection == WCS_PROJECTION_TAN)
