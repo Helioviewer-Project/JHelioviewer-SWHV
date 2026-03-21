@@ -38,6 +38,11 @@ final class NonOrthoProjection {
         };
     }
 
+    static Vec3 unprojectSurfacePoint(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        Vec2 gridPoint = mouseToGrid(scale, camera, vp, x, y, gridType);
+        return unproject(kind, camera.getViewpoint(), gridType, gridPoint);
+    }
+
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     private static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
