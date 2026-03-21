@@ -79,6 +79,11 @@ final class NonOrthoProjection {
         return current;
     }
 
+    static Vec2 projectToScreen(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
+        Vec2 projected = mode.project(viewpoint, gridType, v);
+        return new Vec2(projected.x * vp.aspect, projected.y);
+    }
+
     private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
         double longitude = Math.toRadians(pt.x);
         double latitude = Math.toRadians(pt.y);

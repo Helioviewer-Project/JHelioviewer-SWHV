@@ -139,8 +139,7 @@ public enum ProjectionMode {
     }
 
     public final Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
-        Vec2 projected = projectMap(viewpoint, gridType, v);
-        return new Vec2(projected.x * vp.aspect, projected.y);
+        return NonOrthoProjection.projectToScreen(this, viewpoint, gridType, vp, v);
     }
 
     protected abstract Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v);
@@ -152,7 +151,7 @@ public enum ProjectionMode {
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
-        Vec2 projected = projectToScreen(viewpoint, gridType, vp, vertex);
+        Vec2 projected = NonOrthoProjection.projectToScreen(this, viewpoint, gridType, vp, vertex);
         vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
     }
 
