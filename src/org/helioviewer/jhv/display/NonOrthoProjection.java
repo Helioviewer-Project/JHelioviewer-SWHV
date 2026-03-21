@@ -14,19 +14,19 @@ final class NonOrthoProjection {
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectLatitudinal(mapRotation(gridType, viewpoint).rotateVector(v), scale);
+        return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
     static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
-        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinal(pt));
+        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinalPoint(pt));
     }
 
     static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectPolar(mapRotation(gridType, viewpoint).rotateVector(v), scale);
+        return projectPolarVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
     static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
-        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolar(pt));
+        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolarPoint(pt));
     }
 
     static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
@@ -74,7 +74,7 @@ final class NonOrthoProjection {
         return Quat.createXY(gridType == GridType.Viewpoint ? viewpoint.lat : 0, gridType.toLongitude(viewpoint));
     }
 
-    private static Vec2 projectPolar(Vec3 v, GridScale scale) {
+    private static Vec2 projectPolarVector(Vec3 v, GridScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
         double theta = polarAngleRadians(v);
         double scaledr = scale.getYValueInv(r);
@@ -82,7 +82,7 @@ final class NonOrthoProjection {
         return new Vec2(scaledtheta, scaledr);
     }
 
-    private static Vec3 unprojectPolar(Vec2 pt) {
+    private static Vec3 unprojectPolarPoint(Vec2 pt) {
         double r = pt.y;
         double theta = Math.toRadians(pt.x);
         double x = PolarBasis.x(r, theta);
@@ -91,7 +91,7 @@ final class NonOrthoProjection {
         return new Vec3(x, y, z);
     }
 
-    private static Vec2 projectLatitudinal(Vec3 v, GridScale scale) {
+    private static Vec2 projectLatitudinalVector(Vec3 v, GridScale scale) {
         // Positive latitude corresponds to positive Y in the non-ortho map basis.
         double latitude = SphericalCoords.latitude(v);
         double longitude = SphericalCoords.longitude(v);
@@ -100,7 +100,7 @@ final class NonOrthoProjection {
         return new Vec2(scaledphi, scaledtheta);
     }
 
-    private static Vec3 unprojectLatitudinal(Vec2 pt) {
+    private static Vec3 unprojectLatitudinalPoint(Vec2 pt) {
         double longitude = Math.toRadians(pt.x);
         double latitude = Math.toRadians(pt.y);
         return new Vec3(
