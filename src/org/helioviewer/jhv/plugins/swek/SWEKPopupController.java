@@ -164,7 +164,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 }
             } else {
                 Vec2 tf = null;
-                if ((Display.mode == ProjectionMode.LogPolar || Display.mode == ProjectionMode.Polar) && evt.isCactus()) {
+                if (Display.mode.isPolarLike() && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
                     double distSun = computeDistSun(evt);
                     tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle), Display.mode.scale.getYValueInv(distSun));
