@@ -10,7 +10,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
 // through an explicit map basis shared by rendering and mouse unprojection.
 public enum ProjectionMode {
-    Orthographic(GLSLSolarShader.ortho, GridScale.ortho, null) {
+    Orthographic(GLSLSolarShader.ortho, GridScale.ortho) {
         @Override
         public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
             throw new UnsupportedOperationException("Orthographic mode does not use projectToScreen()");
@@ -54,6 +54,10 @@ public enum ProjectionMode {
     public final GLSLSolarShader shader;
     public final GridScale scale;
     private final NonOrthoProjection.Kind nonOrthoKind;
+
+    ProjectionMode(GLSLSolarShader _shader, GridScale _scale) {
+        this(_shader, _scale, null);
+    }
 
     ProjectionMode(GLSLSolarShader _shader, GridScale _scale, NonOrthoProjection.Kind _nonOrthoKind) {
         shader = _shader;
