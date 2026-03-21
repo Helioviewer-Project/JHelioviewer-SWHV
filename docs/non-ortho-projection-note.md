@@ -4,7 +4,10 @@ This note documents the current convention used by the non-orthographic display 
 
 ## Scope
 
-- Java overlay and mouse-projection code lives in `src/org/helioviewer/jhv/display/ProjectionMode.java` and `src/org/helioviewer/jhv/display/NonOrthoProjection.java`.
+- Java projection-related code is split across:
+  - `src/org/helioviewer/jhv/display/ProjectionMode.java`
+  - `src/org/helioviewer/jhv/display/NonOrthoProjection.java`
+  - `src/org/helioviewer/jhv/display/OrthoProjection.java`
 - Image reprojection lives in:
   - `resources/glsl/solarHpc.frag`
   - `resources/glsl/solarLati.frag`
@@ -14,6 +17,10 @@ This note documents the current convention used by the non-orthographic display 
 ## Current convention
 
 - `Orthographic` is a separate path. It renders directly in 3D and should not be used as a reference for non-ortho sign conventions.
+- Current Java ownership is:
+  - `ProjectionMode`: mode selection, shader/scale selection, small mode queries, and dispatch
+  - `NonOrthoProjection`: non-ortho projection math, non-ortho point/line emission, non-ortho mouse/grid helpers, non-ortho display/surface unprojection
+  - `OrthoProjection`: orthographic point/line emission, orthographic mouse/grid helpers, orthographic display/surface unprojection
 - Non-ortho modes use an explicit map-basis rotation on the Java side.
 - For `GridType.Viewpoint`, non-ortho maps use a positive latitude rotation in `NonOrthoProjection.mapRotation(...)`, so they intentionally do not reuse `GridType.toGrid(...)`.
 - `HPC` is observer-centered, not origin-centered spherical coordinates.
@@ -41,7 +48,7 @@ This note documents the current convention used by the non-orthographic display 
   - display-surface unprojection
 - In `Orthographic`, display-surface unprojection uses the existing current-view sphere/plane logic.
 - In `HPC`, display-surface unprojection returns flat current-view plane coordinates for display annotations.
-- Other non-ortho modes currently leave display-surface unprojection undefined.
+- In `Latitudinal`, `Polar`, and `LogPolar`, display-surface unprojection currently falls back to current-view sphere/plane unprojection rather than a mode-specific flat display basis.
 - Latitudinal projection is expressed as:
   - `x = longitude`
   - `y = latitude`
@@ -50,6 +57,9 @@ This note documents the current convention used by the non-orthographic display 
 - The Java polar projection expresses that convention directly.
 - The GLSL polar/log-polar shaders intentionally keep the legacy internal `theta = -(...) - HALFPI` style basis expression, because that is the form that matches the image reprojection path after `apply_center(..., vec3(pos.x, -pos.y, 0.), ...)`.
 - Remaining sign flips in the GLSL code, such as final texture-space Y inversion, belong to image/WCS sampling space and should not be confused with the map convention itself.
+- Java projected polyline emission differs by mode:
+  - `HPC` emits continuous projected segments and does not wrap horizontally
+  - `Latitudinal`, `Polar`, and `LogPolar` use the shared wrapped projected-line path
 
 ## Important consequence
 
@@ -74,6 +84,7 @@ Changing only one side will usually produce one or more of:
   - those tools use flat display-plane points while dragging/drawing
   - but `AbstractAnnotateable` still serializes points as spherical `lon/lat`
   - so saving and reloading those `HPC` annotations is not yet a stable operation
+- Callers now increasingly use mode predicates on `ProjectionMode` (`isOrthographic()`, `isHpc()`, `isLatitudinal()`, `isPolar()`, `isLogPolar()`) instead of raw enum equality checks.
 - `HPC` extent inversion is currently exact for:
   - `TAN`
   - non-slanted `AZP`

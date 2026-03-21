@@ -91,15 +91,15 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
             return;
 
         fov.setCenter(centerX * distance, centerY * distance);
-        fov.putCenter(centerBuf, color);
+        fov.putCenter(centerBuf, color, false);
 
         if (inner > 0)
-            fov.putCircLine(inner * distance, lineBuf, color);
+            fov.putCircLine(inner * distance, lineBuf, color, false);
         if (type == FOVType.RECTANGULAR) {
-            fov.putRectLine(wide * distance, high * distance, lineBuf, color);
+            fov.putRectLine(wide * distance, high * distance, lineBuf, color, false);
             FOVText.drawLabel(renderer, name, (centerX - wide) * distance, (centerY - high) * distance, high * distance);
         } else {
-            fov.putCircLine(wide * distance, lineBuf, color);
+            fov.putCircLine(wide * distance, lineBuf, color, false);
             double halfSide = wide / Math.sqrt(2);
             FOVText.drawLabel(renderer, name, (centerX - halfSide) * distance, (centerY - halfSide) * distance, halfSide * distance);
         }

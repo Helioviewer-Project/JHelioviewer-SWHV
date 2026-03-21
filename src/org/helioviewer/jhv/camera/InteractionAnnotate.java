@@ -11,7 +11,6 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -71,7 +70,7 @@ class InteractionAnnotate implements Interaction.Type {
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
 
         Transform.pushView();
-        if (Display.mode == ProjectionMode.Orthographic)
+        if (Display.mode.isOrthographic())
             Transform.rotateViewInverse(viewpoint.toQuat());
 
         transLine.setVertex(gl, transBuf);

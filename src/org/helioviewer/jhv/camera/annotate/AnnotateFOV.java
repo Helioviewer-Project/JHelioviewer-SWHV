@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -38,16 +37,15 @@ public class AnnotateFOV extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        boolean flat = Display.mode == ProjectionMode.HPC;
         byte[] color = dragged ? dragColor : (active ? activeColor : baseColor);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
 
-        fov.setCenter(p0.x + dx, p0.y + dy, flat);
-        fov.putCenter(centerBuf, color, flat);
-        fov.putRectLine(dx, dy, lineBuf, color, flat);
+        fov.setCenter(p0.x + dx, p0.y + dy);
+        fov.putCenter(centerBuf, color, Display.mode.isHpc());
+        fov.putRectLine(dx, dy, lineBuf, color, Display.mode.isHpc());
     }
 
     @Override
