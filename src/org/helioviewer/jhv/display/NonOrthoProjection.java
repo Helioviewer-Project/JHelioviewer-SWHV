@@ -39,23 +39,23 @@ final class NonOrthoProjection {
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
-    static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    private static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
-    static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
+    private static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
         return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinalPoint(pt));
     }
 
-    static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    private static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectPolarVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
-    static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
+    private static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
         return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolarPoint(pt));
     }
 
-    static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
+    private static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
         double zeta = viewpoint.distance - v.z;
         double longitude = Math.atan2(v.x, zeta);
         double latitude = Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
@@ -64,7 +64,7 @@ final class NonOrthoProjection {
                 scale.getYValueInv(Math.toDegrees(latitude)));
     }
 
-    static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
+    private static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
         Vec3 ray = helioprojectiveRayDegrees(pt);
 
         double b = viewpoint.distance * ray.z;
