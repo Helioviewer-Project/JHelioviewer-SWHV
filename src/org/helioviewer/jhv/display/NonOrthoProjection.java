@@ -1,11 +1,13 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 
 final class NonOrthoProjection {
 
@@ -57,6 +59,26 @@ final class NonOrthoProjection {
         return new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
     }
 
+    static Vec2 emitWrappedMapVertex(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        Vec2 current = mode.project(viewpoint, gridType, vertex);
+        if (first)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        emitWrappedVertex(vp, previous, current, vexBuf, color);
+        if (last)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        return current;
+    }
+
+    static Vec2 emitUnwrappedMapVertex(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        Vec2 current = mode.project(viewpoint, gridType, vertex);
+        if (first)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        emitProjectedVertex(vp, current, vexBuf, color);
+        if (last)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        return current;
+    }
+
     private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
         double longitude = Math.toRadians(pt.x);
         double latitude = Math.toRadians(pt.y);
@@ -66,6 +88,37 @@ final class NonOrthoProjection {
                 -1);
         ray.normalize();
         return ray;
+    }
+
+    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
+        if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
+            emitHorizontalWrap(vp, current, previous, vexBuf, color);
+        }
+        emitProjectedVertex(vp, current, vexBuf, color);
+    }
+
+    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, BufVertex vexBuf, byte[] color) {
+        float y = (float) current.y;
+        float x;
+        if (current.x <= 0 && previous.x >= 0) {
+            x = (float) (0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        } else if (current.x >= 0 && previous.x <= 0) {
+            x = (float) (-0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        }
+    }
+
+    private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
+        vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
     private static Quat mapRotation(GridType gridType, Position viewpoint) {

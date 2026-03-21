@@ -75,7 +75,7 @@ public enum ProjectionMode {
 
         @Override
         public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-            return emitUnwrappedMapVertex(viewpoint, gridType, vp, vertex, vexBuf, color, first, last);
+            return NonOrthoProjection.emitUnwrappedMapVertex(this, viewpoint, gridType, vp, vertex, vexBuf, color, first, last);
         }
 
         @Override
@@ -148,59 +148,12 @@ public enum ProjectionMode {
     protected abstract Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt);
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-        Vec2 current = projectMap(viewpoint, gridType, vertex);
-        if (first)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        emitWrappedVertex(vp, previous, current, vexBuf, color);
-        if (last)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        return current;
-    }
-
-    protected final Vec2 emitUnwrappedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
-        Vec2 current = projectMap(viewpoint, gridType, vertex);
-        if (first)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        emitProjectedVertex(vp, current, vexBuf, color);
-        if (last)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        return current;
+        return NonOrthoProjection.emitWrappedMapVertex(this, viewpoint, gridType, vp, vertex, previous, vexBuf, color, first, last);
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
         Vec2 projected = projectToScreen(viewpoint, gridType, vp, vertex);
         vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
-    }
-
-    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
-        if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
-            emitHorizontalWrap(vp, current, previous, vexBuf, color);
-        }
-        emitProjectedVertex(vp, current, vexBuf, color);
-    }
-
-    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, BufVertex vexBuf, byte[] color) {
-        float y = (float) current.y;
-        float x;
-        if (current.x <= 0 && previous.x >= 0) {
-            x = (float) (0.5 * vp.aspect);
-            vexBuf.putVertex(x, y, 0, 1, color);
-            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-
-            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
-            vexBuf.putVertex(-x, y, 0, 1, color);
-        } else if (current.x >= 0 && previous.x <= 0) {
-            x = (float) (-0.5 * vp.aspect);
-            vexBuf.putVertex(x, y, 0, 1, color);
-            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-
-            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
-            vexBuf.putVertex(-x, y, 0, 1, color);
-        }
-    }
-
-    protected static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
-        vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
