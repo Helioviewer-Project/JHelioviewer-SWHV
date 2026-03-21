@@ -224,7 +224,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     private static boolean isAngularFlatVerticalAxis() {
-        return Display.mode == ProjectionMode.HPC || Display.mode == ProjectionMode.Latitudinal;
+        return Display.mode.isHpcLike();
     }
 
     private boolean needsFlatGridRebuild(Viewport vp, GridMath.AxisSignature xSignature, GridMath.AxisSignature ySignature) {

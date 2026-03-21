@@ -74,6 +74,10 @@ public enum ProjectionMode {
         return this == Polar || this == LogPolar;
     }
 
+    public boolean isHpcLike() {
+        return this == HPC || this == Latitudinal;
+    }
+
     public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
         return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
     }
