@@ -39,8 +39,7 @@ final class NonOrthoProjection {
     }
 
     static Vec3 unprojectSurfacePoint(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        Vec2 gridPoint = mouseToGrid(scale, camera, vp, x, y, gridType);
-        return unproject(kind, camera.getViewpoint(), gridType, gridPoint);
+        return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, x, y, gridType));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
@@ -79,9 +78,9 @@ final class NonOrthoProjection {
             return null;
 
         double root = Math.sqrt(discriminant);
-        double tNear = -b - root;
-        double tFar = -b + root;
-        double t = tNear > 0 ? tNear : tFar;
+        double t = -b - root;
+        if (t <= 0)
+            t = -b + root;
         if (t <= 0)
             return null;
 
@@ -102,13 +101,13 @@ final class NonOrthoProjection {
     }
 
     static Vec2 projectToScreen(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
-        Vec2 projected = project(kind, viewpoint, gridType, v, scale);
-        return new Vec2(projected.x * vp.aspect, projected.y);
+        Vec2 pt = project(kind, viewpoint, gridType, v, scale);
+        return new Vec2(pt.x * vp.aspect, pt.y);
     }
 
     static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
-        Vec2 projected = projectToScreen(kind, viewpoint, gridType, scale, vp, vertex);
-        vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
+        Vec2 pt = project(kind, viewpoint, gridType, vertex, scale);
+        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
     }
 
     static Vec3 unprojectDisplayPoint(Kind kind, Camera camera, Viewport vp, int x, int y) {
@@ -119,16 +118,15 @@ final class NonOrthoProjection {
     }
 
     static Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
-        double gx = CameraHelper.computeUpX(camera, vp, x) / vp.aspect;
-        double gy = CameraHelper.computeUpY(camera, vp, y);
-        return new Vec2(gx, gy);
+        return new Vec2(
+                CameraHelper.computeUpX(camera, vp, x) / vp.aspect,
+                CameraHelper.computeUpY(camera, vp, y));
     }
 
     static Vec2 mouseToGrid(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        Vec2 pt = mouseToScreen(camera, vp, x, y);
         return new Vec2(
-                scale.getInterpolatedXDisplayValue(pt.x + 0.5, gridType),
-                scale.getInterpolatedYValue(pt.y + 0.5));
+                scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(camera, vp, x) / vp.aspect + 0.5, gridType),
+                scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));
     }
 
     private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {

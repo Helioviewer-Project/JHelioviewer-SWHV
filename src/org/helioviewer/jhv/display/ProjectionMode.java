@@ -43,7 +43,7 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y) {
             return OrthoProjection.unprojectDisplayPoint(camera, vp, x, y);
         }
     },
@@ -110,7 +110,7 @@ public enum ProjectionMode {
         return NonOrthoProjection.unprojectSurfacePoint(nonOrthoKind, scale, camera, vp, x, y, gridType);
     }
 
-    public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+    public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y) {
         return NonOrthoProjection.unprojectDisplayPoint(nonOrthoKind, camera, vp, x, y);
     }
 }
