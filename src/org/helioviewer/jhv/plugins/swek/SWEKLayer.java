@@ -18,7 +18,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
@@ -338,7 +337,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-            if (Display.mode == ProjectionMode.Latitudinal && evt.isCactus())
+            if (Display.mode.isLatitudinal() && evt.isCactus())
                 continue;
             bindTexture(gl, evtr.getSupplier().getGroup());
             glslTexture.renderTexture(gl, GL3.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
@@ -381,7 +380,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
-            if (evt.isCactus() && (Display.mode == ProjectionMode.LogPolar || Display.mode == ProjectionMode.Polar)) {
+            if (evt.isCactus() && (Display.mode.isPolar() || Display.mode.isLogPolar())) {
                 drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
             } else {
                 drawPolygon(camera, vp, evtr, evt);

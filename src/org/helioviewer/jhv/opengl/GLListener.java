@@ -4,7 +4,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -112,15 +111,15 @@ public class GLListener implements GLEventListener {
     }
 
     public static void renderSceneScale(Camera camera, GL3 gl) {
-        if (Display.mode == ProjectionMode.Polar) {
+        if (Display.mode.isPolar()) {
             GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
-        } else if (Display.mode == ProjectionMode.LogPolar) {
+        } else if (Display.mode.isLogPolar()) {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
         gl.glDisable(GL3.GL_DEPTH_TEST); // avoid depth fighting, e.g., grid
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
-        boolean hpcMode = Display.mode == ProjectionMode.HPC;
+        boolean hpcMode = Display.mode.isHpc();
         Region hpcBounds = hpcMode ? getCenteredHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
             if (hpcMode) {
@@ -194,7 +193,7 @@ public class GLListener implements GLEventListener {
         if (Movie.isRecording())
             ExportMovie.handleMovieExport(camera, gl);
 
-        if (Display.mode == ProjectionMode.Orthographic) {
+        if (Display.mode.isOrthographic()) {
             renderScene(camera, gl);
             renderMiniview(gl);
         } else

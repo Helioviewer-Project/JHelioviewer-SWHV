@@ -4,7 +4,6 @@ import java.nio.Buffer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 
 import com.jogamp.opengl.FBObject;
 import com.jogamp.opengl.FBObject.Attachment;
@@ -58,7 +57,7 @@ public class GLGrab {
             Display.reshapeAll();
 
             fbo.bind(gl);
-            if (Display.mode == ProjectionMode.Orthographic) {
+            if (Display.mode.isOrthographic()) {
                 GLListener.renderScene(camera, gl);
             } else {
                 GLListener.renderSceneScale(camera, gl);

@@ -1,35 +1,65 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 
 final class NonOrthoProjection {
+
+    enum Kind {
+        HPC,
+        LATITUDINAL,
+        POLAR
+    }
 
     private NonOrthoProjection() {
     }
 
+    static Vec2 project(Kind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+        return switch (kind) {
+            case HPC -> projectHpc(viewpoint, v, scale);
+            case LATITUDINAL -> projectLatitudinal(viewpoint, gridType, v, scale);
+            case POLAR -> projectPolar(viewpoint, gridType, v, scale);
+        };
+    }
+
+    static Vec3 unproject(Kind kind, Position viewpoint, GridType gridType, Vec2 pt) {
+        return switch (kind) {
+            case HPC -> unprojectHpc(viewpoint, pt);
+            case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt);
+            case POLAR -> unprojectPolar(viewpoint, gridType, pt);
+        };
+    }
+
+    static Vec3 unprojectSurfacePoint(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, x, y, gridType));
+    }
+
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
-    static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    private static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
-    static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
+    private static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
         return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinalPoint(pt));
     }
 
-    static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    private static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectPolarVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
-    static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
+    private static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
         return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolarPoint(pt));
     }
 
-    static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
+    private static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
         double zeta = viewpoint.distance - v.z;
         double longitude = Math.atan2(v.x, zeta);
         double latitude = Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
@@ -38,7 +68,7 @@ final class NonOrthoProjection {
                 scale.getYValueInv(Math.toDegrees(latitude)));
     }
 
-    static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
+    private static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
         Vec3 ray = helioprojectiveRayDegrees(pt);
 
         double b = viewpoint.distance * ray.z;
@@ -48,13 +78,55 @@ final class NonOrthoProjection {
             return null;
 
         double root = Math.sqrt(discriminant);
-        double tNear = -b - root;
-        double tFar = -b + root;
-        double t = tNear > 0 ? tNear : tFar;
+        double t = -b - root;
+        if (t <= 0)
+            t = -b + root;
         if (t <= 0)
             return null;
 
         return new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+    }
+
+    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
+        if (first)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        if (kind == Kind.HPC)
+            emitProjectedVertex(vp, current, vexBuf, color);
+        else
+            emitWrappedVertex(vp, previous, current, vexBuf, color);
+        if (last)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        return current;
+    }
+
+    static Vec2 projectToScreen(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
+        Vec2 pt = project(kind, viewpoint, gridType, v, scale);
+        return new Vec2(pt.x * vp.aspect, pt.y);
+    }
+
+    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+        Vec2 pt = project(kind, viewpoint, gridType, vertex, scale);
+        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
+    }
+
+    static Vec3 unprojectDisplayPoint(Kind kind, Camera camera, Viewport vp, int x, int y) {
+        return switch (kind) {
+            case HPC -> new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
+            case LATITUDINAL, POLAR -> CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+        };
+    }
+
+    static Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
+        return new Vec2(
+                CameraHelper.computeUpX(camera, vp, x) / vp.aspect,
+                CameraHelper.computeUpY(camera, vp, y));
+    }
+
+    static Vec2 mouseToGrid(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        return new Vec2(
+                scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(camera, vp, x) / vp.aspect + 0.5, gridType),
+                scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));
     }
 
     private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
@@ -66,6 +138,37 @@ final class NonOrthoProjection {
                 -1);
         ray.normalize();
         return ray;
+    }
+
+    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
+        if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
+            emitHorizontalWrap(vp, current, previous, vexBuf, color);
+        }
+        emitProjectedVertex(vp, current, vexBuf, color);
+    }
+
+    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, BufVertex vexBuf, byte[] color) {
+        float y = (float) current.y;
+        float x;
+        if (current.x <= 0 && previous.x >= 0) {
+            x = (float) (0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        } else if (current.x >= 0 && previous.x <= 0) {
+            x = (float) (-0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        }
+    }
+
+    private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
+        vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
     private static Quat mapRotation(GridType gridType, Position viewpoint) {
