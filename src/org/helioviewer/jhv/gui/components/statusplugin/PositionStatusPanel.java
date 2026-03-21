@@ -46,7 +46,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
             setText(formatHpc(coord));
         } else if (Display.mode.isLatitudinal()) {
             setText(formatLati(coord));
-        } else if (Display.mode.isPolarLike()) {
+        } else if (Display.mode.isPolar() || Display.mode.isLogPolar()) {
             setText(formatPolar(coord));
         } else {
             String valueStr = ImageData.nanValue;
