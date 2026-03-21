@@ -13,24 +13,28 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 final class NonOrthoProjection {
 
+    enum Kind {
+        HPC,
+        LATITUDINAL,
+        POLAR
+    }
+
     private NonOrthoProjection() {
     }
 
-    static Vec2 project(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    static Vec2 project(Kind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return switch (kind) {
             case HPC -> projectHpc(viewpoint, v, scale);
             case LATITUDINAL -> projectLatitudinal(viewpoint, gridType, v, scale);
             case POLAR -> projectPolar(viewpoint, gridType, v, scale);
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use project()");
         };
     }
 
-    static Vec3 unproject(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, Vec2 pt) {
+    static Vec3 unproject(Kind kind, Position viewpoint, GridType gridType, Vec2 pt) {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt);
             case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt);
             case POLAR -> unprojectPolar(viewpoint, gridType, pt);
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use unproject()");
         };
     }
 
@@ -79,11 +83,11 @@ final class NonOrthoProjection {
         return new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
     }
 
-    static Vec2 emitMapVertex(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
         Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
         if (first)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        if (kind == ProjectionMode.NonOrthoKind.HPC)
+        if (kind == Kind.HPC)
             emitProjectedVertex(vp, current, vexBuf, color);
         else
             emitWrappedVertex(vp, previous, current, vexBuf, color);
@@ -92,21 +96,20 @@ final class NonOrthoProjection {
         return current;
     }
 
-    static Vec2 projectToScreen(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
+    static Vec2 projectToScreen(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
         Vec2 projected = project(kind, viewpoint, gridType, v, scale);
         return new Vec2(projected.x * vp.aspect, projected.y);
     }
 
-    static void emitMapPoint(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
         Vec2 projected = projectToScreen(kind, viewpoint, gridType, scale, vp, vertex);
         vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
     }
 
-    static Vec3 unprojectDisplayPoint(ProjectionMode.NonOrthoKind kind, Camera camera, Viewport vp, int x, int y) {
+    static Vec3 unprojectDisplayPoint(Kind kind, Camera camera, Viewport vp, int x, int y) {
         return switch (kind) {
             case HPC -> new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
             case LATITUDINAL, POLAR -> CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use non-ortho display unprojection()");
         };
     }
 

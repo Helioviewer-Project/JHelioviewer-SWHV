@@ -14,7 +14,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
 // through an explicit map basis shared by rendering and mouse unprojection.
 public enum ProjectionMode {
-    Orthographic(GLSLSolarShader.ortho, GridScale.ortho, NonOrthoKind.NONE) {
+    Orthographic(GLSLSolarShader.ortho, GridScale.ortho, null) {
         @Override
         public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
             if (first) {
@@ -57,37 +57,36 @@ public enum ProjectionMode {
             return new Vec2(phi, theta);
         }
     },
-    HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoKind.HPC),
-    Latitudinal(GLSLSolarShader.lati, GridScale.lati, NonOrthoKind.LATITUDINAL),
-    LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, NonOrthoKind.POLAR),
-    Polar(GLSLSolarShader.polar, GridScale.polar, NonOrthoKind.POLAR);
-
-    enum NonOrthoKind {
-        NONE,
-        HPC,
-        LATITUDINAL,
-        POLAR
-    }
+    HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoProjection.Kind.HPC),
+    Latitudinal(GLSLSolarShader.lati, GridScale.lati, NonOrthoProjection.Kind.LATITUDINAL),
+    LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, NonOrthoProjection.Kind.POLAR),
+    Polar(GLSLSolarShader.polar, GridScale.polar, NonOrthoProjection.Kind.POLAR);
 
     public final GLSLSolarShader shader;
     public final GridScale scale;
-    private final NonOrthoKind nonOrthoKind;
+    private final NonOrthoProjection.Kind nonOrthoKind;
 
-    ProjectionMode(GLSLSolarShader _shader, GridScale _scale, NonOrthoKind _nonOrthoKind) {
+    ProjectionMode(GLSLSolarShader _shader, GridScale _scale, NonOrthoProjection.Kind _nonOrthoKind) {
         shader = _shader;
         scale = _scale;
         nonOrthoKind = _nonOrthoKind;
     }
 
     public final Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
+        if (nonOrthoKind == null)
+            throw new UnsupportedOperationException("Orthographic mode does not use projectToScreen()");
         return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
     }
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+        if (nonOrthoKind == null)
+            throw new UnsupportedOperationException("Orthographic mode does not use non-ortho polyline emission");
         return NonOrthoProjection.emitMapVertex(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, previous, vexBuf, color, first, last);
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
+        if (nonOrthoKind == null)
+            throw new UnsupportedOperationException("Orthographic mode does not use non-ortho point emission");
         NonOrthoProjection.emitMapPoint(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, vexBuf, color, size);
     }
 
@@ -105,10 +104,14 @@ public enum ProjectionMode {
     }
 
     public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        if (nonOrthoKind == null)
+            throw new UnsupportedOperationException("Orthographic mode does not use non-ortho surface unprojection()");
         return NonOrthoProjection.unproject(nonOrthoKind, camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
     }
 
     public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) { // doesn't work well for Lati/*Polar
+        if (nonOrthoKind == null)
+            throw new UnsupportedOperationException("Orthographic mode does not use non-ortho display unprojection()");
         return NonOrthoProjection.unprojectDisplayPoint(nonOrthoKind, camera, vp, x, y);
     }
 }
