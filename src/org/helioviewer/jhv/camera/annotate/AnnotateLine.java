@@ -18,10 +18,11 @@ public class AnnotateLine extends AbstractAnnotateable {
     }
 
     private static void drawLine(double centerX, double centerY, double bw, double bh, BufVertex buf, byte[] color) {
+        boolean flat = Display.mode.isHpc();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             double y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
-            double z = FOVShape.computeZ(x, y, Display.mode.isHpc());
+            double z = FOVShape.computeZ(x, y, flat);
             if (i == 0) { // first
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }

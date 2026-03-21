@@ -16,13 +16,11 @@ final class OrthoProjection {
     }
 
     static void emitMapVertex(Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-        if (first) {
+        if (first)
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
-        }
         vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, color);
-        if (last) {
+        if (last)
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
-        }
     }
 
     static void emitMapPoint(Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
@@ -38,11 +36,10 @@ final class OrthoProjection {
     }
 
     static Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        Quat rotation = Quat.ZERO;
-        if (gridType != GridType.Viewpoint) {
-            Position viewpoint = camera.getViewpoint();
-            rotation = Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
-        }
+        Position viewpoint = camera.getViewpoint();
+        Quat rotation = gridType == GridType.Viewpoint
+                ? Quat.ZERO
+                : Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
 
         Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, x, y, rotation);
         if (p == null)
@@ -50,8 +47,7 @@ final class OrthoProjection {
 
         double theta = Math.toDegrees(SphericalCoords.latitude(p));
         double phi = Math.toDegrees(SphericalCoords.longitude(p));
-        if (gridType == GridType.Carrington && phi < 0)
-            phi += 360;
+        phi = gridType == GridType.Carrington && phi < 0 ? phi + 360 : phi;
         return new Vec2(phi, theta);
     }
 }
