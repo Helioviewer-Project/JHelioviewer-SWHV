@@ -82,7 +82,7 @@ public enum ProjectionMode {
     LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, NonOrthoKind.POLAR),
     Polar(GLSLSolarShader.polar, GridScale.polar, NonOrthoKind.POLAR);
 
-    private enum NonOrthoKind {
+    enum NonOrthoKind {
         NONE,
         HPC,
         LATITUDINAL,
@@ -112,21 +112,11 @@ public enum ProjectionMode {
     }
 
     protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
-        return switch (nonOrthoKind) {
-            case HPC -> NonOrthoProjection.projectHpc(viewpoint, v, scale);
-            case LATITUDINAL -> NonOrthoProjection.projectLatitudinal(viewpoint, gridType, v, scale);
-            case POLAR -> NonOrthoProjection.projectPolar(viewpoint, gridType, v, scale);
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use project()");
-        };
+        return NonOrthoProjection.project(nonOrthoKind, viewpoint, gridType, v, scale);
     }
 
     protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
-        return switch (nonOrthoKind) {
-            case HPC -> NonOrthoProjection.unprojectHpc(viewpoint, pt);
-            case LATITUDINAL -> NonOrthoProjection.unprojectLatitudinal(viewpoint, gridType, pt);
-            case POLAR -> NonOrthoProjection.unprojectPolar(viewpoint, gridType, pt);
-            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use unproject()");
-        };
+        return NonOrthoProjection.unproject(nonOrthoKind, viewpoint, gridType, pt);
     }
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {

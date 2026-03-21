@@ -14,6 +14,24 @@ final class NonOrthoProjection {
     private NonOrthoProjection() {
     }
 
+    static Vec2 project(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+        return switch (kind) {
+            case HPC -> projectHpc(viewpoint, v, scale);
+            case LATITUDINAL -> projectLatitudinal(viewpoint, gridType, v, scale);
+            case POLAR -> projectPolar(viewpoint, gridType, v, scale);
+            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use project()");
+        };
+    }
+
+    static Vec3 unproject(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, Vec2 pt) {
+        return switch (kind) {
+            case HPC -> unprojectHpc(viewpoint, pt);
+            case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt);
+            case POLAR -> unprojectPolar(viewpoint, gridType, pt);
+            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use unproject()");
+        };
+    }
+
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
