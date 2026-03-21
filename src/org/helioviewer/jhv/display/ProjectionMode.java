@@ -79,24 +79,8 @@ public enum ProjectionMode {
         nonOrthoKind = _nonOrthoKind;
     }
 
-    public final Vec2 project(Position viewpoint, GridType gridType, Vec3 v) {
-        return projectMap(viewpoint, gridType, v);
-    }
-
-    public final Vec3 unproject(Position viewpoint, GridType gridType, Vec2 pt) {
-        return unprojectMap(viewpoint, gridType, pt);
-    }
-
     public final Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
         return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
-    }
-
-    private Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
-        return NonOrthoProjection.project(nonOrthoKind, viewpoint, gridType, v, scale);
-    }
-
-    private Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
-        return NonOrthoProjection.unproject(nonOrthoKind, viewpoint, gridType, pt);
     }
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
@@ -121,7 +105,7 @@ public enum ProjectionMode {
     }
 
     public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return unproject(camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
+        return NonOrthoProjection.unproject(nonOrthoKind, camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
     }
 
     public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) { // doesn't work well for Lati/*Polar
