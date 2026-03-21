@@ -66,6 +66,10 @@ public enum ProjectionMode {
         nonOrthoKind = _nonOrthoKind;
     }
 
+    public boolean isOrthographic() {
+        return this == Orthographic;
+    }
+
     public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
         return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
     }

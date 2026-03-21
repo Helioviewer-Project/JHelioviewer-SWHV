@@ -136,7 +136,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
             if (pi == null)
                 continue;
 
-            if (Display.mode == ProjectionMode.Orthographic) {
+            if (Display.mode.isOrthographic()) {
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
