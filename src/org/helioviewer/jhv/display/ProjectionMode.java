@@ -48,11 +48,6 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-            return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
-        }
-
-        @Override
         public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
             Quat rotation = Quat.ZERO; // final frame to unproject into
             if (gridType != GridType.Viewpoint) {
@@ -76,6 +71,17 @@ public enum ProjectionMode {
         @Override
         protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
             return NonOrthoProjection.projectHpc(viewpoint, v, scale);
+        }
+
+        @Override
+        public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+            Vec2 current = projectMap(viewpoint, gridType, vertex);
+            if (first)
+                emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+            emitProjectedVertex(vp, current, vexBuf, color);
+            if (last)
+                emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+            return current;
         }
 
         @Override
@@ -189,7 +195,7 @@ public enum ProjectionMode {
         }
     }
 
-    private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
+    protected static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
