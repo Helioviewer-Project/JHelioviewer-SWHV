@@ -88,7 +88,7 @@ public enum ProjectionMode {
     }
 
     public final Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
-        return NonOrthoProjection.projectToScreen(this, viewpoint, gridType, vp, v);
+        return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
     }
 
     private Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
@@ -100,11 +100,11 @@ public enum ProjectionMode {
     }
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-        return NonOrthoProjection.emitMapVertex(nonOrthoKind, this, viewpoint, gridType, vp, vertex, previous, vexBuf, color, first, last);
+        return NonOrthoProjection.emitMapVertex(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, previous, vexBuf, color, first, last);
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
-        NonOrthoProjection.emitMapPoint(this, viewpoint, gridType, vp, vertex, vexBuf, color, size);
+        NonOrthoProjection.emitMapPoint(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, vexBuf, color, size);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {

@@ -79,8 +79,8 @@ final class NonOrthoProjection {
         return new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
     }
 
-    static Vec2 emitMapVertex(ProjectionMode.NonOrthoKind kind, ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
-        Vec2 current = mode.project(viewpoint, gridType, vertex);
+    static Vec2 emitMapVertex(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
         if (first)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
         if (kind == ProjectionMode.NonOrthoKind.HPC)
@@ -92,13 +92,13 @@ final class NonOrthoProjection {
         return current;
     }
 
-    static Vec2 projectToScreen(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
-        Vec2 projected = mode.project(viewpoint, gridType, v);
+    static Vec2 projectToScreen(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
+        Vec2 projected = project(kind, viewpoint, gridType, v, scale);
         return new Vec2(projected.x * vp.aspect, projected.y);
     }
 
-    static void emitMapPoint(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
-        Vec2 projected = projectToScreen(mode, viewpoint, gridType, vp, vertex);
+    static void emitMapPoint(ProjectionMode.NonOrthoKind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+        Vec2 projected = projectToScreen(kind, viewpoint, gridType, scale, vp, vertex);
         vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
     }
 
