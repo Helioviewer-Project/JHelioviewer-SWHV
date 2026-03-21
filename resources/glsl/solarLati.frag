@@ -11,16 +11,18 @@ vec2 sampleLatiTexcoord(const vec2 crval, const vec4 crota, const vec4 rect, con
     clamp_value(latitude, -HALFPI, HALFPI);
 
     float cosLatitude = cos(latitude);
-    float sinLatitude = sin(latitude);
-    float cosLongitude = cos(longitude);
-    float sinLongitude = sin(longitude);
+    vec3 spherical;
+    spherical.x = cosLatitude * cos(longitude);
+    spherical.y = cosLatitude * sin(longitude);
+    spherical.z = sin(latitude);
 
     float sinGridLatitude = -sin(grid.z);
     float cosGridLatitude = cos(grid.z);
-    vec3 rotatedSpherical = vec3(
-        cosGridLatitude * cosLatitude * cosLongitude + sinGridLatitude * sinLatitude,
-        cosLatitude * sinLongitude,
-        -sinGridLatitude * cosLatitude * cosLongitude + cosGridLatitude * sinLatitude);
+    mat3 rot = mat3(
+        cosGridLatitude, 0., sinGridLatitude,
+        0., 1., 0.,
+        -sinGridLatitude, 0., cosGridLatitude);
+    vec3 rotatedSpherical = rot * spherical;
     if (rotatedSpherical.x < 0.)
         discard;
 
