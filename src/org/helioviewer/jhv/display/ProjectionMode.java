@@ -2,7 +2,6 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -44,7 +43,7 @@ public enum ProjectionMode {
 
         @Override
         public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-            return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+            return OrthoProjection.unprojectDisplayPoint(camera, vp, x, y);
         }
     },
     HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoProjection.Kind.HPC),
