@@ -18,7 +18,8 @@ public enum ProjectionMode {
 
         @Override
         public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-            return OrthoProjection.emitMapVertex(vertex, previous, vexBuf, color, first, last, radius);
+            OrthoProjection.emitMapVertex(vertex, vexBuf, color, first, last, radius);
+            return previous;
         }
 
         @Override
