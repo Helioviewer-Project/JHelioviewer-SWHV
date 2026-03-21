@@ -14,7 +14,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
 // through an explicit map basis shared by rendering and mouse unprojection.
 public enum ProjectionMode {
-    Orthographic(GLSLSolarShader.ortho, GridScale.ortho) {
+    Orthographic(GLSLSolarShader.ortho, GridScale.ortho, NonOrthoKind.NONE) {
         @Override
         protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
             throw new UnsupportedOperationException("Orthographic mode does not use project()");
@@ -67,20 +67,10 @@ public enum ProjectionMode {
             return new Vec2(phi, theta);
         }
     },
-    HPC(GLSLSolarShader.hpc, GridScale.hpc) {
-        @Override
-        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
-            return NonOrthoProjection.projectHpc(viewpoint, v, scale);
-        }
-
+    HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoKind.HPC) {
         @Override
         public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
             return NonOrthoProjection.emitUnwrappedMapVertex(this, viewpoint, gridType, vp, vertex, vexBuf, color, first, last);
-        }
-
-        @Override
-        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
-            return NonOrthoProjection.unprojectHpc(viewpoint, pt);
         }
 
         @Override
@@ -88,46 +78,25 @@ public enum ProjectionMode {
             return new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
         }
     },
-    Latitudinal(GLSLSolarShader.lati, GridScale.lati) {
-        @Override
-        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
-            return NonOrthoProjection.projectLatitudinal(viewpoint, gridType, v, scale);
-        }
+    Latitudinal(GLSLSolarShader.lati, GridScale.lati, NonOrthoKind.LATITUDINAL),
+    LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, NonOrthoKind.POLAR),
+    Polar(GLSLSolarShader.polar, GridScale.polar, NonOrthoKind.POLAR);
 
-        @Override
-        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
-            return NonOrthoProjection.unprojectLatitudinal(viewpoint, gridType, pt);
-        }
-    },
-    LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar) {
-        @Override
-        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
-            return NonOrthoProjection.projectPolar(viewpoint, gridType, v, scale);
-        }
-
-        @Override
-        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
-            return NonOrthoProjection.unprojectPolar(viewpoint, gridType, pt);
-        }
-    },
-    Polar(GLSLSolarShader.polar, GridScale.polar) {
-        @Override
-        protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
-            return NonOrthoProjection.projectPolar(viewpoint, gridType, v, scale);
-        }
-
-        @Override
-        protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
-            return NonOrthoProjection.unprojectPolar(viewpoint, gridType, pt);
-        }
-    };
+    private enum NonOrthoKind {
+        NONE,
+        HPC,
+        LATITUDINAL,
+        POLAR
+    }
 
     public final GLSLSolarShader shader;
     public final GridScale scale;
+    private final NonOrthoKind nonOrthoKind;
 
-    ProjectionMode(GLSLSolarShader _shader, GridScale _scale) {
+    ProjectionMode(GLSLSolarShader _shader, GridScale _scale, NonOrthoKind _nonOrthoKind) {
         shader = _shader;
         scale = _scale;
+        nonOrthoKind = _nonOrthoKind;
     }
 
     public final Vec2 project(Position viewpoint, GridType gridType, Vec3 v) {
@@ -142,9 +111,23 @@ public enum ProjectionMode {
         return NonOrthoProjection.projectToScreen(this, viewpoint, gridType, vp, v);
     }
 
-    protected abstract Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v);
+    protected Vec2 projectMap(Position viewpoint, GridType gridType, Vec3 v) {
+        return switch (nonOrthoKind) {
+            case HPC -> NonOrthoProjection.projectHpc(viewpoint, v, scale);
+            case LATITUDINAL -> NonOrthoProjection.projectLatitudinal(viewpoint, gridType, v, scale);
+            case POLAR -> NonOrthoProjection.projectPolar(viewpoint, gridType, v, scale);
+            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use project()");
+        };
+    }
 
-    protected abstract Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt);
+    protected Vec3 unprojectMap(Position viewpoint, GridType gridType, Vec2 pt) {
+        return switch (nonOrthoKind) {
+            case HPC -> NonOrthoProjection.unprojectHpc(viewpoint, pt);
+            case LATITUDINAL -> NonOrthoProjection.unprojectLatitudinal(viewpoint, gridType, pt);
+            case POLAR -> NonOrthoProjection.unprojectPolar(viewpoint, gridType, pt);
+            case NONE -> throw new UnsupportedOperationException("Orthographic mode does not use unproject()");
+        };
+    }
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
         return NonOrthoProjection.emitWrappedMapVertex(this, viewpoint, gridType, vp, vertex, previous, vexBuf, color, first, last);
