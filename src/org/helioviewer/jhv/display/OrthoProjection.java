@@ -34,6 +34,10 @@ final class OrthoProjection {
         return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
     }
 
+    static Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y) {
+        return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+    }
+
     static Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
         Quat rotation = Quat.ZERO;
         if (gridType != GridType.Viewpoint) {
