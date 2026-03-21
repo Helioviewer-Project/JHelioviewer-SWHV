@@ -75,13 +75,7 @@ public enum ProjectionMode {
 
         @Override
         public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-            Vec2 current = projectMap(viewpoint, gridType, vertex);
-            if (first)
-                emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-            emitProjectedVertex(vp, current, vexBuf, color);
-            if (last)
-                emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-            return current;
+            return emitUnwrappedMapVertex(viewpoint, gridType, vp, vertex, vexBuf, color, first, last);
         }
 
         @Override
@@ -158,6 +152,16 @@ public enum ProjectionMode {
         if (first)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
         emitWrappedVertex(vp, previous, current, vexBuf, color);
+        if (last)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        return current;
+    }
+
+    protected final Vec2 emitUnwrappedMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        Vec2 current = projectMap(viewpoint, gridType, vertex);
+        if (first)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        emitProjectedVertex(vp, current, vexBuf, color);
         if (last)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
         return current;
