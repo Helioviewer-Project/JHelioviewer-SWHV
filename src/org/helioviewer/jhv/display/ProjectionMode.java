@@ -70,6 +70,14 @@ public enum ProjectionMode {
         return this == Orthographic;
     }
 
+    public boolean isHpc() {
+        return this == HPC;
+    }
+
+    public boolean isLatitudinal() {
+        return this == Latitudinal;
+    }
+
     public boolean isPolarLike() {
         return this == Polar || this == LogPolar;
     }

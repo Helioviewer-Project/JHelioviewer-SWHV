@@ -120,7 +120,7 @@ public class GLListener implements GLEventListener {
 
         gl.glDisable(GL3.GL_DEPTH_TEST); // avoid depth fighting, e.g., grid
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
-        boolean hpcMode = Display.mode == ProjectionMode.HPC;
+        boolean hpcMode = Display.mode.isHpc();
         Region hpcBounds = hpcMode ? getCenteredHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
             if (hpcMode) {
