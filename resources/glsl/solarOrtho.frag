@@ -6,7 +6,7 @@ const vec3 zAxis = vec3(0, 0, 1);
 // 1 = simple-TAN
 #define SIMPLE_TAN 1
 
-vec2 worldToTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
+vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
 #if SIMPLE_TAN
     if (int(wcs.projectionMeta.x) == WCS_PROJECTION_TAN)
         return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);
@@ -77,7 +77,7 @@ void main(void) {
             discard;
     }
 
-    vec2 texcoord = worldToTexcoord(rotatedHitPoint, wcs[0], pv0);
+    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], pv0);
 
     float rotatedHitPointRad2 = dot(rotatedHitPoint.xy, rotatedHitPoint.xy);
     float minRadius2 = display.radii.x * display.radii.x;
@@ -94,18 +94,18 @@ void main(void) {
             discard;
     }
 
-    vec2 difftexcoord;
+    vec2 diffTexCoord;
     if (diffMode) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
             diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
 
-        difftexcoord = worldToTexcoord(diffRotatedHitPoint, wcs[1], pv1);
+        diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], pv1);
 
         float diffRotatedHitPointRad2 = dot(diffRotatedHitPoint.xy, diffRotatedHitPoint.xy);
         if (diffRotatedHitPointRad2 > maxRadius2 || diffRotatedHitPointRad2 < minRadius2) {
             discard;
         }
     }
-    outColor = getColor(texcoord, difftexcoord, enhancementFactor);
+    outColor = getColor(texCoord, diffTexCoord, enhancementFactor);
 }

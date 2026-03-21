@@ -20,9 +20,9 @@ vec2 sampleLogPolarTexcoord(const vec2 crval, const vec4 crota, const vec4 rect,
     }
 
     vec3 centered = apply_center(vec3(polarXY.x, -polarXY.y, 0.), crval, crota);
-    vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
-    clamp_texture(texcoord);
-    return texcoord;
+    vec2 texCoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+    clamp_texture(texCoord);
+    return texCoord;
 }
 
 void main(void) {
@@ -31,12 +31,12 @@ void main(void) {
     float radialCoordinate = exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart));
     float enhancementFactor = max(1., radialCoordinate);
     bool diffMode = display.isDiff != NODIFFERENCE;
-    vec2 texcoord = sampleLogPolarTexcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
+    vec2 texCoord = sampleLogPolarTexcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
     if (!diffMode) {
-        color = getColor(texcoord, texcoord, enhancementFactor);
+        color = getColor(texCoord, texCoord, enhancementFactor);
     } else {
-        vec2 difftexcoord = sampleLogPolarTexcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, radialCoordinate);
-        color = getColor(texcoord, difftexcoord, enhancementFactor);
+        vec2 diffTexCoord = sampleLogPolarTexcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, radialCoordinate);
+        color = getColor(texCoord, diffTexCoord, enhancementFactor);
     }
     outColor = color;
 }
