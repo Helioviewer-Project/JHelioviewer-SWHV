@@ -38,23 +38,25 @@ vec3 sampleOffLimbPoint(const WCS wcs, const vec4 up1, const bool discardBackFac
 void main(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 upXY = up1.xy;
+    bool diffMode = display.isDiff != NODIFFERENCE;
 
-    float radius2 = dot(up1.xy, up1.xy);
+    float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
 
-    float factor;
+    float enhancementFactor;
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffRotatedHitPoint = vec3(0.);
 
     if (onDisk) {
-        hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
+        hitPoint = vec3(upXY, sqrt(1. - radius2));
         rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
-        if (display.isDiff != NODIFFERENCE)
+        if (diffMode)
             diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], hitPoint);
 
-        factor = 1.;
+        enhancementFactor = 1.;
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
     } else {
-        factor = sqrt(radius2);
+        enhancementFactor = sqrt(radius2);
         gl_FragDepth = 1.;
     }
 
@@ -77,20 +79,23 @@ void main(void) {
 
     vec2 texcoord = worldToTexcoord(rotatedHitPoint, wcs[0], pv0);
 
-    float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
-    vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-    float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
-
     float rotatedHitPointRad2 = dot(rotatedHitPoint.xy, rotatedHitPoint.xy);
     float minRadius2 = display.radii.x * display.radii.x;
     float maxRadius2 = display.radii.y * display.radii.y;
-    if (rotatedHitPointRad2 > maxRadius2 || rotatedHitPointRad2 < minRadius2 ||
-        (display.cutOff.z >= 0. && (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z))) {
+    if (rotatedHitPointRad2 > maxRadius2 || rotatedHitPointRad2 < minRadius2) {
         discard;
     }
 
+    if (display.cutOff.z >= 0.) {
+        float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
+        vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
+        float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
+        if (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z)
+            discard;
+    }
+
     vec2 difftexcoord;
-    if (display.isDiff != NODIFFERENCE) {
+    if (diffMode) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
             diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
@@ -102,5 +107,5 @@ void main(void) {
             discard;
         }
     }
-    outColor = getColor(texcoord, difftexcoord, factor);
+    outColor = getColor(texcoord, difftexcoord, enhancementFactor);
 }
