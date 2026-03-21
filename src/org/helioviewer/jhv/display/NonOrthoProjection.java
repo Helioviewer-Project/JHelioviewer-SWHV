@@ -102,6 +102,11 @@ final class NonOrthoProjection {
         return new Vec2(projected.x * vp.aspect, projected.y);
     }
 
+    static void emitMapPoint(ProjectionMode mode, Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+        Vec2 projected = projectToScreen(mode, viewpoint, gridType, vp, vertex);
+        vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
+    }
+
     private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
         double longitude = Math.toRadians(pt.x);
         double latitude = Math.toRadians(pt.y);

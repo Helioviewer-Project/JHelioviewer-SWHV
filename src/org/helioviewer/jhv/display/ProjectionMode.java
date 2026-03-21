@@ -124,8 +124,7 @@ public enum ProjectionMode {
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
-        Vec2 projected = NonOrthoProjection.projectToScreen(this, viewpoint, gridType, vp, vertex);
-        vexBuf.putVertex((float) projected.x, (float) projected.y, 0, (float) size, color);
+        NonOrthoProjection.emitMapPoint(this, viewpoint, gridType, vp, vertex, vexBuf, color, size);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
