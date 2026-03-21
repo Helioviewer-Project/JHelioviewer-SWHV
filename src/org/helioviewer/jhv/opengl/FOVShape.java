@@ -17,10 +17,6 @@ public class FOVShape {
         centerY = _centerY;
     }
 
-    public void putCenter(BufVertex buf, byte[] color) {
-        putCenter(buf, color, false);
-    }
-
     public void putCenter(BufVertex buf, byte[] color, boolean flat) {
         double centerZ = computeZ(centerX, centerY, flat);
         buf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
@@ -31,10 +27,6 @@ public class FOVShape {
             return 0;
         double n = 1 - x * x - y * y;
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
-    }
-
-    public void putRectLine(double bw, double bh, BufVertex buf, byte[] color) {
-        putRectLine(bw, bh, buf, color, false);
     }
 
     public void putRectLine(double bw, double bh, BufVertex buf, byte[] color, boolean flat) {
@@ -73,10 +65,6 @@ public class FOVShape {
                 buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
         }
-    }
-
-    public void putCircLine(double r, BufVertex buf, byte[] color) {
-        putCircLine(r, buf, color, false);
     }
 
     public void putCircLine(double r, BufVertex buf, byte[] color, boolean flat) {
