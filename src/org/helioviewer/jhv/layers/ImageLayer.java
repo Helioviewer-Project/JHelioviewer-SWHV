@@ -257,7 +257,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1, meta1.getWCSProjection(), meta1.getWCSPlaneUnitsPerRad(), (float) metaViewpoint1.distance);
         shader.bindPV(gl, meta0.getPV2(), meta1.getPV2());
 
-        if (Display.mode == ProjectionMode.Latitudinal) {
+        if (Display.mode.isLatitudinal()) {
             GridType gridType = Display.gridType;
             shader.bindLatitudinalGrid(gl,
                     latiLongitude(gridType, cameraViewpoint, metaViewpoint0),

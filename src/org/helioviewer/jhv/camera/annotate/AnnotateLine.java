@@ -19,7 +19,7 @@ public class AnnotateLine extends AbstractAnnotateable {
     }
 
     private static void drawLine(double centerX, double centerY, double bw, double bh, BufVertex buf, byte[] color) {
-        boolean flat = Display.mode == ProjectionMode.HPC;
+        boolean flat = Display.mode.isHpc();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             double y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
