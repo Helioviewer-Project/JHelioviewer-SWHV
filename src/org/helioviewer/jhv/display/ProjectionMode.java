@@ -67,13 +67,7 @@ public enum ProjectionMode {
             return new Vec2(phi, theta);
         }
     },
-    HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoKind.HPC) {
-        @Override
-        public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-            return NonOrthoProjection.emitUnwrappedMapVertex(this, viewpoint, gridType, vp, vertex, vexBuf, color, first, last);
-        }
-
-    },
+    HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoKind.HPC),
     Latitudinal(GLSLSolarShader.lati, GridScale.lati, NonOrthoKind.LATITUDINAL),
     LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, NonOrthoKind.POLAR),
     Polar(GLSLSolarShader.polar, GridScale.polar, NonOrthoKind.POLAR);
@@ -116,7 +110,7 @@ public enum ProjectionMode {
     }
 
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-        return NonOrthoProjection.emitWrappedMapVertex(this, viewpoint, gridType, vp, vertex, previous, vexBuf, color, first, last);
+        return NonOrthoProjection.emitMapVertex(nonOrthoKind, this, viewpoint, gridType, vp, vertex, previous, vexBuf, color, first, last);
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
