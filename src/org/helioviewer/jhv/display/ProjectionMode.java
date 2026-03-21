@@ -107,10 +107,10 @@ public enum ProjectionMode {
     }
 
     public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return NonOrthoProjection.unproject(nonOrthoKind, camera.getViewpoint(), gridType, mouseToGrid(camera, vp, x, y, gridType));
+        return NonOrthoProjection.unprojectSurfacePoint(nonOrthoKind, scale, camera, vp, x, y, gridType);
     }
 
-    public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) { // doesn't work well for Lati/*Polar
+    public Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
         return NonOrthoProjection.unprojectDisplayPoint(nonOrthoKind, camera, vp, x, y);
     }
 }
