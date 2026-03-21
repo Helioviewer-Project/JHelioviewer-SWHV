@@ -78,8 +78,12 @@ public enum ProjectionMode {
         return this == Latitudinal;
     }
 
-    public boolean isPolarLike() {
-        return this == Polar || this == LogPolar;
+    public boolean isPolar() {
+        return this == Polar;
+    }
+
+    public boolean isLogPolar() {
+        return this == LogPolar;
     }
 
     public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {

@@ -4,7 +4,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -112,9 +111,9 @@ public class GLListener implements GLEventListener {
     }
 
     public static void renderSceneScale(Camera camera, GL3 gl) {
-        if (Display.mode == ProjectionMode.Polar) {
+        if (Display.mode.isPolar()) {
             GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
-        } else if (Display.mode == ProjectionMode.LogPolar) {
+        } else if (Display.mode.isLogPolar()) {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
