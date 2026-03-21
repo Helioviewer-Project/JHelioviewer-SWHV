@@ -15,7 +15,7 @@ final class OrthoProjection {
     private OrthoProjection() {
     }
 
-    static Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+    static void emitMapVertex(Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
         if (first) {
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
         }
@@ -23,7 +23,6 @@ final class OrthoProjection {
         if (last) {
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
         }
-        return previous;
     }
 
     static void emitMapPoint(Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
