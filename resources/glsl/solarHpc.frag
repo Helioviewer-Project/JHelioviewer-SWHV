@@ -84,23 +84,23 @@ void main(void) {
     bool diffMode = display.isDiff != NODIFFERENCE;
     float observerDistance = wcs[0].projectionMeta.z;
     vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, observerDistance);
-    vec2 texcoord;
+    vec2 texCoord;
     float enhancementFactor;
     clipHpcGeometry(hpcXY);
-    texcoord = sampleHpcTexcoord(wcs[0], helioprojective, hpcXY, wcs[0].deltaT, pv0, enhancementFactor);
+    texCoord = sampleHpcTexcoord(wcs[0], helioprojective, hpcXY, wcs[0].deltaT, pv0, enhancementFactor);
     if (!diffMode) {
-        clamp_texture(texcoord);
-        color = getColor(texcoord, texcoord, enhancementFactor);
+        clamp_texture(texCoord);
+        color = getColor(texCoord, texCoord, enhancementFactor);
     } else {
         float diffObserverDistance = wcs[1].projectionMeta.z;
         vec2 diffHpcXY = helioprojectiveToHpcXY(helioprojective, diffObserverDistance);
-        vec2 difftexcoord;
+        vec2 diffTexCoord;
         float diffEnhancementFactor;
         clipHpcGeometry(diffHpcXY);
-        difftexcoord = sampleHpcTexcoord(wcs[1], helioprojective, diffHpcXY, wcs[1].deltaT, pv1, diffEnhancementFactor);
-        clamp_texture(texcoord);
-        clamp_texture(difftexcoord);
-        color = getColor(texcoord, difftexcoord, max(enhancementFactor, diffEnhancementFactor));
+        diffTexCoord = sampleHpcTexcoord(wcs[1], helioprojective, diffHpcXY, wcs[1].deltaT, pv1, diffEnhancementFactor);
+        clamp_texture(texCoord);
+        clamp_texture(diffTexCoord);
+        color = getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
     }
     outColor = color;
 }
