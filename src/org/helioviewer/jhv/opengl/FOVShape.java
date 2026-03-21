@@ -13,10 +13,6 @@ public class FOVShape {
     private double centerY = 0;
 
     public void setCenter(double _centerX, double _centerY) {
-        setCenter(_centerX, _centerY, false);
-    }
-
-    public void setCenter(double _centerX, double _centerY, boolean flat) {
         centerX = _centerX;
         centerY = _centerY;
     }
@@ -28,10 +24,6 @@ public class FOVShape {
     public void putCenter(BufVertex buf, byte[] color, boolean flat) {
         double centerZ = computeZ(centerX, centerY, flat);
         buf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
-    }
-
-    public static double computeZ(double x, double y) {
-        return computeZ(x, y, false);
     }
 
     public static double computeZ(double x, double y, boolean flat) {
