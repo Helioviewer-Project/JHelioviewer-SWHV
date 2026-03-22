@@ -533,7 +533,7 @@ def build_jhv_equivalent_astropy_wcs(header, meta: JHVMeta) -> WCS:
     return wcs
 
 
-def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, float, float]:
+def raw_hpc_footprint_bounds_degrees(meta: JHVMeta) -> tuple[float, float, float, float]:
     samples = [
         (-meta.crpix1_gl * meta.unit_per_pixel_x, -meta.crpix2_gl * meta.unit_per_pixel_y),
         ((meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x, -meta.crpix2_gl * meta.unit_per_pixel_y),
@@ -560,7 +560,11 @@ def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, floa
         max_x = max(max_x, lon_deg)
         min_y = min(min_y, lat_deg)
         max_y = max(max_y, lat_deg)
+    return (min_x, max_x, min_y, max_y)
 
+
+def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, float, float]:
+    min_x, max_x, min_y, max_y = raw_hpc_footprint_bounds_degrees(meta)
     half_width = max(abs(min_x), abs(max_x))
     half_height = max(abs(min_y), abs(max_y), half_width / aspect)
     half_width = half_height * aspect
@@ -683,7 +687,15 @@ def sample_worlds_from_pixels(pixel_wcs: WCS, meta: JHVMeta, sample_count: int) 
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate the JHV WCS orthographic code path against astropy.wcs.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Validate the current JHV image/WCS projection code paths against astropy.wcs. "
+            "The script covers the formal TAN/AZP/ZPN image path, the inverse TAN/AZP/ZPN branches "
+            "implemented by JHV, the centered HPC display-bounds logic, and the existing orthographic/HPC/TAN "
+            "comparison modes already used by this branch. It does not validate newer Java overlay-only behavior "
+            "such as viewpoint-space external-point projection or visible-hemisphere clipping."
+        )
+    )
     parser.add_argument("fits_file", type=Path)
     parser.add_argument("--hdu", type=int, default=None, help="Explicit FITS HDU index to use")
     parser.add_argument("--samples", type=int, default=1000, help="Number of random 3D samples")
@@ -694,6 +706,7 @@ def main() -> int:
     parser.add_argument("--inverse-azp", action="store_true", help="Validate the non-slanted AZP inverse plane->world mapping")
     parser.add_argument("--inverse-zpn", action="store_true", help="Validate the primary-branch ZPN inverse plane->world mapping")
     parser.add_argument("--hpc-render-compare", action="store_true", help="Render a bounded HPC screen through JHV and Astropy mappings and write diagnostic PNGs")
+    parser.add_argument("--hpc-bounds-compare", action="store_true", help="Report the raw and centered HPC bounds used by the current JHV display logic")
     parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare formal-TAN in Orthographic mode against JHV HPC over the full rendered comparison frame")
     parser.add_argument("--compare-initial-tan-image-frame", action="store_true", help="Compare simple-TAN against formal-TAN over the full image frame")
     parser.add_argument("--compare-initial-tan-vs-hpc", action="store_true", help="Compare simple-TAN against the JHV HPC display sampling over the full rendered comparison frame")
@@ -711,10 +724,32 @@ def main() -> int:
     projection_wcs = build_projection_only_wcs(header)
     pixel_wcs = build_jhv_equivalent_astropy_wcs(header, meta)
 
+    if args.hpc_bounds_compare:
+        raw_bounds_deg = raw_hpc_footprint_bounds_degrees(meta)
+        centered_bounds_deg = hpc_bounds_degrees(meta, 1.0)
+        print(f"file={args.fits_file}")
+        print("mode=hpc_bounds_compare")
+        print(f"projection={meta.projection}")
+        print(f"observer_distance={meta.observer_distance:.12f}")
+        print(
+            "raw_bounds_deg=("
+            f"{raw_bounds_deg[0]:.12f}, {raw_bounds_deg[1]:.12f}, "
+            f"{raw_bounds_deg[2]:.12f}, {raw_bounds_deg[3]:.12f})"
+        )
+        print(
+            "centered_bounds_deg=("
+            f"{centered_bounds_deg[0]:.12f}, {centered_bounds_deg[1]:.12f}, "
+            f"{centered_bounds_deg[2]:.12f}, {centered_bounds_deg[3]:.12f})"
+        )
+        print(f"centered_half_width_deg={centered_bounds_deg[1]:.12f}")
+        print(f"centered_half_height_deg={centered_bounds_deg[3]:.12f}")
+        return 0
+
     if args.hpc_render_compare:
         if image_data.ndim != 2:
             raise ValueError(f"HPC render compare expects 2D image data, got shape {image_data.shape!r}")
 
+        raw_bounds_deg = raw_hpc_footprint_bounds_degrees(meta)
         bounds_deg = hpc_bounds_degrees(meta, 1.0)
         size = args.render_size
         jhv_img = np.full((size, size), np.nan, dtype=np.float64)
@@ -766,6 +801,7 @@ def main() -> int:
 
         print(f"file={args.fits_file}")
         print(f"mode=hpc_render_compare size={size}")
+        print(f"raw_bounds_deg=({raw_bounds_deg[0]:.12f}, {raw_bounds_deg[1]:.12f}, {raw_bounds_deg[2]:.12f}, {raw_bounds_deg[3]:.12f})")
         print(f"bounds_deg=({bounds_deg[0]:.12f}, {bounds_deg[1]:.12f}, {bounds_deg[2]:.12f}, {bounds_deg[3]:.12f})")
         print(f"pixel_center_max_error_px={max_px_err:.6e}")
         print(f"pixel_center_rms_error_px={math.sqrt(sum_px_err2 / count):.6e}" if count > 0 else "pixel_center_rms_error_px=nan")
