@@ -1,95 +1,70 @@
 
 const vec3 zAxis = vec3(0, 0, 1);
 
-vec3 differential(const float dt, const vec3 v) {
-    if (dt == 0.)
-        return v;
+// TAN choice for ortho only
+// 0 = formal-TAN
+// 1 = simple-TAN
+#define SIMPLE_TAN 1
 
-    float phi = atan(v.x, v.z);
-    float theta = asin(v.y);
-    phi -= differentialRotation(dt, theta); // difference from rigid rotation
-    return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
+vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
+#if SIMPLE_TAN
+    if (int(wcs.projectionMeta.x) == WCS_PROJECTION_TAN)
+        return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);
+#endif
+    vec2 helioprojective = worldToHelioprojective(world, wcs.projectionMeta.z);
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, PV);
+    return wcsPlaneToTexcoord(plane, wcs);
 }
 
-/*
-// DOI 10.1007/s11207-008-9277-6, §2.2.2, Eq.18-23
-vec2 distort(const vec2 c, const float[6] PV) {
-    float mju = PV[1];
-    if (mju == 0)
-        return c;
-
-    clamp_coord(c);
-    vec2 v = c - 0.5;
-    float R = length(v);
-    float Z = cos(asin(R));
-    float Ra = (mju + 1) / (Z + mju);
-    return vec2(v.x * Ra, v.y * Ra) + 0.5;
-}
-*/
-
-vec2 distort(const vec2 c, const float[6] PV) { // DS
-    float mju = PV[1];
-    if (mju == 0)
-        return c;
-
-    clamp_coord(c);
-    vec2 v = c - 0.5;
-
-    float r = length(v);
-    float theta = atan(v.y, v.x);
-
-    float R = r * (1 + r * r * r * r * mju);
-    return vec2(R * cos(theta), R * sin(theta)) + 0.5;
-}
-
-float intersectPlane(const vec4 quat, const vec4 vecin, const bool hideBack) {
+float intersectPlane(const vec4 quat, const vec4 vecin, const bool discardBackFacing) {
     vec3 altnormal = rotate_vector(quat, zAxis);
-    if (hideBack && altnormal.z <= 0.)
+    if (discardBackFacing && altnormal.z <= 0.)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
 
-vec2 world2pix(const vec2 w, const WCS wcs, const float[6] PV) {
-    vec2 c = rotate_vector_inverse(wcs.crota, vec3(w - wcs.crval, 0)).xy;
+vec3 rotateOnDiskPoint(const WCS wcs, const vec3 hitPoint) {
+    vec3 rotated = rotate_vector_inverse(wcs.cameraDiff, hitPoint);
+    if (wcs.deltaT != 0.)
+        rotated = differential(wcs.deltaT, rotated);
+    return rotated;
+}
 
-    vec4 rect = wcs.rect;
-    vec2 tc = distort(rect.zw * vec2(c.x - rect.x, -c.y - rect.y), PV);
-    clamp_coord(tc);
-
-    return tc;
+vec3 sampleOffLimbPoint(const WCS wcs, const vec4 up1, const bool discardBackFacing, out vec3 hitPoint) {
+    hitPoint = vec3(up1.xy, intersectPlane(wcs.cameraDiff, up1, discardBackFacing));
+    return rotate_vector_inverse(wcs.cameraDiff, hitPoint);
 }
 
 void main(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 upXY = up1.xy;
+    bool diffMode = display.isDiff != NODIFFERENCE;
 
-    float radius2 = dot(up1.xy, up1.xy);
+    float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
 
-    float factor;
+    float enhancementFactor;
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffRotatedHitPoint = vec3(0.);
 
     if (onDisk) {
-        hitPoint = vec3(up1.x, up1.y, sqrt(1. - radius2));
-        rotatedHitPoint = differential(wcs[0].deltaT, rotate_vector_inverse(wcs[0].cameraDiff, hitPoint));
-        if (display.isDiff != NODIFFERENCE) {
-            diffRotatedHitPoint = differential(wcs[1].deltaT, rotate_vector_inverse(wcs[1].cameraDiff, hitPoint));
-        }
+        hitPoint = vec3(upXY, sqrt(1. - radius2));
+        rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
+        if (diffMode)
+            diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], hitPoint);
 
-        factor = 1.;
+        enhancementFactor = 1.;
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
     } else {
-        factor = sqrt(radius2);
+        enhancementFactor = sqrt(radius2);
         gl_FragDepth = 1.;
     }
 
     if (rotatedHitPoint.z <= 0.) { // off-limb or back
-        hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
+        rotatedHitPoint = sampleOffLimbPoint(wcs[0], up1, onDisk, hitPoint);
         if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
-
-        rotatedHitPoint = rotate_vector_inverse(wcs[0].cameraDiff, hitPoint);
-        if (length(rotatedHitPoint) <= 1.) // differential: central disk
+        if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
             discard;
 
         if (display.calculateDepth != 0) // intersecting Euhforia planes
@@ -97,36 +72,40 @@ void main(void) {
     }
 
     if (display.sector.z != 0.) {
-        float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x); // maybe WCSed?
+        float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x);
         if (theta < display.sector.x || theta > display.sector.y)
             discard;
     }
 
-    vec2 texcoord = world2pix(rotatedHitPoint.xy, wcs[0], pv0);
+    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], pv0);
 
-    float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
-    vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-    float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
-
-    float rotatedHitPointRad = length(rotatedHitPoint.xy);
-    if (rotatedHitPointRad > display.radii.y || rotatedHitPointRad < display.radii.x ||
-        (display.cutOff.z >= 0. && (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z))) {
+    float rotatedHitPointRad2 = dot(rotatedHitPoint.xy, rotatedHitPoint.xy);
+    float minRadius2 = display.radii.x * display.radii.x;
+    float maxRadius2 = display.radii.y * display.radii.y;
+    if (rotatedHitPointRad2 > maxRadius2 || rotatedHitPointRad2 < minRadius2) {
         discard;
     }
 
-    vec2 difftexcoord;
-    if (display.isDiff != NODIFFERENCE) {
+    if (display.cutOff.z >= 0.) {
+        float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
+        vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
+        float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
+        if (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z)
+            discard;
+    }
+
+    vec2 diffTexCoord;
+    if (diffMode) {
         if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
-            hitPoint = vec3(up1.x, up1.y, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
-            diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, hitPoint);
+            diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
 
-        difftexcoord = world2pix(diffRotatedHitPoint.xy, wcs[1], pv1);
+        diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], pv1);
 
-        float diffRotatedHitPointRad = length(diffRotatedHitPoint.xy);
-        if (diffRotatedHitPointRad > display.radii.y || diffRotatedHitPointRad < display.radii.x) {
+        float diffRotatedHitPointRad2 = dot(diffRotatedHitPoint.xy, diffRotatedHitPoint.xy);
+        if (diffRotatedHitPointRad2 > maxRadius2 || diffRotatedHitPointRad2 < minRadius2) {
             discard;
         }
     }
-    outColor = getColor(texcoord, difftexcoord, factor);
+    outColor = getColor(texCoord, diffTexCoord, enhancementFactor);
 }

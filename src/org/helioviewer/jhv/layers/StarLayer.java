@@ -1,7 +1,8 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
@@ -20,8 +21,10 @@ import com.jogamp.opengl.GL3;
 
 public final class StarLayer extends AbstractLayer implements Camera.Listener, GaiaClient.Receiver {
 
-    private final Cache<Position, Optional<BufVertex>> cache = Caffeine.newBuilder().softValues().build();
+    private final Cache<Position, BufVertex> cache = Caffeine.newBuilder().softValues().build();
+    private final Set<Position> pending = new HashSet<>();
     private final GLSLShape points = new GLSLShape(true);
+    private BufVertex uploadedBuf;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -34,14 +37,21 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     public void viewpointChanged(Position viewpoint) {
         if (cache.getIfPresent(viewpoint) != null) // avoid repeated calls
             return;
-        cache.put(viewpoint, Optional.empty()); // promise
+        if (!pending.add(viewpoint))
+            return;
         GaiaClient.submitSearch(this, viewpoint);
     }
 
     @Override
     public void setStars(Position viewpoint, BufVertex pointsBuf) {
-        cache.put(viewpoint, Optional.of(pointsBuf));
+        pending.remove(viewpoint);
+        cache.put(viewpoint, pointsBuf);
         MovieDisplay.display();
+    }
+
+    @Override
+    public void setStarsFailed(Position viewpoint) {
+        pending.remove(viewpoint);
     }
 
     @Override
@@ -50,11 +60,14 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
             return;
 
         Position viewpoint = camera.getViewpoint();
-        Optional<BufVertex> optBuf = cache.getIfPresent(viewpoint);
-        if (optBuf == null || optBuf.isEmpty())
+        BufVertex buf = cache.getIfPresent(viewpoint);
+        if (buf == null)
             return;
 
-        points.setVertexRepeatable(gl, optBuf.get());
+        if (buf != uploadedBuf) {
+            points.setVertexRepeatable(gl, buf);
+            uploadedBuf = buf;
+        }
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
@@ -79,6 +92,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
 
     @Override
     public void dispose(GL3 gl) {
+        uploadedBuf = null;
         points.dispose(gl);
     }
 

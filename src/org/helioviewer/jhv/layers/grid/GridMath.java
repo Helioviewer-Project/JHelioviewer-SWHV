@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers.grid;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -11,6 +12,9 @@ import org.helioviewer.jhv.opengl.GLSLShape;
 import com.jogamp.opengl.GL3;
 
 public class GridMath {
+    private static final double[] ANGULAR_STEPS = {0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 45, 90, 180};
+    private static final double[] LINEAR_STEP_FACTORS = {1, 2, 5, 10};
+    private static final double TARGET_FLAT_GRID_DIVISIONS = 8;
 
     private static final int SUBDIVISIONS = 360;
 
@@ -36,9 +40,6 @@ public class GridMath {
     private static final int TENS_RADIUS = 3;
     private static final int END_RADIUS = TENS_RADIUS * 10;
     private static final int START_RADIUS = 2;
-
-    public static final int FLAT_STEPS_THETA = 24;
-    public static final int FLAT_STEPS_RADIAL = 10;
 
     public static void initAxes(GL3 gl, GLSLLine axesLine) {
         BufVertex vexBuf = new BufVertex(8 * GLSLLine.stride);
@@ -145,40 +146,109 @@ public class GridMath {
         radialThickLine.setVertex(gl, thickBuf);
     }
 
-    public static void initFlatGrid(GL3 gl, GLSLLine flatLine, double aspect) {
-        int no_points = (LINEAR_STEPS + 3) * (FLAT_STEPS_THETA + 1 + FLAT_STEPS_RADIAL + 1);
+    public static void initFlatGrid(GL3 gl, GLSLLine flatLine, double aspect, double[] xPositions, double[] yPositions) {
+        int no_points = (LINEAR_STEPS + 3) * (xPositions.length + yPositions.length);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
 
-        for (int i = 0; i <= FLAT_STEPS_THETA; i++) {
-            float start = (float) (aspect * (-0.5 + i / (double) FLAT_STEPS_THETA));
+        for (double xPosition : xPositions) {
+            float start = (float) (aspect * xPosition);
             for (int k = 0; k <= LINEAR_STEPS; k++) {
                 float v = (float) (-0.5 + k / (double) LINEAR_STEPS);
 
                 if (k == 0) {
                     vexBuf.putVertex(start, v, 0, 1, Colors.Null);
                 }
-                vexBuf.putVertex(start, v, 0, 1, i == FLAT_STEPS_THETA / 2 ? color2 : color1);
+                vexBuf.putVertex(start, v, 0, 1, Math.abs(xPosition) < 1e-9 ? color2 : color1);
                 if (k == LINEAR_STEPS) {
                     vexBuf.putVertex(start, v, 0, 1, Colors.Null);
                 }
             }
         }
-        for (int i = 0; i <= FLAT_STEPS_RADIAL; i++) {
-            float start = (float) (-0.5 + i / (double) FLAT_STEPS_RADIAL);
+        for (double yPosition : yPositions) {
+            float start = (float) yPosition;
             for (int k = 0; k <= LINEAR_STEPS; k++) {
                 float v = (float) (aspect * (-0.5 + k / (double) LINEAR_STEPS));
 
                 if (k == 0) {
                     vexBuf.putVertex(v, start, 0, 1, Colors.Null);
                 }
-                vexBuf.putVertex(v, start, 0, 1, i == FLAT_STEPS_RADIAL / 2 ? color2 : color1);
+                vexBuf.putVertex(v, start, 0, 1, Math.abs(yPosition) < 1e-9 ? color2 : color1);
                 if (k == LINEAR_STEPS) {
                     vexBuf.putVertex(v, start, 0, 1, Colors.Null);
                 }
             }
         }
-
         flatLine.setVertex(gl, vexBuf);
+    }
+
+    public static FlatAxis buildFlatAxis(GridScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
+        double start = signature.first();
+        if (signature.step() == 0) {
+            double label = wrap0to360 ? wrapCarrington(start) : start;
+            return new FlatAxis(
+                    signature,
+                    new double[]{label},
+                    new double[]{horizontal ? scale.getXValueInv(start) : scale.getYValueInv(start)});
+        }
+
+        double step = signature.step();
+        double first = signature.first();
+        int count = (int) Math.max(0, Math.floor((signature.last() - first) / step) + 1);
+        double[] labels = new double[count];
+        double[] positions = new double[count];
+        for (int i = 0; i < count; i++) {
+            double value = first + i * step;
+            labels[i] = wrap0to360 ? wrapCarrington(value) : value;
+            positions[i] = horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value);
+        }
+        return new FlatAxis(signature, labels, positions);
+    }
+
+    public static AxisSignature buildFlatAxisSignature(boolean angular, double start, double stop) {
+        double range = Math.abs(stop - start);
+        if (!Double.isFinite(range) || range <= Math.ulp(1.0))
+            return new AxisSignature(0, start, start);
+
+        double step = angular ? chooseAngularStep(range) : chooseLinearStep(range);
+        double lo = Math.min(start, stop);
+        double hi = Math.max(start, stop);
+        double first = Math.ceil(lo / step) * step;
+        double last = Math.floor(hi / step) * step;
+        return new AxisSignature(step, first, last);
+    }
+
+    private static double wrapCarrington(double value) {
+        double wrapped = value % 360;
+        return wrapped < 0 ? wrapped + 360 : wrapped;
+    }
+
+    private static double chooseAngularStep(double range) {
+        double target = range / TARGET_FLAT_GRID_DIVISIONS;
+        for (double step : ANGULAR_STEPS) {
+            if (step >= target)
+                return step;
+        }
+        return ANGULAR_STEPS[ANGULAR_STEPS.length - 1];
+    }
+
+    private static double chooseLinearStep(double range) {
+        if (!Double.isFinite(range) || range <= Math.ulp(1.0))
+            return 1;
+        double base = Math.pow(10, Math.floor(Math.log10(range / TARGET_FLAT_GRID_DIVISIONS)));
+        for (double factor : LINEAR_STEP_FACTORS) {
+            double step = factor * base;
+            if (step >= range / TARGET_FLAT_GRID_DIVISIONS)
+                return step;
+        }
+        return 10 * base;
+    }
+
+    // Cache key for a snapped flat axis. Using step/first/last makes the grid
+    // stable against tiny raw-range drifts that do not change the visible ticks.
+    public record AxisSignature(double step, double first, double last) {
+    }
+
+    public record FlatAxis(AxisSignature signature, double[] labels, double[] positions) {
     }
 
     public static void initGrid(GL3 gl, GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {

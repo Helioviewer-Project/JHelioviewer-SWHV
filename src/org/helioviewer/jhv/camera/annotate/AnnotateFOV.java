@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -43,8 +44,8 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double dy = 0.5 * (p1.y - p0.y);
 
         fov.setCenter(p0.x + dx, p0.y + dy);
-        fov.putCenter(centerBuf, color);
-        fov.putRectLine(dx, dy, lineBuf, color);
+        fov.putCenter(centerBuf, color, Display.mode.isHpc());
+        fov.putRectLine(dx, dy, lineBuf, color, Display.mode.isHpc());
     }
 
     @Override

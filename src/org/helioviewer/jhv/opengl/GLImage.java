@@ -47,14 +47,12 @@ public class GLImage {
     private double enhanced = 0;
     private DifferenceMode diffMode = DifferenceMode.None;
 
-    private LUT lut = gray;
+    private LUT lut = LUT.gray();
     private LUT lastLut;
 
     private boolean invertLUT = false;
     private boolean lastInverted = false;
     private boolean lutChanged = true;
-
-    private static final LUT gray = LUT.get("Gray");
 
     public void streamImage(GL3 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         if (!imageData.getUploaded()) {
@@ -96,7 +94,7 @@ public class GLImage {
     private void applyLUT(GL3 gl) {
         lutTex.bind(gl);
 
-        LUT currlut = diffMode == DifferenceMode.None ? lut : gray;
+        LUT currlut = diffMode == DifferenceMode.None ? lut : LUT.gray();
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT = invertLUT ? currlut.lut8Inv() : currlut.lut8();
             IntBuffer lutBuffer = IntBuffer.wrap(intLUT);
@@ -221,7 +219,7 @@ public class GLImage {
             return;
         }
         if (newLUT == null)
-            newLUT = gray;
+            newLUT = LUT.gray();
 
         lut = newLUT;
         invertLUT = invert;

@@ -2,7 +2,6 @@ package org.helioviewer.jhv.layers.stars;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -37,10 +36,13 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.FutureCallback;
 
-public class GaiaClient {
+public final class GaiaClient {
 
     static {
         Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING); // shut-up info logs
+    }
+
+    private GaiaClient() {
     }
 
     public static void submitSearch(Receiver receiver, Position viewpoint) {
@@ -49,6 +51,8 @@ public class GaiaClient {
 
     public interface Receiver {
         void setStars(Position viewpoint, BufVertex pointBuf);
+
+        void setStarsFailed(Position viewpoint);
     }
 
     private static final float SIZE_STAR = 0.08f;
@@ -218,7 +222,13 @@ public class GaiaClient {
 // --Commented out by Inspection STOP (23/06/2024, 23:15)
 
     private static final LoadingCache<String, List<Star>> starCache = Caffeine.newBuilder().maximumSize(1000)
-            .build(adql -> requestStars(adql));
+            .build(adql -> {
+                try {
+                    return requestStars(adql);
+                } catch (Exception e) {
+                    throw new RuntimeException("Gaia query failed for " + adql, e);
+                }
+            });
 
     private static final UriTemplate queryTemplate = new UriTemplate("https://gea.esac.esa.int/tap-server/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "fits"));
@@ -228,7 +238,7 @@ public class GaiaClient {
                 String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%d,%d,%d)) AND phot_g_mean_mag<%d", ra, dec, cone, mag);
     }
 
-    private static List<Star> requestStars(String adql) {
+    private static List<Star> requestStars(String adql) throws Exception {
         String uri = queryTemplate.expand(UriTemplate.vars().set("QUERY", adql));
         try (NetClient nc = NetClient.of(new URI(uri));
              StarTable table = new StarTableFactory().makeStarTable(nc.getStream(), new FitsTableBuilder())) {
@@ -236,15 +246,16 @@ public class GaiaClient {
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
                     try {
+                        Object[] row = rseq.getRow();
                         // https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/sec_dm_main_source_catalogue/ssec_dm_gaia_source.html
-                        long source_id = ((Number) rseq.getCell(0)).longValue();
-                        double ra = Math.toRadians(((Number) rseq.getCell(1)).doubleValue()); // [rad]
-                        double dec = Math.toRadians(((Number) rseq.getCell(2)).doubleValue()); // [rad]
-                        double pmra = Math.toRadians(((Number) rseq.getCell(3)).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
-                        double pmdec = Math.toRadians(((Number) rseq.getCell(4)).doubleValue() / (1000. * 3600.)); // [rad/yr]
-                        double px = ((Number) rseq.getCell(5)).doubleValue() / 1000.; // [arcsec]
-                        double rv = ((Number) rseq.getCell(6)).doubleValue(); // [km/s]
-                        double mag = ((Number) rseq.getCell(7)).doubleValue();
+                        long source_id = ((Number) row[0]).longValue();
+                        double ra = Math.toRadians(((Number) row[1]).doubleValue()); // [rad]
+                        double dec = Math.toRadians(((Number) row[2]).doubleValue()); // [rad]
+                        double pmra = Math.toRadians(((Number) row[3]).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
+                        double pmdec = Math.toRadians(((Number) row[4]).doubleValue() / (1000. * 3600.)); // [rad/yr]
+                        double px = ((Number) row[5]).doubleValue() / 1000.; // [arcsec]
+                        double rv = ((Number) row[6]).doubleValue(); // [km/s]
+                        double mag = ((Number) row[7]).doubleValue();
 
                         pmra = Double.isFinite(pmra) ? pmra : 0;
                         pmdec = Double.isFinite(pmdec) ? pmdec : 0;
@@ -258,10 +269,7 @@ public class GaiaClient {
             }
             Log.info("Found " + stars.size() + " stars with " + adql);
             return stars;
-        } catch (Exception e) {
-            Log.error(adql + e);
         }
-        return Collections.emptyList();
     }
 
     private record Query(Position viewpoint) implements Callable<BufVertex> {
@@ -289,6 +297,7 @@ public class GaiaClient {
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
+            receiver.setStarsFailed(viewpoint);
             Log.error(t);
             Message.err("An error occurred querying the server", t.getMessage());
         }

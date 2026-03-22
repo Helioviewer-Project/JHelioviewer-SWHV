@@ -13,6 +13,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.layers.image.HpcUtils;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -103,6 +104,26 @@ public class ImageLayers {
             }
         }
         return size;
+    }
+
+    public static Region getLargestHpcBounds() {
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+
+            Region bounds = HpcUtils.hpcBounds(layer.getMetaData());
+            minX = Math.min(minX, bounds.llx);
+            maxX = Math.max(maxX, bounds.urx);
+            minY = Math.min(minY, bounds.lly);
+            maxY = Math.max(maxY, bounds.ury);
+        }
+        if (!Double.isFinite(minX) || !Double.isFinite(maxX) || !Double.isFinite(minY) || !Double.isFinite(maxY))
+            return new Region(-5, -5, 10, 10);
+        return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
     }
 
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
