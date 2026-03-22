@@ -1,7 +1,7 @@
 ---
 title: |
    | SWHV CCN4
-   | Zenithal WCS and HPC Validation Notes
+   | Zenithal WCS and HPC Validation Note
 subtitle: SWHV-ROB-TN-001-CCN4 v1.0
 subject: SWHV CCN4 
 date: SWHV-ROB-TN-001-CCN4 - Version 1.0 - 2026-03-22
