@@ -37,6 +37,8 @@ This note documents the current convention used by the non-orthographic display 
 - In Java, `HPC` projection is expressed with the observer-distance-dependent formulas:
   - `Tx = atan2(x, D - z)`
   - `Ty = atan2(y, sqrt(x^2 + (D - z)^2))`
+- For Java overlays, external solar/world points are first rotated into the
+  current observer/viewpoint frame before those `HPC` formulas are applied.
 - In GLSL, `solarHpc.frag` starts from the displayed `Tx,Ty` map coordinates, optionally intersects the observer ray with the unit solar sphere for on-disk differential rotation, and then reprojects through the source-image WCS.
 - `HPC` display coordinates are angular coordinates in degrees. They are not orthographic scene coordinates, and they are not guaranteed to match `Orthographic` at the same on-screen radius.
 - Because `HPC` is angular, its visible grid scale changes with observer distance:
@@ -60,6 +62,9 @@ This note documents the current convention used by the non-orthographic display 
 - Java projected polyline emission differs by mode:
   - `HPC` emits continuous projected segments and does not wrap horizontally
   - `Latitudinal`, `Polar`, and `LogPolar` use the shared wrapped projected-line path
+- In Java overlay emission, `HPC` is also clipped to the visible hemisphere:
+  - back-side surface points are skipped instead of being projected through the map
+  - clipped polyline segments terminate and restart as separate strips
 
 ## Important consequence
 
