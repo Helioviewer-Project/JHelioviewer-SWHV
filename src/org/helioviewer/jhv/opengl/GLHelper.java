@@ -24,14 +24,7 @@ public class GLHelper {
 
     public static void initRectangleFront(GL3 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
         BufVertex vexBuf = new BufVertex(4 * GLSLShape.stride);
-        float x1 = (float) (x0 + w);
-        float y1 = (float) (y0 + h);
-
-        vexBuf.putVertex((float) x0, (float) y0, 0, 1, color);
-        vexBuf.putVertex(x1, (float) y0, 0, 1, color);
-        vexBuf.putVertex((float) x0, y1, 0, 1, color);
-        vexBuf.putVertex(x1, y1, 0, 1, color);
-
+        vexBuf.putQuad2DStrip((float) x0, (float) y0, (float) (x0 + w), (float) (y0 + h), color);
         rectangle.setVertex(gl, vexBuf);
     }
 
