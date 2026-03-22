@@ -42,13 +42,6 @@ final class NonOrthoProjection {
         return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, x, y, gridType));
     }
 
-    static Vec3 unprojectDisplayPoint(Kind kind, Camera camera, Viewport vp, int x, int y) {
-        return switch (kind) {
-            case HPC -> new Vec3(CameraHelper.computeUpX(camera, vp, x), CameraHelper.computeUpY(camera, vp, y), 0);
-            case LATITUDINAL, POLAR -> CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
-        };
-    }
-
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     private static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
@@ -120,13 +113,7 @@ final class NonOrthoProjection {
         vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
     }
 
-    static Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y) {
-        return new Vec2(
-                CameraHelper.computeUpX(camera, vp, x) / vp.aspect,
-                CameraHelper.computeUpY(camera, vp, y));
-    }
-
-    static Vec2 mouseToScaledScreen(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+    static Vec2 mouseToScreen(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
         Vec2 mouseGrid = mouseToGrid(scale, camera, vp, x, y, gridType);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,

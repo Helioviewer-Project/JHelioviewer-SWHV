@@ -72,7 +72,6 @@ class InteractionAnnotate implements Interaction.Type {
         Transform.pushView();
         if (Display.mode.isOrthographic())
             Transform.rotateViewInverse(viewpoint.toQuat());
-
         transLine.setVertex(gl, transBuf);
         transLine.renderLine(gl, vp.aspect, LINEWIDTH);
         center.setVertex(gl, centerBuf);

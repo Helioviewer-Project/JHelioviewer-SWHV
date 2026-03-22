@@ -6,6 +6,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
@@ -73,7 +74,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 computePointSky(Camera camera, Viewport vp, int x, int y) {
-        return Display.mode.unprojectDisplayPoint(camera, vp, x, y);
+        return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
     }
 
     @Nullable
