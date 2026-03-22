@@ -2,9 +2,9 @@
 title: |
    | SWHV CCN4
    | Zenithal WCS and HPC Validation Notes
-subtitle: SWHV-ROB-TN-001-CCN4 v0.99
+subtitle: SWHV-ROB-TN-001-CCN4 v1.0
 subject: SWHV CCN4 
-date: SWHV-ROB-TN-001-CCN4 - Version 0.99 - 2026-03-15
+date: SWHV-ROB-TN-001-CCN4 - Version 1.0 - 2026-03-22
 lof: true
 lot: false
 ---
@@ -48,7 +48,7 @@ a separate problem.
 
 A dedicated validator was built in:
 
-- [extra/test/validate_jhv_wcs_against_astropy.py](extra/test/validate_jhv_wcs_against_astropy.py)
+- `extra/test/validate_jhv_wcs_against_astropy.py`
 
 Outside the renderer, it reproduces the parts of the JHV WCS/HPC mapping path
 covered by this note and compares them directly against Astropy wherever
@@ -171,7 +171,8 @@ Included in the validator:
   - six-term `ZPN` (primary branch only)
 - the `HPC` image sampling path:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
-- the `HPC` display domain used in the validation runs reported here
+- the raw image-footprint `HPC` bounds and the centered `HPC` display bounds
+  used in the validation runs reported here
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` for the specific no-rotation comparison mode.
 
@@ -185,7 +186,12 @@ Excluded:
 - mouse-position reporting or synthetic overdrawing such as annotations, grid
   overlays, and similar on-screen constructs
 - playback/view policy effects such as dynamic refitting of the visible `HPC`
-  box or any other transient user-driven viewing state
+  box beyond the centered bounds logic explicitly reproduced by the validator,
+  or any other transient user-driven viewing state
+- Java overlay-only behavior such as:
+  - viewpoint-space projection of external overlay points in `HPC`
+  - visible-hemisphere clipping of `HPC` overlay emission
+  - transformed annotation drawing/picking behavior
 - full OpenGL rasterization state, blending, and UI behavior
 
 The validator therefore establishes:
@@ -221,6 +227,9 @@ In this validator, Astropy is the external reference for:
     Astropy `world -> pixel`
   - the script compares the resulting source-pixel centers and also writes diff
     images
+- centered `HPC` bounds reporting
+  - the script reports both the raw image-footprint bounds and the centered
+    display bounds used by the JHV `HPC` screen mapping
 
 Not compared against Astropy:
 
@@ -232,7 +241,7 @@ Not compared against Astropy:
 
 The main script is:
 
-- [extra/test/validate_jhv_wcs_against_astropy.py](extra/test/validate_jhv_wcs_against_astropy.py)
+- `extra/test/validate_jhv_wcs_against_astropy.py`
 
 Run it with:
 
@@ -350,10 +359,11 @@ and writes:
 
 under:
 
-- [extra/test/out](extra/test/out)
+- `extra/test/out`
 
 It also reports:
 
+- `raw_bounds_deg`
 - `bounds_deg`
 - `pixel_center_max_error_px`
 - `pixel_center_rms_error_px`
@@ -476,6 +486,13 @@ Astropy as the external WCS reference.
 - JHV `world -> helioprojective -> TAN plane -> pixel`
 - `TAN plane -> helioprojective angles`
 - matches Astropy to numerical precision
+- representative measured results include:
+  - forward random-sample check on `20241224_194245_d4c2A.fts`:
+    - `1.00e-7 mas` max (`6.821210e-12 px`)
+    - `projection_max_error_internal=1.012523e-13`
+  - inverse `TAN` on `sample.171.fits`:
+    - `2.05e-7 mas` max
+    - `roundtrip_plane_max_error_internal=8.881784e-16`
 
 2. `formal-TAN` is substantially more accurate than `simple-TAN`.
 
@@ -483,7 +500,9 @@ Astropy as the external WCS reference.
   samples gives:
   - `sample.171.fits` (`1.009 AU`):
     - `simple-TAN`: `2.20 arcsec` max, `1.12 arcsec` RMS
+      (`3.674571 px` max, `1.864828 px` RMS)
     - `formal-TAN`: `2.81e-7 mas` max, `6.35e-8 mas` RMS
+      (`4.686171e-10 px` max, `1.059870e-10 px` RMS)
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
     - `simple-TAN`: `11.42 arcsec` max, `2.46 arcsec` RMS
     - `formal-TAN`: `3.41e-7 mas` max, `7.73e-8 mas` RMS
@@ -504,23 +523,33 @@ Astropy as the external WCS reference.
   therefore not a direct measurement of the `simple-TAN`
   small-angle-approximation error alone.
 
-3. `AZP` is correct for the current HI files.
+3. `AZP` is correct for the tested HI files.
 
 - JHV `world -> helioprojective -> AZP plane -> pixel`
 - `AZP plane -> helioprojective angles`
 - matches Astropy to numerical precision
-- current HI files are non-slanted: `PV2_2` is absent, so `gamma = 0`
+- the tested HI files are non-slanted: `PV2_2` is absent, so `gamma = 0`
+- representative measured results include:
+  - full pixel-center check on `20250622_000831_s4h1A.fts`:
+    - `1.72e-7 mas` max (`2.387424e-12 px`)
+  - inverse `AZP` on the same file:
+    - `1.02e-7 mas` max
+    - `roundtrip_plane_max_error_internal=4.263256e-14`
 
 4. Six-term `ZPN` is correct for the tested PSP/WISPR files.
 
 - JHV `world -> helioprojective -> ZPN plane -> pixel`
 - `ZPN plane -> helioprojective angles`
-- currently implemented with `PV2_0..PV2_5`
+- implemented with `PV2_0..PV2_5`
 - matches Astropy to numerical precision on:
   - `extra/test/data/psp_L3_wispr_20231227T150508_V1_1211.fits`
   - `extra/test/data/psp_L3_wispr_20231227T150704_V1_2222.fits`
-- the current implementation keeps only the primary monotonic branch of the
+- the implementation keeps only the primary monotonic branch of the
   radial polynomial
+- a representative measured result on
+  `psp_L3_wispr_20231227T150704_V1_2222.fits`:
+  - `1.15e-5 mas` max
+  - `roundtrip_plane_max_error_internal=4.840572e-14`
 
 ## Astropy validation of JHV HPC rendering
 
@@ -542,18 +571,31 @@ bounded rendered `HPC` screen domain and compares it directly against Astropy.
 
 Measured `HPC` validation results:
 
-- COR2 (`TAN`): `3.97e-4 mas` max (`7.50e-12 px`)
-- HI1 (`AZP`): `3.59e-7 mas` max (`5.00e-12 px`)
-- HI2 (`AZP`): `80.3 mas` max (`3.09e-4 px`) over the finite valid rendered
-  domain
-- PSP/WISPR 1211 (`ZPN`): `4.42e-5 mas` max (`2.90e-10 px`)
-- PSP/WISPR 2222 (`ZPN`): `1.21e-5 mas` max (`5.93e-11 px`)
+- COR2 (`TAN`, `20241224_194245_d4c2A.fts`) with explicit bounds report:
+  - raw image-footprint bounds:
+    - `(-4.479846762614, 4.536935044095, -4.500971194048, 4.495966937161) deg`
+  - centered display bounds:
+    - `(-4.536935044095, 4.536935044095, -4.536935044095, 4.536935044095) deg`
+  - `1.05e-7 mas` max (`7.162271e-12 px`)
+  - `3.31e-8 mas` RMS (`2.254367e-12 px`)
+- HI1 (`AZP`, `20250622_000831_s4h1A.fts`):
+  - `3.55e-7 mas` max (`4.945377e-12 px`)
+- HI2 (`AZP`, `20250622_000851_s4h2A.fts`):
+  - `8.38 mas` max (`3.230013e-05 px`) over the finite valid rendered domain
+- PSP/WISPR 1211 (`ZPN`, `psp_L3_wispr_20231227T150508_V1_1211.fits`):
+  - `6.65e-6 mas` max (`4.365575e-11 px`)
+- PSP/WISPR 2222 (`ZPN`, `psp_L3_wispr_20231227T150704_V1_2222.fits`):
+  - `1.94e-6 mas` max (`9.549694e-12 px`)
 
-For HI2, the `80.3 mas` / `3.09e-4 px` maximum occurs near the extreme finite
-valid `AZP` edge, where the projection magnification becomes very large. At
-those edge samples, the projection maps the point to a source-pixel location
-about 88 million pixels from the image reference point, so the absolute
-difference corresponds to a relative disagreement of about `1e-12`.
+The centered display bounds are intentionally slightly larger than the raw
+image-footprint bounds because the JHV `HPC` screen mapping recenters
+the domain symmetrically about disk center and pads the shorter axis to the
+active display aspect.
+
+For HI2, the finite rendered `AZP` domain still produces the largest absolute
+pixel discrepancy among the tested `HPC` render cases because the valid image
+region extends close to the projection's steep outer edge, where small angular
+differences translate into larger source-pixel shifts.
 
 ## `Formal-TAN` versus JHV `HPC`
 
@@ -568,12 +610,15 @@ Measured comparison result:
   `Orthographic` mode and `HPC` on the TAN samples gives:
   - `sample.171.fits` (`1.009 AU`):
     - `2.20 arcsec` max, `1.44 arcsec` RMS
+      (`3.670598 px` max, `2.397799 px` RMS)
     - theoretical max from Appendix A: `2.19 arcsec`
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
-    - `11.22 arcsec` max, `7.34 arcsec` RMS
+    - `11.22 arcsec` max, `7.32 arcsec` RMS
+      (`2.525841 px` max, `1.649627 px` RMS)
     - theoretical max from Appendix A: `11.05 arcsec`
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
-    - `2.40 arcsec` max, `1.57 arcsec` RMS
+    - `2.40 arcsec` max, `1.56 arcsec` RMS
+      (`1.629523e-01 px` max, `1.064475e-01 px` RMS)
     - theoretical max from Appendix A: `2.29 arcsec`
 
 These results support the following conclusions:
@@ -593,17 +638,21 @@ This is again an internal JHV comparison. Its purpose is to show whether
 
 - it compares the source pixels sampled by `simple-TAN` in `Orthographic`
   mode and by `HPC` over the same full rendered comparison frame
-- native-resolution full-frame comparison between `simple-TAN` and `HPC` gives:
+- native-resolution full-frame comparison between `simple-TAN` and `HPC`
+  gives:
   - `sample.171.fits` (`1.009 AU`):
     - `16.8 mas` max, `4.96 mas` RMS
+      (`2.807831e-02 px` max, `8.273222e-03 px` RMS)
     - theoretical on-disk max from Appendix B: `6.73 mas`
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
     - `518 mas` max, `145 mas` RMS
+      (`1.165703e-01 px` max, `3.266729e-02 px` RMS)
     - theoretical on-disk max from Appendix B: `76.9 mas`
     - large nonzero `CRVALi` offset the solar disk from boresight and likely
       contribute to the higher value
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
     - `21.1 mas` max, `5.77 mas` RMS
+      (`1.434673e-03 px` max, `3.928160e-04 px` RMS)
     - theoretical on-disk max from Appendix B: `7.65 mas`
 - this confirms that `simple-TAN` is much closer to the `HPC` display
   geometry than `formal-TAN`, which supports its use in `Orthographic` mode
