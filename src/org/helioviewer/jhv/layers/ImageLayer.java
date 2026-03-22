@@ -256,16 +256,30 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1, meta1.getWCSProjection(), meta1.getWCSPlaneUnitsPerRad(), (float) metaViewpoint1.distance);
         shader.bindPV(gl, meta0.getPV2(), meta1.getPV2());
 
+        float grid00 = 0;
+        float grid01 = 0;
+        float grid02 = 0;
+        float grid10 = 0;
+        float grid11 = 0;
+        float grid12 = 0;
         if (Display.mode.isLatitudinal()) {
             GridType gridType = Display.gridType;
+            grid00 = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint0);
+            grid01 = (float) gridType.toLatitude(metaViewpoint0);
+            grid02 = (float) metaViewpoint0.lat;
+            grid10 = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint1);
+            grid11 = (float) gridType.toLatitude(metaViewpoint1);
+            grid12 = (float) metaViewpoint1.lat;
             shader.bindLatitudinalGrid(gl,
-                    latiLongitude(gridType, cameraViewpoint, metaViewpoint0),
-                    gridType.toLatitude(metaViewpoint0),
-                    metaViewpoint0.lat,
-                    latiLongitude(gridType, cameraViewpoint, metaViewpoint1),
-                    gridType.toLatitude(metaViewpoint1),
-                    metaViewpoint1.lat);
+                    grid00, grid01, grid02,
+                    grid10, grid11, grid12);
         }
+
+        GLSLSolarShader.bindProjection(gl,
+                meta0.getWCSProjection(), meta0.getWCSPlaneUnitsPerRad(), (float) metaViewpoint0.distance,
+                grid00, grid01, grid02,
+                meta1.getWCSProjection(), meta1.getWCSPlaneUnitsPerRad(), (float) metaViewpoint1.distance,
+                grid10, grid11, grid12);
 
         GLListener.glslSolar.render(gl);
     }

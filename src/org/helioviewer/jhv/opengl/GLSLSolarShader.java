@@ -6,6 +6,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -34,21 +35,26 @@ public class GLSLSolarShader extends GLSLShader {
         hasCommon = _hasCommon;
     }
 
-    private static GLBO screenBO;
-    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4 + 4);
-    private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
-
     private static GLBO wcsBO;
     private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4 + 4));
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
+
+    private static GLBO projectionBO;
+    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4));
+    private static final int PROJECTION_SIZE = projectionBuf.capacity() * 4;
+
+    private static GLBO screenBO;
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4 + 4);
+    private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO displayBO;
     private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 4 + 4);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
-        screenBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
         wcsBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
+        projectionBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
+        screenBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
         displayBO = new GLBO(gl, GL3.GL_UNIFORM_BUFFER, GL3.GL_STREAM_DRAW);
 
         sphere._init(gl, sphere.hasCommon);
@@ -68,9 +74,10 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     static void setupCommonBlocks(GL3 gl, int programID) {
-        setupUBO(gl, programID, "ScreenBlock", screenBO.getID(), 0);
-        setupUBO(gl, programID, "WCSBlock", wcsBO.getID(), 1);
-        setupUBO(gl, programID, "DisplayBlock", displayBO.getID(), 2);
+        setupUBO(gl, programID, "WCSBlock", wcsBO.getID(), 0);
+        setupUBO(gl, programID, "ProjectionBlock", projectionBO.getID(), 1);
+        setupUBO(gl, programID, "ScreenBlock", screenBO.getID(), 2);
+        setupUBO(gl, programID, "DisplayBlock", displayBO.getID(), 3);
     }
 
     @Override
@@ -95,21 +102,10 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
-        screenBO.delete(gl);
         wcsBO.delete(gl);
+        projectionBO.delete(gl);
+        screenBO.delete(gl);
         displayBO.delete(gl);
-    }
-
-    static void bindScreen(GL3 gl, Viewport vp) {
-        FloatBuffer inv = Transform.getInverse();
-        screenBuf.put(inv);
-        inv.flip();
-        screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
-        screenBuf.put((float) Display.mode.scale.getInterpolatedXDisplayValue(0, Display.gridType));
-        screenBuf.put((float) Display.mode.scale.getInterpolatedXDisplayValue(1, Display.gridType));
-        screenBuf.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
-
-        screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
     }
 
     public static void bindWCS(GL3 gl,
@@ -128,6 +124,33 @@ public class GLSLSolarShader extends GLSLShader {
         wcsBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
 
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
+    }
+
+    public static void bindProjection(GL3 gl,
+                                      MetaData.WCSProjection projection0, float planeUnitsPerRad0, float observerDistance0,
+                                      float grid00, float grid01, float grid02,
+                                      MetaData.WCSProjection projection1, float planeUnitsPerRad1, float observerDistance1,
+                                      float grid10, float grid11, float grid12) {
+        projectionBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
+        projectionBuf.put(grid00).put(grid01).put(grid02).put(0);
+
+        projectionBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
+        projectionBuf.put(grid10).put(grid11).put(grid12).put(0);
+
+        projectionBO.setBufferData(gl, PROJECTION_SIZE, PROJECTION_SIZE, projectionBuf.flip());
+    }
+
+    static void bindScreen(GL3 gl, Viewport vp) {
+        GridScale scale = Display.mode.scale;
+        FloatBuffer inv = Transform.getInverse();
+        screenBuf.put(inv);
+        inv.flip();
+        screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
+        screenBuf.put((float) scale.getInterpolatedXDisplayValue(0, Display.gridType));
+        screenBuf.put((float) scale.getInterpolatedXDisplayValue(1, Display.gridType));
+        screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
+
+        screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
     }
 
     static void bindDisplay(GL3 gl, float[] color,

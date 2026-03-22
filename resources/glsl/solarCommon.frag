@@ -18,20 +18,6 @@ const int WCS_PROJECTION_ZPN = 2;
 
 out vec4 outColor;
 
-struct Screen {
-    mat4 inverseMVP;
-    vec4 viewport;
-    float iaspect;
-    float xStart;
-    float xStop;
-    float yStart;
-    float yStop;
-};
-
-layout(std140) uniform ScreenBlock {
-    Screen screen;
-};
-
 struct WCS {
     vec4 cameraDiff; // not strictly WCS
     vec4 rect;
@@ -44,6 +30,33 @@ struct WCS {
 
 layout(std140) uniform WCSBlock {
     WCS wcs[2];
+};
+
+struct ProjectionParams {
+    float projectionCode;
+    float planeUnitsPerRadian;
+    float observerDistance;
+    float padding0;
+    vec3 grid;
+    float padding1;
+};
+
+layout(std140) uniform ProjectionBlock {
+    ProjectionParams projection[2];
+};
+
+struct Screen {
+    mat4 inverseMVP;
+    vec4 viewport;
+    float iaspect;
+    float xStart;
+    float xStop;
+    float yStart;
+    float yStop;
+};
+
+layout(std140) uniform ScreenBlock {
+    Screen screen;
 };
 
 struct Display {
