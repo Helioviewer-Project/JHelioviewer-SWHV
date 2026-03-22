@@ -270,9 +270,6 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             grid10 = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint1);
             grid11 = (float) gridType.toLatitude(metaViewpoint1);
             grid12 = (float) metaViewpoint1.lat;
-            shader.bindLatitudinalGrid(gl,
-                    grid00, grid01, grid02,
-                    grid10, grid11, grid12);
         }
 
         GLSLSolarShader.bindProjection(gl,

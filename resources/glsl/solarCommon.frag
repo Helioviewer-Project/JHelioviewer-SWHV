@@ -80,8 +80,6 @@ uniform sampler2D image;
 uniform sampler2D diffImage;
 uniform sampler1D lut;
 
-uniform vec3 grid[2];
-
 uniform float pv0[6]; // should be in WCS uniform block
 uniform float pv1[6];
 
