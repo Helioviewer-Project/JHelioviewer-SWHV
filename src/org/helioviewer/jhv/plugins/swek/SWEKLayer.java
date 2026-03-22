@@ -109,7 +109,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     private static void drawInterpolated(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, BufVertex buf, byte[] color) {
         int steps = Math.max(1, mres);
-        Vec3 v = new Vec3();
         for (int i = 0; i <= steps; i++) {
             double alpha = 1. - i / (double) steps;
             double r = alpha * r_start + (1 - alpha) * r_end;
@@ -152,7 +151,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            Vec3 v = new Vec3();
             for (float[] el : texCoord) {
                 double deltatheta = sz / distSun * (el[0] * 2 - 1);
                 double deltar = sz * (el[1] * 2 - 1);

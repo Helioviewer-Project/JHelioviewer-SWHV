@@ -253,7 +253,7 @@ final class NonOrthoProjection {
         double latitude = Math.toRadians(pt.y);
         return new Vec3(
                 SphericalCoords.x(1, longitude, latitude),
-                SphericalCoords.y(1, longitude, latitude),
+                SphericalCoords.y(1, latitude),
                 SphericalCoords.z(1, longitude, latitude));
     }
 

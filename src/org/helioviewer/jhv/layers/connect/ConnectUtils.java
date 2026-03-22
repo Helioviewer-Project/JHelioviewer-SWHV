@@ -18,7 +18,7 @@ class ConnectUtils {
         return new Position.Cartesian(
                 milli,
                 SphericalCoords.x(1, lon, lat),
-                SphericalCoords.y(1, lon, lat),
+                SphericalCoords.y(1, lat),
                 SphericalCoords.z(1, lon, lat));
     }
 
