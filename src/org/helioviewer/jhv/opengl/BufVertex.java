@@ -74,6 +74,22 @@ public class BufVertex {
         count++;
     }
 
+    public void putQuad2D(float left, float bottom, float right, float top, byte[] color) {
+        putVertex(left, bottom, 0, 1, color);
+        putVertex(right, bottom, 0, 1, color);
+        putVertex(right, top, 0, 1, color);
+        putVertex(left, bottom, 0, 1, color);
+        putVertex(right, top, 0, 1, color);
+        putVertex(left, top, 0, 1, color);
+    }
+
+    public void putQuad2DStrip(float left, float bottom, float right, float top, byte[] color) {
+        putVertex(left, bottom, 0, 1, color);
+        putVertex(right, bottom, 0, 1, color);
+        putVertex(left, top, 0, 1, color);
+        putVertex(right, top, 0, 1, color);
+    }
+
     public int getCount() {
         return count;
     }
