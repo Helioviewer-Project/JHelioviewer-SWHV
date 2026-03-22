@@ -6,13 +6,13 @@ const vec3 zAxis = vec3(0, 0, 1);
 // 1 = simple-TAN
 #define SIMPLE_TAN 1
 
-vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const float[6] PV) {
+vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
 #if SIMPLE_TAN
-    if (int(wcs.projectionMeta.x) == WCS_PROJECTION_TAN)
+    if (int(projection.projectionCode) == WCS_PROJECTION_TAN)
         return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);
 #endif
-    vec2 helioprojective = worldToHelioprojective(world, wcs.projectionMeta.z);
-    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, PV);
+    vec2 helioprojective = worldToHelioprojective(world, projection.observerDistance);
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
     return wcsPlaneToTexcoord(plane, wcs);
 }
 
@@ -77,7 +77,7 @@ void main(void) {
             discard;
     }
 
-    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], pv0);
+    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
 
     float rotatedHitPointRad2 = dot(rotatedHitPoint.xy, rotatedHitPoint.xy);
     float minRadius2 = display.radii.x * display.radii.x;
@@ -100,7 +100,7 @@ void main(void) {
             diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
 
-        diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], pv1);
+        diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
 
         float diffRotatedHitPointRad2 = dot(diffRotatedHitPoint.xy, diffRotatedHitPoint.xy);
         if (diffRotatedHitPointRad2 > maxRadius2 || diffRotatedHitPointRad2 < minRadius2) {

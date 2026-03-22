@@ -330,14 +330,14 @@ vec2 projectZpnToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
 }
 
 // Projection-space to texture-space mapping.
-vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const float[6] PV) {
-    int projection = int(wcs.projectionMeta.x);
-    if (projection == WCS_PROJECTION_TAN)
-        return projectTanToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y);
-    if (projection == WCS_PROJECTION_AZP)
-        return projectAzpToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y, PV);
-    if (projection == WCS_PROJECTION_ZPN)
-        return projectZpnToWcsPlane(helioprojective, wcs.crval, wcs.projectionMeta.y, PV);
+vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
+    int projectionCode = int(projection.projectionCode);
+    if (projectionCode == WCS_PROJECTION_TAN)
+        return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
+    if (projectionCode == WCS_PROJECTION_AZP)
+        return projectAzpToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
+    if (projectionCode == WCS_PROJECTION_ZPN)
+        return projectZpnToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
 
     return helioprojective - wcs.crval;
 }
