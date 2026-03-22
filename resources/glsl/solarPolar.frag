@@ -1,50 +1,42 @@
 
-void get_polar_texcoord(const vec2 CRVAL, const vec4 CROTA, const vec4 rect, const vec2 scrpos, out vec2 texcoord, out float radius) {
-    float interpolated = screen.yStart + scrpos.y * (screen.yStop - screen.yStart);
-    if (interpolated > display.radii.y || interpolated < display.radii.x)
+vec2 samplePolarTexcoord(const vec2 crval, const vec4 crota, const vec4 rect, const vec2 scrpos, const float radialCoordinate) {
+    if (radialCoordinate > display.radii.y || radialCoordinate < display.radii.x)
         discard;
 
     // Effective polar map convention is 0 at north and increasing anti-clockwise.
     // This basis must stay consistent with the Java-side non-ortho projection after
     // the subsequent apply_center(..., vec3(pos.x, -pos.y, 0.), ...) step.
     float theta = -(scrpos.x * TWOPI + HALFPI);
-    vec3 pos = vec3(cos(theta), sin(theta), 0.) * interpolated;
-    // if (interpolated < 1.)
-    //     pos.z = interpolated;
+    vec2 polarXY = vec2(cos(theta), sin(theta)) * radialCoordinate;
 
     if (display.cutOff.z >= 0.) {
-        vec2 dpos = pos.yx;
+        // Convert the polar north-up basis to the display-plane x/y basis used by cutOff.
+        vec2 displayXY = polarXY.yx;
         vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-        float geometryFlatDist = abs(dot(dpos, display.cutOff.xy));
-        float geometryFlatDistAlt = abs(dot(dpos, cutOffAlt));
+        float geometryFlatDist = abs(dot(displayXY, display.cutOff.xy));
+        float geometryFlatDistAlt = abs(dot(displayXY, cutOffAlt));
         if (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z)
             discard;
     }
 
-    vec3 centered = apply_center(vec3(pos.x, -pos.y, 0.), CRVAL, CROTA);
-    texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
-    clamp_texture(texcoord);
-
-    radius = 1.;
-    if (interpolated > 1.) {
-        radius = interpolated;
-    }
+    vec3 centered = apply_center(vec3(polarXY.x, -polarXY.y, 0.), crval, crota);
+    vec2 texCoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+    clamp_texture(texCoord);
+    return texCoord;
 }
 
 void main(void) {
     vec4 color;
-    vec2 texcoord;
-    float radius;
-
     vec2 scrpos = getScrPos();
-    get_polar_texcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, texcoord, radius);
-    if (display.isDiff == NODIFFERENCE) {
-        color = getColor(texcoord, texcoord, radius);
+    float radialCoordinate = screen.yStart + scrpos.y * (screen.yStop - screen.yStart);
+    float enhancementFactor = max(1., radialCoordinate);
+    bool diffMode = display.isDiff != NODIFFERENCE;
+    vec2 texCoord = samplePolarTexcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
+    if (!diffMode) {
+        color = getColor(texCoord, texCoord, enhancementFactor);
     } else {
-        vec2 difftexcoord;
-        float diffradius;
-        get_polar_texcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, difftexcoord, diffradius);
-        color = getColor(texcoord, difftexcoord, radius);
+        vec2 diffTexCoord = samplePolarTexcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, radialCoordinate);
+        color = getColor(texCoord, diffTexCoord, enhancementFactor);
     }
     outColor = color;
 }

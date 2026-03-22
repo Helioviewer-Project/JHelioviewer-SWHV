@@ -64,7 +64,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
     @Override
     protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
-        return computePointSun(camera, vp, x, y);
+        return computePointSurface(camera, vp, x, y);
     }
 
     @Nullable

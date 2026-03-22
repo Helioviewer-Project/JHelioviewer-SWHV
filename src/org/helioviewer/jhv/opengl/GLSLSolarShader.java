@@ -8,6 +8,7 @@ import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.metadata.MetaData;
 
 import com.jogamp.opengl.GL3;
 
@@ -15,6 +16,7 @@ public class GLSLSolarShader extends GLSLShader {
 
     public static final GLSLSolarShader sphere = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarSphere.frag", false);
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag", true);
+    public static final GLSLSolarShader hpc = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarHpc.frag", true);
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag", true);
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag", true);
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag", true);
@@ -33,11 +35,11 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static GLBO screenBO;
-    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4);
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4 + 4);
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO wcsBO;
-    private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4));
+    private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4 + 4));
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO displayBO;
@@ -51,6 +53,7 @@ public class GLSLSolarShader extends GLSLShader {
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
+        hpc._init(gl, hpc.hasCommon);
         lati._init(gl, lati.hasCommon);
         polar._init(gl, polar.hasCommon);
         logpolar._init(gl, logpolar.hasCommon);
@@ -64,15 +67,19 @@ public class GLSLSolarShader extends GLSLShader {
         gl.glBindBufferBase(GL3.GL_UNIFORM_BUFFER, binding, uboID);
     }
 
+    static void setupCommonBlocks(GL3 gl, int programID) {
+        setupUBO(gl, programID, "ScreenBlock", screenBO.getID(), 0);
+        setupUBO(gl, programID, "WCSBlock", wcsBO.getID(), 1);
+        setupUBO(gl, programID, "DisplayBlock", displayBO.getID(), 2);
+    }
+
     @Override
     protected void initUniforms(GL3 gl, int id) {
         gridRef = gl.glGetUniformLocation(id, "grid");
         pv0Ref = gl.glGetUniformLocation(id, "pv0");
         pv1Ref = gl.glGetUniformLocation(id, "pv1");
 
-        setupUBO(gl, id, "ScreenBlock", screenBO.getID(), 0);
-        setupUBO(gl, id, "WCSBlock", wcsBO.getID(), 1);
-        setupUBO(gl, id, "DisplayBlock", displayBO.getID(), 2);
+        setupCommonBlocks(gl, id);
 
         if (hasCommon) {
             setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
@@ -84,6 +91,7 @@ public class GLSLSolarShader extends GLSLShader {
     public static void dispose(GL3 gl) {
         sphere._dispose(gl);
         ortho._dispose(gl);
+        hpc._dispose(gl);
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
@@ -97,25 +105,27 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
+        screenBuf.put((float) Display.mode.scale.getInterpolatedXDisplayValue(0, Display.gridType));
+        screenBuf.put((float) Display.mode.scale.getInterpolatedXDisplayValue(1, Display.gridType));
         screenBuf.put((float) Display.mode.scale.getYstart()).put((float) Display.mode.scale.getYstop());
 
         screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
     }
 
     public static void bindWCS(GL3 gl,
-                               Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
-                               Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
+                               Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0, MetaData.WCSProjection projection0, float planeUnitsPerRad0, float observerDistance0,
+                               Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1, MetaData.WCSProjection projection1, float planeUnitsPerRad1, float observerDistance1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
-        wcsBuf.put(crval0);
-        wcsBuf.put(deltaT0).put(0);
+        wcsBuf.put(crval0).put(deltaT0).put(0);
+        wcsBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
 
         cameraDiff1.setFloatBuffer(wcsBuf);
         wcsBuf.put(r1.glslArray);
         crota1.setFloatBuffer(wcsBuf);
-        wcsBuf.put(crval1);
-        wcsBuf.put(deltaT1).put(0);
+        wcsBuf.put(crval1).put(deltaT1).put(0);
+        wcsBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
 
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }

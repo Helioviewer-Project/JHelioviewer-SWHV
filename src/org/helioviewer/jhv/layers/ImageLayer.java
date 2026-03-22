@@ -10,7 +10,6 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -253,11 +252,11 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         }
 
         GLSLSolarShader.bindWCS(gl,
-                cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
-                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
+                cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0, meta0.getWCSProjection(), meta0.getWCSPlaneUnitsPerRad(), (float) metaViewpoint0.distance,
+                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1, meta1.getWCSProjection(), meta1.getWCSPlaneUnitsPerRad(), (float) metaViewpoint1.distance);
         shader.bindPV(gl, meta0.getPV2(), meta1.getPV2());
 
-        if (Display.mode == ProjectionMode.Latitudinal) {
+        if (Display.mode.isLatitudinal()) {
             GridType gridType = Display.gridType;
             shader.bindLatitudinalGrid(gl,
                     latiLongitude(gridType, cameraViewpoint, metaViewpoint0),

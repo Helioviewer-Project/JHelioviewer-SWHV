@@ -295,6 +295,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
             double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
             unitPerArcsec = Sun.Radius / radiusSunInArcsec;
+            wcsPlaneUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
 
             unitPerPixelX = Math.abs(arcsecPerPixelX * unitPerArcsec);
             unitPerPixelY = Math.abs(arcsecPerPixelY * unitPerArcsec);
@@ -313,6 +314,13 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
             String ctype1 = m.getString("CTYPE1").orElse("");
             String ctype2 = m.getString("CTYPE2").orElse("");
+            if (ctype1.endsWith("AZP") && ctype2.endsWith("AZP")) {
+                wcsProjection = MetaData.WCSProjection.AZP;
+            } else if (ctype1.endsWith("ZPN") && ctype2.endsWith("ZPN")) {
+                wcsProjection = MetaData.WCSProjection.ZPN;
+            } else {
+                wcsProjection = MetaData.WCSProjection.TAN;
+            }
             if (isZenital(ctype1) && isZenital(ctype2)) {
                 for (int i = 0; i < pv2.length; i++) {
                     double pv = m.getDouble("PV2_" + i).orElse(0.);

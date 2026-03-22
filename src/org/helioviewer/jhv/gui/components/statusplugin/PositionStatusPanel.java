@@ -12,7 +12,6 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.JHVTransferHandler;
@@ -28,6 +27,7 @@ import org.helioviewer.jhv.math.Vec3;
 public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener, MouseMotionListener {
 
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
+    private static final String nanHpc = String.format("%7s,%7s", "--", "--");
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanPolar = String.format("%7s\u00B0,%7s\u2609", "--", "--");
 
@@ -42,9 +42,11 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         Viewport vp = Display.getActiveViewport();
         Vec2 coord = Display.mode.mouseToGrid(camera, vp, x, y, Display.gridType);
 
-        if (Display.mode == ProjectionMode.Latitudinal) {
+        if (Display.mode.isHpc()) {
+            setText(formatHpc(coord));
+        } else if (Display.mode.isLatitudinal()) {
             setText(formatLati(coord));
-        } else if (Display.mode == ProjectionMode.Polar || Display.mode == ProjectionMode.LogPolar) {
+        } else if (Display.mode.isPolar() || Display.mode.isLogPolar()) {
             setText(formatPolar(coord));
         } else {
             String valueStr = ImageData.nanValue;
@@ -76,8 +78,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                     annStr = String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
                 }
 
-                double px = (180 / Math.PI) * Math.atan2(v.x, viewpoint.distance);
-                double py = (180 / Math.PI) * Math.atan2(v.y, viewpoint.distance);
+                double zeta = viewpoint.distance - v.z;
+                double px = (180 / Math.PI) * Math.atan2(v.x, zeta);
+                double py = (180 / Math.PI) * Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
 
                 ImageLayer layer = Layers.getActiveImageLayer();
@@ -110,6 +113,11 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         return String.format("(\u03C6,\u03B8):(%s)", coordStr);
     }
 
+    private static String formatHpc(@Nonnull Vec2 coord) {
+        String coordStr = coord == Vec2.NAN ? nanHpc : String.format("%s,%s", formatXY(coord.x), formatXY(coord.y));
+        return String.format("(Tx,Ty):(%s)", coordStr);
+    }
+
     private static String formatPolar(@Nonnull Vec2 coord) {
         String coordStr = coord == Vec2.NAN ? nanPolar : String.format("%+7.2f\u00B0,%s", coord.x, formatR(coord.y));
         return String.format("(\u03B8,\u03c1):(%s)", coordStr);
@@ -131,14 +139,6 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
@@ -148,7 +148,21 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON3)
+        maybeCopyToClipboard(e);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        maybeCopyToClipboard(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        maybeCopyToClipboard(e);
+    }
+
+    private void maybeCopyToClipboard(MouseEvent e) {
+        if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
             JHVTransferHandler.getInstance().toClipboard(camera.getViewpoint().time.toString() + getText());
     }
 

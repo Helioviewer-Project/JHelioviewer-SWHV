@@ -1,10 +1,10 @@
 package org.helioviewer.jhv.plugins.pfss;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +15,7 @@ class PfssCache {
 
     private final TreeMap<Long, URI> map = new TreeMap<>();
     private final Cache<URI, PfssLoader.Data> cache = Caffeine.newBuilder().softValues().build();
-    private final Set<URI> inFlight = ConcurrentHashMap.newKeySet();
+    private final Set<URI> inFlight = new HashSet<>();
     private int downloads;
 
     void beginDownload() {

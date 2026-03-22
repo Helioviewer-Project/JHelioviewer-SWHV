@@ -27,7 +27,7 @@ public final class SphericalCoords {
         return radius * Math.cos(latitude) * Math.sin(longitude);
     }
 
-    public static double y(double radius, double longitude, double latitude) {
+    public static double y(double radius, double latitude) {
         return radius * Math.sin(latitude);
     }
 
@@ -38,7 +38,7 @@ public final class SphericalCoords {
     public static Vec3 vec3(double radius, double longitude, double latitude) {
         return new Vec3(
                 x(radius, longitude, latitude),
-                y(radius, longitude, latitude),
+                y(radius, latitude),
                 z(radius, longitude, latitude));
     }
 

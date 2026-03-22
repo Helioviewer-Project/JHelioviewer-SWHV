@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -111,14 +111,23 @@ public class GLListener implements GLEventListener {
     }
 
     public static void renderSceneScale(Camera camera, GL3 gl) {
-        if (Display.mode == ProjectionMode.Polar) {
+        if (Display.mode.isPolar()) {
             GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
-        } else if (Display.mode == ProjectionMode.LogPolar) {
+        } else if (Display.mode.isLogPolar()) {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
+        gl.glDisable(GL3.GL_DEPTH_TEST); // avoid depth fighting, e.g., grid
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
+        boolean hpcMode = Display.mode.isHpc();
+        Region hpcBounds = hpcMode ? getCenteredHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
+            if (hpcMode) {
+                double halfWidth = 0.5 * hpcBounds.width;
+                double halfHeight = Math.max(0.5 * hpcBounds.height, halfWidth / vp.aspect);
+                halfWidth = halfHeight * vp.aspect;
+                GridScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
+            }
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
             GLSLSolarShader.bindScreen(gl, vp);
@@ -127,6 +136,18 @@ public class GLListener implements GLEventListener {
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
             Layers.renderFloat(camera, vp, gl);
         }
+        gl.glEnable(GL3.GL_DEPTH_TEST);
+    }
+
+    private static Region getCenteredHpcScaleBounds() {
+        Region bounds = ImageLayers.getLargestHpcBounds();
+        double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
+        double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
+        if (halfWidth <= 0)
+            halfWidth = 5;
+        if (halfHeight <= 0)
+            halfHeight = 5;
+        return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
     }
 
     private static void renderFullFloatScene(Camera camera, GL3 gl) {
@@ -172,7 +193,7 @@ public class GLListener implements GLEventListener {
         if (Movie.isRecording())
             ExportMovie.handleMovieExport(camera, gl);
 
-        if (Display.mode == ProjectionMode.Orthographic) {
+        if (Display.mode.isOrthographic()) {
             renderScene(camera, gl);
             renderMiniview(gl);
         } else

@@ -1,32 +1,219 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.BufVertex;
 
 final class NonOrthoProjection {
+
+    enum Kind {
+        HPC,
+        LATITUDINAL,
+        POLAR
+    }
 
     private NonOrthoProjection() {
     }
 
+    static Vec2 project(Kind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+        return switch (kind) {
+            case HPC -> projectHpc(viewpoint, v, scale);
+            case LATITUDINAL -> projectLatitudinal(viewpoint, gridType, v, scale);
+            case POLAR -> projectPolar(viewpoint, gridType, v, scale);
+        };
+    }
+
+    static Vec3 unproject(Kind kind, Position viewpoint, GridType gridType, Vec2 pt) {
+        return switch (kind) {
+            case HPC -> unprojectHpc(viewpoint, pt);
+            case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt);
+            case POLAR -> unprojectPolar(viewpoint, gridType, pt);
+        };
+    }
+
+    static Vec3 unprojectSurfacePoint(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, x, y, gridType));
+    }
+
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
-    static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectLatitudinal(mapRotation(gridType, viewpoint).rotateVector(v), scale);
+    private static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+        return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
-    static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
-        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinal(pt));
+    private static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
+        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinalPoint(pt));
     }
 
-    static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectPolar(mapRotation(gridType, viewpoint).rotateVector(v), scale);
+    private static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+        return projectPolarVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
     }
 
-    static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
-        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolar(pt));
+    private static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
+        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolarPoint(pt));
+    }
+
+    private static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
+        // External solar points arrive in world space; HPC projection is defined in viewpoint space.
+        return projectHpcViewpointSpace(toHpcViewpointSpace(viewpoint, v), viewpoint.distance, scale);
+    }
+
+    private static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
+        Vec3 ray = helioprojectiveRayDegrees(pt);
+
+        double b = viewpoint.distance * ray.z;
+        double c = viewpoint.distance * viewpoint.distance - 1;
+        double discriminant = b * b - c;
+        if (discriminant < 0)
+            return null;
+
+        double root = Math.sqrt(discriminant);
+        double t = -b - root;
+        if (t <= 0)
+            t = -b + root;
+        if (t <= 0)
+            return null;
+
+        // Return the inverse in world space to match the rotated projectHpc() path above.
+        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+        return viewpoint.toQuat().rotateInverseVector(view);
+    }
+
+    static Vec2 projectToScreen(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
+        Vec2 pt = project(kind, viewpoint, gridType, v, scale);
+        return new Vec2(pt.x * vp.aspect, pt.y);
+    }
+
+    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        if (kind == Kind.HPC)
+            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, vexBuf, color, first, last);
+
+        Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
+        if (first)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        emitWrappedVertex(vp, previous, current, vexBuf, color);
+        if (last)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        return current;
+    }
+
+    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+        if (kind == Kind.HPC) {
+            emitHpcPoint(viewpoint, scale, vp, vertex, vexBuf, color, size);
+            return;
+        }
+
+        Vec2 pt = project(kind, viewpoint, gridType, vertex, scale);
+        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
+    }
+
+    static Vec2 mouseToScreen(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        Vec2 mouseGrid = mouseToGrid(scale, camera, vp, x, y, gridType);
+        return new Vec2(
+                scale.getXValueInv(mouseGrid.x) * vp.aspect,
+                scale.getYValueInv(mouseGrid.y));
+    }
+
+    static Vec2 mouseToGrid(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        return new Vec2(
+                scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(camera, vp, x) / vp.aspect + 0.5, gridType),
+                scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));
+    }
+
+    private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
+        double longitude = Math.toRadians(pt.x);
+        double latitude = Math.toRadians(pt.y);
+        Vec3 ray = new Vec3(
+                Math.tan(longitude),
+                Math.tan(latitude) / Math.cos(longitude),
+                -1);
+        ray.normalize();
+        return ray;
+    }
+
+    private static Vec3 toHpcViewpointSpace(Position viewpoint, Vec3 v) {
+        return viewpoint.toQuat().rotateVector(v);
+    }
+
+    private static Vec2 projectHpcViewpointSpace(Vec3 view, double observerDistance, GridScale scale) {
+        double zeta = observerDistance - view.z;
+        double longitude = Math.atan2(view.x, zeta);
+        double latitude = Math.atan2(view.y, Math.sqrt(view.x * view.x + zeta * zeta));
+        return new Vec2(
+                scale.getXValueInv(Math.toDegrees(longitude)),
+                scale.getYValueInv(Math.toDegrees(latitude)));
+    }
+
+    private static boolean isVisibleHpcViewpointSpace(Vec3 view) {
+        return view.z >= 0;
+    }
+
+    private static Vec2 projectVisibleHpcSurfacePoint(Position viewpoint, Vec3 vertex, GridScale scale) {
+        Vec3 view = toHpcViewpointSpace(viewpoint, vertex);
+        if (!isVisibleHpcViewpointSpace(view))
+            return null;
+        return projectHpcViewpointSpace(view, viewpoint.distance, scale);
+    }
+
+    private static Vec2 emitHpcVertex(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
+        Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
+        if (current == null) {
+            if (previous != null)
+                vexBuf.repeatVertex(Colors.Null);
+            return null;
+        }
+        if (first || previous == null)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        emitProjectedVertex(vp, current, vexBuf, color);
+        if (last)
+            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+        return current;
+    }
+
+    private static void emitHpcPoint(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+        // Skip back-side surface points in HPC instead of projecting them through the map.
+        Vec2 pt = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
+        if (pt == null)
+            return;
+        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
+    }
+
+    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
+        if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
+            emitHorizontalWrap(vp, current, previous, vexBuf, color);
+        }
+        emitProjectedVertex(vp, current, vexBuf, color);
+    }
+
+    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, BufVertex vexBuf, byte[] color) {
+        float y = (float) current.y;
+        float x;
+        if (current.x <= 0 && previous.x >= 0) {
+            x = (float) (0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        } else if (current.x >= 0 && previous.x <= 0) {
+            x = (float) (-0.5 * vp.aspect);
+            vexBuf.putVertex(x, y, 0, 1, color);
+            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+
+            vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
+            vexBuf.putVertex(-x, y, 0, 1, color);
+        }
+    }
+
+    private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
+        vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
     private static Quat mapRotation(GridType gridType, Position viewpoint) {
@@ -35,7 +222,7 @@ final class NonOrthoProjection {
         return Quat.createXY(gridType == GridType.Viewpoint ? viewpoint.lat : 0, gridType.toLongitude(viewpoint));
     }
 
-    private static Vec2 projectPolar(Vec3 v, GridScale scale) {
+    private static Vec2 projectPolarVector(Vec3 v, GridScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
         double theta = polarAngleRadians(v);
         double scaledr = scale.getYValueInv(r);
@@ -43,7 +230,7 @@ final class NonOrthoProjection {
         return new Vec2(scaledtheta, scaledr);
     }
 
-    private static Vec3 unprojectPolar(Vec2 pt) {
+    private static Vec3 unprojectPolarPoint(Vec2 pt) {
         double r = pt.y;
         double theta = Math.toRadians(pt.x);
         double x = PolarBasis.x(r, theta);
@@ -52,7 +239,7 @@ final class NonOrthoProjection {
         return new Vec3(x, y, z);
     }
 
-    private static Vec2 projectLatitudinal(Vec3 v, GridScale scale) {
+    private static Vec2 projectLatitudinalVector(Vec3 v, GridScale scale) {
         // Positive latitude corresponds to positive Y in the non-ortho map basis.
         double latitude = SphericalCoords.latitude(v);
         double longitude = SphericalCoords.longitude(v);
@@ -61,12 +248,12 @@ final class NonOrthoProjection {
         return new Vec2(scaledphi, scaledtheta);
     }
 
-    private static Vec3 unprojectLatitudinal(Vec2 pt) {
+    private static Vec3 unprojectLatitudinalPoint(Vec2 pt) {
         double longitude = Math.toRadians(pt.x);
         double latitude = Math.toRadians(pt.y);
         return new Vec3(
                 SphericalCoords.x(1, longitude, latitude),
-                SphericalCoords.y(1, longitude, latitude),
+                SphericalCoords.y(1, latitude),
                 SphericalCoords.z(1, longitude, latitude));
     }
 

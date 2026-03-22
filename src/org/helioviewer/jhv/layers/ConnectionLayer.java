@@ -19,7 +19,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
@@ -32,7 +31,6 @@ import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
-import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
@@ -121,47 +119,20 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
     }
 
-    private static void putPointScale(Position viewpoint, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color) {
-        Vec2 tf = Display.mode.project(viewpoint, Display.gridType, vertex);
-        float x = (float) (tf.x * vp.aspect);
-        float y = (float) tf.y;
-        vexBuf.putVertex(x, y, 0, SIZE_POINT, color);
-    }
-
-    private static Vec3 increaseOrthoRadius(Vec3 v) {
-        return new Vec3(ORTHO_RADIUS * v.x, ORTHO_RADIUS * v.y, ORTHO_RADIUS * v.z);
-    }
-
     private static void putConnectivity(Position viewpoint, Viewport vp, List<Vec3> points, BufVertex vexBuf, byte[] color) {
-        if (Display.mode == ProjectionMode.Orthographic)
-            points.forEach(v -> {
-                Vec3 ortho = increaseOrthoRadius(v);
-                vexBuf.putVertex((float) ortho.x, (float) ortho.y, (float) ortho.z, 2 * SIZE_POINT, color);
-            });
-        else
-            points.forEach(v -> putPointScale(viewpoint, vp, v, vexBuf, color));
+        points.forEach(v -> Display.mode.emitMapPoint(viewpoint, Display.gridType, vp, v, vexBuf, color, 2 * SIZE_POINT, ORTHO_RADIUS));
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
         if (hcs.isEmpty())
             return;
-        if (Display.mode == ProjectionMode.Orthographic) {
-            Vec3 first = increaseOrthoRadius(hcs.getFirst());
-            hcsBuf.putVertex(first, Colors.Null);
-            hcs.forEach(v -> hcsBuf.putVertex(increaseOrthoRadius(v), hcsColor));
-            hcsBuf.putVertex(first, hcsColor);
-            hcsBuf.putVertex(first, Colors.Null);
-        } else {
-            Position viewpoint = camera.getViewpoint();
-            Vec2 previous = null;
-            Vec3 first = hcs.getFirst();
-            GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
-            for (Vec3 v : hcs) {
-                previous = GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, v, previous, hcsBuf, hcsColor);
-            }
-            previous = GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, hcsColor);
-            GLHelper.emitProjectedMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, Colors.Null);
+        Position viewpoint = camera.getViewpoint();
+        Vec3 first = hcs.getFirst();
+        Vec2 previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, null, hcsBuf, hcsColor, true, false, ORTHO_RADIUS);
+        for (int i = 1; i < hcs.size(); i++) {
+            previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, hcs.get(i), previous, hcsBuf, hcsColor, false, false, ORTHO_RADIUS);
         }
+        Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, hcsColor, false, true, ORTHO_RADIUS);
 
         hcsLine.setVertex(gl, hcsBuf);
         hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);

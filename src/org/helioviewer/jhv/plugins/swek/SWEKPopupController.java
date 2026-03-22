@@ -16,7 +16,6 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
@@ -136,7 +135,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
             if (pi == null)
                 continue;
 
-            if (Display.mode == ProjectionMode.Orthographic) {
+            if (Display.mode.isOrthographic()) {
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
@@ -164,19 +163,19 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 }
             } else {
                 Vec2 tf = null;
-                if ((Display.mode == ProjectionMode.LogPolar || Display.mode == ProjectionMode.Polar) && evt.isCactus()) {
+                if ((Display.mode.isPolar() || Display.mode.isLogPolar()) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
                     double distSun = computeDistSun(evt);
-                    tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle), Display.mode.scale.getYValueInv(distSun));
+                    tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle) * vp.aspect, Display.mode.scale.getYValueInv(distSun));
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = Display.mode.project(camera.getViewpoint(), Display.gridType, pt);
+                        tf = Display.mode.projectToScreen(camera.getViewpoint(), Display.gridType, vp, pt);
                     }
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = Display.mode.mouseToViewPlane(camera, vp, mouseOverX, mouseOverY);
+                    Vec2 mousepos = Display.mode.mouseToScreen(camera, vp, mouseOverX, mouseOverY, Display.gridType);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
