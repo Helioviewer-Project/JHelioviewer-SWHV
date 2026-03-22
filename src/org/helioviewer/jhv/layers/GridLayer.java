@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -23,18 +22,16 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
+import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
-import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
@@ -60,8 +57,6 @@ public final class GridLayer extends AbstractLayer {
     private static final double LINEWIDTH_AXES = 2 * LINEWIDTH;
     // private static final double PLANETEXT_Z = 0.01;
 
-    private static final DecimalFormat formatter2 = MathUtils.numberFormatter("0", 2);
-
     private double lonStep = 15;
     private double latStep = 20;
     private boolean gridNeedsInit = true;
@@ -77,7 +72,7 @@ public final class GridLayer extends AbstractLayer {
     private final GLSLLine radialThickLine = new GLSLLine(false);
     private final GLSLLine radialCircleLineFar = new GLSLLine(false);
     private final GLSLLine radialThickLineFar = new GLSLLine(false);
-    private final GLSLLine flatLine = new GLSLLine(false);
+    private final FlatGrid flatGrid = new FlatGrid();
     private final GLSLLine gridLine = new GLSLLine(false);
 
     private List<GridLabel> latLabels;
@@ -178,87 +173,7 @@ public final class GridLayer extends AbstractLayer {
     public void renderScale(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
-        int pixelsPerSolarRadius = (int) (textScale * CameraHelper.getPixelFactor(camera, vp));
-        drawGridFlat(gl, vp);
-        if (showLabels) {
-            drawGridTextFlat(pixelsPerSolarRadius, vp);
-        }
-    }
-
-    private double previousAspect = -1;
-    private ProjectionMode previousFlatMode;
-    private GridType previousFlatGridType;
-    private GridMath.AxisSignature previousFlatXSignature;
-    private GridMath.AxisSignature previousFlatYSignature;
-
-    private double[] flatGridXPositions = new double[0];
-    private double[] flatGridYPositions = new double[0];
-    private double[] flatGridXLabels = new double[0];
-    private double[] flatGridYLabels = new double[0];
-
-    private void drawGridFlat(GL3 gl, Viewport vp) {
-        GridScale scale = Display.mode.scale;
-        boolean angularVertical = isAngularFlatVerticalAxis();
-        double xStart = scale.getInterpolatedXValue(0);
-        double xStop = scale.getInterpolatedXValue(1);
-        double yStart = scale.getInterpolatedYValue(0);
-        double yStop = scale.getInterpolatedYValue(1);
-        GridMath.AxisSignature xSignature = GridMath.buildFlatAxisSignature(true, xStart, xStop);
-        GridMath.AxisSignature ySignature = GridMath.buildFlatAxisSignature(angularVertical, yStart, yStop);
-        if (needsFlatGridRebuild(vp, xSignature, ySignature)) {
-            boolean wrap0to360 = Display.gridType == GridType.Carrington;
-            GridMath.FlatAxis xAxis = GridMath.buildFlatAxis(scale, true, wrap0to360, xSignature);
-            GridMath.FlatAxis yAxis = GridMath.buildFlatAxis(scale, false, false, ySignature);
-            flatGridXPositions = xAxis.positions();
-            flatGridYPositions = yAxis.positions();
-            flatGridXLabels = xAxis.labels();
-            flatGridYLabels = yAxis.labels();
-            GridMath.initFlatGrid(gl, flatLine, vp.aspect, flatGridXPositions, flatGridYPositions);
-            previousAspect = vp.aspect;
-            previousFlatMode = Display.mode;
-            previousFlatGridType = Display.gridType;
-            previousFlatXSignature = xSignature;
-            previousFlatYSignature = ySignature;
-        }
-        flatLine.renderLine(gl, vp.aspect, LINEWIDTH);
-    }
-
-    private static boolean isAngularFlatVerticalAxis() {
-        return Display.mode.isHpc() || Display.mode.isLatitudinal();
-    }
-
-    private boolean needsFlatGridRebuild(Viewport vp, GridMath.AxisSignature xSignature, GridMath.AxisSignature ySignature) {
-        return previousAspect != vp.aspect ||
-                previousFlatMode != Display.mode ||
-                previousFlatGridType != Display.gridType ||
-                !Objects.equals(previousFlatXSignature, xSignature) ||
-                !Objects.equals(previousFlatYSignature, ySignature);
-    }
-
-    private void drawGridTextFlat(int size, Viewport vp) {
-        float w = (float) vp.aspect;
-        float h = 1;
-        JhvTextRenderer renderer = GLText.getRenderer(size);
-        renderer.setColor(Colors.WhiteFloat);
-        float textScaleFactor = 0.3f * textScale / renderer.getFont().getSize2D();
-
-        renderer.begin3DRendering();
-        {
-            for (int i = 0; i < flatGridXLabels.length; i++) {
-                if (Math.abs(flatGridXPositions[i]) < 1e-9) {
-                    continue;
-                }
-                String txt = formatter2.format(flatGridXLabels[i]);
-                float x = (float) flatGridXPositions[i];
-                renderer.draw3D(txt, w * x, 0, 0, textScaleFactor);
-            }
-            for (int i = 0; i < flatGridYLabels.length; i++) {
-                String txt = formatter2.format(flatGridYLabels[i]);
-                float y = (float) flatGridYPositions[i];
-                renderer.draw3D(txt, 0, h * y, 0, textScaleFactor);
-            }
-        }
-        renderer.end3DRendering();
+        flatGrid.render(camera, vp, gl, showLabels);
     }
 
     private void drawEarthCircles(GL3 gl, Viewport vp, double factor, Position p) {
@@ -332,7 +247,7 @@ public final class GridLayer extends AbstractLayer {
         radialThickLineFar.init(gl);
         GridMath.initRadialCircles(gl, radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
-        flatLine.init(gl);
+        flatGrid.init(gl);
     }
 
     @Override
@@ -345,7 +260,7 @@ public final class GridLayer extends AbstractLayer {
         radialThickLine.dispose(gl);
         radialCircleLineFar.dispose(gl);
         radialThickLineFar.dispose(gl);
-        flatLine.dispose(gl);
+        flatGrid.dispose(gl);
     }
 
     @Override

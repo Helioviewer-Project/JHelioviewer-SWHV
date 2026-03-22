@@ -120,11 +120,11 @@ public class Camera {
         }
     }
 
-    double getTranslationX() {
+    public double getTranslationX() {
         return translation.x;
     }
 
-    double getTranslationY() {
+    public double getTranslationY() {
         return translation.y;
     }
 
