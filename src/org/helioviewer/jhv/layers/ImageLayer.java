@@ -252,8 +252,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         }
 
         GLSLSolarShader.bindWCS(gl,
-                cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0, meta0.getWCSProjection(), meta0.getWCSPlaneUnitsPerRad(), (float) metaViewpoint0.distance,
-                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1, meta1.getWCSProjection(), meta1.getWCSPlaneUnitsPerRad(), (float) metaViewpoint1.distance);
+                cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
+                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
         shader.bindPV(gl, meta0.getPV2(), meta1.getPV2());
 
         float grid00 = 0;
