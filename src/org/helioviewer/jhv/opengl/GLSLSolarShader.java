@@ -24,11 +24,8 @@ public class GLSLSolarShader extends GLSLShader {
 
     private final boolean hasCommon;
 
-    private int gridRef;
     private int pv0Ref;
     private int pv1Ref;
-
-    private final float[] floatArr = new float[8];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
         super(vertex, fragment);
@@ -82,7 +79,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void initUniforms(GL3 gl, int id) {
-        gridRef = gl.glGetUniformLocation(id, "grid");
         pv0Ref = gl.glGetUniformLocation(id, "pv0");
         pv1Ref = gl.glGetUniformLocation(id, "pv1");
 
@@ -173,20 +169,6 @@ public class GLSLSolarShader extends GLSLShader {
     public void bindPV(GL3 gl, float[] pv0, float[] pv1) {
         gl.glUniform1fv(pv0Ref, pv0.length, pv0, 0);
         gl.glUniform1fv(pv1Ref, pv1.length, pv1, 0);
-    }
-
-    public void bindLatitudinalGrid(GL3 gl,
-                                    double baseLongitude, double baseLatitudeOffset, double heliographicLatitude,
-                                    double diffLongitude, double diffLatitudeOffset, double diffHeliographicLatitude) {
-        // Latitudinal shader grid triples are:
-        // (map longitude offset, map latitude offset, heliographic latitude).
-        floatArr[0] = (float) baseLongitude;
-        floatArr[1] = (float) baseLatitudeOffset;
-        floatArr[2] = (float) heliographicLatitude;
-        floatArr[3] = (float) diffLongitude;
-        floatArr[4] = (float) diffLatitudeOffset;
-        floatArr[5] = (float) diffHeliographicLatitude;
-        gl.glUniform3fv(gridRef, 2, floatArr, 0);
     }
 
 }

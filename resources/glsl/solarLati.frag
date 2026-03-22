@@ -42,11 +42,11 @@ void main(void) {
 
     vec2 scrpos = getScrPos();
     bool diffMode = display.isDiff != NODIFFERENCE;
-    vec2 texCoord = sampleLatiTexcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, wcs[0].deltaT, grid[0]);
+    vec2 texCoord = sampleLatiTexcoord(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, wcs[0].deltaT, projection[0].grid);
     if (!diffMode) {
         color = getColor(texCoord, texCoord, 1);
     } else {
-        vec2 diffTexCoord = sampleLatiTexcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, wcs[1].deltaT, grid[1]);
+        vec2 diffTexCoord = sampleLatiTexcoord(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, wcs[1].deltaT, projection[1].grid);
         color = getColor(texCoord, diffTexCoord, 1);
     }
     outColor = color;
