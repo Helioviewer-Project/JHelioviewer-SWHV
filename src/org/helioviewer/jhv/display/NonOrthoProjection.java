@@ -60,9 +60,11 @@ final class NonOrthoProjection {
     }
 
     private static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
-        double zeta = viewpoint.distance - v.z;
-        double longitude = Math.atan2(v.x, zeta);
-        double latitude = Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
+        // External solar points arrive in world space; HPC projection is defined in viewpoint space.
+        Vec3 view = viewpoint.toQuat().rotateVector(v);
+        double zeta = viewpoint.distance - view.z;
+        double longitude = Math.atan2(view.x, zeta);
+        double latitude = Math.atan2(view.y, Math.sqrt(view.x * view.x + zeta * zeta));
         return new Vec2(
                 scale.getXValueInv(Math.toDegrees(longitude)),
                 scale.getYValueInv(Math.toDegrees(latitude)));
@@ -84,12 +86,21 @@ final class NonOrthoProjection {
         if (t <= 0)
             return null;
 
-        return new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+        // Return the inverse in world space to match the rotated projectHpc() path above.
+        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+        return viewpoint.toQuat().rotateInverseVector(view);
     }
 
     static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+        // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
+        if (kind == Kind.HPC && !isVisibleHpc(viewpoint, vertex)) {
+            if (previous != null)
+                vexBuf.repeatVertex(Colors.Null);
+            return null;
+        }
+
         Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
-        if (first)
+        if (first || kind == Kind.HPC && previous == null)
             emitProjectedVertex(vp, current, vexBuf, Colors.Null);
         if (kind == Kind.HPC)
             emitProjectedVertex(vp, current, vexBuf, color);
@@ -106,6 +117,10 @@ final class NonOrthoProjection {
     }
 
     static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+        // Skip back-side surface points in HPC instead of projecting them through the map.
+        if (kind == Kind.HPC && !isVisibleHpc(viewpoint, vertex))
+            return;
+
         Vec2 pt = project(kind, viewpoint, gridType, vertex, scale);
         vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
     }
@@ -138,6 +153,10 @@ final class NonOrthoProjection {
                 -1);
         ray.normalize();
         return ray;
+    }
+
+    private static boolean isVisibleHpc(Position viewpoint, Vec3 v) {
+        return viewpoint.toQuat().rotateVector(v).z >= 0;
     }
 
     private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
