@@ -117,7 +117,6 @@ public class GLListener implements GLEventListener {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
         }
 
-        gl.glDisable(GL3.GL_DEPTH_TEST); // avoid depth fighting, e.g., grid
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         boolean hpcMode = Display.mode.isHpc();
         Region hpcBounds = hpcMode ? getCenteredHpcScaleBounds() : null;
@@ -136,7 +135,6 @@ public class GLListener implements GLEventListener {
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
             Layers.renderFloat(camera, vp, gl);
         }
-        gl.glEnable(GL3.GL_DEPTH_TEST);
     }
 
     private static Region getCenteredHpcScaleBounds() {
