@@ -19,10 +19,6 @@ final class OrthoProjection {
         return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
     }
 
-    static Vec3 unprojectDisplayPoint(Camera camera, Viewport vp, int x, int y) {
-        return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
-    }
-
     static void emitMapVertex(Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
         if (first)
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
