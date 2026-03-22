@@ -51,25 +51,25 @@ public class BufVertex {
         }
     }
 
-    public void putVertex(Vec3 v, byte[] b) {
-        putVertex((float) v.x, (float) v.y, (float) v.z, 1, b);
+    public void putVertex(Vec3 v, byte[] color) {
+        putVertex((float) v.x, (float) v.y, (float) v.z, 1, color);
     }
 
-    public void putVertex(float x, float y, float z, float w, byte[] b) {
+    public void putVertex(float x, float y, float z, float w, byte[] color) {
         bufferLast.put(0, x).put(1, y).put(2, z).put(3, w);
-        repeatVertex(b);
+        repeatVertex(color);
     }
 
-    public void repeatVertex(byte[] b) {
+    public void repeatVertex(byte[] color) {
         ensureVertx(16);
         System.arraycopy(byteLast, 0, arrayVertx, lengthVertx, 16);
         lengthVertx += 16;
 
         ensureColor(4);
-        arrayColor[lengthColor++] = b[0];
-        arrayColor[lengthColor++] = b[1];
-        arrayColor[lengthColor++] = b[2];
-        arrayColor[lengthColor++] = b[3];
+        arrayColor[lengthColor++] = color[0];
+        arrayColor[lengthColor++] = color[1];
+        arrayColor[lengthColor++] = color[2];
+        arrayColor[lengthColor++] = color[3];
 
         count++;
     }
