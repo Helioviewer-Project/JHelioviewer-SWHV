@@ -115,13 +115,6 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
         return distSun;
     }
 
-    private Vec2 mouseToScaledScreen(Viewport vp) {
-        Vec2 mouseGrid = Display.mode.mouseToGrid(camera, vp, mouseOverX, mouseOverY, Display.gridType);
-        return new Vec2(
-                Display.mode.scale.getXValueInv(mouseGrid.x) * vp.aspect,
-                Display.mode.scale.getYValueInv(mouseGrid.y));
-    }
-
     @Override
     public void mouseMoved(MouseEvent e) {
         List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
@@ -182,7 +175,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = mouseToScaledScreen(vp);
+                    Vec2 mousepos = Display.mode.mouseToScaledScreen(camera, vp, mouseOverX, mouseOverY, Display.gridType);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
