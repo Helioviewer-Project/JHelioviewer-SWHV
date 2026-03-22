@@ -25,7 +25,6 @@ struct WCS {
     vec2 crval;
     float deltaT; // not strictly WCS
     float padding;
-    vec4 projectionMeta; // x = projection code, y = plane units per radian, z = observer distance
 };
 
 layout(std140) uniform WCSBlock {
@@ -80,7 +79,7 @@ uniform sampler2D image;
 uniform sampler2D diffImage;
 uniform sampler1D lut;
 
-uniform float pv0[6]; // should be in WCS uniform block
+uniform float pv0[6]; // kept as plain uniforms for simple indexed access
 uniform float pv1[6];
 
 #define BLUR_TAP_COUNT (3 * 3)

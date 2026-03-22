@@ -33,7 +33,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static GLBO wcsBO;
-    private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4 + 4));
+    private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4));
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO projectionBO;
@@ -105,19 +105,17 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindWCS(GL3 gl,
-                               Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0, MetaData.WCSProjection projection0, float planeUnitsPerRad0, float observerDistance0,
-                               Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1, MetaData.WCSProjection projection1, float planeUnitsPerRad1, float observerDistance1) {
+                               Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
+                               Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval0).put(deltaT0).put(0);
-        wcsBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
 
         cameraDiff1.setFloatBuffer(wcsBuf);
         wcsBuf.put(r1.glslArray);
         crota1.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval1).put(deltaT1).put(0);
-        wcsBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
 
         wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
