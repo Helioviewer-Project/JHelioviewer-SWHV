@@ -47,10 +47,8 @@ This note documents the current convention used by the non-orthographic display 
   - this is expected behavior for the current `HPC` mode, not a rendering bug
 - Java picking now distinguishes between:
   - solar-point unprojection
-  - display-surface unprojection
-- In `Orthographic`, display-surface unprojection uses the existing current-view sphere/plane logic.
-- In `HPC`, display-surface unprojection returns flat current-view plane coordinates for display annotations.
-- In `Latitudinal`, `Polar`, and `LogPolar`, display-surface unprojection currently falls back to current-view sphere/plane unprojection rather than a mode-specific flat display basis.
+  - current-view sphere/plane picking for transformed display annotations such as line/FOV
+- `Orthographic` and non-ortho modes now share the same current-view sphere/plane pick path for those transformed annotations.
 - Latitudinal projection is expressed as:
   - `x = longitude`
   - `y = latitude`
