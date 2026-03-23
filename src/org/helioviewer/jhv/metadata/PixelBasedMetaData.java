@@ -2,6 +2,7 @@ package org.helioviewer.jhv.metadata;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.wcs.WcsHeader;
 
 public class PixelBasedMetaData extends BaseMetaData {
 
@@ -17,6 +18,7 @@ public class PixelBasedMetaData extends BaseMetaData {
         region = new Region(-0.5 * pixelW * unitPerPixel, -0.5 * pixelH * unitPerPixel, pixelW * unitPerPixel, pixelH * unitPerPixel);
 
         displayName = _displayName;
+        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
     }
 
 }

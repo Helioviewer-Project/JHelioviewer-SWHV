@@ -27,6 +27,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.wcs.WcsHeader;
 import org.json.JSONObject;
 
 import com.jogamp.opengl.GL3;
@@ -214,12 +215,14 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
         MetaData meta1 = imageDataDiff.getMetaData();
         Position metaViewpoint1 = meta1.getViewpoint();
+        WcsHeader wcs0 = meta0.getWcsHeader();
+        WcsHeader wcs1 = meta1.getWcsHeader();
 
         Quat cameraDiff0 = Quat.rotateWithConjugate(q, metaViewpoint0.toQuat());
         Quat cameraDiff1 = Quat.rotateWithConjugate(q, metaViewpoint1.toQuat());
 
-        Quat crota0 = meta0.getCROTA();
-        Quat crota1 = meta1.getCROTA();
+        Quat crota0 = wcs0.crota;
+        Quat crota1 = wcs1.crota;
         double deltaCROTA = glImage.getDeltaCROTA();
         if (deltaCROTA != 0) {
             Quat dquat = Quat.createAxisZ(Math.toRadians(deltaCROTA));
@@ -229,20 +232,20 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
         int deltaCRVAL1 = glImage.getDeltaCRVAL1();
         if (deltaCRVAL1 == 0) {
-            crval0[0] = (float) meta0.getCRVAL().x;
-            crval1[0] = (float) meta1.getCRVAL().x;
+            crval0[0] = (float) wcs0.crval.x;
+            crval1[0] = (float) wcs1.crval.x;
         } else {
-            crval0[0] = (float) (meta0.getCRVAL().x + deltaCRVAL1 * meta0.getUnitPerArcsec());
-            crval1[0] = (float) (meta1.getCRVAL().x + deltaCRVAL1 * meta1.getUnitPerArcsec());
+            crval0[0] = (float) (wcs0.crval.x + deltaCRVAL1 * meta0.getUnitPerArcsec());
+            crval1[0] = (float) (wcs1.crval.x + deltaCRVAL1 * meta1.getUnitPerArcsec());
         }
 
         int deltaCRVAL2 = glImage.getDeltaCRVAL2();
         if (deltaCRVAL2 == 0) {
-            crval0[1] = (float) meta0.getCRVAL().y;
-            crval1[1] = (float) meta1.getCRVAL().y;
+            crval0[1] = (float) wcs0.crval.y;
+            crval1[1] = (float) wcs1.crval.y;
         } else {
-            crval0[1] = (float) (meta0.getCRVAL().y + deltaCRVAL2 * meta0.getUnitPerArcsec());
-            crval1[1] = (float) (meta1.getCRVAL().y + deltaCRVAL2 * meta1.getUnitPerArcsec());
+            crval0[1] = (float) (wcs0.crval.y + deltaCRVAL2 * meta0.getUnitPerArcsec());
+            crval1[1] = (float) (wcs1.crval.y + deltaCRVAL2 * meta1.getUnitPerArcsec());
         }
 
         float deltaT0 = 0, deltaT1 = 0;
@@ -254,7 +257,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         GLSLSolarShader.bindWCS(gl,
                 cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
-        shader.bindPV(gl, meta0.getPV2(), meta1.getPV2());
+        shader.bindPV(gl, wcs0.pv2, wcs1.pv2);
 
         float grid00 = 0;
         float grid01 = 0;
@@ -273,9 +276,9 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         }
 
         GLSLSolarShader.bindProjection(gl,
-                meta0.getWCSProjection(), meta0.getWCSPlaneUnitsPerRad(), (float) metaViewpoint0.distance,
+                wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance,
                 grid00, grid01, grid02,
-                meta1.getWCSProjection(), meta1.getWCSPlaneUnitsPerRad(), (float) metaViewpoint1.distance,
+                wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance,
                 grid10, grid11, grid12);
 
         GLListener.glslSolar.render(gl);

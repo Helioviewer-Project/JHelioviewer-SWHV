@@ -30,7 +30,7 @@ public final class DisplayMapBounds {
         if (mode.isHpc())
             return ImageBounds.hpc(metaData);
 
-        WcsProjection.Context context = new WcsProjection.Context(metaData);
+        WcsHeader wcsHeader = metaData.getWcsHeader();
         Region region = metaData.getPhysicalRegion();
         double x0 = region.llx;
         double x1 = region.urx;
@@ -46,10 +46,10 @@ public final class DisplayMapBounds {
             double t = i / (double) EDGE_SAMPLES;
             double x = x0 + t * (x1 - x0);
             double y = y0 + t * (y1 - y0);
-            updateBounds(bounds, context, metaViewpoint, mode, gridType, cameraViewpoint, x, y0);
-            updateBounds(bounds, context, metaViewpoint, mode, gridType, cameraViewpoint, x, y1);
-            updateBounds(bounds, context, metaViewpoint, mode, gridType, cameraViewpoint, x0, y);
-            updateBounds(bounds, context, metaViewpoint, mode, gridType, cameraViewpoint, x1, y);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x, y0);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x, y1);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x0, y);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x1, y);
         }
 
         if (!Double.isFinite(bounds[0]) || !Double.isFinite(bounds[1]) || !Double.isFinite(bounds[2]) || !Double.isFinite(bounds[3])) {
@@ -62,8 +62,8 @@ public final class DisplayMapBounds {
         return regionFromBounds(bounds);
     }
 
-    private static void updateBounds(double[] bounds, WcsProjection.Context context, Position metaViewpoint, ProjectionMode mode, GridType gridType, Position cameraViewpoint, double x, double y) {
-        Vec2 helioprojective = WcsProjection.planeToHelioprojective(context, x, y);
+    private static void updateBounds(double[] bounds, WcsHeader wcsHeader, Position metaViewpoint, ProjectionMode mode, GridType gridType, Position cameraViewpoint, double x, double y) {
+        Vec2 helioprojective = WcsProjection.planeToHelioprojective(wcsHeader, x, y);
         Vec3 world = helioprojectiveToWorld(metaViewpoint, helioprojective);
         if (world == null)
             return;
