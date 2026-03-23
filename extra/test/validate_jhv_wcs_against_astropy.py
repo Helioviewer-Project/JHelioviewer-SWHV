@@ -691,7 +691,7 @@ def main() -> int:
         description=(
             "Validate the current JHV image/WCS projection code paths against astropy.wcs. "
             "The script covers the formal TAN/AZP/ZPN image path, the inverse TAN/AZP/ZPN branches "
-            "implemented by JHV, the centered HPC display-bounds logic, and the existing orthographic/HPC/TAN "
+            "implemented by JHV where the validator has coverage, the centered HPC display-bounds logic, and the existing orthographic/HPC/TAN "
             "comparison modes already used by this branch. It does not validate newer Java overlay-only behavior "
             "such as viewpoint-space external-point projection or visible-hemisphere clipping."
         )
