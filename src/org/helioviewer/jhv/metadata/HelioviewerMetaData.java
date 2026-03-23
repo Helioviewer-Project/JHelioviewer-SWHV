@@ -279,6 +279,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private void retrievePixelParameters(MetaDataContainer m) {
+        int pixelW, pixelH;
         if (m.getLong("ZNAXIS").isPresent()) {
             pixelW = (int) m.getRequiredLong("ZNAXIS1");
             pixelH = (int) m.getRequiredLong("ZNAXIS2");

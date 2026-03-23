@@ -15,9 +15,7 @@ public interface MetaData {
     @Nonnull
     Region getPhysicalRegion();
 
-    int getPixelWidth();
-
-    int getPixelHeight();
+    double getUnitPerPixelY();
 
     double getUnitPerArcsec();
 
