@@ -60,14 +60,17 @@ examples.
 
 The work reported here includes:
 
-- validating `formal-TAN`, non-slanted `AZP`, and six-term `ZPN` (primary
+- validating `formal-TAN`, `AZP`, and six-term `ZPN` (primary
   branch only) against Astropy, including round-trip checks.
 - validating the `HPC` sampling path against Astropy.
 
 Main conclusions:
 
-- `formal-TAN`, non-slanted `AZP`, and six-term `ZPN` are validated against
+- `formal-TAN`, `AZP`, and six-term `ZPN` are validated against
   Astropy, including the tested inverse mappings.
+- The available `AZP` validation files are non-slanted (`gamma = 0`), so
+  slanted `AZP` is implemented but not directly tested in the runs reported
+  here.
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
   path covered by this note.
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
@@ -167,7 +170,7 @@ Included in the validator:
   - `PV2_0..PV2_5`
 - the shared WCS projection math for:
   - `TAN`
-  - non-slanted `AZP`
+  - `AZP`
   - six-term `ZPN` (primary branch only)
 - the `HPC` image sampling path:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
@@ -304,7 +307,7 @@ It validates:
 - `TAN plane -> helioprojective`
 - round-trip error
 
-4. Inverse non-slanted `AZP`
+4. Inverse `AZP`
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -319,7 +322,6 @@ It validates:
 
 - `AZP plane -> helioprojective`
 - round-trip error
-- only the non-slanted `gamma = 0` case used by the tested HI files
 
 5. Inverse primary-branch `ZPN`
 
