@@ -1,7 +1,25 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.7.8 (pending)
+## JHelioviewer 4.8.0 (pending)
+
+### Display and interaction
+- Add helioprojective Cartesian (`HPC`) projection mode
+- Improve alignment and clipping of overlays in `HPC`, including event hover and surface-overlay visibility
+- Improve flat-grid rendering, labels, and position readout in non-orthographic modes
+- Fix flat-grid shimmer in non-orthographic modes
+- Make transformed line/FOV annotations use a shared current-view picking path
+- Improve zoom, mouse interaction, and several toolbar/macOS interaction details, including `1:1` sizing in flat modes
+
+### Image and datasets
+- Add formal `TAN`, `AZP`, and primary-branch `ZPN` support for non-orthographic image display
+- Add bundled colormaps for AIA, PUNCH, and STEREO COR/HI datasets
+- Load LUT definitions from resources
+
+### Technical
+- Improve star-query and table-access performance
+- Add Astropy-based WCS validation tooling, test data, and documentation for the non-orthographic projection path
+- Various bug fixes, cleanups, and internal refactoring
 
 ## JHelioviewer 4.7.7 (2026-03-03)
 
