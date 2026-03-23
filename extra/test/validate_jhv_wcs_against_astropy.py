@@ -276,9 +276,6 @@ def zpn_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -
 
 def azp_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     gamma = math.radians(meta.pv2[2])
-    if abs(gamma) > 1e-12:
-        raise ValueError("Inverse AZP validator currently supports only the non-slanted gamma=0 case")
-
     x = plane_internal[0] / meta.plane_units_per_rad
     y = plane_internal[1] / meta.plane_units_per_rad
     r = math.hypot(x, y)
@@ -286,30 +283,27 @@ def azp_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMe
     lon0 = meta.crval_internal_x / meta.plane_units_per_rad
     lat0 = meta.crval_internal_y / meta.plane_units_per_rad
     mu = meta.pv2[1]
+    sin_gamma = math.sin(gamma)
+    cos_gamma = math.cos(gamma)
 
     if r == 0.0:
         return (lon0, lat0)
 
     mu_plus_1 = mu + 1.0
-    if mu == 1.0:
-        t = 0.5 * r
-    else:
-        discriminant = mu_plus_1 * mu_plus_1 - r * r * (mu * mu - 1.0)
-        if discriminant < 0.0:
-            raise ValueError("Plane point is outside the real AZP inverse branch")
-        t = r * mu_plus_1 / (mu_plus_1 + math.sqrt(discriminant))
-    eta = 2.0 * math.atan(t)
-
-    alpha = math.atan2(x, y)
-    sin_eta = math.sin(eta)
-    cos_eta = math.cos(eta)
-    a = sin_eta * math.sin(alpha)
-    b = sin_eta * math.cos(alpha)
+    a = 1.0 + y * sin_gamma / mu_plus_1
+    k = (x * x + y * y * cos_gamma * cos_gamma) / (mu_plus_1 * mu_plus_1 * a * a)
+    discriminant = 1.0 + k * (1.0 - mu * mu)
+    if discriminant < 0.0:
+        raise ValueError("Plane point is outside the real AZP inverse branch")
+    cos_native_distance = (-k * mu + math.sqrt(discriminant)) / (1.0 + k)
+    denom = (mu + cos_native_distance) / a
+    native_x = x * denom / mu_plus_1
+    native_y = y * cos_gamma * denom / mu_plus_1
 
     sin_lat0 = math.sin(lat0)
     cos_lat0 = math.cos(lat0)
-    lat = math.asin(cos_eta * sin_lat0 + b * cos_lat0)
-    lon = lon0 + math.atan2(a, cos_eta * cos_lat0 - b * sin_lat0)
+    lat = math.asin(cos_native_distance * sin_lat0 + native_y * cos_lat0)
+    lon = lon0 + math.atan2(native_x, cos_native_distance * cos_lat0 - native_y * sin_lat0)
     return (lon, lat)
 
 
@@ -703,7 +697,7 @@ def main() -> int:
     parser.add_argument("--report-worst", type=int, default=5, help="How many worst samples to print")
     parser.add_argument("--all-pixels", action="store_true", help="Validate all pixel centers instead of random 3D samples")
     parser.add_argument("--inverse-tan", action="store_true", help="Validate the TAN inverse plane->world mapping")
-    parser.add_argument("--inverse-azp", action="store_true", help="Validate the non-slanted AZP inverse plane->world mapping")
+    parser.add_argument("--inverse-azp", action="store_true", help="Validate the AZP inverse plane->world mapping")
     parser.add_argument("--inverse-zpn", action="store_true", help="Validate the primary-branch ZPN inverse plane->world mapping")
     parser.add_argument("--hpc-render-compare", action="store_true", help="Render a bounded HPC screen through JHV and Astropy mappings and write diagnostic PNGs")
     parser.add_argument("--hpc-bounds-compare", action="store_true", help="Report the raw and centered HPC bounds used by the current JHV display logic")

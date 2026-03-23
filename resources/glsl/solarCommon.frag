@@ -336,7 +336,7 @@ vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs,
     if (projectionCode == WCS_PROJECTION_ZPN)
         return projectZpnToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
 
-    return helioprojective - wcs.crval;
+    return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
 }
 
 vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {

@@ -101,6 +101,8 @@ Changing only one side will usually produce one or more of:
   - `TAN`
   - `AZP`
   - six-term `ZPN` on its primary monotonic branch
+- unsupported projection codes fall back to `TAN` on both the Java and GLSL
+  sides
 - `ZPN` support uses only `PV2_0..PV2_5`, which matches the
   solar test files
 
