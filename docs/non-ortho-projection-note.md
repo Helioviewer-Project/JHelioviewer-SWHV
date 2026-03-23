@@ -8,6 +8,10 @@ This note documents the convention used by the non-orthographic display modes (`
   - `src/org/helioviewer/jhv/display/ProjectionMode.java`
   - `src/org/helioviewer/jhv/display/NonOrthoProjection.java`
   - `src/org/helioviewer/jhv/display/OrthoProjection.java`
+  - `src/org/helioviewer/jhv/wcs/WcsProjection.java`
+  - `src/org/helioviewer/jhv/wcs/WcsInverse.java`
+  - `src/org/helioviewer/jhv/wcs/ImageBounds.java`
+  - `src/org/helioviewer/jhv/wcs/DisplayMapBounds.java`
 - Image reprojection lives in:
   - `resources/glsl/solarHpc.frag`
   - `resources/glsl/solarLati.frag`
@@ -21,6 +25,9 @@ This note documents the convention used by the non-orthographic display modes (`
   - `ProjectionMode`: mode selection, shader/scale selection, small mode queries, and dispatch
   - `NonOrthoProjection`: non-ortho projection math, non-ortho point/line emission, non-ortho mouse/grid helpers, and non-ortho surface unprojection
   - `OrthoProjection`: orthographic point/line emission, orthographic mouse/grid helpers, and orthographic surface unprojection
+  - `WcsProjection` / `WcsInverse`: shared image-WCS plane to helioprojective conversion used by bounds and `1:1` sizing helpers
+  - `ImageBounds`: intrinsic image-side `HPC` footprint bounds
+  - `DisplayMapBounds`: display-map bounds used for non-ortho `1:1` sizing
 - Non-ortho modes use an explicit map-basis rotation on the Java side.
 - For `GridType.Viewpoint`, non-ortho maps use a positive latitude rotation in `NonOrthoProjection.mapRotation(...)`, so they intentionally do not reuse `GridType.toGrid(...)`.
 - `HPC` is observer-centered, not origin-centered spherical coordinates.
@@ -79,7 +86,7 @@ Changing only one side will usually produce one or more of:
 ## Validation boundary
 
 - `HPC` render sampling is validated against Astropy for the tested `TAN`,
-  non-slanted `AZP`, and six-term primary-branch `ZPN` test files.
+  `AZP`, and six-term primary-branch `ZPN` test files.
 - The validator also reports the raw image-footprint `HPC` bounds and the centered display bounds used by the `HPC` screen mapping.
 - Direct screen comparison also shows that `HPC` and `Orthographic` are not identical display geometries, even with the same observer viewpoint and `dragRotation = 0`.
 - `HPC` mouse unprojection remains incomplete off-disk, because the Java path intersects only the unit solar sphere.
@@ -91,9 +98,8 @@ Changing only one side will usually produce one or more of:
 - `ProjectionMode` exposes mode predicates (`isOrthographic()`, `isHpc()`, `isLatitudinal()`, `isPolar()`, `isLogPolar()`) for call sites that express mode distinctions through helpers rather than raw enum equality checks.
 - `HPC` extent inversion is exact for:
   - `TAN`
-  - non-slanted `AZP`
+  - `AZP`
   - six-term `ZPN` on its primary monotonic branch
-- slanted `AZP` is not documented as supported
 - `ZPN` support uses only `PV2_0..PV2_5`, which matches the
   solar test files
 
