@@ -4,15 +4,18 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.metadata.MetaData;
 
-public class ImageBounds {
+public final class ImageBounds {
+
+    private ImageBounds() {
+    }
 
     public static Region hpc(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
         WcsProjection.Context context = new WcsProjection.Context(metaData);
         double x0 = region.llx;
-        double x1 = region.llx + region.width;
+        double x1 = region.urx;
         double y0 = region.lly;
-        double y1 = region.lly + region.height;
+        double y1 = region.ury;
         double xm = 0.5 * (x0 + x1);
         double ym = 0.5 * (y0 + y1);
         double[] bounds = {

@@ -1,0 +1,99 @@
+package org.helioviewer.jhv.layers;
+
+import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.wcs.DisplayMapBounds;
+import org.helioviewer.jhv.wcs.ImageBounds;
+
+public final class ImageLayerBounds {
+
+    private ImageLayerBounds() {
+    }
+
+    public static double getLargestPhysicalHeight() {
+        if (!Display.mode.isOrthographic())
+            return 1;
+
+        double size = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+            size = Math.max(size, layer.getMetaData().getPhysicalRegion().height);
+        }
+        return size;
+    }
+
+    public static double getLargestRadialSize() {
+        double size = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+            size = Math.max(size, radial(layer.getMetaData()));
+        }
+        return size;
+    }
+
+    public static double getOneToOneCameraWidth(ImageLayer layer) {
+        Viewport vp = Display.getActiveViewport();
+        MetaData metaData = layer.getMetaData();
+        double imageFraction = vp.height / (double) metaData.getPixelHeight();
+        double imageHeight = DisplayMapBounds.oneToOneHeight(Display.mode, Display.gridType, layer.getImageData().getViewpoint(), metaData);
+        if (Display.mode.isOrthographic())
+            return imageFraction * imageHeight;
+
+        double visibleHeight = getVisibleMapHeight(vp);
+        return visibleHeight > 0 ? imageFraction * imageHeight / visibleHeight : 0;
+    }
+
+    private static double getVisibleMapHeight(Viewport vp) {
+        if (Display.mode.isOrthographic())
+            return 1;
+        if (Display.mode.isHpc()) {
+            Region bounds = getLargestHpcBounds();
+            double halfWidth = 0.5 * bounds.width;
+            double halfHeight = 0.5 * bounds.height;
+            halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
+            return 2 * halfHeight;
+        }
+
+        GridScale scale = Display.mode.scale;
+        return Math.abs(scale.getInterpolatedYValue(1) - scale.getInterpolatedYValue(0));
+    }
+
+    public static Region getLargestHpcBounds() {
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+
+            Region bounds = ImageBounds.hpc(layer.getMetaData());
+            minX = Math.min(minX, bounds.llx);
+            maxX = Math.max(maxX, bounds.urx);
+            minY = Math.min(minY, bounds.lly);
+            maxY = Math.max(maxY, bounds.ury);
+        }
+        if (!Double.isFinite(minX) || !Double.isFinite(maxX) || !Double.isFinite(minY) || !Double.isFinite(maxY))
+            return new Region(-5, -5, 10, 10);
+        return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
+    }
+
+    private static double radial(MetaData metaData) {
+        Region region = metaData.getPhysicalRegion();
+        Vec2 crval = metaData.getCRVAL();
+        double x0 = region.llx - crval.x;
+        double x1 = region.urx - crval.x;
+        double y0 = region.lly - crval.y;
+        double y1 = region.ury - crval.y;
+        return Math.max(
+                Math.max(Math.hypot(x0, y0), Math.hypot(x1, y0)),
+                Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
+    }
+
+}

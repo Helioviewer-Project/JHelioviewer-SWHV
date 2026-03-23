@@ -7,7 +7,7 @@ import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.Movie;
@@ -112,9 +112,9 @@ public class GLListener implements GLEventListener {
 
     public static void renderSceneScale(Camera camera, GL3 gl) {
         if (Display.mode.isPolar()) {
-            GridScale.polar.set(0, 360, 0, ImageLayers.getLargestRadialSize());
+            GridScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
         } else if (Display.mode.isLogPolar()) {
-            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayers.getLargestRadialSize()));
+            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayerBounds.getLargestRadialSize()));
         }
 
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
@@ -138,7 +138,7 @@ public class GLListener implements GLEventListener {
     }
 
     private static Region getCenteredHpcScaleBounds() {
-        Region bounds = ImageLayers.getLargestHpcBounds();
+        Region bounds = ImageLayerBounds.getLargestHpcBounds();
         double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
         double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
         if (halfWidth <= 0)
