@@ -13,6 +13,14 @@ public final class PolarBasis {
         return radius * Math.cos(angleRadians);
     }
 
+    public static double angle(Vec3 v) {
+        // Polar basis: 0 at north, increasing anti-clockwise.
+        double theta = Math.atan2(-v.x, v.y);
+        theta += 2 * Math.PI;
+        theta %= 2 * Math.PI;
+        return theta;
+    }
+
     public static Vec2 vec2(double radius, double angleRadians) {
         // Polar basis: 0 at north, increasing anti-clockwise.
         return new Vec2(x(radius, angleRadians), y(radius, angleRadians));
