@@ -11,9 +11,12 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
 
-public class DisplayMapBounds {
+public final class DisplayMapBounds {
 
     private static final int EDGE_SAMPLES = 32;
+
+    private DisplayMapBounds() {
+    }
 
     public static double oneToOneHeight(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
         if (mode.isOrthographic() || mode.isPolar() || mode.isLogPolar())

@@ -27,6 +27,7 @@ import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -403,7 +404,7 @@ public class Actions {
                 return;
 
             Camera camera = Display.getCamera();
-            double cameraWidth = ImageLayers.getOneToOneCameraWidth(layer);
+            double cameraWidth = ImageLayerBounds.getOneToOneCameraWidth(layer);
             if (cameraWidth > 0) {
                 double fov = 2. * Math.atan2(0.5 * cameraWidth, camera.getViewpoint().distance);
                 camera.setFOV(fov);
