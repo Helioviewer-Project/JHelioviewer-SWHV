@@ -93,17 +93,28 @@ public class ImageLayers {
         return size;
     }
 
-    public static double getLargestPhysicalSize() {
+    public static double getLargestRadialSize() {
         double size = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled()) {
-                Region r = layer.getMetaData().getPhysicalRegion();
-                double newSize = Math.sqrt(r.height * r.height + r.width * r.width);
+                double newSize = radial(layer.getMetaData());
                 if (newSize > size)
                     size = newSize;
             }
         }
         return size;
+    }
+
+    private static double radial(MetaData metaData) {
+        Region region = metaData.getPhysicalRegion();
+        org.helioviewer.jhv.math.Vec2 crval = metaData.getCRVAL();
+        double x0 = region.llx - crval.x;
+        double x1 = region.urx - crval.x;
+        double y0 = region.lly - crval.y;
+        double y1 = region.ury - crval.y;
+        return Math.max(
+                Math.max(Math.hypot(x0, y0), Math.hypot(x1, y0)),
+                Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
     }
 
     public static Region getLargestHpcBounds() {
