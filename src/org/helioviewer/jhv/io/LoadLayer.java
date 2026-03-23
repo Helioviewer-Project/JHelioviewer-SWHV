@@ -14,13 +14,13 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.uri.URIView;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
