@@ -306,9 +306,9 @@ public class Actions {
 
     }
 
-    public static class UpdateChecker extends AbstractAction {
+    public static class CheckForUpdates extends AbstractAction {
 
-        public UpdateChecker() {
+        public CheckForUpdates() {
             super("Check for Updates...");
         }
 
