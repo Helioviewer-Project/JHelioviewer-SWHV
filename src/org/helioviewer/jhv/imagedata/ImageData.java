@@ -35,8 +35,8 @@ public class ImageData {
         imageBuffer = _imageBuffer;
 
         metaData = _metaData;
-        crval = metaData.getCRVAL();
-        crota = metaData.getCROTA();
+        crval = metaData.getWcsHeader().crval;
+        crota = metaData.getWcsHeader().crota;
 
         unit = metaData.getUnit();
         physLUT = metaData.getPhysicalLUT();

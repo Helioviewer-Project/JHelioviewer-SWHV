@@ -9,7 +9,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.wcs.WcsHeader;
 
 import com.jogamp.opengl.GL3;
 
@@ -121,9 +121,9 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindProjection(GL3 gl,
-                                      MetaData.WCSProjection projection0, float planeUnitsPerRad0, float observerDistance0,
+                                      WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
                                       float grid00, float grid01, float grid02,
-                                      MetaData.WCSProjection projection1, float planeUnitsPerRad1, float observerDistance1,
+                                      WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
                                       float grid10, float grid11, float grid12) {
         projectionBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
         projectionBuf.put(grid00).put(grid01).put(grid02).put(0);

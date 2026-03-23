@@ -2,6 +2,7 @@ package org.helioviewer.jhv.metadata;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.WcsHeader;
 
 public class NullMetaData extends BaseMetaData {
 
@@ -10,6 +11,7 @@ public class NullMetaData extends BaseMetaData {
 
         pixelW = 1024;
         pixelH = 1024;
+        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
     }
 
 }
