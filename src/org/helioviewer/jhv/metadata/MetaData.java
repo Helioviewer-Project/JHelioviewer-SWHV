@@ -9,11 +9,8 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 
 public interface MetaData {
-    enum WCSProjection {
-        TAN,
-        AZP,
-        ZPN
-    }
+
+    enum WCSProjection {TAN, AZP, ZPN}
 
     @Nonnull
     String getDisplayName();

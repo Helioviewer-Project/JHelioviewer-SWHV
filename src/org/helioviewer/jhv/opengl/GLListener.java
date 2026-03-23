@@ -112,9 +112,9 @@ public class GLListener implements GLEventListener {
 
     public static void renderSceneScale(Camera camera, GL3 gl) {
         if (Display.mode.isPolar()) {
-            GridScale.polar.set(0, 360, 0, 0.5 * ImageLayers.getLargestPhysicalSize());
+            GridScale.polar.set(0, 360, 0, ImageLayers.getLargestRadialSize());
         } else if (Display.mode.isLogPolar()) {
-            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, 0.5 * ImageLayers.getLargestPhysicalSize()));
+            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayers.getLargestRadialSize()));
         }
 
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
