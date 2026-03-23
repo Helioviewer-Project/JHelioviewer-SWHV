@@ -65,8 +65,9 @@ final class WcsInverse {
         if (nativeDistance == 0)
             return new Vec2(context.phi0, context.theta0);
 
-        double nativeX = x / radial;
-        double nativeY = y / radial;
+        double nativeRadius = Math.sin(nativeDistance);
+        double nativeX = nativeRadius * x / radial;
+        double nativeY = nativeRadius * y / radial;
         double cosNativeDistance = Math.cos(nativeDistance);
         return nativeToHelioprojective(context, nativeX, nativeY, cosNativeDistance);
     }
