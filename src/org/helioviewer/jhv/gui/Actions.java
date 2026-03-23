@@ -25,6 +25,7 @@ import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
+import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
@@ -313,7 +314,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            org.helioviewer.jhv.io.UpdateChecker.check(true);
+            UpdateChecker.check(true);
         }
 
     }
