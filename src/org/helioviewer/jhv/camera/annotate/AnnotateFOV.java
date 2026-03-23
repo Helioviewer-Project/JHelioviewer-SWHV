@@ -16,7 +16,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
         super(jo);
     }
 
-    public void zoom(Camera camera) {
+    public void zoom(Camera camera, Viewport vp) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -25,10 +25,13 @@ public class AnnotateFOV extends AbstractAnnotateable {
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
+        double halfHeight = Math.abs(dy);
+        double halfWidth = Math.abs(dx) / vp.aspect;
+        double halfSize = 1.1 * Math.max(halfHeight, halfWidth); // give some margin
 
         camera.setTranslation(-(p0.x + dx), -(p0.y + dy));
         camera.resetDragRotation();
-        camera.setFOV(2 * Math.atan2(Math.sqrt(dx * dx + dy * dy), camera.getViewpoint().distance));
+        camera.setFOV(2 * Math.atan2(halfSize, camera.getViewpoint().distance));
     }
 
     @Override
