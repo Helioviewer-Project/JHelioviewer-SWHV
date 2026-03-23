@@ -200,7 +200,7 @@ public class GLListener implements GLEventListener {
 
         fpsCount++;
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
-        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance);
+        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
         // GLInfo.checkGLErrors(gl, "GLListener.display()");
     }
 
