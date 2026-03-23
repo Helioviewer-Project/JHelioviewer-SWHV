@@ -11,12 +11,14 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.layers.image.HpcUtils;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.SampUtils;
@@ -120,6 +122,20 @@ public class ImageLayers {
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
     }
 
+    public static double getVisibleMapHeight(Viewport vp) {
+        if (Display.mode.isOrthographic())
+            return 1;
+        if (Display.mode.isHpc()) {
+            double halfWidth = 0.5 * getLargestHpcBounds().width;
+            double halfHeight = 0.5 * getLargestHpcBounds().height;
+            halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
+            return 2 * halfHeight;
+        }
+
+        GridScale scale = Display.mode.scale;
+        return Math.abs(scale.getInterpolatedYValue(1) - scale.getInterpolatedYValue(0));
+    }
+
     public static Region getLargestHpcBounds() {
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
@@ -129,7 +145,7 @@ public class ImageLayers {
             if (!layer.isEnabled())
                 continue;
 
-            Region bounds = HpcUtils.hpcBounds(layer.getMetaData());
+            Region bounds = ImageBounds.hpc(layer.getMetaData());
             minX = Math.min(minX, bounds.llx);
             maxX = Math.max(maxX, bounds.urx);
             minY = Math.min(minY, bounds.lly);
