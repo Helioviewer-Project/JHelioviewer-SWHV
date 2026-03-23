@@ -38,6 +38,20 @@ public class FlatGrid {
     private Axis xAxis = Axis.EMPTY;
     private Axis yAxis = Axis.EMPTY;
 
+    // Step and inclusive bounds of one flat axis.
+    private record AxisSignature(double step, double first, double last) {
+    }
+
+    // Built axis labels, zero-axis flags, and positions.
+    private record Axis(AxisSignature signature, double[] labels, boolean[] axisFlags, double[] positions) {
+        private static final Axis EMPTY = new Axis(null, new double[0], new boolean[0], new double[0]);
+    }
+
+    // Projection and camera state that invalidates the cached flat grid.
+    private record FlatGridKey(ProjectionMode mode, GridType gridType, double aspect, double cameraWidth,
+                               double translationX, double translationY) {
+    }
+
     public void init(GL3 gl) {
         shape.init(gl);
     }
@@ -53,6 +67,10 @@ public class FlatGrid {
             int labelSize = (int) (TEXT_SCALE * CameraHelper.getPixelFactor(camera, vp));
             drawLabels(camera, labelSize, vp);
         }
+    }
+
+    private static FlatGridKey key(Camera camera, Viewport vp) {
+        return new FlatGridKey(Display.mode, Display.gridType, vp.aspect, camera.getCameraWidth(), camera.getTranslationX(), camera.getTranslationY());
     }
 
     private void rebuildIfNeeded(Camera camera, Viewport vp, GL3 gl) {
@@ -109,6 +127,19 @@ public class FlatGrid {
         shape.setVertex(gl, vexBuf);
     }
 
+    private static AxisSignature buildAxisSignature(boolean angular, double start, double stop) {
+        double range = Math.abs(stop - start);
+        if (!Double.isFinite(range) || range <= Math.ulp(1.0))
+            return new AxisSignature(0, start, start);
+
+        double step = angular ? chooseAngularStep(range) : chooseLinearStep(range);
+        double lo = Math.min(start, stop);
+        double hi = Math.max(start, stop);
+        double first = Math.ceil(lo / step) * step;
+        double last = Math.floor(hi / step) * step;
+        return new AxisSignature(step, first, last);
+    }
+
     private static Axis buildAxis(GridScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
         double[] labels;
         double[] positions;
@@ -135,24 +166,6 @@ public class FlatGrid {
         return new Axis(signature, labels, axisFlags, positions);
     }
 
-    private static AxisSignature buildAxisSignature(boolean angular, double start, double stop) {
-        double range = Math.abs(stop - start);
-        if (!Double.isFinite(range) || range <= Math.ulp(1.0))
-            return new AxisSignature(0, start, start);
-
-        double step = angular ? chooseAngularStep(range) : chooseLinearStep(range);
-        double lo = Math.min(start, stop);
-        double hi = Math.max(start, stop);
-        double first = Math.ceil(lo / step) * step;
-        double last = Math.floor(hi / step) * step;
-        return new AxisSignature(step, first, last);
-    }
-
-    private static double wrapCarrington(double value) {
-        double wrapped = value % 360;
-        return wrapped < 0 ? wrapped + 360 : wrapped;
-    }
-
     private static double chooseAngularStep(double range) {
         double target = range / TARGET_DIVISIONS;
         for (double step : ANGULAR_STEPS) {
@@ -174,20 +187,8 @@ public class FlatGrid {
         return 10 * base;
     }
 
-    private static FlatGridKey key(Camera camera, Viewport vp) {
-        return new FlatGridKey(Display.mode, Display.gridType, vp.aspect, camera.getCameraWidth(), camera.getTranslationX(), camera.getTranslationY());
-    }
-
-    // Step and inclusive bounds of one flat axis.
-    private record AxisSignature(double step, double first, double last) {
-    }
-
-    // Built axis labels, zero-axis flags, and positions.
-    private record Axis(AxisSignature signature, double[] labels, boolean[] axisFlags, double[] positions) {
-        private static final Axis EMPTY = new Axis(null, new double[0], new boolean[0], new double[0]);
-    }
-
-    // Projection and camera state that invalidates the cached flat grid.
-    private record FlatGridKey(ProjectionMode mode, GridType gridType, double aspect, double cameraWidth, double translationX, double translationY) {
+    private static double wrapCarrington(double value) {
+        double wrapped = value % 360;
+        return wrapped < 0 ? wrapped + 360 : wrapped;
     }
 }
