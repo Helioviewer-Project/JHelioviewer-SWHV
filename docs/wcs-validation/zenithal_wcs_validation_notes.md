@@ -66,8 +66,8 @@ The work reported here includes:
 
 Main conclusions:
 
-- `formal-TAN`, `AZP`, and `ZPN` are validated against Astropy, including the
-  tested inverse mappings.
+- `formal-TAN`, non-slanted `AZP`, and six-term `ZPN` are validated against
+  Astropy, including the tested inverse mappings.
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
   path covered by this note.
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
@@ -319,6 +319,7 @@ It validates:
 
 - `AZP plane -> helioprojective`
 - round-trip error
+- only the non-slanted `gamma = 0` case used by the tested HI files
 
 5. Inverse primary-branch `ZPN`
 
@@ -523,12 +524,14 @@ Astropy as the external WCS reference.
   therefore not a direct measurement of the `simple-TAN`
   small-angle-approximation error alone.
 
-3. `AZP` is correct for the tested HI files.
+3. `AZP` is correct for the tested non-slanted HI files.
 
 - JHV `world -> helioprojective -> AZP plane -> pixel`
 - `AZP plane -> helioprojective angles`
 - matches Astropy to numerical precision
 - the tested HI files are non-slanted: `PV2_2` is absent, so `gamma = 0`
+- JHV also implements slanted `AZP`, but that case is not validated by the
+  sample set reported in this note
 - representative measured results include:
   - full pixel-center check on `20250622_000831_s4h1A.fts`:
     - `1.72e-7 mas` max (`2.387424e-12 px`)

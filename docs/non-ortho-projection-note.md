@@ -8,8 +8,8 @@ This note documents the convention used by the non-orthographic display modes (`
   - `src/org/helioviewer/jhv/display/ProjectionMode.java`
   - `src/org/helioviewer/jhv/display/NonOrthoProjection.java`
   - `src/org/helioviewer/jhv/display/OrthoProjection.java`
+  - `src/org/helioviewer/jhv/wcs/WcsHeader.java`
   - `src/org/helioviewer/jhv/wcs/WcsProjection.java`
-  - `src/org/helioviewer/jhv/wcs/WcsInverse.java`
   - `src/org/helioviewer/jhv/wcs/ImageBounds.java`
   - `src/org/helioviewer/jhv/wcs/DisplayMapBounds.java`
 - Image reprojection lives in:
@@ -25,7 +25,8 @@ This note documents the convention used by the non-orthographic display modes (`
   - `ProjectionMode`: mode selection, shader/scale selection, small mode queries, and dispatch
   - `NonOrthoProjection`: non-ortho projection math, non-ortho point/line emission, non-ortho mouse/grid helpers, and non-ortho surface unprojection
   - `OrthoProjection`: orthographic point/line emission, orthographic mouse/grid helpers, and orthographic surface unprojection
-  - `WcsProjection` / `WcsInverse`: shared image-WCS plane to helioprojective conversion used by bounds and `1:1` sizing helpers
+  - `WcsHeader`: shared image-WCS data bundle
+  - `WcsProjection`: shared image-WCS plane to helioprojective conversion used by bounds and `1:1` sizing helpers
   - `ImageBounds`: intrinsic image-side `HPC` footprint bounds
   - `DisplayMapBounds`: display-map bounds used for non-ortho `1:1` sizing
 - Non-ortho modes use an explicit map-basis rotation on the Java side.
