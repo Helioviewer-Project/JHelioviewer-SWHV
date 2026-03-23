@@ -21,8 +21,6 @@ class BaseMetaData implements MetaData {
 
     protected boolean calculateDepth;
 
-    protected int pixelW;
-    protected int pixelH;
     protected double unitPerPixelX = 1;
     protected double unitPerPixelY = 1;
     protected double unitPerArcsec = DEFAULT_UNIT_PER_ARCSEC;
@@ -60,13 +58,8 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public int getPixelWidth() {
-        return pixelW;
-    }
-
-    @Override
-    public int getPixelHeight() {
-        return pixelH;
+    public double getUnitPerPixelY() {
+        return unitPerPixelY;
     }
 
     @Override
@@ -135,12 +128,12 @@ class BaseMetaData implements MetaData {
 
     @Override
     public double xPixelFactor(double xPoint) {
-        return (xPoint - region.llx) * (1 / unitPerPixelX / pixelW);
+        return (xPoint - region.llx) / region.width;
     }
 
     @Override
     public double yPixelFactor(double yPoint) {
-        return 1 - (yPoint - region.lly) * (1 / unitPerPixelY / pixelH);
+        return 1 - (yPoint - region.lly) / region.height;
     }
 
     @Nonnull

@@ -62,7 +62,7 @@ public class URIView extends BaseView {
             }
             xml = readXml;
 
-            imageRegion = m.roiToRegion(0, 0, m.getPixelWidth(), m.getPixelHeight(), 1, 1);
+            imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
             metaData[0] = m;
             decodeCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), buffer);
 

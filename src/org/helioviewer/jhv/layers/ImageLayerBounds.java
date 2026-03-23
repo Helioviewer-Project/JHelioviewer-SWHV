@@ -40,13 +40,13 @@ public final class ImageLayerBounds {
     public static double getOneToOneCameraWidth(ImageLayer layer) {
         Viewport vp = Display.getActiveViewport();
         MetaData metaData = layer.getMetaData();
-        double imageFraction = vp.height / (double) metaData.getPixelHeight();
         double imageHeight = DisplayMapBounds.oneToOneHeight(Display.mode, Display.gridType, layer.getImageData().getViewpoint(), metaData);
+        double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / metaData.getPhysicalRegion().height;
         if (Display.mode.isOrthographic())
-            return imageFraction * imageHeight;
+            return cameraWidth;
 
         double visibleHeight = getVisibleMapHeight(vp);
-        return visibleHeight > 0 ? imageFraction * imageHeight / visibleHeight : 0;
+        return visibleHeight > 0 ? cameraWidth / visibleHeight : 0;
     }
 
     private static double getVisibleMapHeight(Viewport vp) {

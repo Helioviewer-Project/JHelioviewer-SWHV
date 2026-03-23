@@ -8,10 +8,7 @@ public class PixelBasedMetaData extends BaseMetaData {
 
     public static final PixelBasedMetaData EMPTY = new PixelBasedMetaData(1, 1, "");
 
-    public PixelBasedMetaData(int _pixelW, int _pixelH, String _displayName) {
-        pixelW = _pixelW;
-        pixelH = _pixelH;
-
+    public PixelBasedMetaData(int pixelW, int pixelH, String _displayName) {
         double unitPerPixel = Sun.Radius / Math.max(pixelW, pixelH);
         unitPerPixelX = unitPerPixel;
         unitPerPixelY = unitPerPixel;
