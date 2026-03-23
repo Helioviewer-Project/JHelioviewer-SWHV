@@ -32,7 +32,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
@@ -400,17 +399,17 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             ImageLayer layer = Layers.getActiveImageLayer();
-            if (layer != null) {
-                MetaData m = layer.getMetaData();
-                Camera camera = Display.getCamera();
-                double imageFraction = Display.getActiveViewport().height / (double) m.getPixelHeight();
-                double fov = 2. * Math.atan2(0.5 * m.getPhysicalRegion().height * imageFraction, camera.getViewpoint().distance);
+            if (layer == null)
+                return;
+
+            Camera camera = Display.getCamera();
+            double cameraWidth = ImageLayers.getOneToOneCameraWidth(layer);
+            if (cameraWidth > 0) {
+                double fov = 2. * Math.atan2(0.5 * cameraWidth, camera.getViewpoint().distance);
                 camera.setFOV(fov);
-
-                MovieDisplay.render(1);
             }
+            MovieDisplay.render(1);
         }
-
     }
 
     public static class ZoomOut extends AbstractKeyAction {

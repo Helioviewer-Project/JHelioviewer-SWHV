@@ -19,6 +19,7 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.wcs.DisplayMapBounds;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.astrogrid.samp.Message;
@@ -90,11 +91,9 @@ public class ImageLayers {
 
         double size = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled()) {
-                double newSize = layer.getMetaData().getPhysicalRegion().height;
-                if (newSize > size)
-                    size = newSize;
-            }
+            if (!layer.isEnabled())
+                continue;
+            size = Math.max(size, layer.getMetaData().getPhysicalRegion().height);
         }
         return size;
     }
@@ -102,11 +101,9 @@ public class ImageLayers {
     public static double getLargestRadialSize() {
         double size = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled()) {
-                double newSize = radial(layer.getMetaData());
-                if (newSize > size)
-                    size = newSize;
-            }
+            if (!layer.isEnabled())
+                continue;
+            size = Math.max(size, radial(layer.getMetaData()));
         }
         return size;
     }
@@ -123,12 +120,25 @@ public class ImageLayers {
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
     }
 
-    public static double getVisibleMapHeight(Viewport vp) {
+    public static double getOneToOneCameraWidth(ImageLayer layer) {
+        Viewport vp = Display.getActiveViewport();
+        MetaData metaData = layer.getMetaData();
+        double imageFraction = vp.height / (double) metaData.getPixelHeight();
+        double imageHeight = DisplayMapBounds.oneToOneHeight(Display.mode, Display.gridType, layer.getImageData().getViewpoint(), metaData);
+        if (Display.mode.isOrthographic())
+            return imageFraction * imageHeight;
+
+        double visibleHeight = getVisibleMapHeight(vp);
+        return visibleHeight > 0 ? imageFraction * imageHeight / visibleHeight : 0;
+    }
+
+    private static double getVisibleMapHeight(Viewport vp) {
         if (Display.mode.isOrthographic())
             return 1;
         if (Display.mode.isHpc()) {
-            double halfWidth = 0.5 * getLargestHpcBounds().width;
-            double halfHeight = 0.5 * getLargestHpcBounds().height;
+            Region bounds = getLargestHpcBounds();
+            double halfWidth = 0.5 * bounds.width;
+            double halfHeight = 0.5 * bounds.height;
             halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
             return 2 * halfHeight;
         }
@@ -160,9 +170,9 @@ public class ImageLayers {
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
         for (ImageLayer layer : Layers.getImageLayers()) {
             APIRequest req = layer.getAPIRequest();
-            if (req != null) {
-                layer.load(new APIRequest(req.server(), req.sourceId(), startTime, endTime, cadence));
-            }
+            if (req == null)
+                continue;
+            layer.load(new APIRequest(req.server(), req.sourceId(), startTime, endTime, cadence));
         }
     }
 
@@ -276,9 +286,9 @@ public class ImageLayers {
         long now = System.currentTimeMillis();
         for (ImageLayer layer : Layers.getImageLayers()) {
             APIRequest req = layer.getAPIRequest();
-            if (req != null) {
-                layer.load(new APIRequest(req.server(), req.sourceId(), now - (req.endTime() - req.startTime()), now, req.cadence()));
-            }
+            if (req == null)
+                continue;
+            layer.load(new APIRequest(req.server(), req.sourceId(), now - (req.endTime() - req.startTime()), now, req.cadence()));
         }
     }
 
