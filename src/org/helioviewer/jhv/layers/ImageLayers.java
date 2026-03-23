@@ -17,6 +17,7 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.HelioviewerMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
@@ -112,7 +113,7 @@ public class ImageLayers {
 
     private static double radial(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
-        org.helioviewer.jhv.math.Vec2 crval = metaData.getCRVAL();
+        Vec2 crval = metaData.getCRVAL();
         double x0 = region.llx - crval.x;
         double x1 = region.urx - crval.x;
         double y0 = region.lly - crval.y;
