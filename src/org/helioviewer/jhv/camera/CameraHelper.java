@@ -3,7 +3,6 @@ package org.helioviewer.jhv.camera;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.Quat;
@@ -125,11 +124,7 @@ public class CameraHelper {
     }
 
     public static void zoomToFit(Camera camera) {
-        double size = 1;
-        if (Display.mode.isOrthographic()) {
-            size = ImageLayers.getLargestPhysicalHeight();
-        }
-
+        double size = ImageLayers.getLargestPhysicalHeight();
         double newFOV = Camera.INITFOV;
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);

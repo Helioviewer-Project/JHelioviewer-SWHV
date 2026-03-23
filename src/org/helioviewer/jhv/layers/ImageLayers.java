@@ -82,6 +82,9 @@ public class ImageLayers {
     }
 
     public static double getLargestPhysicalHeight() {
+        if (!Display.mode.isOrthographic())
+            return 1;
+
         double size = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled()) {
