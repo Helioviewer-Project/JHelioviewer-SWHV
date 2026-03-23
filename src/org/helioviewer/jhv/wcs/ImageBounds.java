@@ -11,7 +11,7 @@ public final class ImageBounds {
 
     public static Region hpc(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
-        WcsProjection.Context context = new WcsProjection.Context(metaData);
+        WcsHeader wcsHeader = metaData.getWcsHeader();
         double x0 = region.llx;
         double x1 = region.urx;
         double y0 = region.lly;
@@ -22,19 +22,19 @@ public final class ImageBounds {
                 Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY
         };
-        updateHpcBounds(bounds, context, x0, y0);
-        updateHpcBounds(bounds, context, x1, y0);
-        updateHpcBounds(bounds, context, x0, y1);
-        updateHpcBounds(bounds, context, x1, y1);
-        updateHpcBounds(bounds, context, xm, y0);
-        updateHpcBounds(bounds, context, xm, y1);
-        updateHpcBounds(bounds, context, x0, ym);
-        updateHpcBounds(bounds, context, x1, ym);
+        updateHpcBounds(bounds, wcsHeader, x0, y0);
+        updateHpcBounds(bounds, wcsHeader, x1, y0);
+        updateHpcBounds(bounds, wcsHeader, x0, y1);
+        updateHpcBounds(bounds, wcsHeader, x1, y1);
+        updateHpcBounds(bounds, wcsHeader, xm, y0);
+        updateHpcBounds(bounds, wcsHeader, xm, y1);
+        updateHpcBounds(bounds, wcsHeader, x0, ym);
+        updateHpcBounds(bounds, wcsHeader, x1, ym);
         return regionFromBounds(bounds);
     }
 
-    private static void updateHpcBounds(double[] bounds, WcsProjection.Context context, double x, double y) {
-        Vec2 helioprojective = WcsProjection.planeToHelioprojective(context, x, y);
+    private static void updateHpcBounds(double[] bounds, WcsHeader wcsHeader, double x, double y) {
+        Vec2 helioprojective = WcsProjection.planeToHelioprojective(wcsHeader, x, y);
         double hpcX = Math.toDegrees(helioprojective.x);
         double hpcY = Math.toDegrees(helioprojective.y);
         bounds[0] = Math.min(bounds[0], hpcX);

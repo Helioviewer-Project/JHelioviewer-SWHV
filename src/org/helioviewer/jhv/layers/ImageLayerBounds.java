@@ -86,7 +86,7 @@ public final class ImageLayerBounds {
 
     private static double radial(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
-        Vec2 crval = metaData.getCRVAL();
+        Vec2 crval = metaData.getWcsHeader().crval;
         double x0 = region.llx - crval.x;
         double x1 = region.urx - crval.x;
         double y0 = region.lly - crval.y;

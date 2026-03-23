@@ -14,6 +14,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.WcsHeader;
 
 public final class HelioviewerMetaData extends BaseMetaData {
 
@@ -46,6 +47,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
         viewpoint = retrievePosition(m, retrieveTime(m));
         retrievePixelParameters(m);
+        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
 
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
@@ -315,11 +317,11 @@ public final class HelioviewerMetaData extends BaseMetaData {
             String ctype1 = m.getString("CTYPE1").orElse("");
             String ctype2 = m.getString("CTYPE2").orElse("");
             if (ctype1.endsWith("AZP") && ctype2.endsWith("AZP")) {
-                wcsProjection = MetaData.WCSProjection.AZP;
+                wcsProjection = WcsHeader.Projection.AZP;
             } else if (ctype1.endsWith("ZPN") && ctype2.endsWith("ZPN")) {
-                wcsProjection = MetaData.WCSProjection.ZPN;
+                wcsProjection = WcsHeader.Projection.ZPN;
             } else {
-                wcsProjection = MetaData.WCSProjection.TAN;
+                wcsProjection = WcsHeader.Projection.TAN;
             }
             if (isZenital(ctype1) && isZenital(ctype2)) {
                 for (int i = 0; i < pv2.length; i++) {

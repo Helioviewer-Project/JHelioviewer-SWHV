@@ -96,7 +96,8 @@ public class J2KView extends BaseView {
                     metaData[i] = new HelioviewerMetaData(new XMLMetaDataContainer(xmlMetaData[i]));
                 } catch (Exception e) {
                     xmlMetaData[i] = EMPTY_METAXML;
-                    metaData[i] = new PixelBasedMetaData(100, 100, dataUri.baseName());
+                    ResolutionSet.Level level = source.getResolutionSet(i).getLevel(0);
+                    metaData[i] = new PixelBasedMetaData(level.width(), level.height(), dataUri.baseName());
                     Log.warn("Helioviewer metadata missing for layer " + i, e);
                 }
                 frameMap.put(metaData[i].getViewpoint().time, i);

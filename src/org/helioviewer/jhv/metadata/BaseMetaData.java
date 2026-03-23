@@ -8,6 +8,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.wcs.WcsHeader;
 
 class BaseMetaData implements MetaData {
 
@@ -38,8 +39,9 @@ class BaseMetaData implements MetaData {
     protected float sector1 = 0;
 
     protected final float[] pv2 = new float[6];
-    protected MetaData.WCSProjection wcsProjection = MetaData.WCSProjection.TAN;
+    protected WcsHeader.Projection wcsProjection = WcsHeader.Projection.TAN;
     protected float wcsPlaneUnitsPerRad = (float) Sun.MeanEarthDistance;
+    protected WcsHeader wcsHeader;
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected float cutOffX = 0;
@@ -94,21 +96,6 @@ class BaseMetaData implements MetaData {
     }
 
     @Override
-    public float[] getPV2() {
-        return pv2;
-    }
-
-    @Override
-    public MetaData.WCSProjection getWCSProjection() {
-        return wcsProjection;
-    }
-
-    @Override
-    public float getWCSPlaneUnitsPerRad() {
-        return wcsPlaneUnitsPerRad;
-    }
-
-    @Override
     public float getCutOffValue() {
         return cutOffValue;
     }
@@ -125,14 +112,8 @@ class BaseMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Vec2 getCRVAL() {
-        return crval;
-    }
-
-    @Nonnull
-    @Override
-    public Quat getCROTA() {
-        return crota;
+    public WcsHeader getWcsHeader() {
+        return wcsHeader;
     }
 
     @Override
