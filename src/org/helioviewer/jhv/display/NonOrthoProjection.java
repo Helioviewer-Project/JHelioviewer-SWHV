@@ -13,11 +13,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 final class NonOrthoProjection {
 
-    enum Kind {
-        HPC,
-        LATITUDINAL,
-        POLAR
-    }
+    enum Kind {HPC, LATITUDINAL, POLAR}
 
     private NonOrthoProjection() {
     }
@@ -224,7 +220,7 @@ final class NonOrthoProjection {
 
     private static Vec2 projectPolarVector(Vec3 v, GridScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
-        double theta = polarAngleRadians(v);
+        double theta = PolarBasis.angle(v);
         double scaledr = scale.getYValueInv(r);
         double scaledtheta = scale.getXValueInv(Math.toDegrees(theta));
         return new Vec2(scaledtheta, scaledr);
@@ -255,13 +251,5 @@ final class NonOrthoProjection {
                 SphericalCoords.x(1, longitude, latitude),
                 SphericalCoords.y(1, latitude),
                 SphericalCoords.z(1, longitude, latitude));
-    }
-
-    private static double polarAngleRadians(Vec3 v) {
-        // Polar angle is defined as 0 at north and increasing anti-clockwise.
-        double theta = Math.atan2(-v.x, v.y);
-        theta += 2 * Math.PI;
-        theta %= 2 * Math.PI;
-        return theta;
     }
 }
