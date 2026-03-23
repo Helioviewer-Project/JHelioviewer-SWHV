@@ -5,12 +5,9 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.wcs.WcsHeader;
 
 public interface MetaData {
-
-    enum WCSProjection {TAN, AZP, ZPN}
 
     @Nonnull
     String getDisplayName();
@@ -27,10 +24,7 @@ public interface MetaData {
     float getResponseFactor();
 
     @Nonnull
-    Vec2 getCRVAL();
-
-    @Nonnull
-    Quat getCROTA();
+    WcsHeader getWcsHeader();
 
     float getSector0();
 
@@ -45,14 +39,6 @@ public interface MetaData {
     float getCutOffX();
 
     float getCutOffY();
-
-    @Nonnull
-    float[] getPV2();
-
-    @Nonnull
-    WCSProjection getWCSProjection();
-
-    float getWCSPlaneUnitsPerRad();
 
     @Nonnull
     Position getViewpoint();
