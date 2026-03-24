@@ -31,7 +31,7 @@ public class AnnotateCross extends AbstractAnnotateable {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, longitude1, latitude1, longitude2, latitude2);
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, vexBuf);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 
