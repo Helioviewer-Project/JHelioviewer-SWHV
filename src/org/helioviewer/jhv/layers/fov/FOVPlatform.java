@@ -104,7 +104,6 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, null, color, Colors.White, vexBuf);
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS / 2, Quat.X90, color, Colors.White, vexBuf);
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, SUBDIVISIONS / 4, 3 * SUBDIVISIONS / 4, Quat.Y90, color, Colors.White, vexBuf);
-
         hemiLine.setVertex(gl, vexBuf);
     }
 

@@ -5,6 +5,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 
@@ -60,34 +61,8 @@ public class GridMath {
     public static void initEarthCircles(GL3 gl, GLSLLine earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
-        Vec3 rotv = new Vec3(), v = new Vec3();
-
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            double a = 2 * Math.PI * i / SUBDIVISIONS;
-            v.x = EARTH_CIRCLE_RADIUS * Math.cos(a);
-            v.y = EARTH_CIRCLE_RADIUS * Math.sin(a);
-            v.z = 0.;
-            rotv = Quat.X90.rotateVector(v);
-            if (i == 0) {
-                vexBuf.putVertex(rotv, Colors.Null);
-            }
-            vexBuf.putVertex(rotv, earthLineColor);
-        }
-        vexBuf.putVertex(rotv, Colors.Null);
-
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            double a = 2 * Math.PI * i / SUBDIVISIONS;
-            v.x = EARTH_CIRCLE_RADIUS * Math.cos(a);
-            v.y = EARTH_CIRCLE_RADIUS * Math.sin(a);
-            v.z = 0.;
-            rotv = Quat.Y90.rotateVector(v);
-            if (i == 0) {
-                vexBuf.putVertex(rotv, Colors.Null);
-            }
-            vexBuf.putVertex(rotv, earthLineColor);
-        }
-        vexBuf.putVertex(rotv, Colors.Null);
-
+        GLHelper.emitCircle(EARTH_CIRCLE_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, Quat.X90, earthLineColor, earthLineColor, vexBuf);
+        GLHelper.emitCircle(EARTH_CIRCLE_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, Quat.Y90, earthLineColor, earthLineColor, vexBuf);
         earthCircleLine.setVertex(gl, vexBuf);
     }
 
