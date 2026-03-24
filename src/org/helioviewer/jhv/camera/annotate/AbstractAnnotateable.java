@@ -55,9 +55,9 @@ abstract class AbstractAnnotateable implements Annotateable {
         return SphericalCoords.unit(lon, lat);
     }
 
-    static Vec3 interpolateSpherical(double t, SphericalPoint point1, SphericalPoint point2) {
-        double longitude = (1 - t) * point1.longitude() + t * point2.longitude();
-        double latitude = (1 - t) * point1.latitude() + t * point2.latitude();
+    static Vec3 interpolateSpherical(double t, double longitude1, double latitude1, double longitude2, double latitude2) {
+        double longitude = (1 - t) * longitude1 + t * longitude2;
+        double latitude = (1 - t) * latitude1 + t * latitude2;
         return SphericalCoords.unit(longitude, latitude);
     }
 

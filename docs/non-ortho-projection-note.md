@@ -8,10 +8,10 @@ This note documents the convention used by the non-orthographic display modes (`
   - `src/org/helioviewer/jhv/display/ProjectionMode.java`
   - `src/org/helioviewer/jhv/display/NonOrthoProjection.java`
   - `src/org/helioviewer/jhv/display/OrthoProjection.java`
+  - `src/org/helioviewer/jhv/display/DisplayMapBounds.java`
   - `src/org/helioviewer/jhv/wcs/WcsHeader.java`
   - `src/org/helioviewer/jhv/wcs/WcsProjection.java`
   - `src/org/helioviewer/jhv/wcs/ImageBounds.java`
-  - `src/org/helioviewer/jhv/wcs/DisplayMapBounds.java`
 - Image reprojection lives in:
   - `resources/glsl/solarHpc.frag`
   - `resources/glsl/solarLati.frag`
@@ -30,7 +30,7 @@ This note documents the convention used by the non-orthographic display modes (`
   - `ImageBounds`: intrinsic image-side `HPC` footprint bounds
   - `DisplayMapBounds`: display-map bounds used for non-ortho `1:1` sizing
 - Non-ortho modes use an explicit map-basis rotation on the Java side.
-- For `GridType.Viewpoint`, non-ortho maps use a positive latitude rotation in `NonOrthoProjection.mapRotation(...)`, so they intentionally do not reuse `GridType.toGrid(...)`.
+- For `GridType.Viewpoint`, non-ortho maps use a positive latitude rotation in `GridType.mapRotation(...)`.
 - `HPC` is observer-centered, not origin-centered spherical coordinates.
 - The `HPC` display convention is:
   - `x = Tx` (helioprojective longitude / west-east angular offset)

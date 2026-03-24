@@ -20,43 +20,35 @@ public class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     private static void drawRectangle(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint start, SphericalPoint end, BufVertex buf, byte[] color) {
-        if (start.longitude() * end.longitude() < 0) {
-            if (end.longitude() < start.longitude() && start.longitude() > Math.PI / 2)
-                end = new SphericalPoint(end.radius(), end.longitude() + 2 * Math.PI, end.latitude());
-            else if (end.longitude() > start.longitude() && start.longitude() < -Math.PI / 2)
-                start = new SphericalPoint(start.radius(), start.longitude() + 2 * Math.PI, start.latitude());
+        double startLongitude = start.longitude();
+        double startLatitude = start.latitude();
+        double endLongitude = end.longitude();
+        double endLatitude = end.latitude();
+        if (startLongitude * endLongitude < 0) {
+            if (endLongitude < startLongitude && startLongitude > Math.PI / 2)
+                endLongitude += 2 * Math.PI;
+            else if (endLongitude > startLongitude && startLongitude < -Math.PI / 2)
+                startLongitude += 2 * Math.PI;
         }
-
-        SphericalPoint corner2 = new SphericalPoint(1, end.longitude(), start.latitude());
-        SphericalPoint corner4 = new SphericalPoint(1, start.longitude(), end.latitude());
-        SphericalPoint point1, point2;
         Vec2 previous = null;
 
-        point1 = start;
-        point2 = corner2;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, startLatitude, endLongitude, startLatitude);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, false, ANNOTATION_RADIUS);
         }
 
-        point1 = corner2;
-        point2 = end;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, startLatitude, endLongitude, endLatitude);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, false, ANNOTATION_RADIUS);
         }
 
-        point1 = end;
-        point2 = corner4;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, endLatitude, startLongitude, endLatitude);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, false, ANNOTATION_RADIUS);
         }
 
-        point1 = corner4;
-        point2 = start;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, endLatitude, startLongitude, startLatitude);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, i == SUBDIVISIONS, ANNOTATION_RADIUS);
         }
     }
