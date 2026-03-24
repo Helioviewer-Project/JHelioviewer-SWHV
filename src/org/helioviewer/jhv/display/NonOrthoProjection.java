@@ -27,9 +27,9 @@ final class NonOrthoProjection {
 
     static Vec3 unproject(Kind kind, Position viewpoint, GridType gridType, Vec2 pt) {
         return switch (kind) {
-            case HPC -> unprojectHpc(viewpoint, pt);
-            case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt);
-            case POLAR -> unprojectPolar(viewpoint, gridType, pt);
+            case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
+            case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt.x, pt.y);
+            case POLAR -> unprojectPolar(viewpoint, gridType, pt.x, pt.y);
         };
     }
 
@@ -42,16 +42,16 @@ final class NonOrthoProjection {
         return projectLatitudinalVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
     }
 
-    private static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
-        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectLatitudinalPoint(pt));
+    private static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, double longitudeDeg, double latitudeDeg) {
+        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectLatitudinalPoint(longitudeDeg, latitudeDeg));
     }
 
     private static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return projectPolarVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
     }
 
-    private static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
-        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectPolarPoint(pt));
+    private static Vec3 unprojectPolar(Position viewpoint, GridType gridType, double angleDeg, double radius) {
+        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectPolarPoint(angleDeg, radius));
     }
 
     private static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
@@ -59,8 +59,8 @@ final class NonOrthoProjection {
         return projectHpcViewpointSpace(toHpcViewpointSpace(viewpoint, v), viewpoint.distance, scale);
     }
 
-    private static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
-        return helioprojectiveToWorld(viewpoint, Math.toRadians(pt.x), Math.toRadians(pt.y));
+    private static Vec3 unprojectHpc(Position viewpoint, double longitudeDeg, double latitudeDeg) {
+        return helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
     static Vec2 projectToScreen(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
@@ -221,9 +221,9 @@ final class NonOrthoProjection {
         return new Vec2(scaledtheta, scaledr);
     }
 
-    private static Vec3 unprojectPolarPoint(Vec2 pt) {
-        double r = pt.y;
-        double theta = Math.toRadians(pt.x);
+    private static Vec3 unprojectPolarPoint(double angleDeg, double radius) {
+        double r = radius;
+        double theta = Math.toRadians(angleDeg);
         double x = PolarBasis.x(r, theta);
         double y = PolarBasis.y(r, theta);
         double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
@@ -239,9 +239,9 @@ final class NonOrthoProjection {
         return new Vec2(scaledphi, scaledtheta);
     }
 
-    private static Vec3 unprojectLatitudinalPoint(Vec2 pt) {
-        double longitude = Math.toRadians(pt.x);
-        double latitude = Math.toRadians(pt.y);
+    private static Vec3 unprojectLatitudinalPoint(double longitudeDeg, double latitudeDeg) {
+        double longitude = Math.toRadians(longitudeDeg);
+        double latitude = Math.toRadians(latitudeDeg);
         return new Vec3(
                 SphericalCoords.x(1, longitude, latitude),
                 SphericalCoords.y(1, latitude),
