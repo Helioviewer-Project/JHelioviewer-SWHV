@@ -3,12 +3,12 @@ package org.helioviewer.jhv.wcs;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.math.Vec2;
 
-final class WcsProjection {
+public final class WcsProjection {
 
     private WcsProjection() {
     }
 
-    static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double x, double y) {
+    public static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double x, double y) {
         Vec3 plane = wcsHeader.crota.rotateVector(new Vec3(x, y, 0));
         return inverseWcsPlaneToHelioprojective(wcsHeader, plane.x, plane.y);
     }
