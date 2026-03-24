@@ -2,6 +2,9 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.Point;
 
+import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.math.Quat;
+
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -10,6 +13,38 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLHelper {
+
+    public static void emitCircle(double radius, int subdivisions, int startStep, int endStep, Quat rotation, byte[] evenColor, byte[] oddColor, BufVertex vexBuf) {
+        double[] point = {0, 0, 0};
+        double[] rotated = {0, 0, 0};
+
+        for (int i = startStep; i <= endStep; i++) {
+            double angle = 2 * Math.PI * i / subdivisions;
+            point[0] = radius * Math.cos(angle);
+            point[1] = radius * Math.sin(angle);
+            point[2] = 0.0;
+
+            float x;
+            float y;
+            float z;
+            if (rotation != null) {
+                rotation.qxv(point, rotated);
+                x = (float) rotated[0];
+                y = (float) rotated[1];
+                z = (float) rotated[2];
+            } else {
+                x = (float) point[0];
+                y = (float) point[1];
+                z = 0;
+            }
+
+            if (i == startStep)
+                vexBuf.putVertex(x, y, z, 1, Colors.Null);
+            vexBuf.putVertex(x, y, z, 1, i % 2 == 0 ? evenColor : oddColor);
+            if (i == endStep)
+                vexBuf.putVertex(x, y, z, 1, Colors.Null);
+        }
+    }
 
     public static void initCircleFront(GL3 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
         int no_points = 2 * (segments + 1);

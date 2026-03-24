@@ -25,8 +25,8 @@ import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
@@ -39,7 +39,7 @@ import com.jogamp.opengl.GL3;
 class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
 
     static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
-    private static final int SUBDIVISIONS = 180;
+    private static final int SUBDIVISIONS = 180; // divisible by 4 so quarter-turn arcs align to exact step ranges
     private static final double HEMI_RADIUS = Sun.Radius + LINEWIDTH_FOV; // avoid intersecting solar surface
 
     private final GLSLLine hemiLine = new GLSLLine(false);
@@ -101,46 +101,9 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
     private void initHemiLine(GL3 gl) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
-        Vec3 rotv = new Vec3(), v = new Vec3();
-
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
-            double a = 2 * Math.PI * i / SUBDIVISIONS;
-            v.x = HEMI_RADIUS * Math.cos(a);
-            v.y = HEMI_RADIUS * Math.sin(a);
-            v.z = 0.;
-
-            if (i == 0) {
-                vexBuf.putVertex(v, Colors.Null);
-            }
-            vexBuf.putVertex(v, i % 2 == 0 ? color : Colors.White);
-        }
-        vexBuf.putVertex(v, Colors.Null);
-
-        for (int i = 0; i <= SUBDIVISIONS / 2; i++) {
-            double a = 2 * Math.PI * i / SUBDIVISIONS;
-            v.x = HEMI_RADIUS * Math.cos(a);
-            v.y = HEMI_RADIUS * Math.sin(a);
-            v.z = 0.;
-            rotv = Quat.X90.rotateVector(v);
-            if (i == 0) {
-                vexBuf.putVertex(rotv, Colors.Null);
-            }
-            vexBuf.putVertex(rotv, i % 2 == 0 ? color : Colors.White);
-        }
-        vexBuf.putVertex(rotv, Colors.Null);
-
-        for (int i = 0; i <= SUBDIVISIONS / 2; i++) {
-            double a = 2 * Math.PI * i / SUBDIVISIONS + Math.PI / 2;
-            v.x = HEMI_RADIUS * Math.cos(a);
-            v.y = HEMI_RADIUS * Math.sin(a);
-            v.z = 0.;
-            rotv = Quat.Y90.rotateVector(v);
-            if (i == 0) {
-                vexBuf.putVertex(rotv, Colors.Null);
-            }
-            vexBuf.putVertex(rotv, i % 2 == 0 ? color : Colors.White);
-        }
-        vexBuf.putVertex(rotv, Colors.Null);
+        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, null, color, Colors.White, vexBuf);
+        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS / 2, Quat.X90, color, Colors.White, vexBuf);
+        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, SUBDIVISIONS / 4, 3 * SUBDIVISIONS / 4, Quat.Y90, color, Colors.White, vexBuf);
 
         hemiLine.setVertex(gl, vexBuf);
     }
