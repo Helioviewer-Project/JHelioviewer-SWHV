@@ -242,9 +242,6 @@ final class NonOrthoProjection {
     private static Vec3 unprojectLatitudinalPoint(double longitudeDeg, double latitudeDeg) {
         double longitude = Math.toRadians(longitudeDeg);
         double latitude = Math.toRadians(latitudeDeg);
-        return new Vec3(
-                SphericalCoords.x(1, longitude, latitude),
-                SphericalCoords.y(1, latitude),
-                SphericalCoords.z(1, longitude, latitude));
+        return SphericalCoords.unit(longitude, latitude);
     }
 }

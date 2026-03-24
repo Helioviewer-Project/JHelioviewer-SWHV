@@ -27,7 +27,7 @@ import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.SunJSONTypes;
-import org.helioviewer.jhv.math.SphericalCoords;
+import org.helioviewer.jhv.math.SphericalPoint;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -138,7 +138,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
 
-    private static Vec3 interpolate(long t, Position.Cartesian prev, Position.Cartesian next) {
+    private static SphericalPoint interpolateToSpherical(long t, Position.Cartesian prev, Position.Cartesian next) {
         long tprev = prev.milli();
         long tnext = next.milli();
         double alpha = tnext == tprev ? 1. : Math.clamp((t - tprev) / (double) (tnext - tprev), 0., 1.);
@@ -146,17 +146,15 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         double y = (1. - alpha) * prev.y() + alpha * next.y();
         double z = (1. - alpha) * prev.z() + alpha * next.z();
 
-        Vec3 cart = new Vec3(x, y, z);
-        return new Vec3(1, SphericalCoords.longitude(cart), SphericalCoords.latitude(cart));
+        return SphericalPoint.fromCartesian(x, y, z);
     }
 
     private void drawFootpointInterpolated(Camera camera, Viewport vp, GL3 gl) {
         Position viewpoint = camera.getViewpoint();
         updateTimestamp(viewpoint.time);
 
-        Vec3 v = interpolate(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-
-        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, v, footpointBuf, footpointColor);
+        SphericalPoint point = interpolateToSpherical(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
+        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, point, footpointBuf, footpointColor);
         footpointLine.setVertex(gl, footpointBuf);
         footpointLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
