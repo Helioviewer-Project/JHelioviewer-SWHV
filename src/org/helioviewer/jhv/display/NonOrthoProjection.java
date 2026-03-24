@@ -68,22 +68,22 @@ final class NonOrthoProjection {
         return new Vec2(pt.x * vp.aspect, pt.y);
     }
 
-    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, byte[] color, boolean first, boolean last, BufVertex vexBuf) {
         if (kind == Kind.HPC)
-            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, vexBuf, color, first, last);
+            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, color, first, last, vexBuf);
 
         Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
         if (first)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        emitWrappedVertex(vp, previous, current, vexBuf, color);
+            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
+        emitWrappedVertex(vp, previous, current, color, vexBuf);
         if (last)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
         return current;
     }
 
-    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, byte[] color, double size, BufVertex vexBuf) {
         if (kind == Kind.HPC) {
-            emitHpcPoint(viewpoint, scale, vp, vertex, vexBuf, color, size);
+            emitHpcPoint(viewpoint, scale, vp, vertex, color, size, vexBuf);
             return;
         }
 
@@ -158,7 +158,7 @@ final class NonOrthoProjection {
         return projectHpcViewpointSpace(view, viewpoint.distance, scale);
     }
 
-    private static Vec2 emitHpcVertex(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last) {
+    private static Vec2 emitHpcVertex(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, byte[] color, boolean first, boolean last, BufVertex vexBuf) {
         // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
         Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
         if (current == null) {
@@ -167,14 +167,14 @@ final class NonOrthoProjection {
             return null;
         }
         if (first || previous == null)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
-        emitProjectedVertex(vp, current, vexBuf, color);
+            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
+        emitProjectedVertex(vp, current, color, vexBuf);
         if (last)
-            emitProjectedVertex(vp, current, vexBuf, Colors.Null);
+            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
         return current;
     }
 
-    private static void emitHpcPoint(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size) {
+    private static void emitHpcPoint(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, byte[] color, double size, BufVertex vexBuf) {
         // Skip back-side surface points in HPC instead of projecting them through the map.
         Vec2 pt = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
         if (pt == null)
@@ -182,14 +182,14 @@ final class NonOrthoProjection {
         vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
     }
 
-    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, BufVertex vexBuf, byte[] color) {
+    private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, byte[] color, BufVertex vexBuf) {
         if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
-            emitHorizontalWrap(vp, current, previous, vexBuf, color);
+            emitHorizontalWrap(vp, current, previous, color, vexBuf);
         }
-        emitProjectedVertex(vp, current, vexBuf, color);
+        emitProjectedVertex(vp, current, color, vexBuf);
     }
 
-    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, BufVertex vexBuf, byte[] color) {
+    private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, byte[] color, BufVertex vexBuf) {
         float y = (float) current.y;
         float x;
         if (current.x <= 0 && previous.x >= 0) {
@@ -209,7 +209,7 @@ final class NonOrthoProjection {
         }
     }
 
-    private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
+    private static void emitProjectedVertex(Viewport vp, Vec2 projected, byte[] color, BufVertex vexBuf) {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 

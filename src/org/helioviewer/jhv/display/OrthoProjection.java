@@ -19,7 +19,7 @@ final class OrthoProjection {
         return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
     }
 
-    static void emitMapVertex(Vec3 vertex, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
+    static void emitMapVertex(Vec3 vertex, byte[] color, boolean first, boolean last, double radius, BufVertex vexBuf) {
         if (first)
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
         vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, color);
@@ -27,7 +27,7 @@ final class OrthoProjection {
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
     }
 
-    static void emitMapPoint(Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
+    static void emitMapPoint(Vec3 vertex, byte[] color, double size, double radius, BufVertex vexBuf) {
         vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), (float) size, color);
     }
 

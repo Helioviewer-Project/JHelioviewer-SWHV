@@ -22,14 +22,14 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-            OrthoProjection.emitMapVertex(vertex, vexBuf, color, first, last, radius);
+        public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, byte[] color, boolean first, boolean last, double radius, BufVertex vexBuf) {
+            OrthoProjection.emitMapVertex(vertex, color, first, last, radius, vexBuf);
             return previous;
         }
 
         @Override
-        public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
-            OrthoProjection.emitMapPoint(vertex, vexBuf, color, size, radius);
+        public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, byte[] color, double size, double radius, BufVertex vexBuf) {
+            OrthoProjection.emitMapPoint(vertex, color, size, radius, vexBuf);
         }
 
         @Override
@@ -89,12 +89,12 @@ public enum ProjectionMode {
         return NonOrthoProjection.unprojectSurfacePoint(nonOrthoKind, scale, camera, vp, x, y, gridType);
     }
 
-    public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, BufVertex vexBuf, byte[] color, boolean first, boolean last, double radius) {
-        return NonOrthoProjection.emitMapVertex(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, previous, vexBuf, color, first, last);
+    public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, byte[] color, boolean first, boolean last, double radius, BufVertex vexBuf) {
+        return NonOrthoProjection.emitMapVertex(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, previous, color, first, last, vexBuf);
     }
 
-    public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, BufVertex vexBuf, byte[] color, double size, double radius) {
-        NonOrthoProjection.emitMapPoint(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, vexBuf, color, size);
+    public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, byte[] color, double size, double radius, BufVertex vexBuf) {
+        NonOrthoProjection.emitMapPoint(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, color, size, vexBuf);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {

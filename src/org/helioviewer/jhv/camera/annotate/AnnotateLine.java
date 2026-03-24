@@ -17,18 +17,18 @@ public class AnnotateLine extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawLine(double centerX, double centerY, double bw, double bh, BufVertex buf, byte[] color) {
+    private static void drawLine(double centerX, double centerY, double bw, double bh, byte[] color, BufVertex vexBuf) {
         boolean flat = Display.mode.isHpc();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             double y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
             double z = FOVShape.computeZ(x, y, flat);
             if (i == 0) { // first
-                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
+                vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
-            buf.putVertex((float) x, (float) y, (float) z, 1, color);
+            vexBuf.putVertex((float) x, (float) y, (float) z, 1, color);
             if (i == SUBDIVISIONS) { // last
-                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
+                vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
         }
     }
@@ -45,7 +45,7 @@ public class AnnotateLine extends AbstractAnnotateable {
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
 
-        drawLine(p0.x + dx, p0.y + dy, dx, dy, lineBuf, color);
+        drawLine(p0.x + dx, p0.y + dy, dx, dy, color, lineBuf);
     }
 
     @Override

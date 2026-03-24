@@ -14,7 +14,7 @@ public interface Annotateable {
     @Nullable
     Object getData();
 
-    void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex buf);
+    void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex vexBuf);
 
     void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf);
 

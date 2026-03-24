@@ -82,7 +82,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex vexBuf) {
     }
 
     @Override

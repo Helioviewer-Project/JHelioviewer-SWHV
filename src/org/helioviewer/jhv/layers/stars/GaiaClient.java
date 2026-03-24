@@ -92,30 +92,30 @@ public final class GaiaClient {
         return new StarRequest((int) ra, (int) dec, SEARCH_CONE + 1, SEARCH_MAG);
     }
 
-    private static void computePlanet(double[] rsc, String planet, JHVTime time, double[] sc, double[] theta, BufVertex pointsBuf) throws SpiceErrorException {
+    private static void computePlanet(double[] rsc, String planet, JHVTime time, double[] sc, double[] theta, BufVertex vexBuf) throws SpiceErrorException {
         double[] pl = Spice.getPosition("SUN", planet, "SOLO_IAU_SUN_2009", time);
         pl[0] -= rsc[0]; // sc->planet = sun->planet - sun->sc
         pl[1] -= rsc[1];
         pl[2] -= rsc[2];
         pl = SpiceMath.recrad(pl);
-        putPlanet(pl, sc, theta, pointsBuf);
+        putPlanet(pl, sc, theta, vexBuf);
     }
 
-    private static void computePlanetPrecise(String location, String planet, JHVTime time, double[] sc, double[] theta, BufVertex pointsBuf) throws SpiceErrorException {
+    private static void computePlanetPrecise(String location, String planet, JHVTime time, double[] sc, double[] theta, BufVertex vexBuf) throws SpiceErrorException {
         double[] pl = SpiceMath.recrad(Spice.getPosition(location, planet, "SOLO_IAU_SUN_2009", time));
-        putPlanet(pl, sc, theta, pointsBuf);
+        putPlanet(pl, sc, theta, vexBuf);
     }
 
     private static BufVertex computePoints(Position viewpoint, List<Star> stars) throws SpiceErrorException {
-        BufVertex pointsBuf = new BufVertex(500 * GLSLShape.stride);
+        BufVertex vexBuf = new BufVertex(500 * GLSLShape.stride);
         JHVTime time = viewpoint.time;
         double[] sc = {viewpoint.distance, -viewpoint.lon, viewpoint.lat}; // lon was negated
         double[] theta = new double[2];
 
         double[] rsc = SpiceMath.radrec(sc[0], sc[1], sc[2]);
-        computePlanet(rsc, "MERCURY", time, sc, theta, pointsBuf);
-        computePlanet(rsc, "VENUS", time, sc, theta, pointsBuf);
-        computePlanet(rsc, "MARS BARYCENTER", time, sc, theta, pointsBuf);
+        computePlanet(rsc, "MERCURY", time, sc, theta, vexBuf);
+        computePlanet(rsc, "VENUS", time, sc, theta, vexBuf);
+        computePlanet(rsc, "MARS BARYCENTER", time, sc, theta, vexBuf);
 
         double dyr = (time.milli / 1000. - EPOCH) / JYEAR_SEC;
         double[][] carr = Spice.j2000ToSun.get(time);
@@ -125,19 +125,19 @@ public final class GaiaClient {
             double dec = star.dec() + star.pmdec() * dyr;
 
             double[] st = SpiceMath.radrec(1, ra, dec);
-            putStar(st, sc, carr, theta, pointsBuf);
+            putStar(st, sc, carr, theta, vexBuf);
         }
-        return pointsBuf;
+        return vexBuf;
     }
 
     private static BufVertex computePointsPrecise(String location, JHVTime time, List<Star> stars) throws SpiceErrorException {
-        BufVertex pointsBuf = new BufVertex(500 * GLSLShape.stride);
+        BufVertex vexBuf = new BufVertex(500 * GLSLShape.stride);
         double[] sc = SpiceMath.recrad(Spice.getPosition(location, "SUN", "SOLO_IAU_SUN_2009", time));
         double[] theta = new double[2];
 
-        computePlanetPrecise(location, "MERCURY", time, sc, theta, pointsBuf);
-        computePlanetPrecise(location, "VENUS", time, sc, theta, pointsBuf);
-        computePlanetPrecise(location, "MARS BARYCENTER", time, sc, theta, pointsBuf);
+        computePlanetPrecise(location, "MERCURY", time, sc, theta, vexBuf);
+        computePlanetPrecise(location, "VENUS", time, sc, theta, vexBuf);
+        computePlanetPrecise(location, "MARS BARYCENTER", time, sc, theta, vexBuf);
 
         double[] ssb = Spice.getPosition("SSB", location, "J2000", time);
         ssb[0] *= Sun.MeanEarthDistanceInv; // [au]
@@ -159,27 +159,27 @@ public final class GaiaClient {
             // Deflection of starlight by the Sun
             st = JSOFA.jauLdsun(st, sun, auDist);
             // Stellar aberration correction not needed for JHV
-            putStar(st, sc, carr, theta, pointsBuf);
+            putStar(st, sc, carr, theta, vexBuf);
         }
-        return pointsBuf;
+        return vexBuf;
     }
 
-    private static void putStar(double[] st /* rec */, double[] sc /* rad */, double[][] carr, double[] theta, BufVertex pointsBuf) {
+    private static void putStar(double[] st /* rec */, double[] sc /* rad */, double[][] carr, double[] theta, BufVertex vexBuf) {
         st = SpiceMath.mxv(carr, st); // to Carrington
         st = SpiceMath.recrad(st);
         calcProj3(0, st[1], st[2], sc[1], sc[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_STAR, COLOR_STAR);
+        putVertex(theta[0], theta[1], sc[0], SIZE_STAR, COLOR_STAR, vexBuf);
     }
 
-    private static void putPlanet(double[] pl /* rad */, double[] sc /* rad */, double[] theta, BufVertex pointsBuf) {
+    private static void putPlanet(double[] pl /* rad */, double[] sc /* rad */, double[] theta, BufVertex vexBuf) {
         calcProj3(0, pl[1], pl[2], sc[1], sc[2], theta);
-        putVertex(pointsBuf, theta[0], theta[1], sc[0], SIZE_PLANET, COLOR_PLANET);
+        putVertex(theta[0], theta[1], sc[0], SIZE_PLANET, COLOR_PLANET, vexBuf);
     }
 
-    private static void putVertex(BufVertex pointsBuf, double Tx, double Ty, double dist, float size, byte[] color) {
+    private static void putVertex(double Tx, double Ty, double dist, float size, byte[] color, BufVertex vexBuf) {
         double x = dist * Math.tan(Tx);
         double y = dist * Math.tan(Ty);
-        pointsBuf.putVertex((float) x, (float) y, 0, size, color);
+        vexBuf.putVertex((float) x, (float) y, 0, size, color);
     }
 
 // --Commented out by Inspection START (23/06/2024, 23:15):
