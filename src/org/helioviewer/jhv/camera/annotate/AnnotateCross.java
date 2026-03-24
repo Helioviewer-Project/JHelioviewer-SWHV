@@ -23,19 +23,16 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint point, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
-        SphericalPoint p1 = new SphericalPoint(1, point.longitude() + delta, point.latitude());
-        SphericalPoint p2 = new SphericalPoint(1, point.longitude() - delta, point.latitude());
-        SphericalPoint p3 = new SphericalPoint(1, point.longitude(), point.latitude() + delta);
-        SphericalPoint p4 = new SphericalPoint(1, point.longitude(), point.latitude() - delta);
-
-        interpolatedDraw(viewpoint, gridType, vp, p1, p2, buf, color);
-        interpolatedDraw(viewpoint, gridType, vp, p3, p4, buf, color);
+        double longitude = point.longitude();
+        double latitude = point.latitude();
+        interpolatedDraw(viewpoint, gridType, vp, longitude + delta, latitude, longitude - delta, latitude, buf, color);
+        interpolatedDraw(viewpoint, gridType, vp, longitude, latitude + delta, longitude, latitude - delta, buf, color);
     }
 
-    private static void interpolatedDraw(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint point1, SphericalPoint point2, BufVertex buf, byte[] color) {
+    private static void interpolatedDraw(Position viewpoint, GridType gridType, Viewport vp, double longitude1, double latitude1, double longitude2, double latitude2, BufVertex buf, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, longitude1, latitude1, longitude2, latitude2);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS);
         }
     }

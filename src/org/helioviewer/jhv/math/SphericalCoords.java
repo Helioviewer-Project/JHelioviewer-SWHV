@@ -47,7 +47,7 @@ public final class SphericalCoords {
         return radius * Math.cos(latitude) * Math.cos(longitude);
     }
 
-    public static SphericalPoint point(double x, double y, double z) {
+    static SphericalPoint point(double x, double y, double z) {
         double radius = radius(x, y, z);
         return new SphericalPoint(
                 radius,
