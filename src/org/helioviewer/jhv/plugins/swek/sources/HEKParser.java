@@ -34,8 +34,8 @@ class HEKParser {
         List<HgsPoint> hgsBoundedBox = null;
         List<HgsPoint> hgsBoundCC = null;
         HgsPoint hgsCentralPoint = null;
-        Double hgsX = null;
-        Double hgsY = null;
+        Double hgsLongitudeDeg = null;
+        Double hgsLatitudeDeg = null;
 
         boolean waveCM = false;
         String waveValue = null;
@@ -67,9 +67,9 @@ class HEKParser {
                 } else if (lowKey.equals("hgs_coord")) {
                     hgsCentralPoint = parsePoint(value);
                 } else if (lowKey.equals("hgs_x")) {
-                    hgsX = Double.valueOf(value);
+                    hgsLongitudeDeg = Double.valueOf(value);
                 } else if (lowKey.equals("hgs_y")) {
-                    hgsY = Double.valueOf(value);
+                    hgsLatitudeDeg = Double.valueOf(value);
                 } else if (lowKey.equals("rasterscan") || lowKey.equals("bound_chaincode") ||
                         lowKey.startsWith("hgc_") || lowKey.startsWith("hgs_") || lowKey.startsWith("hpc_") || lowKey.startsWith("hrc_")) {
                     // nothing, delete
@@ -97,7 +97,7 @@ class HEKParser {
             currentEvent.addParameter("obs_meanwavel", waveValue, full);
         }
 
-        handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
+        handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsLongitudeDeg, hgsLatitudeDeg);
     }
 
     private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
@@ -149,7 +149,7 @@ class HEKParser {
      * "POLYGON((0.745758 77.471192,0.667026 75.963757,...,0.691115 69.443955,0.767379 71.565051,0.745758 77.471192))"
      *
      * @param value the value to parse
-     * @return a list of JHV points
+     * @return a list of HGS longitude/latitude points
      */
     private static List<HgsPoint> parsePolygon(String value) {
         List<HgsPoint> polygonPoints = new ArrayList<>();
@@ -174,7 +174,7 @@ class HEKParser {
      * Parses a point of the format POINT(0.716676950817756 73.6104596659652).
      *
      * @param value the point to parse
-     * @return The HGS point or null if it could not be parsed.
+     * @return the HGS longitude/latitude point or null if it could not be parsed
      */
     @Nullable
     private static HgsPoint parsePoint(String value) {
@@ -185,8 +185,8 @@ class HEKParser {
     }
 
     /**
-     * Parses a string of the format "0.716676950817756 73.6104596659652" to a
-     * GL3DVec3
+     * Parses a string of the format "0.716676950817756 73.6104596659652" to an
+     * HGS longitude/latitude point.
      *
      * @param value the string to parse
      * @return the HGS point or null if it could not be parsed
@@ -198,18 +198,17 @@ class HEKParser {
 
         try (Scanner s = new Scanner(value)) {
             s.useDelimiter(" ");
-            if (s.hasNext())
-                longitudeDeg = Double.parseDouble(s.next());
-            if (s.hasNext())
-                latitudeDeg = Double.parseDouble(s.next());
+            if (s.hasNextDouble())
+                longitudeDeg = s.nextDouble();
+            if (s.hasNextDouble())
+                latitudeDeg = s.nextDouble();
         }
 
         return longitudeDeg != null && latitudeDeg != null ? new HgsPoint(longitudeDeg, latitudeDeg) : null;
     }
 
-    private static void handleCoordinates(JHVEvent currentEvent, List<HgsPoint> hgsBoundedBox, List<HgsPoint> hgsBoundCC, HgsPoint hgsCentralPoint, Double hgsX, Double hgsY) {
-        hgsBoundedBox = checkAndFixBoundingBox(hgsBoundedBox);
-        handleHGSCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsX, hgsY);
+    private static void handleCoordinates(JHVEvent currentEvent, List<HgsPoint> hgsBoundedBox, List<HgsPoint> hgsBoundCC, HgsPoint hgsCentralPoint, Double hgsLongitudeDeg, Double hgsLatitudeDeg) {
+        handleHGSCoordinates(currentEvent, checkAndFixBoundingBox(hgsBoundedBox), hgsBoundCC, hgsCentralPoint, hgsLongitudeDeg, hgsLatitudeDeg);
     }
 
     @Nullable
@@ -242,38 +241,31 @@ class HEKParser {
         return hgsBoundedBox;
     }
 
-    private static void handleHGSCoordinates(JHVEvent currentEvent, List<HgsPoint> hgsBoundedBox, List<HgsPoint> hgsBoundCC, HgsPoint hgsCentralPoint, Double hgsX, Double hgsY) {
-        if (hgsBoundedBox != null || hgsCentralPoint != null || (hgsX != null && hgsY != null) || hgsBoundCC != null) {
-            List<HgsPoint> localHGSBoundedBox = hgsBoundedBox == null ? new ArrayList<>() : hgsBoundedBox;
-            List<HgsPoint> localHGSBoundCC = hgsBoundCC == null ? new ArrayList<>() : hgsBoundCC;
+    private static void handleHGSCoordinates(JHVEvent currentEvent, List<HgsPoint> hgsBoundedBox, List<HgsPoint> hgsBoundCC, HgsPoint hgsCentralPoint, Double hgsLongitudeDeg, Double hgsLatitudeDeg) {
+        if (hgsBoundedBox == null && hgsCentralPoint == null && (hgsLongitudeDeg == null || hgsLatitudeDeg == null) && hgsBoundCC == null)
+            return;
 
-            HgsPoint localHGSCentralPoint = null;
-            if (hgsCentralPoint != null) {
-                localHGSCentralPoint = hgsCentralPoint;
-            } else if (hgsX != null && hgsY != null) {
-                localHGSCentralPoint = new HgsPoint(hgsX, hgsY);
-            }
+        List<HgsPoint> boundedBox = hgsBoundedBox == null ? List.of() : hgsBoundedBox;
+        List<HgsPoint> boundCC = hgsBoundCC == null ? List.of() : hgsBoundCC;
+        HgsPoint centralPoint = hgsCentralPoint != null ? hgsCentralPoint
+                : hgsLongitudeDeg != null && hgsLatitudeDeg != null ? new HgsPoint(hgsLongitudeDeg, hgsLatitudeDeg)
+                : null;
 
-            Position p = Sun.getEarth(new JHVTime(currentEvent.start));
-            double elon = p.lon;
+        Position p = Sun.getEarth(new JHVTime(currentEvent.start));
+        double elon = p.lon;
 
-            List<Vec3> jhvBoundedBox = new ArrayList<>(localHGSBoundedBox.size());
-            localHGSBoundedBox.forEach(el -> jhvBoundedBox.add(convertHGSJHV(el, elon)));
+        List<Vec3> jhvBoundedBox = new ArrayList<>(boundedBox.size());
+        boundedBox.forEach(point -> jhvBoundedBox.add(hgsToJhv(point, elon)));
 
-            List<Vec3> jhvBoundCC = new ArrayList<>(localHGSBoundCC.size());
-            localHGSBoundCC.forEach(el -> jhvBoundCC.add(convertHGSJHV(el, elon)));
+        List<Vec3> jhvBoundCC = new ArrayList<>(boundCC.size());
+        boundCC.forEach(point -> jhvBoundCC.add(hgsToJhv(point, elon)));
 
-            Vec3 jhvCentralPoint = null;
-            if (localHGSCentralPoint != null) {
-                jhvCentralPoint = convertHGSJHV(localHGSCentralPoint, elon);
-            }
-
-            currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundedBox, jhvBoundCC,
-                    currentEvent.isCactus() ? p : null)); // reduce memory usage
-        }
+        Vec3 jhvCentralPoint = centralPoint != null ? hgsToJhv(centralPoint, elon) : null;
+        currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundedBox, jhvBoundCC,
+                currentEvent.isCactus() ? p : null)); // reduce memory usage
     }
 
-    private static Vec3 convertHGSJHV(HgsPoint point, double elon) {
+    private static Vec3 hgsToJhv(HgsPoint point, double elon) {
         return SphericalCoords.unit(Math.toRadians(point.longitudeDeg()) - elon, Math.toRadians(point.latitudeDeg()));
     }
 
