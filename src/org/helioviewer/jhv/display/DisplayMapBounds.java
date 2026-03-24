@@ -1,14 +1,15 @@
-package org.helioviewer.jhv.wcs;
+package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.wcs.ImageBounds;
+import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsProjection;
 
 public final class DisplayMapBounds {
 
@@ -63,7 +64,7 @@ public final class DisplayMapBounds {
 
     private static void updateBounds(double[] bounds, WcsHeader wcsHeader, Position metaViewpoint, ProjectionMode mode, GridType gridType, Position cameraViewpoint, double x, double y) {
         Vec2 helioprojective = WcsProjection.planeToHelioprojective(wcsHeader, x, y);
-        Vec3 world = helioprojectiveToWorld(metaViewpoint, helioprojective);
+        Vec3 world = NonOrthoProjection.helioprojectiveToWorld(metaViewpoint, helioprojective.x, helioprojective.y);
         if (world == null)
             return;
 
@@ -88,32 +89,5 @@ public final class DisplayMapBounds {
         return new Region(bounds[0], bounds[2],
                 Math.max(Math.nextUp(0.0), bounds[1] - bounds[0]),
                 Math.max(Math.nextUp(0.0), bounds[3] - bounds[2]));
-    }
-
-    private static Vec3 helioprojectiveToWorld(Position viewpoint, Vec2 helioprojective) {
-        Vec3 ray = helioprojectiveToObserverRay(helioprojective);
-        double b = viewpoint.distance * ray.z;
-        double c = viewpoint.distance * viewpoint.distance - 1;
-        double discriminant = b * b - c;
-        if (discriminant < 0)
-            return null;
-
-        double root = Math.sqrt(discriminant);
-        double t = -b - root;
-        if (t <= 0)
-            t = -b + root;
-        if (t <= 0)
-            return null;
-
-        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
-        return viewpoint.toQuat().rotateInverseVector(view);
-    }
-
-    private static Vec3 helioprojectiveToObserverRay(Vec2 helioprojective) {
-        double phi = helioprojective.x;
-        double theta = helioprojective.y;
-        Vec3 ray = new Vec3(Math.tan(phi), Math.tan(theta) / Math.cos(phi), -1);
-        ray.normalize();
-        return ray;
     }
 }

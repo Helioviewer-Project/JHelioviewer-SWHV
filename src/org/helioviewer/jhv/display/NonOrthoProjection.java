@@ -60,24 +60,7 @@ final class NonOrthoProjection {
     }
 
     private static Vec3 unprojectHpc(Position viewpoint, Vec2 pt) {
-        Vec3 ray = helioprojectiveRayDegrees(pt);
-
-        double b = viewpoint.distance * ray.z;
-        double c = viewpoint.distance * viewpoint.distance - 1;
-        double discriminant = b * b - c;
-        if (discriminant < 0)
-            return null;
-
-        double root = Math.sqrt(discriminant);
-        double t = -b - root;
-        if (t <= 0)
-            t = -b + root;
-        if (t <= 0)
-            return null;
-
-        // Return the inverse in world space to match the rotated projectHpc() path above.
-        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
-        return viewpoint.toQuat().rotateInverseVector(view);
+        return helioprojectiveToWorld(viewpoint, Math.toRadians(pt.x), Math.toRadians(pt.y));
     }
 
     static Vec2 projectToScreen(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
@@ -121,9 +104,28 @@ final class NonOrthoProjection {
                 scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));
     }
 
-    private static Vec3 helioprojectiveRayDegrees(Vec2 pt) {
-        double longitude = Math.toRadians(pt.x);
-        double latitude = Math.toRadians(pt.y);
+    static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {
+        Vec3 ray = helioprojectiveRay(longitude, latitude);
+
+        double b = viewpoint.distance * ray.z;
+        double c = viewpoint.distance * viewpoint.distance - 1;
+        double discriminant = b * b - c;
+        if (discriminant < 0)
+            return null;
+
+        double root = Math.sqrt(discriminant);
+        double t = -b - root;
+        if (t <= 0)
+            t = -b + root;
+        if (t <= 0)
+            return null;
+
+        // Return the inverse in world space to match the rotated projectHpc() path above.
+        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+        return viewpoint.toQuat().rotateInverseVector(view);
+    }
+
+    private static Vec3 helioprojectiveRay(double longitude, double latitude) {
         Vec3 ray = new Vec3(
                 Math.tan(longitude),
                 Math.tan(latitude) / Math.cos(longitude),
