@@ -68,9 +68,9 @@ final class NonOrthoProjection {
         return new Vec2(pt.x * vp.aspect, pt.y);
     }
 
-    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, byte[] color, boolean first, boolean last, BufVertex vexBuf) {
+    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC)
-            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, color, first, last, vexBuf);
+            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, first, last, color, vexBuf);
 
         Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
         if (first)
@@ -81,9 +81,9 @@ final class NonOrthoProjection {
         return current;
     }
 
-    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, byte[] color, double size, BufVertex vexBuf) {
+    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC) {
-            emitHpcPoint(viewpoint, scale, vp, vertex, color, size, vexBuf);
+            emitHpcPoint(viewpoint, scale, vp, vertex, size, color, vexBuf);
             return;
         }
 
@@ -158,7 +158,7 @@ final class NonOrthoProjection {
         return projectHpcViewpointSpace(view, viewpoint.distance, scale);
     }
 
-    private static Vec2 emitHpcVertex(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, byte[] color, boolean first, boolean last, BufVertex vexBuf) {
+    private static Vec2 emitHpcVertex(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
         // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
         Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
         if (current == null) {
@@ -174,7 +174,7 @@ final class NonOrthoProjection {
         return current;
     }
 
-    private static void emitHpcPoint(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, byte[] color, double size, BufVertex vexBuf) {
+    private static void emitHpcPoint(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
         // Skip back-side surface points in HPC instead of projecting them through the map.
         Vec2 pt = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
         if (pt == null)

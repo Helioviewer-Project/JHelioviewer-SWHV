@@ -45,7 +45,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
             vx.x = center.x + cosr * v.x + sinr * bp.x;
             vx.y = center.y + cosr * v.y + sinr * bp.y;
             vx.z = center.z + cosr * v.z + sinr * bp.z;
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vx, previous, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, vexBuf);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vx, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 

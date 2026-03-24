@@ -191,7 +191,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     pt.x = xnew / r;
                     pt.y = ynew / r;
                     pt.z = znew / r;
-                    previous = Display.mode.emitMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, color, j == 0, j == DIVPOINTS, POLYGON_RADIUS, vexBuf);
+                    previous = Display.mode.emitMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};

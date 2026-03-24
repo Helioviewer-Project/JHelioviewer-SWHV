@@ -17,7 +17,7 @@ public class FOVShape {
         centerY = _centerY;
     }
 
-    public void putCenter(byte[] color, boolean flat, BufVertex vexBuf) {
+    public void putCenter(boolean flat, byte[] color, BufVertex vexBuf) {
         double centerZ = computeZ(centerX, centerY, flat);
         vexBuf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
     }
@@ -29,7 +29,7 @@ public class FOVShape {
         return n > 0 ? epsilon + Math.sqrt(n) : epsilon;
     }
 
-    public void putRectLine(double bw, double bh, byte[] color, boolean flat, BufVertex vexBuf) {
+    public void putRectLine(double bw, double bh, boolean flat, byte[] color, BufVertex vexBuf) {
         double x, y, z;
 
         for (int i = 0; i <= RECT_SUBDIVS; i++) {
@@ -67,7 +67,7 @@ public class FOVShape {
         }
     }
 
-    public void putCircLine(double r, byte[] color, boolean flat, BufVertex vexBuf) {
+    public void putCircLine(double r, boolean flat, byte[] color, BufVertex vexBuf) {
         for (int i = 0; i <= CIRC_SUBDIVS; i++) {
             double t = i * 2. * Math.PI / CIRC_SUBDIVS;
             double x = centerX + Math.sin(t) * r;
