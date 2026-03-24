@@ -21,15 +21,15 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
     }
 
     @Override
-    public void setVertexRepeatable(GL3 gl, BufVertex buf) {
-        count = buf.getCount();
+    public void setVertexRepeatable(GL3 gl, BufVertex vexBuf) {
+        count = vexBuf.getCount();
         if (count == 0)
             return;
 
         Buffer buffer;
-        buffer = buf.toVertexBuffer();
+        buffer = vexBuf.toVertexBuffer();
         vbo[0].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
-        buffer = buf.toColorBuffer();
+        buffer = vexBuf.toColorBuffer();
         vbo[1].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
 
         count--;

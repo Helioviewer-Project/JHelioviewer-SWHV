@@ -24,7 +24,7 @@ class PfssLine {
         brightColor[3] = (byte) 255;
     }
 
-    static void calculatePositions(PfssLoader.Data data, int detail, boolean fixedColor, double radius, BufVertex lineBuf) {
+    static void calculatePositions(PfssLoader.Data data, int detail, boolean fixedColor, double radius, BufVertex vexBuf) {
         float[] lineX = data.lineX();
         float[] lineY = data.lineY();
         float[] lineZ = data.lineZ();
@@ -48,7 +48,7 @@ class PfssLine {
                     computeBrightColor(b, brightColor);
 
                     if (i == 0) {
-                        lineBuf.putVertex(x, z, -y, 1, Colors.Null);
+                        vexBuf.putVertex(x, z, -y, 1, Colors.Null);
 
                         if (fixedColor) {
                             int idxLast = j * points + points - 1;
@@ -67,9 +67,9 @@ class PfssLine {
                         }
                     }
 
-                    lineBuf.putVertex(x, z, -y, 1, r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
+                    vexBuf.putVertex(x, z, -y, 1, r > radius ? Colors.Null : (fixedColor ? oneColor : brightColor));
                     if (i == points - 1) {
-                        lineBuf.repeatVertex(Colors.Null);
+                        vexBuf.repeatVertex(Colors.Null);
                     }
                 }
             }

@@ -136,34 +136,34 @@ public class SunJSONTypes {
 
     private static BufVertex getVerticesPoint(List<Vec3> coordinates, List<byte[]> colors, double thickness) {
         int num = coordinates.size();
-        BufVertex buf = new BufVertex(num * GLSLShape.stride);
+        BufVertex vexBuf = new BufVertex(num * GLSLShape.stride);
 
         float pointSize = (float) (2 * thickness);
         for (int i = 0; i < num; i++) {
             Vec3 v = coordinates.get(i);
-            buf.putVertex((float) v.x, (float) v.y, (float) v.z, pointSize, colors.get(i));
+            vexBuf.putVertex((float) v.x, (float) v.y, (float) v.z, pointSize, colors.get(i));
         }
-        return buf;
+        return vexBuf;
     }
 
     private static BufVertex getVerticesLine(List<Vec3> coordinates, List<byte[]> colors) {
         int num = coordinates.size();
-        BufVertex buf = new BufVertex((num + 2) * GLSLLine.stride);
+        BufVertex vexBuf = new BufVertex((num + 2) * GLSLLine.stride);
 
         Vec3 v = coordinates.getFirst();
-        buf.putVertex(v, Colors.Null);
-        buf.repeatVertex(colors.getFirst());
+        vexBuf.putVertex(v, Colors.Null);
+        vexBuf.repeatVertex(colors.getFirst());
         for (int i = 1; i < num; i++) {
-            buf.putVertex(coordinates.get(i), colors.get(i));
+            vexBuf.putVertex(coordinates.get(i), colors.get(i));
         }
-        buf.repeatVertex(Colors.Null);
-        return buf;
+        vexBuf.repeatVertex(Colors.Null);
+        return vexBuf;
     }
 
     private static final int SUBDIVISIONS = 360;
 
     private static BufVertex getVerticesEllipse(List<Vec3> coordinates, List<byte[]> colors) {
-        BufVertex buf = new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
+        BufVertex vexBuf = new BufVertex((SUBDIVISIONS + 1 + 2) * GLSLLine.stride);
 
         Vec3 c = coordinates.get(0);
         Vec3 u = coordinates.get(1);
@@ -181,11 +181,11 @@ public class SunJSONTypes {
             double y = c.y + cost * u.y + sint * v.y;
             double z = c.z + cost * u.z + sint * v.z;
             if (i == 0)
-                buf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
-            buf.putVertex((float) x, (float) y, (float) z, 1, color);
+                vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
+            vexBuf.putVertex((float) x, (float) y, (float) z, 1, color);
         }
-        buf.repeatVertex(Colors.Null);
-        return buf;
+        vexBuf.repeatVertex(Colors.Null);
+        return vexBuf;
     }
 
 }

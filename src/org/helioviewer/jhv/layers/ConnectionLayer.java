@@ -111,16 +111,16 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     private void drawConnectivity(Camera camera, Viewport vp, GL3 gl) {
         Position viewpoint = camera.getViewpoint();
-        putConnectivity(viewpoint, vp, connectivity.SSW, connectivityBuf, sswColor);
-        putConnectivity(viewpoint, vp, connectivity.FSW, connectivityBuf, fswColor);
-        putConnectivity(viewpoint, vp, connectivity.M, connectivityBuf, mColor);
+        putConnectivity(viewpoint, vp, connectivity.SSW, sswColor, connectivityBuf);
+        putConnectivity(viewpoint, vp, connectivity.FSW, fswColor, connectivityBuf);
+        putConnectivity(viewpoint, vp, connectivity.M, mColor, connectivityBuf);
 
         connectivityCenter.setVertex(gl, connectivityBuf);
         connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
     }
 
-    private static void putConnectivity(Position viewpoint, Viewport vp, List<Vec3> points, BufVertex vexBuf, byte[] color) {
-        points.forEach(v -> Display.mode.emitMapPoint(viewpoint, Display.gridType, vp, v, vexBuf, color, 2 * SIZE_POINT, ORTHO_RADIUS));
+    private static void putConnectivity(Position viewpoint, Viewport vp, List<Vec3> points, byte[] color, BufVertex vexBuf) {
+        points.forEach(v -> Display.mode.emitMapPoint(viewpoint, Display.gridType, vp, v, color, 2 * SIZE_POINT, ORTHO_RADIUS, vexBuf));
     }
 
     private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
@@ -128,11 +128,11 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             return;
         Position viewpoint = camera.getViewpoint();
         Vec3 first = hcs.getFirst();
-        Vec2 previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, null, hcsBuf, hcsColor, true, false, ORTHO_RADIUS);
+        Vec2 previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, null, hcsColor, true, false, ORTHO_RADIUS, hcsBuf);
         for (int i = 1; i < hcs.size(); i++) {
-            previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, hcs.get(i), previous, hcsBuf, hcsColor, false, false, ORTHO_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, hcs.get(i), previous, hcsColor, false, false, ORTHO_RADIUS, hcsBuf);
         }
-        Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsBuf, hcsColor, false, true, ORTHO_RADIUS);
+        Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, previous, hcsColor, false, true, ORTHO_RADIUS, hcsBuf);
 
         hcsLine.setVertex(gl, hcsBuf);
         hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);
@@ -154,7 +154,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         updateTimestamp(viewpoint.time);
 
         SphericalPoint point = interpolateToSpherical(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, point.longitude(), point.latitude(), footpointBuf, footpointColor);
+        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, point.longitude(), point.latitude(), footpointColor, footpointBuf);
         footpointLine.setVertex(gl, footpointBuf);
         footpointLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }

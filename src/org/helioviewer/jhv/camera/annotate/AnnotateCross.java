@@ -21,27 +21,27 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, double longitude, double latitude, BufVertex buf, byte[] color) {
+    public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
         double delta = 2.5 * Math.PI / 180;
-        interpolatedDraw(viewpoint, gridType, vp, longitude + delta, latitude, longitude - delta, latitude, buf, color);
-        interpolatedDraw(viewpoint, gridType, vp, longitude, latitude + delta, longitude, latitude - delta, buf, color);
+        interpolatedDraw(viewpoint, gridType, vp, longitude + delta, latitude, longitude - delta, latitude, color, vexBuf);
+        interpolatedDraw(viewpoint, gridType, vp, longitude, latitude + delta, longitude, latitude - delta, color, vexBuf);
     }
 
-    private static void interpolatedDraw(Position viewpoint, GridType gridType, Viewport vp, double longitude1, double latitude1, double longitude2, double latitude2, BufVertex buf, byte[] color) {
+    private static void interpolatedDraw(Position viewpoint, GridType gridType, Viewport vp, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, longitude1, latitude1, longitude2, latitude2);
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, vexBuf);
         }
     }
 
     @Override
-    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex vexBuf) {
         if (startPoint == null)
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        drawCross(viewpoint, gridType, vp, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), buf, color);
+        drawCross(viewpoint, gridType, vp, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), color, vexBuf);
     }
 
     @Override

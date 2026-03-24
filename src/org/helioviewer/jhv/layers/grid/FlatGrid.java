@@ -118,11 +118,11 @@ public class FlatGrid {
 
         for (int i = 0; i < xAxis.positions().length; i++) {
             byte[] color = xAxis.axisFlags()[i] ? AXIS_COLOR : GRID_COLOR;
-            RasterLine.putVertical(vexBuf, camera, vp, vp.aspect * xAxis.positions()[i], -0.5, 0.5, THICKNESS_PIXELS, color);
+            RasterLine.putVertical(camera, vp, vp.aspect * xAxis.positions()[i], -0.5, 0.5, THICKNESS_PIXELS, color, vexBuf);
         }
         for (int i = 0; i < yAxis.positions().length; i++) {
             byte[] color = yAxis.axisFlags()[i] ? AXIS_COLOR : GRID_COLOR;
-            RasterLine.putHorizontal(vexBuf, camera, vp, -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], THICKNESS_PIXELS, color);
+            RasterLine.putHorizontal(camera, vp, -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], THICKNESS_PIXELS, color, vexBuf);
         }
         shape.setVertex(gl, vexBuf);
     }

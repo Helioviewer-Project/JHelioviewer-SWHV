@@ -60,13 +60,13 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
             return;
 
         Position viewpoint = camera.getViewpoint();
-        BufVertex buf = cache.getIfPresent(viewpoint);
-        if (buf == null)
+        BufVertex vexBuf = cache.getIfPresent(viewpoint);
+        if (vexBuf == null)
             return;
 
-        if (buf != uploadedBuf) {
-            points.setVertexRepeatable(gl, buf);
-            uploadedBuf = buf;
+        if (vexBuf != uploadedBuf) {
+            points.setVertexRepeatable(gl, vexBuf);
+            uploadedBuf = vexBuf;
         }
 
         Transform.pushView();

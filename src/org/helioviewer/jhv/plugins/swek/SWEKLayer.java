@@ -107,7 +107,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         tex.bind(gl);
     }
 
-    private static void drawInterpolated(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, BufVertex buf, byte[] color) {
+    private static void drawInterpolated(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, byte[] color, BufVertex vexBuf) {
         int steps = Math.max(1, mres);
         for (int i = 0; i <= steps; i++) {
             double alpha = 1. - i / (double) steps;
@@ -117,11 +117,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             Vec3 res = q.rotateInverseVector(PolarBasis.vec3(r, theta));
 
             if (i == 0) {
-                buf.putVertex(res, Colors.Null);
+                vexBuf.putVertex(res, Colors.Null);
             }
-            buf.putVertex(res, color);
+            vexBuf.putVertex(res, color);
         }
-        buf.repeatVertex(Colors.Null);
+        vexBuf.repeatVertex(Colors.Null);
     }
 
     private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
@@ -140,14 +140,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        BufVertex buf = evtr.isHighlighted() ? bufThick : bufEvent;
+        BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
-        drawInterpolated(angularResolution, distSun, distSun, thetaStart, principalAngle, q, buf, color);
-        drawInterpolated(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, buf, color);
-        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, buf, color);
-        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, buf, color);
-        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, buf, color);
+        drawInterpolated(angularResolution, distSun, distSun, thetaStart, principalAngle, q, color, vexBuf);
+        drawInterpolated(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, color, vexBuf);
+        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, color, vexBuf);
+        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, color, vexBuf);
+        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, color, vexBuf);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
@@ -172,7 +172,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             return;
         }
 
-        BufVertex buf = evtr.isHighlighted() ? bufThick : bufEvent;
+        BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
         Vec3 pt = new Vec3();
@@ -191,7 +191,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     pt.x = xnew / r;
                     pt.y = ynew / r;
                     pt.z = znew / r;
-                    previous = Display.mode.emitMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, buf, color, j == 0, j == DIVPOINTS, POLYGON_RADIUS);
+                    previous = Display.mode.emitMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, color, j == 0, j == DIVPOINTS, POLYGON_RADIUS, vexBuf);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
@@ -265,43 +265,43 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        BufVertex buf = evtr.isHighlighted() ? bufThick : bufEvent;
+        BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
         float x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
         float y = (float) scale.getYValueInv(distSunBegin);
-        buf.putVertex(x, y, 0, 1, Colors.Null);
-        buf.repeatVertex(color);
+        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        buf.putVertex(x, y, 0, 1, color);
-        buf.repeatVertex(Colors.Null);
+        vexBuf.putVertex(x, y, 0, 1, color);
+        vexBuf.repeatVertex(Colors.Null);
 
         x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        buf.putVertex(x, y, 0, 1, Colors.Null);
-        buf.repeatVertex(color);
+        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        buf.putVertex(x, y, 0, 1, color);
-        buf.repeatVertex(Colors.Null);
+        vexBuf.putVertex(x, y, 0, 1, color);
+        vexBuf.repeatVertex(Colors.Null);
 
         x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
         y = (float) scale.getYValueInv(distSunBegin);
-        buf.putVertex(x, y, 0, 1, Colors.Null);
-        buf.repeatVertex(color);
+        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(color);
 
         y = (float) scale.getYValueInv(distSun + 0.05);
-        buf.putVertex(x, y, 0, 1, color);
-        buf.repeatVertex(Colors.Null);
+        vexBuf.putVertex(x, y, 0, 1, color);
+        vexBuf.repeatVertex(Colors.Null);
 
         y = (float) scale.getYValueInv(distSun);
-        buf.putVertex(x, y, 0, 1, Colors.Null);
-        buf.repeatVertex(color);
+        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(color);
 
         x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
-        buf.putVertex(x, y, 0, 1, color);
-        buf.repeatVertex(Colors.Null);
+        vexBuf.putVertex(x, y, 0, 1, color);
+        vexBuf.repeatVertex(Colors.Null);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;

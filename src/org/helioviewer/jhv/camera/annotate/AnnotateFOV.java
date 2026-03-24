@@ -47,8 +47,8 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double dy = 0.5 * (p1.y - p0.y);
 
         fov.setCenter(p0.x + dx, p0.y + dy);
-        fov.putCenter(centerBuf, color, Display.mode.isHpc());
-        fov.putRectLine(dx, dy, lineBuf, color, Display.mode.isHpc());
+        fov.putCenter(color, Display.mode.isHpc(), centerBuf);
+        fov.putRectLine(dx, dy, color, Display.mode.isHpc(), lineBuf);
     }
 
     @Override

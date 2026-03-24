@@ -23,7 +23,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawCircle(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
+    private void drawCircle(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -45,12 +45,12 @@ public class AnnotateCircle extends AbstractAnnotateable {
             vx.x = center.x + cosr * u.x + sinr * v.x;
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vx, previous, buf, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vx, previous, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, vexBuf);
         }
     }
 
     @Override
-    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -59,7 +59,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawCircle(viewpoint, gridType, vp, p0, p1, buf, color);
+        drawCircle(viewpoint, gridType, vp, p0, p1, color, vexBuf);
     }
 
     @Override

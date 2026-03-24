@@ -19,7 +19,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawRectangle(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint start, SphericalPoint end, BufVertex buf, byte[] color) {
+    private static void drawRectangle(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
         double startLongitude = start.longitude();
         double startLatitude = start.latitude();
         double endLongitude = end.longitude();
@@ -34,27 +34,27 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, startLatitude, endLongitude, startLatitude);
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, false, ANNOTATION_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, color, i == 0, false, ANNOTATION_RADIUS, vexBuf);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, startLatitude, endLongitude, endLatitude);
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, false, ANNOTATION_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, color, false, false, ANNOTATION_RADIUS, vexBuf);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, endLatitude, startLongitude, endLatitude);
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, false, ANNOTATION_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, color, false, false, ANNOTATION_RADIUS, vexBuf);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, endLatitude, startLongitude, startLatitude);
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, i == SUBDIVISIONS, ANNOTATION_RADIUS);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, color, false, i == SUBDIVISIONS, ANNOTATION_RADIUS, vexBuf);
         }
     }
 
     @Override
-    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex buf) {
+    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -65,7 +65,7 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         SphericalPoint spherical0 = SphericalPoint.fromCartesian(p0);
         SphericalPoint spherical1 = SphericalPoint.fromCartesian(p1);
-        drawRectangle(viewpoint, gridType, vp, spherical0, spherical1, buf, color);
+        drawRectangle(viewpoint, gridType, vp, spherical0, spherical1, color, vexBuf);
     }
 
     @Override
