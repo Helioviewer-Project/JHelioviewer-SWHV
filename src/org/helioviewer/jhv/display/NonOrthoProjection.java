@@ -5,7 +5,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.PolarBasis;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -40,19 +39,19 @@ final class NonOrthoProjection {
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     private static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectLatitudinalVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
+        return projectLatitudinalVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
     }
 
     private static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, Vec2 pt) {
-        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectLatitudinalPoint(pt));
+        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectLatitudinalPoint(pt));
     }
 
     private static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
-        return projectPolarVector(mapRotation(gridType, viewpoint).rotateVector(v), scale);
+        return projectPolarVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
     }
 
     private static Vec3 unprojectPolar(Position viewpoint, GridType gridType, Vec2 pt) {
-        return mapRotation(gridType, viewpoint).rotateInverseVector(unprojectPolarPoint(pt));
+        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectPolarPoint(pt));
     }
 
     private static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
@@ -210,12 +209,6 @@ final class NonOrthoProjection {
 
     private static void emitProjectedVertex(Viewport vp, Vec2 projected, BufVertex vexBuf, byte[] color) {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
-    }
-
-    private static Quat mapRotation(GridType gridType, Position viewpoint) {
-        // Non-ortho maps use GridType.toGrid() longitude, but Viewpoint latitude is
-        // rotated with a positive sign to match the shared non-ortho map basis.
-        return Quat.createXY(gridType == GridType.Viewpoint ? viewpoint.lat : 0, gridType.toLongitude(viewpoint));
     }
 
     private static Vec2 projectPolarVector(Vec3 v, GridScale scale) {

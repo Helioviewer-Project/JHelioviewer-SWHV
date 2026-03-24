@@ -25,4 +25,8 @@ public enum GridType {
         };
     }
 
+    public Quat mapRotation(Position viewpoint) { // rotation into this gridType map frame
+        return Quat.createXY(this == Viewpoint ? viewpoint.lat : 0, toLongitude(viewpoint));
+    }
+
 }
