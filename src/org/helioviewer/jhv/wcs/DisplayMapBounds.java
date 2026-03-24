@@ -5,7 +5,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.math.PolarBasis;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -68,7 +67,7 @@ public final class DisplayMapBounds {
         if (world == null)
             return;
 
-        Vec3 rotated = mapRotation(gridType, cameraViewpoint).rotateVector(world);
+        Vec3 rotated = gridType.mapRotation(cameraViewpoint).rotateVector(world);
         double mapX;
         double mapY;
         if (mode.isLatitudinal()) {
@@ -89,10 +88,6 @@ public final class DisplayMapBounds {
         return new Region(bounds[0], bounds[2],
                 Math.max(Math.nextUp(0.0), bounds[1] - bounds[0]),
                 Math.max(Math.nextUp(0.0), bounds[3] - bounds[2]));
-    }
-
-    private static Quat mapRotation(GridType gridType, Position viewpoint) {
-        return Quat.createXY(gridType == GridType.Viewpoint ? viewpoint.lat : 0, gridType.toLongitude(viewpoint));
     }
 
     private static Vec3 helioprojectiveToWorld(Position viewpoint, Vec2 helioprojective) {
