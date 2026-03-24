@@ -15,8 +15,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 public class GLHelper {
 
     public static void emitCircle(double radius, int subdivisions, int startStep, int endStep, Quat rotation, byte[] evenColor, byte[] oddColor, BufVertex vexBuf) {
-        double[] point = {0, 0, 0};
-        double[] rotated = {0, 0, 0};
+        double[] point = {0, 0, 0}, rotated = {0, 0, 0};
 
         for (int i = startStep; i <= endStep; i++) {
             double angle = 2 * Math.PI * i / subdivisions;
@@ -24,9 +23,7 @@ public class GLHelper {
             point[1] = radius * Math.sin(angle);
             point[2] = 0.0;
 
-            float x;
-            float y;
-            float z;
+            float x, y, z;
             if (rotation != null) {
                 rotation.qxv(point, rotated);
                 x = (float) rotated[0];
