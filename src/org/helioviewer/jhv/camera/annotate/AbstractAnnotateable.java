@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
+import org.helioviewer.jhv.math.SphericalPoint;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.json.JSONArray;
@@ -54,17 +55,10 @@ abstract class AbstractAnnotateable implements Annotateable {
         return SphericalCoords.unit(lon, lat);
     }
 
-    static Vec3 interpolate(double t, Vec3 point1, Vec3 point2) {
-        double longitude = (1 - t) * point1.y + t * point2.y;
-        double latitude = (1 - t) * point1.z + t * point2.z;
+    static Vec3 interpolateSpherical(double t, SphericalPoint point1, SphericalPoint point2) {
+        double longitude = (1 - t) * point1.longitude() + t * point2.longitude();
+        double latitude = (1 - t) * point1.latitude() + t * point2.latitude();
         return SphericalCoords.unit(longitude, latitude);
-    }
-
-    static Vec3 annotationSpherical(Vec3 point) {
-        return new Vec3(
-                SphericalCoords.radius(point),
-                SphericalCoords.longitude(point),
-                SphericalCoords.latitude(point));
     }
 
     @Nullable

@@ -6,16 +6,28 @@ public final class SphericalCoords {
     }
 
     public static double radius(Vec3 v) {
-        return v.length();
+        return radius(v.x, v.y, v.z);
+    }
+
+    public static double radius(double x, double y, double z) {
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     public static double longitude(Vec3 v) {
-        return Math.atan2(v.x, v.z);
+        return longitude(v.x, v.z);
+    }
+
+    public static double longitude(double x, double z) {
+        return Math.atan2(x, z);
     }
 
     public static double latitude(Vec3 v) {
-        double r = radius(v);
-        return r == 0 ? 0 : Math.asin(Math.clamp(v.y / r, -1., 1.));
+        return latitude(v.x, v.y, v.z);
+    }
+
+    public static double latitude(double x, double y, double z) {
+        double radius = radius(x, y, z);
+        return radius == 0 ? 0 : Math.asin(Math.clamp(y / radius, -1., 1.));
     }
 
     // public static double colatitude(Vec3 v) {
@@ -33,6 +45,14 @@ public final class SphericalCoords {
 
     public static double z(double radius, double longitude, double latitude) {
         return radius * Math.cos(latitude) * Math.cos(longitude);
+    }
+
+    public static SphericalPoint point(double x, double y, double z) {
+        double radius = radius(x, y, z);
+        return new SphericalPoint(
+                radius,
+                longitude(x, z),
+                radius == 0 ? 0 : Math.asin(Math.clamp(y / radius, -1., 1.)));
     }
 
     public static Vec3 vec3(double radius, double longitude, double latitude) {

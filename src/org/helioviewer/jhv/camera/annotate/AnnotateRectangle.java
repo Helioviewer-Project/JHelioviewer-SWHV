@@ -5,6 +5,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.SphericalPoint;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -18,44 +19,44 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawRectangle(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, Vec3 ep, BufVertex buf, byte[] color) {
-        if (bp.y * ep.y < 0) {
-            if (ep.y < bp.y && bp.y > Math.PI / 2)
-                ep.y += 2 * Math.PI;
-            else if (ep.y > bp.y && bp.y < -Math.PI / 2)
-                bp.y += 2 * Math.PI;
+    private static void drawRectangle(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint start, SphericalPoint end, BufVertex buf, byte[] color) {
+        if (start.longitude() * end.longitude() < 0) {
+            if (end.longitude() < start.longitude() && start.longitude() > Math.PI / 2)
+                end = new SphericalPoint(end.radius(), end.longitude() + 2 * Math.PI, end.latitude());
+            else if (end.longitude() > start.longitude() && start.longitude() < -Math.PI / 2)
+                start = new SphericalPoint(start.radius(), start.longitude() + 2 * Math.PI, start.latitude());
         }
 
-        Vec3 p2 = new Vec3(1, ep.y, bp.z);
-        Vec3 p4 = new Vec3(1, bp.y, ep.z);
-        Vec3 point1, point2;
+        SphericalPoint corner2 = new SphericalPoint(1, end.longitude(), start.latitude());
+        SphericalPoint corner4 = new SphericalPoint(1, start.longitude(), end.latitude());
+        SphericalPoint point1, point2;
         Vec2 previous = null;
 
-        point1 = bp;
-        point2 = p2;
+        point1 = start;
+        point2 = corner2;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, false, ANNOTATION_RADIUS);
         }
 
-        point1 = p2;
-        point2 = ep;
+        point1 = corner2;
+        point2 = end;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, false, ANNOTATION_RADIUS);
         }
 
-        point1 = ep;
-        point2 = p4;
+        point1 = end;
+        point2 = corner4;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, false, ANNOTATION_RADIUS);
         }
 
-        point1 = p4;
-        point2 = bp;
+        point1 = corner4;
+        point2 = start;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, point1, point2);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, false, i == SUBDIVISIONS, ANNOTATION_RADIUS);
         }
     }
@@ -70,8 +71,8 @@ public class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        Vec3 spherical0 = annotationSpherical(p0);
-        Vec3 spherical1 = annotationSpherical(p1);
+        SphericalPoint spherical0 = SphericalPoint.fromCartesian(p0);
+        SphericalPoint spherical1 = SphericalPoint.fromCartesian(p1);
         drawRectangle(viewpoint, gridType, vp, spherical0, spherical1, buf, color);
     }
 

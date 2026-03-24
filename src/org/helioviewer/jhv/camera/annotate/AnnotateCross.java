@@ -7,6 +7,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.SphericalPoint;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -20,21 +21,21 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, BufVertex buf, byte[] color) {
+    public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint point, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
-        Vec3 p1 = new Vec3(1, bp.y + delta, bp.z);
-        Vec3 p2 = new Vec3(1, bp.y - delta, bp.z);
-        Vec3 p3 = new Vec3(1, bp.y, bp.z + delta);
-        Vec3 p4 = new Vec3(1, bp.y, bp.z - delta);
+        SphericalPoint p1 = new SphericalPoint(1, point.longitude() + delta, point.latitude());
+        SphericalPoint p2 = new SphericalPoint(1, point.longitude() - delta, point.latitude());
+        SphericalPoint p3 = new SphericalPoint(1, point.longitude(), point.latitude() + delta);
+        SphericalPoint p4 = new SphericalPoint(1, point.longitude(), point.latitude() - delta);
 
         interpolatedDraw(viewpoint, gridType, vp, p1, p2, buf, color);
         interpolatedDraw(viewpoint, gridType, vp, p3, p4, buf, color);
     }
 
-    private static void interpolatedDraw(Position viewpoint, GridType gridType, Viewport vp, Vec3 p1s, Vec3 p2s, BufVertex buf, byte[] color) {
+    private static void interpolatedDraw(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint point1, SphericalPoint point2, BufVertex buf, byte[] color) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
-            Vec3 pc = interpolate(i / (double) SUBDIVISIONS, p1s, p2s);
+            Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, point1, point2);
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, pc, previous, buf, color, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS);
         }
     }
@@ -45,7 +46,7 @@ public class AnnotateCross extends AbstractAnnotateable {
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        Vec3 spherical = annotationSpherical(startPoint);
+        SphericalPoint spherical = SphericalPoint.fromCartesian(startPoint);
         drawCross(viewpoint, gridType, vp, spherical, buf, color);
     }
 
