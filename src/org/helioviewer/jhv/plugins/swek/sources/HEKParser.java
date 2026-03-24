@@ -97,7 +97,7 @@ class HEKParser {
             currentEvent.addParameter("obs_meanwavel", waveValue, full);
         }
 
-        handleCoordinates(currentEvent, hgsBoundedBox, hgsBoundCC, hgsCentralPoint, hgsLongitudeDeg, hgsLatitudeDeg);
+        handleHGSCoordinates(currentEvent, checkAndFixBoundingBox(hgsBoundedBox), hgsBoundCC, hgsCentralPoint, hgsLongitudeDeg, hgsLatitudeDeg);
     }
 
     private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
@@ -153,7 +153,7 @@ class HEKParser {
      */
     private static List<HgsPoint> parsePolygon(String value) {
         List<HgsPoint> polygonPoints = new ArrayList<>();
-        if (value.toLowerCase().contains("polygon")) {
+        if (containsIgnoreCase(value, "polygon")) {
             String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
             String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
 
@@ -178,7 +178,7 @@ class HEKParser {
      */
     @Nullable
     private static HgsPoint parsePoint(String value) {
-        if (value.toLowerCase().contains("point")) {
+        if (containsIgnoreCase(value, "point")) {
             return parseCoordinates(value.substring(value.indexOf('(') + 1, value.indexOf(')')));
         }
         return null;
@@ -205,10 +205,6 @@ class HEKParser {
         }
 
         return longitudeDeg != null && latitudeDeg != null ? new HgsPoint(longitudeDeg, latitudeDeg) : null;
-    }
-
-    private static void handleCoordinates(JHVEvent currentEvent, List<HgsPoint> hgsBoundedBox, List<HgsPoint> hgsBoundCC, HgsPoint hgsCentralPoint, Double hgsLongitudeDeg, Double hgsLatitudeDeg) {
-        handleHGSCoordinates(currentEvent, checkAndFixBoundingBox(hgsBoundedBox), hgsBoundCC, hgsCentralPoint, hgsLongitudeDeg, hgsLatitudeDeg);
     }
 
     @Nullable
@@ -267,6 +263,15 @@ class HEKParser {
 
     private static Vec3 hgsToJhv(HgsPoint point, double elon) {
         return SphericalCoords.unit(Math.toRadians(point.longitudeDeg()) - elon, Math.toRadians(point.latitudeDeg()));
+    }
+
+    private static boolean containsIgnoreCase(String value, String token) {
+        int limit = value.length() - token.length();
+        for (int i = 0; i <= limit; i++) {
+            if (value.regionMatches(true, i, token, 0, token.length()))
+                return true;
+        }
+        return false;
     }
 
 }

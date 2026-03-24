@@ -7,7 +7,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.SphericalPoint;
+import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -21,10 +21,8 @@ public class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, SphericalPoint point, BufVertex buf, byte[] color) {
+    public static void drawCross(Position viewpoint, GridType gridType, Viewport vp, double longitude, double latitude, BufVertex buf, byte[] color) {
         double delta = 2.5 * Math.PI / 180;
-        double longitude = point.longitude();
-        double latitude = point.latitude();
         interpolatedDraw(viewpoint, gridType, vp, longitude + delta, latitude, longitude - delta, latitude, buf, color);
         interpolatedDraw(viewpoint, gridType, vp, longitude, latitude + delta, longitude, latitude - delta, buf, color);
     }
@@ -43,8 +41,7 @@ public class AnnotateCross extends AbstractAnnotateable {
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        SphericalPoint spherical = SphericalPoint.fromCartesian(startPoint);
-        drawCross(viewpoint, gridType, vp, spherical, buf, color);
+        drawCross(viewpoint, gridType, vp, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), buf, color);
     }
 
     @Override

@@ -154,7 +154,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         updateTimestamp(viewpoint.time);
 
         SphericalPoint point = interpolateToSpherical(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, point, footpointBuf, footpointColor);
+        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, point.longitude(), point.latitude(), footpointBuf, footpointColor);
         footpointLine.setVertex(gl, footpointBuf);
         footpointLine.renderLine(gl, vp.aspect, LINEWIDTH);
     }
