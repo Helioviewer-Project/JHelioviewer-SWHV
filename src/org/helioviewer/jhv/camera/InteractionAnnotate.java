@@ -11,6 +11,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -55,13 +56,14 @@ class InteractionAnnotate implements Interaction.Type {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         Position viewpoint = camera.getViewpoint();
+        MapContext ctx = new MapContext(viewpoint, Display.gridType, vp);
         anns.forEach(annotateable -> {
             boolean active = annotateable == activeAnn;
-            annotateable.draw(viewpoint, Display.gridType, vp, active, annsBuf);
+            annotateable.draw(ctx, active, annsBuf);
             annotateable.drawTransformed(active, transBuf, centerBuf);
         });
         if (newAnnotateable != null) {
-            newAnnotateable.draw(viewpoint, Display.gridType, vp, false, annsBuf);
+            newAnnotateable.draw(ctx, false, annsBuf);
             newAnnotateable.drawTransformed(false, transBuf, centerBuf);
         }
         annsLine.setVertex(gl, annsBuf);

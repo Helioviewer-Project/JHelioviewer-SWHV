@@ -81,6 +81,10 @@ public enum ProjectionMode {
         return this == LogPolar;
     }
 
+    public Vec2 projectToScreen(MapContext ctx, Vec3 v) {
+        return projectToScreen(ctx.viewpoint(), ctx.gridType(), ctx.vp(), v);
+    }
+
     public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
         return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
     }
@@ -89,8 +93,16 @@ public enum ProjectionMode {
         return NonOrthoProjection.unprojectSurfacePoint(nonOrthoKind, scale, camera, vp, x, y, gridType);
     }
 
+    public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
+        return emitMapVertex(ctx.viewpoint(), ctx.gridType(), ctx.vp(), vertex, previous, first, last, radius, color, vexBuf);
+    }
+
     public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
         return NonOrthoProjection.emitMapVertex(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, previous, first, last, color, vexBuf);
+    }
+
+    public void emitMapPoint(MapContext ctx, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
+        emitMapPoint(ctx.viewpoint(), ctx.gridType(), ctx.vp(), vertex, size, radius, color, vexBuf);
     }
 
     public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
