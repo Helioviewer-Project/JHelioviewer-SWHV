@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.camera.annotate;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -67,12 +65,6 @@ public class AnnotateCross extends AbstractAnnotateable {
     @Override
     public boolean isDraggable() {
         return false;
-    }
-
-    @Nullable
-    @Override
-    public Object getData() {
-        return startPoint;
     }
 
 }
