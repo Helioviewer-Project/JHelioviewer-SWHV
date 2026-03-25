@@ -19,6 +19,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
@@ -90,12 +91,13 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public void render(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
+        MapContext ctx = new MapContext(camera.getViewpoint(), Display.gridType, vp);
         if (connectivity != null)
-            drawConnectivity(camera, vp, gl);
+            drawConnectivity(ctx, camera, gl);
         if (hcs != null)
-            drawHCS(camera, vp, gl);
+            drawHCS(ctx, gl);
         if (footpointMap != null)
-            drawFootpointInterpolated(camera, vp, gl);
+            drawFootpointInterpolated(ctx, gl);
 
         if (!geometryMap.isEmpty()) {
             SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
@@ -109,33 +111,31 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         render(camera, vp, gl);
     }
 
-    private void drawConnectivity(Camera camera, Viewport vp, GL3 gl) {
-        Position viewpoint = camera.getViewpoint();
-        putConnectivity(viewpoint, vp, connectivity.SSW, sswColor, connectivityBuf);
-        putConnectivity(viewpoint, vp, connectivity.FSW, fswColor, connectivityBuf);
-        putConnectivity(viewpoint, vp, connectivity.M, mColor, connectivityBuf);
+    private void drawConnectivity(MapContext ctx, Camera camera, GL3 gl) {
+        putConnectivity(ctx, connectivity.SSW, sswColor, connectivityBuf);
+        putConnectivity(ctx, connectivity.FSW, fswColor, connectivityBuf);
+        putConnectivity(ctx, connectivity.M, mColor, connectivityBuf);
 
         connectivityCenter.setVertex(gl, connectivityBuf);
-        connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
+        connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, ctx.vp()));
     }
 
-    private static void putConnectivity(Position viewpoint, Viewport vp, List<Vec3> points, byte[] color, BufVertex vexBuf) {
-        points.forEach(v -> Display.mode.emitMapPoint(viewpoint, Display.gridType, vp, v, 2 * SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
+    private static void putConnectivity(MapContext ctx, List<Vec3> points, byte[] color, BufVertex vexBuf) {
+        points.forEach(v -> Display.mode.emitMapPoint(ctx, v, 2 * SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
     }
 
-    private void drawHCS(Camera camera, Viewport vp, GL3 gl) {
+    private void drawHCS(MapContext ctx, GL3 gl) {
         if (hcs.isEmpty())
             return;
-        Position viewpoint = camera.getViewpoint();
         Vec3 first = hcs.getFirst();
-        Vec2 previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, null, true, false, ORTHO_RADIUS, hcsColor, hcsBuf);
+        Vec2 previous = Display.mode.emitMapVertex(ctx, first, null, true, false, ORTHO_RADIUS, hcsColor, hcsBuf);
         for (int i = 1; i < hcs.size(); i++) {
-            previous = Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, hcs.get(i), previous, false, false, ORTHO_RADIUS, hcsColor, hcsBuf);
+            previous = Display.mode.emitMapVertex(ctx, hcs.get(i), previous, false, false, ORTHO_RADIUS, hcsColor, hcsBuf);
         }
-        Display.mode.emitMapVertex(viewpoint, Display.gridType, vp, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
+        Display.mode.emitMapVertex(ctx, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
 
         hcsLine.setVertex(gl, hcsBuf);
-        hcsLine.renderLine(gl, vp.aspect, LINEWIDTH);
+        hcsLine.renderLine(gl, ctx.vp().aspect, LINEWIDTH);
     }
 
     private static SphericalPoint interpolateToSpherical(long t, Position.Cartesian prev, Position.Cartesian next) {
@@ -149,14 +149,14 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         return SphericalPoint.fromCartesian(x, y, z);
     }
 
-    private void drawFootpointInterpolated(Camera camera, Viewport vp, GL3 gl) {
-        Position viewpoint = camera.getViewpoint();
-        updateTimestamp(viewpoint.time);
+    private void drawFootpointInterpolated(MapContext ctx, GL3 gl) {
+        JHVTime time = ctx.viewpoint().time;
+        updateTimestamp(time);
 
-        SphericalPoint point = interpolateToSpherical(viewpoint.time.milli, footpointMap.lowerValue(viewpoint.time), footpointMap.higherValue(viewpoint.time));
-        AnnotateCross.drawCross(viewpoint, Display.gridType, vp, point.longitude(), point.latitude(), footpointColor, footpointBuf);
+        SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.lowerValue(time), footpointMap.higherValue(time));
+        AnnotateCross.drawCross(ctx, point.longitude(), point.latitude(), footpointColor, footpointBuf);
         footpointLine.setVertex(gl, footpointBuf);
-        footpointLine.renderLine(gl, vp.aspect, LINEWIDTH);
+        footpointLine.renderLine(gl, ctx.vp().aspect, LINEWIDTH);
     }
 
     @Override

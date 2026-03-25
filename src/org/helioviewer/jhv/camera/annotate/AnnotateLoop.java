@@ -2,11 +2,10 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridType;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -24,7 +23,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
     }
 
     // Draw the loop as a semicircle whose feet are exactly bp and ep.
-    private void drawLoop(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+    private void drawLoop(MapContext ctx, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
         Vec3 center = new Vec3(0.5 * (bp.x + ep.x), 0.5 * (bp.y + ep.y), 0.5 * (bp.z + ep.z));
         Vec3 u = new Vec3(0.5 * (bp.x - ep.x), 0.5 * (bp.y - ep.y), 0.5 * (bp.z - ep.z));
         double centerLen = center.length();
@@ -45,12 +44,12 @@ public class AnnotateLoop extends AbstractAnnotateable {
                     center.x + cosr * u.x + sinr * center.x,
                     center.y + cosr * u.y + sinr * center.y,
                     center.z + cosr * u.z + sinr * center.z);
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            previous = Display.mode.emitMapVertex(ctx, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 
     @Override
-    public void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex vexBuf) {
+    public void draw(MapContext ctx, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -59,7 +58,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawLoop(viewpoint, gridType, vp, p0, p1, color, vexBuf);
+        drawLoop(ctx, p0, p1, color, vexBuf);
     }
 
     @Override

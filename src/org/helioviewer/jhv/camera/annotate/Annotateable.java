@@ -2,9 +2,8 @@ package org.helioviewer.jhv.camera.annotate;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.GridType;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.json.JSONObject;
@@ -14,7 +13,7 @@ public interface Annotateable {
     @Nullable
     Object getData();
 
-    void draw(Position viewpoint, GridType gridType, Viewport vp, boolean active, BufVertex vexBuf);
+    void draw(MapContext ctx, boolean active, BufVertex vexBuf);
 
     void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf);
 
