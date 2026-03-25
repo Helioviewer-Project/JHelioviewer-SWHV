@@ -19,6 +19,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -171,7 +172,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawPolygon(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(MapContext ctx, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -197,7 +198,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
                     Vec3 pt = new Vec3(xnew / r, ynew / r, znew / r);
-                    previous = Display.mode.emitMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
+                    previous = Display.mode.emitMapVertex(ctx, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
@@ -247,14 +248,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(Camera camera, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIconScale(MapContext ctx, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.projectToScreen(camera.getViewpoint(), Display.gridType, vp, pt);
+            Vec2 tf = Display.mode.projectToScreen(ctx, pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x, tf.y, sz, sz);
         }
@@ -354,13 +355,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
         if (evs.isEmpty())
             return;
+        MapContext ctx = new MapContext(camera.getViewpoint(), Display.gridType, vp);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus()) {
                 drawCactusArc(evtr, evt, controller.currentTime);
             } else {
-                drawPolygon(camera, vp, evtr, evt);
+                drawPolygon(ctx, evtr, evt);
                 if (icons) {
                     drawIcon(evtr, evt);
                 }
@@ -379,15 +381,16 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
         if (evs.isEmpty())
             return;
+        MapContext ctx = new MapContext(camera.getViewpoint(), Display.gridType, vp);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (evt.isCactus() && (Display.mode.isPolar() || Display.mode.isLogPolar())) {
                 drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
             } else {
-                drawPolygon(camera, vp, evtr, evt);
+                drawPolygon(ctx, evtr, evt);
                 if (icons) {
-                    drawIconScale(camera, vp, evtr, evt);
+                    drawIconScale(ctx, evtr, evt);
                 }
             }
         }

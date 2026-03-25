@@ -7,10 +7,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -128,7 +130,9 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
         mouseOverX = e.getX();
         mouseOverY = e.getY();
 
+        Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();
+        MapContext ctx = new MapContext(viewpoint, Display.gridType, vp);
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
@@ -148,7 +152,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                         hitpoint = q.rotateInverseVector(hitpoint);
                     }
                 } else {
-                    hitpoint = CameraHelper.unprojectToOutputSphere(camera, vp, mouseOverX, mouseOverY, camera.getViewpoint().toQuat());
+                    hitpoint = CameraHelper.unprojectToOutputSphere(camera, vp, mouseOverX, mouseOverY, viewpoint.toQuat());
                     pt = pi.centralPoint();
                 }
 
@@ -170,7 +174,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = Display.mode.projectToScreen(camera.getViewpoint(), Display.gridType, vp, pt);
+                        tf = Display.mode.projectToScreen(ctx, pt);
                     }
                 }
 
