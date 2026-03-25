@@ -33,8 +33,8 @@ final class NonOrthoProjection {
         };
     }
 
-    static Vec3 mouseToSurface(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, x, y, gridType));
+    static Vec3 mouseToSurface(Kind kind, GridScale scale, Camera camera, Viewport vp, GridType gridType, int x, int y) {
+        return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
@@ -91,14 +91,14 @@ final class NonOrthoProjection {
         vexBuf.putVertex((float) (pt.x * ctx.vp().aspect), (float) pt.y, 0, (float) size, color);
     }
 
-    static Vec2 mouseToScreen(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        Vec2 mouseGrid = mouseToGrid(scale, camera, vp, x, y, gridType);
+    static Vec2 mouseToScreen(GridScale scale, Camera camera, Viewport vp, GridType gridType, int x, int y) {
+        Vec2 mouseGrid = mouseToGrid(scale, camera, vp, gridType, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
                 scale.getYValueInv(mouseGrid.y));
     }
 
-    static Vec2 mouseToGrid(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+    static Vec2 mouseToGrid(GridScale scale, Camera camera, Viewport vp, GridType gridType, int x, int y) {
         return new Vec2(
                 scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(camera, vp, x) / vp.aspect + 0.5, gridType),
                 scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));

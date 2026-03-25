@@ -132,7 +132,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
 
         Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();
-        MapContext ctx = new MapContext(viewpoint, Display.gridType, vp);
+        MapContext ctx = new MapContext(viewpoint, vp, Display.gridType);
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
@@ -179,7 +179,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = Display.mode.mouseToScreen(camera, vp, mouseOverX, mouseOverY, Display.gridType);
+                    Vec2 mousepos = Display.mode.mouseToScreen(camera, vp, Display.gridType, mouseOverX, mouseOverY);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
