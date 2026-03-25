@@ -61,7 +61,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 Object annData = JHVFrame.getInteraction().getAnnotationData();
                 if (annData instanceof String str) {
                     annStr = str;
-                } else if (r > 1 && annData instanceof Vec3 annv) {
+                } /* else if (r > 1 && annData instanceof Vec3 annv) {
                     Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
                     Vec3 vva = viewpoint.toQuat().rotateVector(annv);
                     Vec3 v_a = v.x < 0 ?
@@ -73,10 +73,10 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                     double alpha = Math.atan2(r, viewpoint.distance);
                     double beta = Math.acos(Vec3.dot(v_a, Vec3.ZAxis));
                     double gamma = Math.PI - alpha - beta;
-                    double h = /*Math.abs*/(viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
+                    double h = (viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
 
                     annStr = String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
-                }
+                } */
 
                 double zeta = viewpoint.distance - v.z;
                 double px = (180 / Math.PI) * Math.atan2(v.x, zeta);
