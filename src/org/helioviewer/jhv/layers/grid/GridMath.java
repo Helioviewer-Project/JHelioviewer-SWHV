@@ -91,15 +91,14 @@ public class GridMath {
             }
         }
 
-        Vec3 v = new Vec3();
         double i = 0;
         for (int j = 0; j < no_lines; j++) {
             i += step;
             Quat q = Quat.createAxisZ((Math.PI / 180) * i);
 
             for (int k = 0; k <= LINEAR_STEPS; k++) {
-                v.x = (START_RADIUS + k * (END_RADIUS - START_RADIUS) / (double) LINEAR_STEPS) * unit;
-                Vec3 rotv = q.rotateVector(v);
+                double radius = (START_RADIUS + k * (END_RADIUS - START_RADIUS) / (double) LINEAR_STEPS) * unit;
+                Vec3 rotv = q.rotateVector(new Vec3(radius, 0, 0));
 
                 if (k == 0) {
                     circleBuf.putVertex(rotv, Colors.Null);
@@ -122,7 +121,6 @@ public class GridMath {
         int no_points = 2 * (no_lat_steps + no_lon_steps) * (HALFDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
 
-        Vec3 v = new Vec3();
         double rotation;
         for (int j = 0; j < no_lon_steps; j++) {
             for (int k = -1; k <= 1; k += 2) {
@@ -130,10 +128,7 @@ public class GridMath {
                 Quat q = Quat.createAxisY(Math.PI / 2 + Math.PI + (Math.PI / 180) * rotation);
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
                     double a = -Math.PI / 2 + Math.PI * i / HALFDIVISIONS;
-                    v.x = GRID_RADIUS * Math.cos(a);
-                    v.y = GRID_RADIUS * Math.sin(a);
-                    v.z = 0.;
-                    Vec3 rotv = q.rotateVector(v);
+                    Vec3 rotv = q.rotateVector(new Vec3(GRID_RADIUS * Math.cos(a), GRID_RADIUS * Math.sin(a), 0));
 
                     if (i == 0) {
                         vexBuf.putVertex(rotv, Colors.Null);
@@ -149,11 +144,13 @@ public class GridMath {
             for (int k = -1; k <= 1; k += 2) {
                 rotation = latstepDegrees * j * k;
                 double scale = Math.cos((Math.PI / 180.) * (90 - rotation));
+                double radialScale = Math.sqrt(1. - scale * scale);
                 for (int i = 0; i <= HALFDIVISIONS; i++) {
                     double a = 2 * Math.PI * i / HALFDIVISIONS;
-                    v.y = GRID_RADIUS * scale;
-                    v.x = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.sin(a);
-                    v.z = GRID_RADIUS * Math.sqrt(1. - scale * scale) * Math.cos(a);
+                    Vec3 v = new Vec3(
+                            GRID_RADIUS * radialScale * Math.sin(a),
+                            GRID_RADIUS * scale,
+                            GRID_RADIUS * radialScale * Math.cos(a));
 
                     if (i == 0) {
                         vexBuf.putVertex(v, Colors.Null);
