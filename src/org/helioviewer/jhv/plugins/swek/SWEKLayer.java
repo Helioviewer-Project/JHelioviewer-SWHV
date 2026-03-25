@@ -175,7 +175,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
-        Vec3 pt = new Vec3();
         Vec2 previous = null;
         // draw bounds
         float[] oldBoundaryPoint3d = new float[0];
@@ -188,9 +187,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double ynew = alpha * oldBoundaryPoint3d[1] + (1 - alpha) * points[3 * i + 1];
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
-                    pt.x = xnew / r;
-                    pt.y = ynew / r;
-                    pt.z = znew / r;
+                    Vec3 pt = new Vec3(xnew / r, ynew / r, znew / r);
                     previous = Display.mode.emitMapVertex(camera.getViewpoint(), Display.gridType, vp, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
                 }
             }
@@ -204,14 +201,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         double width2 = width / 2.;
         double height2 = height / 2.;
-        Vec3 p0 = q.rotateVector(new Vec3(-width2, -height2, 0));
-        Vec3 p1 = q.rotateVector(new Vec3(width2, -height2, 0));
-        Vec3 p2 = q.rotateVector(new Vec3(-width2, height2, 0));
-        Vec3 p3 = q.rotateVector(new Vec3(width2, height2, 0));
-        p0.plus(targetDir);
-        p1.plus(targetDir);
-        p2.plus(targetDir);
-        p3.plus(targetDir);
+        Vec3 r0 = q.rotateVector(new Vec3(-width2, -height2, 0));
+        Vec3 r1 = q.rotateVector(new Vec3(width2, -height2, 0));
+        Vec3 r2 = q.rotateVector(new Vec3(-width2, height2, 0));
+        Vec3 r3 = q.rotateVector(new Vec3(width2, height2, 0));
+        Vec3 p0 = new Vec3(r0.x + targetDir.x, r0.y + targetDir.y, r0.z + targetDir.z);
+        Vec3 p1 = new Vec3(r1.x + targetDir.x, r1.y + targetDir.y, r1.z + targetDir.z);
+        Vec3 p2 = new Vec3(r2.x + targetDir.x, r2.y + targetDir.y, r2.z + targetDir.z);
+        Vec3 p3 = new Vec3(r3.x + targetDir.x, r3.y + targetDir.y, r3.z + targetDir.z);
 
         texBuf.putCoord(p0, texCoord[0]);
         texBuf.putCoord(p1, texCoord[1]);
