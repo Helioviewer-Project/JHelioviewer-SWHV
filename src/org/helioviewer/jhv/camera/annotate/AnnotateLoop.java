@@ -33,14 +33,13 @@ public class AnnotateLoop extends AbstractAnnotateable {
 
         Vec3 center = Vec3.multiply(bp, cosf);
         Vec3 u = Vec3.cross(bp, ep);
-        u.normalize();
         Vec3 v = Vec3.cross(bp, u);
 
         Vec3 vx = new Vec3();
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double t = i * Math.PI / SUBDIVISIONS;
-            double cosr = Math.cos(t) * r;
+            double cosr = Math.cos(t);
             double sinr = Math.sin(t) * r;
             vx.x = center.x + cosr * v.x + sinr * bp.x;
             vx.y = center.y + cosr * v.y + sinr * bp.y;
