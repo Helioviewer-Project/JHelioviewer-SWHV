@@ -23,27 +23,28 @@ public class AnnotateLoop extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawCircle(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
-        double cosf = Vec3.dot(bp, ep);
-        double r = Math.sqrt(1 - cosf * cosf);
-        // P = center + r cos(A) (bp x ep) + r sin(A) ep
+    // Draw the loop as a semicircle whose feet are exactly bp and ep.
+    private void drawLoop(Position viewpoint, GridType gridType, Viewport vp, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+        Vec3 center = new Vec3(0.5 * (bp.x + ep.x), 0.5 * (bp.y + ep.y), 0.5 * (bp.z + ep.z));
+        Vec3 u = new Vec3(0.5 * (bp.x - ep.x), 0.5 * (bp.y - ep.y), 0.5 * (bp.z - ep.z));
+        double centerLen = center.length();
+        if (centerLen < 1e-12) // reject antipodal drawing
+            return;
 
-        double h = (cosf + r) * Math.sqrt(bp.x * bp.x + bp.y * bp.y + bp.z * bp.z) - Sun.Radius;
-        heightStr = h < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2609", h);
+        double radiusLen = u.length();
+        double height = centerLen + radiusLen - Sun.Radius;
+        heightStr = height < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", height * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2609", height);
 
-        Vec3 center = Vec3.multiply(bp, cosf);
-        Vec3 u = Vec3.cross(bp, ep);
-        Vec3 v = Vec3.cross(bp, u);
-
+        double centerScale = radiusLen / centerLen;
         Vec3 vx = new Vec3();
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double t = i * Math.PI / SUBDIVISIONS;
             double cosr = Math.cos(t);
-            double sinr = Math.sin(t) * r;
-            vx.x = center.x + cosr * v.x + sinr * bp.x;
-            vx.y = center.y + cosr * v.y + sinr * bp.y;
-            vx.z = center.z + cosr * v.z + sinr * bp.z;
+            double sinr = Math.sin(t) * centerScale;
+            vx.x = center.x + cosr * u.x + sinr * center.x;
+            vx.y = center.y + cosr * u.y + sinr * center.y;
+            vx.z = center.z + cosr * u.z + sinr * center.z;
             previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vx, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
@@ -58,7 +59,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawCircle(viewpoint, gridType, vp, p0, p1, color, vexBuf);
+        drawLoop(viewpoint, gridType, vp, p0, p1, color, vexBuf);
     }
 
     @Override
