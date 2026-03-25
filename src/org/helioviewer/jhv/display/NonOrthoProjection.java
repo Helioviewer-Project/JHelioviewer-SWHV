@@ -33,7 +33,7 @@ final class NonOrthoProjection {
         };
     }
 
-    static Vec3 unprojectSurfacePoint(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
+    static Vec3 mouseToSurface(Kind kind, GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
         return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, x, y, gridType));
     }
 
@@ -63,32 +63,32 @@ final class NonOrthoProjection {
         return helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
-    static Vec2 projectToScreen(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 v) {
-        Vec2 pt = project(kind, viewpoint, gridType, v, scale);
-        return new Vec2(pt.x * vp.aspect, pt.y);
+    static Vec2 projectToScreen(Kind kind, MapContext ctx, GridScale scale, Vec3 v) {
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), v, scale);
+        return new Vec2(pt.x * ctx.vp().aspect, pt.y);
     }
 
-    static Vec2 emitMapVertex(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
+    static Vec2 emitMapVertex(Kind kind, MapContext ctx, GridScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC)
-            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, first, last, color, vexBuf);
+            return emitHpcVertex(ctx.viewpoint(), scale, ctx.vp(), vertex, previous, first, last, color, vexBuf);
 
-        Vec2 current = project(kind, viewpoint, gridType, vertex, scale);
+        Vec2 current = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, scale);
         if (first)
-            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
-        emitWrappedVertex(vp, previous, current, color, vexBuf);
+            emitProjectedVertex(ctx.vp(), current, Colors.Null, vexBuf);
+        emitWrappedVertex(ctx.vp(), previous, current, color, vexBuf);
         if (last)
-            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
+            emitProjectedVertex(ctx.vp(), current, Colors.Null, vexBuf);
         return current;
     }
 
-    static void emitMapPoint(Kind kind, Position viewpoint, GridType gridType, GridScale scale, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
+    static void emitMapPoint(Kind kind, MapContext ctx, GridScale scale, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC) {
-            emitHpcPoint(viewpoint, scale, vp, vertex, size, color, vexBuf);
+            emitHpcPoint(ctx.viewpoint(), scale, ctx.vp(), vertex, size, color, vexBuf);
             return;
         }
 
-        Vec2 pt = project(kind, viewpoint, gridType, vertex, scale);
-        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, scale);
+        vexBuf.putVertex((float) (pt.x * ctx.vp().aspect), (float) pt.y, 0, (float) size, color);
     }
 
     static Vec2 mouseToScreen(GridScale scale, Camera camera, Viewport vp, int x, int y, GridType gridType) {
