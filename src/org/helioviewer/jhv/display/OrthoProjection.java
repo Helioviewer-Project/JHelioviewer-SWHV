@@ -31,7 +31,7 @@ final class OrthoProjection {
         vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), (float) size, color);
     }
 
-    static Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+    static Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
         Position viewpoint = camera.getViewpoint();
         Quat rotation = gridType == GridType.Viewpoint
                 ? Quat.ZERO

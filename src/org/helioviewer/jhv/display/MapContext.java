@@ -2,5 +2,5 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 
-public record MapContext(Position viewpoint, GridType gridType, Viewport vp) {
+public record MapContext(Position viewpoint, Viewport vp, GridType gridType) {
 }

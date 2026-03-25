@@ -40,7 +40,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
-        Vec2 coord = Display.mode.mouseToGrid(camera, vp, x, y, Display.gridType);
+        Vec2 coord = Display.mode.mouseToGrid(camera, vp, Display.gridType, x, y);
 
         if (Display.mode.isHpc()) {
             setText(formatHpc(coord));

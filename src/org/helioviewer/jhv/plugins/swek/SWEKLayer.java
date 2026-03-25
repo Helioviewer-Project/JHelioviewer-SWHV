@@ -355,7 +355,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), Display.gridType, vp);
+        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
@@ -381,7 +381,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), Display.gridType, vp);
+        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);

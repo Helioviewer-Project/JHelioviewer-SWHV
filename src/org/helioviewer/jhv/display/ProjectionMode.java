@@ -16,7 +16,7 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
             return OrthoProjection.mouseToSurface(camera, vp, x, y);
         }
 
@@ -32,12 +32,12 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-            return OrthoProjection.mouseToGrid(camera, vp, x, y, gridType);
+        public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
+            return OrthoProjection.mouseToGrid(camera, vp, gridType, x, y);
         }
 
         @Override
-        public Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        public Vec2 mouseToScreen(Camera camera, Viewport vp, GridType gridType, int x, int y) {
             throw new UnsupportedOperationException("Orthographic mode does not use non-ortho mouseToScreen()");
         }
     },
@@ -84,8 +84,8 @@ public enum ProjectionMode {
         return NonOrthoProjection.projectToScreen(nonOrthoKind, ctx, scale, v);
     }
 
-    public Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return NonOrthoProjection.mouseToSurface(nonOrthoKind, scale, camera, vp, x, y, gridType);
+    public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToSurface(nonOrthoKind, scale, camera, vp, gridType, x, y);
     }
 
     public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
@@ -96,11 +96,11 @@ public enum ProjectionMode {
         NonOrthoProjection.emitMapPoint(nonOrthoKind, ctx, scale, vertex, size, color, vexBuf);
     }
 
-    public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return NonOrthoProjection.mouseToGrid(scale, camera, vp, x, y, gridType);
+    public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToGrid(scale, camera, vp, gridType, x, y);
     }
 
-    public Vec2 mouseToScreen(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return NonOrthoProjection.mouseToScreen(scale, camera, vp, x, y, gridType);
+    public Vec2 mouseToScreen(Camera camera, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToScreen(scale, camera, vp, gridType, x, y);
     }
 }

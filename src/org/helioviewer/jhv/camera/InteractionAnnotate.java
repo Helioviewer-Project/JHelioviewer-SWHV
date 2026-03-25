@@ -56,7 +56,7 @@ class InteractionAnnotate implements Interaction.Type {
         Annotateable activeAnn = activeIndex >= 0 && activeIndex < anns.size() ? anns.get(activeIndex) : null;
 
         Position viewpoint = camera.getViewpoint();
-        MapContext ctx = new MapContext(viewpoint, Display.gridType, vp);
+        MapContext ctx = new MapContext(viewpoint, vp, Display.gridType);
         anns.forEach(annotateable -> {
             boolean active = annotateable == activeAnn;
             annotateable.draw(ctx, active, annsBuf);
