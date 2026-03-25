@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.display;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -12,23 +11,23 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, GridScale.ortho) {
         @Override
-        public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
+        public Vec2 projectToScreen(MapContext ctx, Vec3 v) {
             throw new UnsupportedOperationException("Orthographic mode does not use projectToScreen()");
         }
 
         @Override
-        public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-            return OrthoProjection.unprojectSurfacePoint(camera, vp, x, y);
+        public Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+            return OrthoProjection.mouseToSurface(camera, vp, x, y);
         }
 
         @Override
-        public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
+        public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
             OrthoProjection.emitMapVertex(vertex, first, last, radius, color, vexBuf);
             return previous;
         }
 
         @Override
-        public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
+        public void emitMapPoint(MapContext ctx, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
             OrthoProjection.emitMapPoint(vertex, size, radius, color, vexBuf);
         }
 
@@ -82,31 +81,19 @@ public enum ProjectionMode {
     }
 
     public Vec2 projectToScreen(MapContext ctx, Vec3 v) {
-        return projectToScreen(ctx.viewpoint(), ctx.gridType(), ctx.vp(), v);
+        return NonOrthoProjection.projectToScreen(nonOrthoKind, ctx, scale, v);
     }
 
-    public Vec2 projectToScreen(Position viewpoint, GridType gridType, Viewport vp, Vec3 v) {
-        return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, gridType, scale, vp, v);
-    }
-
-    public Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y, GridType gridType) {
-        return NonOrthoProjection.unprojectSurfacePoint(nonOrthoKind, scale, camera, vp, x, y, gridType);
+    public Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y, GridType gridType) {
+        return NonOrthoProjection.mouseToSurface(nonOrthoKind, scale, camera, vp, x, y, gridType);
     }
 
     public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        return emitMapVertex(ctx.viewpoint(), ctx.gridType(), ctx.vp(), vertex, previous, first, last, radius, color, vexBuf);
-    }
-
-    public Vec2 emitMapVertex(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        return NonOrthoProjection.emitMapVertex(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, previous, first, last, color, vexBuf);
+        return NonOrthoProjection.emitMapVertex(nonOrthoKind, ctx, scale, vertex, previous, first, last, color, vexBuf);
     }
 
     public void emitMapPoint(MapContext ctx, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        emitMapPoint(ctx.viewpoint(), ctx.gridType(), ctx.vp(), vertex, size, radius, color, vexBuf);
-    }
-
-    public void emitMapPoint(Position viewpoint, GridType gridType, Viewport vp, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        NonOrthoProjection.emitMapPoint(nonOrthoKind, viewpoint, gridType, scale, vp, vertex, size, color, vexBuf);
+        NonOrthoProjection.emitMapPoint(nonOrthoKind, ctx, scale, vertex, size, color, vexBuf);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, int x, int y, GridType gridType) {

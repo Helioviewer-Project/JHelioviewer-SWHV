@@ -50,7 +50,7 @@ public class AnnotateLine extends AbstractAnnotateable {
 
     @Override
     protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
-        return computePointSky(camera, vp, x, y);
+        return mouseToSky(camera, vp, x, y);
     }
 
 }

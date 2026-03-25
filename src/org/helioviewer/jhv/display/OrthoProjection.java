@@ -15,7 +15,7 @@ final class OrthoProjection {
     private OrthoProjection() {
     }
 
-    static Vec3 unprojectSurfacePoint(Camera camera, Viewport vp, int x, int y) {
+    static Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y) {
         return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
     }
 
