@@ -36,16 +36,16 @@ public class AnnotateLoop extends AbstractAnnotateable {
         heightStr = height < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", height * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2609", height);
 
         double centerScale = radiusLen / centerLen;
-        Vec3 vx = new Vec3();
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double t = i * Math.PI / SUBDIVISIONS;
             double cosr = Math.cos(t);
             double sinr = Math.sin(t) * centerScale;
-            vx.x = center.x + cosr * u.x + sinr * center.x;
-            vx.y = center.y + cosr * u.y + sinr * center.y;
-            vx.z = center.z + cosr * u.z + sinr * center.z;
-            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vx, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            Vec3 vex = new Vec3(
+                    center.x + cosr * u.x + sinr * center.x,
+                    center.y + cosr * u.y + sinr * center.y,
+                    center.z + cosr * u.z + sinr * center.z);
+            previous = Display.mode.emitMapVertex(viewpoint, gridType, vp, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 
