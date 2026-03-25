@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.math;
 
-import org.helioviewer.jhv.Log;
 import org.json.JSONArray;
 
 public class Vec3 {
@@ -21,42 +20,16 @@ public class Vec3 {
         public double length() {
             return 1;
         }
-
-        @Override
-        public void normalize() {
-        }
     }
 
-    public double x;
-    public double y;
-    public double z;
+    public final double x;
+    public final double y;
+    public final double z;
 
     public Vec3(double _x, double _y, double _z) {
         x = _x;
         y = _y;
         z = _z;
-    }
-
-    public Vec3() {
-        x = 0;
-        y = 0;
-        z = 0;
-    }
-
-    public void plus(Vec3 vec) {
-        x += vec.x;
-        y += vec.y;
-        z += vec.z;
-    }
-
-    public void minus(Vec3 vec) {
-        x -= vec.x;
-        y -= vec.y;
-        z -= vec.z;
-    }
-
-    public static Vec3 multiply(Vec3 vec1, double s) {
-        return new Vec3(vec1.x * s, vec1.y * s, vec1.z * s);
     }
 
     public static double dot(Vec3 u, Vec3 v) {
@@ -78,6 +51,7 @@ public class Vec3 {
         return absmax * Math.sqrt(tmpx * tmpx + tmpy * tmpy + tmpz * tmpz);
     }
 
+    /*
     public void normalize() {
         double len = Math.sqrt(x * x + y * y + z * z); // length();
         if (len == 0.0)
@@ -105,6 +79,7 @@ public class Vec3 {
             z = 0;
         }
     }
+    */
 
     public JSONArray toJson() {
         return new JSONArray(new double[]{x, y, z});
