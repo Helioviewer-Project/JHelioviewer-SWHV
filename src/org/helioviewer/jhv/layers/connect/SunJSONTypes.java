@@ -168,18 +168,18 @@ public class SunJSONTypes {
         Vec3 c = coordinates.get(0);
         Vec3 u = coordinates.get(1);
         Vec3 v = coordinates.get(2);
+        Vec3 du = new Vec3(u.x - c.x, u.y - c.y, u.z - c.z);
+        Vec3 dv = new Vec3(v.x - c.x, v.y - c.y, v.z - c.z);
         byte[] color = colors.getFirst();
 
-        u.minus(c);
-        v.minus(c);
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double a = 2 * Math.PI * i / SUBDIVISIONS;
             double cost = Math.cos(a);
             double sint = Math.sin(a);
 
-            double x = c.x + cost * u.x + sint * v.x;
-            double y = c.y + cost * u.y + sint * v.y;
-            double z = c.z + cost * u.z + sint * v.z;
+            double x = c.x + cost * du.x + sint * dv.x;
+            double y = c.y + cost * du.y + sint * dv.y;
+            double z = c.z + cost * du.z + sint * dv.z;
             if (i == 0)
                 vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             vexBuf.putVertex((float) x, (float) y, (float) z, 1, color);
