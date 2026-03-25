@@ -49,6 +49,8 @@ import com.jogamp.opengl.GL3;
 
 // has to be public for state
 public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
+    private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {
+    }
 
     private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getGLCanvas());
     private final JPanel optionsPanel;
@@ -57,6 +59,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
     private static final double POLYGON_RADIUS = Sun.Radius * 1.01;
+    private static final double DIST_SUN_BEGIN = 2.4;
 
     private static final HashMap<String, GLTexture> iconCacheId = new HashMap<>();
     private static final double ICON_ALPHA = 0.7;
@@ -124,15 +127,21 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         vexBuf.repeatVertex(Colors.Null);
     }
 
-    private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private static CactusArcParams cactusArcParams(JHVEvent evt, long timestamp) {
         double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
-        double angularWidth = Math.toRadians(angularWidthDegree);
         double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
-        double principalAngle = Math.toRadians(principalAngleDegree);
         double speed = SWEKData.readCMESpeed(evt);
-        double factor = Sun.RadiusMeter;
-        double distSunBegin = 2.4;
-        double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
+        double distSun = DIST_SUN_BEGIN + speed * (timestamp - evt.start) / Sun.RadiusMeter;
+        return new CactusArcParams(angularWidthDegree, principalAngleDegree, distSun);
+    }
+
+    private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+        CactusArcParams params = cactusArcParams(evt, timestamp);
+        double angularWidthDegree = params.angularWidthDegree();
+        double angularWidth = Math.toRadians(angularWidthDegree);
+        double principalAngleDegree = params.principalAngleDegree();
+        double principalAngle = Math.toRadians(principalAngleDegree);
+        double distSun = params.distSun();
         int lineResolution = 2;
         int angularResolution = (int) (angularWidthDegree / 4);
 
@@ -145,9 +154,9 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         drawInterpolated(angularResolution, distSun, distSun, thetaStart, principalAngle, q, color, vexBuf);
         drawInterpolated(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, color, vexBuf);
-        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaStart, thetaStart, q, color, vexBuf);
-        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, principalAngle, principalAngle, q, color, vexBuf);
-        drawInterpolated(lineResolution, distSunBegin, distSun + 0.05, thetaEnd, thetaEnd, q, color, vexBuf);
+        drawInterpolated(lineResolution, DIST_SUN_BEGIN, distSun + 0.05, thetaStart, thetaStart, q, color, vexBuf);
+        drawInterpolated(lineResolution, DIST_SUN_BEGIN, distSun + 0.05, principalAngle, principalAngle, q, color, vexBuf);
+        drawInterpolated(lineResolution, DIST_SUN_BEGIN, distSun + 0.05, thetaEnd, thetaEnd, q, color, vexBuf);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
@@ -252,12 +261,10 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale) {
-        double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
-        double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
-        double speed = SWEKData.readCMESpeed(evt);
-        double factor = Sun.RadiusMeter;
-        double distSunBegin = 2.4;
-        double distSun = distSunBegin + speed * (timestamp - evt.start) / factor;
+        CactusArcParams params = cactusArcParams(evt, timestamp);
+        double angularWidthDegree = params.angularWidthDegree();
+        double principalAngleDegree = params.principalAngleDegree();
+        double distSun = params.distSun();
 
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
@@ -266,7 +273,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         byte[] color = Colors.bytes(evtr.getColor());
 
         float x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
-        float y = (float) scale.getYValueInv(distSunBegin);
+        float y = (float) scale.getYValueInv(DIST_SUN_BEGIN);
         vexBuf.putVertex(x, y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
 
@@ -275,7 +282,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         vexBuf.repeatVertex(Colors.Null);
 
         x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
-        y = (float) scale.getYValueInv(distSunBegin);
+        y = (float) scale.getYValueInv(DIST_SUN_BEGIN);
         vexBuf.putVertex(x, y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
 
@@ -284,7 +291,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         vexBuf.repeatVertex(Colors.Null);
 
         x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
-        y = (float) scale.getYValueInv(distSunBegin);
+        y = (float) scale.getYValueInv(DIST_SUN_BEGIN);
         vexBuf.putVertex(x, y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
 
