@@ -33,15 +33,14 @@ public class AnnotateCircle extends AbstractAnnotateable {
 
         Vec3 center = Vec3.multiply(bp, cosf);
         Vec3 u = Vec3.cross(bp, ep);
-        u.normalize();
         Vec3 v = Vec3.cross(bp, u);
 
         Vec3 vx = new Vec3();
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double t = i * 2. * Math.PI / SUBDIVISIONS;
-            double cosr = Math.cos(t) * r;
-            double sinr = Math.sin(t) * r;
+            double cosr = Math.cos(t);
+            double sinr = Math.sin(t);
             vx.x = center.x + cosr * u.x + sinr * v.x;
             vx.y = center.y + cosr * u.y + sinr * v.y;
             vx.z = center.z + cosr * u.z + sinr * v.z;
