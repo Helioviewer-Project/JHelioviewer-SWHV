@@ -21,7 +21,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
-import org.helioviewer.jhv.input.KeyShortcuts;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
@@ -44,7 +43,6 @@ public class Actions {
         public AbstractKeyAction(String name, KeyStroke key) {
             super(name);
             putValue(ACCELERATOR_KEY, key);
-            KeyShortcuts.registerKey(key, this);
         }
 
     }
