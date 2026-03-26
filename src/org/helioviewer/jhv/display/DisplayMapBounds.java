@@ -19,7 +19,7 @@ public final class DisplayMapBounds {
     }
 
     public static double oneToOneHeight(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
-        if (mode.isOrthographic() || mode.isPolar() || mode.isLogPolar())
+        if (mode.isOrthographic())
             return metaData.getPhysicalRegion().height;
         return bounds(mode, gridType, cameraViewpoint, metaData).height;
     }
