@@ -111,7 +111,7 @@ public class LoadLayer {
     @Nullable
     private static URI requestAPI(String url) throws Exception {
         try {
-            return parseAPIResponse(url, JSONUtils.get(new URI(url)));
+            return parseAPIResponse(JSONUtils.get(new URI(url)));
         } catch (SocketTimeoutException e) {
             Log.error("Socket timeout while requesting JPIP URL", e);
             Message.err("Socket timeout", "Socket timeout while requesting JPIP URL.");
@@ -122,7 +122,7 @@ public class LoadLayer {
     }
 
     @Nullable
-    private static URI parseAPIResponse(String url, JSONObject data) throws Exception {
+    private static URI parseAPIResponse(JSONObject data) throws Exception {
         if (!data.isNull("frames")) {
             JSONArray arr = data.getJSONArray("frames");
             data.put("frames", arr.length()); // don't log timestamps, modifies input
