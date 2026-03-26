@@ -100,7 +100,8 @@ public class J2KView extends BaseView {
                     metaData[i] = new PixelBasedMetaData(level.width(), level.height(), dataUri.baseName());
                     Log.warn("Helioviewer metadata missing for layer " + i, e);
                 }
-                frameMap.put(metaData[i].getViewpoint().time, i);
+                if (frameMap.put(metaData[i].getViewpoint().time, i) != null) // log duplicated
+                    Log.warn("Duplicate time stamp: " + metaData[i].getViewpoint().time);
             }
             frameMap.buildIndex();
             if (frameMap.maxIndex() != maxFrame)
