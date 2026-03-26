@@ -10,8 +10,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 
-import javax.swing.KeyStroke;
-
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -101,10 +99,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void keyPressed(KeyEvent e) {
-        KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-        if (KeyShortcuts.handleKeyStroke(keyStroke, e.getSource()))
-            return;
-
         interaction.keyPressed(e);
         keyListeners.forEach(listener -> listener.keyPressed(e));
     }
