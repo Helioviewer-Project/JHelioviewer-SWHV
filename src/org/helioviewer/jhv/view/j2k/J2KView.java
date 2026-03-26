@@ -264,8 +264,8 @@ public class J2KView extends BaseView {
 
         if (priority || level < currentLevel) {
             reader.signal(new J2KParams.Read(this, decodeParams, viewpoint, priority));
+            currentLevel = level;
         }
-        currentLevel = level;
     }
 
     @Override
