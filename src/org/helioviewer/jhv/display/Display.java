@@ -34,7 +34,7 @@ public class Display {
     }
 
     private static final Camera camera = new Camera(UpdateViewpoint.observer);
-    private static final Camera miniCamera = new Camera(UpdateViewpoint.earthFixedDistance);
+    private static final Camera miniCamera = new Camera(UpdateViewpoint.earthAt1au);
 
     public static Camera getCamera() {
         return camera;
