@@ -17,6 +17,7 @@ public interface UpdateViewpoint {
     }
 
     UpdateViewpoint observer = new Observer();
+    UpdateViewpoint observerFixedDistance = new ObserverFixedDistance();
     UpdateViewpoint earthFixedDistance = new EarthFixedDistance();
     UpdateViewpoint equatorial = new Equatorial();
     UpdateViewpoint location = new Location();
@@ -26,6 +27,16 @@ public interface UpdateViewpoint {
         public Position update(JHVTime time) {
             ImageLayer layer = Layers.getActiveImageLayer();
             return layer == null ? Sun.getEarth(time) : layer.getView().getMetaData(time).getViewpoint();
+        }
+    }
+
+    class ObserverFixedDistance implements UpdateViewpoint {
+        @Override
+        public Position update(JHVTime time) {
+            ImageLayer layer = Layers.getActiveImageLayer();
+            return layer == null
+                    ? Position.toFixedDistance(Sun.getEarth(time), Sun.MeanEarthDistance)
+                    : Position.toFixedDistance(layer.getView().getMetaData(time).getViewpoint(), Sun.MeanEarthDistance);
         }
     }
 

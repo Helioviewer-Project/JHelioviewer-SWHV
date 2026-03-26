@@ -27,12 +27,21 @@ import com.jidesoft.swing.JideButton;
 class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
 
     private enum CameraMode {
-        Location(UpdateViewpoint.location), Heliosphere(UpdateViewpoint.equatorial);
+        ObserverFixedDistance("Observer at 1au", UpdateViewpoint.observerFixedDistance),
+        Location("Location", UpdateViewpoint.location),
+        Heliosphere("Heliosphere", UpdateViewpoint.equatorial);
 
+        final String label;
         final UpdateViewpoint update;
 
-        CameraMode(UpdateViewpoint _update) {
+        CameraMode(String _label, UpdateViewpoint _update) {
+            label = _label;
             update = _update;
+        }
+
+        @Override
+        public String toString() {
+            return label;
         }
     }
 
@@ -43,6 +52,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     private ViewpointLayerOptionsExpert currentOptionPanel;
 
     private static final String explanation = """
+            <b>ObserverFixedDistance</b>: view from the active observer, but at a 1au fixed distance.
             <b>Location</b>: view from selected object.
             <b>Heliosphere</b>: view onto the solar equatorial plane.
             
@@ -105,7 +115,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     }
 
     void serialize(JSONObject jo) {
-        jo.put("mode", cameraMode);
+        jo.put("mode", cameraMode.name());
         jo.put("camera", Display.getCamera().toJson());
         jo.put("location", locationOptionPanel.toJson());
         jo.put("equatorial", equatorialOptionPanel.toJson());
@@ -139,6 +149,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
 
     private ViewpointLayerOptionsExpert optionPanelForCurrentMode() {
         return switch (cameraMode) {
+            case ObserverFixedDistance -> null;
             case Location -> locationOptionPanel;
             case Heliosphere -> equatorialOptionPanel;
         };
