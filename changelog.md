@@ -5,6 +5,7 @@
 
 ### Display and interaction
 - Add helioprojective Cartesian (`HPC`) projection mode
+- Add "Observer at 1au" viewpoint option
 - Improve alignment and clipping of overlays in `HPC`, including event hover and surface-overlay visibility
 - Improve flat-grid rendering, labels, and position readout in non-orthographic modes
 - Fix flat-grid shimmer in non-orthographic modes

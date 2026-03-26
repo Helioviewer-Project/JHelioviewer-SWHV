@@ -27,7 +27,7 @@ import com.jidesoft.swing.JideButton;
 class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
 
     private enum CameraMode {
-        ObserverFixedDistance("Observer at 1au", UpdateViewpoint.observerFixedDistance),
+        ObserverAt1au("Observer at 1au", UpdateViewpoint.observerAt1au),
         Location("Location", UpdateViewpoint.location),
         Heliosphere("Heliosphere", UpdateViewpoint.equatorial);
 
@@ -52,7 +52,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     private ViewpointLayerOptionsExpert currentOptionPanel;
 
     private static final String explanation = """
-            <b>ObserverFixedDistance</b>: view from the active observer, but at a 1au fixed distance.
+            <b>Observer at 1au</b>: view from the active observer, but at 1au fixed distance.
             <b>Location</b>: view from selected object.
             <b>Heliosphere</b>: view onto the solar equatorial plane.
             
@@ -83,7 +83,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
         }
         switchOptionsPanel(optionPanelForCurrentMode());
 
-        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 10, 0));
+        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 8, 0));
         ButtonGroup modeGroup = new ButtonGroup();
         for (CameraMode mode : CameraMode.values()) {
             JRadioButton radio = new JRadioButton(mode.toString(), mode == cameraMode);
@@ -149,7 +149,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
 
     private ViewpointLayerOptionsExpert optionPanelForCurrentMode() {
         return switch (cameraMode) {
-            case ObserverFixedDistance -> null;
+            case ObserverAt1au -> null;
             case Location -> locationOptionPanel;
             case Heliosphere -> equatorialOptionPanel;
         };
