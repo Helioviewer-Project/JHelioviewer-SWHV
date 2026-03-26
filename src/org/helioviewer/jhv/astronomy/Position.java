@@ -37,6 +37,10 @@ public class Position {
         return location;
     }
 
+    public static Position toFixedDistance(Position p, double _distance) {
+        return new Position(p.time, _distance, p.lon, p.lat);
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o)
