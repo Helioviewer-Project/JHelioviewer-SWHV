@@ -39,7 +39,6 @@ struct ProjectionParams {
     float padding0;
     vec4 sourceViewQuat;
     vec4 displayMapQuat;
-    vec4 legacyGrid;
 };
 
 layout(std140) uniform ProjectionBlock {
@@ -83,6 +82,7 @@ uniform sampler1D lut;
 
 uniform float pv0[6]; // kept as plain uniforms for simple indexed access
 uniform float pv1[6];
+uniform vec3 latiGrid[2];
 
 #define BLUR_TAP_COUNT (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }
@@ -343,12 +343,11 @@ vec2 projectZpnToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
 
 // Projection-space to texture-space mapping.
 vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    int projectionCode = int(projection.projectionCode);
-    if (projectionCode == WCS_PROJECTION_TAN)
+    if (projection.projectionCode == WCS_PROJECTION_TAN)
         return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
-    if (projectionCode == WCS_PROJECTION_AZP)
+    if (projection.projectionCode == WCS_PROJECTION_AZP)
         return projectAzpToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
-    if (projectionCode == WCS_PROJECTION_ZPN)
+    if (projection.projectionCode == WCS_PROJECTION_ZPN)
         return projectZpnToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
 
     return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);

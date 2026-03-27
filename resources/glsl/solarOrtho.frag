@@ -7,12 +7,12 @@ const vec3 zAxis = vec3(0, 0, 1);
 #define SIMPLE_TAN 1
 
 vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    if (int(projection.projectionCode) == WCS_PROJECTION_CAR) {
+    if (projection.projectionCode == WCS_PROJECTION_CAR) {
         vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
         return wcsPlaneToTexcoord(plane, wcs);
     }
 #if SIMPLE_TAN
-    if (int(projection.projectionCode) == WCS_PROJECTION_TAN)
+    if (projection.projectionCode == WCS_PROJECTION_TAN)
         return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);
 #endif
     vec2 helioprojective = worldToHelioprojective(world, projection.observerDistance);
@@ -44,7 +44,7 @@ void main(void) {
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 upXY = up1.xy;
     bool diffMode = display.isDiff != NODIFFERENCE;
-    bool carMode = int(projection[0].projectionCode) == WCS_PROJECTION_CAR;
+    bool carMode = projection[0].projectionCode == WCS_PROJECTION_CAR;
 
     float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
