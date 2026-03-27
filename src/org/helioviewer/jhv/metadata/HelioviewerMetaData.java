@@ -291,17 +291,29 @@ public final class HelioviewerMetaData extends BaseMetaData {
         if (instrument.equals("CALLISTO")) { // pixel based
             region = new Region(0, 0, pixelW, pixelH);
         } else {
+            String ctype1 = m.getString("CTYPE1").orElse("");
+            String ctype2 = m.getString("CTYPE2").orElse("");
+            wcsProjection = WcsHeader.Projection.fromCtypePair(ctype1, ctype2);
+            boolean isCar = wcsProjection == WcsHeader.Projection.CAR;
+
             double arcsecX = m.getString("CUNIT1").map(u -> u.equalsIgnoreCase("deg") ? 3600 : 1).orElse(1);
             double arcsecY = m.getString("CUNIT2").map(u -> u.equalsIgnoreCase("deg") ? 3600 : 1).orElse(1);
             double arcsecPerPixelX = m.getRequiredDouble("CDELT1") * arcsecX;
             double arcsecPerPixelY = m.getRequiredDouble("CDELT2") * arcsecY;
 
-            double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
-            unitPerArcsec = Sun.Radius / radiusSunInArcsec;
-            wcsPlaneUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
+            if (isCar) {
+                unitPerArcsec = Math.PI / (180. * 3600.);
+                wcsPlaneUnitsPerRad = 1;
+                unitPerPixelX = Math.abs(Math.toRadians(m.getRequiredDouble("CDELT1")));
+                unitPerPixelY = Math.abs(Math.toRadians(m.getRequiredDouble("CDELT2")));
+            } else {
+                double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
+                unitPerArcsec = Sun.Radius / radiusSunInArcsec;
+                wcsPlaneUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
 
-            unitPerPixelX = Math.abs(arcsecPerPixelX * unitPerArcsec);
-            unitPerPixelY = Math.abs(arcsecPerPixelY * unitPerArcsec);
+                unitPerPixelX = Math.abs(arcsecPerPixelX * unitPerArcsec);
+                unitPerPixelY = Math.abs(arcsecPerPixelY * unitPerArcsec);
+            }
 
             // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
             double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
@@ -311,20 +323,15 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
             region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            double crval1 = m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
-            double crval2 = m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
+            double crval1 = isCar
+                    ? Math.toRadians(m.getDouble("CRVAL1").orElse(0.))
+                    : m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
+            double crval2 = isCar
+                    ? Math.toRadians(m.getDouble("CRVAL2").orElse(0.))
+                    : m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
             crval = new Vec2(crval1, crval2);
 
-            String ctype1 = m.getString("CTYPE1").orElse("");
-            String ctype2 = m.getString("CTYPE2").orElse("");
-            if (ctype1.endsWith("AZP") && ctype2.endsWith("AZP")) {
-                wcsProjection = WcsHeader.Projection.AZP;
-            } else if (ctype1.endsWith("ZPN") && ctype2.endsWith("ZPN")) {
-                wcsProjection = WcsHeader.Projection.ZPN;
-            } else {
-                wcsProjection = WcsHeader.Projection.TAN;
-            }
-            if (isZenital(ctype1) && isZenital(ctype2)) {
+            if (wcsProjection.usesPv2()) {
                 for (int i = 0; i < pv2.length; i++) {
                     double pv = m.getDouble("PV2_" + i).orElse(0.);
                     pv2[i] = (float) pv;
@@ -344,10 +351,6 @@ public final class HelioviewerMetaData extends BaseMetaData {
                 crota = Quat.createAxisZ(c);
             }
         }
-    }
-
-    private static boolean isZenital(String proj) {
-        return proj.endsWith("AZP") || proj.endsWith("ZPN");
     }
 
     private double getSolarRadiusFactor() {
