@@ -274,6 +274,7 @@ float wrapDeltaLongitude(float lon, float lon0) {
 }
 
 vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad) {
+    // CAR is a direct surface lon/lat map, not observer-image geometry.
     float lon = atan(world.x, world.z);
     float lat = asin(clamp(world.y / length(world), -1., 1.));
     vec2 referenceAngles = crval / planeUnitsPerRad;
