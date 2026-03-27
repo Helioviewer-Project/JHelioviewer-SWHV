@@ -10,6 +10,7 @@ vec3 displayLatitudinalWorld(const vec2 scrpos, const vec4 displayMapQuat) {
 }
 
 vec2 sampleLatiCarTexcoord(const vec2 scrpos, const WCS wcs, const ProjectionParams projection) {
+    // Interpret the latitudinal screen directly in the selected map frame, then sample the CAR surface map.
     vec3 world = displayLatitudinalWorld(scrpos, projection.displayMapQuat);
     vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
     vec2 texCoord = wcsPlaneToTexcoord(plane, wcs);
