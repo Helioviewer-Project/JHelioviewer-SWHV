@@ -300,12 +300,22 @@ public final class HelioviewerMetaData extends BaseMetaData {
             double arcsecY = m.getString("CUNIT2").map(u -> u.equalsIgnoreCase("deg") ? 3600 : 1).orElse(1);
             double arcsecPerPixelX = m.getRequiredDouble("CDELT1") * arcsecX;
             double arcsecPerPixelY = m.getRequiredDouble("CDELT2") * arcsecY;
+            double pc11 = m.getDouble("PC1_1").orElse(1.);
+            double pc12 = m.getDouble("PC1_2").orElse(0.);
+            double pc21 = m.getDouble("PC2_1").orElse(0.);
+            double pc22 = m.getDouble("PC2_2").orElse(1.);
 
             if (isCar) {
                 unitPerArcsec = Math.PI / (180. * 3600.);
                 wcsPlaneUnitsPerRad = 1;
-                unitPerPixelX = Math.abs(Math.toRadians(m.getRequiredDouble("CDELT1")));
-                unitPerPixelY = Math.abs(Math.toRadians(m.getRequiredDouble("CDELT2")));
+                double cdelt1Rad = Math.toRadians(m.getRequiredDouble("CDELT1"));
+                double cdelt2Rad = Math.toRadians(m.getRequiredDouble("CDELT2"));
+                double cd11 = cdelt1Rad * pc11;
+                double cd12 = cdelt1Rad * pc12;
+                double cd21 = cdelt2Rad * pc21;
+                double cd22 = cdelt2Rad * pc22;
+                unitPerPixelX = Math.hypot(cd11, cd21);
+                unitPerPixelY = Math.hypot(cd12, cd22);
             } else {
                 double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
                 unitPerArcsec = Sun.Radius / radiusSunInArcsec;
@@ -340,13 +350,19 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
             if (!CROTABlockSet.contains(instrument)) {
                 double c;
-                try {
-                    // Eq.32 Thompson (2006)
-                    c = Math.atan2(m.getRequiredDouble("PC2_1") / (arcsecPerPixelX / arcsecPerPixelY), m.getRequiredDouble("PC1_1"));
-                } catch (Exception e) {
-                    c = m.getDouble("CROTA").map(Math::toRadians)
-                            .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
-                            .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
+                if (isCar) {
+                    double cd11 = Math.toRadians(m.getRequiredDouble("CDELT1")) * pc11;
+                    double cd21 = Math.toRadians(m.getRequiredDouble("CDELT2")) * pc21;
+                    c = Math.atan2(cd21, cd11);
+                } else {
+                    try {
+                        // Eq.32 Thompson (2006)
+                        c = Math.atan2(pc21 / (arcsecPerPixelX / arcsecPerPixelY), pc11);
+                    } catch (Exception e) {
+                        c = m.getDouble("CROTA").map(Math::toRadians)
+                                .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
+                                .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
+                    }
                 }
                 crota = Quat.createAxisZ(c);
             }

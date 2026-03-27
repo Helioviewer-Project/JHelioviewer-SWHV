@@ -15,12 +15,20 @@ lot: false
 
 This note describes the zenithal WCS and `HPC` work implemented in JHV, and
 the corresponding validation against Astropy and direct internal comparison
-tests.
+tests. It also includes a `CAR` (plate-carree / Carrington
+map) validation case for surface maps described by FITS WCS axes
+`CRLN-CAR / CRLT-CAR`. The main focus of the note
+remains the zenithal projections and their use in `HPC`. For the general
+FITS/WCS header conventions used throughout, the primary reference is Greisen
+and Calabretta, "Representations of world coordinates in FITS" ([A&A 395,
+1061-1075,
+2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1061G/abstract)).
 
 In this work, a new `TAN` path was implemented together with `AZP` and
-six-term `ZPN`, in line with the theoretical foundation of
-Greisen and Calabretta, "Representations of celestial coordinates in FITS"
-([A&A 395, 1077-1122, 2002](https://www.aanda.org/articles/aa/abs/2002/45/aah3859/aah3859.html)).
+six-term `ZPN`, in line with the FITS celestial-coordinate projection paper
+([A&A 395, 1077-1122, 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1077C/abstract)).
+That paper is also the direct projection reference for the `CAR` case
+summarized in this note.
 Hereafter, `formal-TAN` denotes this Greisen & Calabretta `TAN` formulation in
 JHV.
 
@@ -63,6 +71,8 @@ The work reported here includes:
 - validating `formal-TAN`, `AZP`, and six-term `ZPN` (primary
   branch only) against Astropy, including round-trip checks.
 - validating the `HPC` sampling path against Astropy.
+- validating one full-Sun `CRLN-CAR / CRLT-CAR` surface-map case
+  against Astropy.
 
 Main conclusions:
 
@@ -73,6 +83,8 @@ Main conclusions:
   here.
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
   path covered by this note.
+- the `CAR` case is validated against Astropy for the source WCS
+  interpretation and sampling path on a full-Sun Carrington surface map.
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` shows that the two display geometries are not identical even with the
   same observer viewpoint and `dragRotation = 0`.
@@ -94,13 +106,14 @@ Bottom line:
 - `HPC` mode was added (with the noted caveat about the viewpoint).
 - support for `AZP` and `ZPN` data was added (with the noted caveat about the
   heliospheric imagers).
+- support for `CAR` surface maps was added.
 - the position numbers reported in the panel at the bottom of the JHV window
   are display-geometry numbers derived from the mouse pointer position, not
   coordinates read back from the active image WCS. In `HPC`, `Latitudinal`,
   `Polar`, and `LogPolar`, they follow the corresponding JHV display
   projection. In `Orthographic`, they are derived purely from the inferred 3D
   scene point and therefore do not, in general, reflect the image `TAN`,
-  `AZP`, or `ZPN` WCS.
+  `AZP`, `ZPN`, or `CAR` WCS.
 
 # The validator
 
@@ -172,10 +185,13 @@ Included in the validator:
   - `TAN`
   - `AZP`
   - six-term `ZPN` (primary branch only)
+  - `CAR`
 - the `HPC` image sampling path:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
 - the raw image-footprint `HPC` bounds and the centered `HPC` display bounds
   used in the validation runs reported here
+- the `CAR` source WCS interpretation used for `CRLN-CAR / CRLT-CAR`
+  surface maps
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` for the specific no-rotation comparison mode.
 
@@ -191,6 +207,8 @@ Excluded:
 - playback/view policy effects such as dynamic refitting of the visible `HPC`
   box beyond the centered bounds logic explicitly reproduced by the validator,
   or any other transient user-driven viewing state
+- `CAR` display-policy choices beyond the validated source-WCS
+  interpretation and sampling path
 - Java overlay-only behavior such as:
   - viewpoint-space projection of external overlay points in `HPC`
   - visible-hemisphere clipping of `HPC` overlay emission
@@ -201,6 +219,8 @@ The validator therefore establishes:
 
 - whether the implemented reprojection and sampling math matches Astropy
 - whether the implemented `HPC` sampling map matches Astropy
+- whether the `CAR` source WCS interpretation and sampling path match
+  Astropy
 - whether the `formal-TAN` path in `Orthographic` mode and `HPC` sample the
   same source pixels over the same rendered comparison frame.
 
@@ -233,6 +253,11 @@ In this validator, Astropy is the external reference for:
 - centered `HPC` bounds reporting
   - the script reports both the raw image-footprint bounds and the centered
     display bounds used by the JHV `HPC` screen mapping
+- full pixel-center validation for `CAR`
+  - using the effective linear transform (`PC * CDELT`) together with the
+    native `CRLN-CAR / CRLT-CAR` axis semantics
+- inverse `CAR`
+  - plane -> world lon/lat, checked by the same round-trip strategy
 
 Not compared against Astropy:
 
@@ -289,6 +314,12 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
 
 This mode checks the full FITS image grid against Astropy and reports the worst
 pixel-center error.
+
+For the `CAR` case, the same mode also validates Carrington
+surface maps against Astropy over the full source image grid. In that case, the
+validator uses the effective linear transform `PC * CDELT`, not bare `CDELT`,
+and keeps the original axis types (`CRLN-CAR / CRLT-CAR`) when constructing the
+Astropy comparison WCS.
 
 3. Inverse `TAN`
 
@@ -376,6 +407,22 @@ Interpretation:
 - the script reports absolute pixel errors directly
 - HI2 can show a slightly larger absolute `px` error because `AZP`
   magnification near the finite valid edge becomes extremely large
+
+7. Inverse `CAR`
+
+```text
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/sunerf_map.fits \
+  --inverse-car
+```
+
+This mode validates inverse `CAR` on sampled projection-plane points. It is not
+an on-disk or full-image-grid test.
+
+It validates:
+
+- `CAR plane -> world lon/lat`
+- round-trip error
 
 ### Internal JHV comparison modes
 
@@ -477,7 +524,9 @@ Interpretation:
 The primary discrepancy units reported in this note are angular sky errors
 derived from `CDELT`, expressed in milliarcseconds or arcseconds as
 appropriate. Pixel errors are kept as secondary units because they are the
-quantities reported directly by the validator.
+quantities reported directly by the validator. For the `CAR`
+surface-map case, the same reporting convention is used with angular map units
+derived from the effective linear scale `PC * CDELT`.
 
 ## FITS projections
 
@@ -669,6 +718,33 @@ This is again an internal JHV comparison. Its purpose is to show whether
   samples all WCS projections from the same flat image-view plane, so the
   off-limb part of the comparison reflects the difference between that flat
   `Orthographic` off-limb geometry and the `HPC` display geometry.
+
+## `CAR` surface-map validation
+
+This subsection reports the Astropy validation results for the tested
+full-Sun Carrington surface-map case.
+
+- the validated file is:
+  - `extra/test/data/sunerf_map.fits`
+- this file is a `CRLN-CAR / CRLT-CAR` surface map
+- the correct effective scale comes from the linear WCS transform
+  `PC * CDELT`, not from bare `CDELT`
+- the validator therefore keeps the original `CRLN-CAR / CRLT-CAR` axis types
+  and uses the effective linear transform when constructing the Astropy
+  comparison WCS
+- JHV and Astropy agree to numerical precision
+- representative measured results on `extra/test/data/sunerf_map.fits`:
+  - full pixel-center check:
+    - `3.07e-7 mas` max (`1.705303e-13 px`)
+  - forward sampled check:
+    - `projection_max_error_internal=1.332268e-15`
+    - `pixel_center_max_error_px=1.705303e-13`
+  - inverse `CAR` on the same file:
+    - `inverse_world_max_error_deg=3.552714e-15`
+    - `roundtrip_plane_max_error_internal=0`
+- this `CAR` case validates the source WCS interpretation and
+  sampling path, not the full interactive display policy for these surface
+  maps
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
