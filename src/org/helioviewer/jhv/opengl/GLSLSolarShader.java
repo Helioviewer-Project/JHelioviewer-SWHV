@@ -37,7 +37,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO projectionBO;
-    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4));
+    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4));
     private static final int PROJECTION_SIZE = projectionBuf.capacity() * 4;
 
     private static GLBO screenBO;
@@ -122,14 +122,18 @@ public class GLSLSolarShader extends GLSLShader {
 
     public static void bindProjection(GL3 gl,
                                       WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
-                                      float grid00, float grid01, float grid02,
+                                      Quat sourceView0, Quat displayMap0, float[] legacyGrid0,
                                       WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
-                                      float grid10, float grid11, float grid12) {
+                                      Quat sourceView1, Quat displayMap1, float[] legacyGrid1) {
         projectionBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
-        projectionBuf.put(grid00).put(grid01).put(grid02).put(0);
+        sourceView0.setFloatBuffer(projectionBuf);
+        displayMap0.setFloatBuffer(projectionBuf);
+        projectionBuf.put(legacyGrid0);
 
         projectionBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
-        projectionBuf.put(grid10).put(grid11).put(grid12).put(0);
+        sourceView1.setFloatBuffer(projectionBuf);
+        displayMap1.setFloatBuffer(projectionBuf);
+        projectionBuf.put(legacyGrid1);
 
         projectionBO.setBufferData(gl, PROJECTION_SIZE, PROJECTION_SIZE, projectionBuf.flip());
     }
@@ -140,8 +144,8 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
-        screenBuf.put((float) scale.getInterpolatedXDisplayValue(0, Display.gridType));
-        screenBuf.put((float) scale.getInterpolatedXDisplayValue(1, Display.gridType));
+        screenBuf.put((float) scale.getInterpolatedXValue(0));
+        screenBuf.put((float) scale.getInterpolatedXValue(1));
         screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
 
         screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());

@@ -7,6 +7,10 @@ const vec3 zAxis = vec3(0, 0, 1);
 #define SIMPLE_TAN 1
 
 vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
+    if (int(projection.projectionCode) == WCS_PROJECTION_CAR) {
+        vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
+        return wcsPlaneToTexcoord(plane, wcs);
+    }
 #if SIMPLE_TAN
     if (int(projection.projectionCode) == WCS_PROJECTION_TAN)
         return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);
@@ -40,18 +44,27 @@ void main(void) {
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 upXY = up1.xy;
     bool diffMode = display.isDiff != NODIFFERENCE;
+    bool carMode = int(projection[0].projectionCode) == WCS_PROJECTION_CAR;
 
     float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
+    if (carMode && !onDisk)
+        discard;
 
     float enhancementFactor;
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffRotatedHitPoint = vec3(0.);
 
     if (onDisk) {
         hitPoint = vec3(upXY, sqrt(1. - radius2));
-        rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
-        if (diffMode)
-            diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], hitPoint);
+        if (carMode) {
+            rotatedHitPoint = rotate_vector_inverse(projection[0].sourceViewQuat, hitPoint);
+            if (diffMode)
+                diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, hitPoint);
+        } else {
+            rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
+            if (diffMode)
+                diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], hitPoint);
+        }
 
         enhancementFactor = 1.;
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
@@ -60,7 +73,7 @@ void main(void) {
         gl_FragDepth = 1.;
     }
 
-    if (rotatedHitPoint.z <= 0.) { // off-limb or back
+    if (!carMode && rotatedHitPoint.z <= 0.) { // off-limb or back
         rotatedHitPoint = sampleOffLimbPoint(wcs[0], up1, onDisk, hitPoint);
         if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
@@ -96,7 +109,7 @@ void main(void) {
 
     vec2 diffTexCoord;
     if (diffMode) {
-        if (/*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
+        if (!carMode && /*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
             diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
 

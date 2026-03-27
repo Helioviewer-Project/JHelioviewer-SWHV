@@ -193,6 +193,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     private final float[] crval0 = new float[2];
     private final float[] crval1 = new float[2];
+    private final float[] legacyGrid0 = new float[4];
+    private final float[] legacyGrid1 = new float[4];
 
     @Override
     public void render(Camera camera, Viewport vp, GL3 gl) {
@@ -259,27 +261,28 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
         shader.bindPV(gl, wcs0.pv2, wcs1.pv2);
 
-        float grid00 = 0;
-        float grid01 = 0;
-        float grid02 = 0;
-        float grid10 = 0;
-        float grid11 = 0;
-        float grid12 = 0;
+        Quat sourceView0 = wcs0.projection == WcsHeader.Projection.CAR ? q : metaViewpoint0.toQuat();
+        Quat sourceView1 = wcs1.projection == WcsHeader.Projection.CAR ? q : metaViewpoint1.toQuat();
+        Quat displayMap0 = Quat.ZERO;
+        Quat displayMap1 = Quat.ZERO;
         if (Display.mode.isLatitudinal()) {
+            displayMap0 = displayMap1 = Display.gridType.mapRotation(cameraViewpoint);
             GridType gridType = Display.gridType;
-            grid00 = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint0);
-            grid01 = (float) gridType.toLatitude(metaViewpoint0);
-            grid02 = (float) metaViewpoint0.lat;
-            grid10 = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint1);
-            grid11 = (float) gridType.toLatitude(metaViewpoint1);
-            grid12 = (float) metaViewpoint1.lat;
+            legacyGrid0[0] = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint0);
+            legacyGrid0[1] = (float) gridType.toLatitude(metaViewpoint0);
+            legacyGrid0[2] = (float) metaViewpoint0.lat;
+            legacyGrid0[3] = 0;
+            legacyGrid1[0] = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint1);
+            legacyGrid1[1] = (float) gridType.toLatitude(metaViewpoint1);
+            legacyGrid1[2] = (float) metaViewpoint1.lat;
+            legacyGrid1[3] = 0;
         }
 
         GLSLSolarShader.bindProjection(gl,
                 wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance,
-                grid00, grid01, grid02,
+                sourceView0, displayMap0, legacyGrid0,
                 wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance,
-                grid10, grid11, grid12);
+                sourceView1, displayMap1, legacyGrid1);
 
         GLListener.glslSolar.render(gl);
     }

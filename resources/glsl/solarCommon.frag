@@ -15,6 +15,7 @@
 const int WCS_PROJECTION_TAN = 0;
 const int WCS_PROJECTION_AZP = 1;
 const int WCS_PROJECTION_ZPN = 2;
+const int WCS_PROJECTION_CAR = 3;
 
 out vec4 outColor;
 
@@ -36,8 +37,9 @@ struct ProjectionParams {
     float planeUnitsPerRadian;
     float observerDistance;
     float padding0;
-    vec3 grid;
-    float padding1;
+    vec4 sourceViewQuat;
+    vec4 displayMapQuat;
+    vec4 legacyGrid;
 };
 
 layout(std140) uniform ProjectionBlock {
@@ -265,6 +267,19 @@ vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     return planeUnitsPerRad * vec2(
         nativeX / cosNativeDistance,
         nativeY / cosNativeDistance);
+}
+
+float wrapDeltaLongitude(float lon, float lon0) {
+    return mod(lon - lon0 + PI, TWOPI) - PI;
+}
+
+vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad) {
+    float lon = atan(world.x, world.z);
+    float lat = asin(clamp(world.y / length(world), -1., 1.));
+    vec2 referenceAngles = crval / planeUnitsPerRad;
+    return vec2(
+        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceAngles.x),
+        planeUnitsPerRad * (lat - referenceAngles.y));
 }
 
 vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
