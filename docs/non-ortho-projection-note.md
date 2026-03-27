@@ -18,94 +18,114 @@ This note documents the convention used by the non-orthographic display modes (`
   - `resources/glsl/solarPolar.frag`
   - `resources/glsl/solarLogPolar.frag`
 
-## Convention
+## Projection Model
 
-- `Orthographic` is a separate path. It renders directly in 3D and should not be used as a reference for non-ortho sign conventions.
+- `Orthographic` is a separate path. It renders directly in 3D and should not
+  be used as the reference for non-ortho sign conventions.
 - Java ownership is:
-  - `ProjectionMode`: mode selection, shader/scale selection, small mode queries, and dispatch
-  - `NonOrthoProjection`: non-ortho projection math, non-ortho point/line emission, non-ortho mouse/grid helpers, and non-ortho surface unprojection
-  - `OrthoProjection`: orthographic point/line emission, orthographic mouse/grid helpers, and orthographic surface unprojection
-  - `WcsHeader`: shared image-WCS data bundle
-  - `WcsProjection`: shared image-WCS plane to helioprojective conversion used by bounds and `1:1` sizing helpers
+  - `ProjectionMode`: mode selection, shader/scale selection, and dispatch
+  - `NonOrthoProjection`: non-ortho projection math, point/line emission, mouse/grid helpers, and surface unprojection
+  - `OrthoProjection`: orthographic point/line emission and picking helpers
+  - `WcsHeader` / `WcsProjection`: shared image-WCS bundle and plane-to-helioprojective conversion
   - `ImageBounds`: intrinsic image-side `HPC` footprint bounds
   - `DisplayMapBounds`: display-map bounds used for non-ortho `1:1` sizing
-- Non-ortho modes use an explicit map-basis rotation on the Java side.
-- For `GridType.Viewpoint`, non-ortho maps use a positive latitude rotation in `GridType.mapRotation(...)`.
-- `HPC` is observer-centered, not origin-centered spherical coordinates.
-- The `HPC` display convention is:
-  - `x = Tx` (helioprojective longitude / west-east angular offset)
-  - `y = Ty` (helioprojective latitude / south-north angular offset)
-- The `HPC` visible scale is derived from the actual image footprint in
-  `Tx,Ty`, but the displayed bounds stay centered on `(Tx, Ty) = (0, 0)`.
-- Aspect-ratio padding is added around `(0, 0)` so angular scale stays
-  isotropic on screen.
-- For a given rendered frame, the `HPC` scale is derived from the enabled
-  image-layer bounds and then centered on `(Tx, Ty) = (0, 0)` before
-  aspect-ratio padding is applied.
-- In Java, `HPC` projection is expressed with the observer-distance-dependent formulas:
-  - `Tx = atan2(x, D - z)`
-  - `Ty = atan2(y, sqrt(x^2 + (D - z)^2))`
-- For Java overlays, external solar/world points are first rotated into the
-  observer/viewpoint frame before those `HPC` formulas are applied.
-- In GLSL, `solarHpc.frag` starts from the displayed `Tx,Ty` map coordinates, optionally intersects the observer ray with the unit solar sphere for on-disk differential rotation, and then reprojects through the source-image WCS.
-- `HPC` display coordinates are angular coordinates in degrees. They are not orthographic scene coordinates, and they are not guaranteed to match `Orthographic` at the same on-screen radius.
-- Because `HPC` is angular, its visible grid scale changes with observer distance:
-  - a closer observer sees the same solar structure under a larger angle
-  - a more distant observer sees it under a smaller angle
-  - this is expected behavior for `HPC`, not a rendering bug
+- Non-ortho modes use an explicit map-basis rotation on the Java side. For
+  `GridType.Viewpoint`, that rotation uses positive latitude in
+  `GridType.mapRotation(...)`.
 - Java picking distinguishes between:
   - solar-point unprojection
   - current-view sphere/plane picking for transformed display annotations such as line/FOV
-- `Orthographic` and non-ortho modes share the same current-view sphere/plane pick path for those transformed annotations.
-- Latitudinal projection is expressed as:
-  - `x = longitude`
-  - `y = latitude`
-- The GLSL latitudinal shader uses explicit latitude internally as well: `0` at the equator, positive toward solar north.
-- Polar and log-polar projection use a polar angle with `0°` at north and increasing anti-clockwise.
-- The Java polar projection expresses that convention directly.
-- The GLSL polar/log-polar shaders intentionally keep the legacy internal `theta = -(...) - HALFPI` style basis expression, because that is the form that matches the image reprojection path after `apply_center(..., vec3(pos.x, -pos.y, 0.), ...)`.
-- Remaining sign flips in the GLSL code, such as final texture-space Y inversion, belong to image/WCS sampling space and should not be confused with the map convention itself.
-- Java projected polyline emission differs by mode:
-  - `HPC` emits continuous projected segments and does not wrap horizontally
-  - `Latitudinal`, `Polar`, and `LogPolar` use the shared wrapped projected-line path
-- In Java overlay emission, `HPC` is also clipped to the visible hemisphere:
-  - back-side surface points are skipped instead of being projected through the map
-  - clipped polyline segments terminate and restart as separate strips
+- `Orthographic` and non-ortho modes share the current-view sphere/plane pick
+  path for those transformed annotations.
 
-## Important consequence
+### Mode notes
 
-The Java overlay path and the GLSL image path must be kept in sync as two implementations of the same convention.
+- `HPC` is observer-centered, not origin-centered spherical coordinates.
+  - display coordinates are `Tx,Ty` in degrees
+  - Java overlays project with:
+    - `Tx = atan2(x, D - z)`
+    - `Ty = atan2(y, sqrt(x^2 + (D - z)^2))`
+  - Java overlays first rotate world-space points into the viewpoint frame
+    before applying those formulas
+  - the visible scale is derived from enabled image-layer bounds, then centered
+    on `(Tx, Ty) = (0, 0)` and padded for aspect ratio
+  - GLSL `solarHpc.frag` starts from displayed `Tx,Ty`, intersects the
+    observer ray with the unit sphere for on-disk differential rotation, and
+    otherwise samples the source-image WCS directly from the same
+    helioprojective angles
+  - Java overlay emission clips to the visible hemisphere and does not wrap
+    horizontally
+- `Latitudinal` uses `x = longitude`, `y = latitude`.
+  - the GLSL latitudinal shader uses explicit latitude internally as well, with
+    `0` at the equator and positive northward
+- `Polar` and `LogPolar` use polar angle with `0°` at north and increasing
+  anti-clockwise.
+  - the Java polar projection expresses that convention directly
+  - the GLSL polar/log-polar shaders keep the legacy internal
+    `theta = -(...) - HALFPI` basis because it matches the image reprojection
+    path after `apply_center(..., vec3(pos.x, -pos.y, 0.), ...)`
+- Remaining sign flips in GLSL, such as final texture-space Y inversion, belong
+  to image/WCS sampling space and should not be confused with the map
+  convention itself.
 
-Changing only one side will usually produce one or more of:
+## Consequences and Limits
 
-- incorrect helioprojective aspect or scale in `HPC`
-- north/south mirroring
-- reversed polar-angle direction
-- overlay/image misalignment
-- incorrect mouse picking in non-ortho modes
-
-## Validation boundary
-
-- `HPC` render sampling is validated against Astropy for the tested `TAN`,
-  `AZP`, and six-term primary-branch `ZPN` test files.
-- The validator also reports the raw image-footprint `HPC` bounds and the centered display bounds used by the `HPC` screen mapping.
-- Direct screen comparison also shows that `HPC` and `Orthographic` are not identical display geometries, even with the same observer viewpoint and `dragRotation = 0`.
-- `HPC` mouse unprojection remains incomplete off-disk, because the Java path intersects only the unit solar sphere.
-- `HPC` line/FOV annotation persistence is not fully correct yet:
-  - those tools use the shared current-view sphere/plane pick path while dragging/drawing
-  - but `AbstractAnnotateable` serializes points as spherical `lon/lat`
-  - so saving and reloading those `HPC` annotations is not yet a stable operation
-- The Astropy validation script covers the image/WCS `HPC` path, not Java-side overlay behavior such as viewpoint-space external-point projection or visible-hemisphere clipping.
-- `ProjectionMode` exposes mode predicates (`isOrthographic()`, `isHpc()`, `isLatitudinal()`, `isPolar()`, `isLogPolar()`) for call sites that express mode distinctions through helpers rather than raw enum equality checks.
+- Java overlays and GLSL image reprojection are two implementations of the same
+  non-ortho convention. Changing only one side usually causes one or more of:
+  - incorrect `HPC` aspect or scale
+  - north/south mirroring
+  - reversed polar-angle direction
+  - overlay/image misalignment
+  - incorrect mouse picking
+- `HPC` render sampling is validated against Astropy for the supported
+  source-observer `TAN`, `AZP`, and six-term primary-branch `ZPN` image/WCS
+  paths.
+- That validation does **not** cover Java-side overlay behavior such as
+  viewpoint-space projection of Carrington surface coordinates or
+  visible-hemisphere clipping.
+- Direct screen comparison also shows that `HPC` and `Orthographic` are not the
+  same display geometry, even with the same observer viewpoint and
+  `dragRotation = 0`.
+- `HPC` mouse unprojection remains incomplete off-disk: the Java path only
+  tries to intersect the unit solar sphere, and off-disk rays return `null`.
+- `HPC` line/FOV annotation persistence is not yet stable because dragging uses
+  the shared current-view sphere/plane pick path, while persistence still stores
+  points as spherical `lon/lat`.
+- `ProjectionMode` exposes mode predicates (`isOrthographic()`, `isHpc()`,
+  `isLatitudinal()`, `isPolar()`, `isLogPolar()`) so call sites can express
+  mode distinctions through helpers rather than raw enum equality checks.
 - `HPC` extent inversion is exact for:
   - `TAN`
   - `AZP`
   - six-term `ZPN` on its primary monotonic branch
-- unsupported projection codes fall back to `TAN` on both the Java and GLSL
-  sides
-- `ZPN` support uses only `PV2_0..PV2_5`, which matches the
-  solar test files
+- Unsupported projection codes fall back to `TAN` on both the Java and GLSL
+  sides.
+- `ZPN` support uses only `PV2_0..PV2_5`, which matches the solar test files.
+
+## HPC Viewpoint Findings
+
+- Commit `2d5ef3435` changed Java `HPC` overlay semantics by rotating
+  world-space points into viewpoint space before projection and clipping
+  overlays to the visible hemisphere.
+- The GLSL image path in `resources/glsl/solarHpc.frag` did not receive the same
+  semantic update at that time, so Java overlays and GLSL image reprojection
+  drifted apart.
+- A narrow on-disk GLSL sync patch is possible and can improve image/overlay
+  agreement for rotated `TAN` cases.
+- In the supported source-observer case, that patch is effectively a no-op:
+  old and new rendering are visually indistinguishable because the display and
+  source observer frames already coincide.
+- This does **not** make user-selected non-observer viewpoints in `HPC`
+  supported. `HPC` should be treated as sane only for the source observer
+  orientation.
+- Viewpoints selected through the Viewpoint layer may look better or worse
+  after local fixes, but they remain outside the supported `HPC` contract.
+- `observerAt1au` could not be made stable by local scalar renormalization of
+  the existing `HPC` image path. The current shader and metadata bundle are too
+  tightly coupled to the source observer geometry for that kind of patch.
 
 ## Practical rule
 
-When changing non-ortho projection behavior, always review Java and GLSL together.
+When changing non-ortho projection behavior, always review Java and GLSL
+together, and treat Astropy validation as evidence for the supported image/WCS
+path only, not for unsupported `HPC` viewpoint modes.
