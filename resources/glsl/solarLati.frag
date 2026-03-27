@@ -17,8 +17,7 @@ vec2 sampleLatiCarTexcoord(const vec2 scrpos, const WCS wcs, const ProjectionPar
     return texCoord;
 }
 
-vec2 sampleLatiZenithalTexcoord(const vec2 scrpos, const WCS wcs, const int index) {
-    vec3 grid = latiGrid[index];
+vec2 sampleLatiZenithalTexcoord(const vec2 scrpos, const WCS wcs, const vec3 grid) {
     float longitude = grid.x + scrpos.x * TWOPI;
     float latitude = grid.y + (scrpos.y - 0.5) * PI;
 
@@ -39,21 +38,14 @@ vec2 sampleLatiZenithalTexcoord(const vec2 scrpos, const WCS wcs, const int inde
         cosGridLatitude, 0., sinGridLatitude,
         0., 1., 0.,
         -sinGridLatitude, 0., cosGridLatitude);
-    vec3 sourceView = rot * spherical;
-    if (sourceView.x < 0.)
+    vec3 rotatedSpherical = rot * spherical;
+    if (rotatedSpherical.x < 0.)
         discard;
 
-    vec3 centered = apply_center(vec3(sourceView.y, sourceView.z, 0.), wcs.crval, wcs.crota);
+    vec3 centered = apply_center(vec3(rotatedSpherical.y, rotatedSpherical.z, 0.), wcs.crval, wcs.crota);
     vec2 texCoord = wcs.rect.zw * vec2(centered.x - wcs.rect.x, -centered.y - wcs.rect.y);
     clamp_texture(texCoord);
     return texCoord;
-}
-
-vec2 sampleLatiTexcoord(const vec2 scrpos, const WCS wcs, const ProjectionParams projection) {
-    if (projection.projectionCode == WCS_PROJECTION_CAR)
-        return sampleLatiCarTexcoord(scrpos, wcs, projection);
-
-    return sampleLatiZenithalTexcoord(scrpos, wcs, 0);
 }
 
 void main(void) {
@@ -64,11 +56,11 @@ void main(void) {
     bool diffMode = display.isDiff != NODIFFERENCE;
     vec2 texCoord = projection[0].projectionCode == WCS_PROJECTION_CAR
             ? sampleLatiCarTexcoord(scrpos, wcs[0], projection[0])
-            : sampleLatiZenithalTexcoord(scrpos, wcs[0], 0);
+            : sampleLatiZenithalTexcoord(scrpos, wcs[0], latiGrid[0]);
     vec2 diffTexCoord = texCoord;
     if (diffMode)
         diffTexCoord = projection[1].projectionCode == WCS_PROJECTION_CAR
                 ? sampleLatiCarTexcoord(scrpos, wcs[1], projection[1])
-                : sampleLatiZenithalTexcoord(scrpos, wcs[1], 1);
+                : sampleLatiZenithalTexcoord(scrpos, wcs[1], latiGrid[1]);
     outColor = getColor(texCoord, diffTexCoord, 1);
 }
