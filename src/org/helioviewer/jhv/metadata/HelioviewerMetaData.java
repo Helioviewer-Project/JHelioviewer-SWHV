@@ -293,7 +293,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
         } else {
             String ctype1 = m.getString("CTYPE1").orElse("");
             String ctype2 = m.getString("CTYPE2").orElse("");
-            wcsProjection = WcsHeader.Projection.fromCtypePair(ctype1, ctype2);
+            wcsProjection = WcsHeader.Projection.fromCtype(ctype1, ctype2);
             boolean isCar = wcsProjection == WcsHeader.Projection.CAR;
 
             double arcsecX = m.getString("CUNIT1").map(u -> u.equalsIgnoreCase("deg") ? 3600 : 1).orElse(1);

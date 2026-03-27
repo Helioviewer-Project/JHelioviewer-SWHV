@@ -48,6 +48,7 @@ void main(void) {
 
     float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
+    // CAR has no off-limb representation; wrap only the visible solar sphere.
     if (carMode && !onDisk)
         discard;
 
