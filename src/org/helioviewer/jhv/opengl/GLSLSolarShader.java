@@ -26,6 +26,8 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int pv0Ref;
     private int pv1Ref;
+    private int latiGridRef;
+    private static final float[] latiGridBuf = new float[6];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
         super(vertex, fragment);
@@ -37,7 +39,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO projectionBO;
-    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4));
+    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4));
     private static final int PROJECTION_SIZE = projectionBuf.capacity() * 4;
 
     private static GLBO screenBO;
@@ -81,6 +83,7 @@ public class GLSLSolarShader extends GLSLShader {
     protected void initUniforms(GL3 gl, int id) {
         pv0Ref = gl.glGetUniformLocation(id, "pv0");
         pv1Ref = gl.glGetUniformLocation(id, "pv1");
+        latiGridRef = gl.glGetUniformLocation(id, "latiGrid");
 
         setupCommonBlocks(gl, id);
 
@@ -122,20 +125,28 @@ public class GLSLSolarShader extends GLSLShader {
 
     public static void bindProjection(GL3 gl,
                                       WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
-                                      Quat sourceView0, Quat displayMap0, float[] legacyGrid0,
+                                      Quat sourceView0, Quat displayMap0,
                                       WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
-                                      Quat sourceView1, Quat displayMap1, float[] legacyGrid1) {
+                                      Quat sourceView1, Quat displayMap1) {
         projectionBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
         sourceView0.setFloatBuffer(projectionBuf);
         displayMap0.setFloatBuffer(projectionBuf);
-        projectionBuf.put(legacyGrid0);
 
         projectionBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
         sourceView1.setFloatBuffer(projectionBuf);
         displayMap1.setFloatBuffer(projectionBuf);
-        projectionBuf.put(legacyGrid1);
 
         projectionBO.setBufferData(gl, PROJECTION_SIZE, PROJECTION_SIZE, projectionBuf.flip());
+    }
+
+    public void bindLatiGrid(GL3 gl, float[] latiGrid0, float[] latiGrid1) {
+        latiGridBuf[0] = latiGrid0[0];
+        latiGridBuf[1] = latiGrid0[1];
+        latiGridBuf[2] = latiGrid0[2];
+        latiGridBuf[3] = latiGrid1[0];
+        latiGridBuf[4] = latiGrid1[1];
+        latiGridBuf[5] = latiGrid1[2];
+        gl.glUniform3fv(latiGridRef, 2, latiGridBuf, 0);
     }
 
     static void bindScreen(GL3 gl, Viewport vp) {
