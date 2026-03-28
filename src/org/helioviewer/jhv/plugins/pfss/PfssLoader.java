@@ -13,11 +13,10 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import com.google.common.util.concurrent.FutureCallback;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -26,24 +25,20 @@ import okio.BufferedSource;
 
 class PfssLoader {
 
-    private static PfssCache cache() {
-        return PfssPlugin.getPfssCache();
-    }
-
-    private static <T> void submit(Callable<T> task, FutureCallback<T> callback) {
-        cache().beginDownload();
-        EDTCallbackExecutor.pool.submit(task, callback);
-    }
-
     record Data(JHVTime dateObs, float[] lineX, float[] lineY, float[] lineZ, float[] lineS, int points) {
     }
 
     static void submitList(long start, long end) {
-        submit(new ListLoader(start, end), new CallbackList(start));
+        submit("pfss-list", new ListLoader(start, end), result -> onSuccessList(start, result), PfssLoader::onFailureList);
     }
 
     static void submitData(long time, URI uri) {
-        submit(new DataLoader(time, uri), new CallbackData(uri));
+        submit(uri.toString(), new DataLoader(time, uri), result -> onSuccessData(uri, result), (logContext, t) -> onFailureData(uri, t));
+    }
+
+    private static <T> void submit(String logContext, Callable<T> task, java.util.function.Consumer<T> onSuccess, Tasks.FailureHandler onFailure) {
+        cache().beginDownload();
+        Tasks.submit(logContext, task, onSuccess, onFailure);
     }
 
     private record ListLoader(long start, long end) implements Callable<Void> {
@@ -99,31 +94,6 @@ class PfssLoader {
         }
     }
 
-    private record CallbackList(long start) implements FutureCallback<Void> {
-        @Override
-        public void onSuccess(Void result) {
-            cache().endDownload();
-            cache().getNearestData(start); // preload first
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            cache().endDownload();
-            Log.error(t);
-        }
-    }
-
-    private static int findColumn(TableHDU<?> hdu, String name) throws Exception {
-        int col = hdu.findColumn(name);
-        if (col < 0)
-            throw new Exception("Column not found: " + name);
-        return col;
-    }
-
-    private static double decodeShort(short v) {
-        return (v + 32768.) * (2. / 65535.) - 1.;
-    }
-
     private record DataLoader(long time, URI uri) implements Callable<Data> {
         @Override
         public Data call() throws Exception {
@@ -175,20 +145,41 @@ class PfssLoader {
         }
     }
 
-    private record CallbackData(URI uri) implements FutureCallback<Data> {
-        @Override
-        public void onSuccess(Data result) {
-            cache().endDownload();
-            cache().markLoaded(uri, result);
-            MovieDisplay.display(); //!
-        }
+    private static void onSuccessList(long start, Void result) {
+        cache().endDownload();
+        cache().getNearestData(start); // preload first
+    }
 
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            cache().endDownload();
-            cache().markFailed(uri);
-            Log.error(t);
-        }
+    private static void onSuccessData(URI uri, Data result) {
+        cache().endDownload();
+        cache().markLoaded(uri, result);
+        MovieDisplay.display(); //!
+    }
+
+    private static void onFailureList(String logContext, Throwable t) {
+        cache().endDownload();
+        Log.error(t);
+    }
+
+    private static void onFailureData(URI uri, Throwable t) {
+        cache().endDownload();
+        cache().markFailed(uri);
+        Log.error(t);
+    }
+
+    private static PfssCache cache() {
+        return PfssPlugin.getPfssCache();
+    }
+
+    private static int findColumn(TableHDU<?> hdu, String name) throws Exception {
+        int col = hdu.findColumn(name);
+        if (col < 0)
+            throw new Exception("Column not found: " + name);
+        return col;
+    }
+
+    private static double decodeShort(short v) {
+        return (v + 32768.) * (2. / 65535.) - 1.;
     }
 
 }
