@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.everit.json.schema.Schema;
@@ -16,12 +16,10 @@ import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
-import com.google.common.util.concurrent.FutureCallback;
-
 class LoadSources {
 
     static void submit(@Nonnull String server) {
-        EDTCallbackExecutor.pool.submit(new SourcesLoad(server), new Callback(server));
+        Tasks.submit(server, new SourcesLoad(server), DataSources::setupSources, LoadSources::onFailure);
     }
 
     private record SourcesLoad(String server) implements Callable<DataSourcesParser> {
@@ -45,22 +43,12 @@ class LoadSources {
         }
     }
 
-    private record Callback(String server) implements FutureCallback<DataSourcesParser> {
-
-        @Override
-        public void onSuccess(DataSourcesParser result) {
-            DataSources.setupSources(result);
+    private static void onFailure(String server, Throwable t) {
+        DataSources.setupSources(null); // signal failure
+        Log.error(server, t);
+        if (t instanceof ValidationException ve) {
+            ve.getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
         }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            DataSources.setupSources(null); // signal failure
-            Log.error(server, t);
-            if (t instanceof ValidationException ve) {
-                ve.getCausingExceptions().stream().map(ValidationException::getMessage).forEach(Log::error);
-            }
-        }
-
     }
 
 }

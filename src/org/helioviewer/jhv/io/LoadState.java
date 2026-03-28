@@ -5,22 +5,18 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.selector.State;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.json.JSONObject;
-
-import com.google.common.util.concurrent.FutureCallback;
 
 class LoadState {
 
     static void submit(@Nonnull URI uri) {
-        EDTCallbackExecutor.pool.submit(new LoadStateURI(uri), new Callback());
+        Tasks.submit(uri.toString(), new LoadStateURI(uri), State::load, "An error occurred opening the remote file");
     }
 
     static void submit(@Nonnull String json) {
-        EDTCallbackExecutor.pool.submit(new LoadStateString(json), new Callback());
+        Tasks.submit("state", new LoadStateString(json), State::load, "An error occurred opening the remote file");
     }
 
     private record LoadStateURI(URI uri) implements Callable<JSONObject> {
@@ -35,21 +31,6 @@ class LoadState {
         public JSONObject call() {
             return new JSONObject(json).getJSONObject("org.helioviewer.jhv.state");
         }
-    }
-
-    private static class Callback implements FutureCallback<JSONObject> {
-
-        @Override
-        public void onSuccess(JSONObject result) {
-            State.load(result);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred opening the remote file", t.getMessage());
-        }
-
     }
 
 }
