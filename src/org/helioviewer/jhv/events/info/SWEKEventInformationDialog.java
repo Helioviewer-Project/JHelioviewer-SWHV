@@ -20,9 +20,7 @@ import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-
-import com.google.common.util.concurrent.FutureCallback;
+import org.helioviewer.jhv.threads.Tasks;
 
 // Popup displaying information about a HEK event.
 // This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
@@ -79,7 +77,43 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
 
         add(allTablePanel, allTablePanelConstraint);
 
-        EDTCallbackExecutor.pool.submit(new DatabaseCallable(event), new DatabaseCallback());
+        Tasks.submit("event-info", new DatabaseCallable(event), this::onSuccessDatabase, SWEKEventInformationDialog::onFailureDatabase);
+    }
+
+    private record DatabaseCallable(JHVEvent qEvent) implements Callable<List<JHVEvent>> {
+        @Override
+        public List<JHVEvent> call() throws Exception {
+            return EventDatabase.getOtherRelations(qEvent.getUniqueID(), qEvent.getSupplier(), false, true);
+        }
+    }
+
+    private void onSuccessDatabase(@Nonnull List<JHVEvent> result) {
+        result.forEach(JHVEventCache::addEvent);
+
+        List<JHVRelatedEvents> rEvents = new ArrayList<>();
+        int id = event.getUniqueID();
+        for (JHVEvent jhvEvent : result) {
+            int jid = jhvEvent.getUniqueID();
+            //if (jid == id)
+            //    event = jhvEvent;
+            //else
+            if (jid != id)
+                rEvents.add(JHVEventCache.getRelatedEvents(jid));
+        }
+
+        if (!rEvents.isEmpty())
+            otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", rEvents);
+
+        allTablePanel.removeAll();
+        initParameterCollapsiblePanels();
+        setCollapsiblePanels();
+
+        repack();
+        repaint();
+    }
+
+    private static void onFailureDatabase(String logContext, Throwable t) {
+        Log.error(t);
     }
 
     private void initAllTablePanel() {
@@ -195,48 +229,6 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
         allTablePanel.removeAll();
         setCollapsiblePanels();
         pack();
-    }
-
-    private record DatabaseCallable(JHVEvent qEvent) implements Callable<List<JHVEvent>> {
-        @Override
-        public List<JHVEvent> call() throws Exception {
-            return EventDatabase.getOtherRelations(qEvent.getUniqueID(), qEvent.getSupplier(), false, true);
-        }
-    }
-
-    private class DatabaseCallback implements FutureCallback<List<JHVEvent>> {
-
-        @Override
-        public void onSuccess(@Nonnull List<JHVEvent> result) {
-            result.forEach(JHVEventCache::addEvent);
-
-            List<JHVRelatedEvents> rEvents = new ArrayList<>();
-            int id = event.getUniqueID();
-            for (JHVEvent jhvEvent : result) {
-                int jid = jhvEvent.getUniqueID();
-                //if (jid == id)
-                //    event = jhvEvent;
-                //else
-                if (jid != id)
-                    rEvents.add(JHVEventCache.getRelatedEvents(jid));
-            }
-
-            if (!rEvents.isEmpty())
-                otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane("Other Related Events", rEvents);
-
-            allTablePanel.removeAll();
-            initParameterCollapsiblePanels();
-            setCollapsiblePanels();
-
-            repack();
-            repaint();
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-        }
-
     }
 
 }
