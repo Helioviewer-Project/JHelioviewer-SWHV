@@ -16,8 +16,10 @@ import okhttp3.CacheControl;
 import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 //import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 //import okhttp3.logging.HttpLoggingInterceptor;
@@ -50,6 +52,10 @@ class NetClientRemote implements NetClient {
     private final boolean isSuccessful;
 
     NetClientRemote(URI uri, boolean allowError, NetCache cache) throws IOException {
+        this(uri, null, null, allowError, cache);
+    }
+
+    NetClientRemote(URI uri, String contentType, byte[] body, boolean allowError, NetCache cache) throws IOException {
         HttpUrl url = HttpUrl.get(uri);
         if (url == null)
             throw new IOException("Could not parse " + uri);
@@ -59,6 +65,8 @@ class NetClientRemote implements NetClient {
             builder.cacheControl(CacheControl.FORCE_NETWORK);
         else if (cache == NetCache.BYPASS)
             builder.cacheControl(noStore);
+        if (body != null)
+            builder.post(RequestBody.create(body, MediaType.get(contentType)));
         Request request = builder.build();
         //System.out.println(">>> " + url);
 
@@ -72,7 +80,7 @@ class NetClientRemote implements NetClient {
         }
 
         responseBody = response.body();
-        if (responseBody == null) { // unlikely, we only do GET
+        if (responseBody == null) {
             response.close();
             throw new IOException("Empty response body for " + uri);
         }
