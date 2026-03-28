@@ -11,14 +11,11 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.time.TimeUtils;
-
-import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadFootpoint {
 
@@ -29,15 +26,7 @@ public class LoadFootpoint {
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        EDTCallbackExecutor.pool.submit(new Footpoint(uri), new Callback(receiver));
-    }
-
-    private static long parseTime(String s) {
-        try {
-            return TimeUtils.parse(TimeUtils.sqlTimeFormatter, s);
-        } catch (Exception e) {
-            return TimeUtils.parse(euroTimeFormatter, s);
-        }
+        Tasks.submit(uri.toString(), new Footpoint(uri), receiver::setPositionMap, "An error occurred opening the remote file");
     }
 
     private record Footpoint(URI uri) implements Callable<TimeMap<Position.Cartesian>> {
@@ -69,19 +58,12 @@ public class LoadFootpoint {
         }
     }
 
-    private record Callback(Receiver receiver) implements FutureCallback<TimeMap<Position.Cartesian>> {
-
-        @Override
-        public void onSuccess(TimeMap<Position.Cartesian> result) {
-            receiver.setPositionMap(result);
+    private static long parseTime(String s) {
+        try {
+            return TimeUtils.parse(TimeUtils.sqlTimeFormatter, s);
+        } catch (Exception e) {
+            return TimeUtils.parse(euroTimeFormatter, s);
         }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred opening the remote file", t.getMessage());
-        }
-
     }
 
 }

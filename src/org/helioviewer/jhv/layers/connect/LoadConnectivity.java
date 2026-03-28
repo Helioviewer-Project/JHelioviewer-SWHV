@@ -11,14 +11,11 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
-
-import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadConnectivity {
 
@@ -43,7 +40,7 @@ public class LoadConnectivity {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        EDTCallbackExecutor.pool.submit(new ConnectivityLoad(uri), new Callback(receiver));
+        Tasks.submit(uri.toString(), new ConnectivityLoad(uri), receiver::setConnectivity, "An error occurred opening the remote file");
     }
 
     private record ConnectivityLoad(URI uri) implements Callable<Connectivity> {
@@ -96,21 +93,6 @@ public class LoadConnectivity {
                 return null;
             return new Connectivity(time, SSW, FSW, M);
         }
-    }
-
-    private record Callback(Receiver receiver) implements FutureCallback<Connectivity> {
-
-        @Override
-        public void onSuccess(Connectivity result) {
-            receiver.setConnectivity(result);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred opening the remote file", t.getMessage());
-        }
-
     }
 
 }

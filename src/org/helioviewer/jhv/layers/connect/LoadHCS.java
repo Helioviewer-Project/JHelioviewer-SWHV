@@ -10,12 +10,9 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-
-import com.google.common.util.concurrent.FutureCallback;
+import org.helioviewer.jhv.threads.Tasks;
 
 public class LoadHCS {
 
@@ -24,7 +21,7 @@ public class LoadHCS {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        EDTCallbackExecutor.pool.submit(new HCS(uri), new Callback(receiver));
+        Tasks.submit(uri.toString(), new HCS(uri), receiver::setHCS, "An error occurred opening the remote file");
     }
 
     private record HCS(URI uri) implements Callable<List<Vec3>> {
@@ -54,21 +51,6 @@ public class LoadHCS {
             }
             return hcsList;
         }
-    }
-
-    private record Callback(Receiver receiver) implements FutureCallback<List<Vec3>> {
-
-        @Override
-        public void onSuccess(List<Vec3> result) {
-            receiver.setHCS(result);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred opening the remote file", t.getMessage());
-        }
-
     }
 
 }
