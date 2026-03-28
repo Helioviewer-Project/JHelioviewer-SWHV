@@ -15,21 +15,19 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 
 import okio.Buffer;
 import okio.Okio;
 import okio.BufferedSource;
 import okio.BufferedSink;
 
-import com.google.common.util.concurrent.FutureCallback;
-
 public class DownloadLayer {
 
     @Nullable
     public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName) {
         Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), baseName);
-        return EDTCallbackExecutor.pool.submit(new LayerDownload(req, layer, dstPath), new Callback(layer));
+        return Tasks.submit(baseName, new LayerDownload(req, layer, dstPath), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
     }
 
     private static final int BUFSIZ = 1024 * 1024;
@@ -68,21 +66,15 @@ public class DownloadLayer {
         }
     }
 
-    private record Callback(ImageLayer layer) implements FutureCallback<Path> {
+    private static void onSuccess(ImageLayer layer, Path result) {
+        layer.doneDownload();
+        LoadLayer.submit(layer, List.of(result.toUri()));
+        JHVGlobals.displayNotification(result.toString());
+    }
 
-        @Override
-        public void onSuccess(Path result) {
-            layer.doneDownload();
-            LoadLayer.submit(layer, List.of(result.toUri()));
-            JHVGlobals.displayNotification(result.toString());
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            layer.doneDownload();
-            Log.error(t);
-        }
-
+    private static void onFailure(ImageLayer layer, Throwable t) {
+        layer.doneDownload();
+        Log.error(t);
     }
 
 }
