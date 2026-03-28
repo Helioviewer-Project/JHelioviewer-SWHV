@@ -19,11 +19,11 @@ import org.json.JSONObject;
 class LoadRequest {
 
     static void submit(@Nonnull URI uri) {
-        Tasks.submit(uri.toString(), new LoadRequestURI(uri), result -> {}, "An error occurred opening the remote file");
+        Tasks.submit(uri.toString(), new LoadRequestURI(uri), Tasks::doNothing, "An error occurred opening the remote file");
     }
 
     static void submit(@Nonnull String json) {
-        Tasks.submit("request", new LoadRequestString(json), result -> {}, "An error occurred opening the remote file");
+        Tasks.submit("request", new LoadRequestString(json), Tasks::doNothing, "An error occurred opening the remote file");
     }
 
     static void submitCDF(@Nonnull List<URI> uriList) {
