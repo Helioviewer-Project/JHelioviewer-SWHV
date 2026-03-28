@@ -21,7 +21,7 @@ import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.jastronomy.jsofa.JSOFA;
@@ -34,7 +34,6 @@ import uk.ac.starlink.table.StarTableFactory;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.google.common.util.concurrent.FutureCallback;
 
 public final class GaiaClient {
 
@@ -46,7 +45,7 @@ public final class GaiaClient {
     }
 
     public static void submitSearch(Receiver receiver, Position viewpoint) {
-        EDTCallbackExecutor.pool.submit(new Query(viewpoint), new Callback(receiver, viewpoint));
+        Tasks.submit("gaia", new Query(viewpoint), result -> onSuccess(receiver, viewpoint, result), (logContext, t) -> onFailure(receiver, viewpoint, t));
     }
 
     public interface Receiver {
@@ -289,18 +288,14 @@ public final class GaiaClient {
         }
     }
 
-    private record Callback(Receiver receiver, Position viewpoint) implements FutureCallback<BufVertex> {
-        @Override
-        public void onSuccess(@Nonnull BufVertex result) {
-            receiver.setStars(viewpoint, result);
-        }
+    private static void onSuccess(Receiver receiver, Position viewpoint, BufVertex result) {
+        receiver.setStars(viewpoint, result);
+    }
 
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            receiver.setStarsFailed(viewpoint);
-            Log.error(t);
-            Message.err("An error occurred querying the server", t.getMessage());
-        }
+    private static void onFailure(Receiver receiver, Position viewpoint, Throwable t) {
+        receiver.setStarsFailed(viewpoint);
+        Log.error(t);
+        Message.err("An error occurred querying the server", t.getMessage());
     }
 
 }
