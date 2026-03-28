@@ -25,9 +25,7 @@ import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-
-import com.google.common.util.concurrent.FutureCallback;
+import org.helioviewer.jhv.threads.Tasks;
 
 public class JHelioviewer {
 
@@ -107,7 +105,7 @@ public class JHelioviewer {
             frame.setVisible(true);
             UITimer.start();
 
-            EDTCallbackExecutor.pool.submit(new Init(), new Callback());
+            Tasks.submit("init", new Init(), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
         });
     }
 
@@ -119,21 +117,15 @@ public class JHelioviewer {
         }
     }
 
-    private static class Callback implements FutureCallback<Void> {
+    private static void onSuccessInit(Void result) {
+        DataSources.loadSources(true);
+        CommandLine.load();
+        UpdateChecker.check(false);
+    }
 
-        @Override
-        public void onSuccess(Void result) {
-            DataSources.loadSources(true);
-            CommandLine.load();
-            UpdateChecker.check(false);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred during initialization", t.getMessage());
-        }
-
+    private static void onFailureInit(String logContext, Throwable t) {
+        Log.error(t);
+        Message.err("An error occurred during initialization", t.getMessage());
     }
 
     private static boolean isHeadless() {

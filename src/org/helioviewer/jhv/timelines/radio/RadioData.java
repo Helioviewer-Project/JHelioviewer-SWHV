@@ -26,7 +26,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -42,7 +42,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.FutureCallback;
 
 public final class RadioData extends AbstractTimelineLayer {
 
@@ -113,19 +112,16 @@ public final class RadioData extends AbstractTimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
-                EDTCallbackExecutor.pool.submit(new RadioJPXDownload(date), new RadioJPXCallback(date));
+                Tasks.submit(Long.toString(date), new RadioJPXDownload(this, date), result -> onSuccessRadioJPX(date, result), (logContext, t) -> onFailureRadioJPX(date, t));
             }
         }
     }
 
-    private class RadioJPXDownload implements Callable<RadioJ2KData> {
+    private record RadioJPXDownload(RadioData owner, long date) implements Callable<RadioJ2KData> {
 
-        private final long date;
-
-        RadioJPXDownload(long _date) {
-            date = _date;
+        RadioJPXDownload {
             downloading.add(date);
-            Timelines.getLayers().downloadStarted(RadioData.this);
+            Timelines.getLayers().downloadStarted(owner);
         }
 
         @Override
@@ -141,32 +137,20 @@ public final class RadioData extends AbstractTimelineLayer {
 
     }
 
-    private class RadioJPXCallback implements FutureCallback<RadioJ2KData> {
+    private void onSuccessRadioJPX(long date, @Nonnull RadioJ2KData result) {
+        doneRadioJPX(date);
+        cache.put(date, result);
+        result.requestData(DrawController.selectedAxis);
+    }
 
-        private final long date;
+    private void onFailureRadioJPX(long date, @Nonnull Throwable t) {
+        doneRadioJPX(date);
+        Log.error(Throwables.getStackTraceAsString(t));
+    }
 
-        RadioJPXCallback(long _date) {
-            date = _date;
-        }
-
-        private void done() {
-            downloading.remove(date);
-            Timelines.getLayers().downloadFinished(RadioData.this);
-        }
-
-        @Override
-        public void onSuccess(@Nonnull RadioJ2KData result) {
-            done();
-            cache.put(date, result);
-            result.requestData(DrawController.selectedAxis);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            done();
-            Log.error(Throwables.getStackTraceAsString(t));
-        }
-
+    private void doneRadioJPX(long date) {
+        downloading.remove(date);
+        Timelines.getLayers().downloadFinished(RadioData.this);
     }
 
     @Override
