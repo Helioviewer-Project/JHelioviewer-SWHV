@@ -14,8 +14,8 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
@@ -25,16 +25,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadLayer {
 
     public static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req) {
-        return EDTCallbackExecutor.pool.submit(new LoadRemote(layer, req), new Callback(layer));
+        return Tasks.submit("request", new LoadRemote(layer, req), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
     }
 
     public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
-        EDTCallbackExecutor.pool.submit(new LoadURIImage(layer, uriList), new Callback(layer));
+        Tasks.submit(uriList.toString(), new LoadURIImage(layer, uriList), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
     }
 
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
@@ -52,29 +51,22 @@ public class LoadLayer {
         }
     }
 
-    private record Callback(ImageLayer layer) implements FutureCallback<View> {
-
-        @Override
-        public void onSuccess(View result) {
-            if (result != null) // LoadRemote can return null
-                layer.setView(result);
-            else
-                layer.unload();
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            if (JHVThread.isInterrupted(t)) { // ignore
-                Log.warn(t);
-                return;
-            }
-
+    private static void onSuccess(ImageLayer layer, View result) {
+        if (result != null) // LoadRemote can return null
+            layer.setView(result);
+        else
             layer.unload();
+    }
 
-            Log.error(Throwables.getStackTraceAsString(t));
-            Message.err("An error occurred opening the remote file", t.getMessage());
+    private static void onFailure(ImageLayer layer, Throwable t) {
+        if (JHVThread.isInterrupted(t)) { // ignore
+            Log.warn(t);
+            return;
         }
+        layer.unload();
 
+        Log.error(Throwables.getStackTraceAsString(t));
+        Message.err("An error occurred opening the remote file", t.getMessage());
     }
 
     private static View loadUri(DecodeExecutor executor, List<URI> uriList) throws Exception {
