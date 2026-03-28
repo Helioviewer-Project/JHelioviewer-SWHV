@@ -724,9 +724,10 @@ This is again an internal JHV comparison. Its purpose is to show whether
 This subsection reports the Astropy validation results for the tested
 full-Sun Carrington surface-map case.
 
-- the validated file is:
+- the validated files are:
   - `extra/test/data/sunerf_map.fits`
-- this file is a `CRLN-CAR / CRLT-CAR` surface map
+  - `extra/test/data/syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits`
+- both files are `CRLN-CAR / CRLT-CAR` surface maps
 - the correct effective scale comes from the linear WCS transform
   `PC * CDELT`, not from bare `CDELT`
 - the validator therefore keeps the original `CRLN-CAR / CRLT-CAR` axis types
@@ -741,6 +742,16 @@ full-Sun Carrington surface-map case.
     - `pixel_center_max_error_px=1.705303e-13`
   - inverse `CAR` on the same file:
     - `inverse_world_max_error_deg=3.552714e-15`
+    - `roundtrip_plane_max_error_internal=0`
+- representative measured results on
+  `extra/test/data/syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits`:
+  - full pixel-center check:
+    - `4.09e-7 mas` max (`2.273737e-13 px`)
+  - forward sampled check:
+    - `projection_max_error_internal=4.440892e-16`
+    - `pixel_center_max_error_px=2.273737e-13`
+  - inverse `CAR` on the same file:
+    - `inverse_world_max_error_deg=5.684342e-14`
     - `roundtrip_plane_max_error_internal=0`
 - this `CAR` case validates the source WCS interpretation and
   sampling path, not the full interactive display policy for these surface
