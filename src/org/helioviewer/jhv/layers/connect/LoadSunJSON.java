@@ -12,11 +12,10 @@ import org.helioviewer.jhv.gui.Message;
 //import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 
 //import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.FutureCallback;
 
 public class LoadSunJSON {
 
@@ -27,13 +26,13 @@ public class LoadSunJSON {
     public static void submit(@Nonnull List<URI> uriList) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            EDTCallbackExecutor.pool.submit(new LoadSunJSONURI(uriList), new Callback(receiver));
+            Tasks.submit("sunjson", new LoadSunJSONURI(uriList), receiver::setGeometry, LoadSunJSON::onFailure);
     }
 
     public static void submit(@Nonnull String json) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            EDTCallbackExecutor.pool.submit(new LoadSunJSONString(json), new Callback(receiver));
+            Tasks.submit("sunjson", new LoadSunJSONString(json), receiver::setGeometry, LoadSunJSON::onFailure);
     }
 
     private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSONTypes.GeometryCollection>> {
@@ -61,17 +60,9 @@ public class LoadSunJSON {
         }
     }
 
-    private record Callback(Receiver receiver) implements FutureCallback<List<SunJSONTypes.GeometryCollection>> {
-        @Override
-        public void onSuccess(List<SunJSONTypes.GeometryCollection> result) {
-            receiver.setGeometry(result);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(Throwables.getStackTraceAsString(t));
-            Message.err("An error occurred opening the remote file", t.getMessage());
-        }
+    private static void onFailure(String logContext, Throwable t) {
+        Log.error(Throwables.getStackTraceAsString(t));
+        Message.err("An error occurred opening the remote file", t.getMessage());
     }
 
 }
