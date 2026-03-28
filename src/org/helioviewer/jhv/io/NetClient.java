@@ -49,4 +49,13 @@ public interface NetClient extends AutoCloseable {
         return "file".equals(uri.getScheme()) ? new NetClientLocal(uri) : new NetClientRemote(uri, allowError, cache);
     }
 
+    static NetClient post(URI uri, String contentType, byte[] body, boolean allowError, NetCache cache) throws IOException {
+        if (EventQueue.isDispatchThread())
+            throw new IOException("Don't do that");
+        if ("file".equals(uri.getScheme()))
+            throw new IOException("POST not supported for file URIs");
+
+        return new NetClientRemote(uri, contentType, body, allowError, cache);
+    }
+
 }
