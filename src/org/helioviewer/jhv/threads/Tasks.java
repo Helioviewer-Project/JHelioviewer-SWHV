@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.threads;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
@@ -12,17 +13,12 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public final class Tasks {
 
-    @FunctionalInterface
-    public interface FailureHandler {
-        void onFailure(String logContext, Throwable error);
-    }
-
     private Tasks() {
     }
 
-    public static <T> void submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
-                                  @Nonnull FailureHandler onFailure) {
-        EDTCallbackExecutor.pool.submit(task, new FutureCallback<>() {
+    public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
+                                       @Nonnull FailureHandler onFailure) {
+        return EDTCallbackExecutor.pool.submit(task, new FutureCallback<>() {
             @Override
             public void onSuccess(T result) {
                 onSuccess.accept(result);
@@ -35,9 +31,17 @@ public final class Tasks {
         });
     }
 
-    public static <T> void submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
-                                  @Nonnull String errorMessage) {
-        submit(logContext, task, onSuccess, (ctx, t) -> defaultOnFailure(ctx, t, errorMessage));
+    public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
+                                       @Nonnull String errorMessage) {
+        return submit(logContext, task, onSuccess, (ctx, t) -> defaultOnFailure(ctx, t, errorMessage));
+    }
+
+    public static void doNothing(Object result) {
+    }
+
+    @FunctionalInterface
+    public interface FailureHandler {
+        void onFailure(String logContext, Throwable error);
     }
 
     private static void defaultOnFailure(String logContext, Throwable t, String errorMessage) {
