@@ -55,6 +55,44 @@ public class BandReaderHapi {
         Tasks.submit(uri.toString(), new LoadHapiUri(uri), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
     }
 
+    private record LoadHapiCatalog(String server) implements Callable<Catalog> {
+        @Override
+        public Catalog call() throws Exception {
+            return getCatalog(server);
+        }
+    }
+
+    private record LoadHapiStream(Catalog catalog, String url, long start, long end) implements Callable<Band.Data> {
+        @Override
+        public Band.Data call() throws Exception {
+            return getHapiStream(catalog, url, start, end);
+        }
+    }
+
+    private record LoadHapiUri(URI uri) implements Callable<Band.Data> {
+        @Override
+        public Band.Data call() throws Exception {
+            return getHapiUri(uri);
+        }
+    }
+
+    private static void onSuccessData(Band.Data line) {
+        if (line != null) {
+            Band band = Band.createFromType(line.bandType());
+            band.addToCache(line.values(), line.dates());
+            Timelines.getLayers().add(band);
+        }
+    }
+
+    private static void onSuccessCatalog(@Nonnull Catalog catalog) {
+        theCatalog = catalog;
+        Timelines.td.setupDatasets(groupName, theCatalog.types);
+    }
+
+    private static void onFailure(String logContext, Throwable t) {
+        Log.error(Throwables.getStackTraceAsString(t));
+    }
+
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {
     }
 
@@ -307,44 +345,6 @@ public class BandReaderHapi {
         if (uriList.size() != 1)
             throw new Exception("Only one CSV file per zip supported");
         return getHapiUri(uriList.getFirst());
-    }
-
-    private record LoadHapiCatalog(String server) implements Callable<Catalog> {
-        @Override
-        public Catalog call() throws Exception {
-            return getCatalog(server);
-        }
-    }
-
-    private record LoadHapiStream(Catalog catalog, String url, long start, long end) implements Callable<Band.Data> {
-        @Override
-        public Band.Data call() throws Exception {
-            return getHapiStream(catalog, url, start, end);
-        }
-    }
-
-    private record LoadHapiUri(URI uri) implements Callable<Band.Data> {
-        @Override
-        public Band.Data call() throws Exception {
-            return getHapiUri(uri);
-        }
-    }
-
-    private static void onSuccessData(Band.Data line) {
-        if (line != null) {
-            Band band = Band.createFromType(line.bandType());
-            band.addToCache(line.values(), line.dates());
-            Timelines.getLayers().add(band);
-        }
-    }
-
-    private static void onSuccessCatalog(@Nonnull Catalog catalog) {
-        theCatalog = catalog;
-        Timelines.td.setupDatasets(groupName, theCatalog.types);
-    }
-
-    private static void onFailure(String logContext, Throwable t) {
-        Log.error(Throwables.getStackTraceAsString(t));
     }
 
     private static long toMillis(String isoTime) throws Exception {
