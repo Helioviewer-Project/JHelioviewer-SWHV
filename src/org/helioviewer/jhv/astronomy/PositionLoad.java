@@ -12,14 +12,13 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONObject;
 
 //import com.google.common.base.Stopwatch;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.util.concurrent.FutureCallback;
 
 public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject target, boolean isHCI,
                            Future<PositionResponse> future) {
@@ -68,19 +67,6 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
         }
     }
 
-    private record Callback(Interfaces.StatusReceiver receiver) implements FutureCallback<PositionResponse> {
-        @Override
-        public void onSuccess(PositionResponse result) {
-            receiver.setStatus("Loaded");
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            if (!JHVThread.isInterrupted(t))
-                receiver.setStatus(t.getMessage());
-        }
-    }
-
     public boolean isDownloading() {
         return !future.isDone();
     }
@@ -104,11 +90,21 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
         pruneFailedLoads(uv);
         receiver.setStatus("Loading...");
 
-        Future<PositionResponse> future = EDTCallbackExecutor.pool.submit(new LoadPosition(observer, target, frame, start, end), new Callback(receiver));
+        Future<PositionResponse> future = Tasks.submit(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
+                result -> onSuccess(receiver, result), (logContext, t) -> onFailure(receiver, t));
         PositionLoad load = new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, future);
         loads.put(uv, load);
 
         return load;
+    }
+
+    private static void onSuccess(Interfaces.StatusReceiver receiver, PositionResponse result) {
+        receiver.setStatus("Loaded");
+    }
+
+    private static void onFailure(Interfaces.StatusReceiver receiver, Throwable t) {
+        if (!JHVThread.isInterrupted(t))
+            receiver.setStatus(t.getMessage());
     }
 
     public static List<PositionLoad> get(UpdateViewpoint uv) {

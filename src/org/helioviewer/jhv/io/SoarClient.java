@@ -8,16 +8,14 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.gui.Message;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.common.util.concurrent.FutureCallback;
-
 public class SoarClient {
 
+    private static final String querySoops = "SELECT DISTINCT soop_name FROM soop ORDER BY soop_name";
     private static final UriTemplate queryTemplate = new UriTemplate("https://soar.esac.esa.int/soar-sl-tap/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
     private static final UriTemplate loadTemplate = new UriTemplate("https://soar.esac.esa.int/soar-sl-tap/data",
@@ -33,7 +31,7 @@ public class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        EDTCallbackExecutor.pool.submit(new QueryItems(adql), new CallbackItems(receiver));
+        Tasks.submit("soar", new QueryItems(adql), receiver::setSoarResponseItems, "An error occurred querying the server");
     }
 
     public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
@@ -45,7 +43,8 @@ public class SoarClient {
     }
 
     public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
-        EDTCallbackExecutor.pool.submit(new QuerySoops("SELECT DISTINCT soop_name FROM soop ORDER BY soop_name"), new CallbackSoops(receiver));
+        Tasks.submit("soar", new QuerySoops(querySoops), receiver::setSoarResponseSoops,
+                "An error occurred querying the server");
     }
 
     public static void submitLoad(@Nonnull List<DataItem> items) {
@@ -68,7 +67,7 @@ public class SoarClient {
     }
 
     static void submitTable(@Nonnull URI uri) {
-        EDTCallbackExecutor.pool.submit(new QueryTable(uri), new CallbackTable());
+        Tasks.submit(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
     }
 
     private static String adqlSearchTime(List<String> descriptors, String level, long start, long end) {
@@ -92,7 +91,7 @@ public class SoarClient {
                 "level='" + level + "' ORDER BY begin_time";
     }
 
-    private static List<DataItem> json2DataItems(JSONObject jo) {
+    private static List<DataItem> toDataItems(JSONObject jo) {
         JSONArray data = jo.getJSONArray("data");
         int length = data.length();
         List<DataItem> result = new ArrayList<>(length);
@@ -106,7 +105,7 @@ public class SoarClient {
         return result;
     }
 
-    private static List<String> json2Soops(JSONObject jo) {
+    private static List<String> toSoops(JSONObject jo) {
         JSONArray data = jo.getJSONArray("data");
         int length = data.length();
         List<String> result = new ArrayList<>(length);
@@ -125,21 +124,22 @@ public class SoarClient {
         void setSoarResponseSoops(List<String> list);
     }
 
+    private static JSONObject query(String adql) throws Exception {
+        URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
+        return JSONUtils.get(uri);
+    }
+
     private record QueryItems(String adql) implements Callable<List<DataItem>> {
         @Override
         public List<DataItem> call() throws Exception {
-            URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
-            JSONObject jo = JSONUtils.get(uri);
-            return json2DataItems(jo);
+            return toDataItems(query(adql));
         }
     }
 
     private record QuerySoops(String adql) implements Callable<List<String>> {
         @Override
         public List<String> call() throws Exception {
-            URI uri = new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
-            JSONObject jo = JSONUtils.get(uri);
-            return json2Soops(jo);
+            return toSoops(query(adql));
         }
     }
 
@@ -147,45 +147,6 @@ public class SoarClient {
         @Override
         public List<DataItem> call() throws Exception {
             return SoarTable.get(uri);
-        }
-    }
-
-    private record CallbackItems(ReceiverItems receiver) implements FutureCallback<List<DataItem>> {
-        @Override
-        public void onSuccess(@Nonnull List<DataItem> result) {
-            receiver.setSoarResponseItems(result);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred querying the server", t.getMessage());
-        }
-    }
-
-    private record CallbackSoops(ReceiverSoops receiver) implements FutureCallback<List<String>> {
-        @Override
-        public void onSuccess(@Nonnull List<String> result) {
-            receiver.setSoarResponseSoops(result);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred querying the server", t.getMessage());
-        }
-    }
-
-    private static class CallbackTable implements FutureCallback<List<DataItem>> {
-        @Override
-        public void onSuccess(@Nonnull List<DataItem> result) {
-            submitLoad(result);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred querying the server", t.getMessage());
         }
     }
 
