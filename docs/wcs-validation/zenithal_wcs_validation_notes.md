@@ -24,13 +24,11 @@ and Calabretta, "Representations of world coordinates in FITS" ([A&A 395,
 1061-1075,
 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1061G/abstract)).
 
-In this work, a new `TAN` path was implemented together with `AZP` and
-six-term `ZPN`, in line with the FITS celestial-coordinate projection paper
+In this work, a new `TAN` path was implemented together with `AZP`, six-term
+`ZPN`, and support for `CRLN-CAR / CRLT-CAR` surface maps, using the FITS
+celestial-coordinate projection formalism of Calabretta & Greisen
 ([A&A 395, 1077-1122, 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1077C/abstract)).
-That paper is also the direct projection reference for the `CAR` case
-summarized in this note.
-Hereafter, `formal-TAN` denotes this Greisen & Calabretta `TAN` formulation in
-JHV.
+Hereafter, `formal-TAN` denotes this FITS-compliant `TAN` formulation in JHV.
 
 The JHV `TAN` implementation of previous versions is hereafter denoted as
 `simple-TAN`. It treats the orthographic surface point's planar `(x,y)`
@@ -46,6 +44,11 @@ systems for solar image data"
 2006](https://www.aanda.org/articles/aa/abs/2006/14/aa4262-05/aa4262-05.html)).
 Because `HPC` is fundamentally tied to a specific observer viewpoint, it is
 not a natural fit for the multi-viewpoint aspect of JHV.
+
+The `CAR` case covered by this note is a surface-map case: it describes solar
+longitude/latitude on the sphere rather than observer-centered image geometry.
+It is therefore a natural fit for `Latitudinal` and for wrapping the visible
+sphere in `Orthographic`, but not for `HPC`, `Polar`, or `LogPolar`.
 
 Heliospheric imager datasets often use `AZP` or `ZPN` projections. For these
 datasets, the validation in this note supports the correctness of the `HPC`
@@ -106,7 +109,8 @@ Bottom line:
 - `HPC` mode was added (with the noted caveat about the viewpoint).
 - support for `AZP` and `ZPN` data was added (with the noted caveat about the
   heliospheric imagers).
-- support for `CAR` surface maps was added.
+- support for `CAR` surface maps was added (with the noted caveat about the
+  display modes).
 - the position numbers reported in the panel at the bottom of the JHV window
   are display-geometry numbers derived from the mouse pointer position, not
   coordinates read back from the active image WCS. In `HPC`, `Latitudinal`,
