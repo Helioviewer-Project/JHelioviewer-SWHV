@@ -41,6 +41,13 @@ public class JSONUtils {
         }
     }
 
+    public static JSONObject post(URI uri, JSONObject json) throws IOException, JSONException {
+        byte[] body = json.toString().getBytes(StandardCharsets.UTF_8);
+        try (NetClient nc = NetClient.post(uri, "application/json; charset=utf-8", body, false, NetClient.NetCache.NETWORK)) {
+            return get(nc.getReader());
+        }
+    }
+
     public static ByteArrayOutputStream compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFSIZ);
         try (GZIPOutputStream gz = new GZIPOutputStream(baos, BUFSIZ);
