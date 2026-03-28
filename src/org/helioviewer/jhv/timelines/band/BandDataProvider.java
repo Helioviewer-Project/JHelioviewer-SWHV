@@ -8,13 +8,12 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.util.concurrent.FutureCallback;
 
 public class BandDataProvider {
 
@@ -43,7 +42,7 @@ public class BandDataProvider {
     }
 
     public static void loadBand(JSONObject jo) {
-        EDTCallbackExecutor.pool.submit(new BandLoad(jo), new BandLoadCallback());
+        Tasks.submit("band", new BandLoad(jo), BandDataProvider::onSuccess, BandDataProvider::onFailure);
     }
 
     private record BandLoad(JSONObject jo) implements Callable<BandResponse> {
@@ -53,18 +52,14 @@ public class BandDataProvider {
         }
     }
 
-    private static class BandLoadCallback implements FutureCallback<BandResponse> {
-        @Override
-        public void onSuccess(@Nonnull BandResponse result) {
-            Band band = Band.createFromType(result.bandType);
-            band.addToCache(result.values, result.dates);
-            Timelines.getLayers().add(band);
-        }
+    private static void onSuccess(BandResponse result) {
+        Band band = Band.createFromType(result.bandType);
+        band.addToCache(result.values, result.dates);
+        Timelines.getLayers().add(band);
+    }
 
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-        }
+    private static void onFailure(String logContext, Throwable t) {
+        Log.error(t);
     }
 
     private static class BandResponse {

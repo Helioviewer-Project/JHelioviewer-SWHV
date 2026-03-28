@@ -20,7 +20,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.io.UriTemplate;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -34,7 +34,6 @@ import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.FutureCallback;
 
 public class BandReaderHapi {
 
@@ -45,15 +44,15 @@ public class BandReaderHapi {
     private static Catalog theCatalog; //!
 
     public static void requestCatalog() {
-        EDTCallbackExecutor.pool.submit(new LoadHapiCatalog(ROBserver), new CallbackCatalog());
+        Tasks.submit(ROBserver, new LoadHapiCatalog(ROBserver), BandReaderHapi::onSuccessCatalog, BandReaderHapi::onFailure);
     }
 
     static Future<Band.Data> requestData(String url, long start, long end) {
-        return EDTCallbackExecutor.pool.submit(new LoadHapiStream(theCatalog, url, start, end), new CallbackData());
+        return Tasks.submit(url, new LoadHapiStream(theCatalog, url, start, end), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
     }
 
     public static void loadUri(URI uri) {
-        EDTCallbackExecutor.pool.submit(new LoadHapiUri(uri), new CallbackData());
+        Tasks.submit(uri.toString(), new LoadHapiUri(uri), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
     }
 
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {
@@ -331,33 +330,21 @@ public class BandReaderHapi {
         }
     }
 
-    private static class CallbackData implements FutureCallback<Band.Data> {
-        @Override
-        public void onSuccess(Band.Data line) {
-            if (line != null) {
-                Band band = Band.createFromType(line.bandType());
-                band.addToCache(line.values(), line.dates());
-                Timelines.getLayers().add(band);
-            }
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(Throwables.getStackTraceAsString(t));
+    private static void onSuccessData(Band.Data line) {
+        if (line != null) {
+            Band band = Band.createFromType(line.bandType());
+            band.addToCache(line.values(), line.dates());
+            Timelines.getLayers().add(band);
         }
     }
 
-    private static class CallbackCatalog implements FutureCallback<Catalog> {
-        @Override
-        public void onSuccess(@Nonnull Catalog catalog) {
-            theCatalog = catalog;
-            Timelines.td.setupDatasets(groupName, theCatalog.types);
-        }
+    private static void onSuccessCatalog(@Nonnull Catalog catalog) {
+        theCatalog = catalog;
+        Timelines.td.setupDatasets(groupName, theCatalog.types);
+    }
 
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(Throwables.getStackTraceAsString(t));
-        }
+    private static void onFailure(String logContext, Throwable t) {
+        Log.error(Throwables.getStackTraceAsString(t));
     }
 
     private static long toMillis(String isoTime) throws Exception {
