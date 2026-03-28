@@ -7,31 +7,71 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.threads.EDTQueue;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
 import org.helioviewer.jhv.timelines.band.BandReaderCdf;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.common.util.concurrent.FutureCallback;
-
 class LoadRequest {
 
     static void submit(@Nonnull URI uri) {
-        EDTCallbackExecutor.pool.submit(new LoadRequestURI(uri), new Callback());
+        Tasks.submit(uri.toString(), new LoadRequestURI(uri), result -> {}, "An error occurred opening the remote file");
     }
 
     static void submit(@Nonnull String json) {
-        EDTCallbackExecutor.pool.submit(new LoadRequestString(json), new Callback());
+        Tasks.submit("request", new LoadRequestString(json), result -> {}, "An error occurred opening the remote file");
     }
 
     static void submitCDF(@Nonnull List<URI> uriList) {
-        EDTCallbackExecutor.pool.submit(new LoadRequestCDF(uriList), new CallbackCDF());
+        Tasks.submit("cdf", new LoadRequestCDF(uriList), LoadRequest::onSuccessCDF, LoadRequest::onFailureCDF);
         Timelines.dc.setStatus("Loading...");
+    }
+
+    private record LoadRequestURI(URI uri) implements Callable<Void> {
+        @Override
+        public Void call() throws Exception {
+            if (uri.toString().toLowerCase().endsWith(".cdf")) {
+                BandReaderCdf.load(uri);
+            } else
+                parseRequest(JSONUtils.get(uri));
+            return null;
+        }
+    }
+
+    private record LoadRequestString(String json) implements Callable<Void> {
+        @Override
+        public Void call() throws Exception {
+            parseRequest(new JSONObject(json));
+            return null;
+        }
+    }
+
+    private record LoadRequestCDF(List<URI> uriList) implements Callable<Void> {
+        @Override
+        public Void call() {
+            uriList.parallelStream().forEach(uri -> {
+                try {
+                    BandReaderCdf.load(uri);
+                } catch (Exception e) {
+                    Log.warn(uri.toString(), e);
+                }
+            });
+            return null;
+        }
+    }
+
+    private static void onSuccessCDF(Void result) {
+        Timelines.dc.setStatus(null);
+    }
+
+    private static void onFailureCDF(String logContext, Throwable t) {
+        Timelines.dc.setStatus(null);
+        Log.error(logContext, t);
+        org.helioviewer.jhv.gui.Message.err("An error occurred opening the remote file", t.getMessage());
     }
 
     private static void parseRequest(JSONObject jo) throws Exception {
@@ -52,69 +92,6 @@ class LoadRequest {
                 BandDataProvider.loadBand(jt.getJSONObject(i));
             }
         }
-    }
-
-    private record LoadRequestURI(URI uri) implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
-            if (uri.toString().toLowerCase().endsWith(".cdf")) {
-                BandReaderCdf.load(uri);
-            } else
-                parseRequest(JSONUtils.get(uri));
-            return null;
-        }
-    }
-
-    private record LoadRequestCDF(List<URI> uriList) implements Callable<Void> {
-        @Override
-        public Void call() {
-            uriList.parallelStream().forEach(uri -> {
-                try {
-                    BandReaderCdf.load(uri);
-                } catch (Exception e) {
-                    Log.warn(uri.toString(), e);
-                }
-            });
-            return null;
-        }
-    }
-
-    private record LoadRequestString(String json) implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
-            parseRequest(new JSONObject(json));
-            return null;
-        }
-    }
-
-    private static class Callback implements FutureCallback<Void> {
-
-        @Override
-        public void onSuccess(Void result) {
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Log.error(t);
-            Message.err("An error occurred opening the remote file", t.getMessage());
-        }
-
-    }
-
-    private static class CallbackCDF implements FutureCallback<Void> {
-
-        @Override
-        public void onSuccess(Void result) {
-            Timelines.dc.setStatus(null);
-        }
-
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
-            Timelines.dc.setStatus(null);
-            Log.error(t);
-            Message.err("An error occurred opening the remote file", t.getMessage());
-        }
-
     }
 
 }

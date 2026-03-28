@@ -14,13 +14,13 @@ public final class Tasks {
 
     @FunctionalInterface
     public interface FailureHandler {
-        void onFailure(String context, Throwable error);
+        void onFailure(String logContext, Throwable error);
     }
 
     private Tasks() {
     }
 
-    public static <T> void submit(@Nonnull String context, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
+    public static <T> void submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                   @Nonnull FailureHandler onFailure) {
         EDTCallbackExecutor.pool.submit(task, new FutureCallback<>() {
             @Override
@@ -30,18 +30,18 @@ public final class Tasks {
 
             @Override
             public void onFailure(@Nonnull Throwable t) {
-                onFailure.onFailure(context, t);
+                onFailure.onFailure(logContext, t);
             }
         });
     }
 
-    public static <T> void submit(@Nonnull String context, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
+    public static <T> void submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                   @Nonnull String errorMessage) {
-        submit(context, task, onSuccess, (ctx, t) -> defaultOnFailure(ctx, t, errorMessage));
+        submit(logContext, task, onSuccess, (ctx, t) -> defaultOnFailure(ctx, t, errorMessage));
     }
 
-    private static void defaultOnFailure(String context, Throwable t, String errorMessage) {
-        Log.error(context, t);
+    private static void defaultOnFailure(String logContext, Throwable t, String errorMessage) {
+        Log.error(logContext, t);
         Message.err(errorMessage, t.getMessage());
     }
 
