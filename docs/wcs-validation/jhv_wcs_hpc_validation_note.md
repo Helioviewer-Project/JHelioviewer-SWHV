@@ -283,6 +283,10 @@ The main script is:
 
 - `extra/test/validate_jhv_wcs_against_astropy.py`
 
+The documented test set in this note can also be run as a suite with:
+
+- `extra/test/run_jhv_wcs_hpc_validation_suite.py`
+
 Run it with:
 
 ```text
@@ -658,8 +662,8 @@ Measured `HPC` validation results:
     - `(-4.479846762614, 4.536935044095, -4.500971194048, 4.495966937161) deg`
   - centered display bounds:
     - `(-4.536935044095, 4.536935044095, -4.536935044095, 4.536935044095) deg`
-  - `1.05e-7 mas` max (`7.162271e-12 px`)
-  - `3.31e-8 mas` RMS (`2.254367e-12 px`)
+  - `1.10e-7 mas` max (`7.503331e-12 px`)
+  - `3.32e-8 mas` RMS (`2.260672e-12 px`)
 - HI1 (`AZP`, `20250622_000831_s4h1A.fts`):
   - `3.55e-7 mas` max (`4.945377e-12 px`)
 - HI2 (`AZP`, `20250622_000851_s4h2A.fts`):
@@ -692,7 +696,7 @@ Measured comparison result:
   `Orthographic` mode and `HPC` on the TAN samples gives:
   - `sample.171.fits` (`1.009 AU`):
     - `2.20 arcsec` max, `1.44 arcsec` RMS
-      (`3.670598 px` max, `2.397799 px` RMS)
+      (`3.670609 px` max, `2.401908 px` RMS)
     - theoretical max from Appendix A: `2.19 arcsec`
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
     - `11.22 arcsec` max, `7.32 arcsec` RMS
