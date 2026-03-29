@@ -185,6 +185,10 @@ def build_jhv_meta(header) -> JHVMeta:
         )
         crota_rad = math.radians(float(crota_deg))
 
+    pv2 = [float(header.get(f"PV2_{i}", 0.0)) for i in range(6)]
+    if projection == "CEA":
+        pv2[1] = float(header.get("PV2_1", 1.0))
+
     return JHVMeta(
         pixel_width=pixel_width,
         pixel_height=pixel_height,
@@ -201,7 +205,7 @@ def build_jhv_meta(header) -> JHVMeta:
         crota_rad=crota_rad,
         observer_distance=observer_distance,
         projection=projection,
-        pv2=tuple(float(header.get(f"PV2_{i}", 0.0)) for i in range(6)),
+        pv2=tuple(pv2),
     )
 
 
