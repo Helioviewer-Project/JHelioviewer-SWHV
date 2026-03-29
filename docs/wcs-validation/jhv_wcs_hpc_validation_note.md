@@ -2,9 +2,9 @@
 title: |
    | SWHV CCN4
    | WCS and HPC Validation Note
-subtitle: SWHV-ROB-TN-001-CCN4 v1.0
+subtitle: SWHV-ROB-TN-001-CCN4 v2.0
 subject: SWHV CCN4 
-date: SWHV-ROB-TN-001-CCN4 - Version 1.1 - 2026-03-29
+date: SWHV-ROB-TN-001-CCN4 - Version 2.0 - 2026-03-29
 lof: true
 lot: false
 ---
@@ -66,6 +66,11 @@ A dedicated validator was built in:
 Outside the renderer, it reproduces the parts of the JHV WCS/HPC mapping path
 covered by this note and compares them directly against Astropy wherever
 the result is fully defined by WCS.
+
+A companion script, `extra/test/compare_java_metadata_to_validator.py`,
+directly compares the derived WCS metadata quantities produced by the JHV Java
+code with the validator's Python metadata model on the representative FITS test
+files.
 
 The validator was applied to a variety of real instrument FITS files and
 metadata, including COR2, HI1, HI2, SDO/AIA, Solar Orbiter/EUI, and PSP/WISPR
@@ -287,6 +292,10 @@ The documented test set in this note can also be run as a suite with:
 
 - `extra/test/run_jhv_wcs_hpc_validation_suite.py`
 
+A companion Java/Python metadata-comparison check is also available:
+
+- `extra/test/compare_java_metadata_to_validator.py`
+
 Run it with:
 
 ```text
@@ -302,6 +311,86 @@ The validator uses three different comparison domains:
     tests
 - bounded `HPC` screen domain:
   - a finite rendered `HPC` box chosen for the validation run
+
+### Direct Java/Python metadata comparison
+
+The Astropy-based validator described above is intentionally an independent
+Python model of the relevant JHV WCS and sampling logic. That independence is
+useful for validation, but it also means that a pure Astropy agreement result
+does not by itself prove that the Java metadata path is
+interpreting FITS headers in the same way as the validator.
+
+To check that point directly, the work reported in this note also includes a
+small Java-side metadata dumper:
+
+- `extra/test/JHVMetadataDump.java`
+
+and a Python driver that compiles and runs that helper:
+
+- `extra/test/compare_java_metadata_to_validator.py`
+
+The comparison driver:
+
+- compiles the JHV Java code and the `JHVMetadataDump.java` helper
+- opens representative FITS files from the documented validation suite
+- instantiates `HelioviewerMetaData` (the JHV class that interprets the FITS
+  metadata into the derived image/WCS quantities used by the program) on the
+  Java side
+- extracts the derived WCS metadata quantities produced by JHV Java code
+- compares them field-by-field against the Python validator's
+  `build_jhv_meta(...)`
+
+The comparison covers the representative FITS/HDU cases drawn from
+the documented validation suite, including:
+
+- `TAN`
+- `AZP`
+- `ZPN`
+- `CAR`
+- `CEA`
+
+The compared derived quantities include:
+
+- pixel size:
+  - `pixel_width`
+  - `pixel_height`
+- FITS reference-pixel conversion to the JHV/OpenGL convention:
+  - `crpix1_gl`
+  - `crpix2_gl`
+- effective per-axis source scale:
+  - `arcsec_per_pixel_x`
+  - `arcsec_per_pixel_y`
+- normalized internal scaling:
+  - `unit_per_arcsec`
+  - `unit_per_pixel_x`
+  - `unit_per_pixel_y`
+  - `plane_units_per_rad`
+- normalized WCS reference values:
+  - `crval_internal_x`
+  - `crval_internal_y`
+  - `crota_rad`
+- projection family and projection parameters:
+  - `projection`
+  - `pv2`
+
+This comparison is useful for catching Java-side metadata interpretation drift that may not be
+visible from the independent Astropy agreement alone.
+
+In the code state documented here, this direct Java/Python metadata comparison
+passes on all representative cases used by the comparison script.
+
+One caveat remains for the `observer_distance` field when `DSUN_OBS` is absent:
+
+- on the JHV side, the fallback observer distance comes from the runtime SPICE
+  ephemeris path
+- on the Python side, the fallback uses Astropy solar ephemerides
+
+Those two fallback ephemerides do not yield exactly the same observer
+distance. On the tested missing-`DSUN_OBS` cases, the difference is tiny, so
+the direct comparison accepts a small tolerance for `observer_distance` in that
+specific case. This does not affect the conclusion about WCS metadata
+interpretation, but it is worth stating explicitly so the comparison result is
+not over-interpreted.
 
 ### Astropy-based validation modes
 

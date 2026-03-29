@@ -8,7 +8,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
+import astropy.units as u
+from astropy.coordinates import get_sun
 from astropy.io import fits
+from astropy.time import Time
 from astropy.wcs import WCS
 from PIL import Image
 
@@ -86,6 +89,33 @@ def find_image_hdu(hdul: fits.HDUList, hdu_index: int | None):
     raise ValueError("No image HDU found")
 
 
+def header_observed_date(header) -> str:
+    observed_date = (
+        header.get("DATE-AVG")
+        or header.get("DATE_AVG")
+        or header.get("DATE_OBS")
+        or header.get("DATE-OBS")
+    )
+    if observed_date is None:
+        raise ValueError("Missing DATE-OBS-style keyword")
+    observed_date = str(observed_date)
+    if str(header.get("INSTRUME", "")) == "LASCO":
+        observed_time = header.get("TIME_OBS") or header.get("TIME-OBS")
+        if observed_time is None:
+            raise ValueError("LASCO header missing TIME_OBS/TIME-OBS")
+        observed_date = observed_date.replace("/", "-") + "T" + str(observed_time)
+    if observed_date.endswith("Z"):
+        observed_date = observed_date[:-1]
+    if len(observed_date) == 10:
+        observed_date += "T00:00:00"
+    return observed_date
+
+
+def earth_distance_solar_radii(header) -> float:
+    time = Time(header_observed_date(header), format="isot", scale="utc")
+    return float(get_sun(time).distance.to_value(u.m) / SUN_RADIUS_METER)
+
+
 def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
     pc11 = float(header.get("PC1_1", 1.0))
     pc12 = float(header.get("PC1_2", 0.0))
@@ -139,7 +169,7 @@ def build_jhv_meta(header) -> JHVMeta:
     arcsec_per_pixel_y = float(header["CDELT2"]) * arcsec_y
 
     dsun_obs = header.get("DSUN_OBS")
-    observer_distance = dsun_obs / SUN_RADIUS_METER if dsun_obs is not None else SUN_MEAN_EARTH_DISTANCE
+    observer_distance = dsun_obs / SUN_RADIUS_METER if dsun_obs is not None else earth_distance_solar_radii(header)
 
     if projection in {"CAR", "CEA"}:
         unit_per_arcsec = math.pi / (180.0 * 3600.0)
