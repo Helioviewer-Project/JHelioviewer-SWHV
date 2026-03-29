@@ -644,11 +644,9 @@ Interpretation:
 # Results
 
 The primary discrepancy units reported in this note are angular sky errors,
-derived from `CDELT` and expressed in milliarcseconds or arcseconds as
-appropriate. Pixel errors are kept as secondary units because they are the
-quantities reported directly by the validator. For the `CAR` surface-map
-case, the corresponding angular map units are derived from the linear scale
-matrix `PC * CDELT`.
+expressed in milliarcseconds or arcseconds as appropriate. Pixel errors are
+kept as secondary units because they are the quantities reported directly by
+the validator.
 
 ## FITS projections
 
@@ -844,7 +842,7 @@ This is again an internal JHV comparison. Its purpose is to show whether
 ## `CAR` surface-map validation
 
 This subsection reports the Astropy validation results for the tested
-full-Sun Carrington surface-map case.
+full-Sun `CAR` surface-map case.
 
 - the validated files are:
   - `extra/test/data/sunerf_map.fits`
