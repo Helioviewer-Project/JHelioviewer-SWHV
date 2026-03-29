@@ -6,19 +6,25 @@ import org.helioviewer.jhv.math.Vec2;
 public final class WcsHeader {
 
     public enum Projection {
-        TAN, AZP, ZPN, CAR;
+        TAN, AZP, ZPN, CAR, CEA;
+
+        public boolean isSurfaceMap() {
+            return this == CAR || this == CEA;
+        }
 
         public boolean usesPv2() {
-            return this == AZP || this == ZPN;
+            return this == AZP || this == ZPN || this == CEA;
         }
 
         public static Projection fromCtype(String ctype1, String ctype2) {
-            if (ctype1.endsWith("CAR") && ctype2.endsWith("CAR"))
-                return CAR;
             if (ctype1.endsWith("AZP") && ctype2.endsWith("AZP"))
                 return AZP;
             if (ctype1.endsWith("ZPN") && ctype2.endsWith("ZPN"))
                 return ZPN;
+            if (ctype1.endsWith("CAR") && ctype2.endsWith("CAR"))
+                return CAR;
+            if (ctype1.endsWith("CEA") && ctype2.endsWith("CEA"))
+                return CEA;
             return TAN;
         }
     }
