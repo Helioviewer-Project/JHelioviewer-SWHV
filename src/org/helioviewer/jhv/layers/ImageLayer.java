@@ -261,8 +261,8 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
         shader.bindPV(gl, wcs0.pv2, wcs1.pv2);
 
-        Quat sourceView0 = wcs0.projection == WcsHeader.Projection.CAR ? q : metaViewpoint0.toQuat();
-        Quat sourceView1 = wcs1.projection == WcsHeader.Projection.CAR ? q : metaViewpoint1.toQuat();
+        Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();
+        Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
         Quat displayMap0 = Quat.ZERO;
         Quat displayMap1 = Quat.ZERO;
         if (Display.mode.isLatitudinal()) {
