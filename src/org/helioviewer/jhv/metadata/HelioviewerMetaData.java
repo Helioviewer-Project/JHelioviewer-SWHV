@@ -338,10 +338,9 @@ public final class HelioviewerMetaData extends BaseMetaData {
     }
 
     private static SurfaceCd readSurfaceCd(WcsInput wcs, PixelAxes axes, boolean isCea) {
-        // Surface-map X is angular longitude. For CEA, Y is the equal-area coordinate;
-        // for CAR, Y is angular latitude in radians.
-        double cdelt1Rad = Math.toRadians(wcs.cdelt1 * axes.arcsecX / 3600.);
-        double cdelt2Surface = isCea ? wcs.cdelt2 : Math.toRadians(wcs.cdelt2 * axes.arcsecY / 3600.);
+        // Surface-map X is angular longitude. Y is angular latitude for CAR and equal-area Y for CEA.
+        double cdelt1Rad = Math.toRadians(axes.arcsecPerPixelX / 3600.);
+        double cdelt2Surface = isCea ? wcs.cdelt2 : Math.toRadians(axes.arcsecPerPixelY / 3600.);
         return new SurfaceCd(
                 cdelt1Rad * axes.pc11,
                 cdelt1Rad * axes.pc12,
