@@ -47,6 +47,16 @@ def ctype_pair(header) -> tuple[str, str]:
     return str(header.get("CTYPE1", "")), str(header.get("CTYPE2", ""))
 
 
+def default_angular_cunit(header, axis: int) -> str | None:
+    cunit = header.get(f"CUNIT{axis}")
+    if cunit is not None:
+        return cunit
+    ctype = str(header.get(f"CTYPE{axis}", ""))
+    if ctype.endswith("CAR") or ctype.endswith("CEA"):
+        return "deg"
+    return None
+
+
 def unit_scale_from_cunit(cunit: str | None) -> float:
     if cunit and cunit.lower() == "deg":
         return 3600.0
@@ -81,8 +91,8 @@ def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
     pc12 = float(header.get("PC1_2", 0.0))
     pc21 = float(header.get("PC2_1", 0.0))
     pc22 = float(header.get("PC2_2", 1.0))
-    cdelt1_rad = math.radians(angular_header_value_to_deg(float(header["CDELT1"]), header.get("CUNIT1")))
-    cdelt2_rad = math.radians(angular_header_value_to_deg(float(header["CDELT2"]), header.get("CUNIT2")))
+    cdelt1_rad = math.radians(angular_header_value_to_deg(float(header["CDELT1"]), default_angular_cunit(header, 1)))
+    cdelt2_rad = math.radians(angular_header_value_to_deg(float(header["CDELT2"]), default_angular_cunit(header, 2)))
     return (
         cdelt1_rad * pc11,
         cdelt1_rad * pc12,
@@ -91,12 +101,27 @@ def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
     )
 
 
+def cea_effective_cd(header) -> tuple[float, float, float, float]:
+    pc11 = float(header.get("PC1_1", 1.0))
+    pc12 = float(header.get("PC1_2", 0.0))
+    pc21 = float(header.get("PC2_1", 0.0))
+    pc22 = float(header.get("PC2_2", 1.0))
+    cdelt1_rad = math.radians(angular_header_value_to_deg(float(header["CDELT1"]), default_angular_cunit(header, 1)))
+    cdelt2_eq = float(header["CDELT2"])
+    return (
+        cdelt1_rad * pc11,
+        cdelt1_rad * pc12,
+        cdelt2_eq * pc21,
+        cdelt2_eq * pc22,
+    )
+
+
 def build_astropy_wcs_base(header, projection: str, crval1_deg: float, crval2_deg: float) -> WCS:
     ctype1, ctype2 = ctype_pair(header)
     wcs = WCS(naxis=2)
-    if projection == "CAR":
+    if projection in {"CAR", "CEA"}:
         wcs.wcs.ctype = [ctype1, ctype2]
-        wcs.wcs.cunit = [header.get("CUNIT1", "deg"), header.get("CUNIT2", "deg")]
+        wcs.wcs.cunit = [default_angular_cunit(header, 1) or "deg", default_angular_cunit(header, 2) or "deg"]
     else:
         wcs.wcs.ctype = [f"RA---{projection}", f"DEC--{projection}"]
     wcs.wcs.crval = [crval1_deg, crval2_deg]
@@ -108,24 +133,29 @@ def build_jhv_meta(header) -> JHVMeta:
     pixel_height = int(header.get("ZNAXIS2", header.get("NAXIS2")))
     projection = projection_suffix(header)
 
-    arcsec_x = unit_scale_from_cunit(header.get("CUNIT1"))
-    arcsec_y = unit_scale_from_cunit(header.get("CUNIT2"))
+    arcsec_x = unit_scale_from_cunit(default_angular_cunit(header, 1))
+    arcsec_y = unit_scale_from_cunit(default_angular_cunit(header, 2))
     arcsec_per_pixel_x = float(header["CDELT1"]) * arcsec_x
     arcsec_per_pixel_y = float(header["CDELT2"]) * arcsec_y
 
     dsun_obs = header.get("DSUN_OBS")
     observer_distance = dsun_obs / SUN_RADIUS_METER if dsun_obs is not None else SUN_MEAN_EARTH_DISTANCE
 
-    if projection == "CAR":
+    if projection in {"CAR", "CEA"}:
         unit_per_arcsec = math.pi / (180.0 * 3600.0)
         plane_units_per_rad = 1.0
-        cd11, cd12, cd21, cd22 = car_effective_cd_rad(header)
+        cd11, cd12, cd21, cd22 = cea_effective_cd(header) if projection == "CEA" else car_effective_cd_rad(header)
         unit_per_pixel_x = math.hypot(cd11, cd21)
         unit_per_pixel_y = math.hypot(cd12, cd22)
         arcsec_per_pixel_x = math.degrees(unit_per_pixel_x) * 3600.0
-        arcsec_per_pixel_y = math.degrees(unit_per_pixel_y) * 3600.0
-        crval_internal_x = math.radians(angular_header_value_to_deg(header.get("CRVAL1", 0.0), header.get("CUNIT1")))
-        crval_internal_y = math.radians(angular_header_value_to_deg(header.get("CRVAL2", 0.0), header.get("CUNIT2")))
+        arcsec_per_pixel_y = math.degrees(unit_per_pixel_y) * 3600.0 if projection == "CAR" else unit_per_pixel_y
+        crval_internal_x = math.radians(angular_header_value_to_deg(header.get("CRVAL1", 0.0), default_angular_cunit(header, 1)))
+        if projection == "CEA":
+            lam = float(header.get("PV2_1", 1.0))
+            crval_lat = math.radians(angular_header_value_to_deg(header.get("CRVAL2", 0.0), default_angular_cunit(header, 2)))
+            crval_internal_y = math.sin(crval_lat) / lam
+        else:
+            crval_internal_y = math.radians(angular_header_value_to_deg(header.get("CRVAL2", 0.0), default_angular_cunit(header, 2)))
     else:
         radius_sun_in_arcsec = math.degrees(math.atan2(1.0, observer_distance)) * 3600.0
         unit_per_arcsec = 1.0 / radius_sun_in_arcsec
@@ -141,8 +171,8 @@ def build_jhv_meta(header) -> JHVMeta:
     try:
         pc2_1 = float(header["PC2_1"])
         pc1_1 = float(header["PC1_1"])
-        if projection == "CAR":
-            cd11, _, cd21, _ = car_effective_cd_rad(header)
+        if projection in {"CAR", "CEA"}:
+            cd11, _, cd21, _ = cea_effective_cd(header) if projection == "CEA" else car_effective_cd_rad(header)
             crota_rad = math.atan2(cd21, cd11)
         else:
             crota_rad = math.atan2(pc2_1 / (arcsec_per_pixel_x / arcsec_per_pixel_y), pc1_1)
@@ -179,8 +209,8 @@ def ensure_supported_projection(header) -> None:
     ctype1, ctype2 = ctype_pair(header)
     if ctype1[-3:] != ctype2[-3:]:
         raise ValueError(f"Mismatched projection types: {ctype1!r} / {ctype2!r}")
-    if not (ctype1.endswith("TAN") or ctype1.endswith("AZP") or ctype1.endswith("ZPN") or ctype1.endswith("CAR")):
-        raise ValueError(f"Only TAN, AZP, ZPN, and CAR FITS files are supported right now, got {ctype1!r} / {ctype2!r}")
+    if not (ctype1.endswith("TAN") or ctype1.endswith("AZP") or ctype1.endswith("ZPN") or ctype1.endswith("CAR") or ctype1.endswith("CEA")):
+        raise ValueError(f"Only TAN, AZP, ZPN, CAR, and CEA FITS files are supported right now, got {ctype1!r} / {ctype2!r}")
 
 
 def wrap_delta_lon_rad(lon: float, lon0: float) -> float:
@@ -401,6 +431,14 @@ def project_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMet
             meta.plane_units_per_rad * wrap_delta_lon_rad(world_rad[0], lon0),
             meta.plane_units_per_rad * (world_rad[1] - lat0),
         )
+    if meta.projection == "CEA":
+        lon0 = meta.crval_internal_x
+        y0 = meta.crval_internal_y
+        lam = max(abs(meta.pv2[1]), 1e-12)
+        return (
+            meta.plane_units_per_rad * wrap_delta_lon_rad(world_rad[0], lon0),
+            meta.plane_units_per_rad * (math.sin(world_rad[1]) / lam - y0),
+        )
     if meta.projection == "TAN":
         return tan_world_to_plane_internal(world_rad, meta)
     if meta.projection == "AZP":
@@ -417,6 +455,14 @@ def project_plane_internal_to_world(plane_internal: tuple[float, float], meta: J
         return (
             lon0 + plane_internal[0] / meta.plane_units_per_rad,
             lat0 + plane_internal[1] / meta.plane_units_per_rad,
+        )
+    if meta.projection == "CEA":
+        lon0 = meta.crval_internal_x
+        y0 = meta.crval_internal_y
+        lam = max(abs(meta.pv2[1]), 1e-12)
+        return (
+            lon0 + plane_internal[0] / meta.plane_units_per_rad,
+            math.asin(max(-1.0, min(1.0, lam * (plane_internal[1] / meta.plane_units_per_rad + y0)))),
         )
     if meta.projection == "TAN":
         return project_plane_internal_to_world_tan(plane_internal, meta)
@@ -447,6 +493,14 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         delta_lon = (lon - lon0 + math.pi) % (2.0 * math.pi) - math.pi
         x = meta.plane_units_per_rad * delta_lon
         y = meta.plane_units_per_rad * (lat - lat0)
+        return np.column_stack((x, y))
+    if meta.projection == "CEA":
+        lon0 = meta.crval_internal_x
+        y0 = meta.crval_internal_y
+        lam = max(abs(meta.pv2[1]), 1e-12)
+        delta_lon = (lon - lon0 + math.pi) % (2.0 * math.pi) - math.pi
+        x = meta.plane_units_per_rad * delta_lon
+        y = meta.plane_units_per_rad * (np.sin(lat) / lam - y0)
         return np.column_stack((x, y))
 
     lon0 = meta.crval_internal_x / meta.plane_units_per_rad
@@ -564,25 +618,25 @@ def ortho_carrier_world_array_from_hpc_world_deg(world_deg: np.ndarray, meta: JH
 
 
 def build_projection_only_wcs(header) -> WCS:
-    crval1_deg = angular_header_value_to_deg(header.get("CRVAL1", 0.0), header.get("CUNIT1"))
-    crval2_deg = angular_header_value_to_deg(header.get("CRVAL2", 0.0), header.get("CUNIT2"))
+    crval1_deg = angular_header_value_to_deg(header.get("CRVAL1", 0.0), default_angular_cunit(header, 1))
+    crval2_deg = angular_header_value_to_deg(header.get("CRVAL2", 0.0), default_angular_cunit(header, 2))
     projection = projection_suffix(header)
     wcs = build_astropy_wcs_base(header, projection, crval1_deg, crval2_deg)
     wcs.wcs.crpix = [1.0, 1.0]
     wcs.wcs.cdelt = [1.0, 1.0]
     wcs.wcs.pc = [[1.0, 0.0], [0.0, 1.0]]
-    if projection in {"AZP", "ZPN"}:
+    if projection in {"AZP", "ZPN", "CEA"}:
         wcs.wcs.set_pv([(2, i, float(header.get(f"PV2_{i}", 0.0))) for i in range(6) if f"PV2_{i}" in header])
     return wcs
 
 
 def build_jhv_equivalent_astropy_wcs(header, meta: JHVMeta) -> WCS:
-    crval1_deg = angular_header_value_to_deg(header.get("CRVAL1", 0.0), header.get("CUNIT1"))
-    crval2_deg = angular_header_value_to_deg(header.get("CRVAL2", 0.0), header.get("CUNIT2"))
+    crval1_deg = angular_header_value_to_deg(header.get("CRVAL1", 0.0), default_angular_cunit(header, 1))
+    crval2_deg = angular_header_value_to_deg(header.get("CRVAL2", 0.0), default_angular_cunit(header, 2))
     projection = projection_suffix(header)
 
     sx = abs(meta.arcsec_per_pixel_x) / 3600.0
-    sy = abs(meta.arcsec_per_pixel_y) / 3600.0
+    sy = abs(meta.arcsec_per_pixel_y) / 3600.0 if projection != "CEA" else abs(meta.arcsec_per_pixel_y) * 180.0 / math.pi
     c = math.cos(meta.crota_rad)
     s = math.sin(meta.crota_rad)
 
@@ -592,7 +646,7 @@ def build_jhv_equivalent_astropy_wcs(header, meta: JHVMeta) -> WCS:
         [c * sx, s * sy],
         [s * sx, -c * sy],
     ])
-    if projection in {"AZP", "ZPN"}:
+    if projection in {"AZP", "ZPN", "CEA"}:
         wcs.wcs.set_pv([(2, i, float(header.get(f"PV2_{i}", 0.0))) for i in range(6) if f"PV2_{i}" in header])
     return wcs
 
@@ -754,7 +808,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
             "Validate the current JHV image/WCS projection code paths against astropy.wcs. "
-            "The script covers the formal TAN/AZP/ZPN/CAR image path, the inverse TAN/AZP/ZPN/CAR branches "
+            "The script covers the formal TAN/AZP/ZPN/CAR/CEA image path, the inverse TAN/AZP/ZPN/CAR/CEA branches "
             "implemented by JHV where the validator has coverage, the centered HPC display-bounds logic, and the existing orthographic/HPC/TAN "
             "comparison modes already used by this branch. It does not validate newer Java overlay-only behavior "
             "such as viewpoint-space external-point projection or visible-hemisphere clipping."
@@ -770,6 +824,7 @@ def main() -> int:
     parser.add_argument("--inverse-azp", action="store_true", help="Validate the AZP inverse plane->world mapping")
     parser.add_argument("--inverse-zpn", action="store_true", help="Validate the primary-branch ZPN inverse plane->world mapping")
     parser.add_argument("--inverse-car", action="store_true", help="Validate the CAR inverse plane->world mapping")
+    parser.add_argument("--inverse-cea", action="store_true", help="Validate the CEA inverse plane->world mapping")
     parser.add_argument("--hpc-render-compare", action="store_true", help="Render a bounded HPC screen through JHV and Astropy mappings and write diagnostic PNGs")
     parser.add_argument("--hpc-bounds-compare", action="store_true", help="Report the raw and centered HPC bounds used by the current JHV display logic")
     parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare formal-TAN in Orthographic mode against JHV HPC over the full rendered comparison frame")
@@ -1058,10 +1113,10 @@ def main() -> int:
         print(f"initial_tan_vs_hpc_diff_png={diff_path}")
         return 0
 
-    if args.inverse_tan or args.inverse_azp or args.inverse_zpn or args.inverse_car:
-        inverse_mode_count = sum(1 for enabled in (args.inverse_tan, args.inverse_azp, args.inverse_zpn, args.inverse_car) if enabled)
+    if args.inverse_tan or args.inverse_azp or args.inverse_zpn or args.inverse_car or args.inverse_cea:
+        inverse_mode_count = sum(1 for enabled in (args.inverse_tan, args.inverse_azp, args.inverse_zpn, args.inverse_car, args.inverse_cea) if enabled)
         if inverse_mode_count > 1:
-            raise ValueError("Choose at most one of --inverse-tan, --inverse-azp, --inverse-zpn, or --inverse-car")
+            raise ValueError("Choose at most one of --inverse-tan, --inverse-azp, --inverse-zpn, --inverse-car, or --inverse-cea")
 
         if args.inverse_tan:
             expected_projection = "TAN"
@@ -1072,9 +1127,12 @@ def main() -> int:
         elif args.inverse_zpn:
             expected_projection = "ZPN"
             mode_name = "inverse_zpn"
-        else:
+        elif args.inverse_car:
             expected_projection = "CAR"
             mode_name = "inverse_car"
+        else:
+            expected_projection = "CEA"
+            mode_name = "inverse_cea"
 
         if meta.projection != expected_projection:
             raise ValueError(f"--{mode_name.replace('_', '-')} requires a {expected_projection} FITS file")
@@ -1084,7 +1142,7 @@ def main() -> int:
         valid_inverse_samples = 0
         skipped_inverse_samples = 0
         worst_inverse: list[tuple[float, tuple[float, float], tuple[float, float], tuple[float, float]]] = []
-        if expected_projection in {"ZPN", "CAR"}:
+        if expected_projection in {"ZPN", "CAR", "CEA"}:
             inverse_samples = sample_worlds_from_pixels(pixel_wcs, meta, args.samples)
         else:
             inverse_samples = [world2helioprojective(point_xyz, meta.observer_distance) for point_xyz in sample_points(args.samples, args.seed)]
@@ -1179,7 +1237,7 @@ def main() -> int:
 
     valid_samples = 0
     skipped_samples = 0
-    if meta.projection in {"ZPN", "CAR"}:
+    if meta.projection in {"ZPN", "CAR", "CEA"}:
         world_samples = sample_worlds_from_pixels(pixel_wcs, meta, args.samples)
     else:
         world_samples = [world2helioprojective(point_xyz, meta.observer_distance) for point_xyz in sample_points(args.samples, args.seed)]

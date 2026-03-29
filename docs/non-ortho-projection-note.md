@@ -58,8 +58,9 @@ This note documents the convention used by the non-orthographic display modes (`
 - `Latitudinal` uses `x = longitude`, `y = latitude`.
   - the GLSL latitudinal shader uses explicit latitude internally as well, with
     `0` at the equator and positive northward
-  - `CRLN-CAR / CRLT-CAR` surface maps are handled here as direct solar
-    longitude/latitude maps, not as observer-image reprojections
+  - `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface maps are handled
+    here as direct solar longitude/latitude maps, not as observer-image
+    reprojections
 - `Polar` and `LogPolar` use polar angle with `0°` at north and increasing
   anti-clockwise.
   - the Java polar projection expresses that convention directly
@@ -103,15 +104,16 @@ This note documents the convention used by the non-orthographic display modes (`
 - Unsupported projection codes fall back to `TAN` on both the Java and GLSL
   sides.
 - `ZPN` support uses only `PV2_0..PV2_5`, which matches the solar test files.
-- `CRLN-CAR / CRLT-CAR` surface maps are currently supported only in:
+- `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface maps are currently
+  supported only in:
   - `Latitudinal`
   - `Orthographic`
 - They are not supported in:
   - `HPC`, because `HPC` is observer-centered helioprojective angle space
   - `Polar` / `LogPolar`, because those paths still assume observer-image
     reprojection rather than a pure surface lon/lat map
-- In `Orthographic`, `CAR` wraps only the visible solar sphere and has no
-  off-limb representation.
+- In `Orthographic`, `CAR` and `CEA` wrap only the visible solar sphere and
+  have no off-limb representation.
 
 ## HPC Viewpoint Findings
 
