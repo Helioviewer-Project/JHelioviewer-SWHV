@@ -237,6 +237,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
         }
         if (observedDate.endsWith("Z")) // MDI & EIT
             observedDate = observedDate.substring(0, observedDate.length() - 1);
+        if (observedDate.length() == 10) // date-only metadata, assume midnight
+            observedDate += "T00:00:00";
 
         return new JHVTime(observedDate);
     }
