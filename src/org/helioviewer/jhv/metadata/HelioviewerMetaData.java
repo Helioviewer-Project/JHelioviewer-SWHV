@@ -379,9 +379,11 @@ public final class HelioviewerMetaData extends BaseMetaData {
         return Math.sin(latitude) / lambda;
     }
 
-    private static void loadPv2(MetaDataContainer m, float[] pv2) {
+    private static void loadPv2(MetaDataContainer m, WcsInput wcs, WcsHeader.Projection projection, float[] pv2) {
         for (int i = 0; i < pv2.length; i++)
             pv2[i] = m.getDouble("PV2_" + i).map(Double::floatValue).orElse(0f);
+        if (projection == WcsHeader.Projection.CEA) // Thompson (2006): CEA defaults PV2_1 to 1 when omitted.
+            pv2[1] = (float) wcs.pv2_1;
     }
 
     private static double readSurfaceCrota(SurfaceCd cd) {
@@ -446,7 +448,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
             crval = new Vec2(crval1, crval2);
 
             if (wcsProjection.usesPv2())
-                loadPv2(m, pv2);
+                loadPv2(m, wcs, wcsProjection, pv2);
 
             if (!CROTABlockSet.contains(instrument)) {
                 double c = isSurfaceMap ? readSurfaceCrota(surfaceCd) : readObserverImageCrota(m, axes);
