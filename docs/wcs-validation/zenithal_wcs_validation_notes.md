@@ -1,10 +1,10 @@
 ---
 title: |
    | SWHV CCN4
-   | Zenithal WCS and HPC Validation Note
+   | WCS and HPC Validation Note
 subtitle: SWHV-ROB-TN-001-CCN4 v1.0
 subject: SWHV CCN4 
-date: SWHV-ROB-TN-001-CCN4 - Version 1.0 - 2026-03-22
+date: SWHV-ROB-TN-001-CCN4 - Version 1.1 - 2026-03-29
 lof: true
 lot: false
 ---
@@ -15,18 +15,19 @@ lot: false
 
 This note describes the zenithal WCS and `HPC` work implemented in JHV, and
 the corresponding validation against Astropy and direct internal comparison
-tests. It also includes a `CAR` (plate-carree / Carrington
-map) validation case for surface maps described by FITS WCS axes
-`CRLN-CAR / CRLT-CAR`. The main focus of the note
-remains the zenithal projections and their use in `HPC`. For the general
+tests. It also includes validation cases for surface maps described by FITS
+WCS axes `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`. The main focus of
+the note remains the zenithal
+projections and their use in `HPC`. For the general
 FITS/WCS header conventions used throughout, the primary reference is Greisen
 and Calabretta, "Representations of world coordinates in FITS" ([A&A 395,
 1061-1075,
 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1061G/abstract)).
 
 In this work, a new `TAN` path was implemented together with `AZP`, six-term
-`ZPN`, and support for `CRLN-CAR / CRLT-CAR` surface maps, using the FITS
-celestial-coordinate projection formalism of Calabretta & Greisen
+`ZPN`, and support for `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`
+surface maps, using the FITS celestial-coordinate projection formalism of
+Calabretta & Greisen
 ([A&A 395, 1077-1122, 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1077C/abstract)).
 Hereafter, `formal-TAN` denotes this FITS-compliant `TAN` formulation in JHV.
 
@@ -45,10 +46,11 @@ systems for solar image data"
 Because `HPC` is fundamentally tied to a specific observer viewpoint, it is
 not a natural fit for the multi-viewpoint aspect of JHV.
 
-The `CAR` case covered by this note is a surface-map case: it describes solar
-longitude/latitude on the sphere rather than observer-centered image geometry.
-It is therefore a natural fit for `Latitudinal` and for wrapping the visible
-sphere in `Orthographic`, but not for `HPC`, `Polar`, or `LogPolar`.
+The `CAR` and `CEA` cases covered by this note are surface-map cases: they
+describe solar longitude/latitude on the sphere rather than observer-centered
+image geometry. They are therefore a natural fit for `Latitudinal` and for
+wrapping the visible sphere in `Orthographic`, but not for `HPC`, `Polar`, or
+`LogPolar`.
 
 Heliospheric imager datasets often use `AZP` or `ZPN` projections. For these
 datasets, the validation in this note supports the correctness of the `HPC`
@@ -74,7 +76,7 @@ The work reported here includes:
 - validating `formal-TAN`, `AZP`, and six-term `ZPN` (primary
   branch only) against Astropy, including round-trip checks.
 - validating the `HPC` sampling path against Astropy.
-- validating one full-Sun `CRLN-CAR / CRLT-CAR` surface-map case
+- validating `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface-map cases
   against Astropy.
 
 Main conclusions:
@@ -86,8 +88,8 @@ Main conclusions:
   here.
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
   path covered by this note.
-- the `CAR` case is validated against Astropy for the source WCS
-  interpretation and sampling path on a full-Sun Carrington surface map.
+- the `CAR` and `CEA` cases are validated against Astropy for the source WCS
+  interpretation and sampling path on full-Sun surface maps.
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` shows that the two display geometries are not identical even with the
   same observer viewpoint and `dragRotation = 0`.
@@ -109,15 +111,15 @@ Bottom line:
 - `HPC` mode was added (with the noted caveat about the viewpoint).
 - support for `AZP` and `ZPN` data was added (with the noted caveat about the
   heliospheric imagers).
-- support for `CAR` surface maps was added (with the noted caveat about the
-  display modes).
+- support for `CAR` and `CEA` surface maps was added (with the noted caveat
+  about the display modes).
 - the position numbers reported in the panel at the bottom of the JHV window
   are display-geometry numbers derived from the mouse pointer position, not
   coordinates read back from the active image WCS. In `HPC`, `Latitudinal`,
   `Polar`, and `LogPolar`, they follow the corresponding JHV display
   projection. In `Orthographic`, they are derived purely from the inferred 3D
   scene point and therefore do not, in general, reflect the image `TAN`,
-  `AZP`, `ZPN`, or `CAR` WCS.
+  `AZP`, `ZPN`, `CAR`, or `CEA` WCS.
 
 # The validator
 
@@ -190,12 +192,13 @@ Included in the validator:
   - `AZP`
   - six-term `ZPN` (primary branch only)
   - `CAR`
+  - `CEA`
 - the `HPC` image sampling path:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
 - the raw image-footprint `HPC` bounds and the centered `HPC` display bounds
   used in the validation runs reported here
-- the `CAR` source WCS interpretation used for `CRLN-CAR / CRLT-CAR`
-  surface maps
+- the `CAR` and `CEA` source WCS interpretation used for
+  `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface maps
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` for the specific no-rotation comparison mode.
 
@@ -211,7 +214,7 @@ Excluded:
 - playback/view policy effects such as dynamic refitting of the visible `HPC`
   box beyond the centered bounds logic explicitly reproduced by the validator,
   or any other transient user-driven viewing state
-- `CAR` display-policy choices beyond the validated source-WCS
+- `CAR`/`CEA` display-policy choices beyond the validated source-WCS
   interpretation and sampling path
 - Java overlay-only behavior such as:
   - viewpoint-space projection of external overlay points in `HPC`
@@ -223,7 +226,7 @@ The validator therefore establishes:
 
 - whether the implemented reprojection and sampling math matches Astropy
 - whether the implemented `HPC` sampling map matches Astropy
-- whether the `CAR` source WCS interpretation and sampling path match
+- whether the `CAR`/`CEA` source WCS interpretation and sampling path match
   Astropy
 - whether the `formal-TAN` path in `Orthographic` mode and `HPC` sample the
   same source pixels over the same rendered comparison frame.
@@ -261,6 +264,11 @@ In this validator, Astropy is the external reference for:
   - using the effective linear transform (`PC * CDELT`) together with the
     native `CRLN-CAR / CRLT-CAR` axis semantics
 - inverse `CAR`
+  - plane -> world lon/lat, checked by the same round-trip strategy
+- full pixel-center validation for `CEA`
+  - using the effective linear transform (`PC * CDELT`) together with the
+    native `CRLN-CEA / CRLT-CEA` axis semantics
+- inverse `CEA`
   - plane -> world lon/lat, checked by the same round-trip strategy
 
 Not compared against Astropy:
@@ -319,11 +327,11 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
 This mode checks the full FITS image grid against Astropy and reports the worst
 pixel-center error.
 
-For the `CAR` case, the same mode also validates Carrington
-surface maps against Astropy over the full source image grid. In that case, the
-validator uses the effective linear transform `PC * CDELT`, not bare `CDELT`,
-and keeps the original axis types (`CRLN-CAR / CRLT-CAR`) when constructing the
-Astropy comparison WCS.
+For the `CAR` and `CEA` cases, the same mode also validates
+surface maps against Astropy over the full source image grid. In those cases,
+the validator uses the effective linear transform `PC * CDELT`, not bare
+`CDELT`, and keeps the original axis types (`CRLN-CAR / CRLT-CAR` or
+`CRLN-CEA / CRLT-CEA`) when constructing the Astropy comparison WCS.
 
 3. Inverse `TAN`
 
@@ -426,6 +434,22 @@ an on-disk or full-image-grid test.
 It validates:
 
 - `CAR plane -> world lon/lat`
+- round-trip error
+
+8. Inverse `CEA`
+
+```text
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/mrzqs260301t2314c2308_169.fits \
+  --inverse-cea
+```
+
+This mode validates inverse `CEA` on sampled projection-plane points. It is not
+an on-disk or full-image-grid test.
+
+It validates:
+
+- `CEA plane -> world lon/lat`
 - round-trip error
 
 ### Internal JHV comparison modes
@@ -758,6 +782,36 @@ full-Sun Carrington surface-map case.
     - `inverse_world_max_error_deg=5.684342e-14`
     - `roundtrip_plane_max_error_internal=0`
 - this `CAR` case validates the source WCS interpretation and
+  sampling path, not the full interactive display policy for these surface
+  maps
+
+## `CEA` surface-map validation
+
+This subsection reports the Astropy validation results for the tested
+full-Sun `CEA` surface-map case.
+
+- the validated file is:
+  - `extra/test/data/mrzqs260301t2314c2308_169.fits`
+- it is a `CRLN-CEA / CRLT-CEA` surface map
+- the correct effective scale comes from the linear WCS transform
+  `PC * CDELT`, not from bare `CDELT`
+- the second WCS axis is the `CEA` equal-area latitude coordinate, not direct
+  angular latitude
+- the validator therefore keeps the original `CRLN-CEA / CRLT-CEA` axis types
+  and uses the effective linear transform when constructing the Astropy
+  comparison WCS
+- JHV and Astropy agree to numerical precision
+- representative measured results on
+  `extra/test/data/mrzqs260301t2314c2308_169.fits`:
+  - full pixel-center check:
+    - `1.02e-7 mas` max (`5.684342e-14 px`)
+  - forward sampled check:
+    - `projection_max_error_internal=8.881784e-16`
+    - `pixel_center_max_error_px=5.684342e-14`
+  - inverse `CEA` on the same file:
+    - `inverse_world_max_error_deg=1.136868e-13`
+    - `roundtrip_plane_max_error_internal=8.881784e-16`
+- this `CEA` case validates the source WCS interpretation and
   sampling path, not the full interactive display policy for these surface
   maps
 

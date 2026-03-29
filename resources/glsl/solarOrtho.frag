@@ -6,9 +6,15 @@ const vec3 zAxis = vec3(0, 0, 1);
 // 1 = simple-TAN
 #define SIMPLE_TAN 1
 
+// Source-image sampling from the orthographic scene point.
 vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
+    // Surface maps sample directly from world lon/lat, without observer-image geometry.
     if (projection.projectionCode == WCS_PROJECTION_CAR) {
         vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
+        return wcsPlaneToTexcoord(plane, wcs);
+    }
+    if (projection.projectionCode == WCS_PROJECTION_CEA) {
+        vec2 plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
         return wcsPlaneToTexcoord(plane, wcs);
     }
 #if SIMPLE_TAN
@@ -44,12 +50,12 @@ void main(void) {
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 upXY = up1.xy;
     bool diffMode = display.isDiff != NODIFFERENCE;
-    bool carMode = projection[0].projectionCode == WCS_PROJECTION_CAR;
+    bool surfaceMapMode = projection[0].projectionCode == WCS_PROJECTION_CAR || projection[0].projectionCode == WCS_PROJECTION_CEA;
 
     float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
-    // CAR has no off-limb representation; wrap only the visible solar sphere.
-    if (carMode && !onDisk)
+    // CAR/CEA have no off-limb representation; wrap only the visible solar sphere.
+    if (surfaceMapMode && !onDisk)
         discard;
 
     float enhancementFactor;
@@ -57,7 +63,8 @@ void main(void) {
 
     if (onDisk) {
         hitPoint = vec3(upXY, sqrt(1. - radius2));
-        if (carMode) {
+        if (surfaceMapMode) {
+            // CAR/CEA stay attached to the visible sphere under drag/view rotation.
             rotatedHitPoint = rotate_vector_inverse(projection[0].sourceViewQuat, hitPoint);
             if (diffMode)
                 diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, hitPoint);
@@ -74,7 +81,8 @@ void main(void) {
         gl_FragDepth = 1.;
     }
 
-    if (!carMode && rotatedHitPoint.z <= 0.) { // off-limb or back
+    // Observer-image projections keep the existing off-limb / back-side fallback.
+    if (!surfaceMapMode && rotatedHitPoint.z <= 0.) { // off-limb or back
         rotatedHitPoint = sampleOffLimbPoint(wcs[0], up1, onDisk, hitPoint);
         if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
@@ -110,7 +118,7 @@ void main(void) {
 
     vec2 diffTexCoord;
     if (diffMode) {
-        if (!carMode && /*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
+        if (!surfaceMapMode && /*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
             diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
 
