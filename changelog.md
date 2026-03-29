@@ -14,6 +14,7 @@
 
 ### Image and datasets
 - Add formal `TAN`, `AZP`, and primary-branch `ZPN` support for non-orthographic image display
+- Add `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface-map support in `Latitudinal` and `Orthographic` modes
 - Add bundled colormaps for AIA, PUNCH, and STEREO COR/HI datasets
 - Load LUT definitions from resources
 

@@ -16,6 +16,7 @@ const int WCS_PROJECTION_TAN = 0;
 const int WCS_PROJECTION_AZP = 1;
 const int WCS_PROJECTION_ZPN = 2;
 const int WCS_PROJECTION_CAR = 3;
+const int WCS_PROJECTION_CEA = 4;
 
 out vec4 outColor;
 
@@ -273,6 +274,7 @@ float wrapDeltaLongitude(float lon, float lon0) {
     return mod(lon - lon0 + PI, TWOPI) - PI;
 }
 
+// Surface-map forward projections used by Latitudinal and Orthographic.
 vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad) {
     // CAR is a direct surface lon/lat map, not observer-image geometry.
     float lon = atan(world.x, world.z);
@@ -281,6 +283,17 @@ vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeU
     return vec2(
         planeUnitsPerRad * wrapDeltaLongitude(lon, referenceAngles.x),
         planeUnitsPerRad * (lat - referenceAngles.y));
+}
+
+vec2 projectCeaToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
+    // CEA is a direct surface lon/lat map with equal-area latitude scaling.
+    float lon = atan(world.x, world.z);
+    float lat = asin(clamp(world.y / length(world), -1., 1.));
+    float lambda = max(abs(PV[1]), 1e-12);
+    vec2 referenceCoord = crval / planeUnitsPerRad;
+    return vec2(
+        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceCoord.x),
+        planeUnitsPerRad * (sin(lat) / lambda - referenceCoord.y));
 }
 
 vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
