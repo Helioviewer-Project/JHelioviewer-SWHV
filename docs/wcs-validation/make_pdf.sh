@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INPUT="${1:-$SCRIPT_DIR/zenithal_wcs_validation_notes.md}"
+INPUT="${1:-$SCRIPT_DIR/jhv_wcs_hpc_validation_note.md}"
 OUTPUT="${INPUT%.md}.pdf"
 INPUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
 INPUT_BASENAME="$(basename "$INPUT")"
