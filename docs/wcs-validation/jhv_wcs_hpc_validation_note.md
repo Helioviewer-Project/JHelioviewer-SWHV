@@ -129,12 +129,15 @@ Bottom line:
 # The validator
 
 For the validation modes in this note, the validator script provides a
-Python/CPU model
-of the relevant JHV reprojection and sampling logic. It does not execute the
-actual JHV renderer. In particular, major parts of the corresponding code in
-JHV run in GLSL on the GPU, whereas the validator re-expresses that logic in
-Python for comparison and testing. It therefore models the reprojection and
-sampling path, not the full interactive renderer.
+Python/CPU model of the relevant JHV WCS interpretation, reprojection, and
+sampling logic. It does not execute the actual JHV renderer. In particular,
+important parts of the corresponding JHV code run in GLSL on the GPU, so the
+validator re-expresses that logic in Python rather than running the
+Java/GLSL implementation itself. The agreement reported here is therefore
+agreement between Astropy and that Python model, together with separate
+checks that the JHV Java metadata derivation matches the validator's metadata
+model. It is strong evidence that the modeled JHV path is correct, but it is
+not a direct execution-level proof of the full Java+GLSL renderer.
 
 ## JHV behavior modeled by the validator
 
@@ -180,8 +183,6 @@ the image observer frame. Those coordinates are used directly as a
 small-angle approximation to the helioprojective viewing angles, instead of
 first converting the 3D point to helioprojective coordinates and then applying
 the `formal-TAN` projection step.
-
-\newpage
 
 Included in the validator:
 
@@ -642,12 +643,12 @@ Interpretation:
 
 # Results
 
-The primary discrepancy units reported in this note are angular sky errors
-derived from `CDELT`, expressed in milliarcseconds or arcseconds as
+The primary discrepancy units reported in this note are angular sky errors,
+derived from `CDELT` and expressed in milliarcseconds or arcseconds as
 appropriate. Pixel errors are kept as secondary units because they are the
-quantities reported directly by the validator. For the `CAR`
-surface-map case, the same reporting convention is used with angular map units
-derived from the effective linear scale `PC * CDELT`.
+quantities reported directly by the validator. For the `CAR` surface-map
+case, the corresponding angular map units are derived from the linear scale
+matrix `PC * CDELT`.
 
 ## FITS projections
 
