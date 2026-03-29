@@ -280,6 +280,126 @@ public final class HelioviewerMetaData extends BaseMetaData {
         return new Position(time, distObs, lon, lat);
     }
 
+    // Raw FITS WCS input -> derived linear terms -> normalized JHV coordinates.
+
+    private record PixelAxes(
+            double arcsecX,
+            double arcsecY,
+            double arcsecPerPixelX,
+            double arcsecPerPixelY,
+            double pc11,
+            double pc12,
+            double pc21,
+            double pc22) {
+    }
+
+    private record SurfaceCd(
+            double cd11,
+            double cd12,
+            double cd21,
+            double cd22) {
+    }
+
+    private record WcsInput(
+            double cdelt1,
+            double cdelt2,
+            double crval1,
+            double crval2,
+            double pv2_1,
+            double pc11,
+            double pc12,
+            double pc21,
+            double pc22) {
+    }
+
+    private static double readAngularAxisScaleArcsec(MetaDataContainer m, String cunitKey, boolean defaultDegrees) {
+        return m.getString(cunitKey)
+                .map(u -> u.equalsIgnoreCase("deg") ? 3600. : 1.)
+                .orElse(defaultDegrees ? 3600. : 1.);
+    }
+
+    private static WcsInput readWcsInput(MetaDataContainer m) {
+        return new WcsInput(
+                m.getRequiredDouble("CDELT1"),
+                m.getRequiredDouble("CDELT2"),
+                m.getDouble("CRVAL1").orElse(0.),
+                m.getDouble("CRVAL2").orElse(0.),
+                m.getDouble("PV2_1").orElse(1.),
+                m.getDouble("PC1_1").orElse(1.),
+                m.getDouble("PC1_2").orElse(0.),
+                m.getDouble("PC2_1").orElse(0.),
+                m.getDouble("PC2_2").orElse(1.));
+    }
+
+    private static PixelAxes readPixelAxes(WcsInput wcs, MetaDataContainer m, boolean isSurfaceMap) {
+        double arcsecX = readAngularAxisScaleArcsec(m, "CUNIT1", isSurfaceMap);
+        double arcsecY = readAngularAxisScaleArcsec(m, "CUNIT2", isSurfaceMap);
+        return new PixelAxes(arcsecX, arcsecY, wcs.cdelt1 * arcsecX, wcs.cdelt2 * arcsecY, wcs.pc11, wcs.pc12, wcs.pc21, wcs.pc22);
+    }
+
+    private static SurfaceCd readSurfaceCd(WcsInput wcs, PixelAxes axes, boolean isCea) {
+        // Surface-map X is angular longitude. For CEA, Y is the equal-area coordinate;
+        // for CAR, Y is angular latitude in radians.
+        double cdelt1Rad = Math.toRadians(wcs.cdelt1 * axes.arcsecX / 3600.);
+        double cdelt2Surface = isCea ? wcs.cdelt2 : Math.toRadians(wcs.cdelt2 * axes.arcsecY / 3600.);
+        return new SurfaceCd(
+                cdelt1Rad * axes.pc11,
+                cdelt1Rad * axes.pc12,
+                cdelt2Surface * axes.pc21,
+                cdelt2Surface * axes.pc22);
+    }
+
+    private void applySurfaceMapScaling(SurfaceCd cd) {
+        unitPerArcsec = Math.PI / (180. * 3600.);
+        wcsPlaneUnitsPerRad = 1;
+        unitPerPixelX = Math.hypot(cd.cd11, cd.cd21);
+        unitPerPixelY = Math.hypot(cd.cd12, cd.cd22);
+    }
+
+    private void applyObserverImageScaling(PixelAxes axes) {
+        double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
+        unitPerArcsec = Sun.Radius / radiusSunInArcsec;
+        wcsPlaneUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
+        unitPerPixelX = Math.abs(axes.arcsecPerPixelX * unitPerArcsec);
+        unitPerPixelY = Math.abs(axes.arcsecPerPixelY * unitPerArcsec);
+    }
+
+    private static double readSurfaceLongitudeRad(WcsInput wcs) {
+        return Math.toRadians(wcs.crval1);
+    }
+
+    private static double readSurfaceLatitudeRad(WcsInput wcs) {
+        return Math.toRadians(wcs.crval2);
+    }
+
+    private static double readCeaLatitudeY(WcsInput wcs) {
+        // JHV stores the CEA second axis as the equal-area latitude coordinate y = sin(lat) / lambda.
+        double latitude = Math.toRadians(wcs.crval2);
+        double lambda = Math.max(wcs.pv2_1, 1e-12);
+        return Math.sin(latitude) / lambda;
+    }
+
+    private static void loadPv2(MetaDataContainer m, float[] pv2) {
+        for (int i = 0; i < pv2.length; i++)
+            pv2[i] = m.getDouble("PV2_" + i).map(Double::floatValue).orElse(0f);
+    }
+
+    private static double readSurfaceCrota(SurfaceCd cd) {
+        return Math.atan2(cd.cd21, cd.cd11);
+    }
+
+    private double readObserverImageCrota(MetaDataContainer m, PixelAxes axes) {
+        try {
+            // Eq.32 Thompson (2006)
+            return Math.atan2(axes.pc21 / (axes.arcsecPerPixelX / axes.arcsecPerPixelY), axes.pc11);
+        } catch (Exception e) {
+            return m.getDouble("CROTA").map(Math::toRadians)
+                    .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
+                    .or(() -> m.getDouble("CROTA2").map(Math::toRadians))
+                    .orElse(0.);
+        }
+    }
+
     private void retrievePixelParameters(MetaDataContainer m) {
         int pixelW, pixelH;
         if (m.getLong("ZNAXIS").isPresent()) {
@@ -296,36 +416,16 @@ public final class HelioviewerMetaData extends BaseMetaData {
             String ctype1 = m.getString("CTYPE1").orElse("");
             String ctype2 = m.getString("CTYPE2").orElse("");
             wcsProjection = WcsHeader.Projection.fromCtype(ctype1, ctype2);
-            boolean isCar = wcsProjection == WcsHeader.Projection.CAR;
+            boolean isCea = wcsProjection == WcsHeader.Projection.CEA;
+            boolean isSurfaceMap = wcsProjection.isSurfaceMap();
+            WcsInput wcs = readWcsInput(m);
+            PixelAxes axes = readPixelAxes(wcs, m, isSurfaceMap);
+            SurfaceCd surfaceCd = isSurfaceMap ? readSurfaceCd(wcs, axes, isCea) : null;
 
-            double arcsecX = m.getString("CUNIT1").map(u -> u.equalsIgnoreCase("deg") ? 3600 : 1).orElse(1);
-            double arcsecY = m.getString("CUNIT2").map(u -> u.equalsIgnoreCase("deg") ? 3600 : 1).orElse(1);
-            double arcsecPerPixelX = m.getRequiredDouble("CDELT1") * arcsecX;
-            double arcsecPerPixelY = m.getRequiredDouble("CDELT2") * arcsecY;
-            double pc11 = m.getDouble("PC1_1").orElse(1.);
-            double pc12 = m.getDouble("PC1_2").orElse(0.);
-            double pc21 = m.getDouble("PC2_1").orElse(0.);
-            double pc22 = m.getDouble("PC2_2").orElse(1.);
-
-            if (isCar) {
-                unitPerArcsec = Math.PI / (180. * 3600.);
-                wcsPlaneUnitsPerRad = 1;
-                double cdelt1Rad = Math.toRadians(m.getRequiredDouble("CDELT1"));
-                double cdelt2Rad = Math.toRadians(m.getRequiredDouble("CDELT2"));
-                double cd11 = cdelt1Rad * pc11;
-                double cd12 = cdelt1Rad * pc12;
-                double cd21 = cdelt2Rad * pc21;
-                double cd22 = cdelt2Rad * pc22;
-                unitPerPixelX = Math.hypot(cd11, cd21);
-                unitPerPixelY = Math.hypot(cd12, cd22);
-            } else {
-                double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
-                unitPerArcsec = Sun.Radius / radiusSunInArcsec;
-                wcsPlaneUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
-
-                unitPerPixelX = Math.abs(arcsecPerPixelX * unitPerArcsec);
-                unitPerPixelY = Math.abs(arcsecPerPixelY * unitPerArcsec);
-            }
+            if (isSurfaceMap)
+                applySurfaceMapScaling(surfaceCd);
+            else
+                applyObserverImageScaling(axes);
 
             // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
             double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
@@ -335,37 +435,21 @@ public final class HelioviewerMetaData extends BaseMetaData {
 
             region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            double crval1 = isCar
-                    ? Math.toRadians(m.getDouble("CRVAL1").orElse(0.))
-                    : m.getDouble("CRVAL1").orElse(0.) * arcsecX * unitPerArcsec;
-            double crval2 = isCar
-                    ? Math.toRadians(m.getDouble("CRVAL2").orElse(0.))
-                    : m.getDouble("CRVAL2").orElse(0.) * arcsecY * unitPerArcsec;
+            double crval1 = isSurfaceMap
+                    ? readSurfaceLongitudeRad(wcs)
+                    : wcs.crval1 * axes.arcsecX * unitPerArcsec;
+            double crval2 = isCea
+                    ? readCeaLatitudeY(wcs)
+                    : isSurfaceMap
+                    ? readSurfaceLatitudeRad(wcs)
+                    : wcs.crval2 * axes.arcsecY * unitPerArcsec;
             crval = new Vec2(crval1, crval2);
 
-            if (wcsProjection.usesPv2()) {
-                for (int i = 0; i < pv2.length; i++) {
-                    double pv = m.getDouble("PV2_" + i).orElse(0.);
-                    pv2[i] = (float) pv;
-                }
-            }
+            if (wcsProjection.usesPv2())
+                loadPv2(m, pv2);
 
             if (!CROTABlockSet.contains(instrument)) {
-                double c;
-                if (isCar) {
-                    double cd11 = Math.toRadians(m.getRequiredDouble("CDELT1")) * pc11;
-                    double cd21 = Math.toRadians(m.getRequiredDouble("CDELT2")) * pc21;
-                    c = Math.atan2(cd21, cd11);
-                } else {
-                    try {
-                        // Eq.32 Thompson (2006)
-                        c = Math.atan2(pc21 / (arcsecPerPixelX / arcsecPerPixelY), pc11);
-                    } catch (Exception e) {
-                        c = m.getDouble("CROTA").map(Math::toRadians)
-                                .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
-                                .or(() -> m.getDouble("CROTA2").map(Math::toRadians)).orElse(0.);
-                    }
-                }
+                double c = isSurfaceMap ? readSurfaceCrota(surfaceCd) : readObserverImageCrota(m, axes);
                 crota = Quat.createAxisZ(c);
             }
         }
