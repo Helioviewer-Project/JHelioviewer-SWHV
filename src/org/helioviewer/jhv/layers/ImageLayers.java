@@ -13,7 +13,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -99,10 +99,10 @@ public final class ImageLayers {
                 continue;
 
             MetaData m = layer.getMetaData();
-            if (!(m instanceof HelioviewerMetaData hm))
+            if (!(m instanceof FitsMetaData fm))
                 continue;
-            if (hm.getObservatory().contains("SDO") && hm.getInstrument().contains("AIA"))
-                str.append(',').append(hm.getMeasurement());
+            if (fm.getObservatory().contains("SDO") && fm.getInstrument().contains("AIA"))
+                str.append(',').append(fm.getMeasurement());
         }
 
         ImageLayer activeLayer = Layers.getActiveImageLayer();
@@ -153,13 +153,13 @@ public final class ImageLayers {
             if (!layer.isEnabled() || (id = layer.getImageData()) == null)
                 continue;
 
-            if (id.getMetaData() instanceof HelioviewerMetaData hm) {
+            if (id.getMetaData() instanceof FitsMetaData fm) {
                 HashMap<String, String> layerMsg = new HashMap<>();
-                layerMsg.put("observatory", hm.getObservatory());
-                layerMsg.put("instrument", hm.getInstrument());
-                layerMsg.put("detector", hm.getDetector());
-                layerMsg.put("measurement", hm.getMeasurement());
-                layerMsg.put("timestamp", hm.getViewpoint().time.toString());
+                layerMsg.put("observatory", fm.getObservatory());
+                layerMsg.put("instrument", fm.getInstrument());
+                layerMsg.put("detector", fm.getDetector());
+                layerMsg.put("measurement", fm.getMeasurement());
+                layerMsg.put("timestamp", fm.getViewpoint().time.toString());
                 layersData.add(layerMsg);
             }
         }

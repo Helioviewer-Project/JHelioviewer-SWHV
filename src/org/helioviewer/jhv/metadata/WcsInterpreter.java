@@ -149,8 +149,7 @@ final class WcsInterpreter {
 
     private static double readObserverImageCrota(MetaDataContainer m, WcsInput wcs, PixelAxes axes) {
         if (wcs.hasPc) {
-            // Eq.32 Thompson (2006)
-            return Math.atan2(axes.pc21 / (axes.arcsecPerPixelX / axes.arcsecPerPixelY), axes.pc11);
+            return Math.atan2(axes.pc21 * axes.arcsecPerPixelY / axes.arcsecPerPixelX, axes.pc11);
         }
         return m.getDouble("CROTA").map(Math::toRadians)
                 .or(() -> m.getDouble("CROTA1").map(Math::toRadians))

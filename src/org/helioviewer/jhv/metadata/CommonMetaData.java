@@ -10,7 +10,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
-class BaseMetaData implements MetaData {
+class CommonMetaData implements MetaData {
 
     private static final double DEFAULT_UNIT_PER_ARCSEC = Sun.Radius / (Math.toDegrees(Math.atan2(Sun.Radius, Sun.MeanEarthDistance)) * 3600);
 

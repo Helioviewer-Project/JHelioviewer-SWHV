@@ -7,9 +7,9 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.PixelBasedMetaData;
+import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
@@ -19,7 +19,7 @@ public class BaseView implements View {
 
     protected ImageFilter.Type filterType = ImageFilter.Type.None;
     protected LUT builtinLUT;
-    protected MetaData[] metaData = {PixelBasedMetaData.EMPTY}; // paranoia
+    protected MetaData[] metaData = {BasicMetaData.EMPTY}; // paranoia
 
     public BaseView(DecodeExecutor _executor, DataUri _dataUri) {
         executor = _executor;
@@ -78,7 +78,7 @@ public class BaseView implements View {
         if (builtinLUT != null)
             return builtinLUT;
         MetaData m = metaData[0];
-        return m instanceof HelioviewerMetaData hm ? LUT.get(hm) : null;
+        return m instanceof FitsMetaData fm ? LUT.get(fm) : null;
     }
 
     protected ImageData.Handler dataHandler;

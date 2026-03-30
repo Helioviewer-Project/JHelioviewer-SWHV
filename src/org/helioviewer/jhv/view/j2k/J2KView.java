@@ -21,9 +21,9 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.PixelBasedMetaData;
+import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.JHVTime;
@@ -93,11 +93,11 @@ public class J2KView extends BaseView {
                 try {
                     if (xmlMetaData[i] == null)
                         throw new Exception("Missing XML metadata");
-                    metaData[i] = new HelioviewerMetaData(new XMLMetaDataContainer(xmlMetaData[i]));
+                    metaData[i] = new FitsMetaData(new XMLMetaDataContainer(xmlMetaData[i]));
                 } catch (Exception e) {
                     xmlMetaData[i] = EMPTY_METAXML;
                     ResolutionSet.Level level = source.getResolutionSet(i).getLevel(0);
-                    metaData[i] = new PixelBasedMetaData(level.width(), level.height(), dataUri.baseName());
+                    metaData[i] = new BasicMetaData(level.width(), level.height(), dataUri.baseName());
                     Log.warn("Helioviewer metadata missing for layer " + i, e);
                 }
                 if (frameMap.put(metaData[i].getViewpoint().time, i) != null) // log duplicated
