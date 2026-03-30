@@ -4,7 +4,7 @@ title: |
    | WCS and HPC Validation Note
 subtitle: SWHV-ROB-TN-001-CCN4 v2.0
 subject: SWHV CCN4 
-date: SWHV-ROB-TN-001-CCN4 - Version 2.0 - 2026-03-29
+date: SWHV-ROB-TN-001-CCN4 - Version 2.0 - 2026-03-30
 lof: true
 lot: false
 ---
@@ -129,21 +129,21 @@ Bottom line:
 # The validator
 
 For the validation modes in this note, the validator script provides a
-Python/CPU model of the relevant JHV WCS interpretation, reprojection, and
-sampling logic. The model covers not only the derived WCS quantities, but
-also key renderer-side conventions used by the Java/GLSL path: the split
-between observer-image and surface-map sampling, direct world-to-lon/lat
-projection for `CAR` and `CEA`, wrapped longitude sampling for full-width
-surface maps, the FITS-to-texture row flip performed during image upload,
-the bottom-origin screen convention used by the shaders, and GLSL-style
-texture sampling with linear interpolation. It does not execute the actual
-JHV renderer. Important parts of the corresponding JHV code run in GLSL on
-the GPU, so the validator re-expresses that logic in Python rather than
-running the Java/GLSL implementation itself. The agreement reported here is
-therefore agreement between Astropy and that Python model, together with
-separate checks that the JHV Java metadata derivation matches the validator's
-metadata model. This is stronger evidence than a pure WCS-only comparison,
-but it is not a direct execution-level proof of the full Java+GLSL renderer.
+Python/CPU model of the relevant JHV WCS, reprojection, and source-sampling
+logic. Beyond derived WCS quantities, it mirrors key Java/GLSL renderer
+conventions used in the tested paths, including observer-image versus
+surface-map sampling, direct world-to-lon/lat projection for `CAR` and
+`CEA`, wrapped longitude sampling for full-width surface maps, the
+FITS-to-texture row flip, bottom-origin screen coordinates,
+texcoord/discard rules, and GLSL-style linear texture sampling. It does not
+execute the actual JHV renderer: important parts of the corresponding code
+run in GLSL on the GPU, so the validator re-expresses that logic in Python
+instead of running the Java/GLSL implementation itself. The reported
+agreement is therefore agreement between Astropy and that Python model,
+together with separate checks that the JHV Java metadata derivation matches
+the validator's metadata model. This is strong evidence that the modeled JHV
+path is correct, but it is not a direct execution-level proof of the full
+Java+GLSL renderer.
 
 ## JHV behavior modeled by the validator
 
@@ -340,7 +340,7 @@ The comparison driver:
 
 - compiles the JHV Java code and the `JHVMetadataDump.java` helper
 - opens representative FITS files from the documented validation suite
-- instantiates `HelioviewerMetaData` (the JHV class that interprets the FITS
+- instantiates `FitsMetaData` (the JHV class that interprets the FITS
   metadata into the derived image/WCS quantities used by the program) on the
   Java side
 - extracts the derived WCS metadata quantities produced by JHV Java code
@@ -401,15 +401,18 @@ not over-interpreted.
 
 ### Astropy-based validation modes
 
-1. Forward WCS random-sample validation
+1. Forward WCS sampled validation
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
   extra/test/data/20241224_194245_d4c2A.fts
 ```
 
-This mode reports forward WCS errors on sampled world points. It is not tied to
-the displayed solar disk or to the full image frame.
+This mode reports forward WCS errors on sampled points. For `TAN` and `AZP`,
+the samples are generic world/helioprojective points. For `ZPN`, `CAR`, and
+`CEA`, the validator uses pixel-derived world samples so that edge, pole, and
+seam cases are covered more systematically. It is not tied to the displayed
+solar disk or to the full image frame.
 
 It reports:
 
@@ -665,7 +668,7 @@ Astropy as the external WCS reference.
 - `TAN plane -> helioprojective angles`
 - matches Astropy to numerical precision
 - representative measured results include:
-  - forward random-sample check on `20241224_194245_d4c2A.fts`:
+  - forward sampled check on `20241224_194245_d4c2A.fts`:
     - `1.00e-7 mas` max (`6.821210e-12 px`)
     - `projection_max_error_internal=1.012523e-13`
   - inverse `TAN` on `sample.171.fits`:
@@ -679,14 +682,16 @@ Astropy as the external WCS reference.
   - `sample.171.fits` (`1.009 AU`):
     - `simple-TAN`: `2.20 arcsec` max, `1.12 arcsec` RMS
       (`3.674571 px` max, `1.864828 px` RMS)
-    - `formal-TAN`: `2.81e-7 mas` max, `6.35e-8 mas` RMS
-      (`4.686171e-10 px` max, `1.059870e-10 px` RMS)
+    - `formal-TAN`: `2.61e-6 mas` max, `6.49e-8 mas` RMS
+      (`4.357389e-09 px` max, `1.084205e-10 px` RMS)
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
     - `simple-TAN`: `11.42 arcsec` max, `2.46 arcsec` RMS
-    - `formal-TAN`: `3.41e-7 mas` max, `7.73e-8 mas` RMS
+    - `formal-TAN`: `1.38e-6 mas` max, `5.74e-8 mas` RMS
+      (`3.109335e-10 px` max, `1.292454e-11 px` RMS)
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
     - `simple-TAN`: `2.40 arcsec` max, `0.252 arcsec` RMS
-    - `formal-TAN`: `2.62e-7 mas` max, `6.26e-8 mas` RMS
+    - `formal-TAN`: `1.05e-6 mas` max, `6.42e-8 mas` RMS
+      (`7.116796e-11 px` max, `4.363033e-12 px` RMS)
 - for `simple-TAN`, the maximum is set by the on-disk region in all three
   cases. The RMS values are calculated over the full image frame, which
   includes both the on-disk sphere region and the off-limb flat-plane region
@@ -757,15 +762,15 @@ Measured `HPC` validation results:
   - centered display bounds:
     - `(-4.536935044095, 4.536935044095, -4.536935044095, 4.536935044095) deg`
   - `1.10e-7 mas` max (`7.503331e-12 px`)
-  - `3.32e-8 mas` RMS (`2.260672e-12 px`)
+  - `3.32e-8 mas` RMS (`2.261000e-12 px`)
 - HI1 (`AZP`, `20250622_000831_s4h1A.fts`):
-  - `3.55e-7 mas` max (`4.945377e-12 px`)
+  - `3.59e-7 mas` max (`5.002221e-12 px`)
 - HI2 (`AZP`, `20250622_000851_s4h2A.fts`):
-  - `8.38 mas` max (`3.230013e-05 px`) over the finite valid rendered domain
+  - `80.3 mas` max (`3.094152e-04 px`) over the finite valid rendered domain
 - PSP/WISPR 1211 (`ZPN`, `psp_L3_wispr_20231227T150508_V1_1211.fits`):
-  - `6.65e-6 mas` max (`4.365575e-11 px`)
+  - `4.42e-5 mas` max (`2.902993e-10 px`)
 - PSP/WISPR 2222 (`ZPN`, `psp_L3_wispr_20231227T150704_V1_2222.fits`):
-  - `1.94e-6 mas` max (`9.549694e-12 px`)
+  - `1.79e-5 mas` max (`8.787993e-11 px`)
 
 The centered display bounds are intentionally slightly larger than the raw
 image-footprint bounds because the JHV `HPC` screen mapping recenters
@@ -793,12 +798,12 @@ Measured comparison result:
       (`3.670609 px` max, `2.401908 px` RMS)
     - theoretical max from Appendix A: `2.19 arcsec`
   - `solo_L2_eui-fsi174-image_20251002T150055171_V00.fits` (`0.448 AU`):
-    - `11.22 arcsec` max, `7.32 arcsec` RMS
-      (`2.525841 px` max, `1.649627 px` RMS)
+    - `11.22 arcsec` max, `7.34 arcsec` RMS
+      (`2.525865 px` max, `1.652452 px` RMS)
     - theoretical max from Appendix A: `11.05 arcsec`
   - `20241224_194245_d4c2A.fts` (`0.967 AU`):
-    - `2.40 arcsec` max, `1.56 arcsec` RMS
-      (`1.629523e-01 px` max, `1.064475e-01 px` RMS)
+    - `2.40 arcsec` max, `1.57 arcsec` RMS
+      (`1.629534e-01 px` max, `1.066298e-01 px` RMS)
     - theoretical max from Appendix A: `2.29 arcsec`
 
 These results support the following conclusions:
@@ -854,7 +859,7 @@ full-Sun `CAR` surface-map case.
   - `extra/test/data/sunerf_map.fits`
   - `extra/test/data/syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits`
   - `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits`
-- both files are `CRLN-CAR / CRLT-CAR` surface maps
+- all three files are `CRLN-CAR / CRLT-CAR` surface maps
 - the correct effective scale comes from the linear WCS transform
   `PC * CDELT`, not from bare `CDELT`
 - the validator therefore keeps the original `CRLN-CAR / CRLT-CAR` axis types
@@ -865,31 +870,31 @@ full-Sun `CAR` surface-map case.
   - full pixel-center check:
     - `3.07e-7 mas` max (`1.705303e-13 px`)
   - forward sampled check:
-    - `projection_max_error_internal=1.332268e-15`
-    - `pixel_center_max_error_px=1.705303e-13`
+    - `projection_max_error_internal=2.620126e-14`
+    - `pixel_center_max_error_px=3.012701e-12`
   - inverse `CAR` on the same file:
     - `inverse_world_max_error_deg=3.552714e-15`
-    - `roundtrip_plane_max_error_internal=0`
+    - `roundtrip_plane_max_error_internal=2.553513e-14`
 - representative measured results on
   `extra/test/data/syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits`:
   - full pixel-center check:
     - `4.09e-7 mas` max (`2.273737e-13 px`)
   - forward sampled check:
-    - `projection_max_error_internal=4.440892e-16`
-    - `pixel_center_max_error_px=2.273737e-13`
+    - `projection_max_error_internal=4.751755e-14`
+    - `pixel_center_max_error_px=1.460876e-11`
   - inverse `CAR` on the same file:
     - `inverse_world_max_error_deg=5.684342e-14`
-    - `roundtrip_plane_max_error_internal=0`
+    - `roundtrip_plane_max_error_internal=8.881784e-16`
 - representative measured results on
   `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits`:
   - full pixel-center check:
     - `6.14e-7 mas` max (`9.094947e-13 px`)
   - forward sampled check:
-    - `projection_max_error_internal=4.440892e-16`
-    - `pixel_center_max_error_px=2.273737e-13`
+    - `projection_max_error_internal=4.751755e-14`
+    - `pixel_center_max_error_px=1.460876e-11`
   - inverse `CAR` on the same file:
     - `inverse_world_max_error_deg=3.552714e-15`
-    - `roundtrip_plane_max_error_internal=0`
+    - `roundtrip_plane_max_error_internal=4.440892e-16`
 - this `CAR` case validates the source WCS interpretation and
   sampling path, not the full interactive display policy for these surface
   maps
@@ -915,11 +920,11 @@ full-Sun `CEA` surface-map case.
   - full pixel-center check:
     - `1.02e-7 mas` max (`5.684342e-14 px`)
   - forward sampled check:
-    - `projection_max_error_internal=8.881784e-16`
-    - `pixel_center_max_error_px=5.684342e-14`
+    - `projection_max_error_internal=1.776357e-15`
+    - `pixel_center_max_error_px=1.136868e-13`
   - inverse `CEA` on the same file:
     - `inverse_world_max_error_deg=1.136868e-13`
-    - `roundtrip_plane_max_error_internal=8.881784e-16`
+    - `roundtrip_plane_max_error_internal=1.776357e-15`
 - this `CEA` case validates the source WCS interpretation and
   sampling path, not the full interactive display policy for these surface
   maps
