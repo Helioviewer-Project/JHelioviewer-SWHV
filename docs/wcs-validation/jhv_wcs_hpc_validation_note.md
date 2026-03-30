@@ -130,14 +130,20 @@ Bottom line:
 
 For the validation modes in this note, the validator script provides a
 Python/CPU model of the relevant JHV WCS interpretation, reprojection, and
-sampling logic. It does not execute the actual JHV renderer. In particular,
-important parts of the corresponding JHV code run in GLSL on the GPU, so the
-validator re-expresses that logic in Python rather than running the
-Java/GLSL implementation itself. The agreement reported here is therefore
-agreement between Astropy and that Python model, together with separate
-checks that the JHV Java metadata derivation matches the validator's metadata
-model. It is strong evidence that the modeled JHV path is correct, but it is
-not a direct execution-level proof of the full Java+GLSL renderer.
+sampling logic. The model covers not only the derived WCS quantities, but
+also key renderer-side conventions used by the Java/GLSL path: the split
+between observer-image and surface-map sampling, direct world-to-lon/lat
+projection for `CAR` and `CEA`, wrapped longitude sampling for full-width
+surface maps, the FITS-to-texture row flip performed during image upload,
+the bottom-origin screen convention used by the shaders, and GLSL-style
+texture sampling with linear interpolation. It does not execute the actual
+JHV renderer. Important parts of the corresponding JHV code run in GLSL on
+the GPU, so the validator re-expresses that logic in Python rather than
+running the Java/GLSL implementation itself. The agreement reported here is
+therefore agreement between Astropy and that Python model, together with
+separate checks that the JHV Java metadata derivation matches the validator's
+metadata model. This is stronger evidence than a pure WCS-only comparison,
+but it is not a direct execution-level proof of the full Java+GLSL renderer.
 
 ## JHV behavior modeled by the validator
 
@@ -847,6 +853,7 @@ full-Sun `CAR` surface-map case.
 - the validated files are:
   - `extra/test/data/sunerf_map.fits`
   - `extra/test/data/syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits`
+  - `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits`
 - both files are `CRLN-CAR / CRLT-CAR` surface maps
 - the correct effective scale comes from the linear WCS transform
   `PC * CDELT`, not from bare `CDELT`
@@ -872,6 +879,16 @@ full-Sun `CAR` surface-map case.
     - `pixel_center_max_error_px=2.273737e-13`
   - inverse `CAR` on the same file:
     - `inverse_world_max_error_deg=5.684342e-14`
+    - `roundtrip_plane_max_error_internal=0`
+- representative measured results on
+  `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits`:
+  - full pixel-center check:
+    - `6.14e-7 mas` max (`9.094947e-13 px`)
+  - forward sampled check:
+    - `projection_max_error_internal=4.440892e-16`
+    - `pixel_center_max_error_px=2.273737e-13`
+  - inverse `CAR` on the same file:
+    - `inverse_world_max_error_deg=3.552714e-15`
     - `roundtrip_plane_max_error_internal=0`
 - this `CAR` case validates the source WCS interpretation and
   sampling path, not the full interactive display policy for these surface

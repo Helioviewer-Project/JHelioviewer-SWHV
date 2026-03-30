@@ -96,11 +96,11 @@ public final class JHVMetadataDump {
         throw new Exception("No image HDU found");
     }
 
-    private static double crotaRad(HelioviewerMetaData meta) {
+    private static double crotaRad(FitsMetaData meta) {
         return 2.0 * Math.atan2(meta.crota.z, meta.crota.w);
     }
 
-    private static JSONObject dumpMetadata(HelioviewerMetaData meta, Header header) {
+    private static JSONObject dumpMetadata(FitsMetaData meta, Header header) {
         int pixelWidth = (int) header.getLongValue("ZNAXIS1", header.getLongValue("NAXIS1"));
         int pixelHeight = (int) header.getLongValue("ZNAXIS2", header.getLongValue("NAXIS2"));
         double crpix1Gl = header.getDoubleValue("CRPIX1", (pixelWidth + 1) / 2.0) - 0.5;
@@ -166,7 +166,7 @@ public final class JHVMetadataDump {
         try (Fits fits = new Fits(new File(args[0]))) {
             ImageHDU hdu = findImageHdu(fits, requestedHdu);
             Header header = hdu.getHeader();
-            HelioviewerMetaData meta = new HelioviewerMetaData(new FITSMetaDataContainer(header));
+            FitsMetaData meta = new FitsMetaData(new FITSMetaDataContainer(header));
             System.out.println(dumpMetadata(meta, header).toString());
         }
     }

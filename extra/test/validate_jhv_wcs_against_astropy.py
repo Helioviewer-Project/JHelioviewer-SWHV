@@ -597,39 +597,93 @@ def rotate_inverse_z(vec_xy: tuple[float, float], angle_rad: float) -> tuple[flo
     )
 
 
-def jhv_world_to_pixel_center(point_xyz: tuple[float, float, float], meta: JHVMeta) -> tuple[float, float]:
-    world_rad = world2helioprojective(point_xyz, meta.observer_distance)
-    plane_internal = project_world_to_plane_internal(world_rad, meta)
-    rotated_internal = rotate_inverse_z(plane_internal, meta.crota_rad)
+def rotate_z(vec_xy: tuple[float, float], angle_rad: float) -> tuple[float, float]:
+    x, y = vec_xy
+    c = math.cos(angle_rad)
+    s = math.sin(angle_rad)
     return (
-        rotated_internal[0] / meta.unit_per_pixel_x + meta.crpix1_gl,
-        -rotated_internal[1] / meta.unit_per_pixel_y + meta.crpix2_gl,
+        c * x - s * y,
+        s * x + c * y,
     )
 
 
-def jhv_world_array_to_pixel_center(world_deg: np.ndarray, meta: JHVMeta) -> np.ndarray:
-    plane_internal = project_world_to_plane_internal_array(world_deg, meta)
+def surface_map_wraps_x(meta: JHVMeta) -> bool:
+    if meta.projection not in {"CAR", "CEA"}:
+        return False
+    width_internal = meta.pixel_width * abs(meta.unit_per_pixel_x)
+    return abs(width_internal - 2.0 * math.pi) <= 2.0 * abs(meta.unit_per_pixel_x)
+
+
+def wrap_source_x_pixel(x_px: float, meta: JHVMeta) -> float:
+    if surface_map_wraps_x(meta):
+        return x_px % meta.pixel_width
+    return x_px
+
+
+def pixel_center_error_px(jhv_px: tuple[float, float], astro_px: tuple[float, float], meta: JHVMeta) -> float:
+    dx = abs(jhv_px[0] - astro_px[0])
+    if surface_map_wraps_x(meta):
+        dx = min(dx, abs((jhv_px[0] + meta.pixel_width) - astro_px[0]), abs(jhv_px[0] - (astro_px[0] + meta.pixel_width)))
+    dy = abs(jhv_px[1] - astro_px[1])
+    return max(dx, dy)
+
+
+def plane_internal_to_pixel_center(plane_internal: tuple[float, float], meta: JHVMeta, wrap_x: bool = False) -> tuple[float, float]:
+    rotated_internal = rotate_inverse_z(plane_internal, meta.crota_rad)
+    px = rotated_internal[0] / meta.unit_per_pixel_x + meta.crpix1_gl
+    py = -rotated_internal[1] / meta.unit_per_pixel_y + meta.crpix2_gl
+    return (wrap_source_x_pixel(px, meta) if wrap_x else px, py)
+
+
+def plane_internal_array_to_pixel_center(plane_internal: np.ndarray, meta: JHVMeta, wrap_x: bool = False) -> np.ndarray:
     c = math.cos(meta.crota_rad)
     s = math.sin(meta.crota_rad)
     rotated_x = c * plane_internal[:, 0] + s * plane_internal[:, 1]
     rotated_y = -s * plane_internal[:, 0] + c * plane_internal[:, 1]
-    return np.column_stack((
-        rotated_x / meta.unit_per_pixel_x + meta.crpix1_gl,
-        -rotated_y / meta.unit_per_pixel_y + meta.crpix2_gl,
-    ))
+    px = rotated_x / meta.unit_per_pixel_x + meta.crpix1_gl
+    if wrap_x and surface_map_wraps_x(meta):
+        px = np.mod(px, meta.pixel_width)
+    py = -rotated_y / meta.unit_per_pixel_y + meta.crpix2_gl
+    return np.column_stack((px, py))
+
+
+def pixel_center_to_plane_internal(pixel_center: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    rotated_internal = (
+        (pixel_center[0] - meta.crpix1_gl) * meta.unit_per_pixel_x,
+        -(pixel_center[1] - meta.crpix2_gl) * meta.unit_per_pixel_y,
+    )
+    return rotate_z(rotated_internal, meta.crota_rad)
+
+
+def pixel_center_to_world_deg(pixel_center: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    world_rad = project_plane_internal_to_world(pixel_center_to_plane_internal(pixel_center, meta), meta)
+    return (math.degrees(world_rad[0]), math.degrees(world_rad[1]))
+
+
+def jhv_world_to_pixel_center(point_xyz: tuple[float, float, float], meta: JHVMeta, wrap_x: bool = False) -> tuple[float, float]:
+    if meta.projection in {"CAR", "CEA"}:
+        norm = math.sqrt(point_xyz[0] * point_xyz[0] + point_xyz[1] * point_xyz[1] + point_xyz[2] * point_xyz[2])
+        if norm == 0.0:
+            return (math.nan, math.nan)
+        world_rad = (
+            math.atan2(point_xyz[0], point_xyz[2]),
+            math.asin(max(-1.0, min(1.0, point_xyz[1] / norm))),
+        )
+    else:
+        world_rad = world2helioprojective(point_xyz, meta.observer_distance)
+    plane_internal = project_world_to_plane_internal(world_rad, meta)
+    return plane_internal_to_pixel_center(plane_internal, meta, wrap_x=wrap_x)
+
+
+def jhv_world_array_to_pixel_center(world_deg: np.ndarray, meta: JHVMeta, wrap_x: bool = False) -> np.ndarray:
+    plane_internal = project_world_to_plane_internal_array(world_deg, meta)
+    return plane_internal_array_to_pixel_center(plane_internal, meta, wrap_x=wrap_x)
 
 
 def old_tan_world_array_to_pixel_center(world_xyz: np.ndarray, meta: JHVMeta) -> np.ndarray:
     dx = world_xyz[:, 0] - meta.crval_internal_x
     dy = world_xyz[:, 1] - meta.crval_internal_y
-    c = math.cos(meta.crota_rad)
-    s = math.sin(meta.crota_rad)
-    rotated_x = c * dx + s * dy
-    rotated_y = -s * dx + c * dy
-    return np.column_stack((
-        rotated_x / meta.unit_per_pixel_x + meta.crpix1_gl,
-        -rotated_y / meta.unit_per_pixel_y + meta.crpix2_gl,
-    ))
+    return plane_internal_array_to_pixel_center(np.column_stack((dx, dy)), meta)
 
 
 def ortho_carrier_world_array_from_hpc_world_deg(world_deg: np.ndarray, meta: JHVMeta) -> np.ndarray:
@@ -751,11 +805,7 @@ def hpc_screen_to_world_rad(scrpos: tuple[float, float], bounds_deg: tuple[float
 
 def jhv_hpc_world_to_pixel_center(world_rad: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     plane_internal = project_world_to_plane_internal(world_rad, meta)
-    rotated_internal = rotate_inverse_z(plane_internal, meta.crota_rad)
-    return (
-        rotated_internal[0] / meta.unit_per_pixel_x + meta.crpix1_gl,
-        -rotated_internal[1] / meta.unit_per_pixel_y + meta.crpix2_gl,
-    )
+    return plane_internal_to_pixel_center(plane_internal, meta)
 
 
 def ortho_screen_to_world(screen_xy: tuple[float, float]) -> tuple[float, float, float]:
@@ -798,7 +848,72 @@ def sample_nearest(image2d: np.ndarray, px: float, py: float) -> float:
     iy = int(round(py))
     if ix < 0 or iy < 0 or ix >= image2d.shape[1] or iy >= image2d.shape[0]:
         return math.nan
-    return float(image2d[iy, ix])
+    return float(image2d[image2d.shape[0] - 1 - iy, ix])
+
+
+def pixel_center_to_texcoord(px: float, py: float, image2d: np.ndarray) -> tuple[float, float]:
+    return (px / image2d.shape[1], py / image2d.shape[0])
+
+
+def texture_texel(image2d: np.ndarray, texel_x: int, texel_y: int) -> float:
+    return float(image2d[image2d.shape[0] - 1 - texel_y, texel_x])
+
+
+def sample_texture_linear(image2d: np.ndarray, texcoord: tuple[float, float], wrap_x: bool = False) -> float:
+    u, v = texcoord
+    if not math.isfinite(u) or not math.isfinite(v):
+        return math.nan
+
+    if wrap_x:
+        u = u % 1.0
+    elif u < 0.0 or u > 1.0:
+        return math.nan
+
+    if v < 0.0 or v > 1.0:
+        return math.nan
+
+    fx = u * image2d.shape[1] - 0.5
+    fy = v * image2d.shape[0] - 0.5
+    x0 = int(math.floor(fx))
+    y0 = int(math.floor(fy))
+    tx = fx - x0
+    ty = fy - y0
+    x1 = x0 + 1
+    y1 = y0 + 1
+
+    if y0 < 0 or y1 >= image2d.shape[0]:
+        return math.nan
+
+    if wrap_x:
+        x0 = x0 % image2d.shape[1]
+        x1 = x1 % image2d.shape[1]
+    elif x0 < 0 or x1 >= image2d.shape[1]:
+        return math.nan
+
+    v00 = texture_texel(image2d, x0, y0)
+    v10 = texture_texel(image2d, x1, y0)
+    v01 = texture_texel(image2d, x0, y1)
+    v11 = texture_texel(image2d, x1, y1)
+    return (
+        (1.0 - tx) * (1.0 - ty) * v00 +
+        tx * (1.0 - ty) * v10 +
+        (1.0 - tx) * ty * v01 +
+        tx * ty * v11
+    )
+
+
+def sample_observer_image_linear(image2d: np.ndarray, px: float, py: float) -> float:
+    return sample_texture_linear(image2d, pixel_center_to_texcoord(px, py, image2d))
+
+
+def sample_surface_map_linear(image2d: np.ndarray, px: float, py: float, meta: JHVMeta) -> float:
+    return sample_texture_linear(image2d, pixel_center_to_texcoord(px, py, image2d), wrap_x=surface_map_wraps_x(meta))
+
+
+def sample_source_linear(image2d: np.ndarray, px: float, py: float, meta: JHVMeta) -> float:
+    if meta.projection in {"CAR", "CEA"}:
+        return sample_surface_map_linear(image2d, px, py, meta)
+    return sample_observer_image_linear(image2d, px, py)
 
 
 def sample_points(sample_count: int, seed: int) -> list[tuple[float, float, float]]:
@@ -914,7 +1029,7 @@ def main() -> int:
         count = 0
 
         for iy in range(size):
-            sy = iy / (size - 1) if size > 1 else 0.5
+            sy = 1.0 - (iy / (size - 1) if size > 1 else 0.5)
             for ix in range(size):
                 sx = ix / (size - 1) if size > 1 else 0.5
                 world_rad = hpc_screen_to_world_rad((sx, sy), bounds_deg)
@@ -939,8 +1054,8 @@ def main() -> int:
                 else:
                     diff_px[iy, ix] = math.nan
 
-                jhv_img[iy, ix] = sample_nearest(image_data, jhv_px[0], jhv_px[1])
-                astro_img[iy, ix] = sample_nearest(image_data, astro_px[0], astro_px[1])
+                jhv_img[iy, ix] = sample_source_linear(image_data, jhv_px[0], jhv_px[1], meta)
+                astro_img[iy, ix] = sample_source_linear(image_data, astro_px[0], astro_px[1], meta)
 
         intensity_diff = np.abs(jhv_img - astro_img)
         args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -977,7 +1092,7 @@ def main() -> int:
         count = 0
 
         for iy in range(size):
-            sy = -1.0 + 2.0 * (iy / (size - 1) if size > 1 else 0.5)
+            sy = 1.0 - 2.0 * (iy / (size - 1) if size > 1 else 0.5)
             for ix in range(size):
                 sx = -1.0 + 2.0 * (ix / (size - 1) if size > 1 else 0.5)
                 ortho_px, hpc_px = orthographic_vs_hpc_screen_pixel_centers((sx, sy), meta)
@@ -987,8 +1102,8 @@ def main() -> int:
                 sum_px_err2 += err * err
                 count += 1
 
-                ortho_img[iy, ix] = sample_nearest(image_data, ortho_px[0], ortho_px[1])
-                hpc_img[iy, ix] = sample_nearest(image_data, hpc_px[0], hpc_px[1])
+                ortho_img[iy, ix] = sample_source_linear(image_data, ortho_px[0], ortho_px[1], meta)
+                hpc_img[iy, ix] = sample_source_linear(image_data, hpc_px[0], hpc_px[1], meta)
 
         intensity_diff = np.abs(ortho_img - hpc_img)
         args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -1051,8 +1166,8 @@ def main() -> int:
             sum_old_new2 += float(np.sum(old_new_err * old_new_err))
             count += int(old_err.size)
 
-            old_samples = np.array([sample_nearest(image_data, px, py) for px, py in old_px], dtype=np.float64)
-            new_samples = np.array([sample_nearest(image_data, px, py) for px, py in new_px], dtype=np.float64)
+            old_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in old_px], dtype=np.float64)
+            new_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in new_px], dtype=np.float64)
             diff_samples = np.abs(old_samples - new_samples)
             old_img[iy, :] = old_samples
             new_img[iy, :] = new_samples
@@ -1099,7 +1214,7 @@ def main() -> int:
         count = 0
 
         xs = np.linspace(-1.0, 1.0, size, dtype=np.float64)
-        ys = np.linspace(-1.0, 1.0, size, dtype=np.float64)
+        ys = np.linspace(1.0, -1.0, size, dtype=np.float64)
         solar_limb_angle = math.atan2(1.0, meta.observer_distance)
 
         for iy, y in enumerate(ys):
@@ -1120,8 +1235,8 @@ def main() -> int:
             sum_px_err2 += float(np.sum(px_err * px_err))
             count += int(px_err.size)
 
-            old_samples = np.array([sample_nearest(image_data, px, py) for px, py in old_px], dtype=np.float64)
-            hpc_samples = np.array([sample_nearest(image_data, px, py) for px, py in hpc_px], dtype=np.float64)
+            old_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in old_px], dtype=np.float64)
+            hpc_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in hpc_px], dtype=np.float64)
             diff_samples = np.abs(old_samples - hpc_samples)
             old_img[iy, valid_indices] = old_samples
             hpc_img[iy, valid_indices] = hpc_samples
@@ -1243,9 +1358,19 @@ def main() -> int:
             fits_y = np.full(meta.pixel_width, y + 1.0, dtype=np.float64)
             fits_x = np.arange(meta.pixel_width, dtype=np.float64) + 1.0
             world = pixel_wcs.wcs_pix2world(np.column_stack((fits_x, fits_y)), 1)
-            jhv_pixel_center = jhv_world_array_to_pixel_center(world, meta)
+            if not np.all(np.isfinite(world)):
+                world = np.array([
+                    pixel_center_to_world_deg((float(ax - 0.5), float(ay - 0.5)), meta)
+                    if not np.all(np.isfinite(w))
+                    else (float(w[0]), float(w[1]))
+                    for w, ax, ay in zip(world, fits_x, fits_y, strict=True)
+                ], dtype=np.float64)
+            jhv_pixel_center = jhv_world_array_to_pixel_center(world, meta, wrap_x=True)
             astro_pixel_center = np.column_stack((fits_x - 0.5, fits_y - 0.5))
-            errors = np.max(np.abs(jhv_pixel_center - astro_pixel_center), axis=1)
+            errors = np.array([
+                pixel_center_error_px((float(jx), float(jy)), (float(ax), float(ay)), meta)
+                for (jx, jy), (ax, ay) in zip(jhv_pixel_center, astro_pixel_center, strict=True)
+            ], dtype=np.float64)
             row_max = float(np.max(errors))
             pixel_err_max = max(pixel_err_max, row_max)
             if args.report_worst > 0:
@@ -1285,7 +1410,7 @@ def main() -> int:
             skipped_samples += 1
             continue
 
-        jhv_pixel_center_array = jhv_world_array_to_pixel_center(np.array([world_deg], dtype=np.float64), meta)
+        jhv_pixel_center_array = jhv_world_array_to_pixel_center(np.array([world_deg], dtype=np.float64), meta, wrap_x=True)
         jhv_pixel_center = (float(jhv_pixel_center_array[0, 0]), float(jhv_pixel_center_array[0, 1]))
 
         astro_plane_deg = projection_wcs.wcs_world2pix([world_deg], 0)[0]
@@ -1307,10 +1432,7 @@ def main() -> int:
             skipped_samples += 1
             continue
         astro_pixel_center = (astro_pixel_center[0] - 0.5, astro_pixel_center[1] - 0.5)
-        pixel_err = max(
-            abs(jhv_pixel_center[0] - astro_pixel_center[0]),
-            abs(jhv_pixel_center[1] - astro_pixel_center[1]),
-        )
+        pixel_err = pixel_center_error_px(jhv_pixel_center, astro_pixel_center, meta)
         pixel_err_max = max(pixel_err_max, pixel_err)
 
         worst.append((
