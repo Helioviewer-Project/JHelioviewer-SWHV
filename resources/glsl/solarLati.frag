@@ -15,18 +15,14 @@ vec2 sampleLatiCarTexcoord(const vec2 scrpos, const WCS wcs, const ProjectionPar
     // Interpret the latitudinal screen in the selected map frame, then sample the CAR surface map.
     vec3 world = displayLatitudinalWorld(scrpos, projection.displayMapQuat);
     vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
-    vec2 texCoord = wcsPlaneToTexcoord(plane, wcs);
-    clamp_texture(texCoord);
-    return texCoord;
+    return wcsPlaneToWrappedXTexcoord(plane, wcs);
 }
 
 vec2 sampleLatiCeaTexcoord(const vec2 scrpos, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
     // Interpret the latitudinal screen in the selected map frame, then sample the CEA surface map.
     vec3 world = displayLatitudinalWorld(scrpos, projection.displayMapQuat);
     vec2 plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
-    vec2 texCoord = wcsPlaneToTexcoord(plane, wcs);
-    clamp_texture(texCoord);
-    return texCoord;
+    return wcsPlaneToWrappedXTexcoord(plane, wcs);
 }
 
 // Legacy zenithal latitudinal path.

@@ -374,3 +374,12 @@ vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
     clamp_coord(texcoord);
     return texcoord;
 }
+
+vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
+    vec2 centered = rotate_vector_inverse(wcs.crota, vec3(plane, 0)).xy;
+    vec4 rect = wcs.rect;
+    vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+    texcoord.x = fract(texcoord.x);
+    clamp_coord(texcoord);
+    return texcoord;
+}
