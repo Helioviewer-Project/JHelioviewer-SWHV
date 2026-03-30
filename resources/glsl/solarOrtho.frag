@@ -1,5 +1,6 @@
 
 const vec3 zAxis = vec3(0, 0, 1);
+const float PLANE_Z_EPS = 1e-8;
 
 // TAN choice for ortho only
 // 0 = formal-TAN
@@ -29,6 +30,8 @@ vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool discardBackFacing) {
     vec3 altnormal = rotate_vector(quat, zAxis);
     if (discardBackFacing && altnormal.z <= 0.)
+        discard;
+    if (abs(altnormal.z) < PLANE_Z_EPS)
         discard;
     return -dot(altnormal.xy, vecin.xy) / altnormal.z;
 }
