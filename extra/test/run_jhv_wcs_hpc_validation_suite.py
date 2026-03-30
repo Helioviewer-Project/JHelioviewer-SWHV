@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -13,6 +14,14 @@ from pathlib import Path
 class ValidationRun:
     name: str
     args: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ValidationResult:
+    run: ValidationRun
+    returncode: int
+    stdout: str
+    stderr: str
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -90,6 +99,18 @@ RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits"), "--inverse-car"),
     ),
     ValidationRun(
+        "forward_car_aia",
+        (str(DATA / "syn_AIA_171_2026-01-12T00-00-00_f_V3.fits"),),
+    ),
+    ValidationRun(
+        "all_pixels_car_aia",
+        (str(DATA / "syn_AIA_171_2026-01-12T00-00-00_f_V3.fits"), "--all-pixels"),
+    ),
+    ValidationRun(
+        "inverse_car_aia",
+        (str(DATA / "syn_AIA_171_2026-01-12T00-00-00_f_V3.fits"), "--inverse-car"),
+    ),
+    ValidationRun(
         "forward_cea",
         (str(DATA / "mrzqs260301t2314c2308_169.fits"),),
     ),
@@ -160,6 +181,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Continue after failures and report them at the end",
     )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Number of validation runs to execute in parallel",
+    )
     return parser.parse_args()
 
 
@@ -174,12 +201,86 @@ def selected_runs(only: list[str] | None) -> list[ValidationRun]:
     return [run for run in RUNS if run.name in requested]
 
 
-def run_case(run: ValidationRun) -> int:
+def run_case(run: ValidationRun) -> ValidationResult:
     cmd = [sys.executable, str(VALIDATOR), *run.args]
-    print(f"\n== {run.name} ==")
+    completed = subprocess.run(
+        cmd,
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    return ValidationResult(
+        run=run,
+        returncode=completed.returncode,
+        stdout=completed.stdout,
+        stderr=completed.stderr,
+    )
+
+
+def print_result(result: ValidationResult) -> None:
+    cmd = [sys.executable, str(VALIDATOR), *result.run.args]
+    print(f"\n== {result.run.name} ==")
     print(" ".join(cmd))
-    completed = subprocess.run(cmd, cwd=REPO_ROOT)
-    return completed.returncode
+    if result.stdout:
+        print(result.stdout, end="" if result.stdout.endswith("\n") else "\n")
+    if result.stderr:
+        print(result.stderr, end="" if result.stderr.endswith("\n") else "\n", file=sys.stderr)
+
+
+def run_sequential(runs: list[ValidationRun], keep_going: bool) -> list[ValidationResult]:
+    results: list[ValidationResult] = []
+    for run in runs:
+        result = run_case(run)
+        print_result(result)
+        results.append(result)
+        if result.returncode != 0 and not keep_going:
+            break
+    return results
+
+
+def run_parallel(runs: list[ValidationRun], keep_going: bool, jobs: int) -> list[ValidationResult]:
+    results_by_name: dict[str, ValidationResult] = {}
+    submitted: dict[Future[ValidationResult], ValidationRun] = {}
+    stop_submitting = False
+    next_index = 0
+
+    with ThreadPoolExecutor(max_workers=jobs) as executor:
+        while next_index < len(runs) and len(submitted) < jobs:
+            run = runs[next_index]
+            submitted[executor.submit(run_case, run)] = run
+            next_index += 1
+
+        while submitted:
+            done, _ = wait(submitted.keys(), return_when=FIRST_COMPLETED)
+            for future in done:
+                run = submitted.pop(future)
+                result = future.result()
+                results_by_name[run.name] = result
+                if result.returncode != 0 and not keep_going:
+                    stop_submitting = True
+                    for pending in submitted:
+                        pending.cancel()
+                    submitted.clear()
+                    break
+
+            if stop_submitting:
+                break
+
+            while next_index < len(runs) and len(submitted) < jobs:
+                run = runs[next_index]
+                submitted[executor.submit(run_case, run)] = run
+                next_index += 1
+
+    ordered_results: list[ValidationResult] = []
+    for run in runs:
+        result = results_by_name.get(run.name)
+        if result is None:
+            break
+        print_result(result)
+        ordered_results.append(result)
+        if result.returncode != 0 and not keep_going:
+            break
+    return ordered_results
 
 
 def main() -> int:
@@ -190,14 +291,14 @@ def main() -> int:
         return 0
 
     runs = selected_runs(args.only)
-    failures: list[str] = []
-    for run in runs:
-        code = run_case(run)
-        if code == 0:
-            continue
-        failures.append(run.name)
-        if not args.keep_going:
-            return code
+    if args.jobs < 1:
+        raise SystemExit("--jobs must be at least 1")
+
+    results = run_parallel(runs, args.keep_going, args.jobs) if args.jobs > 1 else run_sequential(runs, args.keep_going)
+    failures = [result.run.name for result in results if result.returncode != 0]
+
+    if failures and not args.keep_going:
+        return next(result.returncode for result in results if result.returncode != 0)
 
     if failures:
         print("\nFAILED:")
@@ -205,7 +306,7 @@ def main() -> int:
             print(f"- {name}")
         return 1
 
-    print(f"\nAll {len(runs)} validation run(s) passed.")
+    print(f"\nAll {len(results)} validation run(s) passed.")
     return 0
 
 
