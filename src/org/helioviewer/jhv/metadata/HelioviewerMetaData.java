@@ -298,8 +298,8 @@ public final class HelioviewerMetaData extends BaseMetaData {
             boolean isSurfaceMap = wcsProjection.isSurfaceMap();
 
             if (isSurfaceMap) {
-                unitPerArcsec = wcs.unitPerArcsec();
-                wcsPlaneUnitsPerRad = (float) wcs.unitsPerRad();
+                unitPerArcsec = Math.PI / (180. * 3600.);
+                wcsPlaneUnitsPerRad = 1f;
                 unitPerPixelX = wcs.unitPerPixelX();
                 unitPerPixelY = wcs.unitPerPixelY();
             } else {
