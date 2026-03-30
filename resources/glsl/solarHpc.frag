@@ -74,7 +74,9 @@ vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 he
     }
 
     vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
-    return wcsPlaneToTexcoord(plane, wcs);
+    vec2 texCoord = wcsPlaneToTexcoord(plane, wcs);
+    clamp_texture(texCoord);
+    return texCoord;
 }
 
 void main(void) {
@@ -89,7 +91,6 @@ void main(void) {
     clipHpcGeometry(hpcXY);
     texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, wcs[0].deltaT, pv0, enhancementFactor);
     if (!diffMode) {
-        clamp_texture(texCoord);
         color = getColor(texCoord, texCoord, enhancementFactor);
     } else {
         float diffObserverDistance = projection[1].observerDistance;
@@ -98,8 +99,6 @@ void main(void) {
         float diffEnhancementFactor;
         clipHpcGeometry(diffHpcXY);
         diffTexCoord = sampleHpcTexcoord(wcs[1], projection[1], helioprojective, diffHpcXY, wcs[1].deltaT, pv1, diffEnhancementFactor);
-        clamp_texture(texCoord);
-        clamp_texture(diffTexCoord);
         color = getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
     }
     outColor = color;
