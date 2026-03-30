@@ -11,11 +11,11 @@ vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams
     // Surface maps sample directly from world lon/lat, without observer-image geometry.
     if (projection.projectionCode == WCS_PROJECTION_CAR) {
         vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
-        return wcsPlaneToTexcoord(plane, wcs);
+        return wcsPlaneToWrappedXTexcoord(plane, wcs);
     }
     if (projection.projectionCode == WCS_PROJECTION_CEA) {
         vec2 plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
-        return wcsPlaneToTexcoord(plane, wcs);
+        return wcsPlaneToWrappedXTexcoord(plane, wcs);
     }
 #if SIMPLE_TAN
     if (projection.projectionCode == WCS_PROJECTION_TAN)
