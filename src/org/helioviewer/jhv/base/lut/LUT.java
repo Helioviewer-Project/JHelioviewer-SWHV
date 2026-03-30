@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.metadata.HelioviewerMetaData;
+import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +38,7 @@ public record LUT(String name, int[] lut8) {
             measurement = normalize(measurement);
         }
 
-        boolean matches(HelioviewerMetaData meta) {
+        boolean matches(FitsMetaData meta) {
             return matches(observatory, meta.getObservatory())
                     && matches(instrument, meta.getInstrument())
                     && matches(detector, meta.getDetector())
@@ -146,7 +146,7 @@ public record LUT(String name, int[] lut8) {
     }
 
     @Nullable
-    public static LUT get(HelioviewerMetaData meta) {
+    public static LUT get(FitsMetaData meta) {
         for (ColorRule rule : colorRules) {
             if (rule.matches(meta))
                 return rule.lut;

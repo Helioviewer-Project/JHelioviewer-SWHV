@@ -16,7 +16,7 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
-public final class HelioviewerMetaData extends BaseMetaData {
+public final class FitsMetaData extends CommonMetaData {
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
     private static final Set<String> CROTABlockSet = Set.of("LASCO");
@@ -36,7 +36,7 @@ public final class HelioviewerMetaData extends BaseMetaData {
     private double referenceX = 0;
     private double referenceY = 0;
 
-    public HelioviewerMetaData(@Nonnull MetaDataContainer m) {
+    public FitsMetaData(@Nonnull MetaDataContainer m) {
         identifyObservation(m);
 
         instrument = instrument.trim().intern();

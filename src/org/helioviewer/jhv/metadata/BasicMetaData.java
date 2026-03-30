@@ -4,11 +4,11 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
-public class PixelBasedMetaData extends BaseMetaData {
+public class BasicMetaData extends CommonMetaData {
 
-    public static final PixelBasedMetaData EMPTY = new PixelBasedMetaData(1, 1, "");
+    public static final BasicMetaData EMPTY = new BasicMetaData(1, 1, "");
 
-    public PixelBasedMetaData(int pixelW, int pixelH, String _displayName) {
+    public BasicMetaData(int pixelW, int pixelH, String _displayName) {
         double unitPerPixel = Sun.Radius / Math.max(pixelW, pixelH);
         unitPerPixelX = unitPerPixel;
         unitPerPixelY = unitPerPixel;
