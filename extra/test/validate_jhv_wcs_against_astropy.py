@@ -31,6 +31,7 @@ DISPLAY_SECTOR = (0.0, 0.0, 0.0)
 DISPLAY_CUTOFF = (0.0, 0.0, -1.0)
 DISPLAY_RADII = (0.0, math.inf)
 DISPLAY_SLIT = (0.0, 1.0)
+PLANE_Z_EPS = 1e-8
 
 
 # Metadata / WCS interpretation.
@@ -1367,6 +1368,8 @@ def rotateOnDiskPoint(
 def intersectPlane(camera_diff_quat: tuple[float, float, float, float], vecin: tuple[float, float, float], discard_back_facing: bool) -> float:
     altnormal = rotate_vector(camera_diff_quat, (0.0, 0.0, 1.0))
     if discard_back_facing and altnormal[2] <= 0.0:
+        return math.nan
+    if abs(altnormal[2]) < PLANE_Z_EPS:
         return math.nan
     return -(altnormal[0] * vecin[0] + altnormal[1] * vecin[1]) / altnormal[2]
 
