@@ -74,9 +74,7 @@ vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 he
     }
 
     vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
-    vec2 texCoord = wcsPlaneToTexcoord(plane, wcs);
-    clamp_texture(texCoord);
-    return texCoord;
+    return wcsPlaneToTexcoord(plane, wcs);
 }
 
 void main(void) {
