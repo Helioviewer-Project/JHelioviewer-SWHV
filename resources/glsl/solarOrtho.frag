@@ -7,6 +7,11 @@ const float PLANE_Z_EPS = 1e-8;
 // 1 = simple-TAN
 #define SIMPLE_TAN 1
 
+bool isSurfaceMap(const ProjectionParams projection) {
+    return projection.projectionCode == WCS_PROJECTION_CAR
+        || projection.projectionCode == WCS_PROJECTION_CEA;
+}
+
 // Source-image sampling from the orthographic scene point.
 vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
     // Surface maps sample directly from world lon/lat, without observer-image geometry.
@@ -25,6 +30,33 @@ vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams
     vec2 helioprojective = worldToHelioprojective(world, projection.observerDistance);
     vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
     return wcsPlaneToTexcoord(plane, wcs);
+}
+
+void clipOrthoDisplayGeometry(const vec3 renderedWorld) {
+    if (display.sector.z != 0.) {
+        float theta = atan(renderedWorld.y, renderedWorld.x);
+        if (theta < display.sector.x || theta > display.sector.y)
+            discard;
+    }
+
+    float radial2 = dot(renderedWorld.xy, renderedWorld.xy);
+    float minRadius2 = display.radii.x * display.radii.x;
+    float maxRadius2 = display.radii.y * display.radii.y;
+    if (radial2 > maxRadius2 || radial2 < minRadius2)
+        discard;
+
+    if (display.cutOff.z >= 0.) {
+        float geometryFlatDist = abs(dot(renderedWorld.xy, display.cutOff.xy));
+        vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
+        float geometryFlatDistAlt = abs(dot(renderedWorld.xy, cutOffAlt));
+        if (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z)
+            discard;
+    }
+}
+
+vec2 sampleClippedOrthoTexcoord(const vec3 renderedWorld, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
+    clipOrthoDisplayGeometry(renderedWorld);
+    return sampleOrthoTexcoord(renderedWorld, wcs, projection, PV);
 }
 
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool discardBackFacing) {
@@ -53,7 +85,7 @@ void main(void) {
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 upXY = up1.xy;
     bool diffMode = display.isDiff != NODIFFERENCE;
-    bool surfaceMapMode = projection[0].projectionCode == WCS_PROJECTION_CAR || projection[0].projectionCode == WCS_PROJECTION_CEA;
+    bool surfaceMapMode = isSurfaceMap(projection[0]);
 
     float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
@@ -96,28 +128,7 @@ void main(void) {
             gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
 
-    if (display.sector.z != 0.) {
-        float theta = atan(rotatedHitPoint.y, rotatedHitPoint.x);
-        if (theta < display.sector.x || theta > display.sector.y)
-            discard;
-    }
-
-    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
-
-    float rotatedHitPointRad2 = dot(rotatedHitPoint.xy, rotatedHitPoint.xy);
-    float minRadius2 = display.radii.x * display.radii.x;
-    float maxRadius2 = display.radii.y * display.radii.y;
-    if (rotatedHitPointRad2 > maxRadius2 || rotatedHitPointRad2 < minRadius2) {
-        discard;
-    }
-
-    if (display.cutOff.z >= 0.) {
-        float geometryFlatDist = abs(dot(rotatedHitPoint.xy, display.cutOff.xy));
-        vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-        float geometryFlatDistAlt = abs(dot(rotatedHitPoint.xy, cutOffAlt));
-        if (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z)
-            discard;
-    }
+    vec2 texCoord = sampleClippedOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
 
     vec2 diffTexCoord;
     if (diffMode) {
@@ -125,12 +136,7 @@ void main(void) {
             diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
         }
 
-        diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
-
-        float diffRotatedHitPointRad2 = dot(diffRotatedHitPoint.xy, diffRotatedHitPoint.xy);
-        if (diffRotatedHitPointRad2 > maxRadius2 || diffRotatedHitPointRad2 < minRadius2) {
-            discard;
-        }
+        diffTexCoord = sampleClippedOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
     }
     outColor = getColor(texCoord, diffTexCoord, enhancementFactor);
 }
