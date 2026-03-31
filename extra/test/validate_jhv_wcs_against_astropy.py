@@ -1434,12 +1434,26 @@ def renderOrthographicTexcoords(
     radius2 = screen_xy[0] * screen_xy[0] + screen_xy[1] * screen_xy[1]
     on_disk = radius2 <= 1.0
     surface_map_mode = meta.projection in SURFACE_MAP_PROJECTIONS
+    diff_surface_map_mode = diff_meta.projection in SURFACE_MAP_PROJECTIONS if diff_meta is not None else False
     if surface_map_mode and not on_disk:
         return (math.nan, math.nan), (math.nan, math.nan), (math.nan, math.nan, math.nan), (math.nan, math.nan, math.nan)
+    if diff_meta is not None and diff_surface_map_mode and not on_disk:
+        return (math.nan, math.nan), (math.nan, math.nan), (math.nan, math.nan, math.nan), (math.nan, math.nan, math.nan)
 
-    world_xyz = orthoRenderedWorld(screen_xy, meta, camera_diff_quat, source_view_quat)
+    if on_disk:
+        hit_point = ortho_screen_to_world(screen_xy)
+        world_xyz = (
+            rotate_vector_inverse(source_view_quat, hit_point)
+            if surface_map_mode
+            else rotateOnDiskPoint(hit_point, meta, camera_diff_quat)
+        )
+    else:
+        hit_point = (math.nan, math.nan, math.nan)
+        world_xyz = (0.0, 0.0, 0.0)
+
     if not surface_map_mode and world_xyz[2] <= 0.0:
-        world_xyz, hit_point = sampleOffLimbPoint(screen_xy, meta, camera_diff_quat, on_disk)
+        hit_point = (screen_xy[0], screen_xy[1], intersectPlane(camera_diff_quat, (screen_xy[0], screen_xy[1], 0.0), on_disk))
+        world_xyz = rotate_vector_inverse(camera_diff_quat, hit_point)
         if on_disk and hit_point[2] < 0.0:
             return (math.nan, math.nan), (math.nan, math.nan), world_xyz, world_xyz
         if world_xyz[0] * world_xyz[0] + world_xyz[1] * world_xyz[1] + world_xyz[2] * world_xyz[2] <= 1.0:
@@ -1455,13 +1469,20 @@ def renderOrthographicTexcoords(
     if diff_meta is None:
         return texcoord, texcoord, world_xyz, world_xyz
 
-    diff_surface_map_mode = diff_meta.projection in SURFACE_MAP_PROJECTIONS
-    if diff_surface_map_mode and not on_disk:
-        return (math.nan, math.nan), (math.nan, math.nan), world_xyz, (math.nan, math.nan, math.nan)
+    if on_disk:
+        diff_hit_point = ortho_screen_to_world(screen_xy)
+        diff_world_xyz = (
+            rotate_vector_inverse(diff_source_view_quat, diff_hit_point)
+            if diff_surface_map_mode
+            else rotateOnDiskPoint(diff_hit_point, diff_meta, diff_camera_diff_quat)
+        )
+    else:
+        diff_hit_point = (math.nan, math.nan, math.nan)
+        diff_world_xyz = (0.0, 0.0, 0.0)
 
-    diff_world_xyz = orthoRenderedWorld(screen_xy, diff_meta, diff_camera_diff_quat, diff_source_view_quat)
     if not diff_surface_map_mode and diff_world_xyz[2] <= 0.0:
-        diff_world_xyz, diff_hit_point = sampleOffLimbPoint(screen_xy, diff_meta, diff_camera_diff_quat, on_disk)
+        diff_hit_point = (screen_xy[0], screen_xy[1], intersectPlane(diff_camera_diff_quat, (screen_xy[0], screen_xy[1], 0.0), on_disk))
+        diff_world_xyz = rotate_vector_inverse(diff_camera_diff_quat, diff_hit_point)
         if on_disk and diff_hit_point[2] < 0.0:
             return (math.nan, math.nan), (math.nan, math.nan), world_xyz, diff_world_xyz
         if (
