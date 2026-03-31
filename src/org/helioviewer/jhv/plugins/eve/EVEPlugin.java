@@ -23,8 +23,8 @@ public class EVEPlugin extends Plugin {
     public void install() {
         tl.installTimelines();
         BandReaderHapi.requestCatalog();
-        JHVFrame.getMenuBar().getMenu(0).add(newItem, 2);
-        JHVFrame.getMenuBar().getMenu(0).add(openItem, 4);
+        JHVFrame.getMenuBar().getMenu(0).add(newItem, 3);
+        JHVFrame.getMenuBar().getMenu(0).add(openItem, 5);
     }
 
     @Override

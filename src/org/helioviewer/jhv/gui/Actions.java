@@ -21,6 +21,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
+import org.helioviewer.jhv.gui.dialogs.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
@@ -112,6 +113,19 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             SoarDialog.getInstance().showDialog();
+        }
+
+    }
+
+    public static class NewSynopticLayer extends AbstractAction {
+
+        public NewSynopticLayer() {
+            super("New Synoptic Layer...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SynopticDialog.getInstance().showDialog();
         }
 
     }

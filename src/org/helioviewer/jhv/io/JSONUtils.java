@@ -11,6 +11,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -41,10 +42,10 @@ public class JSONUtils {
         }
     }
 
-    public static JSONObject post(URI uri, JSONObject json) throws IOException, JSONException {
+    public static JSONArray post(URI uri, JSONObject json) throws IOException, JSONException {
         byte[] body = json.toString().getBytes(StandardCharsets.UTF_8);
         try (NetClient nc = NetClient.post(uri, "application/json; charset=utf-8", body, false, NetClient.NetCache.NETWORK)) {
-            return get(nc.getReader());
+            return new JSONArray(new JSONTokener(new BufferedReader(nc.getReader(), BUFSIZ)));
         }
     }
 
