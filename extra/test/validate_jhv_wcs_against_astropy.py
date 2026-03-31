@@ -950,6 +950,67 @@ def sample_source_linear(image2d: np.ndarray, px: float, py: float, meta: JHVMet
     return sample_observer_image_linear(image2d, px, py)
 
 
+def sample_texture_linear_array(image2d: np.ndarray, u: np.ndarray, v: np.ndarray, wrap_x: bool = False) -> np.ndarray:
+    u = np.asarray(u, dtype=np.float64)
+    v = np.asarray(v, dtype=np.float64)
+    out = np.full(u.shape, np.nan, dtype=np.float64)
+
+    finite = np.isfinite(u) & np.isfinite(v)
+    if wrap_x:
+        u = np.mod(u, 1.0)
+    else:
+        finite &= (u >= 0.0) & (u <= 1.0)
+    finite &= (v >= 0.0) & (v <= 1.0)
+    if not np.any(finite):
+        return out
+
+    width = image2d.shape[1]
+    height = image2d.shape[0]
+
+    fx = u[finite] * width - 0.5
+    fy = v[finite] * height - 0.5
+    x0 = np.floor(fx).astype(np.int64)
+    y0 = np.floor(fy).astype(np.int64)
+    tx = fx - x0
+    ty = fy - y0
+    x1 = x0 + 1
+    y1 = y0 + 1
+
+    y0 = np.clip(y0, 0, height - 1)
+    y1 = np.clip(y1, 0, height - 1)
+
+    if wrap_x:
+        x0 = np.mod(x0, width)
+        x1 = np.mod(x1, width)
+    else:
+        x0 = np.clip(x0, 0, width - 1)
+        x1 = np.clip(x1, 0, width - 1)
+
+    ty0 = height - 1 - y0
+    ty1 = height - 1 - y1
+    v00 = image2d[ty0, x0]
+    v10 = image2d[ty0, x1]
+    v01 = image2d[ty1, x0]
+    v11 = image2d[ty1, x1]
+    out[finite] = (
+        (1.0 - tx) * (1.0 - ty) * v00 +
+        tx * (1.0 - ty) * v10 +
+        (1.0 - tx) * ty * v01 +
+        tx * ty * v11
+    )
+    return out
+
+
+def sample_source_linear_array(image2d: np.ndarray, px: np.ndarray, py: np.ndarray, meta: JHVMeta) -> np.ndarray:
+    wrap_x = surface_map_wraps_x(meta)
+    return sample_texture_linear_array(
+        image2d,
+        np.asarray(px, dtype=np.float64) / image2d.shape[1],
+        np.asarray(py, dtype=np.float64) / image2d.shape[0],
+        wrap_x=wrap_x,
+    )
+
+
 def sample_points(sample_count: int, seed: int) -> list[tuple[float, float, float]]:
     rng = random.Random(seed)
     points: list[tuple[float, float, float]] = []
@@ -1685,6 +1746,17 @@ def render_surface_latitudinal_image(size: int, meta: JHVMeta, image2d: np.ndarr
     )
 
 
+def surface_map_display_world_grid(
+    width: int,
+    height: int,
+    bounds_deg: tuple[float, float, float, float],
+) -> np.ndarray:
+    xs = np.linspace(bounds_deg[0], bounds_deg[1], width, dtype=np.float64)
+    ys = np.linspace(bounds_deg[3], bounds_deg[2], height, dtype=np.float64)
+    lon_deg, lat_deg = np.meshgrid(xs, ys)
+    return np.column_stack((lon_deg.ravel(), lat_deg.ravel()))
+
+
 def render_zenithal_latitudinal_image(
     size: int,
     meta: JHVMeta,
@@ -1810,6 +1882,73 @@ def run_orthographic_render(fits_file: Path, output_dir: Path, render_size: int,
     print(f"file={fits_file}")
     print(f"mode=orthographic_render size={render_size}")
     print(f"jhv_png={jhv_path}")
+    return 0
+
+
+def run_surface_map_render_compare(
+    fits_file: Path,
+    output_dir: Path,
+    grid_factor: int,
+    meta: JHVMeta,
+    image_data: np.ndarray,
+    pixel_wcs: WCS,
+) -> int:
+    require_2d_image(image_data, "Surface-map render compare")
+    if not is_surface_map_projection(meta):
+        raise ValueError("Surface-map render compare currently supports CAR/CEA surface maps only")
+    if grid_factor < 1:
+        raise ValueError("Surface-map grid factor must be >= 1")
+
+    width = meta.pixel_width * grid_factor
+    height = meta.pixel_height * grid_factor
+    world_deg = surface_map_display_world_grid(width, height, LATI_SURFACE_BOUNDS_DEG)
+
+    jhv_px = mirrored_world_array_to_pixel_center(world_deg, meta)
+    astro_px_raw = pixel_wcs.wcs_world2pix(world_deg, 1)
+    astro_px = np.column_stack((astro_px_raw[:, 0] - 0.5, astro_px_raw[:, 1] - 0.5))
+
+    jhv_samples = sample_source_linear_array(image_data, jhv_px[:, 0], jhv_px[:, 1], meta)
+    astro_samples = sample_source_linear_array(image_data, astro_px[:, 0], astro_px[:, 1], meta)
+
+    diff_px = np.full(world_deg.shape[0], np.nan, dtype=np.float64)
+    finite = (
+        np.isfinite(jhv_px[:, 0]) & np.isfinite(jhv_px[:, 1]) &
+        np.isfinite(astro_px[:, 0]) & np.isfinite(astro_px[:, 1])
+    )
+    if np.any(finite):
+        dx = np.abs(jhv_px[finite, 0] - astro_px[finite, 0])
+        if surface_map_wraps_x(meta):
+            dx = np.minimum(dx, np.abs((jhv_px[finite, 0] + meta.pixel_width) - astro_px[finite, 0]))
+            dx = np.minimum(dx, np.abs(jhv_px[finite, 0] - (astro_px[finite, 0] + meta.pixel_width)))
+        dy = np.abs(jhv_px[finite, 1] - astro_px[finite, 1])
+        diff_px[finite] = np.maximum(dx, dy)
+
+    sample_diff = np.abs(jhv_samples - astro_samples)
+    jhv_img = jhv_samples.reshape(height, width)
+    astro_img = astro_samples.reshape(height, width)
+    diff_img = sample_diff.reshape(height, width)
+
+    jhv_path = output_dir / f"{fits_file.stem}_surface_map_jhv_{grid_factor}x.png"
+    astro_path = output_dir / f"{fits_file.stem}_surface_map_astropy_{grid_factor}x.png"
+    diff_path = output_dir / f"{fits_file.stem}_surface_map_diff_{grid_factor}x.png"
+    save_png(jhv_path, jhv_img)
+    save_png(astro_path, astro_img)
+    save_png(diff_path, diff_img)
+
+    max_px_err = float(np.nanmax(diff_px)) if np.any(np.isfinite(diff_px)) else math.nan
+    rms_px_err = float(math.sqrt(np.nanmean(diff_px[finite] ** 2))) if np.any(finite) else math.nan
+    max_sample_err = float(np.nanmax(sample_diff)) if np.any(np.isfinite(sample_diff)) else math.nan
+
+    print(f"file={fits_file}")
+    print(f"mode=surface_map_render_compare grid_factor={grid_factor}")
+    print(f"render_size={width}x{height}")
+    print(f"bounds_deg=({LATI_SURFACE_BOUNDS_DEG[0]:.12f}, {LATI_SURFACE_BOUNDS_DEG[1]:.12f}, {LATI_SURFACE_BOUNDS_DEG[2]:.12f}, {LATI_SURFACE_BOUNDS_DEG[3]:.12f})")
+    print(f"pixel_center_max_error_px={max_px_err:.6e}" if math.isfinite(max_px_err) else "pixel_center_max_error_px=nan")
+    print(f"pixel_center_rms_error_px={rms_px_err:.6e}" if math.isfinite(rms_px_err) else "pixel_center_rms_error_px=nan")
+    print(f"sample_max_abs_error={max_sample_err:.6e}" if math.isfinite(max_sample_err) else "sample_max_abs_error=nan")
+    print(f"jhv_png={jhv_path}")
+    print(f"astropy_png={astro_path}")
+    print(f"diff_png={diff_path}")
     return 0
 
 
@@ -2002,37 +2141,47 @@ def run_hpc_render_compare(
 
     for iy in range(render_size):
         sy = 1.0 - (iy / (render_size - 1) if render_size > 1 else 0.5)
+        row_texcoord = np.full((render_size, 2), np.nan, dtype=np.float64)
+        row_jhv_px = np.full((render_size, 2), np.nan, dtype=np.float64)
+        row_world_deg = np.full((render_size, 2), np.nan, dtype=np.float64)
         for ix in range(render_size):
             sx = ix / (render_size - 1) if render_size > 1 else 0.5
             texcoord, _, _, _, helioprojective, _ = renderHpcTexcoords((sx, sy), bounds_deg, meta, image_data)
             if not math.isfinite(texcoord[0]) or not math.isfinite(texcoord[1]):
                 diff_px[iy, ix] = math.nan
-                jhv_img[iy, ix] = math.nan
-                astro_img[iy, ix] = math.nan
                 continue
 
-            world_deg = [math.degrees(helioprojective[0]), math.degrees(helioprojective[1])]
             try:
                 jhv_px = texcoord_to_pixel_center(texcoord, meta.pixel_width, meta.pixel_height)
             except ValueError:
                 diff_px[iy, ix] = math.nan
-                jhv_img[iy, ix] = math.nan
-                astro_img[iy, ix] = math.nan
                 continue
-            astro_px_raw = pixel_wcs.wcs_world2pix([world_deg], 1)[0]
-            astro_px = (float(astro_px_raw[0] - 0.5), float(astro_px_raw[1] - 0.5))
+            row_texcoord[ix] = texcoord
+            row_jhv_px[ix] = jhv_px
+            row_world_deg[ix] = (math.degrees(helioprojective[0]), math.degrees(helioprojective[1]))
 
-            if math.isfinite(astro_px[0]) and math.isfinite(astro_px[1]) and math.isfinite(jhv_px[0]) and math.isfinite(jhv_px[1]):
-                err = max(abs(jhv_px[0] - astro_px[0]), abs(jhv_px[1] - astro_px[1]))
-                diff_px[iy, ix] = err
-                max_px_err = max(max_px_err, err)
-                sum_px_err2 += err * err
-                count += 1
-            else:
-                diff_px[iy, ix] = math.nan
+        world_mask = np.isfinite(row_world_deg[:, 0]) & np.isfinite(row_world_deg[:, 1])
+        row_astro_px = np.full((render_size, 2), np.nan, dtype=np.float64)
+        if np.any(world_mask):
+            astro_px_raw = pixel_wcs.wcs_world2pix(row_world_deg[world_mask], 1)
+            row_astro_px[world_mask] = np.column_stack((astro_px_raw[:, 0] - 0.5, astro_px_raw[:, 1] - 0.5))
 
-            jhv_img[iy, ix] = sample_texture_linear(image_data, texcoord)
-            astro_img[iy, ix] = sample_source_linear(image_data, astro_px[0], astro_px[1], meta)
+        finite_mask = (
+            np.isfinite(row_jhv_px[:, 0]) & np.isfinite(row_jhv_px[:, 1]) &
+            np.isfinite(row_astro_px[:, 0]) & np.isfinite(row_astro_px[:, 1])
+        )
+        if np.any(finite_mask):
+            row_err = np.maximum(
+                np.abs(row_jhv_px[finite_mask, 0] - row_astro_px[finite_mask, 0]),
+                np.abs(row_jhv_px[finite_mask, 1] - row_astro_px[finite_mask, 1]),
+            )
+            diff_px[iy, finite_mask] = row_err
+            max_px_err = max(max_px_err, float(np.max(row_err)))
+            sum_px_err2 += float(np.sum(row_err * row_err))
+            count += int(row_err.size)
+
+        jhv_img[iy] = sample_texture_linear_array(image_data, row_texcoord[:, 0], row_texcoord[:, 1])
+        astro_img[iy] = sample_source_linear_array(image_data, row_astro_px[:, 0], row_astro_px[:, 1], meta)
 
     intensity_diff = np.abs(jhv_img - astro_img)
     jhv_path = output_dir / f"{fits_file.stem}_hpc_jhv.png"
@@ -2072,6 +2221,8 @@ def run_ortho_vs_hpc_screen_compare(
 
     for iy in range(render_size):
         sy = 1.0 - 2.0 * (iy / (render_size - 1) if render_size > 1 else 0.5)
+        row_ortho_px = np.full((render_size, 2), np.nan, dtype=np.float64)
+        row_hpc_px = np.full((render_size, 2), np.nan, dtype=np.float64)
         for ix in range(render_size):
             sx = -1.0 + 2.0 * (ix / (render_size - 1) if render_size > 1 else 0.5)
             ortho_px, hpc_px = orthographic_vs_hpc_screen_pixel_centers((sx, sy), meta, image_data)
@@ -2080,17 +2231,17 @@ def run_ortho_vs_hpc_screen_compare(
                 math.isfinite(hpc_px[0]) and math.isfinite(hpc_px[1])
             ):
                 diff_px[iy, ix] = math.nan
-                ortho_img[iy, ix] = math.nan
-                hpc_img[iy, ix] = math.nan
                 continue
             err = max(abs(ortho_px[0] - hpc_px[0]), abs(ortho_px[1] - hpc_px[1]))
             diff_px[iy, ix] = err
             max_px_err = max(max_px_err, err)
             sum_px_err2 += err * err
             count += 1
+            row_ortho_px[ix] = ortho_px
+            row_hpc_px[ix] = hpc_px
 
-            ortho_img[iy, ix] = sample_source_linear(image_data, ortho_px[0], ortho_px[1], meta)
-            hpc_img[iy, ix] = sample_source_linear(image_data, hpc_px[0], hpc_px[1], meta)
+        ortho_img[iy] = sample_source_linear_array(image_data, row_ortho_px[:, 0], row_ortho_px[:, 1], meta)
+        hpc_img[iy] = sample_source_linear_array(image_data, row_hpc_px[:, 0], row_hpc_px[:, 1], meta)
 
     intensity_diff = np.abs(ortho_img - hpc_img)
     ortho_path = output_dir / f"{fits_file.stem}_ortho_screen.png"
@@ -2183,8 +2334,8 @@ def run_compare_initial_tan_image_frame(
         sum_old_new2 += float(np.sum(old_new_err * old_new_err))
         count += int(old_err.size)
 
-        old_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in old_px], dtype=np.float64)
-        new_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in new_px], dtype=np.float64)
+        old_samples = sample_source_linear_array(image_data, old_px[:, 0], old_px[:, 1], meta)
+        new_samples = sample_source_linear_array(image_data, new_px[:, 0], new_px[:, 1], meta)
         diff_samples = np.abs(old_samples - new_samples)
         old_img[iy, row_indices] = old_samples
         new_img[iy, row_indices] = new_samples
@@ -2265,8 +2416,8 @@ def run_compare_initial_tan_vs_hpc(
         sum_px_err2 += float(np.sum(px_err * px_err))
         count += int(px_err.size)
 
-        old_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in old_px], dtype=np.float64)
-        hpc_samples = np.array([sample_source_linear(image_data, px, py, meta) for px, py in hpc_px], dtype=np.float64)
+        old_samples = sample_source_linear_array(image_data, old_px[:, 0], old_px[:, 1], meta)
+        hpc_samples = sample_source_linear_array(image_data, hpc_px[:, 0], hpc_px[:, 1], meta)
         diff_samples = np.abs(old_samples - hpc_samples)
         old_img[iy, valid_indices] = old_samples
         hpc_img[iy, valid_indices] = hpc_samples
@@ -2540,6 +2691,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--hpc-render-compare", action="store_true", help="Render a bounded HPC screen through JHV and Astropy mappings and write diagnostic PNGs")
     parser.add_argument("--hpc-bounds-compare", action="store_true", help="Report the raw and centered HPC bounds used by the current JHV display logic")
     parser.add_argument("--latitudinal-render", action="store_true", help="Render the CAR/CEA latitudinal surface-map path mirrored from solarLati.frag")
+    parser.add_argument("--surface-map-render-compare", action="store_true", help="Render CAR/CEA surface maps through JHV and Astropy over a dense lon/lat grid and write diagnostic PNGs")
     parser.add_argument("--latitudinal-zenithal-render", action="store_true", help="Render the legacy zenithal latitudinal path mirrored from solarLati.frag")
     parser.add_argument("--polar-render", action="store_true", help="Render the polar path mirrored from solarPolar.frag")
     parser.add_argument("--logpolar-render", action="store_true", help="Render the log-polar path mirrored from solarLogPolar.frag")
@@ -2553,6 +2705,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--compare-initial-tan-image-frame", action="store_true", help="Compare simple-TAN against formal-TAN over the full image frame")
     parser.add_argument("--compare-initial-tan-vs-hpc", action="store_true", help="Compare simple-TAN against the JHV HPC display sampling over the full rendered comparison frame")
     parser.add_argument("--render-size", type=int, default=512, help="Square output size for HPC diagnostic renderings")
+    parser.add_argument("--surface-map-grid-factor", type=int, default=4, help="Render CAR/CEA validation images at this multiple of the source width/height")
     parser.add_argument("--output-dir", type=Path, default=Path("extra/test/out"), help="Directory for diagnostic PNGs")
     return parser
 
@@ -2585,6 +2738,9 @@ def main() -> int:
 
     if args.latitudinal_render:
         return run_latitudinal_render(args.fits_file, args.output_dir, args.render_size, meta, image_data)
+
+    if args.surface_map_render_compare:
+        return run_surface_map_render_compare(args.fits_file, args.output_dir, args.surface_map_grid_factor, meta, image_data, pixel_wcs)
 
     if args.latitudinal_zenithal_render:
         return run_latitudinal_zenithal_render(args.fits_file, args.output_dir, args.render_size, meta, image_data)
