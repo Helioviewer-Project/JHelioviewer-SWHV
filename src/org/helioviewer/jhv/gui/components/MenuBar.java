@@ -26,6 +26,7 @@ public final class MenuBar extends JMenuBar {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new Actions.NewLayer());
         fileMenu.add(new Actions.NewSoarLayer());
+        fileMenu.add(new Actions.NewSynopticLayer());
         fileMenu.add(new Actions.OpenLocalFile());
         fileMenu.addSeparator();
         fileMenu.add(new Actions.LoadState());
