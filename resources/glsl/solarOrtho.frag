@@ -81,31 +81,26 @@ void main(void) {
     vec2 upXY = up1.xy;
     bool diffMode = display.isDiff != NODIFFERENCE;
     bool surfaceMapMode = isSurfaceMap(projection[0]);
+    bool diffSurfaceMapMode = isSurfaceMap(projection[1]);
 
     float radius2 = dot(upXY, upXY);
     bool onDisk = radius2 <= 1.;
     // CAR/CEA have no off-limb representation; wrap only the visible solar sphere.
     if (surfaceMapMode && !onDisk)
         discard;
+    if (diffMode && diffSurfaceMapMode && !onDisk)
+        discard;
 
     float enhancementFactor;
-    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffHitPoint = vec3(0.), diffRotatedHitPoint = vec3(0.);
+    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
 
     if (onDisk) {
         hitPoint = vec3(upXY, sqrt(1. - radius2));
         if (surfaceMapMode) {
             // CAR/CEA stay attached to the visible sphere under drag/view rotation.
             rotatedHitPoint = rotate_vector_inverse(projection[0].sourceViewQuat, hitPoint);
-            if (diffMode) {
-                diffHitPoint = hitPoint;
-                diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, hitPoint);
-            }
         } else {
             rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
-            if (diffMode) {
-                diffHitPoint = hitPoint;
-                diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], hitPoint);
-            }
         }
 
         enhancementFactor = 1.;
@@ -115,6 +110,7 @@ void main(void) {
         gl_FragDepth = 1.;
     }
 
+    bool primaryUsesOffLimbPlane = false;
     // Observer-image projections keep the existing off-limb / back-side fallback.
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(up1.xy, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
@@ -123,16 +119,29 @@ void main(void) {
             discard;
         if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
             discard;
-
-        if (display.calculateDepth != 0) // intersecting Euhforia planes
-            gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
+        primaryUsesOffLimbPlane = true;
     }
+
+    if (primaryUsesOffLimbPlane && display.calculateDepth != 0) // intersecting Euhforia planes
+        gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
 
     vec2 texCoord = sampleClippedOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
 
-    vec2 diffTexCoord;
+    vec2 diffTexCoord = texCoord;
     if (diffMode) {
-        if (!surfaceMapMode && /*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
+        vec3 diffHitPoint = vec3(0.);
+        vec3 diffRotatedHitPoint = vec3(0.);
+
+        if (onDisk) {
+            diffHitPoint = vec3(upXY, sqrt(1. - radius2));
+            if (diffSurfaceMapMode) {
+                diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, diffHitPoint);
+            } else {
+                diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], diffHitPoint);
+            }
+        }
+
+        if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
             diffHitPoint = vec3(up1.xy, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
             diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, diffHitPoint);
             if (onDisk && diffHitPoint.z < 0.) // differential: off-limb behind sphere
