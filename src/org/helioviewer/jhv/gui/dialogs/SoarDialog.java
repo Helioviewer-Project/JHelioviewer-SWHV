@@ -38,6 +38,7 @@ import com.jidesoft.dialog.StandardDialog;
 public class SoarDialog extends StandardDialog implements SoarClient.ReceiverItems, SoarClient.ReceiverSoops {
 
     private static final double MAX_SIZE = 2;
+    private static final Dimension resultSize = new Dimension(500, 350);
     private static final String[] Level = {/* "LL01", "LL02", "LL03",*/ "L1", "L2", "L3"};
     private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
             put("EUI FSI 174", List.of("eui-fsi174-image", "eui-fsi174-image-occulter", "eui-fsi174-image-short")).
@@ -181,7 +182,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
         });
         com.jidesoft.swing.SearchableUtils.installSearchable(listPane);
         JScrollPane scrollPane = new JScrollPane(listPane);
-        scrollPane.setPreferredSize(new Dimension(350, 350));
+        scrollPane.setPreferredSize(resultSize);
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
