@@ -4,7 +4,7 @@ title: |
    | WCS and HPC Validation Note
 subtitle: SWHV-ROB-TN-001-CCN4 v2.0
 subject: SWHV CCN4 
-date: SWHV-ROB-TN-001-CCN4 - Version 2.0 - 2026-03-30
+date: SWHV-ROB-TN-001-CCN4 - Version 2.0 - 2026-03-31
 lof: true
 lot: false
 ---
@@ -318,6 +318,9 @@ The validator uses three different comparison domains:
     tests
 - bounded `HPC` screen domain:
   - a finite rendered `HPC` box chosen for the validation run
+- dense surface-map render grid:
+  - a rendered longitude/latitude grid used for the additional `CAR`/`CEA`
+    surface-map sampling checks
 
 ### Direct Java/Python metadata comparison
 
@@ -928,6 +931,39 @@ full-Sun `CEA` surface-map case.
 - this `CEA` case validates the source WCS interpretation and
   sampling path, not the full interactive display policy for these surface
   maps
+
+## Dense surface-map render compare
+
+In addition to the source-pixel and sampled WCS checks above, the validator
+includes a separate dense rendered surface-map comparison for the tested
+`CAR`/`CEA` files. This mode evaluates the simulated JHV sampling path and the
+Astropy reference on a longitude/latitude render grid at `4x` the source-map
+width and height, with Carrington longitude `0` placed at the center of the
+rendered comparison image.
+
+This is a complementary renderer-shaped check, not a replacement for the
+source-pixel validation numbers reported above.
+
+- `extra/test/data/sunerf_map.fits` (`CAR`):
+  - `pixel_center_max_error_px=1.136868e-13`
+  - `pixel_center_rms_error_px=2.972981e-14`
+  - `sample_max_abs_error=5.599077e-12`
+- `extra/test/data/syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits` (`CAR`):
+  - `pixel_center_max_error_px=4.547474e-13`
+  - `pixel_center_rms_error_px=1.483156e-13`
+  - `sample_max_abs_error=1.178933e-10`
+- `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits` (`CAR`):
+  - `pixel_center_max_error_px=4.547474e-13`
+  - `pixel_center_rms_error_px=1.449107e-13`
+  - `sample_max_abs_error=3.185505e-10`
+- `extra/test/data/mrzqs260301t2314c2308_169.fits` (`CEA`):
+  - `pixel_center_max_error_px=1.136868e-13`
+  - `pixel_center_rms_error_px=3.742207e-14`
+  - `sample_max_abs_error=6.195933e-11`
+
+These dense rendered checks remain in the same numerical regime as the main
+`CAR`/`CEA` Astropy validation and support the conclusion that the modeled JHV
+surface-map sampling path agrees with Astropy to numerical precision.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 

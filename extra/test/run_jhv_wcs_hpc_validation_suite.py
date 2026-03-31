@@ -123,6 +123,22 @@ RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "mrzqs260301t2314c2308_169.fits"), "--inverse-cea"),
     ),
     ValidationRun(
+        "surface_map_render_compare_car_sunerf",
+        (str(DATA / "sunerf_map.fits"), "--surface-map-render-compare", "--surface-map-grid-factor", "4"),
+    ),
+    ValidationRun(
+        "surface_map_render_compare_car_hmi",
+        (str(DATA / "syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits"), "--surface-map-render-compare", "--surface-map-grid-factor", "4"),
+    ),
+    ValidationRun(
+        "surface_map_render_compare_car_aia",
+        (str(DATA / "syn_AIA_171_2026-01-12T00-00-00_f_V3.fits"), "--surface-map-render-compare", "--surface-map-grid-factor", "4"),
+    ),
+    ValidationRun(
+        "surface_map_render_compare_cea",
+        (str(DATA / "mrzqs260301t2314c2308_169.fits"), "--surface-map-render-compare", "--surface-map-grid-factor", "4"),
+    ),
+    ValidationRun(
         "ortho_vs_hpc_screen_compare",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--ortho-vs-hpc-screen-compare", "--render-size", "4096"),
     ),
