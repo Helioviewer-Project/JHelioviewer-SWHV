@@ -1374,29 +1374,12 @@ def intersectPlane(camera_diff_quat: tuple[float, float, float, float], vecin: t
     return -(altnormal[0] * vecin[0] + altnormal[1] * vecin[1]) / altnormal[2]
 
 
-def sampleOffLimbPoint(
-    up_xy: tuple[float, float],
-    meta: JHVMeta,
-    camera_diff_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
-    discard_back_facing: bool = False,
-) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
-    hit_point = (up_xy[0], up_xy[1], intersectPlane(camera_diff_quat, (up_xy[0], up_xy[1], 0.0), discard_back_facing))
-    return rotate_vector_inverse(camera_diff_quat, hit_point), hit_point
-
-
-def orthoRenderedWorld(
-    screen_xy: tuple[float, float],
-    meta: JHVMeta,
-    camera_diff_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
-    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
-) -> tuple[float, float, float]:
-    radius2 = screen_xy[0] * screen_xy[0] + screen_xy[1] * screen_xy[1]
-    if radius2 <= 1.0:
-        hit_point = ortho_screen_to_world(screen_xy)
-        if meta.projection in SURFACE_MAP_PROJECTIONS:
-            return rotate_vector_inverse(source_view_quat, hit_point)
-        return rotateOnDiskPoint(hit_point, meta, camera_diff_quat)
-    return sampleOffLimbPoint(screen_xy, meta, camera_diff_quat)[0]
+def clipOrthoGeometry(sample_point: tuple[float, float, float]) -> bool:
+    xy = (sample_point[0], sample_point[1])
+    if not passes_sector(xy):
+        return False
+    radial2 = sample_point[0] * sample_point[0] + sample_point[1] * sample_point[1]
+    return passes_radii(radial2) and passes_cutoff(xy)
 
 
 def orthographic_vs_hpc_screen_pixel_centers(screen_xy: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[tuple[float, float], tuple[float, float]]:
@@ -1459,10 +1442,7 @@ def renderOrthographicTexcoords(
         if world_xyz[0] * world_xyz[0] + world_xyz[1] * world_xyz[1] + world_xyz[2] * world_xyz[2] <= 1.0:
             return (math.nan, math.nan), (math.nan, math.nan), world_xyz, world_xyz
 
-    if not passes_sector((world_xyz[0], world_xyz[1])):
-        return (math.nan, math.nan), (math.nan, math.nan), world_xyz, world_xyz
-    radial2 = world_xyz[0] * world_xyz[0] + world_xyz[1] * world_xyz[1]
-    if not passes_radii(radial2) or not passes_cutoff((world_xyz[0], world_xyz[1])):
+    if not clipOrthoGeometry(world_xyz):
         return (math.nan, math.nan), (math.nan, math.nan), world_xyz, world_xyz
 
     texcoord = sampleOrthoTexcoord(world_xyz, meta, image2d, simple_tan=simple_tan)
@@ -1492,10 +1472,7 @@ def renderOrthographicTexcoords(
         ) <= 1.0:
             return (math.nan, math.nan), (math.nan, math.nan), world_xyz, diff_world_xyz
 
-    if not passes_sector((diff_world_xyz[0], diff_world_xyz[1])):
-        return (math.nan, math.nan), (math.nan, math.nan), world_xyz, diff_world_xyz
-    diff_radial2 = diff_world_xyz[0] * diff_world_xyz[0] + diff_world_xyz[1] * diff_world_xyz[1]
-    if not passes_radii(diff_radial2) or not passes_cutoff((diff_world_xyz[0], diff_world_xyz[1])):
+    if not clipOrthoGeometry(diff_world_xyz):
         return (math.nan, math.nan), (math.nan, math.nan), world_xyz, diff_world_xyz
 
     diff_texcoord = sampleOrthoTexcoord(
