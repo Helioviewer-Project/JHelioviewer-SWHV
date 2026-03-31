@@ -75,11 +75,6 @@ vec3 rotateOnDiskPoint(const WCS wcs, const vec3 hitPoint) {
     return rotated;
 }
 
-vec3 sampleOffLimbPoint(const WCS wcs, const vec4 up1, const bool discardBackFacing, out vec3 hitPoint) {
-    hitPoint = vec3(up1.xy, intersectPlane(wcs.cameraDiff, up1, discardBackFacing));
-    return rotate_vector_inverse(wcs.cameraDiff, hitPoint);
-}
-
 void main(void) {
     vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
@@ -94,19 +89,23 @@ void main(void) {
         discard;
 
     float enhancementFactor;
-    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffRotatedHitPoint = vec3(0.);
+    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.), diffHitPoint = vec3(0.), diffRotatedHitPoint = vec3(0.);
 
     if (onDisk) {
         hitPoint = vec3(upXY, sqrt(1. - radius2));
         if (surfaceMapMode) {
             // CAR/CEA stay attached to the visible sphere under drag/view rotation.
             rotatedHitPoint = rotate_vector_inverse(projection[0].sourceViewQuat, hitPoint);
-            if (diffMode)
+            if (diffMode) {
+                diffHitPoint = hitPoint;
                 diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, hitPoint);
+            }
         } else {
             rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
-            if (diffMode)
+            if (diffMode) {
+                diffHitPoint = hitPoint;
                 diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], hitPoint);
+            }
         }
 
         enhancementFactor = 1.;
@@ -118,7 +117,8 @@ void main(void) {
 
     // Observer-image projections keep the existing off-limb / back-side fallback.
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) { // off-limb or back
-        rotatedHitPoint = sampleOffLimbPoint(wcs[0], up1, onDisk, hitPoint);
+        hitPoint = vec3(up1.xy, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
+        rotatedHitPoint = rotate_vector_inverse(wcs[0].cameraDiff, hitPoint);
         if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
         if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
@@ -133,7 +133,12 @@ void main(void) {
     vec2 diffTexCoord;
     if (diffMode) {
         if (!surfaceMapMode && /*radius2 >= 1. ||*/ diffRotatedHitPoint.z <= 0.) {
-            diffRotatedHitPoint = sampleOffLimbPoint(wcs[1], up1, onDisk, hitPoint);
+            diffHitPoint = vec3(up1.xy, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
+            diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, diffHitPoint);
+            if (onDisk && diffHitPoint.z < 0.) // differential: off-limb behind sphere
+                discard;
+            if (dot(diffRotatedHitPoint, diffRotatedHitPoint) <= 1.) // differential: central disk
+                discard;
         }
 
         diffTexCoord = sampleClippedOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
