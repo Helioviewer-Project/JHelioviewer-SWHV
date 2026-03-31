@@ -32,31 +32,26 @@ vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams
     return wcsPlaneToTexcoord(plane, wcs);
 }
 
-void clipOrthoDisplayGeometry(const vec3 renderedWorld) {
+void clipOrthoGeometry(const vec3 samplePoint) {
     if (display.sector.z != 0.) {
-        float theta = atan(renderedWorld.y, renderedWorld.x);
+        float theta = atan(samplePoint.y, samplePoint.x);
         if (theta < display.sector.x || theta > display.sector.y)
             discard;
     }
 
-    float radial2 = dot(renderedWorld.xy, renderedWorld.xy);
+    float radial2 = dot(samplePoint.xy, samplePoint.xy);
     float minRadius2 = display.radii.x * display.radii.x;
     float maxRadius2 = display.radii.y * display.radii.y;
     if (radial2 > maxRadius2 || radial2 < minRadius2)
         discard;
 
     if (display.cutOff.z >= 0.) {
-        float geometryFlatDist = abs(dot(renderedWorld.xy, display.cutOff.xy));
+        float geometryFlatDist = abs(dot(samplePoint.xy, display.cutOff.xy));
         vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-        float geometryFlatDistAlt = abs(dot(renderedWorld.xy, cutOffAlt));
+        float geometryFlatDistAlt = abs(dot(samplePoint.xy, cutOffAlt));
         if (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z)
             discard;
     }
-}
-
-vec2 sampleClippedOrthoTexcoord(const vec3 renderedWorld, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    clipOrthoDisplayGeometry(renderedWorld);
-    return sampleOrthoTexcoord(renderedWorld, wcs, projection, PV);
 }
 
 float intersectPlane(const vec4 quat, const vec4 vecin, const bool discardBackFacing) {
@@ -125,7 +120,8 @@ void main(void) {
     if (primaryUsesOffLimbPlane && display.calculateDepth != 0) // intersecting Euhforia planes
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
 
-    vec2 texCoord = sampleClippedOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
+    clipOrthoGeometry(rotatedHitPoint);
+    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
 
     vec2 diffTexCoord = texCoord;
     if (diffMode) {
@@ -150,7 +146,8 @@ void main(void) {
                 discard;
         }
 
-        diffTexCoord = sampleClippedOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
+        clipOrthoGeometry(diffRotatedHitPoint);
+        diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
     }
     outColor = getColor(texCoord, diffTexCoord, enhancementFactor);
 }
