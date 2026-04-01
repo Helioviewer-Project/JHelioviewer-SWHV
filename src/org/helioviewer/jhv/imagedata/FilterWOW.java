@@ -52,7 +52,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             convolveVertical(smooth, variance, width, height, step); // Vertical pass
             // Denoise stage
             if (scale == 0) {
-                noise = (1.48260221850560f / SIGMA_E0) * median(detail, width, height);
+                noise = (1.4826022f / SIGMA_E0) * median(detail, width, height);
                 if (noise > NOISE_THRESH) { // avoid division by 0
                     float denoiseFactor = 1 / (3 * SIGMA_E0 * noise);
                     denoiseParallel(denoiseFactor, detail, width, height);

@@ -29,7 +29,7 @@ class PfssLoader {
     }
 
     static void submitList(long start, long end) {
-        submit("pfss-list", new ListLoader(start, end), result -> onSuccessList(start, result), PfssLoader::onFailureList);
+        submit("pfss-list", new ListLoader(start, end), result -> onSuccessList(start), PfssLoader::onFailureList);
     }
 
     static void submitData(long time, URI uri) {
@@ -145,7 +145,7 @@ class PfssLoader {
         }
     }
 
-    private static void onSuccessList(long start, Void result) {
+    private static void onSuccessList(long start) {
         cache().endDownload();
         cache().getNearestData(start); // preload first
     }

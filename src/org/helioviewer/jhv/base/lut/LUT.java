@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 import javax.annotation.Nonnull;
@@ -68,8 +67,8 @@ public record LUT(String name, int[] lut8) {
         return inv;
     }
 
-    private static TreeMap<String, LUT> loadStandardLuts() {
-        TreeMap<String, LUT> luts = LUTReader.read("/luts/standard-luts.txt");
+    private static Map<String, LUT> loadStandardLuts() {
+        Map<String, LUT> luts = LUTReader.read("/luts/standard-luts.txt");
 
         for (String file : GGR_LUTS) {
             try (InputStream is = FileUtils.getResource("/luts/" + file + ".ggr")) {
