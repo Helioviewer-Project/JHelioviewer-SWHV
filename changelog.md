@@ -1,27 +1,28 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.8.0 (pending)
+## JHelioviewer 4.8.0 (2026-04-01)
 
 ### Display and interaction
 - Add helioprojective Cartesian (`HPC`) projection mode
 - Add "Observer at 1au" viewpoint option
-- Improve alignment and clipping of overlays in `HPC`, including event hover and surface-overlay visibility
+- Add "New Synoptic Layer..." dialog for loading HMI and AIA synchronous synoptic FITS maps from <https://idoc-ssa-prod.ias.u-psud.fr/synopticmaps/s050a/portal/>
 - Improve flat-grid rendering, labels, and position readout in non-orthographic modes
-- Fix flat-grid shimmer in non-orthographic modes
-- Make transformed line/FOV annotations use a shared current-view picking path
 - Improve zoom, mouse interaction, and several toolbar/macOS interaction details, including `1:1` sizing in flat modes
 
 ### Image and datasets
-- Add formal `TAN`, `AZP`, and primary-branch `ZPN` support for non-orthographic image display
-- Add `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface-map support in `Latitudinal` and `Orthographic` modes
-- Add bundled colormaps for AIA, PUNCH, and STEREO COR/HI datasets
-- Load LUT definitions from resources
+- Add `AZP` and `ZPN` WCS projections support
+- Add `CRL*-CAR` and `CRL*-CEA` WCS surface-map support
+- Add more bundled colormaps
 
 ### Technical
-- Improve star-query and table-access performance
-- Add Astropy-based WCS validation tooling, test data, and documentation for the non-orthographic projection path
+- Add Astropy-based WCS validation tooling, test data, and documentation (see `docs/wcs-validation`)
 - Various bug fixes, cleanups, and internal refactoring
+
+### Caveats
+- Display of heliospheric imaging data in `Orthographic` mode may not be ideal
+- `HPC` mode is fundamentally linked to the observer viewpoint, the general Viewpoint functionality of JHV is not supported
+- `CAR` and `CEA` datasets are supported only for `Latitudinal` and `Orthographic` modes
 
 ## JHelioviewer 4.7.7 (2026-03-03)
 

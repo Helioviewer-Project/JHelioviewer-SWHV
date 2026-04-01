@@ -45,7 +45,7 @@ import com.jidesoft.swing.SearchableUtils;
 public class SynopticDialog extends StandardDialog {
     private static final String server = "https://idoc-ssa-prod.ias.u-psud.fr";
     private static final String hmiQuery = "/api/s005a/map/hmi";
-    private static final String aiaQuery = "/api/s005a/map/";
+    private static final String aiaQuery = "/api/s050a/map/";
     private static final Dimension resultSize = new Dimension(500, 350);
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
