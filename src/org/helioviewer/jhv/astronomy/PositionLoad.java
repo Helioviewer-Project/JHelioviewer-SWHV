@@ -91,14 +91,14 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
         receiver.setStatus("Loading...");
 
         Future<PositionResponse> future = Tasks.submit(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
-                result -> onSuccess(receiver, result), (logContext, t) -> onFailure(receiver, t));
+                result -> onSuccess(receiver), (logContext, t) -> onFailure(receiver, t));
         PositionLoad load = new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, future);
         loads.put(uv, load);
 
         return load;
     }
 
-    private static void onSuccess(Interfaces.StatusReceiver receiver, PositionResponse result) {
+    private static void onSuccess(Interfaces.StatusReceiver receiver) {
         receiver.setStatus("Loaded");
     }
 

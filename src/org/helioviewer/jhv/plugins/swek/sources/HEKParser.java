@@ -243,9 +243,9 @@ class HEKParser {
 
         List<HgsPoint> boundedBox = hgsBoundedBox == null ? List.of() : hgsBoundedBox;
         List<HgsPoint> boundCC = hgsBoundCC == null ? List.of() : hgsBoundCC;
-        HgsPoint centralPoint = hgsCentralPoint != null ? hgsCentralPoint
-                : hgsLongitudeDeg != null && hgsLatitudeDeg != null ? new HgsPoint(hgsLongitudeDeg, hgsLatitudeDeg)
-                : null;
+        HgsPoint centralPoint = hgsCentralPoint;
+        if (centralPoint == null && hgsLongitudeDeg != null && hgsLatitudeDeg != null)
+            centralPoint = new HgsPoint(hgsLongitudeDeg, hgsLatitudeDeg);
 
         Position p = Sun.getEarth(new JHVTime(currentEvent.start));
         double elon = p.lon;

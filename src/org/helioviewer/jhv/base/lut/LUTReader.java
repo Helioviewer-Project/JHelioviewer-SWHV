@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.helioviewer.jhv.JHVGlobals;
@@ -64,7 +65,7 @@ final class LUTReader {
     private LUTReader() {
     }
 
-    static TreeMap<String, LUT> read(String resourcePath) {
+    static Map<String, LUT> read(String resourcePath) {
         TreeMap<String, LUT> luts = new TreeMap<>(JHVGlobals.alphanumComparator);
         luts.put(gray.name(), gray);
         luts.put(spectral.name(), spectral);
@@ -77,7 +78,7 @@ final class LUTReader {
         return luts;
     }
 
-    private static void parse(InputStream is, TreeMap<String, LUT> luts) throws IOException {
+    private static void parse(InputStream is, Map<String, LUT> luts) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String name = null;
             int nameLine = 0;
@@ -118,7 +119,7 @@ final class LUTReader {
         }
     }
 
-    private static void addLut(TreeMap<String, LUT> luts, String name, int nameLine, List<String> dataLines) {
+    private static void addLut(Map<String, LUT> luts, String name, int nameLine, List<String> dataLines) {
         if (luts.containsKey(name)) {
             Log.warn("Ignoring duplicate LUT '" + name + "' at line " + nameLine);
             return;
