@@ -1,6 +1,8 @@
 
 # Revision history for JHelioviewer
 
+## JHelioviewer 4.8.1 (pending)
+
 ## JHelioviewer 4.8.0 (2026-04-01)
 
 ### Display and interaction
