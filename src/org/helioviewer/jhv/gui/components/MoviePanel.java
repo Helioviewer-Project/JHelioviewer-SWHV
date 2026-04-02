@@ -34,6 +34,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
@@ -50,6 +51,8 @@ import com.jidesoft.swing.JideSplitButton;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements Interfaces.ObservationSelector {
+
+    private static final int FRAME_HOLD_REPEAT_MS = 125;
 
     // different animation speeds
     private enum SpeedUnit {
@@ -177,6 +180,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
         prevFrameButton.addActionListener(prevFrameAction);
+        HoldRepeat.install(prevFrameButton, FRAME_HOLD_REPEAT_MS);
         buttonPanel.add(prevFrameButton);
 
         playButton = new JideButton(Buttons.play);
@@ -189,6 +193,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         nextFrameButton.setFont(Buttons.getMaterialFont(small));
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(nextFrameAction);
+        HoldRepeat.install(nextFrameButton, FRAME_HOLD_REPEAT_MS);
         buttonPanel.add(nextFrameButton);
 
         recordButton = new RecordButton(small);
