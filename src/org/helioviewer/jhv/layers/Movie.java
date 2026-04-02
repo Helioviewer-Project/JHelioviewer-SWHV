@@ -82,8 +82,8 @@ public class Movie {
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
         ImageLayer layer = Layers.getActiveImageLayer();
         int maximum = layer == null ? 0 : layer.getView().getMaximumFrameNumber();
-        playbackFirstFrame = Math.max(0, Math.min(firstFrame, lastFrame));
-        playbackLastFrame = Math.min(maximum, Math.max(firstFrame, lastFrame));
+        playbackFirstFrame = Math.clamp(firstFrame, 0, maximum);
+        playbackLastFrame = Math.clamp(lastFrame, 0, maximum);
     }
 
     public static long getStartTime() {
