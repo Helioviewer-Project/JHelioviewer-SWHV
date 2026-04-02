@@ -28,6 +28,7 @@ public class Movie {
 
     public static final int FPS_RELATIVE_DEFAULT = 20;
     public static final int FPS_ABSOLUTE = 30;
+
     private static JHVTime playbackFirstTime = TimeUtils.START;
     private static JHVTime playbackLastTime = TimeUtils.START;
 
@@ -127,7 +128,7 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            JHVTime current = JHVTime.clamp(view.getNearestTime(lastTimestamp), playbackFirstTime, playbackLastTime);
+            JHVTime current = JHVTime.clamp(lastTimestamp, playbackFirstTime, playbackLastTime);
             JHVTime next = nextTime(advanceMode, current,
                     () -> playbackFirstTime, () -> playbackLastTime,
                     time -> JHVTime.clamp(view.getLowerTime(time), playbackFirstTime, playbackLastTime),
@@ -143,8 +144,7 @@ public class Movie {
     private static void absoluteTimeAdvance() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            View view = layer.getView();
-            JHVTime current = JHVTime.clamp(view.getNearestTime(lastTimestamp), playbackFirstTime, playbackLastTime);
+            JHVTime current = JHVTime.clamp(lastTimestamp, playbackFirstTime, playbackLastTime);
             JHVTime next = nextTime(advanceMode, current,
                     () -> playbackFirstTime, () -> playbackLastTime,
                     time -> new JHVTime(Math.max(playbackFirstTime.milli, time.milli - deltaT)),
@@ -217,16 +217,14 @@ public class Movie {
     public static void nextFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            View view = layer.getView();
-            syncTime(JHVTime.clamp(view.getHigherTime(lastTimestamp), playbackFirstTime, playbackLastTime));
+            syncTime(JHVTime.clamp(layer.getView().getHigherTime(lastTimestamp), playbackFirstTime, playbackLastTime));
         }
     }
 
     public static void previousFrame() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            View view = layer.getView();
-            syncTime(JHVTime.clamp(view.getLowerTime(lastTimestamp), playbackFirstTime, playbackLastTime));
+            syncTime(JHVTime.clamp(layer.getView().getLowerTime(lastTimestamp), playbackFirstTime, playbackLastTime));
         }
     }
 
