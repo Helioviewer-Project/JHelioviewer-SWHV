@@ -116,24 +116,17 @@ public class Movie {
 
     private static int deltaT;
 
-    private static JHVTime lowerPlaybackTime(View view, JHVTime time) {
-        int frame = clampPlaybackFrame(view.getCurrentFrameNumber());
-        return view.getFrameTime(frame == playbackFirstFrame ? playbackFirstFrame : frame - 1);
-    }
-
-    private static JHVTime higherPlaybackTime(View view, JHVTime time) {
-        int frame = clampPlaybackFrame(view.getCurrentFrameNumber());
-        return view.getFrameTime(frame == playbackLastFrame ? playbackLastFrame : frame + 1);
-    }
-
     private static void relativeTimeAdvance() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
+            JHVTime first = view.getFrameTime(playbackFirstFrame);
+            JHVTime last = view.getFrameTime(playbackLastFrame);
             JHVTime current = view.getFrameTime(clampPlaybackFrame(view.getCurrentFrameNumber()));
             JHVTime next = nextTime(advanceMode, current,
-                    () -> view.getFrameTime(playbackFirstFrame), () -> view.getFrameTime(playbackLastFrame),
-                    time -> lowerPlaybackTime(view, time), time -> higherPlaybackTime(view, time));
+                    () -> first, () -> last,
+                    time -> JHVTime.clamp(view.getLowerTime(time), first, last),
+                    time -> JHVTime.clamp(view.getHigherTime(time), first, last));
 
             if (next == null)
                 pause();

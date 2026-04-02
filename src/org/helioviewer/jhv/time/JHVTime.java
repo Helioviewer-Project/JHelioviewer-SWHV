@@ -21,6 +21,14 @@ public class JHVTime implements Comparable<JHVTime> {
         hash = Long.hashCode(milli);
     }
 
+    public static JHVTime clamp(JHVTime time, JHVTime first, JHVTime last) {
+        if (time.milli < first.milli)
+            return first;
+        if (time.milli > last.milli)
+            return last;
+        return time;
+    }
+
     @Override
     public int compareTo(@Nonnull JHVTime dt) {
         return Long.compare(milli, dt.milli);
