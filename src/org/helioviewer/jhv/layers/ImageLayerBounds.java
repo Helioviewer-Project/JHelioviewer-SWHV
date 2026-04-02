@@ -5,6 +5,7 @@ import org.helioviewer.jhv.display.DisplayMapBounds;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.wcs.ImageBounds;
@@ -38,10 +39,14 @@ public final class ImageLayerBounds {
     }
 
     public static double getOneToOneCameraWidth(ImageLayer layer) {
+        ImageData imageData = layer.getImageData();
+        if (imageData == null)
+            return 0;
+
         Viewport vp = Display.getActiveViewport();
-        MetaData metaData = layer.getMetaData();
+        MetaData metaData = imageData.getMetaData();
         double physicalHeight = metaData.getPhysicalRegion().height;
-        double imageHeight = DisplayMapBounds.oneToOneHeight(Display.mode, Display.gridType, layer.getImageData().getViewpoint(), metaData);
+        double imageHeight = DisplayMapBounds.oneToOneHeight(Display.mode, Display.gridType, imageData.getViewpoint(), metaData);
         double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / physicalHeight;
         if (Display.mode.isOrthographic())
             return cameraWidth;
