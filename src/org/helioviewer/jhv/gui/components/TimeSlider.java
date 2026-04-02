@@ -87,11 +87,9 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void setMaximum(int maximum) {
-        int oldMaximum = getMaximum();
-        boolean fullRange = rangeMin == getMinimum() && rangeMax == oldMaximum;
         super.setMaximum(maximum);
-        rangeMax = fullRange ? maximum : Math.min(rangeMax, maximum);
-        rangeMin = Math.min(rangeMin, rangeMax);
+        rangeMin = getMinimum();
+        rangeMax = maximum;
         Movie.setPlaybackRange(rangeMin, rangeMax);
         repaint();
     }
