@@ -128,8 +128,7 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            JHVTime current = JHVTime.clamp(lastTimestamp, playbackFirstTime, playbackLastTime);
-            JHVTime next = nextTime(advanceMode, current,
+            JHVTime next = nextTime(advanceMode, lastTimestamp,
                     () -> playbackFirstTime, () -> playbackLastTime,
                     time -> JHVTime.clamp(view.getLowerTime(time), playbackFirstTime, playbackLastTime),
                     time -> JHVTime.clamp(view.getHigherTime(time), playbackFirstTime, playbackLastTime));
@@ -144,8 +143,7 @@ public class Movie {
     private static void absoluteTimeAdvance() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            JHVTime current = JHVTime.clamp(lastTimestamp, playbackFirstTime, playbackLastTime);
-            JHVTime next = nextTime(advanceMode, current,
+            JHVTime next = nextTime(advanceMode, lastTimestamp,
                     () -> playbackFirstTime, () -> playbackLastTime,
                     time -> new JHVTime(Math.max(playbackFirstTime.milli, time.milli - deltaT)),
                     time -> new JHVTime(Math.min(playbackLastTime.milli, time.milli + deltaT)));
