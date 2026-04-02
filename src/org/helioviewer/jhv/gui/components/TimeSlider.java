@@ -39,7 +39,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     }
 
     private static final int RANGE_MARKER_SIZE = 6;
-    private static final int MENU_SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+    private static final int MENU_SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(); // Cmd on macOS, Ctrl elsewhere
 
     private final TimeSliderUI sliderUI;
     private final JLabel frameNumberLabel;
@@ -90,18 +90,16 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         int oldMaximum = getMaximum();
         boolean fullRange = rangeMin == getMinimum() && rangeMax == oldMaximum;
         super.setMaximum(maximum);
-        if (fullRange)
-            rangeMax = maximum;
-        else if (rangeMax > maximum)
-            rangeMax = maximum;
-        if (rangeMin > rangeMax)
-            rangeMin = rangeMax;
+        rangeMax = fullRange ? maximum : Math.min(rangeMax, maximum);
+        rangeMin = Math.min(rangeMin, rangeMax);
+        Movie.setPlaybackRange(rangeMin, rangeMax);
         repaint();
     }
 
-    void setRange(int min, int max) {
-        rangeMin = Math.max(getMinimum(), Math.min(min, max));
-        rangeMax = Math.min(getMaximum(), Math.max(min, max));
+    private void setRange(int min, int max) {
+        rangeMin = Math.clamp(Math.min(min, max), getMinimum(), getMaximum());
+        rangeMax = Math.clamp(Math.max(min, max), getMinimum(), getMaximum());
+        Movie.setPlaybackRange(rangeMin, rangeMax);
         repaint();
     }
 
@@ -149,7 +147,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         setCursor(cursorFor(dragMode));
         int value = sliderUI.valueForXPosition(e.getX());
         switch (dragMode) {
-            case Frame -> setValue(value);
+            case Frame -> setValue(Math.clamp(value, rangeMin, rangeMax));
             case Range -> dragRange(value);
             case RangeStart -> setRange(value, rangeMax);
             case RangeEnd -> setRange(rangeMin, value);
@@ -330,8 +328,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         private static Polygon upTriangle(int x, int y) {
             int half = RANGE_MARKER_SIZE / 2;
             return new Polygon(
-                    new int[] {x - half, x + half, x},
-                    new int[] {y, y, y - RANGE_MARKER_SIZE},
+                    new int[]{x - half, x + half, x},
+                    new int[]{y, y, y - RANGE_MARKER_SIZE},
                     3);
         }
 
