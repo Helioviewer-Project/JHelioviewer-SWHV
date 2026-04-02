@@ -201,11 +201,9 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            JHVTime nearest = view.getNearestTime(dateTime);
             JHVTime first = view.getFrameTime(playbackFirstFrame);
             JHVTime last = view.getFrameTime(playbackLastFrame);
-            long clamped = Math.clamp(nearest.milli, first.milli, last.milli);
-            syncTime(view.getNearestTime(new JHVTime(clamped)));
+            syncTime(JHVTime.clamp(view.getNearestTime(dateTime), first, last));
         }
     }
 
@@ -220,8 +218,9 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            int frame = clampPlaybackFrame(view.getCurrentFrameNumber());
-            syncTime(view.getFrameTime(frame == playbackLastFrame ? playbackLastFrame : frame + 1));
+            JHVTime first = view.getFrameTime(playbackFirstFrame);
+            JHVTime last = view.getFrameTime(playbackLastFrame);
+            syncTime(JHVTime.clamp(view.getHigherTime(lastTimestamp), first, last));
         }
     }
 
@@ -229,8 +228,9 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            int frame = clampPlaybackFrame(view.getCurrentFrameNumber());
-            syncTime(view.getFrameTime(frame == playbackFirstFrame ? playbackFirstFrame : frame - 1));
+            JHVTime first = view.getFrameTime(playbackFirstFrame);
+            JHVTime last = view.getFrameTime(playbackLastFrame);
+            syncTime(JHVTime.clamp(view.getLowerTime(lastTimestamp), first, last));
         }
     }
 
