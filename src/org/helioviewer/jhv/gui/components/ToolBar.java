@@ -14,7 +14,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
@@ -23,6 +22,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -36,7 +36,7 @@ import com.jidesoft.swing.JideToggleButton;
 @SuppressWarnings("serial")
 public final class ToolBar extends JToolBar {
 
-    private static final int ZOOM_HOLD_REPEAT_MS = 25;
+    private static final int ZOOM_HOLD_REPEAT_MS = 33;
 
     private static DisplayMode displayMode = DisplayMode.ICONANDTEXT;
 
@@ -90,40 +90,6 @@ public final class ToolBar extends JToolBar {
         JideToggleButton b = new JideToggleButton(text.toString());
         b.setToolTipText(text.tip);
         return b;
-    }
-
-    private static void installHoldRepeat(JideButton button) {
-        final boolean[] held = {false};
-        Timer timer = new Timer(ZOOM_HOLD_REPEAT_MS, e -> {
-            if (held[0] && button.isEnabled()) {
-                button.doClick(0);
-            } else {
-                ((Timer) e.getSource()).stop();
-            }
-        });
-        timer.setInitialDelay(ZOOM_HOLD_REPEAT_MS);
-        timer.setRepeats(true);
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (button.isEnabled()) {
-                    held[0] = true;
-                    timer.restart();
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                held[0] = false;
-                timer.stop();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                held[0] = false;
-                timer.stop();
-            }
-        });
     }
 
     public ToolBar() {
@@ -197,10 +163,10 @@ public final class ToolBar extends JToolBar {
         // Zoom
         JideButton zoomIn = toolButton(ZOOMIN);
         zoomIn.addActionListener(new Actions.ZoomIn());
-        installHoldRepeat(zoomIn);
+        HoldRepeat.install(zoomIn, ZOOM_HOLD_REPEAT_MS);
         JideButton zoomOut = toolButton(ZOOMOUT);
         zoomOut.addActionListener(new Actions.ZoomOut());
-        installHoldRepeat(zoomOut);
+        HoldRepeat.install(zoomOut, ZOOM_HOLD_REPEAT_MS);
         JideButton zoomFit = toolButton(ZOOMFIT);
         zoomFit.addActionListener(new Actions.ZoomFit());
         JideButton zoomOne = toolButton(ZOOMONE);
