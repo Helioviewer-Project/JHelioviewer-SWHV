@@ -28,7 +28,7 @@ public final class HoldRepeat {
                     return;
 
                 future[0] = executor.scheduleAtFixedRate(() -> EventQueue.invokeLater(() -> {
-                    if (button.isShowing() && button.isEnabled())
+                    if (button.isEnabled())
                         button.doClick(0);
                 }), repeatMs, repeatMs, TimeUnit.MILLISECONDS);
             }
