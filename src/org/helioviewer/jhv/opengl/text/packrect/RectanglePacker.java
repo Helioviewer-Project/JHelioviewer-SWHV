@@ -56,7 +56,6 @@ public class RectanglePacker {
     private static final float EXPANSION_FACTOR = 0.5f;
     private static final float SHRINK_FACTOR = 0.3f;
 
-    private final int initialWidth;
     private final int initialHeight;
 
     private int maxWidth = -1;
@@ -76,7 +75,6 @@ public class RectanglePacker {
                            final int initialHeight) {
         this.manager = manager;
         levels = new LevelSet(initialWidth, initialHeight);
-        this.initialWidth = initialWidth;
         this.initialHeight = initialHeight;
     }
 
@@ -115,7 +113,7 @@ public class RectanglePacker {
             backingStore = manager.allocateBackingStore(levels.w(), levels.h());
 
         int attemptNumber = 0;
-        boolean tryAgain = false;
+        boolean tryAgain;
 
         do {
             // Try to allocate
@@ -190,7 +188,7 @@ public class RectanglePacker {
         int newHeight = levels.h();
         LevelSet nextLevelSet = null;
         int attemptNumber = 0;
-        boolean needAdditionFailureNotification = false;
+        boolean needAdditionFailureNotification;
 
         while (!done) {
             if (cause != null) {

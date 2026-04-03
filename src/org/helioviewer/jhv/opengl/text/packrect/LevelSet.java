@@ -156,10 +156,7 @@ public class LevelSet {
     public boolean canExpand(final Level level, final int height) {
         if (levels.isEmpty())
             return false; // Should not happen
-        if (levels.getLast() == level &&
-                (h - nextAddY >= height - level.h()))
-            return true;
-        return false;
+        return levels.getLast() == level && (h - nextAddY >= height - level.h());
     }
 
     public void expand(final Level level, final int oldHeight, final int newHeight) {
