@@ -24,8 +24,8 @@ public class LocationChecker {
                 // Log.info(address);
                 try (InputStream is = FileUtils.getResource("/geoip/GeoLite2-Country.mmdb"); DatabaseReader reader = new DatabaseReader.Builder(is).build()) {
                     CountryResponse response = reader.country(InetAddress.getByName(address));
-                    // Log.info(response.getCountry().getIsoCode());
-                    String continent = response.getContinent().getCode();
+                    // Log.info(response.country().isoCode());
+                    String continent = response.continent().code();
                     if ("EU".equals(continent))
                         Settings.setProperty("default.server", "IAS");
                     else
