@@ -60,12 +60,12 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.GLInfo;
 import org.helioviewer.jhv.opengl.GLSLTexture;
+import org.helioviewer.jhv.opengl.text.packrect.BackingStoreManager;
+import org.helioviewer.jhv.opengl.text.packrect.Rect;
+import org.helioviewer.jhv.opengl.text.packrect.RectanglePacker;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLContext;
-import com.jogamp.opengl.util.packrect.BackingStoreManager;
-import com.jogamp.opengl.util.packrect.Rect;
-import com.jogamp.opengl.util.packrect.RectanglePacker;
 
 /**
  * Renders bitmapped Java 2D text into an OpenGL window with high
