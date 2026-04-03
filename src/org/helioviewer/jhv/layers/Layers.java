@@ -75,7 +75,11 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
     @Override
     public void timeSelectionChanged(long start, long end) {
         nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
-        Movie.timeRangeChanged();
+        // Replacing the placeholder NullView also needs a full Movie resync when it is active.
+        if (activeLayer == nullImageLayer)
+            Movie.setMaster(activeLayer);
+        else
+            Movie.timeRangeChanged();
     }
 
     public static ImageLayer getActiveImageLayer() {
