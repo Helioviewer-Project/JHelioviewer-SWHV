@@ -77,6 +77,7 @@ public class Movie {
             playbackFirstTime = view.getFirstTime();
             playbackLastTime = view.getLastTime();
             MoviePanel.setMovie(view.getMaximumFrameNumber());
+            syncTime(playbackFirstTime);
         }
         timeRangeChanged();
     }
