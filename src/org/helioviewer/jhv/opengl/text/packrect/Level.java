@@ -56,11 +56,6 @@ public class Level {
         public int compare(final Rect r1, final Rect r2) {
             return r1.x() - r2.x();
         }
-
-        @Override
-        public boolean equals(final Object obj) {
-            return this == obj;
-        }
     }
 
     private static final Comparator<Rect> rectXComparator = new RectXComparator();

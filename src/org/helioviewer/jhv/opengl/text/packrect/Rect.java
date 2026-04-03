@@ -84,9 +84,20 @@ public class Rect {
     }
 
     public Rect(final int x, final int y, final int w, final int h, final Object userData) {
-        setPosition(x, y);
-        setSize(w, h);
-        setUserData(userData);
+        if (x < 0)
+            throw new IllegalArgumentException("Negative x");
+        if (y < 0)
+            throw new IllegalArgumentException("Negative y");
+        if (w < 0)
+            throw new IllegalArgumentException("Negative width");
+        if (h < 0)
+            throw new IllegalArgumentException("Negative height");
+
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.userData = userData;
     }
 
     public int x() {
