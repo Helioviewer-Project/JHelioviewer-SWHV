@@ -47,7 +47,7 @@ public class Level {
     private final int yPos;
     private final LevelSet holder;
 
-    private final List<Rect> rects = new ArrayList<Rect>();
+    private final List<Rect> rects = new ArrayList<>();
     private List<Rect> freeList;
     private int nextAddX;
 
@@ -114,8 +114,7 @@ public class Level {
         // See whether we can add from the free list
         if (freeList != null) {
             Rect candidate = null;
-            for (final Iterator<Rect> iter = freeList.iterator(); iter.hasNext(); ) {
-                final Rect cur = iter.next();
+            for (final Rect cur : freeList) {
                 if (cur.canContain(rect)) {
                     candidate = cur;
                     break;
@@ -157,7 +156,7 @@ public class Level {
             nextAddX -= rect.w();
         } else {
             if (freeList == null) {
-                freeList = new ArrayList<Rect>();
+                freeList = new ArrayList<>();
             }
             freeList.add(new Rect(rect.x(), rect.y(), rect.w(), height, null));
             coalesceFreeList();
@@ -183,8 +182,7 @@ public class Level {
         if (freeList == null)
             return false;
         int freeListWidth = 0;
-        for (final Iterator<Rect> iter = freeList.iterator(); iter.hasNext(); ) {
-            final Rect cur = iter.next();
+        for (final Rect cur : freeList) {
             freeListWidth += cur.w();
         }
         // Add on the remaining space at the end
@@ -193,11 +191,10 @@ public class Level {
     }
 
     public void compact(final Object backingStore, final BackingStoreManager manager) {
-        Collections.sort(rects, rectXComparator);
+        rects.sort(rectXComparator);
         int nextCompactionDest = 0;
         manager.beginMovement(backingStore, backingStore);
-        for (final Iterator<Rect> iter = rects.iterator(); iter.hasNext(); ) {
-            final Rect cur = iter.next();
+        for (final Rect cur : rects) {
             if (cur.x() != nextCompactionDest) {
                 manager.move(backingStore, cur,
                         backingStore, new Rect(nextCompactionDest, cur.y(), cur.w(), cur.h(), null));
@@ -218,8 +215,7 @@ public class Level {
      * Visits all Rects contained in this Level.
      */
     public void visit(final RectVisitor visitor) {
-        for (final Iterator<Rect> iter = rects.iterator(); iter.hasNext(); ) {
-            final Rect rect = iter.next();
+        for (final Rect rect : rects) {
             visitor.visit(rect);
         }
     }
@@ -248,7 +244,7 @@ public class Level {
             return;
 
         // Try to coalesce adjacent free blocks in the free list
-        Collections.sort(freeList, rectXComparator);
+        freeList.sort(rectXComparator);
         int i = 0;
         while (i < freeList.size() - 1) {
             final Rect r1 = freeList.get(i);
@@ -262,10 +258,10 @@ public class Level {
             }
         }
         // See whether the last block bumps up against the addition point
-        final Rect last = freeList.get(freeList.size() - 1);
+        final Rect last = freeList.getLast();
         if (last.maxX() + 1 == nextAddX) {
             nextAddX -= last.w();
-            freeList.remove(freeList.size() - 1);
+            freeList.removeLast();
         }
         if (freeList.isEmpty()) {
             freeList = null;
@@ -278,8 +274,7 @@ public class Level {
 
     public void dumpFreeSpace() {
         int freeListWidth = 0;
-        for (final Iterator<Rect> iter = freeList.iterator(); iter.hasNext(); ) {
-            final Rect cur = iter.next();
+        for (final Rect cur : freeList) {
             System.err.println(" Free rectangle at " + cur);
             freeListWidth += cur.w();
         }

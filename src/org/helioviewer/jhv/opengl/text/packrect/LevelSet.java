@@ -49,7 +49,7 @@ import java.util.*;
 
 public class LevelSet {
     // Maintained in sorted order by increasing Y coordinate
-    private final List<Level> levels = new ArrayList<Level>();
+    private final List<Level> levels = new ArrayList<>();
     private int nextAddY;
     private final int w;
     private int h;
@@ -156,7 +156,7 @@ public class LevelSet {
     public boolean canExpand(final Level level, final int height) {
         if (levels.isEmpty())
             return false; // Should not happen
-        if (levels.get(levels.size() - 1) == level &&
+        if (levels.getLast() == level &&
                 (h - nextAddY >= height - level.h()))
             return true;
         return false;
@@ -213,8 +213,7 @@ public class LevelSet {
      * Visits all Rects contained in this LevelSet.
      */
     public void visit(final RectVisitor visitor) {
-        for (final Iterator<Level> iter = levels.iterator(); iter.hasNext(); ) {
-            final Level level = iter.next();
+        for (final Level level : levels) {
             level.visit(visitor);
         }
     }
@@ -226,8 +225,7 @@ public class LevelSet {
      * original Rects.
      */
     public void updateRectangleReferences() {
-        for (final Iterator<Level> iter = levels.iterator(); iter.hasNext(); ) {
-            final Level level = iter.next();
+        for (final Level level : levels) {
             level.updateRectangleReferences();
         }
     }

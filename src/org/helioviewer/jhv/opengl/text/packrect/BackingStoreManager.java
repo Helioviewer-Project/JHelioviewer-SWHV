@@ -48,9 +48,9 @@ package org.helioviewer.jhv.opengl.text.packrect;
  */
 
 public interface BackingStoreManager {
-    public Object allocateBackingStore(int w, int h);
+    Object allocateBackingStore(int w, int h);
 
-    public void deleteBackingStore(Object backingStore);
+    void deleteBackingStore(Object backingStore);
 
     /**
      * Indication whether this BackingStoreManager supports compaction;
@@ -62,7 +62,7 @@ public interface BackingStoreManager {
      * that the backing store can not grow, so that preExpand() will
      * never be called.
      */
-    public boolean canCompact();
+    boolean canCompact();
 
     /**
      * Notification that expansion of the backing store is about to be
@@ -77,7 +77,7 @@ public interface BackingStoreManager {
      * backing store. The caller should not call RectanglePacker.add()
      * in its preExpand() method.
      */
-    public boolean preExpand(Rect cause, int attemptNumber);
+    boolean preExpand(Rect cause, int attemptNumber);
 
     /**
      * Notification that addition of the given Rect failed because a
@@ -88,12 +88,12 @@ public interface BackingStoreManager {
      * failed addition, which will cause a RuntimeException to be
      * thrown from the RectanglePacker.
      */
-    public boolean additionFailed(Rect cause, int attemptNumber);
+    boolean additionFailed(Rect cause, int attemptNumber);
 
     /**
      * Notification that movement is starting.
      */
-    public void beginMovement(Object oldBackingStore, Object newBackingStore);
+    void beginMovement(Object oldBackingStore, Object newBackingStore);
 
     /**
      * Tells the manager to move the contents of the given rect from
@@ -102,13 +102,13 @@ public interface BackingStoreManager {
      * the case of compacting the existing backing store instead of
      * reallocating it.
      */
-    public void move(Object oldBackingStore,
-                     Rect oldLocation,
-                     Object newBackingStore,
-                     Rect newLocation);
+    void move(Object oldBackingStore,
+              Rect oldLocation,
+              Object newBackingStore,
+              Rect newLocation);
 
     /**
      * Notification that movement is ending.
      */
-    public void endMovement(Object oldBackingStore, Object newBackingStore);
+    void endMovement(Object oldBackingStore, Object newBackingStore);
 }
