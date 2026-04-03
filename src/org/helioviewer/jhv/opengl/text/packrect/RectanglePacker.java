@@ -67,11 +67,6 @@ public class RectanglePacker {
         public int compare(final Rect r1, final Rect r2) {
             return r2.h() - r1.h();
         }
-
-        @Override
-        public boolean equals(final Object obj) {
-            return this == obj;
-        }
     }
 
     private static final Comparator<Rect> rectHComparator = new RectHComparator();
