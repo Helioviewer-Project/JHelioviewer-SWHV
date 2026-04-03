@@ -69,7 +69,7 @@ public class GLHelper {
         try {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getGLCapabilities(profile);
-            canvas = new GLCanvas(capabilities);
+            canvas = new JHVGLCanvas(capabilities);
             // GUI events can lead to context destruction and invalidation of GL objects and state
             canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
         } catch (Exception e) {
