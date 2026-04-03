@@ -30,7 +30,7 @@ import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.GLListener;
 
 import com.jogamp.opengl.awt.GLCanvas;
@@ -63,7 +63,7 @@ public class JHVFrame {
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
-        glCanvas = GLHelper.createGLCanvas(); // before camera
+        glCanvas = JHVCanvas.create(); // before camera
         glCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
         glListener = new GLListener(glCanvas);
         glCanvas.addGLEventListener(glListener);

@@ -6,11 +6,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.Quat;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLDrawableFactory;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLHelper {
 
@@ -62,39 +57,6 @@ public class GLHelper {
 
     public static Point GL2AWTPoint(int x, int y) {
         return new Point((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
-    }
-
-    public static GLCanvas createGLCanvas() {
-        GLCanvas canvas = null;
-        try {
-            GLProfile profile = GLProfile.get(GLProfile.GL3);
-            GLCapabilities capabilities = getGLCapabilities(profile);
-            canvas = new JHVGLCanvas(capabilities);
-            // GUI events can lead to context destruction and invalidation of GL objects and state
-            canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
-        } catch (Exception e) {
-            String msg = e.getMessage();
-            GLInfo.glVersionError(msg == null ? "Unknown OpenGL error." : msg);
-        }
-        return canvas;
-    }
-
-    private static GLCapabilities getGLCapabilities(GLProfile profile) {
-        GLCapabilities capabilities = new GLCapabilities(profile);
-        capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(GLInfo.GLSAMPLES);
-        capabilities.setRedBits(8);
-        capabilities.setGreenBits(8);
-        capabilities.setBlueBits(8);
-        capabilities.setAlphaBits(8);
-        capabilities.setDepthBits(32);
-        return capabilities;
-    }
-
-    private static GLAutoDrawable getSharedDrawable(GLProfile profile, GLCapabilities capabilities) {
-        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(profile).createDummyAutoDrawable(null, true, capabilities, null);
-        sharedDrawable.display();
-        return sharedDrawable;
     }
 
 }
