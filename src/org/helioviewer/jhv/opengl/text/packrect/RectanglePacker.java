@@ -215,7 +215,7 @@ public class RectanglePacker {
             nextLevelSet = new LevelSet(newWidth, newHeight);
 
             // Make copies of all existing rectangles
-            final List<Rect> newRects = new ArrayList<Rect>();
+            final List<Rect> newRects = new ArrayList<>();
             for (final Iterator<Level> i1 = levels.iterator(); i1.hasNext(); ) {
                 final Level level = i1.next();
                 for (final Iterator<Rect> i2 = level.iterator(); i2.hasNext(); ) {
@@ -229,11 +229,11 @@ public class RectanglePacker {
             }
             // Sort them by decreasing height (note: this isn't really
             // guaranteed to improve the chances of a successful layout)
-            Collections.sort(newRects, rectHComparator);
+            newRects.sort(rectHComparator);
             // Try putting all of these rectangles into the new level set
             done = true;
-            for (final Iterator<Rect> iter = newRects.iterator(); iter.hasNext(); ) {
-                if (!nextLevelSet.add(iter.next())) {
+            for (Rect newRect : newRects) {
+                if (!nextLevelSet.add(newRect)) {
                     done = false;
                     break;
                 }

@@ -45,5 +45,5 @@ package org.helioviewer.jhv.opengl.text.packrect;
  */
 
 public interface RectVisitor {
-    public void visit(Rect rect);
+    void visit(Rect rect);
 }
