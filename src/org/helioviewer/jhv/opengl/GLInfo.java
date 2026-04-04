@@ -3,11 +3,6 @@ package org.helioviewer.jhv.opengl;
 import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
 
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.gui.Message;
-
-import com.jogamp.opengl.GL3;
-
 public class GLInfo {
 
     public static final int GLSAMPLES = 4;
@@ -16,24 +11,6 @@ public class GLInfo {
     public static String glVersion = "";
 
     public static int maxTextureSize;
-
-    static void glVersionError(String err) {
-        Log.error(err);
-        Message.fatalErr("OpenGL fatal error. JHelioviewer is not able to run:\n" + err);
-    }
-
-    public static void get(GL3 gl) {
-        glVersion = "OpenGL " + gl.glGetString(GL3.GL_VERSION);
-        Log.info(glVersion);
-        // Log.info("Extensions: " + gl.glGetString(GL3.GL_EXTENSIONS));
-        if (!gl.isExtensionAvailable("GL_VERSION_3_3")) {
-            glVersionError("OpenGL 3.3 not supported.");
-        }
-
-        int[] out = {0};
-        gl.glGetIntegerv(GL3.GL_MAX_TEXTURE_SIZE, out, 0);
-        maxTextureSize = out[0];
-    }
 
     public static void updatePixelScale(GraphicsConfiguration gc) {
         if (gc != null) {

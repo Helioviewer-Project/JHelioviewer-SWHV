@@ -23,7 +23,7 @@ final class GLRenderer {
     }
 
     void init(GL3 gl) {
-        GLInfo.get(gl);
+        JHVCanvas.initGLInfo(gl);
         GLInfo.updatePixelScale(canvas.getGraphicsConfiguration());
 
         gl.glDisable(GL3.GL_TEXTURE_1D);
@@ -66,7 +66,7 @@ final class GLRenderer {
         GLSLShapeShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
 
-        JHVGLException.checkErrors(gl, "GLListener.dispose()");
+        JHVGLException.checkErrors(gl, "GLRenderer.dispose()");
     }
 
     void reshape(int x, int y, int width, int height) {
@@ -98,7 +98,6 @@ final class GLRenderer {
             renderSceneScale(camera, gl);
         renderFullFloatScene(camera, gl);
 
-        canvas.frameRendered();
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
     }
