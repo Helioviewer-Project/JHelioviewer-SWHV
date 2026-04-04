@@ -31,12 +31,12 @@ public class FOVLayer extends AbstractLayer {
 
     @Override
     public void init(GL3 gl) {
-        treePane.init(gl);
+        treePane.init();
     }
 
     @Override
     public void dispose(GL3 gl) {
-        treePane.dispose(gl);
+        treePane.dispose();
     }
 
     @Override
