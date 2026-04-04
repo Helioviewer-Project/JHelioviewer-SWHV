@@ -403,7 +403,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
+    public void renderFullFloat(Camera camera, Viewport vp) {
         if (!enabled)
             return;
         if (SWEKPopupController.mouseOverJHVEvent != null) {
