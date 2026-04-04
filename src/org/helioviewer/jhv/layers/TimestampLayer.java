@@ -22,7 +22,6 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
 
 public class TimestampLayer extends AbstractLayer {
 

@@ -33,7 +33,6 @@ import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
 
 @SuppressWarnings("serial")
 class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {

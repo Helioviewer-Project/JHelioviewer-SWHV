@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
 
 public class GLImage {
 
