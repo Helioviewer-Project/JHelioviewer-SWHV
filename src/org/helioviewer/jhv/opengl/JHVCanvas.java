@@ -9,7 +9,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.Message;
+import org.helioviewer.jhv.layers.Movie;
 
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
@@ -118,7 +121,9 @@ public final class JHVCanvas extends AWTGLCanvas {
                 lastGlWidth = glWidth;
                 lastGlHeight = glHeight;
             }
-            GLRenderer.display(gl, whiteBack);
+            if (Movie.isRecording())
+                ExportMovie.handleMovieExport(Display.getCamera(), gl);
+            GLRenderer.display(whiteBack);
             swapBuffers();
             frameRendered();
         } finally {

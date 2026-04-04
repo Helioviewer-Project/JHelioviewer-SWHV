@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 import org.helioviewer.jhv.base.Region;
@@ -8,12 +7,10 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.layers.Movie;
 
 final class GLRenderer {
 
@@ -58,7 +55,7 @@ final class GLRenderer {
             miniview.reshapeViewport();
     }
 
-    static void display(GL3 gl, boolean whiteBackground) {
+    static void display(boolean whiteBackground) {
         if (whiteBackground)
             GL33.glClearColor(1, 1, 1, 0);
         else
@@ -68,14 +65,11 @@ final class GLRenderer {
 
         Camera camera = Display.getCamera();
 
-        if (Movie.isRecording())
-            ExportMovie.handleMovieExport(camera, gl);
-
         if (Display.mode.isOrthographic()) {
             renderScene(camera);
-            renderMiniview(gl);
+            renderMiniview();
         } else
-            renderSceneScale(camera, gl);
+            renderSceneScale(camera);
         renderFullFloatScene(camera);
 
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
@@ -112,7 +106,7 @@ final class GLRenderer {
         }
     }
 
-    private static void renderMiniview(GL3 gl) {
+    private static void renderMiniview() {
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null && miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
@@ -129,7 +123,7 @@ final class GLRenderer {
         }
     }
 
-    static void renderSceneScale(Camera camera, GL3 gl) {
+    static void renderSceneScale(Camera camera) {
         if (Display.mode.isPolar()) {
             GridScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
         } else if (Display.mode.isLogPolar()) {
