@@ -137,7 +137,7 @@ public final class GridLayer extends AbstractLayer {
         Position viewpoint = camera.getViewpoint();
         float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        drawEarthCircles(gl, vp, pixFactor, Sun.getEarth(viewpoint.time));
+        drawEarthCircles(vp, pixFactor, Sun.getEarth(viewpoint.time));
 
         double pixelsPerSolarRadius = textScale * pixFactor;
 
@@ -146,7 +146,7 @@ public final class GridLayer extends AbstractLayer {
         {
             gridLine.renderLine(vp.aspect, LINEWIDTH);
             if (showLabels) {
-                drawGridText(gl, (int) pixelsPerSolarRadius, ztext);
+                drawGridText((int) pixelsPerSolarRadius, ztext);
             }
         }
         Transform.popView();
@@ -159,12 +159,12 @@ public final class GridLayer extends AbstractLayer {
                     radialCircleLineFar.renderLine(vp.aspect, LINEWIDTH);
                     radialThickLineFar.renderLine(vp.aspect, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(gl, radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, ztext, R_LABEL_POS_FAR);
+                        drawRadialGridText(radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, ztext, R_LABEL_POS_FAR);
                 } else {
                     radialCircleLine.renderLine(vp.aspect, LINEWIDTH);
                     radialThickLine.renderLine(vp.aspect, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(gl, radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, ztext, R_LABEL_POS);
+                        drawRadialGridText(radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, ztext, R_LABEL_POS);
                 }
             }
             Transform.popView();
@@ -178,7 +178,7 @@ public final class GridLayer extends AbstractLayer {
         flatGrid.render(camera, vp, gl, showLabels);
     }
 
-    private void drawEarthCircles(GL3 gl, Viewport vp, double factor, Position p) {
+    private void drawEarthCircles(Viewport vp, double factor, Position p) {
         Transform.pushView();
         Transform.rotateViewInverse(p.toQuat());
 
@@ -188,7 +188,7 @@ public final class GridLayer extends AbstractLayer {
         Transform.popView();
     }
 
-    private static void drawRadialGridText(GL3 gl, List<GridLabel> labels, double size, float z, float[] labelPos) {
+    private static void drawRadialGridText(List<GridLabel> labels, double size, float z, float[] labelPos) {
         float fuzz = 0.75f;
         GL33.glDisable(GL33.GL_CULL_FACE);
         for (float rsize : labelPos) {
@@ -203,7 +203,7 @@ public final class GridLayer extends AbstractLayer {
         GL33.glEnable(GL33.GL_CULL_FACE);
     }
 
-    private void drawGridText(GL3 gl, int size, float z) {
+    private void drawGridText(int size, float z) {
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
