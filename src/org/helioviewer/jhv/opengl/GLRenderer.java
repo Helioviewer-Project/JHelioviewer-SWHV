@@ -14,11 +14,11 @@ import org.helioviewer.jhv.layers.Movie;
 
 import com.jogamp.opengl.GL3;
 
-final class GLListener {
+final class GLRenderer {
 
     private final JHVCanvas canvas;
 
-    GLListener(JHVCanvas _canvas) {
+    GLRenderer(JHVCanvas _canvas) {
         canvas = _canvas;
     }
 
