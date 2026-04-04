@@ -58,11 +58,13 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.GLSLTexture;
+import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.text.packrect.BackingStoreManager;
 import org.helioviewer.jhv.opengl.text.packrect.Rect;
 import org.helioviewer.jhv.opengl.text.packrect.RectanglePacker;
+
+import org.lwjgl.opengl.GL33;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLContext;
@@ -429,7 +431,7 @@ public class JhvTextRenderer {
     private static void internal_beginRendering(boolean ortho, int width, int height) {
         if (ortho) {
             GL3 gl = (GL3) GLContext.getCurrentGL();
-            gl.glDisable(GL3.GL_DEPTH_TEST);
+            GL33.glDisable(GL33.GL_DEPTH_TEST);
 
             Transform.pushProjection();
             Transform.setOrtho2DProjection(0, width, 0, height);
@@ -441,7 +443,7 @@ public class JhvTextRenderer {
     private static void internal_endRendering(boolean ortho) {
         if (ortho) {
             GL3 gl = (GL3) GLContext.getCurrentGL();
-            gl.glEnable(GL3.GL_DEPTH_TEST);
+            GL33.glEnable(GL33.GL_DEPTH_TEST);
 
             Transform.popView();
             Transform.popProjection();
@@ -949,7 +951,7 @@ public class JhvTextRenderer {
 
             glslTexture.init(gl);
             glslTexture.setCoord(gl, coordBuf);
-            glslTexture.renderTexture(gl, GL3.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
+            glslTexture.renderTexture(gl, GL33.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }
