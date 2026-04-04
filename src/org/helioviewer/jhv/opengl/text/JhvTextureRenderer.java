@@ -4,10 +4,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLTexture;
 
 import org.lwjgl.opengl.GL33;
@@ -51,8 +50,8 @@ class JhvTextureRenderer {
         imageWidth = width;
         imageHeight = height;
 
-        image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-        imageBuffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
+        image = NativeImageFactory.createCompatible(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+        imageBuffer = NativeImageFactory.getIntBuffer(image);
 
         tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
         tex.bind();
@@ -134,6 +133,7 @@ class JhvTextureRenderer {
     void dispose() {
         tex.delete();
         imageBuffer = null;
+        NativeImageFactory.free(image);
         image = null;
     }
 
@@ -151,19 +151,12 @@ class JhvTextureRenderer {
      * @param height the height of the region to update
      */
     private void upload(int x, int y, int width, int height) {
-        IntBuffer uploadBuffer = directImageBuffer().position(y * imageWidth + x);
+        IntBuffer uploadBuffer = imageBuffer.position(y * imageWidth + x);
         GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, imageWidth);
         GL33.glTexSubImage2D(GL33.GL_TEXTURE_2D, 0, x, y, width, height, GL33.GL_BGRA, GL33.GL_UNSIGNED_INT_8_8_8_8_REV, uploadBuffer);
         GL33.glGenerateMipmap(GL33.GL_TEXTURE_2D);
-    }
-
-    private IntBuffer directImageBuffer() {
-        IntBuffer copy = BufferUtils.newIntBuffer(imageBuffer.capacity());
-        copy.put(imageBuffer);
-        copy.flip();
         imageBuffer.rewind();
-        return copy;
     }
 
 }
