@@ -16,9 +16,10 @@ import com.jogamp.opengl.GL3;
 
 final class GLRenderer {
 
-    void init(GL3 gl) {
-        JHVCanvas.initGLInfo(gl);
+    private GLRenderer() {
+    }
 
+    static void init(GL3 gl) {
         gl.glDisable(GL3.GL_TEXTURE_1D);
         gl.glDisable(GL3.GL_TEXTURE_2D);
 
@@ -48,7 +49,7 @@ final class GLRenderer {
         JHVFrame.getInteraction().initAnnotations(gl);
     }
 
-    void dispose(GL3 gl) {
+    static void dispose(GL3 gl) {
         Layers.dispose(gl);
         JHVFrame.getInteraction().disposeAnnotations(gl);
         GLText.dispose(gl);
@@ -62,7 +63,7 @@ final class GLRenderer {
         JHVGLException.checkErrors(gl, "GLRenderer.dispose()");
     }
 
-    void reshape(int x, int y, int glWidth, int glHeight) {
+    static void reshape(int x, int y, int glWidth, int glHeight) {
         Display.setGLSize(x, y, glWidth, glHeight);
         Display.reshapeAll();
         MiniviewLayer miniview = Layers.getMiniviewLayer();
@@ -70,7 +71,7 @@ final class GLRenderer {
             miniview.reshapeViewport();
     }
 
-    void display(GL3 gl, boolean whiteBackground) {
+    static void display(GL3 gl, boolean whiteBackground) {
         if (whiteBackground)
             gl.glClearColor(1, 1, 1, 0);
         else

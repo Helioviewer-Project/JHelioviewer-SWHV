@@ -35,8 +35,7 @@ public final class JHVCanvas extends GLCanvas {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getCapabilities(profile);
             JHVCanvas canvas = new JHVCanvas(capabilities);
-            GLRenderer renderer = new GLRenderer();
-            canvas.addGLEventListener(createListener(canvas, renderer));
+            canvas.addGLEventListener(createListener(canvas));
             // GUI events can lead to context destruction and invalidation of GL objects and state
             canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
             return canvas;
@@ -45,13 +44,13 @@ public final class JHVCanvas extends GLCanvas {
         }
     }
 
-    static AssertionError glVersionError(String err) {
+    private static AssertionError glVersionError(String err) {
         Log.error(err);
         Message.fatalErr("OpenGL fatal error. JHelioviewer is not able to run:\n" + err);
         return new AssertionError(err);
     }
 
-    static void initGLInfo(GL3 gl) {
+    private static void initGLInfo(GL3 gl) {
         glVersion = "OpenGL " + gl.glGetString(GL3.GL_VERSION);
         Log.info(glVersion);
         if (!gl.isExtensionAvailable("GL_VERSION_3_3"))
@@ -75,22 +74,24 @@ public final class JHVCanvas extends GLCanvas {
         pixelScale[1] = transform.getScaleY();
     }
 
-    private static GLEventListener createListener(JHVCanvas canvas, GLRenderer renderer) {
+    private static GLEventListener createListener(JHVCanvas canvas) {
         return new GLEventListener() {
             @Override
             public void init(GLAutoDrawable drawable) {
                 canvas.updatePixelScale();
-                renderer.init((GL3) drawable.getGL());
+                GL3 gl = (GL3) drawable.getGL();
+                initGLInfo(gl);
+                GLRenderer.init(gl);
             }
 
             @Override
             public void dispose(GLAutoDrawable drawable) {
-                renderer.dispose((GL3) drawable.getGL());
+                GLRenderer.dispose((GL3) drawable.getGL());
             }
 
             @Override
             public void display(GLAutoDrawable drawable) {
-                renderer.display((GL3) drawable.getGL(), canvas.whiteBack);
+                GLRenderer.display((GL3) drawable.getGL(), canvas.whiteBack);
                 canvas.frameRendered();
             }
 
@@ -99,7 +100,7 @@ public final class JHVCanvas extends GLCanvas {
                 canvas.updatePixelScale();
                 int glWidth = canvas.glWidth();
                 int glHeight = canvas.glHeight();
-                renderer.reshape(x, y, glWidth, glHeight);
+                GLRenderer.reshape(x, y, glWidth, glHeight);
             }
         };
     }
