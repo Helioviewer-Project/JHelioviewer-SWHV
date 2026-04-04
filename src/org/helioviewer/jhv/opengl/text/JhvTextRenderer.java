@@ -58,7 +58,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
-import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.text.packrect.BackingStoreManager;
 import org.helioviewer.jhv.opengl.text.packrect.Rect;
@@ -410,7 +410,7 @@ public class JhvTextRenderer {
 
         if (!haveMaxSize) {
             // Set the maximum texture size in the RectanglePacker to keep it from expanding too large
-            packer.setMaxSize(GLInfo.maxTextureSize, GLInfo.maxTextureSize);
+            packer.setMaxSize(JHVCanvas.maxTextureSize, JHVCanvas.maxTextureSize);
             haveMaxSize = true;
         }
     }

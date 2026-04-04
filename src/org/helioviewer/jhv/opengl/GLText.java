@@ -22,7 +22,7 @@ public class GLText {
     public static final int[] shadowOffset = {2, -2};
 
     public static JhvTextRenderer getRenderer(int size) {
-        size = (int) (size * GLInfo.pixelScale[1]);
+        size = (int) (size * JHVCanvas.pixelScale[1]);
 
         int idx = (size - MIN) / STEP;
         if (idx < 0)

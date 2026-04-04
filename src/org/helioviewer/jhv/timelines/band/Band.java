@@ -14,7 +14,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
-import org.helioviewer.jhv.opengl.GLInfo;
+import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
@@ -223,7 +223,7 @@ public final class Band extends AbstractTimelineLayer {
             TimeAxis timeAxis = DrawController.selectedAxis;
             long start = propagationModel.getObservationTime(timeAxis.start());
             long end = propagationModel.getObservationTime(timeAxis.end());
-            for (List<BandCache.DateValue> list : bandCache.getValues(SUPER_SAMPLE * GLInfo.pixelScale[0] * graphArea.width, start, end)) {
+            for (List<BandCache.DateValue> list : bandCache.getValues(SUPER_SAMPLE * JHVCanvas.pixelScale[0] * graphArea.width, start, end)) {
                 int size = list.size();
                 if (size == 0)
                     continue;

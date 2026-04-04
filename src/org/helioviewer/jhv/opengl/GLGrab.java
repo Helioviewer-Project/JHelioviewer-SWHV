@@ -19,7 +19,7 @@ public class GLGrab {
     }
 
     private void init(GL3 gl) {
-        capture = new GLFrameCapture(gl, w, h, GLInfo.GLSAMPLES);
+        capture = new GLFrameCapture(gl, w, h, JHVCanvas.GLSAMPLES);
     }
 
     public void dispose(GL3 gl) {
