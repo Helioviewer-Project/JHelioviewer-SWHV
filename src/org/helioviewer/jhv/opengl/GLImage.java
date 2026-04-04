@@ -8,6 +8,8 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
 
+import org.lwjgl.opengl.GL33;
+
 import com.jogamp.opengl.GL3;
 
 public class GLImage {
@@ -107,9 +109,9 @@ public class GLImage {
     }
 
     public void init(GL3 gl) {
-        tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
-        lutTex = new GLTexture(gl, GL3.GL_TEXTURE_1D, GLTexture.Unit.ONE);
-        diffTex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.TWO);
+        tex = new GLTexture(gl, GL33.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
+        lutTex = new GLTexture(gl, GL33.GL_TEXTURE_1D, GLTexture.Unit.ONE);
+        diffTex = new GLTexture(gl, GL33.GL_TEXTURE_2D, GLTexture.Unit.TWO);
 
         lutChanged = true;
     }

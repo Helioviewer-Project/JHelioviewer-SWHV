@@ -14,6 +14,7 @@ import java.nio.ShortBuffer;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+
 import org.lwjgl.opengl.GL33;
 
 import com.jogamp.opengl.GL3;
