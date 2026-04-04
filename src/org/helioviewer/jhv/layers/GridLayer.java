@@ -35,6 +35,8 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
+import org.lwjgl.opengl.GL33;
+
 import com.jogamp.opengl.GL3;
 
 public final class GridLayer extends AbstractLayer {
@@ -188,7 +190,7 @@ public final class GridLayer extends AbstractLayer {
 
     private static void drawRadialGridText(GL3 gl, List<GridLabel> labels, double size, float z, float[] labelPos) {
         float fuzz = 0.75f;
-        gl.glDisable(GL3.GL_CULL_FACE);
+        GL33.glDisable(GL33.GL_CULL_FACE);
         for (float rsize : labelPos) {
             JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             renderer.setColor(Colors.MiddleGrayFloat);
@@ -198,7 +200,7 @@ public final class GridLayer extends AbstractLayer {
             labels.forEach(label -> renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
             renderer.end3DRendering();
         }
-        gl.glEnable(GL3.GL_CULL_FACE);
+        GL33.glEnable(GL33.GL_CULL_FACE);
     }
 
     private void drawGridText(GL3 gl, int size, float z) {
@@ -209,10 +211,10 @@ public final class GridLayer extends AbstractLayer {
 
         renderer.begin3DRendering();
 
-        gl.glDisable(GL3.GL_CULL_FACE);
+        GL33.glDisable(GL33.GL_CULL_FACE);
         latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
         renderer.flush();
-        gl.glEnable(GL3.GL_CULL_FACE);
+        GL33.glEnable(GL33.GL_CULL_FACE);
 
         lonLabels.forEach(lonLabel -> {
             Transform.pushView();
