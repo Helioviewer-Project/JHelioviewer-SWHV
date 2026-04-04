@@ -20,7 +20,6 @@ import com.jogamp.opengl.GLEventListener;
 public class GLListener implements GLEventListener {
 
     private final JHVCanvas canvas;
-    public static final GLSLSolar glslSolar = new GLSLSolar();
 
     GLListener(JHVCanvas _canvas) {
         canvas = _canvas;
@@ -52,7 +51,7 @@ public class GLListener implements GLEventListener {
 
         gl.glEnable(GL3.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        glslSolar.init(gl);
+        GLSLSolar.quad.init(gl);
         GLSLSolarShader.init(gl);
         GLSLLineShader.init(gl);
         GLSLShapeShader.init(gl);
@@ -68,7 +67,7 @@ public class GLListener implements GLEventListener {
         JHVFrame.getInteraction().disposeAnnotations(gl);
         GLText.dispose(gl);
 
-        glslSolar.dispose(gl);
+        GLSLSolar.quad.dispose(gl);
         GLSLSolarShader.dispose(gl);
         GLSLLineShader.dispose(gl);
         GLSLShapeShader.dispose(gl);
@@ -96,7 +95,7 @@ public class GLListener implements GLEventListener {
             GLSLSolarShader.bindScreen(gl, vp);
 
             GLSLSolarShader.sphere.use(gl);
-            glslSolar.render(gl);
+            GLSLSolar.quad.render(gl);
 
             Layers.render(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp, gl);

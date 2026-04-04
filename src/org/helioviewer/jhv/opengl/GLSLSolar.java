@@ -6,6 +6,8 @@ import com.jogamp.opengl.GL3;
 
 public class GLSLSolar extends VAO1 {
 
+    public static final GLSLSolar quad = new GLSLSolar();
+
     private static final FloatBuffer vertx = FloatBuffer.wrap(new float[]{-1, -1, 0, 1, 1, -1, 0, 1, -1, 1, 0, 1, 1, 1, 0, 1});
 
     GLSLSolar() {

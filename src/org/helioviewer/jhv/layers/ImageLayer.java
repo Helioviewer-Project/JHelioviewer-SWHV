@@ -22,7 +22,7 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
-import org.helioviewer.jhv.opengl.GLListener;
+import org.helioviewer.jhv.opengl.GLSLSolar;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
@@ -281,7 +281,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
                 wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance, sourceView0, displayMap0,
                 wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance, sourceView1, displayMap1);
 
-        GLListener.glslSolar.render(gl);
+        GLSLSolar.quad.render(gl);
     }
 
     private static double latiLongitude(GridType gridType, Position cameraViewpoint, Position metaViewpoint) {
