@@ -31,7 +31,6 @@ import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.opengl.GLListener;
 import org.helioviewer.jhv.opengl.JHVCanvas;
 
 public class JHVFrame {
@@ -42,8 +41,6 @@ public class JHVFrame {
     private static SideContentPane leftPane;
 
     private static JHVCanvas glCanvas;
-    private static GLListener glListener;
-
     private static InputController inputController;
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
@@ -64,8 +61,6 @@ public class JHVFrame {
 
         glCanvas = JHVCanvas.create(); // before camera
         glCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
-        glListener = new GLListener(glCanvas);
-        glCanvas.addGLEventListener(glListener);
 
         layers = Layers.getInstance();
         layersPanel = new LayersPanel(layers);
@@ -194,7 +189,7 @@ public class JHVFrame {
     }
 
     public static void setWhiteBackground(boolean whiteBackground) {
-        glListener.setWhiteBack(whiteBackground);
+        glCanvas.setWhiteBackground(whiteBackground);
     }
 
     public static MainContentPanel getMainContentPanel() {

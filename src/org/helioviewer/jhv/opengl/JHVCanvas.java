@@ -15,12 +15,15 @@ import com.jogamp.opengl.awt.GLCanvas;
 @SuppressWarnings("serial")
 public final class JHVCanvas extends GLCanvas {
 
+    private boolean whiteBack;
+
     public static JHVCanvas create() {
         JHVCanvas canvas = null;
         try {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getCapabilities(profile);
             canvas = new JHVCanvas(capabilities);
+            canvas.addGLEventListener(new GLListener(canvas));
             // GUI events can lead to context destruction and invalidation of GL objects and state
             canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
         } catch (Exception e) {
@@ -32,6 +35,14 @@ public final class JHVCanvas extends GLCanvas {
 
     private JHVCanvas(GLCapabilitiesImmutable capabilities) {
         super(capabilities);
+    }
+
+    public boolean isWhiteBackground() {
+        return whiteBack;
+    }
+
+    public void setWhiteBackground(boolean whiteBackground) {
+        whiteBack = whiteBackground;
     }
 
     @Override

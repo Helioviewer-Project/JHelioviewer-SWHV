@@ -16,21 +16,14 @@ import org.helioviewer.jhv.layers.Movie;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLListener implements GLEventListener {
 
-    private final GLCanvas canvas;
-    private boolean whiteBack;
-
+    private final JHVCanvas canvas;
     public static final GLSLSolar glslSolar = new GLSLSolar();
 
-    public GLListener(GLCanvas _canvas) {
+    GLListener(JHVCanvas _canvas) {
         canvas = _canvas;
-    }
-
-    public void setWhiteBack(boolean b) {
-        whiteBack = b;
     }
 
     @Override
@@ -179,7 +172,7 @@ public class GLListener implements GLEventListener {
         GL3 gl = (GL3) drawable.getGL();
         // gl.glFinish(); - hard stalls the GPU pipeline
 
-        if (whiteBack)
+        if (canvas.isWhiteBackground())
             gl.glClearColor(1, 1, 1, 0);
         else
             gl.glClearColor(0, 0, 0, 0);
