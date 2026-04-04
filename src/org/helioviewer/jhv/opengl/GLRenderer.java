@@ -150,7 +150,7 @@ final class GLRenderer {
             camera.projectionOrtho2D(vp.aspect);
             GLSLSolarShader.bindScreen(vp);
 
-            Layers.renderScale(camera, vp, gl);
+            Layers.renderScale(camera, vp);
             JHVFrame.getInteraction().drawAnnotations(vp);
             Layers.renderFloat(camera, vp);
         }

@@ -107,7 +107,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL3 gl) {
+    public void renderScale(Camera camera, Viewport vp) {
         render(camera, vp);
     }
 

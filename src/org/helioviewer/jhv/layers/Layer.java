@@ -15,7 +15,7 @@ public interface Layer {
     default void render(Camera camera, Viewport vp) {
     }
 
-    default void renderScale(Camera camera, Viewport vp, GL3 gl) {
+    default void renderScale(Camera camera, Viewport vp) {
     }
 
     default void renderFloat(Camera camera, Viewport vp) {
