@@ -260,10 +260,8 @@ public class JhvTextRenderer {
      * Changes the current color of this TextRenderer to the supplied
      * one, where each component ranges from 0.0f - 1.0f. The alpha
      * component, if used, does not need to be premultiplied into the
-     * color channels as described in the documentation for {@link
-     * com.jogamp.opengl.util.texture.Texture Texture}, although
-     * premultiplied colors are used internally. The default color is
-     * opaque white.
+     * color channels, although premultiplied colors are used
+     * internally. The default color is opaque white.
      */
     public void setColor(float[] color) {
         flush();

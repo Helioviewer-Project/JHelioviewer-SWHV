@@ -49,20 +49,6 @@ final class GLRenderer {
         JHVFrame.getInteraction().initAnnotations(gl);
     }
 
-    static void dispose(GL3 gl) {
-        Layers.dispose(gl);
-        JHVFrame.getInteraction().disposeAnnotations(gl);
-        GLText.dispose(gl);
-
-        GLSLSolar.quad.dispose(gl);
-        GLSLSolarShader.dispose(gl);
-        GLSLLineShader.dispose(gl);
-        GLSLShapeShader.dispose(gl);
-        GLSLTextureShader.dispose(gl);
-
-        JHVGLException.checkErrors(gl, "GLRenderer.dispose()");
-    }
-
     static void reshape(int x, int y, int glWidth, int glHeight) {
         Display.setGLSize(x, y, glWidth, glHeight);
         Display.reshapeAll();
@@ -95,6 +81,20 @@ final class GLRenderer {
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
     }
 
+    static void dispose(GL3 gl) {
+        Layers.dispose(gl);
+        JHVFrame.getInteraction().disposeAnnotations(gl);
+        GLText.dispose(gl);
+
+        GLSLSolar.quad.dispose(gl);
+        GLSLSolarShader.dispose(gl);
+        GLSLLineShader.dispose(gl);
+        GLSLShapeShader.dispose(gl);
+        GLSLTextureShader.dispose(gl);
+
+        JHVGLException.checkErrors(gl, "GLRenderer.dispose()");
+    }
+
     static void renderScene(Camera camera, GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
@@ -108,6 +108,23 @@ final class GLRenderer {
             Layers.render(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
             Layers.renderFloat(camera, vp, gl);
+        }
+    }
+
+    private static void renderMiniview(GL3 gl) {
+        MiniviewLayer miniview = Layers.getMiniviewLayer();
+        if (miniview != null && miniview.isEnabled()) {
+            Viewport vp = miniview.getViewport();
+            Camera miniCamera = Display.getMiniCamera();
+
+            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            miniCamera.projectionOrtho2D(vp.aspect);
+            GLSLSolarShader.bindScreen(gl, vp);
+
+            gl.glDisable(GL3.GL_DEPTH_TEST);
+            miniview.renderBackground(gl);
+            Layers.renderMiniview(miniCamera, vp, gl);
+            gl.glEnable(GL3.GL_DEPTH_TEST);
         }
     }
 
@@ -138,6 +155,12 @@ final class GLRenderer {
         }
     }
 
+    private static void renderFullFloatScene(Camera camera, GL3 gl) {
+        Viewport vp = Display.fullViewport;
+        gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+        Layers.renderFullFloat(camera, vp, gl);
+    }
+
     private static Region getCenteredHpcScaleBounds() {
         Region bounds = ImageLayerBounds.getLargestHpcBounds();
         double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
@@ -147,29 +170,6 @@ final class GLRenderer {
         if (halfHeight <= 0)
             halfHeight = 5;
         return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
-    }
-
-    private static void renderFullFloatScene(Camera camera, GL3 gl) {
-        Viewport vp = Display.fullViewport;
-        gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        Layers.renderFullFloat(camera, vp, gl);
-    }
-
-    private static void renderMiniview(GL3 gl) {
-        MiniviewLayer miniview = Layers.getMiniviewLayer();
-        if (miniview != null && miniview.isEnabled()) {
-            Viewport vp = miniview.getViewport();
-            Camera miniCamera = Display.getMiniCamera();
-
-            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            miniCamera.projectionOrtho2D(vp.aspect);
-            GLSLSolarShader.bindScreen(gl, vp);
-
-            gl.glDisable(GL3.GL_DEPTH_TEST);
-            miniview.renderBackground(gl);
-            Layers.renderMiniview(miniCamera, vp, gl);
-            gl.glEnable(GL3.GL_DEPTH_TEST);
-        }
     }
 
 }
