@@ -18,6 +18,8 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.RasterLine;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 
+import org.lwjgl.opengl.GL33;
+
 import com.jogamp.opengl.GL3;
 
 public class FlatGrid {
@@ -62,7 +64,7 @@ public class FlatGrid {
 
     public void render(Camera camera, Viewport vp, GL3 gl, boolean showLabels) {
         rebuildIfNeeded(camera, vp, gl);
-        shape.renderShape(gl, GL3.GL_TRIANGLES);
+        shape.renderShape(gl, GL33.GL_TRIANGLES);
         if (showLabels) {
             int labelSize = (int) (TEXT_SCALE * CameraHelper.getPixelFactor(camera, vp));
             drawLabels(camera, labelSize, vp);

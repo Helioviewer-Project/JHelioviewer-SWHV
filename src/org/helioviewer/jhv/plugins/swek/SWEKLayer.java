@@ -46,6 +46,8 @@ import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
+import org.lwjgl.opengl.GL33;
+
 import com.jogamp.opengl.GL3;
 
 // has to be public for state
@@ -102,7 +104,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             icon.paintIcon(null, graph, 0, 0);
             graph.dispose();
 
-            tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.THREE);
+            tex = new GLTexture(gl, GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
             tex.bind(gl);
 
             GLTexture.copyBufferedImage(gl, bi);
@@ -343,7 +345,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             if (Display.mode.isLatitudinal() && evt.isCactus())
                 continue;
             bindTexture(gl, evtr.getSupplier().getGroup());
-            glslTexture.renderTexture(gl, GL3.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
+            glslTexture.renderTexture(gl, GL33.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }

@@ -17,6 +17,8 @@ import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONObject;
 
+import org.lwjgl.opengl.GL33;
+
 import com.jogamp.opengl.GL3;
 
 public final class MiniviewLayer extends AbstractLayer {
@@ -55,8 +57,8 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     public void renderBackground(GL3 gl) {
-        rectangle.renderShape(gl, GL3.GL_TRIANGLE_STRIP);
-        circle.renderShape(gl, GL3.GL_TRIANGLE_STRIP);
+        rectangle.renderShape(gl, GL33.GL_TRIANGLE_STRIP);
+        circle.renderShape(gl, GL33.GL_TRIANGLE_STRIP);
     }
 
     @Override
