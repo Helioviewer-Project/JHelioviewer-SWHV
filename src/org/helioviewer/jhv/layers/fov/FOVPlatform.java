@@ -119,7 +119,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose());
     }
 
-    void render(Camera camera, Viewport vp, GL3 gl) {
+    void render(Camera camera, Viewport vp) {
         if (!hasEnabled())
             return;
 
