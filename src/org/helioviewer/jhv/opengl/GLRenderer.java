@@ -103,7 +103,7 @@ final class GLRenderer {
             camera.projectionOrtho(vp.aspect);
             GLSLSolarShader.bindScreen(vp);
 
-            GLSLSolarShader.sphere.use(gl);
+            GLSLSolarShader.sphere.use();
             GLSLSolar.quad.render(gl);
 
             Layers.render(camera, vp, gl);

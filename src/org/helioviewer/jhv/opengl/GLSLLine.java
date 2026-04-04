@@ -40,7 +40,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         if (count == 0)
             return;
 
-        GLSLLineShader.line.use(null);
+        GLSLLineShader.line.use();
         GLSLLineShader.line.bindParams(aspect, thickness);
         GLSLLineShader.line.bindMVP();
 
