@@ -48,8 +48,6 @@ import org.json.JSONObject;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
-
 // has to be public for state
 public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
     private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {

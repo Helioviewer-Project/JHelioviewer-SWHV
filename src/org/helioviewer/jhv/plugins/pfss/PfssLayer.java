@@ -15,8 +15,6 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
-
 public class PfssLayer extends AbstractLayer implements TimeListener.Change, TimeListener.Range { // has to be public for state
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;

@@ -37,8 +37,6 @@ import org.json.JSONObject;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
-
 public final class GridLayer extends AbstractLayer {
 
     private static final double RADIAL_UNIT = Sun.Radius;

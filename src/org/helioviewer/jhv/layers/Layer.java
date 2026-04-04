@@ -8,8 +8,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
-
 public interface Layer {
 
     default void render(Camera camera, Viewport vp) {

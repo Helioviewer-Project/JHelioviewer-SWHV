@@ -18,8 +18,6 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.NullView;
 
-import com.jogamp.opengl.GL3;
-
 @SuppressWarnings({"serial", "unchecked"})
 public class Layers extends AbstractTableModel implements Reorderable, TimeListener.Selection {
 

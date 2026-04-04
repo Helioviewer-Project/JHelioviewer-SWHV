@@ -38,8 +38,6 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
-
 public final class ConnectionLayer extends AbstractLayer implements LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver, LoadSunJSON.Receiver {
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
