@@ -3,7 +3,6 @@ package org.helioviewer.jhv.opengl;
 import java.nio.Buffer;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLCapabilitiesImmutable;
 import com.jogamp.opengl.GLException;
 
 final class GLFrameCapture {
@@ -159,9 +158,7 @@ final class GLFrameCapture {
     }
 
     private static int chooseDepthFormat(GL3 gl) {
-        GLCapabilitiesImmutable caps = gl.getContext().getGLDrawable().getChosenGLCapabilities();
-        int depthBits = caps.getDepthBits();
-
+        int depthBits = getInteger(gl, GL3.GL_DEPTH_BITS);
         if (depthBits >= 32)
             return GL3.GL_DEPTH_COMPONENT32;
         if (depthBits >= 24)
@@ -170,12 +167,16 @@ final class GLFrameCapture {
     }
 
     private static int chooseColorInternalFormat(GL3 gl) {
-        GLCapabilitiesImmutable caps = gl.getContext().getGLDrawable().getChosenGLCapabilities();
-        return caps.getAlphaBits() > 0 ? GL3.GL_RGBA8 : GL3.GL_RGB8;
+        return getInteger(gl, GL3.GL_ALPHA_BITS) > 0 ? GL3.GL_RGBA8 : GL3.GL_RGB8;
     }
 
     private static int chooseColorPixelFormat(GL3 gl) {
-        GLCapabilitiesImmutable caps = gl.getContext().getGLDrawable().getChosenGLCapabilities();
-        return caps.getAlphaBits() > 0 ? GL3.GL_RGBA : GL3.GL_RGB;
+        return getInteger(gl, GL3.GL_ALPHA_BITS) > 0 ? GL3.GL_RGBA : GL3.GL_RGB;
+    }
+
+    private static int getInteger(GL3 gl, int name) {
+        int[] value = {0};
+        gl.glGetIntegerv(name, value, 0);
+        return value[0];
     }
 }
