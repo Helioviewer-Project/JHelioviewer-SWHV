@@ -85,8 +85,9 @@ public final class JHVCanvas extends GLCanvas {
             }
 
             @Override
-            public void dispose(GLAutoDrawable drawable) {
-                GLRenderer.dispose((GL3) drawable.getGL());
+            public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+                canvas.updatePixelScale();
+                GLRenderer.reshape(x, y, canvas.glWidth(), canvas.glHeight());
             }
 
             @Override
@@ -96,9 +97,8 @@ public final class JHVCanvas extends GLCanvas {
             }
 
             @Override
-            public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-                canvas.updatePixelScale();
-                GLRenderer.reshape(x, y, canvas.glWidth(), canvas.glHeight());
+            public void dispose(GLAutoDrawable drawable) {
+                GLRenderer.dispose((GL3) drawable.getGL());
             }
         };
     }
