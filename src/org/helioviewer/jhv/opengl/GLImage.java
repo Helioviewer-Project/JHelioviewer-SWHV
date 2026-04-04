@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.IntBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -98,7 +99,10 @@ public class GLImage {
         LUT currlut = diffMode == DifferenceMode.None ? lut : LUT.gray();
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT = invertLUT ? currlut.lut8Inv() : currlut.lut8();
-            IntBuffer lutBuffer = IntBuffer.wrap(intLUT);
+            // TBD: avoid this copy by having LUT provide a direct IntBuffer.
+            IntBuffer lutBuffer = BufferUtils.newIntBuffer(intLUT.length);
+            lutBuffer.put(intLUT);
+            lutBuffer.flip();
             lastLut = currlut;
             lastInverted = invertLUT;
 
