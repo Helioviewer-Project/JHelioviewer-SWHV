@@ -63,7 +63,7 @@ public final class MenuBar extends JMenuBar {
 
         JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
         white.addItemListener(e -> {
-            JHVFrame.getGLListener().setWhiteBack(white.getState());
+            JHVFrame.setWhiteBackground(white.getState());
             MovieDisplay.display();
         });
         viewMenu.add(white);

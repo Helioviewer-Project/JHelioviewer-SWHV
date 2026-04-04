@@ -15,8 +15,8 @@ import com.jogamp.opengl.awt.GLCanvas;
 @SuppressWarnings("serial")
 public final class JHVCanvas extends GLCanvas {
 
-    public static GLCanvas create() {
-        GLCanvas canvas = null;
+    public static JHVCanvas create() {
+        JHVCanvas canvas = null;
         try {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getCapabilities(profile);

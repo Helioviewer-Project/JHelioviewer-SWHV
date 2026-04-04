@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
@@ -30,10 +31,8 @@ import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.GLListener;
-
-import com.jogamp.opengl.awt.GLCanvas;
+import org.helioviewer.jhv.opengl.JHVCanvas;
 
 public class JHVFrame {
 
@@ -42,7 +41,7 @@ public class JHVFrame {
 
     private static SideContentPane leftPane;
 
-    private static GLCanvas glCanvas;
+    private static JHVCanvas glCanvas;
     private static GLListener glListener;
 
     private static InputController inputController;
@@ -186,12 +185,16 @@ public class JHVFrame {
         return leftScrollPane;
     }
 
-    public static GLCanvas getGLCanvas() {
+    public static Component getRenderComponent() {
         return glCanvas;
     }
 
-    public static GLListener getGLListener() {
-        return glListener;
+    public static void requestRender() {
+        glCanvas.display();
+    }
+
+    public static void setWhiteBackground(boolean whiteBackground) {
+        glListener.setWhiteBack(whiteBackground);
     }
 
     public static MainContentPanel getMainContentPanel() {
