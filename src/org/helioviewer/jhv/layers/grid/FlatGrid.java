@@ -101,7 +101,7 @@ public class FlatGrid {
         float textScaleFactor = 0.3f * TEXT_SCALE / GLText.getRenderer(size).getFont().getSize2D();
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
-        renderer.begin3DRendering(gl);
+        renderer.begin3DRendering();
         for (int i = 0; i < xAxis.labels().length; i++) {
             if (xAxis.axisFlags()[i])
                 continue;

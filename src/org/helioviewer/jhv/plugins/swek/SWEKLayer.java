@@ -327,7 +327,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                 txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
             }
         }
-        GLText.drawTextFloat(vp, gl, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     private void renderEvents(Viewport vp, GL3 gl) {
