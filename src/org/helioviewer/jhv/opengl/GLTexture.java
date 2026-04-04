@@ -121,9 +121,44 @@ public class GLTexture {
             return;
         }
 
+        buffer = directBuffer(buffer);
+
         GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(dataType));
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, w);
         genTexture2D(mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(dataType), buffer);
+    }
+
+    private static Buffer directBuffer(Buffer buffer) {
+        if (buffer.isDirect())
+            return buffer;
+
+        return switch (buffer) {
+            case ByteBuffer byteBuffer -> {
+                ByteBuffer direct = BufferUtils.newByteBuffer(byteBuffer.remaining());
+                int position = byteBuffer.position();
+                direct.put(byteBuffer);
+                direct.flip();
+                byteBuffer.position(position);
+                yield direct;
+            }
+            case ShortBuffer shortBuffer -> {
+                ShortBuffer direct = BufferUtils.newShortBuffer(shortBuffer.remaining());
+                int position = shortBuffer.position();
+                direct.put(shortBuffer);
+                direct.flip();
+                shortBuffer.position(position);
+                yield direct;
+            }
+            case IntBuffer intBuffer -> {
+                IntBuffer direct = BufferUtils.newIntBuffer(intBuffer.remaining());
+                int position = intBuffer.position();
+                direct.put(intBuffer);
+                direct.flip();
+                intBuffer.position(position);
+                yield direct;
+            }
+            default -> throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
+        };
     }
 
     public static void copyBuffer1D(IntBuffer source) {
