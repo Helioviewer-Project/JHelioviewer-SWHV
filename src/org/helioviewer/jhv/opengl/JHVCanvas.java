@@ -28,26 +28,26 @@ public final class JHVCanvas extends GLCanvas {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getCapabilities(profile);
             canvas = new JHVCanvas(capabilities);
-            GLListener listener = new GLListener(canvas);
+            GLRenderer renderer = new GLRenderer(canvas);
             canvas.addGLEventListener(new GLEventListener() {
                 @Override
                 public void init(GLAutoDrawable drawable) {
-                    listener.init((GL3) drawable.getGL());
+                    renderer.init((GL3) drawable.getGL());
                 }
 
                 @Override
                 public void dispose(GLAutoDrawable drawable) {
-                    listener.dispose((GL3) drawable.getGL());
+                    renderer.dispose((GL3) drawable.getGL());
                 }
 
                 @Override
                 public void display(GLAutoDrawable drawable) {
-                    listener.display((GL3) drawable.getGL());
+                    renderer.display((GL3) drawable.getGL());
                 }
 
                 @Override
                 public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-                    listener.reshape(x, y, width, height);
+                    renderer.reshape(x, y, width, height);
                 }
             });
             // GUI events can lead to context destruction and invalidation of GL objects and state

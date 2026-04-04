@@ -44,9 +44,9 @@ public class GLGrab {
 
             capture.bindForRender(gl);
             if (Display.mode.isOrthographic()) {
-                GLListener.renderScene(camera, gl);
+                GLRenderer.renderScene(camera, gl);
             } else {
-                GLListener.renderSceneScale(camera, gl);
+                GLRenderer.renderSceneScale(camera, gl);
             }
             capture.readPixels(gl, buffer);
         } finally {
