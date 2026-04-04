@@ -6,7 +6,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLException;
 
 abstract class GLSLShader {
 
@@ -45,7 +44,7 @@ abstract class GLSLShader {
             use(gl);
             initUniforms(gl, progID);
         } catch (Exception e) {
-            throw new GLException("Cannot load shader", e);
+            throw new JHVGLException("Cannot load shader", e);
         }
     }
 
@@ -97,9 +96,9 @@ abstract class GLSLShader {
 
                 String log = new String(infoLog, StandardCharsets.UTF_8);
                 Log.error(log);
-                throw new GLException("Cannot compile " + type + " shader: " + log);
+                throw new JHVGLException("Cannot compile " + type + " shader: " + log);
             } else
-                throw new GLException("Cannot compile " + type + " shader: unknown reason");
+                throw new JHVGLException("Cannot compile " + type + " shader: unknown reason");
         }
         return id;
     }
@@ -121,9 +120,9 @@ abstract class GLSLShader {
 
                 String log = new String(infoLog, StandardCharsets.UTF_8);
                 Log.error(log);
-                throw new GLException("Cannot link shader: " + log);
+                throw new JHVGLException("Cannot link shader: " + log);
             } else
-                throw new GLException("Cannot link shader: unknown reason");
+                throw new JHVGLException("Cannot link shader: unknown reason");
         }
 
         gl.glValidateProgram(id);
