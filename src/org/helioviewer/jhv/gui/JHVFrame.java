@@ -192,6 +192,10 @@ public class JHVFrame {
         glCanvas.setWhiteBackground(whiteBackground);
     }
 
+    public static int getFramerate() {
+        return glCanvas.getFramerate();
+    }
+
     public static MainContentPanel getMainContentPanel() {
         return mainContentPanel;
     }
