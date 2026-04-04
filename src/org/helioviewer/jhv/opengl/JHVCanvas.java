@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import static org.lwjgl.opengl.GL.createCapabilities;
-
 import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
@@ -37,48 +35,13 @@ public final class JHVCanvas extends AWTGLCanvas {
     private int lastGlWidth = -1;
     private int lastGlHeight = -1;
 
-    public static JHVCanvas create() {
-        try {
-            return new JHVCanvas(createData());
-        } catch (Exception e) {
-            throw glVersionError(e.getMessage() == null ? "Unknown OpenGL error." : e.getMessage());
-        }
-    }
-
-    private static GLData createData() {
-        GLData data = new GLData();
-        data.samples = GLSAMPLES;
-        data.redSize = 8;
-        data.greenSize = 8;
-        data.blueSize = 8;
-        data.alphaSize = 8;
-        data.depthSize = 32;
-        data.majorVersion = 3;
-        data.minorVersion = 3;
-        data.profile = GLData.Profile.CORE;
-        return data;
-    }
-
-    private static AssertionError glVersionError(String err) {
-        Log.error(err);
-        Message.fatalErr("OpenGL fatal error. JHelioviewer is not able to run:\n" + err);
-        return new AssertionError(err);
-    }
-
-    private static void initGLInfo() {
-        glVersion = "OpenGL " + GL33.glGetString(GL33.GL_VERSION);
-        Log.info(glVersion);
-        if (!GL.getCapabilities().OpenGL33)
-            throw glVersionError("OpenGL 3.3 not supported.");
-
-        maxTextureSize = GL33.glGetInteger(GL33.GL_MAX_TEXTURE_SIZE);
-    }
-
     private JHVCanvas(GLData data) {
         super(data);
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
+                // Force a redraw after AWT resize so the GL pixel size is recomputed
+                // immediately and the aspect ratio does not lag behind the canvas size.
                 lastGlWidth = -1;
                 lastGlHeight = -1;
                 EventQueue.invokeLater(JHVCanvas.this::display);
@@ -86,10 +49,18 @@ public final class JHVCanvas extends AWTGLCanvas {
         });
     }
 
+    public static JHVCanvas create() {
+        try {
+            return new JHVCanvas(createData());
+        } catch (Exception e) {
+            throw glStartupError(e.getMessage() == null ? "Unknown OpenGL error." : e.getMessage());
+        }
+    }
+
     @Override
     public void initGL() {
         updatePixelScale();
-        createCapabilities();
+        GL.createCapabilities();
         ensureRendererInitialized();
     }
 
@@ -147,31 +118,6 @@ public final class JHVCanvas extends AWTGLCanvas {
         return fps;
     }
 
-    private void updatePixelScale() {
-        GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
-        if (graphicsConfiguration == null) {
-            pixelScale[0] = 1;
-            pixelScale[1] = 1;
-            return;
-        }
-
-        AffineTransform transform = graphicsConfiguration.getDefaultTransform();
-        pixelScale[0] = transform.getScaleX();
-        pixelScale[1] = transform.getScaleY();
-    }
-
-    private int glWidth() {
-        return (int) (getWidth() * pixelScale[0] + .5);
-    }
-
-    private int glHeight() {
-        return (int) (getHeight() * pixelScale[1] + .5);
-    }
-
-    private void frameRendered() {
-        fpsCount++;
-    }
-
     private void ensureRendererInitialized() {
         if (rendererInitialized)
             return;
@@ -199,6 +145,60 @@ public final class JHVCanvas extends AWTGLCanvas {
         } catch (Exception e) {
             throw new RuntimeException("Failed to dispose OpenGL renderer", e);
         }
+    }
+
+    private void updatePixelScale() {
+        GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
+        if (graphicsConfiguration == null) {
+            pixelScale[0] = 1;
+            pixelScale[1] = 1;
+            return;
+        }
+
+        AffineTransform transform = graphicsConfiguration.getDefaultTransform();
+        pixelScale[0] = transform.getScaleX();
+        pixelScale[1] = transform.getScaleY();
+    }
+
+    private int glWidth() {
+        return (int) (getWidth() * pixelScale[0] + .5);
+    }
+
+    private int glHeight() {
+        return (int) (getHeight() * pixelScale[1] + .5);
+    }
+
+    private void frameRendered() {
+        fpsCount++;
+    }
+
+    private static GLData createData() {
+        GLData data = new GLData();
+        data.samples = GLSAMPLES;
+        data.redSize = 8;
+        data.greenSize = 8;
+        data.blueSize = 8;
+        data.alphaSize = 8;
+        data.depthSize = 32;
+        data.majorVersion = 3;
+        data.minorVersion = 3;
+        data.profile = GLData.Profile.CORE;
+        return data;
+    }
+
+    private static void initGLInfo() {
+        glVersion = "OpenGL " + GL33.glGetString(GL33.GL_VERSION);
+        Log.info(glVersion);
+        if (!GL.getCapabilities().OpenGL33)
+            throw glStartupError("OpenGL 3.3 not supported.");
+
+        maxTextureSize = GL33.glGetInteger(GL33.GL_MAX_TEXTURE_SIZE);
+    }
+
+    private static AssertionError glStartupError(String err) {
+        Log.error(err);
+        Message.fatalErr("OpenGL fatal error. JHelioviewer is not able to run:\n" + err);
+        return new AssertionError(err);
     }
 
 }
