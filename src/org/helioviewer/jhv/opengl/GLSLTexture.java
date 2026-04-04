@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 public class GLSLTexture extends VAO1 {
@@ -17,7 +16,7 @@ public class GLSLTexture extends VAO1 {
         super(true, new VAA[]{new VAA(0, size0, false, stride, 0, 0), new VAA(1, size1, false, stride, 4 * size0, 0)});
     }
 
-    public void setCoord(GL3 gl, BufCoord buf) {
+    public void setCoord(BufCoord buf) {
         count = buf.getCount();
         if (count == 0)
             return;
@@ -27,13 +26,13 @@ public class GLSLTexture extends VAO1 {
         buf.clear();
     }
 
-    public void renderTexture(GL3 gl, int mode, float[] color, int first, int toDraw) {
+    public void renderTexture(int mode, float[] color, int first, int toDraw) {
         if (count == 0 || toDraw > count)
             return;
 
-        GLSLTextureShader.texture.use(gl);
-        GLSLTextureShader.texture.bindParams(gl, color);
-        GLSLTextureShader.texture.bindMVP(gl);
+        GLSLTextureShader.texture.use(null);
+        GLSLTextureShader.texture.bindParams(color);
+        GLSLTextureShader.texture.bindMVP();
 
         bind();
         GL33.glDrawArrays(mode, first, toDraw);
