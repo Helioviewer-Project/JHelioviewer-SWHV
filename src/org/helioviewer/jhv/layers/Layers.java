@@ -170,8 +170,8 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         layers.forEach(layer -> layer.renderFloat(camera, vp));
     }
 
-    public static void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
-        layers.forEach(layer -> layer.renderFullFloat(camera, vp, gl));
+    public static void renderFullFloat(Camera camera, Viewport vp) {
+        layers.forEach(layer -> layer.renderFullFloat(camera, vp));
     }
 
     public static void renderMiniview(Camera camera, Viewport miniview, GL3 gl) {

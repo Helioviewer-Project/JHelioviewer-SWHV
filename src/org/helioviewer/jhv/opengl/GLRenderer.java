@@ -159,7 +159,7 @@ final class GLRenderer {
     private static void renderFullFloatScene(Camera camera, GL3 gl) {
         Viewport vp = Display.fullViewport;
         GL33.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        Layers.renderFullFloat(camera, vp, gl);
+        Layers.renderFullFloat(camera, vp);
     }
 
     private static Region getCenteredHpcScaleBounds() {
