@@ -25,13 +25,13 @@ class VAO {
             vaoID = GL33.glGenVertexArrays();
 
             for (int i = 0; i < vbo.length; i++) {
-                vbo[i] = new GLBO(gl, GL33.GL_ARRAY_BUFFER, usage);
+                vbo[i] = new GLBO(GL33.GL_ARRAY_BUFFER, usage);
             }
 
             GL33.glBindVertexArray(vaoID);
             for (int i = 0; i < vaa.length; i++) {
-                vbo[i % vbo.length].bind(gl); //!
-                vaa[i].enable(gl);
+                vbo[i % vbo.length].bind(); //!
+                vaa[i].enable();
             }
         }
     }
@@ -43,13 +43,13 @@ class VAO {
             vaoID = -1;
 
             for (int i = 0; i < vbo.length; i++) {
-                vbo[i].delete(gl);
+                vbo[i].delete();
                 vbo[i] = null;
             }
         }
     }
 
-    protected void bind(GL3 gl) {
+    protected void bind() {
         GL33.glBindVertexArray(vaoID);
     }
 

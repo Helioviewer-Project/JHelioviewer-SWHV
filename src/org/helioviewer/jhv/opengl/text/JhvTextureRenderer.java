@@ -56,8 +56,8 @@ class JhvTextureRenderer {
         image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
         imageBuffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
 
-        tex = new GLTexture(gl, GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
-        tex.bind(gl);
+        tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
+        tex.bind();
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_BASE_LEVEL, 0);
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAX_LEVEL, 15);
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_LINEAR_MIPMAP_LINEAR);
@@ -122,7 +122,7 @@ class JhvTextureRenderer {
     }
 
     void bind(GL3 gl) {
-        tex.bind(gl);
+        tex.bind();
         if (dirtyRegion != null) {
             upload(gl, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
             dirtyRegion = null;
@@ -134,7 +134,7 @@ class JhvTextureRenderer {
      * valid to use this renderer after calling this method.
      */
     void dispose(GL3 gl) {
-        tex.delete(gl);
+        tex.delete();
         imageBuffer = null;
         image = null;
     }

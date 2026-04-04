@@ -7,8 +7,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 class GLBO {
@@ -17,21 +15,21 @@ class GLBO {
     private final int bufferID;
     private final int usage;
 
-    GLBO(GL3 gl, int _target, int _usage) {
+    GLBO(int _target, int _usage) {
         target = _target;
         bufferID = GL33.glGenBuffers();
         usage = _usage;
     }
 
-    void delete(GL3 gl) {
+    void delete() {
         GL33.glDeleteBuffers(bufferID);
     }
 
-    void bind(GL3 gl) {
+    void bind() {
         GL33.glBindBuffer(target, bufferID);
     }
 
-    void setBufferData(GL3 gl, int limit, int capacity, Buffer buffer) {
+    void setBufferData(int limit, int capacity, Buffer buffer) {
         GL33.glBindBuffer(target, bufferID);
         GL33.glBufferData(target, capacity, usage); // orphan, https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         switch (buffer) {

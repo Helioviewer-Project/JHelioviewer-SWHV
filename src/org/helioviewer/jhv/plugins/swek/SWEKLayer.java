@@ -104,13 +104,13 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             icon.paintIcon(null, graph, 0, 0);
             graph.dispose();
 
-            tex = new GLTexture(gl, GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
-            tex.bind(gl);
+            tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
+            tex.bind();
 
             GLTexture.copyBufferedImage(gl, bi);
             iconCacheId.put(key, tex);
         }
-        tex.bind(gl);
+        tex.bind();
     }
 
     private static void drawInterpolated(int mres, double r_start, double r_end, double t_start, double t_end, Quat q, byte[] color, BufVertex vexBuf) {
@@ -458,7 +458,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         lineEvent.dispose(gl);
         lineThick.dispose(gl);
         glslTexture.dispose(gl);
-        iconCacheId.values().forEach(el -> el.delete(gl));
+        iconCacheId.values().forEach(GLTexture::delete);
         iconCacheId.clear();
     }
 

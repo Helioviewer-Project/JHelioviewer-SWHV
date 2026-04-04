@@ -25,9 +25,9 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
 
         Buffer buffer;
         buffer = vexBuf.toVertexBuffer();
-        vbo[0].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        vbo[0].setBufferData(buffer.limit(), buffer.capacity(), buffer);
         buffer = vexBuf.toColorBuffer();
-        vbo[1].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        vbo[1].setBufferData(buffer.limit(), buffer.capacity(), buffer);
     }
 
     public void renderPoints(GL3 gl, double factor) {
@@ -38,7 +38,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         GLSLShapeShader.point.bindParams(gl, factor);
         GLSLShapeShader.point.bindMVP(gl);
 
-        bind(gl);
+        bind();
         GL33.glDrawArrays(GL33.GL_POINTS, 0, count);
     }
 
@@ -49,7 +49,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         GLSLShapeShader.shape.use(gl);
         GLSLShapeShader.shape.bindMVP(gl);
 
-        bind(gl);
+        bind();
         GL33.glDrawArrays(mode, 0, count);
     }
 
