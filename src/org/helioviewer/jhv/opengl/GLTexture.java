@@ -168,14 +168,6 @@ public class GLTexture {
     }
 
     public static void copyBuffer1D(IntBuffer source) {
-        if (!source.isDirect()) {
-            IntBuffer direct = BufferUtils.newIntBuffer(source.remaining());
-            int position = source.position();
-            direct.put(source);
-            direct.flip();
-            source.position(position);
-            source = direct;
-        }
         GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
         GL33.glTexImage1D(GL33.GL_TEXTURE_1D, 0, GL33.GL_RGBA, source.capacity(), 0, GL33.GL_BGRA, GL33.GL_UNSIGNED_INT_8_8_8_8_REV, source);
         GL33.glTexParameteri(GL33.GL_TEXTURE_1D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_NEAREST);
