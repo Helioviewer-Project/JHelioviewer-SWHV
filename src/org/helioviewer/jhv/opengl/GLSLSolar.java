@@ -2,13 +2,16 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
+import org.lwjgl.opengl.GL33;
+
 import com.jogamp.opengl.GL3;
 
 public class GLSLSolar extends VAO1 {
 
     public static final GLSLSolar quad = new GLSLSolar();
 
-    private static final FloatBuffer vertx = FloatBuffer.wrap(new float[]{-1, -1, 0, 1, 1, -1, 0, 1, -1, 1, 0, 1, 1, 1, 0, 1});
+    private static final FloatBuffer vertx = BufferUtils.newFloatBuffer(16).put(new float[]{-1, -1, 0, 1, 1, -1, 0, 1, -1, 1, 0, 1, 1, 1, 0, 1}).flip();
 
     GLSLSolar() {
         super(false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
@@ -16,7 +19,7 @@ public class GLSLSolar extends VAO1 {
 
     public void render(GL3 gl) {
         bind(gl);
-        gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
+        GL33.glDrawArrays(GL33.GL_TRIANGLE_STRIP, 0, 4);
     }
 
     @Override

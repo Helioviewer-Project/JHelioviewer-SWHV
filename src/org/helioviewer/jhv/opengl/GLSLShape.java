@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.Buffer;
 
 import com.jogamp.opengl.GL3;
+import org.lwjgl.opengl.GL33;
 
 public class GLSLShape extends VAO implements GLSLVertexReceiver {
 
@@ -38,7 +39,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         GLSLShapeShader.point.bindMVP(gl);
 
         bind(gl);
-        gl.glDrawArrays(GL3.GL_POINTS, 0, count);
+        GL33.glDrawArrays(GL33.GL_POINTS, 0, count);
     }
 
     public void renderShape(GL3 gl, int mode) {
@@ -49,7 +50,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         GLSLShapeShader.shape.bindMVP(gl);
 
         bind(gl);
-        gl.glDrawArrays(mode, 0, count);
+        GL33.glDrawArrays(mode, 0, count);
     }
 
 }
