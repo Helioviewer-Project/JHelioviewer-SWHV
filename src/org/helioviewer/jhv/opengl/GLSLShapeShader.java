@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 import org.helioviewer.jhv.camera.Transform;
@@ -19,28 +18,28 @@ class GLSLShapeShader extends GLSLShader {
         super(vertex, fragment);
     }
 
-    public static void init(GL3 gl) {
-        point._init(gl, false);
-        shape._init(gl, false);
+    public static void init() {
+        point._init(null, false);
+        shape._init(null, false);
     }
 
-    public static void dispose(GL3 gl) {
-        point._dispose(gl);
-        shape._dispose(gl);
+    public static void dispose() {
+        point._dispose(null);
+        shape._dispose(null);
     }
 
     @Override
-    protected void initUniforms(GL3 gl, int id) {
+    protected void initUniforms(com.jogamp.opengl.GL3 gl, int id) {
         refModelViewProjectionMatrix = GL33.glGetUniformLocation(id, "ModelViewProjectionMatrix");
         factorRef = GL33.glGetUniformLocation(id, "factor");
     }
 
-    void bindParams(GL3 gl, double _factor) {
+    void bindParams(double _factor) {
         factor[0] = (float) _factor;
         GL33.glUniform1fv(factorRef, factor);
     }
 
-    void bindMVP(GL3 gl) {
+    void bindMVP() {
         GL33.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
     }
 

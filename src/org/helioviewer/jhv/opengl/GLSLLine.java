@@ -40,9 +40,9 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         if (count == 0)
             return;
 
-        GLSLLineShader.line.use(gl);
-        GLSLLineShader.line.bindParams(gl, aspect, thickness);
-        GLSLLineShader.line.bindMVP(gl);
+        GLSLLineShader.line.use(null);
+        GLSLLineShader.line.bindParams(aspect, thickness);
+        GLSLLineShader.line.bindMVP();
 
         bind();
         GL33.glDrawArraysInstanced(GL33.GL_TRIANGLE_STRIP, 0, 4, count);

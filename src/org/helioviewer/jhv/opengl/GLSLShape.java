@@ -34,9 +34,9 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         if (count == 0)
             return;
 
-        GLSLShapeShader.point.use(gl);
-        GLSLShapeShader.point.bindParams(gl, factor);
-        GLSLShapeShader.point.bindMVP(gl);
+        GLSLShapeShader.point.use(null);
+        GLSLShapeShader.point.bindParams(factor);
+        GLSLShapeShader.point.bindMVP();
 
         bind();
         GL33.glDrawArrays(GL33.GL_POINTS, 0, count);
@@ -46,8 +46,8 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         if (count == 0)
             return;
 
-        GLSLShapeShader.shape.use(gl);
-        GLSLShapeShader.shape.bindMVP(gl);
+        GLSLShapeShader.shape.use(null);
+        GLSLShapeShader.shape.bindMVP();
 
         bind();
         GL33.glDrawArrays(mode, 0, count);

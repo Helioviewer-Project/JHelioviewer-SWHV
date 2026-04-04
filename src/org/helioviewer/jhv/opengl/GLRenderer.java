@@ -43,8 +43,8 @@ final class GLRenderer {
 
         GLSLSolar.quad.init(gl);
         GLSLSolarShader.init(gl);
-        GLSLLineShader.init(gl);
-        GLSLShapeShader.init(gl);
+        GLSLLineShader.init();
+        GLSLShapeShader.init();
         GLSLTextureShader.init();
 
         JHVFrame.getInteraction().initAnnotations(gl);
@@ -89,8 +89,8 @@ final class GLRenderer {
 
         GLSLSolar.quad.dispose(gl);
         GLSLSolarShader.dispose(gl);
-        GLSLLineShader.dispose(gl);
-        GLSLShapeShader.dispose(gl);
+        GLSLLineShader.dispose();
+        GLSLShapeShader.dispose();
         GLSLTextureShader.dispose();
 
         JHVGLException.checkErrors("GLRenderer.dispose()");
