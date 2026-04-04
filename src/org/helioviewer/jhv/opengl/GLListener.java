@@ -11,13 +11,10 @@ import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.Movie;
-//import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
 
-class GLListener implements GLEventListener {
+final class GLListener {
 
     private final JHVCanvas canvas;
 
@@ -25,9 +22,7 @@ class GLListener implements GLEventListener {
         canvas = _canvas;
     }
 
-    @Override
-    public void init(GLAutoDrawable drawable) {
-        GL3 gl = (GL3) drawable.getGL();
+    void init(GL3 gl) {
         GLInfo.get(gl);
         GLInfo.updatePixelScale(canvas.getGraphicsConfiguration());
 
@@ -60,9 +55,7 @@ class GLListener implements GLEventListener {
         JHVFrame.getInteraction().initAnnotations(gl);
     }
 
-    @Override
-    public void dispose(GLAutoDrawable drawable) {
-        GL3 gl = (GL3) drawable.getGL();
+    void dispose(GL3 gl) {
         Layers.dispose(gl);
         JHVFrame.getInteraction().disposeAnnotations(gl);
         GLText.dispose(gl);
@@ -76,15 +69,38 @@ class GLListener implements GLEventListener {
         JHVGLException.checkErrors(gl, "GLListener.dispose()");
     }
 
-    @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+    void reshape(int x, int y, int width, int height) {
         GLInfo.updatePixelScale(canvas.getGraphicsConfiguration());
         Display.setGLSize(x, y, (int) (canvas.getWidth() * GLInfo.pixelScale[0] + .5), (int) (canvas.getHeight() * GLInfo.pixelScale[1] + .5));
         Display.reshapeAll();
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null)
             miniview.reshapeViewport();
-        // MovieDisplay.render(1);
+    }
+
+    void display(GL3 gl) {
+        if (canvas.isWhiteBackground())
+            gl.glClearColor(1, 1, 1, 0);
+        else
+            gl.glClearColor(0, 0, 0, 0);
+
+        Layers.prerender(gl);
+
+        Camera camera = Display.getCamera();
+
+        if (Movie.isRecording())
+            ExportMovie.handleMovieExport(camera, gl);
+
+        if (Display.mode.isOrthographic()) {
+            renderScene(camera, gl);
+            renderMiniview(gl);
+        } else
+            renderSceneScale(camera, gl);
+        renderFullFloatScene(camera, gl);
+
+        canvas.frameRendered();
+        Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
+        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
     }
 
     static void renderScene(Camera camera, GL3 gl) {
@@ -144,7 +160,6 @@ class GLListener implements GLEventListener {
     private static void renderFullFloatScene(Camera camera, GL3 gl) {
         Viewport vp = Display.fullViewport;
         gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        // camera.projectionOrtho2D(vp.aspect); not needed currently
         Layers.renderFullFloat(camera, vp, gl);
     }
 
@@ -153,7 +168,6 @@ class GLListener implements GLEventListener {
         if (miniview != null && miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Display.getMiniCamera();
-            // miniCamera.timeChanged(Movie.getTime());
 
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
@@ -166,33 +180,4 @@ class GLListener implements GLEventListener {
         }
     }
 
-    @Override
-    public void display(GLAutoDrawable drawable) {
-        GL3 gl = (GL3) drawable.getGL();
-        // gl.glFinish(); - hard stalls the GPU pipeline
-
-        if (canvas.isWhiteBackground())
-            gl.glClearColor(1, 1, 1, 0);
-        else
-            gl.glClearColor(0, 0, 0, 0);
-
-        Layers.prerender(gl);
-
-        Camera camera = Display.getCamera();
-
-        if (Movie.isRecording())
-            ExportMovie.handleMovieExport(camera, gl);
-
-        if (Display.mode.isOrthographic()) {
-            renderScene(camera, gl);
-            renderMiniview(gl);
-        } else
-            renderSceneScale(camera, gl);
-        renderFullFloatScene(camera, gl);
-
-        canvas.frameRendered();
-        Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
-        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
-        // JHVGLException.checkErrors(gl, "GLListener.display()");
-    }
 }
