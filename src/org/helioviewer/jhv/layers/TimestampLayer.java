@@ -55,7 +55,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp, GL3 gl) {
+    public void renderFloat(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
 
