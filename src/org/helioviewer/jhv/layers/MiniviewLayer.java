@@ -79,9 +79,9 @@ public final class MiniviewLayer extends AbstractLayer {
     @Override
     public void init(GL3 gl) {
         circle.init();
-        GLHelper.initCircleFront(gl, circle, 0, 0, 1, 18, colorCircle);
+        GLHelper.initCircleFront(circle, 0, 0, 1, 18, colorCircle);
         rectangle.init();
-        GLHelper.initRectangleFront(gl, rectangle, -30, -30, 60, 60, colorRectangle);
+        GLHelper.initRectangleFront(rectangle, -30, -30, 60, 60, colorRectangle);
     }
 
     @Override

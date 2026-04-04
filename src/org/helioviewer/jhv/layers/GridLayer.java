@@ -127,7 +127,7 @@ public final class GridLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
-            GridMath.initGrid(gl, gridLine, lonStep, latStep);
+            GridMath.initGrid(gridLine, lonStep, latStep);
             gridNeedsInit = false;
         }
 
@@ -231,23 +231,23 @@ public final class GridLayer extends AbstractLayer {
     @Override
     public void init(GL3 gl) {
         gridLine.init();
-        GridMath.initGrid(gl, gridLine, lonStep, latStep);
+        GridMath.initGrid(gridLine, lonStep, latStep);
         gridNeedsInit = false;
 
         axesLine.init();
-        GridMath.initAxes(gl, axesLine);
+        GridMath.initAxes(axesLine);
 
         earthCircleLine.init();
-        GridMath.initEarthCircles(gl, earthCircleLine);
+        GridMath.initEarthCircles(earthCircleLine);
         earthPoint.init();
-        GridMath.initEarthPoint(gl, earthPoint);
+        GridMath.initEarthPoint(earthPoint);
 
         radialCircleLine.init();
         radialThickLine.init();
-        GridMath.initRadialCircles(gl, radialCircleLine, radialThickLine, RADIAL_UNIT, RADIAL_STEP);
+        GridMath.initRadialCircles(radialCircleLine, radialThickLine, RADIAL_UNIT, RADIAL_STEP);
         radialCircleLineFar.init();
         radialThickLineFar.init();
-        GridMath.initRadialCircles(gl, radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
+        GridMath.initRadialCircles(radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
         flatGrid.init();
     }

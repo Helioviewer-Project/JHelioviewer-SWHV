@@ -5,8 +5,6 @@ import java.awt.Point;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.Quat;
 
-import com.jogamp.opengl.GL3;
-
 public class GLHelper {
 
     public static void emitCircle(double radius, int subdivisions, int startStep, int endStep, Quat rotation, byte[] evenColor, byte[] oddColor, BufVertex vexBuf) {
@@ -38,7 +36,7 @@ public class GLHelper {
         }
     }
 
-    public static void initCircleFront(GL3 gl, GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
+    public static void initCircleFront(GLSLShape circle, double x, double y, double r, int segments, byte[] color) {
         int no_points = 2 * (segments + 1);
         BufVertex vexBuf = new BufVertex(no_points * GLSLShape.stride);
         for (int i = 0; i <= segments; ++i) {
@@ -49,7 +47,7 @@ public class GLHelper {
         circle.setVertex(vexBuf);
     }
 
-    public static void initRectangleFront(GL3 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
+    public static void initRectangleFront(GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
         BufVertex vexBuf = new BufVertex(4 * GLSLShape.stride);
         vexBuf.putQuad2DStrip((float) x0, (float) y0, (float) (x0 + w), (float) (y0 + h), color);
         rectangle.setVertex(vexBuf);
