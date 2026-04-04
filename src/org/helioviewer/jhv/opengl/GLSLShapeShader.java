@@ -1,12 +1,9 @@
 package org.helioviewer.jhv.opengl;
 
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniform1fv;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import com.jogamp.opengl.GL3;
+import org.lwjgl.opengl.GL33;
 
 import org.helioviewer.jhv.camera.Transform;
-
-import com.jogamp.opengl.GL3;
 
 class GLSLShapeShader extends GLSLShader {
 
@@ -34,17 +31,17 @@ class GLSLShapeShader extends GLSLShader {
 
     @Override
     protected void initUniforms(GL3 gl, int id) {
-        refModelViewProjectionMatrix = glGetUniformLocation(id, "ModelViewProjectionMatrix");
-        factorRef = glGetUniformLocation(id, "factor");
+        refModelViewProjectionMatrix = GL33.glGetUniformLocation(id, "ModelViewProjectionMatrix");
+        factorRef = GL33.glGetUniformLocation(id, "factor");
     }
 
     void bindParams(GL3 gl, double _factor) {
         factor[0] = (float) _factor;
-        glUniform1fv(factorRef, factor);
+        GL33.glUniform1fv(factorRef, factor);
     }
 
     void bindMVP(GL3 gl) {
-        glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
+        GL33.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
     }
 
 }
