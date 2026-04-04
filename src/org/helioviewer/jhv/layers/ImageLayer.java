@@ -208,7 +208,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         shader.use(gl);
 
         MetaData meta0 = imageData.getMetaData();
-        glImage.applyFilters(gl, meta0, imageData);
+        glImage.applyFilters(meta0, imageData);
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
@@ -256,10 +256,10 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             deltaT1 = (float) ((cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
         }
 
-        GLSLSolarShader.bindWCS(gl,
+        GLSLSolarShader.bindWCS(
                 cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
                 cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
-        shader.bindPV(gl, wcs0.pv2, wcs1.pv2);
+        shader.bindPV(wcs0.pv2, wcs1.pv2);
 
         Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();
         Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
@@ -275,9 +275,9 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             latiGrid1[1] = (float) gridType.toLatitude(metaViewpoint1);
             latiGrid1[2] = (float) metaViewpoint1.lat;
         }
-        shader.bindLatiGrid(gl, latiGrid0, latiGrid1);
+        shader.bindLatiGrid(latiGrid0, latiGrid1);
 
-        GLSLSolarShader.bindProjection(gl,
+        GLSLSolarShader.bindProjection(
                 wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance, sourceView0, displayMap0,
                 wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance, sourceView1, displayMap1);
 

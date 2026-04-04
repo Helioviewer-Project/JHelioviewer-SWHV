@@ -101,7 +101,7 @@ final class GLRenderer {
         for (Viewport vp : Display.getViewports()) {
             GL33.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp.aspect);
-            GLSLSolarShader.bindScreen(gl, vp);
+            GLSLSolarShader.bindScreen(vp);
 
             GLSLSolarShader.sphere.use(gl);
             GLSLSolar.quad.render(gl);
@@ -120,7 +120,7 @@ final class GLRenderer {
 
             GL33.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
-            GLSLSolarShader.bindScreen(gl, vp);
+            GLSLSolarShader.bindScreen(vp);
 
             GL33.glDisable(GL33.GL_DEPTH_TEST);
             miniview.renderBackground(gl);
@@ -148,7 +148,7 @@ final class GLRenderer {
             }
             GL33.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
-            GLSLSolarShader.bindScreen(gl, vp);
+            GLSLSolarShader.bindScreen(vp);
 
             Layers.renderScale(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
