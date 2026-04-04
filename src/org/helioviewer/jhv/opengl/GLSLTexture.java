@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.Buffer;
 
 import com.jogamp.opengl.GL3;
+import org.lwjgl.opengl.GL33;
 
 public class GLSLTexture extends VAO1 {
 
@@ -35,7 +36,7 @@ public class GLSLTexture extends VAO1 {
         GLSLTextureShader.texture.bindMVP(gl);
 
         bind(gl);
-        gl.glDrawArrays(mode, first, toDraw);
+        GL33.glDrawArrays(mode, first, toDraw);
     }
 
 }

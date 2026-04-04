@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.Buffer;
 
 import com.jogamp.opengl.GL3;
+import org.lwjgl.opengl.GL33;
 
 public class GLSLLine extends VAO implements GLSLVertexReceiver {
 
@@ -44,7 +45,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         GLSLLineShader.line.bindMVP(gl);
 
         bind(gl);
-        gl.glDrawArraysInstanced(GL3.GL_TRIANGLE_STRIP, 0, 4, count);
+        GL33.glDrawArraysInstanced(GL33.GL_TRIANGLE_STRIP, 0, 4, count);
     }
 
 }
