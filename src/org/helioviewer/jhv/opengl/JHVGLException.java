@@ -4,6 +4,7 @@ import org.helioviewer.jhv.Log;
 
 import com.jogamp.opengl.GL3;
 
+@SuppressWarnings("serial")
 final class JHVGLException extends RuntimeException {
 
     JHVGLException(String message) {

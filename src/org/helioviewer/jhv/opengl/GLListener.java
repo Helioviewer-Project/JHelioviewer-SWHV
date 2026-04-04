@@ -95,7 +95,7 @@ public class GLListener implements GLEventListener {
         // MovieDisplay.render(1);
     }
 
-    public static void renderScene(Camera camera, GL3 gl) {
+    static void renderScene(Camera camera, GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
             gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -111,7 +111,7 @@ public class GLListener implements GLEventListener {
         }
     }
 
-    public static void renderSceneScale(Camera camera, GL3 gl) {
+    static void renderSceneScale(Camera camera, GL3 gl) {
         if (Display.mode.isPolar()) {
             GridScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
         } else if (Display.mode.isLogPolar()) {
