@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import javax.annotation.Nonnull;
-
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.threads.Tasks;

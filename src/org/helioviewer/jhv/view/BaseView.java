@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.view;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;

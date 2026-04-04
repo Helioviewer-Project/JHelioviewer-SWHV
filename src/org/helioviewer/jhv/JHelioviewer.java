@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
-import javax.annotation.Nonnull;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
