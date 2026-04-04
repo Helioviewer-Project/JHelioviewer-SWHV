@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.imagedata.nio;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.IOException;
 import java.nio.Buffer;
@@ -93,9 +94,39 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
         throw new IncompatibleClassChangeError("Not a " + backendKind + " byte backed image");
     }
 
+    static ByteBuffer getByteBuffer(BufferedImage image, BackendKind backendKind) {
+        return getByteBuffer(image.getRaster().getDataBuffer(), backendKind);
+    }
+
+    static ShortBuffer getShortBuffer(DataBuffer buffer, BackendKind backendKind) {
+        if (buffer instanceof UShortDataBuffer shortDataBuffer && shortDataBuffer.isKind(backendKind))
+            return (ShortBuffer) shortDataBuffer.getBuffer();
+        throw new IncompatibleClassChangeError("Not a " + backendKind + " short backed image");
+    }
+
+    static ShortBuffer getShortBuffer(BufferedImage image, BackendKind backendKind) {
+        return getShortBuffer(image.getRaster().getDataBuffer(), backendKind);
+    }
+
+    static IntBuffer getIntBuffer(DataBuffer buffer, BackendKind backendKind) {
+        if (buffer instanceof IntDataBuffer intDataBuffer && intDataBuffer.isKind(backendKind))
+            return (IntBuffer) intDataBuffer.getBuffer();
+        throw new IncompatibleClassChangeError("Not a " + backendKind + " int backed image");
+    }
+
+    static IntBuffer getIntBuffer(BufferedImage image, BackendKind backendKind) {
+        return getIntBuffer(image.getRaster().getDataBuffer(), backendKind);
+    }
+
     static void free(DataBuffer buffer, BackendKind backendKind) {
         if (buffer instanceof AbstractOwnedDataBuffer ownedDataBuffer && ownedDataBuffer.isKind(backendKind))
             ownedDataBuffer.free();
+    }
+
+    static void free(BufferedImage image, BackendKind backendKind) {
+        if (image == null)
+            return;
+        free(image.getRaster().getDataBuffer(), backendKind);
     }
 
     private abstract static class ByteDataBuffer extends AbstractOwnedDataBuffer {
