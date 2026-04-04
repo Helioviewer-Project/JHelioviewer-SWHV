@@ -10,6 +10,8 @@ import java.awt.event.ComponentEvent;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
+
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
@@ -67,14 +69,12 @@ public final class JHVCanvas extends AWTGLCanvas {
     }
 
     private static void initGLInfo(GL3 gl) {
-        glVersion = "OpenGL " + gl.glGetString(GL3.GL_VERSION);
+        glVersion = "OpenGL " + GL33.glGetString(GL33.GL_VERSION);
         Log.info(glVersion);
         if (!gl.isExtensionAvailable("GL_VERSION_3_3"))
             throw glVersionError("OpenGL 3.3 not supported.");
 
-        int[] out = {0};
-        gl.glGetIntegerv(GL3.GL_MAX_TEXTURE_SIZE, out, 0);
-        maxTextureSize = out[0];
+        maxTextureSize = GL33.glGetInteger(GL33.GL_MAX_TEXTURE_SIZE);
     }
 
     private JHVCanvas(GLData data) {
