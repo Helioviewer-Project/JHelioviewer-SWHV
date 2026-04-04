@@ -104,7 +104,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, null, color, Colors.White, vexBuf);
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS / 2, Quat.X90, color, Colors.White, vexBuf);
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, SUBDIVISIONS / 4, 3 * SUBDIVISIONS / 4, Quat.Y90, color, Colors.White, vexBuf);
-        hemiLine.setVertex(gl, vexBuf);
+        hemiLine.setVertex(vexBuf);
     }
 
     void init(GL3 gl) {
@@ -131,7 +131,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         Transform.pushView();
         Transform.rotateViewInverse(obsPosition.toQuat());
 
-        hemiLine.renderLine(gl, vp.aspect, LINEWIDTH_FOV);
+        hemiLine.renderLine(vp.aspect, LINEWIDTH_FOV);
         double[] rot;
         if (isSOLO && null != (rot = Spice.getRotationEuler("SOLO_SRF", "SOLO_IAU_SUN_2009", time))) {
             // Default SOLO pointing is normal to orbit

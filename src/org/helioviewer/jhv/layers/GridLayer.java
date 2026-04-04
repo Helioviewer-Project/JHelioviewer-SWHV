@@ -132,7 +132,7 @@ public final class GridLayer extends AbstractLayer {
         }
 
         if (showAxis)
-            axesLine.renderLine(gl, vp.aspect, LINEWIDTH_AXES);
+            axesLine.renderLine(vp.aspect, LINEWIDTH_AXES);
 
         Position viewpoint = camera.getViewpoint();
         float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
@@ -144,7 +144,7 @@ public final class GridLayer extends AbstractLayer {
         Transform.pushView();
         Transform.rotateViewInverse(Display.gridType.toCarrington(viewpoint));
         {
-            gridLine.renderLine(gl, vp.aspect, LINEWIDTH);
+            gridLine.renderLine(vp.aspect, LINEWIDTH);
             if (showLabels) {
                 drawGridText(gl, (int) pixelsPerSolarRadius, ztext);
             }
@@ -156,13 +156,13 @@ public final class GridLayer extends AbstractLayer {
             Transform.rotateViewInverse(viewpoint.toQuat());
             {
                 if (viewpoint.distance > 100 * Sun.MeanEarthDistance) {
-                    radialCircleLineFar.renderLine(gl, vp.aspect, LINEWIDTH);
-                    radialThickLineFar.renderLine(gl, vp.aspect, LINEWIDTH_THICK);
+                    radialCircleLineFar.renderLine(vp.aspect, LINEWIDTH);
+                    radialThickLineFar.renderLine(vp.aspect, LINEWIDTH_THICK);
                     if (showLabels)
                         drawRadialGridText(gl, radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, ztext, R_LABEL_POS_FAR);
                 } else {
-                    radialCircleLine.renderLine(gl, vp.aspect, LINEWIDTH);
-                    radialThickLine.renderLine(gl, vp.aspect, LINEWIDTH_THICK);
+                    radialCircleLine.renderLine(vp.aspect, LINEWIDTH);
+                    radialThickLine.renderLine(vp.aspect, LINEWIDTH_THICK);
                     if (showLabels)
                         drawRadialGridText(gl, radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, ztext, R_LABEL_POS);
                 }
@@ -182,8 +182,8 @@ public final class GridLayer extends AbstractLayer {
         Transform.pushView();
         Transform.rotateViewInverse(p.toQuat());
 
-        earthCircleLine.renderLine(gl, vp.aspect, LINEWIDTH_EARTH);
-        earthPoint.renderPoints(gl, factor);
+        earthCircleLine.renderLine(vp.aspect, LINEWIDTH_EARTH);
+        earthPoint.renderPoints(factor);
 
         Transform.popView();
     }

@@ -57,8 +57,8 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     public void renderBackground(GL3 gl) {
-        rectangle.renderShape(gl, GL33.GL_TRIANGLE_STRIP);
-        circle.renderShape(gl, GL33.GL_TRIANGLE_STRIP);
+        rectangle.renderShape(GL33.GL_TRIANGLE_STRIP);
+        circle.renderShape(GL33.GL_TRIANGLE_STRIP);
     }
 
     @Override

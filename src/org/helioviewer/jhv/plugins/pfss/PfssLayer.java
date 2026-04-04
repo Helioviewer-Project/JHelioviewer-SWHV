@@ -139,12 +139,12 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
             lastRadius = radius;
 
             PfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
-            glslLine.setVertex(gl, lineBuf);
+            glslLine.setVertex(lineBuf);
 
             pfssTime = data.dateObs();
             JHVFrame.getLayers().fireTimeUpdated(this);
         }
-        glslLine.renderLine(gl, vp.aspect, LINEWIDTH);
+        glslLine.renderLine(vp.aspect, LINEWIDTH);
     }
 
 }

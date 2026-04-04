@@ -320,11 +320,11 @@ public class ViewpointLayer extends AbstractLayer {
             planetBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], SIZE_PLANET, color);
         }
 
-        orbits.setVertex(gl, orbitBuf);
-        orbits.renderLine(gl, vp.aspect, LINEWIDTH_ORBIT);
+        orbits.setVertex(orbitBuf);
+        orbits.renderLine(vp.aspect, LINEWIDTH_ORBIT);
 
-        planets.setVertex(gl, planetBuf);
-        planets.renderPoints(gl, pointFactor);
+        planets.setVertex(planetBuf);
+        planets.renderPoints(pointFactor);
     }
 
     private void spiralPutVertex(double rad, double lon, double lat, byte[] color) {
@@ -366,8 +366,8 @@ public class ViewpointLayer extends AbstractLayer {
             spiralBuf.repeatVertex(Colors.Null);
         }
 
-        spiral.setVertex(gl, spiralBuf);
-        spiral.renderLine(gl, vp.aspect, LINEWIDTH_SPIRAL);
+        spiral.setVertex(spiralBuf);
+        spiral.renderLine(vp.aspect, LINEWIDTH_SPIRAL);
     }
 
 }

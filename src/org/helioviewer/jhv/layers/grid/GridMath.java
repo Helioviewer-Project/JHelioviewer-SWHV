@@ -49,13 +49,13 @@ public class GridMath {
         vexBuf.putVertex(0, AXIS_STOP, 0, 1, axisNorthColor);
         vexBuf.repeatVertex(Colors.Null);
 
-        axesLine.setVertex(gl, vexBuf);
+        axesLine.setVertex(vexBuf);
     }
 
     public static void initEarthPoint(GL3 gl, GLSLShape earthPoint) {
         BufVertex vexBuf = new BufVertex(GLSLShape.stride);
         vexBuf.putVertex(0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize, earthLineColor);
-        earthPoint.setVertex(gl, vexBuf);
+        earthPoint.setVertex(vexBuf);
     }
 
     public static void initEarthCircles(GL3 gl, GLSLLine earthCircleLine) {
@@ -63,7 +63,7 @@ public class GridMath {
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
         GLHelper.emitCircle(EARTH_CIRCLE_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, Quat.X90, earthLineColor, earthLineColor, vexBuf);
         GLHelper.emitCircle(EARTH_CIRCLE_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, Quat.Y90, earthLineColor, earthLineColor, vexBuf);
-        earthCircleLine.setVertex(gl, vexBuf);
+        earthCircleLine.setVertex(vexBuf);
     }
 
     public static void initRadialCircles(GL3 gl, GLSLLine radialCircleLine, GLSLLine radialThickLine, double unit, double step) {
@@ -110,8 +110,8 @@ public class GridMath {
             }
         }
 
-        radialCircleLine.setVertex(gl, circleBuf);
-        radialThickLine.setVertex(gl, thickBuf);
+        radialCircleLine.setVertex(circleBuf);
+        radialThickLine.setVertex(thickBuf);
     }
 
     public static void initGrid(GL3 gl, GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {
@@ -163,7 +163,7 @@ public class GridMath {
             }
         }
 
-        gridLine.setVertex(gl, vexBuf);
+        gridLine.setVertex(vexBuf);
     }
 
 }

@@ -46,13 +46,13 @@ public class GLHelper {
             vexBuf.putVertex((float) (x + Math.sin(t) * r), (float) (y + Math.cos(t) * r), 0, 1, color);
             vexBuf.putVertex((float) x, (float) y, 0, 1, color);
         }
-        circle.setVertex(gl, vexBuf);
+        circle.setVertex(vexBuf);
     }
 
     public static void initRectangleFront(GL3 gl, GLSLShape rectangle, double x0, double y0, double w, double h, byte[] color) {
         BufVertex vexBuf = new BufVertex(4 * GLSLShape.stride);
         vexBuf.putQuad2DStrip((float) x0, (float) y0, (float) (x0 + w), (float) (y0 + h), color);
-        rectangle.setVertex(gl, vexBuf);
+        rectangle.setVertex(vexBuf);
     }
 
     public static Point GL2AWTPoint(int x, int y) {

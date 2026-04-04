@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 public class GLSLShape extends VAO implements GLSLVertexReceiver {
@@ -18,7 +17,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
     }
 
     @Override
-    public void setVertexRepeatable(GL3 gl, BufVertex vexBuf) {
+    public void setVertexRepeatable(BufVertex vexBuf) {
         count = vexBuf.getCount();
         if (count == 0)
             return;
@@ -30,7 +29,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         vbo[1].setBufferData(buffer.limit(), buffer.capacity(), buffer);
     }
 
-    public void renderPoints(GL3 gl, double factor) {
+    public void renderPoints(double factor) {
         if (count == 0)
             return;
 
@@ -42,7 +41,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         GL33.glDrawArrays(GL33.GL_POINTS, 0, count);
     }
 
-    public void renderShape(GL3 gl, int mode) {
+    public void renderShape(int mode) {
         if (count == 0)
             return;
 

@@ -65,13 +65,13 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
             return;
 
         if (vexBuf != uploadedBuf) {
-            points.setVertexRepeatable(gl, vexBuf);
+            points.setVertexRepeatable(vexBuf);
             uploadedBuf = vexBuf;
         }
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
-        points.renderPoints(gl, CameraHelper.getPixelFactor(camera, vp));
+        points.renderPoints(CameraHelper.getPixelFactor(camera, vp));
         Transform.popView();
     }
 
