@@ -24,7 +24,7 @@ public class GLGrab {
 
     public void dispose(GL3 gl) {
         if (capture != null) {
-            capture.dispose(gl);
+            capture.dispose();
             capture = null;
         }
     }
@@ -42,13 +42,13 @@ public class GLGrab {
             Display.setGLSize(0, 0, w, h);
             Display.reshapeAll();
 
-            capture.bindForRender(gl);
+            capture.bindForRender();
             if (Display.mode.isOrthographic()) {
                 GLRenderer.renderScene(camera);
             } else {
-                GLRenderer.renderSceneScale(camera, gl);
+                GLRenderer.renderSceneScale(camera);
             }
-            capture.readPixels(gl, buffer);
+            capture.readPixels(buffer);
         } finally {
             Display.setGLSize(_x, _y, _w, _h);
             Display.reshapeAll();

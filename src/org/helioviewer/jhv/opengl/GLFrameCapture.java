@@ -101,11 +101,11 @@ final class GLFrameCapture {
         samples = frameSamples;
     }
 
-    void bindForRender(GL3 gl) {
+    void bindForRender() {
         bindFramebuffer(GL33.GL_FRAMEBUFFER, drawFramebuffer);
     }
 
-    void readPixels(GL3 gl, ByteBuffer buffer) {
+    void readPixels(ByteBuffer buffer) {
         if (samples > 0) {
             bindFramebuffer(GL33.GL_READ_FRAMEBUFFER, drawFramebuffer);
             bindFramebuffer(GL33.GL_DRAW_FRAMEBUFFER, resolveFramebuffer);
@@ -120,7 +120,7 @@ final class GLFrameCapture {
         bindFramebuffer(GL33.GL_FRAMEBUFFER, 0);
     }
 
-    void dispose(GL3 gl) {
+    void dispose() {
         deleteRenderbuffer(drawDepthRenderbuffer);
         deleteRenderbuffer(drawColorRenderbuffer);
         if (drawFramebuffer != resolveFramebuffer)
