@@ -1,5 +1,9 @@
 package org.helioviewer.jhv.opengl;
 
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glUniform1fv;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+
 import org.helioviewer.jhv.camera.Transform;
 
 import com.jogamp.opengl.GL3;
@@ -29,20 +33,20 @@ class GLSLLineShader extends GLSLShader {
 
     @Override
     protected void initUniforms(GL3 gl, int id) {
-        refModelViewProjectionMatrix = gl.glGetUniformLocation(id, "ModelViewProjectionMatrix");
-        iaspectRef = gl.glGetUniformLocation(id, "iaspect");
-        thicknessRef = gl.glGetUniformLocation(id, "thickness");
+        refModelViewProjectionMatrix = glGetUniformLocation(id, "ModelViewProjectionMatrix");
+        iaspectRef = glGetUniformLocation(id, "iaspect");
+        thicknessRef = glGetUniformLocation(id, "thickness");
     }
 
     void bindParams(GL3 gl, double aspect, double _thickness) {
         iaspect[0] = (float) (1 / aspect);
-        gl.glUniform1fv(iaspectRef, 1, iaspect, 0);
+        glUniform1fv(iaspectRef, iaspect);
         thickness[0] = (float) (0.5 * _thickness);
-        gl.glUniform1fv(thicknessRef, 1, thickness, 0);
+        glUniform1fv(thicknessRef, thickness);
     }
 
     void bindMVP(GL3 gl) {
-        gl.glUniformMatrix4fv(refModelViewProjectionMatrix, 1, false, Transform.get());
+        glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
     }
 
 }
