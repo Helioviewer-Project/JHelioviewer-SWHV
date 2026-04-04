@@ -145,7 +145,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         renderer.setSurfacePut();
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, gl, obsPosition.distance, pixFactor, color, renderer));
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, obsPosition.distance, pixFactor, color, renderer));
 
         renderer.setDirectPut();
         renderer.end3DRendering();

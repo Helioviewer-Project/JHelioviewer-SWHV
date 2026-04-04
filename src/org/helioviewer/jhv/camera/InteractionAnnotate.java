@@ -49,7 +49,7 @@ class InteractionAnnotate implements Interaction.Type {
         }
     }
 
-    void draw(Viewport vp, GL3 gl) {
+    void draw(Viewport vp) {
         if (newAnnotateable == null && anns.isEmpty())
             return;
 

@@ -107,7 +107,7 @@ final class GLRenderer {
             GLSLSolar.quad.render();
 
             Layers.render(camera, vp, gl);
-            JHVFrame.getInteraction().drawAnnotations(vp, gl);
+            JHVFrame.getInteraction().drawAnnotations(vp);
             Layers.renderFloat(camera, vp, gl);
         }
     }
@@ -151,7 +151,7 @@ final class GLRenderer {
             GLSLSolarShader.bindScreen(vp);
 
             Layers.renderScale(camera, vp, gl);
-            JHVFrame.getInteraction().drawAnnotations(vp, gl);
+            JHVFrame.getInteraction().drawAnnotations(vp);
             Layers.renderFloat(camera, vp, gl);
         }
     }
