@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 import org.helioviewer.jhv.Log;
@@ -30,24 +29,24 @@ abstract class GLSLShader {
         fragment = _fragment;
     }
 
-    protected final void _init(GL3 gl, boolean common) {
+    protected final void _init(boolean common) {
         try {
             String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
-            vertexID = attachShader(gl, ShaderType.vertex, vertexText);
+            vertexID = attachShader(ShaderType.vertex, vertexText);
 
             String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/glsl/solarCommon.frag")) : "";
             String fragmentText = fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment));
-            fragmentID = attachShader(gl, ShaderType.fragment, fragmentText);
+            fragmentID = attachShader(ShaderType.fragment, fragmentText);
 
-            progID = initializeProgram(gl, true);
+            progID = initializeProgram(true);
             use();
-            initUniforms(gl, progID);
+            initUniforms(progID);
         } catch (Exception e) {
             throw new JHVGLException("Cannot load shader", e);
         }
     }
 
-    protected final void _dispose(GL3 gl) {
+    protected final void _dispose() {
         if (progID != 0) {
             GL33.glUseProgram(0);
         }
@@ -69,9 +68,9 @@ abstract class GLSLShader {
         GL33.glUseProgram(progID);
     }
 
-    protected abstract void initUniforms(GL3 gl, int id);
+    protected abstract void initUniforms(int id);
 
-    protected static void setTextureUnit(GL3 gl, int id, String texname, GLTexture.Unit unit) {
+    protected static void setTextureUnit(int id, String texname, GLTexture.Unit unit) {
         int loc = GL33.glGetUniformLocation(id, texname);
         if (loc != -1)
             GL33.glUniform1i(loc, unit.ordinal());
@@ -79,7 +78,7 @@ abstract class GLSLShader {
             Log.error("Invalid texture " + texname);
     }
 
-    private static int attachShader(GL3 gl, ShaderType type, String text) {
+    private static int attachShader(ShaderType type, String text) {
         int id = GL33.glCreateShader(type.glType);
         GL33.glShaderSource(id, text);
         GL33.glCompileShader(id);
@@ -98,7 +97,7 @@ abstract class GLSLShader {
         return id;
     }
 
-    private int initializeProgram(GL3 gl, boolean cleanUp) {
+    private int initializeProgram(boolean cleanUp) {
         int id = GL33.glCreateProgram();
         GL33.glAttachShader(id, vertexID);
         GL33.glAttachShader(id, fragmentID);

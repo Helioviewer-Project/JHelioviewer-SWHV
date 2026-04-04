@@ -20,15 +20,15 @@ class GLSLLineShader extends GLSLShader {
     }
 
     public static void init() {
-        line._init(null, false);
+        line._init(false);
     }
 
     public static void dispose() {
-        line._dispose(null);
+        line._dispose();
     }
 
     @Override
-    protected void initUniforms(com.jogamp.opengl.GL3 gl, int id) {
+    protected void initUniforms(int id) {
         refModelViewProjectionMatrix = GL33.glGetUniformLocation(id, "ModelViewProjectionMatrix");
         iaspectRef = GL33.glGetUniformLocation(id, "iaspect");
         thicknessRef = GL33.glGetUniformLocation(id, "thickness");
