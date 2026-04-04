@@ -18,7 +18,7 @@ public class GLSLSolar extends VAO1 {
         super(false, new VAA[]{new VAA(0, 4, false, 0, 0, 0)});
     }
 
-    public void render(GL3 gl) {
+    public void render() {
         bind();
         GL33.glDrawArrays(GL33.GL_TRIANGLE_STRIP, 0, 4);
     }

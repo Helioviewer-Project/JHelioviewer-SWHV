@@ -281,7 +281,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
                 wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance, sourceView0, displayMap0,
                 wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance, sourceView1, displayMap1);
 
-        GLSLSolar.quad.render(gl);
+        GLSLSolar.quad.render();
     }
 
     private static double latiLongitude(GridType gridType, Position cameraViewpoint, Position metaViewpoint) {

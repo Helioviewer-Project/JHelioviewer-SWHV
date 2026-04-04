@@ -51,7 +51,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 4 + 4);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
-    public static void init(GL3 gl) {
+    public static void init() {
         wcsBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
         projectionBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
         screenBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
@@ -95,7 +95,7 @@ public class GLSLSolarShader extends GLSLShader {
         }
     }
 
-    public static void dispose(GL3 gl) {
+    public static void dispose() {
         sphere._dispose();
         ortho._dispose();
         hpc._dispose();

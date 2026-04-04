@@ -42,7 +42,7 @@ final class GLRenderer {
         GL33.glEnable(GL33.GL_VERTEX_PROGRAM_POINT_SIZE);
 
         GLSLSolar.quad.init(gl);
-        GLSLSolarShader.init(gl);
+        GLSLSolarShader.init();
         GLSLLineShader.init();
         GLSLShapeShader.init();
         GLSLTextureShader.init();
@@ -88,7 +88,7 @@ final class GLRenderer {
         GLText.dispose();
 
         GLSLSolar.quad.dispose(gl);
-        GLSLSolarShader.dispose(gl);
+        GLSLSolarShader.dispose();
         GLSLLineShader.dispose();
         GLSLShapeShader.dispose();
         GLSLTextureShader.dispose();
@@ -104,7 +104,7 @@ final class GLRenderer {
             GLSLSolarShader.bindScreen(vp);
 
             GLSLSolarShader.sphere.use();
-            GLSLSolar.quad.render(gl);
+            GLSLSolar.quad.render();
 
             Layers.render(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp, gl);
