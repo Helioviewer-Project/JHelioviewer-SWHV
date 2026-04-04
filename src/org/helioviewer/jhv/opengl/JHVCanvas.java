@@ -69,7 +69,7 @@ public final class JHVCanvas extends AWTGLCanvas {
         return new AssertionError(err);
     }
 
-    private static void initGLInfo(GL3 gl) {
+    private static void initGLInfo() {
         glVersion = "OpenGL " + GL33.glGetString(GL33.GL_VERSION);
         Log.info(glVersion);
         if (!GL.getCapabilities().OpenGL33)
@@ -195,8 +195,8 @@ public final class JHVCanvas extends AWTGLCanvas {
 
             externalContext.makeCurrent();
             GL3 gl = externalContext.getGL().getGL3();
-            initGLInfo(gl);
-            GLRenderer.init(gl);
+            initGLInfo();
+            GLRenderer.init();
             rendererInitialized = true;
             externalContextInitDeferred = false;
             lastGlWidth = -1;
