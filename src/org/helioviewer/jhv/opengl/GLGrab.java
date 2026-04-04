@@ -5,17 +5,13 @@ import java.nio.Buffer;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 
-import com.jogamp.opengl.FBObject;
-import com.jogamp.opengl.FBObject.Attachment;
-import com.jogamp.opengl.FBObject.TextureAttachment;
 import com.jogamp.opengl.GL3;
 
 public class GLGrab {
 
     public final int w;
     public final int h;
-    private FBObject fbo;
-    private TextureAttachment fboTex;
+    private GLFrameCapture capture;
 
     public GLGrab(int _w, int _h) {
         w = _w;
@@ -23,28 +19,18 @@ public class GLGrab {
     }
 
     private void init(GL3 gl) {
-        fbo = new FBObject();
-        fbo.init(gl, w, h, 0);
-        fboTex = fbo.attachTexture2D(gl, 0, true, GL3.GL_LINEAR, GL3.GL_LINEAR, GL3.GL_CLAMP_TO_EDGE, GL3.GL_CLAMP_TO_EDGE);
-
-        fbo.attachRenderbuffer(gl, Attachment.Type.DEPTH, FBObject.CHOSEN_BITS);
-        fbo.reset(gl, fbo.getWidth(), fbo.getHeight(), GLInfo.GLSAMPLES);
-        fbo.unbind(gl);
+        capture = new GLFrameCapture(gl, w, h, GLInfo.GLSAMPLES);
     }
 
     public void dispose(GL3 gl) {
-        if (fbo != null) {
-            fbo.detachAll(gl);
-            fbo.destroy(gl);
-            if (fboTex != null)
-                fboTex.free(gl);
-            fboTex = null;
-            fbo = null;
+        if (capture != null) {
+            capture.dispose(gl);
+            capture = null;
         }
     }
 
     public void renderFrame(Camera camera, GL3 gl, Buffer buffer) {
-        if (fbo == null)
+        if (capture == null)
             init(gl);
 
         int _x = Display.fullViewport.x;
@@ -53,25 +39,16 @@ public class GLGrab {
         int _h = Display.fullViewport.height;
 
         try {
-            Display.setGLSize(0, 0, fbo.getWidth(), fbo.getHeight());
+            Display.setGLSize(0, 0, w, h);
             Display.reshapeAll();
 
-            fbo.bind(gl);
+            capture.bindForRender(gl);
             if (Display.mode.isOrthographic()) {
                 GLListener.renderScene(camera, gl);
             } else {
                 GLListener.renderSceneScale(camera, gl);
             }
-            fbo.unbind(gl);
-
-            fbo.use(gl, fboTex);
-
-            gl.glBindFramebuffer(GL3.GL_READ_FRAMEBUFFER, fbo.getReadFramebuffer());
-            gl.glPixelStorei(GL3.GL_PACK_ALIGNMENT, 1);
-            gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL3.GL_BGR, GL3.GL_UNSIGNED_BYTE, buffer);
-            gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, 0);
-
-            fbo.unuse(gl);
+            capture.readPixels(gl, buffer);
         } finally {
             Display.setGLSize(_x, _y, _w, _h);
             Display.reshapeAll();
