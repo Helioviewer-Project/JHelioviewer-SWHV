@@ -67,7 +67,6 @@ import org.helioviewer.jhv.opengl.text.packrect.RectanglePacker;
 import org.lwjgl.opengl.GL33;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLContext;
 
 /**
  * Renders bitmapped Java 2D text into an OpenGL window with high
@@ -157,6 +156,7 @@ public class JhvTextRenderer {
     private boolean isOrthoMode;
     private int beginRenderingWidth;
     private int beginRenderingHeight;
+    private GL3 currentGL;
 
     /**
      * Creates a new TextRenderer with the given Font, specified font
@@ -239,8 +239,8 @@ public class JhvTextRenderer {
      * @param width  the width of the current on-screen OpenGL drawable
      * @param height the height of the current on-screen OpenGL drawable
      */
-    public void beginRendering(int width, int height) {
-        beginRendering(true, width, height);
+    public void beginRendering(GL3 gl, int width, int height) {
+        beginRendering(true, gl, width, height);
     }
 
     /**
@@ -254,8 +254,8 @@ public class JhvTextRenderer {
      * to the last color set with this TextRenderer via {@link
      * #setColor setColor}.
      */
-    public void begin3DRendering() {
-        beginRendering(false, 0, 0);
+    public void begin3DRendering(GL3 gl) {
+        beginRendering(false, gl, 0, 0);
     }
 
     /**
@@ -328,6 +328,7 @@ public class JhvTextRenderer {
      * valid to use the TextRenderer after this method is called.
      */
     public void dispose(GL3 gl) {
+        currentGL = gl;
         packer.dispose();
         packer = null;
         cachedBackingStore = null;
@@ -336,6 +337,7 @@ public class JhvTextRenderer {
         cachedGraphics = null;
         cachedFontRenderContext = null;
         glslTexture.dispose(gl);
+        currentGL = null;
     }
 
     //----------------------------------------------------------------------
@@ -400,7 +402,8 @@ public class JhvTextRenderer {
         return cachedGraphics;
     }
 
-    private void beginRendering(boolean ortho, int width, int height) {
+    private void beginRendering(boolean ortho, GL3 gl, int width, int height) {
+        currentGL = gl;
         inBeginEndPair = true;
         isOrthoMode = ortho;
         beginRenderingWidth = width;
@@ -420,6 +423,7 @@ public class JhvTextRenderer {
 
         inBeginEndPair = false;
         internal_endRendering(ortho);
+        currentGL = null;
 /*
         if (++numRenderCycles >= CYCLES_PER_FLUSH) {
             numRenderCycles = 0;
@@ -428,9 +432,9 @@ public class JhvTextRenderer {
 */
     }
 
-    private static void internal_beginRendering(boolean ortho, int width, int height) {
+    private void internal_beginRendering(boolean ortho, int width, int height) {
         if (ortho) {
-            GL3 gl = (GL3) GLContext.getCurrentGL();
+            GL3 gl = currentGL;
             GL33.glDisable(GL33.GL_DEPTH_TEST);
 
             Transform.pushProjection();
@@ -440,9 +444,9 @@ public class JhvTextRenderer {
         }
     }
 
-    private static void internal_endRendering(boolean ortho) {
+    private void internal_endRendering(boolean ortho) {
         if (ortho) {
-            GL3 gl = (GL3) GLContext.getCurrentGL();
+            GL3 gl = currentGL;
             GL33.glEnable(GL33.GL_DEPTH_TEST);
 
             Transform.popView();
@@ -591,12 +595,12 @@ public class JhvTextRenderer {
 
         @Override
         public Object allocateBackingStore(int w, int h) {
-            return new JhvTextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h));
+            return new JhvTextureRenderer(currentGL, MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h));
         }
 
         @Override
         public void deleteBackingStore(Object backingStore) {
-            ((JhvTextureRenderer) backingStore).dispose();
+            ((JhvTextureRenderer) backingStore).dispose(currentGL);
         }
 
         @Override
@@ -946,7 +950,7 @@ public class JhvTextRenderer {
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
-            GL3 gl = (GL3) GLContext.getCurrentGL();
+            GL3 gl = currentGL;
             getBackingStore().bind(gl);
 
             glslTexture.init(gl);

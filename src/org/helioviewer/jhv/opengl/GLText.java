@@ -55,7 +55,7 @@ public class GLText {
     private static final int TOP_MARGIN_TEXT = 0;//5;
     private static final int BOTTOM_MARGIN_TEXT = 0;//5;
 
-    public static void drawTextFloat(Viewport vp, List<String> txts, int pt_x, int pt_y) {
+    public static void drawTextFloat(Viewport vp, GL3 gl, List<String> txts, int pt_x, int pt_y) {
         if (txts.isEmpty())
             return;
 
@@ -87,7 +87,7 @@ public class GLText {
         // float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
 
         int deltaY = 0, dY = (int) (fontSize * 1.1);
-        renderer.beginRendering(vp.width, vp.height);
+        renderer.beginRendering(gl, vp.width, vp.height);
         for (String txt : txts) {
             renderer.setColor(shadowColor);
             renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
