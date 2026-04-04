@@ -40,7 +40,7 @@ abstract class GLSLShader {
             fragmentID = attachShader(gl, ShaderType.fragment, fragmentText);
 
             progID = initializeProgram(gl, true);
-            use(gl);
+            use();
             initUniforms(gl, progID);
         } catch (Exception e) {
             throw new JHVGLException("Cannot load shader", e);
@@ -65,7 +65,7 @@ abstract class GLSLShader {
         }
     }
 
-    public final void use(GL3 gl) {
+    public final void use() {
         GL33.glUseProgram(progID);
     }
 

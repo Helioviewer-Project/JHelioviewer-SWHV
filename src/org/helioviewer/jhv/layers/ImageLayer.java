@@ -205,7 +205,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
             return;
 
         GLSLSolarShader shader = Display.mode.shader;
-        shader.use(gl);
+        shader.use();
 
         MetaData meta0 = imageData.getMetaData();
         glImage.applyFilters(meta0, imageData);
