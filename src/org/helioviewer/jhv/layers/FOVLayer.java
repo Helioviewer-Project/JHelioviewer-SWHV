@@ -23,7 +23,7 @@ public class FOVLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL3 gl) {
+    public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         treePane.render(camera, vp);

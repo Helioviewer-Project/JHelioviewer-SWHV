@@ -51,7 +51,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL3 gl) {
+    public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
 

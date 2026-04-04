@@ -88,7 +88,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL3 gl) {
+    public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
@@ -108,7 +108,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL3 gl) {
-        render(camera, vp, gl);
+        render(camera, vp);
     }
 
     private void drawConnectivity(MapContext ctx, Camera camera) {

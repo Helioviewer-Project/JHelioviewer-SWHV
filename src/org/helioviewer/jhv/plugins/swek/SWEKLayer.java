@@ -351,7 +351,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL3 gl) {
+    public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
