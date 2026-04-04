@@ -108,7 +108,7 @@ public class GLSLSolarShader extends GLSLShader {
         displayBO.delete();
     }
 
-    public static void bindWCS(GL3 gl,
+    public static void bindWCS(
                                Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
                                Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
@@ -124,7 +124,7 @@ public class GLSLSolarShader extends GLSLShader {
         wcsBO.setBufferData(WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
 
-    public static void bindProjection(GL3 gl,
+    public static void bindProjection(
                                       WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
                                       Quat sourceView0, Quat displayMap0,
                                       WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
@@ -140,7 +140,7 @@ public class GLSLSolarShader extends GLSLShader {
         projectionBO.setBufferData(PROJECTION_SIZE, PROJECTION_SIZE, projectionBuf.flip());
     }
 
-    public void bindLatiGrid(GL3 gl, float[] latiGrid0, float[] latiGrid1) {
+    public void bindLatiGrid(float[] latiGrid0, float[] latiGrid1) {
         latiGridBuf[0] = latiGrid0[0];
         latiGridBuf[1] = latiGrid0[1];
         latiGridBuf[2] = latiGrid0[2];
@@ -150,7 +150,7 @@ public class GLSLSolarShader extends GLSLShader {
         GL33.glUniform3fv(latiGridRef, latiGridBuf);
     }
 
-    static void bindScreen(GL3 gl, Viewport vp) {
+    static void bindScreen(Viewport vp) {
         GridScale scale = Display.mode.scale;
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
@@ -163,7 +163,7 @@ public class GLSLSolarShader extends GLSLShader {
         screenBO.setBufferData(SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
     }
 
-    static void bindDisplay(GL3 gl, float[] color,
+    static void bindDisplay(float[] color,
                             float shWidth, float shHeight, float shWeight, int isDiff,
                             float sector0, float sector1, float enhanced,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
@@ -180,7 +180,7 @@ public class GLSLSolarShader extends GLSLShader {
         displayBO.setBufferData(DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
 
-    public void bindPV(GL3 gl, float[] pv0, float[] pv1) {
+    public void bindPV(float[] pv0, float[] pv1) {
         GL33.glUniform1fv(pv0Ref, pv0);
         GL33.glUniform1fv(pv1Ref, pv1);
     }
