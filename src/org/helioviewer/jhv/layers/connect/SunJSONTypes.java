@@ -15,6 +15,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimaps;
+
 public class SunJSONTypes {
 
     public static class GeometryCollection {

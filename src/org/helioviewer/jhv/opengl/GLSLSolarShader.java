@@ -108,8 +108,8 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindWCS(
-                               Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
-                               Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
+            Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
+            Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
@@ -124,10 +124,10 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindProjection(
-                                      WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
-                                      Quat sourceView0, Quat displayMap0,
-                                      WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
-                                      Quat sourceView1, Quat displayMap1) {
+            WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
+            Quat sourceView0, Quat displayMap0,
+            WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
+            Quat sourceView1, Quat displayMap1) {
         projectionBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
         sourceView0.setFloatBuffer(projectionBuf);
         displayMap0.setFloatBuffer(projectionBuf);

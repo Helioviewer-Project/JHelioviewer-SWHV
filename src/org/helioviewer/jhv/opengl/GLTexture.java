@@ -56,11 +56,16 @@ public class GLTexture {
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_BASE_LEVEL, 0);
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAX_LEVEL, 0);
         switch (buffer) {
-            case null -> GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
-            case ByteBuffer byteBuffer -> GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, byteBuffer);
-            case ShortBuffer shortBuffer -> GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, shortBuffer);
-            case IntBuffer intBuffer -> GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, intBuffer);
-            default -> throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
+            case null ->
+                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
+            case ByteBuffer byteBuffer ->
+                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, byteBuffer);
+            case ShortBuffer shortBuffer ->
+                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, shortBuffer);
+            case IntBuffer intBuffer ->
+                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, intBuffer);
+            default ->
+                    throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
         }
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_LINEAR);
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_LINEAR);
@@ -157,7 +162,8 @@ public class GLTexture {
                 intBuffer.position(position);
                 yield direct;
             }
-            default -> throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
+            default ->
+                    throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
         };
     }
 
