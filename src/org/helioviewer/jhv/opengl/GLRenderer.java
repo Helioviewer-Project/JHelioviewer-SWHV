@@ -82,7 +82,7 @@ final class GLRenderer {
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
     }
 
-    static void dispose(GL3 gl) {
+    static void dispose() {
         Layers.dispose();
         JHVFrame.getInteraction().disposeAnnotations();
         GLText.dispose();

@@ -226,7 +226,7 @@ public final class JHVCanvas extends AWTGLCanvas {
             runInContext(() -> {
                 try {
                     currentContext.makeCurrent();
-                    GLRenderer.dispose(currentContext.getGL().getGL3());
+                    GLRenderer.dispose();
                 } finally {
                     currentContext.release();
                     currentContext.destroy();
