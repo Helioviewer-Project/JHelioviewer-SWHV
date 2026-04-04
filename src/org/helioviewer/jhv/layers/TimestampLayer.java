@@ -85,7 +85,7 @@ public class TimestampLayer extends AbstractLayer {
         int deltaY = top ? (int) (vp.height - JHVCanvas.pixelScale[1] * deltaX - size) : deltaX; //!
 
         JhvTextRenderer renderer = GLText.getRenderer(size);
-        renderer.beginRendering(vp.width, vp.height);
+        renderer.beginRendering(gl, vp.width, vp.height);
         renderer.setColor(GLText.shadowColor);
         renderer.draw(text, deltaX + GLText.shadowOffset[0], deltaY + GLText.shadowOffset[1]);
         renderer.setColor(Colors.LightGrayFloat);
