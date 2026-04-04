@@ -101,8 +101,8 @@ public final class FOVTreePane extends JScrollPane {
         platforms.forEach(FOVPlatform::dispose);
     }
 
-    public void render(Camera camera, Viewport vp, GL3 gl) {
-        platforms.forEach(platform -> platform.render(camera, vp, gl));
+    public void render(Camera camera, Viewport vp) {
+        platforms.forEach(platform -> platform.render(camera, vp));
     }
 
     public void serialize(JSONObject jo) {
