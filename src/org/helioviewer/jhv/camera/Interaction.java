@@ -192,12 +192,12 @@ public class Interaction {
         interactionAnnotate.zoom();
     }
 
-    public void initAnnotations(GL3 gl) {
-        interactionAnnotate.init(gl);
+    public void initAnnotations() {
+        interactionAnnotate.init();
     }
 
-    public void disposeAnnotations(GL3 gl) {
-        interactionAnnotate.dispose(gl);
+    public void disposeAnnotations() {
+        interactionAnnotate.dispose();
     }
 
     public void drawAnnotations(Viewport vp, GL3 gl) {

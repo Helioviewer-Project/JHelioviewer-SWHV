@@ -68,12 +68,12 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         return panel;
     }
 
-    void init(GL3 gl) {
+    void init() {
         fovLine.init();
         center.init();
     }
 
-    void dispose(GL3 gl) {
+    void dispose() {
         fovLine.dispose();
         center.dispose();
     }

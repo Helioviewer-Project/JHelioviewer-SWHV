@@ -98,7 +98,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         }
     }
 
-    private void initHemiLine(GL3 gl) {
+    private void initHemiLine() {
         int no_points = 2 * (SUBDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, null, color, Colors.White, vexBuf);
@@ -107,16 +107,16 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         hemiLine.setVertex(vexBuf);
     }
 
-    void init(GL3 gl) {
+    void init() {
         hemiLine.init();
-        initHemiLine(gl);
+        initHemiLine();
 
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init(gl));
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init());
     }
 
-    void dispose(GL3 gl) {
+    void dispose() {
         hemiLine.dispose();
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose(gl));
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose());
     }
 
     void render(Camera camera, Viewport vp, GL3 gl) {
