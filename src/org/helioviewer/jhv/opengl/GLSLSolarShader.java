@@ -57,12 +57,12 @@ public class GLSLSolarShader extends GLSLShader {
         screenBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
         displayBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
 
-        sphere._init(gl, sphere.hasCommon);
-        ortho._init(gl, ortho.hasCommon);
-        hpc._init(gl, hpc.hasCommon);
-        lati._init(gl, lati.hasCommon);
-        polar._init(gl, polar.hasCommon);
-        logpolar._init(gl, logpolar.hasCommon);
+        sphere._init(sphere.hasCommon);
+        ortho._init(ortho.hasCommon);
+        hpc._init(hpc.hasCommon);
+        lati._init(lati.hasCommon);
+        polar._init(polar.hasCommon);
+        logpolar._init(logpolar.hasCommon);
     }
 
     private static void setupUBO(GL3 gl, int programID, String blockName, int uboID, int binding) {
@@ -81,27 +81,27 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     @Override
-    protected void initUniforms(GL3 gl, int id) {
+    protected void initUniforms(int id) {
         pv0Ref = GL33.glGetUniformLocation(id, "pv0");
         pv1Ref = GL33.glGetUniformLocation(id, "pv1");
         latiGridRef = GL33.glGetUniformLocation(id, "latiGrid");
 
-        setupCommonBlocks(gl, id);
+        setupCommonBlocks(null, id);
 
         if (hasCommon) {
-            setTextureUnit(gl, id, "image", GLTexture.Unit.ZERO);
-            setTextureUnit(gl, id, "lut", GLTexture.Unit.ONE);
-            setTextureUnit(gl, id, "diffImage", GLTexture.Unit.TWO);
+            setTextureUnit(id, "image", GLTexture.Unit.ZERO);
+            setTextureUnit(id, "lut", GLTexture.Unit.ONE);
+            setTextureUnit(id, "diffImage", GLTexture.Unit.TWO);
         }
     }
 
     public static void dispose(GL3 gl) {
-        sphere._dispose(gl);
-        ortho._dispose(gl);
-        hpc._dispose(gl);
-        lati._dispose(gl);
-        polar._dispose(gl);
-        logpolar._dispose(gl);
+        sphere._dispose();
+        ortho._dispose();
+        hpc._dispose();
+        lati._dispose();
+        polar._dispose();
+        logpolar._dispose();
         wcsBO.delete();
         projectionBO.delete();
         screenBO.delete();

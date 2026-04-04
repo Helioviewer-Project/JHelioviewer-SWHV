@@ -19,17 +19,17 @@ class GLSLShapeShader extends GLSLShader {
     }
 
     public static void init() {
-        point._init(null, false);
-        shape._init(null, false);
+        point._init(false);
+        shape._init(false);
     }
 
     public static void dispose() {
-        point._dispose(null);
-        shape._dispose(null);
+        point._dispose();
+        shape._dispose();
     }
 
     @Override
-    protected void initUniforms(com.jogamp.opengl.GL3 gl, int id) {
+    protected void initUniforms(int id) {
         refModelViewProjectionMatrix = GL33.glGetUniformLocation(id, "ModelViewProjectionMatrix");
         factorRef = GL33.glGetUniformLocation(id, "factor");
     }
