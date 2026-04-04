@@ -102,7 +102,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (!geometryMap.isEmpty()) {
             SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
             updateTimestamp(g.time());
-            g.render(gl, geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
+            g.render(geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
         }
     }
 

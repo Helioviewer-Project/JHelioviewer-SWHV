@@ -9,8 +9,6 @@ import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 
-import com.jogamp.opengl.GL3;
-
 public class GridMath {
     private static final int SUBDIVISIONS = 360;
 
@@ -36,7 +34,7 @@ public class GridMath {
     private static final int END_RADIUS = TENS_RADIUS * 10;
     private static final int START_RADIUS = 2;
 
-    public static void initAxes(GL3 gl, GLSLLine axesLine) {
+    public static void initAxes(GLSLLine axesLine) {
         BufVertex vexBuf = new BufVertex(8 * GLSLLine.stride);
 
         vexBuf.putVertex(0, -AXIS_STOP, 0, 1, Colors.Null);
@@ -52,13 +50,13 @@ public class GridMath {
         axesLine.setVertex(vexBuf);
     }
 
-    public static void initEarthPoint(GL3 gl, GLSLShape earthPoint) {
+    public static void initEarthPoint(GLSLShape earthPoint) {
         BufVertex vexBuf = new BufVertex(GLSLShape.stride);
         vexBuf.putVertex(0, 0, (float) EARTH_CIRCLE_RADIUS, earthPointSize, earthLineColor);
         earthPoint.setVertex(vexBuf);
     }
 
-    public static void initEarthCircles(GL3 gl, GLSLLine earthCircleLine) {
+    public static void initEarthCircles(GLSLLine earthCircleLine) {
         int no_points = 2 * (SUBDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
         GLHelper.emitCircle(EARTH_CIRCLE_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, Quat.X90, earthLineColor, earthLineColor, vexBuf);
@@ -66,7 +64,7 @@ public class GridMath {
         earthCircleLine.setVertex(vexBuf);
     }
 
-    public static void initRadialCircles(GL3 gl, GLSLLine radialCircleLine, GLSLLine radialThickLine, double unit, double step) {
+    public static void initRadialCircles(GLSLLine radialCircleLine, GLSLLine radialThickLine, double unit, double step) {
         int no_lines = (int) Math.ceil(360 / step);
         int no_points = (END_RADIUS - START_RADIUS + 1 - TENS_RADIUS) * (SUBDIVISIONS + 3) + (LINEAR_STEPS + 3) * no_lines;
         BufVertex circleBuf = new BufVertex(no_points * GLSLLine.stride);
@@ -114,7 +112,7 @@ public class GridMath {
         radialThickLine.setVertex(thickBuf);
     }
 
-    public static void initGrid(GL3 gl, GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {
+    public static void initGrid(GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {
         int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
         int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
         int HALFDIVISIONS = SUBDIVISIONS / 2;
