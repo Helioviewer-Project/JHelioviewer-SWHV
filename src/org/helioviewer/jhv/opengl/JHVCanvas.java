@@ -19,7 +19,6 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
-import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLException;
@@ -113,7 +112,6 @@ public final class JHVCanvas extends AWTGLCanvas {
 
         try {
             currentContext.makeCurrent();
-            GL3 gl = currentContext.getGL().getGL3();
             int glWidth = glWidth();
             int glHeight = glHeight();
             if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
@@ -199,7 +197,6 @@ public final class JHVCanvas extends AWTGLCanvas {
                 externalContext = createExternalContext();
 
             externalContext.makeCurrent();
-            GL3 gl = externalContext.getGL().getGL3();
             initGLInfo();
             GLRenderer.init();
             rendererInitialized = true;
