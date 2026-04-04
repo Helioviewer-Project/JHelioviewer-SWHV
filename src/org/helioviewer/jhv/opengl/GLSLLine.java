@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 public class GLSLLine extends VAO implements GLSLVertexReceiver {
@@ -22,7 +21,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
     }
 
     @Override
-    public void setVertexRepeatable(GL3 gl, BufVertex vexBuf) {
+    public void setVertexRepeatable(BufVertex vexBuf) {
         count = vexBuf.getCount();
         if (count == 0)
             return;
@@ -36,7 +35,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         count--;
     }
 
-    public void renderLine(GL3 gl, double aspect, double thickness) {
+    public void renderLine(double aspect, double thickness) {
         if (count == 0)
             return;
 

@@ -116,8 +116,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         putConnectivity(ctx, connectivity.FSW, fswColor, connectivityBuf);
         putConnectivity(ctx, connectivity.M, mColor, connectivityBuf);
 
-        connectivityCenter.setVertex(gl, connectivityBuf);
-        connectivityCenter.renderPoints(gl, CameraHelper.getPixelFactor(camera, ctx.vp()));
+        connectivityCenter.setVertex(connectivityBuf);
+        connectivityCenter.renderPoints(CameraHelper.getPixelFactor(camera, ctx.vp()));
     }
 
     private static void putConnectivity(MapContext ctx, List<Vec3> points, byte[] color, BufVertex vexBuf) {
@@ -134,8 +134,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         }
         Display.mode.emitMapVertex(ctx, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
 
-        hcsLine.setVertex(gl, hcsBuf);
-        hcsLine.renderLine(gl, ctx.vp().aspect, LINEWIDTH);
+        hcsLine.setVertex(hcsBuf);
+        hcsLine.renderLine(ctx.vp().aspect, LINEWIDTH);
     }
 
     private static SphericalPoint interpolateToSpherical(long t, Position.Cartesian prev, Position.Cartesian next) {
@@ -155,8 +155,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
         SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.lowerValue(time), footpointMap.higherValue(time));
         AnnotateCross.drawCross(ctx, point.longitude(), point.latitude(), footpointColor, footpointBuf);
-        footpointLine.setVertex(gl, footpointBuf);
-        footpointLine.renderLine(gl, ctx.vp().aspect, LINEWIDTH);
+        footpointLine.setVertex(footpointBuf);
+        footpointLine.renderLine(ctx.vp().aspect, LINEWIDTH);
     }
 
     @Override

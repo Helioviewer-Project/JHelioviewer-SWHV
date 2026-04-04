@@ -48,12 +48,12 @@ public class SunJSONTypes {
 
         public void render(GL3 gl, GLSLLine lines, GLSLShape points, double aspect, double factor) {
             linesMap.forEach((thickness, vexBuf) -> {
-                lines.setVertexRepeatable(gl, vexBuf);
-                lines.renderLine(gl, aspect, thickness * factor * 0.5e-2 /* TBD */);
+                lines.setVertexRepeatable(vexBuf);
+                lines.renderLine(aspect, thickness * factor * 0.5e-2 /* TBD */);
             });
             if (pointsBuf != null) {
-                points.setVertexRepeatable(gl, pointsBuf);
-                points.renderPoints(gl, factor);
+                points.setVertexRepeatable(pointsBuf);
+                points.renderPoints(factor);
             }
         }
     }

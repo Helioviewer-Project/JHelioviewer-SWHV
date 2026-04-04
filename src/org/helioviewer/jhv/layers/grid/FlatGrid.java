@@ -64,7 +64,7 @@ public class FlatGrid {
 
     public void render(Camera camera, Viewport vp, GL3 gl, boolean showLabels) {
         rebuildIfNeeded(camera, vp, gl);
-        shape.renderShape(gl, GL33.GL_TRIANGLES);
+        shape.renderShape(GL33.GL_TRIANGLES);
         if (showLabels) {
             int labelSize = (int) (TEXT_SCALE * CameraHelper.getPixelFactor(camera, vp));
             drawLabels(camera, labelSize, vp, gl);
@@ -126,7 +126,7 @@ public class FlatGrid {
             byte[] color = yAxis.axisFlags()[i] ? AXIS_COLOR : GRID_COLOR;
             RasterLine.putHorizontal(camera, vp, -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], THICKNESS_PIXELS, color, vexBuf);
         }
-        shape.setVertex(gl, vexBuf);
+        shape.setVertex(vexBuf);
     }
 
     private static AxisSignature buildAxisSignature(boolean angular, double start, double stop) {

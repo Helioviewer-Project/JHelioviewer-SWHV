@@ -331,10 +331,10 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     private void renderEvents(Viewport vp, GL3 gl) {
-        lineEvent.setVertex(gl, bufEvent);
-        lineThick.setVertex(gl, bufThick);
-        lineEvent.renderLine(gl, vp.aspect, LINEWIDTH);
-        lineThick.renderLine(gl, vp.aspect, LINEWIDTH_HIGHLIGHT);
+        lineEvent.setVertex(bufEvent);
+        lineThick.setVertex(bufThick);
+        lineEvent.renderLine(vp.aspect, LINEWIDTH);
+        lineThick.renderLine(vp.aspect, LINEWIDTH_HIGHLIGHT);
     }
 
     private void renderIcons(GL3 gl, List<JHVRelatedEvents> evs) {

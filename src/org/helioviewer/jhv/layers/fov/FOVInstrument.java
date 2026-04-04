@@ -104,11 +104,11 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
             FOVText.drawLabel(renderer, name, (centerX - halfSide) * distance, (centerY - halfSide) * distance, halfSide * distance);
         }
 
-        center.setVertex(gl, centerBuf);
-        center.renderPoints(gl, pixFactor);
+        center.setVertex(centerBuf);
+        center.renderPoints(pixFactor);
 
-        fovLine.setVertex(gl, lineBuf);
-        fovLine.renderLine(gl, vp.aspect, FOVPlatform.LINEWIDTH_FOV);
+        fovLine.setVertex(lineBuf);
+        fovLine.renderLine(vp.aspect, FOVPlatform.LINEWIDTH_FOV);
     }
 
     boolean isEnabled() {
