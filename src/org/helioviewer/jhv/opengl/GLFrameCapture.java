@@ -3,7 +3,6 @@ package org.helioviewer.jhv.opengl;
 import java.nio.Buffer;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLException;
 
 final class GLFrameCapture {
 
@@ -136,7 +135,7 @@ final class GLFrameCapture {
     private static void checkFramebufferComplete(GL3 gl, String label) {
         int status = gl.glCheckFramebufferStatus(GL3.GL_FRAMEBUFFER);
         if (status != GL3.GL_FRAMEBUFFER_COMPLETE)
-            throw new GLException("GLFrameCapture " + label + " framebuffer incomplete: 0x" + Integer.toHexString(status));
+            throw new JHVGLException("GLFrameCapture " + label + " framebuffer incomplete: 0x" + Integer.toHexString(status));
     }
 
     private static void deleteFramebuffer(GL3 gl, int framebuffer) {
