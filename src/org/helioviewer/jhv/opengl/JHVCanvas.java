@@ -5,10 +5,12 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.helioviewer.jhv.Log;
 
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLCapabilitiesImmutable;
 import com.jogamp.opengl.GLDrawableFactory;
+import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
@@ -26,7 +28,28 @@ public final class JHVCanvas extends GLCanvas {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getCapabilities(profile);
             canvas = new JHVCanvas(capabilities);
-            canvas.addGLEventListener(new GLListener(canvas));
+            GLListener listener = new GLListener(canvas);
+            canvas.addGLEventListener(new GLEventListener() {
+                @Override
+                public void init(GLAutoDrawable drawable) {
+                    listener.init((GL3) drawable.getGL());
+                }
+
+                @Override
+                public void dispose(GLAutoDrawable drawable) {
+                    listener.dispose((GL3) drawable.getGL());
+                }
+
+                @Override
+                public void display(GLAutoDrawable drawable) {
+                    listener.display((GL3) drawable.getGL());
+                }
+
+                @Override
+                public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+                    listener.reshape(x, y, width, height);
+                }
+            });
             // GUI events can lead to context destruction and invalidation of GL objects and state
             canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
         } catch (Exception e) {
