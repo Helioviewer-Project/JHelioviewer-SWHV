@@ -1,15 +1,9 @@
 package org.helioviewer.jhv.opengl;
 
-import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
-import static org.lwjgl.opengl.GL30.glBindBufferBase;
-import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
-import static org.lwjgl.opengl.GL31.glGetUniformBlockIndex;
-import static org.lwjgl.opengl.GL31.glUniformBlockBinding;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniform1fv;
-import static org.lwjgl.opengl.GL20.glUniform3fv;
-
 import java.nio.FloatBuffer;
+
+import com.jogamp.opengl.GL3;
+import org.lwjgl.opengl.GL33;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Region;
@@ -19,8 +13,6 @@ import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.wcs.WcsHeader;
-
-import com.jogamp.opengl.GL3;
 
 public class GLSLSolarShader extends GLSLShader {
 
@@ -60,10 +52,10 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
-        wcsBO = new GLBO(gl, GL_UNIFORM_BUFFER, GL_STREAM_DRAW);
-        projectionBO = new GLBO(gl, GL_UNIFORM_BUFFER, GL_STREAM_DRAW);
-        screenBO = new GLBO(gl, GL_UNIFORM_BUFFER, GL_STREAM_DRAW);
-        displayBO = new GLBO(gl, GL_UNIFORM_BUFFER, GL_STREAM_DRAW);
+        wcsBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
+        projectionBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
+        screenBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
+        displayBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -74,11 +66,11 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static void setupUBO(GL3 gl, int programID, String blockName, int uboID, int binding) {
-        int blockIndex = glGetUniformBlockIndex(programID, blockName);
+        int blockIndex = GL33.glGetUniformBlockIndex(programID, blockName);
         if (blockIndex < 0)
             return;
-        glUniformBlockBinding(programID, blockIndex, binding);
-        glBindBufferBase(GL_UNIFORM_BUFFER, binding, uboID);
+        GL33.glUniformBlockBinding(programID, blockIndex, binding);
+        GL33.glBindBufferBase(GL33.GL_UNIFORM_BUFFER, binding, uboID);
     }
 
     static void setupCommonBlocks(GL3 gl, int programID) {
@@ -90,9 +82,9 @@ public class GLSLSolarShader extends GLSLShader {
 
     @Override
     protected void initUniforms(GL3 gl, int id) {
-        pv0Ref = glGetUniformLocation(id, "pv0");
-        pv1Ref = glGetUniformLocation(id, "pv1");
-        latiGridRef = glGetUniformLocation(id, "latiGrid");
+        pv0Ref = GL33.glGetUniformLocation(id, "pv0");
+        pv1Ref = GL33.glGetUniformLocation(id, "pv1");
+        latiGridRef = GL33.glGetUniformLocation(id, "latiGrid");
 
         setupCommonBlocks(gl, id);
 
@@ -155,7 +147,7 @@ public class GLSLSolarShader extends GLSLShader {
         latiGridBuf[3] = latiGrid1[0];
         latiGridBuf[4] = latiGrid1[1];
         latiGridBuf[5] = latiGrid1[2];
-        glUniform3fv(latiGridRef, latiGridBuf);
+        GL33.glUniform3fv(latiGridRef, latiGridBuf);
     }
 
     static void bindScreen(GL3 gl, Viewport vp) {
@@ -189,8 +181,8 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public void bindPV(GL3 gl, float[] pv0, float[] pv1) {
-        glUniform1fv(pv0Ref, pv0);
-        glUniform1fv(pv1Ref, pv1);
+        GL33.glUniform1fv(pv0Ref, pv0);
+        GL33.glUniform1fv(pv1Ref, pv1);
     }
 
 }
