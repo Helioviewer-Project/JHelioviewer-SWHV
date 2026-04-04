@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.Message;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -23,40 +24,61 @@ public final class JHVCanvas extends GLCanvas {
     private long fpsTime = System.currentTimeMillis();
 
     public static JHVCanvas create() {
-        JHVCanvas canvas = null;
         try {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getCapabilities(profile);
-            canvas = new JHVCanvas(capabilities);
+            JHVCanvas canvas = new JHVCanvas(capabilities);
             GLRenderer renderer = new GLRenderer(canvas);
-            canvas.addGLEventListener(new GLEventListener() {
-                @Override
-                public void init(GLAutoDrawable drawable) {
-                    renderer.init((GL3) drawable.getGL());
-                }
-
-                @Override
-                public void dispose(GLAutoDrawable drawable) {
-                    renderer.dispose((GL3) drawable.getGL());
-                }
-
-                @Override
-                public void display(GLAutoDrawable drawable) {
-                    renderer.display((GL3) drawable.getGL());
-                }
-
-                @Override
-                public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-                    renderer.reshape(x, y, width, height);
-                }
-            });
+            canvas.addGLEventListener(createListener(canvas, renderer));
             // GUI events can lead to context destruction and invalidation of GL objects and state
             canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
+            return canvas;
         } catch (Exception e) {
             String msg = e.getMessage();
-            GLInfo.glVersionError(msg == null ? "Unknown OpenGL error." : msg);
+            throw glVersionError(msg == null ? "Unknown OpenGL error." : msg);
         }
-        return canvas;
+    }
+
+    static AssertionError glVersionError(String err) {
+        Log.error(err);
+        Message.fatalErr("OpenGL fatal error. JHelioviewer is not able to run:\n" + err);
+        return new AssertionError(err);
+    }
+
+    static void initGLInfo(GL3 gl) {
+        GLInfo.glVersion = "OpenGL " + gl.glGetString(GL3.GL_VERSION);
+        Log.info(GLInfo.glVersion);
+        if (!gl.isExtensionAvailable("GL_VERSION_3_3"))
+            throw glVersionError("OpenGL 3.3 not supported.");
+
+        int[] out = {0};
+        gl.glGetIntegerv(GL3.GL_MAX_TEXTURE_SIZE, out, 0);
+        GLInfo.maxTextureSize = out[0];
+    }
+
+    private static GLEventListener createListener(JHVCanvas canvas, GLRenderer renderer) {
+        return new GLEventListener() {
+            @Override
+            public void init(GLAutoDrawable drawable) {
+                renderer.init((GL3) drawable.getGL());
+            }
+
+            @Override
+            public void dispose(GLAutoDrawable drawable) {
+                renderer.dispose((GL3) drawable.getGL());
+            }
+
+            @Override
+            public void display(GLAutoDrawable drawable) {
+                renderer.display((GL3) drawable.getGL());
+                canvas.frameRendered();
+            }
+
+            @Override
+            public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+                renderer.reshape(x, y, width, height);
+            }
+        };
     }
 
     private JHVCanvas(GLCapabilitiesImmutable capabilities) {
