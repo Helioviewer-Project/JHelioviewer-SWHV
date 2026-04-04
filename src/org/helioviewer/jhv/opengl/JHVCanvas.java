@@ -62,7 +62,7 @@ public final class JHVCanvas extends GLCanvas {
         maxTextureSize = out[0];
     }
 
-    void updatePixelScale() {
+    private void updatePixelScale() {
         GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
         if (graphicsConfiguration == null) {
             pixelScale[0] = 1;
@@ -79,6 +79,7 @@ public final class JHVCanvas extends GLCanvas {
         return new GLEventListener() {
             @Override
             public void init(GLAutoDrawable drawable) {
+                canvas.updatePixelScale();
                 renderer.init((GL3) drawable.getGL());
             }
 
@@ -95,7 +96,10 @@ public final class JHVCanvas extends GLCanvas {
 
             @Override
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-                renderer.reshape(x, y, width, height);
+                canvas.updatePixelScale();
+                int glWidth = (int) (canvas.getWidth() * pixelScale[0] + .5);
+                int glHeight = (int) (canvas.getHeight() * pixelScale[1] + .5);
+                renderer.reshape(x, y, glWidth, glHeight);
             }
         };
     }
