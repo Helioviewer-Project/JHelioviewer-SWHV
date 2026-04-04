@@ -41,7 +41,7 @@ final class GLRenderer {
 
         GL33.glEnable(GL33.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        GLSLSolar.quad.init(gl);
+        GLSLSolar.quad.init();
         GLSLSolarShader.init();
         GLSLLineShader.init();
         GLSLShapeShader.init();
@@ -87,7 +87,7 @@ final class GLRenderer {
         JHVFrame.getInteraction().disposeAnnotations(gl);
         GLText.dispose();
 
-        GLSLSolar.quad.dispose(gl);
+        GLSLSolar.quad.dispose();
         GLSLSolarShader.dispose();
         GLSLLineShader.dispose();
         GLSLShapeShader.dispose();

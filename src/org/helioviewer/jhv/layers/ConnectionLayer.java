@@ -161,22 +161,22 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     @Override
     public void init(GL3 gl) {
-        connectivityCenter.init(gl);
-        hcsLine.init(gl);
-        footpointLine.init(gl);
+        connectivityCenter.init();
+        hcsLine.init();
+        footpointLine.init();
 
-        geometryLine.init(gl);
-        geometryPoint.init(gl);
+        geometryLine.init();
+        geometryPoint.init();
     }
 
     @Override
     public void dispose(GL3 gl) {
-        connectivityCenter.dispose(gl);
-        hcsLine.dispose(gl);
-        footpointLine.dispose(gl);
+        connectivityCenter.dispose();
+        hcsLine.dispose();
+        footpointLine.dispose();
 
-        geometryLine.dispose(gl);
-        geometryPoint.dispose(gl);
+        geometryLine.dispose();
+        geometryPoint.dispose();
     }
 
     @Override

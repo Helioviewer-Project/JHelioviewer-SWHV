@@ -54,12 +54,12 @@ public class FlatGrid {
                                double translationX, double translationY) {
     }
 
-    public void init(GL3 gl) {
-        shape.init(gl);
+    public void init() {
+        shape.init();
     }
 
-    public void dispose(GL3 gl) {
-        shape.dispose(gl);
+    public void dispose() {
+        shape.dispose();
     }
 
     public void render(Camera camera, Viewport vp, GL3 gl, boolean showLabels) {

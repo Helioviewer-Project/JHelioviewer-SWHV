@@ -108,14 +108,14 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
     }
 
     void init(GL3 gl) {
-        hemiLine.init(gl);
+        hemiLine.init();
         initHemiLine(gl);
 
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init(gl));
     }
 
     void dispose(GL3 gl) {
-        hemiLine.dispose(gl);
+        hemiLine.dispose();
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose(gl));
     }
 

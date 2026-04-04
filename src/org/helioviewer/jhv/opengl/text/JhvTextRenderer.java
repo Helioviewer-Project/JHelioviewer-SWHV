@@ -332,7 +332,7 @@ public class JhvTextRenderer {
             cachedGraphics.dispose();
         cachedGraphics = null;
         cachedFontRenderContext = null;
-        glslTexture.dispose(null);
+        glslTexture.dispose();
     }
 
     //----------------------------------------------------------------------
@@ -943,7 +943,7 @@ public class JhvTextRenderer {
         if (outstandingGlyphsVerticesPipeline > 0) {
             getBackingStore().bind();
 
-            glslTexture.init(null);
+            glslTexture.init();
             glslTexture.setCoord(coordBuf);
             glslTexture.renderTexture(GL33.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;

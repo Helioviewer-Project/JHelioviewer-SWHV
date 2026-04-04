@@ -448,16 +448,16 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     @Override
     public void init(GL3 gl) {
-        lineEvent.init(gl);
-        lineThick.init(gl);
-        glslTexture.init(gl);
+        lineEvent.init();
+        lineThick.init();
+        glslTexture.init();
     }
 
     @Override
     public void dispose(GL3 gl) {
-        lineEvent.dispose(gl);
-        lineThick.dispose(gl);
-        glslTexture.dispose(gl);
+        lineEvent.dispose();
+        lineThick.dispose();
+        glslTexture.dispose();
         iconCacheId.values().forEach(GLTexture::delete);
         iconCacheId.clear();
     }

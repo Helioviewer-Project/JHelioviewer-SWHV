@@ -182,15 +182,15 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     void init(GL3 gl) {
-        annsLine.init(gl);
-        transLine.init(gl);
-        center.init(gl);
+        annsLine.init();
+        transLine.init();
+        center.init();
     }
 
     void dispose(GL3 gl) {
-        annsLine.dispose(gl);
-        transLine.dispose(gl);
-        center.dispose(gl);
+        annsLine.dispose();
+        transLine.dispose();
+        center.dispose();
     }
 
 }

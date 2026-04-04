@@ -87,13 +87,13 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
 
     @Override
     public void init(GL3 gl) {
-        points.init(gl);
+        points.init();
     }
 
     @Override
     public void dispose(GL3 gl) {
         uploadedBuf = null;
-        points.dispose(gl);
+        points.dispose();
     }
 
     @Override
