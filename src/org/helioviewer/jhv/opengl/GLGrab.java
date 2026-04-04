@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -29,7 +29,7 @@ public class GLGrab {
         }
     }
 
-    public void renderFrame(Camera camera, GL3 gl, Buffer buffer) {
+    public void renderFrame(Camera camera, GL3 gl, ByteBuffer buffer) {
         if (capture == null)
             init(gl);
 
