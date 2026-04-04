@@ -94,7 +94,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         jo.put("icons", icons);
     }
 
-    private static void bindTexture(GL3 gl, SWEKGroup group) {
+    private static void bindTexture(SWEKGroup group) {
         String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
@@ -344,7 +344,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (Display.mode.isLatitudinal() && evt.isCactus())
                 continue;
-            bindTexture(gl, evtr.getSupplier().getGroup());
+            bindTexture(evtr.getSupplier().getGroup());
             glslTexture.renderTexture(GL33.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }

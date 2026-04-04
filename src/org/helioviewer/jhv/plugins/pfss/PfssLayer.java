@@ -58,7 +58,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
         PfssLoader.Data data;
         if ((data = cache.getNearestData(currentTime)) == null)
             return;
-        renderData(gl, vp, data);
+        renderData(vp, data);
         lastData = data;
     }
 
@@ -128,7 +128,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     private boolean lastFixedColor;
     private double lastRadius;
 
-    private void renderData(GL3 gl, Viewport vp, PfssLoader.Data data) {
+    private void renderData(Viewport vp, PfssLoader.Data data) {
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();

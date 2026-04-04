@@ -119,12 +119,12 @@ public class ViewpointLayer extends AbstractLayer {
         Transform.rotateViewInverse(Quat.createXY(viewpoint.lat, viewpoint.lon + relativeLon));
 
         if (spiralSpeed > 0)
-            renderSpiral(gl, vp, lati, spiralSpeed);
+            renderSpiral(vp, lati, spiralSpeed);
 
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
             GL33.glDisable(GL33.GL_DEPTH_TEST);
-            renderPlanets(gl, vp, positionLoads, pixFactor);
+            renderPlanets(vp, positionLoads, pixFactor);
             GL33.glEnable(GL33.GL_DEPTH_TEST);
         }
 
@@ -293,7 +293,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     private final float[] xyzw = {0, 0, 0, 1};
 
-    private void renderPlanets(GL3 gl, Viewport vp, List<PositionLoad> positionLoads, double pointFactor) {
+    private void renderPlanets(Viewport vp, List<PositionLoad> positionLoads, double pointFactor) {
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
@@ -334,7 +334,7 @@ public class ViewpointLayer extends AbstractLayer {
         spiralBuf.putVertex(x, y, z, 1, color);
     }
 
-    private void renderSpiral(GL3 gl, Viewport vp, double[] spiralLati, int speed) {
+    private void renderSpiral(Viewport vp, double[] spiralLati, int speed) {
         double rad0 = spiralLati[0];
         double lon0 = spiralLati[1];
         double lat0 = spiralLati[2];
