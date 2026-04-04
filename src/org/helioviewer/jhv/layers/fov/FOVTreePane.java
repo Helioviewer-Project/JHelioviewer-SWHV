@@ -93,11 +93,11 @@ public final class FOVTreePane extends JScrollPane {
         root.add(platform);
     }
 
-    public void init(GL3 gl) {
+    public void init() {
         platforms.forEach(FOVPlatform::init);
     }
 
-    public void dispose(GL3 gl) {
+    public void dispose() {
         platforms.forEach(FOVPlatform::dispose);
     }
 

@@ -56,7 +56,7 @@ public final class MiniviewLayer extends AbstractLayer {
         miniViewport = DisplayLayout.viewport(0, offset, offset, size, size, Display.fullViewport.height);
     }
 
-    public void renderBackground(GL3 gl) {
+    public void renderBackground() {
         rectangle.renderShape(GL33.GL_TRIANGLE_STRIP);
         circle.renderShape(GL33.GL_TRIANGLE_STRIP);
     }

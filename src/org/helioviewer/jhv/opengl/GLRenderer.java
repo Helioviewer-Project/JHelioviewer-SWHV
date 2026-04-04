@@ -123,7 +123,7 @@ final class GLRenderer {
             GLSLSolarShader.bindScreen(vp);
 
             GL33.glDisable(GL33.GL_DEPTH_TEST);
-            miniview.renderBackground(gl);
+            miniview.renderBackground();
             Layers.renderMiniview(miniCamera, vp, gl);
             GL33.glEnable(GL33.GL_DEPTH_TEST);
         }
