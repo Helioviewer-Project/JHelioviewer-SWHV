@@ -3,22 +3,21 @@ package org.helioviewer.jhv.opengl;
 import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
-import java.lang.reflect.InvocationTargetException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.awt.AWTGLCanvas;
+import org.lwjgl.opengl.awt.GLData;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLCapabilitiesImmutable;
+import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawableFactory;
-import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
 
 @SuppressWarnings("serial")
-public final class JHVCanvas extends GLCanvas {
+public final class JHVCanvas extends AWTGLCanvas {
 
     public static final int GLSAMPLES = 4;
     public static String glVersion = "";
@@ -30,18 +29,32 @@ public final class JHVCanvas extends GLCanvas {
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
 
+    private GLContext externalContext;
+    private boolean rendererInitialized;
+    private boolean externalContextInitDeferred;
+    private int lastGlWidth = -1;
+    private int lastGlHeight = -1;
+
     public static JHVCanvas create() {
         try {
-            GLProfile profile = GLProfile.get(GLProfile.GL3);
-            GLCapabilities capabilities = setCapabilities(profile);
-            JHVCanvas canvas = new JHVCanvas(capabilities);
-            canvas.addGLEventListener(createListener(canvas));
-            // GUI events can lead to context destruction and invalidation of GL objects and state
-            canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
-            return canvas;
+            return new JHVCanvas(createData());
         } catch (Exception e) {
             throw glVersionError(e.getMessage() == null ? "Unknown OpenGL error." : e.getMessage());
         }
+    }
+
+    private static GLData createData() {
+        GLData data = new GLData();
+        data.samples = GLSAMPLES;
+        data.redSize = 8;
+        data.greenSize = 8;
+        data.blueSize = 8;
+        data.alphaSize = 8;
+        data.depthSize = 32;
+        data.majorVersion = 3;
+        data.minorVersion = 3;
+        data.profile = GLData.Profile.CORE;
+        return data;
     }
 
     private static AssertionError glVersionError(String err) {
@@ -61,66 +74,58 @@ public final class JHVCanvas extends GLCanvas {
         maxTextureSize = out[0];
     }
 
-    private void updatePixelScale() {
-        GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
-        if (graphicsConfiguration == null) {
-            pixelScale[0] = 1;
-            pixelScale[1] = 1;
+    private JHVCanvas(GLData data) {
+        super(data);
+    }
+
+    @Override
+    public void initGL() {
+        updatePixelScale();
+        GL.createCapabilities();
+        ensureRendererInitialized();
+    }
+
+    @Override
+    public void paintGL() {
+        updatePixelScale();
+        ensureRendererInitialized();
+        if (!rendererInitialized)
             return;
+
+        GLContext currentContext = externalContext;
+        if (currentContext == null)
+            return;
+
+        try {
+            currentContext.makeCurrent();
+            GL3 gl = currentContext.getGL().getGL3();
+            int glWidth = glWidth();
+            int glHeight = glHeight();
+            if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
+                GLRenderer.reshape(0, 0, glWidth, glHeight);
+                lastGlWidth = glWidth;
+                lastGlHeight = glHeight;
+            }
+            GLRenderer.display(gl, whiteBack);
+            swapBuffers();
+            frameRendered();
+        } finally {
+            currentContext.release();
         }
-
-        AffineTransform transform = graphicsConfiguration.getDefaultTransform();
-        pixelScale[0] = transform.getScaleX();
-        pixelScale[1] = transform.getScaleY();
     }
 
-    private static GLEventListener createListener(JHVCanvas canvas) {
-        return new GLEventListener() {
-            @Override
-            public void init(GLAutoDrawable drawable) {
-                canvas.updatePixelScale();
-                GL3 gl = (GL3) drawable.getGL();
-                initGLInfo(gl);
-                GLRenderer.init(gl);
-            }
-
-            @Override
-            public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-                canvas.updatePixelScale();
-                GLRenderer.reshape(x, y, canvas.glWidth(), canvas.glHeight());
-            }
-
-            @Override
-            public void display(GLAutoDrawable drawable) {
-                GLRenderer.display((GL3) drawable.getGL(), canvas.whiteBack);
-                canvas.frameRendered();
-            }
-
-            @Override
-            public void dispose(GLAutoDrawable drawable) {
-                GLRenderer.dispose((GL3) drawable.getGL());
-            }
-        };
+    public void display() {
+        render();
     }
 
-    private JHVCanvas(GLCapabilitiesImmutable capabilities) {
-        super(capabilities);
+    @Override
+    public void removeNotify() {
+        disposeRenderer();
+        super.removeNotify();
     }
 
     public void setWhiteBackground(boolean whiteBackground) {
         whiteBack = whiteBackground;
-    }
-
-    private int glWidth() {
-        return (int) (getWidth() * pixelScale[0] + .5);
-    }
-
-    private int glHeight() {
-        return (int) (getHeight() * pixelScale[1] + .5);
-    }
-
-    private void frameRendered() {
-        fpsCount++;
     }
 
     public int getFramerate() {
@@ -135,59 +140,105 @@ public final class JHVCanvas extends GLCanvas {
         return fps;
     }
 
+    private void updatePixelScale() {
+        GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
+        if (graphicsConfiguration == null) {
+            pixelScale[0] = 1;
+            pixelScale[1] = 1;
+            return;
+        }
+
+        AffineTransform transform = graphicsConfiguration.getDefaultTransform();
+        pixelScale[0] = transform.getScaleX();
+        pixelScale[1] = transform.getScaleY();
+    }
+
+    private int glWidth() {
+        return (int) (getWidth() * pixelScale[0] + .5);
+    }
+
+    private int glHeight() {
+        return (int) (getHeight() * pixelScale[1] + .5);
+    }
+
+    private void frameRendered() {
+        fpsCount++;
+    }
+
+    private GLContext createExternalContext() {
+        return GLDrawableFactory.getFactory(GLProfile.get(GLProfile.GL3)).createExternalGLContext();
+    }
+
+    private void ensureRendererInitialized() {
+        if (rendererInitialized)
+            return;
+
+        try {
+            if (externalContext == null)
+                externalContext = createExternalContext();
+
+            externalContext.makeCurrent();
+            GL3 gl = externalContext.getGL().getGL3();
+            initGLInfo(gl);
+            GLRenderer.init(gl);
+            rendererInitialized = true;
+            externalContextInitDeferred = false;
+            lastGlWidth = -1;
+            lastGlHeight = -1;
+        } catch (GLException e) {
+            if (!externalContextInitDeferred) {
+                Log.warn("Deferring JOGL external GL context initialization", e);
+                externalContextInitDeferred = true;
+            }
+            if (externalContext != null) {
+                externalContext.destroy();
+                externalContext = null;
+            }
+        } finally {
+            GLContext currentContext = externalContext;
+            if (currentContext != null && currentContext.isCurrent())
+                currentContext.release();
+        }
+    }
+
+    private void disposeRenderer() {
+        GLContext currentContext = externalContext;
+        if (currentContext == null || context == 0L)
+            return;
+
+        try {
+            runInContext(() -> {
+                try {
+                    currentContext.makeCurrent();
+                    GLRenderer.dispose(currentContext.getGL().getGL3());
+                } finally {
+                    currentContext.release();
+                    currentContext.destroy();
+                    externalContext = null;
+                    rendererInitialized = false;
+                    externalContextInitDeferred = false;
+                    lastGlWidth = -1;
+                    lastGlHeight = -1;
+                }
+            });
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to dispose OpenGL renderer", e);
+        }
+    }
+
     @Override
     public void reshape(int x, int y, int width, int height) {
         try {
             super.reshape(x, y, width, height);
         } catch (InternalError e) {
-            if (!isIncompleteResize(e))
-                throw e;
-            Log.warn("Retrying GLCanvas reshape after incomplete resize operation", e);
+            Log.warn("Retrying AWTGLCanvas reshape after resize failure", e);
             EventQueue.invokeLater(() -> {
                 revalidate();
                 repaint();
             });
         }
-    }
-
-    private static GLCapabilities setCapabilities(GLProfile profile) {
-        GLCapabilities capabilities = new GLCapabilities(profile);
-        capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(GLSAMPLES);
-        capabilities.setRedBits(8);
-        capabilities.setGreenBits(8);
-        capabilities.setBlueBits(8);
-        capabilities.setAlphaBits(8);
-        capabilities.setDepthBits(32);
-        return capabilities;
-    }
-
-    private static GLAutoDrawable getSharedDrawable(GLProfile profile, GLCapabilities capabilities) {
-        GLAutoDrawable sharedDrawable = GLDrawableFactory.getFactory(profile).createDummyAutoDrawable(null, true, capabilities, null);
-        sharedDrawable.display();
-        return sharedDrawable;
-    }
-
-    private static boolean isIncompleteResize(Throwable t) {
-        for (Throwable current = t; current != null; current = current.getCause()) {
-            if (current instanceof InvocationTargetException ite)
-                current = ite.getTargetException();
-            if (!(current instanceof InternalError))
-                continue;
-
-            boolean resizeStack = false;
-            for (StackTraceElement element : current.getStackTrace()) {
-                if ("jogamp.opengl.GLDrawableHelper".equals(element.getClassName()) && "resizeOffscreenDrawable".equals(element.getMethodName())) {
-                    resizeStack = true;
-                    break;
-                }
-            }
-
-            String message = current.getMessage();
-            if (resizeStack && message != null && message.startsWith("Incomplete resize operation"))
-                return true;
-        }
-        return false;
     }
 
 }
