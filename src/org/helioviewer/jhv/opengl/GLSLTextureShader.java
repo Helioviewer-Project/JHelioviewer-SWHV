@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 import org.helioviewer.jhv.camera.Transform;
@@ -16,26 +15,26 @@ class GLSLTextureShader extends GLSLShader {
         super(vertex, fragment);
     }
 
-    public static void init(GL3 gl) {
-        texture._init(gl, false);
+    public static void init() {
+        texture._init(null, false);
     }
 
-    public static void dispose(GL3 gl) {
-        texture._dispose(gl);
+    public static void dispose() {
+        texture._dispose(null);
     }
 
     @Override
-    protected void initUniforms(GL3 gl, int id) {
+    protected void initUniforms(com.jogamp.opengl.GL3 gl, int id) {
         refModelViewProjectionMatrix = GL33.glGetUniformLocation(id, "ModelViewProjectionMatrix");
         colorRef = GL33.glGetUniformLocation(id, "color");
-        setTextureUnit(gl, id, "image", GLTexture.Unit.THREE);
+        setTextureUnit(null, id, "image", GLTexture.Unit.THREE);
     }
 
-    void bindParams(GL3 gl, float[] color) {
+    void bindParams(float[] color) {
         GL33.glUniform4fv(colorRef, color);
     }
 
-    void bindMVP(GL3 gl) {
+    void bindMVP() {
         GL33.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
     }
 

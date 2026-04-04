@@ -944,8 +944,8 @@ public class JhvTextRenderer {
             getBackingStore().bind();
 
             glslTexture.init(null);
-            glslTexture.setCoord(null, coordBuf);
-            glslTexture.renderTexture(null, GL33.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
+            glslTexture.setCoord(coordBuf);
+            glslTexture.renderTexture(GL33.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }

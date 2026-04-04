@@ -338,14 +338,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     private void renderIcons(GL3 gl, List<JHVRelatedEvents> evs) {
-        glslTexture.setCoord(gl, texBuf);
+        glslTexture.setCoord(texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(controller.currentTime);
             if (Display.mode.isLatitudinal() && evt.isCactus())
                 continue;
             bindTexture(gl, evtr.getSupplier().getGroup());
-            glslTexture.renderTexture(gl, GL33.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
+            glslTexture.renderTexture(GL33.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }
