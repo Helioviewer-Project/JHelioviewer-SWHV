@@ -14,6 +14,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import okio.BufferedSink;
 import okio.Okio;
+
 public class NetFileCache {
 
     private static final LoadingCache<URI, DataUri> cache = Caffeine.newBuilder().softValues().
