@@ -19,11 +19,6 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
-import com.jogamp.opengl.GLContext;
-import com.jogamp.opengl.GLDrawableFactory;
-import com.jogamp.opengl.GLException;
-import com.jogamp.opengl.GLProfile;
-
 @SuppressWarnings("serial")
 public final class JHVCanvas extends AWTGLCanvas {
 
@@ -37,9 +32,7 @@ public final class JHVCanvas extends AWTGLCanvas {
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
 
-    private GLContext externalContext;
     private boolean rendererInitialized;
-    private boolean externalContextInitDeferred;
     private int lastGlWidth = -1;
     private int lastGlHeight = -1;
 
@@ -106,27 +99,18 @@ public final class JHVCanvas extends AWTGLCanvas {
         if (!rendererInitialized)
             return;
 
-        GLContext currentContext = externalContext;
-        if (currentContext == null)
-            return;
-
-        try {
-            currentContext.makeCurrent();
-            int glWidth = glWidth();
-            int glHeight = glHeight();
-            if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
-                GLRenderer.reshape(0, 0, glWidth, glHeight);
-                lastGlWidth = glWidth;
-                lastGlHeight = glHeight;
-            }
-            if (Movie.isRecording())
-                ExportMovie.handleMovieExport(Display.getCamera());
-            GLRenderer.display(whiteBack);
-            swapBuffers();
-            frameRendered();
-        } finally {
-            currentContext.release();
+        int glWidth = glWidth();
+        int glHeight = glHeight();
+        if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
+            GLRenderer.reshape(0, 0, glWidth, glHeight);
+            lastGlWidth = glWidth;
+            lastGlHeight = glHeight;
         }
+        if (Movie.isRecording())
+            ExportMovie.handleMovieExport(Display.getCamera());
+        GLRenderer.display(whiteBack);
+        swapBuffers();
+        frameRendered();
     }
 
     public void display() {
@@ -180,64 +164,27 @@ public final class JHVCanvas extends AWTGLCanvas {
         fpsCount++;
     }
 
-    private GLContext createExternalContext() {
-        // Temporary migration bridge:
-        // the render surface is LWJGL-backed, but the renderer and layer stack
-        // still consume JOGL GL3. This wraps the current LWJGL context so the
-        // existing renderer can keep running until the render path is ported.
-        return GLDrawableFactory.getFactory(GLProfile.get(GLProfile.GL3)).createExternalGLContext();
-    }
-
     private void ensureRendererInitialized() {
         if (rendererInitialized)
             return;
 
-        try {
-            if (externalContext == null)
-                externalContext = createExternalContext();
-
-            externalContext.makeCurrent();
-            initGLInfo();
-            GLRenderer.init();
-            rendererInitialized = true;
-            externalContextInitDeferred = false;
-            lastGlWidth = -1;
-            lastGlHeight = -1;
-        } catch (GLException e) {
-            if (!externalContextInitDeferred) {
-                Log.warn("Deferring JOGL external GL context initialization", e);
-                externalContextInitDeferred = true;
-            }
-            if (externalContext != null) {
-                externalContext.destroy();
-                externalContext = null;
-            }
-        } finally {
-            GLContext currentContext = externalContext;
-            if (currentContext != null && currentContext.isCurrent())
-                currentContext.release();
-        }
+        initGLInfo();
+        GLRenderer.init();
+        rendererInitialized = true;
+        lastGlWidth = -1;
+        lastGlHeight = -1;
     }
 
     private void disposeRenderer() {
-        GLContext currentContext = externalContext;
-        if (currentContext == null || context == 0L)
+        if (!rendererInitialized || context == 0L)
             return;
 
         try {
             runInContext(() -> {
-                try {
-                    currentContext.makeCurrent();
-                    GLRenderer.dispose();
-                } finally {
-                    currentContext.release();
-                    currentContext.destroy();
-                    externalContext = null;
-                    rendererInitialized = false;
-                    externalContextInitDeferred = false;
-                    lastGlWidth = -1;
-                    lastGlHeight = -1;
-                }
+                GLRenderer.dispose();
+                rendererInitialized = false;
+                lastGlWidth = -1;
+                lastGlHeight = -1;
             });
         } catch (RuntimeException e) {
             throw e;
