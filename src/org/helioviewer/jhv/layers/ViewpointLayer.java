@@ -233,9 +233,9 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove(GL3 gl) {
+    public void remove() {
         setEnabled(false);
-        dispose(gl);
+        dispose();
     }
 
     @Override
@@ -269,14 +269,14 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void init(GL3 gl) {
+    public void init() {
         orbits.init();
         planets.init();
         spiral.init();
     }
 
     @Override
-    public void dispose(GL3 gl) {
+    public void dispose() {
         orbits.dispose();
         planets.dispose();
         spiral.dispose();

@@ -152,10 +152,10 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         MovieDisplay.display();
     }
 
-    public static void prerender(GL3 gl) {
-        removeLayers(gl);
-        initLayers(gl);
-        layers.forEach(layer -> layer.prerender(gl));
+    public static void prerender() {
+        removeLayers();
+        initLayers();
+        layers.forEach(Layer::prerender);
     }
 
     public static void render(Camera camera, Viewport vp, GL3 gl) {
@@ -178,13 +178,13 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         layers.forEach(layer -> layer.renderMiniview(camera, miniview, gl));
     }
 
-    private static void initLayers(GL3 gl) {
-        newLayers.forEach(layer -> layer.init(gl));
+    private static void initLayers() {
+        newLayers.forEach(Layer::init);
         newLayers.clear();
     }
 
-    private static void removeLayers(GL3 gl) {
-        removedLayers.forEach(layer -> layer.remove(gl));
+    private static void removeLayers() {
+        removedLayers.forEach(Layer::remove);
         removedLayers.clear();
     }
 
@@ -249,8 +249,8 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         updateCell(layers.indexOf(layer), LayersPanel.TIME_COL);
     }
 
-    public static void dispose(GL3 gl) {
-        layers.forEach(layer -> layer.dispose(gl));
+    public static void dispose() {
+        layers.forEach(Layer::dispose);
         newLayers = layers;
         layers = new LayerList();
         setActiveImageLayer(null);

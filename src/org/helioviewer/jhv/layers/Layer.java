@@ -27,10 +27,10 @@ public interface Layer {
     default void renderMiniview(Camera camera, Viewport vp, GL3 gl) {
     }
 
-    default void prerender(GL3 gl) {
+    default void prerender() {
     }
 
-    void remove(GL3 gl);
+    void remove();
 
     Component getOptionsPanel();
 
@@ -63,9 +63,9 @@ public interface Layer {
         return false;
     }
 
-    void init(GL3 gl);
+    void init();
 
-    void dispose(GL3 gl);
+    void dispose();
 
     void serialize(JSONObject jo);
 

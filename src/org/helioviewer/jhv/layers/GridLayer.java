@@ -229,7 +229,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void init(GL3 gl) {
+    public void init() {
         gridLine.init();
         GridMath.initGrid(gridLine, lonStep, latStep);
         gridNeedsInit = false;
@@ -253,7 +253,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose(GL3 gl) {
+    public void dispose() {
         gridLine.dispose();
         axesLine.dispose();
         earthCircleLine.dispose();
@@ -266,8 +266,8 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove(GL3 gl) {
-        dispose(gl);
+    public void remove() {
+        dispose();
     }
 
     @Override

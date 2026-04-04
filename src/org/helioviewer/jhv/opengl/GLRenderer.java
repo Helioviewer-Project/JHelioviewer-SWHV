@@ -64,7 +64,7 @@ final class GLRenderer {
         else
             GL33.glClearColor(0, 0, 0, 0);
 
-        Layers.prerender(gl);
+        Layers.prerender();
 
         Camera camera = Display.getCamera();
 
@@ -83,7 +83,7 @@ final class GLRenderer {
     }
 
     static void dispose(GL3 gl) {
-        Layers.dispose(gl);
+        Layers.dispose();
         JHVFrame.getInteraction().disposeAnnotations();
         GLText.dispose();
 

@@ -62,8 +62,8 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     @Override
-    public void remove(GL3 gl) {
-        dispose(gl);
+    public void remove() {
+        dispose();
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     @Override
-    public void init(GL3 gl) {
+    public void init() {
         circle.init();
         GLHelper.initCircleFront(circle, 0, 0, 1, 18, colorCircle);
         rectangle.init();
@@ -85,7 +85,7 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose(GL3 gl) {
+    public void dispose() {
         circle.dispose();
         rectangle.dispose();
     }

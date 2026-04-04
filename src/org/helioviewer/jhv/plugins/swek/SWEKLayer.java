@@ -412,9 +412,9 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void remove(GL3 gl) {
+    public void remove() {
         setEnabled(false);
-        dispose(gl);
+        dispose();
     }
 
     @Override
@@ -447,14 +447,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void init(GL3 gl) {
+    public void init() {
         lineEvent.init();
         lineThick.init();
         glslTexture.init();
     }
 
     @Override
-    public void dispose(GL3 gl) {
+    public void dispose() {
         lineEvent.dispose();
         lineThick.dispose();
         glslTexture.dispose();

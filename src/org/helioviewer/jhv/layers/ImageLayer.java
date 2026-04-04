@@ -106,7 +106,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void init(GL3 gl) {
+    public void init() {
         glImage.init();
     }
 
@@ -161,7 +161,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void remove(GL3 gl) {
+    public void remove() {
         removed = true;
         cancelAsyncTasks();
         executor.abolish();
@@ -169,12 +169,12 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
-        dispose(gl);
+        dispose();
         //System.gc(); // reclaim memory asap
     }
 
     @Override
-    public void prerender(GL3 gl) {
+    public void prerender() {
         if (imageData == null) {
             return;
         }
@@ -312,7 +312,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void dispose(GL3 gl) {
+    public void dispose() {
         glImage.dispose();
     }
 
