@@ -33,7 +33,7 @@ public final class JHVCanvas extends GLCanvas {
     public static JHVCanvas create() {
         try {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
-            GLCapabilities capabilities = getCapabilities(profile);
+            GLCapabilities capabilities = setCapabilities(profile);
             JHVCanvas canvas = new JHVCanvas(capabilities);
             canvas.addGLEventListener(createListener(canvas));
             // GUI events can lead to context destruction and invalidation of GL objects and state
@@ -98,9 +98,7 @@ public final class JHVCanvas extends GLCanvas {
             @Override
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
                 canvas.updatePixelScale();
-                int glWidth = canvas.glWidth();
-                int glHeight = canvas.glHeight();
-                GLRenderer.reshape(x, y, glWidth, glHeight);
+                GLRenderer.reshape(x, y, canvas.glWidth(), canvas.glHeight());
             }
         };
     }
@@ -152,7 +150,7 @@ public final class JHVCanvas extends GLCanvas {
         }
     }
 
-    private static GLCapabilities getCapabilities(GLProfile profile) {
+    private static GLCapabilities setCapabilities(GLProfile profile) {
         GLCapabilities capabilities = new GLCapabilities(profile);
         capabilities.setSampleBuffers(true);
         capabilities.setNumSamples(GLSAMPLES);
@@ -186,7 +184,7 @@ public final class JHVCanvas extends GLCanvas {
             }
 
             String message = current.getMessage();
-            if (resizeStack && message != null && message.startsWith("Incomplete resize operation:"))
+            if (resizeStack && message != null && message.startsWith("Incomplete resize operation"))
                 return true;
         }
         return false;
