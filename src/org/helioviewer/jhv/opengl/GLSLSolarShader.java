@@ -65,7 +65,7 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._init(logpolar.hasCommon);
     }
 
-    private static void setupUBO(GL3 gl, int programID, String blockName, int uboID, int binding) {
+    private static void setupUBO(int programID, String blockName, int uboID, int binding) {
         int blockIndex = GL33.glGetUniformBlockIndex(programID, blockName);
         if (blockIndex < 0)
             return;
@@ -73,11 +73,11 @@ public class GLSLSolarShader extends GLSLShader {
         GL33.glBindBufferBase(GL33.GL_UNIFORM_BUFFER, binding, uboID);
     }
 
-    static void setupCommonBlocks(GL3 gl, int programID) {
-        setupUBO(gl, programID, "WCSBlock", wcsBO.getID(), 0);
-        setupUBO(gl, programID, "ProjectionBlock", projectionBO.getID(), 1);
-        setupUBO(gl, programID, "ScreenBlock", screenBO.getID(), 2);
-        setupUBO(gl, programID, "DisplayBlock", displayBO.getID(), 3);
+    static void setupCommonBlocks(int programID) {
+        setupUBO(programID, "WCSBlock", wcsBO.getID(), 0);
+        setupUBO(programID, "ProjectionBlock", projectionBO.getID(), 1);
+        setupUBO(programID, "ScreenBlock", screenBO.getID(), 2);
+        setupUBO(programID, "DisplayBlock", displayBO.getID(), 3);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class GLSLSolarShader extends GLSLShader {
         pv1Ref = GL33.glGetUniformLocation(id, "pv1");
         latiGridRef = GL33.glGetUniformLocation(id, "latiGrid");
 
-        setupCommonBlocks(null, id);
+        setupCommonBlocks(id);
 
         if (hasCommon) {
             setTextureUnit(id, "image", GLTexture.Unit.ZERO);
