@@ -116,7 +116,7 @@ final class GLRenderer {
         GLSLShapeShader.dispose(gl);
         GLSLTextureShader.dispose(gl);
 
-        JHVGLException.checkErrors(gl, "GLRenderer.dispose()");
+        JHVGLException.checkErrors("GLRenderer.dispose()");
     }
 
     static void renderScene(Camera camera, GL3 gl) {
