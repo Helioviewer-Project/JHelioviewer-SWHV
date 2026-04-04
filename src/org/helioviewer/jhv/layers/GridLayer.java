@@ -172,7 +172,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp, GL3 gl) {
+    public void renderScale(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         flatGrid.render(camera, vp, showLabels);
