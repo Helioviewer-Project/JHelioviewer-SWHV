@@ -72,11 +72,11 @@ final class GLRenderer {
             ExportMovie.handleMovieExport(camera, gl);
 
         if (Display.mode.isOrthographic()) {
-            renderScene(camera, gl);
+            renderScene(camera);
             renderMiniview(gl);
         } else
             renderSceneScale(camera, gl);
-        renderFullFloatScene(camera, gl);
+        renderFullFloatScene(camera);
 
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
@@ -96,7 +96,7 @@ final class GLRenderer {
         JHVGLException.checkErrors("GLRenderer.dispose()");
     }
 
-    static void renderScene(Camera camera, GL3 gl) {
+    static void renderScene(Camera camera) {
         GL33.glClear(GL33.GL_COLOR_BUFFER_BIT | GL33.GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
             GL33.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -106,7 +106,7 @@ final class GLRenderer {
             GLSLSolarShader.sphere.use();
             GLSLSolar.quad.render();
 
-            Layers.render(camera, vp, gl);
+            Layers.render(camera, vp);
             JHVFrame.getInteraction().drawAnnotations(vp);
             Layers.renderFloat(camera, vp);
         }
@@ -156,7 +156,7 @@ final class GLRenderer {
         }
     }
 
-    private static void renderFullFloatScene(Camera camera, GL3 gl) {
+    private static void renderFullFloatScene(Camera camera) {
         Viewport vp = Display.fullViewport;
         GL33.glViewport(vp.x, vp.yGL, vp.width, vp.height);
         Layers.renderFullFloat(camera, vp);

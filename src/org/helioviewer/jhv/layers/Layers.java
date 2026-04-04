@@ -158,8 +158,8 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         layers.forEach(Layer::prerender);
     }
 
-    public static void render(Camera camera, Viewport vp, GL3 gl) {
-        layers.forEach(layer -> layer.render(camera, vp, gl));
+    public static void render(Camera camera, Viewport vp) {
+        layers.forEach(layer -> layer.render(camera, vp));
     }
 
     public static void renderScale(Camera camera, Viewport vp, GL3 gl) {

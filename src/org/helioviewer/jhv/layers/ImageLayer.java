@@ -183,12 +183,12 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     @Override
     public void renderMiniview(Camera camera, Viewport vp, GL3 gl) {
-        render(camera, vp, gl);
+        render(camera, vp);
     }
 
     @Override
     public void renderScale(Camera camera, Viewport vp, GL3 gl) {
-        render(camera, vp, gl);
+        render(camera, vp);
     }
 
     private final float[] crval0 = new float[2];
@@ -197,7 +197,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     private final float[] latiGrid1 = new float[3];
 
     @Override
-    public void render(Camera camera, Viewport vp, GL3 gl) {
+    public void render(Camera camera, Viewport vp) {
         if (imageData == null) {
             return;
         }

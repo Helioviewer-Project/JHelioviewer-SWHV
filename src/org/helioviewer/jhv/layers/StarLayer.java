@@ -55,7 +55,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL3 gl) {
+    public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
 

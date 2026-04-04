@@ -91,7 +91,7 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp, GL3 gl) {
+    public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         if (!optionsPanel.isHeliospheric())
