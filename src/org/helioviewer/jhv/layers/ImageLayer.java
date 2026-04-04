@@ -30,8 +30,6 @@ import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.wcs.WcsHeader;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
-
 public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     private final GLImage glImage;

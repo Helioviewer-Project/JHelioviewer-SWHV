@@ -30,8 +30,6 @@ import org.json.JSONObject;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
-
 public class ViewpointLayer extends AbstractLayer {
 
     private static final double DELTA_ORBIT = 2 * 60 * 1000 * Sun.MeanEarthDistanceInv;
