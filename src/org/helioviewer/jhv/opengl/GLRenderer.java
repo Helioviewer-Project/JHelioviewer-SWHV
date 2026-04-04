@@ -20,7 +20,7 @@ final class GLRenderer {
     private GLRenderer() {
     }
 
-    static void init(GL3 gl) {
+    static void init() {
         GL33.glDisable(GL33.GL_TEXTURE_1D);
         GL33.glDisable(GL33.GL_TEXTURE_2D);
 
