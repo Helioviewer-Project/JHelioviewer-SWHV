@@ -16,8 +16,6 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.threads.JHVThread;
 
-import com.jogamp.opengl.GL3;
-
 public class ExportMovie implements Movie.Listener {
 
     private static final ExportMovie instance = new ExportMovie();
@@ -48,13 +46,13 @@ public class ExportMovie implements Movie.Listener {
         }
     }
 
-    public static void handleMovieExport(Camera camera, GL3 gl) {
+    public static void handleMovieExport(Camera camera) {
         BufferedImage screen = null;
         BufferedImage eve = null;
         boolean submitted = false;
         try {
             screen = MappedImageFactory.createCompatible(grabber.w, grabber.h, BufferedImage.TYPE_3BYTE_BGR);
-            grabber.renderFrame(camera, gl, MappedImageFactory.getByteBuffer(screen));
+            grabber.renderFrame(camera, MappedImageFactory.getByteBuffer(screen));
             eve = EVEImage == null ? null : NativeImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
             submitted = true;

@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.ByteBuffer;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 final class GLFrameCapture {
@@ -17,10 +16,10 @@ final class GLFrameCapture {
     private final int drawColorRenderbuffer;
     private final int drawDepthRenderbuffer;
 
-    GLFrameCapture(GL3 gl, int captureW, int captureH, int requestedSamples) {
+    GLFrameCapture(int captureW, int captureH, int requestedSamples) {
         int frameWidth = Math.max(1, captureW);
         int frameHeight = Math.max(1, captureH);
-        int frameSamples = Math.clamp(requestedSamples, 0, gl.getMaxRenderbufferSamples());
+        int frameSamples = Math.clamp(requestedSamples, 0, GL33.glGetInteger(GL33.GL_MAX_SAMPLES));
         int colorInternalFormat = chooseColorInternalFormat();
         int colorPixelFormat = chooseColorPixelFormat();
         int resolveFbo = 0;

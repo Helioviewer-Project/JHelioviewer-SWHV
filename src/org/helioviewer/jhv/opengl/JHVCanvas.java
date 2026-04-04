@@ -122,7 +122,7 @@ public final class JHVCanvas extends AWTGLCanvas {
                 lastGlHeight = glHeight;
             }
             if (Movie.isRecording())
-                ExportMovie.handleMovieExport(Display.getCamera(), gl);
+                ExportMovie.handleMovieExport(Display.getCamera());
             GLRenderer.display(whiteBack);
             swapBuffers();
             frameRendered();
