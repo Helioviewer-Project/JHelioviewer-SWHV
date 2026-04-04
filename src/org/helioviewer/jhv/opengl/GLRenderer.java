@@ -124,7 +124,7 @@ final class GLRenderer {
 
             GL33.glDisable(GL33.GL_DEPTH_TEST);
             miniview.renderBackground();
-            Layers.renderMiniview(miniCamera, vp, gl);
+            Layers.renderMiniview(miniCamera, vp);
             GL33.glEnable(GL33.GL_DEPTH_TEST);
         }
     }

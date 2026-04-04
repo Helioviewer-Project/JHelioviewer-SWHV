@@ -24,7 +24,7 @@ public interface Layer {
     default void renderFullFloat(Camera camera, Viewport vp) {
     }
 
-    default void renderMiniview(Camera camera, Viewport vp, GL3 gl) {
+    default void renderMiniview(Camera camera, Viewport vp) {
     }
 
     default void prerender() {
