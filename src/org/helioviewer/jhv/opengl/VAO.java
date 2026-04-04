@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import com.jogamp.opengl.GL3;
+import org.lwjgl.opengl.GL33;
 
 class VAO {
 
@@ -14,22 +15,20 @@ class VAO {
     VAO(int nvbo, boolean dynamic, VAA[] _vaa) {
         vbo = new GLBO[nvbo];
         vaa = _vaa;
-        usage = dynamic ? GL3.GL_DYNAMIC_DRAW : GL3.GL_STATIC_DRAW;
+        usage = dynamic ? GL33.GL_DYNAMIC_DRAW : GL33.GL_STATIC_DRAW;
     }
 
     public void init(GL3 gl) {
         if (!inited) {
             inited = true;
 
-            int[] tmpId = new int[1];
-            gl.glGenVertexArrays(1, tmpId, 0);
-            vaoID = tmpId[0];
+            vaoID = GL33.glGenVertexArrays();
 
             for (int i = 0; i < vbo.length; i++) {
-                vbo[i] = new GLBO(gl, GL3.GL_ARRAY_BUFFER, usage);
+                vbo[i] = new GLBO(gl, GL33.GL_ARRAY_BUFFER, usage);
             }
 
-            gl.glBindVertexArray(vaoID);
+            GL33.glBindVertexArray(vaoID);
             for (int i = 0; i < vaa.length; i++) {
                 vbo[i % vbo.length].bind(gl); //!
                 vaa[i].enable(gl);
@@ -40,7 +39,7 @@ class VAO {
     public void dispose(GL3 gl) {
         if (inited) {
             inited = false;
-            gl.glDeleteVertexArrays(1, new int[]{vaoID}, 0);
+            GL33.glDeleteVertexArrays(vaoID);
             vaoID = -1;
 
             for (int i = 0; i < vbo.length; i++) {
@@ -51,7 +50,7 @@ class VAO {
     }
 
     protected void bind(GL3 gl) {
-        gl.glBindVertexArray(vaoID);
+        GL33.glBindVertexArray(vaoID);
     }
 
 }
