@@ -8,9 +8,6 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
 import org.helioviewer.jhv.time.JHVTime;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 public class NullView implements View {
 
     public static ManyView create(long start, long end, int cadence) {

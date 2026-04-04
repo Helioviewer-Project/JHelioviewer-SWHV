@@ -16,7 +16,6 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLImage;
 
 import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.JideToggleButton;
 
 public class DifferencePanel implements FilterDetails {
 

@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
-import javax.annotation.Nonnull;
-
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;

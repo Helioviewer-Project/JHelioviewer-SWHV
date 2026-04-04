@@ -12,9 +12,6 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.JideToggleButton;
-
 public class ChannelMixerPanel implements FilterDetails {
 
     private final JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
