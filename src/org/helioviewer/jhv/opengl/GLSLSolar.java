@@ -6,8 +6,6 @@ import org.helioviewer.jhv.base.BufferUtils;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
-
 public class GLSLSolar extends VAO1 {
 
     public static final GLSLSolar quad = new GLSLSolar();
@@ -24,8 +22,8 @@ public class GLSLSolar extends VAO1 {
     }
 
     @Override
-    public void init(GL3 gl) {
-        super.init(gl);
+    public void init() {
+        super.init();
         vbo.setBufferData(4 * 16, 4 * 16, vertx);
     }
 

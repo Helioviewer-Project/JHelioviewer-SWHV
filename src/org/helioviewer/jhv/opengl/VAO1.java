@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 class VAO1 {
@@ -17,7 +16,7 @@ class VAO1 {
         vaa = _vaa;
     }
 
-    public void init(GL3 gl) {
+    public void init() {
         if (!inited) {
             inited = true;
 
@@ -32,7 +31,7 @@ class VAO1 {
         }
     }
 
-    public void dispose(GL3 gl) {
+    public void dispose() {
         if (inited) {
             inited = false;
 

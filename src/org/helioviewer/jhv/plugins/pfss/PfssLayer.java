@@ -111,12 +111,12 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     @Override
     public void init(GL3 gl) {
-        glslLine.init(gl);
+        glslLine.init();
     }
 
     @Override
     public void dispose(GL3 gl) {
-        glslLine.dispose(gl);
+        glslLine.dispose();
     }
 
     @Override

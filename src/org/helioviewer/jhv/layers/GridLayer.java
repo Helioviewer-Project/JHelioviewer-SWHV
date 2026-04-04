@@ -230,39 +230,39 @@ public final class GridLayer extends AbstractLayer {
 
     @Override
     public void init(GL3 gl) {
-        gridLine.init(gl);
+        gridLine.init();
         GridMath.initGrid(gl, gridLine, lonStep, latStep);
         gridNeedsInit = false;
 
-        axesLine.init(gl);
+        axesLine.init();
         GridMath.initAxes(gl, axesLine);
 
-        earthCircleLine.init(gl);
+        earthCircleLine.init();
         GridMath.initEarthCircles(gl, earthCircleLine);
-        earthPoint.init(gl);
+        earthPoint.init();
         GridMath.initEarthPoint(gl, earthPoint);
 
-        radialCircleLine.init(gl);
-        radialThickLine.init(gl);
+        radialCircleLine.init();
+        radialThickLine.init();
         GridMath.initRadialCircles(gl, radialCircleLine, radialThickLine, RADIAL_UNIT, RADIAL_STEP);
-        radialCircleLineFar.init(gl);
-        radialThickLineFar.init(gl);
+        radialCircleLineFar.init();
+        radialThickLineFar.init();
         GridMath.initRadialCircles(gl, radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
-        flatGrid.init(gl);
+        flatGrid.init();
     }
 
     @Override
     public void dispose(GL3 gl) {
-        gridLine.dispose(gl);
-        axesLine.dispose(gl);
-        earthCircleLine.dispose(gl);
-        earthPoint.dispose(gl);
-        radialCircleLine.dispose(gl);
-        radialThickLine.dispose(gl);
-        radialCircleLineFar.dispose(gl);
-        radialThickLineFar.dispose(gl);
-        flatGrid.dispose(gl);
+        gridLine.dispose();
+        axesLine.dispose();
+        earthCircleLine.dispose();
+        earthPoint.dispose();
+        radialCircleLine.dispose();
+        radialThickLine.dispose();
+        radialCircleLineFar.dispose();
+        radialThickLineFar.dispose();
+        flatGrid.dispose();
     }
 
     @Override

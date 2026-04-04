@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 class VAO {
@@ -18,7 +17,7 @@ class VAO {
         usage = dynamic ? GL33.GL_DYNAMIC_DRAW : GL33.GL_STATIC_DRAW;
     }
 
-    public void init(GL3 gl) {
+    public void init() {
         if (!inited) {
             inited = true;
 
@@ -36,7 +35,7 @@ class VAO {
         }
     }
 
-    public void dispose(GL3 gl) {
+    public void dispose() {
         if (inited) {
             inited = false;
             GL33.glDeleteVertexArrays(vaoID);
