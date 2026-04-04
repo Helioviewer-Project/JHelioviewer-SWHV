@@ -66,7 +66,7 @@ public class GLTexture {
     public void copyImageBuffer(GL3 gl, ImageBuffer imageBuffer) {
         int w = imageBuffer.width;
         int h = imageBuffer.height;
-        if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
+        if (w < 1 || h < 1 || w > JHVCanvas.maxTextureSize || h > JHVCanvas.maxTextureSize) {
             Log.warn("w= " + w + " h=" + h);
             return;
         }
@@ -97,7 +97,7 @@ public class GLTexture {
     public static void copyBufferedImage(GL3 gl, BufferedImage source) {
         int w = source.getWidth();
         int h = source.getHeight();
-        if (w < 1 || h < 1 || w > GLInfo.maxTextureSize || h > GLInfo.maxTextureSize) {
+        if (w < 1 || h < 1 || w > JHVCanvas.maxTextureSize || h > JHVCanvas.maxTextureSize) {
             Log.warn("w= " + w + " h=" + h);
             return;
         }

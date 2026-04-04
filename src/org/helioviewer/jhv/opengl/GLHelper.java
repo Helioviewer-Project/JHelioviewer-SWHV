@@ -56,7 +56,7 @@ public class GLHelper {
     }
 
     public static Point GL2AWTPoint(int x, int y) {
-        return new Point((int) (x / GLInfo.pixelScale[0] + .5), (int) (y / GLInfo.pixelScale[1] + .5));
+        return new Point((int) (x / JHVCanvas.pixelScale[0] + .5), (int) (y / JHVCanvas.pixelScale[1] + .5));
     }
 
 }

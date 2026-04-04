@@ -24,7 +24,7 @@ final class GLRenderer {
 
     void init(GL3 gl) {
         JHVCanvas.initGLInfo(gl);
-        GLInfo.updatePixelScale(canvas.getGraphicsConfiguration());
+        canvas.updatePixelScale();
 
         gl.glDisable(GL3.GL_TEXTURE_1D);
         gl.glDisable(GL3.GL_TEXTURE_2D);
@@ -70,8 +70,8 @@ final class GLRenderer {
     }
 
     void reshape(int x, int y, int width, int height) {
-        GLInfo.updatePixelScale(canvas.getGraphicsConfiguration());
-        Display.setGLSize(x, y, (int) (canvas.getWidth() * GLInfo.pixelScale[0] + .5), (int) (canvas.getHeight() * GLInfo.pixelScale[1] + .5));
+        canvas.updatePixelScale();
+        Display.setGLSize(x, y, (int) (canvas.getWidth() * JHVCanvas.pixelScale[0] + .5), (int) (canvas.getHeight() * JHVCanvas.pixelScale[1] + .5));
         Display.reshapeAll();
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null)

@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.EventQueue;
+import java.awt.GraphicsConfiguration;
+import java.awt.geom.AffineTransform;
 import java.lang.reflect.InvocationTargetException;
 
 import org.helioviewer.jhv.Log;
@@ -18,6 +20,11 @@ import com.jogamp.opengl.awt.GLCanvas;
 @SuppressWarnings("serial")
 public final class JHVCanvas extends GLCanvas {
 
+    public static final int GLSAMPLES = 4;
+    public static String glVersion = "";
+    public static int maxTextureSize;
+    public static final double[] pixelScale = {1, 1};
+
     private boolean whiteBack;
     private int fps;
     private int fpsCount;
@@ -34,8 +41,7 @@ public final class JHVCanvas extends GLCanvas {
             canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
             return canvas;
         } catch (Exception e) {
-            String msg = e.getMessage();
-            throw glVersionError(msg == null ? "Unknown OpenGL error." : msg);
+            throw glVersionError(e.getMessage() == null ? "Unknown OpenGL error." : e.getMessage());
         }
     }
 
@@ -46,14 +52,27 @@ public final class JHVCanvas extends GLCanvas {
     }
 
     static void initGLInfo(GL3 gl) {
-        GLInfo.glVersion = "OpenGL " + gl.glGetString(GL3.GL_VERSION);
-        Log.info(GLInfo.glVersion);
+        glVersion = "OpenGL " + gl.glGetString(GL3.GL_VERSION);
+        Log.info(glVersion);
         if (!gl.isExtensionAvailable("GL_VERSION_3_3"))
             throw glVersionError("OpenGL 3.3 not supported.");
 
         int[] out = {0};
         gl.glGetIntegerv(GL3.GL_MAX_TEXTURE_SIZE, out, 0);
-        GLInfo.maxTextureSize = out[0];
+        maxTextureSize = out[0];
+    }
+
+    void updatePixelScale() {
+        GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
+        if (graphicsConfiguration == null) {
+            pixelScale[0] = 1;
+            pixelScale[1] = 1;
+            return;
+        }
+
+        AffineTransform transform = graphicsConfiguration.getDefaultTransform();
+        pixelScale[0] = transform.getScaleX();
+        pixelScale[1] = transform.getScaleY();
     }
 
     private static GLEventListener createListener(JHVCanvas canvas, GLRenderer renderer) {
@@ -93,18 +112,18 @@ public final class JHVCanvas extends GLCanvas {
         whiteBack = whiteBackground;
     }
 
-    void frameRendered() {
+    private void frameRendered() {
         fpsCount++;
     }
 
     public int getFramerate() {
-        long currentTime = System.currentTimeMillis();
-        long delta = currentTime - fpsTime;
+        long now = System.currentTimeMillis();
+        long delta = now - fpsTime;
 
         if (delta > 1000) {
             fps = (int) ((1000L * fpsCount + delta / 2) / delta);
             fpsCount = 0;
-            fpsTime = currentTime;
+            fpsTime = now;
         }
         return fps;
     }
@@ -127,7 +146,7 @@ public final class JHVCanvas extends GLCanvas {
     private static GLCapabilities getCapabilities(GLProfile profile) {
         GLCapabilities capabilities = new GLCapabilities(profile);
         capabilities.setSampleBuffers(true);
-        capabilities.setNumSamples(GLInfo.GLSAMPLES);
+        capabilities.setNumSamples(GLSAMPLES);
         capabilities.setRedBits(8);
         capabilities.setGreenBits(8);
         capabilities.setBlueBits(8);
