@@ -107,7 +107,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
             tex.bind();
 
-            GLTexture.copyBufferedImage(gl, bi);
+            GLTexture.copyBufferedImage(bi);
             iconCacheId.put(key, tex);
         }
         tex.bind();

@@ -17,8 +17,6 @@ import org.helioviewer.jhv.imagedata.ImageBuffer;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
-
 public class GLTexture {
 
     public enum Unit {
@@ -54,7 +52,7 @@ public class GLTexture {
         texID = prev_width = -1;
     }
 
-    private static void genTexture2D(GL3 gl, int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
+    private static void genTexture2D(int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_BASE_LEVEL, 0);
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAX_LEVEL, 0);
         switch (buffer) {
@@ -70,7 +68,7 @@ public class GLTexture {
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_T, GL33.GL_CLAMP_TO_EDGE);
     }
 
-    public void copyImageBuffer(GL3 gl, ImageBuffer imageBuffer) {
+    public void copyImageBuffer(ImageBuffer imageBuffer) {
         int w = imageBuffer.width;
         int h = imageBuffer.height;
         if (w < 1 || h < 1 || w > JHVCanvas.maxTextureSize || h > JHVCanvas.maxTextureSize) {
@@ -84,7 +82,7 @@ public class GLTexture {
 
         if (w != prev_width || h != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(format);
-            genTexture2D(gl, internalGLFormat, w, h, inputGLFormat, bppGLType, null);
+            genTexture2D(internalGLFormat, w, h, inputGLFormat, bppGLType, null);
 
             prev_width = w;
             prev_height = h;
@@ -101,7 +99,7 @@ public class GLTexture {
         GL33.glBindBuffer(GL33.GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
-    public static void copyBufferedImage(GL3 gl, BufferedImage source) {
+    public static void copyBufferedImage(BufferedImage source) {
         int w = source.getWidth();
         int h = source.getHeight();
         if (w < 1 || h < 1 || w > JHVCanvas.maxTextureSize || h > JHVCanvas.maxTextureSize) {
@@ -125,10 +123,10 @@ public class GLTexture {
 
         GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(dataType));
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, w);
-        genTexture2D(gl, mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(dataType), buffer);
+        genTexture2D(mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(dataType), buffer);
     }
 
-    public static void copyBuffer1D(GL3 gl, IntBuffer source) {
+    public static void copyBuffer1D(IntBuffer source) {
         if (!source.isDirect()) {
             IntBuffer direct = BufferUtils.newIntBuffer(source.remaining());
             int position = source.position();

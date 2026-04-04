@@ -107,7 +107,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     @Override
     public void init(GL3 gl) {
-        glImage.init(gl);
+        glImage.init();
     }
 
     @Override
@@ -178,7 +178,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
         if (imageData == null) {
             return;
         }
-        glImage.streamImage(gl, imageData, prevImageData, baseImageData);
+        glImage.streamImage(imageData, prevImageData, baseImageData);
     }
 
     @Override
@@ -313,7 +313,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
     @Override
     public void dispose(GL3 gl) {
-        glImage.dispose(gl);
+        glImage.dispose();
     }
 
     private ImageData imageData;

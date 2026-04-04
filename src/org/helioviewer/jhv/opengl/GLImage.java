@@ -56,17 +56,17 @@ public class GLImage {
     private boolean lastInverted = false;
     private boolean lutChanged = true;
 
-    public void streamImage(GL3 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
+    public void streamImage(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
             tex.bind();
-            tex.copyImageBuffer(gl, imageData.getImageBuffer());
+            tex.copyImageBuffer(imageData.getImageBuffer());
         }
 
         ImageData prevFrame = diffMode == DifferenceMode.Base ? baseImageData : prevImageData;
         if (diffMode != DifferenceMode.None && prevFrame != null) {
             diffTex.bind();
-            diffTex.copyImageBuffer(gl, prevFrame.getImageBuffer());
+            diffTex.copyImageBuffer(prevFrame.getImageBuffer());
         }
     }
 
@@ -87,13 +87,13 @@ public class GLImage {
                 Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1,
                 (float) slitLeft, (float) slitRight);
 
-        applyLUT(gl);
+        applyLUT();
         tex.bind();
         if (diffMode != DifferenceMode.None)
             diffTex.bind();
     }
 
-    private void applyLUT(GL3 gl) {
+    private void applyLUT() {
         lutTex.bind();
 
         LUT currlut = diffMode == DifferenceMode.None ? lut : LUT.gray();
@@ -103,12 +103,12 @@ public class GLImage {
             lastLut = currlut;
             lastInverted = invertLUT;
 
-            GLTexture.copyBuffer1D(gl, lutBuffer);
+            GLTexture.copyBuffer1D(lutBuffer);
         }
         lutChanged = false;
     }
 
-    public void init(GL3 gl) {
+    public void init() {
         tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
         lutTex = new GLTexture(GL33.GL_TEXTURE_1D, GLTexture.Unit.ONE);
         diffTex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.TWO);
@@ -116,7 +116,7 @@ public class GLImage {
         lutChanged = true;
     }
 
-    public void dispose(GL3 gl) {
+    public void dispose() {
         if (tex != null)
             tex.delete();
         if (lutTex != null)
