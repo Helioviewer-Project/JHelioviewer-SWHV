@@ -22,7 +22,7 @@ public class GLGrab {
         capture = new GLFrameCapture(gl, w, h, JHVCanvas.GLSAMPLES);
     }
 
-    public void dispose(GL3 gl) {
+    public void dispose() {
         if (capture != null) {
             capture.dispose();
             capture = null;

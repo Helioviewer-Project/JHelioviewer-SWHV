@@ -69,7 +69,7 @@ public class ExportMovie implements Movie.Listener {
         Movie.grabDone();
 
         if (shallStop) {
-            grabber.dispose(gl);
+            grabber.dispose();
             stop();
         }
     }
