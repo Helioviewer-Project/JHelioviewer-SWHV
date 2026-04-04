@@ -23,7 +23,7 @@ public class GLSLTexture extends VAO1 {
             return;
 
         Buffer buffer = buf.toBuffer();
-        vbo.setBufferData(gl, 4 * buffer.limit(), 4 * buffer.capacity(), buffer);
+        vbo.setBufferData(4 * buffer.limit(), 4 * buffer.capacity(), buffer);
         buf.clear();
     }
 
@@ -35,7 +35,7 @@ public class GLSLTexture extends VAO1 {
         GLSLTextureShader.texture.bindParams(gl, color);
         GLSLTextureShader.texture.bindMVP(gl);
 
-        bind(gl);
+        bind();
         GL33.glDrawArrays(mode, first, toDraw);
     }
 

@@ -59,13 +59,13 @@ public class GLImage {
     public void streamImage(GL3 gl, ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
-            tex.bind(gl);
+            tex.bind();
             tex.copyImageBuffer(gl, imageData.getImageBuffer());
         }
 
         ImageData prevFrame = diffMode == DifferenceMode.Base ? baseImageData : prevImageData;
         if (diffMode != DifferenceMode.None && prevFrame != null) {
-            diffTex.bind(gl);
+            diffTex.bind();
             diffTex.copyImageBuffer(gl, prevFrame.getImageBuffer());
         }
     }
@@ -88,13 +88,13 @@ public class GLImage {
                 (float) slitLeft, (float) slitRight);
 
         applyLUT(gl);
-        tex.bind(gl);
+        tex.bind();
         if (diffMode != DifferenceMode.None)
-            diffTex.bind(gl);
+            diffTex.bind();
     }
 
     private void applyLUT(GL3 gl) {
-        lutTex.bind(gl);
+        lutTex.bind();
 
         LUT currlut = diffMode == DifferenceMode.None ? lut : LUT.gray();
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
@@ -109,20 +109,20 @@ public class GLImage {
     }
 
     public void init(GL3 gl) {
-        tex = new GLTexture(gl, GL33.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
-        lutTex = new GLTexture(gl, GL33.GL_TEXTURE_1D, GLTexture.Unit.ONE);
-        diffTex = new GLTexture(gl, GL33.GL_TEXTURE_2D, GLTexture.Unit.TWO);
+        tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
+        lutTex = new GLTexture(GL33.GL_TEXTURE_1D, GLTexture.Unit.ONE);
+        diffTex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.TWO);
 
         lutChanged = true;
     }
 
     public void dispose(GL3 gl) {
         if (tex != null)
-            tex.delete(gl);
+            tex.delete();
         if (lutTex != null)
-            lutTex.delete(gl);
+            lutTex.delete();
         if (diffTex != null)
-            diffTex.delete(gl);
+            diffTex.delete();
     }
 
     public void setDeltaCROTA(double delta) {

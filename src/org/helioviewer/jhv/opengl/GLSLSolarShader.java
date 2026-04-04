@@ -52,10 +52,10 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init(GL3 gl) {
-        wcsBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
-        projectionBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
-        screenBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
-        displayBO = new GLBO(gl, GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
+        wcsBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
+        projectionBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
+        screenBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
+        displayBO = new GLBO(GL33.GL_UNIFORM_BUFFER, GL33.GL_STREAM_DRAW);
 
         sphere._init(gl, sphere.hasCommon);
         ortho._init(gl, ortho.hasCommon);
@@ -102,10 +102,10 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose(gl);
         polar._dispose(gl);
         logpolar._dispose(gl);
-        wcsBO.delete(gl);
-        projectionBO.delete(gl);
-        screenBO.delete(gl);
-        displayBO.delete(gl);
+        wcsBO.delete();
+        projectionBO.delete();
+        screenBO.delete();
+        displayBO.delete();
     }
 
     public static void bindWCS(GL3 gl,
@@ -121,7 +121,7 @@ public class GLSLSolarShader extends GLSLShader {
         crota1.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval1).put(deltaT1).put(0);
 
-        wcsBO.setBufferData(gl, WCS_SIZE, WCS_SIZE, wcsBuf.flip());
+        wcsBO.setBufferData(WCS_SIZE, WCS_SIZE, wcsBuf.flip());
     }
 
     public static void bindProjection(GL3 gl,
@@ -137,7 +137,7 @@ public class GLSLSolarShader extends GLSLShader {
         sourceView1.setFloatBuffer(projectionBuf);
         displayMap1.setFloatBuffer(projectionBuf);
 
-        projectionBO.setBufferData(gl, PROJECTION_SIZE, PROJECTION_SIZE, projectionBuf.flip());
+        projectionBO.setBufferData(PROJECTION_SIZE, PROJECTION_SIZE, projectionBuf.flip());
     }
 
     public void bindLatiGrid(GL3 gl, float[] latiGrid0, float[] latiGrid1) {
@@ -160,7 +160,7 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put((float) scale.getInterpolatedXValue(1));
         screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
 
-        screenBO.setBufferData(gl, SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
+        screenBO.setBufferData(SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
     }
 
     static void bindDisplay(GL3 gl, float[] color,
@@ -177,7 +177,7 @@ public class GLSLSolarShader extends GLSLShader {
         displayBuf.put(bOffset).put(bScale);
         displayBuf.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
 
-        displayBO.setBufferData(gl, DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
+        displayBO.setBufferData(DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
     }
 
     public void bindPV(GL3 gl, float[] pv0, float[] pv1) {

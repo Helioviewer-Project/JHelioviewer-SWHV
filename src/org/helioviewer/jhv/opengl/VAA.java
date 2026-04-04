@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 class VAA {
@@ -23,7 +22,7 @@ class VAA {
         divisor = _divisor;
     }
 
-    void enable(GL3 gl) {
+    void enable() {
         GL33.glEnableVertexAttribArray(index);
         GL33.glVertexAttribPointer(index, size, type, normalized, stride, offset);
         GL33.glVertexAttribDivisor(index, divisor);

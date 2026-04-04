@@ -24,10 +24,10 @@ class VAO1 {
             vaoID = GL33.glGenVertexArrays();
             GL33.glBindVertexArray(vaoID);
 
-            vbo = new GLBO(gl, GL33.GL_ARRAY_BUFFER, usage);
-            vbo.bind(gl);
+            vbo = new GLBO(GL33.GL_ARRAY_BUFFER, usage);
+            vbo.bind();
             for (VAA avaa : vaa) {
-                avaa.enable(gl);
+                avaa.enable();
             }
         }
     }
@@ -36,13 +36,13 @@ class VAO1 {
         if (inited) {
             inited = false;
 
-            vbo.delete(gl);
+            vbo.delete();
             GL33.glDeleteVertexArrays(vaoID);
             vaoID = -1;
         }
     }
 
-    protected void bind(GL3 gl) {
+    protected void bind() {
         GL33.glBindVertexArray(vaoID);
     }
 

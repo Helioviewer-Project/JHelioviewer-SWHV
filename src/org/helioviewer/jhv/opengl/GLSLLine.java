@@ -29,9 +29,9 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
 
         Buffer buffer;
         buffer = vexBuf.toVertexBuffer();
-        vbo[0].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        vbo[0].setBufferData(buffer.limit(), buffer.capacity(), buffer);
         buffer = vexBuf.toColorBuffer();
-        vbo[1].setBufferData(gl, buffer.limit(), buffer.capacity(), buffer);
+        vbo[1].setBufferData(buffer.limit(), buffer.capacity(), buffer);
 
         count--;
     }
@@ -44,7 +44,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         GLSLLineShader.line.bindParams(gl, aspect, thickness);
         GLSLLineShader.line.bindMVP(gl);
 
-        bind(gl);
+        bind();
         GL33.glDrawArraysInstanced(GL33.GL_TRIANGLE_STRIP, 0, 4, count);
     }
 

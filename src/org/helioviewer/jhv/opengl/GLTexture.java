@@ -35,22 +35,22 @@ public class GLTexture {
     private int prev_inputGLFormat = -1;
     private int prev_bppGLType = -1;
 
-    public GLTexture(GL3 gl, int _target, Unit _unit) {
+    public GLTexture(int _target, Unit _unit) {
         texID = GL33.glGenTextures();
-        pbo = new GLBO(gl, GL33.GL_PIXEL_UNPACK_BUFFER, GL33.GL_STREAM_DRAW);
+        pbo = new GLBO(GL33.GL_PIXEL_UNPACK_BUFFER, GL33.GL_STREAM_DRAW);
 
         target = _target;
         unit = GL33.GL_TEXTURE0 + _unit.ordinal();
     }
 
-    public void bind(GL3 gl) {
+    public void bind() {
         GL33.glActiveTexture(unit);
         GL33.glBindTexture(target, texID);
     }
 
-    public void delete(GL3 gl) {
+    public void delete() {
         GL33.glDeleteTextures(texID);
-        pbo.delete(gl);
+        pbo.delete();
         texID = prev_width = -1;
     }
 
@@ -96,7 +96,7 @@ public class GLTexture {
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, w);
 
         int size = format.bytes * imageBuffer.buffer.capacity();
-        pbo.setBufferData(gl, size, size, imageBuffer.buffer);
+        pbo.setBufferData(size, size, imageBuffer.buffer);
         GL33.glTexSubImage2D(GL33.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0L);
         GL33.glBindBuffer(GL33.GL_PIXEL_UNPACK_BUFFER, 0);
     }

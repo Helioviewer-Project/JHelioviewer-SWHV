@@ -19,14 +19,14 @@ public class GLSLSolar extends VAO1 {
     }
 
     public void render(GL3 gl) {
-        bind(gl);
+        bind();
         GL33.glDrawArrays(GL33.GL_TRIANGLE_STRIP, 0, 4);
     }
 
     @Override
     public void init(GL3 gl) {
         super.init(gl);
-        vbo.setBufferData(gl, 4 * 16, 4 * 16, vertx);
+        vbo.setBufferData(4 * 16, 4 * 16, vertx);
     }
 
 }
