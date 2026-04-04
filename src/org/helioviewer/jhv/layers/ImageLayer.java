@@ -182,7 +182,7 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     }
 
     @Override
-    public void renderMiniview(Camera camera, Viewport vp, GL3 gl) {
+    public void renderMiniview(Camera camera, Viewport vp) {
         render(camera, vp);
     }
 
