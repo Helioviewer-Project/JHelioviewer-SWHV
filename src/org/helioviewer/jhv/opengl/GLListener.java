@@ -17,7 +17,7 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 
-public class GLListener implements GLEventListener {
+class GLListener implements GLEventListener {
 
     private final JHVCanvas canvas;
 
@@ -190,26 +190,9 @@ public class GLListener implements GLEventListener {
             renderSceneScale(camera, gl);
         renderFullFloatScene(camera, gl);
 
-        fpsCount++;
+        canvas.frameRendered();
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
         // JHVGLException.checkErrors(gl, "GLListener.display()");
     }
-
-    private static int fps;
-    private static int fpsCount;
-    private static long fpsTime = System.currentTimeMillis();
-
-    public static int getFramerate() {
-        long currentTime = System.currentTimeMillis();
-        long delta = currentTime - fpsTime;
-
-        if (delta > 1000) {
-            fps = (int) (1000 * fpsCount / (double) delta + .5);
-            fpsCount = 0;
-            fpsTime = currentTime;
-        }
-        return fps;
-    }
-
 }

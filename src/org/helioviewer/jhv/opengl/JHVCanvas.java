@@ -16,6 +16,9 @@ import com.jogamp.opengl.awt.GLCanvas;
 public final class JHVCanvas extends GLCanvas {
 
     private boolean whiteBack;
+    private int fps;
+    private int fpsCount;
+    private long fpsTime = System.currentTimeMillis();
 
     public static JHVCanvas create() {
         JHVCanvas canvas = null;
@@ -43,6 +46,22 @@ public final class JHVCanvas extends GLCanvas {
 
     public void setWhiteBackground(boolean whiteBackground) {
         whiteBack = whiteBackground;
+    }
+
+    void frameRendered() {
+        fpsCount++;
+    }
+
+    public int getFramerate() {
+        long currentTime = System.currentTimeMillis();
+        long delta = currentTime - fpsTime;
+
+        if (delta > 1000) {
+            fps = (int) ((1000L * fpsCount + delta / 2) / delta);
+            fpsCount = 0;
+            fpsTime = currentTime;
+        }
+        return fps;
     }
 
     @Override
