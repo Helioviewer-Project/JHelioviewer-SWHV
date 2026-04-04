@@ -62,12 +62,12 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(Camera camera, Viewport vp, GL3 gl, boolean showLabels) {
-        rebuildIfNeeded(camera, vp, gl);
+    public void render(Camera camera, Viewport vp, boolean showLabels) {
+        rebuildIfNeeded(camera, vp);
         shape.renderShape(GL33.GL_TRIANGLES);
         if (showLabels) {
             int labelSize = (int) (TEXT_SCALE * CameraHelper.getPixelFactor(camera, vp));
-            drawLabels(camera, labelSize, vp, gl);
+            drawLabels(camera, labelSize, vp);
         }
     }
 
@@ -75,7 +75,7 @@ public class FlatGrid {
         return new FlatGridKey(Display.mode, Display.gridType, vp.aspect, camera.getCameraWidth(), camera.getTranslationX(), camera.getTranslationY());
     }
 
-    private void rebuildIfNeeded(Camera camera, Viewport vp, GL3 gl) {
+    private void rebuildIfNeeded(Camera camera, Viewport vp) {
         FlatGridKey flatGridKey = key(camera, vp);
         GridScale scale = Display.mode.scale;
         AxisSignature xSignature = buildAxisSignature(true, scale.getInterpolatedXValue(0), scale.getInterpolatedXValue(1));
@@ -86,7 +86,7 @@ public class FlatGrid {
         boolean wrap0to360 = Display.gridType == GridType.Carrington;
         xAxis = buildAxis(scale, true, wrap0to360, xSignature);
         yAxis = buildAxis(scale, false, false, ySignature);
-        rebuildShape(gl, camera, vp);
+        rebuildShape(camera, vp);
 
         previousKey = flatGridKey;
     }
@@ -97,7 +97,7 @@ public class FlatGrid {
                 !Objects.equals(yAxis.signature(), ySignature);
     }
 
-    private void drawLabels(Camera camera, int size, Viewport vp, GL3 gl) {
+    private void drawLabels(Camera camera, int size, Viewport vp) {
         float textScaleFactor = 0.3f * TEXT_SCALE / GLText.getRenderer(size).getFont().getSize2D();
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
@@ -114,7 +114,7 @@ public class FlatGrid {
         renderer.end3DRendering();
     }
 
-    private void rebuildShape(GL3 gl, Camera camera, Viewport vp) {
+    private void rebuildShape(Camera camera, Viewport vp) {
         int noPoints = RasterLine.vertexCount(xAxis.positions().length + yAxis.positions().length);
         BufVertex vexBuf = new BufVertex(noPoints * GLSLShape.stride);
 
