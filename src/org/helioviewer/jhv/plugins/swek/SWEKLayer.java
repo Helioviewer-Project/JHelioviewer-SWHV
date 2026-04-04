@@ -319,7 +319,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(Viewport vp, GL3 gl, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         List<String> txts = new ArrayList<>();
         for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
@@ -330,14 +330,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         GLText.drawTextFloat(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
-    private void renderEvents(Viewport vp, GL3 gl) {
+    private void renderEvents(Viewport vp) {
         lineEvent.setVertex(bufEvent);
         lineThick.setVertex(bufThick);
         lineEvent.renderLine(vp.aspect, LINEWIDTH);
         lineThick.renderLine(vp.aspect, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(GL3 gl, List<JHVRelatedEvents> evs) {
+    private void renderIcons(List<JHVRelatedEvents> evs) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
@@ -370,9 +370,9 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                 }
             }
         }
-        renderEvents(vp, gl);
+        renderEvents(vp);
         if (icons) {
-            renderIcons(gl, evs);
+            renderIcons(evs);
         }
     }
 
@@ -396,9 +396,9 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                 }
             }
         }
-        renderEvents(vp, gl);
+        renderEvents(vp);
         if (icons) {
-            renderIcons(gl, evs);
+            renderIcons(evs);
         }
     }
 
@@ -407,7 +407,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (!enabled)
             return;
         if (SWEKPopupController.mouseOverJHVEvent != null) {
-            drawText(vp, gl, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
+            drawText(vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
         }
     }
 

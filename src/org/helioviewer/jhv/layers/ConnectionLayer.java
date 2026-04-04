@@ -93,11 +93,11 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
         if (connectivity != null)
-            drawConnectivity(ctx, camera, gl);
+            drawConnectivity(ctx, camera);
         if (hcs != null)
-            drawHCS(ctx, gl);
+            drawHCS(ctx);
         if (footpointMap != null)
-            drawFootpointInterpolated(ctx, gl);
+            drawFootpointInterpolated(ctx);
 
         if (!geometryMap.isEmpty()) {
             SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
@@ -111,7 +111,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         render(camera, vp, gl);
     }
 
-    private void drawConnectivity(MapContext ctx, Camera camera, GL3 gl) {
+    private void drawConnectivity(MapContext ctx, Camera camera) {
         putConnectivity(ctx, connectivity.SSW, sswColor, connectivityBuf);
         putConnectivity(ctx, connectivity.FSW, fswColor, connectivityBuf);
         putConnectivity(ctx, connectivity.M, mColor, connectivityBuf);
@@ -124,7 +124,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         points.forEach(v -> Display.mode.emitMapPoint(ctx, v, 2 * SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
     }
 
-    private void drawHCS(MapContext ctx, GL3 gl) {
+    private void drawHCS(MapContext ctx) {
         if (hcs.isEmpty())
             return;
         Vec3 first = hcs.getFirst();
@@ -149,7 +149,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         return SphericalPoint.fromCartesian(x, y, z);
     }
 
-    private void drawFootpointInterpolated(MapContext ctx, GL3 gl) {
+    private void drawFootpointInterpolated(MapContext ctx) {
         JHVTime time = ctx.viewpoint().time;
         updateTimestamp(time);
 

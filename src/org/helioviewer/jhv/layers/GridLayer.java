@@ -175,7 +175,7 @@ public final class GridLayer extends AbstractLayer {
     public void renderScale(Camera camera, Viewport vp, GL3 gl) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(camera, vp, gl, showLabels);
+        flatGrid.render(camera, vp, showLabels);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
