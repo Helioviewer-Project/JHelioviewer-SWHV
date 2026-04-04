@@ -108,7 +108,7 @@ final class GLRenderer {
 
             Layers.render(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp);
-            Layers.renderFloat(camera, vp, gl);
+            Layers.renderFloat(camera, vp);
         }
     }
 
@@ -152,7 +152,7 @@ final class GLRenderer {
 
             Layers.renderScale(camera, vp, gl);
             JHVFrame.getInteraction().drawAnnotations(vp);
-            Layers.renderFloat(camera, vp, gl);
+            Layers.renderFloat(camera, vp);
         }
     }
 
