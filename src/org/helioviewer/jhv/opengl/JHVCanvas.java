@@ -28,6 +28,7 @@ public final class JHVCanvas extends AWTGLCanvas {
     public static final double[] pixelScale = {1, 1};
 
     private boolean whiteBack;
+    private boolean displayPending;
     private int fps;
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
@@ -114,7 +115,14 @@ public final class JHVCanvas extends AWTGLCanvas {
     }
 
     public void display() {
-        render();
+        if (displayPending)
+            return;
+
+        displayPending = true;
+        EventQueue.invokeLater(() -> {
+            displayPending = false;
+            render();
+        });
     }
 
     @Override
