@@ -47,7 +47,7 @@ final class GLRenderer {
         GLSLShapeShader.init();
         GLSLTextureShader.init();
 
-        JHVFrame.getInteraction().initAnnotations(gl);
+        JHVFrame.getInteraction().initAnnotations();
     }
 
     static void reshape(int x, int y, int glWidth, int glHeight) {
@@ -84,7 +84,7 @@ final class GLRenderer {
 
     static void dispose(GL3 gl) {
         Layers.dispose(gl);
-        JHVFrame.getInteraction().disposeAnnotations(gl);
+        JHVFrame.getInteraction().disposeAnnotations();
         GLText.dispose();
 
         GLSLSolar.quad.dispose();
