@@ -35,7 +35,7 @@ public final class JHVCanvas extends GLCanvas {
             GLProfile profile = GLProfile.get(GLProfile.GL3);
             GLCapabilities capabilities = getCapabilities(profile);
             JHVCanvas canvas = new JHVCanvas(capabilities);
-            GLRenderer renderer = new GLRenderer(canvas);
+            GLRenderer renderer = new GLRenderer();
             canvas.addGLEventListener(createListener(canvas, renderer));
             // GUI events can lead to context destruction and invalidation of GL objects and state
             canvas.setSharedAutoDrawable(getSharedDrawable(profile, capabilities));
@@ -90,15 +90,15 @@ public final class JHVCanvas extends GLCanvas {
 
             @Override
             public void display(GLAutoDrawable drawable) {
-                renderer.display((GL3) drawable.getGL());
+                renderer.display((GL3) drawable.getGL(), canvas.whiteBack);
                 canvas.frameRendered();
             }
 
             @Override
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
                 canvas.updatePixelScale();
-                int glWidth = (int) (canvas.getWidth() * pixelScale[0] + .5);
-                int glHeight = (int) (canvas.getHeight() * pixelScale[1] + .5);
+                int glWidth = canvas.glWidth();
+                int glHeight = canvas.glHeight();
                 renderer.reshape(x, y, glWidth, glHeight);
             }
         };
@@ -108,12 +108,16 @@ public final class JHVCanvas extends GLCanvas {
         super(capabilities);
     }
 
-    public boolean isWhiteBackground() {
-        return whiteBack;
-    }
-
     public void setWhiteBackground(boolean whiteBackground) {
         whiteBack = whiteBackground;
+    }
+
+    private int glWidth() {
+        return (int) (getWidth() * pixelScale[0] + .5);
+    }
+
+    private int glHeight() {
+        return (int) (getHeight() * pixelScale[1] + .5);
     }
 
     private void frameRendered() {

@@ -16,12 +16,6 @@ import com.jogamp.opengl.GL3;
 
 final class GLRenderer {
 
-    private final JHVCanvas canvas;
-
-    GLRenderer(JHVCanvas _canvas) {
-        canvas = _canvas;
-    }
-
     void init(GL3 gl) {
         JHVCanvas.initGLInfo(gl);
 
@@ -76,8 +70,8 @@ final class GLRenderer {
             miniview.reshapeViewport();
     }
 
-    void display(GL3 gl) {
-        if (canvas.isWhiteBackground())
+    void display(GL3 gl, boolean whiteBackground) {
+        if (whiteBackground)
             gl.glClearColor(1, 1, 1, 0);
         else
             gl.glClearColor(0, 0, 0, 0);
