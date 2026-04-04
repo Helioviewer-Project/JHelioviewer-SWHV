@@ -7,7 +7,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.awt.GLCanvas;
 
 public class GLInfo {
 
@@ -36,8 +35,7 @@ public class GLInfo {
         maxTextureSize = out[0];
     }
 
-    public static void updatePixelScale(GLCanvas canvas) {
-        GraphicsConfiguration gc = canvas.getGraphicsConfiguration();
+    public static void updatePixelScale(GraphicsConfiguration gc) {
         if (gc != null) {
             AffineTransform tx = gc.getDefaultTransform();
             pixelScale[0] = tx.getScaleX();

@@ -37,7 +37,7 @@ public class GLListener implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GL3 gl = (GL3) drawable.getGL();
         GLInfo.get(gl);
-        GLInfo.updatePixelScale(canvas);
+        GLInfo.updatePixelScale(canvas.getGraphicsConfiguration());
 
         gl.glDisable(GL3.GL_TEXTURE_1D);
         gl.glDisable(GL3.GL_TEXTURE_2D);
@@ -86,6 +86,7 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        GLInfo.updatePixelScale(canvas.getGraphicsConfiguration());
         Display.setGLSize(x, y, (int) (canvas.getWidth() * GLInfo.pixelScale[0] + .5), (int) (canvas.getHeight() * GLInfo.pixelScale[1] + .5));
         Display.reshapeAll();
         MiniviewLayer miniview = Layers.getMiniviewLayer();
@@ -175,7 +176,6 @@ public class GLListener implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        GLInfo.updatePixelScale(canvas);
         GL3 gl = (GL3) drawable.getGL();
         // gl.glFinish(); - hard stalls the GPU pipeline
 
