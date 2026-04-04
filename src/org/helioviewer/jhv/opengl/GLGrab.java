@@ -5,8 +5,6 @@ import java.nio.ByteBuffer;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 
-import com.jogamp.opengl.GL3;
-
 public class GLGrab {
 
     public final int w;
@@ -18,8 +16,8 @@ public class GLGrab {
         h = _h;
     }
 
-    private void init(GL3 gl) {
-        capture = new GLFrameCapture(gl, w, h, JHVCanvas.GLSAMPLES);
+    private void init() {
+        capture = new GLFrameCapture(w, h, JHVCanvas.GLSAMPLES);
     }
 
     public void dispose() {
@@ -29,9 +27,9 @@ public class GLGrab {
         }
     }
 
-    public void renderFrame(Camera camera, GL3 gl, ByteBuffer buffer) {
+    public void renderFrame(Camera camera, ByteBuffer buffer) {
         if (capture == null)
-            init(gl);
+            init();
 
         int _x = Display.fullViewport.x;
         int _y = Display.fullViewport.yGL;
