@@ -101,12 +101,12 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void init(GL3 gl) {
+    public void init() {
     }
 
     @Override
-    public void remove(GL3 gl) {
-        dispose(gl);
+    public void remove() {
+        dispose();
     }
 
     @Override
@@ -120,7 +120,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose(GL3 gl) {
+    public void dispose() {
     }
 
     private JPanel optionsPanel() {

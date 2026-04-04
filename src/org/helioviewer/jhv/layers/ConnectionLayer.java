@@ -160,7 +160,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void init(GL3 gl) {
+    public void init() {
         connectivityCenter.init();
         hcsLine.init();
         footpointLine.init();
@@ -170,7 +170,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void dispose(GL3 gl) {
+    public void dispose() {
         connectivityCenter.dispose();
         hcsLine.dispose();
         footpointLine.dispose();
@@ -180,8 +180,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void remove(GL3 gl) {
-        dispose(gl);
+    public void remove() {
+        dispose();
     }
 
     @Override
