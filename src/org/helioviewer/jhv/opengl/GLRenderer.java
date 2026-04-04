@@ -1,5 +1,29 @@
 package org.helioviewer.jhv.opengl;
 
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL14.glBlendEquation;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_PROGRAM_POINT_SIZE;
+import static org.lwjgl.opengl.GL30.GL_MULTISAMPLE;
+import static org.lwjgl.opengl.GL30.GL_TEXTURE_1D;
+import static org.lwjgl.opengl.GL30.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL30.GL_FUNC_ADD;
+
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -20,25 +44,25 @@ final class GLRenderer {
     }
 
     static void init(GL3 gl) {
-        gl.glDisable(GL3.GL_TEXTURE_1D);
-        gl.glDisable(GL3.GL_TEXTURE_2D);
+        glDisable(GL_TEXTURE_1D);
+        glDisable(GL_TEXTURE_2D);
 
-        gl.glEnable(GL3.GL_MULTISAMPLE);
+        glEnable(GL_MULTISAMPLE);
 
-        gl.glEnable(GL3.GL_BLEND);
-        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL3.GL_FUNC_ADD);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendEquation(GL_FUNC_ADD);
 
-        gl.glEnable(GL3.GL_DEPTH_TEST);
-        gl.glDepthFunc(GL3.GL_LEQUAL);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
 
-        gl.glEnable(GL3.GL_CULL_FACE);
-        gl.glCullFace(GL3.GL_BACK);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
-        gl.glClearColor(0, 0, 0, 0);
-        gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        gl.glEnable(GL3.GL_VERTEX_PROGRAM_POINT_SIZE);
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
         GLSLSolar.quad.init(gl);
         GLSLSolarShader.init(gl);
@@ -59,9 +83,9 @@ final class GLRenderer {
 
     static void display(GL3 gl, boolean whiteBackground) {
         if (whiteBackground)
-            gl.glClearColor(1, 1, 1, 0);
+            glClearColor(1, 1, 1, 0);
         else
-            gl.glClearColor(0, 0, 0, 0);
+            glClearColor(0, 0, 0, 0);
 
         Layers.prerender(gl);
 
@@ -96,9 +120,9 @@ final class GLRenderer {
     }
 
     static void renderScene(Camera camera, GL3 gl) {
-        gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
-            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp.aspect);
             GLSLSolarShader.bindScreen(gl, vp);
 
@@ -117,14 +141,14 @@ final class GLRenderer {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Display.getMiniCamera();
 
-            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp.aspect);
             GLSLSolarShader.bindScreen(gl, vp);
 
-            gl.glDisable(GL3.GL_DEPTH_TEST);
+            glDisable(GL_DEPTH_TEST);
             miniview.renderBackground(gl);
             Layers.renderMiniview(miniCamera, vp, gl);
-            gl.glEnable(GL3.GL_DEPTH_TEST);
+            glEnable(GL_DEPTH_TEST);
         }
     }
 
@@ -135,7 +159,7 @@ final class GLRenderer {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayerBounds.getLargestRadialSize()));
         }
 
-        gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         boolean hpcMode = Display.mode.isHpc();
         Region hpcBounds = hpcMode ? getCenteredHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
@@ -145,7 +169,7 @@ final class GLRenderer {
                 halfWidth = halfHeight * vp.aspect;
                 GridScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
             }
-            gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+            glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp.aspect);
             GLSLSolarShader.bindScreen(gl, vp);
 
@@ -157,7 +181,7 @@ final class GLRenderer {
 
     private static void renderFullFloatScene(Camera camera, GL3 gl) {
         Viewport vp = Display.fullViewport;
-        gl.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+        glViewport(vp.x, vp.yGL, vp.width, vp.height);
         Layers.renderFullFloat(camera, vp, gl);
     }
 
