@@ -140,7 +140,7 @@ public class ViewpointLayer extends AbstractLayer {
     public void renderFullFloat(Camera camera, Viewport vp, GL3 gl) {
         if (!enabled)
             return;
-        GLText.drawTextFloat(vp, gl, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
 
     private void clearHoverTextIfNeeded() {

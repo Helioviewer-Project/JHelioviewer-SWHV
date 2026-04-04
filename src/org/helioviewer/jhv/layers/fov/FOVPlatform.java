@@ -141,7 +141,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
 
         JhvTextRenderer renderer = GLText.getRenderer(48);
         renderer.setColor(Colors.WhiteFloat);
-        renderer.begin3DRendering(gl);
+        renderer.begin3DRendering();
         renderer.setSurfacePut();
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);

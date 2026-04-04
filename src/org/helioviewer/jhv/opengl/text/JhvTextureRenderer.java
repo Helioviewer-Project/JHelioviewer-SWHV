@@ -12,8 +12,6 @@ import org.helioviewer.jhv.opengl.GLTexture;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
-
 /**
  * Provides the ability to render into an OpenGL texture using the Java 2D
  * APIs. This renderer class uses an internal Java 2D image (of
@@ -49,7 +47,7 @@ class JhvTextureRenderer {
      * @param width  the width of the texture to render into
      * @param height the height of the texture to render into
      */
-    JhvTextureRenderer(GL3 gl, int width, int height) {
+    JhvTextureRenderer(int width, int height) {
         imageWidth = width;
         imageHeight = height;
 
@@ -121,10 +119,10 @@ class JhvTextureRenderer {
         }
     }
 
-    void bind(GL3 gl) {
+    void bind() {
         tex.bind();
         if (dirtyRegion != null) {
-            upload(gl, dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
+            upload(dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
             dirtyRegion = null;
         }
     }
@@ -133,7 +131,7 @@ class JhvTextureRenderer {
      * Disposes all resources associated with this renderer. It is not
      * valid to use this renderer after calling this method.
      */
-    void dispose(GL3 gl) {
+    void dispose() {
         tex.delete();
         imageBuffer = null;
         image = null;
@@ -152,7 +150,7 @@ class JhvTextureRenderer {
      * @param width  the width of the region to update
      * @param height the height of the region to update
      */
-    private void upload(GL3 gl, int x, int y, int width, int height) {
+    private void upload(int x, int y, int width, int height) {
         IntBuffer uploadBuffer = directImageBuffer().position(y * imageWidth + x);
         GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, imageWidth);

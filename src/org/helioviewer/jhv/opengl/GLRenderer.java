@@ -85,7 +85,7 @@ final class GLRenderer {
     static void dispose(GL3 gl) {
         Layers.dispose(gl);
         JHVFrame.getInteraction().disposeAnnotations(gl);
-        GLText.dispose(gl);
+        GLText.dispose();
 
         GLSLSolar.quad.dispose(gl);
         GLSLSolarShader.dispose(gl);
