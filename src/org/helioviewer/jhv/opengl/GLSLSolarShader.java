@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.FloatBuffer;
 
-import com.jogamp.opengl.GL3;
 import org.lwjgl.opengl.GL33;
 
 import org.helioviewer.jhv.base.BufferUtils;

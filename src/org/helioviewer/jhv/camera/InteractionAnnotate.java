@@ -20,7 +20,6 @@ import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
 
 class InteractionAnnotate implements Interaction.Type {
 

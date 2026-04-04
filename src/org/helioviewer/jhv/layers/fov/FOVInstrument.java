@@ -18,7 +18,6 @@ import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
 
 @SuppressWarnings("serial")
 class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell {

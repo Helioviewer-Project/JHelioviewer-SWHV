@@ -20,7 +20,6 @@ import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 
 import org.lwjgl.opengl.GL33;
 
-import com.jogamp.opengl.GL3;
 
 public class FlatGrid {
 

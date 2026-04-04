@@ -7,7 +7,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
 
 public class FOVLayer extends AbstractLayer {
 

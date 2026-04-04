@@ -19,7 +19,6 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
 
 public class Interaction {
 

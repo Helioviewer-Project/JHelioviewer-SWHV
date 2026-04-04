@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.jogamp.opengl.GL3;
 
 public final class StarLayer extends AbstractLayer implements Camera.Listener, GaiaClient.Receiver {
 

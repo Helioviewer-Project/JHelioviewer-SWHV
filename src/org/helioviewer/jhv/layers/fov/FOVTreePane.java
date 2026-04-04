@@ -17,7 +17,6 @@ import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
 import org.json.JSONObject;
 
-import com.jogamp.opengl.GL3;
 
 @SuppressWarnings("serial")
 public final class FOVTreePane extends JScrollPane {
