@@ -1,12 +1,15 @@
 package org.helioviewer.jhv.opengl;
 
+import static org.lwjgl.opengl.GL.createCapabilities;
+
 import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Message;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
@@ -76,12 +79,20 @@ public final class JHVCanvas extends AWTGLCanvas {
 
     private JHVCanvas(GLData data) {
         super(data);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                lastGlWidth = -1;
+                lastGlHeight = -1;
+                EventQueue.invokeLater(JHVCanvas.this::display);
+            }
+        });
     }
 
     @Override
     public void initGL() {
         updatePixelScale();
-        GL.createCapabilities();
+        createCapabilities();
         ensureRendererInitialized();
     }
 
@@ -166,6 +177,10 @@ public final class JHVCanvas extends AWTGLCanvas {
     }
 
     private GLContext createExternalContext() {
+        // Temporary migration bridge:
+        // the render surface is LWJGL-backed, but the renderer and layer stack
+        // still consume JOGL GL3. This wraps the current LWJGL context so the
+        // existing renderer can keep running until the render path is ported.
         return GLDrawableFactory.getFactory(GLProfile.get(GLProfile.GL3)).createExternalGLContext();
     }
 
