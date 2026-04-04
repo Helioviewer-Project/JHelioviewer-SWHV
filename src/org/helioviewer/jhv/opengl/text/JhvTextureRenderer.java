@@ -13,8 +13,7 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLContext;
 
 /**
- * Provides the ability to render into an OpenGL {@link
- * com.jogamp.opengl.util.texture.Texture Texture} using the Java 2D
+ * Provides the ability to render into an OpenGL texture using the Java 2D
  * APIs. This renderer class uses an internal Java 2D image (of
  * unspecified type) for its backing store and flushes portions of
  * that image to an OpenGL texture on demand. The resulting OpenGL
@@ -23,11 +22,11 @@ import com.jogamp.opengl.GLContext;
 
 class JhvTextureRenderer {
     // For now, we supply only a BufferedImage back-end for this
-    // renderer. In theory we could use the Java 2D/JOGL bridge to fully
+    // renderer. In theory we could use a Java 2D / OpenGL bridge to fully
     // accelerate the rendering paths, but there are restrictions on
     // what work can be done where; for example, Graphics2D-related work
-    // must not be done on the Queue Flusher Thread, but JOGL's
-    // OpenGL-related work must be. This implies that the user's code
+    // must not be done on the Queue Flusher Thread, while
+    // OpenGL-related work must. This implies that the user's code
     // would need to be split up into multiple callbacks run from the
     // appropriate threads, which would be somewhat unfortunate.
 

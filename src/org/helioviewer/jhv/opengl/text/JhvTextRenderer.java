@@ -76,16 +76,14 @@ import com.jogamp.opengl.GLContext;
  * has no visible controls in the public API.
  * <p>
  * Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
- * "<code>TextRenderer renderer;</code>" field to your {@link
- * com.jogamp.opengl.GLEventListener GLEventListener}. In your {@link
- * com.jogamp.opengl.GLEventListener#init init} method, add:
+ * "<code>TextRenderer renderer;</code>" field to your rendering code.
+ * During initialization, add:
  *
  * <PRE>
  * renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
  * </PRE>
  * <p>
- * In the {@link com.jogamp.opengl.GLEventListener#display display} method of your
- * {@link com.jogamp.opengl.GLEventListener GLEventListener}, add:
+ * During a render pass, add:
  * <PRE>
  * renderer.beginRendering(drawable.getWidth(), drawable.getHeight());
  * // optionally set the color
@@ -109,8 +107,7 @@ import com.jogamp.opengl.GLContext;
  * Internally, the renderer uses a rectangle packing algorithm to
  * pack both glyphs and full Strings' rendering results (which are
  * variable size) onto a larger OpenGL texture. The internal backing
- * store is maintained using a {@link
- * com.jogamp.opengl.util.awt.TextureRenderer TextureRenderer}. A least
+ * store is maintained using an internal texture renderer. A least
  * recently used (LRU) algorithm is used to discard previously
  * rendered strings; the specific algorithm is undefined, but is
  * currently implemented by flushing unused Strings' rendering

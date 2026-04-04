@@ -23,8 +23,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.threads.Tasks;
 
 // Popup displaying information about a HEK event.
-// This panel is a JDialog, so that it can be displayed on top of an GLCanvas,
-// which is not possible for other Swing components.
+// This panel is a JDialog so it can appear above the heavyweight render surface.
 @SuppressWarnings("serial")
 public final class SWEKEventInformationDialog extends JDialog implements DataCollapsiblePanelModel.Listener {
 
