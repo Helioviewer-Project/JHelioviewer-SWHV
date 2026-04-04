@@ -201,17 +201,4 @@ public final class JHVCanvas extends AWTGLCanvas {
         }
     }
 
-    @Override
-    public void reshape(int x, int y, int width, int height) {
-        try {
-            super.reshape(x, y, width, height);
-        } catch (InternalError e) {
-            Log.warn("Retrying AWTGLCanvas reshape after resize failure", e);
-            EventQueue.invokeLater(() -> {
-                revalidate();
-                repaint();
-            });
-        }
-    }
-
 }
