@@ -200,8 +200,8 @@ public class Interaction {
         interactionAnnotate.dispose();
     }
 
-    public void drawAnnotations(Viewport vp, GL3 gl) {
-        interactionAnnotate.draw(vp, gl);
+    public void drawAnnotations(Viewport vp) {
+        interactionAnnotate.draw(vp);
     }
 
     @Nullable

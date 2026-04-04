@@ -86,7 +86,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         centerY = _centerY;
     }
 
-    void render(Viewport vp, GL3 gl, double distance, double pixFactor, byte[] color, JhvTextRenderer renderer) {
+    void render(Viewport vp, double distance, double pixFactor, byte[] color, JhvTextRenderer renderer) {
         if (!checkBox.isSelected())
             return;
 
