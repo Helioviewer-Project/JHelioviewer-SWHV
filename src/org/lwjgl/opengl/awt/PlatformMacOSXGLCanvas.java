@@ -13,8 +13,6 @@ import org.lwjgl.system.macosx.ObjCRuntime;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.geom.AffineTransform;
 import java.nio.ByteBuffer;
@@ -93,45 +91,13 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
     public JAWTDrawingSurface ds;
     private Canvas canvas;
     private long view;
-    private long interLayer;
-    private JRootPane rootPane;
-    private boolean updateLayerFrameQueued;
-    private int layerX;
-    private int layerY;
-    private int layerWidth;
-    private int layerHeight;
-    private int backingWidth;
-    private int backingHeight;
+    private int width;
+    private int height;
 
     @Override
     public long create(Canvas canvas, GLData attribs, GLData effective) throws AWTException {
         this.ds = JAWT_GetDrawingSurface(canvas, awt.GetDrawingSurface());
         this.canvas = canvas;
-        canvas.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                scheduleUpdateLayerFrame();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                scheduleUpdateLayerFrame();
-            }
-        });
-        rootPane = SwingUtilities.getRootPane(canvas);
-        if (rootPane != null) {
-            rootPane.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    scheduleUpdateLayerFrame();
-                }
-
-                @Override
-                public void componentMoved(ComponentEvent e) {
-                    scheduleUpdateLayerFrame();
-                }
-            });
-        }
         canvas.addHierarchyListener(e -> {
             // if the canvas, or a parent component is hidden/shown, we must update the hidden state of the layer
             if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) > 0) {
@@ -149,19 +115,19 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
             try {
                 JAWTDrawingSurfaceInfo dsi = JAWT_DrawingSurface_GetDrawingSurfaceInfo(ds, ds.GetDrawingSurfaceInfo());
                 try {
+                    // if the canvas is inside e.g. a JSplitPane, the dsi coordinates are wrong and need to be corrected
                     int x = dsi.bounds().x();
                     int y = dsi.bounds().y();
                     int width = dsi.bounds().width();
                     int height = dsi.bounds().height();
-                    Rectangle frame = layerFrame(x, y, width, height);
-                    x = frame.x;
-                    y = frame.y;
-                    this.layerX = x;
-                    this.layerY = y;
-                    this.layerWidth = width;
-                    this.layerHeight = height;
-                    this.backingWidth = width;
-                    this.backingHeight = height;
+                    JRootPane rootPane = SwingUtilities.getRootPane(canvas);
+                    if (rootPane != null) {
+                        Point point = SwingUtilities.convertPoint(canvas, new Point(), rootPane);
+                        x = point.x;
+                        y = rootPane.getHeight() - point.y - height;
+                    }
+                    this.width = width;
+                    this.height = height;
 
                     //TODO: we don't really need 100
                     ByteBuffer attribsArray = ByteBuffer.allocateDirect(4 * 100).order(ByteOrder.nativeOrder());
@@ -258,39 +224,47 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
     private long createNSOpenGLView(long platformInfo, long pixelFormat, int x, int y, int width, int height) {
         long objc_msgSend = ObjCRuntime.getLibrary().getFunctionAddress("objc_msgSend");
 
-        // NSOpenGLView *view = [[NSOpenGLView alloc] initWithFrame:frame pixelFormat:pixelFormat];
-        // get NSOpenGLView class and allocate instance
-        long NSOpenGLView = ObjCRuntime.objc_getClass("NSOpenGLView");
-        long nsOpenGLView = JNI.invokePPP(NSOpenGLView,
+        // NSOpenGLView *nsOpenGLView = [NSOpenGLView alloc];
+		long nsOpenGLView = JNI.invokePPP(
+                ObjCRuntime.objc_getClass("NSOpenGLView"),
                 ObjCRuntime.sel_getUid("alloc"),
                 objc_msgSend);
 
         // init NSOpenGLView with frame and device
-        long view = NSOpenGLView_initWithFrame(nsOpenGLView, new double[]{0, 0, width, height}, pixelFormat);
+        // NSOpenGLView *view = [nsOpenGLView initWithFrame:pixelFormat:];
+        long view = NSOpenGLView_initWithFrame(nsOpenGLView, 0, 0, width, height, pixelFormat);
 
         // make NSOpenGLView layer-backed
-        JNI.invokePPV(nsOpenGLView,
+        // [view setWantsLayer:YES];
+        JNI.invokePPV(view,
                 ObjCRuntime.sel_getUid("setWantsLayer:"),
                 true,
                 objc_msgSend);
 
         // get layer from NSOpenGLView instance and set its auto resizing mask (kCALayerWidthSizable | kCALayerHeightSizable)
-        long openglViewLayer = JNI.invokePPJ(nsOpenGLView,
+        // CALayer *layer = nsOpenGLView.layer;
+        long openglViewLayer = JNI.invokePPJ(view,
                 ObjCRuntime.sel_getUid("layer"),
                 objc_msgSend);
+
+        // [layer setAutoresizingMask:(kCALayerWidthSizable | kCAHeightSizable)];
         JNI.callPPPV(openglViewLayer,
                 ObjCRuntime.sel_getUid("setAutoresizingMask:"),
                 18,
                 objc_msgSend);
 
         // create intermediate layer and set its frame
-        long caLayer = ObjCRuntime.objc_getClass("CALayer");
-        interLayer = JNI.invokePPP(caLayer,
+        // CALayer *interLayer = [CALayer layer];
+		long interLayer = JNI.invokePPP(
+                ObjCRuntime.objc_getClass("CALayer"),
                 ObjCRuntime.sel_getUid("layer"),
                 objc_msgSend);
+
+        // [interLayer setFrame:CGRectMake(x, y, width, height)];
         setOpenglViewLayersFrame(interLayer, new double[]{x, y, width, height});
 
         // add NSOpenGLView's layer to the intermediate layer
+        // [interLayer addSublayer:layer];
         JNI.callPPPV(interLayer,
                 ObjCRuntime.sel_getUid("addSublayer:"),
                 openglViewLayer,
@@ -307,7 +281,7 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
         return view;
     }
 
-    private static long NSOpenGLView_initWithFrame(long nsopenglView, double[] frame, long pixelFormat) {
+    private static long NSOpenGLView_initWithFrame(long nsopenglView, double x, double y, double width, double height, long pixelFormat) {
         // Prepare the call interface
         FFICIF cif = FFICIF.malloc();
 
@@ -336,10 +310,6 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
                         POINTER_SIZE    // pixelFormat*
         );
 
-        // The memory we'll modify using libffi
-        DoubleBuffer target = BufferUtils.createDoubleBuffer(4);
-        target.put(frame, 0, 4);
-
         // Setup the argument buffers
         {
             // MTKView*
@@ -352,13 +322,13 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
 
             // frame
             arguments.put(memAddress(values));
-            values.putDouble(frame[0]);
+            values.putDouble(x);
             arguments.put(memAddress(values));
-            values.putDouble(frame[1]);
+            values.putDouble(y);
             arguments.put(memAddress(values));
-            values.putDouble(frame[2]);
+            values.putDouble(width);
             arguments.put(memAddress(values));
-            values.putDouble(frame[3]);
+            values.putDouble(height);
 
             // pixelFormat*
             arguments.put(memAddress(values));
@@ -369,7 +339,7 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
 
         // Invoke the function and validate
         ByteBuffer view = BufferUtils.createByteBuffer(8);
-        ffi_call(cif, ObjCRuntime.getLibrary().getFunctionAddress("objc_msgSend"), view, arguments);
+        ffi_call(cif, objc_msgSend, view, arguments);
         cif.free();
 
         final long v = view.asLongBuffer().get(0);
@@ -440,41 +410,6 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
         cif.free();
     }
 
-    private Rectangle layerFrame(int x, int y, int width, int height) {
-        if (rootPane == null)
-            return new Rectangle(x, y, width, height);
-
-        Point rootPoint = SwingUtilities.convertPoint(canvas, new Point(), rootPane);
-        return new Rectangle(rootPoint.x, rootPane.getHeight() - rootPoint.y - height, width, height);
-    }
-
-    private void scheduleUpdateLayerFrame() {
-        if (updateLayerFrameQueued)
-            return;
-
-        updateLayerFrameQueued = true;
-        EventQueue.invokeLater(() -> {
-            updateLayerFrameQueued = false;
-            updateLayerFrame();
-        });
-    }
-
-    private void updateLayerFrame() {
-        if (interLayer == 0L)
-            return;
-
-        Rectangle frame = layerFrame(canvas.getX(), canvas.getY(), canvas.getWidth(), canvas.getHeight());
-        if (frame.x == layerX && frame.y == layerY && frame.width == layerWidth && frame.height == layerHeight)
-            return;
-
-        setOpenglViewLayersFrame(interLayer, new double[]{frame.x, frame.y, frame.width, frame.height});
-        layerX = frame.x;
-        layerY = frame.y;
-        layerWidth = frame.width;
-        layerHeight = frame.height;
-        MacOSX.caFlush();
-    }
-
     @Override
     public boolean swapBuffers() {
         glFlush();
@@ -496,32 +431,17 @@ public class PlatformMacOSXGLCanvas implements PlatformGLCanvas {
         if (context != 0L) {
             JAWTDrawingSurfaceInfo dsi = JAWT_DrawingSurface_GetDrawingSurfaceInfo(ds, ds.GetDrawingSurfaceInfo());
             try {
-                int x = dsi.bounds().x();
-                int y = dsi.bounds().y();
                 int width = dsi.bounds().width();
                 int height = dsi.bounds().height();
-                Rectangle frame = layerFrame(x, y, width, height);
-                x = frame.x;
-                y = frame.y;
-                width = frame.width;
-                height = frame.height;
-
-                if (x != layerX || y != layerY || width != layerWidth || height != layerHeight) {
-                    setOpenglViewLayersFrame(interLayer, new double[]{x, y, width, height});
-                    layerX = x;
-                    layerY = y;
-                    layerWidth = width;
-                    layerHeight = height;
-                }
-                if (width != backingWidth || height != backingHeight) {
+                if (width != this.width || height != this.height) {
                     // [NSOpenGLCotext update] seems bugged. Updating renderer context with CGL works.
                     AffineTransform transform = canvas.getGraphicsConfiguration().getDefaultTransform();
                     int backingWidth = (int) (width * transform.getScaleX());
                     int backingHeight = (int) (height * transform.getScaleY());
                     CGLSetParameter(context, kCGLCPSurfaceBackingSize, new int[]{backingWidth, backingHeight});
                     CGLEnable(context, kCGLCESurfaceBackingSize);
-                    this.backingWidth = width;
-                    this.backingHeight = height;
+                    this.width = width;
+                    this.height = height;
                 }
             } finally {
                 JAWT_DrawingSurface_FreeDrawingSurfaceInfo(dsi, ds.FreeDrawingSurfaceInfo());
