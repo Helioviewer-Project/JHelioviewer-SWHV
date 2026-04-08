@@ -115,6 +115,9 @@ public class GLImage {
         tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
         lutTex = new GLTexture(GL33.GL_TEXTURE_1D, GLTexture.Unit.ONE);
         diffTex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.TWO);
+        // Keep diffImage sampler backed by a complete texture from startup to avoid macOS driver warnings.
+        diffTex.bind();
+        GLTexture.copyIntImage(1, 1, IntBuffer.wrap(new int[]{0xFF000000}));
 
         lutChanged = true;
     }
