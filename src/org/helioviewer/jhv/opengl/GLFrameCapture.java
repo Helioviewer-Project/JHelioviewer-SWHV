@@ -32,7 +32,7 @@ final class GLFrameCapture {
         try {
             gl.glGenFramebuffers(1, ids, 0);
             resolveFbo = ids[0];
-            bindFramebuffer(gl, GL3.GL_FRAMEBUFFER, resolveFbo);
+            gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, resolveFbo);
 
             gl.glGenTextures(1, ids, 0);
             resolveTex = ids[0];
@@ -47,7 +47,7 @@ final class GLFrameCapture {
             if (frameSamples > 0) {
                 gl.glGenFramebuffers(1, ids, 0);
                 drawFbo = ids[0];
-                bindFramebuffer(gl, GL3.GL_FRAMEBUFFER, drawFbo);
+                gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, drawFbo);
 
                 gl.glGenRenderbuffers(1, ids, 0);
                 drawColorRbo = ids[0];
@@ -63,7 +63,7 @@ final class GLFrameCapture {
 
                 checkFramebufferComplete(gl, "draw");
 
-                bindFramebuffer(gl, GL3.GL_FRAMEBUFFER, resolveFbo);
+                gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, resolveFbo);
                 checkFramebufferComplete(gl, "resolve");
             } else {
                 drawFbo = resolveFbo;
@@ -87,7 +87,7 @@ final class GLFrameCapture {
         } finally {
             gl.glBindRenderbuffer(GL3.GL_RENDERBUFFER, 0);
             gl.glBindTexture(GL3.GL_TEXTURE_2D, 0);
-            bindFramebuffer(gl, GL3.GL_FRAMEBUFFER, 0);
+            gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, 0);
         }
 
         resolveFramebuffer = resolveFbo;
@@ -101,22 +101,22 @@ final class GLFrameCapture {
     }
 
     void bindForRender(GL3 gl) {
-        bindFramebuffer(gl, GL3.GL_FRAMEBUFFER, drawFramebuffer);
+        gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, drawFramebuffer);
     }
 
     void readPixels(GL3 gl, Buffer buffer) {
         if (samples > 0) {
-            bindFramebuffer(gl, GL3.GL_READ_FRAMEBUFFER, drawFramebuffer);
-            bindFramebuffer(gl, GL3.GL_DRAW_FRAMEBUFFER, resolveFramebuffer);
+            gl.glBindFramebuffer(GL3.GL_READ_FRAMEBUFFER, drawFramebuffer);
+            gl.glBindFramebuffer(GL3.GL_DRAW_FRAMEBUFFER, resolveFramebuffer);
             gl.glBlitFramebuffer(0, 0, width, height,
                     0, 0, width, height,
                     GL3.GL_COLOR_BUFFER_BIT, GL3.GL_NEAREST);
         }
 
-        bindFramebuffer(gl, GL3.GL_READ_FRAMEBUFFER, resolveFramebuffer);
+        gl.glBindFramebuffer(GL3.GL_READ_FRAMEBUFFER, resolveFramebuffer);
         gl.glPixelStorei(GL3.GL_PACK_ALIGNMENT, 1);
         gl.glReadPixels(0, 0, width, height, GL3.GL_BGR, GL3.GL_UNSIGNED_BYTE, buffer);
-        bindFramebuffer(gl, GL3.GL_FRAMEBUFFER, 0);
+        gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, 0);
     }
 
     void dispose(GL3 gl) {
@@ -126,10 +126,6 @@ final class GLFrameCapture {
             deleteFramebuffer(gl, drawFramebuffer);
         deleteTexture(gl, resolveTexture);
         deleteFramebuffer(gl, resolveFramebuffer);
-    }
-
-    private static void bindFramebuffer(GL3 gl, int target, int framebuffer) {
-        gl.glBindFramebuffer(target, framebuffer);
     }
 
     private static void checkFramebufferComplete(GL3 gl, String label) {
