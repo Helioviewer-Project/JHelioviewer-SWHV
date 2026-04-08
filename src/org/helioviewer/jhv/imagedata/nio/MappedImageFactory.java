@@ -3,6 +3,8 @@ package org.helioviewer.jhv.imagedata.nio;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 public class MappedImageFactory {
 
@@ -25,13 +27,19 @@ public class MappedImageFactory {
     }
 
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
-        return AbstractOwnedDataBuffer.getByteBuffer(bi.getRaster().getDataBuffer(), BACKEND_KIND);
+        return AbstractOwnedDataBuffer.getByteBuffer(bi, BACKEND_KIND);
+    }
+
+    public static ShortBuffer getShortBuffer(BufferedImage bi) {
+        return AbstractOwnedDataBuffer.getShortBuffer(bi, BACKEND_KIND);
+    }
+
+    public static IntBuffer getIntBuffer(BufferedImage bi) {
+        return AbstractOwnedDataBuffer.getIntBuffer(bi, BACKEND_KIND);
     }
 
     public static void free(BufferedImage bi) {
-        if (bi == null)
-            return;
-        AbstractOwnedDataBuffer.free(bi.getRaster().getDataBuffer(), BACKEND_KIND);
+        AbstractOwnedDataBuffer.free(bi, BACKEND_KIND);
     }
 
 }
