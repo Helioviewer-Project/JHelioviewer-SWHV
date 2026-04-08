@@ -4,9 +4,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.nio.IntBuffer;
 
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLTexture;
 
 import com.jogamp.opengl.GL3;
@@ -51,8 +51,8 @@ class JhvTextureRenderer {
         imageWidth = width;
         imageHeight = height;
 
-        image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-        imageBuffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
+        image = NativeImageFactory.createCompatible(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+        imageBuffer = NativeImageFactory.getIntBuffer(image);
 
         GL3 gl = (GL3) GLContext.getCurrentGL();
         tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.THREE);
@@ -135,6 +135,7 @@ class JhvTextureRenderer {
     void dispose() {
         tex.delete((GL3) GLContext.getCurrentGL());
         imageBuffer = null;
+        NativeImageFactory.free(image);
         image = null;
     }
 
@@ -156,6 +157,7 @@ class JhvTextureRenderer {
         gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, imageWidth);
         gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, x, y, width, height, GL3.GL_BGRA, GL3.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer.position(y * imageWidth + x));
         gl.glGenerateMipmap(GL3.GL_TEXTURE_2D);
+        imageBuffer.rewind();
     }
 
 }
