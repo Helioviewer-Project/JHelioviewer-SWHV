@@ -1,18 +1,11 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DataBufferShort;
-import java.awt.image.DataBufferUShort;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
 import org.lwjgl.opengl.GL33;
@@ -104,67 +97,14 @@ public class GLTexture {
         GL33.glBindBuffer(GL33.GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
-    public static void copyBufferedImage(BufferedImage source) {
-        int w = source.getWidth();
-        int h = source.getHeight();
+    public static void copyIntImage(int w, int h, IntBuffer source) {
         if (w < 1 || h < 1 || w > JHVCanvas.maxTextureSize || h > JHVCanvas.maxTextureSize) {
             Log.warn("w= " + w + " h=" + h);
             return;
         }
-
-        DataBuffer rawBuffer = source.getRaster().getDataBuffer();
-        int dataType = rawBuffer.getDataType();
-        Buffer buffer = switch (dataType) {
-            case DataBuffer.TYPE_BYTE -> ByteBuffer.wrap(((DataBufferByte) rawBuffer).getData());
-            case DataBuffer.TYPE_USHORT -> ShortBuffer.wrap(((DataBufferUShort) rawBuffer).getData());
-            case DataBuffer.TYPE_SHORT -> ShortBuffer.wrap(((DataBufferShort) rawBuffer).getData());
-            case DataBuffer.TYPE_INT -> IntBuffer.wrap(((DataBufferInt) rawBuffer).getData());
-            default -> null;
-        };
-        if (buffer == null) {
-            Log.warn("Unsupported DataBuffer type: " + dataType);
-            return;
-        }
-
-        buffer = directBuffer(buffer);
-
-        GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, mapDataBufferTypeToGLAlign(dataType));
+        GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, w);
-        genTexture2D(mapTypeToInternalGLFormat(source.getType()), w, h, mapTypeToInputGLFormat(source.getType()), mapDataBufferTypeToGLType(dataType), buffer);
-    }
-
-    private static Buffer directBuffer(Buffer buffer) {
-        if (buffer.isDirect())
-            return buffer;
-
-        return switch (buffer) {
-            case ByteBuffer byteBuffer -> {
-                ByteBuffer direct = BufferUtils.newByteBuffer(byteBuffer.remaining());
-                int position = byteBuffer.position();
-                direct.put(byteBuffer);
-                direct.flip();
-                byteBuffer.position(position);
-                yield direct;
-            }
-            case ShortBuffer shortBuffer -> {
-                ShortBuffer direct = BufferUtils.newShortBuffer(shortBuffer.remaining());
-                int position = shortBuffer.position();
-                direct.put(shortBuffer);
-                direct.flip();
-                shortBuffer.position(position);
-                yield direct;
-            }
-            case IntBuffer intBuffer -> {
-                IntBuffer direct = BufferUtils.newIntBuffer(intBuffer.remaining());
-                int position = intBuffer.position();
-                direct.put(intBuffer);
-                direct.flip();
-                intBuffer.position(position);
-                yield direct;
-            }
-            default ->
-                    throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
-        };
+        genTexture2D(GL33.GL_RGBA, w, h, GL33.GL_BGRA, GL33.GL_UNSIGNED_INT_8_8_8_8_REV, source);
     }
 
     public static void copyBuffer1D(IntBuffer source) {
@@ -193,32 +133,6 @@ public class GLTexture {
     }
 
     /**
-     * Internal function to map BufferedImage image formats to OpenGL image
-     * formats, used for saving the texture.
-     *
-     * @param type BufferedImage internal image format
-     * @return OpenGL memory image format
-     */
-    private static int mapTypeToInternalGLFormat(int type) {
-        return type == BufferedImage.TYPE_BYTE_GRAY || type == BufferedImage.TYPE_BYTE_INDEXED ? GL33.GL_R8 : GL33.GL_RGBA;
-    }
-
-    /**
-     * Internal function to map BufferedImage image formats to OpenGL image
-     * formats, used for transferring the texture.
-     *
-     * @param type BufferedImage internal image format
-     * @return OpenGL input image format
-     */
-    private static int mapTypeToInputGLFormat(int type) {
-        return switch (type) {
-            case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> GL33.GL_RED;
-            case BufferedImage.TYPE_4BYTE_ABGR, BufferedImage.TYPE_INT_BGR, BufferedImage.TYPE_INT_ARGB -> GL33.GL_BGRA;
-            default -> GL33.GL_RGBA;
-        };
-    }
-
-    /**
      * Internal function to map the number of bytes per pixel to OpenGL types,
      * used for transferring the texture.
      */
@@ -227,39 +141,6 @@ public class GLTexture {
             case 1 -> GL33.GL_UNSIGNED_BYTE;
             case 2 -> GL33.GL_UNSIGNED_SHORT;
             case 4 -> GL33.GL_UNSIGNED_INT_8_8_8_8_REV;
-            default -> 0;
-        };
-    }
-
-    /**
-     * Internal function to map the type of the DataBuffer to OpenGL types,
-     * used for transferring the texture.
-     *
-     * @param dataBufferType DataBuffer type of the input data
-     * @return OpenGL type to use
-     */
-    private static int mapDataBufferTypeToGLType(int dataBufferType) {
-        return switch (dataBufferType) {
-            case DataBuffer.TYPE_BYTE -> GL33.GL_UNSIGNED_BYTE;
-            case DataBuffer.TYPE_SHORT -> GL33.GL_SHORT;
-            case DataBuffer.TYPE_USHORT -> GL33.GL_UNSIGNED_SHORT;
-            case DataBuffer.TYPE_INT -> GL33.GL_UNSIGNED_INT_8_8_8_8_REV;
-            default -> 0;
-        };
-    }
-
-    /**
-     * Internal function to map the type of the DataBuffer to OpenGL aligns,
-     * used for reading input data.
-     *
-     * @param dataBufferType DataBuffer type of the input data
-     * @return OpenGL type to use
-     */
-    private static int mapDataBufferTypeToGLAlign(int dataBufferType) {
-        return switch (dataBufferType) {
-            case DataBuffer.TYPE_BYTE -> 1;
-            case DataBuffer.TYPE_SHORT, DataBuffer.TYPE_USHORT -> 2;
-            case DataBuffer.TYPE_INT -> 4;
             default -> 0;
         };
     }

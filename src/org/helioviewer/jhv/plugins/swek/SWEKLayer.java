@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -97,15 +99,17 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
             ImageIcon icon = group.getIcon();
-            BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics graph = bi.createGraphics();
-            icon.paintIcon(null, graph, 0, 0);
-            graph.dispose();
+            BufferedImage bi = NativeImageFactory.createCompatible(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics g = bi.createGraphics();
+            icon.paintIcon(null, g, 0, 0);
+            g.dispose();
 
             tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
             tex.bind();
 
-            GLTexture.copyBufferedImage(bi);
+            IntBuffer data = NativeImageFactory.getIntBuffer(bi);
+            GLTexture.copyIntImage(bi.getWidth(), bi.getHeight(), data);
+            NativeImageFactory.free(bi);
             iconCacheId.put(key, tex);
         }
         tex.bind();
