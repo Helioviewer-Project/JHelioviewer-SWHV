@@ -139,9 +139,9 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
             Transform.rotateView(Quat.createAxisZ(rot[2]));
         }
 
-        JhvTextRenderer renderer = GLText.getRenderer(48);
+        JhvTextRenderer renderer = GLText.getRenderer(gl, 48);
         renderer.setColor(Colors.WhiteFloat);
-        renderer.begin3DRendering();
+        renderer.begin3DRendering(gl);
         renderer.setSurfacePut();
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);

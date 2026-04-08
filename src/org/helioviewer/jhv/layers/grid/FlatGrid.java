@@ -65,7 +65,7 @@ public class FlatGrid {
         shape.renderShape(gl, GL3.GL_TRIANGLES);
         if (showLabels) {
             int labelSize = (int) (TEXT_SCALE * CameraHelper.getPixelFactor(camera, vp));
-            drawLabels(camera, labelSize, vp);
+            drawLabels(gl, camera, labelSize, vp);
         }
     }
 
@@ -95,11 +95,11 @@ public class FlatGrid {
                 !Objects.equals(yAxis.signature(), ySignature);
     }
 
-    private void drawLabels(Camera camera, int size, Viewport vp) {
-        float textScaleFactor = 0.3f * TEXT_SCALE / GLText.getRenderer(size).getFont().getSize2D();
-        JhvTextRenderer renderer = GLText.getRenderer(size);
+    private void drawLabels(GL3 gl, Camera camera, int size, Viewport vp) {
+        JhvTextRenderer renderer = GLText.getRenderer(gl, size);
+        float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFont().getSize2D();
         renderer.setColor(Colors.WhiteFloat);
-        renderer.begin3DRendering();
+        renderer.begin3DRendering(gl);
         for (int i = 0; i < xAxis.labels().length; i++) {
             if (xAxis.axisFlags()[i])
                 continue;

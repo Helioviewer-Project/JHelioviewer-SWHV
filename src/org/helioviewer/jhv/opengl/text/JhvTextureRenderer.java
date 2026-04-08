@@ -10,7 +10,6 @@ import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLTexture;
 
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLContext;
 
 /**
  * Provides the ability to render into an OpenGL texture using the Java 2D
@@ -47,14 +46,13 @@ class JhvTextureRenderer {
      * @param width  the width of the texture to render into
      * @param height the height of the texture to render into
      */
-    JhvTextureRenderer(int width, int height) {
+    JhvTextureRenderer(GL3 gl, int width, int height) {
         imageWidth = width;
         imageHeight = height;
 
         image = NativeImageFactory.createCompatible(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
         imageBuffer = NativeImageFactory.getIntBuffer(image);
 
-        GL3 gl = (GL3) GLContext.getCurrentGL();
         tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.THREE);
         tex.bind(gl);
         gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_BASE_LEVEL, 0);
@@ -132,8 +130,8 @@ class JhvTextureRenderer {
      * Disposes all resources associated with this renderer. It is not
      * valid to use this renderer after calling this method.
      */
-    void dispose() {
-        tex.delete((GL3) GLContext.getCurrentGL());
+    void dispose(GL3 gl) {
+        tex.delete(gl);
         imageBuffer = null;
         NativeImageFactory.free(image);
         image = null;

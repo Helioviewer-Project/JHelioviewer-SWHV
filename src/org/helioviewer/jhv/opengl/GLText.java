@@ -21,7 +21,7 @@ public class GLText {
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
 
-    public static JhvTextRenderer getRenderer(int size) {
+    public static JhvTextRenderer getRenderer(GL3 gl, int size) {
         size = (int) (size * JHVCanvas.pixelScale[1]);
 
         int idx = (size - MIN) / STEP;
@@ -34,7 +34,9 @@ public class GLText {
             Font font = UIGlobals.canvasFont.deriveFont((float) (idx * STEP + MIN));
             renderers[idx] = new JhvTextRenderer(font, true, true);
             // precache for grid text
+            renderers[idx].begin3DRendering(gl);
             renderers[idx].draw3D("-0123456789.", 0, 0, 0, 0);
+            renderers[idx].end3DRendering();
         }
         return renderers[idx];
     }
@@ -55,11 +57,11 @@ public class GLText {
     private static final int TOP_MARGIN_TEXT = 0;//5;
     private static final int BOTTOM_MARGIN_TEXT = 0;//5;
 
-    public static void drawTextFloat(Viewport vp, List<String> txts, int pt_x, int pt_y) {
+    public static void drawTextFloat(GL3 gl, Viewport vp, List<String> txts, int pt_x, int pt_y) {
         if (txts.isEmpty())
             return;
 
-        JhvTextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
+        JhvTextRenderer renderer = getRenderer(gl, TEXT_SIZE_NORMAL);
         float fontSize = renderer.getFont().getSize2D();
 
         double boundW = 0;
@@ -87,7 +89,7 @@ public class GLText {
         // float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
 
         int deltaY = 0, dY = (int) (fontSize * 1.1);
-        renderer.beginRendering(vp.width, vp.height);
+        renderer.beginRendering(gl, vp.width, vp.height);
         for (String txt : txts) {
             renderer.setColor(shadowColor);
             renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
