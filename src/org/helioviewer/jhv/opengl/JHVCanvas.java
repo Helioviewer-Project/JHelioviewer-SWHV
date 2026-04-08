@@ -26,6 +26,7 @@ public final class JHVCanvas extends GLCanvas {
     public static final double[] pixelScale = {1, 1};
 
     private boolean whiteBack;
+    private boolean displayPending;
     private int fps;
     private int fpsCount;
     private long fpsTime = System.currentTimeMillis();
@@ -136,17 +137,30 @@ public final class JHVCanvas extends GLCanvas {
     }
 
     @Override
-    public void reshape(int x, int y, int width, int height) {
+    public void setBounds(int x, int y, int width, int height) {
         try {
-            super.reshape(x, y, width, height);
-        } catch (InternalError e) {
-            if (!isIncompleteResize(e))
+            super.setBounds(x, y, width, height);
+        } catch (RuntimeException | Error e) {
+            if (!handleIncompleteResize("setBounds", e))
                 throw e;
-            Log.warn("Retrying GLCanvas reshape after incomplete resize operation", e);
-            EventQueue.invokeLater(() -> {
-                revalidate();
-                repaint();
-            });
+        }
+    }
+
+    @Override
+    public void display() {
+        if (displayPending)
+            return;
+        displayPending = true;
+        EventQueue.invokeLater(this::displayOnEdt);
+    }
+
+    private void displayOnEdt() {
+        displayPending = false;
+        try {
+            super.display();
+        } catch (RuntimeException | Error e) {
+            if (!handleIncompleteResize("display", e))
+                throw e;
         }
     }
 
@@ -188,6 +202,19 @@ public final class JHVCanvas extends GLCanvas {
                 return true;
         }
         return false;
+    }
+
+    private boolean handleIncompleteResize(String operation, Throwable t) {
+        if (!isIncompleteResize(t))
+            return false;
+
+        Log.warn("Retrying GLCanvas " + operation + " after incomplete resize operation", t);
+        EventQueue.invokeLater(() -> {
+            revalidate();
+            repaint();
+            display();
+        });
+        return true;
     }
 
 }
