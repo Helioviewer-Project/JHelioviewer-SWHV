@@ -211,18 +211,9 @@ public final class GridLayer extends AbstractLayer {
 
         gl.glDisable(GL3.GL_CULL_FACE);
         latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
-        renderer.flush();
         gl.glEnable(GL3.GL_CULL_FACE);
 
-        lonLabels.forEach(lonLabel -> {
-            Transform.pushView();
-
-            Transform.mulView(lonLabel.m);
-            renderer.draw3D(lonLabel.txt, 0, 0, 0, textScaleFactor);
-            renderer.flush();
-
-            Transform.popView();
-        });
+        lonLabels.forEach(lonLabel -> renderer.draw3D(lonLabel.txt, lonLabel.m, textScaleFactor));
         renderer.end3DRendering();
     }
 
