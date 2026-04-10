@@ -26,6 +26,12 @@ public class MappedImageFactory {
                 (dataType, size, numBanks) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, numBanks, BACKEND_KIND, BufferBacking::mapFile));
     }
 
+    public static BufferedImage createRGBAPremultipliedImage(int width, int height) throws IOException {
+        return CompatibleImageUtils.createRGBAPremultipliedImageOrThrow(
+                width, height,
+                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.createOrThrow(dataType, size, numBanks, BACKEND_KIND, BufferBacking::mapFile));
+    }
+
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
         return AbstractOwnedDataBuffer.getByteBuffer(bi, BACKEND_KIND);
     }

@@ -29,6 +29,12 @@ public class NativeImageFactory {
                 (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
     }
 
+    public static BufferedImage createRGBAPremultipliedImage(int width, int height) {
+        return CompatibleImageUtils.createRGBAPremultipliedImage(
+                width, height,
+                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
+    }
+
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
         return AbstractOwnedDataBuffer.getByteBuffer(bi, BACKEND_KIND);
     }

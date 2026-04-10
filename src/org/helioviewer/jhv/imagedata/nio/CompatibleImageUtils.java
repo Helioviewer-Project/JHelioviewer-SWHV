@@ -1,8 +1,12 @@
 package org.helioviewer.jhv.imagedata.nio;
 
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.io.IOException;
@@ -34,5 +38,31 @@ final class CompatibleImageUtils {
                 width * height * sampleModel.getNumDataElements(),
                 1);
         return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), colorModel.isAlphaPremultiplied(), null);
+    }
+
+    static BufferedImage createRGBAPremultipliedImage(int width, int height, DataBufferFactory dataBufferFactory) {
+        try {
+            return createRGBAPremultipliedImageOrThrow(width, height, dataBufferFactory);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unexpected I/O creating RGBA premultiplied image", e);
+        }
+    }
+
+    static BufferedImage createRGBAPremultipliedImageOrThrow(int width, int height, DataBufferFactory dataBufferFactory) throws IOException {
+        ColorModel colorModel = new ComponentColorModel(
+                ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                true,
+                true,
+                Transparency.TRANSLUCENT,
+                DataBuffer.TYPE_BYTE);
+        SampleModel sampleModel = new PixelInterleavedSampleModel(
+                DataBuffer.TYPE_BYTE,
+                width,
+                height,
+                4,
+                4 * width,
+                new int[]{0, 1, 2, 3});
+        DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 4 * width * height, 1);
+        return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), true, null);
     }
 }
