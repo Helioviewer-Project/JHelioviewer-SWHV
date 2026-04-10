@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -31,7 +31,7 @@ class JhvTextureRenderer {
 
     // The backing store itself
     private BufferedImage image;
-    private IntBuffer imageBuffer;
+    private ByteBuffer imageBuffer;
 
     private final GLTexture tex;
     private Rectangle dirtyRegion;
@@ -50,8 +50,8 @@ class JhvTextureRenderer {
         imageWidth = width;
         imageHeight = height;
 
-        image = NativeImageFactory.createCompatible(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-        imageBuffer = NativeImageFactory.getIntBuffer(image);
+        image = NativeImageFactory.createRGBAPremultipliedImage(imageWidth, imageHeight);
+        imageBuffer = NativeImageFactory.getByteBuffer(image);
 
         tex = new GLTexture(gl, GL3.GL_TEXTURE_2D, GLTexture.Unit.THREE);
         tex.bind(gl);
@@ -61,7 +61,7 @@ class JhvTextureRenderer {
         gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
         gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
         gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_CLAMP_TO_EDGE);
-        gl.glTexImage2D(GL3.GL_TEXTURE_2D, 0, GL3.GL_RGBA, imageWidth, imageHeight, 0, GL3.GL_BGRA, GL3.GL_UNSIGNED_INT_8_8_8_8_REV, null);
+        gl.glTexImage2D(GL3.GL_TEXTURE_2D, 0, GL3.GL_RGBA, imageWidth, imageHeight, 0, GL3.GL_RGBA, GL3.GL_UNSIGNED_BYTE, null);
     }
 
     int getWidth() {
@@ -153,7 +153,7 @@ class JhvTextureRenderer {
     private void upload(GL3 gl, int x, int y, int width, int height) {
         gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, 4);
         gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, imageWidth);
-        gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, x, y, width, height, GL3.GL_BGRA, GL3.GL_UNSIGNED_INT_8_8_8_8_REV, imageBuffer.position(y * imageWidth + x));
+        gl.glTexSubImage2D(GL3.GL_TEXTURE_2D, 0, x, y, width, height, GL3.GL_RGBA, GL3.GL_UNSIGNED_BYTE, imageBuffer.position(4 * (y * imageWidth + x)));
         gl.glGenerateMipmap(GL3.GL_TEXTURE_2D);
         imageBuffer.rewind();
     }
