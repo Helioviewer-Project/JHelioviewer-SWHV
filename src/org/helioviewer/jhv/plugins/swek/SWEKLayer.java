@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
-import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -111,8 +111,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                 tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
                 tex.bind();
 
-                IntBuffer data = NativeImageFactory.getIntBuffer(bi);
-                GLTexture.copyIntImage(bi.getWidth(), bi.getHeight(), data);
+                ByteBuffer data = NativeImageFactory.getByteBuffer(bi);
+                GLTexture.copyByteImage(bi.getWidth(), bi.getHeight(), data);
             } finally {
                 NativeImageFactory.free(bi);
             }

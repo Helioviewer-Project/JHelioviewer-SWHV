@@ -91,7 +91,8 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             long addr = compositorBuf.Get_buf(srcStride, false);
             MemorySegment nativeBuffer = wrapNativeBuffer(addr, 4L * srcStride[0] * actualHeight);
 
-            ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.ARGB32;
+            // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
+            ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
             byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
             MemorySegment outSegment = MemorySegment.ofArray(outBuffer);
 
