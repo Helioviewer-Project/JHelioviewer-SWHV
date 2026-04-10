@@ -71,9 +71,6 @@ final class GLRenderer {
         } else
             renderSceneScale(camera);
         renderFullFloatScene(camera);
-
-        Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
-        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
     }
 
     static void dispose() {
