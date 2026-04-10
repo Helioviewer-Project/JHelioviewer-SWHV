@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.Log;
@@ -86,14 +87,14 @@ public class GLTexture {
         gl.glBindBuffer(GL3.GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
-    public static void copyIntImage(GL3 gl, int w, int h, IntBuffer source) {
+    public static void copyByteImage(GL3 gl, int w, int h, ByteBuffer source) {
         if (w < 1 || h < 1 || w > JHVCanvas.maxTextureSize || h > JHVCanvas.maxTextureSize) {
             Log.warn("w= " + w + " h=" + h);
             return;
         }
         gl.glPixelStorei(GL3.GL_UNPACK_ALIGNMENT, 4);
         gl.glPixelStorei(GL3.GL_UNPACK_ROW_LENGTH, w);
-        genTexture2D(gl, GL3.GL_RGBA, w, h, GL3.GL_BGRA, GL3.GL_UNSIGNED_INT_8_8_8_8_REV, source);
+        genTexture2D(gl, GL3.GL_RGBA, w, h, GL3.GL_RGBA, GL3.GL_UNSIGNED_BYTE, source);
     }
 
     public static void copyBuffer1D(GL3 gl, IntBuffer source) {
@@ -109,7 +110,7 @@ public class GLTexture {
         return switch (format) {
             case Gray8 -> GL3.GL_R8;
             case Gray16 -> GL3.GL_R16;
-            case ARGB32 -> GL3.GL_RGBA;
+            case RGBA32 -> GL3.GL_RGBA;
         };
     }
 
@@ -117,7 +118,7 @@ public class GLTexture {
     private static int mapImageFormatToInputGLFormat(ImageBuffer.Format format) {
         return switch (format) {
             case Gray8, Gray16 -> GL3.GL_RED;
-            case ARGB32 -> GL3.GL_BGRA;
+            case RGBA32 -> GL3.GL_RGBA;
         };
     }
 
@@ -129,7 +130,7 @@ public class GLTexture {
         return switch (bytesPerPixel) {
             case 1 -> GL3.GL_UNSIGNED_BYTE;
             case 2 -> GL3.GL_UNSIGNED_SHORT;
-            case 4 -> GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
+            case 4 -> GL3.GL_UNSIGNED_BYTE;
             default -> 0;
         };
     }
