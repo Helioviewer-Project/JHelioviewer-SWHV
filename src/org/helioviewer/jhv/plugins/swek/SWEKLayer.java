@@ -99,7 +99,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
             ImageIcon icon = group.getIcon();
-            BufferedImage bi = NativeImageFactory.createCompatible(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            BufferedImage bi = NativeImageFactory.createCompatible(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
             Graphics g = bi.createGraphics();
             icon.paintIcon(null, g, 0, 0);
             g.dispose();
