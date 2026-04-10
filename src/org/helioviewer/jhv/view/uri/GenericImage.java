@@ -119,7 +119,7 @@ class GenericImage implements URIImageReader {
                 } finally {
                     NativeImageFactory.free(conv);
                 }
-                format = ImageBuffer.Format.ARGB32;
+                format = ImageBuffer.Format.RGBA32;
             }
         }
         return new ImageBuffer(w, h, format, buffer);

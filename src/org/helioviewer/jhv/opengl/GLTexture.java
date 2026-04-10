@@ -97,14 +97,14 @@ public class GLTexture {
         GL33.glBindBuffer(GL33.GL_PIXEL_UNPACK_BUFFER, 0);
     }
 
-    public static void copyIntImage(int w, int h, IntBuffer source) {
+    public static void copyByteImage(int w, int h, ByteBuffer source) {
         if (w < 1 || h < 1 || w > JHVCanvas.maxTextureSize || h > JHVCanvas.maxTextureSize) {
             Log.warn("w= " + w + " h=" + h);
             return;
         }
         GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, w);
-        genTexture2D(GL33.GL_RGBA, w, h, GL33.GL_BGRA, GL33.GL_UNSIGNED_INT_8_8_8_8_REV, source);
+        genTexture2D(GL33.GL_RGBA, w, h, GL33.GL_RGBA, GL33.GL_UNSIGNED_BYTE, source);
     }
 
     public static void copyBuffer1D(IntBuffer source) {
@@ -120,7 +120,7 @@ public class GLTexture {
         return switch (format) {
             case Gray8 -> GL33.GL_R8;
             case Gray16 -> GL33.GL_R16;
-            case ARGB32 -> GL33.GL_RGBA;
+            case RGBA32 -> GL33.GL_RGBA;
         };
     }
 
@@ -128,7 +128,7 @@ public class GLTexture {
     private static int mapImageFormatToInputGLFormat(ImageBuffer.Format format) {
         return switch (format) {
             case Gray8, Gray16 -> GL33.GL_RED;
-            case ARGB32 -> GL33.GL_BGRA;
+            case RGBA32 -> GL33.GL_RGBA;
         };
     }
 
@@ -140,7 +140,7 @@ public class GLTexture {
         return switch (bytesPerPixel) {
             case 1 -> GL33.GL_UNSIGNED_BYTE;
             case 2 -> GL33.GL_UNSIGNED_SHORT;
-            case 4 -> GL33.GL_UNSIGNED_INT_8_8_8_8_REV;
+            case 4 -> GL33.GL_UNSIGNED_BYTE;
             default -> 0;
         };
     }
