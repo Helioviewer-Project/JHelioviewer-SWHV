@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.uri;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.IndexColorModel;
 import java.awt.Graphics;
@@ -25,6 +24,7 @@ import javax.imageio.stream.ImageInputStream;
 import org.helioviewer.jhv.Log;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 
 // essentially static; local or network cache
 class GenericImage implements URIImageReader {
@@ -106,19 +106,19 @@ class GenericImage implements URIImageReader {
                 buffer = ShortBuffer.wrap(((DataBufferUShort) image.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.Gray16;
             }
-            case BufferedImage.TYPE_INT_ARGB_PRE -> {
-                buffer = IntBuffer.wrap(((DataBufferInt) image.getRaster().getDataBuffer()).getData());
-                format = ImageBuffer.Format.ARGB32;
-            }
             default -> {
-                BufferedImage conv = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
-                Graphics g = conv.getGraphics();
+                BufferedImage conv = NativeImageFactory.createRGBAPremultipliedImage(w, h);
                 try {
-                    g.drawImage(image, 0, 0, null);
+                    Graphics g = conv.getGraphics();
+                    try {
+                        g.drawImage(image, 0, 0, null);
+                    } finally {
+                        g.dispose();
+                    }
+                    buffer = ByteBuffer.allocateDirect(w * h * 4).put(NativeImageFactory.getByteBuffer(conv)).flip();
                 } finally {
-                    g.dispose();
+                    NativeImageFactory.free(conv);
                 }
-                buffer = IntBuffer.wrap(((DataBufferInt) conv.getRaster().getDataBuffer()).getData());
                 format = ImageBuffer.Format.ARGB32;
             }
         }
