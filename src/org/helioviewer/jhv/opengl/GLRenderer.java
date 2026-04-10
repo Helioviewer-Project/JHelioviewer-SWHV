@@ -5,12 +5,10 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.layers.Movie;
 
 import com.jogamp.opengl.GL3;
 
@@ -67,18 +65,12 @@ final class GLRenderer {
 
         Camera camera = Display.getCamera();
 
-        if (Movie.isRecording())
-            ExportMovie.handleMovieExport(camera, gl);
-
         if (Display.mode.isOrthographic()) {
             renderScene(camera, gl);
             renderMiniview(gl);
         } else
             renderSceneScale(camera, gl);
         renderFullFloatScene(camera, gl);
-
-        Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
-        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
     }
 
     static void dispose(GL3 gl) {

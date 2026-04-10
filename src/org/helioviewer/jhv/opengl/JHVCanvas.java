@@ -6,7 +6,13 @@ import java.awt.geom.AffineTransform;
 import java.lang.reflect.InvocationTargetException;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.export.ExportMovie;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
+import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -93,7 +99,14 @@ public final class JHVCanvas extends GLCanvas {
 
             @Override
             public void display(GLAutoDrawable drawable) {
-                GLRenderer.display((GL3) drawable.getGL(), canvas.whiteBack);
+                GL3 gl = (GL3) drawable.getGL();
+                GLRenderer.display(gl, canvas.whiteBack);
+
+                Camera camera = Display.getCamera();
+                if (Movie.isRecording())
+                    ExportMovie.handleMovieExport(camera, gl);
+                Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
+                JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
                 canvas.frameRendered();
             }
 
