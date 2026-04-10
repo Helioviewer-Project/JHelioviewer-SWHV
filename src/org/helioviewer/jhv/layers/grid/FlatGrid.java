@@ -43,8 +43,8 @@ public class FlatGrid {
     }
 
     // Built axis labels, zero-axis flags, and positions.
-    private record Axis(AxisSignature signature, double[] labels, boolean[] axisFlags, double[] positions) {
-        private static final Axis EMPTY = new Axis(null, new double[0], new boolean[0], new double[0]);
+    private record Axis(AxisSignature signature, String[] labels, boolean[] axisFlags, double[] positions) {
+        private static final Axis EMPTY = new Axis(null, new String[0], new boolean[0], new double[0]);
     }
 
     // Projection and camera state that invalidates the cached flat grid.
@@ -104,10 +104,10 @@ public class FlatGrid {
             if (xAxis.axisFlags()[i])
                 continue;
             double x = RasterLine.snapVertical(camera, vp, xAxis.positions()[i]);
-            renderer.draw3D(FORMATTER.format(xAxis.labels()[i]), (float) (vp.aspect * x), 0, 0, textScaleFactor);
+            renderer.draw3D(xAxis.labels()[i], (float) (vp.aspect * x), 0, 0, textScaleFactor);
         }
         for (int i = 0; i < yAxis.labels().length; i++) {
-            renderer.draw3D(FORMATTER.format(yAxis.labels()[i]), 0, (float) RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]), 0, textScaleFactor);
+            renderer.draw3D(yAxis.labels()[i], 0, (float) RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]), 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }
@@ -141,24 +141,24 @@ public class FlatGrid {
     }
 
     private static Axis buildAxis(GridScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
-        double[] labels;
+        String[] labels;
         double[] positions;
         boolean[] axisFlags;
         if (signature.step() == 0) {
             double value = signature.first();
-            labels = new double[]{wrap0to360 ? wrapCarrington(value) : value};
+            labels = new String[]{FORMATTER.format(wrap0to360 ? wrapCarrington(value) : value)};
             positions = new double[]{horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value)};
             axisFlags = new boolean[]{Math.abs(positions[0]) < 1e-9};
         } else {
             double step = signature.step();
             double first = signature.first();
             int count = (int) Math.max(0, Math.floor((signature.last() - first) / step) + 1);
-            labels = new double[count];
+            labels = new String[count];
             positions = new double[count];
             axisFlags = new boolean[count];
             for (int i = 0; i < count; i++) {
                 double value = first + i * step;
-                labels[i] = wrap0to360 ? wrapCarrington(value) : value;
+                labels[i] = FORMATTER.format(wrap0to360 ? wrapCarrington(value) : value);
                 positions[i] = horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value);
                 axisFlags[i] = Math.abs(positions[i]) < 1e-9;
             }
