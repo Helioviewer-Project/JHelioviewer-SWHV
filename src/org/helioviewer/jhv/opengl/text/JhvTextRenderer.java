@@ -64,6 +64,8 @@ import org.helioviewer.jhv.opengl.text.packrect.BackingStoreManager;
 import org.helioviewer.jhv.opengl.text.packrect.Rect;
 import org.helioviewer.jhv.opengl.text.packrect.RectanglePacker;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL33;
 
 /**
@@ -285,6 +287,18 @@ public class JhvTextRenderer {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
                 float advance = glyph.draw3D(x, y, z, scaleFactor);
+                x += advance * scaleFactor;
+            }
+        }
+    }
+
+    public void draw3D(String str, Matrix4f transform, float scaleFactor) {
+        float x = 0;
+        int len = str.length();
+        for (int i = 0; i < len; ++i) {
+            Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
+            if (glyph != null) {
+                float advance = glyph.draw3D(transform, x, 0, 0, scaleFactor);
                 x += advance * scaleFactor;
             }
         }
@@ -724,6 +738,7 @@ public class JhvTextRenderer {
 
     private final CoordPut directPut = new DirectPut();
     private final CoordPut surfacePut = new SurfacePut();
+    private final Vector3f transformedPosition = new Vector3f();
 
     private CoordPut coordPut = directPut;
 
@@ -733,6 +748,11 @@ public class JhvTextRenderer {
 
     public void setSurfacePut() {
         coordPut = surfacePut;
+    }
+
+    private void putTransformed(Matrix4f transform, float x, float y, float z, float c0, float c1) {
+        transform.transformPosition(x, y, z, transformedPosition);
+        coordPut.put(transformedPosition.x, transformedPosition.y, transformedPosition.z, 1, c0, c1);
     }
 
     // Glyph-by-glyph rendering support
@@ -813,6 +833,43 @@ public class JhvTextRenderer {
             coordPut.put(x, y, z, 1, tx1, ty1); // A
             coordPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
             coordPut.put(x, y + (height * scaleFactor), z, 1, tx1, ty2); // D
+
+            outstandingGlyphsVerticesPipeline += kVertsPerQuad;
+            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
+                drawVertices();
+            }
+
+            return advance;
+        }
+
+        float draw3D(Matrix4f transform, float inX, float inY, float z, float scaleFactor) {
+            if (glyphRectForTextureMapping == null) {
+                upload();
+            }
+
+            JhvTextureRenderer renderer = getBackingStore();
+            Rect rect = glyphRectForTextureMapping;
+            TextData data = (TextData) rect.getUserData();
+
+            int width = data.origRectWidth();
+            int height = data.origRectHeight();
+            float x = inX - (scaleFactor * data.origOriginX());
+            float y = inY - (scaleFactor * (height - data.origOriginY()));
+
+            int texturex = rect.x() + (data.origin().x - data.origOriginX());
+            int texturey = renderer.getHeight() - rect.y() - height - (data.origin().y - data.origOriginY());
+
+            float tx1 = texturex / (float) renderer.getWidth();
+            float ty1 = 1f - texturey / (float) renderer.getHeight();
+            float tx2 = (texturex + width) / (float) renderer.getWidth();
+            float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
+
+            putTransformed(transform, x, y, z, tx1, ty1); // A
+            putTransformed(transform, x + (width * scaleFactor), y, z, tx2, ty1); // B
+            putTransformed(transform, x + (width * scaleFactor), y + (height * scaleFactor), z, tx2, ty2); // C
+            putTransformed(transform, x, y, z, tx1, ty1); // A
+            putTransformed(transform, x + (width * scaleFactor), y + (height * scaleFactor), z, tx2, ty2); // C
+            putTransformed(transform, x, y + (height * scaleFactor), z, tx1, ty2); // D
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
