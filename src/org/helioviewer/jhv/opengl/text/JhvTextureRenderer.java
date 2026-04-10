@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLTexture;
@@ -31,7 +31,7 @@ class JhvTextureRenderer {
 
     // The backing store itself
     private BufferedImage image;
-    private IntBuffer imageBuffer;
+    private ByteBuffer imageBuffer;
 
     private final GLTexture tex;
     private Rectangle dirtyRegion;
@@ -50,8 +50,8 @@ class JhvTextureRenderer {
         imageWidth = width;
         imageHeight = height;
 
-        image = NativeImageFactory.createCompatible(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-        imageBuffer = NativeImageFactory.getIntBuffer(image);
+        image = NativeImageFactory.createRGBAPremultipliedImage(imageWidth, imageHeight);
+        imageBuffer = NativeImageFactory.getByteBuffer(image);
 
         tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
         tex.bind();
@@ -61,7 +61,7 @@ class JhvTextureRenderer {
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_LINEAR);
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_S, GL33.GL_CLAMP_TO_EDGE);
         GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_T, GL33.GL_CLAMP_TO_EDGE);
-        GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, GL33.GL_RGBA, imageWidth, imageHeight, 0, GL33.GL_BGRA, GL33.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer) null);
+        GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, GL33.GL_RGBA, imageWidth, imageHeight, 0, GL33.GL_RGBA, GL33.GL_UNSIGNED_BYTE, (ByteBuffer) null);
     }
 
     int getWidth() {
@@ -151,10 +151,9 @@ class JhvTextureRenderer {
      * @param height the height of the region to update
      */
     private void upload(int x, int y, int width, int height) {
-        IntBuffer uploadBuffer = imageBuffer.position(y * imageWidth + x);
         GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
         GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, imageWidth);
-        GL33.glTexSubImage2D(GL33.GL_TEXTURE_2D, 0, x, y, width, height, GL33.GL_BGRA, GL33.GL_UNSIGNED_INT_8_8_8_8_REV, uploadBuffer);
+        GL33.glTexSubImage2D(GL33.GL_TEXTURE_2D, 0, x, y, width, height, GL33.GL_RGBA, GL33.GL_UNSIGNED_BYTE, imageBuffer.position(4 * (y * imageWidth + x)));
         GL33.glGenerateMipmap(GL33.GL_TEXTURE_2D);
         imageBuffer.rewind();
     }
