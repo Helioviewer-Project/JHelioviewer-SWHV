@@ -59,7 +59,6 @@ public class JHelioviewer {
         DataSources.initSources(); // sources must be initialized before settings
         Settings.load();
         System.setProperty("sun.awt.noerasebackground", "true");
-        System.setProperty("org.sqlite.tmpdir", JHVGlobals.libCacheDir);
         // System.setProperty("flatlaf.nativeLibraryPath", JHVGlobals.libCacheDir);
         // System.setProperty("jsamp.nosystray", "true");
 
