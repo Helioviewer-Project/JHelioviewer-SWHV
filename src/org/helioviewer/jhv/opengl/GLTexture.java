@@ -55,8 +55,6 @@ public class GLTexture {
                     GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, byteBuffer);
             case ShortBuffer shortBuffer ->
                     GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, shortBuffer);
-            case IntBuffer intBuffer ->
-                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, intBuffer);
             default ->
                     throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
         }
