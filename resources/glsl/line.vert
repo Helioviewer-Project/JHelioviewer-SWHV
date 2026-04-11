@@ -10,8 +10,8 @@ uniform mat4 ModelViewProjectionMatrix;
 uniform float iaspect;
 uniform float thickness;
 
-const float[] dir = float[](1, -1);
-vec4[2] pos, col;
+const float dir[2] = float[2](1.0, -1.0);
+vec4 pos[2], col[2];
 
 // https://developer.apple.com/forums/thread/86098
 void main(void) {

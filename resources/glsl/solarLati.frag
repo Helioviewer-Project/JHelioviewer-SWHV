@@ -77,5 +77,5 @@ void main(void) {
                 : projection[1].projectionCode == WCS_PROJECTION_CEA
                 ? sampleLatiCeaTexcoord(scrpos, wcs[1], projection[1], pv1)
                 : sampleLatiZenithalTexcoord(scrpos, wcs[1], latiGrid[1]);
-    outColor = getColor(texCoord, diffTexCoord, 1);
+    outColor = getColor(texCoord, diffTexCoord, 1.0);
 }

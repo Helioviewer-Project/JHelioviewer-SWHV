@@ -117,7 +117,7 @@ void main(void) {
         didFallback = true;
     }
 
-    if (didFallback && display.calculateDepth != 0) // intersecting Euhforia planes
+    if (didFallback && display.calculateDepth != 0.) // intersecting Euhforia planes
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
 
     clipOrthoGeometry(rotatedHitPoint);
