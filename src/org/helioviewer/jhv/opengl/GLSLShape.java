@@ -2,8 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import org.lwjgl.opengl.GL33;
-
 public class GLSLShape extends VAO implements GLSLVertexReceiver {
 
     private static final int size0 = 4;
@@ -38,7 +36,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         GLSLShapeShader.point.bindMVP();
 
         bind();
-        GL33.glDrawArrays(GL33.GL_POINTS, 0, count);
+        GL.glDrawArrays(GL.POINTS, 0, count);
     }
 
     public void renderShape(int mode) {
@@ -49,7 +47,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         GLSLShapeShader.shape.bindMVP();
 
         bind();
-        GL33.glDrawArrays(mode, 0, count);
+        GL.glDrawArrays(mode, 0, count);
     }
 
 }

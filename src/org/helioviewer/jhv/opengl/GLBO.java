@@ -7,7 +7,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.lwjgl.opengl.GL33;
 
 class GLBO {
 
@@ -17,26 +16,26 @@ class GLBO {
 
     GLBO(int _target, int _usage) {
         target = _target;
-        bufferID = GL33.glGenBuffers();
+        bufferID = GL.glGenBuffer();
         usage = _usage;
     }
 
     void delete() {
-        GL33.glDeleteBuffers(bufferID);
+        GL.glDeleteBuffer(bufferID);
     }
 
     void bind() {
-        GL33.glBindBuffer(target, bufferID);
+        GL.glBindBuffer(target, bufferID);
     }
 
     void setBufferData(int limit, int capacity, Buffer buffer) {
-        GL33.glBindBuffer(target, bufferID);
-        GL33.glBufferData(target, capacity, usage); // orphan, https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
+        GL.glBindBuffer(target, bufferID);
+        GL.glBufferData(target, capacity, usage); // orphan, https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         switch (buffer) {
-            case ByteBuffer byteBuffer -> GL33.glBufferSubData(target, 0, directByteBuffer(byteBuffer));
-            case FloatBuffer floatBuffer -> GL33.glBufferSubData(target, 0, directFloatBuffer(floatBuffer));
-            case IntBuffer intBuffer -> GL33.glBufferSubData(target, 0, directIntBuffer(intBuffer));
-            case ShortBuffer shortBuffer -> GL33.glBufferSubData(target, 0, directShortBuffer(shortBuffer));
+            case ByteBuffer byteBuffer -> GL.glBufferSubData(target, 0, directByteBuffer(byteBuffer));
+            case FloatBuffer floatBuffer -> GL.glBufferSubData(target, 0, directFloatBuffer(floatBuffer));
+            case IntBuffer intBuffer -> GL.glBufferSubData(target, 0, directIntBuffer(intBuffer));
+            case ShortBuffer shortBuffer -> GL.glBufferSubData(target, 0, directShortBuffer(shortBuffer));
             default -> throw new IllegalArgumentException("Unsupported buffer type: " + buffer.getClass().getName());
         }
     }

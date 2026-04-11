@@ -51,7 +51,7 @@ public class ExportMovie implements Movie.Listener {
         BufferedImage eve = null;
         boolean submitted = false;
         try {
-            screen = MappedImageFactory.createCompatible(grabber.w, grabber.h, BufferedImage.TYPE_3BYTE_BGR);
+            screen = MappedImageFactory.createRGBImage(grabber.w, grabber.h);
             grabber.renderFrame(camera, MappedImageFactory.getByteBuffer(screen));
             eve = EVEImage == null ? null : NativeImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));

@@ -15,7 +15,7 @@ class ExportUtils {
     }
 
     static BufferedImage scaleImage(BufferedImage img, int newW, int newH, int movieLinePosition) {
-        BufferedImage simg = NativeImageFactory.createCompatible(newW, newH, BufferedImage.TYPE_3BYTE_BGR);
+        BufferedImage simg = NativeImageFactory.createRGBImage(newW, newH);
 
         Graphics2D g = simg.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);

@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.lwjgl.opengl.GL33;
-
 class VAA {
 
     private final int index;
@@ -15,7 +13,7 @@ class VAA {
     VAA(int _index, int _size, boolean _normalized, int _stride, long _offset, int _divisor) {
         index = _index;
         size = _size;
-        type = _normalized ? GL33.GL_UNSIGNED_BYTE : GL33.GL_FLOAT;
+        type = _normalized ? GL.UNSIGNED_BYTE : GL.FLOAT;
         normalized = _normalized;
         stride = _stride;
         offset = _offset;
@@ -23,9 +21,9 @@ class VAA {
     }
 
     void enable() {
-        GL33.glEnableVertexAttribArray(index);
-        GL33.glVertexAttribPointer(index, size, type, normalized, stride, offset);
-        GL33.glVertexAttribDivisor(index, divisor);
+        GL.glEnableVertexAttribArray(index);
+        GL.glVertexAttribPointer(index, size, type, normalized, stride, offset);
+        GL.glVertexAttribDivisor(index, divisor);
     }
 
 }

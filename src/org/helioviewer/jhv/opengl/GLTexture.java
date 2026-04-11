@@ -2,13 +2,11 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-
-import org.lwjgl.opengl.GL33;
 
 public class GLTexture {
 
@@ -21,47 +19,51 @@ public class GLTexture {
     private final int target;
     private final GLBO pbo;
 
-    private int prev_width = -1;
-    private int prev_height = -1;
-    private int prev_inputGLFormat = -1;
-    private int prev_bppGLType = -1;
+    private int previousWidth = -1;
+    private int previousHeight = -1;
+    private int previousInputFormat = -1;
+    private int previousInputType = -1;
 
-    public GLTexture(int _target, Unit _unit) {
-        texID = GL33.glGenTextures();
-        pbo = new GLBO(GL33.GL_PIXEL_UNPACK_BUFFER, GL33.GL_STREAM_DRAW);
+    public GLTexture(int textureTarget, Unit textureUnit) {
+        texID = GL.glGenTexture();
+        pbo = new GLBO(GL.PIXEL_UNPACK_BUFFER, GL.STREAM_DRAW);
 
-        target = _target;
-        unit = GL33.GL_TEXTURE0 + _unit.ordinal();
+        target = textureTarget;
+        unit = GL.TEXTURE0 + textureUnit.ordinal();
     }
 
     public void bind() {
-        GL33.glActiveTexture(unit);
-        GL33.glBindTexture(target, texID);
+        GL.glActiveTexture(unit);
+        GL.glBindTexture(target, texID);
     }
 
     public void delete() {
-        GL33.glDeleteTextures(texID);
+        GL.glDeleteTexture(texID);
         pbo.delete();
-        texID = prev_width = -1;
+        texID = -1;
+        previousWidth = -1;
+        previousHeight = -1;
+        previousInputFormat = -1;
+        previousInputType = -1;
     }
 
     private static void genTexture2D(int internalFormat, int width, int height, int inputFormat, int inputType, Buffer buffer) {
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_BASE_LEVEL, 0);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAX_LEVEL, 0);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 0);
         switch (buffer) {
             case null ->
-                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
+                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
             case ByteBuffer byteBuffer ->
-                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, byteBuffer);
+                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, directByteBuffer(byteBuffer));
             case ShortBuffer shortBuffer ->
-                    GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, shortBuffer);
+                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, directShortBuffer(shortBuffer));
             default ->
                     throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
         }
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_LINEAR);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_LINEAR);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_S, GL33.GL_CLAMP_TO_EDGE);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_T, GL33.GL_CLAMP_TO_EDGE);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
     }
 
     public void copyImageBuffer(ImageBuffer imageBuffer) {
@@ -76,23 +78,23 @@ public class GLTexture {
         int inputGLFormat = mapImageFormatToInputGLFormat(format);
         int bppGLType = mapBytesPerPixelToGLType(format.bytes);
 
-        if (w != prev_width || h != prev_height || prev_inputGLFormat != inputGLFormat || prev_bppGLType != bppGLType) {
+        if (w != previousWidth || h != previousHeight || previousInputFormat != inputGLFormat || previousInputType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(format);
             genTexture2D(internalGLFormat, w, h, inputGLFormat, bppGLType, null);
 
-            prev_width = w;
-            prev_height = h;
-            prev_inputGLFormat = inputGLFormat;
-            prev_bppGLType = bppGLType;
+            previousWidth = w;
+            previousHeight = h;
+            previousInputFormat = inputGLFormat;
+            previousInputType = bppGLType;
         }
 
-        GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, format.bytes);
-        GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, w);
+        GL.glPixelStorei(GL.UNPACK_ALIGNMENT, format.bytes);
+        GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, w);
 
         int size = format.bytes * imageBuffer.buffer.capacity();
         pbo.setBufferData(size, size, imageBuffer.buffer);
-        GL33.glTexSubImage2D(GL33.GL_TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0L);
-        GL33.glBindBuffer(GL33.GL_PIXEL_UNPACK_BUFFER, 0);
+        GL.glTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0L);
+        GL.glBindBuffer(GL.PIXEL_UNPACK_BUFFER, 0);
     }
 
     public static void copyByteImage(int w, int h, ByteBuffer source) {
@@ -100,45 +102,62 @@ public class GLTexture {
             Log.warn("w= " + w + " h=" + h);
             return;
         }
-        GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
-        GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, w);
-        genTexture2D(GL33.GL_RGBA, w, h, GL33.GL_RGBA, GL33.GL_UNSIGNED_BYTE, source);
+        GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
+        GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, w);
+        genTexture2D(GL.RGBA, w, h, GL.RGBA, GL.UNSIGNED_BYTE, source);
     }
 
-    public static void copyBuffer1D(IntBuffer source) {
-        GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
-        GL33.glTexImage1D(GL33.GL_TEXTURE_1D, 0, GL33.GL_RGBA, source.capacity(), 0, GL33.GL_BGRA, GL33.GL_UNSIGNED_INT_8_8_8_8_REV, source);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_1D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_NEAREST);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_1D, GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_NEAREST);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_1D, GL33.GL_TEXTURE_WRAP_S, GL33.GL_CLAMP_TO_EDGE);
+    public static void copyBuffer1D(ByteBuffer source) {
+        source = directByteBuffer(source);
+        GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 0);
+        GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, source.remaining() / 4, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, source);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
     }
 
-    // map application image format to OpenGL memory image format
+    private static ByteBuffer directByteBuffer(ByteBuffer buffer) {
+        if (buffer.isDirect())
+            return buffer;
+
+        ByteBuffer direct = BufferUtils.newByteBuffer(buffer.remaining());
+        direct.put(buffer.duplicate());
+        direct.flip();
+        return direct;
+    }
+
+    private static ShortBuffer directShortBuffer(ShortBuffer buffer) {
+        if (buffer.isDirect())
+            return buffer;
+
+        ShortBuffer direct = BufferUtils.newShortBuffer(buffer.remaining());
+        direct.put(buffer.duplicate());
+        direct.flip();
+        return direct;
+    }
+
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
         return switch (format) {
-            case Gray8 -> GL33.GL_R8;
-            case Gray16 -> GL33.GL_R16;
-            case RGBA32 -> GL33.GL_RGBA;
+            case Gray8 -> GL.R8;
+            case Gray16 -> GL.R16;
+            case RGBA32 -> GL.RGBA;
         };
     }
 
-    // Map application image format to OpenGL input image format
     private static int mapImageFormatToInputGLFormat(ImageBuffer.Format format) {
         return switch (format) {
-            case Gray8, Gray16 -> GL33.GL_RED;
-            case RGBA32 -> GL33.GL_RGBA;
+            case Gray8, Gray16 -> GL.RED;
+            case RGBA32 -> GL.RGBA;
         };
     }
 
-    /**
-     * Internal function to map the number of bytes per pixel to OpenGL types,
-     * used for transferring the texture.
-     */
     private static int mapBytesPerPixelToGLType(int bytesPerPixel) {
         return switch (bytesPerPixel) {
-            case 1 -> GL33.GL_UNSIGNED_BYTE;
-            case 2 -> GL33.GL_UNSIGNED_SHORT;
-            case 4 -> GL33.GL_UNSIGNED_BYTE;
+            case 1, 4 -> GL.UNSIGNED_BYTE;
+            case 2 -> GL.UNSIGNED_SHORT;
             default -> 0;
         };
     }

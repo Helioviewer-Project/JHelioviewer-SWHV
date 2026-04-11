@@ -13,12 +13,11 @@ import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.RasterLine;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
-
-import org.lwjgl.opengl.GL33;
 
 
 public class FlatGrid {
@@ -63,7 +62,7 @@ public class FlatGrid {
 
     public void render(Camera camera, Viewport vp, boolean showLabels) {
         rebuildIfNeeded(camera, vp);
-        shape.renderShape(GL33.GL_TRIANGLES);
+        shape.renderShape(GL.TRIANGLES);
         if (showLabels) {
             int labelSize = (int) (TEXT_SCALE * CameraHelper.getPixelFactor(camera, vp));
             drawLabels(camera, labelSize, vp);

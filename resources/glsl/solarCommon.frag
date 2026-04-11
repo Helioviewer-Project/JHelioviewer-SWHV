@@ -1,8 +1,6 @@
 #version 330 core
 
-//precision mediump float;
-
-#define NODIFFERENCE 0
+#define NODIFFERENCE 0.
 #define PI 3.1415926535897932384626433832795
 #define HALFPI (PI / 2.)
 #define TWOPI  (2. * PI)
@@ -12,11 +10,11 @@
 
 #define BOOST 1. / (0.2 * 2.)
 
-const int WCS_PROJECTION_TAN = 0;
-const int WCS_PROJECTION_AZP = 1;
-const int WCS_PROJECTION_ZPN = 2;
-const int WCS_PROJECTION_CAR = 3;
-const int WCS_PROJECTION_CEA = 4;
+const float WCS_PROJECTION_TAN = 0.;
+const float WCS_PROJECTION_AZP = 1.;
+const float WCS_PROJECTION_ZPN = 2.;
+const float WCS_PROJECTION_CAR = 3.;
+const float WCS_PROJECTION_CEA = 4.;
 
 out vec4 outColor;
 
@@ -79,7 +77,7 @@ layout(std140) uniform DisplayBlock {
 
 uniform sampler2D image;
 uniform sampler2D diffImage;
-uniform sampler1D lut;
+uniform sampler2D lut;
 
 uniform float pv0[6]; // kept as plain uniforms for simple indexed access
 uniform float pv1[6];
@@ -150,7 +148,7 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
 
     value += dither(texcoord);
 
-    return texture(lut, value) * display.color;
+    return texture(lut, vec2(value, 0.5)) * display.color;
 }
 
 void clamp_texture(const vec2 texcoord) {

@@ -12,12 +12,11 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayLayout;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONObject;
-
-import org.lwjgl.opengl.GL33;
 
 
 public final class MiniviewLayer extends AbstractLayer {
@@ -56,8 +55,8 @@ public final class MiniviewLayer extends AbstractLayer {
     }
 
     public void renderBackground() {
-        rectangle.renderShape(GL33.GL_TRIANGLE_STRIP);
-        circle.renderShape(GL33.GL_TRIANGLE_STRIP);
+        rectangle.renderShape(GL.TRIANGLE_STRIP);
+        circle.renderShape(GL.TRIANGLE_STRIP);
     }
 
     @Override

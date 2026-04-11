@@ -2,8 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import org.lwjgl.opengl.GL33;
-
 public class GLSLLine extends VAO implements GLSLVertexReceiver {
 
     public static final double LINEWIDTH_BASIC = 0.002;
@@ -44,7 +42,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         GLSLLineShader.line.bindMVP();
 
         bind();
-        GL33.glDrawArraysInstanced(GL33.GL_TRIANGLE_STRIP, 0, 4, count);
+        GL.glDrawArraysInstanced(GL.TRIANGLE_STRIP, 0, 4, count);
     }
 
 }

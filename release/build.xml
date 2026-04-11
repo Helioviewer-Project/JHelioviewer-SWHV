@@ -38,9 +38,11 @@
     <macrodef name="native-bundle">
         <attribute name="destfile"/>
         <attribute name="includes"/>
+        <element name="extra-files" optional="true"/>
         <sequential>
             <jar destfile="@{destfile}">
                 <zipgroupfileset dir="${lib}" includes="@{includes}"/>
+                <extra-files/>
             </jar>
         </sequential>
     </macrodef>
@@ -50,7 +52,11 @@
     </target>
 
     <target name="natives-bundle-macos">
-        <native-bundle destfile="${natives-macos}"   includes="${includes-macos}"/>
+        <native-bundle destfile="${natives-macos}" includes="${includes-macos}">
+            <extra-files>
+                <zipfileset dir="${lib}/natives-macos" includes="*.dylib" prefix="lib/natives-macos"/>
+            </extra-files>
+        </native-bundle>
     </target>
 
     <target name="natives-bundle-windows">
@@ -62,12 +68,13 @@
             <manifest>
                 <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
                 <attribute name="Add-Exports" value="java.desktop/sun.awt java.desktop/sun.swing"/>
+                <attribute name="Add-Opens" value="java.desktop/java.awt java.desktop/sun.lwawt java.desktop/sun.lwawt.macosx"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
                 <attribute name="Class-Path" value="natives-linux.jar natives-macos.jar natives-windows.jar"/>
                 <attribute name="version" value="${version}"/>
                 <attribute name="revision" value="${revision}"/>
             </manifest>
-            <zipgroupfileset dir="${lib}" excludes="**/*linux*.jar,**/*macos*.jar,**/*windows*.jar"/>
+            <zipgroupfileset dir="${lib}" includes="**/*.jar" excludes="**/*linux*.jar,**/*macos*.jar,**/*windows*.jar"/>
             <zipfileset src="../JHelioviewer.jar"/>
         </jar>
     </target>

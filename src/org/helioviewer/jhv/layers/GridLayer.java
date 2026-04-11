@@ -29,13 +29,12 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
+import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.json.JSONObject;
-
-import org.lwjgl.opengl.GL33;
 
 public final class GridLayer extends AbstractLayer {
 
@@ -188,7 +187,7 @@ public final class GridLayer extends AbstractLayer {
 
     private static void drawRadialGridText(List<GridLabel> labels, double size, float z, float[] labelPos) {
         float fuzz = 0.75f;
-        GL33.glDisable(GL33.GL_CULL_FACE);
+        GL.glDisable(GL.CULL_FACE);
         for (float rsize : labelPos) {
             JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             renderer.setColor(Colors.MiddleGrayFloat);
@@ -198,7 +197,7 @@ public final class GridLayer extends AbstractLayer {
             labels.forEach(label -> renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
             renderer.end3DRendering();
         }
-        GL33.glEnable(GL33.GL_CULL_FACE);
+        GL.glEnable(GL.CULL_FACE);
     }
 
     private void drawGridText(int size, float z) {
@@ -209,9 +208,9 @@ public final class GridLayer extends AbstractLayer {
 
         renderer.begin3DRendering();
 
-        GL33.glDisable(GL33.GL_CULL_FACE);
+        GL.glDisable(GL.CULL_FACE);
         latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
-        GL33.glEnable(GL33.GL_CULL_FACE);
+        GL.glEnable(GL.CULL_FACE);
 
         lonLabels.forEach(lonLabel -> renderer.draw3D(lonLabel.txt, lonLabel.m, textScaleFactor));
         renderer.end3DRendering();

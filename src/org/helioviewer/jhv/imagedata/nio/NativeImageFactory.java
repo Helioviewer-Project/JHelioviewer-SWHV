@@ -35,6 +35,12 @@ public class NativeImageFactory {
                 (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
     }
 
+    public static BufferedImage createRGBImage(int width, int height) {
+        return CompatibleImageUtils.createRGBImage(
+                width, height,
+                (dataType, size, numBanks) -> AbstractOwnedDataBuffer.create(dataType, size, numBanks, BACKEND_KIND, BufferBacking::allocate));
+    }
+
     public static ByteBuffer getByteBuffer(BufferedImage bi) {
         return AbstractOwnedDataBuffer.getByteBuffer(bi, BACKEND_KIND);
     }

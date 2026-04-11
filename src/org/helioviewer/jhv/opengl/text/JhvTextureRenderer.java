@@ -7,9 +7,8 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
+import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLTexture;
-
-import org.lwjgl.opengl.GL33;
 
 /**
  * Provides the ability to render into an OpenGL texture using the Java 2D
@@ -53,15 +52,15 @@ class JhvTextureRenderer {
         image = NativeImageFactory.createRGBAPremultipliedImage(imageWidth, imageHeight);
         imageBuffer = NativeImageFactory.getByteBuffer(image);
 
-        tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
+        tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
         tex.bind();
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_BASE_LEVEL, 0);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAX_LEVEL, 15);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_LINEAR_MIPMAP_LINEAR);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_LINEAR);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_S, GL33.GL_CLAMP_TO_EDGE);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_T, GL33.GL_CLAMP_TO_EDGE);
-        GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, GL33.GL_RGBA, imageWidth, imageHeight, 0, GL33.GL_RGBA, GL33.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 15);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+        GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, imageWidth, imageHeight, 0, GL.RGBA, GL.UNSIGNED_BYTE, (ByteBuffer) null);
     }
 
     int getWidth() {
@@ -151,10 +150,10 @@ class JhvTextureRenderer {
      * @param height the height of the region to update
      */
     private void upload(int x, int y, int width, int height) {
-        GL33.glPixelStorei(GL33.GL_UNPACK_ALIGNMENT, 4);
-        GL33.glPixelStorei(GL33.GL_UNPACK_ROW_LENGTH, imageWidth);
-        GL33.glTexSubImage2D(GL33.GL_TEXTURE_2D, 0, x, y, width, height, GL33.GL_RGBA, GL33.GL_UNSIGNED_BYTE, imageBuffer.position(4 * (y * imageWidth + x)));
-        GL33.glGenerateMipmap(GL33.GL_TEXTURE_2D);
+        GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
+        GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, imageWidth);
+        GL.glTexSubImage2D(GL.TEXTURE_2D, 0, x, y, width, height, GL.RGBA, GL.UNSIGNED_BYTE, imageBuffer.position(4 * (y * imageWidth + x)));
+        GL.glGenerateMipmap(GL.TEXTURE_2D);
         imageBuffer.rewind();
     }
 

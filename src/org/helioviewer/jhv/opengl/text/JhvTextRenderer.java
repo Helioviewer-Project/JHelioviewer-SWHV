@@ -58,6 +58,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
+import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.text.packrect.BackingStoreManager;
@@ -66,7 +67,6 @@ import org.helioviewer.jhv.opengl.text.packrect.RectanglePacker;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL33;
 
 /**
  * Renders bitmapped Java 2D text into an OpenGL window with high
@@ -441,7 +441,7 @@ public class JhvTextRenderer {
 
     private void internal_beginRendering(boolean ortho, int width, int height) {
         if (ortho) {
-            GL33.glDisable(GL33.GL_DEPTH_TEST);
+            GL.glDisable(GL.DEPTH_TEST);
 
             Transform.pushProjection();
             Transform.setOrtho2DProjection(0, width, 0, height);
@@ -452,7 +452,7 @@ public class JhvTextRenderer {
 
     private void internal_endRendering(boolean ortho) {
         if (ortho) {
-            GL33.glEnable(GL33.GL_DEPTH_TEST);
+            GL.glEnable(GL.DEPTH_TEST);
 
             Transform.popView();
             Transform.popProjection();
@@ -1002,7 +1002,7 @@ public class JhvTextRenderer {
 
             glslTexture.init();
             glslTexture.setCoord(coordBuf);
-            glslTexture.renderTexture(GL33.GL_TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
+            glslTexture.renderTexture(GL.TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }

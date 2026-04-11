@@ -1,17 +1,12 @@
 package org.helioviewer.jhv.opengl;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.json.JSONObject;
-
-import org.lwjgl.opengl.GL33;
-
 
 public class GLImage {
 
@@ -75,7 +70,6 @@ public class GLImage {
 
     public void applyFilters(MetaData metaData, ImageData imageData) {
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
-
         color[0] = (float) (opacity * red); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         color[1] = (float) (opacity * green);
         color[2] = (float) (opacity * blue);
@@ -100,10 +94,7 @@ public class GLImage {
         LUT currlut = diffMode == DifferenceMode.None ? lut : LUT.gray();
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
             int[] intLUT = invertLUT ? currlut.lut8Inv() : currlut.lut8();
-            // TBD: avoid this copy by having LUT provide a direct IntBuffer.
-            IntBuffer lutBuffer = BufferUtils.newIntBuffer(intLUT.length);
-            lutBuffer.put(intLUT);
-            lutBuffer.flip();
+            ByteBuffer lutBuffer = TextureUpload.packArgbToRgbaBytes(intLUT);
             lastLut = currlut;
             lastInverted = invertLUT;
 
@@ -113,9 +104,9 @@ public class GLImage {
     }
 
     public void init() {
-        tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.ZERO);
-        lutTex = new GLTexture(GL33.GL_TEXTURE_1D, GLTexture.Unit.ONE);
-        diffTex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.TWO);
+        tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.ZERO);
+        lutTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.ONE);
+        diffTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.TWO);
         // Keep diffImage sampler backed by a complete texture from startup to avoid macOS driver warnings.
         diffTex.bind();
         GLTexture.copyByteImage(1, 1, ByteBuffer.wrap(new byte[]{0, 0, 0, (byte) 0xFF}));

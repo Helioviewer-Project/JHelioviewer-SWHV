@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.lwjgl.opengl.GL33;
-
 import org.helioviewer.jhv.camera.Transform;
 
 class GLSLShapeShader extends GLSLShader {
@@ -30,17 +28,17 @@ class GLSLShapeShader extends GLSLShader {
 
     @Override
     protected void initUniforms(int id) {
-        refModelViewProjectionMatrix = GL33.glGetUniformLocation(id, "ModelViewProjectionMatrix");
-        factorRef = GL33.glGetUniformLocation(id, "factor");
+        refModelViewProjectionMatrix = GL.glGetUniformLocation(id, "ModelViewProjectionMatrix");
+        factorRef = GL.glGetUniformLocation(id, "factor");
     }
 
     void bindParams(double _factor) {
         factor[0] = (float) _factor;
-        GL33.glUniform1fv(factorRef, factor);
+        GL.glUniform1fv(factorRef, factor);
     }
 
     void bindMVP() {
-        GL33.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
+        GL.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
     }
 
 }

@@ -4,8 +4,6 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 
-import org.lwjgl.opengl.GL33;
-
 public class GLSLSolar extends VAO1 {
 
     public static final GLSLSolar quad = new GLSLSolar();
@@ -18,7 +16,7 @@ public class GLSLSolar extends VAO1 {
 
     public void render() {
         bind();
-        GL33.glDrawArrays(GL33.GL_TRIANGLE_STRIP, 0, 4);
+        GL.glDrawArrays(GL.TRIANGLE_STRIP, 0, 4);
     }
 
     @Override
