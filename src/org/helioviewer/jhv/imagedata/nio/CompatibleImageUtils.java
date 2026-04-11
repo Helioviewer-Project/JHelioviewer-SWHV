@@ -65,4 +65,30 @@ final class CompatibleImageUtils {
         DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 4 * width * height, 1);
         return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), true, null);
     }
+
+    static BufferedImage createRGBImage(int width, int height, DataBufferFactory dataBufferFactory) {
+        try {
+            return createRGBImageOrThrow(width, height, dataBufferFactory);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unexpected I/O creating RGB image", e);
+        }
+    }
+
+    static BufferedImage createRGBImageOrThrow(int width, int height, DataBufferFactory dataBufferFactory) throws IOException {
+        ColorModel colorModel = new ComponentColorModel(
+                ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                false,
+                false,
+                Transparency.OPAQUE,
+                DataBuffer.TYPE_BYTE);
+        SampleModel sampleModel = new PixelInterleavedSampleModel(
+                DataBuffer.TYPE_BYTE,
+                width,
+                height,
+                3,
+                3 * width,
+                new int[]{0, 1, 2});
+        DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 3 * width * height, 1);
+        return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), false, null);
+    }
 }
