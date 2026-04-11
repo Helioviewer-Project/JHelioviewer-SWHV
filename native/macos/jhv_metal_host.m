@@ -1,12 +1,12 @@
 #import <AppKit/AppKit.h>
 #import <dispatch/dispatch.h>
+#import <jawt_md.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CATransaction.h>
 #import <QuartzCore/CAMetalLayer.h>
 
 @interface JHVMetalHostBox : NSObject
-@property(nonatomic, strong) NSView *childView;
-@property(nonatomic, strong) NSView *hostView;
+@property(nonatomic, strong) CALayer *windowLayer;
 @property(nonatomic, strong) CAMetalLayer *metalLayer;
 @end
 
@@ -31,13 +31,13 @@ static void jhv_set_metal_layer_frame(CAMetalLayer *metalLayer, CGRect frame) {
     });
 }
 
-static CAMetalLayer *jhv_create_metal_layer(id<MTLDevice> device, CGRect frame) {
+static CAMetalLayer *jhv_create_metal_layer(id<MTLDevice> device, CGFloat contentsScale, CGRect frame) {
     CAMetalLayer *metalLayer = [CAMetalLayer layer];
     metalLayer.device = device;
     metalLayer.pixelFormat = MTLPixelFormatBGRA8Unorm;
     metalLayer.framebufferOnly = NO;
     metalLayer.opaque = YES;
-    metalLayer.contentsScale = NSScreen.mainScreen.backingScaleFactor ?: 1.0;
+    metalLayer.contentsScale = contentsScale;
     jhv_set_metal_layer_frame(metalLayer, frame);
     return metalLayer;
 }
@@ -60,58 +60,50 @@ static void jhv_run_on_main_async(void (^block)(void)) {
     dispatch_async(dispatch_get_main_queue(), block);
 }
 
-static NSView *jhv_host_view(void *hostPtr) {
-    if (hostPtr == NULL)
+static id<JAWT_SurfaceLayers> jhv_surface_layers(void *surfaceLayersPtr) {
+    if (surfaceLayersPtr == NULL)
         return nil;
 
-    id host = (__bridge id)hostPtr;
-    if (![host isKindOfClass:[NSView class]])
+    id surfaceLayers = (__bridge id)surfaceLayersPtr;
+    if (![surfaceLayers conformsToProtocol:@protocol(JAWT_SurfaceLayers)])
         return nil;
 
-    return (NSView *)host;
+    return (id<JAWT_SurfaceLayers>)surfaceLayers;
 }
 
-static CGFloat jhv_host_y(NSView *hostView, double y, double height) {
-    if (hostView == nil)
+static CGFloat jhv_layer_y(CALayer *windowLayer, double y, double height) {
+    if (windowLayer == nil)
         return 0.0;
-    return hostView.isFlipped ? y : (hostView.bounds.size.height - y - height);
+    return windowLayer.geometryFlipped ? y : (windowLayer.bounds.size.height - y - height);
 }
 
-void *jhv_metal_host_create(void *hostPtr, double x, double y, double width, double height) {
+void *jhv_metal_host_create(void *surfaceLayersPtr, double x, double y, double width, double height) {
     __block void *result = NULL;
     jhv_run_on_main_sync(^{
         @autoreleasepool {
-            NSView *hostView = jhv_host_view(hostPtr);
-            if (hostView == nil)
+            id<JAWT_SurfaceLayers> surfaceLayers = jhv_surface_layers(surfaceLayersPtr);
+            if (surfaceLayers == nil)
+                return;
+
+            CALayer *windowLayer = surfaceLayers.windowLayer;
+            if (windowLayer == nil)
                 return;
 
             id<MTLDevice> device = MTLCreateSystemDefaultDevice();
             if (device == nil)
                 return;
 
-            CGFloat hostY = jhv_host_y(hostView, y, height);
             JHVMetalHostBox *box = [JHVMetalHostBox new];
-            box.hostView = hostView;
-            CAMetalLayer *metalLayer;
-
-            CALayer *hostLayer = hostView.layer;
-            if (hostLayer != nil) {
-                metalLayer = jhv_create_metal_layer(device, CGRectMake(x, hostY, width, height));
-                [hostLayer addSublayer:metalLayer];
-            } else {
-                NSView *childView = [[NSView alloc] initWithFrame:NSMakeRect(x, hostY, width, height)];
-                childView.wantsLayer = YES;
-                metalLayer = jhv_create_metal_layer(device, CGRectMake(0.0, 0.0, width, height));
-                childView.layer = metalLayer;
-
-                [hostView addSubview:childView positioned:NSWindowAbove relativeTo:nil];
-                [hostView setNeedsDisplay:YES];
-                [childView setNeedsDisplay:YES];
-                [hostView.window.contentView setNeedsDisplay:YES];
-
-                box.childView = childView;
-            }
-            box.metalLayer = metalLayer;
+            CGFloat layerY = jhv_layer_y(windowLayer, y, height);
+            CGFloat windowScale = windowLayer.contentsScale;
+            if (windowScale <= 0.0)
+                windowScale = NSScreen.mainScreen.backingScaleFactor;
+            if (windowScale <= 0.0)
+                windowScale = 1.0;
+            CGRect frame = CGRectMake(x, layerY, width, height);
+            box.windowLayer = windowLayer;
+            box.metalLayer = jhv_create_metal_layer(device, windowScale, frame);
+            [windowLayer addSublayer:box.metalLayer];
             result = (__bridge_retained void *)box;
         }
     });
@@ -125,18 +117,9 @@ void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, do
     JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
     jhv_run_on_main_async(^{
         @autoreleasepool {
-            CGFloat hostY = jhv_host_y(box.hostView, y, height);
-            if (box.childView == nil) {
-                jhv_set_metal_layer_frame(box.metalLayer, CGRectMake(x, hostY, width, height));
-                return;
-            }
-
-            CGRect childFrame = CGRectMake(x, hostY, width, height);
-            jhv_run_without_actions(^{
-                if (!CGRectEqualToRect(box.childView.frame, childFrame))
-                    box.childView.frame = childFrame;
-            });
-            jhv_set_metal_layer_frame(box.metalLayer, CGRectMake(0.0, 0.0, width, height));
+            CGFloat layerY = jhv_layer_y(box.windowLayer, y, height);
+            CGRect frame = CGRectMake(x, layerY, width, height);
+            jhv_set_metal_layer_frame(box.metalLayer, frame);
         }
     });
 }
@@ -156,10 +139,6 @@ void jhv_metal_host_destroy(void *boxPtr) {
     jhv_run_on_main_sync(^{
         @autoreleasepool {
             JHVMetalHostBox *box = (__bridge_transfer JHVMetalHostBox *)boxPtr;
-            if (box.childView != nil) {
-                [box.childView removeFromSuperview];
-                return;
-            }
             [box.metalLayer removeFromSuperlayer];
         }
     });

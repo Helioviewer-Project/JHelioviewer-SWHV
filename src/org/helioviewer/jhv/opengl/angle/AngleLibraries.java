@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.opengl.angle;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,22 +16,20 @@ final class AngleLibraries {
     }
 
     static Path libraryPath(String fileName) {
-        Path libraryPath = NATIVES_DIR.resolve(fileName).toAbsolutePath();
-        if (Files.exists(libraryPath))
-            return libraryPath;
+        Path path = NATIVES_DIR.resolve(fileName).toAbsolutePath();
+        if (Files.exists(path))
+            return path;
 
-        try (InputStream in = FileUtils.getResource("/lib/natives-macos/" + fileName)) {
+        String resourcePath = "/lib/natives-macos/" + fileName;
+        try (InputStream in = FileUtils.getResource(resourcePath)) {
+            if (in == null)
+                throw new IOException("Missing resource " + resourcePath);
             Path extractedPath = Path.of(JHVGlobals.libCacheDir, fileName);
             Files.copy(in, extractedPath, StandardCopyOption.REPLACE_EXISTING);
             return extractedPath;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("Failed to resolve native library " + fileName, e);
         }
     }
 
-    static void configureLwjglProperty(String lwjglProperty, String fileName) {
-        if (System.getProperty(lwjglProperty) != null)
-            return;
-        System.setProperty(lwjglProperty, libraryPath(fileName).toString());
-    }
 }
