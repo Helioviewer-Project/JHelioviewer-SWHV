@@ -34,6 +34,7 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+
 import org.json.JSONObject;
 
 public final class GridLayer extends AbstractLayer {

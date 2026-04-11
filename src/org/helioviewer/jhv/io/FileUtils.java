@@ -29,8 +29,8 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.threads.JHVThread;
 
-import okio.Okio;
 import okio.BufferedSource;
+import okio.Okio;
 
 public class FileUtils {
 

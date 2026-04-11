@@ -13,6 +13,7 @@ import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
 import org.helioviewer.jhv.timelines.band.BandReaderCdf;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

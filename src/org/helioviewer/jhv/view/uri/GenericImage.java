@@ -1,14 +1,14 @@
 package org.helioviewer.jhv.view.uri;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.IndexColorModel;
-import java.awt.Graphics;
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Iterator;
 

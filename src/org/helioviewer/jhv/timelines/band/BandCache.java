@@ -5,8 +5,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.json.JSONObject;
+
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 interface BandCache {
 

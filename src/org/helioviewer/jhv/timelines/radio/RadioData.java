@@ -36,12 +36,12 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
-import org.json.JSONObject;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.base.Throwables;
+import org.json.JSONObject;
 
 public final class RadioData extends AbstractTimelineLayer {
 

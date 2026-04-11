@@ -28,6 +28,7 @@ import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.wcs.WcsHeader;
+
 import org.json.JSONObject;
 
 public class ImageLayer extends AbstractLayer implements ImageData.Handler {

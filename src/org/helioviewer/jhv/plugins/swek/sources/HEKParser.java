@@ -19,6 +19,7 @@ import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

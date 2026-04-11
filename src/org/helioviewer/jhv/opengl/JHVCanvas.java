@@ -2,9 +2,9 @@ package org.helioviewer.jhv.opengl;
 
 import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
-import java.awt.geom.AffineTransform;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.camera.Camera;

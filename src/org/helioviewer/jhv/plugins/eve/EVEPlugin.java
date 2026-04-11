@@ -7,6 +7,7 @@ import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 import org.helioviewer.jhv.timelines.gui.TimelineActions;
+
 import org.json.JSONObject;
 
 public class EVEPlugin extends Plugin {

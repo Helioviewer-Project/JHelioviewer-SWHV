@@ -4,8 +4,8 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
-import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 
 public class GLTexture {

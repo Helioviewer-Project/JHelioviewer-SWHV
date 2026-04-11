@@ -2,7 +2,6 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
-
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 

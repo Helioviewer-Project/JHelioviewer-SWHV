@@ -9,8 +9,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Objects;
 
 import javax.swing.AbstractAction;
@@ -46,8 +46,8 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.JideToggleButton;
 import com.jidesoft.swing.JideSplitButton;
+import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
 public class MoviePanel extends JPanel implements Interfaces.ObservationSelector {

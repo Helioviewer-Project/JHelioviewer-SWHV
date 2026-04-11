@@ -9,6 +9,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
+
 import org.json.JSONObject;
 
 public class SWEKPlugin extends Plugin {

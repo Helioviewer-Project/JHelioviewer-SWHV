@@ -36,6 +36,7 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
+
 import org.json.JSONObject;
 
 public final class ConnectionLayer extends AbstractLayer implements LoadConnectivity.Receiver, LoadFootpoint.Receiver, LoadHCS.Receiver, LoadSunJSON.Receiver {

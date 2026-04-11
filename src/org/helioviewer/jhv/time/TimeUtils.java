@@ -9,10 +9,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
+import org.helioviewer.jhv.astronomy.Spice;
+
 import org.everit.json.schema.FormatValidator;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
-
-import org.helioviewer.jhv.astronomy.Spice;
 
 public class TimeUtils {
 

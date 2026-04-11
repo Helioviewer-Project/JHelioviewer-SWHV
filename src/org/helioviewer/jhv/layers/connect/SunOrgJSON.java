@@ -11,6 +11,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins;
 
 import org.helioviewer.jhv.Settings;
+
 import org.json.JSONObject;
 
 public abstract class Plugin {

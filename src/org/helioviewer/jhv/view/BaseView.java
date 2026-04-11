@@ -6,9 +6,9 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
+import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {

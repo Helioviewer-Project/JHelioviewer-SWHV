@@ -18,9 +18,9 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.Tasks;
 
 import okio.Buffer;
-import okio.Okio;
-import okio.BufferedSource;
 import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.Okio;
 
 public class DownloadLayer {
 

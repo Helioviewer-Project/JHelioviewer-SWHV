@@ -7,6 +7,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

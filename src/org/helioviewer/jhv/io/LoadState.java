@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.threads.Tasks;
+
 import org.json.JSONObject;
 
 class LoadState {

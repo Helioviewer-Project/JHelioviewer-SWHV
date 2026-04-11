@@ -19,7 +19,6 @@ import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.RasterLine;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 
-
 public class FlatGrid {
 
     private static final float TEXT_SCALE = GridLabel.textScale;

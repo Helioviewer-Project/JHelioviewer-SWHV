@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import kdu_jni.KduException;
-
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
@@ -13,6 +11,8 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
+
+import kdu_jni.KduException;
 
 class J2KReader implements Runnable {
 

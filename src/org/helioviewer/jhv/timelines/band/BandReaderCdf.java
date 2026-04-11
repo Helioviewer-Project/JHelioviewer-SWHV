@@ -17,11 +17,10 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.google.common.collect.LinkedListMultimap;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 import uk.ac.bristol.star.cdf.AttributeEntry;
 import uk.ac.bristol.star.cdf.CdfContent;
 import uk.ac.bristol.star.cdf.CdfReader;

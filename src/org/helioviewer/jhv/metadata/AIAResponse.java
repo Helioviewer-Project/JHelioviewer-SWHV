@@ -8,6 +8,7 @@ import java.util.Map;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.time.TimeUtils;
+
 import org.json.JSONObject;
 
 public class AIAResponse {

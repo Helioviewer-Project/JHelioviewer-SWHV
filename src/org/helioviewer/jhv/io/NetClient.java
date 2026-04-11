@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.io;
 
 import java.awt.EventQueue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

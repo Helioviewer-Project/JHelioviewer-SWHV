@@ -27,6 +27,7 @@ import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVTime;
+
 import org.json.JSONObject;
 
 public class ViewpointLayer extends AbstractLayer {

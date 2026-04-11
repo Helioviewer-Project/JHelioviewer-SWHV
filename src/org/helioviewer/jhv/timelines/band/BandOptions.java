@@ -21,9 +21,9 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.json.JSONObject;
 
 import com.jidesoft.swing.JideButton;
+import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 class BandOptions extends JPanel {

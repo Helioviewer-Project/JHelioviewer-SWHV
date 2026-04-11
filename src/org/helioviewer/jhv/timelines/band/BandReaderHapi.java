@@ -24,16 +24,16 @@ import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+
+import com.google.common.base.Throwables;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiTableReader;
 import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
-import com.google.common.base.Throwables;
 
 public class BandReaderHapi {
 

@@ -6,6 +6,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
+
 import org.json.JSONObject;
 
 public class AnnotateFOV extends AbstractAnnotateable {

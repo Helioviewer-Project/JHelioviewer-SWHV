@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
+
 import org.json.JSONObject;
 
 public interface TimelineLayer {

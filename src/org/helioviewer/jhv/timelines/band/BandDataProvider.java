@@ -8,10 +8,10 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.google.common.collect.ArrayListMultimap;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class BandDataProvider {
 
