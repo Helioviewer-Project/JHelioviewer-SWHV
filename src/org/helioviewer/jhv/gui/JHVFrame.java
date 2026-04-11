@@ -11,7 +11,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
@@ -31,7 +30,9 @@ import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
+import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.JHVCanvas;
+import org.helioviewer.jhv.opengl.RenderSurface;
 
 public class JHVFrame {
 
@@ -40,7 +41,8 @@ public class JHVFrame {
 
     private static SideContentPane leftPane;
 
-    private static JHVCanvas glCanvas;
+    private static RenderSurface renderSurface;
+    private static Component renderComponent;
     private static InputController inputController;
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
@@ -59,8 +61,9 @@ public class JHVFrame {
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
-        glCanvas = JHVCanvas.create(); // before camera
-        glCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
+        renderSurface = createRenderSurface();
+        renderComponent = (Component) renderSurface;
+        renderComponent.setMinimumSize(new Dimension(1, 1)); // allow resize
 
         layers = Layers.getInstance();
         layersPanel = new LayersPanel(layers);
@@ -76,19 +79,16 @@ public class JHVFrame {
 
         interaction = new Interaction(Display.getCamera());
         inputController = new InputController(interaction);
-        glCanvas.addMouseListener(inputController);
-        glCanvas.addMouseMotionListener(inputController);
-        glCanvas.addMouseWheelListener(inputController);
-        glCanvas.addKeyListener(inputController);
+        renderComponent.addMouseListener(inputController);
+        renderComponent.addMouseMotionListener(inputController);
+        renderComponent.addMouseWheelListener(inputController);
+        renderComponent.addKeyListener(inputController);
 
-        mainContentPanel = new MainContentPanel(glCanvas);
+        mainContentPanel = new MainContentPanel(renderComponent);
 
-        JSplitPane midSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-        midSplitPane.setDividerSize(2);
-        midSplitPane.setBorder(null);
-
-        midSplitPane.setLeftComponent(leftScrollPane);
-        midSplitPane.setRightComponent(mainContentPanel);
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(leftScrollPane, BorderLayout.WEST);
+        centerPanel.add(mainContentPanel, BorderLayout.CENTER);
 
         zoomStatus = new ZoomStatusPanel();
         carringtonStatus = new CarringtonStatusPanel();
@@ -108,7 +108,7 @@ public class JHVFrame {
         toolBarPanel.add(toolBar, BorderLayout.CENTER);
 
         mainFrame.getContentPane().add(toolBarPanel, BorderLayout.NORTH);
-        mainFrame.getContentPane().add(midSplitPane, BorderLayout.CENTER);
+        mainFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
         mainFrame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
         Movie.setMaster(Layers.getActiveImageLayer()); //! for nullImageLayer
@@ -181,19 +181,19 @@ public class JHVFrame {
     }
 
     public static Component getRenderComponent() {
-        return glCanvas;
+        return renderComponent;
     }
 
     public static void requestRender() {
-        glCanvas.display();
+        renderSurface.requestRender();
     }
 
     public static void setWhiteBackground(boolean whiteBackground) {
-        glCanvas.setWhiteBackground(whiteBackground);
+        renderSurface.setWhiteBackground(whiteBackground);
     }
 
     public static int getFramerate() {
-        return glCanvas.getFramerate();
+        return renderSurface.getFramerate();
     }
 
     public static MainContentPanel getMainContentPanel() {
@@ -230,6 +230,12 @@ public class JHVFrame {
 
     public static MenuBar getMenuBar() {
         return menuBar;
+    }
+
+    private static RenderSurface createRenderSurface() {
+        if (Platform.isMacOS() && !"false".equalsIgnoreCase(System.getProperty("jhv.metal.host")))
+            return new AngleCanvas();
+        return JHVCanvas.create(); // before camera
     }
 
 }

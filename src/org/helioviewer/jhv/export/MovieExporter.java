@@ -51,10 +51,10 @@ class MovieExporter {
         ByteBuffer eveData = null;
         if (eveImage != null) {
             scaled = ExportUtils.scaleImage(eveImage, w, h - mainH, movieLinePosition);
-            eveData = NativeImageFactory.getByteBuffer(scaled).flip().limit(3 * w * scaled.getHeight());
+            eveData = NativeImageFactory.getByteBuffer(scaled).clear().limit(3 * w * scaled.getHeight());
         }
 
-        ByteBuffer mainData = MappedImageFactory.getByteBuffer(mainImage);
+        ByteBuffer mainData = MappedImageFactory.getByteBuffer(mainImage).clear().limit(3 * w * mainH);
         try (FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.APPEND)) {
             for (int j = mainH - 1; j >= 0; j--) { // write image flipped
                 int pos = 3 * w * j;
@@ -115,7 +115,7 @@ class MovieExporter {
         List<String> input = List.of(
                 "-hide_banner",
                 "-f", "rawvideo",
-                "-pix_fmt", "bgr24",
+                "-pix_fmt", "rgb24",
                 "-r", format == VideoFormat.PNG ? "1" : String.valueOf(fps),
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()

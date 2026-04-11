@@ -2,8 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 
-import org.lwjgl.opengl.GL33;
-
 public class GLSLTexture extends VAO1 {
 
     private static final int size0 = 4;
@@ -35,7 +33,7 @@ public class GLSLTexture extends VAO1 {
         GLSLTextureShader.texture.bindMVP();
 
         bind();
-        GL33.glDrawArrays(mode, first, toDraw);
+        GL.glDrawArrays(mode, first, toDraw);
     }
 
 }

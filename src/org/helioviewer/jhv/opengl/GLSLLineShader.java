@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.lwjgl.opengl.GL33;
-
 import org.helioviewer.jhv.camera.Transform;
 
 class GLSLLineShader extends GLSLShader {
@@ -29,20 +27,20 @@ class GLSLLineShader extends GLSLShader {
 
     @Override
     protected void initUniforms(int id) {
-        refModelViewProjectionMatrix = GL33.glGetUniformLocation(id, "ModelViewProjectionMatrix");
-        iaspectRef = GL33.glGetUniformLocation(id, "iaspect");
-        thicknessRef = GL33.glGetUniformLocation(id, "thickness");
+        refModelViewProjectionMatrix = GL.glGetUniformLocation(id, "ModelViewProjectionMatrix");
+        iaspectRef = GL.glGetUniformLocation(id, "iaspect");
+        thicknessRef = GL.glGetUniformLocation(id, "thickness");
     }
 
     void bindParams(double aspect, double _thickness) {
         iaspect[0] = (float) (1 / aspect);
-        GL33.glUniform1fv(iaspectRef, iaspect);
+        GL.glUniform1fv(iaspectRef, iaspect);
         thickness[0] = (float) (0.5 * _thickness);
-        GL33.glUniform1fv(thicknessRef, thickness);
+        GL.glUniform1fv(thicknessRef, thickness);
     }
 
     void bindMVP() {
-        GL33.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
+        GL.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
     }
 
 }

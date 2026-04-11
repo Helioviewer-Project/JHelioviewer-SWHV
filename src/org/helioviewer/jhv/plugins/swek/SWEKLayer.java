@@ -41,14 +41,13 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
-
-import org.lwjgl.opengl.GL33;
 
 // has to be public for state
 public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
@@ -108,7 +107,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     g.dispose();
                 }
 
-                tex = new GLTexture(GL33.GL_TEXTURE_2D, GLTexture.Unit.THREE);
+                tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
                 tex.bind();
 
                 ByteBuffer data = NativeImageFactory.getByteBuffer(bi);
@@ -353,7 +352,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             if (Display.mode.isLatitudinal() && evt.isCactus())
                 continue;
             bindTexture(evtr.getSupplier().getGroup());
-            glslTexture.renderTexture(GL33.GL_TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
+            glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }

@@ -1,14 +1,12 @@
 package org.helioviewer.jhv.opengl;
 
-import org.lwjgl.opengl.GL33;
-
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 
 abstract class GLSLShader {
 
     private enum ShaderType {
-        vertex(GL33.GL_VERTEX_SHADER), fragment(GL33.GL_FRAGMENT_SHADER);
+        vertex(GL.VERTEX_SHADER), fragment(GL.FRAGMENT_SHADER);
 
         final int glType;
 
@@ -31,11 +29,11 @@ abstract class GLSLShader {
 
     protected final void _init(boolean common) {
         try {
-            String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
+            String vertexText = GL.adaptShaderSource(FileUtils.streamToString(FileUtils.getResource(vertex)), true);
             vertexID = attachShader(ShaderType.vertex, vertexText);
 
             String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/glsl/solarCommon.frag")) : "";
-            String fragmentText = fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment));
+            String fragmentText = GL.adaptShaderSource(fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment)), false);
             fragmentID = attachShader(ShaderType.fragment, fragmentText);
 
             progID = initializeProgram(true);
@@ -48,47 +46,47 @@ abstract class GLSLShader {
 
     protected final void _dispose() {
         if (progID != 0) {
-            GL33.glUseProgram(0);
+            GL.glUseProgram(0);
         }
         if (vertexID != 0) {
-            GL33.glDeleteShader(vertexID);
+            GL.glDeleteShader(vertexID);
             vertexID = 0;
         }
         if (fragmentID != 0) {
-            GL33.glDeleteShader(fragmentID);
+            GL.glDeleteShader(fragmentID);
             fragmentID = 0;
         }
         if (progID != 0) {
-            GL33.glDeleteProgram(progID);
+            GL.glDeleteProgram(progID);
             progID = 0;
         }
     }
 
     public final void use() {
-        GL33.glUseProgram(progID);
+        GL.glUseProgram(progID);
     }
 
     protected abstract void initUniforms(int id);
 
     protected static void setTextureUnit(int id, String texname, GLTexture.Unit unit) {
-        int loc = GL33.glGetUniformLocation(id, texname);
+        int loc = GL.glGetUniformLocation(id, texname);
         if (loc != -1)
-            GL33.glUniform1i(loc, unit.ordinal());
+            GL.glUniform1i(loc, unit.ordinal());
         else
             Log.error("Invalid texture " + texname);
     }
 
     private static int attachShader(ShaderType type, String text) {
-        int id = GL33.glCreateShader(type.glType);
-        GL33.glShaderSource(id, text);
-        GL33.glCompileShader(id);
+        int id = GL.glCreateShader(type.glType);
+        GL.glShaderSource(id, text);
+        GL.glCompileShader(id);
 
-        int compileStatus = GL33.glGetShaderi(id, GL33.GL_COMPILE_STATUS);
+        int compileStatus = GL.glGetShaderi(id, GL.COMPILE_STATUS);
         if (compileStatus != 1) {
             Log.error("Shader compile status: " + compileStatus);
-            int infoLogLength = GL33.glGetShaderi(id, GL33.GL_INFO_LOG_LENGTH);
+            int infoLogLength = GL.glGetShaderi(id, GL.INFO_LOG_LENGTH);
             if (infoLogLength > 0) {
-                String log = GL33.glGetShaderInfoLog(id, infoLogLength);
+                String log = GL.glGetShaderInfoLog(id, infoLogLength);
                 Log.error(log);
                 throw new JHVGLException("Cannot compile " + type + " shader: " + log);
             } else
@@ -98,31 +96,31 @@ abstract class GLSLShader {
     }
 
     private int initializeProgram(boolean cleanUp) {
-        int id = GL33.glCreateProgram();
-        GL33.glAttachShader(id, vertexID);
-        GL33.glAttachShader(id, fragmentID);
-        GL33.glLinkProgram(id);
+        int id = GL.glCreateProgram();
+        GL.glAttachShader(id, vertexID);
+        GL.glAttachShader(id, fragmentID);
+        GL.glLinkProgram(id);
 
-        int linkStatus = GL33.glGetProgrami(id, GL33.GL_LINK_STATUS);
+        int linkStatus = GL.glGetProgrami(id, GL.LINK_STATUS);
         if (linkStatus != 1) {
             Log.error("Shader link status: " + linkStatus);
-            int infoLogLength = GL33.glGetProgrami(id, GL33.GL_INFO_LOG_LENGTH);
+            int infoLogLength = GL.glGetProgrami(id, GL.INFO_LOG_LENGTH);
             if (infoLogLength > 0) {
-                String log = GL33.glGetProgramInfoLog(id, infoLogLength);
+                String log = GL.glGetProgramInfoLog(id, infoLogLength);
                 Log.error(log);
                 throw new JHVGLException("Cannot link shader: " + log);
             } else
                 throw new JHVGLException("Cannot link shader: unknown reason");
         }
 
-        GL33.glValidateProgram(id);
+        GL.glValidateProgram(id);
 
         if (cleanUp) {
-            GL33.glDetachShader(id, vertexID);
-            GL33.glDeleteShader(vertexID);
+            GL.glDetachShader(id, vertexID);
+            GL.glDeleteShader(vertexID);
             vertexID = 0;
-            GL33.glDetachShader(id, fragmentID);
-            GL33.glDeleteShader(fragmentID);
+            GL.glDetachShader(id, fragmentID);
+            GL.glDeleteShader(fragmentID);
             fragmentID = 0;
         }
         return id;

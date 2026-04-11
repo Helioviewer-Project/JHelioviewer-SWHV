@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.lwjgl.opengl.GL33;
-
 class VAO1 {
 
     private final VAA[] vaa;
@@ -12,7 +10,7 @@ class VAO1 {
     protected GLBO vbo;
 
     VAO1(boolean dynamic, VAA[] _vaa) {
-        usage = dynamic ? GL33.GL_DYNAMIC_DRAW : GL33.GL_STATIC_DRAW;
+        usage = dynamic ? GL.DYNAMIC_DRAW : GL.STATIC_DRAW;
         vaa = _vaa;
     }
 
@@ -20,10 +18,10 @@ class VAO1 {
         if (!inited) {
             inited = true;
 
-            vaoID = GL33.glGenVertexArrays();
-            GL33.glBindVertexArray(vaoID);
+            vaoID = GL.glGenVertexArray();
+            GL.glBindVertexArray(vaoID);
 
-            vbo = new GLBO(GL33.GL_ARRAY_BUFFER, usage);
+            vbo = new GLBO(GL.ARRAY_BUFFER, usage);
             vbo.bind();
             for (VAA avaa : vaa) {
                 avaa.enable();
@@ -36,13 +34,13 @@ class VAO1 {
             inited = false;
 
             vbo.delete();
-            GL33.glDeleteVertexArrays(vaoID);
+            GL.glDeleteVertexArray(vaoID);
             vaoID = -1;
         }
     }
 
     protected void bind() {
-        GL33.glBindVertexArray(vaoID);
+        GL.glBindVertexArray(vaoID);
     }
 
 }

@@ -15,20 +15,18 @@ import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
 @SuppressWarnings("serial")
-public final class JHVCanvas extends AWTGLCanvas {
+public final class JHVCanvas extends AWTGLCanvas implements RenderSurface {
 
     public static final int GLSAMPLES = 4;
     public static String glVersion = "";
     public static int maxTextureSize;
     public static final double[] pixelScale = {1, 1};
 
-    private boolean whiteBack;
+    private boolean whiteBackground;
     private boolean displayPending;
     private int fps;
     private int fpsCount;
@@ -47,7 +45,7 @@ public final class JHVCanvas extends AWTGLCanvas {
                 // immediately and the aspect ratio does not lag behind the canvas size.
                 lastGlWidth = -1;
                 lastGlHeight = -1;
-                EventQueue.invokeLater(JHVCanvas.this::display);
+                EventQueue.invokeLater(JHVCanvas.this::requestRender);
             }
         });
     }
@@ -63,7 +61,7 @@ public final class JHVCanvas extends AWTGLCanvas {
     @Override
     public void initGL() {
         updatePixelScale();
-        GL.createCapabilities();
+        org.lwjgl.opengl.GL.createCapabilities();
         ensureRendererInitialized();
     }
 
@@ -74,14 +72,14 @@ public final class JHVCanvas extends AWTGLCanvas {
         if (!rendererInitialized)
             return;
 
-        int glWidth = glWidth();
-        int glHeight = glHeight();
+        int glWidth = (int) (getWidth() * pixelScale[0] + .5);
+        int glHeight = (int) (getHeight() * pixelScale[1] + .5);
         if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
-            GLRenderer.reshape(0, 0, glWidth, glHeight);
+            GLRenderer.reshape(glWidth, glHeight);
             lastGlWidth = glWidth;
             lastGlHeight = glHeight;
         }
-        GLRenderer.display(whiteBack);
+        GLRenderer.display(whiteBackground);
         swapBuffers();
 
         Camera camera = Display.getCamera();
@@ -89,10 +87,11 @@ public final class JHVCanvas extends AWTGLCanvas {
             ExportMovie.handleMovieExport(camera);
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
-        frameRendered();
+        fpsCount++;
     }
 
-    public void display() {
+    @Override
+    public void requestRender() {
         if (displayPending)
             return;
 
@@ -109,10 +108,12 @@ public final class JHVCanvas extends AWTGLCanvas {
         super.removeNotify();
     }
 
+    @Override
     public void setWhiteBackground(boolean whiteBackground) {
-        whiteBack = whiteBackground;
+        this.whiteBackground = whiteBackground;
     }
 
+    @Override
     public int getFramerate() {
         long now = System.currentTimeMillis();
         long delta = now - fpsTime;
@@ -167,18 +168,6 @@ public final class JHVCanvas extends AWTGLCanvas {
         pixelScale[1] = transform.getScaleY();
     }
 
-    private int glWidth() {
-        return (int) (getWidth() * pixelScale[0] + .5);
-    }
-
-    private int glHeight() {
-        return (int) (getHeight() * pixelScale[1] + .5);
-    }
-
-    private void frameRendered() {
-        fpsCount++;
-    }
-
     private static GLData createData() {
         GLData data = new GLData();
         data.samples = GLSAMPLES;
@@ -194,12 +183,12 @@ public final class JHVCanvas extends AWTGLCanvas {
     }
 
     private static void initGLInfo() {
-        glVersion = "OpenGL " + GL33.glGetString(GL33.GL_VERSION);
+        glVersion = GL.formatVersionString(GL.glGetString(GL.VERSION));
         Log.info(glVersion);
-        if (!GL.getCapabilities().OpenGL33)
+        if (!org.lwjgl.opengl.GL.getCapabilities().OpenGL33)
             throw glStartupError("OpenGL 3.3 not supported.");
 
-        maxTextureSize = GL33.glGetInteger(GL33.GL_MAX_TEXTURE_SIZE);
+        maxTextureSize = GL.glGetInteger(GL.MAX_TEXTURE_SIZE);
     }
 
     private static AssertionError glStartupError(String err) {

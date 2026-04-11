@@ -2,9 +2,11 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.ByteBuffer;
 
-import org.lwjgl.opengl.GL33;
+import org.helioviewer.jhv.Log;
+import org.lwjgl.system.MemoryUtil;
 
 final class GLFrameCapture {
+    private static final int[] DEPTH_FORMATS = {GL.DEPTH_COMPONENT32, GL.DEPTH_COMPONENT24, GL.DEPTH_COMPONENT16};
 
     private final int width;
     private final int height;
@@ -15,79 +17,73 @@ final class GLFrameCapture {
     private final int drawFramebuffer;
     private final int drawColorRenderbuffer;
     private final int drawDepthRenderbuffer;
+    private final ByteBuffer glesReadback;
 
     GLFrameCapture(int captureW, int captureH, int requestedSamples) {
         int frameWidth = Math.max(1, captureW);
         int frameHeight = Math.max(1, captureH);
-        int frameSamples = Math.clamp(requestedSamples, 0, GL33.glGetInteger(GL33.GL_MAX_SAMPLES));
-        int colorInternalFormat = chooseColorInternalFormat();
-        int colorPixelFormat = chooseColorPixelFormat();
+        int frameSamples = Math.clamp(requestedSamples, 0, GL.glGetInteger(GL.MAX_SAMPLES));
+        int colorInternalFormat = GL.RGB8;
+        int colorPixelFormat = GL.RGB;
         int resolveFbo = 0;
         int resolveTex = 0;
         int drawFbo = 0;
         int drawColorRbo = 0;
         int drawDepthRbo = 0;
-        int[] ids = new int[1];
+        int chosenDepthFormat;
+        ByteBuffer readback = GL.isGles() ? MemoryUtil.memAlloc(frameWidth * frameHeight * 4) : null;
 
         try {
-            GL33.glGenFramebuffers(ids);
-            resolveFbo = ids[0];
-            GL33.glBindFramebuffer(GL33.GL_FRAMEBUFFER, resolveFbo);
+            resolveFbo = GL.glGenFramebuffer();
+            GL.glBindFramebuffer(GL.FRAMEBUFFER, resolveFbo);
 
-            GL33.glGenTextures(ids);
-            resolveTex = ids[0];
-            GL33.glBindTexture(GL33.GL_TEXTURE_2D, resolveTex);
-            GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_LINEAR);
-            GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_LINEAR);
-            GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_S, GL33.GL_CLAMP_TO_EDGE);
-            GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_WRAP_T, GL33.GL_CLAMP_TO_EDGE);
-            GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, colorInternalFormat, frameWidth, frameHeight, 0, colorPixelFormat, GL33.GL_UNSIGNED_BYTE, (ByteBuffer) null);
-            GL33.glFramebufferTexture2D(GL33.GL_FRAMEBUFFER, GL33.GL_COLOR_ATTACHMENT0, GL33.GL_TEXTURE_2D, resolveTex, 0);
+            resolveTex = GL.glGenTexture();
+            GL.glBindTexture(GL.TEXTURE_2D, resolveTex);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+            GL.glTexImage2D(GL.TEXTURE_2D, 0, colorInternalFormat, frameWidth, frameHeight, 0, colorPixelFormat, GL.UNSIGNED_BYTE, (ByteBuffer) null);
+            GL.glFramebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, resolveTex, 0);
 
             if (frameSamples > 0) {
-                GL33.glGenFramebuffers(ids);
-                drawFbo = ids[0];
-                GL33.glBindFramebuffer(GL33.GL_FRAMEBUFFER, drawFbo);
+                drawFbo = GL.glGenFramebuffer();
+                GL.glBindFramebuffer(GL.FRAMEBUFFER, drawFbo);
 
-                GL33.glGenRenderbuffers(ids);
-                drawColorRbo = ids[0];
-                GL33.glBindRenderbuffer(GL33.GL_RENDERBUFFER, drawColorRbo);
-                GL33.glRenderbufferStorageMultisample(GL33.GL_RENDERBUFFER, frameSamples, colorInternalFormat, frameWidth, frameHeight);
-                GL33.glFramebufferRenderbuffer(GL33.GL_FRAMEBUFFER, GL33.GL_COLOR_ATTACHMENT0, GL33.GL_RENDERBUFFER, drawColorRbo);
+                drawColorRbo = GL.glGenRenderbuffer();
+                GL.glBindRenderbuffer(GL.RENDERBUFFER, drawColorRbo);
+                GL.glRenderbufferStorageMultisample(GL.RENDERBUFFER, frameSamples, colorInternalFormat, frameWidth, frameHeight);
+                GL.glFramebufferRenderbuffer(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.RENDERBUFFER, drawColorRbo);
 
-                GL33.glGenRenderbuffers(ids);
-                drawDepthRbo = ids[0];
-                GL33.glBindRenderbuffer(GL33.GL_RENDERBUFFER, drawDepthRbo);
-                GL33.glRenderbufferStorageMultisample(GL33.GL_RENDERBUFFER, frameSamples, chooseDepthFormat(), frameWidth, frameHeight);
-                GL33.glFramebufferRenderbuffer(GL33.GL_FRAMEBUFFER, GL33.GL_DEPTH_ATTACHMENT, GL33.GL_RENDERBUFFER, drawDepthRbo);
+                drawDepthRbo = GL.glGenRenderbuffer();
+                chosenDepthFormat = attachDepthRenderbuffer(frameWidth, frameHeight, frameSamples, drawDepthRbo);
 
-                checkFramebufferComplete("draw");
-
-                GL33.glBindFramebuffer(GL33.GL_FRAMEBUFFER, resolveFbo);
+                GL.glBindFramebuffer(GL.FRAMEBUFFER, resolveFbo);
                 checkFramebufferComplete("resolve");
             } else {
                 drawFbo = resolveFbo;
 
-                GL33.glGenRenderbuffers(ids);
-                drawDepthRbo = ids[0];
-                GL33.glBindRenderbuffer(GL33.GL_RENDERBUFFER, drawDepthRbo);
-                GL33.glRenderbufferStorage(GL33.GL_RENDERBUFFER, chooseDepthFormat(), frameWidth, frameHeight);
-                GL33.glFramebufferRenderbuffer(GL33.GL_FRAMEBUFFER, GL33.GL_DEPTH_ATTACHMENT, GL33.GL_RENDERBUFFER, drawDepthRbo);
-
-                checkFramebufferComplete("draw");
+                drawDepthRbo = GL.glGenRenderbuffer();
+                chosenDepthFormat = attachDepthRenderbuffer(frameWidth, frameHeight, 0, drawDepthRbo);
             }
         } catch (RuntimeException e) {
-            deleteRenderbuffer(drawDepthRbo);
-            deleteRenderbuffer(drawColorRbo);
+            if (drawDepthRbo != 0)
+                GL.glDeleteRenderbuffer(drawDepthRbo);
+            if (drawColorRbo != 0)
+                GL.glDeleteRenderbuffer(drawColorRbo);
             if (drawFbo != resolveFbo)
-                deleteFramebuffer(drawFbo);
-            deleteTexture(resolveTex);
-            deleteFramebuffer(resolveFbo);
+                GL.glDeleteFramebuffer(drawFbo);
+            if (resolveTex != 0)
+                GL.glDeleteTexture(resolveTex);
+            if (resolveFbo != 0)
+                GL.glDeleteFramebuffer(resolveFbo);
+            if (readback != null)
+                MemoryUtil.memFree(readback);
             throw e;
         } finally {
-            GL33.glBindRenderbuffer(GL33.GL_RENDERBUFFER, 0);
-            GL33.glBindTexture(GL33.GL_TEXTURE_2D, 0);
-            GL33.glBindFramebuffer(GL33.GL_FRAMEBUFFER, 0);
+            GL.glBindRenderbuffer(GL.RENDERBUFFER, 0);
+            GL.glBindTexture(GL.TEXTURE_2D, 0);
+            GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
         }
 
         resolveFramebuffer = resolveFbo;
@@ -98,78 +94,91 @@ final class GLFrameCapture {
         width = frameWidth;
         height = frameHeight;
         samples = frameSamples;
+        glesReadback = readback;
+        int depthFormat = chosenDepthFormat;
+        Log.info("GLFrameCapture config: size=" + width + "x" + height
+                + " samples=" + samples
+                + " depth=" + depthBits(depthFormat)
+                + " backend=" + (GL.isGles() ? "gles" : "desktop"));
     }
 
     void bindForRender() {
-        GL33.glBindFramebuffer(GL33.GL_FRAMEBUFFER, drawFramebuffer);
+        GL.glBindFramebuffer(GL.FRAMEBUFFER, drawFramebuffer);
     }
 
     void readPixels(ByteBuffer buffer) {
         if (samples > 0) {
-            GL33.glBindFramebuffer(GL33.GL_READ_FRAMEBUFFER, drawFramebuffer);
-            GL33.glBindFramebuffer(GL33.GL_DRAW_FRAMEBUFFER, resolveFramebuffer);
-            GL33.glBlitFramebuffer(0, 0, width, height,
+            GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, drawFramebuffer);
+            GL.glBindFramebuffer(GL.DRAW_FRAMEBUFFER, resolveFramebuffer);
+            GL.glBlitFramebuffer(0, 0, width, height,
                     0, 0, width, height,
-                    GL33.GL_COLOR_BUFFER_BIT, GL33.GL_NEAREST);
+                    GL.COLOR_BUFFER_BIT, GL.NEAREST);
         }
 
-        GL33.glBindFramebuffer(GL33.GL_READ_FRAMEBUFFER, resolveFramebuffer);
-        GL33.glPixelStorei(GL33.GL_PACK_ALIGNMENT, 1);
-        GL33.glReadPixels(0, 0, width, height, GL33.GL_BGR, GL33.GL_UNSIGNED_BYTE, buffer);
-        GL33.glBindFramebuffer(GL33.GL_FRAMEBUFFER, 0);
+        GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, resolveFramebuffer);
+        GL.glPixelStorei(GL.PACK_ALIGNMENT, 1);
+        if (GL.isGles()) {
+            glesReadback.clear();
+            GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, glesReadback);
+            glesReadback.limit(width * height * 4);
+            buffer.clear();
+            while (glesReadback.remaining() >= 4) {
+                byte r = glesReadback.get();
+                byte g = glesReadback.get();
+                byte b = glesReadback.get();
+                glesReadback.get();
+                buffer.put(r).put(g).put(b);
+            }
+            buffer.flip();
+        } else {
+            GL.glReadPixels(0, 0, width, height, GL.RGB, GL.UNSIGNED_BYTE, buffer);
+        }
+        GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
     }
 
     void dispose() {
-        deleteRenderbuffer(drawDepthRenderbuffer);
-        deleteRenderbuffer(drawColorRenderbuffer);
+        if (drawDepthRenderbuffer != 0)
+            GL.glDeleteRenderbuffer(drawDepthRenderbuffer);
+        if (drawColorRenderbuffer != 0)
+            GL.glDeleteRenderbuffer(drawColorRenderbuffer);
         if (drawFramebuffer != resolveFramebuffer)
-            deleteFramebuffer(drawFramebuffer);
-        deleteTexture(resolveTexture);
-        deleteFramebuffer(resolveFramebuffer);
+            GL.glDeleteFramebuffer(drawFramebuffer);
+        if (resolveTexture != 0)
+            GL.glDeleteTexture(resolveTexture);
+        if (resolveFramebuffer != 0)
+            GL.glDeleteFramebuffer(resolveFramebuffer);
+        if (glesReadback != null)
+            MemoryUtil.memFree(glesReadback);
     }
 
     private static void checkFramebufferComplete(String label) {
-        int status = GL33.glCheckFramebufferStatus(GL33.GL_FRAMEBUFFER);
-        if (status != GL33.GL_FRAMEBUFFER_COMPLETE)
+        int status = GL.glCheckFramebufferStatus(GL.FRAMEBUFFER);
+        if (status != GL.FRAMEBUFFER_COMPLETE)
             throw new JHVGLException("GLFrameCapture " + label + " framebuffer incomplete: 0x" + Integer.toHexString(status));
     }
 
-    private static void deleteFramebuffer(int framebuffer) {
-        if (framebuffer == 0)
-            return;
-        GL33.glDeleteFramebuffers(framebuffer);
+    private static int attachDepthRenderbuffer(int width, int height, int samples, int renderbuffer) {
+        GL.glBindRenderbuffer(GL.RENDERBUFFER, renderbuffer);
+        for (int depthFormat : DEPTH_FORMATS) {
+            if (samples > 0)
+                GL.glRenderbufferStorageMultisample(GL.RENDERBUFFER, samples, depthFormat, width, height);
+            else
+                GL.glRenderbufferStorage(GL.RENDERBUFFER, depthFormat, width, height);
+            GL.glFramebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbuffer);
+            if (GL.glCheckFramebufferStatus(GL.FRAMEBUFFER) == GL.FRAMEBUFFER_COMPLETE)
+                return depthFormat;
+        }
+
+        checkFramebufferComplete("draw");
+        return 0;
     }
 
-    private static void deleteRenderbuffer(int renderbuffer) {
-        if (renderbuffer == 0)
-            return;
-        GL33.glDeleteRenderbuffers(renderbuffer);
+    private static int depthBits(int depthFormat) {
+        return switch (depthFormat) {
+            case GL.DEPTH_COMPONENT32 -> 32;
+            case GL.DEPTH_COMPONENT24 -> 24;
+            default -> 16;
+        };
     }
 
-    private static void deleteTexture(int texture) {
-        if (texture == 0)
-            return;
-        GL33.glDeleteTextures(texture);
-    }
-
-    private static int chooseDepthFormat() {
-        int depthBits = getInteger(GL33.GL_DEPTH_BITS);
-        if (depthBits >= 32)
-            return GL33.GL_DEPTH_COMPONENT32;
-        if (depthBits >= 24)
-            return GL33.GL_DEPTH_COMPONENT24;
-        return GL33.GL_DEPTH_COMPONENT16;
-    }
-
-    private static int chooseColorInternalFormat() {
-        return getInteger(GL33.GL_ALPHA_BITS) > 0 ? GL33.GL_RGBA8 : GL33.GL_RGB8;
-    }
-
-    private static int chooseColorPixelFormat() {
-        return getInteger(GL33.GL_ALPHA_BITS) > 0 ? GL33.GL_RGBA : GL33.GL_RGB;
-    }
-
-    private static int getInteger(int name) {
-        return GL33.glGetInteger(name);
-    }
 }

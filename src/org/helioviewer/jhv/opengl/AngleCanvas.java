@@ -1,0 +1,286 @@
+package org.helioviewer.jhv.opengl;
+
+import java.awt.Canvas;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.IllegalComponentStateException;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyEvent;
+
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+
+import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.export.ExportMovie;
+import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.opengl.angle.AngleRenderer;
+import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
+
+@SuppressWarnings("serial")
+public final class AngleCanvas extends Canvas implements RenderSurface {
+    private long hostHandle;
+    private boolean whiteBackground;
+    private AngleRenderer angleRenderer;
+    private boolean displayPending;
+    private boolean hostUpdatePending;
+    private boolean hostRenderPending;
+    private int fps;
+    private int fpsCount;
+    private long fpsTime = System.currentTimeMillis();
+    private int lastGlWidth = -1;
+    private int lastGlHeight = -1;
+    private Rectangle lastHostBounds;
+
+    public AngleCanvas() {
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
+            }
+        });
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                scheduleHostUpdate(true);
+            }
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Force a redraw after AWT resize so the GL pixel size is recomputed
+                // immediately and the aspect ratio does not lag behind the canvas size.
+                lastGlWidth = -1;
+                lastGlHeight = -1;
+                updatePixelScale();
+                scheduleHostUpdate(true);
+            }
+        });
+        addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
+            @Override
+            public void ancestorMoved(HierarchyEvent e) {
+                scheduleHostUpdate(false);
+            }
+
+            @Override
+            public void ancestorResized(HierarchyEvent e) {
+                scheduleHostUpdate(true);
+            }
+        });
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        updatePixelScale();
+        scheduleHostUpdate(true);
+    }
+
+    @Override
+    public void setBounds(int x, int y, int width, int height) {
+        boolean changed = x != getX() || y != getY() || width != getWidth() || height != getHeight();
+        boolean sizeChanged = width != getWidth() || height != getHeight();
+        super.setBounds(x, y, width, height);
+        if (!changed)
+            return;
+
+        if (sizeChanged) {
+            lastGlWidth = -1;
+            lastGlHeight = -1;
+            updatePixelScale();
+        }
+        scheduleHostUpdate(sizeChanged);
+    }
+
+    @Override
+    public void removeNotify() {
+        detach();
+        super.removeNotify();
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        // Native ANGLE host owns presentation.
+    }
+
+    @Override
+    public void requestRender() {
+        if (displayPending)
+            return;
+        if (angleRenderer == null) {
+            scheduleHostUpdate(true);
+            return;
+        }
+
+        displayPending = true;
+        EventQueue.invokeLater(() -> {
+            displayPending = false;
+            renderNow();
+        });
+    }
+
+    @Override
+    public int getFramerate() {
+        long now = System.currentTimeMillis();
+        long delta = now - fpsTime;
+
+        if (delta > 1000) {
+            fps = (int) ((1000L * fpsCount + delta / 2) / delta);
+            fpsCount = 0;
+            fpsTime = now;
+        }
+        return fps;
+    }
+
+    private void renderNow() {
+        attachIfNeeded();
+        if (angleRenderer == null)
+            return;
+
+        updatePixelScale();
+        int glWidth = (int) (getWidth() * JHVCanvas.pixelScale[0] + .5);
+        int glHeight = (int) (getHeight() * JHVCanvas.pixelScale[1] + .5);
+        if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
+            GLRenderer.reshape(glWidth, glHeight);
+            lastGlWidth = glWidth;
+            lastGlHeight = glHeight;
+        }
+        angleRenderer.render(whiteBackground);
+        Camera camera = Display.getCamera();
+        if (Movie.isRecording())
+            ExportMovie.handleMovieExport(camera);
+        if (Layers.getViewpointLayer() != null)
+            Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
+        if (JHVFrame.getZoomStatusPanel() != null)
+            JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
+        fpsCount++;
+    }
+
+    @Override
+    public void setWhiteBackground(boolean white) {
+        whiteBackground = white;
+    }
+
+    private void attachIfNeeded() {
+        if (hostHandle != 0L || !isDisplayable() || getWidth() <= 0 || getHeight() <= 0)
+            return;
+
+        Rectangle bounds = hostBounds();
+        hostHandle = MacAngleBridge.create(this, bounds.x, bounds.y, bounds.width, bounds.height);
+        if (hostHandle == 0L)
+            return;
+
+        try {
+            long layerPointer = MacAngleBridge.getLayer(hostHandle);
+            if (layerPointer == 0L)
+                throw new IllegalStateException("Metal host did not expose a CAMetalLayer");
+            angleRenderer = new AngleRenderer(layerPointer);
+            lastHostBounds = bounds;
+            lastGlWidth = -1;
+            lastGlHeight = -1;
+        } catch (RuntimeException | Error e) {
+            MacAngleBridge.destroy(hostHandle);
+            hostHandle = 0L;
+            throw e;
+        }
+    }
+
+    private void updateHostFrame(boolean renderNeeded) {
+        if (getWidth() <= 0 || getHeight() <= 0)
+            return;
+
+        if (hostHandle == 0L) {
+            attachIfNeeded();
+            if (hostHandle == 0L)
+                return;
+        }
+
+        Rectangle bounds = hostBounds();
+        if (!bounds.equals(lastHostBounds)) {
+            MacAngleBridge.setFrame(hostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
+            lastHostBounds = bounds;
+        }
+        if (angleRenderer != null && (renderNeeded || lastGlWidth < 0 || lastGlHeight < 0))
+            requestRender();
+    }
+
+    private void scheduleHostUpdate(boolean renderNeeded) {
+        hostRenderPending |= renderNeeded;
+        if (hostUpdatePending || !isDisplayable())
+            return;
+
+        hostUpdatePending = true;
+        EventQueue.invokeLater(() -> {
+            hostUpdatePending = false;
+            boolean render = hostRenderPending;
+            hostRenderPending = false;
+            updateHostFrame(render);
+        });
+    }
+
+    private void detach() {
+        if (angleRenderer != null) {
+            angleRenderer.destroy();
+            angleRenderer = null;
+        }
+        MacAngleBridge.destroy(hostHandle);
+        hostHandle = 0L;
+        displayPending = false;
+        hostUpdatePending = false;
+        hostRenderPending = false;
+        lastHostBounds = null;
+        lastGlWidth = -1;
+        lastGlHeight = -1;
+    }
+
+    private void updatePixelScale() {
+        GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
+        double scaleX = 1;
+        double scaleY = 1;
+        if (graphicsConfiguration != null) {
+            AffineTransform transform = graphicsConfiguration.getDefaultTransform();
+            scaleX = transform.getScaleX();
+            scaleY = transform.getScaleY();
+        }
+        JHVCanvas.pixelScale[0] = scaleX;
+        JHVCanvas.pixelScale[1] = scaleY;
+    }
+
+    private Rectangle hostBounds() {
+        int width = getWidth();
+        int height = getHeight();
+        JRootPane rootPane = SwingUtilities.getRootPane(this);
+        if (rootPane == null)
+            return new Rectangle(0, 0, width, height);
+
+        try {
+            Point canvasOnScreen = getLocationOnScreen();
+            Point contentOnScreen = rootPane.getContentPane().getLocationOnScreen();
+            return new Rectangle(canvasOnScreen.x - contentOnScreen.x, canvasOnScreen.y - contentOnScreen.y, width, height);
+        } catch (IllegalComponentStateException ignore) {
+        }
+
+        Container stop = rootPane.getContentPane();
+        int x = 0;
+        int y = 0;
+        for (Component current = this; current != null && current != stop; current = current.getParent()) {
+            x += current.getX();
+            y += current.getY();
+        }
+        return new Rectangle(x, y, width, height);
+    }
+}

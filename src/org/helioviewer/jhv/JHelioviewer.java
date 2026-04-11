@@ -8,8 +8,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
@@ -32,6 +32,7 @@ public class JHelioviewer {
         System.setProperty("apple.awt.application.appearance", "NSAppearanceNameDarkAqua");
         System.setProperty("apple.awt.application.name", "JHelioviewer");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+        //System.setProperty("org.lwjgl.util.NoChecks", "true");
         // Save current default system timezone in user.timezone
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
         // Per default all times should be given in GMT
@@ -92,9 +93,15 @@ public class JHelioviewer {
                 Log.warn("Plugin load error", e);
             }
 
-            JComponent leftPane = JHVFrame.getLeftScrollPane();
-            JHVFrame.getLayersPanel().setOptionsPanel(Layers.getViewpointLayer());
-            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
+            JHVFrame.getLayersPanel().setOptionsPanel(Layers.getConnectionLayer());
+
+            JScrollPane leftPane = JHVFrame.getLeftScrollPane();
+            int sideWidth = JHVFrame.getLeftContentPane().getPreferredSize().width + leftPane.getVerticalScrollBar().getPreferredSize().width;
+            Dimension sideSize = new Dimension(sideWidth, -1);
+            leftPane.setMinimumSize(sideSize);
+            leftPane.setPreferredSize(sideSize);
+            leftPane.setMaximumSize(sideSize);
+
             JHVFrame.getLayersPanel().setOptionsPanel(null);
 
             frame.pack();

@@ -22,13 +22,12 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
-
-import org.lwjgl.opengl.GL33;
 
 public class ViewpointLayer extends AbstractLayer {
 
@@ -121,9 +120,9 @@ public class ViewpointLayer extends AbstractLayer {
 
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
-            GL33.glDisable(GL33.GL_DEPTH_TEST);
+            GL.glDisable(GL.DEPTH_TEST);
             renderPlanets(vp, positionLoads, pixFactor);
-            GL33.glEnable(GL33.GL_DEPTH_TEST);
+            GL.glEnable(GL.DEPTH_TEST);
         }
 
         Transform.popView();
