@@ -64,8 +64,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
             public void componentResized(ComponentEvent e) {
                 // Force a redraw after AWT resize so the GL pixel size is recomputed
                 // immediately and the aspect ratio does not lag behind the canvas size.
-                lastGlWidth = -1;
-                lastGlHeight = -1;
+                lastGlWidth = lastGlHeight = -1;
                 updatePixelScale();
                 scheduleHostUpdate(true);
             }
@@ -92,15 +91,18 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
 
     @Override
     public void setBounds(int x, int y, int width, int height) {
-        boolean changed = x != getX() || y != getY() || width != getWidth() || height != getHeight();
-        boolean sizeChanged = width != getWidth() || height != getHeight();
+        int oldX = getX();
+        int oldY = getY();
+        int oldWidth = getWidth();
+        int oldHeight = getHeight();
+        boolean changed = x != oldX || y != oldY || width != oldWidth || height != oldHeight;
+        boolean sizeChanged = width != oldWidth || height != oldHeight;
         super.setBounds(x, y, width, height);
         if (!changed)
             return;
 
         if (sizeChanged) {
-            lastGlWidth = -1;
-            lastGlHeight = -1;
+            lastGlWidth = lastGlHeight = -1;
             updatePixelScale();
         }
         scheduleHostUpdate(sizeChanged);
@@ -121,6 +123,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
     public void requestRender() {
         if (displayPending)
             return;
+
         if (angleRenderer == null) {
             scheduleHostUpdate(true);
             return;
@@ -188,10 +191,10 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
             long layerPointer = MacAngleBridge.getLayer(hostHandle);
             if (layerPointer == 0L)
                 throw new IllegalStateException("Metal host did not expose a CAMetalLayer");
+
             angleRenderer = new AngleRenderer(layerPointer);
             lastHostBounds = bounds;
-            lastGlWidth = -1;
-            lastGlHeight = -1;
+            lastGlWidth = lastGlHeight = -1;
         } catch (RuntimeException | Error e) {
             MacAngleBridge.destroy(hostHandle);
             hostHandle = 0L;
@@ -208,13 +211,15 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
             if (hostHandle == 0L)
                 return;
         }
+        if (angleRenderer == null)
+            return;
 
         Rectangle bounds = hostBounds();
         if (!bounds.equals(lastHostBounds)) {
             MacAngleBridge.setFrame(hostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
             lastHostBounds = bounds;
         }
-        if (angleRenderer != null && (renderNeeded || lastGlWidth < 0 || lastGlHeight < 0))
+        if (renderNeeded || lastGlWidth < 0 || lastGlHeight < 0)
             requestRender();
     }
 
@@ -239,12 +244,9 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         }
         MacAngleBridge.destroy(hostHandle);
         hostHandle = 0L;
-        displayPending = false;
-        hostUpdatePending = false;
-        hostRenderPending = false;
+        displayPending = hostUpdatePending = hostRenderPending = false;
         lastHostBounds = null;
-        lastGlWidth = -1;
-        lastGlHeight = -1;
+        lastGlWidth = lastGlHeight = -1;
     }
 
     private void updatePixelScale() {
@@ -267,17 +269,17 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         if (rootPane == null)
             return new Rectangle(0, 0, width, height);
 
+        Container contentPane = rootPane.getContentPane();
         try {
             Point canvasOnScreen = getLocationOnScreen();
-            Point contentOnScreen = rootPane.getContentPane().getLocationOnScreen();
+            Point contentOnScreen = contentPane.getLocationOnScreen();
             return new Rectangle(canvasOnScreen.x - contentOnScreen.x, canvasOnScreen.y - contentOnScreen.y, width, height);
         } catch (IllegalComponentStateException ignore) {
         }
 
-        Container stop = rootPane.getContentPane();
         int x = 0;
         int y = 0;
-        for (Component current = this; current != null && current != stop; current = current.getParent()) {
+        for (Component current = this; current != null && current != contentPane; current = current.getParent()) {
             x += current.getX();
             y += current.getY();
         }

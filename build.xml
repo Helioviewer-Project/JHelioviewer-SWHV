@@ -5,9 +5,6 @@
     <property name="bin" location="bin"/>
     <property name="resources" location="resources"/>
     <property name="jarfile" location= "JHelioviewer.jar"/>
-    <property name="native.macos.dir" location="native/macos"/>
-    <property name="natives.macos.dir" location="lib/natives-macos"/>
-    <property name="metal.host.lib" location="${natives.macos.dir}/libjhvmetalhost.dylib"/>
 
     <fileset id="libfiles" dir="./">
         <include name="lib/**/*.jar"/>
@@ -21,11 +18,11 @@
     <target name="clean">
         <delete dir="${bin}"/>
         <delete file="${jarfile}"/>
-        <delete file="${metal.host.lib}"/>
+        <delete file="lib/natives-macos/libjhvmetalhost.dylib"/>
     </target>
 
     <target name="build-metal-host">
-        <mkdir dir="${natives.macos.dir}"/>
+        <mkdir dir="lib/natives-macos"/>
         <exec executable="xcrun" failonerror="true">
             <arg value="clang"/>
             <arg value="-fobjc-arc"/>
@@ -34,6 +31,8 @@
             <arg value="arm64"/>
             <arg value="-arch"/>
             <arg value="x86_64"/>
+            <arg value="-I${java.home}/include"/>
+            <arg value="-I${java.home}/include/darwin"/>
             <arg value="-framework"/>
             <arg value="Foundation"/>
             <arg value="-framework"/>
@@ -43,8 +42,8 @@
             <arg value="-framework"/>
             <arg value="Metal"/>
             <arg value="-o"/>
-            <arg value="${metal.host.lib}"/>
-            <arg value="${native.macos.dir}/jhv_metal_host.m"/>
+            <arg value="lib/natives-macos/libjhvmetalhost.dylib"/>
+            <arg value="native/macos/jhv_metal_host.m"/>
         </exec>
     </target>
 
@@ -121,7 +120,6 @@
             <manifest>
                 <attribute name="Automatic-Module-Name" value="org.helioviewer.jhv"/>
                 <attribute name="Add-Exports" value="java.desktop/sun.awt java.desktop/sun.swing"/>
-                <attribute name="Add-Opens" value="java.desktop/java.awt java.desktop/sun.lwawt java.desktop/sun.lwawt.macosx"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
                 <attribute name="Class-Path" value="${manifest_cp}"/>
                 <attribute name="version" value="${version}"/>

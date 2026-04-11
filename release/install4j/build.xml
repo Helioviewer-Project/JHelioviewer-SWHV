@@ -73,7 +73,6 @@
             <fileset dir="${resources}"/>
             <manifest>
                 <attribute name="Add-Exports" value="java.desktop/sun.awt java.desktop/sun.swing"/>
-                <attribute name="Add-Opens" value="java.desktop/java.awt java.desktop/sun.lwawt java.desktop/sun.lwawt.macosx"/>
                 <attribute name="Main-Class" value="org.helioviewer.jhv.JHelioviewer"/>
                 <attribute name="Class-Path" value="${manifest_cp}"/>
                 <attribute name="version" value="${version}"/>

@@ -13,10 +13,10 @@ import org.lwjgl.egl.EGL10;
 import org.lwjgl.egl.EGL12;
 import org.lwjgl.egl.EGL13;
 import org.lwjgl.opengles.GLES;
+import org.lwjgl.system.Configuration;
+import org.lwjgl.system.JNI;
 import org.lwjgl.system.MemoryStack;
-
-import static org.lwjgl.system.JNI.callPPP;
-import static org.lwjgl.system.MemoryUtil.memAddressSafe;
+import org.lwjgl.system.MemoryUtil;
 
 public final class AngleRenderer {
     private static boolean lwjglConfigured;
@@ -40,7 +40,7 @@ public final class AngleRenderer {
             // backend from the attribute list, and for EGL_PLATFORM_ANGLE_ANGLE a 0 native display is valid.
             // LWJGL's checked wrappers reject native_display == 0 here, so call the function pointer directly.
             // display = org.lwjgl.egl.EGL15.eglGetPlatformDisplay(EGL_PLATFORM_ANGLE_ANGLE, 0L, displayAttrs);
-            display = callPPP(EGL_PLATFORM_ANGLE_ANGLE, 0L, memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
+            display = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, 0L, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
             if (display == EGL10.EGL_NO_DISPLAY)
                 throw eglError("eglGetPlatformDisplay");
 
@@ -112,8 +112,8 @@ public final class AngleRenderer {
     private static synchronized void ensureLwjglAngleConfigured() {
         if (lwjglConfigured)
             return;
-        AngleLibraries.configureLwjglProperty("org.lwjgl.egl.libname", "libEGL.dylib");
-        AngleLibraries.configureLwjglProperty("org.lwjgl.opengles.libname", "libGLESv2.dylib");
+        Configuration.EGL_LIBRARY_NAME.set(AngleLibraries.libraryPath("libEGL.dylib").toString());
+        Configuration.OPENGLES_LIBRARY_NAME.set(AngleLibraries.libraryPath("libGLESv2.dylib").toString());
         EGL.getCapabilities();
         lwjglConfigured = true;
     }
@@ -137,7 +137,8 @@ public final class AngleRenderer {
     private long chooseConfig(MemoryStack stack, int depthBits, int samples) {
         PointerBuffer configOut = stack.mallocPointer(1);
         IntBuffer numConfigs = stack.mallocInt(1);
-        IntBuffer configAttrs = stack.mallocInt(samples > 0 ? 19 : 15);
+        int attributeCount = samples > 0 ? 19 : 15;
+        IntBuffer configAttrs = stack.mallocInt(attributeCount);
         configAttrs.put(EGL10.EGL_SURFACE_TYPE).put(EGL10.EGL_WINDOW_BIT);
         configAttrs.put(EGL12.EGL_RENDERABLE_TYPE).put(EGL_OPENGL_ES3_BIT);
         configAttrs.put(EGL10.EGL_RED_SIZE).put(8);
@@ -158,15 +159,15 @@ public final class AngleRenderer {
     }
 
     private void logChosenConfig(MemoryStack stack, long config) {
-        IntBuffer value = stack.mallocInt(1);
-        int red = configAttrib(value, config, EGL10.EGL_RED_SIZE);
-        int green = configAttrib(value, config, EGL10.EGL_GREEN_SIZE);
-        int blue = configAttrib(value, config, EGL10.EGL_BLUE_SIZE);
-        int alpha = configAttrib(value, config, EGL10.EGL_ALPHA_SIZE);
-        int depth = configAttrib(value, config, EGL10.EGL_DEPTH_SIZE);
-        int stencil = configAttrib(value, config, EGL10.EGL_STENCIL_SIZE);
-        int sampleBuffers = configAttrib(value, config, EGL10.EGL_SAMPLE_BUFFERS);
-        int samples = configAttrib(value, config, EGL10.EGL_SAMPLES);
+        IntBuffer attribValue = stack.mallocInt(1);
+        int red = configAttrib(attribValue, config, EGL10.EGL_RED_SIZE);
+        int green = configAttrib(attribValue, config, EGL10.EGL_GREEN_SIZE);
+        int blue = configAttrib(attribValue, config, EGL10.EGL_BLUE_SIZE);
+        int alpha = configAttrib(attribValue, config, EGL10.EGL_ALPHA_SIZE);
+        int depth = configAttrib(attribValue, config, EGL10.EGL_DEPTH_SIZE);
+        int stencil = configAttrib(attribValue, config, EGL10.EGL_STENCIL_SIZE);
+        int sampleBuffers = configAttrib(attribValue, config, EGL10.EGL_SAMPLE_BUFFERS);
+        int samples = configAttrib(attribValue, config, EGL10.EGL_SAMPLES);
 
         Log.info("ANGLE EGL config: rgba=" + red + "/" + green + "/" + blue + "/" + alpha
                 + " depth=" + depth

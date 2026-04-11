@@ -8,16 +8,15 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Method;
+
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.jawt.JAWT;
+import org.lwjgl.system.jawt.JAWTFunctions;
+import org.lwjgl.system.jawt.JAWTDrawingSurface;
+import org.lwjgl.system.jawt.JAWTDrawingSurfaceInfo;
 
 @SuppressWarnings("restricted")
 public final class MacAngleBridge {
-    private static final Method GET_COMPONENT_ACCESSOR;
-    private static final Method GET_PEER;
-    private static final Method GET_PLATFORM_WINDOW;
-    private static final Method GET_CONTENT_VIEW;
-    private static final Method GET_AWT_VIEW;
-
     private static final Arena ARENA = Arena.ofShared();
     private static final Linker LINKER = Linker.nativeLinker();
     private static final SymbolLookup LOOKUP = SymbolLookup.libraryLookup(
@@ -34,28 +33,17 @@ public final class MacAngleBridge {
     private static final MethodHandle DESTROY = downcall("jhv_metal_host_destroy",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
-    static {
-        try {
-            GET_COMPONENT_ACCESSOR = Class.forName("sun.awt.AWTAccessor").getMethod("getComponentAccessor");
-            GET_PEER = Class.forName("sun.awt.AWTAccessor$ComponentAccessor").getMethod("getPeer", java.awt.Component.class);
-            GET_PLATFORM_WINDOW = Class.forName("sun.lwawt.LWComponentPeer").getMethod("getPlatformWindow");
-            GET_CONTENT_VIEW = Class.forName("sun.lwawt.macosx.CPlatformWindow").getMethod("getContentView");
-            GET_AWT_VIEW = Class.forName("sun.lwawt.macosx.CPlatformView").getMethod("getAWTView");
-        } catch (ReflectiveOperationException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
-
     private MacAngleBridge() {
     }
 
     public static long create(Canvas canvas, double x, double y, double width, double height) {
-        long hostPointer = awtViewPointer(canvas);
-        if (hostPointer == 0L)
+        long surfaceLayersPointer = surfaceLayersPointer(canvas);
+        if (surfaceLayersPointer == 0L)
             return 0L;
 
         try {
-            return ((MemorySegment) CREATE.invokeExact(MemorySegment.ofAddress(hostPointer), x, y, width, height)).address();
+            MemorySegment surfaceLayers = MemorySegment.ofAddress(surfaceLayersPointer);
+            return ((MemorySegment) CREATE.invokeExact(surfaceLayers, x, y, width, height)).address();
         } catch (Throwable t) {
             throw new RuntimeException("Failed to create Metal host layer", t);
         }
@@ -63,7 +51,8 @@ public final class MacAngleBridge {
 
     public static void setFrame(long handle, double x, double y, double width, double height) {
         try {
-            SET_FRAME.invokeExact(MemorySegment.ofAddress(handle), x, y, width, height);
+            MemorySegment metalHost = MemorySegment.ofAddress(handle);
+            SET_FRAME.invokeExact(metalHost, x, y, width, height);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to resize Metal host layer", t);
         }
@@ -71,7 +60,8 @@ public final class MacAngleBridge {
 
     public static long getLayer(long handle) {
         try {
-            return ((MemorySegment) GET_LAYER.invokeExact(MemorySegment.ofAddress(handle))).address();
+            MemorySegment metalHost = MemorySegment.ofAddress(handle);
+            return ((MemorySegment) GET_LAYER.invokeExact(metalHost)).address();
         } catch (Throwable t) {
             throw new RuntimeException("Failed to resolve Metal layer", t);
         }
@@ -82,30 +72,50 @@ public final class MacAngleBridge {
             return;
 
         try {
-            DESTROY.invokeExact(MemorySegment.ofAddress(handle));
+            MemorySegment metalHost = MemorySegment.ofAddress(handle);
+            DESTROY.invokeExact(metalHost);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to destroy Metal host layer", t);
         }
     }
 
-    private static long awtViewPointer(Canvas canvas) {
-        try {
-            Object componentAccessor = GET_COMPONENT_ACCESSOR.invoke(null);
-            Object peer = GET_PEER.invoke(componentAccessor, canvas);
-            if (peer == null)
+    private static long surfaceLayersPointer(Canvas canvas) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            JAWT awt = JAWT.calloc(stack);
+            awt.version(JAWTFunctions.JAWT_VERSION_9);
+            if (!JAWTFunctions.JAWT_GetAWT(awt))
+                throw new IllegalStateException("JAWT_GetAWT failed");
+
+            long freeDrawingSurface = awt.FreeDrawingSurface();
+            JAWTDrawingSurface drawingSurface = JAWTFunctions.JAWT_GetDrawingSurface(canvas, awt.GetDrawingSurface());
+            if (drawingSurface == null)
                 return 0L;
 
-            Object platformWindow = GET_PLATFORM_WINDOW.invoke(peer);
-            if (platformWindow == null)
-                return 0L;
+            try {
+                long lockDrawingSurface = drawingSurface.Lock();
+                long unlockDrawingSurface = drawingSurface.Unlock();
+                long getSurfaceInfo = drawingSurface.GetDrawingSurfaceInfo();
+                long freeSurfaceInfo = drawingSurface.FreeDrawingSurfaceInfo();
+                int lock = JAWTFunctions.JAWT_DrawingSurface_Lock(drawingSurface, lockDrawingSurface);
+                if ((lock & JAWTFunctions.JAWT_LOCK_ERROR) != 0)
+                    throw new IllegalStateException("JAWT_DrawingSurface_Lock failed");
 
-            Object contentView = GET_CONTENT_VIEW.invoke(platformWindow);
-            if (contentView == null)
-                return 0L;
+                try {
+                    JAWTDrawingSurfaceInfo drawingSurfaceInfo = JAWTFunctions.JAWT_DrawingSurface_GetDrawingSurfaceInfo(drawingSurface, getSurfaceInfo);
+                    if (drawingSurfaceInfo == null)
+                        throw new IllegalStateException("JAWT_DrawingSurface_GetDrawingSurfaceInfo failed");
 
-            return ((Number) GET_AWT_VIEW.invoke(contentView)).longValue();
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Failed to resolve macOS AWT host view", e);
+                    try {
+                        return drawingSurfaceInfo.platformInfo();
+                    } finally {
+                        JAWTFunctions.JAWT_DrawingSurface_FreeDrawingSurfaceInfo(drawingSurfaceInfo, freeSurfaceInfo);
+                    }
+                } finally {
+                    JAWTFunctions.JAWT_DrawingSurface_Unlock(drawingSurface, unlockDrawingSurface);
+                }
+            } finally {
+                JAWTFunctions.JAWT_FreeDrawingSurface(drawingSurface, freeDrawingSurface);
+            }
         }
     }
 
