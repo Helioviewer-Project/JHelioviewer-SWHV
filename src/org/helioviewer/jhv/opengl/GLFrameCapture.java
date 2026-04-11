@@ -115,7 +115,7 @@ final class GLFrameCapture {
 
         gl.glBindFramebuffer(GL3.GL_READ_FRAMEBUFFER, resolveFramebuffer);
         gl.glPixelStorei(GL3.GL_PACK_ALIGNMENT, 1);
-        gl.glReadPixels(0, 0, width, height, GL3.GL_BGR, GL3.GL_UNSIGNED_BYTE, buffer);
+        gl.glReadPixels(0, 0, width, height, GL3.GL_RGB, GL3.GL_UNSIGNED_BYTE, buffer);
         gl.glBindFramebuffer(GL3.GL_FRAMEBUFFER, 0);
     }
 
