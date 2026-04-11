@@ -62,7 +62,7 @@ public class Platform {
         return isWindows;
     }
 
-    static String getResourceDir() {
+    public static String getResourceDir() {
         return resourceDir;
     }
 

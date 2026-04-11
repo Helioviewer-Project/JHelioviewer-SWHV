@@ -112,8 +112,9 @@ public final class AngleRenderer {
     private static synchronized void ensureLwjglAngleConfigured() {
         if (lwjglConfigured)
             return;
-        Configuration.EGL_LIBRARY_NAME.set(AngleLibraries.libraryPath("libEGL.dylib").toString());
-        Configuration.OPENGLES_LIBRARY_NAME.set(AngleLibraries.libraryPath("libGLESv2.dylib").toString());
+        AngleLibraries.extractRuntimeLibraries();
+        Configuration.EGL_LIBRARY_NAME.set(AngleLibraries.libraryPath(AngleLibraries.eglLibraryName()).toString());
+        Configuration.OPENGLES_LIBRARY_NAME.set(AngleLibraries.libraryPath(AngleLibraries.openGlesLibraryName()).toString());
         EGL.getCapabilities();
         lwjglConfigured = true;
     }
