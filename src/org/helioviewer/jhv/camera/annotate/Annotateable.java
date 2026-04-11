@@ -6,6 +6,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
+
 import org.json.JSONObject;
 
 public interface Annotateable {

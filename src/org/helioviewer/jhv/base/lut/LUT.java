@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.metadata.FitsMetaData;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

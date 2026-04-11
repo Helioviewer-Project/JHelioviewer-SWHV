@@ -20,6 +20,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.base.TableValue;
+
 import org.json.JSONArray;
 
 @SuppressWarnings("serial")

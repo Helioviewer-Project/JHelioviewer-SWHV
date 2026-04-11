@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.Log;
+
 import org.lwjgl.system.MemoryUtil;
 
 final class GLFrameCapture {

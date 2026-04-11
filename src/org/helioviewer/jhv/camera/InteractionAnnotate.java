@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
@@ -17,9 +16,9 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 
 class InteractionAnnotate implements Interaction.Type {
 

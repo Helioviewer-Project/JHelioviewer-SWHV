@@ -15,8 +15,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
-import org.json.JSONObject;
 
+import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public final class FOVTreePane extends JScrollPane {

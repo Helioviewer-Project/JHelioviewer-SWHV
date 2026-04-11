@@ -11,8 +11,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -25,6 +25,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;
 //import org.helioviewer.jhv.plugins.swek.sources.FHNWHandler;
 import org.helioviewer.jhv.plugins.swek.sources.HEKHandler;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

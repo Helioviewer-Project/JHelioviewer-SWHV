@@ -6,6 +6,10 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+import org.helioviewer.jhv.base.ArrayUtils;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.math.MathUtils;
+
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
@@ -14,11 +18,6 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
-
-import org.helioviewer.jhv.base.ArrayUtils;
-import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.math.MathUtils;
-
 //import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;

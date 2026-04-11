@@ -13,10 +13,10 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.stars.GaiaClient;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.json.JSONObject;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.json.JSONObject;
 
 public final class StarLayer extends AbstractLayer implements Camera.Listener, GaiaClient.Receiver {
 

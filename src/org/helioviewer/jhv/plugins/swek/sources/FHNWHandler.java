@@ -16,6 +16,7 @@ import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.time.TimeUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

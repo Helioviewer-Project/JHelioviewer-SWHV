@@ -14,6 +14,13 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.timelines.band.BandReaderHapi;
+
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.SampUtils;
@@ -24,16 +31,8 @@ import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
-
-import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.threads.JHVThread;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
 public class SampClient extends HubConnector {
 

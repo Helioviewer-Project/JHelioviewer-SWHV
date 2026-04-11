@@ -7,8 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -47,6 +47,7 @@ import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.GLTexture;
 import org.helioviewer.jhv.time.TimeListener;
+
 import org.json.JSONObject;
 
 // has to be public for state

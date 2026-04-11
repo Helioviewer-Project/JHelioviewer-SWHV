@@ -7,6 +7,7 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.math.MathUtils;
+
 import org.joml.Matrix4f;
 
 public class GridLabel {

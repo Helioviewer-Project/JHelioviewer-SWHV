@@ -17,8 +17,8 @@ import org.helioviewer.jhv.camera.annotate.AnnotateLoop;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
-import org.json.JSONObject;
 
+import org.json.JSONObject;
 
 public class Interaction {
 

@@ -11,8 +11,8 @@ import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.everit.json.schema.Schema;
-import org.everit.json.schema.Validator;
 import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.Validator;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 

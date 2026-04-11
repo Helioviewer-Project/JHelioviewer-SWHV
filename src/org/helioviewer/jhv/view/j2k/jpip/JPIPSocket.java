@@ -6,10 +6,10 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import kdu_jni.KduException;
-
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
+
+import kdu_jni.KduException;
 
 // Assumes a persistent HTTP connection
 public final class JPIPSocket extends HTTPSocket {

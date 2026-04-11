@@ -6,6 +6,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.Callable;
 
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
+
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
 import kdu_jni.Kdu_compositor_buf;
@@ -16,11 +20,6 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
-
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageFilter;
-
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 

@@ -13,6 +13,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
+
 import org.json.JSONObject;
 
 public class PfssLayer extends AbstractLayer implements TimeListener.Change, TimeListener.Range { // has to be public for state

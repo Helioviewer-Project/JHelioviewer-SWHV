@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.wcs;
 
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 
 public final class WcsProjection {
 

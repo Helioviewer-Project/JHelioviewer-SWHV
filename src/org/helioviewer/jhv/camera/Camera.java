@@ -10,6 +10,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

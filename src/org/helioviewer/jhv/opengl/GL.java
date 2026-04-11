@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.lwjgl.opengles.GLES30;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengles.GLES30;
 
 public final class GL {
     public static final int ARRAY_BUFFER = GL33.GL_ARRAY_BUFFER;

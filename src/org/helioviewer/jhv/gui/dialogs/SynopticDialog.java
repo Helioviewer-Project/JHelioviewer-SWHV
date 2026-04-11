@@ -17,8 +17,8 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -34,12 +34,12 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.SearchableUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class SynopticDialog extends StandardDialog {

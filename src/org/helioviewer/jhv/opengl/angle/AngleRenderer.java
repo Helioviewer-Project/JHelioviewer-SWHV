@@ -2,6 +2,11 @@ package org.helioviewer.jhv.opengl.angle;
 
 import java.nio.IntBuffer;
 
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.opengl.GL;
+import org.helioviewer.jhv.opengl.GLRenderer;
+import org.helioviewer.jhv.opengl.JHVCanvas;
+
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.egl.EGL;
 import org.lwjgl.egl.EGL10;
@@ -9,11 +14,6 @@ import org.lwjgl.egl.EGL12;
 import org.lwjgl.egl.EGL13;
 import org.lwjgl.opengles.GLES;
 import org.lwjgl.system.MemoryStack;
-
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.opengl.GL;
-import org.helioviewer.jhv.opengl.GLRenderer;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 
 import static org.lwjgl.system.JNI.callPPP;
 import static org.lwjgl.system.MemoryUtil.memAddressSafe;

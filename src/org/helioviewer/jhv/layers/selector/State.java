@@ -30,10 +30,10 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.google.common.util.concurrent.FutureCallback;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class State {
 

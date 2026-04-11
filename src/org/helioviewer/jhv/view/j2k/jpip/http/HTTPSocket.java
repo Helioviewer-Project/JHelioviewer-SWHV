@@ -8,8 +8,8 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.InflaterInputStream;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
 
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;

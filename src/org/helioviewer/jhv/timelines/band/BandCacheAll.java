@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.helioviewer.jhv.timelines.draw.YAxis;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

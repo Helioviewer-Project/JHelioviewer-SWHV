@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+
 import org.json.JSONObject;
 
 public interface Layer {

@@ -17,6 +17,7 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
+
 import org.json.JSONObject;
 
 public final class DrawController implements Interfaces.LazyComponent, Interfaces.StatusReceiver, JHVEventListener.Highlight, TimeListener.Change {

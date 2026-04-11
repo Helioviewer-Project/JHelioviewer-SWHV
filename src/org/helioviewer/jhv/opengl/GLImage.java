@@ -6,6 +6,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.metadata.MetaData;
+
 import org.json.JSONObject;
 
 public class GLImage {

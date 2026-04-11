@@ -29,14 +29,14 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 @SuppressWarnings("serial")
 public final class MetaDataDialog extends StandardDialog implements Interfaces.ShowableDialog {

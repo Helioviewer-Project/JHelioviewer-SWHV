@@ -4,9 +4,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
-import kdu_jni.KduException;
-
 import org.helioviewer.jhv.Log;
+
+import kdu_jni.KduException;
 
 interface CompletionLevel {
 

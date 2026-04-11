@@ -8,8 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import kdu_jni.KduException;
-
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
@@ -21,9 +19,9 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.JHVTime;
@@ -34,6 +32,7 @@ import org.helioviewer.jhv.view.DecodeExecutor;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import kdu_jni.KduException;
 
 public class J2KView extends BaseView {
 

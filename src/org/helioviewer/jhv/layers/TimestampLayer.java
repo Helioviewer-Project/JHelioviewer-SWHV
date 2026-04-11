@@ -17,11 +17,11 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
-import org.json.JSONObject;
 
+import org.json.JSONObject;
 
 public class TimestampLayer extends AbstractLayer {
 

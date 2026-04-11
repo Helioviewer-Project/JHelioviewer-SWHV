@@ -24,6 +24,7 @@ import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

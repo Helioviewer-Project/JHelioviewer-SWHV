@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

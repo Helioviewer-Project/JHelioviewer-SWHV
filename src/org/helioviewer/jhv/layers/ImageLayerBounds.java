@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.display.DisplayMapBounds;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayMapBounds;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;

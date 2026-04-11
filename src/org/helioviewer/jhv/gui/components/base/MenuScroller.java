@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.components.base;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
