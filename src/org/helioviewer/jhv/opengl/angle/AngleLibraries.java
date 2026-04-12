@@ -17,12 +17,6 @@ final class AngleLibraries {
     private AngleLibraries() {
     }
 
-    static void extractRuntimeLibraries() {
-        if (!Platform.isWindows())
-            return;
-        libraryPath("d3dcompiler_47.dll");
-    }
-
     static Path libraryPath(String fileName) {
         if (Platform.isMacOS() && METAL_HOST_LIBRARY.equals(fileName)) {
             Path path = MACOS_NATIVE_DIR.resolve(fileName).toAbsolutePath();

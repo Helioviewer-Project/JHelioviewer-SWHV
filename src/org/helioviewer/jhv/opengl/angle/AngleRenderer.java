@@ -151,7 +151,6 @@ public final class AngleRenderer {
     private static synchronized void ensureLwjglAngleConfigured(PlatformConfig platform) {
         if (lwjglConfigured)
             return;
-        //AngleLibraries.extractRuntimeLibraries();
         Configuration.EGL_LIBRARY_NAME.set(AngleLibraries.libraryPath(platform.eglLibrary()).toString());
         Configuration.OPENGLES_LIBRARY_NAME.set(AngleLibraries.libraryPath(platform.openGlesLibrary()).toString());
         EGL.getCapabilities();
