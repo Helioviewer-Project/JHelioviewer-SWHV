@@ -4,16 +4,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.FileUtils;
 
 abstract class GLSLShader {
-
-    private enum ShaderType {
-        vertex(GL.VERTEX_SHADER), fragment(GL.FRAGMENT_SHADER);
-
-        final int glType;
-
-        ShaderType(int _glType) {
-            glType = _glType;
-        }
-    }
+    private static final String COMMON_FRAGMENT = "/glsl/solarCommon.frag";
 
     private int progID;
     private int vertexID;
@@ -29,14 +20,14 @@ abstract class GLSLShader {
 
     protected final void _init(boolean common) {
         try {
-            String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
-            vertexID = attachShader(ShaderType.vertex, vertexText);
+            vertexID = attachShader(GL.VERTEX_SHADER, FileUtils.streamToString(FileUtils.getResource(vertex)));
 
-            String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/glsl/solarCommon.frag")) : "";
-            String fragmentText = fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment));
-            fragmentID = attachShader(ShaderType.fragment, fragmentText);
+            String fragmentText = FileUtils.streamToString(FileUtils.getResource(fragment));
+            if (common)
+                fragmentText = FileUtils.streamToString(FileUtils.getResource(COMMON_FRAGMENT)) + fragmentText;
+            fragmentID = attachShader(GL.FRAGMENT_SHADER, fragmentText);
 
-            progID = initializeProgram(true);
+            progID = initializeProgram();
             use();
             initUniforms(progID);
         } catch (Exception e) {
@@ -76,8 +67,8 @@ abstract class GLSLShader {
             Log.error("Invalid texture " + texname);
     }
 
-    private static int attachShader(ShaderType type, String text) {
-        int id = GL.glCreateShader(type.glType);
+    private static int attachShader(int shaderType, String text) {
+        int id = GL.glCreateShader(shaderType);
         GL.glShaderSource(id, text);
         GL.glCompileShader(id);
 
@@ -88,14 +79,14 @@ abstract class GLSLShader {
             if (infoLogLength > 0) {
                 String log = GL.glGetShaderInfoLog(id, infoLogLength);
                 Log.error(log);
-                throw new JHVGLException("Cannot compile " + type + " shader: " + log);
+                throw new JHVGLException("Cannot compile shader: " + log);
             } else
-                throw new JHVGLException("Cannot compile " + type + " shader: unknown reason");
+                throw new JHVGLException("Cannot compile shader: unknown reason");
         }
         return id;
     }
 
-    private int initializeProgram(boolean cleanUp) {
+    private int initializeProgram() {
         int id = GL.glCreateProgram();
         GL.glAttachShader(id, vertexID);
         GL.glAttachShader(id, fragmentID);
@@ -115,14 +106,12 @@ abstract class GLSLShader {
 
         GL.glValidateProgram(id);
 
-        if (cleanUp) {
-            GL.glDetachShader(id, vertexID);
-            GL.glDeleteShader(vertexID);
-            vertexID = 0;
-            GL.glDetachShader(id, fragmentID);
-            GL.glDeleteShader(fragmentID);
-            fragmentID = 0;
-        }
+        GL.glDetachShader(id, vertexID);
+        GL.glDeleteShader(vertexID);
+        vertexID = 0;
+        GL.glDetachShader(id, fragmentID);
+        GL.glDeleteShader(fragmentID);
+        fragmentID = 0;
         return id;
     }
 
