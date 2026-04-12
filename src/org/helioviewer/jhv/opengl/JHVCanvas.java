@@ -21,10 +21,6 @@ import org.lwjgl.opengl.awt.GLData;
 @SuppressWarnings("serial")
 public final class JHVCanvas extends AWTGLCanvas implements RenderSurface {
 
-    public static final int GLSAMPLES = 4;
-    public static String glVersion = "";
-    public static int maxTextureSize;
-
     private boolean whiteBackground;
     private boolean displayPending;
     private int fps;
@@ -169,7 +165,7 @@ public final class JHVCanvas extends AWTGLCanvas implements RenderSurface {
 
     private static GLData createData() {
         GLData data = new GLData();
-        data.samples = GLSAMPLES;
+        data.samples = GL.SAMPLES;
         data.redSize = 8;
         data.greenSize = 8;
         data.blueSize = 8;
@@ -182,12 +178,10 @@ public final class JHVCanvas extends AWTGLCanvas implements RenderSurface {
     }
 
     private static void initGLInfo() {
-        glVersion = GL.formatVersionString(GL.glGetString(GL.VERSION));
-        Log.info(glVersion);
+        GL.initInfo();
+        Log.info(GL.version);
         if (!org.lwjgl.opengl.GL.getCapabilities().OpenGL33)
             throw glStartupError("OpenGL 3.3 not supported.");
-
-        maxTextureSize = GL.glGetInteger(GL.MAX_TEXTURE_SIZE);
     }
 
     private static AssertionError glStartupError(String err) {

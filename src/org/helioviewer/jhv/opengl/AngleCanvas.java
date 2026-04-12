@@ -157,6 +157,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         return fps;
     }
 
+    // Render one frame and keep the shared viewport state in sync with the canvas size.
     private void renderNow() {
         attachIfNeeded();
         if (angleRenderer == null)
@@ -186,6 +187,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         whiteBackground = white;
     }
 
+    // Create the platform-native host/window handle and ANGLE renderer on first use.
     private void attachIfNeeded() {
         if (nativeWindowHandle != 0L || !isDisplayable() || getWidth() <= 0 || getHeight() <= 0)
             return;
@@ -229,6 +231,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         }
     }
 
+    // Push the current AWT bounds to the native host, then trigger a redraw if needed.
     private void updateHostFrame(boolean renderNeeded) {
         if (getWidth() <= 0 || getHeight() <= 0)
             return;
@@ -249,6 +252,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
             requestRender();
     }
 
+    // Coalesce host updates onto the EDT so move/resize bursts become one native update.
     private void scheduleHostUpdate(boolean renderNeeded) {
         hostRenderPending |= renderNeeded;
         if (hostUpdatePending || !isDisplayable())
@@ -263,6 +267,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         });
     }
 
+    // Tear down renderer and native host state, even if part of the shutdown path fails.
     private void detach() {
         try {
             if (angleRenderer != null)
@@ -283,6 +288,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         }
     }
 
+    // Track the current HiDPI scale so GL sizes and UI coordinate conversion stay aligned.
     private void updatePixelScale() {
         GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
         double scaleX = 1;
@@ -296,6 +302,7 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         Display.pixelScale[1] = scaleY;
     }
 
+    // Express the canvas bounds relative to the Swing content pane for native host placement.
     private Rectangle hostBounds() {
         int width = getWidth();
         int height = getHeight();

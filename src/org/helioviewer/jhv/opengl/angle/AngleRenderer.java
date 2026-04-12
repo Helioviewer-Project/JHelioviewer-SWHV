@@ -6,7 +6,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.egl.EGL;
@@ -61,7 +60,7 @@ public final class AngleRenderer {
             if (!EGL12.eglBindAPI(EGL12.EGL_OPENGL_ES_API))
                 throw eglError("eglBindAPI");
 
-            int samples = Math.max(0, JHVCanvas.GLSAMPLES);
+            int samples = Math.max(0, GL.SAMPLES);
             long config = chooseConfig(stack, newDisplay, samples);
             if (config == 0L)
                 throw eglError("eglChooseConfig");
@@ -81,8 +80,7 @@ public final class AngleRenderer {
             GLES.createCapabilities();
             glesInitialized = true;
             GL.useGles(true);
-            JHVCanvas.glVersion = GL.formatVersionString(GL.glGetString(GL.VERSION));
-            JHVCanvas.maxTextureSize = GL.glGetInteger(GL.MAX_TEXTURE_SIZE);
+            GL.initInfo();
             initSharedJhvRenderer();
         } catch (RuntimeException | Error e) {
             if (glesInitialized)
