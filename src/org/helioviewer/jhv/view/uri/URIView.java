@@ -66,9 +66,9 @@ public class URIView extends BaseView {
             metaData[0] = m;
             decodeCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), buffer);
 
-            int[] lut = image.lut();
+            LUT lut = image.lut();
             if (lut != null)
-                builtinLUT = new LUT("built-in", lut);
+                builtinLUT = lut;
         } catch (Exception e) {
             throw new Exception(e.getMessage() + ": " + dataUri, e);
         }

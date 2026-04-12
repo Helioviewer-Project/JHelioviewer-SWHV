@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.view.View;
 
@@ -157,7 +158,7 @@ abstract class J2KSource {
     }
 
     @Nullable
-    int[] getLUT() throws KduException {
+    LUT getLUT() throws KduException {
         Jpx_codestream_source xstream = jpxSrc.Access_codestream(0);
         if (!xstream.Exists()) {
             throw new KduException(">> stream does not exist");
@@ -169,7 +170,6 @@ abstract class J2KSource {
             return null;
 
         int len = palette.Get_num_entries();
-        int[] lut = new int[len];
         float[] red = new float[len];
         float[] green = new float[len];
         float[] blue = new float[len];
@@ -178,10 +178,7 @@ abstract class J2KSource {
         palette.Get_lut(1, green, Kdu_global.JP2_CHANNEL_FORMAT_DEFAULT);
         palette.Get_lut(2, blue, Kdu_global.JP2_CHANNEL_FORMAT_DEFAULT);
 
-        for (int i = 0; i < len; i++) {
-            lut[i] = 0xFF000000 | ((int) ((red[i] + 0.5f) * 0xFF) << 16) | ((int) ((green[i] + 0.5f) * 0xFF) << 8) | ((int) ((blue[i] + 0.5f) * 0xFF));
-        }
-        return lut;
+        return LUT.fromOpaqueRgb("built-in", red, green, blue);
     }
 
     private static final long[] xmlFilter = {Kdu_global.jp2_xml_4cc};

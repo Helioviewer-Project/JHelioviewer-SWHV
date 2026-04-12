@@ -95,8 +95,7 @@ public class GLImage {
 
         LUT currlut = diffMode == DifferenceMode.None ? lut : LUT.gray();
         if (lutChanged || lastLut != currlut || invertLUT != lastInverted) {
-            int[] intLUT = invertLUT ? currlut.lut8Inv() : currlut.lut8();
-            ByteBuffer lutBuffer = TextureUpload.packArgbToRgbaBytes(intLUT);
+            ByteBuffer lutBuffer = invertLUT ? currlut.rgbaInv() : currlut.rgba();
             lastLut = currlut;
             lastInverted = invertLUT;
 
