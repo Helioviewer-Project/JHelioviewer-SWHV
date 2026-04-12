@@ -11,7 +11,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
-    private static final int GL_VERTEX_PROGRAM_POINT_SIZE = 0x8642;
 
     private GLRenderer() {
     }
