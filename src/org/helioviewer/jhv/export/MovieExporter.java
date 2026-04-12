@@ -81,7 +81,6 @@ class MovieExporter {
 
     private static final List<String> formatVideo = List.of(
             "-pix_fmt", "yuv420p",
-            "-vf", "colorspace=iall=bt709:itrc=iec61966-2-1:irange=pc:all=bt709:trc=bt709:range=pc:fast=0",
             "-color_primaries", "bt709",
             "-color_trc", "bt709",
             "-colorspace", "bt709",
