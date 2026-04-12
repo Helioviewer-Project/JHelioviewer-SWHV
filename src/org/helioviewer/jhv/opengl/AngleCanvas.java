@@ -171,13 +171,13 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
             lastGlHeight = glHeight;
         }
         angleRenderer.render(whiteBackground);
+
         Camera camera = Display.getCamera();
         if (Movie.isRecording())
             ExportMovie.handleMovieExport(camera);
-        if (Layers.getViewpointLayer() != null)
-            Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
-        if (JHVFrame.getZoomStatusPanel() != null)
-            JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
+        Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
+        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
+
         fpsCount++;
     }
 
