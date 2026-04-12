@@ -99,7 +99,7 @@ public class GLImage {
             lastLut = currlut;
             lastInverted = invertLUT;
 
-            GLTexture.copyBuffer1D(lutBuffer);
+            GLTexture.copyByteImage(lutBuffer.remaining() / 4, 1, GL.NEAREST, lutBuffer);
         }
         lutChanged = false;
     }
@@ -111,7 +111,7 @@ public class GLImage {
         // Keep diffImage sampler backed by a complete texture from startup to avoid macOS driver warnings.
         diffTex.bind();
         ByteBuffer emptyDiffTexture = BufferUtils.newByteBuffer(4).put(new byte[]{0, 0, 0, (byte) 0xFF}).flip();
-        GLTexture.copyByteImage(1, 1, emptyDiffTexture);
+        GLTexture.copyByteImage(1, 1, GL.LINEAR, emptyDiffTexture);
 
         lutChanged = true;
     }
