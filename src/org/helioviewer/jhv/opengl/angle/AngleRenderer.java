@@ -9,9 +9,7 @@ import org.helioviewer.jhv.opengl.GLRenderer;
 
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.egl.EGL;
-import org.lwjgl.egl.EGL10;
-import org.lwjgl.egl.EGL12;
-import org.lwjgl.egl.EGL13;
+import org.lwjgl.egl.EGL15;
 import org.lwjgl.opengles.GLES;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.JNI;
@@ -40,24 +38,24 @@ public final class AngleRenderer {
         PlatformConfig platform = platformConfig();
         ensureLwjglAngleConfigured(platform);
 
-        long newDisplay = EGL10.EGL_NO_DISPLAY;
-        long newContext = EGL10.EGL_NO_CONTEXT;
-        long newSurface = EGL10.EGL_NO_SURFACE;
+        long newDisplay = EGL15.EGL_NO_DISPLAY;
+        long newContext = EGL15.EGL_NO_CONTEXT;
+        long newSurface = EGL15.EGL_NO_SURFACE;
         boolean glesInitialized = false;
         try (MemoryStack stack = MemoryStack.stackPush()) {
             PointerBuffer displayAttrs = displayAttrs(stack, platform);
             // LWJGL's checked wrappers reject native_display == 0 here, so call the function pointer directly.
             // display = org.lwjgl.egl.EGL15.eglGetPlatformDisplay(EGL_PLATFORM_ANGLE_ANGLE, 0L, displayAttrs);
             newDisplay = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, nativeDisplayHandle, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
-            if (newDisplay == EGL10.EGL_NO_DISPLAY)
+            if (newDisplay == EGL15.EGL_NO_DISPLAY)
                 throw eglError("eglGetPlatformDisplay");
 
             IntBuffer major = stack.mallocInt(1);
             IntBuffer minor = stack.mallocInt(1);
-            if (!EGL10.eglInitialize(newDisplay, major, minor))
+            if (!EGL15.eglInitialize(newDisplay, major, minor))
                 throw eglError("eglInitialize");
             EGL.createDisplayCapabilities(newDisplay, major.get(0), minor.get(0));
-            if (!EGL12.eglBindAPI(EGL12.EGL_OPENGL_ES_API))
+            if (!EGL15.eglBindAPI(EGL15.EGL_OPENGL_ES_API))
                 throw eglError("eglBindAPI");
 
             int samples = Math.max(0, GL.SAMPLES);
@@ -66,16 +64,16 @@ public final class AngleRenderer {
                 throw eglError("eglChooseConfig");
             logChosenConfig(stack, newDisplay, config);
 
-            IntBuffer contextAttrs = stack.ints(EGL13.EGL_CONTEXT_CLIENT_VERSION, 3, EGL10.EGL_NONE);
-            newContext = EGL10.eglCreateContext(newDisplay, config, EGL10.EGL_NO_CONTEXT, contextAttrs);
-            if (newContext == EGL10.EGL_NO_CONTEXT)
+            IntBuffer contextAttrs = stack.ints(EGL15.EGL_CONTEXT_CLIENT_VERSION, 3, EGL15.EGL_NONE);
+            newContext = EGL15.eglCreateContext(newDisplay, config, EGL15.EGL_NO_CONTEXT, contextAttrs);
+            if (newContext == EGL15.EGL_NO_CONTEXT)
                 throw eglError("eglCreateContext");
 
-            newSurface = EGL10.eglCreateWindowSurface(newDisplay, config, nativeWindowHandle, stack.ints(EGL10.EGL_NONE));
-            if (newSurface == EGL10.EGL_NO_SURFACE)
+            newSurface = EGL15.eglCreateWindowSurface(newDisplay, config, nativeWindowHandle, stack.ints(EGL15.EGL_NONE));
+            if (newSurface == EGL15.EGL_NO_SURFACE)
                 throw eglError("eglCreateWindowSurface");
 
-            if (!EGL10.eglMakeCurrent(newDisplay, newSurface, newSurface, newContext))
+            if (!EGL15.eglMakeCurrent(newDisplay, newSurface, newSurface, newContext))
                 throw eglError("eglMakeCurrent");
             GLES.createCapabilities();
             glesInitialized = true;
@@ -84,13 +82,13 @@ public final class AngleRenderer {
         } catch (RuntimeException | Error e) {
             if (glesInitialized)
                 GLES.destroy();
-            if (newDisplay != EGL10.EGL_NO_DISPLAY) {
-                EGL10.eglMakeCurrent(newDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
-                if (newSurface != EGL10.EGL_NO_SURFACE)
-                    EGL10.eglDestroySurface(newDisplay, newSurface);
-                if (newContext != EGL10.EGL_NO_CONTEXT)
-                    EGL10.eglDestroyContext(newDisplay, newContext);
-                EGL10.eglTerminate(newDisplay);
+            if (newDisplay != EGL15.EGL_NO_DISPLAY) {
+                EGL15.eglMakeCurrent(newDisplay, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT);
+                if (newSurface != EGL15.EGL_NO_SURFACE)
+                    EGL15.eglDestroySurface(newDisplay, newSurface);
+                if (newContext != EGL15.EGL_NO_CONTEXT)
+                    EGL15.eglDestroyContext(newDisplay, newContext);
+                EGL15.eglTerminate(newDisplay);
             }
             throw e;
         }
@@ -107,27 +105,27 @@ public final class AngleRenderer {
     }
 
     public void render(boolean whiteBackground) {
-        if (!EGL10.eglMakeCurrent(display, surface, surface, context))
+        if (!EGL15.eglMakeCurrent(display, surface, surface, context))
             throw eglError("eglMakeCurrent");
         GLRenderer.display(whiteBackground);
-        if (!EGL10.eglSwapBuffers(display, surface))
+        if (!EGL15.eglSwapBuffers(display, surface))
             throw eglError("eglSwapBuffers");
     }
 
     public void destroy() {
-        boolean current = EGL10.eglMakeCurrent(display, surface, surface, context);
+        boolean current = EGL15.eglMakeCurrent(display, surface, surface, context);
         try {
             if (current)
                 disposeSharedJhvRenderer();
             else
                 rendererInitialized = false;
         } finally {
-            EGL10.eglMakeCurrent(display, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+            EGL15.eglMakeCurrent(display, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT);
             if (current)
                 GLES.destroy();
-            EGL10.eglDestroySurface(display, surface);
-            EGL10.eglDestroyContext(display, context);
-            EGL10.eglTerminate(display);
+            EGL15.eglDestroySurface(display, surface);
+            EGL15.eglDestroyContext(display, context);
+            EGL15.eglTerminate(display);
         }
     }
 
@@ -155,7 +153,7 @@ public final class AngleRenderer {
     }
 
     private static PointerBuffer displayAttrs(MemoryStack stack, PlatformConfig platform) {
-        return stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, platform.backendType(), EGL10.EGL_NONE);
+        return stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, platform.backendType(), EGL15.EGL_NONE);
     }
 
     private long chooseConfig(MemoryStack stack, long display, int samples) {
@@ -179,35 +177,35 @@ public final class AngleRenderer {
         IntBuffer numConfigs = stack.mallocInt(1);
         int attributeCount = samples > 0 ? 19 : 15;
         IntBuffer configAttrs = stack.mallocInt(attributeCount);
-        configAttrs.put(EGL10.EGL_SURFACE_TYPE).put(EGL10.EGL_WINDOW_BIT);
-        configAttrs.put(EGL12.EGL_RENDERABLE_TYPE).put(EGL_OPENGL_ES3_BIT);
-        configAttrs.put(EGL10.EGL_RED_SIZE).put(8);
-        configAttrs.put(EGL10.EGL_GREEN_SIZE).put(8);
-        configAttrs.put(EGL10.EGL_BLUE_SIZE).put(8);
-        configAttrs.put(EGL10.EGL_ALPHA_SIZE).put(8);
-        configAttrs.put(EGL10.EGL_DEPTH_SIZE).put(depthBits);
+        configAttrs.put(EGL15.EGL_SURFACE_TYPE).put(EGL15.EGL_WINDOW_BIT);
+        configAttrs.put(EGL15.EGL_RENDERABLE_TYPE).put(EGL_OPENGL_ES3_BIT);
+        configAttrs.put(EGL15.EGL_RED_SIZE).put(8);
+        configAttrs.put(EGL15.EGL_GREEN_SIZE).put(8);
+        configAttrs.put(EGL15.EGL_BLUE_SIZE).put(8);
+        configAttrs.put(EGL15.EGL_ALPHA_SIZE).put(8);
+        configAttrs.put(EGL15.EGL_DEPTH_SIZE).put(depthBits);
         if (samples > 0) {
-            configAttrs.put(EGL10.EGL_SAMPLE_BUFFERS).put(1);
-            configAttrs.put(EGL10.EGL_SAMPLES).put(samples);
+            configAttrs.put(EGL15.EGL_SAMPLE_BUFFERS).put(1);
+            configAttrs.put(EGL15.EGL_SAMPLES).put(samples);
         }
-        configAttrs.put(EGL10.EGL_NONE);
+        configAttrs.put(EGL15.EGL_NONE);
         configAttrs.flip();
 
-        if (!EGL10.eglChooseConfig(display, configAttrs, configOut, numConfigs) || numConfigs.get(0) <= 0)
+        if (!EGL15.eglChooseConfig(display, configAttrs, configOut, numConfigs) || numConfigs.get(0) <= 0)
             return 0L;
         return configOut.get(0);
     }
 
     private void logChosenConfig(MemoryStack stack, long display, long config) {
         IntBuffer attribValue = stack.mallocInt(1);
-        int red = configAttrib(attribValue, display, config, EGL10.EGL_RED_SIZE);
-        int green = configAttrib(attribValue, display, config, EGL10.EGL_GREEN_SIZE);
-        int blue = configAttrib(attribValue, display, config, EGL10.EGL_BLUE_SIZE);
-        int alpha = configAttrib(attribValue, display, config, EGL10.EGL_ALPHA_SIZE);
-        int depth = configAttrib(attribValue, display, config, EGL10.EGL_DEPTH_SIZE);
-        int stencil = configAttrib(attribValue, display, config, EGL10.EGL_STENCIL_SIZE);
-        int sampleBuffers = configAttrib(attribValue, display, config, EGL10.EGL_SAMPLE_BUFFERS);
-        int samples = configAttrib(attribValue, display, config, EGL10.EGL_SAMPLES);
+        int red = configAttrib(attribValue, display, config, EGL15.EGL_RED_SIZE);
+        int green = configAttrib(attribValue, display, config, EGL15.EGL_GREEN_SIZE);
+        int blue = configAttrib(attribValue, display, config, EGL15.EGL_BLUE_SIZE);
+        int alpha = configAttrib(attribValue, display, config, EGL15.EGL_ALPHA_SIZE);
+        int depth = configAttrib(attribValue, display, config, EGL15.EGL_DEPTH_SIZE);
+        int stencil = configAttrib(attribValue, display, config, EGL15.EGL_STENCIL_SIZE);
+        int sampleBuffers = configAttrib(attribValue, display, config, EGL15.EGL_SAMPLE_BUFFERS);
+        int samples = configAttrib(attribValue, display, config, EGL15.EGL_SAMPLES);
 
         Log.info("ANGLE EGL config: rgba=" + red + "/" + green + "/" + blue + "/" + alpha
                 + " depth=" + depth
@@ -217,13 +215,13 @@ public final class AngleRenderer {
     }
 
     private int configAttrib(IntBuffer value, long display, long config, int attribute) {
-        if (!EGL10.eglGetConfigAttrib(display, config, attribute, value))
+        if (!EGL15.eglGetConfigAttrib(display, config, attribute, value))
             throw eglError("eglGetConfigAttrib");
         return value.get(0);
     }
 
     private static RuntimeException eglError(String step) {
-        int code = EGL10.eglGetError();
+        int code = EGL15.eglGetError();
         return new RuntimeException(step + " failed with EGL error 0x" + Integer.toHexString(code));
     }
 
