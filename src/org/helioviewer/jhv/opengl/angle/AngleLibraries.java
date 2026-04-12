@@ -11,17 +11,10 @@ import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.io.FileUtils;
 
 final class AngleLibraries {
-    private static final Path METAL_HOST_NATIVE_DIR = Path.of("lib", "natives-macos");
+    private static final String METAL_HOST_LIBRARY = "libjhvmetalhost.dylib";
+    private static final Path MACOS_NATIVE_DIR = Path.of("lib", "natives-macos");
 
     private AngleLibraries() {
-    }
-
-    static String eglLibraryName() {
-        return platformLibraryName("libEGL");
-    }
-
-    static String openGlesLibraryName() {
-        return platformLibraryName("libGLESv2");
     }
 
     static void extractRuntimeLibraries() {
@@ -31,9 +24,11 @@ final class AngleLibraries {
     }
 
     static Path libraryPath(String fileName) {
-        Path path = METAL_HOST_NATIVE_DIR.resolve(fileName).toAbsolutePath();
-        if (Files.exists(path))
-            return path;
+        if (Platform.isMacOS() && METAL_HOST_LIBRARY.equals(fileName)) {
+            Path path = MACOS_NATIVE_DIR.resolve(fileName).toAbsolutePath();
+            if (Files.exists(path))
+                return path;
+        }
 
         String resourcePath = Platform.getResourceDir() + fileName;
         try (InputStream in = FileUtils.getResource(resourcePath)) {
@@ -43,18 +38,8 @@ final class AngleLibraries {
             Files.copy(in, extractedPath, StandardCopyOption.REPLACE_EXISTING);
             return extractedPath;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to resolve native library " + fileName, e);
+            throw new RuntimeException("Failed to resolve native library " + fileName + " from " + resourcePath, e);
         }
-    }
-
-    private static String platformLibraryName(String baseName) {
-        if (Platform.isMacOS())
-            return baseName + ".dylib";
-        if (Platform.isWindows())
-            return baseName + ".dll";
-        if (Platform.isLinux())
-            return baseName + ".so";
-        throw new IllegalStateException("Unsupported OS: " + System.getProperty("os.name"));
     }
 
 }

@@ -233,7 +233,7 @@ public class JHVFrame {
     }
 
     private static RenderSurface createRenderSurface() {
-        if (Platform.isMacOS() && !"false".equalsIgnoreCase(System.getProperty("jhv.metal.host")))
+        if (!"false".equalsIgnoreCase(System.getProperty("jhv.angle")))
             return new AngleCanvas();
         return JHVCanvas.create(); // before camera
     }

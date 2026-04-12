@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl.angle;
 import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.opengl.JHVCanvas;
@@ -19,6 +20,9 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 public final class AngleRenderer {
+    private record PlatformConfig(int backendType, String eglLibrary, String openGlesLibrary) {
+    }
+
     private static boolean lwjglConfigured;
     private static boolean rendererInitialized;
 
@@ -26,56 +30,83 @@ public final class AngleRenderer {
     private static final int EGL_OPENGL_ES3_BIT = 0x00000040;
     private static final int EGL_PLATFORM_ANGLE_ANGLE = 0x3202;
     private static final int EGL_PLATFORM_ANGLE_TYPE_ANGLE = 0x3203;
+    private static final int EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE = 0x3208;
     private static final int EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE = 0x3489;
+    private static final int EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE = 0x320D;
     private final long display;
     private final long context;
     private final long surface;
 
-    public AngleRenderer(long layerPointer) {
-        ensureLwjglAngleConfigured();
+    public AngleRenderer(long nativeDisplayHandle, long nativeWindowHandle) {
+        PlatformConfig platform = platformConfig();
+        ensureLwjglAngleConfigured(platform);
 
+        long newDisplay = EGL10.EGL_NO_DISPLAY;
+        long newContext = EGL10.EGL_NO_CONTEXT;
+        long newSurface = EGL10.EGL_NO_SURFACE;
+        boolean glesInitialized = false;
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            PointerBuffer displayAttrs = stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE, EGL10.EGL_NONE);
-            // eglGetPlatformDisplay(...) should accept a null native display here: ANGLE selects the
-            // backend from the attribute list, and for EGL_PLATFORM_ANGLE_ANGLE a 0 native display is valid.
+            PointerBuffer displayAttrs = displayAttrs(stack, platform);
             // LWJGL's checked wrappers reject native_display == 0 here, so call the function pointer directly.
             // display = org.lwjgl.egl.EGL15.eglGetPlatformDisplay(EGL_PLATFORM_ANGLE_ANGLE, 0L, displayAttrs);
-            display = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, 0L, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
-            if (display == EGL10.EGL_NO_DISPLAY)
+            newDisplay = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, nativeDisplayHandle, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
+            if (newDisplay == EGL10.EGL_NO_DISPLAY)
                 throw eglError("eglGetPlatformDisplay");
 
             IntBuffer major = stack.mallocInt(1);
             IntBuffer minor = stack.mallocInt(1);
-            if (!EGL10.eglInitialize(display, major, minor))
+            if (!EGL10.eglInitialize(newDisplay, major, minor))
                 throw eglError("eglInitialize");
-            EGL.createDisplayCapabilities(display, major.get(0), minor.get(0));
+            EGL.createDisplayCapabilities(newDisplay, major.get(0), minor.get(0));
             if (!EGL12.eglBindAPI(EGL12.EGL_OPENGL_ES_API))
                 throw eglError("eglBindAPI");
 
             int samples = Math.max(0, JHVCanvas.GLSAMPLES);
-            long config = chooseConfig(stack, samples);
+            long config = chooseConfig(stack, newDisplay, samples);
             if (config == 0L)
                 throw eglError("eglChooseConfig");
-            logChosenConfig(stack, config);
+            logChosenConfig(stack, newDisplay, config);
 
             IntBuffer contextAttrs = stack.ints(EGL13.EGL_CONTEXT_CLIENT_VERSION, 3, EGL10.EGL_NONE);
-            context = EGL10.eglCreateContext(display, config, EGL10.EGL_NO_CONTEXT, contextAttrs);
-            if (context == EGL10.EGL_NO_CONTEXT)
+            newContext = EGL10.eglCreateContext(newDisplay, config, EGL10.EGL_NO_CONTEXT, contextAttrs);
+            if (newContext == EGL10.EGL_NO_CONTEXT)
                 throw eglError("eglCreateContext");
 
-            surface = EGL10.eglCreateWindowSurface(display, config, layerPointer, stack.ints(EGL10.EGL_NONE));
-            if (surface == EGL10.EGL_NO_SURFACE)
+            newSurface = EGL10.eglCreateWindowSurface(newDisplay, config, nativeWindowHandle, stack.ints(EGL10.EGL_NONE));
+            if (newSurface == EGL10.EGL_NO_SURFACE)
                 throw eglError("eglCreateWindowSurface");
+
+            if (!EGL10.eglMakeCurrent(newDisplay, newSurface, newSurface, newContext))
+                throw eglError("eglMakeCurrent");
+            GLES.createCapabilities();
+            glesInitialized = true;
+            GL.useGles(true);
+            JHVCanvas.glVersion = GL.formatVersionString(GL.glGetString(GL.VERSION));
+            JHVCanvas.maxTextureSize = GL.glGetInteger(GL.MAX_TEXTURE_SIZE);
+            initSharedJhvRenderer();
+        } catch (RuntimeException | Error e) {
+            if (glesInitialized)
+                GLES.destroy();
+            if (newDisplay != EGL10.EGL_NO_DISPLAY) {
+                EGL10.eglMakeCurrent(newDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+                if (newSurface != EGL10.EGL_NO_SURFACE)
+                    EGL10.eglDestroySurface(newDisplay, newSurface);
+                if (newContext != EGL10.EGL_NO_CONTEXT)
+                    EGL10.eglDestroyContext(newDisplay, newContext);
+                EGL10.eglTerminate(newDisplay);
+            }
+            throw e;
         }
 
-        if (!EGL10.eglMakeCurrent(display, surface, surface, context))
-            throw eglError("eglMakeCurrent");
-        GLES.createCapabilities();
-        GL.useGles(true);
-        JHVCanvas.glVersion = GL.formatVersionString(GL.glGetString(GL.VERSION));
-        JHVCanvas.maxTextureSize = GL.glGetInteger(GL.MAX_TEXTURE_SIZE);
-        initSharedJhvRenderer();
-        render(false);
+        display = newDisplay;
+        context = newContext;
+        surface = newSurface;
+        try {
+            render(false);
+        } catch (RuntimeException | Error e) {
+            destroy();
+            throw e;
+        }
     }
 
     public void render(boolean whiteBackground) {
@@ -87,12 +118,20 @@ public final class AngleRenderer {
     }
 
     public void destroy() {
-        disposeSharedJhvRenderer();
-        EGL10.eglMakeCurrent(display, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
-        GLES.destroy();
-        EGL10.eglDestroySurface(display, surface);
-        EGL10.eglDestroyContext(display, context);
-        EGL10.eglTerminate(display);
+        boolean current = EGL10.eglMakeCurrent(display, surface, surface, context);
+        try {
+            if (current)
+                disposeSharedJhvRenderer();
+            else
+                rendererInitialized = false;
+        } finally {
+            EGL10.eglMakeCurrent(display, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+            if (current)
+                GLES.destroy();
+            EGL10.eglDestroySurface(display, surface);
+            EGL10.eglDestroyContext(display, context);
+            EGL10.eglTerminate(display);
+        }
     }
 
     private static synchronized void initSharedJhvRenderer() {
@@ -109,33 +148,37 @@ public final class AngleRenderer {
         rendererInitialized = false;
     }
 
-    private static synchronized void ensureLwjglAngleConfigured() {
+    private static synchronized void ensureLwjglAngleConfigured(PlatformConfig platform) {
         if (lwjglConfigured)
             return;
-        AngleLibraries.extractRuntimeLibraries();
-        Configuration.EGL_LIBRARY_NAME.set(AngleLibraries.libraryPath(AngleLibraries.eglLibraryName()).toString());
-        Configuration.OPENGLES_LIBRARY_NAME.set(AngleLibraries.libraryPath(AngleLibraries.openGlesLibraryName()).toString());
+        //AngleLibraries.extractRuntimeLibraries();
+        Configuration.EGL_LIBRARY_NAME.set(AngleLibraries.libraryPath(platform.eglLibrary()).toString());
+        Configuration.OPENGLES_LIBRARY_NAME.set(AngleLibraries.libraryPath(platform.openGlesLibrary()).toString());
         EGL.getCapabilities();
         lwjglConfigured = true;
     }
 
-    private long chooseConfig(MemoryStack stack, int samples) {
+    private static PointerBuffer displayAttrs(MemoryStack stack, PlatformConfig platform) {
+        return stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, platform.backendType(), EGL10.EGL_NONE);
+    }
+
+    private long chooseConfig(MemoryStack stack, long display, int samples) {
         for (int depthBits : DEPTH_PREFERENCES) {
             if (samples > 0) {
-                long config = chooseConfig(stack, depthBits, samples);
+                long config = chooseConfig(stack, display, depthBits, samples);
                 if (config != 0L)
                     return config;
             }
         }
         for (int depthBits : DEPTH_PREFERENCES) {
-            long config = chooseConfig(stack, depthBits, 0);
+            long config = chooseConfig(stack, display, depthBits, 0);
             if (config != 0L)
                 return config;
         }
         return 0L;
     }
 
-    private long chooseConfig(MemoryStack stack, int depthBits, int samples) {
+    private long chooseConfig(MemoryStack stack, long display, int depthBits, int samples) {
         PointerBuffer configOut = stack.mallocPointer(1);
         IntBuffer numConfigs = stack.mallocInt(1);
         int attributeCount = samples > 0 ? 19 : 15;
@@ -159,16 +202,16 @@ public final class AngleRenderer {
         return configOut.get(0);
     }
 
-    private void logChosenConfig(MemoryStack stack, long config) {
+    private void logChosenConfig(MemoryStack stack, long display, long config) {
         IntBuffer attribValue = stack.mallocInt(1);
-        int red = configAttrib(attribValue, config, EGL10.EGL_RED_SIZE);
-        int green = configAttrib(attribValue, config, EGL10.EGL_GREEN_SIZE);
-        int blue = configAttrib(attribValue, config, EGL10.EGL_BLUE_SIZE);
-        int alpha = configAttrib(attribValue, config, EGL10.EGL_ALPHA_SIZE);
-        int depth = configAttrib(attribValue, config, EGL10.EGL_DEPTH_SIZE);
-        int stencil = configAttrib(attribValue, config, EGL10.EGL_STENCIL_SIZE);
-        int sampleBuffers = configAttrib(attribValue, config, EGL10.EGL_SAMPLE_BUFFERS);
-        int samples = configAttrib(attribValue, config, EGL10.EGL_SAMPLES);
+        int red = configAttrib(attribValue, display, config, EGL10.EGL_RED_SIZE);
+        int green = configAttrib(attribValue, display, config, EGL10.EGL_GREEN_SIZE);
+        int blue = configAttrib(attribValue, display, config, EGL10.EGL_BLUE_SIZE);
+        int alpha = configAttrib(attribValue, display, config, EGL10.EGL_ALPHA_SIZE);
+        int depth = configAttrib(attribValue, display, config, EGL10.EGL_DEPTH_SIZE);
+        int stencil = configAttrib(attribValue, display, config, EGL10.EGL_STENCIL_SIZE);
+        int sampleBuffers = configAttrib(attribValue, display, config, EGL10.EGL_SAMPLE_BUFFERS);
+        int samples = configAttrib(attribValue, display, config, EGL10.EGL_SAMPLES);
 
         Log.info("ANGLE EGL config: rgba=" + red + "/" + green + "/" + blue + "/" + alpha
                 + " depth=" + depth
@@ -177,7 +220,7 @@ public final class AngleRenderer {
                 + " samples=" + samples);
     }
 
-    private int configAttrib(IntBuffer value, long config, int attribute) {
+    private int configAttrib(IntBuffer value, long display, long config, int attribute) {
         if (!EGL10.eglGetConfigAttrib(display, config, attribute, value))
             throw eglError("eglGetConfigAttrib");
         return value.get(0);
@@ -186,6 +229,16 @@ public final class AngleRenderer {
     private static RuntimeException eglError(String step) {
         int code = EGL10.eglGetError();
         return new RuntimeException(step + " failed with EGL error 0x" + Integer.toHexString(code));
+    }
+
+    private static PlatformConfig platformConfig() {
+        if (Platform.isMacOS())
+            return new PlatformConfig(EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE, "libEGL.dylib", "libGLESv2.dylib");
+        if (Platform.isWindows())
+            return new PlatformConfig(EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE, "libEGL.dll", "libGLESv2.dll");
+        if (Platform.isLinux())
+            return new PlatformConfig(EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE, "libEGL.so", "libGLESv2.so");
+        throw new IllegalStateException("Unsupported ANGLE platform");
     }
 
 }

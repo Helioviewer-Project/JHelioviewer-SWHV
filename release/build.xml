@@ -54,7 +54,8 @@
     <target name="natives-bundle-macos">
         <native-bundle destfile="${natives-macos}" includes="${includes-macos}">
             <extra-files>
-                <zipfileset dir="${lib}/natives-macos" includes="*.dylib" prefix="lib/natives-macos"/>
+                <zipfileset dir="${lib}/natives-macos" includes="libjhvmetalhost.dylib" prefix="jhv/macos-amd64"/>
+                <zipfileset dir="${lib}/natives-macos" includes="libjhvmetalhost.dylib" prefix="jhv/macos-arm64"/>
             </extra-files>
         </native-bundle>
     </target>

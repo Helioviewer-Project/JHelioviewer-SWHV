@@ -77,6 +77,15 @@ static CGFloat jhv_layer_y(CALayer *windowLayer, double y, double height) {
     return windowLayer.geometryFlipped ? y : (windowLayer.bounds.size.height - y - height);
 }
 
+static CGFloat jhv_window_scale(CALayer *windowLayer) {
+    CGFloat windowScale = windowLayer.contentsScale;
+    if (windowScale <= 0.0)
+        windowScale = NSScreen.mainScreen.backingScaleFactor;
+    if (windowScale <= 0.0)
+        windowScale = 1.0;
+    return windowScale;
+}
+
 void *jhv_metal_host_create(void *surfaceLayersPtr, double x, double y, double width, double height) {
     __block void *result = NULL;
     jhv_run_on_main_sync(^{
@@ -95,11 +104,7 @@ void *jhv_metal_host_create(void *surfaceLayersPtr, double x, double y, double w
 
             JHVMetalHostBox *box = [JHVMetalHostBox new];
             CGFloat layerY = jhv_layer_y(windowLayer, y, height);
-            CGFloat windowScale = windowLayer.contentsScale;
-            if (windowScale <= 0.0)
-                windowScale = NSScreen.mainScreen.backingScaleFactor;
-            if (windowScale <= 0.0)
-                windowScale = 1.0;
+            CGFloat windowScale = jhv_window_scale(windowLayer);
             CGRect frame = CGRectMake(x, layerY, width, height);
             box.windowLayer = windowLayer;
             box.metalLayer = jhv_create_metal_layer(device, windowScale, frame);
@@ -115,11 +120,20 @@ void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, do
         return;
 
     JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
+    CFRetain((__bridge CFTypeRef)box);
     jhv_run_on_main_async(^{
         @autoreleasepool {
-            CGFloat layerY = jhv_layer_y(box.windowLayer, y, height);
-            CGRect frame = CGRectMake(x, layerY, width, height);
-            jhv_set_metal_layer_frame(box.metalLayer, frame);
+            JHVMetalHostBox *retainedBox = box;
+            @try {
+                CGFloat layerY = jhv_layer_y(retainedBox.windowLayer, y, height);
+                CGFloat windowScale = jhv_window_scale(retainedBox.windowLayer);
+                if (retainedBox.metalLayer.contentsScale != windowScale)
+                    retainedBox.metalLayer.contentsScale = windowScale;
+                CGRect frame = CGRectMake(x, layerY, width, height);
+                jhv_set_metal_layer_frame(retainedBox.metalLayer, frame);
+            } @finally {
+                CFRelease((__bridge CFTypeRef)retainedBox);
+            }
         }
     });
 }

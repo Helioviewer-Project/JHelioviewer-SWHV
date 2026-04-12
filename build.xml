@@ -23,7 +23,7 @@
 
     <target name="build-metal-host">
         <mkdir dir="lib/natives-macos"/>
-        <exec executable="xcrun" failonerror="true">
+        <exec executable="xcrun" failonerror="false">
             <arg value="clang"/>
             <arg value="-fobjc-arc"/>
             <arg value="-dynamiclib"/>
@@ -128,11 +128,7 @@
         </jar>
     </target>
 
-    <target name="run" depends="jar">
-        <java jar="${jarfile}" fork="true"/>
-    </target>
-
-    <target name="run-metal-host" depends="build-metal-host,jar">
+    <target name="run" depends="build-metal-host,jar">
         <java jar="${jarfile}" fork="true">
             <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
         </java>

@@ -20,6 +20,7 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
+import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -28,10 +29,14 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
+import org.helioviewer.jhv.opengl.angle.WinAngleBridge;
+import org.helioviewer.jhv.opengl.angle.X11AngleBridge;
 
 @SuppressWarnings("serial")
 public final class AngleCanvas extends Canvas implements RenderSurface {
-    private long hostHandle;
+    private long macHostHandle;
+    private long nativeDisplayHandle;
+    private long nativeWindowHandle;
     private boolean whiteBackground;
     private AngleRenderer angleRenderer;
     private boolean displayPending;
@@ -110,8 +115,11 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
 
     @Override
     public void removeNotify() {
-        detach();
-        super.removeNotify();
+        try {
+            detach();
+        } finally {
+            super.removeNotify();
+        }
     }
 
     @Override
@@ -179,25 +187,44 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
     }
 
     private void attachIfNeeded() {
-        if (hostHandle != 0L || !isDisplayable() || getWidth() <= 0 || getHeight() <= 0)
+        if (nativeWindowHandle != 0L || !isDisplayable() || getWidth() <= 0 || getHeight() <= 0)
             return;
 
         Rectangle bounds = hostBounds();
-        hostHandle = MacAngleBridge.create(this, bounds.x, bounds.y, bounds.width, bounds.height);
-        if (hostHandle == 0L)
-            return;
-
+        long newHostHandle = 0L;
+        long newNativeDisplayHandle = 0L;
+        long newNativeWindowHandle;
         try {
-            long layerPointer = MacAngleBridge.getLayer(hostHandle);
-            if (layerPointer == 0L)
-                throw new IllegalStateException("Metal host did not expose a CAMetalLayer");
+            if (Platform.isMacOS()) {
+                MacAngleBridge.Host host = MacAngleBridge.create(this, bounds.x, bounds.y, bounds.width, bounds.height);
+                if (host == null)
+                    return;
+                newHostHandle = host.handle();
+                newNativeWindowHandle = host.layer();
+            } else if (Platform.isWindows()) {
+                newNativeWindowHandle = WinAngleBridge.hwnd(this);
+                if (newNativeWindowHandle == 0L)
+                    return;
+            } else if (Platform.isLinux()) {
+                X11AngleBridge.Surface surface = X11AngleBridge.surface(this);
+                if (surface == null)
+                    return;
+                newNativeDisplayHandle = surface.display();
+                newNativeWindowHandle = surface.drawable();
+            } else {
+                return;
+            }
 
-            angleRenderer = new AngleRenderer(layerPointer);
+            AngleRenderer renderer = new AngleRenderer(newNativeDisplayHandle, newNativeWindowHandle);
+            macHostHandle = newHostHandle;
+            nativeDisplayHandle = newNativeDisplayHandle;
+            nativeWindowHandle = newNativeWindowHandle;
+            angleRenderer = renderer;
             lastHostBounds = bounds;
             lastGlWidth = lastGlHeight = -1;
         } catch (RuntimeException | Error e) {
-            MacAngleBridge.destroy(hostHandle);
-            hostHandle = 0L;
+            if (newHostHandle != 0L)
+                MacAngleBridge.destroy(newHostHandle);
             throw e;
         }
     }
@@ -206,19 +233,18 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         if (getWidth() <= 0 || getHeight() <= 0)
             return;
 
-        if (hostHandle == 0L) {
+        if (nativeWindowHandle == 0L) {
             attachIfNeeded();
-            if (hostHandle == 0L)
+            if (nativeWindowHandle == 0L)
                 return;
         }
         if (angleRenderer == null)
             return;
 
         Rectangle bounds = hostBounds();
-        if (!bounds.equals(lastHostBounds)) {
-            MacAngleBridge.setFrame(hostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
-            lastHostBounds = bounds;
-        }
+        if (Platform.isMacOS() && !bounds.equals(lastHostBounds))
+            MacAngleBridge.setFrame(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
+        lastHostBounds = bounds;
         if (renderNeeded || lastGlWidth < 0 || lastGlHeight < 0)
             requestRender();
     }
@@ -238,15 +264,23 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
     }
 
     private void detach() {
-        if (angleRenderer != null) {
-            angleRenderer.destroy();
+        try {
+            if (angleRenderer != null)
+                angleRenderer.destroy();
+        } finally {
             angleRenderer = null;
+            try {
+                if (Platform.isMacOS())
+                    MacAngleBridge.destroy(macHostHandle);
+            } finally {
+                macHostHandle = 0L;
+                nativeDisplayHandle = 0L;
+                nativeWindowHandle = 0L;
+                displayPending = hostUpdatePending = hostRenderPending = false;
+                lastHostBounds = null;
+                lastGlWidth = lastGlHeight = -1;
+            }
         }
-        MacAngleBridge.destroy(hostHandle);
-        hostHandle = 0L;
-        displayPending = hostUpdatePending = hostRenderPending = false;
-        lastHostBounds = null;
-        lastGlWidth = lastGlHeight = -1;
     }
 
     private void updatePixelScale() {
