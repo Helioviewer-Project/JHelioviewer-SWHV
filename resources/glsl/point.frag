@@ -5,16 +5,13 @@ precision highp float;
 in vec4 fragColor;
 out vec4 outColor;
 
-const vec2 one = vec2(1);
-const vec4 black = vec4(0);
-
 void main(void) {
-    vec2 coord = 2. * gl_PointCoord - one;
-    float radius = length(coord);
-    if (radius > 1.)
+    vec2 coord = 2.0 * gl_PointCoord - vec2(1.0);
+    float radius2 = dot(coord, coord);
+    if (radius2 > 1.0)
       discard;
 
+    float radius = sqrt(radius2);
     float delta = fwidth(radius);
-    float alpha = smoothstep(1. - delta, 1., radius);
-    outColor = mix(fragColor, black, alpha);
+    outColor = vec4(fragColor.rgb, fragColor.a * (1.0 - smoothstep(1.0 - delta, 1.0, radius)));
 }
