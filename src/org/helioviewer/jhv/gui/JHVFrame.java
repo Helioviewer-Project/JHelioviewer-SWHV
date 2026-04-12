@@ -31,8 +31,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.opengl.AngleCanvas;
-import org.helioviewer.jhv.opengl.JHVCanvas;
-import org.helioviewer.jhv.opengl.RenderSurface;
 
 public class JHVFrame {
 
@@ -41,8 +39,7 @@ public class JHVFrame {
 
     private static SideContentPane leftPane;
 
-    private static RenderSurface renderSurface;
-    private static Component renderComponent;
+    private static AngleCanvas renderCanvas;
     private static InputController inputController;
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
@@ -61,9 +58,8 @@ public class JHVFrame {
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
-        renderSurface = createRenderSurface();
-        renderComponent = (Component) renderSurface;
-        renderComponent.setMinimumSize(new Dimension(1, 1)); // allow resize
+        renderCanvas = new AngleCanvas();
+        renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
 
         layers = Layers.getInstance();
         layersPanel = new LayersPanel(layers);
@@ -79,12 +75,12 @@ public class JHVFrame {
 
         interaction = new Interaction(Display.getCamera());
         inputController = new InputController(interaction);
-        renderComponent.addMouseListener(inputController);
-        renderComponent.addMouseMotionListener(inputController);
-        renderComponent.addMouseWheelListener(inputController);
-        renderComponent.addKeyListener(inputController);
+        renderCanvas.addMouseListener(inputController);
+        renderCanvas.addMouseMotionListener(inputController);
+        renderCanvas.addMouseWheelListener(inputController);
+        renderCanvas.addKeyListener(inputController);
 
-        mainContentPanel = new MainContentPanel(renderComponent);
+        mainContentPanel = new MainContentPanel(renderCanvas);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(leftScrollPane, BorderLayout.WEST);
@@ -181,19 +177,19 @@ public class JHVFrame {
     }
 
     public static Component getRenderComponent() {
-        return renderComponent;
+        return renderCanvas;
     }
 
     public static void requestRender() {
-        renderSurface.requestRender();
+        renderCanvas.requestRender();
     }
 
     public static void setWhiteBackground(boolean whiteBackground) {
-        renderSurface.setWhiteBackground(whiteBackground);
+        renderCanvas.setWhiteBackground(whiteBackground);
     }
 
     public static int getFramerate() {
-        return renderSurface.getFramerate();
+        return renderCanvas.getFramerate();
     }
 
     public static MainContentPanel getMainContentPanel() {
@@ -230,12 +226,6 @@ public class JHVFrame {
 
     public static MenuBar getMenuBar() {
         return menuBar;
-    }
-
-    private static RenderSurface createRenderSurface() {
-        if (!"false".equalsIgnoreCase(System.getProperty("jhv.angle")))
-            return new AngleCanvas();
-        return JHVCanvas.create(); // before camera
     }
 
 }
