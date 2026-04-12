@@ -163,8 +163,8 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
             return;
 
         updatePixelScale();
-        int glWidth = (int) (getWidth() * JHVCanvas.pixelScale[0] + .5);
-        int glHeight = (int) (getHeight() * JHVCanvas.pixelScale[1] + .5);
+        int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
+        int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
         if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
             GLRenderer.reshape(glWidth, glHeight);
             lastGlWidth = glWidth;
@@ -292,8 +292,8 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
             scaleX = transform.getScaleX();
             scaleY = transform.getScaleY();
         }
-        JHVCanvas.pixelScale[0] = scaleX;
-        JHVCanvas.pixelScale[1] = scaleY;
+        Display.pixelScale[0] = scaleX;
+        Display.pixelScale[1] = scaleY;
     }
 
     private Rectangle hostBounds() {

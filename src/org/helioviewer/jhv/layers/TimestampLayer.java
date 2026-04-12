@@ -18,7 +18,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 
 import org.json.JSONObject;
@@ -77,11 +76,11 @@ public class TimestampLayer extends AbstractLayer {
         }
 
         int size = (int) (vp.height * (scale * 0.01 * 0.012));
-        if (JHVCanvas.pixelScale[1] == 1) //! nasty
+        if (Display.pixelScale[1] == 1) //! nasty
             size *= 2;
 
         int deltaX = (int) (vp.height * 0.01);
-        int deltaY = top ? (int) (vp.height - JHVCanvas.pixelScale[1] * deltaX - size) : deltaX; //!
+        int deltaY = top ? (int) (vp.height - Display.pixelScale[1] * deltaX - size) : deltaX; //!
 
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.beginRendering(vp.width, vp.height);

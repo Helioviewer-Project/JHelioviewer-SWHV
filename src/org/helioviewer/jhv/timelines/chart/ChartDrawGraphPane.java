@@ -24,10 +24,10 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.base.Regex;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
@@ -142,7 +142,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     private void redrawGraph(Rectangle graphArea) {
         Rectangle graphSize = DrawController.getGraphSize();
-        double sx = JHVCanvas.pixelScale[0], sy = JHVCanvas.pixelScale[1];
+        double sx = Display.pixelScale[0], sy = Display.pixelScale[1];
         int width = (int) (sx * graphSize.getWidth() + .5);
         int height = (int) (sy * graphSize.getHeight() + .5);
 

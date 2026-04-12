@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
@@ -20,7 +21,7 @@ public class GLText {
     public static final int[] shadowOffset = {2, -2};
 
     public static JhvTextRenderer getRenderer(int size) {
-        size = (int) (size * JHVCanvas.pixelScale[1]);
+        size = (int) (size * Display.pixelScale[1]);
 
         int idx = (size - MIN) / STEP;
         if (idx < 0)

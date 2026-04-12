@@ -24,7 +24,6 @@ public final class JHVCanvas extends AWTGLCanvas implements RenderSurface {
     public static final int GLSAMPLES = 4;
     public static String glVersion = "";
     public static int maxTextureSize;
-    public static final double[] pixelScale = {1, 1};
 
     private boolean whiteBackground;
     private boolean displayPending;
@@ -72,8 +71,8 @@ public final class JHVCanvas extends AWTGLCanvas implements RenderSurface {
         if (!rendererInitialized)
             return;
 
-        int glWidth = (int) (getWidth() * pixelScale[0] + .5);
-        int glHeight = (int) (getHeight() * pixelScale[1] + .5);
+        int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
+        int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
         if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
             GLRenderer.reshape(glWidth, glHeight);
             lastGlWidth = glWidth;
@@ -158,14 +157,14 @@ public final class JHVCanvas extends AWTGLCanvas implements RenderSurface {
     private void updatePixelScale() {
         GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
         if (graphicsConfiguration == null) {
-            pixelScale[0] = 1;
-            pixelScale[1] = 1;
+            Display.pixelScale[0] = 1;
+            Display.pixelScale[1] = 1;
             return;
         }
 
         AffineTransform transform = graphicsConfiguration.getDefaultTransform();
-        pixelScale[0] = transform.getScaleX();
-        pixelScale[1] = transform.getScaleY();
+        Display.pixelScale[0] = transform.getScaleX();
+        Display.pixelScale[1] = transform.getScaleY();
     }
 
     private static GLData createData() {
