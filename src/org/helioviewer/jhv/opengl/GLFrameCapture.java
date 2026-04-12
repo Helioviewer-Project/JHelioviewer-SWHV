@@ -32,7 +32,7 @@ final class GLFrameCapture {
         int drawColorRbo = 0;
         int drawDepthRbo = 0;
         int chosenDepthFormat;
-        ByteBuffer readback = GL.isGles() ? MemoryUtil.memAlloc(frameWidth * frameHeight * 4) : null;
+        ByteBuffer readback = MemoryUtil.memAlloc(frameWidth * frameHeight * 4);
 
         try {
             resolveFbo = GL.glGenFramebuffer();
@@ -99,8 +99,7 @@ final class GLFrameCapture {
         int depthFormat = chosenDepthFormat;
         Log.info("GLFrameCapture config: size=" + width + "x" + height
                 + " samples=" + samples
-                + " depth=" + depthBits(depthFormat)
-                + " backend=" + (GL.isGles() ? "gles" : "desktop"));
+                + " depth=" + depthBits(depthFormat));
     }
 
     void bindForRender() {
@@ -118,22 +117,18 @@ final class GLFrameCapture {
 
         GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, resolveFramebuffer);
         GL.glPixelStorei(GL.PACK_ALIGNMENT, 1);
-        if (GL.isGles()) {
-            glesReadback.clear();
-            GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, glesReadback);
-            glesReadback.limit(width * height * 4);
-            buffer.clear();
-            while (glesReadback.remaining() >= 4) {
-                byte r = glesReadback.get();
-                byte g = glesReadback.get();
-                byte b = glesReadback.get();
-                glesReadback.get();
-                buffer.put(r).put(g).put(b);
-            }
-            buffer.flip();
-        } else {
-            GL.glReadPixels(0, 0, width, height, GL.RGB, GL.UNSIGNED_BYTE, buffer);
+        glesReadback.clear();
+        GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, glesReadback);
+        glesReadback.limit(width * height * 4);
+        buffer.clear();
+        while (glesReadback.remaining() >= 4) {
+            byte r = glesReadback.get();
+            byte g = glesReadback.get();
+            byte b = glesReadback.get();
+            glesReadback.get();
+            buffer.put(r).put(g).put(b);
         }
+        buffer.flip();
         GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
     }
 

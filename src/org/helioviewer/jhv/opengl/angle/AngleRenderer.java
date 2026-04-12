@@ -79,7 +79,6 @@ public final class AngleRenderer {
                 throw eglError("eglMakeCurrent");
             GLES.createCapabilities();
             glesInitialized = true;
-            GL.useGles(true);
             GL.initInfo();
             initSharedJhvRenderer();
         } catch (RuntimeException | Error e) {
