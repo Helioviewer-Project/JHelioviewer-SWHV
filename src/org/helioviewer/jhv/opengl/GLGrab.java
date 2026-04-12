@@ -17,7 +17,7 @@ public class GLGrab {
     }
 
     private void init() {
-        capture = new GLFrameCapture(w, h, JHVCanvas.GLSAMPLES);
+        capture = new GLFrameCapture(w, h, GL.SAMPLES);
     }
 
     public void dispose() {

@@ -20,7 +20,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.opengl.JHVCanvas;
+import org.helioviewer.jhv.opengl.GL;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -72,7 +72,7 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
         String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" +
                 "<a href='https://www.jhelioviewer.org'>" + JHVGlobals.programName + "</a></span><br/>" +
                 "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
-                "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + JHVCanvas.glVersion + "</span><br/><br/>" +
+                "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GL.version + "</span><br/><br/>" +
                 "© 2026 <a href='https://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +

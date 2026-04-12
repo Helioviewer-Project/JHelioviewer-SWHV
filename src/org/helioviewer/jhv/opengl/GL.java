@@ -14,6 +14,10 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengles.GLES30;
 
 public final class GL {
+    public static final int SAMPLES = 4;
+    public static String version = "";
+    public static int maxTextureSize;
+
     public static final int ARRAY_BUFFER = GL33.GL_ARRAY_BUFFER;
     public static final int PIXEL_UNPACK_BUFFER = GL33.GL_PIXEL_UNPACK_BUFFER;
     public static final int UNIFORM_BUFFER = GL33.GL_UNIFORM_BUFFER;
@@ -112,6 +116,11 @@ public final class GL {
 
     public static String formatVersionString(String version) {
         return version != null && version.startsWith("OpenGL ") ? version : "OpenGL " + version;
+    }
+
+    public static void initInfo() {
+        version = formatVersionString(glGetString(VERSION));
+        maxTextureSize = glGetInteger(MAX_TEXTURE_SIZE);
     }
 
     public static void glActiveTexture(int unit) {
