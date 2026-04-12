@@ -34,9 +34,6 @@ public final class GLRenderer {
         GL.glClearColor(0, 0, 0, 0);
         GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
-        if (!GL.isGles())
-            GL.glEnable(GL_VERTEX_PROGRAM_POINT_SIZE); // GLES uses gl_PointSize without this desktop-GL enable.
-
         GLSLSolar.quad.init();
         GLSLSolarShader.init();
         GLSLLineShader.init();
