@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.ByteBuffer;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -110,7 +111,8 @@ public class GLImage {
         diffTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.TWO);
         // Keep diffImage sampler backed by a complete texture from startup to avoid macOS driver warnings.
         diffTex.bind();
-        GLTexture.copyByteImage(1, 1, ByteBuffer.wrap(new byte[]{0, 0, 0, (byte) 0xFF}));
+        ByteBuffer emptyDiffTexture = BufferUtils.newByteBuffer(4).put(new byte[]{0, 0, 0, (byte) 0xFF}).flip();
+        GLTexture.copyByteImage(1, 1, emptyDiffTexture);
 
         lutChanged = true;
     }
