@@ -29,11 +29,11 @@ abstract class GLSLShader {
 
     protected final void _init(boolean common) {
         try {
-            String vertexText = GL.adaptShaderSource(FileUtils.streamToString(FileUtils.getResource(vertex)), true);
+            String vertexText = FileUtils.streamToString(FileUtils.getResource(vertex));
             vertexID = attachShader(ShaderType.vertex, vertexText);
 
             String fragmentCommonText = common ? FileUtils.streamToString(FileUtils.getResource("/glsl/solarCommon.frag")) : "";
-            String fragmentText = GL.adaptShaderSource(fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment)), false);
+            String fragmentText = fragmentCommonText + FileUtils.streamToString(FileUtils.getResource(fragment));
             fragmentID = attachShader(ShaderType.fragment, fragmentText);
 
             progID = initializeProgram(true);

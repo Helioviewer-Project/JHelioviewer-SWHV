@@ -60,10 +60,12 @@ public final class GL {
     public static final int RED = GLES30.GL_RED;
     public static final int FLOAT = GLES30.GL_FLOAT;
     public static final int R8 = GLES30.GL_R8;
+    // ANGLE accepts this single-channel 16-bit normalized format, though LWJGL does not expose it on GLES30.
     public static final int R16 = 0x822A;
     public static final int RGB8 = GLES30.GL_RGB8;
     public static final int DEPTH_COMPONENT16 = GLES30.GL_DEPTH_COMPONENT16;
     public static final int DEPTH_COMPONENT24 = GLES30.GL_DEPTH_COMPONENT24;
+    // Keep the 32-bit integer depth format candidate for renderbuffer allocation because it seems to work on ANGLE.
     public static final int DEPTH_COMPONENT32 = 0x81A7;
     public static final int UNSIGNED_BYTE = GLES30.GL_UNSIGNED_BYTE;
     public static final int UNSIGNED_SHORT = GLES30.GL_UNSIGNED_SHORT;
@@ -82,12 +84,6 @@ public final class GL {
     public static final int PACK_ALIGNMENT = GLES30.GL_PACK_ALIGNMENT;
 
     private GL() {
-    }
-
-    public static String adaptShaderSource(String source, boolean vertex) {
-        return vertex
-                ? source.replace("#version 330 core", "#version 300 es")
-                : source.replace("#version 330 core", "#version 300 es\nprecision highp float;");
     }
 
     public static String formatVersionString(String version) {
