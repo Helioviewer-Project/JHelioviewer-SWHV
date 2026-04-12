@@ -18,7 +18,7 @@ final class GLFrameCapture {
     private final int drawFramebuffer;
     private final int drawColorRenderbuffer;
     private final int drawDepthRenderbuffer;
-    private final ByteBuffer glesReadback;
+    private final ByteBuffer rgbaReadback;
 
     GLFrameCapture(int captureW, int captureH, int requestedSamples) {
         int frameWidth = Math.max(1, captureW);
@@ -95,7 +95,7 @@ final class GLFrameCapture {
         width = frameWidth;
         height = frameHeight;
         samples = frameSamples;
-        glesReadback = readback;
+        rgbaReadback = readback;
         int depthFormat = chosenDepthFormat;
         Log.info("GLFrameCapture config: size=" + width + "x" + height
                 + " samples=" + samples
@@ -117,15 +117,15 @@ final class GLFrameCapture {
 
         GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, resolveFramebuffer);
         GL.glPixelStorei(GL.PACK_ALIGNMENT, 1);
-        glesReadback.clear();
-        GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, glesReadback);
-        glesReadback.limit(width * height * 4);
+        rgbaReadback.clear();
+        GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, rgbaReadback);
+        rgbaReadback.limit(width * height * 4);
         buffer.clear();
-        while (glesReadback.remaining() >= 4) {
-            byte r = glesReadback.get();
-            byte g = glesReadback.get();
-            byte b = glesReadback.get();
-            glesReadback.get();
+        while (rgbaReadback.remaining() >= 4) {
+            byte r = rgbaReadback.get();
+            byte g = rgbaReadback.get();
+            byte b = rgbaReadback.get();
+            rgbaReadback.get();
             buffer.put(r).put(g).put(b);
         }
         buffer.flip();
@@ -143,8 +143,8 @@ final class GLFrameCapture {
             GL.glDeleteTexture(resolveTexture);
         if (resolveFramebuffer != 0)
             GL.glDeleteFramebuffer(resolveFramebuffer);
-        if (glesReadback != null)
-            MemoryUtil.memFree(glesReadback);
+        if (rgbaReadback != null)
+            MemoryUtil.memFree(rgbaReadback);
     }
 
     private static void checkFramebufferComplete(String label) {
