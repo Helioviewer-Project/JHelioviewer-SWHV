@@ -20,10 +20,10 @@ final class GLFrameCapture {
     private final int drawDepthRenderbuffer;
     private final ByteBuffer rgbaReadback;
 
-    GLFrameCapture(int captureW, int captureH, int requestedSamples) {
+    GLFrameCapture(int captureW, int captureH) {
         int frameWidth = Math.max(1, captureW);
         int frameHeight = Math.max(1, captureH);
-        int frameSamples = Math.clamp(requestedSamples, 0, GL.glGetInteger(GL.MAX_SAMPLES));
+        int frameSamples = Math.clamp(GL.SAMPLES, 0, GL.glGetInteger(GL.MAX_SAMPLES));
         int colorInternalFormat = GL.RGB8;
         int colorPixelFormat = GL.RGB;
         int resolveFbo = 0;
