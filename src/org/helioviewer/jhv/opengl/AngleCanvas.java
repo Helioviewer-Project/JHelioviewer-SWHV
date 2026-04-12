@@ -33,7 +33,7 @@ import org.helioviewer.jhv.opengl.angle.WinAngleBridge;
 import org.helioviewer.jhv.opengl.angle.X11AngleBridge;
 
 @SuppressWarnings("serial")
-public final class AngleCanvas extends Canvas implements RenderSurface {
+public final class AngleCanvas extends Canvas {
     private long macHostHandle;
     private long nativeDisplayHandle;
     private long nativeWindowHandle;
@@ -127,7 +127,6 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         // Native ANGLE host owns presentation.
     }
 
-    @Override
     public void requestRender() {
         if (displayPending)
             return;
@@ -144,7 +143,6 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         });
     }
 
-    @Override
     public int getFramerate() {
         long now = System.currentTimeMillis();
         long delta = now - fpsTime;
@@ -182,7 +180,6 @@ public final class AngleCanvas extends Canvas implements RenderSurface {
         fpsCount++;
     }
 
-    @Override
     public void setWhiteBackground(boolean white) {
         whiteBackground = white;
     }
