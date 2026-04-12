@@ -29,7 +29,6 @@ public final class GL {
     public static final int BLEND = GLES30.GL_BLEND;
     public static final int CULL_FACE = GLES30.GL_CULL_FACE;
     public static final int DEPTH_TEST = GLES30.GL_DEPTH_TEST;
-    public static final int MULTISAMPLE = 0x809D;
     public static final int ONE = GLES30.GL_ONE;
     public static final int ONE_MINUS_SRC_ALPHA = GLES30.GL_ONE_MINUS_SRC_ALPHA;
     public static final int FUNC_ADD = GLES30.GL_FUNC_ADD;

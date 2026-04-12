@@ -19,8 +19,6 @@ public final class GLRenderer {
     public static void init() {
         GL.glDisable(GL.TEXTURE_2D);
 
-        GL.glEnable(GL.MULTISAMPLE);
-
         GL.glEnable(GL.BLEND);
         GL.glBlendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
         GL.glBlendEquation(GL.FUNC_ADD);
