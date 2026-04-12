@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.awt.Point;
 
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.Quat;
 
 public class GLHelper {
@@ -54,7 +55,7 @@ public class GLHelper {
     }
 
     public static Point GL2AWTPoint(int x, int y) {
-        return new Point((int) (x / JHVCanvas.pixelScale[0] + .5), (int) (y / JHVCanvas.pixelScale[1] + .5));
+        return new Point((int) (x / Display.pixelScale[0] + .5), (int) (y / Display.pixelScale[1] + .5));
     }
 
 }

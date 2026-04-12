@@ -13,7 +13,6 @@ import java.util.HashSet;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 
 public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 
@@ -25,16 +24,16 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     private static MouseEvent synthesizeMouse(MouseEvent e) {
         return new MouseEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                (int) (e.getX() * JHVCanvas.pixelScale[0] + .5),
-                (int) (e.getY() * JHVCanvas.pixelScale[1] + .5),
+                (int) (e.getX() * Display.pixelScale[0] + .5),
+                (int) (e.getY() * Display.pixelScale[1] + .5),
                 e.getClickCount(), e.isPopupTrigger(), e.getButton());
     }
 
     /* Could be useful if pointer position would matter
     private static MouseWheelEvent synthesizeMouseWheel(MouseWheelEvent e) {
         return new MouseWheelEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                (int) (e.getX() * JHVCanvas.pixelScale[0] + .5),
-                (int) (e.getY() * JHVCanvas.pixelScale[1] + .5),
+                (int) (e.getX() * Display.pixelScale[0] + .5),
+                (int) (e.getY() * Display.pixelScale[1] + .5),
                 e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
     }
     */

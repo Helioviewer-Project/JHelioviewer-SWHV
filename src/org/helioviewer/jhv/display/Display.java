@@ -25,6 +25,7 @@ public class Display {
 
     static int glWidth = 1;
     static int glHeight = 1;
+    public static final double[] pixelScale = {1, 1};
 
     public static void setGLSize(int x, int y, int w, int h) {
         glWidth = w;

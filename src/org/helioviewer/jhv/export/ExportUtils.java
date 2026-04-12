@@ -5,9 +5,9 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
-import org.helioviewer.jhv.opengl.JHVCanvas;
 
 class ExportUtils {
 
@@ -24,7 +24,7 @@ class ExportUtils {
             int oldW = img.getWidth(), oldH = img.getHeight();
             g.setColor(UIGlobals.TL_MOVIE_FRAME_COLOR);
             g.setTransform(AffineTransform.getScaleInstance(newW / (double) oldW, newH / (double) oldH));
-            int screenMovieLine = (int) (movieLinePosition * JHVCanvas.pixelScale[0] + .5);
+            int screenMovieLine = (int) (movieLinePosition * Display.pixelScale[0] + .5);
             g.drawLine(screenMovieLine, 0, screenMovieLine, oldH);
         }
         g.dispose();
