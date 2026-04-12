@@ -11,29 +11,21 @@ uniform float iaspect;
 uniform float thickness;
 
 const float dir[2] = float[2](1.0, -1.0);
-vec4 pos[2], col[2];
 
 // https://developer.apple.com/forums/thread/86098
 void main(void) {
-/*  if (Vertex == NextVertex) {
-        gl_Position = ModelViewProjectionMatrix * Vertex;
-        fragColor = Color;
-        return;
-    } */
-
     vec4 curr = ModelViewProjectionMatrix * Vertex;
     vec4 next = ModelViewProjectionMatrix * NextVertex;
 
-    vec4 d = normalize(next - curr);
-    vec4 off = thickness * vec4(-d.y * iaspect, d.x, 0, 0);
-
-    pos[0] = curr;
-    pos[1] = next;
-
-    col[0] = Color;
-    col[1] = NextColor;
+    vec2 delta = next.xy - curr.xy;
+    float len = length(delta);
+    vec2 ortho = len > 0.0 ? vec2(-delta.y * iaspect, delta.x) / len : vec2(0.0);
+    vec4 off = vec4(thickness * ortho, 0.0, 0.0);
 
     int idx = (gl_VertexID >> 1) & 0x1;
-    gl_Position = pos[idx] + dir[gl_VertexID & 0x1] * off;
-    fragColor = col[idx];
+    vec4 pos = idx == 0 ? curr : next;
+    vec4 color = idx == 0 ? Color : NextColor;
+
+    gl_Position = pos + dir[gl_VertexID & 0x1] * off;
+    fragColor = color;
 }
