@@ -54,9 +54,9 @@ public class GLTexture {
             case null ->
                     GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
             case ByteBuffer byteBuffer ->
-                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, directByteBuffer(byteBuffer));
+                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, BufferUtils.directByteBuffer(byteBuffer));
             case ShortBuffer shortBuffer ->
-                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, directShortBuffer(shortBuffer));
+                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, BufferUtils.directShortBuffer(shortBuffer));
             default ->
                     throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
         }
@@ -108,7 +108,7 @@ public class GLTexture {
     }
 
     public static void copyBuffer1D(ByteBuffer source) {
-        source = directByteBuffer(source);
+        source = BufferUtils.directByteBuffer(source);
         GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 0);
@@ -117,26 +117,6 @@ public class GLTexture {
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-    }
-
-    private static ByteBuffer directByteBuffer(ByteBuffer buffer) {
-        if (buffer.isDirect())
-            return buffer;
-
-        ByteBuffer direct = BufferUtils.newByteBuffer(buffer.remaining());
-        direct.put(buffer.duplicate());
-        direct.flip();
-        return direct;
-    }
-
-    private static ShortBuffer directShortBuffer(ShortBuffer buffer) {
-        if (buffer.isDirect())
-            return buffer;
-
-        ShortBuffer direct = BufferUtils.newShortBuffer(buffer.remaining());
-        direct.put(buffer.duplicate());
-        direct.flip();
-        return direct;
     }
 
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
