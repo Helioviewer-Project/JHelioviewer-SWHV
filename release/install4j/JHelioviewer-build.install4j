@@ -51,9 +51,6 @@
           <archive location="classes/natives-windows.jar" failOnError="false" />
           <archive location="classes/JHelioviewer.jar" failOnError="false" />
         </classPath>
-        <nativeLibraryDirectories>
-          <directory name="bin" />
-        </nativeLibraryDirectories>
       </java>
       <vmOptionsFile mode="none" />
       <iconImageFiles>

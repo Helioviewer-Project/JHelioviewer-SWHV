@@ -9,14 +9,11 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.jawt.JAWT;
-import org.lwjgl.system.jawt.JAWTFunctions;
-import org.lwjgl.system.jawt.JAWTDrawingSurface;
-import org.lwjgl.system.jawt.JAWTDrawingSurfaceInfo;
-
 @SuppressWarnings("restricted")
 public final class MacAngleBridge {
+    public record Host(long handle, long layer) {
+    }
+
     private static final Arena ARENA = Arena.ofShared();
     private static final Linker LINKER = Linker.nativeLinker();
     private static final SymbolLookup LOOKUP = SymbolLookup.libraryLookup(
@@ -36,17 +33,32 @@ public final class MacAngleBridge {
     private MacAngleBridge() {
     }
 
-    public static long create(Canvas canvas, double x, double y, double width, double height) {
-        long surfaceLayersPointer = surfaceLayersPointer(canvas);
-        if (surfaceLayersPointer == 0L)
-            return 0L;
+    public static Host create(Canvas canvas, double x, double y, double width, double height) {
+        return AngleJAWT.withPlatformInfo(canvas, platformInfo -> {
+            if (platformInfo == 0L)
+                return null;
 
-        try {
-            MemorySegment surfaceLayers = MemorySegment.ofAddress(surfaceLayersPointer);
-            return ((MemorySegment) CREATE.invokeExact(surfaceLayers, x, y, width, height)).address();
-        } catch (Throwable t) {
-            throw new RuntimeException("Failed to create Metal host layer", t);
-        }
+            long handle = 0L;
+            try {
+                MemorySegment surfaceLayers = MemorySegment.ofAddress(platformInfo);
+                handle = ((MemorySegment) CREATE.invokeExact(surfaceLayers, x, y, width, height)).address();
+                if (handle == 0L)
+                    return null;
+
+                MemorySegment metalHost = MemorySegment.ofAddress(handle);
+                long layer = ((MemorySegment) GET_LAYER.invokeExact(metalHost)).address();
+                if (layer == 0L) {
+                    DESTROY.invokeExact(metalHost);
+                    handle = 0L;
+                    throw new IllegalStateException("Metal host did not expose a CAMetalLayer");
+                }
+                return new Host(handle, layer);
+            } catch (Throwable t) {
+                if (handle != 0L)
+                    destroy(handle);
+                throw new RuntimeException("Failed to create Metal host layer", t);
+            }
+        });
     }
 
     public static void setFrame(long handle, double x, double y, double width, double height) {
@@ -55,15 +67,6 @@ public final class MacAngleBridge {
             SET_FRAME.invokeExact(metalHost, x, y, width, height);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to resize Metal host layer", t);
-        }
-    }
-
-    public static long getLayer(long handle) {
-        try {
-            MemorySegment metalHost = MemorySegment.ofAddress(handle);
-            return ((MemorySegment) GET_LAYER.invokeExact(metalHost)).address();
-        } catch (Throwable t) {
-            throw new RuntimeException("Failed to resolve Metal layer", t);
         }
     }
 
@@ -76,46 +79,6 @@ public final class MacAngleBridge {
             DESTROY.invokeExact(metalHost);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to destroy Metal host layer", t);
-        }
-    }
-
-    private static long surfaceLayersPointer(Canvas canvas) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            JAWT awt = JAWT.calloc(stack);
-            awt.version(JAWTFunctions.JAWT_VERSION_9);
-            if (!JAWTFunctions.JAWT_GetAWT(awt))
-                throw new IllegalStateException("JAWT_GetAWT failed");
-
-            long freeDrawingSurface = awt.FreeDrawingSurface();
-            JAWTDrawingSurface drawingSurface = JAWTFunctions.JAWT_GetDrawingSurface(canvas, awt.GetDrawingSurface());
-            if (drawingSurface == null)
-                return 0L;
-
-            try {
-                long lockDrawingSurface = drawingSurface.Lock();
-                long unlockDrawingSurface = drawingSurface.Unlock();
-                long getSurfaceInfo = drawingSurface.GetDrawingSurfaceInfo();
-                long freeSurfaceInfo = drawingSurface.FreeDrawingSurfaceInfo();
-                int lock = JAWTFunctions.JAWT_DrawingSurface_Lock(drawingSurface, lockDrawingSurface);
-                if ((lock & JAWTFunctions.JAWT_LOCK_ERROR) != 0)
-                    throw new IllegalStateException("JAWT_DrawingSurface_Lock failed");
-
-                try {
-                    JAWTDrawingSurfaceInfo drawingSurfaceInfo = JAWTFunctions.JAWT_DrawingSurface_GetDrawingSurfaceInfo(drawingSurface, getSurfaceInfo);
-                    if (drawingSurfaceInfo == null)
-                        throw new IllegalStateException("JAWT_DrawingSurface_GetDrawingSurfaceInfo failed");
-
-                    try {
-                        return drawingSurfaceInfo.platformInfo();
-                    } finally {
-                        JAWTFunctions.JAWT_DrawingSurface_FreeDrawingSurfaceInfo(drawingSurfaceInfo, freeSurfaceInfo);
-                    }
-                } finally {
-                    JAWTFunctions.JAWT_DrawingSurface_Unlock(drawingSurface, unlockDrawingSurface);
-                }
-            } finally {
-                JAWTFunctions.JAWT_FreeDrawingSurface(drawingSurface, freeDrawingSurface);
-            }
         }
     }
 
