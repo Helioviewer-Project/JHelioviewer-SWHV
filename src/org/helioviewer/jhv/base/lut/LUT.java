@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -15,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 
@@ -23,7 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public record LUT(String name, int[] lut8) {
+public record LUT(String name, ByteBuffer rgba) {
     private static final String[] GGR_LUTS = {
             "AIA94", "AIA131", "AIA171", "AIA193", "AIA211",
             "AIA304", "AIA335", "AIA1600", "AIA1700", "AIA4500"
@@ -58,14 +60,73 @@ public record LUT(String name, int[] lut8) {
     private static final Map<String, LUT> standardLuts = loadStandardLuts();
     private static final List<ColorRule> colorRules = readColorRules(standardLuts);
 
-    public int[] lut8Inv() {
-        int len = lut8.length;
-        int[] inv = new int[len];
+    public LUT(String name, int[] lut8) {
+        this(name, packArgbToRgba(lut8));
+    }
 
-        for (int i = 0; i < len; i++) {
-            inv[i] = lut8[len - 1 - i];
+    public int[] lut8() {
+        ByteBuffer source = rgba.duplicate();
+        int[] lut8 = new int[source.remaining() / 4];
+        for (int i = 0; i < lut8.length; i++) {
+            int red = source.get() & 0xFF;
+            int green = source.get() & 0xFF;
+            int blue = source.get() & 0xFF;
+            int alpha = source.get() & 0xFF;
+            lut8[i] = (alpha << 24) | (red << 16) | (green << 8) | blue;
         }
-        return inv;
+        return lut8;
+    }
+
+    public ByteBuffer rgba() {
+        return rgba.duplicate();
+    }
+
+    public ByteBuffer rgbaInv() {
+        ByteBuffer source = rgba.duplicate();
+        ByteBuffer inverted = BufferUtils.newByteBuffer(source.remaining());
+        for (int pos = source.limit() - 4; pos >= 0; pos -= 4) {
+            inverted.put(source.get(pos))
+                    .put(source.get(pos + 1))
+                    .put(source.get(pos + 2))
+                    .put(source.get(pos + 3));
+        }
+        inverted.flip();
+        return inverted;
+    }
+
+    public static LUT fromOpaqueRgb(String name, byte[] red, byte[] green, byte[] blue) {
+        int len = red.length;
+        ByteBuffer rgba = BufferUtils.newByteBuffer(len * 4);
+        for (int i = 0; i < len; i++) {
+            rgba.put(red[i]).put(green[i]).put(blue[i]).put((byte) 0xFF);
+        }
+        rgba.flip();
+        return new LUT(name, rgba);
+    }
+
+    public static LUT fromOpaqueRgb(String name, float[] red, float[] green, float[] blue) {
+        int len = red.length;
+        ByteBuffer rgba = BufferUtils.newByteBuffer(len * 4);
+        for (int i = 0; i < len; i++) {
+            rgba.put((byte) ((red[i] + 0.5f) * 0xFF))
+                    .put((byte) ((green[i] + 0.5f) * 0xFF))
+                    .put((byte) ((blue[i] + 0.5f) * 0xFF))
+                    .put((byte) 0xFF);
+        }
+        rgba.flip();
+        return new LUT(name, rgba);
+    }
+
+    private static ByteBuffer packArgbToRgba(int[] argb) {
+        ByteBuffer rgba = BufferUtils.newByteBuffer(argb.length * 4);
+        for (int pixel : argb) {
+            rgba.put((byte) (pixel >> 16))
+                    .put((byte) (pixel >> 8))
+                    .put((byte) pixel)
+                    .put((byte) (pixel >>> 24));
+        }
+        rgba.flip();
+        return rgba;
     }
 
     private static Map<String, LUT> loadStandardLuts() {

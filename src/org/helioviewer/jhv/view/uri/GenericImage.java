@@ -21,6 +21,7 @@ import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.base.lut.LUT;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
@@ -56,7 +57,7 @@ class GenericImage implements URIImageReader {
             }
             */
             BufferedImage image = reader.read(0);
-            int[] lut = readLUT(image);
+            LUT lut = readLUT(image);
             ImageBuffer imageBuffer = readBuffered(image);
             reader.dispose();
 
@@ -125,7 +126,7 @@ class GenericImage implements URIImageReader {
     }
 
     @Nullable
-    private static int[] readLUT(BufferedImage image) {
+    private static LUT readLUT(BufferedImage image) {
         ColorModel cm = image.getColorModel();
         if (cm instanceof IndexColorModel icm) {
             int num = icm.getMapSize();
@@ -135,12 +136,7 @@ class GenericImage implements URIImageReader {
             icm.getReds(r);
             icm.getGreens(g);
             icm.getBlues(b);
-
-            int[] lut = new int[num];
-            for (int i = 0; i < num; i++) {
-                lut[i] = 0xFF000000 | ((r[i] & 0xFF) << 16) | ((g[i] & 0xFF) << 8) | (b[i] & 0xFF);
-            }
-            return lut;
+            return LUT.fromOpaqueRgb("built-in", r, g, b);
         }
         return null;
     }

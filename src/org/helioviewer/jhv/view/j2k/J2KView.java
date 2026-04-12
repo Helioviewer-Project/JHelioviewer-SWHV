@@ -80,9 +80,9 @@ public class J2KView extends BaseView {
             }
             source.open();
 
-            int[] lut = source.getLUT();
+            LUT lut = source.getLUT();
             if (lut != null)
-                builtinLUT = new LUT("built-in", lut);
+                builtinLUT = lut;
 
             maxFrame = source.getNumberLayers() - 1;
             metaData = new MetaData[maxFrame + 1];
