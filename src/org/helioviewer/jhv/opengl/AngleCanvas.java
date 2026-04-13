@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
@@ -52,6 +53,7 @@ public final class AngleCanvas extends Canvas {
     public AngleCanvas() {
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+        setBackground(Color.BLACK);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -125,6 +127,11 @@ public final class AngleCanvas extends Canvas {
     @Override
     public void paint(Graphics g) {
         // Native ANGLE host owns presentation.
+    }
+
+    @Override
+    public void update(Graphics g) {
+        paint(g);
     }
 
     public void requestRender() {
