@@ -1,6 +1,5 @@
 package org.helioviewer.jhv;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -9,7 +8,6 @@ import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.Message;
@@ -19,7 +17,6 @@ import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.UpdateChecker;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -93,18 +90,8 @@ public class JHelioviewer {
                 Log.warn("Plugin load error", e);
             }
 
-            JHVFrame.getLayersPanel().setOptionsPanel(Layers.getConnectionLayer());
-
-            JScrollPane leftPane = JHVFrame.getLeftScrollPane();
-            int sideWidth = JHVFrame.getLeftContentPane().getPreferredSize().width + leftPane.getVerticalScrollBar().getPreferredSize().width;
-            Dimension sideSize = new Dimension(sideWidth, -1);
-            leftPane.setMinimumSize(sideSize);
-            leftPane.setPreferredSize(sideSize);
-            leftPane.setMaximumSize(sideSize);
-
-            JHVFrame.getLayersPanel().setOptionsPanel(null);
-
             frame.pack();
+            JHVFrame.stabilizeLeftPaneWidth();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             UITimer.start();
