@@ -27,6 +27,7 @@ import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
@@ -34,8 +35,38 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 
 public class JHVFrame {
 
+    @SuppressWarnings("serial")
+    private static final class FixedWidthPanel extends JPanel {
+        private int fixedWidth = -1;
+
+        FixedWidthPanel() {
+            super(new BorderLayout());
+        }
+
+        void setFixedWidth(int width) {
+            fixedWidth = width;
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension size = super.getPreferredSize();
+            if (fixedWidth > 0)
+                size.width = fixedWidth;
+            return size;
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            Dimension size = super.getMinimumSize();
+            if (fixedWidth > 0)
+                size.width = fixedWidth;
+            return size;
+        }
+    }
+
     private static JFrame mainFrame;
     private static JScrollPane leftScrollPane;
+    private static FixedWidthPanel leftPaneHost;
 
     private static SideContentPane leftPane;
 
@@ -72,6 +103,8 @@ public class JHVFrame {
         leftScrollPane.setFocusable(false);
         leftScrollPane.setBorder(null);
         leftScrollPane.getVerticalScrollBar().setUnitIncrement(layersPanel.getGridRowHeight());
+        leftPaneHost = new FixedWidthPanel();
+        leftPaneHost.add(leftScrollPane, BorderLayout.CENTER);
 
         interaction = new Interaction(Display.getCamera());
         inputController = new InputController(interaction);
@@ -81,9 +114,8 @@ public class JHVFrame {
         renderCanvas.addKeyListener(inputController);
 
         mainContentPanel = new MainContentPanel(renderCanvas);
-
         JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(leftScrollPane, BorderLayout.WEST);
+        centerPanel.add(leftPaneHost, BorderLayout.WEST);
         centerPanel.add(mainContentPanel, BorderLayout.CENTER);
 
         zoomStatus = new ZoomStatusPanel();
@@ -174,6 +206,31 @@ public class JHVFrame {
 
     public static JScrollPane getLeftScrollPane() {
         return leftScrollPane;
+    }
+
+    public static void stabilizeLeftPaneWidth() {
+        MoviePanel moviePanel = MoviePanel.getInstance();
+        // Freeze the left pane to the widest startup state so the scrollbar never overlaps options panels.
+        MoviePanel.setAdvanced(true);
+        int contentWidth = measureMoviePanelWidth(moviePanel, null);
+        contentWidth = Math.max(contentWidth, measureMoviePanelWidth(moviePanel, Layers.getViewpointLayer()));
+        contentWidth = Math.max(contentWidth, measureMoviePanelWidth(moviePanel, Layers.getConnectionLayer()));
+
+        layersPanel.setOptionsPanel(null);
+        MoviePanel.setAdvanced(false);
+        moviePanel.setFixedPreferredWidth(contentWidth);
+        leftPane.revalidate();
+
+        int scrollbarWidth = leftScrollPane.getVerticalScrollBar().getPreferredSize().width;
+        leftPaneHost.setFixedWidth(contentWidth + scrollbarWidth);
+        leftPaneHost.revalidate();
+    }
+
+    private static int measureMoviePanelWidth(MoviePanel moviePanel, Layer optionsLayer) {
+        layersPanel.setOptionsPanel(optionsLayer);
+        moviePanel.revalidate();
+        moviePanel.doLayout();
+        return moviePanel.getPreferredSize().width;
     }
 
     public static Component getRenderComponent() {
