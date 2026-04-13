@@ -53,6 +53,7 @@ import com.jidesoft.swing.JideSplitButton;
 public class MoviePanel extends JPanel implements Interfaces.ObservationSelector {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
+    private int fixedPreferredWidth = -1;
 
     // different animation speeds
     private enum SpeedUnit {
@@ -440,6 +441,18 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
         modePanel.setVisible(advanced);
         recordPanel.setVisible(advanced);
+    }
+
+    public void setFixedPreferredWidth(int width) {
+        fixedPreferredWidth = width;
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension size = super.getPreferredSize();
+        if (fixedPreferredWidth > 0)
+            size.width = fixedPreferredWidth;
+        return size;
     }
 
     private static void updateMovieSpeed() {

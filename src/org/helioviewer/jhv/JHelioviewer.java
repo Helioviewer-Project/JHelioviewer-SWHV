@@ -1,6 +1,5 @@
 package org.helioviewer.jhv;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -19,7 +18,6 @@ import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.UpdateChecker;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -92,12 +90,8 @@ public class JHelioviewer {
                 Log.warn("Plugin load error", e);
             }
 
-            JComponent leftPane = JHVFrame.getLeftScrollPane();
-            JHVFrame.getLayersPanel().setOptionsPanel(Layers.getViewpointLayer());
-            leftPane.setMinimumSize(new Dimension(leftPane.getPreferredSize().width, -1));
-            JHVFrame.getLayersPanel().setOptionsPanel(null);
-
             frame.pack();
+            JHVFrame.stabilizeLeftPaneWidth();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             UITimer.start();
