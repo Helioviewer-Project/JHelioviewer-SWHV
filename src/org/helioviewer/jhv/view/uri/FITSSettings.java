@@ -227,6 +227,7 @@ public class FITSSettings {
             c.gridy++;
 
             add(content);
+            pack(); // hack: fixes first visible layout on Windows at 150% scale
         }
 
         @Override
