@@ -30,6 +30,8 @@ public class JHelioviewer {
         System.setProperty("apple.awt.application.appearance", "NSAppearanceNameDarkAqua");
         System.setProperty("apple.awt.application.name", "JHelioviewer");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("sun.awt.noerasebackground", "true");
+        //System.setProperty("org.lwjgl.util.NoChecks", "true");
         // Save current default system timezone in user.timezone
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
         // Per default all times should be given in GMT
@@ -56,7 +58,6 @@ public class JHelioviewer {
 
         DataSources.initSources(); // sources must be initialized before settings
         Settings.load();
-        System.setProperty("sun.awt.noerasebackground", "true");
         // System.setProperty("jsamp.nosystray", "true");
 
         // Prints the usage message
