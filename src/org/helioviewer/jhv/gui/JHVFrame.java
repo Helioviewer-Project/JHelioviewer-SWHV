@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -9,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.OverlayLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -64,6 +66,29 @@ public class JHVFrame {
         }
     }
 
+    @SuppressWarnings("serial")
+    private static final class RenderStartupHost extends JPanel {
+        private final JPanel placeholder = new JPanel();
+
+        RenderStartupHost(AngleCanvas canvas) {
+            setLayout(new OverlayLayout(this));
+
+            placeholder.setBackground(Color.BLACK);
+            add(placeholder);
+            add(canvas);
+        }
+
+        // Keep a black placeholder over the heavyweight canvas until the first ANGLE frame has presented.
+        void revealCanvas() {
+            if (placeholder.getParent() != this)
+                return;
+
+            remove(placeholder);
+            revalidate();
+            repaint();
+        }
+    }
+
     private static JFrame mainFrame;
     private static JScrollPane leftScrollPane;
     private static FixedWidthPanel leftPaneHost;
@@ -71,6 +96,7 @@ public class JHVFrame {
     private static SideContentPane leftPane;
 
     private static AngleCanvas renderCanvas;
+    private static RenderStartupHost renderHost;
     private static InputController inputController;
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
@@ -91,6 +117,7 @@ public class JHVFrame {
 
         renderCanvas = new AngleCanvas();
         renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
+        renderHost = new RenderStartupHost(renderCanvas);
 
         layers = Layers.getInstance();
         layersPanel = new LayersPanel(layers);
@@ -113,7 +140,7 @@ public class JHVFrame {
         renderCanvas.addMouseWheelListener(inputController);
         renderCanvas.addKeyListener(inputController);
 
-        mainContentPanel = new MainContentPanel(renderCanvas);
+        mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(leftPaneHost, BorderLayout.WEST);
         centerPanel.add(mainContentPanel, BorderLayout.CENTER);
@@ -239,6 +266,10 @@ public class JHVFrame {
 
     public static void requestRender() {
         renderCanvas.requestRender();
+    }
+
+    public static void showRenderCanvas() {
+        renderHost.revealCanvas();
     }
 
     public static void setWhiteBackground(boolean whiteBackground) {
