@@ -53,6 +53,13 @@
         </classPath>
       </java>
       <vmOptionsFile mode="none" />
+      <infoPlist>&lt;key&gt;LSEnvironment&lt;/key&gt;
+&lt;dict&gt;
+    &lt;key&gt;ANGLE_MSL_VERSION_MAJOR&lt;/key&gt;
+    &lt;string&gt;2&lt;/string&gt;
+    &lt;key&gt;ANGLE_MSL_VERSION_MINOR&lt;/key&gt;
+    &lt;string&gt;0&lt;/string&gt;
+&lt;/dict&gt;</infoPlist>
       <iconImageFiles>
         <file path="./resources/JHV_icon.png" />
       </iconImageFiles>
