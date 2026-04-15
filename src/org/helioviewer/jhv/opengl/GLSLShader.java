@@ -104,8 +104,6 @@ abstract class GLSLShader {
                 throw new JHVGLException("Cannot link shader: unknown reason");
         }
 
-        GL.glValidateProgram(id);
-
         GL.glDetachShader(id, vertexID);
         GL.glDeleteShader(vertexID);
         vertexID = 0;

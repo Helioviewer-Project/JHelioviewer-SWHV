@@ -383,9 +383,6 @@ public final class GL {
         GLES30.glUseProgram(program);
     }
 
-    public static void glValidateProgram(int program) {
-    }
-
     public static void glVertexAttribDivisor(int index, int divisor) {
         GLES30.glVertexAttribDivisor(index, divisor);
     }
