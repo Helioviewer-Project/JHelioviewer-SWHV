@@ -71,8 +71,8 @@ public final class AngleCanvas extends Canvas {
             public void componentResized(ComponentEvent e) {
                 // Force a redraw after AWT resize so the GL pixel size is recomputed
                 // immediately and the aspect ratio does not lag behind the canvas size.
-                lastGlWidth = lastGlHeight = -1;
-                updatePixelScale();
+                invalidateGlSize();
+                refreshPixelScale();
                 scheduleHostUpdate(true);
             }
         });
@@ -92,7 +92,7 @@ public final class AngleCanvas extends Canvas {
     @Override
     public void addNotify() {
         super.addNotify();
-        updatePixelScale();
+        refreshPixelScale();
         scheduleHostUpdate(true);
     }
 
@@ -109,8 +109,8 @@ public final class AngleCanvas extends Canvas {
             return;
 
         if (sizeChanged) {
-            lastGlWidth = lastGlHeight = -1;
-            updatePixelScale();
+            invalidateGlSize();
+            refreshPixelScale();
         }
         scheduleHostUpdate(sizeChanged);
     }
@@ -168,7 +168,7 @@ public final class AngleCanvas extends Canvas {
         if (angleRenderer == null)
             return;
 
-        updatePixelScale();
+        refreshPixelScale();
         int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
         int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
         if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
@@ -227,7 +227,7 @@ public final class AngleCanvas extends Canvas {
             nativeWindowHandle = newNativeWindowHandle;
             angleRenderer = renderer;
             lastHostBounds = bounds;
-            lastGlWidth = lastGlHeight = -1;
+            invalidateGlSize();
             // Reveal the real canvas once ANGLE has a live native surface and renderer.
             JHVFrame.showRenderCanvas();
         } catch (RuntimeException | Error e) {
@@ -242,6 +242,8 @@ public final class AngleCanvas extends Canvas {
         if (getWidth() <= 0 || getHeight() <= 0)
             return;
 
+        boolean pixelScaleChanged = refreshPixelScale();
+
         if (nativeWindowHandle == 0L) {
             attachIfNeeded();
             if (nativeWindowHandle == 0L)
@@ -251,10 +253,10 @@ public final class AngleCanvas extends Canvas {
             return;
 
         Rectangle bounds = hostBounds();
-        if (Platform.isMacOS() && !bounds.equals(lastHostBounds))
+        if (Platform.isMacOS() && (!bounds.equals(lastHostBounds) || pixelScaleChanged))
             MacAngleBridge.setFrame(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
         lastHostBounds = bounds;
-        if (renderNeeded || lastGlWidth < 0 || lastGlHeight < 0)
+        if (renderNeeded || pixelScaleChanged || lastGlWidth < 0 || lastGlHeight < 0)
             requestRender();
     }
 
@@ -289,13 +291,27 @@ public final class AngleCanvas extends Canvas {
                 nativeWindowHandle = 0L;
                 displayPending = hostUpdatePending = hostRenderPending = false;
                 lastHostBounds = null;
-                lastGlWidth = lastGlHeight = -1;
+                invalidateGlSize();
             }
         }
     }
 
+    private void invalidateGlSize() {
+        lastGlWidth = -1;
+        lastGlHeight = -1;
+    }
+
+    // Keep the shared pixel scale in sync and invalidate the GL size if a monitor switch
+    // changed the backing pixel ratio.
+    private boolean refreshPixelScale() {
+        boolean changed = updatePixelScale();
+        if (changed)
+            invalidateGlSize();
+        return changed;
+    }
+
     // Track the current HiDPI scale so GL sizes and UI coordinate conversion stay aligned.
-    private void updatePixelScale() {
+    private boolean updatePixelScale() {
         GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
         double scaleX = 1;
         double scaleY = 1;
@@ -304,8 +320,13 @@ public final class AngleCanvas extends Canvas {
             scaleX = transform.getScaleX();
             scaleY = transform.getScaleY();
         }
+        boolean changed = Display.pixelScale[0] != scaleX || Display.pixelScale[1] != scaleY;
+        if (!changed)
+            return false;
+
         Display.pixelScale[0] = scaleX;
         Display.pixelScale[1] = scaleY;
+        return true;
     }
 
     // Express the canvas bounds relative to the Swing content pane for native host placement.
