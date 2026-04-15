@@ -36,7 +36,6 @@ import org.helioviewer.jhv.opengl.angle.X11AngleBridge;
 @SuppressWarnings("serial")
 public final class AngleCanvas extends Canvas {
     private long macHostHandle;
-    private long nativeDisplayHandle;
     private long nativeWindowHandle;
     private boolean whiteBackground;
     private AngleRenderer angleRenderer;
@@ -198,7 +197,6 @@ public final class AngleCanvas extends Canvas {
 
         Rectangle bounds = hostBounds();
         long newHostHandle = 0L;
-        long newNativeDisplayHandle = 0L;
         long newNativeWindowHandle;
         try {
             if (Platform.isMacOS()) {
@@ -215,18 +213,13 @@ public final class AngleCanvas extends Canvas {
                 X11AngleBridge.Surface surface = X11AngleBridge.surface(this);
                 if (surface == null)
                     return;
-                // Let ANGLE open its own X Display on Linux instead of sharing AWT's
-                // connection. Sharing the JAWT Display with AWT's event thread can
-                // trip Xlib/xcb threading assertions in the GLX backend.
-                newNativeDisplayHandle = 0L;
                 newNativeWindowHandle = surface.drawable();
             } else {
                 return;
             }
 
-            AngleRenderer renderer = new AngleRenderer(newNativeDisplayHandle, newNativeWindowHandle);
+            AngleRenderer renderer = new AngleRenderer(newNativeWindowHandle);
             macHostHandle = newHostHandle;
-            nativeDisplayHandle = newNativeDisplayHandle;
             nativeWindowHandle = newNativeWindowHandle;
             angleRenderer = renderer;
             lastHostBounds = bounds;
@@ -290,7 +283,6 @@ public final class AngleCanvas extends Canvas {
                     MacAngleBridge.destroy(macHostHandle);
             } finally {
                 macHostHandle = 0L;
-                nativeDisplayHandle = 0L;
                 nativeWindowHandle = 0L;
                 displayPending = hostUpdatePending = hostRenderPending = false;
                 lastHostBounds = null;

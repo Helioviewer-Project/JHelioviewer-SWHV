@@ -26,8 +26,6 @@ final class AngleLibraries {
 
         String resourcePath = Platform.getResourceDir() + fileName;
         try (InputStream in = FileUtils.getResource(resourcePath)) {
-            if (in == null)
-                throw new IOException("Missing resource " + resourcePath);
             Path extractedPath = Path.of(JHVGlobals.libCacheDir, fileName);
             Files.copy(in, extractedPath, StandardCopyOption.REPLACE_EXISTING);
             return extractedPath;

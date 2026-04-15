@@ -34,7 +34,7 @@ public final class AngleRenderer {
     private final long context;
     private final long surface;
 
-    public AngleRenderer(long nativeDisplayHandle, long nativeWindowHandle) {
+    public AngleRenderer(long nativeWindowHandle) {
         PlatformConfig platform = platformConfig();
         ensureLwjglAngleConfigured(platform);
 
@@ -46,7 +46,7 @@ public final class AngleRenderer {
             PointerBuffer displayAttrs = displayAttrs(stack, platform);
             // LWJGL's checked wrappers reject native_display == 0 here, so call the function pointer directly.
             // display = org.lwjgl.egl.EGL15.eglGetPlatformDisplay(EGL_PLATFORM_ANGLE_ANGLE, 0L, displayAttrs);
-            newDisplay = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, nativeDisplayHandle, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
+            newDisplay = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, 0L, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
             if (newDisplay == EGL15.EGL_NO_DISPLAY)
                 throw eglError("eglGetPlatformDisplay");
 
