@@ -110,7 +110,7 @@ public final class LayersPanel extends JPanel {
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 1;
-        gc.weighty = 0;
+        gc.weighty = 1;
         gc.fill = GridBagConstraints.BOTH;
 
         grid = new LayersTable(model);
@@ -211,6 +211,7 @@ public final class LayersPanel extends JPanel {
         jsp.setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
 
         gc.gridy = 1;
+        gc.weighty = 0;
         optionsPanelWrapper = new JPanel(new BorderLayout());
         add(optionsPanelWrapper, gc);
     }
