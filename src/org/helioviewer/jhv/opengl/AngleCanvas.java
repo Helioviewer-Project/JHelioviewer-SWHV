@@ -215,7 +215,10 @@ public final class AngleCanvas extends Canvas {
                 X11AngleBridge.Surface surface = X11AngleBridge.surface(this);
                 if (surface == null)
                     return;
-                newNativeDisplayHandle = surface.display();
+                // Let ANGLE open its own X Display on Linux instead of sharing AWT's
+                // connection. Sharing the JAWT Display with AWT's event thread can
+                // trip Xlib/xcb threading assertions in the GLX backend.
+                newNativeDisplayHandle = 0L;
                 newNativeWindowHandle = surface.drawable();
             } else {
                 return;
