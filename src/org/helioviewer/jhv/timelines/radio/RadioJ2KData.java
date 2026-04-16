@@ -89,7 +89,7 @@ class RadioJ2KData implements ImageData.Handler {
 
     private static ByteBuffer copyBuffer(ByteBuffer byteBuffer) {
         ByteBuffer copy = ByteBuffer.wrap(new byte[byteBuffer.remaining()]);
-        return copy.put(byteBuffer).flip();
+        return copy.put(byteBuffer.slice()).flip();
     }
 
     void requestData(TimeAxis xAxis) {

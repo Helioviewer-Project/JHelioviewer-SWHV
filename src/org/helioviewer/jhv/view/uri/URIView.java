@@ -11,6 +11,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageBufferCache;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
@@ -22,23 +23,13 @@ import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 public class URIView extends BaseView {
-
-    private static final long MAX_DECODE_CACHE_BYTES = 8L * 1024 * 1024 * 1024;
 
     private record DecodeKey(DataUri uri, ImageFilter.Type filter) {
     }
 
-    private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder()
-            .maximumWeight(MAX_DECODE_CACHE_BYTES)
-            .weigher((DecodeKey key, ImageBuffer value) -> value.byteSize())
-            .build();
-
     static void clearURICache() {
-        decodeCache.invalidateAll();
+        ImageBufferCache.clear();
     }
 
     private final URIImageReader reader;
@@ -69,7 +60,7 @@ public class URIView extends BaseView {
 
             imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
             metaData[0] = m;
-            decodeCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), buffer);
+            ImageBufferCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), buffer);
 
             LUT lut = image.lut();
             if (lut != null)
@@ -82,7 +73,7 @@ public class URIView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         DecodeKey key = new DecodeKey(dataUri, filterType);
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(key);
+        ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
             sendDataToHandler(imageBuffer, viewpoint);
             return;
@@ -115,7 +106,7 @@ public class URIView extends BaseView {
         public void onSuccess(ImageBuffer result) {
             if (key.filter() != filterType) return; // filter changed in-flight
 
-            decodeCache.put(key, result);
+            ImageBufferCache.put(key, result);
             sendDataToHandler(result, viewpoint);
         }
 
@@ -137,12 +128,12 @@ public class URIView extends BaseView {
 
     @Override
     public void abolish() {
-        decodeCache.asMap().keySet().removeIf(k -> k.uri().equals(dataUri));
+        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey k && k.uri().equals(dataUri));
     }
 
     @Override
     public void clearCache() {
-        decodeCache.asMap().keySet().removeIf(k -> k.uri().equals(dataUri));
+        abolish();
     }
 
 }
