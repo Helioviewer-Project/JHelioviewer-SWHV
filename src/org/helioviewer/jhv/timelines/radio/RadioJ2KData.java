@@ -32,6 +32,7 @@ class RadioJ2KData implements ImageData.Handler {
     private final boolean willDraw;
 
     private BufferedImage bufferedImage;
+    private ImageBuffer backingImageBuffer;
     private Region region;
 
     RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor) throws Exception {
@@ -69,6 +70,7 @@ class RadioJ2KData implements ImageData.Handler {
             view = null;
         }
         bufferedImage = null;
+        backingImageBuffer = null;
     }
 
     @Override
@@ -82,6 +84,7 @@ class RadioJ2KData implements ImageData.Handler {
         }
 
         region = imageData.getRegion();
+        backingImageBuffer = imageBuffer;
         bufferedImage = IndexedImageFactory.createIndexed(imageBuffer.buffer, w, h, RadioData.getColorModel());
         DrawController.drawRequest();
     }

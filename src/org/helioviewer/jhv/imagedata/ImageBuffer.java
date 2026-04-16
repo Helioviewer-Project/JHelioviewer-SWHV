@@ -30,6 +30,7 @@ public class ImageBuffer {
     public final Buffer buffer;
     private final float[] lut;
     private final Object cleanerToken = new Object();
+    // Retain the registration so the Arena stays eligible for cleanup when this ImageBuffer becomes unreachable.
     private final Cleaner.Cleanable cleanable;
 
     private static final class ArenaState implements Runnable {
