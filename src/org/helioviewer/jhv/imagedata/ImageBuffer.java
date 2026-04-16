@@ -2,12 +2,15 @@ package org.helioviewer.jhv.imagedata;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.ValueLayout;
+import java.lang.ref.Cleaner;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 public class ImageBuffer {
+
+    private static final Cleaner cleaner = Cleaner.create();
 
     public static final int BAD_PIXEL = Integer.MIN_VALUE;
 
@@ -26,8 +29,24 @@ public class ImageBuffer {
     public final Format format;
     public final Buffer buffer;
     private final float[] lut;
+    private final Object cleanerToken = new Object();
+    private final Cleaner.Cleanable cleanable;
 
-    private Arena arena;
+    private static final class ArenaState implements Runnable {
+        private Arena arena;
+
+        private ArenaState(Arena _arena) {
+            arena = _arena;
+        }
+
+        @Override
+        public void run() {
+            if (arena == null)
+                return;
+            arena.close();
+            arena = null;
+        }
+    }
 
     public ImageBuffer(int _width, int _height, Format _format, byte[] data) {
         this(_width, _height, _format, data, ImageFilter.Type.None, null);
@@ -39,7 +58,8 @@ public class ImageBuffer {
         format = _format;
         lut = _lut;
 
-        arena = Arena.ofShared();
+        Arena arena = Arena.ofShared();
+        cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
         buffer = allocate(arena, filter(format, data, _width, _height, filterType));
     }
 
@@ -53,7 +73,8 @@ public class ImageBuffer {
         format = _format;
         lut = _lut;
 
-        arena = Arena.ofShared();
+        Arena arena = Arena.ofShared();
+        cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
         buffer = allocate(arena, filter(format, data, _width, _height, filterType));
     }
 
@@ -89,13 +110,6 @@ public class ImageBuffer {
 
     public int byteSize() {
         return width * height * format.bytes;
-    }
-
-    public void free() {
-        if (arena == null)
-            return;
-        arena.close();
-        arena = null;
     }
 
     private static Buffer allocate(Arena arena, byte[] data) {
