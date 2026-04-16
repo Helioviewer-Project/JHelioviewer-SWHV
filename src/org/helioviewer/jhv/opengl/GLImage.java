@@ -25,6 +25,7 @@ public class GLImage {
     private GLTexture tex;
     private GLTexture lutTex;
     private GLTexture diffTex;
+    private GLTexture maskTex;
 
     private float red = 1;
     private float green = 1;
@@ -85,6 +86,7 @@ public class GLImage {
                 (float) slitLeft, (float) slitRight);
 
         applyLUT();
+        maskTex.bind();
         tex.bind();
         if (diffMode != DifferenceMode.None)
             diffTex.bind();
@@ -108,10 +110,16 @@ public class GLImage {
         tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.ZERO);
         lutTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.ONE);
         diffTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.TWO);
-        // Keep diffImage sampler backed by a complete texture from startup to avoid macOS driver warnings.
+        maskTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
+
+        // Keep diffImage and mask samplers backed by a complete texture from startup to avoid macOS driver warnings.
         diffTex.bind();
         ByteBuffer emptyDiffTexture = BufferUtils.newByteBuffer(4).put(new byte[]{0, 0, 0, (byte) 0xFF}).flip();
         GLTexture.copyByteImage(1, 1, GL.LINEAR, emptyDiffTexture);
+
+        maskTex.bind();
+        ByteBuffer defaultMaskTexture = BufferUtils.newByteBuffer(1).put((byte) 0xFF).flip();
+        GLTexture.copyByteImage(1, 1, GL.NEAREST, defaultMaskTexture);
 
         lutChanged = true;
     }
@@ -123,6 +131,8 @@ public class GLImage {
             lutTex.delete();
         if (diffTex != null)
             diffTex.delete();
+        if (maskTex != null)
+            maskTex.delete();
     }
 
     public void setDeltaCROTA(double delta) {
