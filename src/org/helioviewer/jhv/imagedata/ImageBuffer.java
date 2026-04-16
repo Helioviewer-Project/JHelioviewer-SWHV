@@ -10,9 +10,11 @@ import java.nio.ShortBuffer;
 
 public class ImageBuffer {
 
-    private static final Cleaner cleaner = Cleaner.create();
-
     public static final int BAD_PIXEL = Integer.MIN_VALUE;
+
+    private static final Cleaner cleaner = Cleaner.create();
+    private final Cleaner.Cleanable cleanable;
+    private final Object cleanerToken = new Object();
 
     public enum Format {
         Gray8(1), Gray16(2), RGBA32(4);
@@ -29,9 +31,6 @@ public class ImageBuffer {
     public final Format format;
     public final Buffer buffer;
     private final float[] lut;
-    private final Object cleanerToken = new Object();
-    // Retain the registration so the Arena stays eligible for cleanup when this ImageBuffer becomes unreachable.
-    private final Cleaner.Cleanable cleanable;
 
     private static final class ArenaState implements Runnable {
         private Arena arena;
