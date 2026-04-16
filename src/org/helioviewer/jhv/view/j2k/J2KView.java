@@ -36,10 +36,15 @@ import kdu_jni.KduException;
 
 public class J2KView extends BaseView {
 
+    private static final long MAX_DECODE_CACHE_BYTES = 8L * 1024 * 1024 * 1024;
+
     private record DecodeKey(J2KParams.Decode params, ImageFilter.Type filter) {
     }
 
-    private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
+    private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder()
+            .maximumWeight(MAX_DECODE_CACHE_BYTES)
+            .weigher((DecodeKey key, ImageBuffer value) -> value.byteSize())
+            .build();
     private static final Cleaner reaper = Cleaner.create();
     private static final AtomicInteger globalSerial = new AtomicInteger();
 
