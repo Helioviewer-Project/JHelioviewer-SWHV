@@ -61,13 +61,13 @@ public class GLImage {
         if (!imageData.getUploaded()) {
             imageData.setUploaded(true);
             tex.bind();
-            tex.copyImageBuffer(imageData.getImageBuffer());
+            tex.copyImageBuffer(imageData.getImageBuffer(), GL.LINEAR);
         }
 
         ImageData prevFrame = diffMode == DifferenceMode.Base ? baseImageData : prevImageData;
         if (diffMode != DifferenceMode.None && prevFrame != null) {
             diffTex.bind();
-            diffTex.copyImageBuffer(prevFrame.getImageBuffer());
+            diffTex.copyImageBuffer(prevFrame.getImageBuffer(), GL.LINEAR);
         }
     }
 
