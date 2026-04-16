@@ -80,6 +80,7 @@ layout(std140) uniform DisplayBlock {
 uniform sampler2D image;
 uniform sampler2D diffImage;
 uniform sampler2D lut;
+uniform sampler2D mask;
 
 uniform float pv0[6]; // kept as plain uniforms for simple indexed access
 uniform float pv1[6];
@@ -116,6 +117,9 @@ float fetch(const sampler2D tex, const vec2 coord, const vec2 bright) {
 }
 
 vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) {
+    if (texture(mask, texcoord).r == 0.)
+        discard;
+
     vec2 brightness = display.brightness;
     if (display.enhanced != 0. && factor != 1.)
         brightness.y *= pow(factor, display.enhanced);
