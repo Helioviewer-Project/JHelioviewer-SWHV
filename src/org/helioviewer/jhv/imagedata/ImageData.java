@@ -17,8 +17,6 @@ public class ImageData {
 
     public static final String nanValue = "----,----      ----";
 
-    private boolean uploaded;
-
     private final ImageBuffer imageBuffer;
 
     private final MetaData metaData;
@@ -63,14 +61,6 @@ public class ImageData {
     @Nonnull
     public Position getViewpoint() {
         return viewpoint;
-    }
-
-    public boolean getUploaded() {
-        return uploaded;
-    }
-
-    public void setUploaded(boolean _uploaded) {
-        uploaded = _uploaded;
     }
 
     @Nonnull

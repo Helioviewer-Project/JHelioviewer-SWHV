@@ -56,12 +56,13 @@ public class GLImage {
     private boolean lastInverted = false;
     private boolean lutChanged = true;
     private DetectorMask uploadedMask = DetectorMask.NONE;
+    private ImageData uploadedImageData;
 
     public void streamImage(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
-        if (!imageData.getUploaded()) {
-            imageData.setUploaded(true);
+        if (uploadedImageData != imageData) {
             tex.bind();
             tex.copyImageBuffer(imageData.getImageBuffer(), GL.LINEAR);
+            uploadedImageData = imageData;
         }
 
         ImageData prevFrame = diffMode == DifferenceMode.Base ? baseImageData : prevImageData;
@@ -115,6 +116,7 @@ public class GLImage {
         diffTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.TWO);
         maskTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
         // Texture objects were recreated, so their corresponding upload bookkeeping must start fresh.
+        uploadedImageData = null;
         lutChanged = true;
         uploadedMask = DetectorMask.NONE;
 
