@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 
 interface URIImageReader {
 
@@ -14,6 +15,6 @@ interface URIImageReader {
 
     Image readImage(File file) throws Exception;
 
-    ImageBuffer readImageBuffer(File file) throws Exception;
+    ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType) throws Exception;
 
 }

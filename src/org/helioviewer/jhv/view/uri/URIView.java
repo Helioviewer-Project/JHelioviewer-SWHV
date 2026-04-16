@@ -89,10 +89,10 @@ public class URIView extends BaseView {
         @Nonnull
         @Override
         public ImageBuffer call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file);
+            ImageBuffer imageBuffer = reader.readImageBuffer(file, type);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
-            return ImageBuffer.filter(imageBuffer, type);
+            return imageBuffer;
         }
     }
 

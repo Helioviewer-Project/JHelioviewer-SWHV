@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 import java.util.stream.IntStream;
 
 //import com.google.common.base.Stopwatch;
@@ -29,9 +26,8 @@ public class ImageFilter {
 
     private static final float BDIV = 1 / 255f, SDIV = 1 / 65535f;
 
-    private static ByteBuffer filter(ByteBuffer buf, int width, int height, Algorithm algorithm) {
+    private static byte[] filter(byte[] array, int width, int height, Algorithm algorithm) {
         int length = width * height;
-        byte[] array = buf.array(); // always backed by array
 
         float[] data = new float[length];
         IntStream.range(0, height).parallel().forEach(y -> {
@@ -53,12 +49,11 @@ public class ImageFilter {
             }
         });
 
-        return ByteBuffer.wrap(out);
+        return out;
     }
 
-    private static ShortBuffer filter(ShortBuffer buf, int width, int height, Algorithm algorithm) {
+    private static short[] filter(short[] array, int width, int height, Algorithm algorithm) {
         int length = width * height;
-        short[] array = buf.array(); // always backed by array
 
         float[] data = new float[length];
         IntStream.range(0, height).parallel().forEach(y -> {
@@ -80,21 +75,15 @@ public class ImageFilter {
             }
         });
 
-        return ShortBuffer.wrap(out);
+        return out;
     }
 
-    static Buffer filter(Buffer buf, int width, int height, Type type) throws Exception {
-        //Stopwatch sw = Stopwatch.createStarted();
-        //try {
-        if (buf instanceof ByteBuffer bb)
-            return filter(bb, width, height, type.algorithm);
-        else if (buf instanceof ShortBuffer sb)
-            return filter(sb, width, height, type.algorithm);
-        else
-            throw new Exception("Unimplemented data type filtering");
-        //} finally {
-        //    System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
-        //}
+    static byte[] filter(byte[] data, int width, int height, Type type) {
+        return type == Type.None ? data : filter(data, width, height, type.algorithm);
+    }
+
+    static short[] filter(short[] data, int width, int height, Type type) {
+        return type == Type.None ? data : filter(data, width, height, type.algorithm);
     }
 
 }
