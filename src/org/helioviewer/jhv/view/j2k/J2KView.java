@@ -13,6 +13,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageBufferCache;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
@@ -29,22 +30,12 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
-
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import kdu_jni.KduException;
 
 public class J2KView extends BaseView {
 
-    private static final long MAX_DECODE_CACHE_BYTES = 8L * 1024 * 1024 * 1024;
-
     private record DecodeKey(J2KParams.Decode params, ImageFilter.Type filter) {
     }
-
-    private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder()
-            .maximumWeight(MAX_DECODE_CACHE_BYTES)
-            .weigher((DecodeKey key, ImageBuffer value) -> value.byteSize())
-            .build();
     private static final Cleaner reaper = Cleaner.create();
     private static final AtomicInteger globalSerial = new AtomicInteger();
 
@@ -140,10 +131,7 @@ public class J2KView extends BaseView {
     private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
         @Override
         public void run() {
-            for (DecodeKey key : decodeCache.asMap().keySet()) {
-                if (key.params().serial() == aSerial)
-                    decodeCache.invalidate(key);
-            }
+            ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == aSerial);
             // reader abolish may take too long in stressed conditions
             JHVThread.create(() -> {
                 try {
@@ -171,7 +159,7 @@ public class J2KView extends BaseView {
 
     @Override
     public void clearCache() {
-        decodeCache.asMap().keySet().removeIf(key -> key.params().serial() == serial);
+        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == serial);
     }
 
     @Override
@@ -276,48 +264,55 @@ public class J2KView extends BaseView {
     public void decode(Position viewpoint, double pixFactor, float factor) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
         AtomicBoolean status = completionLevel.getFrameStatus(decodeParams.frame(), decodeParams.level()); // before signalling to reader
-        boolean shouldCache = status != null && status.get();
-        if (reader != null && !shouldCache) {
+        boolean cacheResult = status != null && status.get();
+        if (reader != null && !cacheResult) {
             signalReader(decodeParams, viewpoint);
         }
-        executeDecode(decodeParams, viewpoint, shouldCache);
+        if (useCachedImage(decodeParams, viewpoint))
+            return;
+        submitDecode(decodeParams, viewpoint, cacheResult);
     }
 
     void refreshDecodeFromReader(J2KParams.Decode decodeParams, Position viewpoint) {
         EventQueue.invokeLater(() -> {
             if (decodeParams.frame() == targetFrame) {
-                executeDecode(decodeParams, viewpoint, false);
+                submitDecode(decodeParams, viewpoint, true);
             }
         });
     }
 
-    private void executeDecode(J2KParams.Decode decodeParams, Position viewpoint, boolean writeCache) {
+    private boolean useCachedImage(J2KParams.Decode decodeParams, Position viewpoint) {
         DecodeKey key = new DecodeKey(decodeParams, filterType);
-        ImageBuffer imageBuffer = decodeCache.getIfPresent(key);
+        ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
             sendDataToHandler(decodeParams, viewpoint, imageBuffer);
-            return;
+            return true;
         }
+        return false;
+    }
+
+    private void submitDecode(J2KParams.Decode decodeParams, Position viewpoint, boolean cacheResult) {
+        DecodeKey key = new DecodeKey(decodeParams, filterType);
         int numComps = completionLevel.getResolutionSet(decodeParams.frame()).numComps;
-        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, writeCache));
+        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, cacheResult));
     }
 
     private class J2KCallback extends DecodeCallback {
 
         private final DecodeKey key;
         private final Position viewpoint;
-        private final boolean writeCache;
+        private final boolean cacheResult;
 
-        J2KCallback(DecodeKey _key, Position _viewpoint, boolean _writeCache) {
+        J2KCallback(DecodeKey _key, Position _viewpoint, boolean _cacheResult) {
             key = _key;
             viewpoint = _viewpoint;
-            writeCache = _writeCache;
+            cacheResult = _cacheResult;
         }
 
         @Override
         public void onSuccess(ImageBuffer result) {
             if (key.filter() != filterType) return; // filter changed in-flight
-            if (writeCache) decodeCache.put(key, result);
+            if (cacheResult) ImageBufferCache.put(key, result);
 
             sendDataToHandler(key.params(), viewpoint, result);
         }
