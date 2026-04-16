@@ -36,9 +36,10 @@ public class J2KView extends BaseView {
 
     private record DecodeKey(J2KParams.Decode params, ImageFilter.Type filter) {
     }
-    private static final Cleaner reaper = Cleaner.create();
+
     private static final AtomicInteger globalSerial = new AtomicInteger();
 
+    private static final Cleaner reaper = Cleaner.create();
     private final Cleaner.Cleanable abolishable;
     // cleaner tracks reachability of this token
     private final Object cleanerToken = new Object();
