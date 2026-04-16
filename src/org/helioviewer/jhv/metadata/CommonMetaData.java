@@ -18,6 +18,7 @@ class CommonMetaData implements MetaData {
     protected String displayName = "unknown";
     protected String unit = "";
     protected float[] physLUT;
+    protected DetectorMask detectorMask = DetectorMask.NONE;
 
     protected boolean calculateDepth;
 
@@ -151,6 +152,12 @@ class CommonMetaData implements MetaData {
     @Override
     public boolean getCalculateDepth() {
         return calculateDepth;
+    }
+
+    @Nonnull
+    @Override
+    public DetectorMask getDetectorMask() {
+        return detectorMask;
     }
 
 }
