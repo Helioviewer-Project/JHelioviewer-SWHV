@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Region;
@@ -32,7 +33,6 @@ class RadioJ2KData implements ImageData.Handler {
     private final boolean willDraw;
 
     private BufferedImage bufferedImage;
-    private ImageBuffer backingImageBuffer;
     private Region region;
 
     RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor) throws Exception {
@@ -70,7 +70,6 @@ class RadioJ2KData implements ImageData.Handler {
             view = null;
         }
         bufferedImage = null;
-        backingImageBuffer = null;
     }
 
     @Override
@@ -84,9 +83,13 @@ class RadioJ2KData implements ImageData.Handler {
         }
 
         region = imageData.getRegion();
-        backingImageBuffer = imageBuffer;
-        bufferedImage = IndexedImageFactory.createIndexed(imageBuffer.buffer, w, h, RadioData.getColorModel());
+        bufferedImage = IndexedImageFactory.createIndexed(copyBuffer((ByteBuffer) imageBuffer.buffer), w, h, RadioData.getColorModel());
         DrawController.drawRequest();
+    }
+
+    private static ByteBuffer copyBuffer(ByteBuffer byteBuffer) {
+        ByteBuffer copy = ByteBuffer.wrap(new byte[byteBuffer.remaining()]);
+        return copy.put(byteBuffer).flip();
     }
 
     void requestData(TimeAxis xAxis) {
