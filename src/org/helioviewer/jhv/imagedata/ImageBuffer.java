@@ -87,6 +87,10 @@ public class ImageBuffer {
         return lut != null;
     }
 
+    public int byteSize() {
+        return width * height * format.bytes;
+    }
+
     public void free() {
         if (arena == null)
             return;

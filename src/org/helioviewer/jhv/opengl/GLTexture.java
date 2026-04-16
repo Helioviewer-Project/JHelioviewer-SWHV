@@ -95,7 +95,7 @@ public class GLTexture {
         GL.glPixelStorei(GL.UNPACK_ALIGNMENT, format.bytes);
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, w);
 
-        int size = format.bytes * imageBuffer.buffer.capacity();
+        int size = imageBuffer.byteSize();
         pbo.setBufferData(size, size, imageBuffer.buffer);
         GL.glTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0L);
         GL.glBindBuffer(GL.PIXEL_UNPACK_BUFFER, 0);
