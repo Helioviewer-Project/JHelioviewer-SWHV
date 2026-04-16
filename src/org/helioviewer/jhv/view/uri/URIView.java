@@ -27,10 +27,15 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 public class URIView extends BaseView {
 
+    private static final long MAX_DECODE_CACHE_BYTES = 8L * 1024 * 1024 * 1024;
+
     private record DecodeKey(DataUri uri, ImageFilter.Type filter) {
     }
 
-    private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder().softValues().build();
+    private static final Cache<DecodeKey, ImageBuffer> decodeCache = Caffeine.newBuilder()
+            .maximumWeight(MAX_DECODE_CACHE_BYTES)
+            .weigher((DecodeKey key, ImageBuffer value) -> value.byteSize())
+            .build();
 
     static void clearURICache() {
         decodeCache.invalidateAll();
