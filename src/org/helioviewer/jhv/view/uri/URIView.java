@@ -29,7 +29,7 @@ public class URIView extends BaseView {
     }
 
     static void clearURICache() {
-        ImageBufferCache.clear();
+        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey);
     }
 
     private final URIImageReader reader;

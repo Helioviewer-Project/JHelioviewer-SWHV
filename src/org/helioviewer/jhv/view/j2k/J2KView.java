@@ -128,10 +128,14 @@ public class J2KView extends BaseView {
         }
     }
 
+    private static void clearCache(int aSerial) {
+        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == aSerial);
+    }
+
     private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
         @Override
         public void run() {
-            ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == aSerial);
+            clearCache(aSerial);
             // reader abolish may take too long in stressed conditions
             JHVThread.create(() -> {
                 try {
@@ -159,7 +163,7 @@ public class J2KView extends BaseView {
 
     @Override
     public void clearCache() {
-        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == serial);
+        clearCache(serial);
     }
 
     @Override
