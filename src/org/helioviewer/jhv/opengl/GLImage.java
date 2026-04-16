@@ -114,6 +114,9 @@ public class GLImage {
         lutTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.ONE);
         diffTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.TWO);
         maskTex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
+        // Texture objects were recreated, so their corresponding upload bookkeeping must start fresh.
+        lutChanged = true;
+        uploadedMask = DetectorMask.NONE;
 
         // Keep diffImage and mask samplers backed by a complete texture from startup to avoid macOS driver warnings.
         diffTex.bind();
