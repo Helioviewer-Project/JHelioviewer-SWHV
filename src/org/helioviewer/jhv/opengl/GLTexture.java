@@ -67,6 +67,10 @@ public class GLTexture {
     }
 
     public void copyImageBuffer(ImageBuffer imageBuffer) {
+        copyImageBuffer(imageBuffer, GL.LINEAR);
+    }
+
+    public void copyImageBuffer(ImageBuffer imageBuffer, int glFilter) {
         int w = imageBuffer.width;
         int h = imageBuffer.height;
         if (w < 1 || h < 1 || w > GL.maxTextureSize || h > GL.maxTextureSize) {
@@ -80,7 +84,7 @@ public class GLTexture {
 
         if (w != previousWidth || h != previousHeight || previousInputFormat != inputGLFormat || previousInputType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(format);
-            genTexture2D(internalGLFormat, w, h, inputGLFormat, bppGLType, GL.LINEAR, null);
+            genTexture2D(internalGLFormat, w, h, inputGLFormat, bppGLType, glFilter, null);
 
             previousWidth = w;
             previousHeight = h;
@@ -97,14 +101,14 @@ public class GLTexture {
         GL.glBindBuffer(GL.PIXEL_UNPACK_BUFFER, 0);
     }
 
-    public static void copyByteImage(int w, int h, int filter, ByteBuffer source) {
+    public static void copyByteImage(int w, int h, int glFilter, ByteBuffer source) {
         if (w < 1 || h < 1 || w > GL.maxTextureSize || h > GL.maxTextureSize) {
             Log.warn("w= " + w + " h=" + h);
             return;
         }
         GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, w);
-        genTexture2D(GL.RGBA, w, h, GL.RGBA, GL.UNSIGNED_BYTE, filter, source);
+        genTexture2D(GL.RGBA, w, h, GL.RGBA, GL.UNSIGNED_BYTE, glFilter, source);
     }
 
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {

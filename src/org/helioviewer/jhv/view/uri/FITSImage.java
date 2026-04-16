@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.uri;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
-class FITSImage implements URIImageReader {
+public class FITSImage implements URIImageReader {
 
     @Override
     public URIImageReader.Image readImage(File file) throws Exception {
@@ -36,6 +37,12 @@ class FITSImage implements URIImageReader {
     @Override
     public ImageBuffer readImageBuffer(File file) throws Exception {
         try (Fits f = new Fits(file)) {
+            return readHDU(findHDU(f));
+        }
+    }
+
+    public ImageBuffer readImageBuffer(InputStream input) throws Exception {
+        try (Fits f = new Fits(input)) {
             return readHDU(findHDU(f));
         }
     }

@@ -56,4 +56,7 @@ public interface MetaData {
 
     boolean getCalculateDepth();
 
+    @Nonnull
+    DetectorMask getDetectorMask();
+
 }

@@ -6,6 +6,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.metadata.DetectorMask;
 import org.helioviewer.jhv.metadata.MetaData;
 
 import org.json.JSONObject;
@@ -54,6 +55,7 @@ public class GLImage {
     private boolean invertLUT = false;
     private boolean lastInverted = false;
     private boolean lutChanged = true;
+    private DetectorMask uploadedMask = DetectorMask.NONE;
 
     public void streamImage(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
         if (!imageData.getUploaded()) {
@@ -86,6 +88,7 @@ public class GLImage {
                 (float) slitLeft, (float) slitRight);
 
         applyLUT();
+        applyMask(metaData.getDetectorMask());
         maskTex.bind();
         tex.bind();
         if (diffMode != DifferenceMode.None)
@@ -118,10 +121,7 @@ public class GLImage {
         GLTexture.copyByteImage(1, 1, GL.LINEAR, emptyDiffTexture);
 
         maskTex.bind();
-        ByteBuffer defaultMaskTexture = BufferUtils.newByteBuffer(1).put((byte) 0xFF).flip();
-        GLTexture.copyByteImage(1, 1, GL.NEAREST, defaultMaskTexture);
-
-        lutChanged = true;
+        maskTex.copyImageBuffer(uploadedMask.getImageBuffer(), GL.NEAREST);
     }
 
     public void dispose() {
@@ -133,6 +133,14 @@ public class GLImage {
             diffTex.delete();
         if (maskTex != null)
             maskTex.delete();
+    }
+
+    private void applyMask(DetectorMask detectorMask) {
+        if (uploadedMask == detectorMask)
+            return;
+        maskTex.bind();
+        maskTex.copyImageBuffer(detectorMask.getImageBuffer(), GL.NEAREST);
+        uploadedMask = detectorMask;
     }
 
     public void setDeltaCROTA(double delta) {

@@ -206,6 +206,8 @@ public final class FitsMetaData extends CommonMetaData {
             displayName = observatory + ' ' + instrument + ' ' + measurement;
         } else if (instrument.equals("EUI")) {
             displayName = instrument + ' ' + detector.replace('_', '-') + ' ' + measurement;
+            if (m.getString("IMGTYPE").orElse("").equals("occulted image"))
+                detectorMask = DetectorMask.EUI_OCCULTED;
         } else if (instrument.equals("PHI")) {
             String level = m.getString("LEVEL").orElse("");
             displayName = instrument + ' ' + detector + (level.isEmpty() ? "" : ' ' + level);
