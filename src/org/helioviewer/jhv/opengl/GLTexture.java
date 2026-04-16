@@ -66,10 +66,6 @@ public class GLTexture {
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
     }
 
-    public void copyImageBuffer(ImageBuffer imageBuffer) {
-        copyImageBuffer(imageBuffer, GL.LINEAR);
-    }
-
     public void copyImageBuffer(ImageBuffer imageBuffer, int glFilter) {
         int w = imageBuffer.width;
         int h = imageBuffer.height;
