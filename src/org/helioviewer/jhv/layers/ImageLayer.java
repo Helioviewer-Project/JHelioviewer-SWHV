@@ -107,13 +107,6 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
     @Override
     public void init() {
         glImage.init();
-        // GL textures were recreated, so any previously uploaded frame state must be invalidated.
-        if (imageData != null)
-            imageData.setUploaded(false);
-        if (prevImageData != null)
-            prevImageData.setUploaded(false);
-        if (baseImageData != null)
-            baseImageData.setUploaded(false);
     }
 
     @Override
