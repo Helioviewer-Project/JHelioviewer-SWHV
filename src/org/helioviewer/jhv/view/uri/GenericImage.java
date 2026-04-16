@@ -7,9 +7,6 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.IndexColorModel;
 import java.io.File;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 import java.util.Iterator;
 
 import javax.annotation.Nullable;
@@ -24,6 +21,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 //import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 
 // essentially static; local or network cache
@@ -66,13 +64,13 @@ class GenericImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType) throws Exception {
         try (ImageInputStream iis = new FileImageInputStream(file)) {
             ImageReader reader = getReader(iis);
             if (reader == null)
                 throw new Exception("No image reader found");
 
-            ImageBuffer imageBuffer = readBuffered(reader.read(0));
+            ImageBuffer imageBuffer = readBuffered(reader.read(0), filterType);
             reader.dispose();
             return imageBuffer;
         }
@@ -92,19 +90,21 @@ class GenericImage implements URIImageReader {
     }
 
     private static ImageBuffer readBuffered(BufferedImage image) {
+        return readBuffered(image, ImageFilter.Type.None);
+    }
+
+    private static ImageBuffer readBuffered(BufferedImage image, ImageFilter.Type filterType) {
         int w = image.getWidth();
         int h = image.getHeight();
 
-        Buffer buffer;
-        ImageBuffer.Format format;
         switch (image.getType()) {
             case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> {
-                buffer = ByteBuffer.wrap(((DataBufferByte) image.getRaster().getDataBuffer()).getData());
-                format = ImageBuffer.Format.Gray8;
+                return new ImageBuffer(w, h, ImageBuffer.Format.Gray8,
+                        ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filterType, null);
             }
             case BufferedImage.TYPE_USHORT_GRAY -> {
-                buffer = ShortBuffer.wrap(((DataBufferUShort) image.getRaster().getDataBuffer()).getData());
-                format = ImageBuffer.Format.Gray16;
+                return new ImageBuffer(w, h, ImageBuffer.Format.Gray16,
+                        ((DataBufferUShort) image.getRaster().getDataBuffer()).getData(), filterType, null);
             }
             default -> {
                 BufferedImage conv = NativeImageFactory.createRGBAPremultipliedImage(w, h);
@@ -115,14 +115,14 @@ class GenericImage implements URIImageReader {
                     } finally {
                         g.dispose();
                     }
-                    buffer = ByteBuffer.allocateDirect(w * h * 4).put(NativeImageFactory.getByteBuffer(conv)).flip();
+                    byte[] buffer = new byte[w * h * 4];
+                    NativeImageFactory.getByteBuffer(conv).get(buffer);
+                    return new ImageBuffer(w, h, ImageBuffer.Format.RGBA32, buffer);
                 } finally {
                     NativeImageFactory.free(conv);
                 }
-                format = ImageBuffer.Format.RGBA32;
             }
         }
-        return new ImageBuffer(w, h, format, buffer);
     }
 
     @Nullable

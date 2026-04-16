@@ -2,13 +2,12 @@ package org.helioviewer.jhv.view.uri;
 
 import java.io.File;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import org.helioviewer.jhv.base.ArrayUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.math.MathUtils;
 
 import nom.tam.fits.BasicHDU;
@@ -30,20 +29,20 @@ public class FITSImage implements URIImageReader {
     public URIImageReader.Image readImage(File file) throws Exception {
         try (Fits f = new Fits(file)) {
             ImageHDU hdu = findHDU(f);
-            return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu), null);
+            return new URIImageReader.Image(getHeaderAsXML(hdu), readHDU(hdu, ImageFilter.Type.None), null);
         }
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType) throws Exception {
         try (Fits f = new Fits(file)) {
-            return readHDU(findHDU(f));
+            return readHDU(findHDU(f), filterType);
         }
     }
 
     public ImageBuffer readImageBuffer(InputStream input) throws Exception {
         try (Fits f = new Fits(input)) {
-            return readHDU(findHDU(f));
+            return readHDU(findHDU(f), ImageFilter.Type.None);
         }
     }
 
@@ -188,7 +187,7 @@ public class FITSImage implements URIImageReader {
     private static final double MIN_MULT = 0.00001;
     private static final double MAX_MULT = 0.99999;
 
-    private static ImageBuffer readHDU(ImageHDU hdu) throws Exception {
+    private static ImageBuffer readHDU(ImageHDU hdu, ImageFilter.Type filterType) throws Exception {
         int[] axes = hdu.getAxes();
         if (axes == null || axes.length != 2)
             throw new Exception("Only 2D FITS files supported");
@@ -204,7 +203,7 @@ public class FITSImage implements URIImageReader {
             for (int j = 0; j < height; j++) {
                 System.arraycopy(inData[j], 0, outData, width * (height - 1 - j), width);
             }
-            return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(outData));
+            return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, outData, filterType, null);
         }
 
         Header header = hdu.getHeader();
@@ -223,7 +222,7 @@ public class FITSImage implements URIImageReader {
                 SampleBuffer sampleData = sampleImage(pixType, blank, bzero, bscale, width, height, pixData);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                    return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, ByteBuffer.wrap(new byte[width * height]));
+                    return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, new byte[width * height], filterType, null);
 
                 if (autoMode) {
                     int kMin = Math.clamp((int) (MIN_MULT * sampleLen), 0, sampleLen - 1);
@@ -313,7 +312,7 @@ public class FITSImage implements URIImageReader {
             case BYTE -> throw new Exception("Unexpected BYTE path in non-byte conversion");
         }
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
-        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, ShortBuffer.wrap(outData), lut);
+        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, outData, filterType, lut);
     }
 
     private static PixType getPixType(Object[] pixData) throws Exception {

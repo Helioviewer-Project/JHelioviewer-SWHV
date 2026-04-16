@@ -2,8 +2,6 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.Callable;
 
 import org.helioviewer.jhv.Log;
@@ -131,8 +129,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-            ImageBuffer ib = new ImageBuffer(actualWidth, actualHeight, format, ByteBuffer.wrap(outBuffer).order(ByteOrder.nativeOrder()));
-            return ImageBuffer.filter(ib, filterType);
+            return new ImageBuffer(actualWidth, actualHeight, format, outBuffer, filterType, null);
         } catch (KduException e) {
             recreateThreadEnv = true;
             throw e;
