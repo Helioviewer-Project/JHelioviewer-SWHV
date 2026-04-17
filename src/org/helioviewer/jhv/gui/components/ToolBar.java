@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.EnumMap;
 //import java.util.LinkedHashMap;
 //import java.util.Map;
 
@@ -22,10 +23,10 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.io.SampClient;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
 
@@ -34,7 +35,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public final class ToolBar extends JToolBar {
+public final class ToolBar extends JToolBar implements ViewerState.Listener {
 
     private static final int ZOOM_HOLD_REPEAT_MS = 33;
 
@@ -118,12 +119,14 @@ public final class ToolBar extends JToolBar {
             displayMode = DisplayMode.valueOf(Settings.getProperty("display.toolbar").toUpperCase());
         } catch (Exception ignore) {
         }
+        JHVFrame.getViewerState().addListener(this);
         setDisplayMode(displayMode);
     }
 
     private JideToggleButton coronaButton;
     private JideToggleButton diffRotationButton;
     private JideToggleButton multiviewButton;
+    private final EnumMap<ProjectionMode, JRadioButtonMenuItem> projectionItems = new EnumMap<>(ProjectionMode.class);
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
@@ -148,6 +151,8 @@ public final class ToolBar extends JToolBar {
     }
 
     private void createNewToolBar() {
+        projectionItems.clear();
+        ViewerState viewerState = JHVFrame.getViewerState();
         if (Platform.isMacOS()) {
             add(Box.createHorizontalStrut(90), 0);
         }
@@ -218,29 +223,20 @@ public final class ToolBar extends JToolBar {
         JHVFrame.getInteraction().setMode(interactionMode);
 
         trackingButton = toolToggleButton(TRACK);
-        trackingButton.setSelected(Display.getCamera().getTrackingMode());
-        trackingButton.addItemListener(e -> Display.getCamera().setTrackingMode(trackingButton.isSelected()));
+        trackingButton.setSelected(viewerState.isTracking());
+        trackingButton.addItemListener(e -> viewerState.setTracking(trackingButton.isSelected()));
 
         diffRotationButton = toolToggleButton(DIFFROTATION);
-        diffRotationButton.setSelected(ImageLayers.getDiffRotationMode());
-        diffRotationButton.addItemListener(e -> {
-            ImageLayers.setDiffRotationMode(diffRotationButton.isSelected());
-            MovieDisplay.display();
-        });
+        diffRotationButton.setSelected(viewerState.isDifferentialRotation());
+        diffRotationButton.addItemListener(e -> viewerState.setDifferentialRotation(diffRotationButton.isSelected()));
 
         coronaButton = toolToggleButton(OFFDISK);
-        coronaButton.setSelected(Display.getShowCorona());
-        coronaButton.addItemListener(e -> {
-            Display.setShowCorona(coronaButton.isSelected());
-            MovieDisplay.display();
-        });
+        coronaButton.setSelected(viewerState.isShowCorona());
+        coronaButton.addItemListener(e -> viewerState.setShowCorona(coronaButton.isSelected()));
 
         multiviewButton = toolToggleButton(MULTIVIEW);
-        multiviewButton.setSelected(Display.multiview);
-        multiviewButton.addItemListener(e -> {
-            Display.multiview = multiviewButton.isSelected();
-            ImageLayers.arrangeMultiView(Display.multiview);
-        });
+        multiviewButton.setSelected(viewerState.isMultiview());
+        multiviewButton.addItemListener(e -> viewerState.setMultiview(multiviewButton.isSelected()));
 
         addButton(trackingButton);
         addButton(diffRotationButton);
@@ -252,11 +248,12 @@ public final class ToolBar extends JToolBar {
         ButtonGroup projectionGroup = new ButtonGroup();
         for (ProjectionMode el : ProjectionMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(el.toString());
-            if (el == Display.mode)
+            if (el == viewerState.getProjection())
                 item.setSelected(true);
-            item.addActionListener(e -> Display.setProjectionMode(el));
+            item.addActionListener(e -> viewerState.setProjection(el));
             projectionGroup.add(item);
             projectionButton.add(item);
+            projectionItems.put(el, item);
         }
         addButton(projectionButton);
 
@@ -279,8 +276,8 @@ public final class ToolBar extends JToolBar {
         addSeparator(dim);
 
         refreshButton = toolToggleButton(REFRESH);
-        refreshButton.setSelected(ImageLayers.getRefreshMode());
-        refreshButton.addItemListener(e -> ImageLayers.setRefreshMode(refreshButton.isSelected()));
+        refreshButton.setSelected(viewerState.isRefresh());
+        refreshButton.addItemListener(e -> viewerState.setRefresh(refreshButton.isSelected()));
         addButton(refreshButton);
 
         addSeparator(dim);
@@ -357,6 +354,26 @@ public final class ToolBar extends JToolBar {
 
             popUpMenu.show(me.getComponent(), me.getX(), me.getY());
         }
+    }
+
+    @Override
+    public void viewerStateChanged() {
+        syncStateButtons();
+    }
+
+    private void syncStateButtons() {
+        if (trackingButton == null)
+            return;
+
+        ViewerState viewerState = JHVFrame.getViewerState();
+        trackingButton.setSelected(viewerState.isTracking());
+        diffRotationButton.setSelected(viewerState.isDifferentialRotation());
+        coronaButton.setSelected(viewerState.isShowCorona());
+        multiviewButton.setSelected(viewerState.isMultiview());
+        refreshButton.setSelected(viewerState.isRefresh());
+        JRadioButtonMenuItem activeProjection = projectionItems.get(viewerState.getProjection());
+        if (activeProjection != null)
+            activeProjection.setSelected(true);
     }
 
 }

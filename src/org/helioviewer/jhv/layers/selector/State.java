@@ -19,6 +19,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -46,15 +47,16 @@ public class State {
     }
 
     private static JSONObject toJson() {
+        ViewerState viewerState = JHVFrame.getViewerState();
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
         main.put("play", Movie.isPlaying());
-        main.put("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected());
-        main.put("projection", Display.mode);
-        main.put("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
-        main.put("refresh", JHVFrame.getToolBar().getRefreshButton().isSelected());
-        main.put("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected());
-        main.put("differentialRotation", JHVFrame.getToolBar().getDiffRotationButton().isSelected());
+        main.put("multiview", viewerState.isMultiview());
+        main.put("projection", viewerState.getProjection());
+        main.put("tracking", viewerState.isTracking());
+        main.put("refresh", viewerState.isRefresh());
+        main.put("showCorona", viewerState.isShowCorona());
+        main.put("differentialRotation", viewerState.isDifferentialRotation());
         main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
 
         JSONArray ja = new JSONArray();
@@ -188,13 +190,14 @@ public class State {
         }
 
         JHVFrame.getInteraction().loadAnnotations(data.optJSONObject("annotations"));
-        JHVFrame.getToolBar().getMultiviewButton().setSelected(data.optBoolean("multiview", JHVFrame.getToolBar().getMultiviewButton().isSelected()));
-        JHVFrame.getToolBar().getShowCoronaButton().setSelected(data.optBoolean("showCorona", JHVFrame.getToolBar().getShowCoronaButton().isSelected()));
-        JHVFrame.getToolBar().getDiffRotationButton().setSelected(data.optBoolean("differentialRotation", JHVFrame.getToolBar().getDiffRotationButton().isSelected()));
+        ViewerState viewerState = JHVFrame.getViewerState();
+        viewerState.setMultiview(data.optBoolean("multiview", viewerState.isMultiview()));
+        viewerState.setShowCorona(data.optBoolean("showCorona", viewerState.isShowCorona()));
+        viewerState.setDifferentialRotation(data.optBoolean("differentialRotation", viewerState.isDifferentialRotation()));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
-        boolean tracking = data.optBoolean("tracking", JHVFrame.getToolBar().getTrackingButton().isSelected());
-        boolean refresh = data.optBoolean("refresh", JHVFrame.getToolBar().getRefreshButton().isSelected());
+        boolean tracking = data.optBoolean("tracking", viewerState.isTracking());
+        boolean refresh = data.optBoolean("refresh", viewerState.isRefresh());
         boolean play = data.optBoolean("play", false);
 
         EDTCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, refresh, play));
@@ -217,8 +220,9 @@ public class State {
 
         private void applyRestoredPlaybackState() {
             Movie.setTime(time);
-            JHVFrame.getToolBar().getTrackingButton().setSelected(tracking);
-            JHVFrame.getToolBar().getRefreshButton().setSelected(refresh);
+            ViewerState viewerState = JHVFrame.getViewerState();
+            viewerState.setTracking(tracking);
+            viewerState.setRefresh(refresh);
             Display.getCamera().refresh();
             if (play)
                 Movie.play();
@@ -248,7 +252,7 @@ public class State {
         try {
             // to be loaded before viewpoint
             try {
-                Display.setProjectionMode(ProjectionMode.valueOf(jo.optString("projection")));
+                JHVFrame.getViewerState().setProjection(ProjectionMode.valueOf(jo.optString("projection")));
             } catch (Exception ignore) {
             }
             loadTimelines(jo);
