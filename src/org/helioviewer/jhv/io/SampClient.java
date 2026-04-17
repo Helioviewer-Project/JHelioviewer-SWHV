@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
@@ -109,72 +110,33 @@ public class SampClient extends HubConnector {
         declareMetadata(Metadata.asMetadata(meta));
 
         addMessageHandler(new JHVSampHandler("image.load.fits", (sender, msg) -> {
-            Object url = msg.getParam("url");
-            if (url != null) {
-                URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> Load.getAllImage(List.of(uri)));
-            }
+            loadURI(msg, AppCommands::loadImage);
         }));
         // load VOTable only from SOAR
         addMessageHandler(new JHVSampHandler("table.load.votable", (sender, msg) -> {
-            if ("SolarOrbiterARchive".equals(sender)) {
-                Object url = msg.getParam("url");
-                if (url != null) {
-                    URI uri = toURI(url.toString());
-                    SoarClient.submitTable(uri);
-                }
-            }
+            if ("SolarOrbiterARchive".equals(sender))
+                loadURI(msg, AppCommands::loadVOTable);
         }));
         // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
         addMessageHandler(new JHVSampHandler("table.load.fits", (sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
-                Object url = msg.getParam("url");
-                if (url != null) {
-                    URI uri = toURI(url.toString());
-                    EventQueue.invokeLater(() -> Load.getAllImage(List.of(uri)));
-                }
+                loadURI(msg, AppCommands::loadImage);
             }
         }));
         // advertise we can load CDF, although we can do only MAG and SWA
         addMessageHandler(new JHVSampHandler("table.load.cdf", (sender, msg) -> {
-            Object url = msg.getParam("url");
-            if (url != null) {
-                URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> Load.getAllCDF(List.of(uri)));
-            }
+            loadURI(msg, AppCommands::loadCDF);
         }));
         addMessageHandler(new JHVSampHandler("jhv.load.image", (sender, msg) -> {
-            JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
-            JSONArray ja = jo.optJSONArray("url");
-            if (ja == null) {
-                URI uri = toURI(jo.optString("url"));
-                EventQueue.invokeLater(() -> Load.getAllImage(List.of(uri)));
-            } else {
-                ArrayList<URI> uris = new ArrayList<>(ja.length());
-                for (Object obj : ja) {
-                    uris.add(toURI(obj.toString()));
-                }
-                EventQueue.invokeLater(() -> Load.getAllImage(uris));
-            }
+            loadURIList(msg, AppCommands::loadImage, AppCommands::loadImage);
         }));
         // Add handler for the HAPI csv files
         addMessageHandler(new JHVSampHandler("jhv.load.hapi", (sender, msg) -> {
-            JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
-            JSONArray ja = jo.optJSONArray("url");
-
-            if (ja == null) {
-                URI uri = toURI(jo.optString("url"));
-                EventQueue.invokeLater(() -> BandReaderHapi.loadUri(uri));
-            } else {
-                for (Object obj : ja) {
-                    URI uri = toURI(obj.toString());
-                    EventQueue.invokeLater(() -> BandReaderHapi.loadUri(uri));
-                }
-            }
+            loadURIList(msg, AppCommands::loadHapi, AppCommands::loadHapi);
         }));
-        addMessageHandler(inlineHandler("jhv.load.request", Load::request, Load::request));
-        addMessageHandler(inlineHandler("jhv.load.state", Load::state, Load::state));
-        addMessageHandler(inlineHandler("jhv.load.sunjson", uri -> Load.getAllSunJSON(List.of(uri)), Load::sunJSON));
+        addMessageHandler(inlineHandler("jhv.load.request", AppCommands::loadRequest, AppCommands::loadRequest));
+        addMessageHandler(inlineHandler("jhv.load.state", AppCommands::loadState, AppCommands::loadState));
+        addMessageHandler(inlineHandler("jhv.load.sunjson", AppCommands::loadSunJSON, AppCommands::loadSunJSON));
         declareSubscriptions(computeSubscriptions());
 
         setAutoconnect(10);
@@ -182,18 +144,43 @@ public class SampClient extends HubConnector {
 
     private static AbstractMessageHandler inlineHandler(String type, Consumer<URI> uriLoader, Consumer<String> valueLoader) {
         return new JHVSampHandler(type, (sender, msg) -> {
-            Object url = msg.getParam("url");
-            if (url != null) {
-                URI uri = toURI(url.toString());
-                EventQueue.invokeLater(() -> uriLoader.accept(uri));
-            } else {
+            if (!loadURI(msg, uriLoader)) {
                 Object value = msg.getParam("value");
                 if (value != null) {
                     String json = value.toString();
-                    EventQueue.invokeLater(() -> valueLoader.accept(json));
+                    invokeLater(valueLoader, json);
                 }
             }
         });
+    }
+
+    private static <T> void invokeLater(Consumer<T> consumer, T value) {
+        EventQueue.invokeLater(() -> consumer.accept(value));
+    }
+
+    private static boolean loadURI(Message msg, Consumer<URI> loader) throws Exception {
+        Object url = msg.getParam("url");
+        if (url == null)
+            return false;
+        URI uri = toURI(url.toString());
+        invokeLater(loader, uri);
+        return true;
+    }
+
+    private static void loadURIList(Message msg, Consumer<URI> uriLoader, Consumer<List<URI>> urisLoader) throws Exception {
+        JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
+        JSONArray ja = jo.optJSONArray("url");
+        if (ja == null) {
+            URI uri = toURI(jo.optString("url"));
+            invokeLater(uriLoader, uri);
+            return;
+        }
+
+        ArrayList<URI> uris = new ArrayList<>(ja.length());
+        for (Object obj : ja) {
+            uris.add(toURI(obj.toString()));
+        }
+        invokeLater(urisLoader, uris);
     }
 
     public static void notifyRequestData() {

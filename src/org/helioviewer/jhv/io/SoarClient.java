@@ -67,7 +67,7 @@ public class SoarClient {
         Load.getAllImage(imageUris);
     }
 
-    static void submitTable(@Nonnull URI uri) {
+    public static void submitTable(@Nonnull URI uri) {
         Tasks.submit(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
     }
 
