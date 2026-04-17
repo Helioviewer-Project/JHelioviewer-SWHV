@@ -71,12 +71,15 @@ Fields:
 - `Movie.AdvanceMode advanceMode`
 - `Integer speed`
 - `ViewerState.PlaybackSpeedUnit speedUnit`
+- `Integer firstFrame`
+- `Integer lastFrame`
 
 Semantics:
 
 - this is a partial-update command
 - `advanceMode == null` leaves playback mode unchanged
 - `speed` and `speedUnit` are applied together with the current missing half filled from [ViewerState.playbackData()](../src/org/helioviewer/jhv/gui/ViewerState.java)
+- `firstFrame` and `lastFrame` are applied together with the current missing half filled from [ViewerState.playbackData()](../src/org/helioviewer/jhv/gui/ViewerState.java)
 
 Current enum/value domains:
 
@@ -121,11 +124,7 @@ Effect:
 
 ### `seek-frame`
 
-Input type: `AppCommands.SeekFrameArgs`
-
-Fields:
-
-- `int frame`
+Input type: `int`
 
 Effect:
 
@@ -133,11 +132,7 @@ Effect:
 
 ### `seek-time`
 
-Input type: `AppCommands.SeekTimeArgs`
-
-Fields:
-
-- `JHVTime time`
+Input type: `JHVTime`
 
 Effect:
 
@@ -251,11 +246,10 @@ Effect:
 
 ### `load-image`
 
-Input type: `AppCommands.LoadURIsArgs`
+Input shape:
 
-Fields:
-
-- `List<URI> uris`
+- `URI`, or
+- non-empty `List<URI>`
 
 Effect:
 
@@ -263,11 +257,10 @@ Effect:
 
 ### `load-cdf`
 
-Input type: `AppCommands.LoadURIsArgs`
+Input shape:
 
-Fields:
-
-- `List<URI> uris`
+- `URI`, or
+- non-empty `List<URI>`
 
 Effect:
 
@@ -283,11 +276,10 @@ Effect:
 
 ### `load-hapi`
 
-Input type: `AppCommands.LoadURIsArgs`
+Input shape:
 
-Fields:
-
-- `List<URI> uris`
+- `URI`, or
+- non-empty `List<URI>`
 
 Effect:
 
