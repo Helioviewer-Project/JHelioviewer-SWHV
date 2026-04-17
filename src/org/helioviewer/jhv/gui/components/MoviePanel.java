@@ -11,8 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.Objects;
-
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -71,6 +69,24 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         @Override
         public String toString() {
             return str;
+        }
+
+        static SpeedUnit fromPlaybackSpeedUnit(ViewerState.PlaybackSpeedUnit playbackSpeedUnit) {
+            return switch (playbackSpeedUnit) {
+                case FRAMES_PER_SECOND -> FRAMESPERSECOND;
+                case MINUTES_PER_SECOND -> MINUTESPERSECOND;
+                case HOURS_PER_SECOND -> HOURSPERSECOND;
+                case DAYS_PER_SECOND -> DAYSPERSECOND;
+            };
+        }
+
+        ViewerState.PlaybackSpeedUnit toPlaybackSpeedUnit() {
+            return switch (this) {
+                case FRAMESPERSECOND -> ViewerState.PlaybackSpeedUnit.FRAMES_PER_SECOND;
+                case MINUTESPERSECOND -> ViewerState.PlaybackSpeedUnit.MINUTES_PER_SECOND;
+                case HOURSPERSECOND -> ViewerState.PlaybackSpeedUnit.HOURS_PER_SECOND;
+                case DAYSPERSECOND -> ViewerState.PlaybackSpeedUnit.DAYS_PER_SECOND;
+            };
         }
     }
 
@@ -216,22 +232,21 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         // Speed
         modePanel.add(new JLabel(" Play ", JLabel.RIGHT));
 
-        int speedMax = 120;
-        speedSpinner = new JHVSpinner(Movie.FPS_RELATIVE_DEFAULT, 1, speedMax, 1);
-        speedSpinner.setToolTipText("Maximum " + speedMax + " fps");
-        speedSpinner.addChangeListener(e -> updateMovieSpeed());
+        speedSpinner = new JHVSpinner(Movie.FPS_RELATIVE_DEFAULT, ViewerState.PLAYBACK_SPEED_MIN, ViewerState.PLAYBACK_SPEED_MAX, 1);
+        speedSpinner.setToolTipText("Maximum " + ViewerState.PLAYBACK_SPEED_MAX + " fps");
+        speedSpinner.addChangeListener(e -> updatePlaybackConfig());
         modePanel.add(speedSpinner);
 
         speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND});
         speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
-        speedUnitComboBox.addActionListener(e -> updateMovieSpeed());
+        speedUnitComboBox.addActionListener(e -> updatePlaybackConfig());
         modePanel.add(speedUnitComboBox);
 
         // Animation mode
         modePanel.add(new JLabel(" and ", JLabel.RIGHT));
 
-        advanceModeComboBox = new JComboBox<>(new AdvanceMode[]{AdvanceMode.Loop, AdvanceMode.Stop, AdvanceMode.Swing});
-        advanceModeComboBox.addActionListener(e -> Movie.setAdvanceMode((AdvanceMode) Objects.requireNonNull(advanceModeComboBox.getSelectedItem())));
+        advanceModeComboBox = new JComboBox<>(new AdvanceMode[]{AdvanceMode.Loop, AdvanceMode.Stop, AdvanceMode.Swing, AdvanceMode.SwingDown});
+        advanceModeComboBox.addActionListener(e -> ViewerState.setPlaybackAdvanceMode((AdvanceMode) advanceModeComboBox.getSelectedItem()));
         modePanel.add(advanceModeComboBox);
 
         // Record
@@ -271,7 +286,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(RecordSize.values());
         recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
-        recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) Objects.requireNonNull(recordSizeCombo.getSelectedItem())));
+        recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) recordSizeCombo.getSelectedItem()));
         c.gridx = 3;
         recordPanel.add(recordSizeCombo, c);
 
@@ -317,7 +332,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         setEnabledState(false);
         ViewerState.addMovieListener(this);
-        syncMovieState();
+        movieStateChanged();
     }
 
     @Override
@@ -409,7 +424,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
+                SpeedUnit unit = (SpeedUnit) speedUnitComboBox.getSelectedItem();
                 int fps = unit == SpeedUnit.FRAMESPERSECOND ? ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() : Movie.FPS_ABSOLUTE;
                 ExportMovie.start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
             } else {
@@ -458,14 +473,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         return size;
     }
 
-    private static void updateMovieSpeed() {
+    private static void updatePlaybackConfig() {
         int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-        SpeedUnit unit = (SpeedUnit) Objects.requireNonNull(speedUnitComboBox.getSelectedItem());
-        if (unit == SpeedUnit.FRAMESPERSECOND) {
-            Movie.setDesiredRelativeSpeed(speed);
-        } else {
-            Movie.setDesiredAbsoluteSpeed(speed * unit.secPerSecond);
-        }
+        SpeedUnit unit = (SpeedUnit) speedUnitComboBox.getSelectedItem();
+        if (unit == null)
+            return;
+        ViewerState.setPlaybackSpeed(speed, unit.toPlaybackSpeedUnit());
     }
 
     private static void setFrameSlider(int frame) {
@@ -507,11 +520,20 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     @Override
     public void movieStateChanged() {
-        syncMovieState();
-    }
-
-    private void syncMovieState() {
         ViewerState.MovieData movieData = ViewerState.movieData();
+        ViewerState.PlaybackData playbackData = ViewerState.playbackData();
+
+        if (advanceModeComboBox.getSelectedItem() != playbackData.advanceMode())
+            advanceModeComboBox.setSelectedItem(playbackData.advanceMode());
+
+        Integer speed = playbackData.speed();
+        if (!speed.equals(speedSpinner.getValue()))
+            speedSpinner.setValue(speed);
+
+        SpeedUnit speedUnit = SpeedUnit.fromPlaybackSpeedUnit(playbackData.speedUnit());
+        if (speedUnitComboBox.getSelectedItem() != speedUnit)
+            speedUnitComboBox.setSelectedItem(speedUnit);
+
         if (!movieData.available()) {
             unsetMovie();
             setPlayState(false);

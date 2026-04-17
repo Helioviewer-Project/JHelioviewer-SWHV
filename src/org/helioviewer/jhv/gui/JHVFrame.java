@@ -134,6 +134,7 @@ public class JHVFrame {
         leftPaneHost.add(leftScrollPane, BorderLayout.CENTER);
 
         interaction = new Interaction(Display.getCamera());
+        ViewerState.initFromInteraction();
         inputController = new InputController(interaction);
         renderCanvas.addMouseListener(inputController);
         renderCanvas.addMouseMotionListener(inputController);

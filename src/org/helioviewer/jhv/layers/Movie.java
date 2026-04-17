@@ -31,6 +31,7 @@ public class Movie {
 
     private static JHVTime playbackFirstTime = TimeUtils.START;
     private static JHVTime playbackLastTime = TimeUtils.START;
+    private static AdvanceMode currentAdvanceMode = AdvanceMode.Loop;
 
     @Nullable
     private static JHVTime nextTime(AdvanceMode mode, JHVTime time,
@@ -51,13 +52,13 @@ public class Movie {
                 }
                 case Swing -> {
                     if (next.milli == lastTime.get().milli) {
-                        setAdvanceMode(AdvanceMode.SwingDown);
+                        setCurrentAdvanceMode(AdvanceMode.SwingDown);
                         return lowerTime.apply(next);
                     }
                 }
                 case SwingDown -> {
                     if (next.milli == firstTime.get().milli) {
-                        setAdvanceMode(AdvanceMode.Swing);
+                        setCurrentAdvanceMode(AdvanceMode.Swing);
                         return higherTime.apply(next);
                     }
                 }
@@ -129,7 +130,7 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             View view = layer.getView();
-            JHVTime next = nextTime(advanceMode, lastTimestamp,
+            JHVTime next = nextTime(currentAdvanceMode, lastTimestamp,
                     () -> playbackFirstTime, () -> playbackLastTime,
                     time -> JHVTime.clamp(view.getLowerTime(time), playbackFirstTime, playbackLastTime),
                     time -> JHVTime.clamp(view.getHigherTime(time), playbackFirstTime, playbackLastTime));
@@ -144,7 +145,7 @@ public class Movie {
     private static void absoluteTimeAdvance() {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
-            JHVTime next = nextTime(advanceMode, lastTimestamp,
+            JHVTime next = nextTime(currentAdvanceMode, lastTimestamp,
                     () -> playbackFirstTime, () -> playbackLastTime,
                     time -> new JHVTime(Math.max(playbackFirstTime.milli, time.milli - deltaT)),
                     time -> new JHVTime(Math.min(playbackLastTime.milli, time.milli + deltaT)));
@@ -310,10 +311,12 @@ public class Movie {
         deltaT = 1000 / FPS_ABSOLUTE * sec;
     }
 
-    private static AdvanceMode advanceMode = AdvanceMode.Loop;
-
     public static void setAdvanceMode(AdvanceMode mode) {
-        advanceMode = mode;
+        currentAdvanceMode = mode;
+    }
+
+    private static void setCurrentAdvanceMode(AdvanceMode mode) {
+        currentAdvanceMode = mode;
     }
 
     private static boolean recording;
