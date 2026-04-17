@@ -35,7 +35,10 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.opengl.AngleCanvas;
 
-public class JHVFrame {
+public final class JHVFrame {
+
+    private JHVFrame() {
+    }
 
     @SuppressWarnings("serial")
     private static final class FixedWidthPanel extends JPanel {
@@ -107,7 +110,6 @@ public class JHVFrame {
     private static LayersPanel layersPanel;
     private static Layers layers;
 
-    private static ToolBar toolBar;
     private static MenuBar menuBar;
 
     public static JFrame prepare() {
@@ -158,7 +160,7 @@ public class JHVFrame {
         statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.RIGHT);
         statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.RIGHT);
 
-        toolBar = new ToolBar();
+        ToolBar toolBar = new ToolBar();
 
         JPanel toolBarPanel = new JPanel(new BorderLayout());
         toolBarPanel.add(toolBar, BorderLayout.CENTER);

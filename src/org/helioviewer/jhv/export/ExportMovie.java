@@ -15,7 +15,7 @@ import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.threads.JHVThread;
 
-public class ExportMovie implements Movie.Listener {
+public final class ExportMovie implements Movie.Listener {
 
     private static final ExportMovie instance = new ExportMovie();
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("JHV-EncodeMovie"));
