@@ -56,7 +56,7 @@ class GenericImage implements URIImageReader {
             */
             BufferedImage image = reader.read(0);
             LUT lut = readLUT(image);
-            ImageBuffer imageBuffer = readBuffered(image);
+            ImageBuffer imageBuffer = readBuffered(image, ImageFilter.Type.None);
             reader.dispose();
 
             return new URIImageReader.Image(xml, imageBuffer, lut);
@@ -89,10 +89,6 @@ class GenericImage implements URIImageReader {
         return reader;
     }
 
-    private static ImageBuffer readBuffered(BufferedImage image) {
-        return readBuffered(image, ImageFilter.Type.None);
-    }
-
     private static ImageBuffer readBuffered(BufferedImage image, ImageFilter.Type filterType) {
         int w = image.getWidth();
         int h = image.getHeight();
@@ -100,11 +96,11 @@ class GenericImage implements URIImageReader {
         switch (image.getType()) {
             case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> {
                 return new ImageBuffer(w, h, ImageBuffer.Format.Gray8,
-                        ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filterType, null);
+                        ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filterType);
             }
             case BufferedImage.TYPE_USHORT_GRAY -> {
                 return new ImageBuffer(w, h, ImageBuffer.Format.Gray16,
-                        ((DataBufferUShort) image.getRaster().getDataBuffer()).getData(), filterType, null);
+                        ((DataBufferUShort) image.getRaster().getDataBuffer()).getData(), filterType);
             }
             default -> {
                 BufferedImage conv = NativeImageFactory.createRGBAPremultipliedImage(w, h);

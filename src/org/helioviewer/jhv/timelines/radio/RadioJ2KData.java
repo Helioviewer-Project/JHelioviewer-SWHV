@@ -16,10 +16,11 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.view.DecodeExecutor;
+import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
-class RadioJ2KData implements ImageData.Handler {
+class RadioJ2KData implements View.DataHandler {
 
     private J2KViewCallisto view;
     private DecodeExecutor executor;

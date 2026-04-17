@@ -31,7 +31,7 @@ import org.helioviewer.jhv.wcs.WcsHeader;
 
 import org.json.JSONObject;
 
-public class ImageLayer extends AbstractLayer implements ImageData.Handler {
+public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final GLImage glImage;
     private final DecodeExecutor executor;
