@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.camera.Interaction;
@@ -24,14 +25,16 @@ public final class ViewerState {
     }
 
     public enum PlaybackSpeedUnit {
-        FRAMES_PER_SECOND(0),
-        MINUTES_PER_SECOND(60),
-        HOURS_PER_SECOND(3600),
-        DAYS_PER_SECOND(86400);
+        FRAMES_PER_SECOND("Frames/sec", 0),
+        MINUTES_PER_SECOND("Solar minutes/sec", 60),
+        HOURS_PER_SECOND("Solar hours/sec", 3600),
+        DAYS_PER_SECOND("Solar days/sec", 86400);
 
+        private final String label;
         private final int secPerSecond;
 
-        PlaybackSpeedUnit(int _secPerSecond) {
+        PlaybackSpeedUnit(String _label, int _secPerSecond) {
+            label = _label;
             secPerSecond = _secPerSecond;
         }
 
@@ -42,20 +45,82 @@ public final class ViewerState {
         public int secPerSecond() {
             return secPerSecond;
         }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    public enum RecordingMode {
+        LOOP("One loop"),
+        SHOT("Screenshot"),
+        FREE("Unlimited");
+
+        private final String label;
+
+        RecordingMode(String _label) {
+            label = _label;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    public enum RecordingSize {
+        ORIGINAL("On screen", 0, 0, false),
+        H1024("1024×1024", 1024, 1024, true),
+        H1080("1920×1080", 1920, 1080, true),
+        H2048("2048×2048", 2048, 2048, true),
+        H2160("3840×2160", 3840, 2160, true),
+        H4096("4096×4096", 4096, 4096, true);
+
+        private final String label;
+        private final int width;
+        private final int height;
+        private final boolean internal;
+
+        RecordingSize(String _label, int _width, int _height, boolean _internal) {
+            label = _label;
+            width = _width;
+            height = _height;
+            internal = _internal;
+        }
+
+        public boolean isInternal() {
+            return internal;
+        }
+
+        public Dimension getSize() {
+            if (this == ORIGINAL)
+                return new Dimension(Display.fullViewport.width, Display.fullViewport.height);
+            return new Dimension(width, height);
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 
     public record ModeData(ProjectionMode projection, Interaction.AnnotationMode annotationMode, boolean multiview,
                            boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {
     }
 
-    public record MovieData(boolean available, boolean playing, int maxFrame, int activeFrame) {
+    public record MovieData(boolean available, boolean playing, int maxFrame, int activeFrame, boolean recording) {
     }
 
     public record PlaybackData(Movie.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit) {
     }
 
+    public record RecordingData(RecordingMode mode, RecordingSize size) {
+    }
+
     private static final ArrayList<ModeListener> modeListeners = new ArrayList<>();
     private static final ArrayList<MovieListener> movieListeners = new ArrayList<>();
+    private static boolean suppressModeNotifications;
 
     private static ProjectionMode projection = Display.mode;
     private static Interaction.AnnotationMode annotationMode = Interaction.AnnotationMode.Cross;
@@ -73,17 +138,23 @@ public final class ViewerState {
     private static Movie.AdvanceMode playbackAdvanceMode = Movie.AdvanceMode.Loop;
     private static int playbackSpeed = Movie.FPS_RELATIVE_DEFAULT;
     private static PlaybackSpeedUnit playbackSpeedUnit = PlaybackSpeedUnit.FRAMES_PER_SECOND;
+    private static RecordingMode recordingMode = RecordingMode.LOOP;
+    private static RecordingSize recordingSize = RecordingSize.ORIGINAL;
 
     public static ModeData modeData() {
         return new ModeData(projection, getAnnotationMode(), multiview, tracking, refresh, showCorona, differentialRotation);
     }
 
     public static MovieData movieData() {
-        return new MovieData(movieAvailable, moviePlaying, movieMaxFrame, movieActiveFrame);
+        return new MovieData(movieAvailable, moviePlaying, movieMaxFrame, movieActiveFrame, Movie.isRecording());
     }
 
     public static PlaybackData playbackData() {
         return new PlaybackData(playbackAdvanceMode, playbackSpeed, playbackSpeedUnit);
+    }
+
+    public static RecordingData recordingData() {
+        return new RecordingData(recordingMode, recordingSize);
     }
 
     public static void writeModeJson(JSONObject target) {
@@ -124,65 +195,36 @@ public final class ViewerState {
         target.put("play", moviePlaying);
     }
 
-    public static MovieData readMovieJson(JSONObject source) {
-        MovieData current = movieData();
-        return new MovieData(
-                current.available(),
-                source.optBoolean("play", current.playing()),
-                current.maxFrame(),
-                current.activeFrame());
+    public static boolean readMoviePlaying(JSONObject source) {
+        return source.optBoolean("play", moviePlaying);
     }
 
     public static void applyMode(ModeData data) {
-        ProjectionMode newProjection = data.projection();
-        Interaction.AnnotationMode newAnnotationMode = data.annotationMode();
-        boolean changed = false;
-        boolean needsDisplay = false;
+        boolean changed = projection != data.projection()
+                || annotationMode != data.annotationMode()
+                || multiview != data.multiview()
+                || tracking != data.tracking()
+                || refresh != data.refresh()
+                || showCorona != data.showCorona()
+                || differentialRotation != data.differentialRotation();
 
-        if (projection != newProjection) {
-            projection = newProjection;
-            Display.setProjectionMode(newProjection);
-            changed = true;
-        }
-        if (annotationMode != newAnnotationMode) {
-            annotationMode = newAnnotationMode;
-            if (JHVFrame.getInteraction() != null)
-                JHVFrame.getInteraction().setAnnotationMode(newAnnotationMode);
-            changed = true;
-        }
-        if (multiview != data.multiview()) {
-            multiview = data.multiview();
-            Display.multiview = multiview;
-            ImageLayers.arrangeMultiView(multiview);
-            changed = true;
-        }
-        if (tracking != data.tracking()) {
-            tracking = data.tracking();
-            Display.getCamera().setTrackingMode(tracking);
-            changed = true;
-        }
-        if (refresh != data.refresh()) {
-            refresh = data.refresh();
-            ImageLayers.setRefreshMode(refresh);
-            changed = true;
-        }
-        if (showCorona != data.showCorona()) {
-            showCorona = data.showCorona();
-            Display.setShowCorona(showCorona);
-            changed = true;
-            needsDisplay = true;
-        }
-        if (differentialRotation != data.differentialRotation()) {
-            differentialRotation = data.differentialRotation();
-            ImageLayers.setDiffRotationMode(differentialRotation);
-            changed = true;
-            needsDisplay = true;
+        if (!changed)
+            return;
+
+        suppressModeNotifications = true;
+        try {
+            setProjection(data.projection());
+            setAnnotationMode(data.annotationMode());
+            setMultiview(data.multiview());
+            setTracking(data.tracking());
+            setRefresh(data.refresh());
+            setShowCorona(data.showCorona());
+            setDifferentialRotation(data.differentialRotation());
+        } finally {
+            suppressModeNotifications = false;
         }
 
-        if (needsDisplay)
-            MovieDisplay.display();
-        if (changed)
-            notifyModeListeners();
+        notifyModeListeners();
     }
 
     public static ProjectionMode getProjection() {
@@ -285,24 +327,12 @@ public final class ViewerState {
         notifyModeListeners();
     }
 
-    public static boolean isMoviePlaying() {
-        return moviePlaying;
-    }
-
     public static void setMoviePlaying(boolean newMoviePlaying) {
         if (moviePlaying == newMoviePlaying)
             return;
 
         moviePlaying = newMoviePlaying;
         notifyMovieListeners();
-    }
-
-    public static boolean isMovieAvailable() {
-        return movieAvailable;
-    }
-
-    public static int getMovieMaxFrame() {
-        return movieMaxFrame;
     }
 
     public static void setMovieAvailable(int newMovieMaxFrame) {
@@ -314,17 +344,13 @@ public final class ViewerState {
     }
 
     public static void clearMovie() {
-        boolean changed = movieAvailable || movieMaxFrame != 0 || movieActiveFrame != 0 || moviePlaying;
+        boolean changed = movieAvailable || movieMaxFrame != 0 || movieActiveFrame != 0 || moviePlaying || Movie.isRecording();
         movieAvailable = false;
         movieMaxFrame = 0;
         movieActiveFrame = 0;
         moviePlaying = false;
         if (changed)
             notifyMovieListeners();
-    }
-
-    public static int getMovieActiveFrame() {
-        return movieActiveFrame;
     }
 
     public static void setMovieActiveFrame(int newMovieActiveFrame) {
@@ -335,8 +361,8 @@ public final class ViewerState {
         notifyMovieListeners();
     }
 
-    public static Movie.AdvanceMode getPlaybackAdvanceMode() {
-        return playbackAdvanceMode;
+    public static void movieRecordingChanged() {
+        notifyMovieListeners();
     }
 
     public static void setPlaybackAdvanceMode(Movie.AdvanceMode newPlaybackAdvanceMode) {
@@ -346,14 +372,6 @@ public final class ViewerState {
         playbackAdvanceMode = newPlaybackAdvanceMode;
         Movie.setAdvanceMode(newPlaybackAdvanceMode);
         notifyMovieListeners();
-    }
-
-    public static int getPlaybackSpeed() {
-        return playbackSpeed;
-    }
-
-    public static PlaybackSpeedUnit getPlaybackSpeedUnit() {
-        return playbackSpeedUnit;
     }
 
     public static void setPlaybackSpeed(int newPlaybackSpeed, PlaybackSpeedUnit newPlaybackSpeedUnit) {
@@ -372,6 +390,22 @@ public final class ViewerState {
             Movie.setDesiredRelativeSpeed(playbackSpeed);
         else
             Movie.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
+    }
+
+    public static void setRecordingMode(RecordingMode newRecordingMode) {
+        if (recordingMode == newRecordingMode)
+            return;
+
+        recordingMode = newRecordingMode;
+        notifyMovieListeners();
+    }
+
+    public static void setRecordingSize(RecordingSize newRecordingSize) {
+        if (recordingSize == newRecordingSize)
+            return;
+
+        recordingSize = newRecordingSize;
+        notifyMovieListeners();
     }
 
     public static void addModeListener(ModeListener listener) {
@@ -393,6 +427,8 @@ public final class ViewerState {
     }
 
     private static void notifyModeListeners() {
+        if (suppressModeNotifications)
+            return;
         modeListeners.forEach(ModeListener::modeStateChanged);
     }
 
