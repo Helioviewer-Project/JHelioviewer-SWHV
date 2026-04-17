@@ -25,7 +25,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.helioviewer.jhv.export.ExportMovie;
+import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
@@ -38,7 +38,6 @@ import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -82,24 +81,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     public static MoviePanel getInstance() {
         return instance == null ? instance = new MoviePanel() : instance;
-    }
-
-    private static void unsetMovie() {
-        timeSlider.setMaximum(0);
-        timeSlider.repaint();
-        setEnabledState(false);
-
-        if (Movie.isRecording())
-            ExportMovie.shallStop();
-        recordButton.setEnabled(false);
-    }
-
-    private static void setMovie(int max) {
-        timeSlider.setMaximum(max);
-        timeSlider.repaint();
-        setEnabledState(true);
-
-        recordButton.setEnabled(true);
     }
 
     private MoviePanel() {
@@ -160,13 +141,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         // Speed
         modePanel.add(new JLabel(" Play ", JLabel.RIGHT));
 
-        speedSpinner = new JHVSpinner(Movie.FPS_RELATIVE_DEFAULT, ViewerState.PLAYBACK_SPEED_MIN, ViewerState.PLAYBACK_SPEED_MAX, 1);
+        speedSpinner = new JHVSpinner(ViewerState.playbackData().speed(), ViewerState.PLAYBACK_SPEED_MIN, ViewerState.PLAYBACK_SPEED_MAX, 1);
         speedSpinner.setToolTipText("Maximum " + ViewerState.PLAYBACK_SPEED_MAX + " fps");
         speedSpinner.addChangeListener(e -> updatePlaybackConfig());
         modePanel.add(speedSpinner);
 
         speedUnitComboBox = new JComboBox<>(ViewerState.PlaybackSpeedUnit.values());
-        speedUnitComboBox.setSelectedItem(ViewerState.PlaybackSpeedUnit.FRAMES_PER_SECOND);
         speedUnitComboBox.addActionListener(e -> updatePlaybackConfig());
         modePanel.add(speedUnitComboBox);
 
@@ -187,7 +167,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         loopButton = new JRadioButton(ViewerState.RecordingMode.LOOP.toString());
         shotButton = new JRadioButton(ViewerState.RecordingMode.SHOT.toString());
         freeButton = new JRadioButton(ViewerState.RecordingMode.FREE.toString());
-        loopButton.setSelected(true);
 
         c.gridy = 0;
         c.gridx = 0;
@@ -213,7 +192,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         recordPanel.add(new JLabel("Size ", JLabel.RIGHT), c);
 
         recordSizeComboBox = new JComboBox<>(ViewerState.RecordingSize.values());
-        recordSizeComboBox.setSelectedItem(ViewerState.RecordingSize.ORIGINAL);
         recordSizeComboBox.addActionListener(e -> ViewerState.setRecordingSize((ViewerState.RecordingSize) recordSizeComboBox.getSelectedItem()));
         c.gridx = 3;
         recordPanel.add(recordSizeComboBox, c);
@@ -331,13 +309,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                ViewerState.PlaybackData playbackData = ViewerState.playbackData();
-                ViewerState.RecordingData recordingData = ViewerState.recordingData();
-                int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
-                Dimension size = recordingData.size().getSize();
-                ExportMovie.start(size.width, size.height, recordingData.size().isInternal(), fps, recordingData.mode());
+                AppCommands.recordStart(null);
             } else {
-                ExportMovie.shallStop();
+                AppCommands.recordStop();
             }
         }
     }
@@ -379,23 +353,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         if (unit == null)
             return;
         ViewerState.setPlaybackSpeed(speed, unit);
-    }
-
-    private static void setFrameSlider(int frame) {
-        timeSlider.setAllowFrame(false);
-        timeSlider.setValue(frame);
-        timeSlider.setAllowFrame(true);
-    }
-
-    // only for Layers
-    private static void setPlayState(boolean play) {
-        if (play) {
-            playButton.setText(Buttons.pause);
-            playButton.setToolTipText("Pause movie");
-        } else {
-            playButton.setText(Buttons.play);
-            playButton.setToolTipText("Play movie");
-        }
     }
 
     public static TimeSlider getTimeSlider() {
@@ -446,16 +403,27 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         ComponentUtils.setEnabled(modePanel, !movieData.recording());
         ComponentUtils.setEnabled(recordPanel, !movieData.recording());
 
-        if (!movieData.available()) {
-            unsetMovie();
-            setPlayState(false);
-            setFrameSlider(0);
-            return;
+        boolean available = movieData.available();
+        if (timeSlider.getMaximum() != (available ? movieData.maxFrame() : 0)) {
+            timeSlider.setMaximum(available ? movieData.maxFrame() : 0);
+            timeSlider.repaint();
+        }
+        setEnabledState(available);
+        if (!available && movieData.recording())
+            AppCommands.recordStop();
+
+        if (available && movieData.playing()) {
+            playButton.setText(Buttons.pause);
+            playButton.setToolTipText("Pause movie");
+        } else {
+            playButton.setText(Buttons.play);
+            playButton.setToolTipText("Play movie");
         }
 
-        setMovie(movieData.maxFrame());
-        setPlayState(movieData.playing());
-        setFrameSlider(movieData.activeFrame());
+        int activeFrame = available ? movieData.activeFrame() : 0;
+        timeSlider.setAllowFrame(false);
+        timeSlider.setValue(activeFrame);
+        timeSlider.setAllowFrame(true);
     }
 
     private static class PlayPauseAction extends Actions.AbstractKeyAction {
@@ -466,7 +434,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Movie.toggle();
+            AppCommands.togglePlayback();
             putValue(NAME, playButton.getToolTipText());
         }
 
@@ -480,9 +448,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Movie.isPlaying())
-                Movie.pause();
-            Movie.previousFrame();
+            if (ViewerState.movieData().playing())
+                AppCommands.pause();
+            AppCommands.previousFrame();
         }
 
     }
@@ -495,9 +463,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Movie.isPlaying())
-                Movie.pause();
-            Movie.nextFrame();
+            if (ViewerState.movieData().playing())
+                AppCommands.pause();
+            AppCommands.nextFrame();
         }
 
     }

@@ -19,16 +19,28 @@ public final class Load {
         }
     }
 
+    public static void getAllCDF(@Nonnull URI uri) {
+        LoadRequest.submitCDF(List.of(uri));
+    }
+
     public static void getAllImage(@Nonnull List<URI> uris) {
         if (!uris.isEmpty()) {
             LoadLayer.submit(ImageLayer.create(null), uris);
         }
     }
 
+    public static void getAllImage(@Nonnull URI uri) {
+        LoadLayer.submit(ImageLayer.create(null), List.of(uri));
+    }
+
     public static void getAllSunJSON(@Nonnull List<URI> uris) {
         if (!uris.isEmpty()) {
             LoadSunJSON.submit(uris);
         }
+    }
+
+    public static void getAllSunJSON(@Nonnull URI uri) {
+        LoadSunJSON.submit(List.of(uri));
     }
 
     public static void request(@Nonnull URI uri) {

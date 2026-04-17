@@ -6,9 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,20 +106,20 @@ public final class SampClient extends HubConnector {
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
 
-        addMessageHandler(new JHVSampHandler("image.load.fits", (sender, msg) -> loadURI(msg, AppCommands.LOAD_IMAGE, uri -> new AppCommands.LoadURIsArgs(List.of(uri)))));
+        addMessageHandler(new JHVSampHandler("image.load.fits", (sender, msg) -> loadURI(msg, AppCommands.LOAD_IMAGE)));
         // load VOTable only from SOAR
         addMessageHandler(new JHVSampHandler("table.load.votable", (sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender))
-                loadURI(msg, AppCommands.LOAD_VOTABLE, uri -> uri);
+                loadURI(msg, AppCommands.LOAD_VOTABLE);
         }));
         // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
         addMessageHandler(new JHVSampHandler("table.load.fits", (sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
-                loadURI(msg, AppCommands.LOAD_IMAGE, uri -> new AppCommands.LoadURIsArgs(List.of(uri)));
+                loadURI(msg, AppCommands.LOAD_IMAGE);
             }
         }));
         // advertise we can load CDF, although we can do only MAG and SWA
-        addMessageHandler(new JHVSampHandler("table.load.cdf", (sender, msg) -> loadURI(msg, AppCommands.LOAD_CDF, uri -> new AppCommands.LoadURIsArgs(List.of(uri)))));
+        addMessageHandler(new JHVSampHandler("table.load.cdf", (sender, msg) -> loadURI(msg, AppCommands.LOAD_CDF)));
         addMessageHandler(new JHVSampHandler("jhv.load.image", (sender, msg) -> loadURIList(msg, AppCommands.LOAD_IMAGE)));
         // Add handler for the HAPI csv files
         addMessageHandler(new JHVSampHandler("jhv.load.hapi", (sender, msg) -> loadURIList(msg, AppCommands.LOAD_HAPI)));
@@ -135,11 +133,10 @@ public final class SampClient extends HubConnector {
 
     private static AbstractMessageHandler inlineHandler(String type, String commandId) {
         return new JHVSampHandler(type, (sender, msg) -> {
-            if (!loadURI(msg, commandId, uri -> new AppCommands.LoadURIOrJSONArgs(uri, null))) {
+            if (!loadURI(msg, commandId)) {
                 Object value = msg.getParam("value");
                 if (value != null) {
-                    String json = value.toString();
-                    invokeCommand(commandId, new AppCommands.LoadURIOrJSONArgs(null, json));
+                    invokeCommand(commandId, value.toString());
                 }
             }
         });
@@ -155,12 +152,12 @@ public final class SampClient extends HubConnector {
         });
     }
 
-    private static <I> boolean loadURI(Message msg, String commandId, Function<URI, I> inputFactory) throws Exception {
+    private static boolean loadURI(Message msg, String commandId) throws Exception {
         Object url = msg.getParam("url");
         if (url == null)
             return false;
         URI uri = toURI(url.toString());
-        invokeCommand(commandId, inputFactory.apply(uri));
+        invokeCommand(commandId, uri);
         return true;
     }
 
@@ -169,7 +166,7 @@ public final class SampClient extends HubConnector {
         JSONArray ja = jo.optJSONArray("url");
         if (ja == null) {
             URI uri = toURI(jo.optString("url"));
-            invokeCommand(commandId, new AppCommands.LoadURIsArgs(List.of(uri)));
+            invokeCommand(commandId, uri);
             return;
         }
 
@@ -177,7 +174,7 @@ public final class SampClient extends HubConnector {
         for (Object obj : ja) {
             uris.add(toURI(obj.toString()));
         }
-        invokeCommand(commandId, new AppCommands.LoadURIsArgs(uris));
+        invokeCommand(commandId, uris);
     }
 
     public static void notifyRequestData() {

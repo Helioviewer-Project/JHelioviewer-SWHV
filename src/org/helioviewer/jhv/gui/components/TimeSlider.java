@@ -20,19 +20,20 @@ import javax.swing.JSlider;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.view.View;
 
 // Extension of JSlider displaying the caching status on the track.
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener {
+public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, ViewerState.PlaybackRangeListener {
 
     private enum DragMode {
         Frame, Range, RangeStart, RangeEnd
@@ -46,8 +47,6 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     private boolean dirty;
     private boolean wasPlaying;
     private boolean allowSetFrame = true;
-    private int rangeMin;
-    private int rangeMax;
     private int dragAnchorValue;
     private int dragRangeMin;
     private int dragRangeMax;
@@ -56,8 +55,6 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     public TimeSlider(int _orientation, int min, int max, int value) {
         super(_orientation, min, max, value);
         setSnapToTicks(true);
-        rangeMin = min;
-        rangeMax = max;
 
         sliderUI = new TimeSliderUI(this);
         setUI(sliderUI);
@@ -73,6 +70,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         UITimer.register(this);
+        ViewerState.addPlaybackRangeListener(this);
 
         frameNumberLabel = new JLabel((getValue() + 1) + "/" + (getMaximum() + 1), JLabel.RIGHT);
     }
@@ -88,16 +86,14 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void setMaximum(int maximum) {
         super.setMaximum(maximum);
-        rangeMin = getMinimum();
-        rangeMax = maximum;
-        Movie.setPlaybackRange(rangeMin, rangeMax);
+        AppCommands.setPlaybackRange(getMinimum(), maximum);
         repaint();
     }
 
     private void setRange(int min, int max) {
-        rangeMin = Math.clamp(Math.min(min, max), getMinimum(), getMaximum());
-        rangeMax = Math.clamp(Math.max(min, max), getMinimum(), getMaximum());
-        Movie.setPlaybackRange(rangeMin, rangeMax);
+        AppCommands.setPlaybackRange(
+                Math.clamp(Math.min(min, max), getMinimum(), getMaximum()),
+                Math.clamp(Math.max(min, max), getMinimum(), getMaximum()));
         repaint();
     }
 
@@ -129,15 +125,15 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     public void setValue(int n) {
         super.setValue(n);
         if (allowSetFrame)
-            Movie.setFrame(n);
+            AppCommands.seekFrame(n);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0)
-            Movie.nextFrame();
+            AppCommands.nextFrame();
         else if (e.getWheelRotation() > 0)
-            Movie.previousFrame();
+            AppCommands.previousFrame();
     }
 
     @Override
@@ -145,10 +141,10 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         setCursor(cursorFor(dragMode));
         int value = sliderUI.valueForXPosition(e.getX());
         switch (dragMode) {
-            case Frame -> setValue(Math.clamp(value, rangeMin, rangeMax));
+            case Frame -> setValue(Math.clamp(value, getPlaybackFirstFrame(), getPlaybackLastFrame()));
             case Range -> dragRange(value);
-            case RangeStart -> setRange(value, rangeMax);
-            case RangeEnd -> setRange(rangeMin, value);
+            case RangeStart -> setRange(value, getPlaybackLastFrame());
+            case RangeEnd -> setRange(getPlaybackFirstFrame(), value);
         }
     }
 
@@ -173,13 +169,13 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void mousePressed(MouseEvent e) {
-        wasPlaying = Movie.isPlaying();
+        wasPlaying = ViewerState.movieData().playing();
         if (wasPlaying)
-            Movie.pause();
+            AppCommands.pause();
         dragMode = dragModeFor(e);
         dragAnchorValue = sliderUI.valueForXPosition(e.getX());
-        dragRangeMin = rangeMin;
-        dragRangeMax = rangeMax;
+        dragRangeMin = getPlaybackFirstFrame();
+        dragRangeMax = getPlaybackLastFrame();
         setCursor(cursorFor(e));
         mouseDragged(e);
     }
@@ -189,7 +185,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         dragMode = DragMode.Frame;
         setCursor(cursorFor(e));
         if (wasPlaying)
-            Movie.play();
+            AppCommands.play();
     }
 
     private void dragRange(int value) {
@@ -233,9 +229,22 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     }
 
     private DragMode nearestBoundary(int x) {
-        int rangeStartX = sliderUI.xPosition(rangeMin);
-        int rangeEndX = sliderUI.xPosition(rangeMax);
+        int rangeStartX = sliderUI.xPosition(getPlaybackFirstFrame());
+        int rangeEndX = sliderUI.xPosition(getPlaybackLastFrame());
         return Math.abs(x - rangeStartX) <= Math.abs(x - rangeEndX) ? DragMode.RangeStart : DragMode.RangeEnd;
+    }
+
+    private static int getPlaybackFirstFrame() {
+        return ViewerState.playbackData().firstFrame();
+    }
+
+    private static int getPlaybackLastFrame() {
+        return ViewerState.playbackData().lastFrame();
+    }
+
+    @Override
+    public void playbackRangeChanged() {
+        repaint();
     }
 
     // Extension of BasicSliderUI overriding some drawing functions.
@@ -301,8 +310,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
                 }
             }
 
-            int rangeStartX = xPosition(timeSlider.rangeMin);
-            int rangeEndX = xPosition(timeSlider.rangeMax);
+            int rangeStartX = xPosition(getPlaybackFirstFrame());
+            int rangeEndX = xPosition(getPlaybackLastFrame());
             int left = Math.min(rangeStartX, rangeEndX);
             int right = Math.max(rangeStartX, rangeEndX);
             int width = Math.max(1, right - left + 1);
@@ -312,8 +321,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
         private void paintRangeMarkers(Graphics2D g) {
             TimeSlider timeSlider = (TimeSlider) slider;
-            int rangeStartX = xPosition(timeSlider.rangeMin);
-            int rangeEndX = xPosition(timeSlider.rangeMax);
+            int rangeStartX = xPosition(getPlaybackFirstFrame());
+            int rangeEndX = xPosition(getPlaybackLastFrame());
             int left = Math.min(rangeStartX, rangeEndX);
             int right = Math.max(rangeStartX, rangeEndX);
             int markerY = trackRect.y + trackRect.height - 1;

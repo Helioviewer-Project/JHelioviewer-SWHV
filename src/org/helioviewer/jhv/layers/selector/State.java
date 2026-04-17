@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -209,10 +210,10 @@ public final class State {
 
         private void applyRestoredPlaybackState() {
             ViewerState.applyMode(modeData);
-            Movie.setTime(time);
+            AppCommands.seekTime(time);
             Display.getCamera().refresh();
             if (moviePlaying)
-                Movie.play();
+                AppCommands.play();
         }
 
         @Override

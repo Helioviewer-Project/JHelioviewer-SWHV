@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Camera;
@@ -107,8 +108,8 @@ public final class ExportMovie implements Movie.Listener {
 
             if (mode == ViewerState.RecordingMode.LOOP) {
                 Movie.addFrameListener(instance);
-                Movie.setFrame(0);
-                Movie.play();
+                AppCommands.seekFrame(0);
+                AppCommands.play();
             }
         }
     }
