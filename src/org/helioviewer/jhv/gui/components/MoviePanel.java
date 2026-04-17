@@ -25,7 +25,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;

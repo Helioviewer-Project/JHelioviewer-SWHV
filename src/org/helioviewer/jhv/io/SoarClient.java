@@ -14,7 +14,10 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class SoarClient {
+public final class SoarClient {
+
+    private SoarClient() {
+    }
 
     private static final String querySoops = "SELECT DISTINCT soop_name FROM soop ORDER BY soop_name";
     private static final UriTemplate queryTemplate = new UriTemplate("https://soar.esac.esa.int/soar-sl-tap/tap/sync",

@@ -35,7 +35,10 @@ import com.google.common.util.concurrent.FutureCallback;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class State {
+public final class State {
+
+    private State() {
+    }
 
     public static void save(String dir, String file) {
         try (BufferedWriter writer = Files.newBufferedWriter(Path.of(dir, file))) {
