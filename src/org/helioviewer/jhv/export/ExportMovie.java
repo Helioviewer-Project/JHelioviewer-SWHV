@@ -7,8 +7,7 @@ import java.util.concurrent.Executors;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.MoviePanel.RecordMode;
+import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.Movie;
@@ -24,7 +23,7 @@ public class ExportMovie implements Movie.Listener {
     private static MovieExporter exporter;
     private static GLGrab grabber;
 
-    private static RecordMode mode;
+    private static ViewerState.RecordingMode mode;
     private static boolean shallStop;
 
     public static BufferedImage EVEImage = null;
@@ -74,9 +73,8 @@ public class ExportMovie implements Movie.Listener {
 
     private static final int MACROBLOCK = 8;
 
-    public static void start(int _w, int _h, boolean isInternal, int fps, RecordMode _mode) {
+    public static void start(int _w, int _h, boolean isInternal, int fps, ViewerState.RecordingMode _mode) {
         Movie.startRecording();
-        MoviePanel.setEnabledOptions(false);
         shallStop = false;
 
         int scrw = 1;
@@ -87,15 +85,15 @@ public class ExportMovie implements Movie.Listener {
         }
 
         mode = _mode;
-        int canvasWidth = mode == RecordMode.SHOT ? _w : (_w / MACROBLOCK) * MACROBLOCK;
+        int canvasWidth = mode == ViewerState.RecordingMode.SHOT ? _w : (_w / MACROBLOCK) * MACROBLOCK;
         int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
         int canvasHeight = isInternal ? _h - sh : _h;
-        int exportHeight = mode == RecordMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
+        int exportHeight = mode == ViewerState.RecordingMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
 
         canvasHeight = exportHeight - sh;
         grabber = new GLGrab(canvasWidth, canvasHeight);
 
-        if (mode == RecordMode.SHOT) {
+        if (mode == ViewerState.RecordingMode.SHOT) {
             exporter = new MovieExporter(VideoFormat.PNG, canvasWidth, exportHeight, fps);
             shallStop = true;
             MovieDisplay.render(1);
@@ -107,7 +105,7 @@ public class ExportMovie implements Movie.Listener {
             }
             exporter = new MovieExporter(format, canvasWidth, exportHeight, fps);
 
-            if (mode == RecordMode.LOOP) {
+            if (mode == ViewerState.RecordingMode.LOOP) {
                 Movie.addFrameListener(instance);
                 Movie.setFrame(0);
                 Movie.play();
@@ -117,9 +115,7 @@ public class ExportMovie implements Movie.Listener {
 
     private static void stop() {
         Movie.stopRecording();
-        MoviePanel.setEnabledOptions(true);
-        MoviePanel.unselectRecordButton();
-        if (mode == RecordMode.LOOP) {
+        if (mode == ViewerState.RecordingMode.LOOP) {
             Movie.removeFrameListener(instance);
         }
 

@@ -328,10 +328,12 @@ public class Movie {
 
     public static void startRecording() {
         recording = true;
+        ViewerState.movieRecordingChanged();
     }
 
     public static void stopRecording() {
         recording = false;
+        ViewerState.movieRecordingChanged();
     }
 
     public static boolean isRecording() {

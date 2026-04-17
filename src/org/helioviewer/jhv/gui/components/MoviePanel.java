@@ -54,82 +54,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
 
-    // different animation speeds
-    private enum SpeedUnit {
-        FRAMESPERSECOND("Frames/sec", 0), MINUTESPERSECOND("Solar minutes/sec", 60), HOURSPERSECOND("Solar hours/sec", 3600), DAYSPERSECOND("Solar days/sec", 86400);
-
-        private final String str;
-        final int secPerSecond;
-
-        SpeedUnit(String _str, int s) {
-            str = _str;
-            secPerSecond = s;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-
-        static SpeedUnit fromPlaybackSpeedUnit(ViewerState.PlaybackSpeedUnit playbackSpeedUnit) {
-            return switch (playbackSpeedUnit) {
-                case FRAMES_PER_SECOND -> FRAMESPERSECOND;
-                case MINUTES_PER_SECOND -> MINUTESPERSECOND;
-                case HOURS_PER_SECOND -> HOURSPERSECOND;
-                case DAYS_PER_SECOND -> DAYSPERSECOND;
-            };
-        }
-
-        ViewerState.PlaybackSpeedUnit toPlaybackSpeedUnit() {
-            return switch (this) {
-                case FRAMESPERSECOND -> ViewerState.PlaybackSpeedUnit.FRAMES_PER_SECOND;
-                case MINUTESPERSECOND -> ViewerState.PlaybackSpeedUnit.MINUTES_PER_SECOND;
-                case HOURSPERSECOND -> ViewerState.PlaybackSpeedUnit.HOURS_PER_SECOND;
-                case DAYSPERSECOND -> ViewerState.PlaybackSpeedUnit.DAYS_PER_SECOND;
-            };
-        }
-    }
-
-    public enum RecordMode {
-        LOOP, SHOT, FREE
-    }
-
-    private enum RecordSize {
-        ORIGINAL("On screen", 0, 0, false),
-        H1024("1024×1024", 1024, 1024, true),
-        H1080("1920×1080", 1920, 1080, true),
-        H2048("2048×2048", 2048, 2048, true),
-        H2160("3840×2160", 3840, 2160, true),
-        H4096("4096×4096", 4096, 4096, true);
-
-        private final String label;
-        private final int width;
-        private final int height;
-        private final boolean internal;
-
-        RecordSize(String _label, int _width, int _height, boolean _internal) {
-            label = _label;
-            width = _width;
-            height = _height;
-            internal = _internal;
-        }
-
-        boolean isInternal() {
-            return internal;
-        }
-
-        Dimension getSize() {
-            if (this == ORIGINAL)
-                return new Dimension(Display.fullViewport.width, Display.fullViewport.height);
-            return new Dimension(width, height);
-        }
-
-        @Override
-        public String toString() {
-            return label;
-        }
-    }
-
     private static boolean isAdvanced;
 
     private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
@@ -145,8 +69,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     private static JideButton advancedButton;
     private static JHVSpinner speedSpinner;
-    private static JComboBox<SpeedUnit> speedUnitComboBox;
+    private static JComboBox<ViewerState.PlaybackSpeedUnit> speedUnitComboBox;
     private static JComboBox<AdvanceMode> advanceModeComboBox;
+    private static JRadioButton loopButton;
+    private static JRadioButton shotButton;
+    private static JRadioButton freeButton;
+    private static JComboBox<ViewerState.RecordingSize> recordSizeComboBox;
 
     private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
     private static final JPanel recordPanel = new JPanel(new GridBagLayout());
@@ -162,7 +90,8 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         timeSlider.repaint();
         setEnabledState(false);
 
-        clickRecordButton();
+        if (Movie.isRecording())
+            ExportMovie.shallStop();
         recordButton.setEnabled(false);
     }
 
@@ -237,8 +166,8 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         speedSpinner.addChangeListener(e -> updatePlaybackConfig());
         modePanel.add(speedSpinner);
 
-        speedUnitComboBox = new JComboBox<>(new SpeedUnit[]{SpeedUnit.FRAMESPERSECOND, SpeedUnit.MINUTESPERSECOND, SpeedUnit.HOURSPERSECOND, SpeedUnit.DAYSPERSECOND});
-        speedUnitComboBox.setSelectedItem(SpeedUnit.FRAMESPERSECOND);
+        speedUnitComboBox = new JComboBox<>(ViewerState.PlaybackSpeedUnit.values());
+        speedUnitComboBox.setSelectedItem(ViewerState.PlaybackSpeedUnit.FRAMES_PER_SECOND);
         speedUnitComboBox.addActionListener(e -> updatePlaybackConfig());
         modePanel.add(speedUnitComboBox);
 
@@ -256,9 +185,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         c.weighty = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        JRadioButton loopButton = new JRadioButton("One loop");
-        JRadioButton shotButton = new JRadioButton("Screenshot");
-        JRadioButton freeButton = new JRadioButton("Unlimited");
+        loopButton = new JRadioButton(ViewerState.RecordingMode.LOOP.toString());
+        shotButton = new JRadioButton(ViewerState.RecordingMode.SHOT.toString());
+        freeButton = new JRadioButton(ViewerState.RecordingMode.FREE.toString());
         loopButton.setSelected(true);
 
         c.gridy = 0;
@@ -276,19 +205,19 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         group.add(shotButton);
         group.add(freeButton);
 
-        loopButton.addActionListener(e -> recordButton.setRecordMode(RecordMode.LOOP));
-        shotButton.addActionListener(e -> recordButton.setRecordMode(RecordMode.SHOT));
-        freeButton.addActionListener(e -> recordButton.setRecordMode(RecordMode.FREE));
+        loopButton.addActionListener(e -> ViewerState.setRecordingMode(ViewerState.RecordingMode.LOOP));
+        shotButton.addActionListener(e -> ViewerState.setRecordingMode(ViewerState.RecordingMode.SHOT));
+        freeButton.addActionListener(e -> ViewerState.setRecordingMode(ViewerState.RecordingMode.FREE));
 
         c.gridy = 1;
         c.gridx = 2;
         recordPanel.add(new JLabel("Size ", JLabel.RIGHT), c);
 
-        JComboBox<RecordSize> recordSizeCombo = new JComboBox<>(RecordSize.values());
-        recordSizeCombo.setSelectedItem(RecordSize.ORIGINAL);
-        recordSizeCombo.addActionListener(e -> recordButton.setRecordSize((RecordSize) recordSizeCombo.getSelectedItem()));
+        recordSizeComboBox = new JComboBox<>(ViewerState.RecordingSize.values());
+        recordSizeComboBox.setSelectedItem(ViewerState.RecordingSize.ORIGINAL);
+        recordSizeComboBox.addActionListener(e -> ViewerState.setRecordingSize((ViewerState.RecordingSize) recordSizeComboBox.getSelectedItem()));
         c.gridx = 3;
-        recordPanel.add(recordSizeCombo, c);
+        recordPanel.add(recordSizeComboBox, c);
 
         timeSelectorPanel.addListener(Layers.getInstance());
 
@@ -391,28 +320,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         }
     }
 
-    private static void clickRecordButton() {
-        if (recordButton.isSelected()) {
-            recordButton.setSelected(false);
-            recordButton.actionPerformed(null);
-        }
-    }
-
-    public static void unselectRecordButton() {
-        if (recordButton.isSelected())
-            recordButton.setSelected(false);
-    }
-
-    public static void setEnabledOptions(boolean enabled) {
-        ComponentUtils.setEnabled(modePanel, enabled);
-        ComponentUtils.setEnabled(recordPanel, enabled);
-    }
-
     private static class RecordButton extends JideToggleButton implements ActionListener {
-
-        private RecordMode mode = RecordMode.LOOP;
-        private RecordSize size = RecordSize.ORIGINAL;
-
         RecordButton(float fontSize) {
             super(Buttons.record);
             setFont(Buttons.getMaterialFont(fontSize));
@@ -424,22 +332,15 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                SpeedUnit unit = (SpeedUnit) speedUnitComboBox.getSelectedItem();
-                int fps = unit == SpeedUnit.FRAMESPERSECOND ? ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue() : Movie.FPS_ABSOLUTE;
-                ExportMovie.start(size.getSize().width, size.getSize().height, size.isInternal(), fps, mode);
+                ViewerState.PlaybackData playbackData = ViewerState.playbackData();
+                ViewerState.RecordingData recordingData = ViewerState.recordingData();
+                int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
+                Dimension size = recordingData.size().getSize();
+                ExportMovie.start(size.width, size.height, recordingData.size().isInternal(), fps, recordingData.mode());
             } else {
                 ExportMovie.shallStop();
             }
         }
-
-        void setRecordMode(RecordMode _mode) {
-            mode = _mode;
-        }
-
-        void setRecordSize(RecordSize _size) {
-            size = _size;
-        }
-
     }
 
     private static void setEnabledState(boolean enabled) {
@@ -475,10 +376,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     private static void updatePlaybackConfig() {
         int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-        SpeedUnit unit = (SpeedUnit) speedUnitComboBox.getSelectedItem();
+        ViewerState.PlaybackSpeedUnit unit = (ViewerState.PlaybackSpeedUnit) speedUnitComboBox.getSelectedItem();
         if (unit == null)
             return;
-        ViewerState.setPlaybackSpeed(speed, unit.toPlaybackSpeedUnit());
+        ViewerState.setPlaybackSpeed(speed, unit);
     }
 
     private static void setFrameSlider(int frame) {
@@ -530,9 +431,21 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         if (!speed.equals(speedSpinner.getValue()))
             speedSpinner.setValue(speed);
 
-        SpeedUnit speedUnit = SpeedUnit.fromPlaybackSpeedUnit(playbackData.speedUnit());
-        if (speedUnitComboBox.getSelectedItem() != speedUnit)
-            speedUnitComboBox.setSelectedItem(speedUnit);
+        if (speedUnitComboBox.getSelectedItem() != playbackData.speedUnit())
+            speedUnitComboBox.setSelectedItem(playbackData.speedUnit());
+
+        ViewerState.RecordingData recordingData = ViewerState.recordingData();
+        switch (recordingData.mode()) {
+            case LOOP -> loopButton.setSelected(true);
+            case SHOT -> shotButton.setSelected(true);
+            case FREE -> freeButton.setSelected(true);
+        }
+        if (recordSizeComboBox.getSelectedItem() != recordingData.size())
+            recordSizeComboBox.setSelectedItem(recordingData.size());
+        if (recordButton.isSelected() != movieData.recording())
+            recordButton.setSelected(movieData.recording());
+        ComponentUtils.setEnabled(modePanel, !movieData.recording());
+        ComponentUtils.setEnabled(recordPanel, !movieData.recording());
 
         if (!movieData.available()) {
             unsetMovie();
