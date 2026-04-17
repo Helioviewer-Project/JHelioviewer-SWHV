@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import javax.swing.Timer;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -71,12 +71,12 @@ public class Movie {
             pause();
             playbackFirstTime = TimeUtils.START;
             playbackLastTime = TimeUtils.START;
-            MoviePanel.unsetMovie();
+            ViewerState.clearMovie();
         } else {
             View view = layer.getView();
             playbackFirstTime = view.getFirstTime();
             playbackLastTime = view.getLastTime();
-            MoviePanel.setMovie(view.getMaximumFrameNumber());
+            ViewerState.setMovieAvailable(view.getMaximumFrameNumber());
             syncTime(playbackFirstTime);
         }
         timeRangeChanged();
@@ -182,13 +182,13 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null && layer.getView().isMultiFrame()) {
             movieTimer.restart();
-            MoviePanel.setPlayState(true);
+            ViewerState.setMoviePlaying(true);
         }
     }
 
     public static void pause() {
         movieTimer.stop();
-        MoviePanel.setPlayState(false);
+        ViewerState.setMoviePlaying(false);
         MovieDisplay.render(1); /* ! force update for on the fly resolution change */
     }
 
@@ -253,7 +253,7 @@ public class Movie {
 
         frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
 
-        MoviePanel.setFrameSlider(activeFrame);
+        ViewerState.setMovieActiveFrame(activeFrame);
 
         if (recording)
             notDone = true;

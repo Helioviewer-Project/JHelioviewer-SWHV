@@ -35,7 +35,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public final class ToolBar extends JToolBar implements ViewerState.Listener {
+public final class ToolBar extends JToolBar implements ViewerState.ModeListener {
 
     private static final int ZOOM_HOLD_REPEAT_MS = 33;
 
@@ -119,20 +119,21 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
             displayMode = DisplayMode.valueOf(Settings.getProperty("display.toolbar").toUpperCase());
         } catch (Exception ignore) {
         }
-        JHVFrame.getViewerState().addListener(this);
+        ViewerState.addModeListener(this);
         setDisplayMode(displayMode);
     }
 
     private JideToggleButton coronaButton;
     private JideToggleButton diffRotationButton;
     private JideToggleButton multiviewButton;
+    private final EnumMap<Interaction.AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(Interaction.AnnotationMode.class);
     private final EnumMap<ProjectionMode, JRadioButtonMenuItem> projectionItems = new EnumMap<>(ProjectionMode.class);
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
     private void createNewToolBar() {
+        annotationItems.clear();
         projectionItems.clear();
-        ViewerState viewerState = JHVFrame.getViewerState();
         if (Platform.isMacOS()) {
             add(Box.createHorizontalStrut(90), 0);
         }
@@ -203,20 +204,20 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
         JHVFrame.getInteraction().setMode(interactionMode);
 
         trackingButton = toolToggleButton(TRACK);
-        trackingButton.setSelected(viewerState.isTracking());
-        trackingButton.addItemListener(e -> viewerState.setTracking(trackingButton.isSelected()));
+        trackingButton.setSelected(ViewerState.isTracking());
+        trackingButton.addItemListener(e -> ViewerState.setTracking(trackingButton.isSelected()));
 
         diffRotationButton = toolToggleButton(DIFFROTATION);
-        diffRotationButton.setSelected(viewerState.isDifferentialRotation());
-        diffRotationButton.addItemListener(e -> viewerState.setDifferentialRotation(diffRotationButton.isSelected()));
+        diffRotationButton.setSelected(ViewerState.isDifferentialRotation());
+        diffRotationButton.addItemListener(e -> ViewerState.setDifferentialRotation(diffRotationButton.isSelected()));
 
         coronaButton = toolToggleButton(OFFDISK);
-        coronaButton.setSelected(viewerState.isShowCorona());
-        coronaButton.addItemListener(e -> viewerState.setShowCorona(coronaButton.isSelected()));
+        coronaButton.setSelected(ViewerState.isShowCorona());
+        coronaButton.addItemListener(e -> ViewerState.setShowCorona(coronaButton.isSelected()));
 
         multiviewButton = toolToggleButton(MULTIVIEW);
-        multiviewButton.setSelected(viewerState.isMultiview());
-        multiviewButton.addItemListener(e -> viewerState.setMultiview(multiviewButton.isSelected()));
+        multiviewButton.setSelected(ViewerState.isMultiview());
+        multiviewButton.addItemListener(e -> ViewerState.setMultiview(multiviewButton.isSelected()));
 
         addButton(trackingButton);
         addButton(diffRotationButton);
@@ -228,9 +229,9 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
         ButtonGroup projectionGroup = new ButtonGroup();
         for (ProjectionMode el : ProjectionMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(el.toString());
-            if (el == viewerState.getProjection())
+            if (el == ViewerState.getProjection())
                 item.setSelected(true);
-            item.addActionListener(e -> viewerState.setProjection(el));
+            item.addActionListener(e -> ViewerState.setProjection(el));
             projectionGroup.add(item);
             projectionButton.add(item);
             projectionItems.put(el, item);
@@ -241,11 +242,12 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
         ButtonGroup annotationGroup = new ButtonGroup();
         for (Interaction.AnnotationMode mode : Interaction.AnnotationMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
-            if (mode == JHVFrame.getInteraction().getAnnotationMode())
+            if (mode == ViewerState.getAnnotationMode())
                 item.setSelected(true);
-            item.addActionListener(e -> JHVFrame.getInteraction().setAnnotationMode(mode));
+            item.addActionListener(e -> ViewerState.setAnnotationMode(mode));
             annotationGroup.add(item);
             annotationButton.add(item);
+            annotationItems.put(mode, item);
         }
         annotationButton.addSeparator();
         annotationButton.add(new Actions.ClearAnnotations());
@@ -256,8 +258,8 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
         addSeparator(dim);
 
         refreshButton = toolToggleButton(REFRESH);
-        refreshButton.setSelected(viewerState.isRefresh());
-        refreshButton.addItemListener(e -> viewerState.setRefresh(refreshButton.isSelected()));
+        refreshButton.setSelected(ViewerState.isRefresh());
+        refreshButton.addItemListener(e -> ViewerState.setRefresh(refreshButton.isSelected()));
         addButton(refreshButton);
 
         addSeparator(dim);
@@ -337,7 +339,7 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
     }
 
     @Override
-    public void viewerStateChanged() {
+    public void modeStateChanged() {
         syncStateButtons();
     }
 
@@ -345,15 +347,17 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
         if (trackingButton == null)
             return;
 
-        ViewerState viewerState = JHVFrame.getViewerState();
-        trackingButton.setSelected(viewerState.isTracking());
-        diffRotationButton.setSelected(viewerState.isDifferentialRotation());
-        coronaButton.setSelected(viewerState.isShowCorona());
-        multiviewButton.setSelected(viewerState.isMultiview());
-        refreshButton.setSelected(viewerState.isRefresh());
-        JRadioButtonMenuItem activeProjection = projectionItems.get(viewerState.getProjection());
+        trackingButton.setSelected(ViewerState.isTracking());
+        diffRotationButton.setSelected(ViewerState.isDifferentialRotation());
+        coronaButton.setSelected(ViewerState.isShowCorona());
+        multiviewButton.setSelected(ViewerState.isMultiview());
+        refreshButton.setSelected(ViewerState.isRefresh());
+        JRadioButtonMenuItem activeProjection = projectionItems.get(ViewerState.getProjection());
         if (activeProjection != null)
             activeProjection.setSelected(true);
+        JRadioButtonMenuItem activeAnnotationMode = annotationItems.get(ViewerState.getAnnotationMode());
+        if (activeAnnotationMode != null)
+            activeAnnotationMode.setSelected(true);
     }
 
 }
