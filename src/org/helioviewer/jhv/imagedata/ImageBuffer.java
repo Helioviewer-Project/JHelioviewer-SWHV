@@ -30,7 +30,6 @@ public class ImageBuffer {
     public final int height;
     public final Format format;
     public final Buffer buffer;
-    private final float[] lut;
 
     private static final class ArenaState implements Runnable {
         private Arena arena;
@@ -56,7 +55,6 @@ public class ImageBuffer {
         width = _width;
         height = _height;
         format = _format;
-        lut = _lut;
 
         Arena arena = Arena.ofShared();
         cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
@@ -71,41 +69,10 @@ public class ImageBuffer {
         width = _width;
         height = _height;
         format = _format;
-        lut = _lut;
 
         Arena arena = Arena.ofShared();
         cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
         buffer = allocate(arena, filter(format, data, _width, _height, filterType));
-    }
-
-    private int getPixelInternal(int x, int y) {
-        if (x < 0 || x > width - 1 || y < 0 || y > height - 1 || format == Format.RGBA32)
-            return BAD_PIXEL;
-
-        int idx = x + y * width;
-        if (buffer instanceof ByteBuffer bb)
-            return (bb.get(idx) + 256) & 0xFF;
-        if (buffer instanceof ShortBuffer sb)
-            return (sb.get(idx) + 65536) & 0xFFFF;
-        return BAD_PIXEL;
-    }
-
-    float getPixel(int x, int y, float[] metaLUT) {
-        int p = getPixelInternal(x, y);
-        if (p == BAD_PIXEL)
-            return BAD_PIXEL;
-
-        if (lut != null) {
-            return lut[Math.clamp(p, 0, lut.length - 1)];
-        }
-        if (metaLUT != null) {
-            return metaLUT[Math.clamp(p, 0, metaLUT.length - 1)];
-        }
-        return p;
-    }
-
-    boolean hasLUT() {
-        return lut != null;
     }
 
     public int byteSize() {

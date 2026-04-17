@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.metadata;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
@@ -16,8 +14,6 @@ class CommonMetaData implements MetaData {
 
     protected Region region = Region.DEFAULT;
     protected String displayName = "unknown";
-    protected String unit = "";
-    protected float[] physLUT;
     protected DetectorMask detectorMask = DetectorMask.NONE;
 
     protected boolean calculateDepth;
@@ -125,28 +121,6 @@ class CommonMetaData implements MetaData {
     public Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
         return new Region(roiX * factorX * unitPerPixelX + region.llx, roiY * factorY * unitPerPixelY + region.lly,
                 roiWidth * factorX * unitPerPixelX, roiHeight * factorY * unitPerPixelY);
-    }
-
-    @Override
-    public double xPixelFactor(double xPoint) {
-        return (xPoint - region.llx) / region.width;
-    }
-
-    @Override
-    public double yPixelFactor(double yPoint) {
-        return 1 - (yPoint - region.lly) / region.height;
-    }
-
-    @Nonnull
-    @Override
-    public String getUnit() {
-        return unit;
-    }
-
-    @Nullable
-    @Override
-    public float[] getPhysicalLUT() {
-        return physLUT;
     }
 
     @Override

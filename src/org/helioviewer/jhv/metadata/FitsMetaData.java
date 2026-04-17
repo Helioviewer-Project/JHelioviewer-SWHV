@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.metadata;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -20,13 +18,6 @@ public final class FitsMetaData extends CommonMetaData {
 
     private static final Set<String> SECCHIDetectors = Set.of("EUVI", "COR1", "COR2", "HI1", "HI2");
     private static final Set<String> CROTABlockSet = Set.of("LASCO");
-
-    private static final Map<String, String> unitRepl = Map.of(
-            " ", "",
-            "-1", "\u207B\u00B9",
-            "-2", "\u207B\u00B2",
-            "-3", "\u207B\u00B3",
-            "-5", "\u207B\u2075");
 
     private String instrument = "";
     private String detector = "";
@@ -52,8 +43,6 @@ public final class FitsMetaData extends CommonMetaData {
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
         retrieveSector(m);
-
-        retrieveUnit(m);
         retrieveResponse();
 
         if (instrument.equals("Euhforia"))
@@ -65,29 +54,6 @@ public final class FitsMetaData extends CommonMetaData {
         double s1 = m.getDouble("HV_SECT1").map(Math::toRadians).orElse(0.);
         sector0 = (float) s0;
         sector1 = (float) s1;
-    }
-
-    private void retrieveUnit(MetaDataContainer m) {
-        // a linear physical LUT
-        Optional<Double> mZero = m.getDouble("HV_ZERO");
-        Optional<Double> mScale = m.getDouble("HV_SCALE");
-        Optional<Double> mDataMax = m.getDouble("DATAMAX");
-        if (mZero.isPresent() && mScale.isPresent() && mDataMax.isPresent()) {
-            double zero = mZero.get();
-            double scale = mScale.get();
-            int size = Math.clamp((int) Math.ceil(mDataMax.get()) + 1, 0, 65536);
-            physLUT = new float[size];
-            for (int i = 0; i < size; i++)
-                physLUT[i] = (float) (zero + i * scale);
-        }
-
-        // only if we have LUT
-        if (physLUT != null) {
-            unit = m.getString("BUNIT").orElseGet(() -> unit);
-            for (Map.Entry<String, String> entry : unitRepl.entrySet())
-                unit = unit.replace(entry.getKey(), entry.getValue());
-            unit = unit.intern();
-        }
     }
 
     private void retrieveResponse() {

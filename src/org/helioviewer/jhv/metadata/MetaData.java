@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.metadata;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.wcs.WcsHeader;
@@ -43,16 +41,6 @@ public interface MetaData {
 
     @Nonnull
     Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);
-
-    double xPixelFactor(double xPoint);
-
-    double yPixelFactor(double yPoint);
-
-    @Nonnull
-    String getUnit();
-
-    @Nullable
-    float[] getPhysicalLUT();
 
     boolean getCalculateDepth();
 
