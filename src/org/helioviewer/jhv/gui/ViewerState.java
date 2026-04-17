@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.gui;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.json.JSONObject;
 
@@ -23,11 +23,35 @@ public final class ViewerState {
         void movieStateChanged();
     }
 
+    public enum PlaybackSpeedUnit {
+        FRAMES_PER_SECOND(0),
+        MINUTES_PER_SECOND(60),
+        HOURS_PER_SECOND(3600),
+        DAYS_PER_SECOND(86400);
+
+        private final int secPerSecond;
+
+        PlaybackSpeedUnit(int _secPerSecond) {
+            secPerSecond = _secPerSecond;
+        }
+
+        public boolean isRelative() {
+            return this == FRAMES_PER_SECOND;
+        }
+
+        public int secPerSecond() {
+            return secPerSecond;
+        }
+    }
+
     public record ModeData(ProjectionMode projection, Interaction.AnnotationMode annotationMode, boolean multiview,
                            boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {
     }
 
     public record MovieData(boolean available, boolean playing, int maxFrame, int activeFrame) {
+    }
+
+    public record PlaybackData(Movie.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit) {
     }
 
     private static final ArrayList<ModeListener> modeListeners = new ArrayList<>();
@@ -44,13 +68,22 @@ public final class ViewerState {
     private static boolean movieAvailable;
     private static int movieMaxFrame;
     private static int movieActiveFrame;
+    public static final int PLAYBACK_SPEED_MIN = 1;
+    public static final int PLAYBACK_SPEED_MAX = 120;
+    private static Movie.AdvanceMode playbackAdvanceMode = Movie.AdvanceMode.Loop;
+    private static int playbackSpeed = Movie.FPS_RELATIVE_DEFAULT;
+    private static PlaybackSpeedUnit playbackSpeedUnit = PlaybackSpeedUnit.FRAMES_PER_SECOND;
 
     public static ModeData modeData() {
-        return new ModeData(projection, annotationMode, multiview, tracking, refresh, showCorona, differentialRotation);
+        return new ModeData(projection, getAnnotationMode(), multiview, tracking, refresh, showCorona, differentialRotation);
     }
 
     public static MovieData movieData() {
         return new MovieData(movieAvailable, moviePlaying, movieMaxFrame, movieActiveFrame);
+    }
+
+    public static PlaybackData playbackData() {
+        return new PlaybackData(playbackAdvanceMode, playbackSpeed, playbackSpeedUnit);
     }
 
     public static void writeModeJson(JSONObject target) {
@@ -101,8 +134,8 @@ public final class ViewerState {
     }
 
     public static void applyMode(ModeData data) {
-        ProjectionMode newProjection = Objects.requireNonNull(data.projection());
-        Interaction.AnnotationMode newAnnotationMode = Objects.requireNonNull(data.annotationMode());
+        ProjectionMode newProjection = data.projection();
+        Interaction.AnnotationMode newAnnotationMode = data.annotationMode();
         boolean changed = false;
         boolean needsDisplay = false;
 
@@ -157,13 +190,17 @@ public final class ViewerState {
     }
 
     public static void setProjection(ProjectionMode newProjection) {
-        ProjectionMode value = Objects.requireNonNull(newProjection);
-        if (projection == value)
+        if (projection == newProjection)
             return;
 
-        projection = value;
-        Display.setProjectionMode(value);
+        projection = newProjection;
+        Display.setProjectionMode(newProjection);
         notifyModeListeners();
+    }
+
+    public static void initFromInteraction() {
+        if (JHVFrame.getInteraction() != null)
+            annotationMode = JHVFrame.getInteraction().getAnnotationMode();
     }
 
     public static Interaction.AnnotationMode getAnnotationMode() {
@@ -171,13 +208,12 @@ public final class ViewerState {
     }
 
     public static void setAnnotationMode(Interaction.AnnotationMode newAnnotationMode) {
-        Interaction.AnnotationMode value = Objects.requireNonNull(newAnnotationMode);
-        if (annotationMode == value)
+        if (annotationMode == newAnnotationMode)
             return;
 
-        annotationMode = value;
+        annotationMode = newAnnotationMode;
         if (JHVFrame.getInteraction() != null)
-            JHVFrame.getInteraction().setAnnotationMode(value);
+            JHVFrame.getInteraction().setAnnotationMode(newAnnotationMode);
         notifyModeListeners();
     }
 
@@ -297,6 +333,45 @@ public final class ViewerState {
 
         movieActiveFrame = newMovieActiveFrame;
         notifyMovieListeners();
+    }
+
+    public static Movie.AdvanceMode getPlaybackAdvanceMode() {
+        return playbackAdvanceMode;
+    }
+
+    public static void setPlaybackAdvanceMode(Movie.AdvanceMode newPlaybackAdvanceMode) {
+        if (playbackAdvanceMode == newPlaybackAdvanceMode)
+            return;
+
+        playbackAdvanceMode = newPlaybackAdvanceMode;
+        Movie.setAdvanceMode(newPlaybackAdvanceMode);
+        notifyMovieListeners();
+    }
+
+    public static int getPlaybackSpeed() {
+        return playbackSpeed;
+    }
+
+    public static PlaybackSpeedUnit getPlaybackSpeedUnit() {
+        return playbackSpeedUnit;
+    }
+
+    public static void setPlaybackSpeed(int newPlaybackSpeed, PlaybackSpeedUnit newPlaybackSpeedUnit) {
+        int speed = Math.clamp(newPlaybackSpeed, PLAYBACK_SPEED_MIN, PLAYBACK_SPEED_MAX);
+        boolean changed = playbackSpeed != speed || playbackSpeedUnit != newPlaybackSpeedUnit;
+
+        playbackSpeed = speed;
+        playbackSpeedUnit = newPlaybackSpeedUnit;
+        applyPlaybackSpeed();
+        if (changed)
+            notifyMovieListeners();
+    }
+
+    private static void applyPlaybackSpeed() {
+        if (playbackSpeedUnit.isRelative())
+            Movie.setDesiredRelativeSpeed(playbackSpeed);
+        else
+            Movie.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
     }
 
     public static void addModeListener(ModeListener listener) {

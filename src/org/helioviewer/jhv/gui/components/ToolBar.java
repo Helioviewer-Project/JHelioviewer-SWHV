@@ -19,14 +19,12 @@ import javax.swing.JToolBar;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Interaction;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.io.SampClient;
-import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.math.Quat;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
 
@@ -119,8 +117,8 @@ public final class ToolBar extends JToolBar implements ViewerState.ModeListener 
             displayMode = DisplayMode.valueOf(Settings.getProperty("display.toolbar").toUpperCase());
         } catch (Exception ignore) {
         }
-        ViewerState.addModeListener(this);
         setDisplayMode(displayMode);
+        ViewerState.addModeListener(this);
     }
 
     private JideToggleButton coronaButton;
@@ -340,13 +338,6 @@ public final class ToolBar extends JToolBar implements ViewerState.ModeListener 
 
     @Override
     public void modeStateChanged() {
-        syncStateButtons();
-    }
-
-    private void syncStateButtons() {
-        if (trackingButton == null)
-            return;
-
         trackingButton.setSelected(ViewerState.isTracking());
         diffRotationButton.setSelected(ViewerState.isDifferentialRotation());
         coronaButton.setSelected(ViewerState.isShowCorona());

@@ -201,7 +201,8 @@ public class State {
     }
 
     private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time,
-                            ViewerState.ModeData modeData, ViewerState.MovieData movieData) implements FutureCallback<Void> {
+                            ViewerState.ModeData modeData,
+                            ViewerState.MovieData movieData) implements FutureCallback<Void> {
 
         private void applyRestoredPlaybackState() {
             ViewerState.applyMode(modeData);
