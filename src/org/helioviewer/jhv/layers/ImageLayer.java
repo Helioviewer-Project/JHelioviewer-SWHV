@@ -205,13 +205,12 @@ public class ImageLayer extends AbstractLayer implements ImageData.Handler {
 
         GLSLSolarShader shader = Display.mode.shader;
         shader.use();
-
-        MetaData meta0 = imageData.getMetaData();
-        glImage.applyFilters(meta0, imageData);
+        glImage.applyFilters();
 
         Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
 
+        MetaData meta0 = imageData.getMetaData();
         Position metaViewpoint0 = meta0.getViewpoint();
         ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
         MetaData meta1 = imageDataDiff.getMetaData();
