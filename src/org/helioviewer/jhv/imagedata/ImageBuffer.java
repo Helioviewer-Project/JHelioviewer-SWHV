@@ -113,16 +113,14 @@ public class ImageBuffer {
     }
 
     private static Buffer allocate(Arena arena, byte[] data) {
-        ByteBuffer buffer = arena.allocateFrom(ValueLayout.JAVA_BYTE, data).asByteBuffer();
-        return buffer;
+        return arena.allocateFrom(ValueLayout.JAVA_BYTE, data).asByteBuffer();
     }
 
     private static Buffer allocate(Arena arena, short[] data) {
-        ShortBuffer buffer = arena.allocateFrom(ValueLayout.JAVA_SHORT, data)
+        return arena.allocateFrom(ValueLayout.JAVA_SHORT, data)
                 .asByteBuffer()
                 .order(ByteOrder.nativeOrder())
                 .asShortBuffer();
-        return buffer;
     }
 
     private static byte[] filter(Format format, byte[] data, int width, int height, ImageFilter.Type filterType) {
