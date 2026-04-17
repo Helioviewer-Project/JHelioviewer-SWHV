@@ -107,8 +107,6 @@ public class JHVFrame {
     private static LayersPanel layersPanel;
     private static Layers layers;
 
-    private static final ViewerState viewerState = new ViewerState();
-
     private static ToolBar toolBar;
     private static MenuBar menuBar;
 
@@ -308,10 +306,6 @@ public class JHVFrame {
 
     public static Interaction getInteraction() {
         return interaction;
-    }
-
-    public static ViewerState getViewerState() {
-        return viewerState;
     }
 
     public static MenuBar getMenuBar() {

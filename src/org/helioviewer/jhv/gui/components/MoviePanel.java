@@ -34,6 +34,7 @@ import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
@@ -50,7 +51,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements Interfaces.ObservationSelector {
+public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, ViewerState.MovieListener {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
@@ -140,7 +141,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         return instance == null ? instance = new MoviePanel() : instance;
     }
 
-    public static void unsetMovie() {
+    private static void unsetMovie() {
         timeSlider.setMaximum(0);
         timeSlider.repaint();
         setEnabledState(false);
@@ -149,7 +150,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         recordButton.setEnabled(false);
     }
 
-    public static void setMovie(int max) {
+    private static void setMovie(int max) {
         timeSlider.setMaximum(max);
         timeSlider.repaint();
         setEnabledState(true);
@@ -315,6 +316,8 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         add(JHVFrame.getLayersPanel());
 
         setEnabledState(false);
+        ViewerState.addMovieListener(this);
+        syncMovieState();
     }
 
     @Override
@@ -465,14 +468,14 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         }
     }
 
-    public static void setFrameSlider(int frame) {
+    private static void setFrameSlider(int frame) {
         timeSlider.setAllowFrame(false);
         timeSlider.setValue(frame);
         timeSlider.setAllowFrame(true);
     }
 
     // only for Layers
-    public static void setPlayState(boolean play) {
+    private static void setPlayState(boolean play) {
         if (play) {
             playButton.setText(Buttons.pause);
             playButton.setToolTipText("Pause movie");
@@ -500,6 +503,25 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     static AbstractAction getNextFrameAction() {
         return nextFrameAction;
+    }
+
+    @Override
+    public void movieStateChanged() {
+        syncMovieState();
+    }
+
+    private void syncMovieState() {
+        ViewerState.MovieData movieData = ViewerState.movieData();
+        if (!movieData.available()) {
+            unsetMovie();
+            setPlayState(false);
+            setFrameSlider(0);
+            return;
+        }
+
+        setMovie(movieData.maxFrame());
+        setPlayState(movieData.playing());
+        setFrameSlider(movieData.activeFrame());
     }
 
     private static class PlayPauseAction extends Actions.AbstractKeyAction {

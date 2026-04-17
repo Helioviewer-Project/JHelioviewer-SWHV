@@ -46,11 +46,10 @@ public class State {
     }
 
     private static JSONObject toJson() {
-        ViewerState viewerState = JHVFrame.getViewerState();
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
-        main.put("play", Movie.isPlaying());
-        viewerState.writeJson(main);
+        ViewerState.writeModeJson(main);
+        ViewerState.writeMovieJson(main);
         main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
 
         JSONArray ja = new JSONArray();
@@ -148,7 +147,7 @@ public class State {
         newList.forEach(layer -> Timelines.getLayers().add(layer));
     }
 
-    private static void loadLayers(JSONObject data, ViewerState.Data viewerStateData) {
+    private static void loadLayers(JSONObject data, ViewerState.ModeData modeData, ViewerState.MovieData movieData) {
         Layers.clear();
 
         for (Object o : data.getJSONArray("layers")) {
@@ -186,9 +185,7 @@ public class State {
         JHVFrame.getInteraction().loadAnnotations(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
-        boolean play = data.optBoolean("play", false);
-
-        EDTCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, viewerStateData, play));
+        EDTCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, modeData, movieData));
     }
 
     private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
@@ -204,13 +201,13 @@ public class State {
     }
 
     private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time,
-                            ViewerState.Data viewerStateData, boolean play) implements FutureCallback<Void> {
+                            ViewerState.ModeData modeData, ViewerState.MovieData movieData) implements FutureCallback<Void> {
 
         private void applyRestoredPlaybackState() {
-            JHVFrame.getViewerState().apply(viewerStateData);
+            ViewerState.applyMode(modeData);
             Movie.setTime(time);
             Display.getCamera().refresh();
-            if (play)
+            if (movieData.playing())
                 Movie.play();
         }
 
@@ -236,12 +233,12 @@ public class State {
 
     public static void load(JSONObject jo) {
         try {
-            ViewerState viewerState = JHVFrame.getViewerState();
-            ViewerState.Data viewerStateData = viewerState.readJson(jo);
+            ViewerState.ModeData modeData = ViewerState.readModeJson(jo);
+            ViewerState.MovieData movieData = ViewerState.readMovieJson(jo);
             // to be loaded before viewpoint
-            viewerState.setProjection(viewerStateData.projection());
+            ViewerState.setProjection(modeData.projection());
             loadTimelines(jo);
-            loadLayers(jo, viewerStateData);
+            loadLayers(jo, modeData, movieData);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.loadState(plugins);
