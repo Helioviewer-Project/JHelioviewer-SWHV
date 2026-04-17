@@ -1,7 +1,7 @@
 # App Commands
 
 This note documents the app-command registry implemented in
-[AppCommands.java](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/AppCommands.java).
+[AppCommands.java](../src/org/helioviewer/jhv/AppCommands.java).
 
 The command layer is app-level infrastructure:
 
@@ -55,7 +55,7 @@ Semantics:
 
 - this is a partial-update command
 - `null` fields mean "leave current state unchanged"
-- the command reads current [ViewerState.modeData()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/gui/ViewerState.java) and applies a merged `ModeData`
+- the command reads current [ViewerState.modeData()](../src/org/helioviewer/jhv/gui/ViewerState.java) and applies a merged `ModeData`
 
 Current enum/value domains used by this command:
 
@@ -76,7 +76,7 @@ Semantics:
 
 - this is a partial-update command
 - `advanceMode == null` leaves playback mode unchanged
-- `speed` and `speedUnit` are applied together with the current missing half filled from [ViewerState.playbackData()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/gui/ViewerState.java)
+- `speed` and `speedUnit` are applied together with the current missing half filled from [ViewerState.playbackData()](../src/org/helioviewer/jhv/gui/ViewerState.java)
 
 Current enum/value domains:
 
@@ -93,7 +93,7 @@ Playback speed constraints:
 - maximum: `120`
 
 Those constraints are defined in
-[ViewerState.java](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/gui/ViewerState.java) as `PLAYBACK_SPEED_MIN` and `PLAYBACK_SPEED_MAX`.
+[ViewerState.java](../src/org/helioviewer/jhv/gui/ViewerState.java) as `PLAYBACK_SPEED_MIN` and `PLAYBACK_SPEED_MAX`.
 
 ### `play`
 
@@ -101,7 +101,7 @@ Input type: none
 
 Effect:
 
-- calls [Movie.play()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/layers/Movie.java)
+- calls [Movie.play()](../src/org/helioviewer/jhv/layers/Movie.java)
 
 ### `pause`
 
@@ -109,7 +109,7 @@ Input type: none
 
 Effect:
 
-- calls [Movie.pause()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/layers/Movie.java)
+- calls [Movie.pause()](../src/org/helioviewer/jhv/layers/Movie.java)
 
 ### `toggle-playback`
 
@@ -117,7 +117,7 @@ Input type: none
 
 Effect:
 
-- calls [Movie.toggle()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/layers/Movie.java)
+- calls [Movie.toggle()](../src/org/helioviewer/jhv/layers/Movie.java)
 
 ### `seek-frame`
 
@@ -129,7 +129,7 @@ Fields:
 
 Effect:
 
-- calls [Movie.setFrame(...)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/layers/Movie.java)
+- calls [Movie.setFrame(...)](../src/org/helioviewer/jhv/layers/Movie.java)
 
 ### `seek-time`
 
@@ -141,7 +141,7 @@ Fields:
 
 Effect:
 
-- calls [Movie.setTime(...)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/layers/Movie.java)
+- calls [Movie.setTime(...)](../src/org/helioviewer/jhv/layers/Movie.java)
 
 ### `next-frame`
 
@@ -149,7 +149,7 @@ Input type: none
 
 Effect:
 
-- calls [Movie.nextFrame()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/layers/Movie.java)
+- calls [Movie.nextFrame()](../src/org/helioviewer/jhv/layers/Movie.java)
 
 ### `previous-frame`
 
@@ -157,7 +157,7 @@ Input type: none
 
 Effect:
 
-- calls [Movie.previousFrame()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/layers/Movie.java)
+- calls [Movie.previousFrame()](../src/org/helioviewer/jhv/layers/Movie.java)
 
 ### `set-recording`
 
@@ -203,7 +203,7 @@ Semantics:
 
 - if recording is already active, the command returns immediately
 - if input is non-null, it first updates recording and playback configuration
-- export then starts from the resulting [ViewerState.recordingData()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/gui/ViewerState.java) and [ViewerState.playbackData()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/gui/ViewerState.java)
+- export then starts from the resulting [ViewerState.recordingData()](../src/org/helioviewer/jhv/gui/ViewerState.java) and [ViewerState.playbackData()](../src/org/helioviewer/jhv/gui/ViewerState.java)
 
 ### `record-stop`
 
@@ -211,7 +211,7 @@ Input type: none
 
 Effect:
 
-- if recording is active, calls [ExportMovie.shallStop()](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/export/ExportMovie.java)
+- if recording is active, calls [ExportMovie.shallStop()](../src/org/helioviewer/jhv/export/ExportMovie.java)
 
 ### `load-state`
 
@@ -222,7 +222,7 @@ Input shape:
 
 Effect:
 
-- URI case calls [Load.state(URI)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/Load.java)
+- URI case calls [Load.state(URI)](../src/org/helioviewer/jhv/io/Load.java)
 - JSON case calls `Load.state(String)`
 
 ### `load-request`
@@ -234,7 +234,7 @@ Input shape:
 
 Effect:
 
-- URI case calls [Load.request(URI)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/Load.java)
+- URI case calls [Load.request(URI)](../src/org/helioviewer/jhv/io/Load.java)
 - JSON case calls `Load.request(String)`
 
 ### `load-sunjson`
@@ -246,7 +246,7 @@ Input shape:
 
 Effect:
 
-- URI case calls [Load.getAllSunJSON(...)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/Load.java)
+- URI case calls [Load.getAllSunJSON(...)](../src/org/helioviewer/jhv/io/Load.java)
 - JSON case calls `Load.sunJSON(String)`
 
 ### `load-image`
@@ -259,7 +259,7 @@ Fields:
 
 Effect:
 
-- calls [Load.getAllImage(...)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/Load.java)
+- calls [Load.getAllImage(...)](../src/org/helioviewer/jhv/io/Load.java)
 
 ### `load-cdf`
 
@@ -271,7 +271,7 @@ Fields:
 
 Effect:
 
-- calls [Load.getAllCDF(...)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/Load.java)
+- calls [Load.getAllCDF(...)](../src/org/helioviewer/jhv/io/Load.java)
 
 ### `load-votable`
 
@@ -279,7 +279,7 @@ Input type: `URI`
 
 Effect:
 
-- calls [SoarClient.submitTable(...)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/SoarClient.java)
+- calls [SoarClient.submitTable(...)](../src/org/helioviewer/jhv/io/SoarClient.java)
 
 ### `load-hapi`
 
@@ -291,7 +291,7 @@ Fields:
 
 Effect:
 
-- loads each URI with [BandReaderHapi.loadUri(...)](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/timelines/band/BandReaderHapi.java)
+- loads each URI with [BandReaderHapi.loadUri(...)](../src/org/helioviewer/jhv/timelines/band/BandReaderHapi.java)
 
 ## State Semantics
 
@@ -311,7 +311,7 @@ This is important for transport clients such as SAMP. External control should le
 ## Current SAMP Mapping
 
 The following SAMP load operations currently dispatch through `AppCommands.Registry` in
-[SampClient.java](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/SampClient.java):
+[SampClient.java](../src/org/helioviewer/jhv/io/SampClient.java):
 
 - `image.load.fits` -> `load-image`
 - `table.load.fits` -> `load-image`
@@ -332,7 +332,7 @@ Notes:
 
 This section describes the payload shape an external SAMP client can send today.
 
-These are the message params that [SampClient.java](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/SampClient.java) actually reads now.
+These are the message params that [SampClient.java](../src/org/helioviewer/jhv/io/SampClient.java) actually reads now.
 
 ### Single-URL payloads
 
@@ -450,8 +450,8 @@ The same pattern can be used for future SAMP verbs such as:
 Two places are natural completion hooks for future transport feedback:
 
 - recording completion:
-  [MovieExporter.java](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/export/MovieExporter.java)
+  [MovieExporter.java](../src/org/helioviewer/jhv/export/MovieExporter.java)
 - state loading completion:
-  [LoadState.java](/Users/bogdan/jhv/JHelioviewer-SWHV/src/org/helioviewer/jhv/io/LoadState.java)
+  [LoadState.java](../src/org/helioviewer/jhv/io/LoadState.java)
 
 These are not fully documented protocol callbacks yet; this note only records the current code-backed hook points.
