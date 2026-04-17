@@ -16,9 +16,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.StatusPanel;
-import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -34,7 +31,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     private final Camera camera;
 
     public PositionStatusPanel() {
-        setText(formatOrtho(Vec2.NAN, "", 0, 0, 0, 0, ImageData.nanValue));
+        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
         camera = Display.getCamera();
     }
 
@@ -49,10 +46,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         } else if (Display.mode.isPolar() || Display.mode.isLogPolar()) {
             setText(formatPolar(coord));
         } else {
-            String valueStr = ImageData.nanValue;
             Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
             if (v == null) {
-                setText(formatOrtho(Vec2.NAN, "", 0, 0, 0, 0, valueStr));
+                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {
                 String annStr = "";
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
@@ -82,14 +78,8 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 double px = (180 / Math.PI) * Math.atan2(v.x, zeta);
                 double py = (180 / Math.PI) * Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
-
-                ImageLayer layer = Layers.getActiveImageLayer();
-                ImageData id;
-                if (layer != null && (id = layer.getImageData()) != null) {
-                    valueStr = id.getPixelString((float) v.x, (float) v.y);
-                }
-
-                setText(formatOrtho(coord, annStr, r, pa, px, py, valueStr));
+                String ortho = formatOrtho(coord, r, pa, px, py);
+                setText(annStr.isEmpty() ? ortho : annStr + " | " + ortho);
             }
         }
     }
@@ -123,9 +113,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         return String.format("(\u03B8,\u03c1):(%s)", coordStr);
     }
 
-    private static String formatOrtho(@Nonnull Vec2 coord, String annStr, double r, double pa, double px, double py, String valueStr) {
+    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py) {
         String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("%s | (\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s) | %s", annStr, formatR(r), pa, coordStr, formatXY(px), formatXY(py), valueStr);
+        return String.format("(\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s)", formatR(r), pa, coordStr, formatXY(px), formatXY(py));
     }
 
     @Override
