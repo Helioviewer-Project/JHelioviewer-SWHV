@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -251,7 +251,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     public static void setMovieFrame(Point point) {
         if (!graphArea.contains(point))
             return;
-        Movie.setTime(new JHVTime(selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x)));
+        AppCommands.seekTime(new JHVTime(selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x)));
     }
 
     @Override

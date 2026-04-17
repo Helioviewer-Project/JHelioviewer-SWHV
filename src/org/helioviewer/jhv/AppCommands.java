@@ -43,10 +43,21 @@ public final class AppCommands {
     public static final String LOAD_VOTABLE = "load-votable";
     public static final String LOAD_HAPI = "load-hapi";
 
-    public interface Command<I> {
+    public interface RegisteredCommand {
         String id();
+    }
+
+    public interface Command<I> extends RegisteredCommand {
 
         void run(@Nullable I input) throws Exception;
+    }
+
+    private interface IntCommand extends RegisteredCommand {
+        void run(int input) throws Exception;
+    }
+
+    private interface TimeCommand extends RegisteredCommand {
+        void run(@Nullable JHVTime input) throws Exception;
     }
 
     @FunctionalInterface
@@ -72,13 +83,9 @@ public final class AppCommands {
     public record SetPlaybackArgs(
             @Nullable Movie.AdvanceMode advanceMode,
             @Nullable Integer speed,
-            @Nullable ViewerState.PlaybackSpeedUnit speedUnit) {
-    }
-
-    public record SeekFrameArgs(int frame) {
-    }
-
-    public record SeekTimeArgs(JHVTime time) {
+            @Nullable ViewerState.PlaybackSpeedUnit speedUnit,
+            @Nullable Integer firstFrame,
+            @Nullable Integer lastFrame) {
     }
 
     public record SetRecordingArgs(
@@ -92,15 +99,6 @@ public final class AppCommands {
             @Nullable Movie.AdvanceMode advanceMode,
             @Nullable Integer speed,
             @Nullable ViewerState.PlaybackSpeedUnit speedUnit) {
-    }
-
-    public record LoadURIOrJSONArgs(
-            @Nullable URI uri,
-            @Nullable String json) {
-    }
-
-    public record LoadURIsArgs(
-            List<URI> uris) {
     }
 
     private static final SetViewStateCommand setViewStateCommand = new SetViewStateCommand();
@@ -124,7 +122,7 @@ public final class AppCommands {
     private static final LoadHapiCommand loadHapiCommand = new LoadHapiCommand();
 
     public static final class Registry {
-        private static final LinkedHashMap<String, Command<?>> commands = new LinkedHashMap<>();
+        private static final LinkedHashMap<String, RegisteredCommand> commands = new LinkedHashMap<>();
 
         static {
             register(setViewStateCommand);
@@ -151,7 +149,7 @@ public final class AppCommands {
         private Registry() {
         }
 
-        private static void register(Command<?> command) {
+        private static void register(RegisteredCommand command) {
             commands.put(command.id(), command);
         }
 
@@ -160,16 +158,36 @@ public final class AppCommands {
         }
 
         @Nullable
-        public static Command<?> get(String id) {
+        public static RegisteredCommand get(String id) {
             return commands.get(id);
         }
 
         @SuppressWarnings("unchecked")
         public static <I> void run(String id, @Nullable I input) throws Exception {
-            Command<I> command = (Command<I>) commands.get(id);
+            RegisteredCommand command = commands.get(id);
             if (command == null)
                 throw new IllegalArgumentException("Unknown command: " + id);
-            command.run(input);
+            if (!(command instanceof Command<?>))
+                throw new IllegalArgumentException("Command does not accept object input: " + id);
+            ((Command<I>) command).run(input);
+        }
+
+        public static void run(String id, int input) throws Exception {
+            RegisteredCommand command = commands.get(id);
+            if (command == null)
+                throw new IllegalArgumentException("Unknown command: " + id);
+            if (!(command instanceof IntCommand intCommand))
+                throw new IllegalArgumentException("Command does not accept int input: " + id);
+            intCommand.run(input);
+        }
+
+        public static void run(String id, @Nullable JHVTime input) throws Exception {
+            RegisteredCommand command = commands.get(id);
+            if (command == null)
+                throw new IllegalArgumentException("Unknown command: " + id);
+            if (!(command instanceof TimeCommand timeCommand))
+                throw new IllegalArgumentException("Command does not accept time input: " + id);
+            timeCommand.run(input);
         }
     }
 
@@ -179,6 +197,10 @@ public final class AppCommands {
 
     public static void setPlayback(@Nullable SetPlaybackArgs args) {
         setPlaybackCommand.run(args);
+    }
+
+    public static void setPlaybackRange(int firstFrame, int lastFrame) {
+        setPlaybackCommand.setRange(firstFrame, lastFrame);
     }
 
     public static void play() {
@@ -193,12 +215,12 @@ public final class AppCommands {
         togglePlaybackCommand.run(null);
     }
 
-    public static void seekFrame(SeekFrameArgs args) {
-        seekFrameCommand.run(args);
+    public static void seekFrame(int frame) {
+        seekFrameCommand.run(frame);
     }
 
-    public static void seekTime(SeekTimeArgs args) {
-        seekTimeCommand.run(args);
+    public static void seekTime(@Nullable JHVTime time) {
+        seekTimeCommand.run(time);
     }
 
     public static void nextFrame() {
@@ -222,43 +244,43 @@ public final class AppCommands {
     }
 
     public static void loadState(URI uri) {
-        loadStateCommand.run(new LoadURIOrJSONArgs(uri, null));
+        loadStateCommand.run(uri);
     }
 
     public static void loadState(String json) {
-        loadStateCommand.run(new LoadURIOrJSONArgs(null, json));
+        loadStateCommand.run(json);
     }
 
     public static void loadRequest(URI uri) {
-        loadRequestCommand.run(new LoadURIOrJSONArgs(uri, null));
+        loadRequestCommand.run(uri);
     }
 
     public static void loadRequest(String json) {
-        loadRequestCommand.run(new LoadURIOrJSONArgs(null, json));
+        loadRequestCommand.run(json);
     }
 
     public static void loadSunJSON(URI uri) {
-        loadSunJSONCommand.run(new LoadURIOrJSONArgs(uri, null));
+        loadSunJSONCommand.run(uri);
     }
 
     public static void loadSunJSON(String json) {
-        loadSunJSONCommand.run(new LoadURIOrJSONArgs(null, json));
+        loadSunJSONCommand.run(json);
     }
 
     public static void loadImage(URI uri) {
-        loadImageCommand.run(new LoadURIsArgs(List.of(uri)));
+        loadImageCommand.run(uri);
     }
 
     public static void loadImage(List<URI> uris) {
-        loadImageCommand.run(new LoadURIsArgs(uris));
+        loadImageCommand.run(uris);
     }
 
     public static void loadCDF(URI uri) {
-        loadCDFCommand.run(new LoadURIsArgs(List.of(uri)));
+        loadCDFCommand.run(uri);
     }
 
     public static void loadCDF(List<URI> uris) {
-        loadCDFCommand.run(new LoadURIsArgs(uris));
+        loadCDFCommand.run(uris);
     }
 
     public static void loadVOTable(URI uri) {
@@ -266,27 +288,41 @@ public final class AppCommands {
     }
 
     public static void loadHapi(URI uri) {
-        loadHapiCommand.run(new LoadURIsArgs(List.of(uri)));
+        loadHapiCommand.run(uri);
     }
 
     public static void loadHapi(List<URI> uris) {
-        loadHapiCommand.run(new LoadURIsArgs(uris));
+        loadHapiCommand.run(uris);
     }
 
-    private static void loadURIOrJSON(String commandId, @Nullable URI uri, @Nullable String json, URILoader uriLoader, JSONLoader jsonLoader) {
-        if (uri == null && json == null)
-            return;
-        if (uri != null && json != null)
-            throw new IllegalArgumentException(commandId + " accepts either uri or json");
-
-        if (uri != null)
-            uriLoader.load(uri);
-        else
-            jsonLoader.load(json);
+    private static void loadURIOrJSON(String commandId, @Nullable Object input, URILoader uriLoader, JSONLoader jsonLoader) {
+        switch (input) {
+            case null -> {
+                return;
+            }
+            case URI uri -> {
+                uriLoader.load(uri);
+                return;
+            }
+            case String json -> {
+                jsonLoader.load(json);
+                return;
+            }
+            default -> {
+            }
+        }
+        throw new IllegalArgumentException(commandId + " accepts URI or String");
     }
 
-    private static boolean hasURIs(@Nullable LoadURIsArgs input) {
-        return input != null && input.uris() != null && !input.uris().isEmpty();
+    @SuppressWarnings("unchecked")
+    private static List<URI> asURIList(String commandId, Object input) {
+        if (!(input instanceof List<?> uris))
+            throw new IllegalArgumentException(commandId + " accepts URI or List<URI>");
+        for (Object uri : uris) {
+            if (!(uri instanceof URI))
+                throw new IllegalArgumentException(commandId + " accepts URI or List<URI>");
+        }
+        return (List<URI>) uris;
     }
 
     private static final class SetViewStateCommand implements Command<SetViewStateArgs> {
@@ -332,6 +368,17 @@ public final class AppCommands {
                 ViewerState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
                 ViewerState.setPlaybackSpeed(speed, speedUnit);
             }
+
+            if (input.firstFrame() != null || input.lastFrame() != null) {
+                ViewerState.PlaybackData current = ViewerState.playbackData();
+                int firstFrame = input.firstFrame() == null ? current.firstFrame() : input.firstFrame();
+                int lastFrame = input.lastFrame() == null ? current.lastFrame() : input.lastFrame();
+                setRange(firstFrame, lastFrame);
+            }
+        }
+
+        private void setRange(int firstFrame, int lastFrame) {
+            ViewerState.setPlaybackRange(firstFrame, lastFrame);
         }
     }
 
@@ -371,31 +418,29 @@ public final class AppCommands {
         }
     }
 
-    private static final class SeekFrameCommand implements Command<SeekFrameArgs> {
+    private static final class SeekFrameCommand implements IntCommand {
         @Override
         public String id() {
             return SEEK_FRAME;
         }
 
         @Override
-        public void run(@Nullable SeekFrameArgs input) {
-            if (input == null)
-                return;
-            Movie.setFrame(input.frame());
+        public void run(int input) {
+            Movie.setFrame(input);
         }
     }
 
-    private static final class SeekTimeCommand implements Command<SeekTimeArgs> {
+    private static final class SeekTimeCommand implements TimeCommand {
         @Override
         public String id() {
             return SEEK_TIME;
         }
 
         @Override
-        public void run(@Nullable SeekTimeArgs input) {
-            if (input == null || input.time() == null)
+        public void run(@Nullable JHVTime input) {
+            if (input == null)
                 return;
-            Movie.setTime(input.time());
+            Movie.setTime(input);
         }
     }
 
@@ -453,8 +498,18 @@ public final class AppCommands {
                 return;
 
             if (input != null) {
-                setRecordingCommand.run(new SetRecordingArgs(input.mode(), input.size()));
-                setPlaybackCommand.run(new SetPlaybackArgs(input.advanceMode(), input.speed(), input.speedUnit()));
+                if (input.mode() != null)
+                    ViewerState.setRecordingMode(input.mode());
+                if (input.size() != null)
+                    ViewerState.setRecordingSize(input.size());
+                if (input.advanceMode() != null)
+                    ViewerState.setPlaybackAdvanceMode(input.advanceMode());
+                if (input.speed() != null || input.speedUnit() != null) {
+                    ViewerState.PlaybackData current = ViewerState.playbackData();
+                    int speed = input.speed() == null ? current.speed() : input.speed();
+                    ViewerState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
+                    ViewerState.setPlaybackSpeed(speed, speedUnit);
+                }
             }
 
             ViewerState.RecordingData recordingData = ViewerState.recordingData();
@@ -479,73 +534,83 @@ public final class AppCommands {
         }
     }
 
-    private static final class LoadStateCommand implements Command<LoadURIOrJSONArgs> {
+    private static final class LoadStateCommand implements Command<Object> {
         @Override
         public String id() {
             return LOAD_STATE;
         }
 
         @Override
-        public void run(@Nullable LoadURIOrJSONArgs input) {
-            if (input == null)
-                return;
-            loadURIOrJSON(id(), input.uri(), input.json(), Load::state, Load::state);
+        public void run(@Nullable Object input) {
+            loadURIOrJSON(id(), input, Load::state, Load::state);
         }
     }
 
-    private static final class LoadRequestCommand implements Command<LoadURIOrJSONArgs> {
+    private static final class LoadRequestCommand implements Command<Object> {
         @Override
         public String id() {
             return LOAD_REQUEST;
         }
 
         @Override
-        public void run(@Nullable LoadURIOrJSONArgs input) {
-            if (input == null)
-                return;
-            loadURIOrJSON(id(), input.uri(), input.json(), Load::request, Load::request);
+        public void run(@Nullable Object input) {
+            loadURIOrJSON(id(), input, Load::request, Load::request);
         }
     }
 
-    private static final class LoadSunJSONCommand implements Command<LoadURIOrJSONArgs> {
+    private static final class LoadSunJSONCommand implements Command<Object> {
         @Override
         public String id() {
             return LOAD_SUN_JSON;
         }
 
         @Override
-        public void run(@Nullable LoadURIOrJSONArgs input) {
-            if (input == null)
-                return;
-            loadURIOrJSON(id(), input.uri(), input.json(), uri -> Load.getAllSunJSON(List.of(uri)), Load::sunJSON);
+        public void run(@Nullable Object input) {
+            loadURIOrJSON(id(), input, Load::getAllSunJSON, Load::sunJSON);
         }
     }
 
-    private static final class LoadImageCommand implements Command<LoadURIsArgs> {
+    private static final class LoadImageCommand implements Command<Object> {
         @Override
         public String id() {
             return LOAD_IMAGE;
         }
 
         @Override
-        public void run(@Nullable LoadURIsArgs input) {
-            if (!hasURIs(input))
+        public void run(@Nullable Object input) {
+            if (input == null)
                 return;
-            Load.getAllImage(input.uris());
+            if (input instanceof URI uri) {
+                Load.getAllImage(uri);
+                return;
+            }
+            if (input instanceof List<?> uris && !uris.isEmpty()) {
+                Load.getAllImage(asURIList(id(), uris));
+                return;
+            }
+            throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
         }
     }
 
-    private static final class LoadCDFCommand implements Command<LoadURIsArgs> {
+    private static final class LoadCDFCommand implements Command<Object> {
         @Override
         public String id() {
             return LOAD_CDF;
         }
 
         @Override
-        public void run(@Nullable LoadURIsArgs input) {
-            if (!hasURIs(input))
+        public void run(@Nullable Object input) {
+            if (input == null)
                 return;
-            Load.getAllCDF(input.uris());
+            if (input instanceof URI uri) {
+                Load.getAllCDF(uri);
+                return;
+            }
+            if (input instanceof List<?> uris && !uris.isEmpty()) {
+                Load.getAllCDF(asURIList(id(), uris));
+                return;
+            }
+            throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
         }
     }
 
@@ -563,17 +628,25 @@ public final class AppCommands {
         }
     }
 
-    private static final class LoadHapiCommand implements Command<LoadURIsArgs> {
+    private static final class LoadHapiCommand implements Command<Object> {
         @Override
         public String id() {
             return LOAD_HAPI;
         }
 
         @Override
-        public void run(@Nullable LoadURIsArgs input) {
-            if (!hasURIs(input))
+        public void run(@Nullable Object input) {
+            if (input == null)
                 return;
-            input.uris().forEach(BandReaderHapi::loadUri);
+            if (input instanceof URI uri) {
+                BandReaderHapi.loadUri(uri);
+                return;
+            }
+            if (input instanceof List<?> uris && !uris.isEmpty()) {
+                asURIList(id(), uris).forEach(BandReaderHapi::loadUri);
+                return;
+            }
+            throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
         }
     }
 }
