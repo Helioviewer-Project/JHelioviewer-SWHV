@@ -8,10 +8,6 @@ import org.helioviewer.jhv.metadata.MetaData;
 
 public class ImageData {
 
-    public interface Handler {
-        void handleData(ImageData imageData);
-    }
-
     private final ImageBuffer imageBuffer;
 
     private final MetaData metaData;

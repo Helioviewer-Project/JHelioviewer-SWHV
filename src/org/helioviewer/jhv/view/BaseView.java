@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
@@ -80,10 +79,10 @@ public class BaseView implements View {
         return m instanceof FitsMetaData fm ? LUT.get(fm) : null;
     }
 
-    protected ImageData.Handler dataHandler;
+    protected View.DataHandler dataHandler;
 
     @Override
-    public void setDataHandler(ImageData.Handler _dataHandler) {
+    public void setDataHandler(View.DataHandler _dataHandler) {
         dataHandler = _dataHandler;
     }
 

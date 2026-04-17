@@ -2,7 +2,6 @@ package org.helioviewer.jhv.view;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
@@ -53,7 +52,7 @@ public class NullView implements View {
     }
 
     @Override
-    public void setDataHandler(ImageData.Handler dataHandler) {
+    public void setDataHandler(View.DataHandler dataHandler) {
     }
 
     @Override

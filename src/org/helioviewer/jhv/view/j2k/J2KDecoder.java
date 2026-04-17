@@ -129,7 +129,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-            return new ImageBuffer(actualWidth, actualHeight, format, outBuffer, filterType, null);
+            return new ImageBuffer(actualWidth, actualHeight, format, outBuffer, filterType);
         } catch (KduException e) {
             recreateThreadEnv = true;
             throw e;

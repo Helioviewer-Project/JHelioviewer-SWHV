@@ -4,13 +4,9 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.ShortBuffer;
 
 public class ImageBuffer {
-
-    public static final int BAD_PIXEL = Integer.MIN_VALUE;
 
     private static final Cleaner cleaner = Cleaner.create();
     private final Cleaner.Cleanable cleanable;
@@ -48,10 +44,10 @@ public class ImageBuffer {
     }
 
     public ImageBuffer(int _width, int _height, Format _format, byte[] data) {
-        this(_width, _height, _format, data, ImageFilter.Type.None, null);
+        this(_width, _height, _format, data, ImageFilter.Type.None);
     }
 
-    public ImageBuffer(int _width, int _height, Format _format, byte[] data, ImageFilter.Type filterType, float[] _lut) {
+    public ImageBuffer(int _width, int _height, Format _format, byte[] data, ImageFilter.Type filterType) {
         width = _width;
         height = _height;
         format = _format;
@@ -62,10 +58,10 @@ public class ImageBuffer {
     }
 
     public ImageBuffer(int _width, int _height, Format _format, short[] data) {
-        this(_width, _height, _format, data, ImageFilter.Type.None, null);
+        this(_width, _height, _format, data, ImageFilter.Type.None);
     }
 
-    public ImageBuffer(int _width, int _height, Format _format, short[] data, ImageFilter.Type filterType, float[] _lut) {
+    public ImageBuffer(int _width, int _height, Format _format, short[] data, ImageFilter.Type filterType) {
         width = _width;
         height = _height;
         format = _format;

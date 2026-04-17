@@ -15,6 +15,10 @@ import org.helioviewer.jhv.time.JHVTime;
 
 public interface View {
 
+    interface DataHandler {
+        void handleData(ImageData imageData);
+    }
+
     String EMPTY_METAXML = "<xml/>";
     AtomicBoolean complete = new AtomicBoolean(true);
 
@@ -58,7 +62,7 @@ public interface View {
         return 0;
     }
 
-    void setDataHandler(ImageData.Handler dataHandler);
+    void setDataHandler(DataHandler dataHandler);
 
     default boolean isDownloading() {
         return false;

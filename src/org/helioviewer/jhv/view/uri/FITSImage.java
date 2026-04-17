@@ -25,6 +25,8 @@ import com.google.common.xml.XmlEscapers;
 // essentially static; local or network cache
 public class FITSImage implements URIImageReader {
 
+    private static final int BAD_PIXEL = Integer.MIN_VALUE;
+
     @Override
     public URIImageReader.Image readImage(File file) throws Exception {
         try (Fits f = new Fits(file)) {
@@ -68,7 +70,7 @@ public class FITSImage implements URIImageReader {
 
     private static float floatPixel(double v, double bzero, double bscale) {
         if (Double.isNaN(v)) {
-            return ImageBuffer.BAD_PIXEL;
+            return BAD_PIXEL;
         } else if (Double.isInfinite(v)) {
             return Float.MAX_VALUE;
         } else {
@@ -97,8 +99,8 @@ public class FITSImage implements URIImageReader {
                     short[] lineData = (short[]) pixData[j];
                     for (int i = 0; i < width; i += stepW) {
                         short raw = lineData[i];
-                        float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                        float v = (blank != BLANK && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
                             samples[sampleLen++] = v;
                         }
                     }
@@ -109,8 +111,8 @@ public class FITSImage implements URIImageReader {
                     int[] lineData = (int[]) pixData[j];
                     for (int i = 0; i < width; i += stepW) {
                         int raw = lineData[i];
-                        float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                        float v = (blank != BLANK && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
                             samples[sampleLen++] = v;
                         }
                     }
@@ -121,8 +123,8 @@ public class FITSImage implements URIImageReader {
                     long[] lineData = (long[]) pixData[j];
                     for (int i = 0; i < width; i += stepW) {
                         long raw = lineData[i];
-                        float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                        float v = (blank != BLANK && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
                             samples[sampleLen++] = v;
                         }
                     }
@@ -133,7 +135,7 @@ public class FITSImage implements URIImageReader {
                     float[] lineData = (float[]) pixData[j];
                     for (int i = 0; i < width; i += stepW) {
                         float v = floatPixel(lineData[i], bzero, bscale);
-                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
                             samples[sampleLen++] = v;
                         }
                     }
@@ -144,7 +146,7 @@ public class FITSImage implements URIImageReader {
                     double[] lineData = (double[]) pixData[j];
                     for (int i = 0; i < width; i += stepW) {
                         float v = floatPixel(lineData[i], bzero, bscale);
-                        if (v != ImageBuffer.BAD_PIXEL && v != Float.MAX_VALUE) {
+                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
                             samples[sampleLen++] = v;
                         }
                     }
@@ -164,21 +166,15 @@ public class FITSImage implements URIImageReader {
         };
     }
 
-    private static void storeMappedPixel(short[] outData, int outIdx, float[] lut, float v, double scale, double mapped) {
-        int p = (int) Math.clamp(scale * mapped + .5, 0, 65535);
-        lut[p] = v;
-        outData[outIdx] = (short) p;
-    }
-
-    private static void processPixel(short[] outData, int outIdx, float[] lut, float v, float minV, float maxV, float range,
+    private static void processPixel(short[] outData, int outIdx, float v, float minV, float maxV, float range,
                                      FITSSettings.ScalingMode scalingMode, double scale) {
-        if (v == ImageBuffer.BAD_PIXEL) {
+        if (v == BAD_PIXEL) {
             outData[outIdx] = 0;
         } else {
             v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
             float d = v - minV;
             double mapped = mapScaled(scalingMode, d, range);
-            storeMappedPixel(outData, outIdx, lut, v, scale, mapped);
+            outData[outIdx] = (short) Math.clamp((int) (scale * mapped + .5), 0, 65535);
         }
     }
 
@@ -203,7 +199,7 @@ public class FITSImage implements URIImageReader {
             for (int j = 0; j < height; j++) {
                 System.arraycopy(inData[j], 0, outData, width * (height - 1 - j), width);
             }
-            return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, outData, filterType, null);
+            return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, outData, filterType);
         }
 
         Header header = hdu.getHeader();
@@ -222,7 +218,7 @@ public class FITSImage implements URIImageReader {
                 SampleBuffer sampleData = sampleImage(pixType, blank, bzero, bscale, width, height, pixData);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                    return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, new byte[width * height], filterType, null);
+                    return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, new byte[width * height], filterType);
 
                 if (autoMode) {
                     int kMin = Math.clamp((int) (MIN_MULT * sampleLen), 0, sampleLen - 1);
@@ -247,8 +243,6 @@ public class FITSImage implements URIImageReader {
         // System.out.println(">>> " + min + ' ' + max);
 
         short[] outData = new short[width * height];
-        float[] lut = new float[65536];
-
         FITSSettings.ScalingMode scalingMode = FITSSettings.scalingMode;
         double scale = switch (scalingMode) {
             case Gamma -> 65535. / fn_gamma(max - min);
@@ -267,8 +261,8 @@ public class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     short raw = lineData[i];
-                    float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
+                    float v = (blank != BLANK && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                    processPixel(outData, outIdx, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case INT -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -277,8 +271,8 @@ public class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     int raw = lineData[i];
-                    float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
+                    float v = (blank != BLANK && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                    processPixel(outData, outIdx, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case LONG -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -287,8 +281,8 @@ public class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     long raw = lineData[i];
-                    float v = (blank != BLANK && raw == blank) ? ImageBuffer.BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
+                    float v = (blank != BLANK && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                    processPixel(outData, outIdx, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case FLOAT -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -297,7 +291,7 @@ public class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(lineData[i], bzero, bscale);
-                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
+                    processPixel(outData, outIdx, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case DOUBLE -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -306,13 +300,13 @@ public class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(lineData[i], bzero, bscale);
-                    processPixel(outData, outIdx, lut, v, minV, maxV, range, scalingMode, scale);
+                    processPixel(outData, outIdx, v, minV, maxV, range, scalingMode, scale);
                 }
             });
             case BYTE -> throw new Exception("Unexpected BYTE path in non-byte conversion");
         }
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
-        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, outData, filterType, lut);
+        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, outData, filterType);
     }
 
     private static PixType getPixType(Object[] pixData) throws Exception {

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
 import javax.annotation.Nonnull;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
