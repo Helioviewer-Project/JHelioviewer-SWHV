@@ -130,26 +130,6 @@ public final class ToolBar extends JToolBar implements ViewerState.Listener {
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
-    public JideToggleButton getShowCoronaButton() {
-        return coronaButton;
-    }
-
-    public JideToggleButton getDiffRotationButton() {
-        return diffRotationButton;
-    }
-
-    public JideToggleButton getMultiviewButton() {
-        return multiviewButton;
-    }
-
-    public JideToggleButton getRefreshButton() {
-        return refreshButton;
-    }
-
-    public JideToggleButton getTrackingButton() {
-        return trackingButton;
-    }
-
     private void createNewToolBar() {
         projectionItems.clear();
         ViewerState viewerState = JHVFrame.getViewerState();

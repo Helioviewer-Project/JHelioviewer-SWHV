@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -51,12 +50,7 @@ public class State {
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
         main.put("play", Movie.isPlaying());
-        main.put("multiview", viewerState.isMultiview());
-        main.put("projection", viewerState.getProjection());
-        main.put("tracking", viewerState.isTracking());
-        main.put("refresh", viewerState.isRefresh());
-        main.put("showCorona", viewerState.isShowCorona());
-        main.put("differentialRotation", viewerState.isDifferentialRotation());
+        viewerState.writeJson(main);
         main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
 
         JSONArray ja = new JSONArray();
@@ -154,7 +148,7 @@ public class State {
         newList.forEach(layer -> Timelines.getLayers().add(layer));
     }
 
-    private static void loadLayers(JSONObject data) {
+    private static void loadLayers(JSONObject data, ViewerState.Data viewerStateData) {
         Layers.clear();
 
         for (Object o : data.getJSONArray("layers")) {
@@ -190,17 +184,11 @@ public class State {
         }
 
         JHVFrame.getInteraction().loadAnnotations(data.optJSONObject("annotations"));
-        ViewerState viewerState = JHVFrame.getViewerState();
-        viewerState.setMultiview(data.optBoolean("multiview", viewerState.isMultiview()));
-        viewerState.setShowCorona(data.optBoolean("showCorona", viewerState.isShowCorona()));
-        viewerState.setDifferentialRotation(data.optBoolean("differentialRotation", viewerState.isDifferentialRotation()));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
-        boolean tracking = data.optBoolean("tracking", viewerState.isTracking());
-        boolean refresh = data.optBoolean("refresh", viewerState.isRefresh());
         boolean play = data.optBoolean("play", false);
 
-        EDTCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, tracking, refresh, play));
+        EDTCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, viewerStateData, play));
     }
 
     private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
@@ -215,14 +203,12 @@ public class State {
         }
     }
 
-    private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time, boolean tracking,
-                            boolean refresh, boolean play) implements FutureCallback<Void> {
+    private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time,
+                            ViewerState.Data viewerStateData, boolean play) implements FutureCallback<Void> {
 
         private void applyRestoredPlaybackState() {
+            JHVFrame.getViewerState().apply(viewerStateData);
             Movie.setTime(time);
-            ViewerState viewerState = JHVFrame.getViewerState();
-            viewerState.setTracking(tracking);
-            viewerState.setRefresh(refresh);
             Display.getCamera().refresh();
             if (play)
                 Movie.play();
@@ -250,13 +236,12 @@ public class State {
 
     public static void load(JSONObject jo) {
         try {
+            ViewerState viewerState = JHVFrame.getViewerState();
+            ViewerState.Data viewerStateData = viewerState.readJson(jo);
             // to be loaded before viewpoint
-            try {
-                JHVFrame.getViewerState().setProjection(ProjectionMode.valueOf(jo.optString("projection")));
-            } catch (Exception ignore) {
-            }
+            viewerState.setProjection(viewerStateData.projection());
             loadTimelines(jo);
-            loadLayers(jo);
+            loadLayers(jo, viewerStateData);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.loadState(plugins);

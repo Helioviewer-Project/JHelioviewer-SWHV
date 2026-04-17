@@ -310,10 +310,6 @@ public class JHVFrame {
         return interaction;
     }
 
-    public static ToolBar getToolBar() {
-        return toolBar;
-    }
-
     public static ViewerState getViewerState() {
         return viewerState;
     }
