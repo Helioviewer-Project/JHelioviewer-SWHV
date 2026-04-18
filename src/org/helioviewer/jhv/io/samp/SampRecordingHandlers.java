@@ -12,15 +12,19 @@ final class SampRecordingHandlers {
     private SampRecordingHandlers() {
     }
 
-    static AbstractMessageHandler startHandler() {
-        return new SampClient.JHVSampHandler("jhv.record.start", (senderId, sender, msg) -> start(msg, senderId));
+    static void register(SampClient client) {
+        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.set.recording", (senderId, sender, msg) -> {
+            String mode = SampClient.optionalString(msg, "mode");
+            String size = SampClient.optionalString(msg, "size");
+            EventQueue.invokeLater(() -> Commands.setRecordingRaw(mode, size));
+        }));
+        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.record.start",
+                (senderId, sender, msg) -> start(msg, senderId)));
+        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.record.stop",
+                (senderId, sender, msg) -> EventQueue.invokeLater(Commands::recordStop)));
     }
 
-    static AbstractMessageHandler stopHandler() {
-        return new SampClient.JHVSampHandler("jhv.record.stop", (senderId, sender, msg) -> EventQueue.invokeLater(Commands::recordStop));
-    }
-
-    static void start(Message msg, String senderId) {
+    private static void start(Message msg, String senderId) {
         String requestId = SampClient.optionalString(msg, "requestId");
         Commands.OperationContext context = new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.record.start");
         Commands.RecordStartArgs args = new Commands.RecordStartArgs(

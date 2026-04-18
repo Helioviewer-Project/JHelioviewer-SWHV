@@ -18,12 +18,26 @@ final class SampLoadHandlers {
     private SampLoadHandlers() {
     }
 
-    static AbstractMessageHandler uriHandler(String type, String commandId) {
+    static void register(SampClient client) {
+        client.addMessageHandler(uriHandler("image.load.fits", Commands.LOAD_IMAGE));
+        client.addMessageHandler(votableHandler());
+        client.addMessageHandler(fitsTableHandler());
+        // advertise we can load CDF, although we can do only MAG and SWA
+        client.addMessageHandler(uriHandler("table.load.cdf", Commands.LOAD_CDF));
+        client.addMessageHandler(uriListHandler("jhv.load.image", Commands.LOAD_IMAGE));
+        // Add handler for the HAPI csv files
+        client.addMessageHandler(uriListHandler("jhv.load.hapi", Commands.LOAD_HAPI));
+        client.addMessageHandler(uriOrValueHandler("jhv.load.request", Commands.LOAD_REQUEST));
+        client.addMessageHandler(uriOrValueHandler("jhv.load.sunjson", Commands.LOAD_SUN_JSON));
+        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.load.state", (senderId, sender, msg) -> loadState(msg, senderId)));
+    }
+
+    private static AbstractMessageHandler uriHandler(String type, String commandId) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURI(msg, commandId));
     }
 
     // load VOTable only from SOAR
-    static AbstractMessageHandler votableHandler() {
+    private static AbstractMessageHandler votableHandler() {
         return new SampClient.JHVSampHandler("table.load.votable", (senderId, sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender))
                 loadURI(msg, Commands.LOAD_VOTABLE);
@@ -31,28 +45,28 @@ final class SampLoadHandlers {
     }
 
     // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
-    static AbstractMessageHandler fitsTableHandler() {
+    private static AbstractMessageHandler fitsTableHandler() {
         return new SampClient.JHVSampHandler("table.load.fits", (senderId, sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender))
                 loadURI(msg, Commands.LOAD_IMAGE);
         });
     }
 
-    static AbstractMessageHandler uriListHandler(String type, String commandId) {
+    private static AbstractMessageHandler uriListHandler(String type, String commandId) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURIList(msg, commandId));
     }
 
-    static AbstractMessageHandler uriOrValueHandler(String type, String commandId) {
+    private static AbstractMessageHandler uriOrValueHandler(String type, String commandId) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> {
-            if (!loadURI(msg, commandId)) {
-                String value = SampClient.optionalString(msg, "value");
-                if (value != null)
-                    invokeCommand(commandId, value);
-            }
+            if (loadURI(msg, commandId))
+                return;
+            String value = SampClient.optionalString(msg, "value");
+            if (value != null)
+                invokeCommand(commandId, value);
         });
     }
 
-    static void loadState(Message msg, String senderId) throws Exception {
+    private static void loadState(Message msg, String senderId) throws Exception {
         String requestId = SampClient.optionalString(msg, "requestId");
         Commands.OperationContext context =
                 new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.load.state");
@@ -61,6 +75,7 @@ final class SampLoadHandlers {
             invokeLoadState(context, toURI(input.toString()));
             return;
         }
+
         String value = SampClient.optionalString(msg, "value");
         if (value != null)
             invokeLoadState(context, value);
@@ -79,7 +94,7 @@ final class SampLoadHandlers {
         });
     }
 
-    static boolean loadURI(Message msg, String commandId) throws Exception {
+    private static boolean loadURI(Message msg, String commandId) throws Exception {
         Object url = msg.getParam("url");
         if (url == null)
             return false;
