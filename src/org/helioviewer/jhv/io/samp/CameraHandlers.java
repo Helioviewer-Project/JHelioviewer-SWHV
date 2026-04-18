@@ -8,9 +8,9 @@ import org.helioviewer.jhv.math.Quat;
 
 import org.astrogrid.samp.Message;
 
-final class SampCameraHandlers {
+final class CameraHandlers {
 
-    private SampCameraHandlers() {
+    private CameraHandlers() {
     }
 
     static void register(SampClient client) {

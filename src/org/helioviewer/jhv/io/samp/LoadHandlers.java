@@ -13,9 +13,9 @@ import org.helioviewer.jhv.Log;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 
-final class SampLoadHandlers {
+final class LoadHandlers {
 
-    private SampLoadHandlers() {
+    private LoadHandlers() {
     }
 
     static void register(SampClient client) {
@@ -25,6 +25,7 @@ final class SampLoadHandlers {
         // advertise we can load CDF, although we can do only MAG and SWA
         client.addMessageHandler(uriHandler("table.load.cdf", Commands.LOAD_CDF));
         client.addMessageHandler(uriListHandler("jhv.load.image", Commands.LOAD_IMAGE));
+        client.addMessageHandler(uriListHandler("jhv.load.cdf", Commands.LOAD_CDF));
         // Add handler for the HAPI csv files
         client.addMessageHandler(uriListHandler("jhv.load.hapi", Commands.LOAD_HAPI));
         client.addMessageHandler(uriOrValueHandler("jhv.load.request", Commands.LOAD_REQUEST));
