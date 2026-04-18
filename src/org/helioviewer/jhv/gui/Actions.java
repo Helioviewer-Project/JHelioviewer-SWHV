@@ -12,6 +12,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
+import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.ExitHooks;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
@@ -86,7 +87,7 @@ public class Actions {
         public void actionPerformed(ActionEvent e) {
             File state = LoadStateDialog.get();
             if (state != null)
-                Load.state(state.toURI());
+                AppCommands.loadState(state.toURI());
         }
 
     }
