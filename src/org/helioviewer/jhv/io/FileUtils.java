@@ -161,7 +161,7 @@ public class FileUtils {
         }
     }
 
-    private static List<URI> listDirOrSingle(URI uri) throws IOException {
+    private static List<URI> resolveURIList(URI uri) throws IOException {
         Path path;
         try {
             path = Path.of(uri);
@@ -174,11 +174,11 @@ public class FileUtils {
         return listDir(path);
     }
 
-    public static void listDirOrSingleOffEDT(URI uri, String threadName, Consumer<List<URI>> callback) {
+    public static void resolveURIListOffEDT(URI uri, String threadName, Consumer<List<URI>> callback) {
         JHVThread.create(() -> {
             List<URI> uris = List.of(uri);
             try {
-                uris = listDirOrSingle(uri);
+                uris = resolveURIList(uri);
             } catch (Exception e) {
                 Log.warn("Error reading directory: " + uri, e);
             }
