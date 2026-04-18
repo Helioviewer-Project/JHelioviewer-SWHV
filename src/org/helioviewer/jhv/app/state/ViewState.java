@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
@@ -184,23 +185,67 @@ public final class ViewState {
         ModeData current = modeData();
         ProjectionMode projectionValue = current.projection();
         Interaction.AnnotationMode annotationModeValue = current.annotationMode();
+        boolean multiviewValue = current.multiview();
+        boolean trackingValue = current.tracking();
+        boolean refreshValue = current.refresh();
+        boolean showCoronaValue = current.showCorona();
+        boolean differentialRotationValue = current.differentialRotation();
+        String projectionName = source.optString("projection", projectionValue.name());
+        String annotationModeName = source.optString("annotationMode", annotationModeValue.name());
         try {
-            projectionValue = ProjectionMode.valueOf(source.optString("projection", projectionValue.name()));
-        } catch (Exception ignore) {
+            projectionValue = ProjectionMode.valueOf(projectionName);
+        } catch (IllegalArgumentException e) {
+            Log.warn("Ignoring invalid projection state value: " + projectionName, e);
         }
         try {
-            annotationModeValue = Interaction.AnnotationMode.valueOf(source.optString("annotationMode", annotationModeValue.name()));
-        } catch (Exception ignore) {
+            annotationModeValue = Interaction.AnnotationMode.valueOf(annotationModeName);
+        } catch (IllegalArgumentException e) {
+            Log.warn("Ignoring invalid annotation mode state value: " + annotationModeName, e);
+        }
+        if (source.has("multiview") && !source.isNull("multiview")) {
+            Object multiview = source.opt("multiview");
+            if (multiview instanceof Boolean value)
+                multiviewValue = value;
+            else
+                Log.warn("Ignoring invalid multiview state value: " + multiview);
+        }
+        if (source.has("tracking") && !source.isNull("tracking")) {
+            Object tracking = source.opt("tracking");
+            if (tracking instanceof Boolean value)
+                trackingValue = value;
+            else
+                Log.warn("Ignoring invalid tracking state value: " + tracking);
+        }
+        if (source.has("refresh") && !source.isNull("refresh")) {
+            Object refresh = source.opt("refresh");
+            if (refresh instanceof Boolean value)
+                refreshValue = value;
+            else
+                Log.warn("Ignoring invalid refresh state value: " + refresh);
+        }
+        if (source.has("showCorona") && !source.isNull("showCorona")) {
+            Object showCorona = source.opt("showCorona");
+            if (showCorona instanceof Boolean value)
+                showCoronaValue = value;
+            else
+                Log.warn("Ignoring invalid showCorona state value: " + showCorona);
+        }
+        if (source.has("differentialRotation") && !source.isNull("differentialRotation")) {
+            Object differentialRotation = source.opt("differentialRotation");
+            if (differentialRotation instanceof Boolean value)
+                differentialRotationValue = value;
+            else
+                Log.warn("Ignoring invalid differentialRotation state value: " + differentialRotation);
         }
 
         return new ModeData(
                 projectionValue,
                 annotationModeValue,
-                source.optBoolean("multiview", current.multiview()),
-                source.optBoolean("tracking", current.tracking()),
-                source.optBoolean("refresh", current.refresh()),
-                source.optBoolean("showCorona", current.showCorona()),
-                source.optBoolean("differentialRotation", current.differentialRotation()));
+                multiviewValue,
+                trackingValue,
+                refreshValue,
+                showCoronaValue,
+                differentialRotationValue);
     }
 
     public static void writeMovieJson(JSONObject target) {
@@ -208,7 +253,15 @@ public final class ViewState {
     }
 
     public static boolean readMoviePlaying(JSONObject source) {
-        return source.optBoolean("play", moviePlaying);
+        if (!source.has("play") || source.isNull("play"))
+            return moviePlaying;
+
+        Object play = source.opt("play");
+        if (play instanceof Boolean value)
+            return value;
+
+        Log.warn("Ignoring invalid movie play state value: " + play);
+        return moviePlaying;
     }
 
     public static void applyMode(ModeData data) {
@@ -368,10 +421,14 @@ public final class ViewState {
     }
 
     public static void setMovieAvailable(int newMovieMaxFrame) {
-        boolean changed = !movieAvailable || movieMaxFrame != newMovieMaxFrame;
+        int maxFrame = Math.max(0, newMovieMaxFrame);
+        if (maxFrame != newMovieMaxFrame)
+            Log.warn("Clamping invalid movie max frame " + newMovieMaxFrame + " to " + maxFrame);
+
+        boolean changed = !movieAvailable || movieMaxFrame != maxFrame;
         movieAvailable = true;
-        movieMaxFrame = newMovieMaxFrame;
-        applyPlaybackRangeState(0, newMovieMaxFrame);
+        movieMaxFrame = maxFrame;
+        applyPlaybackRangeState(0, maxFrame);
         notifyPlaybackRangeListeners();
         if (changed)
             notifyMovieListeners();
@@ -390,10 +447,15 @@ public final class ViewState {
     }
 
     public static void setMovieActiveFrame(int newMovieActiveFrame) {
-        if (movieActiveFrame == newMovieActiveFrame)
+        int maxFrame = movieAvailable ? movieMaxFrame : 0;
+        int activeFrame = Math.clamp(newMovieActiveFrame, 0, maxFrame);
+        if (activeFrame != newMovieActiveFrame)
+            Log.warn("Clamping invalid movie active frame " + newMovieActiveFrame + " to " + activeFrame);
+
+        if (movieActiveFrame == activeFrame)
             return;
 
-        movieActiveFrame = newMovieActiveFrame;
+        movieActiveFrame = activeFrame;
         notifyMovieListeners();
     }
 
@@ -412,6 +474,8 @@ public final class ViewState {
 
     public static void setPlaybackSpeed(int newPlaybackSpeed, PlaybackSpeedUnit newPlaybackSpeedUnit) {
         int speed = Math.clamp(newPlaybackSpeed, PLAYBACK_SPEED_MIN, PLAYBACK_SPEED_MAX);
+        if (speed != newPlaybackSpeed)
+            Log.warn("Clamping invalid playback speed " + newPlaybackSpeed + " to " + speed);
         if (playbackSpeed == speed && playbackSpeedUnit == newPlaybackSpeedUnit)
             return;
 
@@ -445,9 +509,66 @@ public final class ViewState {
         }
     }
 
+    // Commands/ExportMovie-only partial update entry point.
+    public static void applyRecordStartUpdate(
+            @Nullable String mode,
+            @Nullable String size,
+            @Nullable String advanceMode,
+            @Nullable String speed,
+            @Nullable String speedUnit) {
+        if (mode != null) {
+            try {
+                setRecordingMode(RecordingMode.valueOf(mode));
+            } catch (IllegalArgumentException e) {
+                Log.warn("Ignoring invalid recording mode value: " + mode, e);
+            }
+        }
+
+        if (size != null) {
+            try {
+                setRecordingSize(RecordingSize.valueOf(size));
+            } catch (IllegalArgumentException e) {
+                Log.warn("Ignoring invalid recording size value: " + size, e);
+            }
+        }
+
+        if (advanceMode != null) {
+            try {
+                setPlaybackAdvanceMode(Movie.AdvanceMode.valueOf(advanceMode));
+            } catch (IllegalArgumentException e) {
+                Log.warn("Ignoring invalid playback advance mode value: " + advanceMode, e);
+            }
+        }
+
+        if (speed != null || speedUnit != null) {
+            PlaybackData current = playbackData();
+            int resolvedSpeed = current.speed();
+            PlaybackSpeedUnit resolvedSpeedUnit = current.speedUnit();
+            if (speed != null) {
+                try {
+                    resolvedSpeed = Integer.parseInt(speed);
+                } catch (NumberFormatException e) {
+                    Log.warn("Ignoring invalid playback speed value: " + speed, e);
+                }
+            }
+            if (speedUnit != null) {
+                try {
+                    resolvedSpeedUnit = PlaybackSpeedUnit.valueOf(speedUnit);
+                } catch (IllegalArgumentException e) {
+                    Log.warn("Ignoring invalid playback speed unit value: " + speedUnit, e);
+                }
+            }
+            setPlaybackSpeed(resolvedSpeed, resolvedSpeedUnit);
+        }
+    }
+
     public static void setPlaybackRange(int newPlaybackFirstFrame, int newPlaybackLastFrame) {
-        int firstFrame = Math.clamp(newPlaybackFirstFrame, 0, newPlaybackLastFrame);
-        int lastFrame = Math.max(firstFrame, newPlaybackLastFrame);
+        int lastFrame = Math.max(0, newPlaybackLastFrame);
+        int firstFrame = Math.clamp(newPlaybackFirstFrame, 0, lastFrame);
+        if (lastFrame != newPlaybackLastFrame)
+            Log.warn("Clamping invalid playback last frame " + newPlaybackLastFrame + " to " + lastFrame);
+        if (firstFrame != newPlaybackFirstFrame)
+            Log.warn("Clamping invalid playback first frame " + newPlaybackFirstFrame + " to " + firstFrame);
         if (playbackFirstFrame == firstFrame && playbackLastFrame == lastFrame)
             return;
 

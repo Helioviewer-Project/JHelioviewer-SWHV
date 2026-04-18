@@ -124,11 +124,11 @@ public final class Commands {
     }
 
     public record RecordStartArgs(
-            @Nullable ViewState.RecordingMode mode,
-            @Nullable ViewState.RecordingSize size,
-            @Nullable Movie.AdvanceMode advanceMode,
-            @Nullable Integer speed,
-            @Nullable ViewState.PlaybackSpeedUnit speedUnit) {
+            @Nullable String mode,
+            @Nullable String size,
+            @Nullable String advanceMode,
+            @Nullable String speed,
+            @Nullable String speedUnit) {
     }
 
     public record OperationContext(

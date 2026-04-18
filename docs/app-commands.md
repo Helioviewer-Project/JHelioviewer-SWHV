@@ -1,12 +1,12 @@
 # App Commands
 
 This note documents the app-command registry implemented in
-[AppCommands.java](../src/org/helioviewer/jhv/AppCommands.java).
+[Commands.java](../src/org/helioviewer/jhv/app/Commands.java).
 
 The command layer is app-level infrastructure:
 
-- commands live in `org.helioviewer.jhv.AppCommands`
-- commands are registered in `AppCommands.Registry`
+- commands live in `org.helioviewer.jhv.app.Commands`
+- commands are registered in `Commands.Registry`
 - transport layers such as SAMP can parse incoming messages, build command inputs, and call the registry
 
 This document reflects the code as it exists now. It does not describe planned commands that are not implemented yet.
@@ -46,7 +46,7 @@ The registry currently contains these command ids:
 
 ### `set-view-state`
 
-Input type: `AppCommands.SetViewStateArgs`
+Input type: `Commands.SetViewStateArgs`
 
 Fields:
 
@@ -60,9 +60,10 @@ Fields:
 
 Semantics:
 
-- this is a partial-update command
-- `null` fields mean "leave current state unchanged"
-- the command reads current [ViewerState.modeData()](../src/org/helioviewer/jhv/gui/ViewerState.java) and applies a merged `ModeData`
+This is a partial-update command. Callers may provide only the fields they want
+to change and leave the rest as `null`. Omitted fields are merged with the
+current mode state in [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
+before the update is applied.
 
 Current enum/value domains used by this command:
 
@@ -71,27 +72,29 @@ Current enum/value domains used by this command:
 
 ### `set-playback`
 
-Input type: `AppCommands.SetPlaybackArgs`
+Input type: `Commands.SetPlaybackArgs`
 
 Fields:
 
 - `Movie.AdvanceMode advanceMode`
 - `Integer speed`
-- `ViewerState.PlaybackSpeedUnit speedUnit`
+- `ViewState.PlaybackSpeedUnit speedUnit`
 - `Integer firstFrame`
 - `Integer lastFrame`
 
 Semantics:
 
-- this is a partial-update command
-- `advanceMode == null` leaves playback mode unchanged
-- `speed` and `speedUnit` are applied together with the current missing half filled from [ViewerState.playbackData()](../src/org/helioviewer/jhv/gui/ViewerState.java)
-- `firstFrame` and `lastFrame` are applied together with the current missing half filled from [ViewerState.playbackData()](../src/org/helioviewer/jhv/gui/ViewerState.java)
+This is a partial-update command. Callers may provide only the playback fields
+they want to change and leave the rest as `null`. Omitted fields are merged
+with the current playback state in
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) before the
+update is applied. In particular, `speed` and `speedUnit` are resolved as one
+pair, and `firstFrame` and `lastFrame` are resolved as one pair.
 
 Current enum/value domains:
 
 - `Movie.AdvanceMode`: `Loop`, `Stop`, `Swing`, `SwingDown`
-- `ViewerState.PlaybackSpeedUnit`:
+- `ViewState.PlaybackSpeedUnit`:
   - `FRAMES_PER_SECOND`
   - `MINUTES_PER_SECOND`
   - `HOURS_PER_SECOND`
@@ -103,7 +106,7 @@ Playback speed constraints:
 - maximum: `120`
 
 Those constraints are defined in
-[ViewerState.java](../src/org/helioviewer/jhv/gui/ViewerState.java) as `PLAYBACK_SPEED_MIN` and `PLAYBACK_SPEED_MAX`.
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) as `PLAYBACK_SPEED_MIN` and `PLAYBACK_SPEED_MAX`.
 
 ### `play`
 
@@ -163,25 +166,28 @@ Effect:
 
 ### `set-recording`
 
-Input type: `AppCommands.SetRecordingArgs`
+Input type: `Commands.SetRecordingArgs`
 
 Fields:
 
-- `ViewerState.RecordingMode mode`
-- `ViewerState.RecordingSize size`
+- `ViewState.RecordingMode mode`
+- `ViewState.RecordingSize size`
 
 Semantics:
 
-- this is a partial-update command
-- `null` fields mean "leave current recording configuration unchanged"
+This is a partial-update command. Callers may provide only the recording
+fields they want to change and leave the rest as `null`. Omitted fields are
+merged with the current recording state in
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) before the
+update is applied.
 
 Current enum/value domains:
 
-- `ViewerState.RecordingMode`:
+- `ViewState.RecordingMode`:
   - `LOOP`
   - `SHOT`
   - `FREE`
-- `ViewerState.RecordingSize`:
+- `ViewState.RecordingSize`:
   - `ORIGINAL`
   - `H1024`
   - `H1080`
@@ -191,21 +197,25 @@ Current enum/value domains:
 
 ### `record-start`
 
-Input type: `AppCommands.RecordStartArgs`
+Input type: `Commands.RecordStartArgs`
 
 Fields:
 
-- `ViewerState.RecordingMode mode`
-- `ViewerState.RecordingSize size`
-- `Movie.AdvanceMode advanceMode`
-- `Integer speed`
-- `ViewerState.PlaybackSpeedUnit speedUnit`
+- `String mode`
+- `String size`
+- `String advanceMode`
+- `String speed`
+- `String speedUnit`
 
 Semantics:
 
 - if recording is already active, the command returns immediately
 - if input is non-null, it first updates recording and playback configuration
-- export then starts from the resulting [ViewerState.recordingData()](../src/org/helioviewer/jhv/gui/ViewerState.java) and [ViewerState.playbackData()](../src/org/helioviewer/jhv/gui/ViewerState.java)
+- those five fields are carried as raw strings and resolved in
+  [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
+- invalid values are warned about and ignored in `ViewState`; they do not fail
+  the command
+- export then starts from the resulting [ViewState.recordingData()](../src/org/helioviewer/jhv/app/state/ViewState.java) and [ViewState.playbackData()](../src/org/helioviewer/jhv/app/state/ViewState.java)
 
 ### `record-stop`
 
@@ -361,12 +371,10 @@ In particular:
 
 leave the resulting state visible in the UI after execution.
 
-This is important for transport clients such as SAMP. External control should leave the application in the state it requested, unless a future command is explicitly documented as temporary.
-
 ## Current SAMP Mapping
 
-The following SAMP load operations currently dispatch through `AppCommands.Registry` in
-[SampClient.java](../src/org/helioviewer/jhv/io/SampClient.java):
+The following SAMP operations are currently wired from
+[SampClient.java](../src/org/helioviewer/jhv/io/samp/SampClient.java):
 
 - `image.load.fits` -> `load-image`
 - `table.load.fits` -> `load-image`
@@ -377,9 +385,17 @@ The following SAMP load operations currently dispatch through `AppCommands.Regis
 - `jhv.load.request` -> `load-request`
 - `jhv.load.state` -> `load-state`
 - `jhv.load.sunjson` -> `load-sunjson`
+- `jhv.record.start` -> `record-start`
+- `jhv.record.stop` -> `record-stop`
 
 Notes:
 
+- all of the above currently go through `Commands.Registry`, except:
+  - `jhv.load.state`
+  - `jhv.record.start`
+  - `jhv.record.stop`
+- `jhv.load.state` uses the context-aware `Commands.loadState(...)` path directly so JHV can send a correlated completion notification later
+- `jhv.record.start` and `jhv.record.stop` use direct `Commands` helpers rather than `Commands.Registry`
 - `table.load.votable` is currently accepted only from sender `SolarOrbiterARchive`
 - `table.load.fits` is currently accepted only from senders `SolarOrbiterARchive` and `SSA`
 
@@ -387,7 +403,7 @@ Notes:
 
 This section describes the payload shape an external SAMP client can send today.
 
-These are the message params that [SampClient.java](../src/org/helioviewer/jhv/io/SampClient.java) actually reads now.
+These are the message params that [SampClient.java](../src/org/helioviewer/jhv/io/samp/SampClient.java) actually reads now.
 
 ### Single-URL payloads
 
@@ -449,13 +465,19 @@ Message types:
 - `jhv.load.state`
 - `jhv.load.sunjson`
 
+For `jhv.load.state`, clients may also send an optional `requestId` parameter.
+This is not a SAMP-standard field; it is part of JHV's application-level
+message contract and is used only so the client can correlate the eventual
+completion notification.
+
 Accepted payload shapes:
 
 URL form:
 
 ```json
 {
-  "url": "https://example.invalid/state.json"
+  "url": "https://example.invalid/state.json",
+  "requestId": "abc-123"
 }
 ```
 
@@ -463,7 +485,8 @@ Inline-value form:
 
 ```json
 {
-  "value": "{\"org.helioviewer.jhv.state\":{...}}"
+  "value": "{\"org.helioviewer.jhv.state\":{...}}",
+  "requestId": "abc-123"
 }
 ```
 
@@ -479,16 +502,202 @@ Current behavior:
 - for `jhv.load.image` and `jhv.load.hapi`, the `url` array elements are each converted with `toString()`
 - `table.load.votable` is additionally sender-restricted to `SolarOrbiterARchive`
 - `table.load.fits` is additionally sender-restricted to `SolarOrbiterARchive` and `SSA`
+- `requestId` is currently meaningful for `jhv.load.state` and `jhv.record.start`
+
+### Recording payloads
+
+`jhv.record.start` currently accepts these optional params:
+
+- `requestId`
+- `mode`
+- `size`
+- `advanceMode`
+- `speed`
+- `speedUnit`
+
+Each param is read as a plain string and stored in the corresponding
+`Commands.RecordStartArgs` field. Omitted params leave the existing recording or
+playback configuration unchanged. `ViewState` later resolves and validates the
+values when the command is applied.
+
+Expected string domains:
+
+- `mode`: `LOOP`, `SHOT`, `FREE`
+- `size`: `ORIGINAL`, `H1024`, `H1080`, `H2048`, `H2160`, `H4096`
+- `advanceMode`: `Loop`, `Stop`, `Swing`, `SwingDown`
+- `speedUnit`: `FRAMES_PER_SECOND`, `MINUTES_PER_SECOND`, `HOURS_PER_SECOND`, `DAYS_PER_SECOND`
+
+These values are currently matched with Java `valueOf(...)`, so spelling and
+case must match the names above exactly.
+
+Example:
+
+```json
+{
+  "requestId": "rec-1",
+  "mode": "LOOP",
+  "size": "H1080",
+  "advanceMode": "Loop",
+  "speed": "24",
+  "speedUnit": "FRAMES_PER_SECOND"
+}
+```
+
+`jhv.record.stop` currently reads no params.
+
+## `jhv.load.state` Client Contract
+
+This is the current end-to-end contract implemented in
+[SampClient.java](../src/org/helioviewer/jhv/io/samp/SampClient.java).
+
+Request:
+
+- `samp.mtype`: `jhv.load.state`
+- `samp.params`:
+  - either `url` or `value`
+  - optional `requestId`
+
+Response:
+
+- completion is sent as a targeted SAMP notify back to the same client that
+  sent the request
+- `samp.mtype`: `jhv.load.state.completed`
+- `samp.params` always includes:
+  - `mtype`: `jhv.load.state`
+  - `status`: `success` or `failure`
+  - `message`
+- `samp.params` additionally includes `requestId` if and only if the original
+  request supplied one
+
+Success example:
+
+```json
+{
+  "samp.mtype": "jhv.load.state.completed",
+  "samp.params": {
+    "requestId": "abc-123",
+    "mtype": "jhv.load.state",
+    "status": "success",
+    "message": "State loaded."
+  }
+}
+```
+
+Failure example:
+
+```json
+{
+  "samp.mtype": "jhv.load.state.completed",
+  "samp.params": {
+    "requestId": "abc-123",
+    "mtype": "jhv.load.state",
+    "status": "failure",
+    "message": "An error occurred opening the remote file."
+  }
+}
+```
+
+Semantics:
+
+- `success` means the state restore actually finished, not just that the JSON
+  was fetched or parsed
+- `failure` may come from:
+  - fetch/parse failure in [LoadState.java](../src/org/helioviewer/jhv/io/LoadState.java)
+  - restore-time failure in [State.java](../src/org/helioviewer/jhv/app/state/State.java)
+- without `requestId`, multiple outstanding `jhv.load.state` requests from the
+  same client are ambiguous to correlate
+- clients that want reliable correlation should always send `requestId`
+
+## `jhv.record.start` Client Contract
+
+This is the current end-to-end contract implemented in
+[SampClient.java](../src/org/helioviewer/jhv/io/samp/SampClient.java) and
+[SampRecordingHandlers.java](../src/org/helioviewer/jhv/io/samp/SampRecordingHandlers.java).
+
+Request:
+
+- `samp.mtype`: `jhv.record.start`
+- `samp.params`:
+  - optional `requestId`
+  - optional `mode`
+  - optional `size`
+  - optional `advanceMode`
+  - optional `speed`
+  - optional `speedUnit`
+
+Response:
+
+- completion is sent as a targeted SAMP notify back to the same client that
+  sent the start request
+- `samp.mtype`: `jhv.record.start.completed`
+- `samp.params` always includes:
+  - `mtype`: `jhv.record.start`
+  - `status`: `success` or `failure`
+  - `message`
+- `samp.params` additionally includes:
+  - `requestId` if and only if the original request supplied one
+  - `output` when recording finishes successfully and JHV has a result path or
+    output pattern to report
+
+Success example:
+
+```json
+{
+  "samp.mtype": "jhv.record.start.completed",
+  "samp.params": {
+    "requestId": "rec-1",
+    "mtype": "jhv.record.start",
+    "status": "success",
+    "message": "Recording finished.",
+    "output": "/path/to/file.mp4"
+  }
+}
+```
+
+Failure example:
+
+```json
+{
+  "samp.mtype": "jhv.record.start.completed",
+  "samp.params": {
+    "requestId": "rec-1",
+    "mtype": "jhv.record.start",
+    "status": "failure",
+    "message": "Recording failed."
+  }
+}
+```
+
+Semantics:
+
+- completion is tied to the original `jhv.record.start` request, even if the
+  recording is later stopped via `jhv.record.stop`
+- `jhv.record.stop` currently just requests stop; it does not carry correlation
+  and does not produce a separate completion message
+- `failure` may come from:
+  - export failure while closing the recording
+- invalid `jhv.record.start` values do not currently fail the request; they are
+  warned about and ignored in
+  [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
+- without `requestId`, multiple outstanding `jhv.record.start` requests from
+  the same client are ambiguous to correlate
+- clients that want reliable correlation should always send `requestId`
 
 ## How SAMP Should Pass Arguments
 
 The intended pattern is:
 
 1. parse SAMP message params
-2. build the corresponding `AppCommands` input object
-3. call `AppCommands.Registry.run(commandId, input)`
+2. build the corresponding `Commands` input object
+3. either call `Commands.Registry.run(commandId, input)` or, for the small
+   number of context-aware commands, call the dedicated `Commands` helper
 
-This is already how the load commands are wired.
+This is already how the load commands are wired, except for `jhv.load.state`,
+which uses the dedicated context-aware `Commands.loadState(...)` helper so
+it can carry `requestId` and client identity through to completion.
+
+`jhv.record.start` and `jhv.record.stop` likewise use direct `Commands`
+helpers rather than `Commands.Registry`.
 
 The same pattern can be used for future SAMP verbs such as:
 
@@ -502,11 +711,7 @@ The same pattern can be used for future SAMP verbs such as:
 
 ## Completion Feedback
 
-Two places are natural completion hooks for future transport feedback:
+Current implementation:
 
-- recording completion:
-  [MovieExporter.java](../src/org/helioviewer/jhv/export/MovieExporter.java)
-- state loading completion:
-  [LoadState.java](../src/org/helioviewer/jhv/io/LoadState.java)
-
-These are not fully documented protocol callbacks yet; this note only records the current code-backed hook points.
+- `jhv.load.state.completed` is implemented as described above
+- `jhv.record.start.completed` is implemented as described above

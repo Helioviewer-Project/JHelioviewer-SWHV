@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.io.samp;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,10 +8,10 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.threads.JHVThread;
 
@@ -46,6 +46,11 @@ public final class SampClient extends HubConnector {
         @Override
         public void recordingFinished(@Nullable Commands.OperationContext context, boolean success, String message,
                                       @Nullable String output) {
+            if (context == null || context.owner() != SampClient.class || context.clientId() == null)
+                return;
+            if (!"jhv.record.start".equals(context.mtype()))
+                return;
+            notifyCompletion(context, "jhv.record.start.completed", success, message, output);
         }
     };
 
@@ -109,6 +114,7 @@ public final class SampClient extends HubConnector {
         declareMetadata(Metadata.asMetadata(meta));
 
         registerLoadHandlers();
+        registerRecordingHandlers();
         declareSubscriptions(computeSubscriptions());
         Commands.addCompletionListener(completionListener);
 
@@ -136,6 +142,11 @@ public final class SampClient extends HubConnector {
         addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.request", Commands.LOAD_REQUEST));
         addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.sunjson", Commands.LOAD_SUN_JSON));
         addMessageHandler(new JHVSampHandler("jhv.load.state", (senderId, sender, msg) -> SampLoadHandlers.loadState(msg, senderId)));
+    }
+
+    private void registerRecordingHandlers() {
+        addMessageHandler(SampRecordingHandlers.startHandler());
+        addMessageHandler(SampRecordingHandlers.stopHandler());
     }
 
     private static void notifyCompletion(Commands.OperationContext context, String completionMType,

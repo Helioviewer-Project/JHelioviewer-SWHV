@@ -24,7 +24,7 @@ import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
-import org.helioviewer.jhv.io.SampClient;
+import org.helioviewer.jhv.io.samp.SampClient;
 import org.helioviewer.jhv.math.Quat;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
 
