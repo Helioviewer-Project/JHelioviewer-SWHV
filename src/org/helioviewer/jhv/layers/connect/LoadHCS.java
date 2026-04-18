@@ -21,7 +21,7 @@ public class LoadHCS {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        Tasks.submit(uri.toString(), new HCS(uri), receiver::setHCS, "An error occurred opening the remote file");
+        Tasks.submit(uri.toString(), new HCS(uri), receiver::setHCS, "An error occurred opening the remote file.");
     }
 
     private record HCS(URI uri) implements Callable<List<Vec3>> {
