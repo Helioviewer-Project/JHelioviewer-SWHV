@@ -29,6 +29,7 @@ public final class ExportMovie implements Movie.Listener {
 
     private static ViewerState.RecordingMode mode;
     private static boolean shallStop;
+    private static @Nullable AppCommands.OperationContext operationContext;
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
@@ -77,9 +78,10 @@ public final class ExportMovie implements Movie.Listener {
 
     private static final int MACROBLOCK = 8;
 
-    public static void start(@Nullable AppCommands.RecordStartArgs input) {
+    public static void start(@Nullable AppCommands.OperationContext context, @Nullable AppCommands.RecordStartArgs input) {
         if (Movie.isRecording())
             return;
+        operationContext = context;
 
         if (input != null) {
             if (input.mode() != null)
@@ -156,6 +158,11 @@ public final class ExportMovie implements Movie.Listener {
         }
     }
 
+    private static void recordingFinished(boolean success, String message, @Nullable String output) {
+        AppCommands.notifyRecordingFinished(operationContext, success, message, output);
+        operationContext = null;
+    }
+
     // loop mode only
     @Override
     public void frameChanged(int frame, boolean last) {
@@ -189,9 +196,12 @@ public final class ExportMovie implements Movie.Listener {
         @Override
         public void run() {
             try {
-                movieExporter.close();
+                String output = movieExporter.close();
+                recordingFinished(true, "Recording finished.", output);
             } catch (Exception e) {
                 Log.error(e);
+                String message = e.getMessage() == null || e.getMessage().isBlank() ? "Recording failed." : e.getMessage();
+                recordingFinished(false, message, null);
             }
             System.gc();
         }

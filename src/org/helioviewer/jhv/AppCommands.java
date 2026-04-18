@@ -1,6 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -56,7 +57,6 @@ public final class AppCommands {
     }
 
     public interface Command<I> extends RegisteredCommand {
-
         void run(@Nullable I input);
     }
 
@@ -131,6 +131,24 @@ public final class AppCommands {
             @Nullable ViewerState.PlaybackSpeedUnit speedUnit) {
     }
 
+    public record OperationContext(
+            Class<?> owner,
+            @Nullable String requestId,
+            @Nullable String mtype) {
+    }
+
+    public interface CompletionListener {
+        void loadStateFinished(@Nullable OperationContext context, boolean success, String message);
+
+        void recordingFinished(
+                @Nullable OperationContext context,
+                boolean success,
+                String message,
+                @Nullable String output);
+    }
+
+    private static final ArrayList<CompletionListener> completionListeners = new ArrayList<>();
+
     private static final Command<SetViewStateArgs> setViewStateCommand = new BasicCommand<>(SET_VIEW_STATE, input -> {
         if (input == null)
             return;
@@ -169,7 +187,7 @@ public final class AppCommands {
             return;
         ViewerState.applyRecordingUpdate(input.mode(), input.size());
     });
-    private static final Command<RecordStartArgs> recordStartCommand = new BasicCommand<>(RECORD_START, ExportMovie::start);
+    private static final Command<RecordStartArgs> recordStartCommand = new BasicCommand<>(RECORD_START, input -> ExportMovie.start(null, input));
     private static final Command<Void> recordStopCommand = new BasicCommand<>(RECORD_STOP, input -> ExportMovie.shallStop());
     private static final Command<Object> loadStateCommand = new BasicCommand<>(LOAD_STATE, Load::state);
     private static final Command<Object> loadRequestCommand = new BasicCommand<>(LOAD_REQUEST, Load::request);
@@ -323,6 +341,10 @@ public final class AppCommands {
         recordStartCommand.run(args);
     }
 
+    public static void recordStart(@Nullable OperationContext context, @Nullable RecordStartArgs args) {
+        ExportMovie.start(context, args);
+    }
+
     public static void recordStop() {
         recordStopCommand.run(null);
     }
@@ -331,8 +353,16 @@ public final class AppCommands {
         loadStateCommand.run(uri);
     }
 
+    public static void loadState(@Nullable OperationContext context, URI uri) {
+        Load.state(context, uri);
+    }
+
     public static void loadState(String json) {
         loadStateCommand.run(json);
+    }
+
+    public static void loadState(@Nullable OperationContext context, String json) {
+        Load.state(context, json);
     }
 
     public static void loadRequest(URI uri) {
@@ -405,6 +435,27 @@ public final class AppCommands {
 
     public static void rotateView90(@Nullable Quat rotation) {
         rotateView90Command.run(rotation);
+    }
+
+    public static void addCompletionListener(CompletionListener listener) {
+        if (!completionListeners.contains(listener))
+            completionListeners.add(listener);
+    }
+
+    public static void removeCompletionListener(CompletionListener listener) {
+        completionListeners.remove(listener);
+    }
+
+    public static void notifyLoadStateFinished(@Nullable OperationContext context, boolean success, String message) {
+        completionListeners.forEach(listener -> listener.loadStateFinished(context, success, message));
+    }
+
+    public static void notifyRecordingFinished(
+            @Nullable OperationContext context,
+            boolean success,
+            String message,
+            @Nullable String output) {
+        completionListeners.forEach(listener -> listener.recordingFinished(context, success, message, output));
     }
 
 }

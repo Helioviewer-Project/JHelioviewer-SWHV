@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
@@ -93,14 +95,16 @@ class MovieExporter {
             "-vf", "scale=in_range=pc:out_range=pc"
     );
 
-    void close() throws Exception {
+    @Nullable
+    String close() throws Exception {
         if (tempFile == null) // unlikely reach here on encode error
-            return;
+            return null;
 
         try {
             String outPath = prefix + format.extension;
             runFFmpeg(buildCommand(outPath));
             notifyFinished(outPath);
+            return outPath;
         } catch (Exception e) {
             deleteOutputs();
             throw e;
