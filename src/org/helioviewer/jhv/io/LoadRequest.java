@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.threads.Tasks;
@@ -72,7 +73,7 @@ class LoadRequest {
     private static void onFailureCDF(String logContext, Throwable t) {
         Timelines.dc.setStatus(null);
         Log.error(logContext, t);
-        org.helioviewer.jhv.gui.Message.err("An error occurred opening the remote file", t.getMessage());
+        Message.err("An error occurred opening the remote file", t.getMessage());
     }
 
     private static void parseRequest(JSONObject jo) throws Exception {
