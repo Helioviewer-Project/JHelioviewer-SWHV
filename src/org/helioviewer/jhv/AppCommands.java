@@ -1,6 +1,5 @@
 package org.helioviewer.jhv;
 
-import java.awt.Dimension;
 import java.net.URI;
 import java.util.List;
 import java.util.Collection;
@@ -516,29 +515,7 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable RecordStartArgs input) {
-            if (Movie.isRecording())
-                return;
-
-            if (input != null) {
-                if (input.mode() != null)
-                    ViewerState.setRecordingMode(input.mode());
-                if (input.size() != null)
-                    ViewerState.setRecordingSize(input.size());
-                if (input.advanceMode() != null)
-                    ViewerState.setPlaybackAdvanceMode(input.advanceMode());
-                if (input.speed() != null || input.speedUnit() != null) {
-                    ViewerState.PlaybackData current = ViewerState.playbackData();
-                    int speed = input.speed() == null ? current.speed() : input.speed();
-                    ViewerState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
-                    ViewerState.setPlaybackSpeed(speed, speedUnit);
-                }
-            }
-
-            ViewerState.RecordingData recordingData = ViewerState.recordingData();
-            ViewerState.PlaybackData playbackData = ViewerState.playbackData();
-            Dimension size = recordingData.size().getSize();
-            int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
-            ExportMovie.start(size.width, size.height, recordingData.size().isInternal(), fps, recordingData.mode());
+            ExportMovie.start(input);
         }
     }
 

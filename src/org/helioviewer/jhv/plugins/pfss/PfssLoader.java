@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Sun;
@@ -34,7 +35,7 @@ class PfssLoader {
         submit(uri.toString(), new DataLoader(time, uri), result -> onSuccessData(uri, result), (logContext, t) -> onFailureData(uri, t));
     }
 
-    private static <T> void submit(String logContext, Callable<T> task, java.util.function.Consumer<T> onSuccess, Tasks.FailureHandler onFailure) {
+    private static <T> void submit(String logContext, Callable<T> task, Consumer<T> onSuccess, Tasks.FailureHandler onFailure) {
         cache().beginDownload();
         Tasks.submit(logContext, task, onSuccess, onFailure);
     }

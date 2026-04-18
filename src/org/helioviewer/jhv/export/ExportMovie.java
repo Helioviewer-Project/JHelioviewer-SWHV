@@ -1,8 +1,11 @@
 package org.helioviewer.jhv.export;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.Log;
@@ -73,6 +76,32 @@ public final class ExportMovie implements Movie.Listener {
     }
 
     private static final int MACROBLOCK = 8;
+
+    public static void start(@Nullable AppCommands.RecordStartArgs input) {
+        if (Movie.isRecording())
+            return;
+
+        if (input != null) {
+            if (input.mode() != null)
+                ViewerState.setRecordingMode(input.mode());
+            if (input.size() != null)
+                ViewerState.setRecordingSize(input.size());
+            if (input.advanceMode() != null)
+                ViewerState.setPlaybackAdvanceMode(input.advanceMode());
+            if (input.speed() != null || input.speedUnit() != null) {
+                ViewerState.PlaybackData current = ViewerState.playbackData();
+                int speed = input.speed() == null ? current.speed() : input.speed();
+                ViewerState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
+                ViewerState.setPlaybackSpeed(speed, speedUnit);
+            }
+        }
+
+        ViewerState.RecordingData recordingData = ViewerState.recordingData();
+        ViewerState.PlaybackData playbackData = ViewerState.playbackData();
+        Dimension size = recordingData.size().getSize();
+        int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
+        start(size.width, size.height, recordingData.size().isInternal(), fps, recordingData.mode());
+    }
 
     public static void start(int _w, int _h, boolean isInternal, int fps, ViewerState.RecordingMode _mode) {
         Movie.startRecording();
