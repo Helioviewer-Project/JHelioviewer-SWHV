@@ -25,6 +25,7 @@
         <mkdir dir="lib/natives-macos"/>
         <exec executable="xcrun" failonerror="false">
             <arg value="clang"/>
+            <arg value="-O2"/>
             <arg value="-fobjc-arc"/>
             <arg value="-dynamiclib"/>
             <arg value="-arch"/>
