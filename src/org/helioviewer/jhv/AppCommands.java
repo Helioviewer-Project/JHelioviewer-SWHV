@@ -14,11 +14,9 @@ import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.io.Load;
-import org.helioviewer.jhv.io.SoarClient;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
 public final class AppCommands {
 
@@ -71,16 +69,6 @@ public final class AppCommands {
 
     private interface QuatCommand extends RegisteredCommand {
         void run(@Nullable Quat input) throws Exception;
-    }
-
-    @FunctionalInterface
-    private interface URILoader {
-        void load(URI uri);
-    }
-
-    @FunctionalInterface
-    private interface JSONLoader {
-        void load(String json);
     }
 
     public record SetViewStateArgs(
@@ -359,36 +347,6 @@ public final class AppCommands {
         rotateView90Command.run(rotation);
     }
 
-    private static void loadURIOrJSON(String commandId, @Nullable Object input, URILoader uriLoader, JSONLoader jsonLoader) {
-        switch (input) {
-            case null -> {
-                return;
-            }
-            case URI uri -> {
-                uriLoader.load(uri);
-                return;
-            }
-            case String json -> {
-                jsonLoader.load(json);
-                return;
-            }
-            default -> {
-            }
-        }
-        throw new IllegalArgumentException(commandId + " accepts URI or String");
-    }
-
-    @SuppressWarnings("unchecked")
-    private static List<URI> asURIList(String commandId, Object input) {
-        if (!(input instanceof List<?> uris))
-            throw new IllegalArgumentException(commandId + " accepts URI or List<URI>");
-        for (Object uri : uris) {
-            if (!(uri instanceof URI))
-                throw new IllegalArgumentException(commandId + " accepts URI or List<URI>");
-        }
-        return (List<URI>) uris;
-    }
-
     private static final class SetViewStateCommand implements Command<SetViewStateArgs> {
         @Override
         public String id() {
@@ -606,7 +564,7 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            loadURIOrJSON(id(), input, Load::state, Load::state);
+            Load.state(input);
         }
     }
 
@@ -618,7 +576,7 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            loadURIOrJSON(id(), input, Load::request, Load::request);
+            Load.request(input);
         }
     }
 
@@ -630,7 +588,7 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            loadURIOrJSON(id(), input, Load::getAllSunJSON, Load::sunJSON);
+            Load.sunJSON(input);
         }
     }
 
@@ -642,20 +600,7 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            switch (input) {
-                case null -> {
-                    return;
-                }
-                case URI uri -> {
-                    Load.getAllImage(uri);
-                    return;
-                }
-                case List<?> uris when !uris.isEmpty() -> {
-                    Load.getAllImage(asURIList(id(), uris));
-                    return;
-                }
-                default -> throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
-            }
+            Load.image(input);
         }
     }
 
@@ -667,20 +612,7 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            switch (input) {
-                case null -> {
-                    return;
-                }
-                case URI uri -> {
-                    Load.getAllCDF(uri);
-                    return;
-                }
-                case List<?> uris when !uris.isEmpty() -> {
-                    Load.getAllCDF(asURIList(id(), uris));
-                    return;
-                }
-                default -> throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
-            }
+            Load.cdf(input);
         }
     }
 
@@ -694,7 +626,7 @@ public final class AppCommands {
         public void run(@Nullable URI input) {
             if (input == null)
                 return;
-            SoarClient.submitTable(input);
+            Load.votable(input);
         }
     }
 
@@ -706,20 +638,7 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            switch (input) {
-                case null -> {
-                    return;
-                }
-                case URI uri -> {
-                    BandReaderHapi.loadUri(uri);
-                    return;
-                }
-                case List<?> uris when !uris.isEmpty() -> {
-                    asURIList(id(), uris).forEach(BandReaderHapi::loadUri);
-                    return;
-                }
-                default -> throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
-            }
+            Load.hapi(input);
         }
     }
 

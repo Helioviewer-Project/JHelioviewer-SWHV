@@ -2,45 +2,61 @@ package org.helioviewer.jhv.io;
 
 import java.net.URI;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
+import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
 public final class Load {
 
     private Load() {
     }
 
-    public static void getAllCDF(@Nonnull List<URI> uris) {
-        if (!uris.isEmpty()) {
+    public static void cdf(@Nonnull List<URI> uris) {
+        if (!uris.isEmpty())
             LoadRequest.submitCDF(uris);
-        }
     }
 
-    public static void getAllCDF(@Nonnull URI uri) {
-        LoadRequest.submitCDF(List.of(uri));
+    public static void cdf(@Nonnull URI uri) {
+        cdf(List.of(uri));
     }
 
-    public static void getAllImage(@Nonnull List<URI> uris) {
-        if (!uris.isEmpty()) {
+    public static void cdf(@Nullable Object input) {
+        dispatchURIOrList("cdf", input, Load::cdf, Load::cdf);
+    }
+
+    public static void image(@Nonnull List<URI> uris) {
+        if (!uris.isEmpty())
             LoadLayer.submit(ImageLayer.create(null), uris);
-        }
     }
 
-    public static void getAllImage(@Nonnull URI uri) {
-        LoadLayer.submit(ImageLayer.create(null), List.of(uri));
+    public static void image(@Nonnull URI uri) {
+        image(List.of(uri));
     }
 
-    public static void getAllSunJSON(@Nonnull List<URI> uris) {
-        if (!uris.isEmpty()) {
+    public static void image(@Nullable Object input) {
+        dispatchURIOrList("image", input, Load::image, Load::image);
+    }
+
+    public static void sunJSON(@Nonnull List<URI> uris) {
+        if (!uris.isEmpty())
             LoadSunJSON.submit(uris);
-        }
     }
 
-    public static void getAllSunJSON(@Nonnull URI uri) {
-        LoadSunJSON.submit(List.of(uri));
+    public static void sunJSON(@Nonnull URI uri) {
+        sunJSON(List.of(uri));
+    }
+
+    public static void sunJSON(@Nonnull String json) {
+        LoadSunJSON.submit(json);
+    }
+
+    public static void sunJSON(@Nullable Object input) {
+        dispatchURIOrListOrJSON("sunJSON", input, Load::sunJSON, Load::sunJSON, Load::sunJSON);
     }
 
     public static void request(@Nonnull URI uri) {
@@ -51,6 +67,10 @@ public final class Load {
         LoadRequest.submit(json);
     }
 
+    public static void request(@Nullable Object input) {
+        dispatchURIOrJSON("request", input, Load::request, Load::request);
+    }
+
     public static void state(@Nonnull URI uri) {
         LoadState.submit(uri);
     }
@@ -59,7 +79,83 @@ public final class Load {
         LoadState.submit(json);
     }
 
-    public static void sunJSON(@Nonnull String json) {
-        LoadSunJSON.submit(json);
+    public static void state(@Nullable Object input) {
+        dispatchURIOrJSON("state", input, Load::state, Load::state);
+    }
+
+    public static void hapi(@Nonnull URI uri) {
+        BandReaderHapi.loadUri(uri);
+    }
+
+    public static void hapi(@Nonnull List<URI> uris) {
+        if (!uris.isEmpty())
+            for (URI uri : uris)
+                hapi(uri);
+    }
+
+    public static void hapi(@Nullable Object input) {
+        dispatchURIOrList("hapi", input, Load::hapi, Load::hapi);
+    }
+
+    public static void votable(@Nonnull URI uri) {
+        SoarClient.submitTable(uri);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<URI> requireNonEmptyURIList(String operation, Object input) {
+        if (!(input instanceof List<?> uris))
+            throw new IllegalArgumentException(operation + " accepts URI or List<URI>");
+        if (uris.isEmpty())
+            throw new IllegalArgumentException(operation + " accepts non-empty List<URI>");
+        for (Object uri : uris) {
+            if (!(uri instanceof URI))
+                throw new IllegalArgumentException(operation + " accepts URI or List<URI>");
+        }
+        return (List<URI>) uris;
+    }
+
+    private static void dispatchURIOrList(
+            String operation,
+            @Nullable Object input,
+            Consumer<URI> uriLoader,
+            Consumer<List<URI>> listLoader) {
+        switch (input) {
+            case null -> {
+                return;
+            }
+            case URI uri -> uriLoader.accept(uri);
+            default -> listLoader.accept(requireNonEmptyURIList(operation, input));
+        }
+    }
+
+    private static void dispatchURIOrJSON(
+            String operation,
+            @Nullable Object input,
+            Consumer<URI> uriLoader,
+            Consumer<String> jsonLoader) {
+        switch (input) {
+            case null -> {
+                return;
+            }
+            case URI uri -> uriLoader.accept(uri);
+            case String json -> jsonLoader.accept(json);
+            default -> throw new IllegalArgumentException(operation + " accepts URI or String");
+        }
+    }
+
+    private static void dispatchURIOrListOrJSON(
+            String operation,
+            @Nullable Object input,
+            Consumer<URI> uriLoader,
+            Consumer<List<URI>> listLoader,
+            Consumer<String> jsonLoader) {
+        switch (input) {
+            case null -> {
+                return;
+            }
+            case URI uri -> uriLoader.accept(uri);
+            case String json -> jsonLoader.accept(json);
+            default -> listLoader.accept(requireNonEmptyURIList(operation, input));
+        }
     }
 }
