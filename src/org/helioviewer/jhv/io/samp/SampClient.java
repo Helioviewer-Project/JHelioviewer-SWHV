@@ -112,11 +112,11 @@ public final class SampClient extends HubConnector {
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
 
-        SampLoadHandlers.register(this);
-        SampPlaybackHandlers.register(this);
-        SampRecordingHandlers.register(this);
-        SampViewHandlers.register(this);
-        SampCameraHandlers.register(this);
+        LoadHandlers.register(this);
+        PlaybackHandlers.register(this);
+        RecordingHandlers.register(this);
+        ViewHandlers.register(this);
+        CameraHandlers.register(this);
 
         declareSubscriptions(computeSubscriptions());
         Commands.addCompletionListener(completionListener);

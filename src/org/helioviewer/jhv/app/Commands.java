@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.ViewActions;
-import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.Movie;
@@ -51,75 +48,12 @@ public final class Commands {
     public static final String RESET_VIEW_AXIS = "reset-view-axis";
     public static final String ROTATE_VIEW_90 = "rotate-view-90";
 
-    public interface RegisteredCommand {
-        String id();
-    }
-
-    public interface Command<I> extends RegisteredCommand {
-        void run(@Nullable I input);
-    }
-
-    private interface IntCommand extends RegisteredCommand {
-        void run(int input);
-    }
-
-    private interface TimeCommand extends RegisteredCommand {
-        void run(@Nullable JHVTime input);
-    }
-
-    private interface QuatCommand extends RegisteredCommand {
-        void run(@Nullable Quat input);
-    }
-
-    private record BasicCommand<I>(String id, Consumer<I> runner) implements Command<I> {
-        @Override
-        public void run(@Nullable I input) {
-            runner.accept(input);
-        }
-    }
-
-    private record BasicIntCommand(String id, IntConsumer runner) implements IntCommand {
-        @Override
-        public void run(int input) {
-            runner.accept(input);
-        }
-    }
-
-    private record BasicTimeCommand(String id, Consumer<JHVTime> runner) implements TimeCommand {
-        @Override
-        public void run(@Nullable JHVTime input) {
-            runner.accept(input);
-        }
-    }
-
-    private record BasicQuatCommand(String id, Consumer<Quat> runner) implements QuatCommand {
-        @Override
-        public void run(@Nullable Quat input) {
-            runner.accept(input);
-        }
-    }
-
-    public record SetViewStateArgs(
-            @Nullable ProjectionMode projection,
-            @Nullable Interaction.AnnotationMode annotationMode,
-            @Nullable Boolean multiview,
-            @Nullable Boolean tracking,
-            @Nullable Boolean refresh,
-            @Nullable Boolean showCorona,
-            @Nullable Boolean differentialRotation) {
-    }
-
     public record SetPlaybackArgs(
             @Nullable String advanceMode,
             @Nullable String speed,
             @Nullable String speedUnit,
             @Nullable String firstFrame,
             @Nullable String lastFrame) {
-    }
-
-    public record SetRecordingArgs(
-            @Nullable ViewState.RecordingMode mode,
-            @Nullable ViewState.RecordingSize size) {
     }
 
     public record RecordStartArgs(
@@ -143,143 +77,36 @@ public final class Commands {
 
     private static final ArrayList<CompletionListener> completionListeners = new ArrayList<>();
 
-    private static final Command<SetViewStateArgs> setViewStateCommand = new BasicCommand<>(SET_VIEW_STATE, input -> {
-        if (input == null)
-            return;
-        ViewState.applyModeUpdate(
-                input.projection(),
-                input.annotationMode(),
-                input.multiview(),
-                input.tracking(),
-                input.refresh(),
-                input.showCorona(),
-                input.differentialRotation());
-    });
-    private static final Command<SetPlaybackArgs> setPlaybackCommand = new BasicCommand<>(SET_PLAYBACK, input -> {
-        if (input == null)
-            return;
-        ViewState.applyPlaybackUpdateRaw(
-                input.advanceMode(),
-                input.speed(),
-                input.speedUnit(),
-                input.firstFrame(),
-                input.lastFrame());
-    });
-    private static final Command<Void> playCommand = new BasicCommand<>(PLAY, input -> Movie.play());
-    private static final Command<Void> pauseCommand = new BasicCommand<>(PAUSE, input -> Movie.pause());
-    private static final Command<Void> togglePlaybackCommand = new BasicCommand<>(TOGGLE_PLAYBACK, input -> Movie.toggle());
-    private static final IntCommand seekFrameCommand = new BasicIntCommand(SEEK_FRAME, Movie::setFrame);
-    private static final TimeCommand seekTimeCommand = new BasicTimeCommand(SEEK_TIME, input -> {
-        if (input == null)
-            return;
-        Movie.setTime(input);
-    });
-    private static final Command<Void> nextFrameCommand = new BasicCommand<>(NEXT_FRAME, input -> Movie.nextFrame());
-    private static final Command<Void> previousFrameCommand = new BasicCommand<>(PREVIOUS_FRAME, input -> Movie.previousFrame());
-    private static final Command<SetRecordingArgs> setRecordingCommand = new BasicCommand<>(SET_RECORDING, input -> {
-        if (input == null)
-            return;
-        ViewState.applyRecordingUpdate(input.mode(), input.size());
-    });
-    private static final Command<RecordStartArgs> recordStartCommand = new BasicCommand<>(RECORD_START, input -> ExportMovie.start(null, input));
-    private static final Command<Void> recordStopCommand = new BasicCommand<>(RECORD_STOP, input -> ExportMovie.shallStop());
-    private static final Command<Object> loadStateCommand = new BasicCommand<>(LOAD_STATE, Load::state);
-    private static final Command<Object> loadRequestCommand = new BasicCommand<>(LOAD_REQUEST, Load::request);
-    private static final Command<Object> loadSunJSONCommand = new BasicCommand<>(LOAD_SUN_JSON, Load::sunJSON);
-    private static final Command<Object> loadImageCommand = new BasicCommand<>(LOAD_IMAGE, Load::image);
-    private static final Command<Object> loadCDFCommand = new BasicCommand<>(LOAD_CDF, Load::cdf);
-    private static final Command<URI> loadVOTableCommand = new BasicCommand<>(LOAD_VOTABLE, input -> {
-        if (input == null)
-            return;
-        Load.votable(input);
-    });
-    private static final Command<Object> loadHapiCommand = new BasicCommand<>(LOAD_HAPI, Load::hapi);
-    private static final Command<Void> zoomInCommand = new BasicCommand<>(ZOOM_IN, input -> ViewActions.zoomIn());
-    private static final Command<Void> zoomOutCommand = new BasicCommand<>(ZOOM_OUT, input -> ViewActions.zoomOut());
-    private static final Command<Void> zoomFitCommand = new BasicCommand<>(ZOOM_FIT, input -> ViewActions.zoomFit());
-    private static final Command<Void> zoomOneToOneCommand = new BasicCommand<>(ZOOM_ONE_TO_ONE, input -> ViewActions.zoomOneToOne());
-    private static final Command<Void> resetViewCommand = new BasicCommand<>(RESET_VIEW, input -> ViewActions.resetView());
-    private static final Command<Void> resetViewAxisCommand = new BasicCommand<>(RESET_VIEW_AXIS, input -> ViewActions.resetViewAxis());
-    private static final QuatCommand rotateView90Command = new BasicQuatCommand(ROTATE_VIEW_90, ViewActions::rotateView90);
-
     public static final class Registry {
-        private static final LinkedHashMap<String, RegisteredCommand> commands = new LinkedHashMap<>();
+        private static final LinkedHashMap<String, Consumer<Object>> commands = new LinkedHashMap<>();
 
         static {
-            register(setViewStateCommand);
-            register(setPlaybackCommand);
-            register(playCommand);
-            register(pauseCommand);
-            register(togglePlaybackCommand);
-            register(seekFrameCommand);
-            register(seekTimeCommand);
-            register(nextFrameCommand);
-            register(previousFrameCommand);
-            register(setRecordingCommand);
-            register(recordStartCommand);
-            register(recordStopCommand);
-            register(loadStateCommand);
-            register(loadRequestCommand);
-            register(loadSunJSONCommand);
-            register(loadImageCommand);
-            register(loadCDFCommand);
-            register(loadVOTableCommand);
-            register(loadHapiCommand);
-            register(zoomInCommand);
-            register(zoomOutCommand);
-            register(zoomFitCommand);
-            register(zoomOneToOneCommand);
-            register(resetViewCommand);
-            register(resetViewAxisCommand);
-            register(rotateView90Command);
+            commands.put(LOAD_STATE, Load::state);
+            commands.put(LOAD_REQUEST, Load::request);
+            commands.put(LOAD_SUN_JSON, Load::sunJSON);
+            commands.put(LOAD_IMAGE, Load::image);
+            commands.put(LOAD_CDF, Load::cdf);
+            commands.put(LOAD_VOTABLE, input -> {
+                if (!(input instanceof URI uri))
+                    throw new IllegalArgumentException("load-votable accepts URI");
+                Load.votable(uri);
+            });
+            commands.put(LOAD_HAPI, Load::hapi);
         }
 
         private Registry() {
         }
 
-        private static void register(RegisteredCommand command) {
-            commands.put(command.id(), command);
-        }
-
-        private static RegisteredCommand require(String id) {
-            RegisteredCommand command = commands.get(id);
+        private static Consumer<Object> require(String id) {
+            Consumer<Object> command = commands.get(id);
             if (command == null)
                 throw new IllegalArgumentException("Unknown command: " + id);
             return command;
         }
 
-        @SuppressWarnings("unchecked")
-        public static <I> void run(String id, @Nullable I input) {
-            RegisteredCommand command = require(id);
-            if (!(command instanceof Command<?>))
-                throw new IllegalArgumentException("Command does not accept object input: " + id);
-            ((Command<I>) command).run(input);
+        public static void run(String id, @Nullable Object input) {
+            require(id).accept(input);
         }
-
-        public static void run(String id, int input) {
-            RegisteredCommand command = require(id);
-            if (!(command instanceof IntCommand intCommand))
-                throw new IllegalArgumentException("Command does not accept int input: " + id);
-            intCommand.run(input);
-        }
-
-        public static void run(String id, @Nullable JHVTime input) {
-            RegisteredCommand command = require(id);
-            if (!(command instanceof TimeCommand timeCommand))
-                throw new IllegalArgumentException("Command does not accept time input: " + id);
-            timeCommand.run(input);
-        }
-
-        public static void run(String id, @Nullable Quat input) {
-            RegisteredCommand command = require(id);
-            if (!(command instanceof QuatCommand quatCommand))
-                throw new IllegalArgumentException("Command does not accept rotation input: " + id);
-            quatCommand.run(input);
-        }
-    }
-
-    public static void setViewState(@Nullable SetViewStateArgs args) {
-        setViewStateCommand.run(args);
     }
 
     public static void setViewStateRaw(
@@ -295,7 +122,14 @@ public final class Commands {
     }
 
     public static void setPlayback(@Nullable SetPlaybackArgs args) {
-        setPlaybackCommand.run(args);
+        if (args == null)
+            return;
+        ViewState.applyPlaybackUpdateRaw(
+                args.advanceMode(),
+                args.speed(),
+                args.speedUnit(),
+                args.firstFrame(),
+                args.lastFrame());
     }
 
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
@@ -303,43 +137,37 @@ public final class Commands {
     }
 
     public static void play() {
-        playCommand.run(null);
+        Movie.play();
     }
 
     public static void pause() {
-        pauseCommand.run(null);
+        Movie.pause();
     }
 
     public static void togglePlayback() {
-        togglePlaybackCommand.run(null);
+        Movie.toggle();
     }
 
     public static void seekFrame(int frame) {
-        seekFrameCommand.run(frame);
+        Movie.setFrame(frame);
     }
 
     public static void seekTime(@Nullable JHVTime time) {
-        seekTimeCommand.run(time);
+        if (time == null)
+            return;
+        Movie.setTime(time);
     }
 
     public static void nextFrame() {
-        nextFrameCommand.run(null);
+        Movie.nextFrame();
     }
 
     public static void previousFrame() {
-        previousFrameCommand.run(null);
-    }
-
-    public static void setRecording(@Nullable SetRecordingArgs args) {
-        setRecordingCommand.run(args);
+        Movie.previousFrame();
     }
 
     public static void setRecordingRaw(@Nullable String mode, @Nullable String size) {
         ViewState.applyRecordingUpdateRaw(mode, size);
-    }
-
-    public static void recordStart(@Nullable RecordStartArgs args) {
-        recordStartCommand.run(args);
     }
 
     public static void recordStart(@Nullable OperationContext context, @Nullable RecordStartArgs args) {
@@ -347,11 +175,11 @@ public final class Commands {
     }
 
     public static void recordStop() {
-        recordStopCommand.run(null);
+        ExportMovie.shallStop();
     }
 
     public static void loadState(URI uri) {
-        loadStateCommand.run(uri);
+        Load.state(uri);
     }
 
     public static void loadState(@Nullable OperationContext context, URI uri) {
@@ -359,7 +187,7 @@ public final class Commands {
     }
 
     public static void loadState(String json) {
-        loadStateCommand.run(json);
+        Load.state(json);
     }
 
     public static void loadState(@Nullable OperationContext context, String json) {
@@ -367,75 +195,75 @@ public final class Commands {
     }
 
     public static void loadRequest(URI uri) {
-        loadRequestCommand.run(uri);
+        Load.request(uri);
     }
 
     public static void loadRequest(String json) {
-        loadRequestCommand.run(json);
+        Load.request(json);
     }
 
     public static void loadSunJSON(URI uri) {
-        loadSunJSONCommand.run(uri);
+        Load.sunJSON(uri);
     }
 
     public static void loadSunJSON(String json) {
-        loadSunJSONCommand.run(json);
+        Load.sunJSON(json);
     }
 
     public static void loadImage(URI uri) {
-        loadImageCommand.run(uri);
+        Load.image(uri);
     }
 
     public static void loadImage(List<URI> uris) {
-        loadImageCommand.run(uris);
+        Load.image(uris);
     }
 
     public static void loadCDF(URI uri) {
-        loadCDFCommand.run(uri);
+        Load.cdf(uri);
     }
 
     public static void loadCDF(List<URI> uris) {
-        loadCDFCommand.run(uris);
+        Load.cdf(uris);
     }
 
     public static void loadVOTable(URI uri) {
-        loadVOTableCommand.run(uri);
+        Load.votable(uri);
     }
 
     public static void loadHapi(URI uri) {
-        loadHapiCommand.run(uri);
+        Load.hapi(uri);
     }
 
     public static void loadHapi(List<URI> uris) {
-        loadHapiCommand.run(uris);
+        Load.hapi(uris);
     }
 
     public static void zoomIn() {
-        zoomInCommand.run(null);
+        ViewActions.zoomIn();
     }
 
     public static void zoomOut() {
-        zoomOutCommand.run(null);
+        ViewActions.zoomOut();
     }
 
     public static void zoomFit() {
-        zoomFitCommand.run(null);
+        ViewActions.zoomFit();
     }
 
     public static void zoomOneToOne() {
-        zoomOneToOneCommand.run(null);
+        ViewActions.zoomOneToOne();
     }
 
     public static void resetView() {
-        resetViewCommand.run(null);
+        ViewActions.resetView();
     }
 
     public static void resetViewAxis() {
-        resetViewAxisCommand.run(null);
+        ViewActions.resetViewAxis();
     }
 
     public static void rotateView90(@Nullable Quat rotation) {
-        rotateView90Command.run(rotation);
+        ViewActions.rotateView90(rotation);
     }
 
     public static void addCompletionListener(CompletionListener listener) {

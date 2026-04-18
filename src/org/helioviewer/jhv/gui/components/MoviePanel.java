@@ -309,7 +309,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                Commands.recordStart(null);
+                Commands.recordStart(null, null);
             } else {
                 Commands.recordStop();
             }

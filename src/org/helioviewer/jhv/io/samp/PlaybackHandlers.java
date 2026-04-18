@@ -8,9 +8,9 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import org.astrogrid.samp.Message;
 
-final class SampPlaybackHandlers {
+final class PlaybackHandlers {
 
-    private SampPlaybackHandlers() {
+    private PlaybackHandlers() {
     }
 
     static void register(SampClient client) {

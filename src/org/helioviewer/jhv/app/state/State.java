@@ -207,7 +207,7 @@ public final class State {
     }
 
     private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,
-                            ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData,
+                            @Nullable ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData,
                             boolean moviePlaying) implements FutureCallback<Void> {
 
         private void applyRestoredPlaybackState() {

@@ -292,8 +292,7 @@ public final class ViewState {
         notifyModeListeners();
     }
 
-    // Commands-only partial update entry point.
-    public static void applyModeUpdate(
+    private static void applyModeUpdate(
             @Nullable ProjectionMode projection,
             @Nullable Interaction.AnnotationMode annotationMode,
             @Nullable Boolean multiview,
@@ -312,7 +311,6 @@ public final class ViewState {
                 differentialRotation == null ? current.differentialRotation() : differentialRotation));
     }
 
-    // Commands-only partial update entry point.
     public static void applyModeUpdateRaw(
             @Nullable String projection,
             @Nullable String annotationMode,
@@ -504,8 +502,7 @@ public final class ViewState {
         notifyMovieListeners();
     }
 
-    // Commands-only partial update entry point.
-    public static void applyPlaybackUpdate(
+    private static void applyPlaybackUpdate(
             @Nullable Movie.AdvanceMode advanceMode,
             @Nullable Integer speed,
             @Nullable PlaybackSpeedUnit speedUnit,
@@ -528,7 +525,6 @@ public final class ViewState {
         }
     }
 
-    // Commands-only partial update entry point.
     public static void applyPlaybackUpdateRaw(
             @Nullable String advanceMode,
             @Nullable String speed,
@@ -550,26 +546,8 @@ public final class ViewState {
             @Nullable String advanceMode,
             @Nullable String speed,
             @Nullable String speedUnit) {
-        RecordingMode resolvedMode = parseEnum(mode, RecordingMode.class, "recording mode");
-        if (resolvedMode != null)
-            setRecordingMode(resolvedMode);
-
-        RecordingSize resolvedSize = parseEnum(size, RecordingSize.class, "recording size");
-        if (resolvedSize != null)
-            setRecordingSize(resolvedSize);
-
-        Movie.AdvanceMode resolvedAdvanceMode = parseEnum(advanceMode, Movie.AdvanceMode.class, "playback advance mode");
-        if (resolvedAdvanceMode != null)
-            setPlaybackAdvanceMode(resolvedAdvanceMode);
-
-        if (speed != null || speedUnit != null) {
-            PlaybackData current = playbackData();
-            Integer parsedSpeed = parseInteger(speed, "playback speed");
-            PlaybackSpeedUnit parsedSpeedUnit = parseEnum(speedUnit, PlaybackSpeedUnit.class, "playback speed unit");
-            int resolvedSpeed = parsedSpeed == null ? current.speed() : parsedSpeed;
-            PlaybackSpeedUnit resolvedSpeedUnit = parsedSpeedUnit == null ? current.speedUnit() : parsedSpeedUnit;
-            setPlaybackSpeed(resolvedSpeed, resolvedSpeedUnit);
-        }
+        applyRecordingUpdateRaw(mode, size);
+        applyPlaybackUpdateRaw(advanceMode, speed, speedUnit, null, null);
     }
 
     public static void setPlaybackRange(int newPlaybackFirstFrame, int newPlaybackLastFrame) {
@@ -648,8 +626,7 @@ public final class ViewState {
         notifyMovieListeners();
     }
 
-    // Commands-only partial update entry point.
-    public static void applyRecordingUpdate(
+    private static void applyRecordingUpdate(
             @Nullable RecordingMode mode,
             @Nullable RecordingSize size) {
         if (mode != null)
@@ -658,7 +635,6 @@ public final class ViewState {
             setRecordingSize(size);
     }
 
-    // Commands-only partial update entry point.
     public static void applyRecordingUpdateRaw(
             @Nullable String mode,
             @Nullable String size) {

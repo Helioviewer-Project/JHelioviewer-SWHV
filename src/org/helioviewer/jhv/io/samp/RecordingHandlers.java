@@ -5,11 +5,10 @@ import java.awt.EventQueue;
 import org.helioviewer.jhv.app.Commands;
 
 import org.astrogrid.samp.Message;
-import org.astrogrid.samp.client.AbstractMessageHandler;
 
-final class SampRecordingHandlers {
+final class RecordingHandlers {
 
-    private SampRecordingHandlers() {
+    private RecordingHandlers() {
     }
 
     static void register(SampClient client) {

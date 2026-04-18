@@ -4,9 +4,9 @@ import java.awt.EventQueue;
 
 import org.helioviewer.jhv.app.Commands;
 
-final class SampViewHandlers {
+final class ViewHandlers {
 
-    private SampViewHandlers() {
+    private ViewHandlers() {
     }
 
     static void register(SampClient client) {
