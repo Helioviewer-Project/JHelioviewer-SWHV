@@ -135,6 +135,8 @@ public final class ExportMovie implements Movie.Listener {
     }
 
     public static void shallStop() {
+        if (!Movie.isRecording())
+            return;
         shallStop = true;
         MovieDisplay.display(); // force detach
     }
