@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.swing.Timer;
 
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -72,12 +72,12 @@ public class Movie {
             pause();
             playbackFirstTime = TimeUtils.START;
             playbackLastTime = TimeUtils.START;
-            ViewerState.clearMovie();
+            ViewState.clearMovie();
         } else {
             View view = layer.getView();
             playbackFirstTime = view.getFirstTime();
             playbackLastTime = view.getLastTime();
-            ViewerState.setMovieAvailable(view.getMaximumFrameNumber());
+            ViewState.setMovieAvailable(view.getMaximumFrameNumber());
             syncTime(playbackFirstTime);
         }
         timeRangeChanged();
@@ -183,13 +183,13 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null && layer.getView().isMultiFrame()) {
             movieTimer.restart();
-            ViewerState.setMoviePlaying(true);
+            ViewState.setMoviePlaying(true);
         }
     }
 
     public static void pause() {
         movieTimer.stop();
-        ViewerState.setMoviePlaying(false);
+        ViewState.setMoviePlaying(false);
         MovieDisplay.render(1); /* ! force update for on the fly resolution change */
     }
 
@@ -254,7 +254,7 @@ public class Movie {
 
         frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
 
-        ViewerState.setMovieActiveFrame(activeFrame);
+        ViewState.setMovieActiveFrame(activeFrame);
 
         if (recording)
             notDone = true;
@@ -328,12 +328,12 @@ public class Movie {
 
     public static void startRecording() {
         recording = true;
-        ViewerState.movieRecordingChanged();
+        ViewState.movieRecordingChanged();
     }
 
     public static void stopRecording() {
         recording = false;
-        ViewerState.movieRecordingChanged();
+        ViewState.movieRecordingChanged();
     }
 
     public static boolean isRecording() {

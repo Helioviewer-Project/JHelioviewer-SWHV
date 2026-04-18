@@ -1,9 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.EventQueue;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +8,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
@@ -29,8 +25,6 @@ import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.hub.Hub;
 import org.astrogrid.samp.hub.HubServiceMode;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public final class SampClient extends HubConnector {
 
@@ -39,6 +33,21 @@ public final class SampClient extends HubConnector {
     }
 
     private static SampClient instance; // keep instance built at startup
+    private static final Commands.CompletionListener completionListener = new Commands.CompletionListener() {
+        @Override
+        public void loadStateFinished(@Nullable Commands.OperationContext context, boolean success, String message) {
+            if (context == null || context.owner() != SampClient.class || context.clientId() == null)
+                return;
+            if (!"jhv.load.state".equals(context.mtype()))
+                return;
+            notifyCompletion(context, "jhv.load.state.completed", success, message, null);
+        }
+
+        @Override
+        public void recordingFinished(@Nullable Commands.OperationContext context, boolean success, String message,
+                                      @Nullable String output) {
+        }
+    };
 
     public static void init() {
         JHVThread.create(() -> {
@@ -55,25 +64,18 @@ public final class SampClient extends HubConnector {
         }, "JHV-StartSamp").start();
     }
 
-    private static URI toURI(String url) throws Exception {
-        URI uri = new URI(url);
-        if (uri.getScheme() == null) // assume local file
-            uri = Path.of(url).toUri();
-        return uri;
-    }
-
     @FunctionalInterface
-    private interface CheckedConsumer<T, U> {
-        void accept(T t, U u) throws Exception;
+    interface CheckedHandler {
+        void accept(String senderId, String senderName, Message msg) throws Exception;
     }
 
-    private static class JHVSampHandler extends AbstractMessageHandler {
+    static class JHVSampHandler extends AbstractMessageHandler {
 
         private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web
         private final String type;
-        private final CheckedConsumer<String, Message> consumer;
+        private final CheckedHandler consumer;
 
-        JHVSampHandler(String _type, CheckedConsumer<String, Message> _consumer) {
+        JHVSampHandler(String _type, CheckedHandler _consumer) {
             super(Collections.singletonMap(_type, harmless));
             type = _type;
             consumer = _consumer;
@@ -85,7 +87,7 @@ public final class SampClient extends HubConnector {
             try {
                 String sender = c.getMetadata(senderId).getName();
                 // Log.info("{\"sender\": \"" + sender + "\",\"message\": " + SampUtils.toJson(msg, false));
-                consumer.accept(sender, msg);
+                consumer.accept(senderId, sender, msg);
             } catch (Exception e) {
                 Log.warn(type, e);
             }
@@ -106,75 +108,56 @@ public final class SampClient extends HubConnector {
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
 
-        addMessageHandler(new JHVSampHandler("image.load.fits", (sender, msg) -> loadURI(msg, AppCommands.LOAD_IMAGE)));
-        // load VOTable only from SOAR
-        addMessageHandler(new JHVSampHandler("table.load.votable", (sender, msg) -> {
-            if ("SolarOrbiterARchive".equals(sender))
-                loadURI(msg, AppCommands.LOAD_VOTABLE);
-        }));
-        // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
-        addMessageHandler(new JHVSampHandler("table.load.fits", (sender, msg) -> {
-            if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
-                loadURI(msg, AppCommands.LOAD_IMAGE);
-            }
-        }));
-        // advertise we can load CDF, although we can do only MAG and SWA
-        addMessageHandler(new JHVSampHandler("table.load.cdf", (sender, msg) -> loadURI(msg, AppCommands.LOAD_CDF)));
-        addMessageHandler(new JHVSampHandler("jhv.load.image", (sender, msg) -> loadURIList(msg, AppCommands.LOAD_IMAGE)));
-        // Add handler for the HAPI csv files
-        addMessageHandler(new JHVSampHandler("jhv.load.hapi", (sender, msg) -> loadURIList(msg, AppCommands.LOAD_HAPI)));
-        addMessageHandler(inlineHandler("jhv.load.request", AppCommands.LOAD_REQUEST));
-        addMessageHandler(inlineHandler("jhv.load.state", AppCommands.LOAD_STATE));
-        addMessageHandler(inlineHandler("jhv.load.sunjson", AppCommands.LOAD_SUN_JSON));
+        registerLoadHandlers();
         declareSubscriptions(computeSubscriptions());
+        Commands.addCompletionListener(completionListener);
 
         setAutoconnect(10);
     }
 
-    private static AbstractMessageHandler inlineHandler(String type, String commandId) {
-        return new JHVSampHandler(type, (sender, msg) -> {
-            if (!loadURI(msg, commandId)) {
-                Object value = msg.getParam("value");
-                if (value != null) {
-                    invokeCommand(commandId, value.toString());
-                }
+    private void registerLoadHandlers() {
+        addMessageHandler(SampLoadHandlers.uriHandler("image.load.fits", Commands.LOAD_IMAGE));
+        // load VOTable only from SOAR
+        addMessageHandler(new JHVSampHandler("table.load.votable", (senderId, sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender))
+                SampLoadHandlers.loadURI(msg, Commands.LOAD_VOTABLE);
+        }));
+        // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
+        addMessageHandler(new JHVSampHandler("table.load.fits", (senderId, sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
+                SampLoadHandlers.loadURI(msg, Commands.LOAD_IMAGE);
             }
-        });
+        }));
+        // advertise we can load CDF, although we can do only MAG and SWA
+        addMessageHandler(SampLoadHandlers.uriHandler("table.load.cdf", Commands.LOAD_CDF));
+        addMessageHandler(SampLoadHandlers.uriListHandler("jhv.load.image", Commands.LOAD_IMAGE));
+        // Add handler for the HAPI csv files
+        addMessageHandler(SampLoadHandlers.uriListHandler("jhv.load.hapi", Commands.LOAD_HAPI));
+        addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.request", Commands.LOAD_REQUEST));
+        addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.sunjson", Commands.LOAD_SUN_JSON));
+        addMessageHandler(new JHVSampHandler("jhv.load.state", (senderId, sender, msg) -> SampLoadHandlers.loadState(msg, senderId)));
     }
 
-    private static void invokeCommand(String commandId, Object input) {
-        EventQueue.invokeLater(() -> {
-            try {
-                AppCommands.Registry.run(commandId, input);
-            } catch (Exception e) {
-                Log.warn(commandId, e);
-            }
-        });
-    }
-
-    private static boolean loadURI(Message msg, String commandId) throws Exception {
-        Object url = msg.getParam("url");
-        if (url == null)
-            return false;
-        URI uri = toURI(url.toString());
-        invokeCommand(commandId, uri);
-        return true;
-    }
-
-    private static void loadURIList(Message msg, String commandId) throws Exception {
-        JSONObject jo = new JSONObject(SampUtils.toJson(msg.getParams(), false));
-        JSONArray ja = jo.optJSONArray("url");
-        if (ja == null) {
-            URI uri = toURI(jo.optString("url"));
-            invokeCommand(commandId, uri);
+    private static void notifyCompletion(Commands.OperationContext context, String completionMType,
+                                         boolean success, String message, @Nullable String output) {
+        if (instance == null)
             return;
+        Message msg = new Message(completionMType);
+        if (context.requestId() != null)
+            msg.addParam("requestId", context.requestId());
+        if (context.mtype() != null)
+            msg.addParam("mtype", context.mtype());
+        msg.addParam("status", success ? "success" : "failure");
+        msg.addParam("message", message);
+        if (output != null)
+            msg.addParam("output", output);
+        try {
+            HubConnection c = instance.getConnection();
+            if (c != null && context.clientId() != null)
+                c.notify(context.clientId(), msg);
+        } catch (Exception e) {
+            Log.warn(e);
         }
-
-        ArrayList<URI> uris = new ArrayList<>(ja.length());
-        for (Object obj : ja) {
-            uris.add(toURI(obj.toString()));
-        }
-        invokeCommand(commandId, uris);
     }
 
     public static void notifyRequestData() {

@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
@@ -82,7 +82,7 @@ public final class Load {
         state(null, uri);
     }
 
-    public static void state(@Nullable AppCommands.OperationContext context, @Nonnull URI uri) {
+    public static void state(@Nullable Commands.OperationContext context, @Nonnull URI uri) {
         LoadState.submit(context, uri);
     }
 
@@ -90,7 +90,7 @@ public final class Load {
         state(null, json);
     }
 
-    public static void state(@Nullable AppCommands.OperationContext context, @Nonnull String json) {
+    public static void state(@Nullable Commands.OperationContext context, @Nonnull String json) {
         LoadState.submit(context, json);
     }
 

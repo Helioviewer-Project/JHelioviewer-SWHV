@@ -1,28 +1,28 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.app;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.ViewActions;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.export.ExportMovie;
-import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVTime;
 
-public final class AppCommands {
+public final class Commands {
 
-    private AppCommands() {
+    private Commands() {
     }
 
     public static final String SET_VIEW_STATE = "set-view-state";
@@ -113,26 +113,27 @@ public final class AppCommands {
     public record SetPlaybackArgs(
             @Nullable Movie.AdvanceMode advanceMode,
             @Nullable Integer speed,
-            @Nullable ViewerState.PlaybackSpeedUnit speedUnit,
+            @Nullable ViewState.PlaybackSpeedUnit speedUnit,
             @Nullable Integer firstFrame,
             @Nullable Integer lastFrame) {
     }
 
     public record SetRecordingArgs(
-            @Nullable ViewerState.RecordingMode mode,
-            @Nullable ViewerState.RecordingSize size) {
+            @Nullable ViewState.RecordingMode mode,
+            @Nullable ViewState.RecordingSize size) {
     }
 
     public record RecordStartArgs(
-            @Nullable ViewerState.RecordingMode mode,
-            @Nullable ViewerState.RecordingSize size,
+            @Nullable ViewState.RecordingMode mode,
+            @Nullable ViewState.RecordingSize size,
             @Nullable Movie.AdvanceMode advanceMode,
             @Nullable Integer speed,
-            @Nullable ViewerState.PlaybackSpeedUnit speedUnit) {
+            @Nullable ViewState.PlaybackSpeedUnit speedUnit) {
     }
 
     public record OperationContext(
             Class<?> owner,
+            @Nullable String clientId,
             @Nullable String requestId,
             @Nullable String mtype) {
     }
@@ -152,7 +153,7 @@ public final class AppCommands {
     private static final Command<SetViewStateArgs> setViewStateCommand = new BasicCommand<>(SET_VIEW_STATE, input -> {
         if (input == null)
             return;
-        ViewerState.applyModeUpdate(
+        ViewState.applyModeUpdate(
                 input.projection(),
                 input.annotationMode(),
                 input.multiview(),
@@ -164,7 +165,7 @@ public final class AppCommands {
     private static final Command<SetPlaybackArgs> setPlaybackCommand = new BasicCommand<>(SET_PLAYBACK, input -> {
         if (input == null)
             return;
-        ViewerState.applyPlaybackUpdate(
+        ViewState.applyPlaybackUpdate(
                 input.advanceMode(),
                 input.speed(),
                 input.speedUnit(),
@@ -185,7 +186,7 @@ public final class AppCommands {
     private static final Command<SetRecordingArgs> setRecordingCommand = new BasicCommand<>(SET_RECORDING, input -> {
         if (input == null)
             return;
-        ViewerState.applyRecordingUpdate(input.mode(), input.size());
+        ViewState.applyRecordingUpdate(input.mode(), input.size());
     });
     private static final Command<RecordStartArgs> recordStartCommand = new BasicCommand<>(RECORD_START, input -> ExportMovie.start(null, input));
     private static final Command<Void> recordStopCommand = new BasicCommand<>(RECORD_STOP, input -> ExportMovie.shallStop());
@@ -302,7 +303,7 @@ public final class AppCommands {
     }
 
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
-        ViewerState.setPlaybackRange(firstFrame, lastFrame);
+        ViewState.setPlaybackRange(firstFrame, lastFrame);
     }
 
     public static void play() {

@@ -8,7 +8,7 @@ import java.io.File;
 
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -54,7 +54,7 @@ public class TimelineActions {
                 Settings.setProperty("path.local", directory);
                 for (File fileName : fileNames) {
                     if (fileName.isFile())
-                        AppCommands.loadRequest(fileName.toURI());
+                        Commands.loadRequest(fileName.toURI());
                 }
             }
         }

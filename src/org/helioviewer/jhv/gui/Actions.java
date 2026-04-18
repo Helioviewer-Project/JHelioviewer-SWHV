@@ -12,7 +12,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.ExitHooks;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
@@ -26,7 +27,6 @@ import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
@@ -81,7 +81,7 @@ public class Actions {
         public void actionPerformed(ActionEvent e) {
             File state = LoadStateDialog.get();
             if (state != null)
-                AppCommands.loadState(state.toURI());
+                Commands.loadState(state.toURI());
         }
 
     }
@@ -192,7 +192,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.resetView();
+            Commands.resetView();
         }
 
     }
@@ -219,7 +219,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.resetViewAxis();
+            Commands.resetViewAxis();
         }
 
     }
@@ -235,7 +235,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.rotateView90(rotation);
+            Commands.rotateView90(rotation);
         }
 
     }
@@ -362,7 +362,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.zoomFit();
+            Commands.zoomFit();
         }
 
     }
@@ -389,7 +389,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.zoomIn();
+            Commands.zoomIn();
         }
 
     }
@@ -402,7 +402,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.zoomOneToOne();
+            Commands.zoomOneToOne();
         }
     }
 
@@ -414,7 +414,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.zoomOut();
+            Commands.zoomOut();
         }
 
     }

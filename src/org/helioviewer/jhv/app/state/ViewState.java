@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.gui;
+package org.helioviewer.jhv.app.state;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -8,14 +8,16 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
+
 import org.json.JSONObject;
 
-public final class ViewerState {
+public final class ViewState {
 
-    private ViewerState() {
+    private ViewState() {
     }
 
     public interface ModeListener {
@@ -237,7 +239,7 @@ public final class ViewerState {
         notifyModeListeners();
     }
 
-    // AppCommands-only partial update entry point.
+    // Commands-only partial update entry point.
     public static void applyModeUpdate(
             @Nullable ProjectionMode projection,
             @Nullable Interaction.AnnotationMode annotationMode,
@@ -419,7 +421,7 @@ public final class ViewerState {
         notifyMovieListeners();
     }
 
-    // AppCommands-only partial update entry point.
+    // Commands-only partial update entry point.
     public static void applyPlaybackUpdate(
             @Nullable Movie.AdvanceMode advanceMode,
             @Nullable Integer speed,
@@ -482,7 +484,7 @@ public final class ViewerState {
         notifyMovieListeners();
     }
 
-    // AppCommands-only partial update entry point.
+    // Commands-only partial update entry point.
     public static void applyRecordingUpdate(
             @Nullable RecordingMode mode,
             @Nullable RecordingSize size) {
