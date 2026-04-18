@@ -16,9 +16,6 @@ import org.helioviewer.jhv.AppCommands;
 import org.helioviewer.jhv.ExitHooks;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
@@ -27,10 +24,7 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.UpdateChecker;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.selector.State;
 import org.helioviewer.jhv.math.Quat;
@@ -198,7 +192,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Display.getCamera().reset();
+            AppCommands.resetView();
         }
 
     }
@@ -225,8 +219,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Display.getCamera().resetDragRotationAxis();
-            MovieDisplay.display();
+            AppCommands.resetViewAxis();
         }
 
     }
@@ -242,8 +235,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Display.getCamera().rotateDragRotation(rotation);
-            MovieDisplay.display();
+            AppCommands.rotateView90(rotation);
         }
 
     }
@@ -370,8 +362,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            CameraHelper.zoomToFit(Display.getCamera());
-            MovieDisplay.render(1);
+            AppCommands.zoomFit();
         }
 
     }
@@ -398,8 +389,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Display.getCamera().zoom(-Camera.ZOOM_MULTIPLIER_BUTTON);
-            MovieDisplay.render(1);
+            AppCommands.zoomIn();
         }
 
     }
@@ -412,17 +402,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ImageLayer layer = Layers.getActiveImageLayer();
-            if (layer == null)
-                return;
-
-            Camera camera = Display.getCamera();
-            double cameraWidth = ImageLayerBounds.getOneToOneCameraWidth(layer);
-            if (cameraWidth > 0) {
-                double fov = 2. * Math.atan2(0.5 * cameraWidth, camera.getViewpoint().distance);
-                camera.setFOV(fov);
-            }
-            MovieDisplay.render(1);
+            AppCommands.zoomOneToOne();
         }
     }
 
@@ -434,8 +414,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Display.getCamera().zoom(+Camera.ZOOM_MULTIPLIER_BUTTON);
-            MovieDisplay.display();
+            AppCommands.zoomOut();
         }
 
     }

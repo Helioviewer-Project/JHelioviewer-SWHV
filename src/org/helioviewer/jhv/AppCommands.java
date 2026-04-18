@@ -9,12 +9,14 @@ import java.util.LinkedHashMap;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Interaction;
+import org.helioviewer.jhv.camera.ViewActions;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.SoarClient;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
@@ -42,6 +44,13 @@ public final class AppCommands {
     public static final String LOAD_CDF = "load-cdf";
     public static final String LOAD_VOTABLE = "load-votable";
     public static final String LOAD_HAPI = "load-hapi";
+    public static final String ZOOM_IN = "zoom-in";
+    public static final String ZOOM_OUT = "zoom-out";
+    public static final String ZOOM_FIT = "zoom-fit";
+    public static final String ZOOM_ONE_TO_ONE = "zoom-one-to-one";
+    public static final String RESET_VIEW = "reset-view";
+    public static final String RESET_VIEW_AXIS = "reset-view-axis";
+    public static final String ROTATE_VIEW_90 = "rotate-view-90";
 
     public interface RegisteredCommand {
         String id();
@@ -58,6 +67,10 @@ public final class AppCommands {
 
     private interface TimeCommand extends RegisteredCommand {
         void run(@Nullable JHVTime input) throws Exception;
+    }
+
+    private interface QuatCommand extends RegisteredCommand {
+        void run(@Nullable Quat input) throws Exception;
     }
 
     @FunctionalInterface
@@ -120,6 +133,13 @@ public final class AppCommands {
     private static final LoadCDFCommand loadCDFCommand = new LoadCDFCommand();
     private static final LoadVOTableCommand loadVOTableCommand = new LoadVOTableCommand();
     private static final LoadHapiCommand loadHapiCommand = new LoadHapiCommand();
+    private static final ZoomInCommand zoomInCommand = new ZoomInCommand();
+    private static final ZoomOutCommand zoomOutCommand = new ZoomOutCommand();
+    private static final ZoomFitCommand zoomFitCommand = new ZoomFitCommand();
+    private static final ZoomOneToOneCommand zoomOneToOneCommand = new ZoomOneToOneCommand();
+    private static final ResetViewCommand resetViewCommand = new ResetViewCommand();
+    private static final ResetViewAxisCommand resetViewAxisCommand = new ResetViewAxisCommand();
+    private static final RotateView90Command rotateView90Command = new RotateView90Command();
 
     public static final class Registry {
         private static final LinkedHashMap<String, RegisteredCommand> commands = new LinkedHashMap<>();
@@ -144,6 +164,13 @@ public final class AppCommands {
             register(loadCDFCommand);
             register(loadVOTableCommand);
             register(loadHapiCommand);
+            register(zoomInCommand);
+            register(zoomOutCommand);
+            register(zoomFitCommand);
+            register(zoomOneToOneCommand);
+            register(resetViewCommand);
+            register(resetViewAxisCommand);
+            register(rotateView90Command);
         }
 
         private Registry() {
@@ -188,6 +215,15 @@ public final class AppCommands {
             if (!(command instanceof TimeCommand timeCommand))
                 throw new IllegalArgumentException("Command does not accept time input: " + id);
             timeCommand.run(input);
+        }
+
+        public static void run(String id, @Nullable Quat input) throws Exception {
+            RegisteredCommand command = commands.get(id);
+            if (command == null)
+                throw new IllegalArgumentException("Unknown command: " + id);
+            if (!(command instanceof QuatCommand quatCommand))
+                throw new IllegalArgumentException("Command does not accept rotation input: " + id);
+            quatCommand.run(input);
         }
     }
 
@@ -293,6 +329,34 @@ public final class AppCommands {
 
     public static void loadHapi(List<URI> uris) {
         loadHapiCommand.run(uris);
+    }
+
+    public static void zoomIn() {
+        zoomInCommand.run(null);
+    }
+
+    public static void zoomOut() {
+        zoomOutCommand.run(null);
+    }
+
+    public static void zoomFit() {
+        zoomFitCommand.run(null);
+    }
+
+    public static void zoomOneToOne() {
+        zoomOneToOneCommand.run(null);
+    }
+
+    public static void resetView() {
+        resetViewCommand.run(null);
+    }
+
+    public static void resetViewAxis() {
+        resetViewAxisCommand.run(null);
+    }
+
+    public static void rotateView90(@Nullable Quat rotation) {
+        rotateView90Command.run(rotation);
     }
 
     private static void loadURIOrJSON(String commandId, @Nullable Object input, URILoader uriLoader, JSONLoader jsonLoader) {
@@ -578,17 +642,20 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            if (input == null)
-                return;
-            if (input instanceof URI uri) {
-                Load.getAllImage(uri);
-                return;
+            switch (input) {
+                case null -> {
+                    return;
+                }
+                case URI uri -> {
+                    Load.getAllImage(uri);
+                    return;
+                }
+                case List<?> uris when !uris.isEmpty() -> {
+                    Load.getAllImage(asURIList(id(), uris));
+                    return;
+                }
+                default -> throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
             }
-            if (input instanceof List<?> uris && !uris.isEmpty()) {
-                Load.getAllImage(asURIList(id(), uris));
-                return;
-            }
-            throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
         }
     }
 
@@ -600,17 +667,20 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            if (input == null)
-                return;
-            if (input instanceof URI uri) {
-                Load.getAllCDF(uri);
-                return;
+            switch (input) {
+                case null -> {
+                    return;
+                }
+                case URI uri -> {
+                    Load.getAllCDF(uri);
+                    return;
+                }
+                case List<?> uris when !uris.isEmpty() -> {
+                    Load.getAllCDF(asURIList(id(), uris));
+                    return;
+                }
+                default -> throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
             }
-            if (input instanceof List<?> uris && !uris.isEmpty()) {
-                Load.getAllCDF(asURIList(id(), uris));
-                return;
-            }
-            throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
         }
     }
 
@@ -636,17 +706,104 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Object input) {
-            if (input == null)
-                return;
-            if (input instanceof URI uri) {
-                BandReaderHapi.loadUri(uri);
-                return;
+            switch (input) {
+                case null -> {
+                    return;
+                }
+                case URI uri -> {
+                    BandReaderHapi.loadUri(uri);
+                    return;
+                }
+                case List<?> uris when !uris.isEmpty() -> {
+                    asURIList(id(), uris).forEach(BandReaderHapi::loadUri);
+                    return;
+                }
+                default -> throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
             }
-            if (input instanceof List<?> uris && !uris.isEmpty()) {
-                asURIList(id(), uris).forEach(BandReaderHapi::loadUri);
-                return;
-            }
-            throw new IllegalArgumentException(id() + " accepts URI or List<URI>");
+        }
+    }
+
+    private static final class ZoomInCommand implements Command<Void> {
+        @Override
+        public String id() {
+            return ZOOM_IN;
+        }
+
+        @Override
+        public void run(@Nullable Void input) {
+            ViewActions.zoomIn();
+        }
+    }
+
+    private static final class ZoomOutCommand implements Command<Void> {
+        @Override
+        public String id() {
+            return ZOOM_OUT;
+        }
+
+        @Override
+        public void run(@Nullable Void input) {
+            ViewActions.zoomOut();
+        }
+    }
+
+    private static final class ZoomFitCommand implements Command<Void> {
+        @Override
+        public String id() {
+            return ZOOM_FIT;
+        }
+
+        @Override
+        public void run(@Nullable Void input) {
+            ViewActions.zoomFit();
+        }
+    }
+
+    private static final class ZoomOneToOneCommand implements Command<Void> {
+        @Override
+        public String id() {
+            return ZOOM_ONE_TO_ONE;
+        }
+
+        @Override
+        public void run(@Nullable Void input) {
+            ViewActions.zoomOneToOne();
+        }
+    }
+
+    private static final class ResetViewCommand implements Command<Void> {
+        @Override
+        public String id() {
+            return RESET_VIEW;
+        }
+
+        @Override
+        public void run(@Nullable Void input) {
+            ViewActions.resetView();
+        }
+    }
+
+    private static final class ResetViewAxisCommand implements Command<Void> {
+        @Override
+        public String id() {
+            return RESET_VIEW_AXIS;
+        }
+
+        @Override
+        public void run(@Nullable Void input) {
+            ViewActions.resetViewAxis();
+        }
+    }
+
+    private static final class RotateView90Command implements QuatCommand {
+        @Override
+        public String id() {
+            return ROTATE_VIEW_90;
+        }
+
+        @Override
+        public void run(@Nullable Quat input) {
+            ViewActions.rotateView90(input);
         }
     }
 }
