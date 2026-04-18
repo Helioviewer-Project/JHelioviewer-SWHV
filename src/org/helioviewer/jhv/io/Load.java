@@ -58,7 +58,6 @@ public final class Load {
     public static void sunJSON(@Nullable Object input) {
         switch (input) {
             case null -> {
-                return;
             }
             case URI uri -> sunJSON(uri);
             case String json -> sunJSON(json);
@@ -128,7 +127,6 @@ public final class Load {
             Consumer<List<URI>> listLoader) {
         switch (input) {
             case null -> {
-                return;
             }
             case URI uri -> uriLoader.accept(uri);
             default -> listLoader.accept(requireURIList(operation, input));
@@ -142,7 +140,6 @@ public final class Load {
             Consumer<String> jsonLoader) {
         switch (input) {
             case null -> {
-                return;
             }
             case URI uri -> uriLoader.accept(uri);
             case String json -> jsonLoader.accept(json);
