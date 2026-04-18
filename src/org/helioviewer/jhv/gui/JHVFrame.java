@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
@@ -136,7 +137,7 @@ public final class JHVFrame {
         leftPaneHost.add(leftScrollPane, BorderLayout.CENTER);
 
         interaction = new Interaction(Display.getCamera());
-        ViewerState.initFromInteraction();
+        ViewState.initFromInteraction();
         inputController = new InputController(interaction);
         renderCanvas.addMouseListener(inputController);
         renderCanvas.addMouseMotionListener(inputController);

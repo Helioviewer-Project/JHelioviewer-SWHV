@@ -25,13 +25,13 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
@@ -47,7 +47,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, ViewerState.MovieListener {
+public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, ViewState.MovieListener {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
@@ -67,12 +67,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     private static JideButton advancedButton;
     private static JHVSpinner speedSpinner;
-    private static JComboBox<ViewerState.PlaybackSpeedUnit> speedUnitComboBox;
+    private static JComboBox<ViewState.PlaybackSpeedUnit> speedUnitComboBox;
     private static JComboBox<AdvanceMode> advanceModeComboBox;
     private static JRadioButton loopButton;
     private static JRadioButton shotButton;
     private static JRadioButton freeButton;
-    private static JComboBox<ViewerState.RecordingSize> recordSizeComboBox;
+    private static JComboBox<ViewState.RecordingSize> recordSizeComboBox;
 
     private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
     private static final JPanel recordPanel = new JPanel(new GridBagLayout());
@@ -141,12 +141,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         // Speed
         modePanel.add(new JLabel(" Play ", JLabel.RIGHT));
 
-        speedSpinner = new JHVSpinner(ViewerState.playbackData().speed(), ViewerState.PLAYBACK_SPEED_MIN, ViewerState.PLAYBACK_SPEED_MAX, 1);
-        speedSpinner.setToolTipText("Maximum " + ViewerState.PLAYBACK_SPEED_MAX + " fps");
+        speedSpinner = new JHVSpinner(ViewState.playbackData().speed(), ViewState.PLAYBACK_SPEED_MIN, ViewState.PLAYBACK_SPEED_MAX, 1);
+        speedSpinner.setToolTipText("Maximum " + ViewState.PLAYBACK_SPEED_MAX + " fps");
         speedSpinner.addChangeListener(e -> updatePlaybackConfig());
         modePanel.add(speedSpinner);
 
-        speedUnitComboBox = new JComboBox<>(ViewerState.PlaybackSpeedUnit.values());
+        speedUnitComboBox = new JComboBox<>(ViewState.PlaybackSpeedUnit.values());
         speedUnitComboBox.addActionListener(e -> updatePlaybackConfig());
         modePanel.add(speedUnitComboBox);
 
@@ -154,7 +154,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         modePanel.add(new JLabel(" and ", JLabel.RIGHT));
 
         advanceModeComboBox = new JComboBox<>(new AdvanceMode[]{AdvanceMode.Loop, AdvanceMode.Stop, AdvanceMode.Swing, AdvanceMode.SwingDown});
-        advanceModeComboBox.addActionListener(e -> ViewerState.setPlaybackAdvanceMode((AdvanceMode) advanceModeComboBox.getSelectedItem()));
+        advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((AdvanceMode) advanceModeComboBox.getSelectedItem()));
         modePanel.add(advanceModeComboBox);
 
         // Record
@@ -164,9 +164,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         c.weighty = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        loopButton = new JRadioButton(ViewerState.RecordingMode.LOOP.toString());
-        shotButton = new JRadioButton(ViewerState.RecordingMode.SHOT.toString());
-        freeButton = new JRadioButton(ViewerState.RecordingMode.FREE.toString());
+        loopButton = new JRadioButton(ViewState.RecordingMode.LOOP.toString());
+        shotButton = new JRadioButton(ViewState.RecordingMode.SHOT.toString());
+        freeButton = new JRadioButton(ViewState.RecordingMode.FREE.toString());
 
         c.gridy = 0;
         c.gridx = 0;
@@ -183,16 +183,16 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         group.add(shotButton);
         group.add(freeButton);
 
-        loopButton.addActionListener(e -> ViewerState.setRecordingMode(ViewerState.RecordingMode.LOOP));
-        shotButton.addActionListener(e -> ViewerState.setRecordingMode(ViewerState.RecordingMode.SHOT));
-        freeButton.addActionListener(e -> ViewerState.setRecordingMode(ViewerState.RecordingMode.FREE));
+        loopButton.addActionListener(e -> ViewState.setRecordingMode(ViewState.RecordingMode.LOOP));
+        shotButton.addActionListener(e -> ViewState.setRecordingMode(ViewState.RecordingMode.SHOT));
+        freeButton.addActionListener(e -> ViewState.setRecordingMode(ViewState.RecordingMode.FREE));
 
         c.gridy = 1;
         c.gridx = 2;
         recordPanel.add(new JLabel("Size ", JLabel.RIGHT), c);
 
-        recordSizeComboBox = new JComboBox<>(ViewerState.RecordingSize.values());
-        recordSizeComboBox.addActionListener(e -> ViewerState.setRecordingSize((ViewerState.RecordingSize) recordSizeComboBox.getSelectedItem()));
+        recordSizeComboBox = new JComboBox<>(ViewState.RecordingSize.values());
+        recordSizeComboBox.addActionListener(e -> ViewState.setRecordingSize((ViewState.RecordingSize) recordSizeComboBox.getSelectedItem()));
         c.gridx = 3;
         recordPanel.add(recordSizeComboBox, c);
 
@@ -237,7 +237,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         add(JHVFrame.getLayersPanel());
 
         setEnabledState(false);
-        ViewerState.addMovieListener(this);
+        ViewState.addMovieListener(this);
         movieStateChanged();
     }
 
@@ -309,9 +309,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                AppCommands.recordStart(null);
+                Commands.recordStart(null);
             } else {
-                AppCommands.recordStop();
+                Commands.recordStop();
             }
         }
     }
@@ -349,10 +349,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     private static void updatePlaybackConfig() {
         int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
-        ViewerState.PlaybackSpeedUnit unit = (ViewerState.PlaybackSpeedUnit) speedUnitComboBox.getSelectedItem();
+        ViewState.PlaybackSpeedUnit unit = (ViewState.PlaybackSpeedUnit) speedUnitComboBox.getSelectedItem();
         if (unit == null)
             return;
-        ViewerState.setPlaybackSpeed(speed, unit);
+        ViewState.setPlaybackSpeed(speed, unit);
     }
 
     public static TimeSlider getTimeSlider() {
@@ -377,8 +377,8 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     @Override
     public void movieStateChanged() {
-        ViewerState.MovieData movieData = ViewerState.movieData();
-        ViewerState.PlaybackData playbackData = ViewerState.playbackData();
+        ViewState.MovieData movieData = ViewState.movieData();
+        ViewState.PlaybackData playbackData = ViewState.playbackData();
 
         if (advanceModeComboBox.getSelectedItem() != playbackData.advanceMode())
             advanceModeComboBox.setSelectedItem(playbackData.advanceMode());
@@ -390,7 +390,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         if (speedUnitComboBox.getSelectedItem() != playbackData.speedUnit())
             speedUnitComboBox.setSelectedItem(playbackData.speedUnit());
 
-        ViewerState.RecordingData recordingData = ViewerState.recordingData();
+        ViewState.RecordingData recordingData = ViewState.recordingData();
         switch (recordingData.mode()) {
             case LOOP -> loopButton.setSelected(true);
             case SHOT -> shotButton.setSelected(true);
@@ -410,7 +410,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         }
         setEnabledState(available);
         if (!available && movieData.recording())
-            AppCommands.recordStop();
+            Commands.recordStop();
 
         if (available && movieData.playing()) {
             playButton.setText(Buttons.pause);
@@ -434,7 +434,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            AppCommands.togglePlayback();
+            Commands.togglePlayback();
             putValue(NAME, playButton.getToolTipText());
         }
 
@@ -448,9 +448,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (ViewerState.movieData().playing())
-                AppCommands.pause();
-            AppCommands.previousFrame();
+            if (ViewState.movieData().playing())
+                Commands.pause();
+            Commands.previousFrame();
         }
 
     }
@@ -463,9 +463,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (ViewerState.movieData().playing())
-                AppCommands.pause();
-            AppCommands.nextFrame();
+            if (ViewState.movieData().playing())
+                Commands.pause();
+            Commands.nextFrame();
         }
 
     }

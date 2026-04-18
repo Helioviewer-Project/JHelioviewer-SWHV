@@ -7,11 +7,11 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.Movie;
@@ -27,9 +27,9 @@ public final class ExportMovie implements Movie.Listener {
     private static MovieExporter exporter;
     private static GLGrab grabber;
 
-    private static ViewerState.RecordingMode mode;
+    private static ViewState.RecordingMode mode;
     private static boolean shallStop;
-    private static @Nullable AppCommands.OperationContext operationContext;
+    private static @Nullable Commands.OperationContext operationContext;
 
     public static BufferedImage EVEImage = null;
     public static int EVEMovieLinePosition = -1;
@@ -78,34 +78,34 @@ public final class ExportMovie implements Movie.Listener {
 
     private static final int MACROBLOCK = 8;
 
-    public static void start(@Nullable AppCommands.OperationContext context, @Nullable AppCommands.RecordStartArgs input) {
+    public static void start(@Nullable Commands.OperationContext context, @Nullable Commands.RecordStartArgs input) {
         if (Movie.isRecording())
             return;
         operationContext = context;
 
         if (input != null) {
             if (input.mode() != null)
-                ViewerState.setRecordingMode(input.mode());
+                ViewState.setRecordingMode(input.mode());
             if (input.size() != null)
-                ViewerState.setRecordingSize(input.size());
+                ViewState.setRecordingSize(input.size());
             if (input.advanceMode() != null)
-                ViewerState.setPlaybackAdvanceMode(input.advanceMode());
+                ViewState.setPlaybackAdvanceMode(input.advanceMode());
             if (input.speed() != null || input.speedUnit() != null) {
-                ViewerState.PlaybackData current = ViewerState.playbackData();
+                ViewState.PlaybackData current = ViewState.playbackData();
                 int speed = input.speed() == null ? current.speed() : input.speed();
-                ViewerState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
-                ViewerState.setPlaybackSpeed(speed, speedUnit);
+                ViewState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
+                ViewState.setPlaybackSpeed(speed, speedUnit);
             }
         }
 
-        ViewerState.RecordingData recordingData = ViewerState.recordingData();
-        ViewerState.PlaybackData playbackData = ViewerState.playbackData();
+        ViewState.RecordingData recordingData = ViewState.recordingData();
+        ViewState.PlaybackData playbackData = ViewState.playbackData();
         Dimension size = recordingData.size().getSize();
         int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
         start(size.width, size.height, recordingData.size().isInternal(), fps, recordingData.mode());
     }
 
-    public static void start(int _w, int _h, boolean isInternal, int fps, ViewerState.RecordingMode _mode) {
+    public static void start(int _w, int _h, boolean isInternal, int fps, ViewState.RecordingMode _mode) {
         Movie.startRecording();
         shallStop = false;
 
@@ -117,15 +117,15 @@ public final class ExportMovie implements Movie.Listener {
         }
 
         mode = _mode;
-        int canvasWidth = mode == ViewerState.RecordingMode.SHOT ? _w : (_w / MACROBLOCK) * MACROBLOCK;
+        int canvasWidth = mode == ViewState.RecordingMode.SHOT ? _w : (_w / MACROBLOCK) * MACROBLOCK;
         int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
         int canvasHeight = isInternal ? _h - sh : _h;
-        int exportHeight = mode == ViewerState.RecordingMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
+        int exportHeight = mode == ViewState.RecordingMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
 
         canvasHeight = exportHeight - sh;
         grabber = new GLGrab(canvasWidth, canvasHeight);
 
-        if (mode == ViewerState.RecordingMode.SHOT) {
+        if (mode == ViewState.RecordingMode.SHOT) {
             exporter = new MovieExporter(VideoFormat.PNG, canvasWidth, exportHeight, fps);
             shallStop = true;
             MovieDisplay.render(1);
@@ -137,17 +137,17 @@ public final class ExportMovie implements Movie.Listener {
             }
             exporter = new MovieExporter(format, canvasWidth, exportHeight, fps);
 
-            if (mode == ViewerState.RecordingMode.LOOP) {
+            if (mode == ViewState.RecordingMode.LOOP) {
                 Movie.addFrameListener(instance);
-                AppCommands.seekFrame(0);
-                AppCommands.play();
+                Commands.seekFrame(0);
+                Commands.play();
             }
         }
     }
 
     private static void stop() {
         Movie.stopRecording();
-        if (mode == ViewerState.RecordingMode.LOOP) {
+        if (mode == ViewState.RecordingMode.LOOP) {
             Movie.removeFrameListener(instance);
         }
 
@@ -159,7 +159,7 @@ public final class ExportMovie implements Movie.Listener {
     }
 
     private static void recordingFinished(boolean success, String message, @Nullable String output) {
-        AppCommands.notifyRecordingFinished(operationContext, success, message, output);
+        Commands.notifyRecordingFinished(operationContext, success, message, output);
         operationContext = null;
     }
 

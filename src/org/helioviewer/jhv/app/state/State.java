@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers.selector;
+package org.helioviewer.jhv.app.state;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -15,11 +15,10 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -52,8 +51,8 @@ public final class State {
     private static JSONObject toJson() {
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
-        ViewerState.writeModeJson(main);
-        ViewerState.writeMovieJson(main);
+        ViewState.writeModeJson(main);
+        ViewState.writeMovieJson(main);
         main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
 
         JSONArray ja = new JSONArray();
@@ -151,7 +150,8 @@ public final class State {
         newList.forEach(layer -> Timelines.getLayers().add(layer));
     }
 
-    private static void loadLayers(JSONObject data, ViewerState.ModeData modeData, boolean moviePlaying) {
+    private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context,
+                                   ViewState.ModeData modeData, boolean moviePlaying) {
         Layers.clear();
 
         for (Object o : data.getJSONArray("layers")) {
@@ -189,7 +189,9 @@ public final class State {
         JHVFrame.getInteraction().loadAnnotations(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
-        EDTCallbackExecutor.pool.submit(new WaitLoad(newLayers.keySet()), new Callback(newLayers, masterLayer, time, modeData, moviePlaying));
+        EDTCallbackExecutor.pool.submit(
+                new WaitLoad(newLayers.keySet()),
+                new Callback(context, newLayers, masterLayer, time, modeData, moviePlaying));
     }
 
     private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
@@ -204,16 +206,16 @@ public final class State {
         }
     }
 
-    private record Callback(Map<ImageLayer, Boolean> newLayers, ImageLayer masterLayer, JHVTime time,
-                            ViewerState.ModeData modeData,
+    private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,
+                            ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData,
                             boolean moviePlaying) implements FutureCallback<Void> {
 
         private void applyRestoredPlaybackState() {
-            ViewerState.applyMode(modeData);
-            AppCommands.seekTime(time);
+            ViewState.applyMode(modeData);
+            Commands.seekTime(time);
             Display.getCamera().refresh();
             if (moviePlaying)
-                AppCommands.play();
+                Commands.play();
         }
 
         @Override
@@ -227,28 +229,33 @@ public final class State {
             if (masterLayer != null && Layers.getImageLayers().contains(masterLayer))
                 Layers.setActiveImageLayer(masterLayer);
             applyRestoredPlaybackState();
+            Commands.notifyLoadStateFinished(context, true, "State loaded.");
         }
 
         @Override
         public void onFailure(@Nonnull Throwable t) {
             Log.error(t);
+            String message = t.getMessage() == null || t.getMessage().isBlank() ? "State load failed." : t.getMessage();
+            Commands.notifyLoadStateFinished(context, false, message);
         }
 
     }
 
-    public static void load(JSONObject jo) {
+    public static void load(@Nullable Commands.OperationContext context, JSONObject jo) {
         try {
-            ViewerState.ModeData modeData = ViewerState.readModeJson(jo);
-            boolean moviePlaying = ViewerState.readMoviePlaying(jo);
+            ViewState.ModeData modeData = ViewState.readModeJson(jo);
+            boolean moviePlaying = ViewState.readMoviePlaying(jo);
             // to be loaded before viewpoint
-            ViewerState.setProjection(modeData.projection());
+            ViewState.setProjection(modeData.projection());
             loadTimelines(jo);
-            loadLayers(jo, modeData, moviePlaying);
+            loadLayers(jo, context, modeData, moviePlaying);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.loadState(plugins);
         } catch (Exception e) {
             Log.error(e);
+            String message = e.getMessage() == null || e.getMessage().isBlank() ? "State load failed." : e.getMessage();
+            Commands.notifyLoadStateFinished(context, false, message);
         }
     }
 

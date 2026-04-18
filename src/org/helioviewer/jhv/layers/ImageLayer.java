@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -142,7 +142,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         CameraHelper.zoomToFit(Display.getMiniCamera());
         Layers.setActiveImageLayer(this);
-        AppCommands.seekFrame(0);
+        Commands.seekFrame(0);
 
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);

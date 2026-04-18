@@ -20,11 +20,11 @@ import javax.swing.JSlider;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.ViewerState;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.view.View;
@@ -33,7 +33,7 @@ import org.helioviewer.jhv.view.View;
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, ViewerState.PlaybackRangeListener {
+public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, ViewState.PlaybackRangeListener {
 
     private enum DragMode {
         Frame, Range, RangeStart, RangeEnd
@@ -70,7 +70,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         UITimer.register(this);
-        ViewerState.addPlaybackRangeListener(this);
+        ViewState.addPlaybackRangeListener(this);
 
         frameNumberLabel = new JLabel((getValue() + 1) + "/" + (getMaximum() + 1), JLabel.RIGHT);
     }
@@ -86,12 +86,12 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void setMaximum(int maximum) {
         super.setMaximum(maximum);
-        AppCommands.setPlaybackRange(getMinimum(), maximum);
+        Commands.setPlaybackRange(getMinimum(), maximum);
         repaint();
     }
 
     private void setRange(int min, int max) {
-        AppCommands.setPlaybackRange(
+        Commands.setPlaybackRange(
                 Math.clamp(Math.min(min, max), getMinimum(), getMaximum()),
                 Math.clamp(Math.max(min, max), getMinimum(), getMaximum()));
         repaint();
@@ -125,15 +125,15 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     public void setValue(int n) {
         super.setValue(n);
         if (allowSetFrame)
-            AppCommands.seekFrame(n);
+            Commands.seekFrame(n);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0)
-            AppCommands.nextFrame();
+            Commands.nextFrame();
         else if (e.getWheelRotation() > 0)
-            AppCommands.previousFrame();
+            Commands.previousFrame();
     }
 
     @Override
@@ -169,9 +169,9 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void mousePressed(MouseEvent e) {
-        wasPlaying = ViewerState.movieData().playing();
+        wasPlaying = ViewState.movieData().playing();
         if (wasPlaying)
-            AppCommands.pause();
+            Commands.pause();
         dragMode = dragModeFor(e);
         dragAnchorValue = sliderUI.valueForXPosition(e.getX());
         dragRangeMin = getPlaybackFirstFrame();
@@ -185,7 +185,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         dragMode = DragMode.Frame;
         setCursor(cursorFor(e));
         if (wasPlaying)
-            AppCommands.play();
+            Commands.play();
     }
 
     private void dragRange(int value) {
@@ -235,11 +235,11 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     }
 
     private static int getPlaybackFirstFrame() {
-        return ViewerState.playbackData().firstFrame();
+        return ViewState.playbackData().firstFrame();
     }
 
     private static int getPlaybackLastFrame() {
-        return ViewerState.playbackData().lastFrame();
+        return ViewState.playbackData().lastFrame();
     }
 
     @Override

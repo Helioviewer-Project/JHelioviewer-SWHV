@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.helioviewer.jhv.AppCommands;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 
@@ -52,11 +52,11 @@ public class CommandLine {
     public static void loadRequest() {
         // -request: works only for default server
         for (URI uri : getURIOptionValues("-request")) {
-            AppCommands.loadRequest(uri);
+            Commands.loadRequest(uri);
         }
         // -state
         for (URI uri : getURIOptionValues("-state")) {
-            AppCommands.loadState(uri);
+            Commands.loadState(uri);
             break;
         }
     }
