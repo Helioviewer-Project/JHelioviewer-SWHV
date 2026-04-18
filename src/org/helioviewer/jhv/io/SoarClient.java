@@ -66,11 +66,11 @@ public final class SoarClient {
                 Log.warn(e);
             }
         }
-        Load.getAllCDF(cdfUris);
-        Load.getAllImage(imageUris);
+        Load.cdf(cdfUris);
+        Load.image(imageUris);
     }
 
-    public static void submitTable(@Nonnull URI uri) {
+    static void submitTable(@Nonnull URI uri) {
         Tasks.submit(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
     }
 

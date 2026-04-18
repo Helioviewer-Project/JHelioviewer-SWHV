@@ -149,7 +149,7 @@ public class Actions {
                     if (f.isFile() && f.canRead()) // cannot select directories anyway
                         uris.add(f.toURI());
                 }
-                Load.getAllImage(uris);
+                Load.image(uris);
             }
         }
 

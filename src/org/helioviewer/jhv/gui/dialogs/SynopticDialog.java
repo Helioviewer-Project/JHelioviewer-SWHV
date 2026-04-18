@@ -83,7 +83,7 @@ public class SynopticDialog extends StandardDialog {
             if (selected.isEmpty())
                 return;
 
-            Load.getAllImage(selected);
+            Load.image(selected);
             setVisible(false);
         });
 
