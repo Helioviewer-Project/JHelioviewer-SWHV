@@ -3,6 +3,8 @@ package org.helioviewer.jhv.gui;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
@@ -235,6 +237,26 @@ public final class ViewerState {
         notifyModeListeners();
     }
 
+    // AppCommands-only partial update entry point.
+    public static void applyModeUpdate(
+            @Nullable ProjectionMode projection,
+            @Nullable Interaction.AnnotationMode annotationMode,
+            @Nullable Boolean multiview,
+            @Nullable Boolean tracking,
+            @Nullable Boolean refresh,
+            @Nullable Boolean showCorona,
+            @Nullable Boolean differentialRotation) {
+        ModeData current = modeData();
+        applyMode(new ModeData(
+                projection == null ? current.projection() : projection,
+                annotationMode == null ? current.annotationMode() : annotationMode,
+                multiview == null ? current.multiview() : multiview,
+                tracking == null ? current.tracking() : tracking,
+                refresh == null ? current.refresh() : refresh,
+                showCorona == null ? current.showCorona() : showCorona,
+                differentialRotation == null ? current.differentialRotation() : differentialRotation));
+    }
+
     public static ProjectionMode getProjection() {
         return projection;
     }
@@ -347,9 +369,7 @@ public final class ViewerState {
         boolean changed = !movieAvailable || movieMaxFrame != newMovieMaxFrame;
         movieAvailable = true;
         movieMaxFrame = newMovieMaxFrame;
-        playbackFirstFrame = 0;
-        playbackLastFrame = newMovieMaxFrame;
-        Movie.setPlaybackRange(playbackFirstFrame, playbackLastFrame);
+        applyPlaybackRangeState(0, newMovieMaxFrame);
         notifyPlaybackRangeListeners();
         if (changed)
             notifyMovieListeners();
@@ -361,9 +381,7 @@ public final class ViewerState {
         movieMaxFrame = 0;
         movieActiveFrame = 0;
         moviePlaying = false;
-        playbackFirstFrame = 0;
-        playbackLastFrame = 0;
-        Movie.setPlaybackRange(playbackFirstFrame, playbackLastFrame);
+        applyPlaybackRangeState(0, 0);
         notifyPlaybackRangeListeners();
         if (changed)
             notifyMovieListeners();
@@ -392,13 +410,37 @@ public final class ViewerState {
 
     public static void setPlaybackSpeed(int newPlaybackSpeed, PlaybackSpeedUnit newPlaybackSpeedUnit) {
         int speed = Math.clamp(newPlaybackSpeed, PLAYBACK_SPEED_MIN, PLAYBACK_SPEED_MAX);
-        boolean changed = playbackSpeed != speed || playbackSpeedUnit != newPlaybackSpeedUnit;
+        if (playbackSpeed == speed && playbackSpeedUnit == newPlaybackSpeedUnit)
+            return;
 
         playbackSpeed = speed;
         playbackSpeedUnit = newPlaybackSpeedUnit;
         applyPlaybackSpeed();
-        if (changed)
-            notifyMovieListeners();
+        notifyMovieListeners();
+    }
+
+    // AppCommands-only partial update entry point.
+    public static void applyPlaybackUpdate(
+            @Nullable Movie.AdvanceMode advanceMode,
+            @Nullable Integer speed,
+            @Nullable PlaybackSpeedUnit speedUnit,
+            @Nullable Integer firstFrame,
+            @Nullable Integer lastFrame) {
+        if (advanceMode != null)
+            setPlaybackAdvanceMode(advanceMode);
+
+        PlaybackData current = playbackData();
+        if (speed != null || speedUnit != null) {
+            int mergedSpeed = speed == null ? current.speed() : speed;
+            PlaybackSpeedUnit mergedSpeedUnit = speedUnit == null ? current.speedUnit() : speedUnit;
+            setPlaybackSpeed(mergedSpeed, mergedSpeedUnit);
+        }
+
+        if (firstFrame != null || lastFrame != null) {
+            int mergedFirstFrame = firstFrame == null ? current.firstFrame() : firstFrame;
+            int mergedLastFrame = lastFrame == null ? current.lastFrame() : lastFrame;
+            setPlaybackRange(mergedFirstFrame, mergedLastFrame);
+        }
     }
 
     public static void setPlaybackRange(int newPlaybackFirstFrame, int newPlaybackLastFrame) {
@@ -407,9 +449,7 @@ public final class ViewerState {
         if (playbackFirstFrame == firstFrame && playbackLastFrame == lastFrame)
             return;
 
-        playbackFirstFrame = firstFrame;
-        playbackLastFrame = lastFrame;
-        Movie.setPlaybackRange(firstFrame, lastFrame);
+        applyPlaybackRangeState(firstFrame, lastFrame);
         notifyPlaybackRangeListeners();
     }
 
@@ -418,6 +458,12 @@ public final class ViewerState {
             Movie.setDesiredRelativeSpeed(playbackSpeed);
         else
             Movie.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
+    }
+
+    private static void applyPlaybackRangeState(int firstFrame, int lastFrame) {
+        playbackFirstFrame = firstFrame;
+        playbackLastFrame = lastFrame;
+        Movie.setPlaybackRange(firstFrame, lastFrame);
     }
 
     public static void setRecordingMode(RecordingMode newRecordingMode) {
@@ -434,6 +480,16 @@ public final class ViewerState {
 
         recordingSize = newRecordingSize;
         notifyMovieListeners();
+    }
+
+    // AppCommands-only partial update entry point.
+    public static void applyRecordingUpdate(
+            @Nullable RecordingMode mode,
+            @Nullable RecordingSize size) {
+        if (mode != null)
+            setRecordingMode(mode);
+        if (size != null)
+            setRecordingSize(size);
     }
 
     public static void addModeListener(ModeListener listener) {

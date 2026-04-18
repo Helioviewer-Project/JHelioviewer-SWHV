@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import javax.annotation.Nullable;
 
@@ -55,19 +57,47 @@ public final class AppCommands {
 
     public interface Command<I> extends RegisteredCommand {
 
-        void run(@Nullable I input) throws Exception;
+        void run(@Nullable I input);
     }
 
     private interface IntCommand extends RegisteredCommand {
-        void run(int input) throws Exception;
+        void run(int input);
     }
 
     private interface TimeCommand extends RegisteredCommand {
-        void run(@Nullable JHVTime input) throws Exception;
+        void run(@Nullable JHVTime input);
     }
 
     private interface QuatCommand extends RegisteredCommand {
-        void run(@Nullable Quat input) throws Exception;
+        void run(@Nullable Quat input);
+    }
+
+    private record BasicCommand<I>(String id, Consumer<I> runner) implements Command<I> {
+        @Override
+        public void run(@Nullable I input) {
+            runner.accept(input);
+        }
+    }
+
+    private record BasicIntCommand(String id, IntConsumer runner) implements IntCommand {
+        @Override
+        public void run(int input) {
+            runner.accept(input);
+        }
+    }
+
+    private record BasicTimeCommand(String id, Consumer<JHVTime> runner) implements TimeCommand {
+        @Override
+        public void run(@Nullable JHVTime input) {
+            runner.accept(input);
+        }
+    }
+
+    private record BasicQuatCommand(String id, Consumer<Quat> runner) implements QuatCommand {
+        @Override
+        public void run(@Nullable Quat input) {
+            runner.accept(input);
+        }
     }
 
     public record SetViewStateArgs(
@@ -101,32 +131,64 @@ public final class AppCommands {
             @Nullable ViewerState.PlaybackSpeedUnit speedUnit) {
     }
 
-    private static final SetViewStateCommand setViewStateCommand = new SetViewStateCommand();
-    private static final SetPlaybackCommand setPlaybackCommand = new SetPlaybackCommand();
-    private static final PlayCommand playCommand = new PlayCommand();
-    private static final PauseCommand pauseCommand = new PauseCommand();
-    private static final TogglePlaybackCommand togglePlaybackCommand = new TogglePlaybackCommand();
-    private static final SeekFrameCommand seekFrameCommand = new SeekFrameCommand();
-    private static final SeekTimeCommand seekTimeCommand = new SeekTimeCommand();
-    private static final NextFrameCommand nextFrameCommand = new NextFrameCommand();
-    private static final PreviousFrameCommand previousFrameCommand = new PreviousFrameCommand();
-    private static final SetRecordingCommand setRecordingCommand = new SetRecordingCommand();
-    private static final RecordStartCommand recordStartCommand = new RecordStartCommand();
-    private static final RecordStopCommand recordStopCommand = new RecordStopCommand();
-    private static final LoadStateCommand loadStateCommand = new LoadStateCommand();
-    private static final LoadRequestCommand loadRequestCommand = new LoadRequestCommand();
-    private static final LoadSunJSONCommand loadSunJSONCommand = new LoadSunJSONCommand();
-    private static final LoadImageCommand loadImageCommand = new LoadImageCommand();
-    private static final LoadCDFCommand loadCDFCommand = new LoadCDFCommand();
-    private static final LoadVOTableCommand loadVOTableCommand = new LoadVOTableCommand();
-    private static final LoadHapiCommand loadHapiCommand = new LoadHapiCommand();
-    private static final ZoomInCommand zoomInCommand = new ZoomInCommand();
-    private static final ZoomOutCommand zoomOutCommand = new ZoomOutCommand();
-    private static final ZoomFitCommand zoomFitCommand = new ZoomFitCommand();
-    private static final ZoomOneToOneCommand zoomOneToOneCommand = new ZoomOneToOneCommand();
-    private static final ResetViewCommand resetViewCommand = new ResetViewCommand();
-    private static final ResetViewAxisCommand resetViewAxisCommand = new ResetViewAxisCommand();
-    private static final RotateView90Command rotateView90Command = new RotateView90Command();
+    private static final Command<SetViewStateArgs> setViewStateCommand = new BasicCommand<>(SET_VIEW_STATE, input -> {
+        if (input == null)
+            return;
+        ViewerState.applyModeUpdate(
+                input.projection(),
+                input.annotationMode(),
+                input.multiview(),
+                input.tracking(),
+                input.refresh(),
+                input.showCorona(),
+                input.differentialRotation());
+    });
+    private static final Command<SetPlaybackArgs> setPlaybackCommand = new BasicCommand<>(SET_PLAYBACK, input -> {
+        if (input == null)
+            return;
+        ViewerState.applyPlaybackUpdate(
+                input.advanceMode(),
+                input.speed(),
+                input.speedUnit(),
+                input.firstFrame(),
+                input.lastFrame());
+    });
+    private static final Command<Void> playCommand = new BasicCommand<>(PLAY, input -> Movie.play());
+    private static final Command<Void> pauseCommand = new BasicCommand<>(PAUSE, input -> Movie.pause());
+    private static final Command<Void> togglePlaybackCommand = new BasicCommand<>(TOGGLE_PLAYBACK, input -> Movie.toggle());
+    private static final IntCommand seekFrameCommand = new BasicIntCommand(SEEK_FRAME, Movie::setFrame);
+    private static final TimeCommand seekTimeCommand = new BasicTimeCommand(SEEK_TIME, input -> {
+        if (input == null)
+            return;
+        Movie.setTime(input);
+    });
+    private static final Command<Void> nextFrameCommand = new BasicCommand<>(NEXT_FRAME, input -> Movie.nextFrame());
+    private static final Command<Void> previousFrameCommand = new BasicCommand<>(PREVIOUS_FRAME, input -> Movie.previousFrame());
+    private static final Command<SetRecordingArgs> setRecordingCommand = new BasicCommand<>(SET_RECORDING, input -> {
+        if (input == null)
+            return;
+        ViewerState.applyRecordingUpdate(input.mode(), input.size());
+    });
+    private static final Command<RecordStartArgs> recordStartCommand = new BasicCommand<>(RECORD_START, ExportMovie::start);
+    private static final Command<Void> recordStopCommand = new BasicCommand<>(RECORD_STOP, input -> ExportMovie.shallStop());
+    private static final Command<Object> loadStateCommand = new BasicCommand<>(LOAD_STATE, Load::state);
+    private static final Command<Object> loadRequestCommand = new BasicCommand<>(LOAD_REQUEST, Load::request);
+    private static final Command<Object> loadSunJSONCommand = new BasicCommand<>(LOAD_SUN_JSON, Load::sunJSON);
+    private static final Command<Object> loadImageCommand = new BasicCommand<>(LOAD_IMAGE, Load::image);
+    private static final Command<Object> loadCDFCommand = new BasicCommand<>(LOAD_CDF, Load::cdf);
+    private static final Command<URI> loadVOTableCommand = new BasicCommand<>(LOAD_VOTABLE, input -> {
+        if (input == null)
+            return;
+        Load.votable(input);
+    });
+    private static final Command<Object> loadHapiCommand = new BasicCommand<>(LOAD_HAPI, Load::hapi);
+    private static final Command<Void> zoomInCommand = new BasicCommand<>(ZOOM_IN, input -> ViewActions.zoomIn());
+    private static final Command<Void> zoomOutCommand = new BasicCommand<>(ZOOM_OUT, input -> ViewActions.zoomOut());
+    private static final Command<Void> zoomFitCommand = new BasicCommand<>(ZOOM_FIT, input -> ViewActions.zoomFit());
+    private static final Command<Void> zoomOneToOneCommand = new BasicCommand<>(ZOOM_ONE_TO_ONE, input -> ViewActions.zoomOneToOne());
+    private static final Command<Void> resetViewCommand = new BasicCommand<>(RESET_VIEW, input -> ViewActions.resetView());
+    private static final Command<Void> resetViewAxisCommand = new BasicCommand<>(RESET_VIEW_AXIS, input -> ViewActions.resetViewAxis());
+    private static final QuatCommand rotateView90Command = new BasicQuatCommand(ROTATE_VIEW_90, ViewActions::rotateView90);
 
     public static final class Registry {
         private static final LinkedHashMap<String, RegisteredCommand> commands = new LinkedHashMap<>();
@@ -167,6 +229,13 @@ public final class AppCommands {
             commands.put(command.id(), command);
         }
 
+        private static RegisteredCommand require(String id) {
+            RegisteredCommand command = commands.get(id);
+            if (command == null)
+                throw new IllegalArgumentException("Unknown command: " + id);
+            return command;
+        }
+
         public static Collection<String> ids() {
             return commands.keySet();
         }
@@ -177,37 +246,29 @@ public final class AppCommands {
         }
 
         @SuppressWarnings("unchecked")
-        public static <I> void run(String id, @Nullable I input) throws Exception {
-            RegisteredCommand command = commands.get(id);
-            if (command == null)
-                throw new IllegalArgumentException("Unknown command: " + id);
+        public static <I> void run(String id, @Nullable I input) {
+            RegisteredCommand command = require(id);
             if (!(command instanceof Command<?>))
                 throw new IllegalArgumentException("Command does not accept object input: " + id);
             ((Command<I>) command).run(input);
         }
 
-        public static void run(String id, int input) throws Exception {
-            RegisteredCommand command = commands.get(id);
-            if (command == null)
-                throw new IllegalArgumentException("Unknown command: " + id);
+        public static void run(String id, int input) {
+            RegisteredCommand command = require(id);
             if (!(command instanceof IntCommand intCommand))
                 throw new IllegalArgumentException("Command does not accept int input: " + id);
             intCommand.run(input);
         }
 
-        public static void run(String id, @Nullable JHVTime input) throws Exception {
-            RegisteredCommand command = commands.get(id);
-            if (command == null)
-                throw new IllegalArgumentException("Unknown command: " + id);
+        public static void run(String id, @Nullable JHVTime input) {
+            RegisteredCommand command = require(id);
             if (!(command instanceof TimeCommand timeCommand))
                 throw new IllegalArgumentException("Command does not accept time input: " + id);
             timeCommand.run(input);
         }
 
-        public static void run(String id, @Nullable Quat input) throws Exception {
-            RegisteredCommand command = commands.get(id);
-            if (command == null)
-                throw new IllegalArgumentException("Unknown command: " + id);
+        public static void run(String id, @Nullable Quat input) {
+            RegisteredCommand command = require(id);
             if (!(command instanceof QuatCommand quatCommand))
                 throw new IllegalArgumentException("Command does not accept rotation input: " + id);
             quatCommand.run(input);
@@ -223,7 +284,7 @@ public final class AppCommands {
     }
 
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
-        setPlaybackCommand.setRange(firstFrame, lastFrame);
+        ViewerState.setPlaybackRange(firstFrame, lastFrame);
     }
 
     public static void play() {
@@ -346,358 +407,4 @@ public final class AppCommands {
         rotateView90Command.run(rotation);
     }
 
-    private static final class SetViewStateCommand implements Command<SetViewStateArgs> {
-        @Override
-        public String id() {
-            return SET_VIEW_STATE;
-        }
-
-        @Override
-        public void run(@Nullable SetViewStateArgs input) {
-            if (input == null)
-                return;
-
-            ViewerState.ModeData current = ViewerState.modeData();
-            ViewerState.applyMode(new ViewerState.ModeData(
-                    input.projection() == null ? current.projection() : input.projection(),
-                    input.annotationMode() == null ? current.annotationMode() : input.annotationMode(),
-                    input.multiview() == null ? current.multiview() : input.multiview(),
-                    input.tracking() == null ? current.tracking() : input.tracking(),
-                    input.refresh() == null ? current.refresh() : input.refresh(),
-                    input.showCorona() == null ? current.showCorona() : input.showCorona(),
-                    input.differentialRotation() == null ? current.differentialRotation() : input.differentialRotation()));
-        }
-    }
-
-    private static final class SetPlaybackCommand implements Command<SetPlaybackArgs> {
-        @Override
-        public String id() {
-            return SET_PLAYBACK;
-        }
-
-        @Override
-        public void run(@Nullable SetPlaybackArgs input) {
-            if (input == null)
-                return;
-
-            if (input.advanceMode() != null)
-                ViewerState.setPlaybackAdvanceMode(input.advanceMode());
-
-            if (input.speed() != null || input.speedUnit() != null) {
-                ViewerState.PlaybackData current = ViewerState.playbackData();
-                int speed = input.speed() == null ? current.speed() : input.speed();
-                ViewerState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
-                ViewerState.setPlaybackSpeed(speed, speedUnit);
-            }
-
-            if (input.firstFrame() != null || input.lastFrame() != null) {
-                ViewerState.PlaybackData current = ViewerState.playbackData();
-                int firstFrame = input.firstFrame() == null ? current.firstFrame() : input.firstFrame();
-                int lastFrame = input.lastFrame() == null ? current.lastFrame() : input.lastFrame();
-                setRange(firstFrame, lastFrame);
-            }
-        }
-
-        private void setRange(int firstFrame, int lastFrame) {
-            ViewerState.setPlaybackRange(firstFrame, lastFrame);
-        }
-    }
-
-    private static final class PlayCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return PLAY;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            Movie.play();
-        }
-    }
-
-    private static final class PauseCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return PAUSE;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            Movie.pause();
-        }
-    }
-
-    private static final class TogglePlaybackCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return TOGGLE_PLAYBACK;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            Movie.toggle();
-        }
-    }
-
-    private static final class SeekFrameCommand implements IntCommand {
-        @Override
-        public String id() {
-            return SEEK_FRAME;
-        }
-
-        @Override
-        public void run(int input) {
-            Movie.setFrame(input);
-        }
-    }
-
-    private static final class SeekTimeCommand implements TimeCommand {
-        @Override
-        public String id() {
-            return SEEK_TIME;
-        }
-
-        @Override
-        public void run(@Nullable JHVTime input) {
-            if (input == null)
-                return;
-            Movie.setTime(input);
-        }
-    }
-
-    private static final class NextFrameCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return NEXT_FRAME;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            Movie.nextFrame();
-        }
-    }
-
-    private static final class PreviousFrameCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return PREVIOUS_FRAME;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            Movie.previousFrame();
-        }
-    }
-
-    private static final class SetRecordingCommand implements Command<SetRecordingArgs> {
-        @Override
-        public String id() {
-            return SET_RECORDING;
-        }
-
-        @Override
-        public void run(@Nullable SetRecordingArgs input) {
-            if (input == null)
-                return;
-
-            if (input.mode() != null)
-                ViewerState.setRecordingMode(input.mode());
-            if (input.size() != null)
-                ViewerState.setRecordingSize(input.size());
-        }
-    }
-
-    private static final class RecordStartCommand implements Command<RecordStartArgs> {
-        @Override
-        public String id() {
-            return RECORD_START;
-        }
-
-        @Override
-        public void run(@Nullable RecordStartArgs input) {
-            ExportMovie.start(input);
-        }
-    }
-
-    private static final class RecordStopCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return RECORD_STOP;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            ExportMovie.shallStop();
-        }
-    }
-
-    private static final class LoadStateCommand implements Command<Object> {
-        @Override
-        public String id() {
-            return LOAD_STATE;
-        }
-
-        @Override
-        public void run(@Nullable Object input) {
-            Load.state(input);
-        }
-    }
-
-    private static final class LoadRequestCommand implements Command<Object> {
-        @Override
-        public String id() {
-            return LOAD_REQUEST;
-        }
-
-        @Override
-        public void run(@Nullable Object input) {
-            Load.request(input);
-        }
-    }
-
-    private static final class LoadSunJSONCommand implements Command<Object> {
-        @Override
-        public String id() {
-            return LOAD_SUN_JSON;
-        }
-
-        @Override
-        public void run(@Nullable Object input) {
-            Load.sunJSON(input);
-        }
-    }
-
-    private static final class LoadImageCommand implements Command<Object> {
-        @Override
-        public String id() {
-            return LOAD_IMAGE;
-        }
-
-        @Override
-        public void run(@Nullable Object input) {
-            Load.image(input);
-        }
-    }
-
-    private static final class LoadCDFCommand implements Command<Object> {
-        @Override
-        public String id() {
-            return LOAD_CDF;
-        }
-
-        @Override
-        public void run(@Nullable Object input) {
-            Load.cdf(input);
-        }
-    }
-
-    private static final class LoadVOTableCommand implements Command<URI> {
-        @Override
-        public String id() {
-            return LOAD_VOTABLE;
-        }
-
-        @Override
-        public void run(@Nullable URI input) {
-            if (input == null)
-                return;
-            Load.votable(input);
-        }
-    }
-
-    private static final class LoadHapiCommand implements Command<Object> {
-        @Override
-        public String id() {
-            return LOAD_HAPI;
-        }
-
-        @Override
-        public void run(@Nullable Object input) {
-            Load.hapi(input);
-        }
-    }
-
-    private static final class ZoomInCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return ZOOM_IN;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            ViewActions.zoomIn();
-        }
-    }
-
-    private static final class ZoomOutCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return ZOOM_OUT;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            ViewActions.zoomOut();
-        }
-    }
-
-    private static final class ZoomFitCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return ZOOM_FIT;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            ViewActions.zoomFit();
-        }
-    }
-
-    private static final class ZoomOneToOneCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return ZOOM_ONE_TO_ONE;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            ViewActions.zoomOneToOne();
-        }
-    }
-
-    private static final class ResetViewCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return RESET_VIEW;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            ViewActions.resetView();
-        }
-    }
-
-    private static final class ResetViewAxisCommand implements Command<Void> {
-        @Override
-        public String id() {
-            return RESET_VIEW_AXIS;
-        }
-
-        @Override
-        public void run(@Nullable Void input) {
-            ViewActions.resetViewAxis();
-        }
-    }
-
-    private static final class RotateView90Command implements QuatCommand {
-        @Override
-        public String id() {
-            return ROTATE_VIEW_90;
-        }
-
-        @Override
-        public void run(@Nullable Quat input) {
-            ViewActions.rotateView90(input);
-        }
-    }
 }

@@ -34,6 +34,13 @@ The registry currently contains these command ids:
 - `load-cdf`
 - `load-votable`
 - `load-hapi`
+- `zoom-in`
+- `zoom-out`
+- `zoom-fit`
+- `zoom-one-to-one`
+- `reset-view`
+- `reset-view-axis`
+- `rotate-view-90`
 
 ## Command Inputs
 
@@ -241,7 +248,7 @@ Input shape:
 
 Effect:
 
-- URI case calls [Load.getAllSunJSON(...)](../src/org/helioviewer/jhv/io/Load.java)
+- URI case calls [Load.sunJSON(URI)](../src/org/helioviewer/jhv/io/Load.java)
 - JSON case calls `Load.sunJSON(String)`
 
 ### `load-image`
@@ -253,7 +260,7 @@ Input shape:
 
 Effect:
 
-- calls [Load.getAllImage(...)](../src/org/helioviewer/jhv/io/Load.java)
+- calls [Load.image(...)](../src/org/helioviewer/jhv/io/Load.java)
 
 ### `load-cdf`
 
@@ -264,7 +271,7 @@ Input shape:
 
 Effect:
 
-- calls [Load.getAllCDF(...)](../src/org/helioviewer/jhv/io/Load.java)
+- calls [Load.cdf(...)](../src/org/helioviewer/jhv/io/Load.java)
 
 ### `load-votable`
 
@@ -272,7 +279,7 @@ Input type: `URI`
 
 Effect:
 
-- calls [SoarClient.submitTable(...)](../src/org/helioviewer/jhv/io/SoarClient.java)
+- calls [Load.votable(...)](../src/org/helioviewer/jhv/io/Load.java)
 
 ### `load-hapi`
 
@@ -284,6 +291,62 @@ Input shape:
 Effect:
 
 - loads each URI with [BandReaderHapi.loadUri(...)](../src/org/helioviewer/jhv/timelines/band/BandReaderHapi.java)
+
+### `zoom-in`
+
+Input type: none
+
+Effect:
+
+- calls [ViewActions.zoomIn()](../src/org/helioviewer/jhv/camera/ViewActions.java)
+
+### `zoom-out`
+
+Input type: none
+
+Effect:
+
+- calls [ViewActions.zoomOut()](../src/org/helioviewer/jhv/camera/ViewActions.java)
+
+### `zoom-fit`
+
+Input type: none
+
+Effect:
+
+- calls [ViewActions.zoomFit()](../src/org/helioviewer/jhv/camera/ViewActions.java)
+
+### `zoom-one-to-one`
+
+Input type: none
+
+Effect:
+
+- calls [ViewActions.zoomOneToOne()](../src/org/helioviewer/jhv/camera/ViewActions.java)
+
+### `reset-view`
+
+Input type: none
+
+Effect:
+
+- calls [ViewActions.resetView()](../src/org/helioviewer/jhv/camera/ViewActions.java)
+
+### `reset-view-axis`
+
+Input type: none
+
+Effect:
+
+- calls [ViewActions.resetViewAxis()](../src/org/helioviewer/jhv/camera/ViewActions.java)
+
+### `rotate-view-90`
+
+Input type: `Quat`
+
+Effect:
+
+- calls [ViewActions.rotateView90(...)](../src/org/helioviewer/jhv/camera/ViewActions.java)
 
 ## State Semantics
 
