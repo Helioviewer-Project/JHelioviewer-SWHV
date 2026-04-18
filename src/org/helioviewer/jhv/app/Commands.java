@@ -2,7 +2,6 @@ package org.helioviewer.jhv.app;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -247,10 +246,6 @@ public final class Commands {
             if (command == null)
                 throw new IllegalArgumentException("Unknown command: " + id);
             return command;
-        }
-
-        public static Collection<String> ids() {
-            return commands.keySet();
         }
 
         @SuppressWarnings("unchecked")

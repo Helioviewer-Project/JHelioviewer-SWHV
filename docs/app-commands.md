@@ -65,6 +65,11 @@ to change and leave the rest as `null`. Omitted fields are merged with the
 current mode state in [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
 before the update is applied.
 
+SAMP currently does not construct `Commands.SetViewStateArgs` directly. The
+SAMP path goes through `Commands.setViewStateRaw(...)`, and
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) resolves
+and validates those raw strings there.
+
 Current enum/value domains used by this command:
 
 - `ProjectionMode`: `Orthographic`, `HPC`, `Latitudinal`, `LogPolar`, `Polar`
@@ -185,6 +190,11 @@ fields they want to change and leave the rest as `null`. Omitted fields are
 merged with the current recording state in
 [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) before the
 update is applied.
+
+SAMP currently does not construct `Commands.SetRecordingArgs` directly. The
+SAMP path goes through `Commands.setRecordingRaw(...)`, and
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) resolves
+and validates those raw strings there.
 
 Current enum/value domains:
 
@@ -402,6 +412,13 @@ The following SAMP operations are currently wired from
 - `jhv.set.recording` -> `set-recording`
 - `jhv.record.start` -> `record-start`
 - `jhv.record.stop` -> `record-stop`
+- `jhv.zoom.in` -> `zoom-in`
+- `jhv.zoom.out` -> `zoom-out`
+- `jhv.zoom.fit` -> `zoom-fit`
+- `jhv.zoom.one.to.one` -> `zoom-one-to-one`
+- `jhv.reset.view` -> `reset-view`
+- `jhv.reset.view.axis` -> `reset-view-axis`
+- `jhv.rotate.view.90` -> `rotate-view-90`
 
 Notes:
 
@@ -419,8 +436,15 @@ Notes:
   - `jhv.set.recording`
   - `jhv.record.start`
   - `jhv.record.stop`
+  - `jhv.zoom.in`
+  - `jhv.zoom.out`
+  - `jhv.zoom.fit`
+  - `jhv.zoom.one.to.one`
+  - `jhv.reset.view`
+  - `jhv.reset.view.axis`
+  - `jhv.rotate.view.90`
 - `jhv.load.state` uses the context-aware `Commands.loadState(...)` path directly so JHV can send a correlated completion notification later
-- the view/playback/recording SAMP commands above use direct `Commands` helpers rather than `Commands.Registry`
+- the view/playback/recording/camera SAMP commands above use direct `Commands` helpers rather than `Commands.Registry`
 - `table.load.votable` is currently accepted only from sender `SolarOrbiterARchive`
 - `table.load.fits` is currently accepted only from senders `SolarOrbiterARchive` and `SSA`
 
@@ -701,6 +725,34 @@ These simple playback message types currently read no params:
 - `jhv.next.frame`
 - `jhv.previous.frame`
 
+### Camera payloads
+
+These camera message types currently read no params:
+
+- `jhv.zoom.in`
+- `jhv.zoom.out`
+- `jhv.zoom.fit`
+- `jhv.zoom.one.to.one`
+- `jhv.reset.view`
+- `jhv.reset.view.axis`
+
+`jhv.rotate.view.90` currently accepts:
+
+- `axis`
+
+`axis` is parsed in [SampCameraHandlers.java](../src/org/helioviewer/jhv/io/samp/SampCameraHandlers.java)
+and accepts `X`, `Y`, or `Z` case-insensitively, mapping them to
+`Quat.X90`, `Quat.Y90`, or `Quat.Z90`. Invalid values are warned about and
+ignored there.
+
+Example:
+
+```json
+{
+  "axis": "Z"
+}
+```
+
 ## `jhv.load.state` Client Contract
 
 This is the current end-to-end contract implemented in
@@ -857,8 +909,10 @@ it can carry `requestId` and client identity through to completion.
 
 `jhv.set.view.state`, `jhv.set.playback`, `jhv.play`, `jhv.pause`,
 `jhv.toggle.playback`, `jhv.seek.frame`, `jhv.seek.time`, `jhv.next.frame`,
-`jhv.previous.frame`, `jhv.set.recording`, `jhv.record.start`, and
-`jhv.record.stop` likewise use direct `Commands` helpers rather than
+`jhv.previous.frame`, `jhv.set.recording`, `jhv.record.start`,
+`jhv.record.stop`, `jhv.zoom.in`, `jhv.zoom.out`, `jhv.zoom.fit`,
+`jhv.zoom.one.to.one`, `jhv.reset.view`, `jhv.reset.view.axis`, and
+`jhv.rotate.view.90` likewise use direct `Commands` helpers rather than
 `Commands.Registry`.
 
 ## Completion Feedback

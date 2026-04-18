@@ -116,6 +116,7 @@ public final class SampClient extends HubConnector {
         SampPlaybackHandlers.register(this);
         SampRecordingHandlers.register(this);
         SampViewHandlers.register(this);
+        SampCameraHandlers.register(this);
 
         declareSubscriptions(computeSubscriptions());
         Commands.addCompletionListener(completionListener);
