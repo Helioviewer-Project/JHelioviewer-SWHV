@@ -13,8 +13,9 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.io.FileUtils;
 
-import com.jidesoft.comparator.AlphanumComparator;
 import org.apache.tika.Tika;
+
+import com.jidesoft.comparator.AlphanumComparator;
 
 public class JHVGlobals {
 

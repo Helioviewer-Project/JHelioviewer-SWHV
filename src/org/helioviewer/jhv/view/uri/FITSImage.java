@@ -17,6 +17,7 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
+
 //import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;

@@ -7,11 +7,12 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.XMLUtils;
 
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Longs;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Longs;
 
 public class XMLMetaDataContainer implements MetaDataContainer {
 

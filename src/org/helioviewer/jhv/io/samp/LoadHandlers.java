@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Commands;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;

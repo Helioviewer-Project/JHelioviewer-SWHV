@@ -14,9 +14,10 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
 
-import com.google.common.collect.ImmutableMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.collect.ImmutableMap;
 
 public class DataSources {
 

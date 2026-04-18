@@ -18,6 +18,7 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
+
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
 

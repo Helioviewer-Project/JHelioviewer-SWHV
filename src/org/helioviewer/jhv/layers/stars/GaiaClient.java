@@ -22,9 +22,11 @@ import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.JHVTime;
 
+import org.jastronomy.jsofa.JSOFA;
+
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.jastronomy.jsofa.JSOFA;
+
 import spice.basic.SpiceErrorException;
 import uk.ac.starlink.fits.FitsTableBuilder;
 import uk.ac.starlink.table.RowSequence;

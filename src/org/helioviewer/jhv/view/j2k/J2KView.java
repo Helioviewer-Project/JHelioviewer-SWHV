@@ -30,6 +30,7 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
+
 import kdu_jni.KduException;
 
 public class J2KView extends BaseView {

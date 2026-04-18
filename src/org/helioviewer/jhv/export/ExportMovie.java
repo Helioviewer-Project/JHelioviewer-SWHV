@@ -7,10 +7,10 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;

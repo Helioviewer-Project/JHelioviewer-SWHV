@@ -20,8 +20,9 @@ import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.time.TimeListener;
 
-import com.jidesoft.swing.JideButton;
 import org.json.JSONObject;
+
+import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
 class ViewpointLayerOptions extends JPanel implements TimeListener.Range {

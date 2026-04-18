@@ -12,11 +12,11 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.ExitHooks;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
