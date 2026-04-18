@@ -390,12 +390,16 @@ The following SAMP operations are currently wired from
 - `jhv.load.request` -> `load-request`
 - `jhv.load.state` -> `load-state`
 - `jhv.load.sunjson` -> `load-sunjson`
+- `jhv.set.view.state` -> `set-view-state`
 - `jhv.set.playback` -> `set-playback`
 - `jhv.play` -> `play`
 - `jhv.pause` -> `pause`
 - `jhv.toggle.playback` -> `toggle-playback`
+- `jhv.seek.frame` -> `seek-frame`
+- `jhv.seek.time` -> `seek-time`
 - `jhv.next.frame` -> `next-frame`
 - `jhv.previous.frame` -> `previous-frame`
+- `jhv.set.recording` -> `set-recording`
 - `jhv.record.start` -> `record-start`
 - `jhv.record.stop` -> `record-stop`
 
@@ -403,17 +407,20 @@ Notes:
 
 - all of the above currently go through `Commands.Registry`, except:
   - `jhv.load.state`
+  - `jhv.set.view.state`
   - `jhv.set.playback`
   - `jhv.play`
   - `jhv.pause`
   - `jhv.toggle.playback`
+  - `jhv.seek.frame`
+  - `jhv.seek.time`
   - `jhv.next.frame`
   - `jhv.previous.frame`
+  - `jhv.set.recording`
   - `jhv.record.start`
   - `jhv.record.stop`
 - `jhv.load.state` uses the context-aware `Commands.loadState(...)` path directly so JHV can send a correlated completion notification later
-- the playback SAMP commands above use direct `Commands` helpers rather than `Commands.Registry`
-- `jhv.record.start` and `jhv.record.stop` use direct `Commands` helpers rather than `Commands.Registry`
+- the view/playback/recording SAMP commands above use direct `Commands` helpers rather than `Commands.Registry`
 - `table.load.votable` is currently accepted only from sender `SolarOrbiterARchive`
 - `table.load.fits` is currently accepted only from senders `SolarOrbiterARchive` and `SSA`
 
@@ -524,6 +531,30 @@ Current behavior:
 
 ### Recording payloads
 
+`jhv.set.recording` currently accepts these optional params:
+
+- `mode`
+- `size`
+
+Each param is read as a plain string and passed to
+`Commands.setRecordingRaw(...)`. Omitted params leave the existing recording
+configuration unchanged. `ViewState` later resolves and validates the values
+when the command is applied.
+
+Expected string domains:
+
+- `mode`: `LOOP`, `SHOT`, `FREE`
+- `size`: `ORIGINAL`, `H1024`, `H1080`, `H2048`, `H2160`, `H4096`
+
+Example:
+
+```json
+{
+  "mode": "LOOP",
+  "size": "H1080"
+}
+```
+
 `jhv.record.start` currently accepts these optional params:
 
 - `requestId`
@@ -565,6 +596,39 @@ Example:
 
 ### Playback payloads
 
+`jhv.set.view.state` currently accepts these optional params:
+
+- `projection`
+- `annotationMode`
+- `multiview`
+- `tracking`
+- `refresh`
+- `showCorona`
+- `differentialRotation`
+
+Each param is read as a plain string and passed to
+`Commands.setViewStateRaw(...)`. Omitted params leave the existing mode
+configuration unchanged. `ViewState` later resolves and validates the values
+when the command is applied.
+
+Expected string domains:
+
+- `projection`: `Orthographic`, `HPC`, `Latitudinal`, `LogPolar`, `Polar`
+- `annotationMode`: `Rectangle`, `Circle`, `Cross`, `FOV`, `Line`, `Loop`
+- `multiview`, `tracking`, `refresh`, `showCorona`, `differentialRotation`:
+  `true` or `false` case-insensitively
+
+Example:
+
+```json
+{
+  "projection": "HPC",
+  "annotationMode": "Cross",
+  "multiview": "false",
+  "tracking": "true"
+}
+```
+
 `jhv.set.playback` currently accepts these optional params:
 
 - `advanceMode`
@@ -594,6 +658,38 @@ Example:
   "speedUnit": "FRAMES_PER_SECOND",
   "firstFrame": "0",
   "lastFrame": "120"
+}
+```
+
+`jhv.seek.frame` currently accepts:
+
+- `frame`
+
+`frame` is parsed in [SampPlaybackHandlers.java](../src/org/helioviewer/jhv/io/samp/SampPlaybackHandlers.java)
+as a decimal integer string before calling `Commands.seekFrame(...)`. Invalid
+values are warned about and ignored there.
+
+Example:
+
+```json
+{
+  "frame": "12"
+}
+```
+
+`jhv.seek.time` currently accepts:
+
+- `time`
+
+`time` is parsed in [SampPlaybackHandlers.java](../src/org/helioviewer/jhv/io/samp/SampPlaybackHandlers.java)
+with `new JHVTime(time)` before calling `Commands.seekTime(...)`. Invalid
+values are warned about and ignored there.
+
+Example:
+
+```json
+{
+  "time": "2024-01-01T12:00:00"
 }
 ```
 
@@ -759,19 +855,11 @@ This is already how the load commands are wired, except for `jhv.load.state`,
 which uses the dedicated context-aware `Commands.loadState(...)` helper so
 it can carry `requestId` and client identity through to completion.
 
-`jhv.set.playback`, `jhv.play`, `jhv.pause`, `jhv.toggle.playback`,
-`jhv.next.frame`, and `jhv.previous.frame` likewise use direct `Commands`
-helpers rather than `Commands.Registry`.
-
-`jhv.record.start` and `jhv.record.stop` likewise use direct `Commands`
-helpers rather than `Commands.Registry`.
-
-The same pattern can be used for future SAMP verbs such as:
-
-- `set-view-state`
-- `seek-frame`
-- `seek-time`
-- `set-recording`
+`jhv.set.view.state`, `jhv.set.playback`, `jhv.play`, `jhv.pause`,
+`jhv.toggle.playback`, `jhv.seek.frame`, `jhv.seek.time`, `jhv.next.frame`,
+`jhv.previous.frame`, `jhv.set.recording`, `jhv.record.start`, and
+`jhv.record.stop` likewise use direct `Commands` helpers rather than
+`Commands.Registry`.
 
 ## Completion Feedback
 

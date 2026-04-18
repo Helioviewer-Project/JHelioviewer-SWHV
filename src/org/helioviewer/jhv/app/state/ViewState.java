@@ -312,6 +312,25 @@ public final class ViewState {
                 differentialRotation == null ? current.differentialRotation() : differentialRotation));
     }
 
+    // Commands-only partial update entry point.
+    public static void applyModeUpdateRaw(
+            @Nullable String projection,
+            @Nullable String annotationMode,
+            @Nullable String multiview,
+            @Nullable String tracking,
+            @Nullable String refresh,
+            @Nullable String showCorona,
+            @Nullable String differentialRotation) {
+        applyModeUpdate(
+                parseEnum(projection, ProjectionMode.class, "projection"),
+                parseEnum(annotationMode, Interaction.AnnotationMode.class, "annotation mode"),
+                parseBoolean(multiview, "multiview"),
+                parseBoolean(tracking, "tracking"),
+                parseBoolean(refresh, "refresh"),
+                parseBoolean(showCorona, "showCorona"),
+                parseBoolean(differentialRotation, "differentialRotation"));
+    }
+
     public static ProjectionMode getProjection() {
         return projection;
     }
@@ -591,6 +610,17 @@ public final class ViewState {
         }
     }
 
+    private static @Nullable Boolean parseBoolean(@Nullable String value, String name) {
+        if (value == null)
+            return null;
+        if ("true".equalsIgnoreCase(value))
+            return true;
+        if ("false".equalsIgnoreCase(value))
+            return false;
+        Log.warn("Ignoring invalid " + name + " value: " + value);
+        return null;
+    }
+
     private static <E extends Enum<E>> @Nullable E parseEnum(@Nullable String value, Class<E> enumClass, String name) {
         if (value == null)
             return null;
@@ -626,6 +656,15 @@ public final class ViewState {
             setRecordingMode(mode);
         if (size != null)
             setRecordingSize(size);
+    }
+
+    // Commands-only partial update entry point.
+    public static void applyRecordingUpdateRaw(
+            @Nullable String mode,
+            @Nullable String size) {
+        applyRecordingUpdate(
+                parseEnum(mode, RecordingMode.class, "recording mode"),
+                parseEnum(size, RecordingSize.class, "recording size"));
     }
 
     public static void addModeListener(ModeListener listener) {

@@ -17,7 +17,6 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
-import org.astrogrid.samp.SampUtils;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.DefaultClientProfile;
@@ -74,7 +73,7 @@ public final class SampClient extends HubConnector {
         void accept(String senderId, String senderName, Message msg) throws Exception;
     }
 
-    static class JHVSampHandler extends AbstractMessageHandler {
+    static final class JHVSampHandler extends AbstractMessageHandler {
 
         private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web
         private final String type;
@@ -113,41 +112,15 @@ public final class SampClient extends HubConnector {
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
 
-        registerLoadHandlers();
-        registerPlaybackHandlers();
-        registerRecordingHandlers();
+        SampLoadHandlers.register(this);
+        SampPlaybackHandlers.register(this);
+        SampRecordingHandlers.register(this);
+        SampViewHandlers.register(this);
+
         declareSubscriptions(computeSubscriptions());
         Commands.addCompletionListener(completionListener);
 
         setAutoconnect(10);
-    }
-
-    private void registerLoadHandlers() {
-        addMessageHandler(SampLoadHandlers.uriHandler("image.load.fits", Commands.LOAD_IMAGE));
-        addMessageHandler(SampLoadHandlers.votableHandler());
-        addMessageHandler(SampLoadHandlers.fitsTableHandler());
-        // advertise we can load CDF, although we can do only MAG and SWA
-        addMessageHandler(SampLoadHandlers.uriHandler("table.load.cdf", Commands.LOAD_CDF));
-        addMessageHandler(SampLoadHandlers.uriListHandler("jhv.load.image", Commands.LOAD_IMAGE));
-        // Add handler for the HAPI csv files
-        addMessageHandler(SampLoadHandlers.uriListHandler("jhv.load.hapi", Commands.LOAD_HAPI));
-        addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.request", Commands.LOAD_REQUEST));
-        addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.sunjson", Commands.LOAD_SUN_JSON));
-        addMessageHandler(new JHVSampHandler("jhv.load.state", (senderId, sender, msg) -> SampLoadHandlers.loadState(msg, senderId)));
-    }
-
-    private void registerPlaybackHandlers() {
-        addMessageHandler(SampPlaybackHandlers.setPlaybackHandler());
-        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.play", Commands::play));
-        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.pause", Commands::pause));
-        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.toggle.playback", Commands::togglePlayback));
-        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.next.frame", Commands::nextFrame));
-        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.previous.frame", Commands::previousFrame));
-    }
-
-    private void registerRecordingHandlers() {
-        addMessageHandler(SampRecordingHandlers.startHandler());
-        addMessageHandler(SampRecordingHandlers.stopHandler());
     }
 
     private static void notifyCompletion(Commands.OperationContext context, String completionMType,

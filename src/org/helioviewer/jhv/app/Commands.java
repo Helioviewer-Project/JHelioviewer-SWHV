@@ -131,21 +131,15 @@ public final class Commands {
             @Nullable String speedUnit) {
     }
 
-    public record OperationContext(
-            Class<?> owner,
-            @Nullable String clientId,
-            @Nullable String requestId,
-            @Nullable String mtype) {
+    public record OperationContext(Class<?> owner, @Nullable String clientId, @Nullable String requestId,
+                                   @Nullable String mtype) {
     }
 
     public interface CompletionListener {
         void loadStateFinished(@Nullable OperationContext context, boolean success, String message);
 
-        void recordingFinished(
-                @Nullable OperationContext context,
-                boolean success,
-                String message,
-                @Nullable String output);
+        void recordingFinished(@Nullable OperationContext context, boolean success, String message,
+                               @Nullable String output);
     }
 
     private static final ArrayList<CompletionListener> completionListeners = new ArrayList<>();
@@ -259,11 +253,6 @@ public final class Commands {
             return commands.keySet();
         }
 
-        @Nullable
-        public static RegisteredCommand get(String id) {
-            return commands.get(id);
-        }
-
         @SuppressWarnings("unchecked")
         public static <I> void run(String id, @Nullable I input) {
             RegisteredCommand command = require(id);
@@ -296,6 +285,18 @@ public final class Commands {
 
     public static void setViewState(@Nullable SetViewStateArgs args) {
         setViewStateCommand.run(args);
+    }
+
+    public static void setViewStateRaw(
+            @Nullable String projection,
+            @Nullable String annotationMode,
+            @Nullable String multiview,
+            @Nullable String tracking,
+            @Nullable String refresh,
+            @Nullable String showCorona,
+            @Nullable String differentialRotation) {
+        ViewState.applyModeUpdateRaw(projection, annotationMode, multiview, tracking, refresh, showCorona,
+                differentialRotation);
     }
 
     public static void setPlayback(@Nullable SetPlaybackArgs args) {
@@ -336,6 +337,10 @@ public final class Commands {
 
     public static void setRecording(@Nullable SetRecordingArgs args) {
         setRecordingCommand.run(args);
+    }
+
+    public static void setRecordingRaw(@Nullable String mode, @Nullable String size) {
+        ViewState.applyRecordingUpdateRaw(mode, size);
     }
 
     public static void recordStart(@Nullable RecordStartArgs args) {
@@ -451,11 +456,8 @@ public final class Commands {
         completionListeners.forEach(listener -> listener.loadStateFinished(context, success, message));
     }
 
-    public static void notifyRecordingFinished(
-            @Nullable OperationContext context,
-            boolean success,
-            String message,
-            @Nullable String output) {
+    public static void notifyRecordingFinished(@Nullable OperationContext context, boolean success, String message,
+                                               @Nullable String output) {
         completionListeners.forEach(listener -> listener.recordingFinished(context, success, message, output));
     }
 
