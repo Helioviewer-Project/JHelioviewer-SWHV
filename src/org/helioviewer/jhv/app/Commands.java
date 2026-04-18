@@ -111,11 +111,11 @@ public final class Commands {
     }
 
     public record SetPlaybackArgs(
-            @Nullable Movie.AdvanceMode advanceMode,
-            @Nullable Integer speed,
-            @Nullable ViewState.PlaybackSpeedUnit speedUnit,
-            @Nullable Integer firstFrame,
-            @Nullable Integer lastFrame) {
+            @Nullable String advanceMode,
+            @Nullable String speed,
+            @Nullable String speedUnit,
+            @Nullable String firstFrame,
+            @Nullable String lastFrame) {
     }
 
     public record SetRecordingArgs(
@@ -165,7 +165,7 @@ public final class Commands {
     private static final Command<SetPlaybackArgs> setPlaybackCommand = new BasicCommand<>(SET_PLAYBACK, input -> {
         if (input == null)
             return;
-        ViewState.applyPlaybackUpdate(
+        ViewState.applyPlaybackUpdateRaw(
                 input.advanceMode(),
                 input.speed(),
                 input.speedUnit(),

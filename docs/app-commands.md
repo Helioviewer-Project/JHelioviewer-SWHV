@@ -76,11 +76,11 @@ Input type: `Commands.SetPlaybackArgs`
 
 Fields:
 
-- `Movie.AdvanceMode advanceMode`
-- `Integer speed`
-- `ViewState.PlaybackSpeedUnit speedUnit`
-- `Integer firstFrame`
-- `Integer lastFrame`
+- `String advanceMode`
+- `String speed`
+- `String speedUnit`
+- `String firstFrame`
+- `String lastFrame`
 
 Semantics:
 
@@ -90,6 +90,11 @@ with the current playback state in
 [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) before the
 update is applied. In particular, `speed` and `speedUnit` are resolved as one
 pair, and `firstFrame` and `lastFrame` are resolved as one pair.
+
+Those five fields are carried as raw strings and resolved in
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java). Invalid
+strings are warned about and ignored there; out-of-range numeric values are
+warned about and clamped. They do not fail the command.
 
 Current enum/value domains:
 
@@ -213,8 +218,8 @@ Semantics:
 - if input is non-null, it first updates recording and playback configuration
 - those five fields are carried as raw strings and resolved in
   [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
-- invalid values are warned about and ignored in `ViewState`; they do not fail
-  the command
+- invalid strings are warned about and ignored in `ViewState`; out-of-range
+  numeric values are warned about and clamped. They do not fail the command
 - export then starts from the resulting [ViewState.recordingData()](../src/org/helioviewer/jhv/app/state/ViewState.java) and [ViewState.playbackData()](../src/org/helioviewer/jhv/app/state/ViewState.java)
 
 ### `record-stop`
@@ -385,6 +390,12 @@ The following SAMP operations are currently wired from
 - `jhv.load.request` -> `load-request`
 - `jhv.load.state` -> `load-state`
 - `jhv.load.sunjson` -> `load-sunjson`
+- `jhv.set.playback` -> `set-playback`
+- `jhv.play` -> `play`
+- `jhv.pause` -> `pause`
+- `jhv.toggle.playback` -> `toggle-playback`
+- `jhv.next.frame` -> `next-frame`
+- `jhv.previous.frame` -> `previous-frame`
 - `jhv.record.start` -> `record-start`
 - `jhv.record.stop` -> `record-stop`
 
@@ -392,9 +403,16 @@ Notes:
 
 - all of the above currently go through `Commands.Registry`, except:
   - `jhv.load.state`
+  - `jhv.set.playback`
+  - `jhv.play`
+  - `jhv.pause`
+  - `jhv.toggle.playback`
+  - `jhv.next.frame`
+  - `jhv.previous.frame`
   - `jhv.record.start`
   - `jhv.record.stop`
 - `jhv.load.state` uses the context-aware `Commands.loadState(...)` path directly so JHV can send a correlated completion notification later
+- the playback SAMP commands above use direct `Commands` helpers rather than `Commands.Registry`
 - `jhv.record.start` and `jhv.record.stop` use direct `Commands` helpers rather than `Commands.Registry`
 - `table.load.votable` is currently accepted only from sender `SolarOrbiterARchive`
 - `table.load.fits` is currently accepted only from senders `SolarOrbiterARchive` and `SSA`
@@ -545,6 +563,48 @@ Example:
 
 `jhv.record.stop` currently reads no params.
 
+### Playback payloads
+
+`jhv.set.playback` currently accepts these optional params:
+
+- `advanceMode`
+- `speed`
+- `speedUnit`
+- `firstFrame`
+- `lastFrame`
+
+Each param is read as a plain string and stored in the corresponding
+`Commands.SetPlaybackArgs` field. Omitted params leave the existing playback
+configuration unchanged. `ViewState` later resolves and validates the values
+when the command is applied.
+
+Expected string domains:
+
+- `advanceMode`: `Loop`, `Stop`, `Swing`, `SwingDown`
+- `speedUnit`: `FRAMES_PER_SECOND`, `MINUTES_PER_SECOND`, `HOURS_PER_SECOND`, `DAYS_PER_SECOND`
+
+`speed`, `firstFrame`, and `lastFrame` are decimal integer strings.
+
+Example:
+
+```json
+{
+  "advanceMode": "Loop",
+  "speed": "24",
+  "speedUnit": "FRAMES_PER_SECOND",
+  "firstFrame": "0",
+  "lastFrame": "120"
+}
+```
+
+These simple playback message types currently read no params:
+
+- `jhv.play`
+- `jhv.pause`
+- `jhv.toggle.playback`
+- `jhv.next.frame`
+- `jhv.previous.frame`
+
 ## `jhv.load.state` Client Contract
 
 This is the current end-to-end contract implemented in
@@ -676,8 +736,11 @@ Semantics:
   and does not produce a separate completion message
 - `failure` may come from:
   - export failure while closing the recording
-- invalid `jhv.record.start` values do not currently fail the request; they are
-  warned about and ignored in
+- invalid `jhv.record.start` string values do not currently fail the request;
+  they are warned about and ignored in
+  [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
+- out-of-range numeric values such as playback speed likewise do not fail the
+  request; they are warned about and clamped in
   [ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java)
 - without `requestId`, multiple outstanding `jhv.record.start` requests from
   the same client are ambiguous to correlate
@@ -696,18 +759,19 @@ This is already how the load commands are wired, except for `jhv.load.state`,
 which uses the dedicated context-aware `Commands.loadState(...)` helper so
 it can carry `requestId` and client identity through to completion.
 
+`jhv.set.playback`, `jhv.play`, `jhv.pause`, `jhv.toggle.playback`,
+`jhv.next.frame`, and `jhv.previous.frame` likewise use direct `Commands`
+helpers rather than `Commands.Registry`.
+
 `jhv.record.start` and `jhv.record.stop` likewise use direct `Commands`
 helpers rather than `Commands.Registry`.
 
 The same pattern can be used for future SAMP verbs such as:
 
 - `set-view-state`
-- `set-playback`
 - `seek-frame`
 - `seek-time`
 - `set-recording`
-- `record-start`
-- `record-stop`
 
 ## Completion Feedback
 

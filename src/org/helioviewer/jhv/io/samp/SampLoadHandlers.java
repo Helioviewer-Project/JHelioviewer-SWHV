@@ -22,6 +22,22 @@ final class SampLoadHandlers {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURI(msg, commandId));
     }
 
+    // load VOTable only from SOAR
+    static AbstractMessageHandler votableHandler() {
+        return new SampClient.JHVSampHandler("table.load.votable", (senderId, sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender))
+                loadURI(msg, Commands.LOAD_VOTABLE);
+        });
+    }
+
+    // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
+    static AbstractMessageHandler fitsTableHandler() {
+        return new SampClient.JHVSampHandler("table.load.fits", (senderId, sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender))
+                loadURI(msg, Commands.LOAD_IMAGE);
+        });
+    }
+
     static AbstractMessageHandler uriListHandler(String type, String commandId) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURIList(msg, commandId));
     }
@@ -29,16 +45,15 @@ final class SampLoadHandlers {
     static AbstractMessageHandler uriOrValueHandler(String type, String commandId) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> {
             if (!loadURI(msg, commandId)) {
-                Object value = msg.getParam("value");
+                String value = SampClient.optionalString(msg, "value");
                 if (value != null)
-                    invokeCommand(commandId, value.toString());
+                    invokeCommand(commandId, value);
             }
         });
     }
 
     static void loadState(Message msg, String senderId) throws Exception {
-        Object requestIdParam = msg.getParam("requestId");
-        String requestId = requestIdParam == null ? null : requestIdParam.toString();
+        String requestId = SampClient.optionalString(msg, "requestId");
         Commands.OperationContext context =
                 new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.load.state");
         Object input = msg.getParam("url");
@@ -46,9 +61,9 @@ final class SampLoadHandlers {
             invokeLoadState(context, toURI(input.toString()));
             return;
         }
-        input = msg.getParam("value");
-        if (input != null)
-            invokeLoadState(context, input.toString());
+        String value = SampClient.optionalString(msg, "value");
+        if (value != null)
+            invokeLoadState(context, value);
     }
 
     private static void invokeLoadState(Commands.OperationContext context, Object input) {
