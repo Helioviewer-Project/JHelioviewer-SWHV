@@ -35,11 +35,12 @@ import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.SearchableUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public class SynopticDialog extends StandardDialog {

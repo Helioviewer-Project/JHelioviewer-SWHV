@@ -15,8 +15,8 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -31,9 +31,10 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
 
-import com.google.common.util.concurrent.FutureCallback;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.util.concurrent.FutureCallback;
 
 public final class State {
 

@@ -22,9 +22,10 @@ import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
 import org.helioviewer.jhv.view.uri.URIView;
 
-import com.google.common.base.Throwables;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.base.Throwables;
 
 public class LoadLayer {
 

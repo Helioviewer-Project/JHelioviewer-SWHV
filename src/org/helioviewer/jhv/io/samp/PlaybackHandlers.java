@@ -2,8 +2,8 @@ package org.helioviewer.jhv.io.samp;
 
 import java.awt.EventQueue;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.astrogrid.samp.Message;

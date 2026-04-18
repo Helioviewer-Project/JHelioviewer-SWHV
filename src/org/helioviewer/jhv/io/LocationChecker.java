@@ -10,6 +10,7 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CountryResponse;
+
 import okio.BufferedSource;
 
 public class LocationChecker {

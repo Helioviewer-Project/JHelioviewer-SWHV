@@ -12,6 +12,7 @@ import org.helioviewer.jhv.JHVGlobals;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import okio.BufferedSink;
 import okio.Okio;
 

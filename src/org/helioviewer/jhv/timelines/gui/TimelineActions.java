@@ -8,8 +8,8 @@ import java.io.File;
 
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;

@@ -25,9 +25,11 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
-import com.google.common.base.Throwables;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.google.common.base.Throwables;
+
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiTableReader;

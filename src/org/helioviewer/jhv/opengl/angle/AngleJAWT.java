@@ -4,9 +4,9 @@ import java.awt.Canvas;
 
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.jawt.JAWT;
-import org.lwjgl.system.jawt.JAWTFunctions;
 import org.lwjgl.system.jawt.JAWTDrawingSurface;
 import org.lwjgl.system.jawt.JAWTDrawingSurfaceInfo;
+import org.lwjgl.system.jawt.JAWTFunctions;
 
 final class AngleJAWT {
     interface PlatformInfoAccess<T> {
