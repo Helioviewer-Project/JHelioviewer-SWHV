@@ -2,8 +2,6 @@ package org.helioviewer.jhv.io.samp;
 
 import java.awt.EventQueue;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.app.Commands;
 
 import org.astrogrid.samp.Message;
@@ -23,19 +21,14 @@ final class SampRecordingHandlers {
     }
 
     static void start(Message msg, String senderId) {
-        String requestId = optionalString(msg, "requestId");
+        String requestId = SampClient.optionalString(msg, "requestId");
         Commands.OperationContext context = new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.record.start");
         Commands.RecordStartArgs args = new Commands.RecordStartArgs(
-                optionalString(msg, "mode"),
-                optionalString(msg, "size"),
-                optionalString(msg, "advanceMode"),
-                optionalString(msg, "speed"),
-                optionalString(msg, "speedUnit"));
+                SampClient.optionalString(msg, "mode"),
+                SampClient.optionalString(msg, "size"),
+                SampClient.optionalString(msg, "advanceMode"),
+                SampClient.optionalString(msg, "speed"),
+                SampClient.optionalString(msg, "speedUnit"));
         EventQueue.invokeLater(() -> Commands.recordStart(context, args));
-    }
-
-    private static @Nullable String optionalString(Message msg, String key) {
-        Object value = msg.getParam(key);
-        return value == null ? null : value.toString();
     }
 }

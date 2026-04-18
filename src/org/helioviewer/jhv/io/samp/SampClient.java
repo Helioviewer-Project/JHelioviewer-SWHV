@@ -114,6 +114,7 @@ public final class SampClient extends HubConnector {
         declareMetadata(Metadata.asMetadata(meta));
 
         registerLoadHandlers();
+        registerPlaybackHandlers();
         registerRecordingHandlers();
         declareSubscriptions(computeSubscriptions());
         Commands.addCompletionListener(completionListener);
@@ -123,17 +124,8 @@ public final class SampClient extends HubConnector {
 
     private void registerLoadHandlers() {
         addMessageHandler(SampLoadHandlers.uriHandler("image.load.fits", Commands.LOAD_IMAGE));
-        // load VOTable only from SOAR
-        addMessageHandler(new JHVSampHandler("table.load.votable", (senderId, sender, msg) -> {
-            if ("SolarOrbiterARchive".equals(sender))
-                SampLoadHandlers.loadURI(msg, Commands.LOAD_VOTABLE);
-        }));
-        // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
-        addMessageHandler(new JHVSampHandler("table.load.fits", (senderId, sender, msg) -> {
-            if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender)) {
-                SampLoadHandlers.loadURI(msg, Commands.LOAD_IMAGE);
-            }
-        }));
+        addMessageHandler(SampLoadHandlers.votableHandler());
+        addMessageHandler(SampLoadHandlers.fitsTableHandler());
         // advertise we can load CDF, although we can do only MAG and SWA
         addMessageHandler(SampLoadHandlers.uriHandler("table.load.cdf", Commands.LOAD_CDF));
         addMessageHandler(SampLoadHandlers.uriListHandler("jhv.load.image", Commands.LOAD_IMAGE));
@@ -142,6 +134,15 @@ public final class SampClient extends HubConnector {
         addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.request", Commands.LOAD_REQUEST));
         addMessageHandler(SampLoadHandlers.uriOrValueHandler("jhv.load.sunjson", Commands.LOAD_SUN_JSON));
         addMessageHandler(new JHVSampHandler("jhv.load.state", (senderId, sender, msg) -> SampLoadHandlers.loadState(msg, senderId)));
+    }
+
+    private void registerPlaybackHandlers() {
+        addMessageHandler(SampPlaybackHandlers.setPlaybackHandler());
+        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.play", Commands::play));
+        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.pause", Commands::pause));
+        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.toggle.playback", Commands::togglePlayback));
+        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.next.frame", Commands::nextFrame));
+        addMessageHandler(SampPlaybackHandlers.commandHandler("jhv.previous.frame", Commands::previousFrame));
     }
 
     private void registerRecordingHandlers() {
@@ -186,6 +187,11 @@ public final class SampClient extends HubConnector {
         } catch (Exception e) {
             Log.warn(e);
         }
+    }
+
+    static @Nullable String optionalString(Message msg, String key) {
+        Object value = msg.getParam(key);
+        return value == null ? null : value.toString();
     }
 
 }

@@ -509,6 +509,21 @@ public final class ViewState {
         }
     }
 
+    // Commands-only partial update entry point.
+    public static void applyPlaybackUpdateRaw(
+            @Nullable String advanceMode,
+            @Nullable String speed,
+            @Nullable String speedUnit,
+            @Nullable String firstFrame,
+            @Nullable String lastFrame) {
+        applyPlaybackUpdate(
+                parseEnum(advanceMode, Movie.AdvanceMode.class, "playback advance mode"),
+                parseInteger(speed, "playback speed"),
+                parseEnum(speedUnit, PlaybackSpeedUnit.class, "playback speed unit"),
+                parseInteger(firstFrame, "playback first frame"),
+                parseInteger(lastFrame, "playback last frame"));
+    }
+
     // Commands/ExportMovie-only partial update entry point.
     public static void applyRecordStartUpdate(
             @Nullable String mode,
@@ -516,48 +531,24 @@ public final class ViewState {
             @Nullable String advanceMode,
             @Nullable String speed,
             @Nullable String speedUnit) {
-        if (mode != null) {
-            try {
-                setRecordingMode(RecordingMode.valueOf(mode));
-            } catch (IllegalArgumentException e) {
-                Log.warn("Ignoring invalid recording mode value: " + mode, e);
-            }
-        }
+        RecordingMode resolvedMode = parseEnum(mode, RecordingMode.class, "recording mode");
+        if (resolvedMode != null)
+            setRecordingMode(resolvedMode);
 
-        if (size != null) {
-            try {
-                setRecordingSize(RecordingSize.valueOf(size));
-            } catch (IllegalArgumentException e) {
-                Log.warn("Ignoring invalid recording size value: " + size, e);
-            }
-        }
+        RecordingSize resolvedSize = parseEnum(size, RecordingSize.class, "recording size");
+        if (resolvedSize != null)
+            setRecordingSize(resolvedSize);
 
-        if (advanceMode != null) {
-            try {
-                setPlaybackAdvanceMode(Movie.AdvanceMode.valueOf(advanceMode));
-            } catch (IllegalArgumentException e) {
-                Log.warn("Ignoring invalid playback advance mode value: " + advanceMode, e);
-            }
-        }
+        Movie.AdvanceMode resolvedAdvanceMode = parseEnum(advanceMode, Movie.AdvanceMode.class, "playback advance mode");
+        if (resolvedAdvanceMode != null)
+            setPlaybackAdvanceMode(resolvedAdvanceMode);
 
         if (speed != null || speedUnit != null) {
             PlaybackData current = playbackData();
-            int resolvedSpeed = current.speed();
-            PlaybackSpeedUnit resolvedSpeedUnit = current.speedUnit();
-            if (speed != null) {
-                try {
-                    resolvedSpeed = Integer.parseInt(speed);
-                } catch (NumberFormatException e) {
-                    Log.warn("Ignoring invalid playback speed value: " + speed, e);
-                }
-            }
-            if (speedUnit != null) {
-                try {
-                    resolvedSpeedUnit = PlaybackSpeedUnit.valueOf(speedUnit);
-                } catch (IllegalArgumentException e) {
-                    Log.warn("Ignoring invalid playback speed unit value: " + speedUnit, e);
-                }
-            }
+            Integer parsedSpeed = parseInteger(speed, "playback speed");
+            PlaybackSpeedUnit parsedSpeedUnit = parseEnum(speedUnit, PlaybackSpeedUnit.class, "playback speed unit");
+            int resolvedSpeed = parsedSpeed == null ? current.speed() : parsedSpeed;
+            PlaybackSpeedUnit resolvedSpeedUnit = parsedSpeedUnit == null ? current.speedUnit() : parsedSpeedUnit;
             setPlaybackSpeed(resolvedSpeed, resolvedSpeedUnit);
         }
     }
@@ -587,6 +578,28 @@ public final class ViewState {
         playbackFirstFrame = firstFrame;
         playbackLastFrame = lastFrame;
         Movie.setPlaybackRange(firstFrame, lastFrame);
+    }
+
+    private static @Nullable Integer parseInteger(@Nullable String value, String name) {
+        if (value == null)
+            return null;
+        try {
+            return Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            Log.warn("Ignoring invalid " + name + " value: " + value, e);
+            return null;
+        }
+    }
+
+    private static <E extends Enum<E>> @Nullable E parseEnum(@Nullable String value, Class<E> enumClass, String name) {
+        if (value == null)
+            return null;
+        try {
+            return Enum.valueOf(enumClass, value);
+        } catch (IllegalArgumentException e) {
+            Log.warn("Ignoring invalid " + name + " value: " + value, e);
+            return null;
+        }
     }
 
     public static void setRecordingMode(RecordingMode newRecordingMode) {
