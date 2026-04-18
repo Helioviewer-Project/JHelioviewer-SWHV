@@ -550,8 +550,6 @@ public final class AppCommands {
 
         @Override
         public void run(@Nullable Void input) {
-            if (!Movie.isRecording())
-                return;
             ExportMovie.shallStop();
         }
     }
