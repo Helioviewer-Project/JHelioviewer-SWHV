@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.io.samp;
 
 import java.awt.EventQueue;
 import java.net.URI;

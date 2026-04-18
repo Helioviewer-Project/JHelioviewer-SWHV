@@ -83,20 +83,8 @@ public final class ExportMovie implements Movie.Listener {
             return;
         operationContext = context;
 
-        if (input != null) {
-            if (input.mode() != null)
-                ViewState.setRecordingMode(input.mode());
-            if (input.size() != null)
-                ViewState.setRecordingSize(input.size());
-            if (input.advanceMode() != null)
-                ViewState.setPlaybackAdvanceMode(input.advanceMode());
-            if (input.speed() != null || input.speedUnit() != null) {
-                ViewState.PlaybackData current = ViewState.playbackData();
-                int speed = input.speed() == null ? current.speed() : input.speed();
-                ViewState.PlaybackSpeedUnit speedUnit = input.speedUnit() == null ? current.speedUnit() : input.speedUnit();
-                ViewState.setPlaybackSpeed(speed, speedUnit);
-            }
-        }
+        if (input != null)
+            ViewState.applyRecordStartUpdate(input.mode(), input.size(), input.advanceMode(), input.speed(), input.speedUnit());
 
         ViewState.RecordingData recordingData = ViewState.recordingData();
         ViewState.PlaybackData playbackData = ViewState.playbackData();

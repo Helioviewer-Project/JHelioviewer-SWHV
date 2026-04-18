@@ -19,7 +19,7 @@ import java.util.Set;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.LocationChecker;
-import org.helioviewer.jhv.io.SampClient;
+import org.helioviewer.jhv.io.samp.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.view.j2k.KakaduMessageSystem;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
