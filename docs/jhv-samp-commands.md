@@ -30,34 +30,34 @@ JHV accepts these SAMP message types:
 
 ### Playback messages
 
-- `jhv.set.playback`
-- `jhv.play`
-- `jhv.pause`
-- `jhv.toggle.playback`
-- `jhv.seek.frame`
-- `jhv.seek.time`
-- `jhv.next.frame`
-- `jhv.previous.frame`
+- `jhv.playback.set`
+- `jhv.playback.play`
+- `jhv.playback.pause`
+- `jhv.playback.toggle`
+- `jhv.playback.seek-frame`
+- `jhv.playback.seek-time`
+- `jhv.playback.next-frame`
+- `jhv.playback.previous-frame`
 
 ### View messages
 
-- `jhv.set.view.state`
+- `jhv.view.set`
 
 ### Recording messages
 
-- `jhv.set.recording`
+- `jhv.record.set`
 - `jhv.record.start`
 - `jhv.record.stop`
 
 ### Camera messages
 
-- `jhv.zoom.in`
-- `jhv.zoom.out`
-- `jhv.zoom.fit`
-- `jhv.zoom.one.to.one`
-- `jhv.reset.view`
-- `jhv.reset.view.axis`
-- `jhv.rotate.view.90`
+- `jhv.view.zoom-in`
+- `jhv.view.zoom-out`
+- `jhv.view.zoom-fit`
+- `jhv.view.zoom-one-to-one`
+- `jhv.view.reset`
+- `jhv.view.reset-axis`
+- `jhv.view.rotate90`
 
 Restrictions:
 
@@ -70,9 +70,9 @@ Restrictions:
 
 These messages update only the fields they receive:
 
-- `jhv.set.view.state`
-- `jhv.set.playback`
-- `jhv.set.recording`
+- `jhv.view.set`
+- `jhv.playback.set`
+- `jhv.record.set`
 - `jhv.record.start`
 
 For these messages:
@@ -99,30 +99,30 @@ These messages act immediately instead of performing a partial state merge:
 - `jhv.load.request`
 - `jhv.load.state`
 - `jhv.load.sunjson`
-- `jhv.play`
-- `jhv.pause`
-- `jhv.toggle.playback`
-- `jhv.seek.frame`
-- `jhv.seek.time`
-- `jhv.next.frame`
-- `jhv.previous.frame`
+- `jhv.playback.play`
+- `jhv.playback.pause`
+- `jhv.playback.toggle`
+- `jhv.playback.seek-frame`
+- `jhv.playback.seek-time`
+- `jhv.playback.next-frame`
+- `jhv.playback.previous-frame`
 - `jhv.record.stop`
-- `jhv.zoom.in`
-- `jhv.zoom.out`
-- `jhv.zoom.fit`
-- `jhv.zoom.one.to.one`
-- `jhv.reset.view`
-- `jhv.reset.view.axis`
-- `jhv.rotate.view.90`
+- `jhv.view.zoom-in`
+- `jhv.view.zoom-out`
+- `jhv.view.zoom-fit`
+- `jhv.view.zoom-one-to-one`
+- `jhv.view.reset`
+- `jhv.view.reset-axis`
+- `jhv.view.rotate90`
 
 ### Persistent state
 
 These messages update real JHV state and leave the resulting state visible in
 the UI after execution:
 
-- `jhv.set.view.state`
-- `jhv.set.playback`
-- `jhv.set.recording`
+- `jhv.view.set`
+- `jhv.playback.set`
+- `jhv.record.set`
 - `jhv.record.start`
 
 ## Message Payloads
@@ -229,14 +229,127 @@ Behavior:
 ### Load notes
 
 - SAMP params are read as plain values and converted with `toString()`
-- for `jhv.load.image`, `jhv.load.cdf`, and `jhv.load.hapi`, the `url` array elements are each converted with `toString()`
+- for `jhv.load.image`, `jhv.load.cdf`, and `jhv.load.hapi`, the `url` array
+  elements are each converted with `toString()`
 - `table.load.votable` is additionally sender-restricted to `SolarOrbiterARchive`
 - `table.load.fits` is additionally sender-restricted to `SolarOrbiterARchive` and `SSA`
-- `requestId` is meaningful for `jhv.load.state` and `jhv.record.start`
+
+### Playback Messages
+
+### `jhv.playback.set`
+
+Accepted params:
+
+- `advanceMode`
+- `speed`
+- `speedUnit`
+- `firstFrame`
+- `lastFrame`
+
+This is a partial-update message. Omitted params leave the existing playback
+configuration unchanged. Invalid strings are warned about and ignored.
+
+Expected string domains:
+
+- `advanceMode`: `Loop`, `Stop`, `Swing`, `SwingDown`
+- `speedUnit`: `FRAMES_PER_SECOND`, `MINUTES_PER_SECOND`, `HOURS_PER_SECOND`, `DAYS_PER_SECOND`
+
+`speed`, `firstFrame`, and `lastFrame` are decimal integer strings.
+
+Example:
+
+```json
+{
+  "advanceMode": "Loop",
+  "speed": "24",
+  "speedUnit": "FRAMES_PER_SECOND",
+  "firstFrame": "0",
+  "lastFrame": "120"
+}
+```
+
+### `jhv.playback.seek-frame`
+
+Accepted params:
+
+- `frame`
+
+`frame` is parsed as a decimal integer string before dispatch. Invalid values
+are warned about and ignored.
+
+Example:
+
+```json
+{
+  "frame": "12"
+}
+```
+
+### `jhv.playback.seek-time`
+
+Accepted params:
+
+- `time`
+
+`time` is parsed with `new JHVTime(time)` before dispatch. Invalid values are
+warned about and ignored.
+
+Example:
+
+```json
+{
+  "time": "2024-01-01T12:00:00"
+}
+```
+
+### Parameterless playback messages
+
+These messages read no params:
+
+- `jhv.playback.play`
+- `jhv.playback.pause`
+- `jhv.playback.toggle`
+- `jhv.playback.next-frame`
+- `jhv.playback.previous-frame`
+
+### View Messages
+
+### `jhv.view.set`
+
+Accepted params:
+
+- `projection`
+- `annotationMode`
+- `multiview`
+- `tracking`
+- `refresh`
+- `showCorona`
+- `differentialRotation`
+
+This is a partial-update message. Omitted params leave the existing mode
+configuration unchanged. Invalid strings are warned about and ignored.
+
+Expected string domains:
+
+- `projection`: `Orthographic`, `HPC`, `Latitudinal`, `LogPolar`, `Polar`
+- `annotationMode`: `Rectangle`, `Circle`, `Cross`, `FOV`, `Line`, `Loop`
+- `multiview`, `tracking`, `refresh`, `showCorona`, `differentialRotation`:
+  `true` or `false` case-insensitively
+
+Example:
+
+```json
+{
+  "projection": "HPC",
+  "annotationMode": "Cross",
+  "multiview": "false",
+  "tracking": "true"
+}
+```
 
 ### Recording Messages
 
-### `jhv.set.recording`
+### `jhv.record.set`
 
 Accepted params:
 
@@ -308,120 +421,9 @@ Accepted params: none
 This requests stop if recording is active. It does not have its own completion
 message.
 
-### View And Playback Messages
-
-### `jhv.set.view.state`
-
-Accepted params:
-
-- `projection`
-- `annotationMode`
-- `multiview`
-- `tracking`
-- `refresh`
-- `showCorona`
-- `differentialRotation`
-
-This is a partial-update message. Omitted params leave the existing mode
-configuration unchanged. Invalid strings are warned about and ignored.
-
-Expected string domains:
-
-- `projection`: `Orthographic`, `HPC`, `Latitudinal`, `LogPolar`, `Polar`
-- `annotationMode`: `Rectangle`, `Circle`, `Cross`, `FOV`, `Line`, `Loop`
-- `multiview`, `tracking`, `refresh`, `showCorona`, `differentialRotation`:
-  `true` or `false` case-insensitively
-
-Example:
-
-```json
-{
-  "projection": "HPC",
-  "annotationMode": "Cross",
-  "multiview": "false",
-  "tracking": "true"
-}
-```
-
-### `jhv.set.playback`
-
-Accepted params:
-
-- `advanceMode`
-- `speed`
-- `speedUnit`
-- `firstFrame`
-- `lastFrame`
-
-This is a partial-update message. Omitted params leave the existing playback
-configuration unchanged. Invalid strings are warned about and ignored.
-
-Expected string domains:
-
-- `advanceMode`: `Loop`, `Stop`, `Swing`, `SwingDown`
-- `speedUnit`: `FRAMES_PER_SECOND`, `MINUTES_PER_SECOND`, `HOURS_PER_SECOND`, `DAYS_PER_SECOND`
-
-`speed`, `firstFrame`, and `lastFrame` are decimal integer strings.
-
-Example:
-
-```json
-{
-  "advanceMode": "Loop",
-  "speed": "24",
-  "speedUnit": "FRAMES_PER_SECOND",
-  "firstFrame": "0",
-  "lastFrame": "120"
-}
-```
-
-### `jhv.seek.frame`
-
-Accepted params:
-
-- `frame`
-
-`frame` is parsed as a decimal integer string before dispatch. Invalid values
-are warned about and ignored.
-
-Example:
-
-```json
-{
-  "frame": "12"
-}
-```
-
-### `jhv.seek.time`
-
-Accepted params:
-
-- `time`
-
-`time` is parsed with `new JHVTime(time)` before dispatch. Invalid values are
-warned about and ignored.
-
-Example:
-
-```json
-{
-  "time": "2024-01-01T12:00:00"
-}
-```
-
-### Parameterless playback messages
-
-These messages read no params:
-
-- `jhv.play`
-- `jhv.pause`
-- `jhv.toggle.playback`
-- `jhv.next.frame`
-- `jhv.previous.frame`
-
 ### Camera Messages
 
-### `jhv.rotate.view.90`
+### `jhv.view.rotate90`
 
 Accepted params:
 
@@ -442,12 +444,12 @@ Example:
 
 These messages read no params:
 
-- `jhv.zoom.in`
-- `jhv.zoom.out`
-- `jhv.zoom.fit`
-- `jhv.zoom.one.to.one`
-- `jhv.reset.view`
-- `jhv.reset.view.axis`
+- `jhv.view.zoom-in`
+- `jhv.view.zoom-out`
+- `jhv.view.zoom-fit`
+- `jhv.view.zoom-one-to-one`
+- `jhv.view.reset`
+- `jhv.view.reset-axis`
 
 ## `jhv.load.state` Client Contract
 
@@ -676,7 +678,7 @@ Notes:
 
 - the `view mode` keys above are the full serialized view mode
 - `time` is the stored movie time value and is the same kind of value that
-  `jhv.seek.time` applies
+  `jhv.playback.seek-time` applies
 - for image layers, `master: true` marks the layer that should become the
   active image layer after restore
 
@@ -685,6 +687,6 @@ Implementation references:
 - [SampClient.java](../src/org/helioviewer/jhv/io/samp/SampClient.java)
 - [LoadHandlers.java](../src/org/helioviewer/jhv/io/samp/LoadHandlers.java)
 - [PlaybackHandlers.java](../src/org/helioviewer/jhv/io/samp/PlaybackHandlers.java)
-- [RecordingHandlers.java](../src/org/helioviewer/jhv/io/samp/RecordingHandlers.java)
+- [RecordHandlers.java](../src/org/helioviewer/jhv/io/samp/RecordHandlers.java)
 - [ViewHandlers.java](../src/org/helioviewer/jhv/io/samp/ViewHandlers.java)
 - [CameraHandlers.java](../src/org/helioviewer/jhv/io/samp/CameraHandlers.java)

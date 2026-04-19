@@ -21,18 +21,6 @@ public final class Commands {
     private Commands() {
     }
 
-    public static final String SET_VIEW_STATE = "set-view-state";
-    public static final String SET_PLAYBACK = "set-playback";
-    public static final String PLAY = "play";
-    public static final String PAUSE = "pause";
-    public static final String TOGGLE_PLAYBACK = "toggle-playback";
-    public static final String SEEK_FRAME = "seek-frame";
-    public static final String SEEK_TIME = "seek-time";
-    public static final String NEXT_FRAME = "next-frame";
-    public static final String PREVIOUS_FRAME = "previous-frame";
-    public static final String SET_RECORDING = "set-recording";
-    public static final String RECORD_START = "record-start";
-    public static final String RECORD_STOP = "record-stop";
     public static final String LOAD_STATE = "load-state";
     public static final String LOAD_REQUEST = "load-request";
     public static final String LOAD_SUN_JSON = "load-sunjson";
@@ -40,15 +28,8 @@ public final class Commands {
     public static final String LOAD_CDF = "load-cdf";
     public static final String LOAD_VOTABLE = "load-votable";
     public static final String LOAD_HAPI = "load-hapi";
-    public static final String ZOOM_IN = "zoom-in";
-    public static final String ZOOM_OUT = "zoom-out";
-    public static final String ZOOM_FIT = "zoom-fit";
-    public static final String ZOOM_ONE_TO_ONE = "zoom-one-to-one";
-    public static final String RESET_VIEW = "reset-view";
-    public static final String RESET_VIEW_AXIS = "reset-view-axis";
-    public static final String ROTATE_VIEW_90 = "rotate-view-90";
 
-    public record SetPlaybackArgs(
+    public record PlaybackInput(
             @Nullable String advanceMode,
             @Nullable String speed,
             @Nullable String speedUnit,
@@ -56,7 +37,7 @@ public final class Commands {
             @Nullable String lastFrame) {
     }
 
-    public record RecordStartArgs(
+    public record RecordStartInput(
             @Nullable String mode,
             @Nullable String size,
             @Nullable String advanceMode,
@@ -121,15 +102,15 @@ public final class Commands {
                 differentialRotation);
     }
 
-    public static void setPlayback(@Nullable SetPlaybackArgs args) {
-        if (args == null)
+    public static void setPlayback(@Nullable PlaybackInput input) {
+        if (input == null)
             return;
         ViewState.applyPlaybackUpdateRaw(
-                args.advanceMode(),
-                args.speed(),
-                args.speedUnit(),
-                args.firstFrame(),
-                args.lastFrame());
+                input.advanceMode(),
+                input.speed(),
+                input.speedUnit(),
+                input.firstFrame(),
+                input.lastFrame());
     }
 
     public static void setPlaybackRange(int firstFrame, int lastFrame) {
@@ -170,8 +151,8 @@ public final class Commands {
         ViewState.applyRecordingUpdateRaw(mode, size);
     }
 
-    public static void recordStart(@Nullable OperationContext context, @Nullable RecordStartArgs args) {
-        ExportMovie.start(context, args);
+    public static void recordStart(@Nullable OperationContext context, @Nullable RecordStartInput input) {
+        ExportMovie.start(context, input);
     }
 
     public static void recordStop() {

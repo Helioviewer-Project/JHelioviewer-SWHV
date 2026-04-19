@@ -14,29 +14,31 @@ final class PlaybackHandlers {
     }
 
     static void register(SampClient client) {
-        client.addMessageHandler(setPlaybackHandler());
-        client.addMessageHandler(commandHandler("jhv.play", Commands::play));
-        client.addMessageHandler(commandHandler("jhv.pause", Commands::pause));
-        client.addMessageHandler(commandHandler("jhv.toggle.playback", Commands::togglePlayback));
-        client.addMessageHandler(commandHandler("jhv.next.frame", Commands::nextFrame));
-        client.addMessageHandler(commandHandler("jhv.previous.frame", Commands::previousFrame));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.seek.frame", (senderId, sender, msg) -> seekFrame(msg)));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.seek.time", (senderId, sender, msg) -> seekTime(msg)));
+        client.addMessageHandler(playbackSetHandler());
+        client.addMessageHandler(commandHandler("jhv.playback.play", Commands::play));
+        client.addMessageHandler(commandHandler("jhv.playback.pause", Commands::pause));
+        client.addMessageHandler(commandHandler("jhv.playback.toggle", Commands::togglePlayback));
+        client.addMessageHandler(commandHandler("jhv.playback.next-frame", Commands::nextFrame));
+        client.addMessageHandler(commandHandler("jhv.playback.previous-frame", Commands::previousFrame));
+        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.playback.seek-frame",
+                (senderId, sender, msg) -> playbackSeekFrame(msg)));
+        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.playback.seek-time",
+                (senderId, sender, msg) -> playbackSeekTime(msg)));
     }
 
-    private static SampClient.JHVSampHandler setPlaybackHandler() {
-        return new SampClient.JHVSampHandler("jhv.set.playback", (senderId, sender, msg) -> {
-            Commands.SetPlaybackArgs args = new Commands.SetPlaybackArgs(
+    private static SampClient.JHVSampHandler playbackSetHandler() {
+        return new SampClient.JHVSampHandler("jhv.playback.set", (senderId, sender, msg) -> {
+            Commands.PlaybackInput input = new Commands.PlaybackInput(
                     SampClient.optionalString(msg, "advanceMode"),
                     SampClient.optionalString(msg, "speed"),
                     SampClient.optionalString(msg, "speedUnit"),
                     SampClient.optionalString(msg, "firstFrame"),
                     SampClient.optionalString(msg, "lastFrame"));
-            EventQueue.invokeLater(() -> Commands.setPlayback(args));
+            EventQueue.invokeLater(() -> Commands.setPlayback(input));
         });
     }
 
-    private static void seekFrame(Message msg) {
+    private static void playbackSeekFrame(Message msg) {
         String frame = SampClient.optionalString(msg, "frame");
         if (frame == null)
             return;
@@ -48,7 +50,7 @@ final class PlaybackHandlers {
         }
     }
 
-    private static void seekTime(Message msg) {
+    private static void playbackSeekTime(Message msg) {
         String time = SampClient.optionalString(msg, "time");
         if (time == null)
             return;
