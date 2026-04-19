@@ -4,8 +4,8 @@ import java.awt.EventQueue;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
-
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Consumer;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
@@ -19,51 +19,51 @@ final class LoadHandlers {
     }
 
     static void register(SampClient client) {
-        client.addMessageHandler(uriHandler("image.load.fits", Commands.LOAD_IMAGE));
-        client.addMessageHandler(votableHandler());
-        client.addMessageHandler(fitsTableHandler());
+        client.addMessageHandler(singleURIHandler("image.load.fits", Commands::loadImage));
+        // load VOTable only from SOAR
+        client.addMessageHandler(new SampClient.JHVSampHandler("table.load.votable", (senderId, sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender))
+                loadURI(msg, Commands::loadVOTable);
+        }));
+        // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
+        client.addMessageHandler(new SampClient.JHVSampHandler("table.load.fits", (senderId, sender, msg) -> {
+            if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender))
+                loadURI(msg, Commands::loadImage);
+        }));
         // advertise we can load CDF, although we can do only MAG and SWA
-        client.addMessageHandler(uriHandler("table.load.cdf", Commands.LOAD_CDF));
-        client.addMessageHandler(uriListHandler("jhv.load.image", Commands.LOAD_IMAGE));
-        client.addMessageHandler(uriListHandler("jhv.load.cdf", Commands.LOAD_CDF));
+        client.addMessageHandler(singleURIHandler("table.load.cdf", Commands::loadCDF));
+        client.addMessageHandler(uriListHandler("jhv.load.image", Commands::loadImage, Commands::loadImage));
+        client.addMessageHandler(uriListHandler("jhv.load.cdf", Commands::loadCDF, Commands::loadCDF));
         // Add handler for the HAPI csv files
-        client.addMessageHandler(uriListHandler("jhv.load.hapi", Commands.LOAD_HAPI));
-        client.addMessageHandler(uriOrValueHandler("jhv.load.request", Commands.LOAD_REQUEST));
-        client.addMessageHandler(uriOrValueHandler("jhv.load.sunjson", Commands.LOAD_SUN_JSON));
+        client.addMessageHandler(uriListHandler("jhv.load.hapi", Commands::loadHapi, Commands::loadHapi));
+        client.addMessageHandler(uriOrValueHandler("jhv.load.request", Commands::loadRequest, Commands::loadRequest));
+        client.addMessageHandler(uriOrValueHandler("jhv.load.sunjson", Commands::loadSunJSON, Commands::loadSunJSON));
         client.addMessageHandler(new SampClient.JHVSampHandler("jhv.load.state", (senderId, sender, msg) -> loadState(msg, senderId)));
     }
 
-    private static AbstractMessageHandler uriHandler(String type, String commandId) {
-        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURI(msg, commandId));
+    private static AbstractMessageHandler singleURIHandler(String type, Consumer<URI> consumer) {
+        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURI(msg, consumer));
     }
 
-    // load VOTable only from SOAR
-    private static AbstractMessageHandler votableHandler() {
-        return new SampClient.JHVSampHandler("table.load.votable", (senderId, sender, msg) -> {
-            if ("SolarOrbiterARchive".equals(sender))
-                loadURI(msg, Commands.LOAD_VOTABLE);
-        });
+    private static AbstractMessageHandler uriListHandler(String type, Consumer<URI> singleConsumer,
+                                                         Consumer<List<URI>> listConsumer) {
+        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) ->
+                loadURIList(msg, singleConsumer, listConsumer));
     }
 
-    // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
-    private static AbstractMessageHandler fitsTableHandler() {
-        return new SampClient.JHVSampHandler("table.load.fits", (senderId, sender, msg) -> {
-            if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender))
-                loadURI(msg, Commands.LOAD_IMAGE);
-        });
-    }
-
-    private static AbstractMessageHandler uriListHandler(String type, String commandId) {
-        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURIList(msg, commandId));
-    }
-
-    private static AbstractMessageHandler uriOrValueHandler(String type, String commandId) {
+    private static AbstractMessageHandler uriOrValueHandler(String type, Consumer<URI> uriConsumer,
+                                                            Consumer<String> valueConsumer) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> {
-            if (loadURI(msg, commandId))
+            Object url = msg.getParam("url");
+            if (url != null) {
+                URI uri = toURI(url.toString());
+                EventQueue.invokeLater(() -> uriConsumer.accept(uri));
                 return;
+            }
+
             String value = SampClient.optionalString(msg, "value");
             if (value != null)
-                invokeCommand(commandId, value);
+                EventQueue.invokeLater(() -> valueConsumer.accept(value));
         });
     }
 
@@ -90,31 +90,30 @@ final class LoadHandlers {
                 else
                     Commands.loadState(context, input.toString());
             } catch (Exception e) {
-                Log.warn(Commands.LOAD_STATE, e);
+                Log.warn("jhv.load.state", e);
             }
         });
     }
 
-    private static boolean loadURI(Message msg, String commandId) throws Exception {
-        Object url = msg.getParam("url");
-        if (url == null)
-            return false;
-        URI uri = toURI(url.toString());
-        invokeCommand(commandId, uri);
-        return true;
+    private static void loadURI(Message msg, Consumer<URI> consumer) throws Exception {
+        URI uri = requiredURI(msg);
+        if (uri == null)
+            return;
+        EventQueue.invokeLater(() -> consumer.accept(uri));
     }
 
-    private static void loadURIList(Message msg, String commandId) throws Exception {
+    private static void loadURIList(Message msg, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer)
+            throws Exception {
         Object url = msg.getParam("url");
         if (!(url instanceof Iterable<?> urls)) {
-            loadURI(msg, commandId);
+            loadURI(msg, singleConsumer);
             return;
         }
 
         ArrayList<URI> uris = new ArrayList<>();
         for (Object obj : urls)
             uris.add(toURI(obj.toString()));
-        invokeCommand(commandId, uris);
+        EventQueue.invokeLater(() -> listConsumer.accept(uris));
     }
 
     private static URI toURI(String url) throws Exception {
@@ -124,13 +123,10 @@ final class LoadHandlers {
         return uri;
     }
 
-    private static void invokeCommand(String commandId, @Nullable Object input) {
-        EventQueue.invokeLater(() -> {
-            try {
-                Commands.Registry.run(commandId, input);
-            } catch (Exception e) {
-                Log.warn(commandId, e);
-            }
-        });
+    private static URI requiredURI(Message msg) throws Exception {
+        Object url = msg.getParam("url");
+        if (url == null)
+            return null;
+        return toURI(url.toString());
     }
 }
