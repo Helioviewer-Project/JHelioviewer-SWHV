@@ -54,7 +54,7 @@ JHV accepts these SAMP message types:
 - `jhv.view.zoom-in`
 - `jhv.view.zoom-out`
 - `jhv.view.zoom-fit`
-- `jhv.view.zoom-one-to-one`
+- `jhv.view.zoom-1-to-1`
 - `jhv.view.reset`
 - `jhv.view.reset-axis`
 - `jhv.view.rotate90`
@@ -110,7 +110,7 @@ These messages act immediately instead of performing a partial state merge:
 - `jhv.view.zoom-in`
 - `jhv.view.zoom-out`
 - `jhv.view.zoom-fit`
-- `jhv.view.zoom-one-to-one`
+- `jhv.view.zoom-1-to-1`
 - `jhv.view.reset`
 - `jhv.view.reset-axis`
 - `jhv.view.rotate90`
@@ -447,7 +447,7 @@ These messages read no params:
 - `jhv.view.zoom-in`
 - `jhv.view.zoom-out`
 - `jhv.view.zoom-fit`
-- `jhv.view.zoom-one-to-one`
+- `jhv.view.zoom-1-to-1`
 - `jhv.view.reset`
 - `jhv.view.reset-axis`
 

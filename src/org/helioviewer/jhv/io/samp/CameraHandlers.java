@@ -13,7 +13,7 @@ final class CameraHandlers {
         client.addMessageHandler(commandHandler("jhv.view.zoom-in", Commands::zoomIn));
         client.addMessageHandler(commandHandler("jhv.view.zoom-out", Commands::zoomOut));
         client.addMessageHandler(commandHandler("jhv.view.zoom-fit", Commands::zoomFit));
-        client.addMessageHandler(commandHandler("jhv.view.zoom-one-to-one", Commands::zoomOneToOne));
+        client.addMessageHandler(commandHandler("jhv.view.zoom-1-to-1", Commands::zoomOneToOne));
         client.addMessageHandler(commandHandler("jhv.view.reset", Commands::resetView));
         client.addMessageHandler(commandHandler("jhv.view.reset-axis", Commands::resetViewAxis));
         client.addMessageHandler(new SampClient.JHVSampHandler("jhv.view.rotate90",
