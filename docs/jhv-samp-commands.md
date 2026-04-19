@@ -197,6 +197,9 @@ This is not a SAMP-standard field; it is part of JHV's application-level
 message contract and is used only so the client can correlate the eventual
 completion notification.
 
+The `url` or inline `value` for `jhv.load.state` must contain a JHV state
+document, not arbitrary JSON.
+
 Accepted payload shapes:
 
 URL form:
@@ -586,6 +589,96 @@ Implemented completion messages:
 
 - `jhv.load.state.completed` is implemented as described above
 - `jhv.record.start.completed` is implemented as described above
+
+## JHV State Document Format
+
+`jhv.load.state` accepts a JHV state document, not arbitrary JSON.
+
+The role of the state document is to rebuild the same scene:
+
+- reload all datasets described by the `data` keys
+- restore their per-dataset view options
+- restore the global view mode
+- reapply the equivalent of `seek-time`
+
+The document must be a JSON object with this top-level wrapper:
+
+```json
+{
+  "org.helioviewer.jhv.state": {
+    "...": "..."
+  }
+}
+```
+
+Inside `org.helioviewer.jhv.state`, the top-level keys can be understood in
+three roles:
+
+- `data`
+  - `annotations`
+  - `layers`
+  - `imageLayers`
+  - `timelines`
+  - `plugins`
+- `view mode`
+  - `projection`
+  - `annotationMode`
+  - `multiview`
+  - `tracking`
+  - `refresh`
+  - `showCorona`
+  - `differentialRotation`
+- `commands`
+  - `time`
+
+Meaning:
+
+- `data` tells JHV what data to reload and which per-entry view options to
+  restore for annotations, layers, image layers, timelines, and plugin-backed
+  data such as PFSS and SWEK
+- `view mode` restores the global viewing mode
+- `commands` reapply the equivalent of `seek-time`, because the selected time
+  is intimately linked to data presentation
+
+`layers` and `timelines` are arrays of objects with this general shape:
+
+```json
+{
+  "className": "org.helioviewer.jhv.layers.GridLayer",
+  "name": "Display name",
+  "data": { "...": "layer or timeline view options..." },
+  "enabled": true
+}
+```
+
+Real `className` examples from the source:
+
+- layers:
+  - `org.helioviewer.jhv.layers.GridLayer`
+  - `org.helioviewer.jhv.layers.TimestampLayer`
+- timelines:
+  - `org.helioviewer.jhv.timelines.radio.RadioData`
+  - `org.helioviewer.jhv.timelines.band.Band`
+
+`imageLayers` uses the same shape, plus optional `master`:
+
+```json
+{
+  "className": "org.helioviewer.jhv.layers.ImageLayer",
+  "name": "Layer name",
+  "data": { "...": "image-layer view options..." },
+  "enabled": true,
+  "master": true
+}
+```
+
+Notes:
+
+- the `view mode` keys above are the full serialized view mode
+- `time` is the stored movie time value and is the same kind of value that
+  `jhv.seek.time` applies
+- for image layers, `master: true` marks the layer that should become the
+  active image layer after restore
 
 Implementation references:
 
