@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
-import javax.annotation.Nullable;
-
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
@@ -52,9 +51,19 @@ public final class ViewActions {
         MovieDisplay.display();
     }
 
-    public static void rotateView90(@Nullable Quat rotation) {
-        if (rotation == null)
+    public static void rotateView90(String axis) {
+        if (axis == null)
             return;
+
+        switch (axis.toUpperCase()) {
+            case "X" -> rotateView90(Quat.X90);
+            case "Y" -> rotateView90(Quat.Y90);
+            case "Z" -> rotateView90(Quat.Z90);
+            default -> Log.warn("Ignoring invalid rotate view axis value: " + axis);
+        }
+    }
+
+    private static void rotateView90(Quat rotation) {
         Display.getCamera().rotateDragRotation(rotation);
         MovieDisplay.display();
     }

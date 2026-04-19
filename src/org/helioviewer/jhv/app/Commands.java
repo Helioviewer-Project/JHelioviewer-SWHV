@@ -13,7 +13,6 @@ import org.helioviewer.jhv.camera.ViewActions;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.JHVTime;
 
 public final class Commands {
@@ -243,8 +242,8 @@ public final class Commands {
         ViewActions.resetViewAxis();
     }
 
-    public static void rotateView90(@Nullable Quat rotation) {
-        ViewActions.rotateView90(rotation);
+    public static void rotateView90(@Nullable String axis) {
+        ViewActions.rotateView90(axis);
     }
 
     public static void addCompletionListener(CompletionListener listener) {

@@ -25,7 +25,6 @@ import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.io.samp.SampClient;
-import org.helioviewer.jhv.math.Quat;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
 
 import com.jidesoft.swing.JideButton;
@@ -161,9 +160,9 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         resetCameraAxis.addActionListener(new Actions.ResetCameraAxis());
 
         JideSplitButton rotate90Button = toolSplitButton(ROTATE90);
-        rotate90Button.add(new Actions.Rotate90Camera("X Axis", Quat.X90));
-        rotate90Button.add(new Actions.Rotate90Camera("Y Axis", Quat.Y90));
-        rotate90Button.add(new Actions.Rotate90Camera("Z Axis", Quat.Z90));
+        rotate90Button.add(new Actions.Rotate90Camera("X Axis", "X"));
+        rotate90Button.add(new Actions.Rotate90Camera("Y Axis", "Y"));
+        rotate90Button.add(new Actions.Rotate90Camera("Z Axis", "Z"));
 
         addButton(zoomIn);
         addButton(zoomOut);

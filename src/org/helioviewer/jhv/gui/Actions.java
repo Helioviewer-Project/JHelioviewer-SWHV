@@ -17,6 +17,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
+import org.helioviewer.jhv.camera.ViewActions;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
@@ -27,7 +28,6 @@ import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
@@ -226,16 +226,16 @@ public class Actions {
 
     public static class Rotate90Camera extends AbstractAction {
 
-        private final Quat rotation;
+        private final String axis;
 
-        public Rotate90Camera(String name, Quat _rotation) {
+        public Rotate90Camera(String name, String _axis) {
             super(name);
-            rotation = _rotation;
+            axis = _axis;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Commands.rotateView90(rotation);
+            ViewActions.rotateView90(axis);
         }
 
     }
