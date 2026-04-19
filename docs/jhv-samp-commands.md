@@ -1,19 +1,15 @@
 # JHV SAMP Commands
 
-This note describes the SAMP interface that JHelioviewer exposes.
+This note describes the SAMP interface exposed by JHelioviewer to external
+clients. It documents the accepted `samp.mtype` values, the expected message
+parameters, the handling of invalid input, and the completion notifications
+that JHV may send back.
 
-It is written for an external SAMP client:
-
-- which `samp.mtype` values JHV accepts
-- which params each message may send
-- how JHV handles invalid values
-- which completion notifications JHV may send back
-
-It documents only implemented SAMP commands.
+Only implemented SAMP commands are documented here.
 
 ## Accepted Message Types
 
-JHV accepts these SAMP message types:
+JHV accepts the following SAMP message types:
 
 ### Load messages
 
@@ -77,7 +73,7 @@ These messages update only the fields they receive:
 
 For these messages:
 
-- omitted params leave the existing JHV state unchanged
+- omitted parameters leave the existing JHV state unchanged
 - invalid string values are warned about and ignored
 - out-of-range numeric values are warned about and clamped
 
@@ -115,7 +111,7 @@ These messages act immediately instead of performing a partial state merge:
 - `jhv.view.reset-axis`
 - `jhv.view.rotate90`
 
-### Persistent state
+### State-changing messages
 
 These messages update real JHV state and leave the resulting state visible in
 the UI after execution:
@@ -125,7 +121,7 @@ the UI after execution:
 - `jhv.record.set`
 - `jhv.record.start`
 
-## Message Payloads
+## Payloads
 
 This section describes the payloads an external SAMP client can send.
 
@@ -152,7 +148,7 @@ The `url` value may also be a local path string. JHV will treat a value with no 
 
 ### Multi-URL or single-URL load payloads
 
-These message types read the `url` param in one of two forms:
+These message types read the `url` parameter in one of two forms:
 
 - `jhv.load.image`
 - `jhv.load.cdf`
@@ -228,7 +224,7 @@ Behavior:
 
 ### Load notes
 
-- SAMP params are read as plain values and converted with `toString()`
+- SAMP parameters are read as plain values and converted with `toString()`
 - for `jhv.load.image`, `jhv.load.cdf`, and `jhv.load.hapi`, the `url` array
   elements are each converted with `toString()`
 - `table.load.votable` is additionally sender-restricted to `SolarOrbiterARchive`
@@ -238,7 +234,7 @@ Behavior:
 
 ### `jhv.playback.set`
 
-Accepted params:
+Accepted parameters:
 
 - `advanceMode`
 - `speed`
@@ -246,7 +242,7 @@ Accepted params:
 - `firstFrame`
 - `lastFrame`
 
-This is a partial-update message. Omitted params leave the existing playback
+This is a partial-update message. Omitted parameters leave the existing playback
 configuration unchanged. Invalid strings are warned about and ignored.
 
 Expected string domains:
@@ -270,7 +266,7 @@ Example:
 
 ### `jhv.playback.seek-frame`
 
-Accepted params:
+Accepted parameters:
 
 - `frame`
 
@@ -287,7 +283,7 @@ Example:
 
 ### `jhv.playback.seek-time`
 
-Accepted params:
+Accepted parameters:
 
 - `time`
 
@@ -304,7 +300,7 @@ Example:
 
 ### Parameterless playback messages
 
-These messages read no params:
+These messages read no parameters:
 
 - `jhv.playback.play`
 - `jhv.playback.pause`
@@ -316,7 +312,7 @@ These messages read no params:
 
 ### `jhv.view.set`
 
-Accepted params:
+Accepted parameters:
 
 - `projection`
 - `annotationMode`
@@ -326,7 +322,7 @@ Accepted params:
 - `showCorona`
 - `differentialRotation`
 
-This is a partial-update message. Omitted params leave the existing mode
+This is a partial-update message. Omitted parameters leave the existing mode
 configuration unchanged. Invalid strings are warned about and ignored.
 
 Expected string domains:
@@ -351,12 +347,12 @@ Example:
 
 ### `jhv.record.set`
 
-Accepted params:
+Accepted parameters:
 
 - `mode`
 - `size`
 
-This is a partial-update message. Omitted params leave the existing recording
+This is a partial-update message. Omitted parameters leave the existing recording
 configuration unchanged. Invalid strings are warned about and ignored.
 
 Expected string domains:
@@ -375,7 +371,7 @@ Example:
 
 ### `jhv.record.start`
 
-Accepted params:
+Accepted parameters:
 
 - `requestId`
 - `mode`
@@ -387,7 +383,7 @@ Accepted params:
 This message starts recording using the resulting recording and playback state.
 If recording is already active, it returns immediately.
 
-Omitted params leave the existing recording or playback configuration
+Omitted parameters leave the existing recording or playback configuration
 unchanged. Invalid strings are warned about and ignored. Out-of-range numeric
 values are warned about and clamped.
 
@@ -416,7 +412,7 @@ Example:
 
 ### `jhv.record.stop`
 
-Accepted params: none
+Accepted parameters: none
 
 This requests stop if recording is active. It does not have its own completion
 message.
@@ -425,7 +421,7 @@ message.
 
 ### `jhv.view.rotate90`
 
-Accepted params:
+Accepted parameters:
 
 - `axis`
 
@@ -442,7 +438,7 @@ Example:
 
 ### Parameterless camera messages
 
-These messages read no params:
+These messages read no parameters:
 
 - `jhv.view.zoom-in`
 - `jhv.view.zoom-out`
