@@ -202,41 +202,11 @@ public final class ViewState {
         } catch (IllegalArgumentException e) {
             Log.warn("Ignoring invalid annotation mode state value: " + annotationModeName, e);
         }
-        if (source.has("multiview") && !source.isNull("multiview")) {
-            Object multiview = source.opt("multiview");
-            if (multiview instanceof Boolean value)
-                multiviewValue = value;
-            else
-                Log.warn("Ignoring invalid multiview state value: " + multiview);
-        }
-        if (source.has("tracking") && !source.isNull("tracking")) {
-            Object tracking = source.opt("tracking");
-            if (tracking instanceof Boolean value)
-                trackingValue = value;
-            else
-                Log.warn("Ignoring invalid tracking state value: " + tracking);
-        }
-        if (source.has("refresh") && !source.isNull("refresh")) {
-            Object refresh = source.opt("refresh");
-            if (refresh instanceof Boolean value)
-                refreshValue = value;
-            else
-                Log.warn("Ignoring invalid refresh state value: " + refresh);
-        }
-        if (source.has("showCorona") && !source.isNull("showCorona")) {
-            Object showCorona = source.opt("showCorona");
-            if (showCorona instanceof Boolean value)
-                showCoronaValue = value;
-            else
-                Log.warn("Ignoring invalid showCorona state value: " + showCorona);
-        }
-        if (source.has("differentialRotation") && !source.isNull("differentialRotation")) {
-            Object differentialRotation = source.opt("differentialRotation");
-            if (differentialRotation instanceof Boolean value)
-                differentialRotationValue = value;
-            else
-                Log.warn("Ignoring invalid differentialRotation state value: " + differentialRotation);
-        }
+        multiviewValue = readBoolean(source, "multiview", multiviewValue);
+        trackingValue = readBoolean(source, "tracking", trackingValue);
+        refreshValue = readBoolean(source, "refresh", refreshValue);
+        showCoronaValue = readBoolean(source, "showCorona", showCoronaValue);
+        differentialRotationValue = readBoolean(source, "differentialRotation", differentialRotationValue);
 
         return new ModeData(
                 projectionValue,
@@ -246,22 +216,6 @@ public final class ViewState {
                 refreshValue,
                 showCoronaValue,
                 differentialRotationValue);
-    }
-
-    public static void writeMovieJson(JSONObject target) {
-        target.put("play", moviePlaying);
-    }
-
-    public static boolean readMoviePlaying(JSONObject source) {
-        if (!source.has("play") || source.isNull("play"))
-            return moviePlaying;
-
-        Object play = source.opt("play");
-        if (play instanceof Boolean value)
-            return value;
-
-        Log.warn("Ignoring invalid movie play state value: " + play);
-        return moviePlaying;
     }
 
     public static void applyMode(ModeData data) {
@@ -498,7 +452,10 @@ public final class ViewState {
 
         playbackSpeed = speed;
         playbackSpeedUnit = newPlaybackSpeedUnit;
-        applyPlaybackSpeed();
+        if (playbackSpeedUnit.isRelative())
+            Movie.setDesiredRelativeSpeed(playbackSpeed);
+        else
+            Movie.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
         notifyMovieListeners();
     }
 
@@ -564,13 +521,6 @@ public final class ViewState {
         notifyPlaybackRangeListeners();
     }
 
-    private static void applyPlaybackSpeed() {
-        if (playbackSpeedUnit.isRelative())
-            Movie.setDesiredRelativeSpeed(playbackSpeed);
-        else
-            Movie.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
-    }
-
     private static void applyPlaybackRangeState(int firstFrame, int lastFrame) {
         playbackFirstFrame = firstFrame;
         playbackLastFrame = lastFrame;
@@ -586,6 +536,18 @@ public final class ViewState {
             Log.warn("Ignoring invalid " + name + " value: " + value, e);
             return null;
         }
+    }
+
+    private static boolean readBoolean(JSONObject source, String key, boolean currentValue) {
+        if (!source.has(key) || source.isNull(key))
+            return currentValue;
+
+        Object value = source.opt(key);
+        if (value instanceof Boolean booleanValue)
+            return booleanValue;
+
+        Log.warn("Ignoring invalid " + key + " state value: " + value);
+        return currentValue;
     }
 
     private static @Nullable Boolean parseBoolean(@Nullable String value, String name) {

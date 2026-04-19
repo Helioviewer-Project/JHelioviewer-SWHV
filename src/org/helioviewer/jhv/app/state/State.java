@@ -53,7 +53,6 @@ public final class State {
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
         ViewState.writeModeJson(main);
-        ViewState.writeMovieJson(main);
         main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
 
         JSONArray ja = new JSONArray();
@@ -152,7 +151,7 @@ public final class State {
     }
 
     private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context,
-                                   ViewState.ModeData modeData, boolean moviePlaying) {
+                                   ViewState.ModeData modeData) {
         Layers.clear();
 
         for (Object o : data.getJSONArray("layers")) {
@@ -192,7 +191,7 @@ public final class State {
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         EDTCallbackExecutor.pool.submit(
                 new WaitLoad(newLayers.keySet()),
-                new Callback(context, newLayers, masterLayer, time, modeData, moviePlaying));
+                new Callback(context, newLayers, masterLayer, time, modeData));
     }
 
     private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
@@ -208,15 +207,13 @@ public final class State {
     }
 
     private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,
-                            @Nullable ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData,
-                            boolean moviePlaying) implements FutureCallback<Void> {
+                            @Nullable ImageLayer masterLayer, JHVTime time,
+                            ViewState.ModeData modeData) implements FutureCallback<Void> {
 
         private void applyRestoredPlaybackState() {
             ViewState.applyMode(modeData);
             Commands.seekTime(time);
             Display.getCamera().refresh();
-            if (moviePlaying)
-                Commands.play();
         }
 
         @Override
@@ -245,11 +242,10 @@ public final class State {
     public static void load(@Nullable Commands.OperationContext context, JSONObject jo) {
         try {
             ViewState.ModeData modeData = ViewState.readModeJson(jo);
-            boolean moviePlaying = ViewState.readMoviePlaying(jo);
             // to be loaded before viewpoint
             ViewState.setProjection(modeData.projection());
             loadTimelines(jo);
-            loadLayers(jo, context, modeData, moviePlaying);
+            loadLayers(jo, context, modeData);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.loadState(plugins);
