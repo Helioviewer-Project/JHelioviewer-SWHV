@@ -235,7 +235,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ViewActions.rotateView90(axis);
+            Commands.rotateView90(axis);
         }
 
     }

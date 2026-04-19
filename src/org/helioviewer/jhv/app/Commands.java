@@ -2,9 +2,7 @@ package org.helioviewer.jhv.app;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -19,14 +17,6 @@ public final class Commands {
 
     private Commands() {
     }
-
-    public static final String LOAD_STATE = "load-state";
-    public static final String LOAD_REQUEST = "load-request";
-    public static final String LOAD_SUN_JSON = "load-sunjson";
-    public static final String LOAD_IMAGE = "load-image";
-    public static final String LOAD_CDF = "load-cdf";
-    public static final String LOAD_VOTABLE = "load-votable";
-    public static final String LOAD_HAPI = "load-hapi";
 
     public record PlaybackInput(
             @Nullable String advanceMode,
@@ -56,38 +46,6 @@ public final class Commands {
     }
 
     private static final ArrayList<CompletionListener> completionListeners = new ArrayList<>();
-
-    public static final class Registry {
-        private static final LinkedHashMap<String, Consumer<Object>> commands = new LinkedHashMap<>();
-
-        static {
-            commands.put(LOAD_STATE, Load::state);
-            commands.put(LOAD_REQUEST, Load::request);
-            commands.put(LOAD_SUN_JSON, Load::sunJSON);
-            commands.put(LOAD_IMAGE, Load::image);
-            commands.put(LOAD_CDF, Load::cdf);
-            commands.put(LOAD_VOTABLE, input -> {
-                if (!(input instanceof URI uri))
-                    throw new IllegalArgumentException("load-votable accepts URI");
-                Load.votable(uri);
-            });
-            commands.put(LOAD_HAPI, Load::hapi);
-        }
-
-        private Registry() {
-        }
-
-        private static Consumer<Object> require(String id) {
-            Consumer<Object> command = commands.get(id);
-            if (command == null)
-                throw new IllegalArgumentException("Unknown command: " + id);
-            return command;
-        }
-
-        public static void run(String id, @Nullable Object input) {
-            require(id).accept(input);
-        }
-    }
 
     public static void setViewStateRaw(
             @Nullable String projection,
@@ -132,9 +90,7 @@ public final class Commands {
         Movie.setFrame(frame);
     }
 
-    public static void seekTime(@Nullable JHVTime time) {
-        if (time == null)
-            return;
+    public static void seekTime(JHVTime time) {
         Movie.setTime(time);
     }
 
