@@ -1,7 +1,17 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 4.8.1 (pending)
+## JHelioviewer 5.0 (pending)
+
+### Technical
+- Major internal groundwork to replace the backend renderer
+- Major internal refactoring of image buffers and their caching
+- Restructuring of application flow around explicit commands, with those commands exposed through SAMP (see `docs/jhv-samp-commands.md`)
+
+## JHelioviewer 4.8.1 (2026-04-19)
+
+- Make possible to restrict playback range: drag with Option/Alt in frame slider to modify range, drag with Command/Ctrl to move range
+- Various bug fixes, cleanups, and significant internal refactoring
 
 ## JHelioviewer 4.8.0 (2026-04-01)
 
