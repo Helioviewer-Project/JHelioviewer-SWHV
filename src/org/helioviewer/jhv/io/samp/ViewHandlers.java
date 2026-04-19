@@ -10,7 +10,7 @@ final class ViewHandlers {
     }
 
     static void register(SampClient client) {
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.set.view.state", (senderId, sender, msg) -> {
+        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.view.set", (senderId, sender, msg) -> {
             String projection = SampClient.optionalString(msg, "projection");
             String annotationMode = SampClient.optionalString(msg, "annotationMode");
             String multiview = SampClient.optionalString(msg, "multiview");
