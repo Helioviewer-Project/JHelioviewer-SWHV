@@ -9,6 +9,7 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.math.MathUtils;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 public class GridLabel {
 
@@ -29,12 +30,24 @@ public class GridLabel {
 
     public static class TransformedGridLabel extends GridLabel {
 
-        public final Matrix4f transform;
+        public final Vector3f origin;
+        public final Vector3f basisX;
+        public final Vector3f basisY;
 
-        private TransformedGridLabel(String txt, float x, float y, Matrix4f transform) {
+        private TransformedGridLabel(String txt, float x, float y, Vector3f _origin, Vector3f _basisX, Vector3f _basisY) {
             super(txt, x, y);
-            this.transform = transform;
+            origin = _origin;
+            basisX = _basisX;
+            basisY = _basisY;
         }
+    }
+
+    // Derive the transformed text origin and local x/y basis vectors once from the label matrix.
+    private static TransformedGridLabel makeTransformedLabel(String txt, float x, float y, Matrix4f transform) {
+        Vector3f origin = transform.transformPosition(0, 0, 0, new Vector3f());
+        Vector3f basisX = transform.transformPosition(1, 0, 0, new Vector3f()).sub(origin, new Vector3f());
+        Vector3f basisY = transform.transformPosition(0, 1, 0, new Vector3f()).sub(origin, new Vector3f());
+        return new TransformedGridLabel(txt, x, y, origin, basisX, basisY);
     }
 
     public static List<GridLabel> makeRadialLabels(double delta, double radialStep) {
@@ -100,7 +113,7 @@ public class GridLabel {
             Matrix4f m = new Matrix4f();
             m.translation(x, 0, y);
             m.rotateTranslation((float) (theta * Math.PI / 180.), 0, 1, 0, m);
-            labels.add(new TransformedGridLabel(txt, x, y, m));
+            labels.add(makeTransformedLabel(txt, x, y, m));
         }
         for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
             String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
@@ -111,7 +124,7 @@ public class GridLabel {
             Matrix4f m = new Matrix4f();
             m.translation(x, 0, y);
             m.rotateTranslation((float) (theta * Math.PI / 180.), 0, 1, 0, m);
-            labels.add(new TransformedGridLabel(txt, x, y, m));
+            labels.add(makeTransformedLabel(txt, x, y, m));
         }
         return labels;
     }

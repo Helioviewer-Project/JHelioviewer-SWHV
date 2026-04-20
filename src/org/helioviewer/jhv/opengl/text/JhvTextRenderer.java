@@ -292,12 +292,23 @@ public class JhvTextRenderer {
     }
 
     public void draw3D(String str, Matrix4f transform, float scaleFactor) {
+        // The matrix places the local text frame in 3D. Transform the local origin and the unit x/y axes once,
+        // then build all glyph corners from that transformed basis instead of re-transforming each corner.
+        transform.transformPosition(0, 0, 0, transformedOrigin);
+        transform.transformPosition(1, 0, 0, transformedBasisX);
+        transform.transformPosition(0, 1, 0, transformedBasisY);
+        transformedBasisX.sub(transformedOrigin);
+        transformedBasisY.sub(transformedOrigin);
+        draw3D(str, transformedOrigin, transformedBasisX, transformedBasisY, scaleFactor);
+    }
+
+    public void draw3D(String str, Vector3f origin, Vector3f basisX, Vector3f basisY, float scaleFactor) {
         float x = 0;
         int len = str.length();
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
-                float advance = glyph.draw3D(transform, x, 0, 0, scaleFactor);
+                float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
                 x += advance * scaleFactor;
             }
         }
@@ -737,7 +748,14 @@ public class JhvTextRenderer {
 
     private final CoordPut directPut = new DirectPut();
     private final CoordPut surfacePut = new SurfacePut();
-    private final Vector3f transformedPosition = new Vector3f();
+
+    private final Vector3f transformedOrigin = new Vector3f();
+    private final Vector3f transformedBasisX = new Vector3f();
+    private final Vector3f transformedBasisY = new Vector3f();
+    private final Vector3f transformedA = new Vector3f();
+    private final Vector3f transformedB = new Vector3f();
+    private final Vector3f transformedC = new Vector3f();
+    private final Vector3f transformedD = new Vector3f();
 
     private CoordPut coordPut = directPut;
 
@@ -747,11 +765,6 @@ public class JhvTextRenderer {
 
     public void setSurfacePut() {
         coordPut = surfacePut;
-    }
-
-    private void putTransformed(Matrix4f transform, float x, float y, float z, float c0, float c1) {
-        transform.transformPosition(x, y, z, transformedPosition);
-        coordPut.put(transformedPosition.x, transformedPosition.y, transformedPosition.z, 1, c0, c1);
     }
 
     // Glyph-by-glyph rendering support
@@ -841,7 +854,7 @@ public class JhvTextRenderer {
             return advance;
         }
 
-        float draw3D(Matrix4f transform, float inX, float inY, float z, float scaleFactor) {
+        float draw3D(Vector3f origin, Vector3f basisX, Vector3f basisY, float inX, float inY, float scaleFactor) {
             if (glyphRectForTextureMapping == null) {
                 upload();
             }
@@ -863,12 +876,20 @@ public class JhvTextRenderer {
             float tx2 = (texturex + width) / (float) renderer.getWidth();
             float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
 
-            putTransformed(transform, x, y, z, tx1, ty1); // A
-            putTransformed(transform, x + (width * scaleFactor), y, z, tx2, ty1); // B
-            putTransformed(transform, x + (width * scaleFactor), y + (height * scaleFactor), z, tx2, ty2); // C
-            putTransformed(transform, x, y, z, tx1, ty1); // A
-            putTransformed(transform, x + (width * scaleFactor), y + (height * scaleFactor), z, tx2, ty2); // C
-            putTransformed(transform, x, y + (height * scaleFactor), z, tx1, ty2); // D
+            float x1 = x + (width * scaleFactor);
+            float y1 = y + (height * scaleFactor);
+
+            transformedA.set(origin).fma(x, basisX).fma(y, basisY);
+            transformedB.set(origin).fma(x1, basisX).fma(y, basisY);
+            transformedC.set(origin).fma(x1, basisX).fma(y1, basisY);
+            transformedD.set(origin).fma(x, basisX).fma(y1, basisY);
+
+            coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, tx1, ty1); // A
+            coordPut.put(transformedB.x, transformedB.y, transformedB.z, 1, tx2, ty1); // B
+            coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, tx2, ty2); // C
+            coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, tx1, ty1); // A
+            coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, tx2, ty2); // C
+            coordPut.put(transformedD.x, transformedD.y, transformedD.z, 1, tx1, ty2); // D
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
             if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
