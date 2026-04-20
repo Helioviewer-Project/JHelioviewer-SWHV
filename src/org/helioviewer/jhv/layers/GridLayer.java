@@ -211,6 +211,7 @@ public final class GridLayer extends AbstractLayer {
 
         GL.glDisable(GL.CULL_FACE);
         latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
+        renderer.flush();
         GL.glEnable(GL.CULL_FACE);
 
         lonLabels.forEach(lonLabel -> renderer.draw3D(lonLabel.txt, lonLabel.origin, lonLabel.basisX, lonLabel.basisY, textScaleFactor));
