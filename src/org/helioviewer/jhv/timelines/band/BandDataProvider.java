@@ -57,7 +57,7 @@ public class BandDataProvider {
         Timelines.getLayers().add(band);
     }
 
-    private static void onFailure(String logContext, Throwable t) {
+    private static void onFailure(String ignoredLogContext, Throwable t) {
         Log.error(t);
     }
 

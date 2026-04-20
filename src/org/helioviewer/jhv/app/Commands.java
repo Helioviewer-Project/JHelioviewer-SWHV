@@ -122,10 +122,6 @@ public final class Commands {
         Load.state(context, uri);
     }
 
-    public static void loadState(String json) {
-        Load.state(json);
-    }
-
     public static void loadState(@Nullable OperationContext context, String json) {
         Load.state(context, json);
     }

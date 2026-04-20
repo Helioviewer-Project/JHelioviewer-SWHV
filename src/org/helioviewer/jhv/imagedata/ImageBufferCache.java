@@ -35,8 +35,4 @@ public final class ImageBufferCache {
     public static void invalidateIf(Predicate<Object> predicate) {
         cache.asMap().keySet().removeIf(predicate);
     }
-
-    public static void clear() {
-        cache.invalidateAll();
-    }
 }

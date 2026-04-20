@@ -82,7 +82,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public void serialize(JSONObject jo) {
     }
 
-    public ConnectionLayer(JSONObject jo) {
+    public ConnectionLayer(JSONObject ignoredJo) {
         optionsPanel = optionsPanel();
     }
 

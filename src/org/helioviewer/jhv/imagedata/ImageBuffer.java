@@ -57,10 +57,6 @@ public class ImageBuffer {
         buffer = allocate(arena, filter(format, data, _width, _height, filterType));
     }
 
-    public ImageBuffer(int _width, int _height, Format _format, short[] data) {
-        this(_width, _height, _format, data, ImageFilter.Type.None);
-    }
-
     public ImageBuffer(int _width, int _height, Format _format, short[] data, ImageFilter.Type filterType) {
         width = _width;
         height = _height;

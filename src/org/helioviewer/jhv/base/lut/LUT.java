@@ -77,6 +77,7 @@ public record LUT(String name, ByteBuffer rgba) {
         return lut8;
     }
 
+    @Override
     public ByteBuffer rgba() {
         return rgba.duplicate();
     }
