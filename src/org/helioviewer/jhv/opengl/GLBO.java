@@ -14,6 +14,9 @@ class GLBO {
     private final int bufferID;
     private final int usage;
 
+    private float[] lastFloatData;
+    private int lastFloatCount = -1;
+
     GLBO(int _target, int _usage) {
         target = _target;
         bufferID = GL.glGenBuffer();
@@ -38,6 +41,29 @@ class GLBO {
             case ShortBuffer shortBuffer -> GL.glBufferSubData(target, 0, BufferUtils.directShortBuffer(shortBuffer));
             default -> throw new IllegalArgumentException("Unsupported buffer type: " + buffer.getClass().getName());
         }
+    }
+
+    void setBufferDataIfChanged(int limit, int capacity, FloatBuffer buffer) {
+        if (limit == lastFloatCount && floatDataMatches(buffer, limit))
+            return;
+
+        setBufferData(limit, capacity, buffer);
+
+        if (lastFloatData == null || lastFloatData.length < limit)
+            lastFloatData = new float[limit];
+        for (int i = 0; i < limit; i++)
+            lastFloatData[i] = buffer.get(i);
+        lastFloatCount = limit;
+    }
+
+    private boolean floatDataMatches(FloatBuffer buffer, int limit) {
+        if (lastFloatData == null)
+            return false;
+        for (int i = 0; i < limit; i++) {
+            if (Float.floatToRawIntBits(lastFloatData[i]) != Float.floatToRawIntBits(buffer.get(i)))
+                return false;
+        }
+        return true;
     }
 
     int getID() {
