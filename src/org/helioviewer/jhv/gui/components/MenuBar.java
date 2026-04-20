@@ -75,9 +75,9 @@ public final class MenuBar extends JMenuBar {
 
         JMenu movieMenu = new JMenu("Movie");
         movieMenu.setMnemonic(KeyEvent.VK_M);
-        movieMenu.add(MoviePanel.getPlayPauseAction());
-        movieMenu.add(MoviePanel.getPreviousFrameAction());
-        movieMenu.add(MoviePanel.getNextFrameAction());
+        movieMenu.add(Actions.PLAY_PAUSE);
+        movieMenu.add(Actions.PREVIOUS_FRAME);
+        movieMenu.add(Actions.NEXT_FRAME);
         add(movieMenu);
 
         Actions.ShowDialog settingsAction = new Actions.ShowDialog("Settings...", new SettingsDialog());

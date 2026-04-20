@@ -9,10 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -21,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -32,7 +28,6 @@ import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
@@ -89,12 +84,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         // Time slider
         timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
-        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RIGHT_ARROW");
-        timeSlider.getActionMap().put("RIGHT_ARROW", nextFrameAction);
-        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LEFT_ARROW");
-        timeSlider.getActionMap().put("LEFT_ARROW", prevFrameAction);
-        timeSlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SPACE");
-        timeSlider.getActionMap().put("SPACE", playPauseAction);
 
         JPanel sliderPanel = new JPanel(new BorderLayout());
         sliderPanel.add(timeSlider);
@@ -107,20 +96,20 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         prevFrameButton = new JideButton(Buttons.backward);
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
-        prevFrameButton.addActionListener(prevFrameAction);
+        prevFrameButton.addActionListener(Actions.PREVIOUS_FRAME);
         HoldRepeat.install(prevFrameButton, FRAME_HOLD_REPEAT_MS);
         buttonPanel.add(prevFrameButton);
 
         playButton = new JideButton(Buttons.play);
         playButton.setFont(Buttons.getMaterialFont(big));
         playButton.setToolTipText("Play movie");
-        playButton.addActionListener(playPauseAction);
+        playButton.addActionListener(Actions.PLAY_PAUSE);
         buttonPanel.add(playButton);
 
         nextFrameButton = new JideButton(Buttons.forward);
         nextFrameButton.setFont(Buttons.getMaterialFont(small));
         nextFrameButton.setToolTipText("Step to next frame");
-        nextFrameButton.addActionListener(nextFrameAction);
+        nextFrameButton.addActionListener(Actions.NEXT_FRAME);
         HoldRepeat.install(nextFrameButton, FRAME_HOLD_REPEAT_MS);
         buttonPanel.add(nextFrameButton);
 
@@ -360,22 +349,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         return timeSlider;
     }
 
-    private static final AbstractAction playPauseAction = new PlayPauseAction();
-    private static final AbstractAction prevFrameAction = new PreviousFrameAction();
-    private static final AbstractAction nextFrameAction = new NextFrameAction();
-
-    static AbstractAction getPlayPauseAction() {
-        return playPauseAction;
-    }
-
-    static AbstractAction getPreviousFrameAction() {
-        return prevFrameAction;
-    }
-
-    static AbstractAction getNextFrameAction() {
-        return nextFrameAction;
-    }
-
     @Override
     public void movieStateChanged() {
         ViewState.MovieData movieData = ViewState.movieData();
@@ -428,50 +401,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         timeSlider.setAllowFrame(false);
         timeSlider.setValue(activeFrame);
         timeSlider.setAllowFrame(true);
-    }
-
-    private static class PlayPauseAction extends Actions.AbstractKeyAction {
-
-        PlayPauseAction() {
-            super("Play/Pause Movie", KeyStroke.getKeyStroke(KeyEvent.VK_P, UIGlobals.menuShortcutMask));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Commands.togglePlayback();
-            putValue(NAME, playButton.getToolTipText());
-        }
-
-    }
-
-    private static class PreviousFrameAction extends Actions.AbstractKeyAction {
-
-        PreviousFrameAction() {
-            super("Step to Previous Frame", KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (ViewState.movieData().playing())
-                Commands.pause();
-            Commands.previousFrame();
-        }
-
-    }
-
-    private static class NextFrameAction extends Actions.AbstractKeyAction {
-
-        NextFrameAction() {
-            super("Step to Next Frame", KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (ViewState.movieData().playing())
-                Commands.pause();
-            Commands.nextFrame();
-        }
-
     }
 
 }
