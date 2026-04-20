@@ -34,6 +34,11 @@ public final class AngleRenderer {
     private final long context;
     private final long surface;
 
+    // Front-load LWJGL/ANGLE library setup and EGL capability discovery before the first real renderer is created.
+    public static void prewarm() {
+        ensureLwjglAngleConfigured(platformConfig());
+    }
+
     public AngleRenderer(long nativeWindowHandle) {
         PlatformConfig platform = platformConfig();
         ensureLwjglAngleConfigured(platform);

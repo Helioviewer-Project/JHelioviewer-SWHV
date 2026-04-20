@@ -33,6 +33,10 @@ public final class MacAngleBridge {
     private MacAngleBridge() {
     }
 
+    public static void prewarm() {
+        // Force class initialization and native symbol resolution before the first canvas attach.
+    }
+
     public static Host create(Canvas canvas, double x, double y, double width, double height) {
         return AngleJAWT.withPlatformInfo(canvas, platformInfo -> {
             if (platformInfo == 0L)
