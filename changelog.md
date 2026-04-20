@@ -3,6 +3,8 @@
 
 ## JHelioviewer 5.0 (pending)
 
+- Support arbitrary masks in detector frame
+
 ### Technical
 - Major internal groundwork to replace the backend renderer
 - Major internal refactoring of image buffers and their caching

@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -17,11 +18,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
+import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
@@ -71,6 +74,13 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         addMouseWheelListener(this);
         UITimer.register(this);
         ViewState.addPlaybackRangeListener(this);
+
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "nextFrame");
+        getActionMap().put("nextFrame", Actions.NEXT_FRAME);
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "previousFrame");
+        getActionMap().put("previousFrame", Actions.PREVIOUS_FRAME);
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "playPause");
+        getActionMap().put("playPause", Actions.PLAY_PAUSE);
 
         frameNumberLabel = new JLabel((getValue() + 1) + "/" + (getMaximum() + 1), JLabel.RIGHT);
     }
