@@ -91,7 +91,7 @@ public class BandReaderHapi {
         Timelines.td.setupDatasets(groupName, theCatalog.types);
     }
 
-    private static void onFailure(String logContext, Throwable t) {
+    private static void onFailure(String ignoredLogContext, Throwable t) {
         Log.error(Throwables.getStackTraceAsString(t));
     }
 

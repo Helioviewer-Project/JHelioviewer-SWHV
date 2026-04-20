@@ -21,7 +21,6 @@ public final class GL {
     public static final int COMPILE_STATUS = GLES30.GL_COMPILE_STATUS;
     public static final int CULL_FACE = GLES30.GL_CULL_FACE;
     public static final int DEPTH_ATTACHMENT = GLES30.GL_DEPTH_ATTACHMENT;
-    public static final int DEPTH_BITS = GLES30.GL_DEPTH_BITS;
     public static final int DEPTH_BUFFER_BIT = GLES30.GL_DEPTH_BUFFER_BIT;
     public static final int DEPTH_COMPONENT16 = GLES30.GL_DEPTH_COMPONENT16;
     public static final int DEPTH_COMPONENT24 = GLES30.GL_DEPTH_COMPONENT24;

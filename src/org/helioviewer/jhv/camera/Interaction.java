@@ -3,8 +3,6 @@ package org.helioviewer.jhv.camera;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
@@ -61,15 +59,6 @@ public class Interaction {
                 return new AnnotateLoop(jo);
             }
         };
-
-        public static final Map<Class<? extends Annotateable>, String> modes = Map.of(
-                AnnotateRectangle.class, Rectangle.toString(),
-                AnnotateCircle.class, Circle.toString(),
-                AnnotateCross.class, Cross.toString(),
-                AnnotateFOV.class, FOV.toString(),
-                AnnotateLine.class, Line.toString(),
-                AnnotateLoop.class, Loop.toString()
-        );
 
         abstract Annotateable generate(JSONObject jo);
 
