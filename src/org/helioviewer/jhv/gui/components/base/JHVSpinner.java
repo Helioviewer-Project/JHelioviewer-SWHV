@@ -23,6 +23,7 @@ public final class JHVSpinner extends JSpinner {
     @Override
     public Object getValue() {
         try {
+            // Return the parsed editor value, not a stale pre-edit model value.
             commitEdit();
         } catch (Exception ignore) {
         }
