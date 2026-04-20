@@ -41,6 +41,7 @@ public class GLGrab {
             Display.reshapeAll();
 
             capture.bindForRender();
+            GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
             if (Display.mode.isOrthographic()) {
                 GLRenderer.renderScene(camera);
             } else {
