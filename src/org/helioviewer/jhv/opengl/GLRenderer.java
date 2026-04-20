@@ -53,6 +53,7 @@ public final class GLRenderer {
             GL.glClearColor(1, 1, 1, 0);
         else
             GL.glClearColor(0, 0, 0, 0);
+        GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
         Layers.prerender();
 
@@ -81,7 +82,6 @@ public final class GLRenderer {
     }
 
     static void renderScene(Camera camera) {
-        GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp.aspect);
@@ -120,7 +120,6 @@ public final class GLRenderer {
             GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayerBounds.getLargestRadialSize()));
         }
 
-        GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
         boolean hpcMode = Display.mode.isHpc();
         Region hpcBounds = hpcMode ? getCenteredHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
