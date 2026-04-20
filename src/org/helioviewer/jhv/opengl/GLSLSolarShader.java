@@ -149,13 +149,12 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindScreen(Viewport vp) {
-        GridScale scale = Display.mode.scale;
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
-        screenBuf.put((float) scale.getInterpolatedXValue(0));
-        screenBuf.put((float) scale.getInterpolatedXValue(1));
+        GridScale scale = Display.mode.scale;
+        screenBuf.put((float) scale.getInterpolatedXValue(0)).put((float) scale.getInterpolatedXValue(1));
         screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
 
         screenBO.setBufferDataIfChanged(screenBuf.flip().limit(), SCREEN_SIZE, screenBuf);

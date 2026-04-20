@@ -51,8 +51,7 @@ class GLBO {
 
         if (lastFloatData == null || lastFloatData.length < limit)
             lastFloatData = new float[limit];
-        for (int i = 0; i < limit; i++)
-            lastFloatData[i] = buffer.get(i);
+        buffer.get(0, lastFloatData);
         lastFloatCount = limit;
     }
 
