@@ -65,7 +65,7 @@ public class Rect {
 
     // The level we're currently installed in in the parent
     // RectanglePacker, or null if not hooked in to the table yet
-    private Level level;
+    //private Level level;
 
     // The user's object this rectangle represents.
     private Object userData;

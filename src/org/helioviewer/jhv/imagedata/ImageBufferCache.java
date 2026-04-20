@@ -28,10 +28,6 @@ public final class ImageBufferCache {
         cache.put(key, imageBuffer);
     }
 
-    public static void invalidate(Object key) {
-        cache.invalidate(key);
-    }
-
     public static void invalidateIf(Predicate<Object> predicate) {
         cache.asMap().keySet().removeIf(predicate);
     }

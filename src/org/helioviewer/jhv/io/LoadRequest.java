@@ -66,7 +66,7 @@ class LoadRequest {
         }
     }
 
-    private static void onSuccessCDF(Void result) {
+    private static void onSuccessCDF(Void ignoredResult) {
         Timelines.dc.setStatus(null);
     }
 

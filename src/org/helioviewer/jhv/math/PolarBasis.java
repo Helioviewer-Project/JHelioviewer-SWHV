@@ -21,11 +21,6 @@ public final class PolarBasis {
         return theta;
     }
 
-    public static Vec2 vec2(double radius, double angleRadians) {
-        // Polar basis: 0 at north, increasing anti-clockwise.
-        return new Vec2(x(radius, angleRadians), y(radius, angleRadians));
-    }
-
     public static Vec3 vec3(double radius, double angleRadians) {
         return new Vec3(x(radius, angleRadians), y(radius, angleRadians), 0);
     }
