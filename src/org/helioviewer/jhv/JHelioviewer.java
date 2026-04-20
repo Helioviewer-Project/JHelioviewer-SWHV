@@ -17,6 +17,7 @@ import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.UpdateChecker;
+import org.helioviewer.jhv.opengl.angle.AngleWarmup;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -80,6 +81,7 @@ public class JHelioviewer {
             Log.info("Start main window");
             UIGlobals.setLaf();
             JFrame frame = JHVFrame.prepare();
+            AngleWarmup.start();
 
             try {
                 Log.info("Load enabled plugins");
