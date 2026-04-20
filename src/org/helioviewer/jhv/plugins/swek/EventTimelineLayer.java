@@ -88,7 +88,9 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         eventUnderMouse = null;
         List<JHVRelatedEvents> events = JHVEventCache.getEvents(xAxis.start(), xAxis.end());
         if (events.isEmpty()) {
-            JHVEventCache.highlight(null);
+            if (mousePosition != null) {
+                JHVEventCache.highlight(null);
+            }
             return;
         }
 
@@ -118,11 +120,13 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
             }
         }
 
-        if (eventUnderMouse != null && mousePosition != null) {
-            drawEvent(graphArea, eventUnderMouse.event, eventUnderMouse.x0, eventUnderMouse.x1, eventUnderMouse.yPosition, g, mousePosition);
-            JHVEventCache.highlight(eventUnderMouse.event);
-        } else {
-            JHVEventCache.highlight(null);
+        if (mousePosition != null) {
+            if (eventUnderMouse != null) {
+                drawEvent(graphArea, eventUnderMouse.event, eventUnderMouse.x0, eventUnderMouse.x1, eventUnderMouse.yPosition, g, mousePosition);
+                JHVEventCache.highlight(eventUnderMouse.event);
+            } else {
+                JHVEventCache.highlight(null);
+            }
         }
     }
 
