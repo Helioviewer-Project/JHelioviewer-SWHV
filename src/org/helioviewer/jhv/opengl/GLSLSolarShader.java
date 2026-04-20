@@ -119,7 +119,7 @@ public class GLSLSolarShader extends GLSLShader {
         crota1.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval1).put(deltaT1).put(0);
 
-        wcsBO.setBufferData(WCS_SIZE, WCS_SIZE, wcsBuf.flip());
+        wcsBO.setBufferDataIfChanged(wcsBuf.flip().limit(), WCS_SIZE, wcsBuf);
     }
 
     public static void bindProjection(
@@ -135,7 +135,7 @@ public class GLSLSolarShader extends GLSLShader {
         sourceView1.setFloatBuffer(projectionBuf);
         displayMap1.setFloatBuffer(projectionBuf);
 
-        projectionBO.setBufferData(PROJECTION_SIZE, PROJECTION_SIZE, projectionBuf.flip());
+        projectionBO.setBufferDataIfChanged(projectionBuf.flip().limit(), PROJECTION_SIZE, projectionBuf);
     }
 
     public void bindLatiGrid(float[] latiGrid0, float[] latiGrid1) {
@@ -158,7 +158,7 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put((float) scale.getInterpolatedXValue(1));
         screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
 
-        screenBO.setBufferData(SCREEN_SIZE, SCREEN_SIZE, screenBuf.flip());
+        screenBO.setBufferDataIfChanged(screenBuf.flip().limit(), SCREEN_SIZE, screenBuf);
     }
 
     static void bindDisplay(float[] color,
@@ -175,7 +175,7 @@ public class GLSLSolarShader extends GLSLShader {
         displayBuf.put(bOffset).put(bScale);
         displayBuf.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
 
-        displayBO.setBufferData(DISPLAY_SIZE, DISPLAY_SIZE, displayBuf.flip());
+        displayBO.setBufferDataIfChanged(displayBuf.flip().limit(), DISPLAY_SIZE, displayBuf);
     }
 
     public void bindPV(float[] pv0, float[] pv1) {
