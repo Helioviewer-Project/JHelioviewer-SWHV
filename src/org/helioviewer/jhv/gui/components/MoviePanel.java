@@ -349,7 +349,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     }
 
     private static void updatePlaybackConfig() {
-        int speed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber().intValue();
+        int speed = ((Number) speedSpinner.getValue()).intValue();
         ViewState.PlaybackSpeedUnit unit = (ViewState.PlaybackSpeedUnit) speedUnitComboBox.getSelectedItem();
         if (unit == null)
             return;
@@ -385,7 +385,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             advanceModeComboBox.setSelectedItem(playbackData.advanceMode());
 
         Integer speed = playbackData.speed();
-        if (!speed.equals(speedSpinner.getValue()))
+        // Do not call speedSpinner.getValue() here: JHVSpinner commits editor text on read,
+        // and this passive UI sync must not force-commit an in-progress edit.
+        Number spinnerSpeed = ((SpinnerNumberModel) speedSpinner.getModel()).getNumber();
+        if (spinnerSpeed.intValue() != speed)
             speedSpinner.setValue(speed);
 
         if (speedUnitComboBox.getSelectedItem() != playbackData.speedUnit())
