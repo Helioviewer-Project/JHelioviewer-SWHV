@@ -48,30 +48,30 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
 
-    private static boolean isAdvanced;
+    private boolean isAdvanced;
 
-    private static final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
+    private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final ImageSelectorPanel imageSelectorPanel;
     private final JideSplitButton addLayerButton;
 
     private static TimeSlider timeSlider;
-    private static JideButton prevFrameButton;
-    private static JideButton nextFrameButton;
-    private static JideButton playButton;
+    private final JideButton prevFrameButton;
+    private final JideButton nextFrameButton;
+    private final JideButton playButton;
 
-    private static RecordButton recordButton;
+    private final RecordButton recordButton;
 
-    private static JideButton advancedButton;
-    private static JHVSpinner speedSpinner;
-    private static JComboBox<ViewState.PlaybackSpeedUnit> speedUnitComboBox;
-    private static JComboBox<AdvanceMode> advanceModeComboBox;
-    private static JRadioButton loopButton;
-    private static JRadioButton shotButton;
-    private static JRadioButton freeButton;
-    private static JComboBox<ViewState.RecordingSize> recordSizeComboBox;
+    private final JideButton advancedButton;
+    private final JHVSpinner speedSpinner;
+    private final JComboBox<ViewState.PlaybackSpeedUnit> speedUnitComboBox;
+    private final JComboBox<AdvanceMode> advanceModeComboBox;
+    private final JRadioButton loopButton;
+    private final JRadioButton shotButton;
+    private final JRadioButton freeButton;
+    private final JComboBox<ViewState.RecordingSize> recordSizeComboBox;
 
-    private static final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-    private static final JPanel recordPanel = new JPanel(new GridBagLayout());
+    private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
+    private final JPanel recordPanel = new JPanel(new GridBagLayout());
 
     private static MoviePanel instance;
 
@@ -306,7 +306,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         }
     }
 
-    private static void setEnabledState(boolean enabled) {
+    private void setEnabledState(boolean enabled) {
         advanceModeComboBox.setEnabled(enabled);
         timeSlider.setEnabled(enabled);
         playButton.setEnabled(enabled);
@@ -318,7 +318,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         advancedButton.setEnabled(enabled);
     }
 
-    public static void setAdvanced(boolean advanced) {
+    public void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
         advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
         modePanel.setVisible(advanced);
@@ -337,7 +337,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         return size;
     }
 
-    private static void updatePlaybackConfig() {
+    private void updatePlaybackConfig() {
         int speed = ((Number) speedSpinner.getValue()).intValue();
         ViewState.PlaybackSpeedUnit unit = (ViewState.PlaybackSpeedUnit) speedUnitComboBox.getSelectedItem();
         if (unit == null)

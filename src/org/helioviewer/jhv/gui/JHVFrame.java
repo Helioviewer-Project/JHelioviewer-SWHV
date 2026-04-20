@@ -125,7 +125,6 @@ public final class JHVFrame {
 
         leftPane = new SideContentPane();
         leftPane.add("Image Layers", MoviePanel.getInstance(), true);
-        MoviePanel.setAdvanced(false);
 
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
@@ -236,13 +235,13 @@ public final class JHVFrame {
     public static void stabilizeLeftPaneWidth() {
         MoviePanel moviePanel = MoviePanel.getInstance();
         // Freeze the left pane to the widest startup state so the scrollbar never overlaps options panels.
-        MoviePanel.setAdvanced(true);
+        moviePanel.setAdvanced(true);
         int contentWidth = measureMoviePanelWidth(moviePanel, null);
         contentWidth = Math.max(contentWidth, measureMoviePanelWidth(moviePanel, Layers.getViewpointLayer()));
         contentWidth = Math.max(contentWidth, measureMoviePanelWidth(moviePanel, Layers.getConnectionLayer()));
 
         layersPanel.setOptionsPanel(null);
-        MoviePanel.setAdvanced(false);
+        moviePanel.setAdvanced(false);
         moviePanel.setFixedPreferredWidth(contentWidth);
         leftPane.revalidate();
 
