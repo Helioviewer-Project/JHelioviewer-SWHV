@@ -12,7 +12,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.OverlayLayout;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
@@ -73,21 +72,20 @@ public final class JHVFrame {
     @SuppressWarnings("serial")
     private static final class RenderStartupHost extends JPanel {
         private final JPanel placeholder = new JPanel();
+        private AngleCanvas canvas;
 
-        RenderStartupHost(AngleCanvas canvas) {
-            setLayout(new OverlayLayout(this));
-
+        RenderStartupHost() {
+            super(new BorderLayout());
             placeholder.setBackground(Color.BLACK);
-            add(placeholder);
-            add(canvas);
+            add(placeholder, BorderLayout.CENTER);
         }
 
-        // Keep a black placeholder over the heavyweight canvas until the first ANGLE frame has presented.
-        void revealCanvas() {
-            if (placeholder.getParent() != this)
+        void attachCanvas(AngleCanvas _canvas) {
+            if (canvas != null)
                 return;
-
+            canvas = _canvas;
             remove(placeholder);
+            add(canvas, BorderLayout.CENTER);
             revalidate();
             repaint();
         }
@@ -112,15 +110,15 @@ public final class JHVFrame {
     private static Layers layers;
 
     private static MenuBar menuBar;
+    private static boolean whiteBackground;
 
     public static JFrame prepare() {
         mainFrame = createFrame();
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
-        renderCanvas = new AngleCanvas();
-        renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
-        renderHost = new RenderStartupHost(renderCanvas);
+        renderCanvas = null;
+        renderHost = new RenderStartupHost();
 
         layers = Layers.getInstance();
         layersPanel = new LayersPanel(layers);
@@ -139,10 +137,6 @@ public final class JHVFrame {
         interaction = new Interaction(Display.getCamera());
         ViewState.initFromInteraction();
         inputController = new InputController(interaction);
-        renderCanvas.addMouseListener(inputController);
-        renderCanvas.addMouseMotionListener(inputController);
-        renderCanvas.addMouseWheelListener(inputController);
-        renderCanvas.addKeyListener(inputController);
 
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -265,23 +259,36 @@ public final class JHVFrame {
     }
 
     public static Component getRenderComponent() {
-        return renderCanvas;
+        return renderCanvas != null ? renderCanvas : renderHost;
+    }
+
+    public static void attachRenderCanvas() {
+        if (renderCanvas != null)
+            return;
+
+        renderCanvas = new AngleCanvas();
+        renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
+        renderCanvas.setWhiteBackground(whiteBackground);
+        renderCanvas.addMouseListener(inputController);
+        renderCanvas.addMouseMotionListener(inputController);
+        renderCanvas.addMouseWheelListener(inputController);
+        renderCanvas.addKeyListener(inputController);
+        renderHost.attachCanvas(renderCanvas);
     }
 
     public static void requestRender() {
-        renderCanvas.requestRender();
-    }
-
-    public static void showRenderCanvas() {
-        renderHost.revealCanvas();
+        if (renderCanvas != null)
+            renderCanvas.requestRender();
     }
 
     public static void setWhiteBackground(boolean whiteBackground) {
-        renderCanvas.setWhiteBackground(whiteBackground);
+        JHVFrame.whiteBackground = whiteBackground;
+        if (renderCanvas != null)
+            renderCanvas.setWhiteBackground(whiteBackground);
     }
 
     public static int getFramerate() {
-        return renderCanvas.getFramerate();
+        return renderCanvas != null ? renderCanvas.getFramerate() : 0;
     }
 
     public static MainContentPanel getMainContentPanel() {

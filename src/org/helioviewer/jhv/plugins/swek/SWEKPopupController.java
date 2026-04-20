@@ -19,6 +19,7 @@ import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
+import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -32,7 +33,6 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     private static final int xOffset = 12;
     private static final int yOffset = 12;
 
-    private final Component component;
     private final Camera camera;
 
     private Cursor lastCursor;
@@ -42,9 +42,12 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     static int mouseOverY;
     long currentTime;
 
-    SWEKPopupController(Component _component) {
-        component = _component;
+    SWEKPopupController() {
         camera = Display.getCamera();
+    }
+
+    private static Component component() {
+        return JHVFrame.getRenderComponent();
     }
 
     @Override
@@ -52,7 +55,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
         currentTime = milli;
     }
 
-    private Point calcWindowPosition(Point p, int hekWidth, int hekHeight) {
+    private Point calcWindowPosition(Component component, Point p, int hekWidth, int hekHeight) {
         int compWidth = component.getWidth();
         int compHeight = component.getHeight();
         Point compLoc = component.getLocationOnScreen();
@@ -90,12 +93,13 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     @Override
     public void mouseClicked(MouseEvent e) {
         if (mouseOverJHVEvent != null) {
+            Component canvas = component();
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(currentTime));
             hekPopUp.pack();
-            hekPopUp.setLocation(calcWindowPosition(GLHelper.GL2AWTPoint(e.getX(), e.getY()), hekPopUp.getWidth(), hekPopUp.getHeight()));
+            hekPopUp.setLocation(calcWindowPosition(canvas, GLHelper.GL2AWTPoint(e.getX(), e.getY()), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
 
-            component.setCursor(helpCursor);
+            canvas.setCursor(helpCursor);
         }
     }
 
@@ -107,7 +111,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     void resetHover() {
         mouseOverJHVEvent = null;
         JHVEventCache.highlight(null);
-        component.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
+        component().setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
     }
 
     private double computeDistSun(JHVEvent evt) {
@@ -190,15 +194,16 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
             }
         }
 
+        Component canvas = component();
         JHVEventCache.highlight(mouseOverJHVEvent);
-        Cursor cursor = component.getCursor();
+        Cursor cursor = canvas.getCursor();
         if (helpCursor != cursor)
             lastCursor = cursor;
 
         if (mouseOverJHVEvent != null) {
-            component.setCursor(helpCursor);
+            canvas.setCursor(helpCursor);
         } else {
-            component.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
+            canvas.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
         }
     }
 

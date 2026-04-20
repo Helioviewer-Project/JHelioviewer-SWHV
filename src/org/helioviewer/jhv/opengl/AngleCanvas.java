@@ -224,8 +224,6 @@ public final class AngleCanvas extends Canvas {
             angleRenderer = renderer;
             lastHostBounds = bounds;
             invalidateGlSize();
-            // Reveal the real canvas once ANGLE has a live native surface and renderer.
-            JHVFrame.showRenderCanvas();
         } catch (RuntimeException | Error e) {
             if (newHostHandle != 0L)
                 MacAngleBridge.destroy(newHostHandle);

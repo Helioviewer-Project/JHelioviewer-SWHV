@@ -55,7 +55,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {
     }
 
-    private final SWEKPopupController controller = new SWEKPopupController(JHVFrame.getRenderComponent());
+    private final SWEKPopupController controller = new SWEKPopupController();
     private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
