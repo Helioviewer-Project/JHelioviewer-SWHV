@@ -36,7 +36,7 @@ public final class Tasks {
         return submit(logContext, task, onSuccess, (ctx, t) -> defaultOnFailure(ctx, t, errorMessage));
     }
 
-    public static void doNothing(Object result) {
+    public static void doNothing(Object ignoredResult) {
     }
 
     @FunctionalInterface

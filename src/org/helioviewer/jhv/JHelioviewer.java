@@ -110,13 +110,13 @@ public class JHelioviewer {
         }
     }
 
-    private static void onSuccessInit(Void result) {
+    private static void onSuccessInit(Void ignoredResult) {
         DataSources.loadSources(true);
         CommandLine.load();
         UpdateChecker.check(false);
     }
 
-    private static void onFailureInit(String logContext, Throwable t) {
+    private static void onFailureInit(String ignoredLogContext, Throwable t) {
         Log.error(t);
         Message.err("An error occurred during initialization", t.getMessage());
     }

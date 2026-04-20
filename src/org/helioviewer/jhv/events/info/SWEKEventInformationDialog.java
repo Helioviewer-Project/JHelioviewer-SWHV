@@ -111,7 +111,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
         repaint();
     }
 
-    private static void onFailureDatabase(String logContext, Throwable t) {
+    private static void onFailureDatabase(String ignoredLogContext, Throwable t) {
         Log.error(t);
     }
 

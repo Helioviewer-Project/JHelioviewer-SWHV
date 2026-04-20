@@ -5,10 +5,6 @@ public final class SphericalCoords {
     private SphericalCoords() {
     }
 
-    public static double radius(Vec3 v) {
-        return radius(v.x, v.y, v.z);
-    }
-
     public static double radius(double x, double y, double z) {
         return Math.sqrt(x * x + y * y + z * z);
     }

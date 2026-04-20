@@ -155,7 +155,7 @@ class PfssLoader {
         MovieDisplay.display(); //!
     }
 
-    private static void onFailureList(String logContext, Throwable t) {
+    private static void onFailureList(String ignoredLogContext, Throwable t) {
         cache().endDownload();
         Log.error(t);
     }

@@ -228,10 +228,6 @@ public final class JHVFrame {
         return leftPane;
     }
 
-    public static JScrollPane getLeftScrollPane() {
-        return leftScrollPane;
-    }
-
     public static void stabilizeLeftPaneWidth() {
         MoviePanel moviePanel = MoviePanel.getInstance();
         // Freeze the left pane to the widest startup state so the scrollbar never overlaps options panels.
