@@ -76,7 +76,7 @@ public final class GridLayer extends AbstractLayer {
     private final GLSLLine gridLine = new GLSLLine(false);
 
     private List<GridLabel> latLabels;
-    private List<GridLabel> lonLabels;
+    private List<GridLabel.TransformedGridLabel> lonLabels;
     private final List<GridLabel> radialLabels;
     private final List<GridLabel> radialLabelsFar;
 
@@ -213,7 +213,7 @@ public final class GridLayer extends AbstractLayer {
         latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
         GL.glEnable(GL.CULL_FACE);
 
-        lonLabels.forEach(lonLabel -> renderer.draw3D(lonLabel.txt, lonLabel.m, textScaleFactor));
+        lonLabels.forEach(lonLabel -> renderer.draw3D(lonLabel.txt, lonLabel.transform, textScaleFactor));
         renderer.end3DRendering();
     }
 

@@ -16,18 +16,25 @@ public class GridLabel {
     public static final float textScale = (float) (0.06 * Sun.Radius);
 
     private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
-    private static final Matrix4f identity = new Matrix4f();
 
     public final String txt;
     public final float x;
     public final float y;
-    public final Matrix4f m;
 
-    private GridLabel(String _txt, float _x, float _y, Matrix4f _m) {
+    private GridLabel(String _txt, float _x, float _y) {
         txt = _txt;
         x = _x;
         y = _y;
-        m = _m;
+    }
+
+    public static class TransformedGridLabel extends GridLabel {
+
+        public final Matrix4f transform;
+
+        private TransformedGridLabel(String txt, float x, float y, Matrix4f transform) {
+            super(txt, x, y);
+            this.transform = transform;
+        }
     }
 
     public static List<GridLabel> makeRadialLabels(double delta, double radialStep) {
@@ -41,7 +48,7 @@ public class GridLabel {
             double angle = -phi * Math.PI / 180. + delta;
             float x = (float) (Math.sin(angle) * size - horizontalAdjustment);
             float y = (float) (Math.cos(angle) * size - verticalAdjustment);
-            labels.add(new GridLabel(txt, x, y, identity));
+            labels.add(new GridLabel(txt, x, y));
         }
         return labels;
     }
@@ -59,10 +66,10 @@ public class GridLabel {
             float x = (float) (Math.sin(angle) * size);
             float y = (float) (Math.cos(angle) * size - verticalAdjustment);
 
-            labels.add(new GridLabel(txt, x, y, identity));
+            labels.add(new GridLabel(txt, x, y));
             if (phi != 90) {
                 x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
-                labels.add(new GridLabel(txt, x, y, identity));
+                labels.add(new GridLabel(txt, x, y));
             }
         }
         for (double phi = -latStep; phi >= -90; phi -= latStep) {
@@ -71,19 +78,19 @@ public class GridLabel {
             float x = (float) (Math.sin(angle) * size);
             float y = (float) (Math.cos(angle) * size - verticalAdjustment);
 
-            labels.add(new GridLabel(txt, x, y, identity));
+            labels.add(new GridLabel(txt, x, y));
             if (phi != -90) {
                 x = (float) (-Math.sin(angle) * size - horizontalAdjustment);
-                labels.add(new GridLabel(txt, x, y, identity));
+                labels.add(new GridLabel(txt, x, y));
             }
         }
         return labels;
     }
 
-    public static List<GridLabel> makeLonLabels(GridType gridType, double lonStep) {
+    public static List<TransformedGridLabel> makeLonLabels(GridType gridType, double lonStep) {
         double size = Sun.Radius * 1.05;
 
-        List<GridLabel> labels = new ArrayList<>();
+        List<TransformedGridLabel> labels = new ArrayList<>();
         for (double theta = 0; theta <= 180.; theta += lonStep) {
             String txt = formatter1.format(theta);
             double angle = (90 - theta) * Math.PI / 180.;
@@ -93,7 +100,7 @@ public class GridLabel {
             Matrix4f m = new Matrix4f();
             m.translation(x, 0, y);
             m.rotateTranslation((float) (theta * Math.PI / 180.), 0, 1, 0, m);
-            labels.add(new GridLabel(txt, x, y, m));
+            labels.add(new TransformedGridLabel(txt, x, y, m));
         }
         for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
             String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
@@ -104,7 +111,7 @@ public class GridLabel {
             Matrix4f m = new Matrix4f();
             m.translation(x, 0, y);
             m.rotateTranslation((float) (theta * Math.PI / 180.), 0, 1, 0, m);
-            labels.add(new GridLabel(txt, x, y, m));
+            labels.add(new TransformedGridLabel(txt, x, y, m));
         }
         return labels;
     }
