@@ -141,6 +141,7 @@ public class JhvTextRenderer {
     private RectanglePacker packer;
     private boolean haveMaxSize;
     private final RenderDelegate renderDelegate;
+    private final TextBackend textBackend;
     private JhvTextureRenderer cachedBackingStore;
     private Graphics2D cachedGraphics;
     private FontRenderContext cachedFontRenderContext;
@@ -178,6 +179,7 @@ public class JhvTextRenderer {
         // (it will already automatically resize if necessary)
         packer = new RectanglePacker(new Manager(), kSize, kSize);
         renderDelegate = new DefaultRenderDelegate();
+        textBackend = new Java2DTextBackend();
         glyphProducer = new GlyphProducer(font.getNumGlyphs());
     }
 
@@ -200,7 +202,7 @@ public class JhvTextRenderer {
      */
     public Rectangle2D getBounds(String str) {
         // Must return a Rectangle compatible with the layout algorithm - must be idempotent
-        return normalize(renderDelegate.getBounds(font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str))));
+        return normalize(textBackend.getBounds(str));
     }
 
     // Returns the Font this renderer is using
@@ -356,6 +358,7 @@ public class JhvTextRenderer {
             cachedGraphics.dispose();
         cachedGraphics = null;
         cachedFontRenderContext = null;
+        textBackend.dispose();
         glslTexture.dispose();
     }
 
@@ -532,6 +535,22 @@ public class JhvTextRenderer {
          * particular those states which are not the defaults.
          */
         void drawGlyphVector(Graphics2D graphics, GlyphVector str, int x, int y);
+    }
+
+    /**
+     * Separates glyph measurement/rasterization from atlas management so we can
+     * switch away from the current Java2D path without rewriting the quad and
+     * texture-cache logic.
+     */
+    private interface TextBackend {
+        Rectangle2D getBounds(String str);
+
+        @Nullable
+        Glyph createGlyph(char unicodeID);
+
+        void uploadGlyph(Glyph glyph);
+
+        void dispose();
     }
 
     // Data associated with each rectangle of text
@@ -719,6 +738,61 @@ public class JhvTextRenderer {
 
     }
 
+    private class Java2DTextBackend implements TextBackend {
+        @Override
+        public Rectangle2D getBounds(String str) {
+            return renderDelegate.getBounds(font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str)));
+        }
+
+        @Override
+        public @Nullable Glyph createGlyph(char unicodeID) {
+            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), new char[] {unicodeID});
+            int gc = gv.getGlyphCode(0);
+            if (gc >= glyphProducer.glyphCache.length) {
+                return null;
+            }
+            return new Glyph(unicodeID, gc, gv.getGlyphMetrics(0).getAdvance(), gv);
+        }
+
+        @Override
+        public void uploadGlyph(Glyph glyph) {
+            GlyphVector gv = (GlyphVector) glyph.backendData;
+            Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv));
+            Rectangle2D bbox = normalize(origBBox);
+            Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
+            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(origin, origBBox, glyph.unicodeID));
+            packer.add(rect);
+            glyph.glyphRectForTextureMapping = rect;
+
+            Graphics2D g = getGraphics2D();
+            int strx = rect.x() + origin.x;
+            int stry = rect.y() + origin.y;
+
+            g.setComposite(AlphaComposite.Clear);
+            g.fillRect(rect.x(), rect.y(), rect.w(), rect.h());
+            g.setComposite(AlphaComposite.Src);
+
+            renderDelegate.drawGlyphVector(g, gv, strx, stry);
+
+            if (DRAW_BBOXES) {
+                TextData data = (TextData) rect.getUserData();
+                g.drawRect(strx - data.origOriginX(),
+                        stry - data.origOriginY(),
+                        data.origRectWidth(),
+                        data.origRectHeight());
+                g.drawRect(strx - data.origin().x,
+                        stry - data.origin().y,
+                        rect.w(),
+                        rect.h());
+            }
+            getBackingStore().markDirty(rect.x(), rect.y(), rect.w(), rect.h());
+        }
+
+        @Override
+        public void dispose() {
+        }
+    }
+
     private interface CoordPut {
 
         void put(float x, float y, float z, float w, float c0, float c1);
@@ -790,18 +864,18 @@ public class JhvTextRenderer {
         private final int glyphCode;
         // The advance of this glyph
         private final float advance;
-        // The GlyphVector for this single character
-        private final GlyphVector singleUnicodeGlyphVector;
+        // Backend-specific glyph data used for rasterization.
+        private final Object backendData;
         // The rectangle of this glyph on the backing store, or null
         // if it has been cleared due to space pressure
         private Rect glyphRectForTextureMapping;
 
         // Creates a Glyph representing an individual Unicode character
-        Glyph(int unicodeID, int glyphCode, float advance, GlyphVector singleUnicodeGlyphVector) {
+        Glyph(int unicodeID, int glyphCode, float advance, Object backendData) {
             this.unicodeID = unicodeID;
             this.glyphCode = glyphCode;
             this.advance = advance;
-            this.singleUnicodeGlyphVector = singleUnicodeGlyphVector;
+            this.backendData = backendData;
         }
 
         // Returns this glyph's unicode ID
@@ -905,48 +979,12 @@ public class JhvTextRenderer {
         }
 
         private void upload() {
-            GlyphVector gv = singleUnicodeGlyphVector;
-            Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv));
-            Rectangle2D bbox = normalize(origBBox);
-            Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
-            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(origin, origBBox, unicodeID));
-            packer.add(rect);
-            glyphRectForTextureMapping = rect;
-            Graphics2D g = getGraphics2D();
-            // OK, should now have an (x, y) for this rectangle; rasterize
-            // the glyph
-            int strx = rect.x() + origin.x;
-            int stry = rect.y() + origin.y;
-
-            // Clear out the area we're going to draw into
-            g.setComposite(AlphaComposite.Clear);
-            g.fillRect(rect.x(), rect.y(), rect.w(), rect.h());
-            g.setComposite(AlphaComposite.Src);
-
-            // Draw the string
-            renderDelegate.drawGlyphVector(g, gv, strx, stry);
-
-            if (DRAW_BBOXES) {
-                TextData data = (TextData) rect.getUserData();
-                // Draw a bounding box on the backing store
-                g.drawRect(strx - data.origOriginX(),
-                        stry - data.origOriginY(),
-                        data.origRectWidth(),
-                        data.origRectHeight());
-                g.drawRect(strx - data.origin().x,
-                        stry - data.origin().y,
-                        rect.w(),
-                        rect.h());
-            }
-            // Mark this region of the TextureRenderer as dirty
-            getBackingStore().markDirty(rect.x(), rect.y(), rect.w(), rect.h());
+            textBackend.uploadGlyph(this);
         }
 
     }
 
     class GlyphProducer {
-        // A temporary to prevent excessive garbage creation
-        private final char[] singleUnicode = new char[1];
         private static final int undefined = -2;
         // The mapping from unicode character to font-specific glyph ID
         private final int[] unicodes2Glyphs;
@@ -997,14 +1035,10 @@ public class JhvTextRenderer {
             }
 
             // Must fabricate the glyph
-            singleUnicode[0] = unicodeID;
-            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), singleUnicode);
-            int gc = gv.getGlyphCode(0);
-            // Have seen huge glyph codes (65536) coming out of some fonts in some Unicode situations
-            if (gc >= glyphCache.length) {
+            Glyph glyph = textBackend.createGlyph(unicodeID);
+            if (glyph == null) {
                 return null;
             }
-            Glyph glyph = new Glyph(unicodeID, gc, gv.getGlyphMetrics(0).getAdvance(), gv);
             register(glyph);
             return glyph;
         }
