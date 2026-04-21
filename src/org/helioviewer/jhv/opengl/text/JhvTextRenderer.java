@@ -39,9 +39,6 @@
  */
 package org.helioviewer.jhv.opengl.text;
 
-import java.awt.AlphaComposite;
-import java.awt.Point;
-import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 //import java.util.ArrayList;
@@ -165,10 +162,10 @@ public class JhvTextRenderer {
      * @param useFractionalMetrics whether to use fractional font
      *                             metrics at the Java 2D level
      */
-    public JhvTextRenderer(float fontSize, ByteBuffer fontData, boolean antialiased, boolean useFractionalMetrics) {
-        this.fontSize = fontSize;
-        this.antialiased = antialiased;
-        this.useFractionalMetrics = useFractionalMetrics;
+    public JhvTextRenderer(float size, ByteBuffer fontData, boolean antialiasing, boolean fractionalMetrics) {
+        fontSize = size;
+        antialiased = antialiasing;
+        useFractionalMetrics = fractionalMetrics;
 
         // FIXME: consider adjusting the size based on font size
         // (it will already automatically resize if necessary)
@@ -319,19 +316,29 @@ public class JhvTextRenderer {
     // Internals only below this point
     //
 
-    private static Rectangle2D preNormalize(Rectangle2D src) {
+    private record Bounds(double minX, double minY, double width, double height) {
+        double maxX() {
+            return minX + width;
+        }
+
+        double maxY() {
+            return minY + height;
+        }
+    }
+
+    private static Bounds preNormalize(Bounds src) {
         // Need to round to integer coordinates
         // Also give ourselves a little slop around the reported
         // bounds of glyphs because it looks like neither the visual
         // nor the pixel bounds works perfectly well
-        int minX = (int) Math.floor(src.getMinX()) - 1;
-        int minY = (int) Math.floor(src.getMinY()) - 1;
-        int maxX = (int) Math.ceil(src.getMaxX()) + 1;
-        int maxY = (int) Math.ceil(src.getMaxY()) + 1;
-        return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
+        int minX = (int) Math.floor(src.minX) - 1;
+        int minY = (int) Math.floor(src.minY) - 1;
+        int maxX = (int) Math.ceil(src.maxX()) + 1;
+        int maxY = (int) Math.ceil(src.maxY()) + 1;
+        return new Bounds(minX, minY, maxX - minX, maxY - minY);
     }
 
-    private Rectangle2D normalize(Rectangle2D src) {
+    private Bounds normalize(Bounds src) {
         // Give ourselves a boundary around each entity on the backing
         // store in order to prevent bleeding of nearby Strings due to
         // the fact that we use linear filtering
@@ -341,10 +348,10 @@ public class JhvTextRenderer {
         // heuristically, 1.5% of the font's height
         int boundary = (int) Math.max(1, 0.015 * fontSize);
 
-        return new Rectangle2D.Double((int) Math.floor(src.getMinX() - boundary),
-                (int) Math.floor(src.getMinY() - boundary),
-                (int) Math.ceil(src.getWidth() + 2 * boundary),
-                (int) Math.ceil(src.getHeight()) + 2 * boundary);
+        return new Bounds((int) Math.floor(src.minX - boundary),
+                (int) Math.floor(src.minY - boundary),
+                (int) Math.ceil(src.width + 2 * boundary),
+                (int) Math.ceil(src.height) + 2 * boundary);
     }
 
     private JhvTextureRenderer getBackingStore() {
@@ -446,42 +453,26 @@ public class JhvTextRenderer {
     }
 
     // Data associated with each rectangle of text
-    static class TextData {
-        // If this TextData represents a single glyph, this is its unicode ID
-        //final int unicodeID;
-
+    static record TextData(
+            int originX,
+            int originY,
+            int origRectWidth,
+            int origRectHeight,
+            int origRectMinX,
+            int origRectMinY,
+            int unicodeID) {
         // The following must be defined and used VERY precisely. This is
         // the offset from the upper-left corner of this rectangle (Java
         // 2D coordinate system) at which the string must be rasterized in
         // order to fit within the rectangle -- the leftmost point of the
         // baseline.
-        private final Point origin;
-
-        // This represents the pre-normalized rectangle, which fits
-        // within the rectangle on the backing store. We keep a
-        // one-pixel border around entries on the backing store to
-        // prevent bleeding of adjacent letters when using GL_LINEAR
-        // filtering for rendering. The origin of this rectangle is
-        // equivalent to the origin above.
-        //private final Rectangle2D origRect;
-        private final int origRectWidth;
-        private final int origRectHeight;
-        private final int origRectMinX;
-        private final int origRectMinY;
-
-        //private boolean used; // Whether this text was used recently
-
-        TextData(Point _origin, Rectangle2D origRect, int _unicodeID) {
-            //unicodeID = _unicodeID;
-            origin = _origin;
-            origRectWidth = (int) origRect.getWidth();
-            origRectHeight = (int) origRect.getHeight();
-            origRectMinX = (int) -origRect.getMinX();
-            origRectMinY = (int) -origRect.getMinY();
-        }
-
-        Point origin() {
-            return origin;
+        TextData(int originX, int originY, Bounds origRect, int unicodeID) {
+            this(originX, originY,
+                    (int) origRect.width,
+                    (int) origRect.height,
+                    (int) -origRect.minX,
+                    (int) -origRect.minY,
+                    unicodeID);
         }
 
         // The following three methods are used to locate the glyph
@@ -492,14 +483,6 @@ public class JhvTextRenderer {
 
         int origOriginY() {
             return origRectMinY;
-        }
-
-        int origRectWidth() {
-            return origRectWidth;
-        }
-
-        int origRectHeight() {
-            return origRectHeight;
         }
 /*
         boolean used() {
@@ -609,8 +592,8 @@ public class JhvTextRenderer {
         private final STBTTFontinfo fontInfo;
         private final float scale;
 
-        StbTextBackend(ByteBuffer fontData, float pixelHeight) {
-            this.fontData = fontData;
+        StbTextBackend(ByteBuffer sourceFontData, float pixelHeight) {
+            fontData = sourceFontData;
             fontInfo = STBTTFontinfo.create();
             if (!STBTruetype.stbtt_InitFont(fontInfo, fontData)) {
                 fontInfo.free();
@@ -645,18 +628,19 @@ public class JhvTextRenderer {
         @Override
         public void uploadGlyph(Glyph glyph) {
             StbGlyphData glyphData = (StbGlyphData) glyph.backendData;
-            Rectangle2D origBBox = new Rectangle2D.Double(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
-            Rectangle2D bbox = normalize(origBBox);
-            Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
-            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(origin, origBBox, glyph.unicodeID));
+            Bounds origBBox = new Bounds(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
+            Bounds bbox = normalize(origBBox);
+            int originX = (int) -bbox.minX;
+            int originY = (int) -bbox.minY;
+            Rect rect = new Rect(0, 0, (int) bbox.width, (int) bbox.height, new TextData(originX, originY, origBBox, glyph.unicodeID));
             packer.add(rect);
             glyph.glyphRectForTextureMapping = rect;
 
             JhvTextureRenderer renderer = getBackingStore();
             renderer.clear(rect.x(), rect.y(), rect.w(), rect.h());
 
-            int bitmapX = rect.x() + (origin.x - ((TextData) rect.getUserData()).origOriginX());
-            int bitmapY = rect.y() + (origin.y - ((TextData) rect.getUserData()).origOriginY());
+            int bitmapX = rect.x() + (originX - ((TextData) rect.getUserData()).origOriginX());
+            int bitmapY = rect.y() + (originY - ((TextData) rect.getUserData()).origOriginY());
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 IntBuffer width = stack.mallocInt(1);
                 IntBuffer height = stack.mallocInt(1);
@@ -688,12 +672,12 @@ public class JhvTextRenderer {
         private final int x1;
         private final int y1;
 
-        private StbGlyphData(int glyphIndex, int x0, int y0, int x1, int y1) {
-            this.glyphIndex = glyphIndex;
-            this.x0 = x0;
-            this.y0 = y0;
-            this.x1 = x1;
-            this.y1 = y1;
+        private StbGlyphData(int glyphIndexValue, int minX, int minY, int maxX, int maxY) {
+            glyphIndex = glyphIndexValue;
+            x0 = minX;
+            y0 = minY;
+            x1 = maxX;
+            y1 = maxY;
         }
 
         int glyphIndex() {
@@ -787,11 +771,11 @@ public class JhvTextRenderer {
         private Rect glyphRectForTextureMapping;
 
         // Creates a Glyph representing an individual Unicode character
-        Glyph(int unicodeID, int glyphCode, float advance, Object backendData) {
-            this.unicodeID = unicodeID;
-            this.glyphCode = glyphCode;
-            this.advance = advance;
-            this.backendData = backendData;
+        Glyph(int unicodeIDValue, int glyphCodeValue, float advanceValue, Object glyphBackendData) {
+            unicodeID = unicodeIDValue;
+            glyphCode = glyphCodeValue;
+            advance = advanceValue;
+            backendData = glyphBackendData;
         }
 
         // Returns this glyph's unicode ID
@@ -821,8 +805,8 @@ public class JhvTextRenderer {
             float x = inX - (scaleFactor * data.origOriginX());
             float y = inY - (scaleFactor * (height - data.origOriginY()));
 
-            int texturex = rect.x() + (data.origin().x - data.origOriginX());
-            int texturey = renderer.getHeight() - rect.y() - height - (data.origin().y - data.origOriginY());
+            int texturex = rect.x() + (data.originX() - data.origOriginX());
+            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origOriginY());
 
             float tx1 = texturex / (float) renderer.getWidth();
             float ty1 = 1f - texturey / (float) renderer.getHeight();
@@ -858,8 +842,8 @@ public class JhvTextRenderer {
             float x = inX - (scaleFactor * data.origOriginX());
             float y = inY - (scaleFactor * (height - data.origOriginY()));
 
-            int texturex = rect.x() + (data.origin().x - data.origOriginX());
-            int texturey = renderer.getHeight() - rect.y() - height - (data.origin().y - data.origOriginY());
+            int texturex = rect.x() + (data.originX() - data.origOriginX());
+            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origOriginY());
 
             float tx1 = texturex / (float) renderer.getWidth();
             float ty1 = 1f - texturey / (float) renderer.getHeight();

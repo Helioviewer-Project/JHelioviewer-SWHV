@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl.text;
 
-import java.awt.Rectangle;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.opengl.GL;
@@ -13,7 +12,11 @@ class JhvTextureRenderer {
     private byte[] clearRow;
 
     private final GLTexture tex;
-    private Rectangle dirtyRegion;
+    private boolean dirty;
+    private int dirtyX;
+    private int dirtyY;
+    private int dirtyWidth;
+    private int dirtyHeight;
 
     private final int imageWidth;
     private final int imageHeight;
@@ -112,19 +115,29 @@ class JhvTextureRenderer {
     }
 
     void markDirty(int x, int y, int width, int height) {
-        Rectangle curRegion = new Rectangle(x, y, width, height);
-        if (dirtyRegion == null) {
-            dirtyRegion = curRegion;
+        if (!dirty) {
+            dirty = true;
+            dirtyX = x;
+            dirtyY = y;
+            dirtyWidth = width;
+            dirtyHeight = height;
         } else {
-            dirtyRegion.add(curRegion);
+            int minX = Math.min(dirtyX, x);
+            int minY = Math.min(dirtyY, y);
+            int maxX = Math.max(dirtyX + dirtyWidth, x + width);
+            int maxY = Math.max(dirtyY + dirtyHeight, y + height);
+            dirtyX = minX;
+            dirtyY = minY;
+            dirtyWidth = maxX - minX;
+            dirtyHeight = maxY - minY;
         }
     }
 
     void bind() {
         tex.bind();
-        if (dirtyRegion != null) {
-            upload(dirtyRegion.x, dirtyRegion.y, dirtyRegion.width, dirtyRegion.height);
-            dirtyRegion = null;
+        if (dirty) {
+            upload(dirtyX, dirtyY, dirtyWidth, dirtyHeight);
+            dirty = false;
         }
     }
 
