@@ -574,13 +574,13 @@ public class JhvTextRenderer {
 
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 IntBuffer advanceWidth = stack.mallocInt(1);
-                IntBuffer leftBearing = stack.mallocInt(1);
+                IntBuffer ignoredLeftBearing = stack.mallocInt(1);
                 IntBuffer x0 = stack.mallocInt(1);
                 IntBuffer y0 = stack.mallocInt(1);
                 IntBuffer x1 = stack.mallocInt(1);
                 IntBuffer y1 = stack.mallocInt(1);
 
-                STBTruetype.stbtt_GetGlyphHMetrics(fontInfo, glyphIndex, advanceWidth, leftBearing);
+                STBTruetype.stbtt_GetGlyphHMetrics(fontInfo, glyphIndex, advanceWidth, ignoredLeftBearing);
                 STBTruetype.stbtt_GetGlyphBitmapBox(fontInfo, glyphIndex, scale, scale, x0, y0, x1, y1);
 
                 StbGlyphData glyphData = new StbGlyphData(glyphIndex, x0.get(0), y0.get(0), x1.get(0), y1.get(0));
@@ -604,11 +604,12 @@ public class JhvTextRenderer {
             int bitmapX = rect.x() + (originX - ((TextData) rect.getUserData()).origOriginX());
             int bitmapY = rect.y() + (originY - ((TextData) rect.getUserData()).origOriginY());
             try (MemoryStack stack = MemoryStack.stackPush()) {
-                IntBuffer width = stack.mallocInt(1);
-                IntBuffer height = stack.mallocInt(1);
-                IntBuffer xoff = stack.mallocInt(1);
-                IntBuffer yoff = stack.mallocInt(1);
-                ByteBuffer bitmap = STBTruetype.stbtt_GetGlyphBitmap(fontInfo, scale, scale, glyphData.glyphIndex(), width, height, xoff, yoff);
+                IntBuffer ignoredWidth = stack.mallocInt(1);
+                IntBuffer ignoredHeight = stack.mallocInt(1);
+                IntBuffer ignoredXOffset = stack.mallocInt(1);
+                IntBuffer ignoredYOffset = stack.mallocInt(1);
+                ByteBuffer bitmap = STBTruetype.stbtt_GetGlyphBitmap(fontInfo, scale, scale, glyphData.glyphIndex(),
+                        ignoredWidth, ignoredHeight, ignoredXOffset, ignoredYOffset);
                 if (bitmap != null) {
                     try {
                         renderer.drawMask(bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
@@ -626,25 +627,7 @@ public class JhvTextRenderer {
         }
     }
 
-    private static final class StbGlyphData {
-        private final int glyphIndex;
-        private final int x0;
-        private final int y0;
-        private final int x1;
-        private final int y1;
-
-        private StbGlyphData(int glyphIndexValue, int minX, int minY, int maxX, int maxY) {
-            glyphIndex = glyphIndexValue;
-            x0 = minX;
-            y0 = minY;
-            x1 = maxX;
-            y1 = maxY;
-        }
-
-        int glyphIndex() {
-            return glyphIndex;
-        }
-
+    private record StbGlyphData(int glyphIndex, int x0, int y0, int x1, int y1) {
         int width() {
             return x1 - x0;
         }
