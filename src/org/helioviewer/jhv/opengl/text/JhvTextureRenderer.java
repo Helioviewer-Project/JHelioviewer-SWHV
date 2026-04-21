@@ -1,36 +1,16 @@
 package org.helioviewer.jhv.opengl.text;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLTexture;
 
-/**
- * Provides the ability to render into an OpenGL texture using the Java 2D
- * APIs. This renderer class uses an internal Java 2D image (of
- * unspecified type) for its backing store and flushes portions of
- * that image to an OpenGL texture on demand. The resulting OpenGL
- * texture can then be mapped on to a polygon for display.
- */
+import org.lwjgl.system.MemoryUtil;
 
 class JhvTextureRenderer {
-    // For now, we supply only a BufferedImage back-end for this
-    // renderer. In theory we could use a Java 2D / OpenGL bridge to fully
-    // accelerate the rendering paths, but there are restrictions on
-    // what work can be done where; for example, Graphics2D-related work
-    // must not be done on the Queue Flusher Thread, while
-    // OpenGL-related work must. This implies that the user's code
-    // would need to be split up into multiple callbacks run from the
-    // appropriate threads, which would be somewhat unfortunate.
-
-    // The backing store itself
-    private BufferedImage image;
     private ByteBuffer imageBuffer;
+    private byte[] clearRow;
 
     private final GLTexture tex;
     private Rectangle dirtyRegion;
@@ -38,19 +18,10 @@ class JhvTextureRenderer {
     private final int imageWidth;
     private final int imageHeight;
 
-    /**
-     * Creates a new renderer with backing store of the specified width
-     * and height.
-     *
-     * @param width  the width of the texture to render into
-     * @param height the height of the texture to render into
-     */
     JhvTextureRenderer(int width, int height) {
         imageWidth = width;
         imageHeight = height;
-
-        image = NativeImageFactory.createRGBAPremultipliedImage(imageWidth, imageHeight);
-        imageBuffer = NativeImageFactory.getByteBuffer(image);
+        imageBuffer = MemoryUtil.memCalloc(imageWidth * imageHeight * 4);
 
         tex = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
         tex.bind();
@@ -71,34 +42,14 @@ class JhvTextureRenderer {
         return imageHeight;
     }
 
-    /**
-     * Creates a {@link java.awt.Graphics2D Graphics2D} instance for
-     * rendering to the backing store of this renderer. The returned
-     * object should be disposed of using the normal {@link
-     * java.awt.Graphics#dispose() Graphics.dispose()} method once it
-     * is no longer being used.
-     *
-     * @return a new {@link java.awt.Graphics2D Graphics2D} object for
-     * rendering into the backing store of this renderer
-     */
-    Graphics2D createGraphics() {
-        return image.createGraphics();
-    }
-
-    /**
-     * Returns the underlying Java 2D {@link java.awt.Image Image}
-     * being rendered into.
-     */
-    Image getImage() {
-        return image;
-    }
-
     void clear(int x, int y, int width, int height) {
+        if (clearRow == null || clearRow.length < width * 4)
+            clearRow = new byte[width * 4];
         int rowStride = imageWidth * 4;
         for (int row = 0; row < height; row++) {
             int offset = ((y + row) * rowStride) + (x * 4);
             imageBuffer.position(offset);
-            imageBuffer.put(new byte[width * 4]);
+            imageBuffer.put(clearRow, 0, width * 4);
         }
         imageBuffer.rewind();
     }
@@ -119,21 +70,47 @@ class JhvTextureRenderer {
         imageBuffer.rewind();
     }
 
-    /**
-     * Marks the given region of the TextureRenderer as dirty. This
-     * region, and any previously set dirty regions, will be
-     * automatically synchronized with the underlying Texture during
-     * the next bind operation, at which
-     * point the dirty region will be cleared. It is not necessary for
-     * an OpenGL context to be current when this method is called.
-     *
-     * @param x      the x coordinate (in Java 2D coordinates -- relative to
-     *               upper left) of the region to update
-     * @param y      the y coordinate (in Java 2D coordinates -- relative to
-     *               upper left) of the region to update
-     * @param width  the width of the region to update
-     * @param height the height of the region to update
-     */
+    void drawRgba(int x, int y, int width, int height, ByteBuffer rgba, int rowStride) {
+        ByteBuffer src = rgba.duplicate();
+        int dstRowStride = imageWidth * 4;
+        for (int row = 0; row < height; row++) {
+            int srcOffset = row * rowStride;
+            int dstOffset = ((y + row) * dstRowStride) + (x * 4);
+            src.position(srcOffset).limit(srcOffset + width * 4);
+            imageBuffer.position(dstOffset);
+            imageBuffer.put(src);
+            src.clear();
+        }
+        imageBuffer.rewind();
+    }
+
+    void copyArea(int srcX, int srcY, int width, int height, int dstX, int dstY) {
+        byte[] tmp = new byte[width * height * 4];
+        int rowStride = imageWidth * 4;
+        for (int row = 0; row < height; row++) {
+            int srcOffset = ((srcY + row) * rowStride) + (srcX * 4);
+            imageBuffer.position(srcOffset);
+            imageBuffer.get(tmp, row * width * 4, width * 4);
+        }
+        for (int row = 0; row < height; row++) {
+            int dstOffset = ((dstY + row) * rowStride) + (dstX * 4);
+            imageBuffer.position(dstOffset);
+            imageBuffer.put(tmp, row * width * 4, width * 4);
+        }
+        imageBuffer.rewind();
+    }
+
+    void copyFrom(JhvTextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
+        byte[] tmp = new byte[width * height * 4];
+        int srcRowStride = other.imageWidth * 4;
+        for (int row = 0; row < height; row++) {
+            int srcOffset = ((srcY + row) * srcRowStride) + (srcX * 4);
+            other.imageBuffer.position(srcOffset);
+            other.imageBuffer.get(tmp, row * width * 4, width * 4);
+        }
+        drawRgba(dstX, dstY, width, height, ByteBuffer.wrap(tmp), width * 4);
+    }
+
     void markDirty(int x, int y, int width, int height) {
         Rectangle curRegion = new Rectangle(x, y, width, height);
         if (dirtyRegion == null) {
@@ -151,30 +128,13 @@ class JhvTextureRenderer {
         }
     }
 
-    /**
-     * Disposes all resources associated with this renderer. It is not
-     * valid to use this renderer after calling this method.
-     */
     void dispose() {
         tex.delete();
+        MemoryUtil.memFree(imageBuffer);
         imageBuffer = null;
-        NativeImageFactory.free(image);
-        image = null;
+        clearRow = null;
     }
 
-    /**
-     * Synchronizes the specified region of the backing store down to
-     * the underlying OpenGL texture. If {@link #markDirty markDirty}
-     * is used instead to indicate the regions that are out of sync,
-     * this method does not need to be called.
-     *
-     * @param x      the x coordinate (in Java 2D coordinates -- relative to
-     *               upper left) of the region to update
-     * @param y      the y coordinate (in Java 2D coordinates -- relative to
-     *               upper left) of the region to update
-     * @param width  the width of the region to update
-     * @param height the height of the region to update
-     */
     private void upload(int x, int y, int width, int height) {
         GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, imageWidth);
@@ -182,5 +142,4 @@ class JhvTextureRenderer {
         GL.glGenerateMipmap(GL.TEXTURE_2D);
         imageBuffer.rewind();
     }
-
 }
