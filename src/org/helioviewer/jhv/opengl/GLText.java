@@ -1,13 +1,19 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.Font;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+
+import org.lwjgl.system.MemoryUtil;
 
 public class GLText {
 
@@ -16,6 +22,7 @@ public class GLText {
     private static final int STEP = 1;
     private static final int SIZE = (MAX - MIN) / STEP + 1;
     private static final JhvTextRenderer[] renderers = new JhvTextRenderer[SIZE];
+    private static ByteBuffer canvasFontData;
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
@@ -31,7 +38,7 @@ public class GLText {
 
         if (renderers[idx] == null) {
             Font font = UIGlobals.canvasFont.deriveFont((float) (idx * STEP + MIN));
-            renderers[idx] = new JhvTextRenderer(font, true, true);
+            renderers[idx] = new JhvTextRenderer(font, getCanvasFontData(), true, true);
             // precache for grid text
             renderers[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }
@@ -44,6 +51,25 @@ public class GLText {
                 renderers[i].dispose();
                 renderers[i] = null;
             }
+        }
+        if (canvasFontData != null) {
+            MemoryUtil.memFree(canvasFontData);
+            canvasFontData = null;
+        }
+    }
+
+    private static ByteBuffer getCanvasFontData() {
+        if (canvasFontData != null)
+            return canvasFontData.duplicate();
+
+        try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
+            byte[] bytes = is.readAllBytes();
+            ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
+            buffer.put(bytes).flip();
+            canvasFontData = buffer;
+            return canvasFontData.duplicate();
+        } catch (IOException e) {
+            return null;
         }
     }
 

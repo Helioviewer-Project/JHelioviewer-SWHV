@@ -50,6 +50,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.text.StringCharacterIterator;
 //import java.util.ArrayList;
 
@@ -69,6 +70,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.stb.STBTTFontinfo;
 import org.lwjgl.stb.STBTruetype;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 /**
@@ -145,6 +147,7 @@ public class JhvTextRenderer {
     private RectanglePacker packer;
     private boolean haveMaxSize;
     private final RenderDelegate renderDelegate;
+    private final TextBackend boundsBackend;
     private final TextBackend textBackend;
     private JhvTextureRenderer cachedBackingStore;
     private Graphics2D cachedGraphics;
@@ -175,6 +178,10 @@ public class JhvTextRenderer {
      *                             metrics at the Java 2D level
      */
     public JhvTextRenderer(Font font, boolean antialiased, boolean useFractionalMetrics) {
+        this(font, null, antialiased, useFractionalMetrics);
+    }
+
+    public JhvTextRenderer(Font font, @Nullable ByteBuffer fontData, boolean antialiased, boolean useFractionalMetrics) {
         this.font = font;
         this.antialiased = antialiased;
         this.useFractionalMetrics = useFractionalMetrics;
@@ -183,7 +190,8 @@ public class JhvTextRenderer {
         // (it will already automatically resize if necessary)
         packer = new RectanglePacker(new Manager(), kSize, kSize);
         renderDelegate = new DefaultRenderDelegate();
-        textBackend = new Java2DTextBackend();
+        boundsBackend = new Java2DTextBackend();
+        textBackend = fontData == null ? boundsBackend : new StbTextBackend(fontData, font.getSize2D());
         glyphProducer = new GlyphProducer(font.getNumGlyphs());
     }
 
@@ -206,7 +214,7 @@ public class JhvTextRenderer {
      */
     public Rectangle2D getBounds(String str) {
         // Must return a Rectangle compatible with the layout algorithm - must be idempotent
-        return normalize(textBackend.getBounds(str));
+        return normalize(boundsBackend.getBounds(str));
     }
 
     // Returns the Font this renderer is using
@@ -362,7 +370,9 @@ public class JhvTextRenderer {
             cachedGraphics.dispose();
         cachedGraphics = null;
         cachedFontRenderContext = null;
-        textBackend.dispose();
+        boundsBackend.dispose();
+        if (textBackend != boundsBackend)
+            textBackend.dispose();
         glslTexture.dispose();
     }
 
@@ -797,17 +807,19 @@ public class JhvTextRenderer {
         }
     }
 
-    private static class StbTextBackend implements TextBackend {
+    private class StbTextBackend implements TextBackend {
         private final ByteBuffer fontData;
         private final STBTTFontinfo fontInfo;
+        private final float scale;
 
-        StbTextBackend(ByteBuffer fontData) {
+        StbTextBackend(ByteBuffer fontData, float pixelHeight) {
             this.fontData = fontData;
             fontInfo = STBTTFontinfo.create();
             if (!STBTruetype.stbtt_InitFont(fontInfo, fontData)) {
                 fontInfo.free();
                 throw new IllegalArgumentException("Failed to initialize STB font");
             }
+            scale = STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, pixelHeight);
         }
 
         @Override
@@ -817,18 +829,91 @@ public class JhvTextRenderer {
 
         @Override
         public @Nullable Glyph createGlyph(char unicodeID) {
-            throw new UnsupportedOperationException("STB glyph creation is not implemented yet");
+            int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, unicodeID);
+            if (glyphIndex == 0) {
+                return null;
+            }
+
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer advanceWidth = stack.mallocInt(1);
+                IntBuffer leftBearing = stack.mallocInt(1);
+                IntBuffer x0 = stack.mallocInt(1);
+                IntBuffer y0 = stack.mallocInt(1);
+                IntBuffer x1 = stack.mallocInt(1);
+                IntBuffer y1 = stack.mallocInt(1);
+
+                STBTruetype.stbtt_GetGlyphHMetrics(fontInfo, glyphIndex, advanceWidth, leftBearing);
+                STBTruetype.stbtt_GetGlyphBitmapBox(fontInfo, glyphIndex, scale, scale, x0, y0, x1, y1);
+
+                StbGlyphData glyphData = new StbGlyphData(glyphIndex, x0.get(0), y0.get(0), x1.get(0), y1.get(0));
+                return new Glyph(unicodeID, glyphIndex, advanceWidth.get(0) * scale, glyphData);
+            }
         }
 
         @Override
         public void uploadGlyph(Glyph glyph) {
-            throw new UnsupportedOperationException("STB glyph upload is not implemented yet");
+            StbGlyphData glyphData = (StbGlyphData) glyph.backendData;
+            Rectangle2D origBBox = new Rectangle2D.Double(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
+            Rectangle2D bbox = normalize(origBBox);
+            Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
+            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(origin, origBBox, glyph.unicodeID));
+            packer.add(rect);
+            glyph.glyphRectForTextureMapping = rect;
+
+            JhvTextureRenderer renderer = getBackingStore();
+            renderer.clear(rect.x(), rect.y(), rect.w(), rect.h());
+
+            int bitmapX = rect.x() + (origin.x - ((TextData) rect.getUserData()).origOriginX());
+            int bitmapY = rect.y() + (origin.y - ((TextData) rect.getUserData()).origOriginY());
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer width = stack.mallocInt(1);
+                IntBuffer height = stack.mallocInt(1);
+                IntBuffer xoff = stack.mallocInt(1);
+                IntBuffer yoff = stack.mallocInt(1);
+                ByteBuffer bitmap = STBTruetype.stbtt_GetGlyphBitmap(fontInfo, scale, scale, glyphData.glyphIndex(), width, height, xoff, yoff);
+                if (bitmap != null) {
+                    try {
+                        renderer.drawMask(bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
+                    } finally {
+                        STBTruetype.stbtt_FreeBitmap(bitmap);
+                    }
+                }
+            }
+
+            renderer.markDirty(rect.x(), rect.y(), rect.w(), rect.h());
         }
 
         @Override
         public void dispose() {
             fontInfo.free();
-            MemoryUtil.memFree(fontData);
+        }
+    }
+
+    private static final class StbGlyphData {
+        private final int glyphIndex;
+        private final int x0;
+        private final int y0;
+        private final int x1;
+        private final int y1;
+
+        private StbGlyphData(int glyphIndex, int x0, int y0, int x1, int y1) {
+            this.glyphIndex = glyphIndex;
+            this.x0 = x0;
+            this.y0 = y0;
+            this.x1 = x1;
+            this.y1 = y1;
+        }
+
+        int glyphIndex() {
+            return glyphIndex;
+        }
+
+        int width() {
+            return x1 - x0;
+        }
+
+        int height() {
+            return y1 - y0;
         }
     }
 
