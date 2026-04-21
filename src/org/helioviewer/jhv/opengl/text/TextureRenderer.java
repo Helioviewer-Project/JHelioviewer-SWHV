@@ -10,8 +10,6 @@ import org.lwjgl.system.MemoryUtil;
 
 class TextureRenderer {
     private ByteBuffer imageBuffer;
-    private byte[] clearRow;
-    private byte[] copyBuffer;
 
     private final GLTexture tex;
     private boolean dirty;
@@ -48,15 +46,13 @@ class TextureRenderer {
     }
 
     void clear(int x, int y, int width, int height) {
-        if (clearRow == null || clearRow.length < width * 4)
-            clearRow = new byte[width * 4];
+        long base = MemoryUtil.memAddress(imageBuffer);
         int rowStride = imageWidth * 4;
+        long clearBytes = (long) width * 4;
         for (int row = 0; row < height; row++) {
-            int offset = ((y + row) * rowStride) + (x * 4);
-            imageBuffer.position(offset);
-            imageBuffer.put(clearRow, 0, width * 4);
+            long offset = (long) ((y + row) * rowStride + (x * 4));
+            MemoryUtil.memSet(base + offset, 0, clearBytes);
         }
-        imageBuffer.rewind();
     }
 
     void drawMask(int x, int y, int width, int height, ByteBuffer mask) {
@@ -72,11 +68,8 @@ class TextureRenderer {
         imageBuffer.rewind();
     }
 
-    void drawGlyphMask(Rect rect, TextRenderer.TextData data, int glyphWidth, int glyphHeight, ByteBuffer mask) {
+    void drawGlyphMask(Rect rect, int bitmapX, int bitmapY, int glyphWidth, int glyphHeight, ByteBuffer mask) {
         clear(rect.x(), rect.y(), rect.w(), rect.h());
-
-        int bitmapX = rect.x() + (data.originX() - data.origOriginX());
-        int bitmapY = rect.y() + (data.originY() - data.origOriginY());
         drawMask(bitmapX, bitmapY, glyphWidth, glyphHeight, mask);
 
         markDirty(rect.x(), rect.y(), rect.w(), rect.h());
@@ -97,36 +90,30 @@ class TextureRenderer {
     }
 
     void copyArea(int srcX, int srcY, int width, int height, int dstX, int dstY) {
-        byte[] tmp = copyBuffer(width * height * 4);
+        long base = MemoryUtil.memAddress(imageBuffer);
         int rowStride = imageWidth * 4;
+        long rowBytes = (long) width * 4;
+        ByteBuffer scratch = MemoryUtil.memAlloc((int) rowBytes);
         for (int row = 0; row < height; row++) {
-            int srcOffset = ((srcY + row) * rowStride) + (srcX * 4);
-            imageBuffer.position(srcOffset);
-            imageBuffer.get(tmp, row * width * 4, width * 4);
+            long srcOffset = (long) ((srcY + row) * rowStride + (srcX * 4));
+            long dstOffset = (long) ((dstY + row) * rowStride + (dstX * 4));
+            MemoryUtil.memCopy(base + srcOffset, MemoryUtil.memAddress(scratch), rowBytes);
+            MemoryUtil.memCopy(MemoryUtil.memAddress(scratch), base + dstOffset, rowBytes);
         }
-        for (int row = 0; row < height; row++) {
-            int dstOffset = ((dstY + row) * rowStride) + (dstX * 4);
-            imageBuffer.position(dstOffset);
-            imageBuffer.put(tmp, row * width * 4, width * 4);
-        }
-        imageBuffer.rewind();
+        MemoryUtil.memFree(scratch);
     }
 
     void copyFrom(TextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
-        byte[] tmp = copyBuffer(width * height * 4);
+        long srcBase = MemoryUtil.memAddress(other.imageBuffer);
+        long dstBase = MemoryUtil.memAddress(imageBuffer);
         int srcRowStride = other.imageWidth * 4;
         int dstRowStride = imageWidth * 4;
+        long rowBytes = (long) width * 4;
         for (int row = 0; row < height; row++) {
-            int srcOffset = ((srcY + row) * srcRowStride) + (srcX * 4);
-            other.imageBuffer.position(srcOffset);
-            other.imageBuffer.get(tmp, row * width * 4, width * 4);
+            long srcOffset = (long) ((srcY + row) * srcRowStride + (srcX * 4));
+            long dstOffset = (long) ((dstY + row) * dstRowStride + (dstX * 4));
+            MemoryUtil.memCopy(srcBase + srcOffset, dstBase + dstOffset, rowBytes);
         }
-        for (int row = 0; row < height; row++) {
-            int dstOffset = ((dstY + row) * dstRowStride) + (dstX * 4);
-            imageBuffer.position(dstOffset);
-            imageBuffer.put(tmp, row * width * 4, width * 4);
-        }
-        imageBuffer.rewind();
     }
 
     void markDirty(int x, int y, int width, int height) {
@@ -160,14 +147,6 @@ class TextureRenderer {
         tex.delete();
         MemoryUtil.memFree(imageBuffer);
         imageBuffer = null;
-        clearRow = null;
-        copyBuffer = null;
-    }
-
-    private byte[] copyBuffer(int size) {
-        if (copyBuffer == null || copyBuffer.length < size)
-            copyBuffer = new byte[size];
-        return copyBuffer;
     }
 
     private void upload(int x, int y, int width, int height) {

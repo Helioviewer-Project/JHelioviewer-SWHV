@@ -419,7 +419,7 @@ public class TextRenderer {
 */
 
     // Data associated with each rectangle of text
-    static record TextData(
+    private static record TextData(
             int originX,
             int originY,
             int origRectWidth,
@@ -465,7 +465,7 @@ public class TextRenderer {
 */
     }
 
-    class Manager implements BackingStoreManager {
+    private final class Manager implements BackingStoreManager {
 
         @Override
         public Object allocateBackingStore(int w, int h) {
@@ -553,7 +553,7 @@ public class TextRenderer {
         }
     }
 
-    private class StbTextBackend {
+    private final class StbTextBackend {
         private final STBTTFontinfo fontInfo;
         private final float scale;
 
@@ -563,10 +563,10 @@ public class TextRenderer {
                 fontInfo.free();
                 throw new IllegalArgumentException("Failed to initialize STB font");
             }
-            scale = STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, pixelHeight);
+            scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, pixelHeight);
         }
 
-        public @Nullable Glyph createGlyph(char unicodeID) {
+        private @Nullable Glyph createGlyph(char unicodeID) {
             int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, unicodeID);
             if (glyphIndex == 0) {
                 return null;
@@ -588,7 +588,7 @@ public class TextRenderer {
             }
         }
 
-        public void uploadGlyph(Glyph glyph) {
+        private void uploadGlyph(Glyph glyph) {
             StbGlyphData glyphData = (StbGlyphData) glyph.backendData;
             Bounds origBBox = new Bounds(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
             Bounds bbox = normalize(origBBox);
@@ -609,7 +609,9 @@ public class TextRenderer {
                         ignoredWidth, ignoredHeight, ignoredXOffset, ignoredYOffset);
                 if (bitmap != null) {
                     try {
-                        renderer.drawGlyphMask(rect, data, glyphData.width(), glyphData.height(), bitmap);
+                        int bitmapX = rect.x() + (data.originX() - data.origOriginX());
+                        int bitmapY = rect.y() + (data.originY() - data.origOriginY());
+                        renderer.drawGlyphMask(rect, bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
                     } finally {
                         STBTruetype.stbtt_FreeBitmap(bitmap);
                     }
@@ -617,7 +619,7 @@ public class TextRenderer {
             }
         }
 
-        public void dispose() {
+        private void dispose() {
             fontInfo.free();
         }
     }
@@ -638,7 +640,7 @@ public class TextRenderer {
 
     }
 
-    private class DirectPut implements CoordPut {
+    private final class DirectPut implements CoordPut {
 
         @Override
         public void put(float x, float y, float z, float w, float c0, float c1) {
@@ -647,7 +649,7 @@ public class TextRenderer {
 
     }
 
-    private class SurfacePut implements CoordPut {
+    private final class SurfacePut implements CoordPut {
 
         private static final float epsilon = 0.125f; // should depend on triangle size
 
@@ -687,7 +689,7 @@ public class TextRenderer {
      * to the backing store on demand.
      */
 
-    class Glyph {
+    private final class Glyph {
         // This glyph's unicode ID.
         private final int unicodeID;
         // The glyph code in the font.
@@ -814,7 +816,7 @@ public class TextRenderer {
 
     }
 
-    class GlyphProducer {
+    private final class GlyphProducer {
         private static final int undefined = -2;
         // The mapping from unicode character to font-specific glyph ID
         private final int[] unicodes2Glyphs;
