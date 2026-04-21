@@ -93,6 +93,32 @@ class JhvTextureRenderer {
         return image;
     }
 
+    void clear(int x, int y, int width, int height) {
+        int rowStride = imageWidth * 4;
+        for (int row = 0; row < height; row++) {
+            int offset = ((y + row) * rowStride) + (x * 4);
+            imageBuffer.position(offset);
+            imageBuffer.put(new byte[width * 4]);
+        }
+        imageBuffer.rewind();
+    }
+
+    void drawMask(int x, int y, int width, int height, ByteBuffer mask) {
+        int rowStride = imageWidth * 4;
+        int start = mask.position();
+        for (int row = 0; row < height; row++) {
+            int imageOffset = ((y + row) * rowStride) + (x * 4);
+            for (int col = 0; col < width; col++) {
+                int alpha = mask.get(start + row * width + col) & 0xFF;
+                imageBuffer.put(imageOffset + (col * 4), (byte) alpha);
+                imageBuffer.put(imageOffset + (col * 4) + 1, (byte) alpha);
+                imageBuffer.put(imageOffset + (col * 4) + 2, (byte) alpha);
+                imageBuffer.put(imageOffset + (col * 4) + 3, (byte) alpha);
+            }
+        }
+        imageBuffer.rewind();
+    }
+
     /**
      * Marks the given region of the TextureRenderer as dirty. This
      * region, and any previously set dirty regions, will be
