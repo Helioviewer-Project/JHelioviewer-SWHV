@@ -4,12 +4,14 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLTexture;
+import org.helioviewer.jhv.opengl.text.packrect.Rect;
 
 import org.lwjgl.system.MemoryUtil;
 
 class JhvTextureRenderer {
     private ByteBuffer imageBuffer;
     private byte[] clearRow;
+    private byte[] copyBuffer;
 
     private final GLTexture tex;
     private boolean dirty;
@@ -64,13 +66,20 @@ class JhvTextureRenderer {
             int imageOffset = ((y + row) * rowStride) + (x * 4);
             for (int col = 0; col < width; col++) {
                 int alpha = mask.get(start + row * width + col) & 0xFF;
-                imageBuffer.put(imageOffset + (col * 4), (byte) alpha);
-                imageBuffer.put(imageOffset + (col * 4) + 1, (byte) alpha);
-                imageBuffer.put(imageOffset + (col * 4) + 2, (byte) alpha);
-                imageBuffer.put(imageOffset + (col * 4) + 3, (byte) alpha);
+                imageBuffer.putInt(imageOffset + (col * 4), alpha | (alpha << 8) | (alpha << 16) | (alpha << 24));
             }
         }
         imageBuffer.rewind();
+    }
+
+    void drawGlyphMask(Rect rect, JhvTextRenderer.TextData data, int glyphWidth, int glyphHeight, ByteBuffer mask) {
+        clear(rect.x(), rect.y(), rect.w(), rect.h());
+
+        int bitmapX = rect.x() + (data.originX() - data.origOriginX());
+        int bitmapY = rect.y() + (data.originY() - data.origOriginY());
+        drawMask(bitmapX, bitmapY, glyphWidth, glyphHeight, mask);
+
+        markDirty(rect.x(), rect.y(), rect.w(), rect.h());
     }
 
     void drawRgba(int x, int y, int width, int height, ByteBuffer rgba, int rowStride) {
@@ -88,7 +97,7 @@ class JhvTextureRenderer {
     }
 
     void copyArea(int srcX, int srcY, int width, int height, int dstX, int dstY) {
-        byte[] tmp = new byte[width * height * 4];
+        byte[] tmp = copyBuffer(width * height * 4);
         int rowStride = imageWidth * 4;
         for (int row = 0; row < height; row++) {
             int srcOffset = ((srcY + row) * rowStride) + (srcX * 4);
@@ -104,14 +113,20 @@ class JhvTextureRenderer {
     }
 
     void copyFrom(JhvTextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
-        byte[] tmp = new byte[width * height * 4];
+        byte[] tmp = copyBuffer(width * height * 4);
         int srcRowStride = other.imageWidth * 4;
+        int dstRowStride = imageWidth * 4;
         for (int row = 0; row < height; row++) {
             int srcOffset = ((srcY + row) * srcRowStride) + (srcX * 4);
             other.imageBuffer.position(srcOffset);
             other.imageBuffer.get(tmp, row * width * 4, width * 4);
         }
-        drawRgba(dstX, dstY, width, height, ByteBuffer.wrap(tmp), width * 4);
+        for (int row = 0; row < height; row++) {
+            int dstOffset = ((dstY + row) * dstRowStride) + (dstX * 4);
+            imageBuffer.position(dstOffset);
+            imageBuffer.put(tmp, row * width * 4, width * 4);
+        }
+        imageBuffer.rewind();
     }
 
     void markDirty(int x, int y, int width, int height) {
@@ -146,6 +161,13 @@ class JhvTextureRenderer {
         MemoryUtil.memFree(imageBuffer);
         imageBuffer = null;
         clearRow = null;
+        copyBuffer = null;
+    }
+
+    private byte[] copyBuffer(int size) {
+        if (copyBuffer == null || copyBuffer.length < size)
+            copyBuffer = new byte[size];
+        return copyBuffer;
     }
 
     private void upload(int x, int y, int width, int height) {
