@@ -124,7 +124,7 @@ public class JhvTextRenderer {
     private final float fontSize;
     private RectanglePacker packer;
     private boolean haveMaxSize;
-    private final TextBackend textBackend;
+    private final StbTextBackend textBackend;
     private JhvTextureRenderer cachedBackingStore;
     private final GlyphProducer glyphProducer;
 
@@ -418,18 +418,6 @@ public class JhvTextRenderer {
     }
 */
 
-    /**
-     * Separates glyph measurement/rasterization from atlas management.
-     */
-    private interface TextBackend {
-        @Nullable
-        Glyph createGlyph(char unicodeID);
-
-        void uploadGlyph(Glyph glyph);
-
-        void dispose();
-    }
-
     // Data associated with each rectangle of text
     static record TextData(
             int originX,
@@ -565,7 +553,7 @@ public class JhvTextRenderer {
         }
     }
 
-    private class StbTextBackend implements TextBackend {
+    private class StbTextBackend {
         private final STBTTFontinfo fontInfo;
         private final float scale;
 
@@ -578,7 +566,6 @@ public class JhvTextRenderer {
             scale = STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, pixelHeight);
         }
 
-        @Override
         public @Nullable Glyph createGlyph(char unicodeID) {
             int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, unicodeID);
             if (glyphIndex == 0) {
@@ -601,7 +588,6 @@ public class JhvTextRenderer {
             }
         }
 
-        @Override
         public void uploadGlyph(Glyph glyph) {
             StbGlyphData glyphData = (StbGlyphData) glyph.backendData;
             Bounds origBBox = new Bounds(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
@@ -635,7 +621,6 @@ public class JhvTextRenderer {
             renderer.markDirty(rect.x(), rect.y(), rect.w(), rect.h());
         }
 
-        @Override
         public void dispose() {
             fontInfo.free();
         }
