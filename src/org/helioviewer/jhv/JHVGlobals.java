@@ -98,8 +98,14 @@ public class JHVGlobals {
 
     public static void openURL(String url) {
         try {
-            if (UIGlobals.canBrowse && url != null)
-                Desktop.getDesktop().browse(new URI(url));
+            if (url == null)
+                return;
+
+            URI uri = new URI(url);
+            if ("file".equalsIgnoreCase(uri.getScheme()) && UIGlobals.canOpen)
+                Desktop.getDesktop().open(new File(uri));
+            else if (UIGlobals.canBrowse)
+                Desktop.getDesktop().browse(uri);
         } catch (Exception e) {
             Log.warn(e);
         }
