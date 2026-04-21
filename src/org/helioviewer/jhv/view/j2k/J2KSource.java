@@ -29,6 +29,8 @@ abstract class J2KSource {
     private final Jpx_source jpxSrc = new Jpx_source();
     private boolean isJP2;
     private boolean isClosed = true;
+    private boolean closing;
+    private int users;
 
     static class Local extends J2KSource {
 
@@ -71,12 +73,43 @@ abstract class J2KSource {
 
     abstract void open() throws KduException;
 
+    synchronized boolean beginUse() {
+        if (closing)
+            return false;
+        users++;
+        return true;
+    }
+
+    synchronized void endUse() {
+        users--;
+        if (users == 0)
+            notifyAll();
+    }
+
     void close() throws KduException {
         if (isClosed)
             return;
         jpxSrc.Close();
         jp2Src.Close();
         isClosed = true;
+    }
+
+    void closeWhenUnused() throws KduException {
+        synchronized (this) {
+            closing = true;
+            while (users > 0) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    // The background abolisher thread is not expected to be interrupted.
+                    // If this wait ever hangs in normal flow, some decode path leaked
+                    // beginUse() without a matching endUse() and that path should be fixed.
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        close();
     }
 
     Jpx_source jpxSource() {

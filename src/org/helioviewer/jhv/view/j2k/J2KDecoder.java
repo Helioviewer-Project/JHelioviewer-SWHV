@@ -4,7 +4,12 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Callable;
+
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageFilter;
 
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
@@ -16,10 +21,6 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
-
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageFilter;
 
 //import com.google.common.math.StatsAccumulator;
 //import com.google.common.base.Stopwatch;
@@ -48,10 +49,14 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 
     @Override
     public ImageBuffer call() throws Exception {
+        boolean sourceInUse = false;
         boolean sourceOpened = false;
         boolean recreateThreadEnv = false;
         Kdu_region_compositor compositor = null;
         try {
+            sourceInUse = src.beginUse();
+            if (!sourceInUse)
+                throw new CancellationException("Decode cancelled after source close");
             if (src.isJP2()) {
                 src.open();
                 sourceOpened = true;
@@ -140,6 +145,8 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         } finally {
             if (compositor != null)
                 destroyCompositor(compositor);
+            if (sourceInUse)
+                src.endUse();
             if (sourceOpened)
                 src.close();
             if (recreateThreadEnv)

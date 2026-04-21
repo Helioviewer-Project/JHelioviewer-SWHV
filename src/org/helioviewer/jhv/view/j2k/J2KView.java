@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.awt.EventQueue;
 import java.lang.ref.Cleaner;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -136,17 +137,14 @@ public class J2KView extends BaseView {
     private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
         @Override
         public void run() {
-            for (DecodeKey key : decodeCache.asMap().keySet()) {
-                if (key.params().serial() == aSerial)
-                    decodeCache.invalidate(key);
-            }
             // reader abolish may take too long in stressed conditions
             JHVThread.create(() -> {
                 try {
                     if (aReader != null) {
                         aReader.abolish();
                     }
-                    aSource.close();
+                    aSource.closeWhenUnused();
+                    decodeCache.asMap().keySet().removeIf(key -> key.params().serial() == aSerial);
                 } catch (KduException e) {
                     Log.error(e);
                 }
@@ -295,7 +293,11 @@ public class J2KView extends BaseView {
             return;
         }
         int numComps = completionLevel.getResolutionSet(decodeParams.frame()).numComps;
-        executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, writeCache));
+        try {
+            executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, writeCache));
+        } catch (RejectedExecutionException ignore) {
+            // Teardown may shut the executor down before a late refresh/resubmit reaches this point.
+        }
     }
 
     private class J2KCallback extends DecodeCallback {
