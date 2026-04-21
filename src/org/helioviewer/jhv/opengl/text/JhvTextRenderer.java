@@ -63,19 +63,18 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 /**
- * Renders bitmapped Java 2D text into an OpenGL window with high
- * performance, full Unicode support, and a simple API. Performs
- * appropriate caching of text rendering results in an OpenGL texture
- * internally to avoid repeated font rasterization. The caching is
- * completely automatic, does not require any user intervention, and
- * has no visible controls in the public API.
+ * Renders bitmapped text into an OpenGL window with high performance, full
+ * Unicode support, and a simple API. Glyphs are rasterized through STB and
+ * cached in an OpenGL texture atlas to avoid repeated rasterization. The
+ * caching is automatic, does not require user intervention, and has no visible
+ * controls in the public API.
  * <p>
  * Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
  * "<code>TextRenderer renderer;</code>" field to your rendering code.
  * During initialization, add:
  *
  * <PRE>
- * renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
+ * renderer = new TextRenderer(...);
  * </PRE>
  * <p>
  * During a render pass, add:
@@ -100,15 +99,8 @@ import org.lwjgl.system.MemoryUtil;
  * in your application.
  * <p>
  * Internally, the renderer uses a rectangle packing algorithm to
- * pack both glyphs and full Strings' rendering results (which are
- * variable size) onto a larger OpenGL texture. The internal backing
- * store is maintained using an internal texture renderer. A least
- * recently used (LRU) algorithm is used to discard previously
- * rendered strings; the specific algorithm is undefined, but is
- * currently implemented by flushing unused Strings' rendering
- * results every few hundred rendering cycles, where a rendering
- * cycle is defined as a pair of calls to {@link #beginRendering
- * beginRendering} / {@link #endRendering endRendering}.
+ * pack glyph bitmaps into a larger OpenGL texture. The internal backing
+ * store is maintained by an internal texture renderer.
  *
  * @author John Burkey
  * @author Kenneth Russell
@@ -130,9 +122,6 @@ public class JhvTextRenderer {
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
     private final float fontSize;
-    private final boolean antialiased;
-    private final boolean useFractionalMetrics;
-
     private RectanglePacker packer;
     private boolean haveMaxSize;
     private final TextBackend textBackend;
@@ -150,22 +139,13 @@ public class JhvTextRenderer {
     private int beginRenderingHeight;
 
     /**
-     * Creates a new TextRenderer with the given Font, specified font
-     * properties, and given RenderDelegate. The
-     * <code>antialiased</code> and <code>useFractionalMetrics</code>
-     * flags provide control over the same properties at the Java 2D
-     * level. The <code>renderDelegate</code> provides more control
-     * over the text rendered.
+     * Creates a new TextRenderer using the supplied font bytes and pixel size.
      *
-     * @param font                 the font to render with
-     * @param antialiased          whether to use antialiased fonts
-     * @param useFractionalMetrics whether to use fractional font
-     *                             metrics at the Java 2D level
+     * @param size     the pixel size of the font
+     * @param fontData the font data to rasterize glyphs from
      */
-    public JhvTextRenderer(float size, ByteBuffer fontData, boolean antialiasing, boolean fractionalMetrics) {
+    public JhvTextRenderer(float size, ByteBuffer fontData) {
         fontSize = size;
-        antialiased = antialiasing;
-        useFractionalMetrics = fractionalMetrics;
 
         // FIXME: consider adjusting the size based on font size
         // (it will already automatically resize if necessary)
@@ -439,9 +419,7 @@ public class JhvTextRenderer {
 */
 
     /**
-     * Separates glyph measurement/rasterization from atlas management so we can
-     * switch away from the current Java2D path without rewriting the quad and
-     * texture-cache logic.
+     * Separates glyph measurement/rasterization from atlas management.
      */
     private interface TextBackend {
         @Nullable

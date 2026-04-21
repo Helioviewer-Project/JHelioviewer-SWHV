@@ -37,7 +37,7 @@ public class GLText {
 
         if (renderers[idx] == null) {
             Font font = rendererFont(idx);
-            renderers[idx] = new JhvTextRenderer(font.getSize2D(), getCanvasFontData(), true, true);
+            renderers[idx] = new JhvTextRenderer(font.getSize2D(), getCanvasFontData());
             // precache for grid text
             renderers[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }
