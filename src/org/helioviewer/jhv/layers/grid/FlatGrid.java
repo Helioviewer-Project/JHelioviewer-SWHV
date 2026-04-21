@@ -17,7 +17,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.RasterLine;
-import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public class FlatGrid {
 
@@ -95,7 +95,7 @@ public class FlatGrid {
     }
 
     private void drawLabels(Camera camera, int size, Viewport vp) {
-        JhvTextRenderer renderer = GLText.getRenderer(size);
+        TextRenderer renderer = GLText.getRenderer(size);
         float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize();
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();

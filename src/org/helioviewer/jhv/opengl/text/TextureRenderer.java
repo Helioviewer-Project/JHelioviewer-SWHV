@@ -8,7 +8,7 @@ import org.helioviewer.jhv.opengl.text.packrect.Rect;
 
 import org.lwjgl.system.MemoryUtil;
 
-class JhvTextureRenderer {
+class TextureRenderer {
     private ByteBuffer imageBuffer;
     private byte[] clearRow;
     private byte[] copyBuffer;
@@ -23,7 +23,7 @@ class JhvTextureRenderer {
     private final int imageWidth;
     private final int imageHeight;
 
-    JhvTextureRenderer(int width, int height) {
+    TextureRenderer(int width, int height) {
         imageWidth = width;
         imageHeight = height;
         imageBuffer = MemoryUtil.memCalloc(imageWidth * imageHeight * 4);
@@ -72,7 +72,7 @@ class JhvTextureRenderer {
         imageBuffer.rewind();
     }
 
-    void drawGlyphMask(Rect rect, JhvTextRenderer.TextData data, int glyphWidth, int glyphHeight, ByteBuffer mask) {
+    void drawGlyphMask(Rect rect, TextRenderer.TextData data, int glyphWidth, int glyphHeight, ByteBuffer mask) {
         clear(rect.x(), rect.y(), rect.w(), rect.h());
 
         int bitmapX = rect.x() + (data.originX() - data.origOriginX());
@@ -112,7 +112,7 @@ class JhvTextureRenderer {
         imageBuffer.rewind();
     }
 
-    void copyFrom(JhvTextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
+    void copyFrom(TextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
         byte[] tmp = copyBuffer(width * height * 4);
         int srcRowStride = other.imageWidth * 4;
         int dstRowStride = imageWidth * 4;

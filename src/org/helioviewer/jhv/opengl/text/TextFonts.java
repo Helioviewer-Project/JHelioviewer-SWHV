@@ -15,13 +15,18 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 public final class TextFonts {
+    private static final String CANVAS_FONT_RESOURCE = "/fonts/DejaVuSansCondensed.ttf";
     private static final Map<String, ByteBuffer> fontDataByPath = new HashMap<>();
     private static final Map<String, STBTTFontinfo> fontInfoByPath = new HashMap<>();
 
     private TextFonts() {
     }
 
-    public static synchronized ByteBuffer loadFontData(String resourcePath) {
+    public static ByteBuffer loadCanvasFontData() {
+        return loadFontData(CANVAS_FONT_RESOURCE);
+    }
+
+    public static ByteBuffer loadFontData(String resourcePath) {
         ByteBuffer fontData = fontDataByPath.get(resourcePath);
         if (fontData != null)
             return fontData.duplicate();
@@ -35,6 +40,10 @@ public final class TextFonts {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load font " + resourcePath, e);
         }
+    }
+
+    public static float measureCanvasWidth(float pixelHeight, String str) {
+        return measureWidth(CANVAS_FONT_RESOURCE, pixelHeight, str);
     }
 
     public static float measureWidth(String resourcePath, float pixelHeight, String str) {
@@ -58,7 +67,7 @@ public final class TextFonts {
         return width;
     }
 
-    public static synchronized void dispose() {
+    public static void dispose() {
         for (STBTTFontinfo fontInfo : fontInfoByPath.values())
             fontInfo.free();
         fontInfoByPath.clear();
@@ -68,7 +77,7 @@ public final class TextFonts {
         fontDataByPath.clear();
     }
 
-    private static synchronized STBTTFontinfo fontInfo(String resourcePath) {
+    private static STBTTFontinfo fontInfo(String resourcePath) {
         STBTTFontinfo fontInfo = fontInfoByPath.get(resourcePath);
         if (fontInfo != null)
             return fontInfo;

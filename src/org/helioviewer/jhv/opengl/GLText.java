@@ -5,25 +5,24 @@ import java.util.List;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.helioviewer.jhv.opengl.text.TextFonts;
+import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public class GLText {
-    private static final String CANVAS_FONT_RESOURCE = "/fonts/DejaVuSansCondensed.ttf";
     private static final int MIN = 10;
     private static final int MAX = 144;
     private static final int STEP = 1;
     private static final int SIZE = (MAX - MIN) / STEP + 1;
-    private static final JhvTextRenderer[] renderers = new JhvTextRenderer[SIZE];
+    private static final TextRenderer[] renderers = new TextRenderer[SIZE];
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
 
-    public static JhvTextRenderer getRenderer(int size) {
+    public static TextRenderer getRenderer(int size) {
         int idx = rendererIndex(size);
 
         if (renderers[idx] == null) {
-            renderers[idx] = new JhvTextRenderer(rendererSize(idx), TextFonts.loadFontData(CANVAS_FONT_RESOURCE));
+            renderers[idx] = new TextRenderer(rendererSize(idx), TextFonts.loadCanvasFontData());
             // precache for grid text
             renderers[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }
@@ -66,13 +65,14 @@ public class GLText {
         if (txts.isEmpty())
             return;
 
-        JhvTextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
+        TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
         float fontSize = renderer.getFontSize();
 
         double boundW = 0;
         int ct = 0;
+        float textSize = rendererSize(rendererIndex(TEXT_SIZE_NORMAL));
         for (String txt : txts) {
-            double w = TextFonts.measureWidth(CANVAS_FONT_RESOURCE, rendererSize(rendererIndex(TEXT_SIZE_NORMAL)), txt);
+            double w = TextFonts.measureCanvasWidth(textSize, txt);
             if (boundW < w)
                 boundW = w;
             ct++;
