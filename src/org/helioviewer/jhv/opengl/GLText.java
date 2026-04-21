@@ -1,6 +1,9 @@
 package org.helioviewer.jhv.opengl;
 
 import java.awt.Font;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -16,6 +19,7 @@ import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
 import org.lwjgl.system.MemoryUtil;
 
 public class GLText {
+    private static final FontRenderContext BOUNDS_FRC = new FontRenderContext(null, true, true);
 
     private static final int MIN = 10;
     private static final int MAX = 144;
@@ -90,7 +94,7 @@ public class GLText {
         double boundW = 0;
         int ct = 0;
         for (String txt : txts) {
-            double w = renderer.getBounds(txt).getWidth();
+            double w = getBounds(renderer.getFont(), txt).getWidth();
             if (boundW < w)
                 boundW = w;
             ct++;
@@ -123,4 +127,8 @@ public class GLText {
         renderer.endRendering();
     }
 
+    private static Rectangle2D getBounds(Font font, String str) {
+        GlyphVector glyphs = font.createGlyphVector(BOUNDS_FRC, str);
+        return glyphs.getVisualBounds();
+    }
 }
