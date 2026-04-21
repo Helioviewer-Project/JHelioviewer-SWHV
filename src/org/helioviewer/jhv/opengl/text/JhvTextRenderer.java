@@ -566,14 +566,12 @@ public class JhvTextRenderer {
     }
 
     private class StbTextBackend implements TextBackend {
-        private final ByteBuffer fontData;
         private final STBTTFontinfo fontInfo;
         private final float scale;
 
         StbTextBackend(ByteBuffer sourceFontData, float pixelHeight) {
-            fontData = sourceFontData;
             fontInfo = STBTTFontinfo.create();
-            if (!STBTruetype.stbtt_InitFont(fontInfo, fontData)) {
+            if (!STBTruetype.stbtt_InitFont(fontInfo, sourceFontData)) {
                 fontInfo.free();
                 throw new IllegalArgumentException("Failed to initialize STB font");
             }
@@ -722,25 +720,16 @@ public class JhvTextRenderer {
     // Glyph-by-glyph rendering support
 
     /**
-     * A Glyph represents either a single unicode glyph or a
-     * substring of characters to be drawn. The reason for the dual
-     * behavior is so that we can take in a sequence of unicode
-     * characters and partition them into runs of individual glyphs,
-     * but if we encounter complex text and/or unicode sequences we
-     * don't understand, we can render them using the
-     * string-by-string method.
-     * Glyphs need to be able to re-upload themselves to the backing
-     * store on demand as we go along in the render sequence.
+     * A Glyph represents a single unicode glyph and knows how to upload itself
+     * to the backing store on demand.
      */
 
     class Glyph {
-        // If this Glyph represents an individual unicode glyph, this
-        // is its unicode ID. If it represents a String, this is -1.
+        // This glyph's unicode ID.
         private final int unicodeID;
-        // If the above field isn't -1, then these fields are used.
-        // The glyph code in the font
+        // The glyph code in the font.
         private final int glyphCode;
-        // The advance of this glyph
+        // The advance of this glyph.
         private final float advance;
         // Backend-specific glyph data used for rasterization.
         private final Object backendData;
@@ -898,9 +887,8 @@ public class JhvTextRenderer {
             glyphCache[glyph.getGlyphCode()] = glyph;
         }
 
-        // Returns a glyph object for this single glyph. Returns null
-        // if the unicode or glyph ID would be out of bounds of the
-        // glyph cache.
+        // Returns a glyph object for this single glyph. Returns null if the
+        // unicode or glyph ID would be out of bounds of the glyph cache.
         @Nullable
         Glyph getGlyph(char unicodeID) {
             if (unicodeID >= unicodes2Glyphs.length) {

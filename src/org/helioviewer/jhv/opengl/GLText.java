@@ -86,7 +86,7 @@ public class GLText {
             canvasFontData = buffer;
             return canvasFontData.duplicate();
         } catch (IOException e) {
-            return null;
+            throw new IllegalStateException("Failed to load canvas font", e);
         }
     }
 
