@@ -40,7 +40,6 @@
 package org.helioviewer.jhv.opengl.text;
 
 import java.awt.AlphaComposite;
-import java.awt.Font;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
@@ -133,7 +132,7 @@ public class JhvTextRenderer {
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
-    private final Font font;
+    private final float fontSize;
     private final boolean antialiased;
     private final boolean useFractionalMetrics;
 
@@ -166,21 +165,20 @@ public class JhvTextRenderer {
      * @param useFractionalMetrics whether to use fractional font
      *                             metrics at the Java 2D level
      */
-    public JhvTextRenderer(Font font, ByteBuffer fontData, boolean antialiased, boolean useFractionalMetrics) {
-        this.font = font;
+    public JhvTextRenderer(float fontSize, ByteBuffer fontData, boolean antialiased, boolean useFractionalMetrics) {
+        this.fontSize = fontSize;
         this.antialiased = antialiased;
         this.useFractionalMetrics = useFractionalMetrics;
 
         // FIXME: consider adjusting the size based on font size
         // (it will already automatically resize if necessary)
         packer = new RectanglePacker(new Manager(), kSize, kSize);
-        textBackend = new StbTextBackend(fontData, font.getSize2D());
-        glyphProducer = new GlyphProducer(font.getNumGlyphs());
+        textBackend = new StbTextBackend(fontData, fontSize);
+        glyphProducer = new GlyphProducer();
     }
 
-    // Returns the Font this renderer is using
-    public Font getFont() {
-        return font;
+    public float getFontSize() {
+        return fontSize;
     }
 
     /**
@@ -341,7 +339,7 @@ public class JhvTextRenderer {
         // NOTE that this boundary is quite heuristic and is related
         // to how far away in 3D we may view the text --
         // heuristically, 1.5% of the font's height
-        int boundary = (int) Math.max(1, 0.015 * font.getSize());
+        int boundary = (int) Math.max(1, 0.015 * fontSize);
 
         return new Rectangle2D.Double((int) Math.floor(src.getMinX() - boundary),
                 (int) Math.floor(src.getMinY() - boundary),
@@ -909,9 +907,9 @@ public class JhvTextRenderer {
         // The mapping from glyph ID to Glyph
         private final Glyph[] glyphCache;
 
-        GlyphProducer(int fontLengthInGlyphs) {
+        GlyphProducer() {
             unicodes2Glyphs = new int[10000]; // highest character we can draw
-            glyphCache = new Glyph[fontLengthInGlyphs];
+            glyphCache = new Glyph[65536];
             clearAllCacheEntries();
         }
 
