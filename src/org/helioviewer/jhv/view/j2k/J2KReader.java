@@ -51,9 +51,11 @@ class J2KReader implements Runnable {
 
     // runs in abolish thread
     void abolish() throws KduException {
-        if (isAbolished)
-            return;
-        isAbolished = true;
+        synchronized (this) {
+            if (isAbolished)
+                return;
+            isAbolished = true;
+        }
 
         while (myThread.isAlive()) {
             try {
@@ -71,6 +73,8 @@ class J2KReader implements Runnable {
     }
 
     synchronized void signal(J2KParams.Read params) {
+        if (isAbolished) // ignore new work when we're closing down
+            return;
         signalQueue.poll(); // latest wins
         signalQueue.offer(params);
     }
