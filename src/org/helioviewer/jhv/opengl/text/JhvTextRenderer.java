@@ -43,12 +43,11 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.text.StringCharacterIterator;
@@ -58,6 +57,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Transform;
+import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.GL;
@@ -150,7 +150,6 @@ public class JhvTextRenderer {
     private final TextBackend boundsBackend;
     private final TextBackend textBackend;
     private JhvTextureRenderer cachedBackingStore;
-    private Graphics2D cachedGraphics;
     private FontRenderContext cachedFontRenderContext;
     private final GlyphProducer glyphProducer;
 
@@ -220,20 +219,6 @@ public class JhvTextRenderer {
     // Returns the Font this renderer is using
     public Font getFont() {
         return font;
-    }
-
-    /**
-     * Returns a FontRenderContext which can be used for external
-     * text-related size computations. This object should be considered
-     * transient and may become invalidated between {@link
-     * #beginRendering beginRendering} / {@link #endRendering
-     * endRendering} pairs.
-     */
-    private FontRenderContext getFontRenderContext() {
-        if (cachedFontRenderContext == null) {
-            cachedFontRenderContext = getGraphics2D().getFontRenderContext();
-        }
-        return cachedFontRenderContext;
     }
 
     /**
@@ -366,9 +351,6 @@ public class JhvTextRenderer {
         packer.dispose();
         packer = null;
         cachedBackingStore = null;
-        if (cachedGraphics != null)
-            cachedGraphics.dispose();
-        cachedGraphics = null;
         cachedFontRenderContext = null;
         boundsBackend.dispose();
         if (textBackend != boundsBackend)
@@ -411,31 +393,17 @@ public class JhvTextRenderer {
     private JhvTextureRenderer getBackingStore() {
         JhvTextureRenderer renderer = (JhvTextureRenderer) packer.getBackingStore();
         if (renderer != cachedBackingStore) {
-            // Backing store changed since last time; discard any cached Graphics2D
-            if (cachedGraphics != null) {
-                cachedGraphics.dispose();
-                cachedGraphics = null;
-                cachedFontRenderContext = null;
-            }
+            cachedFontRenderContext = null;
             cachedBackingStore = renderer;
         }
         return cachedBackingStore;
     }
 
-    private Graphics2D getGraphics2D() {
-        JhvTextureRenderer renderer = getBackingStore();
-        if (cachedGraphics == null) {
-            cachedGraphics = renderer.createGraphics();
-            // Set up composite, font and rendering hints
-            cachedGraphics.setComposite(AlphaComposite.Src);
-            cachedGraphics.setColor(Color.WHITE);
-            cachedGraphics.setFont(font);
-            cachedGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    (antialiased ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF));
-            cachedGraphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                    (useFractionalMetrics ? RenderingHints.VALUE_FRACTIONALMETRICS_ON : RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
+    private FontRenderContext getFontRenderContext() {
+        if (cachedFontRenderContext == null) {
+            cachedFontRenderContext = new FontRenderContext(null, antialiased, useFractionalMetrics);
         }
-        return cachedGraphics;
+        return cachedFontRenderContext;
     }
 
     private void beginRendering(boolean ortho, int width, int height) {
@@ -639,7 +607,6 @@ public class JhvTextRenderer {
     }
 
     class Manager implements BackingStoreManager {
-        private Graphics2D g;
 
         @Override
         public Object allocateBackingStore(int w, int h) {
@@ -699,9 +666,6 @@ public class JhvTextRenderer {
                 flush();
                 internal_endRendering(isOrthoMode);
             }
-
-            JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
-            g = newRenderer.createGraphics();
         }
 
         @Override
@@ -710,24 +674,16 @@ public class JhvTextRenderer {
             JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
             if (oldRenderer == newRenderer) {
                 // Movement on the same backing store -- easy case
-                g.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
+                newRenderer.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
                         oldLocation.h(), newLocation.x() - oldLocation.x(),
                         newLocation.y() - oldLocation.y());
             } else {
-                // Need to draw from the old renderer's image into the new one
-                Image img = oldRenderer.getImage();
-                g.drawImage(img, newLocation.x(), newLocation.y(),
-                        newLocation.x() + newLocation.w(),
-                        newLocation.y() + newLocation.h(), oldLocation.x(),
-                        oldLocation.y(), oldLocation.x() + oldLocation.w(),
-                        oldLocation.y() + oldLocation.h(), null);
+                newRenderer.copyFrom(oldRenderer, oldLocation.x(), oldLocation.y(), oldLocation.w(), oldLocation.h(), newLocation.x(), newLocation.y());
             }
         }
 
         @Override
         public void endMovement(Object oldBackingStore, Object newBackingStore) {
-            g.dispose();
-
             // Sync the whole surface
             JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
             newRenderer.markDirty(0, 0, newRenderer.getWidth(), newRenderer.getHeight());
@@ -778,28 +734,44 @@ public class JhvTextRenderer {
             packer.add(rect);
             glyph.glyphRectForTextureMapping = rect;
 
-            Graphics2D g = getGraphics2D();
-            int strx = rect.x() + origin.x;
-            int stry = rect.y() + origin.y;
+            BufferedImage image = NativeImageFactory.createRGBAPremultipliedImage(rect.w(), rect.h());
+            try {
+                Graphics2D g = image.createGraphics();
+                try {
+                    g.setComposite(AlphaComposite.Src);
+                    g.setColor(Color.WHITE);
+                    g.setFont(font);
 
-            g.setComposite(AlphaComposite.Clear);
-            g.fillRect(rect.x(), rect.y(), rect.w(), rect.h());
-            g.setComposite(AlphaComposite.Src);
+                    int strx = origin.x;
+                    int stry = origin.y;
 
-            renderDelegate.drawGlyphVector(g, gv, strx, stry);
+                    g.setComposite(AlphaComposite.Clear);
+                    g.fillRect(0, 0, rect.w(), rect.h());
+                    g.setComposite(AlphaComposite.Src);
 
-            if (DRAW_BBOXES) {
-                TextData data = (TextData) rect.getUserData();
-                g.drawRect(strx - data.origOriginX(),
-                        stry - data.origOriginY(),
-                        data.origRectWidth(),
-                        data.origRectHeight());
-                g.drawRect(strx - data.origin().x,
-                        stry - data.origin().y,
-                        rect.w(),
-                        rect.h());
+                    renderDelegate.drawGlyphVector(g, gv, strx, stry);
+
+                    if (DRAW_BBOXES) {
+                        TextData data = (TextData) rect.getUserData();
+                        g.drawRect(strx - data.origOriginX(),
+                                stry - data.origOriginY(),
+                                data.origRectWidth(),
+                                data.origRectHeight());
+                        g.drawRect(strx - data.origin().x,
+                                stry - data.origin().y,
+                                rect.w(),
+                                rect.h());
+                    }
+                } finally {
+                    g.dispose();
+                }
+
+                JhvTextureRenderer renderer = getBackingStore();
+                renderer.drawRgba(rect.x(), rect.y(), rect.w(), rect.h(), NativeImageFactory.getByteBuffer(image), rect.w() * 4);
+                renderer.markDirty(rect.x(), rect.y(), rect.w(), rect.h());
+            } finally {
+                NativeImageFactory.free(image);
             }
-            getBackingStore().markDirty(rect.x(), rect.y(), rect.w(), rect.h());
         }
 
         @Override
