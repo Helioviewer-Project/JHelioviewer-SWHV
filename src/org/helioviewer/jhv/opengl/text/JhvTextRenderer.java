@@ -599,10 +599,7 @@ public class JhvTextRenderer {
             glyph.glyphRectForTextureMapping = rect;
 
             JhvTextureRenderer renderer = getBackingStore();
-            renderer.clear(rect.x(), rect.y(), rect.w(), rect.h());
-
-            int bitmapX = rect.x() + (originX - ((TextData) rect.getUserData()).origOriginX());
-            int bitmapY = rect.y() + (originY - ((TextData) rect.getUserData()).origOriginY());
+            TextData data = (TextData) rect.getUserData();
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 IntBuffer ignoredWidth = stack.mallocInt(1);
                 IntBuffer ignoredHeight = stack.mallocInt(1);
@@ -612,14 +609,12 @@ public class JhvTextRenderer {
                         ignoredWidth, ignoredHeight, ignoredXOffset, ignoredYOffset);
                 if (bitmap != null) {
                     try {
-                        renderer.drawMask(bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
+                        renderer.drawGlyphMask(rect, data, glyphData.width(), glyphData.height(), bitmap);
                     } finally {
                         STBTruetype.stbtt_FreeBitmap(bitmap);
                     }
                 }
             }
-
-            renderer.markDirty(rect.x(), rect.y(), rect.w(), rect.h());
         }
 
         public void dispose() {
