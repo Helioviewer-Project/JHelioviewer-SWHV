@@ -4,6 +4,9 @@ import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.view.View;
+
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_palette;
 import kdu_jni.Jp2_threadsafe_family_src;
@@ -19,9 +22,6 @@ import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
 import kdu_jni.Kdu_dims;
 import kdu_jni.Kdu_global;
-
-import org.helioviewer.jhv.math.MathUtils;
-import org.helioviewer.jhv.view.View;
 
 abstract class J2KSource {
 
