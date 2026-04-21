@@ -49,6 +49,7 @@ import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
+import java.nio.ByteBuffer;
 import java.text.StringCharacterIterator;
 //import java.util.ArrayList;
 
@@ -66,6 +67,9 @@ import org.helioviewer.jhv.opengl.text.packrect.RectanglePacker;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.stb.STBTTFontinfo;
+import org.lwjgl.stb.STBTruetype;
+import org.lwjgl.system.MemoryUtil;
 
 /**
  * Renders bitmapped Java 2D text into an OpenGL window with high
@@ -790,6 +794,41 @@ public class JhvTextRenderer {
 
         @Override
         public void dispose() {
+        }
+    }
+
+    private static class StbTextBackend implements TextBackend {
+        private final ByteBuffer fontData;
+        private final STBTTFontinfo fontInfo;
+
+        StbTextBackend(ByteBuffer fontData) {
+            this.fontData = fontData;
+            fontInfo = STBTTFontinfo.create();
+            if (!STBTruetype.stbtt_InitFont(fontInfo, fontData)) {
+                fontInfo.free();
+                throw new IllegalArgumentException("Failed to initialize STB font");
+            }
+        }
+
+        @Override
+        public Rectangle2D getBounds(String str) {
+            throw new UnsupportedOperationException("STB text bounds are not implemented yet");
+        }
+
+        @Override
+        public @Nullable Glyph createGlyph(char unicodeID) {
+            throw new UnsupportedOperationException("STB glyph creation is not implemented yet");
+        }
+
+        @Override
+        public void uploadGlyph(Glyph glyph) {
+            throw new UnsupportedOperationException("STB glyph upload is not implemented yet");
+        }
+
+        @Override
+        public void dispose() {
+            fontInfo.free();
+            MemoryUtil.memFree(fontData);
         }
     }
 
