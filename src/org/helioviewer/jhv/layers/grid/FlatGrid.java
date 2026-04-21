@@ -96,7 +96,7 @@ public class FlatGrid {
 
     private void drawLabels(Camera camera, int size, Viewport vp) {
         JhvTextRenderer renderer = GLText.getRenderer(size);
-        float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFont().getSize2D();
+        float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize();
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();
         for (int i = 0; i < xAxis.labels().length; i++) {

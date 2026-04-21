@@ -25,6 +25,7 @@ public class GLText {
     private static final int MAX = 144;
     private static final int STEP = 1;
     private static final int SIZE = (MAX - MIN) / STEP + 1;
+    private static final Font[] fonts = new Font[SIZE];
     private static final JhvTextRenderer[] renderers = new JhvTextRenderer[SIZE];
     private static ByteBuffer canvasFontData;
 
@@ -32,17 +33,11 @@ public class GLText {
     public static final int[] shadowOffset = {2, -2};
 
     public static JhvTextRenderer getRenderer(int size) {
-        size = (int) (size * Display.pixelScale[1]);
-
-        int idx = (size - MIN) / STEP;
-        if (idx < 0)
-            idx = 0;
-        else if (idx >= SIZE)
-            idx = SIZE - 1;
+        int idx = rendererIndex(size);
 
         if (renderers[idx] == null) {
-            Font font = UIGlobals.canvasFont.deriveFont((float) (idx * STEP + MIN));
-            renderers[idx] = new JhvTextRenderer(font, getCanvasFontData(), true, true);
+            Font font = rendererFont(idx);
+            renderers[idx] = new JhvTextRenderer(font.getSize2D(), getCanvasFontData(), true, true);
             // precache for grid text
             renderers[idx].draw3D("-0123456789.", 0, 0, 0, 0);
         }
@@ -55,11 +50,29 @@ public class GLText {
                 renderers[i].dispose();
                 renderers[i] = null;
             }
+            fonts[i] = null;
         }
         if (canvasFontData != null) {
             MemoryUtil.memFree(canvasFontData);
             canvasFontData = null;
         }
+    }
+
+    private static int rendererIndex(int size) {
+        size = (int) (size * Display.pixelScale[1]);
+
+        int idx = (size - MIN) / STEP;
+        if (idx < 0)
+            idx = 0;
+        else if (idx >= SIZE)
+            idx = SIZE - 1;
+        return idx;
+    }
+
+    private static Font rendererFont(int idx) {
+        if (fonts[idx] == null)
+            fonts[idx] = UIGlobals.canvasFont.deriveFont((float) (idx * STEP + MIN));
+        return fonts[idx];
     }
 
     private static ByteBuffer getCanvasFontData() {
@@ -89,12 +102,13 @@ public class GLText {
             return;
 
         JhvTextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
-        float fontSize = renderer.getFont().getSize2D();
+        Font font = rendererFont(rendererIndex(TEXT_SIZE_NORMAL));
+        float fontSize = renderer.getFontSize();
 
         double boundW = 0;
         int ct = 0;
         for (String txt : txts) {
-            double w = getBounds(renderer.getFont(), txt).getWidth();
+            double w = getBounds(font, txt).getWidth();
             if (boundW < w)
                 boundW = w;
             ct++;

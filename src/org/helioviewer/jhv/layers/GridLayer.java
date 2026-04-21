@@ -192,7 +192,7 @@ public final class GridLayer extends AbstractLayer {
         for (float rsize : labelPos) {
             JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             renderer.setColor(Colors.MiddleGrayFloat);
-            float textScaleFactor = textScale / renderer.getFont().getSize2D();
+            float textScaleFactor = textScale / renderer.getFontSize();
 
             renderer.begin3DRendering();
             labels.forEach(label -> renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
@@ -205,7 +205,7 @@ public final class GridLayer extends AbstractLayer {
         JhvTextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
-        float textScaleFactor = textScale / renderer.getFont().getSize2D();
+        float textScaleFactor = textScale / renderer.getFontSize();
 
         renderer.begin3DRendering();
 
