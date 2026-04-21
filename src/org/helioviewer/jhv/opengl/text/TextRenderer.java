@@ -69,7 +69,7 @@ import org.lwjgl.system.MemoryUtil;
  * caching is automatic, does not require user intervention, and has no visible
  * controls in the public API.
  * <p>
- * Using the {@link JhvTextRenderer TextRenderer} is simple. Add a
+ * Using the {@link TextRenderer TextRenderer} is simple. Add a
  * "<code>TextRenderer renderer;</code>" field to your rendering code.
  * During initialization, add:
  *
@@ -105,7 +105,7 @@ import org.lwjgl.system.MemoryUtil;
  * @author John Burkey
  * @author Kenneth Russell
  */
-public class JhvTextRenderer {
+public class TextRenderer {
 
     private static final boolean DRAW_BBOXES = false;
 
@@ -125,7 +125,7 @@ public class JhvTextRenderer {
     private RectanglePacker packer;
     private boolean haveMaxSize;
     private final StbTextBackend textBackend;
-    private JhvTextureRenderer cachedBackingStore;
+    private TextureRenderer cachedBackingStore;
     private final GlyphProducer glyphProducer;
 
     //private int numRenderCycles;
@@ -144,7 +144,7 @@ public class JhvTextRenderer {
      * @param size     the pixel size of the font
      * @param fontData the font data to rasterize glyphs from
      */
-    public JhvTextRenderer(float size, ByteBuffer fontData) {
+    public TextRenderer(float size, ByteBuffer fontData) {
         fontSize = size;
 
         // FIXME: consider adjusting the size based on font size
@@ -159,7 +159,7 @@ public class JhvTextRenderer {
     }
 
     /**
-     * Begins rendering with this {@link JhvTextRenderer TextRenderer}
+     * Begins rendering with this {@link TextRenderer TextRenderer}
      * into the current OpenGL drawable, pushing the projection and
      * modelview matrices and some state bits and setting up a
      * two-dimensional orthographic projection with (0, 0) as the
@@ -178,7 +178,7 @@ public class JhvTextRenderer {
     }
 
     /**
-     * Begins rendering of 2D text in 3D with this {@link JhvTextRenderer
+     * Begins rendering of 2D text in 3D with this {@link TextRenderer
      * TextRenderer} into the current OpenGL drawable. Assumes the end
      * user is responsible for setting up the modelview and projection
      * matrices, and will render text using the {@link #draw3D draw3D}
@@ -262,7 +262,7 @@ public class JhvTextRenderer {
     }
 
     /**
-     * Ends a render cycle with this {@link JhvTextRenderer TextRenderer}.
+     * Ends a render cycle with this {@link TextRenderer TextRenderer}.
      * Restores the projection and modelview matrices as well as
      * several OpenGL state bits. Should be paired with {@link
      * #beginRendering beginRendering}.
@@ -272,7 +272,7 @@ public class JhvTextRenderer {
     }
 
     /**
-     * Ends a 3D render cycle with this {@link JhvTextRenderer TextRenderer}.
+     * Ends a 3D render cycle with this {@link TextRenderer TextRenderer}.
      * Restores several OpenGL state bits. Should be paired with {@link
      * #begin3DRendering begin3DRendering}.
      */
@@ -334,8 +334,8 @@ public class JhvTextRenderer {
                 (int) Math.ceil(src.height) + 2 * boundary);
     }
 
-    private JhvTextureRenderer getBackingStore() {
-        JhvTextureRenderer renderer = (JhvTextureRenderer) packer.getBackingStore();
+    private TextureRenderer getBackingStore() {
+        TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
         if (renderer != cachedBackingStore) {
             cachedBackingStore = renderer;
         }
@@ -469,12 +469,12 @@ public class JhvTextRenderer {
 
         @Override
         public Object allocateBackingStore(int w, int h) {
-            return new JhvTextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h));
+            return new TextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h));
         }
 
         @Override
         public void deleteBackingStore(Object backingStore) {
-            ((JhvTextureRenderer) backingStore).dispose();
+            ((TextureRenderer) backingStore).dispose();
         }
 
         @Override
@@ -529,8 +529,8 @@ public class JhvTextRenderer {
 
         @Override
         public void move(Object oldBackingStore, Rect oldLocation, Object newBackingStore, Rect newLocation) {
-            JhvTextureRenderer oldRenderer = (JhvTextureRenderer) oldBackingStore;
-            JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
+            TextureRenderer oldRenderer = (TextureRenderer) oldBackingStore;
+            TextureRenderer newRenderer = (TextureRenderer) newBackingStore;
             if (oldRenderer == newRenderer) {
                 // Movement on the same backing store -- easy case
                 newRenderer.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
@@ -544,7 +544,7 @@ public class JhvTextRenderer {
         @Override
         public void endMovement(Object oldBackingStore, Object newBackingStore) {
             // Sync the whole surface
-            JhvTextureRenderer newRenderer = (JhvTextureRenderer) newBackingStore;
+            TextureRenderer newRenderer = (TextureRenderer) newBackingStore;
             newRenderer.markDirty(0, 0, newRenderer.getWidth(), newRenderer.getHeight());
             // Re-enter the begin / end pair if necessary
             if (inBeginEndPair) {
@@ -598,7 +598,7 @@ public class JhvTextRenderer {
             packer.add(rect);
             glyph.glyphRectForTextureMapping = rect;
 
-            JhvTextureRenderer renderer = getBackingStore();
+            TextureRenderer renderer = getBackingStore();
             TextData data = (TextData) rect.getUserData();
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 IntBuffer ignoredWidth = stack.mallocInt(1);
@@ -725,7 +725,7 @@ public class JhvTextRenderer {
                 upload();
             }
 
-            JhvTextureRenderer renderer = getBackingStore();
+            TextureRenderer renderer = getBackingStore();
             Rect rect = glyphRectForTextureMapping;
             TextData data = (TextData) rect.getUserData();
             //data.markUsed();
@@ -763,7 +763,7 @@ public class JhvTextRenderer {
                 upload();
             }
 
-            JhvTextureRenderer renderer = getBackingStore();
+            TextureRenderer renderer = getBackingStore();
             Rect rect = glyphRectForTextureMapping;
             TextData data = (TextData) rect.getUserData();
 

@@ -33,7 +33,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 import org.json.JSONObject;
 
@@ -190,7 +190,7 @@ public final class GridLayer extends AbstractLayer {
         float fuzz = 0.75f;
         GL.glDisable(GL.CULL_FACE);
         for (float rsize : labelPos) {
-            JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
+            TextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             renderer.setColor(Colors.MiddleGrayFloat);
             float textScaleFactor = textScale / renderer.getFontSize();
 
@@ -202,7 +202,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     private void drawGridText(int size, float z) {
-        JhvTextRenderer renderer = GLText.getRenderer(size);
+        TextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFontSize();
