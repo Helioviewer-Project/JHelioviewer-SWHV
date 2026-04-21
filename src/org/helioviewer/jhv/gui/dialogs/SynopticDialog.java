@@ -253,7 +253,7 @@ public class SynopticDialog extends StandardDialog {
         updateButtonState();
     }
 
-    private void onSearchFailure(Throwable t) {
+    private void onSearchFailure(Throwable ignored) {
         searching = false;
         foundLabel.setText("0 found");
         updateButtonState();
