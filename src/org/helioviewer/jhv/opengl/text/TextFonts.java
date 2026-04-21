@@ -48,7 +48,7 @@ public final class TextFonts {
 
     public static float measureWidth(String resourcePath, float pixelHeight, String str) {
         STBTTFontinfo fontInfo = fontInfo(resourcePath);
-        float scale = STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, pixelHeight);
+        float scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, pixelHeight);
         float width = 0;
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
