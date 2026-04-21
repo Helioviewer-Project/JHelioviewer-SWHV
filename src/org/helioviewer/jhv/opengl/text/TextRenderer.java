@@ -218,11 +218,15 @@ public class TextRenderer {
      */
     public void draw3D(String str, float x, float y, float z, float scaleFactor) {
         int len = str.length();
+        Glyph previousGlyph = null;
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
+                if (previousGlyph != null)
+                    x += textBackend.getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
                 float advance = glyph.draw3D(x, y, z, scaleFactor);
                 x += advance * scaleFactor;
+                previousGlyph = glyph;
             }
         }
     }
@@ -241,11 +245,15 @@ public class TextRenderer {
     public void draw3D(String str, Vector3f origin, Vector3f basisX, Vector3f basisY, float scaleFactor) {
         float x = 0;
         int len = str.length();
+        Glyph previousGlyph = null;
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
+                if (previousGlyph != null)
+                    x += textBackend.getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
                 float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
                 x += advance * scaleFactor;
+                previousGlyph = glyph;
             }
         }
     }
@@ -617,6 +625,10 @@ public class TextRenderer {
                     }
                 }
             }
+        }
+
+        private float getKerning(int leftGlyphCode, int rightGlyphCode) {
+            return STBTruetype.stbtt_GetGlyphKernAdvance(fontInfo, leftGlyphCode, rightGlyphCode) * scale;
         }
 
         private void dispose() {
