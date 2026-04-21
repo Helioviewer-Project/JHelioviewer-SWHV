@@ -54,13 +54,17 @@ public final class TextFonts {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer advanceWidth = stack.mallocInt(1);
             IntBuffer ignoredLeftBearing = stack.mallocInt(1);
+            int previousGlyphIndex = 0;
             int len = str.length();
             for (int i = 0; i < len; i++) {
                 int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, str.charAt(i));
                 if (glyphIndex == 0)
                     continue;
+                if (previousGlyphIndex != 0)
+                    width += STBTruetype.stbtt_GetGlyphKernAdvance(fontInfo, previousGlyphIndex, glyphIndex) * scale;
                 STBTruetype.stbtt_GetGlyphHMetrics(fontInfo, glyphIndex, advanceWidth, ignoredLeftBearing);
                 width += advanceWidth.get(0) * scale;
+                previousGlyphIndex = glyphIndex;
             }
         }
 
