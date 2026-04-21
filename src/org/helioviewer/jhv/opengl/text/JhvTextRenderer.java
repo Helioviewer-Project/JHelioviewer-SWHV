@@ -40,14 +40,9 @@
 package org.helioviewer.jhv.opengl.text;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 //import java.util.ArrayList;
@@ -56,7 +51,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Transform;
-import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.GL;
@@ -145,10 +139,8 @@ public class JhvTextRenderer {
 
     private RectanglePacker packer;
     private boolean haveMaxSize;
-    private final RenderDelegate renderDelegate;
     private final TextBackend textBackend;
     private JhvTextureRenderer cachedBackingStore;
-    private FontRenderContext cachedFontRenderContext;
     private final GlyphProducer glyphProducer;
 
     //private int numRenderCycles;
@@ -174,11 +166,7 @@ public class JhvTextRenderer {
      * @param useFractionalMetrics whether to use fractional font
      *                             metrics at the Java 2D level
      */
-    public JhvTextRenderer(Font font, boolean antialiased, boolean useFractionalMetrics) {
-        this(font, null, antialiased, useFractionalMetrics);
-    }
-
-    public JhvTextRenderer(Font font, @Nullable ByteBuffer fontData, boolean antialiased, boolean useFractionalMetrics) {
+    public JhvTextRenderer(Font font, ByteBuffer fontData, boolean antialiased, boolean useFractionalMetrics) {
         this.font = font;
         this.antialiased = antialiased;
         this.useFractionalMetrics = useFractionalMetrics;
@@ -186,8 +174,7 @@ public class JhvTextRenderer {
         // FIXME: consider adjusting the size based on font size
         // (it will already automatically resize if necessary)
         packer = new RectanglePacker(new Manager(), kSize, kSize);
-        renderDelegate = new DefaultRenderDelegate();
-        textBackend = fontData == null ? new Java2DTextBackend() : new StbTextBackend(fontData, font.getSize2D());
+        textBackend = new StbTextBackend(fontData, font.getSize2D());
         glyphProducer = new GlyphProducer(font.getNumGlyphs());
     }
 
@@ -326,7 +313,6 @@ public class JhvTextRenderer {
         packer.dispose();
         packer = null;
         cachedBackingStore = null;
-        cachedFontRenderContext = null;
         textBackend.dispose();
         glslTexture.dispose();
     }
@@ -366,17 +352,9 @@ public class JhvTextRenderer {
     private JhvTextureRenderer getBackingStore() {
         JhvTextureRenderer renderer = (JhvTextureRenderer) packer.getBackingStore();
         if (renderer != cachedBackingStore) {
-            cachedFontRenderContext = null;
             cachedBackingStore = renderer;
         }
         return cachedBackingStore;
-    }
-
-    private FontRenderContext getFontRenderContext() {
-        if (cachedFontRenderContext == null) {
-            cachedFontRenderContext = new FontRenderContext(null, antialiased, useFractionalMetrics);
-        }
-        return cachedFontRenderContext;
     }
 
     private void beginRendering(boolean ortho, int width, int height) {
@@ -454,43 +432,6 @@ public class JhvTextRenderer {
         }
     }
 */
-
-    /**
-     * Class supporting more full control over the process of rendering
-     * the bitmapped text. Allows customization of whether the backing
-     * store text bitmap is full-color or intensity only, the size of
-     * each individual rendered text rectangle, and the contents of
-     * each individual rendered text string. The default implementation
-     * of this interface uses an intensity-only texture, a
-     * closely-cropped rectangle around the text, and renders text
-     * using the color white, which is modulated by the set color
-     * during the rendering process.
-     */
-    interface RenderDelegate {
-
-        /**
-         * Computes the bounds of the given GlyphVector, already
-         * assumed to have been created for a particular Font,
-         * relative to the origin.
-         */
-        Rectangle2D getBounds(GlyphVector gv);
-
-        /**
-         * Render the passed GlyphVector at the designated location using
-         * the supplied Graphics2D instance. The surrounding region will
-         * already have been cleared to the RGB color (0, 0, 0) with zero
-         * alpha. The initial drawing context of the passed Graphics2D
-         * will be set to use AlphaComposite.Src, the color white, the
-         * Font specified in the TextRenderer's constructor, and the
-         * rendering hints specified in the TextRenderer constructor.
-         * Changes made by the end user may be visible in successive
-         * calls to this method, but are not guaranteed to be preserved.
-         * Implementors of this method should reset the Graphics2D's
-         * state to that desired each time this method is called, in
-         * particular those states which are not the defaults.
-         */
-        void drawGlyphVector(Graphics2D graphics, GlyphVector str, int x, int y);
-    }
 
     /**
      * Separates glyph measurement/rasterization from atlas management so we can
@@ -662,86 +603,6 @@ public class JhvTextRenderer {
             if (inBeginEndPair) {
                 internal_beginRendering(isOrthoMode, beginRenderingWidth, beginRenderingHeight);
             }
-        }
-    }
-
-    private static class DefaultRenderDelegate implements RenderDelegate {
-
-        @Override
-        public Rectangle2D getBounds(GlyphVector gv) {
-            return gv.getVisualBounds();
-        }
-
-        @Override
-        public void drawGlyphVector(Graphics2D graphics, GlyphVector str, int x, int y) {
-            graphics.drawGlyphVector(str, x, y);
-        }
-
-    }
-
-    private class Java2DTextBackend implements TextBackend {
-        @Override
-        public @Nullable Glyph createGlyph(char unicodeID) {
-            GlyphVector gv = font.createGlyphVector(getFontRenderContext(), new char[] {unicodeID});
-            int gc = gv.getGlyphCode(0);
-            if (gc >= glyphProducer.glyphCache.length) {
-                return null;
-            }
-            return new Glyph(unicodeID, gc, gv.getGlyphMetrics(0).getAdvance(), gv);
-        }
-
-        @Override
-        public void uploadGlyph(Glyph glyph) {
-            GlyphVector gv = (GlyphVector) glyph.backendData;
-            Rectangle2D origBBox = preNormalize(renderDelegate.getBounds(gv));
-            Rectangle2D bbox = normalize(origBBox);
-            Point origin = new Point((int) -bbox.getMinX(), (int) -bbox.getMinY());
-            Rect rect = new Rect(0, 0, (int) bbox.getWidth(), (int) bbox.getHeight(), new TextData(origin, origBBox, glyph.unicodeID));
-            packer.add(rect);
-            glyph.glyphRectForTextureMapping = rect;
-
-            BufferedImage image = NativeImageFactory.createRGBAPremultipliedImage(rect.w(), rect.h());
-            try {
-                Graphics2D g = image.createGraphics();
-                try {
-                    g.setComposite(AlphaComposite.Src);
-                    g.setColor(Color.WHITE);
-                    g.setFont(font);
-
-                    int strx = origin.x;
-                    int stry = origin.y;
-
-                    g.setComposite(AlphaComposite.Clear);
-                    g.fillRect(0, 0, rect.w(), rect.h());
-                    g.setComposite(AlphaComposite.Src);
-
-                    renderDelegate.drawGlyphVector(g, gv, strx, stry);
-
-                    if (DRAW_BBOXES) {
-                        TextData data = (TextData) rect.getUserData();
-                        g.drawRect(strx - data.origOriginX(),
-                                stry - data.origOriginY(),
-                                data.origRectWidth(),
-                                data.origRectHeight());
-                        g.drawRect(strx - data.origin().x,
-                                stry - data.origin().y,
-                                rect.w(),
-                                rect.h());
-                    }
-                } finally {
-                    g.dispose();
-                }
-
-                JhvTextureRenderer renderer = getBackingStore();
-                renderer.drawRgba(rect.x(), rect.y(), rect.w(), rect.h(), NativeImageFactory.getByteBuffer(image), rect.w() * 4);
-                renderer.markDirty(rect.x(), rect.y(), rect.w(), rect.h());
-            } finally {
-                NativeImageFactory.free(image);
-            }
-        }
-
-        @Override
-        public void dispose() {
         }
     }
 
