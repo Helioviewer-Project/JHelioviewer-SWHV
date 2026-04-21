@@ -50,7 +50,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.text.StringCharacterIterator;
 //import java.util.ArrayList;
 
 import javax.annotation.Nullable;
@@ -147,7 +146,6 @@ public class JhvTextRenderer {
     private RectanglePacker packer;
     private boolean haveMaxSize;
     private final RenderDelegate renderDelegate;
-    private final TextBackend boundsBackend;
     private final TextBackend textBackend;
     private JhvTextureRenderer cachedBackingStore;
     private FontRenderContext cachedFontRenderContext;
@@ -189,31 +187,8 @@ public class JhvTextRenderer {
         // (it will already automatically resize if necessary)
         packer = new RectanglePacker(new Manager(), kSize, kSize);
         renderDelegate = new DefaultRenderDelegate();
-        boundsBackend = new Java2DTextBackend();
-        textBackend = fontData == null ? boundsBackend : new StbTextBackend(fontData, font.getSize2D());
+        textBackend = fontData == null ? new Java2DTextBackend() : new StbTextBackend(fontData, font.getSize2D());
         glyphProducer = new GlyphProducer(font.getNumGlyphs());
-    }
-
-    /**
-     * Returns the bounding rectangle of the given String,
-     * assuming it was rendered at the origin. The coordinate system of
-     * the returned rectangle is Java 2D's, with increasing Y
-     * coordinates in the downward direction. The relative coordinate
-     * (0, 0) in the returned rectangle corresponds to the baseline of
-     * the leftmost character of the rendered string, in similar
-     * fashion to the results returned by, for example, {@link
-     * java.awt.font.GlyphVector#getVisualBounds}. Most applications
-     * will use only the width and height of the returned Rectangle for
-     * the purposes of centering or justifying the String. It is not
-     * specified which Java 2D bounds ({@link
-     * java.awt.font.GlyphVector#getVisualBounds getVisualBounds},
-     * {@link java.awt.font.GlyphVector#getPixelBounds getPixelBounds},
-     * etc.) the returned bounds correspond to, although every effort
-     * is made to ensure an accurate bound.
-     */
-    public Rectangle2D getBounds(String str) {
-        // Must return a Rectangle compatible with the layout algorithm - must be idempotent
-        return normalize(boundsBackend.getBounds(str));
     }
 
     // Returns the Font this renderer is using
@@ -352,9 +327,7 @@ public class JhvTextRenderer {
         packer = null;
         cachedBackingStore = null;
         cachedFontRenderContext = null;
-        boundsBackend.dispose();
-        if (textBackend != boundsBackend)
-            textBackend.dispose();
+        textBackend.dispose();
         glslTexture.dispose();
     }
 
@@ -525,8 +498,6 @@ public class JhvTextRenderer {
      * texture-cache logic.
      */
     private interface TextBackend {
-        Rectangle2D getBounds(String str);
-
         @Nullable
         Glyph createGlyph(char unicodeID);
 
@@ -710,11 +681,6 @@ public class JhvTextRenderer {
 
     private class Java2DTextBackend implements TextBackend {
         @Override
-        public Rectangle2D getBounds(String str) {
-            return renderDelegate.getBounds(font.createGlyphVector(getFontRenderContext(), new StringCharacterIterator(str)));
-        }
-
-        @Override
         public @Nullable Glyph createGlyph(char unicodeID) {
             GlyphVector gv = font.createGlyphVector(getFontRenderContext(), new char[] {unicodeID});
             int gc = gv.getGlyphCode(0);
@@ -792,11 +758,6 @@ public class JhvTextRenderer {
                 throw new IllegalArgumentException("Failed to initialize STB font");
             }
             scale = STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, pixelHeight);
-        }
-
-        @Override
-        public Rectangle2D getBounds(String str) {
-            throw new UnsupportedOperationException("STB text bounds are not implemented yet");
         }
 
         @Override
