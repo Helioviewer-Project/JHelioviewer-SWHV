@@ -65,7 +65,8 @@ import org.lwjgl.system.MemoryUtil;
 // Originally based on JOGL TextRenderer. This version now mixes the original
 // packing and rendering structure with STB glyph rasterization.
 public final class TextRenderer {
-    private static final int kSize = 256;
+    // Start a bit larger to reduce early atlas growth, repacking, and glyph re-upload churn.
+    private static final int kSize = 512;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
