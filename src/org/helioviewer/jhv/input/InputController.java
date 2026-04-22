@@ -28,7 +28,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
                 (int) (e.getY() * Display.pixelScale[1] + .5),
                 e.getButton(),
                 e.getClickCount(),
-                e.getModifiersEx());
+                e.isShiftDown());
     }
 
     private static ScrollEvent synthesizeScroll(MouseWheelEvent e) {
@@ -36,7 +36,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     }
 
     private static KeyInputEvent synthesizeKey(KeyEvent e) {
-        return new KeyInputEvent(e.getKeyCode(), e.getModifiersEx());
+        return new KeyInputEvent(e.getKeyCode(), e.isShiftDown());
     }
 
     private static MouseEvent synthesizeMouse(MouseEvent e) {

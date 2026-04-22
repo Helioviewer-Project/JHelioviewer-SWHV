@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
@@ -135,10 +134,10 @@ class InteractionAnnotate implements Interaction.Type {
     @Override
     public void keyPressed(KeyInputEvent e) {
         int code = e.keyCode();
-        if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
+        if (code == KeyInputEvent.BACK_SPACE || code == KeyInputEvent.DELETE) {
             remove();
             MovieDisplay.display();
-        } else if (code == KeyEvent.VK_N && activeIndex >= 0 && !anns.isEmpty()) {
+        } else if (code == KeyInputEvent.N && activeIndex >= 0 && !anns.isEmpty()) {
             activeIndex++;
             activeIndex %= anns.size();
             MovieDisplay.display();
