@@ -8,7 +8,7 @@ import org.helioviewer.jhv.opengl.text.packrect.Rect;
 
 import org.lwjgl.system.MemoryUtil;
 
-class TextureRenderer {
+final class TextureRenderer {
     private ByteBuffer imageBuffer;
     private ByteBuffer copyScratch;
 
@@ -79,12 +79,14 @@ class TextureRenderer {
     void copyArea(int srcX, int srcY, int width, int height, int dstX, int dstY) {
         long base = MemoryUtil.memAddress(imageBuffer);
         int rowStride = imageWidth * 4;
+        int srcXBytes = srcX * 4;
+        int dstXBytes = dstX * 4;
         long rowBytes = (long) width * 4;
         ensureCopyScratch((int) rowBytes);
+        long scratchAddress = MemoryUtil.memAddress(copyScratch);
         for (int row = 0; row < height; row++) {
-            long srcOffset = (long) (srcY + row) * rowStride + (long) srcX * 4;
-            long dstOffset = (long) (dstY + row) * rowStride + (long) dstX * 4;
-            long scratchAddress = MemoryUtil.memAddress(copyScratch);
+            long srcOffset = (long) (srcY + row) * rowStride + srcXBytes;
+            long dstOffset = (long) (dstY + row) * rowStride + dstXBytes;
             MemoryUtil.memCopy(base + srcOffset, scratchAddress, rowBytes);
             MemoryUtil.memCopy(scratchAddress, base + dstOffset, rowBytes);
         }
@@ -95,10 +97,12 @@ class TextureRenderer {
         long dstBase = MemoryUtil.memAddress(imageBuffer);
         int srcRowStride = other.imageWidth * 4;
         int dstRowStride = imageWidth * 4;
+        int srcXBytes = srcX * 4;
+        int dstXBytes = dstX * 4;
         long rowBytes = (long) width * 4;
         for (int row = 0; row < height; row++) {
-            long srcOffset = (long) (srcY + row) * srcRowStride + (long) srcX * 4;
-            long dstOffset = (long) (dstY + row) * dstRowStride + (long) dstX * 4;
+            long srcOffset = (long) (srcY + row) * srcRowStride + srcXBytes;
+            long dstOffset = (long) (dstY + row) * dstRowStride + dstXBytes;
             MemoryUtil.memCopy(srcBase + srcOffset, dstBase + dstOffset, rowBytes);
         }
     }

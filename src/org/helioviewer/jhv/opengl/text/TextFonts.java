@@ -19,24 +19,23 @@ public final class TextFonts {
     private static final Map<String, ByteBuffer> fontDataByPath = new HashMap<>();
     private static final Map<String, STBTTFontinfo> fontInfoByPath = new HashMap<>();
 
-    private TextFonts() {
-    }
+    private TextFonts() {}
 
     public static ByteBuffer loadCanvasFontData() {
-        return loadFontData(CANVAS_FONT_RESOURCE);
+        return fontData(CANVAS_FONT_RESOURCE).duplicate();
     }
 
-    public static ByteBuffer loadFontData(String resourcePath) {
+    private static ByteBuffer fontData(String resourcePath) {
         ByteBuffer fontData = fontDataByPath.get(resourcePath);
         if (fontData != null)
-            return fontData.duplicate();
+            return fontData;
 
         try (InputStream is = FileUtils.getResource(resourcePath)) {
             byte[] bytes = is.readAllBytes();
             ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
             buffer.put(bytes).flip();
             fontDataByPath.put(resourcePath, buffer);
-            return buffer.duplicate();
+            return buffer;
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load font " + resourcePath, e);
         }
@@ -46,7 +45,7 @@ public final class TextFonts {
         return measureWidth(CANVAS_FONT_RESOURCE, pixelHeight, str);
     }
 
-    public static float measureWidth(String resourcePath, float pixelHeight, String str) {
+    private static float measureWidth(String resourcePath, float pixelHeight, String str) {
         STBTTFontinfo fontInfo = fontInfo(resourcePath);
         float scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, pixelHeight);
         float width = 0;
@@ -87,7 +86,7 @@ public final class TextFonts {
             return fontInfo;
 
         fontInfo = STBTTFontinfo.create();
-        if (!STBTruetype.stbtt_InitFont(fontInfo, loadFontData(resourcePath))) {
+        if (!STBTruetype.stbtt_InitFont(fontInfo, fontData(resourcePath))) {
             fontInfo.free();
             throw new IllegalStateException("Failed to initialize font " + resourcePath);
         }
