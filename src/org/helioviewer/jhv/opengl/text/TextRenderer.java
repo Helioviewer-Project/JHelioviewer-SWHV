@@ -41,6 +41,7 @@ package org.helioviewer.jhv.opengl.text;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
@@ -61,18 +62,9 @@ import org.lwjgl.stb.STBTruetype;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-/**
- * Renders text through a glyph atlas backed by STB-truetype rasterization.
- * Glyphs are created lazily, cached in a packed atlas texture, and emitted as
- * textured quads. The public API supports orthographic text via
- * {@link #beginRendering(int, int)} / {@link #endRendering()} and 3D text via
- * {@link #begin3DRendering()} / {@link #end3DRendering()}.
- * <p>
- * The renderer mutates OpenGL texture state and quad buffers while active.
- * Call {@link #flush()} before changing model/view/projection state between
- * text draws in the same render cycle.
- */
-public class TextRenderer {
+// Originally based on JOGL TextRenderer. This version now mixes the original
+// packing and rendering structure with STB glyph rasterization.
+public final class TextRenderer {
     private static final int kSize = 256;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
@@ -80,7 +72,8 @@ public class TextRenderer {
     private final float fontSize;
     private RectanglePacker packer;
     private boolean haveMaxSize;
-    private final StbTextBackend textBackend;
+    private final STBTTFontinfo fontInfo;
+    private final float scale;
     private final GlyphProducer glyphProducer;
 
     // Need to keep track of whether we're in a beginRendering() /
@@ -91,16 +84,15 @@ public class TextRenderer {
     private int beginRenderingWidth;
     private int beginRenderingHeight;
 
-    /**
-     * Creates a new TextRenderer using the supplied font bytes and pixel size.
-     *
-     * @param size     the pixel size of the font
-     * @param fontData the font data to rasterize glyphs from
-     */
     public TextRenderer(float size, ByteBuffer fontData) {
         fontSize = size;
         packer = new RectanglePacker(new Manager(), kSize, kSize);
-        textBackend = new StbTextBackend(fontData, fontSize);
+        fontInfo = STBTTFontinfo.create();
+        if (!STBTruetype.stbtt_InitFont(fontInfo, fontData)) {
+            fontInfo.free();
+            throw new IllegalArgumentException("Failed to initialize STB font");
+        }
+        scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, fontSize);
         glyphProducer = new GlyphProducer();
     }
 
@@ -108,34 +100,19 @@ public class TextRenderer {
         return fontSize;
     }
 
-    /**
-     * Begins an orthographic text pass for a viewport of the given size.
-     *
-     * @param width  viewport width in pixels
-     * @param height viewport height in pixels
-     */
     public void beginRendering(int width, int height) {
         beginRendering(true, width, height);
     }
 
-    /**
-     * Begins a 3D text pass using the current view/projection state.
-     */
     public void begin3DRendering() {
         beginRendering(false, 0, 0);
     }
 
-    /**
-     * Sets the current text color. Components are expected in the 0..1 range.
-     */
     public void setColor(float[] color) {
         flush();
         textColor = color;
     }
 
-    /**
-     * Draws the supplied string at the given 3D location.
-     */
     public void draw(String str, float x, float y, float z, float scaleFactor) {
         int len = str.length();
         Glyph previousGlyph = null;
@@ -143,7 +120,7 @@ public class TextRenderer {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
                 if (previousGlyph != null)
-                    x += textBackend.getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+                    x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
                 float advance = glyph.draw3D(x, y, z, scaleFactor);
                 x += advance * scaleFactor;
                 previousGlyph = glyph;
@@ -170,7 +147,7 @@ public class TextRenderer {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
                 if (previousGlyph != null)
-                    x += textBackend.getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+                    x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
                 float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
                 x += advance * scaleFactor;
                 previousGlyph = glyph;
@@ -178,34 +155,22 @@ public class TextRenderer {
         }
     }
 
-    /**
-     * Flushes queued glyph quads to the current GL target.
-     */
     public void flush() {
         drawVertices();
     }
 
-    /**
-     * Ends an orthographic text pass started with {@link #beginRendering(int, int)}.
-     */
     public void endRendering() {
         endRendering(true);
     }
 
-    /**
-     * Ends a 3D text pass started with {@link #begin3DRendering()}.
-     */
     public void end3DRendering() {
         endRendering(false);
     }
 
-    /**
-     * Releases atlas and font resources held by this renderer.
-     */
     public void dispose() {
         packer.dispose();
         packer = null;
-        textBackend.dispose();
+        fontInfo.free();
         glslTexture.dispose();
     }
 
@@ -213,15 +178,7 @@ public class TextRenderer {
     // Internals only below this point
     //
 
-    private record Bounds(double minX, double minY, double width, double height) {
-        double maxX() {
-            return minX + width;
-        }
-
-        double maxY() {
-            return minY + height;
-        }
-    }
+    private record Bounds(double minX, double minY, double width, double height) {}
 
     private Bounds normalize(Bounds src) {
         // Give ourselves a boundary around each entity on the backing
@@ -237,10 +194,6 @@ public class TextRenderer {
                 (int) Math.floor(src.minY - boundary),
                 (int) Math.ceil(src.width + 2 * boundary),
                 (int) Math.ceil(src.height) + 2 * boundary);
-    }
-
-    private TextureRenderer getBackingStore() {
-        return (TextureRenderer) packer.getBackingStore();
     }
 
     private void beginRendering(boolean ortho, int width, int height) {
@@ -306,15 +259,6 @@ public class TextRenderer {
                     (int) -origRect.minY);
         }
 
-        // The following three methods are used to locate the glyph
-        // within the expanded rectangle coming from normalize()
-        int origOriginX() {
-            return origRectMinX;
-        }
-
-        int origOriginY() {
-            return origRectMinY;
-        }
     }
 
     private final class Manager implements BackingStoreManager {
@@ -404,79 +348,61 @@ public class TextRenderer {
         }
     }
 
-    private final class StbTextBackend {
-        private final STBTTFontinfo fontInfo;
-        private final float scale;
-
-        StbTextBackend(ByteBuffer sourceFontData, float pixelHeight) {
-            fontInfo = STBTTFontinfo.create();
-            if (!STBTruetype.stbtt_InitFont(fontInfo, sourceFontData)) {
-                fontInfo.free();
-                throw new IllegalArgumentException("Failed to initialize STB font");
-            }
-            scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, pixelHeight);
+    private @Nullable Glyph createGlyph(char unicodeID) {
+        int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, unicodeID);
+        if (glyphIndex == 0) {
+            return null;
         }
 
-        private @Nullable Glyph createGlyph(char unicodeID) {
-            int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, unicodeID);
-            if (glyphIndex == 0) {
-                return null;
-            }
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer advanceWidth = stack.mallocInt(1);
+            IntBuffer ignoredLeftBearing = stack.mallocInt(1);
+            IntBuffer x0 = stack.mallocInt(1);
+            IntBuffer y0 = stack.mallocInt(1);
+            IntBuffer x1 = stack.mallocInt(1);
+            IntBuffer y1 = stack.mallocInt(1);
 
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                IntBuffer advanceWidth = stack.mallocInt(1);
-                IntBuffer ignoredLeftBearing = stack.mallocInt(1);
-                IntBuffer x0 = stack.mallocInt(1);
-                IntBuffer y0 = stack.mallocInt(1);
-                IntBuffer x1 = stack.mallocInt(1);
-                IntBuffer y1 = stack.mallocInt(1);
+            STBTruetype.stbtt_GetGlyphHMetrics(fontInfo, glyphIndex, advanceWidth, ignoredLeftBearing);
+            STBTruetype.stbtt_GetGlyphBitmapBox(fontInfo, glyphIndex, scale, scale, x0, y0, x1, y1);
 
-                STBTruetype.stbtt_GetGlyphHMetrics(fontInfo, glyphIndex, advanceWidth, ignoredLeftBearing);
-                STBTruetype.stbtt_GetGlyphBitmapBox(fontInfo, glyphIndex, scale, scale, x0, y0, x1, y1);
-
-                StbGlyphData glyphData = new StbGlyphData(glyphIndex, x0.get(0), y0.get(0), x1.get(0), y1.get(0));
-                return new Glyph(unicodeID, glyphIndex, advanceWidth.get(0) * scale, glyphData);
-            }
+            StbGlyphData glyphData = new StbGlyphData(glyphIndex, x0.get(0), y0.get(0), x1.get(0), y1.get(0));
+            return new Glyph(unicodeID, glyphIndex, advanceWidth.get(0) * scale, glyphData);
         }
+    }
 
-        private void uploadGlyph(Glyph glyph) {
-            StbGlyphData glyphData = (StbGlyphData) glyph.backendData;
-            Bounds origBBox = new Bounds(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
-            Bounds bbox = normalize(origBBox);
-            int originX = (int) -bbox.minX;
-            int originY = (int) -bbox.minY;
-            Rect rect = new Rect(0, 0, (int) bbox.width, (int) bbox.height, new TextData(originX, originY, origBBox));
-            packer.add(rect);
-            glyph.glyphRectForTextureMapping = rect;
+    private void uploadGlyph(Glyph glyph) {
+        StbGlyphData glyphData = glyph.backendData;
+        Bounds origBBox = new Bounds(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
+        Bounds bbox = normalize(origBBox);
+        int originX = (int) -bbox.minX;
+        int originY = (int) -bbox.minY;
+        Rect rect = new Rect(0, 0, (int) bbox.width, (int) bbox.height, new TextData(originX, originY, origBBox));
+        packer.add(rect);
+        glyph.glyphRectForTextureMapping = rect;
 
-            TextureRenderer renderer = getBackingStore();
-            TextData data = (TextData) rect.getUserData();
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                IntBuffer ignoredWidth = stack.mallocInt(1);
-                IntBuffer ignoredHeight = stack.mallocInt(1);
-                IntBuffer ignoredXOffset = stack.mallocInt(1);
-                IntBuffer ignoredYOffset = stack.mallocInt(1);
-                ByteBuffer bitmap = STBTruetype.stbtt_GetGlyphBitmap(fontInfo, scale, scale, glyphData.glyphIndex(),
-                        ignoredWidth, ignoredHeight, ignoredXOffset, ignoredYOffset);
-                if (bitmap != null) {
-                    try {
-                        int bitmapX = rect.x() + (data.originX() - data.origOriginX());
-                        int bitmapY = rect.y() + (data.originY() - data.origOriginY());
-                        renderer.drawGlyphMask(rect, bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
-                    } finally {
-                        STBTruetype.stbtt_FreeBitmap(bitmap);
-                    }
+        TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
+        TextData data = (TextData) rect.getUserData();
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer ignoredWidth = stack.mallocInt(1);
+            IntBuffer ignoredHeight = stack.mallocInt(1);
+            IntBuffer ignoredXOffset = stack.mallocInt(1);
+            IntBuffer ignoredYOffset = stack.mallocInt(1);
+            ByteBuffer bitmap = STBTruetype.stbtt_GetGlyphBitmap(fontInfo, scale, scale, glyphData.glyphIndex(),
+                    ignoredWidth, ignoredHeight, ignoredXOffset, ignoredYOffset);
+            if (bitmap != null) {
+                try {
+                    int bitmapX = rect.x() + (data.originX() - data.origRectMinX());
+                    int bitmapY = rect.y() + (data.originY() - data.origRectMinY());
+                    renderer.drawGlyphMask(rect, bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
+                } finally {
+                    STBTruetype.stbtt_FreeBitmap(bitmap);
                 }
             }
         }
+    }
 
-        private float getKerning(int leftGlyphCode, int rightGlyphCode) {
-            return STBTruetype.stbtt_GetGlyphKernAdvance(fontInfo, leftGlyphCode, rightGlyphCode) * scale;
-        }
-
-        private void dispose() {
-            fontInfo.free();
-        }
+    private float getKerning(int leftGlyphCode, int rightGlyphCode) {
+        return STBTruetype.stbtt_GetGlyphKernAdvance(fontInfo, leftGlyphCode, rightGlyphCode) * scale;
     }
 
     private record StbGlyphData(int glyphIndex, int x0, int y0, int x1, int y1) {
@@ -546,13 +472,13 @@ public class TextRenderer {
         // The advance of this glyph.
         private final float advance;
         // Backend-specific glyph data used for rasterization.
-        private final Object backendData;
+        private final StbGlyphData backendData;
         // The rectangle of this glyph on the backing store, or null
         // if it has been cleared due to space pressure
         private Rect glyphRectForTextureMapping;
 
         // Creates a Glyph representing an individual Unicode character
-        Glyph(int unicodeIDValue, int glyphCodeValue, float advanceValue, Object glyphBackendData) {
+        Glyph(int unicodeIDValue, int glyphCodeValue, float advanceValue, StbGlyphData glyphBackendData) {
             unicodeID = unicodeIDValue;
             glyphCode = glyphCodeValue;
             advance = advanceValue;
@@ -576,18 +502,18 @@ public class TextRenderer {
                 upload();
             }
 
-            TextureRenderer renderer = getBackingStore();
+            TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
             Rect rect = glyphRectForTextureMapping;
             TextData data = (TextData) rect.getUserData();
             //data.markUsed();
 
             int width = data.origRectWidth();
             int height = data.origRectHeight();
-            float x = inX - (scaleFactor * data.origOriginX());
-            float y = inY - (scaleFactor * (height - data.origOriginY()));
+            float x = inX - (scaleFactor * data.origRectMinX());
+            float y = inY - (scaleFactor * (height - data.origRectMinY()));
 
-            int texturex = rect.x() + (data.originX() - data.origOriginX());
-            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origOriginY());
+            int texturex = rect.x() + (data.originX() - data.origRectMinX());
+            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origRectMinY());
 
             float tx1 = texturex / (float) renderer.getWidth();
             float ty1 = 1f - texturey / (float) renderer.getHeight();
@@ -614,17 +540,17 @@ public class TextRenderer {
                 upload();
             }
 
-            TextureRenderer renderer = getBackingStore();
+            TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
             Rect rect = glyphRectForTextureMapping;
             TextData data = (TextData) rect.getUserData();
 
             int width = data.origRectWidth();
             int height = data.origRectHeight();
-            float x = inX - (scaleFactor * data.origOriginX());
-            float y = inY - (scaleFactor * (height - data.origOriginY()));
+            float x = inX - (scaleFactor * data.origRectMinX());
+            float y = inY - (scaleFactor * (height - data.origRectMinY()));
 
-            int texturex = rect.x() + (data.originX() - data.origOriginX());
-            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origOriginY());
+            int texturex = rect.x() + (data.originX() - data.origRectMinX());
+            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origRectMinY());
 
             float tx1 = texturex / (float) renderer.getWidth();
             float ty1 = 1f - texturey / (float) renderer.getHeight();
@@ -660,7 +586,7 @@ public class TextRenderer {
         }
 
         private void upload() {
-            textBackend.uploadGlyph(this);
+            uploadGlyph(this);
         }
 
     }
@@ -678,22 +604,13 @@ public class TextRenderer {
             clearAllCacheEntries();
         }
 
-        void clearCacheEntry(int unicodeID) {
-            int glyphID = unicodes2Glyphs[unicodeID];
-            if (glyphID != undefined) {
-                Glyph glyph = glyphCache[glyphID];
-                if (glyph != null) {
-                    glyph.clear();
-                }
-                glyphCache[glyphID] = null;
-            }
-            unicodes2Glyphs[unicodeID] = undefined;
-        }
-
         void clearAllCacheEntries() {
-            for (int i = 0; i < unicodes2Glyphs.length; i++) {
-                clearCacheEntry(i);
+            for (Glyph glyph : glyphCache) {
+                if (glyph != null)
+                    glyph.clear();
             }
+            Arrays.fill(glyphCache, null);
+            Arrays.fill(unicodes2Glyphs, undefined);
         }
 
         private void register(Glyph glyph) {
@@ -715,7 +632,7 @@ public class TextRenderer {
             }
 
             // Must fabricate the glyph
-            Glyph glyph = textBackend.createGlyph(unicodeID);
+            Glyph glyph = createGlyph(unicodeID);
             if (glyph == null) {
                 return null;
             }
@@ -732,7 +649,7 @@ public class TextRenderer {
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
-            getBackingStore().bind();
+            ((TextureRenderer) packer.getBackingStore()).bind();
 
             glslTexture.init();
             glslTexture.setCoord(coordBuf);
