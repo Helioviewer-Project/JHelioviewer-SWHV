@@ -75,19 +75,18 @@ public class TimestampLayer extends AbstractLayer {
             }
         }
 
-        int size = (int) (vp.height * (scale * 0.01 * 0.012));
-        if (Display.pixelScale[1] == 1) //! nasty
-            size *= 2;
+        int size = (int) (vp.height * (scale * 0.01 * 0.024));
 
         int deltaX = (int) (vp.height * 0.01);
         int deltaY = top ? (int) (vp.height - Display.pixelScale[1] * deltaX - size) : deltaX; //!
 
         TextRenderer renderer = GLText.getRenderer(size);
+        float textScaleFactor = size / renderer.getFontSize();
         renderer.beginRendering(vp.width, vp.height);
         renderer.setColor(GLText.shadowColor);
-        renderer.draw(text, deltaX + GLText.shadowOffset[0], deltaY + GLText.shadowOffset[1]);
+        renderer.draw(text, deltaX + GLText.shadowOffset[0], deltaY + GLText.shadowOffset[1], 0, textScaleFactor);
         renderer.setColor(Colors.LightGrayFloat);
-        renderer.draw(text, deltaX, deltaY);
+        renderer.draw(text, deltaX, deltaY, 0, textScaleFactor);
         renderer.endRendering();
     }
 

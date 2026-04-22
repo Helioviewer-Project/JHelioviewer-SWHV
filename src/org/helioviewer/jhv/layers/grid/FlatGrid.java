@@ -103,10 +103,10 @@ public class FlatGrid {
             if (xAxis.axisFlags()[i])
                 continue;
             double x = RasterLine.snapVertical(camera, vp, xAxis.positions()[i]);
-            renderer.draw3D(xAxis.labels()[i], (float) (vp.aspect * x), 0, 0, textScaleFactor);
+            renderer.draw(xAxis.labels()[i], (float) (vp.aspect * x), 0, 0, textScaleFactor);
         }
         for (int i = 0; i < yAxis.labels().length; i++) {
-            renderer.draw3D(yAxis.labels()[i], 0, (float) RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]), 0, textScaleFactor);
+            renderer.draw(yAxis.labels()[i], 0, (float) RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]), 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }
