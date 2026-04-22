@@ -1,6 +1,5 @@
 package org.helioviewer.jhv;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -9,9 +8,9 @@ import java.util.Properties;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 
 import org.apache.tika.Tika;
 
@@ -102,11 +101,7 @@ public class JHVGlobals {
             if (url == null)
                 return;
 
-            URI uri = new URI(url);
-            if ("file".equalsIgnoreCase(uri.getScheme()) && UIGlobals.canOpen)
-                Desktop.getDesktop().open(new File(uri));
-            else if (UIGlobals.canBrowse)
-                Desktop.getDesktop().browse(uri);
+            DesktopIntegration.openURI(new URI(url));
         } catch (Exception e) {
             Log.warn(e);
         }

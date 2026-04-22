@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.gui.components;
 
-import java.awt.Desktop;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -15,6 +14,7 @@ import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.LogDialog;
 import org.helioviewer.jhv.gui.dialogs.SettingsDialog;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.view.uri.FITSSettings;
 
 // Menu bar of the main window
@@ -37,7 +37,7 @@ public final class MenuBar extends JMenuBar {
 
         Actions.ExitProgram exitAction = new Actions.ExitProgram();
         if (Platform.isMacOS()) {
-            Desktop.getDesktop().setQuitHandler((e, response) -> exitAction.actionPerformed(null));
+            DesktopIntegration.setQuitHandler((e, response) -> exitAction.actionPerformed(null));
         } else {
             fileMenu.addSeparator();
             fileMenu.add(exitAction);
@@ -82,7 +82,7 @@ public final class MenuBar extends JMenuBar {
 
         Actions.ShowDialog settingsAction = new Actions.ShowDialog("Settings...", new SettingsDialog());
         if (Platform.isMacOS()) {
-            Desktop.getDesktop().setPreferencesHandler(e -> settingsAction.actionPerformed(null));
+            DesktopIntegration.setPreferencesHandler(e -> settingsAction.actionPerformed(null));
             JMenu windowMenu = new JMenu("Window");
             windowMenu.setMnemonic(KeyEvent.VK_W);
             windowMenu.add(new Actions.WindowMinimize());
@@ -100,7 +100,7 @@ public final class MenuBar extends JMenuBar {
 
         Actions.ShowDialog aboutAction = new Actions.ShowDialog("About JHelioviewer...", new AboutDialog());
         if (Platform.isMacOS()) {
-            Desktop.getDesktop().setAboutHandler(e -> aboutAction.actionPerformed(null));
+            DesktopIntegration.setAboutHandler(e -> aboutAction.actionPerformed(null));
         } else {
             helpMenu.add(aboutAction);
         }

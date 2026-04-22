@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.input;
+package org.helioviewer.jhv.swing;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;
@@ -8,6 +8,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.input.KeyInputEvent;
+import org.helioviewer.jhv.input.PointerEvent;
+import org.helioviewer.jhv.input.ScrollEvent;
 
 public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
     private final InputController inputController;
