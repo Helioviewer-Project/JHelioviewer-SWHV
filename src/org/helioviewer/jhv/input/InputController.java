@@ -14,8 +14,7 @@ import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 
-public class InputController implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
-
+public class InputController {
     private final Interaction interaction;
 
     public InputController(Interaction _interaction) {
@@ -55,7 +54,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     }
     */
 
-    @Override
     public void mouseClicked(MouseEvent e1) {
         PointerEvent e = synthesizePointer(e1);
         MouseEvent mouse = synthesizeMouse(e1);
@@ -65,7 +63,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseListeners.forEach(listener -> listener.mouseClicked(mouse));
     }
 
-    @Override
     public void mouseEntered(MouseEvent e1) {
         PointerEvent pointer = synthesizePointer(e1);
         MouseEvent e = synthesizeMouse(e1);
@@ -73,7 +70,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseListeners.forEach(listener -> listener.mouseEntered(e));
     }
 
-    @Override
     public void mouseExited(MouseEvent e1) {
         PointerEvent pointer = synthesizePointer(e1);
         MouseEvent e = synthesizeMouse(e1);
@@ -81,7 +77,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseListeners.forEach(listener -> listener.mouseExited(e));
     }
 
-    @Override
     public void mousePressed(MouseEvent e1) {
         ((Component) e1.getSource()).requestFocusInWindow();
         PointerEvent e = synthesizePointer(e1);
@@ -92,7 +87,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseListeners.forEach(listener -> listener.mousePressed(mouse));
     }
 
-    @Override
     public void mouseReleased(MouseEvent e1) {
         PointerEvent e = synthesizePointer(e1);
         MouseEvent mouse = synthesizeMouse(e1);
@@ -101,7 +95,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseListeners.forEach(listener -> listener.mouseReleased(mouse));
     }
 
-    @Override
     public void mouseDragged(MouseEvent e1) {
         PointerEvent e = synthesizePointer(e1);
         MouseEvent mouse = synthesizeMouse(e1);
@@ -111,7 +104,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseMotionListeners.forEach(listener -> listener.mouseDragged(mouse));
     }
 
-    @Override
     public void mouseMoved(MouseEvent e1) {
         PointerEvent pointer = synthesizePointer(e1);
         MouseEvent e = synthesizeMouse(e1);
@@ -120,7 +112,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseMotionListeners.forEach(listener -> listener.mouseMoved(e));
     }
 
-    @Override
     public void mouseWheelMoved(MouseWheelEvent e1) {
         // MouseWheelEvent e = synthesizeMouseWheel(e1);
         // Display.setActiveViewport(e.getX(), e.getY());
@@ -130,7 +121,6 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e1));
     }
 
-    @Override
     public void keyPressed(KeyEvent e) {
         KeyInputEvent key = synthesizeKey(e);
         interaction.keyPressed(key);
@@ -138,13 +128,11 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         keyListeners.forEach(listener -> listener.keyPressed(e));
     }
 
-    @Override
     public void keyTyped(KeyEvent e) {
         inputKeyListeners.forEach(listener -> listener.keyTyped(synthesizeKey(e)));
         keyListeners.forEach(listener -> listener.keyTyped(e));
     }
 
-    @Override
     public void keyReleased(KeyEvent e) {
         KeyInputEvent key = synthesizeKey(e);
         interaction.keyReleased(key);
