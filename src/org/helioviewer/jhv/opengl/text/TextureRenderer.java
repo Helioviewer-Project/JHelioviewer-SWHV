@@ -75,20 +75,6 @@ class TextureRenderer {
         markDirty(rect.x(), rect.y(), rect.w(), rect.h());
     }
 
-    void drawRgba(int x, int y, int width, int height, ByteBuffer rgba, int rowStride) {
-        ByteBuffer src = rgba.duplicate();
-        int dstRowStride = imageWidth * 4;
-        for (int row = 0; row < height; row++) {
-            int srcOffset = row * rowStride;
-            int dstOffset = ((y + row) * dstRowStride) + (x * 4);
-            src.position(srcOffset).limit(srcOffset + width * 4);
-            imageBuffer.position(dstOffset);
-            imageBuffer.put(src);
-            src.clear();
-        }
-        imageBuffer.rewind();
-    }
-
     void copyArea(int srcX, int srcY, int width, int height, int dstX, int dstY) {
         long base = MemoryUtil.memAddress(imageBuffer);
         int rowStride = imageWidth * 4;
