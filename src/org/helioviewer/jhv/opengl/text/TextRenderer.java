@@ -62,47 +62,15 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 /**
- * Renders bitmapped text into an OpenGL window with high performance, full
- * Unicode support, and a simple API. Glyphs are rasterized through STB and
- * cached in an OpenGL texture atlas to avoid repeated rasterization. The
- * caching is automatic, does not require user intervention, and has no visible
- * controls in the public API.
+ * Renders text through a glyph atlas backed by STB-truetype rasterization.
+ * Glyphs are created lazily, cached in a packed atlas texture, and emitted as
+ * textured quads. The public API supports orthographic text via
+ * {@link #beginRendering(int, int)} / {@link #endRendering()} and 3D text via
+ * {@link #begin3DRendering()} / {@link #end3DRendering()}.
  * <p>
- * Using the {@link TextRenderer TextRenderer} is simple. Add a
- * "<code>TextRenderer renderer;</code>" field to your rendering code.
- * During initialization, add:
- *
- * <PRE>
- * renderer = new TextRenderer(...);
- * </PRE>
- * <p>
- * During a render pass, add:
- * <PRE>
- * renderer.beginRendering(drawable.getWidth(), drawable.getHeight());
- * // optionally set the color
- * renderer.setColor(1.0f, 0.2f, 0.2f, 0.8f);
- * renderer.draw("Text to draw", xPosition, yPosition);
- * // ... more draw commands, color changes, etc.
- * renderer.endRendering();
- * </PRE>
- * <p>
- * Unless you are sharing textures and display lists between OpenGL
- * contexts, you do not need to call the {@link #dispose dispose}
- * method of the TextRenderer; the OpenGL resources it uses
- * internally will be cleaned up automatically when the OpenGL
- * context is destroyed.
- * <p>
- * <b>Note</b> that the TextRenderer may cause the vertex and texture
- * coordinate array buffer bindings to change, or to be unbound. This
- * is important to note if you are using Vertex Buffer Objects (VBOs)
- * in your application.
- * <p>
- * Internally, the renderer uses a rectangle packing algorithm to
- * pack glyph bitmaps into a larger OpenGL texture. The internal backing
- * store is maintained by an internal texture renderer.
- *
- * @author John Burkey
- * @author Kenneth Russell
+ * The renderer mutates OpenGL texture state and quad buffers while active.
+ * Call {@link #flush()} before changing model/view/projection state between
+ * text draws in the same render cycle.
  */
 public class TextRenderer {
     private static final int kSize = 256;
@@ -141,45 +109,24 @@ public class TextRenderer {
     }
 
     /**
-     * Begins rendering with this {@link TextRenderer TextRenderer}
-     * into the current OpenGL drawable, pushing the projection and
-     * modelview matrices and some state bits and setting up a
-     * two-dimensional orthographic projection with (0, 0) as the
-     * lower-left coordinate and (width, height) as the upper-right
-     * coordinate. Binds and enables the internal OpenGL texture
-     * object, sets the texture environment mode to GL_MODULATE, and
-     * changes the current color to the last color set with this
-     * TextRenderer via {@link #setColor setColor}. Disables the depth
-     * test if the disableDepthTest argument is true.
+     * Begins an orthographic text pass for a viewport of the given size.
      *
-     * @param width  the width of the current on-screen OpenGL drawable
-     * @param height the height of the current on-screen OpenGL drawable
+     * @param width  viewport width in pixels
+     * @param height viewport height in pixels
      */
     public void beginRendering(int width, int height) {
         beginRendering(true, width, height);
     }
 
     /**
-     * Begins rendering of 2D text in 3D with this {@link TextRenderer
-     * TextRenderer} into the current OpenGL drawable. Assumes the end
-     * user is responsible for setting up the modelview and projection
-     * matrices, and will render text using the {@link #draw3D draw3D}
-     * method. This method pushes some OpenGL state bits, binds and
-     * enables the internal OpenGL texture object, sets the texture
-     * environment mode to GL_MODULATE, and changes the current color
-     * to the last color set with this TextRenderer via {@link
-     * #setColor setColor}.
+     * Begins a 3D text pass using the current view/projection state.
      */
     public void begin3DRendering() {
         beginRendering(false, 0, 0);
     }
 
     /**
-     * Changes the current color of this TextRenderer to the supplied
-     * one, where each component ranges from 0.0f - 1.0f. The alpha
-     * component, if used, does not need to be premultiplied into the
-     * color channels, although premultiplied colors are used
-     * internally. The default color is opaque white.
+     * Sets the current text color. Components are expected in the 0..1 range.
      */
     public void setColor(float[] color) {
         flush();
@@ -187,16 +134,14 @@ public class TextRenderer {
     }
 
     /**
-     * Draws the supplied String at the desired location using the
-     * renderer's current color.
+     * Draws the supplied string at the given orthographic position.
      */
     public void draw(String str, int x, int y) {
         draw3D(str, x, y, 0, 1);
     }
 
     /**
-     * Draws the supplied String at the desired 3D location using the
-     * renderer's current color.
+     * Draws the supplied string at the given 3D location.
      */
     public void draw3D(String str, float x, float y, float z, float scaleFactor) {
         int len = str.length();
@@ -241,38 +186,28 @@ public class TextRenderer {
     }
 
     /**
-     * Causes the TextRenderer to flush any internal caches it may be
-     * maintaining and draw its rendering results to the screen. This
-     * should be called after each call to draw() if you are setting
-     * OpenGL state such as the modelview matrix between calls to
-     * draw().
+     * Flushes queued glyph quads to the current GL target.
      */
     public void flush() {
         drawVertices();
     }
 
     /**
-     * Ends a render cycle with this {@link TextRenderer TextRenderer}.
-     * Restores the projection and modelview matrices as well as
-     * several OpenGL state bits. Should be paired with {@link
-     * #beginRendering beginRendering}.
+     * Ends an orthographic text pass started with {@link #beginRendering(int, int)}.
      */
     public void endRendering() {
         endRendering(true);
     }
 
     /**
-     * Ends a 3D render cycle with this {@link TextRenderer TextRenderer}.
-     * Restores several OpenGL state bits. Should be paired with {@link
-     * #begin3DRendering begin3DRendering}.
+     * Ends a 3D text pass started with {@link #begin3DRendering()}.
      */
     public void end3DRendering() {
         endRendering(false);
     }
 
     /**
-     * Disposes of all resources this TextRenderer is using. It is not
-     * valid to use the TextRenderer after this method is called.
+     * Releases atlas and font resources held by this renderer.
      */
     public void dispose() {
         packer.dispose();
@@ -561,22 +496,17 @@ public class TextRenderer {
     }
 
     private interface CoordPut {
-
         void put(float x, float y, float z, float w, float c0, float c1);
-
     }
 
     private final class DirectPut implements CoordPut {
-
         @Override
         public void put(float x, float y, float z, float w, float c0, float c1) {
             coordBuf.putCoord(x, y, z, w, c0, c1);
         }
-
     }
 
     private final class SurfacePut implements CoordPut {
-
         private static final float epsilon = 0.125f; // should depend on triangle size
 
         @Override
@@ -584,7 +514,6 @@ public class TextRenderer {
             float n = 1 - x * x - y * y;
             coordBuf.putCoord(x, y, n > 0 ? epsilon + (float) Math.sqrt(n) : epsilon, w, c0, c1);
         }
-
     }
 
     private final CoordPut directPut = new DirectPut();
