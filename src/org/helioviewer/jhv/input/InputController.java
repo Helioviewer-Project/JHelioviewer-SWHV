@@ -6,7 +6,7 @@ import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 
-public class InputController {
+public final class InputController {
     private final Interaction interaction;
 
     public InputController(Interaction _interaction) {
@@ -17,10 +17,6 @@ public class InputController {
         Display.setActiveViewport(e.x(), e.y());
         interaction.mouseClicked(e);
         pointerListeners.forEach(listener -> listener.mouseClicked(e));
-    }
-
-    public void mouseEntered(PointerEvent e) {
-        pointerListeners.forEach(listener -> listener.mouseEntered(e));
     }
 
     public void mouseExited(PointerEvent e) {
@@ -51,37 +47,24 @@ public class InputController {
 
     public void mouseWheelMoved(ScrollEvent e) {
         interaction.mouseWheelMoved(e);
-        scrollListeners.forEach(listener -> listener.mouseWheelMoved(e));
     }
 
     public void keyPressed(KeyInputEvent e) {
         interaction.keyPressed(e);
-        inputKeyListeners.forEach(listener -> listener.keyPressed(e));
-    }
-
-    public void keyTyped(KeyInputEvent e) {
-        inputKeyListeners.forEach(listener -> listener.keyTyped(e));
     }
 
     public void keyReleased(KeyInputEvent e) {
         interaction.keyReleased(e);
-        inputKeyListeners.forEach(listener -> listener.keyReleased(e));
     }
 
     private final HashSet<InputPointerListener> pointerListeners = new HashSet<>();
     private final HashSet<InputPointerMotionListener> pointerMotionListeners = new HashSet<>();
-    private final HashSet<InputScrollListener> scrollListeners = new HashSet<>();
-    private final HashSet<InputKeyListener> inputKeyListeners = new HashSet<>();
 
     public void addListener(Object listener) {
         if (listener instanceof InputPointerListener pointerListener)
             pointerListeners.add(pointerListener);
         if (listener instanceof InputPointerMotionListener pointerMotionListener)
             pointerMotionListeners.add(pointerMotionListener);
-        if (listener instanceof InputScrollListener scrollListener)
-            scrollListeners.add(scrollListener);
-        if (listener instanceof InputKeyListener inputKeyListener)
-            inputKeyListeners.add(inputKeyListener);
     }
 
     public void removeListener(Object listener) {
@@ -89,10 +72,6 @@ public class InputController {
             pointerListeners.remove(pointerListener);
         if (listener instanceof InputPointerMotionListener pointerMotionListener)
             pointerMotionListeners.remove(pointerMotionListener);
-        if (listener instanceof InputScrollListener scrollListener)
-            scrollListeners.remove(scrollListener);
-        if (listener instanceof InputKeyListener inputKeyListener)
-            inputKeyListeners.remove(inputKeyListener);
     }
 
 }

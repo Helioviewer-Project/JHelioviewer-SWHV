@@ -155,21 +155,21 @@ public class Interaction {
     }
 
     public void mousePressed(PointerEvent e, Viewport vp) {
-        if (e.isShiftDown()) {
+        if (e.shiftDown()) {
             annotate = true;
         }
         getType().mousePressed(e, vp, annotationMode);
     }
 
     public void keyPressed(KeyInputEvent e) {
-        if (e.isShiftDown()) {
+        if (e.shiftDown()) {
             annotate = true;
         }
         getType().keyPressed(e);
     }
 
     public void keyReleased(KeyInputEvent e) {
-        annotate = e.isShiftDown();
+        annotate = e.shiftDown();
     }
 
     public void clearAnnotations() {
