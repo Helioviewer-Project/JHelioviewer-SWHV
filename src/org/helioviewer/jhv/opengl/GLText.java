@@ -10,12 +10,14 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.text.TextFonts;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 
-public class GLText {
+public final class GLText {
     private static final int[] RENDERER_SIZES = {10, 12, 14, 16, 20, 24, 32, 48, 64};
     private static final Map<Integer, TextRenderer> renderers = new HashMap<>();
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
+
+    private GLText() {}
 
     public static TextRenderer getRenderer(int size) {
         int physicalSize = physicalSize(rendererSize(size));
@@ -49,10 +51,10 @@ public class GLText {
 
     private static final int TEXT_SIZE_NORMAL = 14;
 
-    private static final int LEFT_MARGIN_TEXT = 0;//10;
-    private static final int RIGHT_MARGIN_TEXT = 0;//10;
-    private static final int TOP_MARGIN_TEXT = 0;//5;
-    private static final int BOTTOM_MARGIN_TEXT = 0;//5;
+    private static final int LEFT_MARGIN_TEXT = 0;
+    private static final int RIGHT_MARGIN_TEXT = 0;
+    private static final int TOP_MARGIN_TEXT = 0;
+    private static final int BOTTOM_MARGIN_TEXT = 0;
 
     public static void drawTextFloat(Viewport vp, List<String> txts, int pt_x, int pt_y) {
         if (txts.isEmpty())
@@ -81,8 +83,6 @@ public class GLText {
         if (h + pt_y - textSize - TOP_MARGIN_TEXT > vp.height) {
             textInit_y -= (int) (h + pt_y - textSize - TOP_MARGIN_TEXT - vp.height);
         }
-        // float left = textInit_x - LEFT_MARGIN_TEXT;
-        // float bottom = textInit_y - textSize - TOP_MARGIN_TEXT;
 
         int deltaY = 0, dY = (int) (textSize * 1.1);
         renderer.beginRendering(vp.width, vp.height);

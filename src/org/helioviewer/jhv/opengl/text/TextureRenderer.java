@@ -12,10 +12,6 @@ final class TextureRenderer {
 
     private final GLTexture tex;
     private boolean dirty;
-    private int dirtyX;
-    private int dirtyY;
-    private int dirtyWidth;
-    private int dirtyHeight;
 
     private final int imageWidth;
     private final int imageHeight;
@@ -44,58 +40,28 @@ final class TextureRenderer {
         return imageHeight;
     }
 
-    void clear(int x, int y, int width, int height) {
-        long base = MemoryUtil.memAddress(imageBuffer);
-        int rowStride = imageWidth * 4;
-        long clearBytes = (long) width * 4;
-        for (int row = 0; row < height; row++) {
-            long offset = (long) (y + row) * rowStride + (long) x * 4;
-            MemoryUtil.memSet(base + offset, 0, clearBytes);
-        }
-    }
-
     void drawMask(int x, int y, int width, int height, ByteBuffer mask) {
         int rowStride = imageWidth * 4;
         int start = mask.position();
         for (int row = 0; row < height; row++) {
+            int maskOffset = start + row * width;
             int imageOffset = ((y + row) * rowStride) + (x * 4);
             for (int col = 0; col < width; col++) {
-                int alpha = mask.get(start + row * width + col) & 0xFF;
-                imageBuffer.putInt(imageOffset + (col * 4), alpha | (alpha << 8) | (alpha << 16) | (alpha << 24));
+                int alpha = mask.get(maskOffset++) & 0xFF;
+                imageBuffer.putInt(imageOffset, alpha | (alpha << 8) | (alpha << 16) | (alpha << 24));
+                imageOffset += 4;
             }
         }
-        imageBuffer.rewind();
     }
 
-    void drawGlyphMask(int rectX, int rectY, int rectWidth, int rectHeight, int bitmapX, int bitmapY, int glyphWidth, int glyphHeight, ByteBuffer mask) {
-        clear(rectX, rectY, rectWidth, rectHeight);
-        drawMask(bitmapX, bitmapY, glyphWidth, glyphHeight, mask);
-        markDirty(rectX, rectY, rectWidth, rectHeight);
-    }
-
-    void markDirty(int x, int y, int width, int height) {
-        if (!dirty) {
-            dirty = true;
-            dirtyX = x;
-            dirtyY = y;
-            dirtyWidth = width;
-            dirtyHeight = height;
-        } else {
-            int minX = Math.min(dirtyX, x);
-            int minY = Math.min(dirtyY, y);
-            int maxX = Math.max(dirtyX + dirtyWidth, x + width);
-            int maxY = Math.max(dirtyY + dirtyHeight, y + height);
-            dirtyX = minX;
-            dirtyY = minY;
-            dirtyWidth = maxX - minX;
-            dirtyHeight = maxY - minY;
-        }
+    void markDirty() {
+        dirty = true;
     }
 
     void bind() {
         tex.bind();
         if (dirty) {
-            upload(dirtyX, dirtyY, dirtyWidth, dirtyHeight);
+            upload();
             dirty = false;
         }
     }
@@ -106,10 +72,10 @@ final class TextureRenderer {
         imageBuffer = null;
     }
 
-    private void upload(int x, int y, int width, int height) {
+    private void upload() {
         GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, imageWidth);
-        GL.glTexSubImage2D(GL.TEXTURE_2D, 0, x, y, width, height, GL.RGBA, GL.UNSIGNED_BYTE, imageBuffer.position(4 * (y * imageWidth + x)));
+        GL.glTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, imageWidth, imageHeight, GL.RGBA, GL.UNSIGNED_BYTE, imageBuffer);
         GL.glGenerateMipmap(GL.TEXTURE_2D);
         imageBuffer.rewind();
     }

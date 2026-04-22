@@ -3,8 +3,6 @@ package org.helioviewer.jhv.opengl.text;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.helioviewer.jhv.io.FileUtils;
 
@@ -15,7 +13,7 @@ public final class TextFonts {
     private static final String GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 +-.,:;/()[]|?☉";
     private static final char FALLBACK_GLYPH = '?';
     private static final boolean[] supportedGlyphs = new boolean[Character.MAX_VALUE + 1];
-    private static final Map<String, ByteBuffer> fontDataByPath = new HashMap<>();
+    private static ByteBuffer fontData;
 
     static {
         for (int i = 0; i < GLYPHS.length(); i++)
@@ -25,36 +23,38 @@ public final class TextFonts {
     private TextFonts() {}
 
     public static ByteBuffer loadCanvasFontData() {
-        return fontData(CANVAS_FONT_RESOURCE).duplicate();
+        return fontData().duplicate();
     }
 
     static String glyphs() {
         return GLYPHS;
     }
 
+    static char fallbackGlyph() {
+        return FALLBACK_GLYPH;
+    }
+
     static char mapGlyph(char ch) {
         return supportedGlyphs[ch] ? ch : FALLBACK_GLYPH;
     }
 
-    private static ByteBuffer fontData(String resourcePath) {
-        ByteBuffer fontData = fontDataByPath.get(resourcePath);
+    private static ByteBuffer fontData() {
         if (fontData != null)
             return fontData;
 
-        try (InputStream is = FileUtils.getResource(resourcePath)) {
+        try (InputStream is = FileUtils.getResource(CANVAS_FONT_RESOURCE)) {
             byte[] bytes = is.readAllBytes();
             ByteBuffer buffer = MemoryUtil.memAlloc(bytes.length);
             buffer.put(bytes).flip();
-            fontDataByPath.put(resourcePath, buffer);
-            return buffer;
+            fontData = buffer;
+            return fontData;
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load font " + resourcePath, e);
+            throw new IllegalStateException("Failed to load font " + CANVAS_FONT_RESOURCE, e);
         }
     }
 
     public static void dispose() {
-        for (ByteBuffer fontData : fontDataByPath.values())
-            MemoryUtil.memFree(fontData);
-        fontDataByPath.clear();
+        MemoryUtil.memFree(fontData);
+        fontData = null;
     }
 }

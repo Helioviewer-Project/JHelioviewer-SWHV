@@ -33,6 +33,8 @@ public final class TextRenderer {
     private final STBTTFontinfo fontInfo;
     private final float scale;
     private final TextureRenderer atlas;
+    private final int atlasWidth;
+    private final int atlasHeight;
     private final GlyphProducer glyphProducer;
     private final boolean[] loggedMissingGlyphs = new boolean[Character.MAX_VALUE + 1];
 
@@ -46,6 +48,8 @@ public final class TextRenderer {
         scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, fontSize);
         glyphProducer = new GlyphProducer();
         atlas = buildAtlas();
+        atlasWidth = atlas.getWidth();
+        atlasHeight = atlas.getHeight();
     }
 
     public float getFontSize() {
@@ -74,7 +78,7 @@ public final class TextRenderer {
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (previousGlyph != null)
-                x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+                x += getKerning(previousGlyph.glyphCode, glyph.glyphCode) * scaleFactor;
             float advance = glyph.draw3D(x, y, z, scaleFactor);
             x += advance * scaleFactor;
             previousGlyph = glyph;
@@ -97,7 +101,7 @@ public final class TextRenderer {
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (previousGlyph != null)
-                width += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode());
+                width += getKerning(previousGlyph.glyphCode, glyph.glyphCode);
             width += glyph.advance;
             previousGlyph = glyph;
         }
@@ -111,7 +115,7 @@ public final class TextRenderer {
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (previousGlyph != null)
-                x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+                x += getKerning(previousGlyph.glyphCode, glyph.glyphCode) * scaleFactor;
             float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
             x += advance * scaleFactor;
             previousGlyph = glyph;
@@ -160,7 +164,6 @@ public final class TextRenderer {
             return y1 - y0;
         }
     }
-    private record GlyphLayout(Glyph glyph, TextData data, int rectWidth, int rectHeight) {}
 
     private Bounds normalize(Bounds src) {
         int boundary = (int) Math.max(1, 0.015 * fontSize);
@@ -171,37 +174,47 @@ public final class TextRenderer {
     }
 
     private TextureRenderer buildAtlas() {
-        List<GlyphLayout> layouts = new ArrayList<>(glyphProducer.glyphs.size());
         int atlasWidth = kAtlasWidth;
 
         for (Glyph glyph : glyphProducer.glyphs) {
             Bounds origBBox = new Bounds(glyph.backendData.x0, glyph.backendData.y0, glyph.backendData.width(), glyph.backendData.height());
             Bounds bbox = normalize(origBBox);
-            TextData data = new TextData((int) -bbox.minX, (int) -bbox.minY, origBBox);
-            int rectWidth = (int) bbox.width;
-            int rectHeight = (int) bbox.height;
-            atlasWidth = Math.max(atlasWidth, MathUtils.nextPowerOfTwo(rectWidth));
-            layouts.add(new GlyphLayout(glyph, data, rectWidth, rectHeight));
+            glyph.textData = new TextData((int) -bbox.minX, (int) -bbox.minY, origBBox);
+            glyph.atlasRectWidth = (int) bbox.width;
+            glyph.atlasRectHeight = (int) bbox.height;
+            atlasWidth = Math.max(atlasWidth, MathUtils.nextPowerOfTwo(glyph.atlasRectWidth));
         }
 
+        int atlasHeight = 0;
         int x = 0;
-        int y = 0;
         int rowHeight = 0;
-        for (GlyphLayout layout : layouts) {
-            if (x > 0 && x + layout.rectWidth > atlasWidth) {
+        for (Glyph glyph : glyphProducer.glyphs) {
+            if (x > 0 && x + glyph.atlasRectWidth > atlasWidth) {
+                atlasHeight += rowHeight;
+                x = 0;
+                rowHeight = 0;
+            }
+            x += glyph.atlasRectWidth;
+            rowHeight = Math.max(rowHeight, glyph.atlasRectHeight);
+        }
+        atlasHeight += rowHeight;
+
+        TextureRenderer renderer = new TextureRenderer(atlasWidth, MathUtils.nextPowerOfTwo(atlasHeight));
+        x = 0;
+        int y = 0;
+        rowHeight = 0;
+        for (Glyph glyph : glyphProducer.glyphs) {
+            if (x > 0 && x + glyph.atlasRectWidth > atlasWidth) {
                 y += rowHeight;
                 x = 0;
                 rowHeight = 0;
             }
-            layout.glyph.textData = layout.data;
-            layout.glyph.glyphRectForTextureMapping = new GlyphRect(x, y, layout.rectWidth, layout.rectHeight);
-            x += layout.rectWidth;
-            rowHeight = Math.max(rowHeight, layout.rectHeight);
+            glyph.glyphRectForTextureMapping = new GlyphRect(x, y, glyph.atlasRectWidth, glyph.atlasRectHeight);
+            rasterizeGlyph(renderer, glyph);
+            x += glyph.atlasRectWidth;
+            rowHeight = Math.max(rowHeight, glyph.atlasRectHeight);
         }
-
-        TextureRenderer renderer = new TextureRenderer(atlasWidth, MathUtils.nextPowerOfTwo(y + rowHeight));
-        for (GlyphLayout layout : layouts)
-            rasterizeGlyph(renderer, layout.glyph);
+        renderer.markDirty();
         return renderer;
     }
 
@@ -242,7 +255,7 @@ public final class TextRenderer {
                 try {
                     int bitmapX = rect.x + (data.originX - data.origRectMinX);
                     int bitmapY = rect.y + (data.originY - data.origRectMinY);
-                    renderer.drawGlyphMask(rect.x, rect.y, rect.w, rect.h, bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
+                    renderer.drawMask(bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
                 } finally {
                     STBTruetype.stbtt_FreeBitmap(bitmap);
                 }
@@ -300,6 +313,8 @@ public final class TextRenderer {
         private final int glyphCode;
         private final float advance;
         private final StbGlyphData backendData;
+        private int atlasRectWidth;
+        private int atlasRectHeight;
         private GlyphRect glyphRectForTextureMapping;
         private TextData textData;
 
@@ -307,10 +322,6 @@ public final class TextRenderer {
             glyphCode = glyphCodeValue;
             advance = advanceValue;
             backendData = glyphBackendData;
-        }
-
-        int getGlyphCode() {
-            return glyphCode;
         }
 
         float draw3D(float inX, float inY, float z, float scaleFactor) {
@@ -322,12 +333,12 @@ public final class TextRenderer {
             float y = inY - (scaleFactor * (height - data.origRectMinY));
 
             int texturex = rect.x + (data.originX - data.origRectMinX);
-            int texturey = atlas.getHeight() - rect.y - height - (data.originY - data.origRectMinY);
+            int texturey = atlasHeight - rect.y - height - (data.originY - data.origRectMinY);
 
-            float tx1 = texturex / (float) atlas.getWidth();
-            float ty1 = 1f - texturey / (float) atlas.getHeight();
-            float tx2 = (texturex + width) / (float) atlas.getWidth();
-            float ty2 = 1f - (texturey + height) / (float) atlas.getHeight();
+            float tx1 = texturex / (float) atlasWidth;
+            float ty1 = 1f - texturey / (float) atlasHeight;
+            float tx2 = (texturex + width) / (float) atlasWidth;
+            float ty2 = 1f - (texturey + height) / (float) atlasHeight;
 
             coordPut.put(x, y, z, 1, tx1, ty1);
             coordPut.put(x + (width * scaleFactor), y, z, 1, tx2, ty1);
@@ -352,12 +363,12 @@ public final class TextRenderer {
             float y = inY - (scaleFactor * (height - data.origRectMinY));
 
             int texturex = rect.x + (data.originX - data.origRectMinX);
-            int texturey = atlas.getHeight() - rect.y - height - (data.originY - data.origRectMinY);
+            int texturey = atlasHeight - rect.y - height - (data.originY - data.origRectMinY);
 
-            float tx1 = texturex / (float) atlas.getWidth();
-            float ty1 = 1f - texturey / (float) atlas.getHeight();
-            float tx2 = (texturex + width) / (float) atlas.getWidth();
-            float ty2 = 1f - (texturey + height) / (float) atlas.getHeight();
+            float tx1 = texturex / (float) atlasWidth;
+            float ty1 = 1f - texturey / (float) atlasHeight;
+            float tx2 = (texturex + width) / (float) atlasWidth;
+            float ty2 = 1f - (texturey + height) / (float) atlasHeight;
 
             float x1 = x + (width * scaleFactor);
             float y1 = y + (height * scaleFactor);
@@ -397,7 +408,7 @@ public final class TextRenderer {
                     glyphs.add(glyph);
                 }
             }
-            fallbackGlyph = glyphsByChar[TextFonts.mapGlyph('\0')];
+            fallbackGlyph = glyphsByChar[TextFonts.fallbackGlyph()];
             if (fallbackGlyph == null)
                 throw new IllegalStateException("Fallback glyph '?' is missing from the font");
         }
