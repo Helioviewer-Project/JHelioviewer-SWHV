@@ -33,7 +33,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 import org.json.JSONObject;
 
@@ -103,8 +103,7 @@ public final class GridLayer extends AbstractLayer {
         String strGridType = jo.optString("type", Display.gridType.toString());
         try {
             Display.setGridType(GridType.valueOf(strGridType));
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
     }
 
     public GridLayer(JSONObject jo) {
@@ -190,31 +189,31 @@ public final class GridLayer extends AbstractLayer {
         float fuzz = 0.75f;
         GL.glDisable(GL.CULL_FACE);
         for (float rsize : labelPos) {
-            JhvTextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
+            TextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
             renderer.setColor(Colors.MiddleGrayFloat);
-            float textScaleFactor = textScale / renderer.getFont().getSize2D();
+            float textScaleFactor = textScale / renderer.getFontSize();
 
             renderer.begin3DRendering();
-            labels.forEach(label -> renderer.draw3D(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
+            labels.forEach(label -> renderer.draw(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
             renderer.end3DRendering();
         }
         GL.glEnable(GL.CULL_FACE);
     }
 
     private void drawGridText(int size, float z) {
-        JhvTextRenderer renderer = GLText.getRenderer(size);
+        TextRenderer renderer = GLText.getRenderer(size);
         renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
-        float textScaleFactor = textScale / renderer.getFont().getSize2D();
+        float textScaleFactor = textScale / renderer.getFontSize();
 
         renderer.begin3DRendering();
 
         GL.glDisable(GL.CULL_FACE);
-        latLabels.forEach(label -> renderer.draw3D(label.txt, label.x, label.y, z, textScaleFactor));
+        latLabels.forEach(label -> renderer.draw(label.txt, label.x, label.y, z, textScaleFactor));
         renderer.flush();
         GL.glEnable(GL.CULL_FACE);
 
-        lonLabels.forEach(lonLabel -> renderer.draw3D(lonLabel.txt, lonLabel.origin, lonLabel.basisX, lonLabel.basisY, textScaleFactor));
+        lonLabels.forEach(lonLabel -> renderer.draw(lonLabel.txt, lonLabel.origin, lonLabel.basisX, lonLabel.basisY, textScaleFactor));
         renderer.end3DRendering();
     }
 

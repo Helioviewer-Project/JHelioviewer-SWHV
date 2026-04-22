@@ -14,8 +14,7 @@ final class NonOrthoProjection {
 
     enum Kind {HPC, LATITUDINAL, POLAR}
 
-    private NonOrthoProjection() {
-    }
+    private NonOrthoProjection() {}
 
     static Vec2 project(Kind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
         return switch (kind) {

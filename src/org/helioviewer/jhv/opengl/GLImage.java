@@ -308,8 +308,7 @@ public class GLImage {
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
         try {
             diffMode = DifferenceMode.valueOf(strDiffMode);
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         JSONObject colorObject = jo.optJSONObject("color");
         if (colorObject != null) {
             red = colorObject.optBoolean("red", true) ? 1 : 0;

@@ -30,11 +30,9 @@ public class PfssPlugin extends Plugin {
     }
 
     @Override
-    public void saveState(JSONObject jo) {
-    }
+    public void saveState(JSONObject jo) {}
 
     @Override
-    public void loadState(JSONObject jo) {
-    }
+    public void loadState(JSONObject jo) {}
 
 }

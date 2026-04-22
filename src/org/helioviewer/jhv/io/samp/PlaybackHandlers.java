@@ -10,8 +10,7 @@ import org.astrogrid.samp.Message;
 
 final class PlaybackHandlers {
 
-    private PlaybackHandlers() {
-    }
+    private PlaybackHandlers() {}
 
     static void register(SampClient client) {
         client.addMessageHandler(playbackSetHandler());

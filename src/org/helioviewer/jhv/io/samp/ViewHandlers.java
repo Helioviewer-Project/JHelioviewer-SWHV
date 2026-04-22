@@ -6,8 +6,7 @@ import org.helioviewer.jhv.app.Commands;
 
 final class ViewHandlers {
 
-    private ViewHandlers() {
-    }
+    private ViewHandlers() {}
 
     static void register(SampClient client) {
         client.addMessageHandler(new SampClient.JHVSampHandler("jhv.view.set", (senderId, sender, msg) -> {

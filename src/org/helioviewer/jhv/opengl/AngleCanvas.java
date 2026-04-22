@@ -14,8 +14,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 
 import javax.swing.JRootPane;
@@ -53,13 +51,6 @@ public final class AngleCanvas extends Canvas {
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         setBackground(Color.BLACK);
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                requestFocusInWindow();
-            }
-        });
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
@@ -335,8 +326,7 @@ public final class AngleCanvas extends Canvas {
             Point canvasOnScreen = getLocationOnScreen();
             Point contentOnScreen = contentPane.getLocationOnScreen();
             return new Rectangle(canvasOnScreen.x - contentOnScreen.x, canvasOnScreen.y - contentOnScreen.y, width, height);
-        } catch (IllegalComponentStateException ignore) {
-        }
+        } catch (IllegalComponentStateException ignore) {}
 
         int x = 0;
         int y = 0;

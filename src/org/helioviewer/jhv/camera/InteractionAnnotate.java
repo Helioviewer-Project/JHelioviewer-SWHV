@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
@@ -12,6 +10,8 @@ import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.input.KeyInputEvent;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -95,9 +95,9 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(MouseEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
+    public void mousePressed(PointerEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
         newAnnotateable = annotationMode.generate(null);
-        newAnnotateable.mousePressed(camera, vp, e.getX(), e.getY());
+        newAnnotateable.mousePressed(camera, vp, e.x(), e.y());
         if (!newAnnotateable.isDraggable()) {
             finishAnnotateable();
         }
@@ -105,9 +105,9 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     @Override
-    public void mouseDragged(MouseEvent e, Viewport vp) {
+    public void mouseDragged(PointerEvent e, Viewport vp) {
         if (newAnnotateable != null && newAnnotateable.isDraggable()) {
-            newAnnotateable.mouseDragged(camera, vp, e.getX(), e.getY());
+            newAnnotateable.mouseDragged(camera, vp, e.x(), e.y());
             MovieDisplay.display();
         }
     }
@@ -127,17 +127,16 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(PointerEvent e) {
         finishAnnotateable();
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-        if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
+    public void keyPressed(KeyInputEvent e) {
+        if (e.key() == KeyInputEvent.Key.BACKSPACE || e.key() == KeyInputEvent.Key.DELETE) {
             remove();
             MovieDisplay.display();
-        } else if (code == KeyEvent.VK_N && activeIndex >= 0 && !anns.isEmpty()) {
+        } else if (e.key() == KeyInputEvent.Key.N && activeIndex >= 0 && !anns.isEmpty()) {
             activeIndex++;
             activeIndex %= anns.size();
             MovieDisplay.display();

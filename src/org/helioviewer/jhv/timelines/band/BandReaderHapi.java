@@ -95,20 +95,15 @@ public class BandReaderHapi {
         Log.error(Throwables.getStackTraceAsString(t));
     }
 
-    private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {
-    }
+    private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {}
 
-    private record Dataset(String id, List<BandReader> readers, long start, long stop) {
-    }
+    private record Dataset(String id, List<BandReader> readers, long start, long stop) {}
 
-    private record BandParameter(BandReader reader, long start, long stop) {
-    }
+    private record BandParameter(BandReader reader, long start, long stop) {}
 
-    private record BandReader(BandType type, HapiTableReader tableReader) {
-    }
+    private record BandReader(BandType type, HapiTableReader tableReader) {}
 
-    private record Parameter(String name, String units, String scale, JSONArray range) {
-    }
+    private record Parameter(String name, String units, String scale, JSONArray range) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";

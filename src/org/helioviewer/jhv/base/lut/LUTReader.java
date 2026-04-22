@@ -62,8 +62,7 @@ final class LUTReader {
             -12748362, -12683339, -12552780, -12422478, -12291919, -12226896, -12096337, -11966034, -11835475, -11770452, -11639893,
             -11509590, -11444567, -11314008, -11183449, -11053146, -10988123, -10857564, -10727005, -10596446});
 
-    private LUTReader() {
-    }
+    private LUTReader() {}
 
     static Map<String, LUT> read(String resourcePath) {
         TreeMap<String, LUT> luts = new TreeMap<>(JHVGlobals.alphanumComparator);

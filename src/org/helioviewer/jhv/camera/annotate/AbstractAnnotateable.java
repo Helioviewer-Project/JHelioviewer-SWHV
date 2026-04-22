@@ -82,12 +82,10 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void draw(MapContext ctx, boolean active, BufVertex vexBuf) {
-    }
+    public void draw(MapContext ctx, boolean active, BufVertex vexBuf) {}
 
     @Override
-    public void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf) {
-    }
+    public void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf) {}
 
     @Override
     public void mousePressed(Camera camera, Viewport vp, int x, int y) {

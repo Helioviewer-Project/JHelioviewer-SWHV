@@ -29,10 +29,8 @@ class J2KParams {
 
     }
 
-    record Decode(int serial, int frame, SubImage subImage, int level, float factor) {
-    }
+    record Decode(int serial, int frame, SubImage subImage, int level, float factor) {}
 
-    record Read(J2KView view, Decode decodeParams, Position viewpoint, boolean priority) {
-    }
+    record Read(J2KView view, Decode decodeParams, Position viewpoint, boolean priority) {}
 
 }

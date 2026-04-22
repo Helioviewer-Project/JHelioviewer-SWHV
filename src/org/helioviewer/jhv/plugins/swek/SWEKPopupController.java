@@ -3,8 +3,6 @@ package org.helioviewer.jhv.plugins.swek;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -20,6 +18,9 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.input.InputPointerListener;
+import org.helioviewer.jhv.input.InputPointerMotionListener;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -27,7 +28,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.time.TimeListener;
 
-class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
+class SWEKPopupController implements InputPointerListener, InputPointerMotionListener, TimeListener.Change {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
@@ -91,12 +92,12 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(PointerEvent e) {
         if (mouseOverJHVEvent != null) {
             Component canvas = component();
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(currentTime));
             hekPopUp.pack();
-            hekPopUp.setLocation(calcWindowPosition(canvas, GLHelper.GL2AWTPoint(e.getX(), e.getY()), hekPopUp.getWidth(), hekPopUp.getHeight()));
+            hekPopUp.setLocation(calcWindowPosition(canvas, GLHelper.GL2AWTPoint(e.x(), e.y()), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
 
             canvas.setCursor(helpCursor);
@@ -104,7 +105,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     }
 
     @Override
-    public void mouseExited(MouseEvent e) {
+    public void mouseExited(PointerEvent e) {
         resetHover();
     }
 
@@ -122,7 +123,7 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(PointerEvent e) {
         List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
         if (activeEvents.isEmpty()) {
             resetHover();
@@ -131,8 +132,8 @@ class SWEKPopupController extends MouseAdapter implements TimeListener.Change {
 
         mouseOverJHVEvent = null;
 
-        mouseOverX = e.getX();
-        mouseOverY = e.getY();
+        mouseOverX = e.x();
+        mouseOverY = e.y();
 
         Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();

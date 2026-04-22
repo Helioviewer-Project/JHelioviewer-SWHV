@@ -39,8 +39,7 @@ public final class GaiaClient {
         Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING); // shut-up info logs
     }
 
-    private GaiaClient() {
-    }
+    private GaiaClient() {}
 
     public static void submitSearch(Receiver receiver, Position viewpoint) {
         Tasks.submit("gaia", new Query(viewpoint), result -> onSuccess(receiver, viewpoint, result), (logContext, t) -> onFailure(receiver, viewpoint, t));
@@ -66,11 +65,9 @@ public final class GaiaClient {
     private static final int SEARCH_CONE = 4;
     private static final int SEARCH_MAG = 9;
 
-    private record StarRequest(int ra, int dec, int cone, int mag) {
-    }
+    private record StarRequest(int ra, int dec, int cone, int mag) {}
 
-    private record Star(long id, double ra, double dec, double pmra, double pmdec, double px, double rv, double mag) {
-    }
+    private record Star(long id, double ra, double dec, double pmra, double pmdec, double px, double rv, double mag) {}
 
     private static StarRequest computeRequest(Position viewpoint) {
         double[] sc = SpiceMath.radrec(-1, -viewpoint.lon, viewpoint.lat); // sc to Sun, lon was negated

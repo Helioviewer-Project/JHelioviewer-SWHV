@@ -76,8 +76,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
         if (jo != null) {
             try {
                 cameraMode = CameraMode.valueOf(jo.optString("mode"));
-            } catch (Exception ignore) {
-            }
+            } catch (Exception ignore) {}
             JSONObject jc = jo.optJSONObject("camera");
             if (jc != null)
                 Display.getCamera().fromJson(jc);

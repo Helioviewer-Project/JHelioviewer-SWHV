@@ -42,8 +42,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     }
 
     @Override
-    public void serialize(JSONObject jo) {
-    }
+    public void serialize(JSONObject jo) {}
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
@@ -178,8 +177,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         return false;
     }
 
-    private record EventPlotConfiguration(JHVRelatedEvents event, int x0, int x1, int yPosition) {
-    }
+    private record EventPlotConfiguration(JHVRelatedEvents event, int x0, int x1, int yPosition) {}
 
     @Nullable
     private static JHVRelatedEvents drawEvent(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, Graphics2D g, Point mousePosition) {

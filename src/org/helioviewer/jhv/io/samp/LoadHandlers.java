@@ -15,8 +15,7 @@ import org.astrogrid.samp.client.AbstractMessageHandler;
 
 final class LoadHandlers {
 
-    private LoadHandlers() {
-    }
+    private LoadHandlers() {}
 
     static void register(SampClient client) {
         client.addMessageHandler(singleURIHandler("image.load.fits", Commands::loadImage));

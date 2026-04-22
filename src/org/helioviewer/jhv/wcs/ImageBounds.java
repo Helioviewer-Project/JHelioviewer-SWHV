@@ -6,8 +6,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 
 public final class ImageBounds {
 
-    private ImageBounds() {
-    }
+    private ImageBounds() {}
 
     public static Region hpc(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();

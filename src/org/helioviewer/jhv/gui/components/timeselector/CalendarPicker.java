@@ -166,8 +166,7 @@ class CalendarPicker extends JPanel {
                         changeDisplayMode(DisplayMode.YEARS);
                         updateDateDisplay();
                     }
-                    case YEARS -> {
-                    }
+                    case YEARS -> {}
                 }
             } else if (e.getSource() == quickForwardButton) {
                 // increase current date by using the view controller of the next higher period control

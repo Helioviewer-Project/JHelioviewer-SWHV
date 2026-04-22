@@ -27,8 +27,7 @@ public class ProxyHostnameChecker implements HostnameChecker {
 
     private final Object checker = getHostnameChecker();
 
-    public ProxyHostnameChecker() {
-    }
+    public ProxyHostnameChecker() {}
 
     private Object getHostnameChecker() {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

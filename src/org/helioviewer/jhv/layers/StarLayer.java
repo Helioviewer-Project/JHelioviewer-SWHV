@@ -27,11 +27,9 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     private BufVertex uploadedBuf;
 
     @Override
-    public void serialize(JSONObject jo) {
-    }
+    public void serialize(JSONObject jo) {}
 
-    public StarLayer(JSONObject jo) {
-    }
+    public StarLayer(JSONObject jo) {}
 
     @Override
     public void viewpointChanged(Position viewpoint) {

@@ -13,15 +13,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
+import org.helioviewer.jhv.swing.TransferAccess;
 
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final JHVUncaughtExceptionHandler instance = new JHVUncaughtExceptionHandler();
 
-    private JHVUncaughtExceptionHandler() {
-    }
+    private JHVUncaughtExceptionHandler() {}
 
     // This method should be called once when the application starts
     public static void setupHandlerForThread() {
@@ -41,7 +40,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         copyToClipboard.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent me) {
-                JHVTransferHandler.getInstance().toClipboard(msg);
+                TransferAccess.writeClipboard(msg);
                 JOptionPane.showMessageDialog(null, "Error report copied to clipboard.");
             }
         });

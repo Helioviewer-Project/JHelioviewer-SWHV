@@ -11,8 +11,7 @@ public final class AngleWarmup {
 
     private static boolean started;
 
-    private AngleWarmup() {
-    }
+    private AngleWarmup() {}
 
     public static void start() {
         if (started)

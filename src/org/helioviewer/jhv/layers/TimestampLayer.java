@@ -18,7 +18,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 import org.json.JSONObject;
 
@@ -75,19 +75,18 @@ public class TimestampLayer extends AbstractLayer {
             }
         }
 
-        int size = (int) (vp.height * (scale * 0.01 * 0.012));
-        if (Display.pixelScale[1] == 1) //! nasty
-            size *= 2;
+        int size = (int) (vp.height * (scale * 0.01 * 0.024));
 
         int deltaX = (int) (vp.height * 0.01);
         int deltaY = top ? (int) (vp.height - Display.pixelScale[1] * deltaX - size) : deltaX; //!
 
-        JhvTextRenderer renderer = GLText.getRenderer(size);
+        TextRenderer renderer = GLText.getRenderer(size);
+        float textScaleFactor = size / renderer.getFontSize();
         renderer.beginRendering(vp.width, vp.height);
         renderer.setColor(GLText.shadowColor);
-        renderer.draw(text, deltaX + GLText.shadowOffset[0], deltaY + GLText.shadowOffset[1]);
+        renderer.draw(text, deltaX + GLText.shadowOffset[0], deltaY + GLText.shadowOffset[1], 0, textScaleFactor);
         renderer.setColor(Colors.LightGrayFloat);
-        renderer.draw(text, deltaX, deltaY);
+        renderer.draw(text, deltaX, deltaY, 0, textScaleFactor);
         renderer.endRendering();
     }
 
@@ -99,8 +98,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void init() {
-    }
+    public void init() {}
 
     @Override
     public void remove() {
@@ -118,8 +116,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose() {
-    }
+    public void dispose() {}
 
     private JPanel optionsPanel() {
         JHVSlider slider = new JHVSlider(MIN_SCALE, MAX_SCALE, scale);

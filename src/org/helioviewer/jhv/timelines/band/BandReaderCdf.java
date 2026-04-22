@@ -55,11 +55,9 @@ public class BandReaderCdf {
     private static final Set<String> SWAIncluded = Set.of("N", "V_RTN", "T");
 
     private record CDFData(DatesValues datesValues, float scaleMin, float scaleMax, String scaleType, String units,
-                           String[] labels) {
-    }
+                           String[] labels) {}
 
-    private record CDFVariable(Variable variable, Map<String, String> attributes) {
-    }
+    private record CDFVariable(Variable variable, Map<String, String> attributes) {}
 
     private static List<Band.Data> read(URI uri) throws IOException {
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
