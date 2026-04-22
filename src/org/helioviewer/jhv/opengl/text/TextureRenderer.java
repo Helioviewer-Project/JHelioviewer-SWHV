@@ -4,13 +4,11 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLTexture;
-import org.helioviewer.jhv.opengl.text.packrect.Rect;
 
 import org.lwjgl.system.MemoryUtil;
 
 final class TextureRenderer {
     private ByteBuffer imageBuffer;
-    private ByteBuffer copyScratch;
 
     private final GLTexture tex;
     private boolean dirty;
@@ -69,42 +67,10 @@ final class TextureRenderer {
         imageBuffer.rewind();
     }
 
-    void drawGlyphMask(Rect rect, int bitmapX, int bitmapY, int glyphWidth, int glyphHeight, ByteBuffer mask) {
-        clear(rect.x(), rect.y(), rect.w(), rect.h());
+    void drawGlyphMask(int rectX, int rectY, int rectWidth, int rectHeight, int bitmapX, int bitmapY, int glyphWidth, int glyphHeight, ByteBuffer mask) {
+        clear(rectX, rectY, rectWidth, rectHeight);
         drawMask(bitmapX, bitmapY, glyphWidth, glyphHeight, mask);
-
-        markDirty(rect.x(), rect.y(), rect.w(), rect.h());
-    }
-
-    void copyArea(int srcX, int srcY, int width, int height, int dstX, int dstY) {
-        long base = MemoryUtil.memAddress(imageBuffer);
-        int rowStride = imageWidth * 4;
-        int srcXBytes = srcX * 4;
-        int dstXBytes = dstX * 4;
-        long rowBytes = (long) width * 4;
-        ensureCopyScratch((int) rowBytes);
-        long scratchAddress = MemoryUtil.memAddress(copyScratch);
-        for (int row = 0; row < height; row++) {
-            long srcOffset = (long) (srcY + row) * rowStride + srcXBytes;
-            long dstOffset = (long) (dstY + row) * rowStride + dstXBytes;
-            MemoryUtil.memCopy(base + srcOffset, scratchAddress, rowBytes);
-            MemoryUtil.memCopy(scratchAddress, base + dstOffset, rowBytes);
-        }
-    }
-
-    void copyFrom(TextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
-        long srcBase = MemoryUtil.memAddress(other.imageBuffer);
-        long dstBase = MemoryUtil.memAddress(imageBuffer);
-        int srcRowStride = other.imageWidth * 4;
-        int dstRowStride = imageWidth * 4;
-        int srcXBytes = srcX * 4;
-        int dstXBytes = dstX * 4;
-        long rowBytes = (long) width * 4;
-        for (int row = 0; row < height; row++) {
-            long srcOffset = (long) (srcY + row) * srcRowStride + srcXBytes;
-            long dstOffset = (long) (dstY + row) * dstRowStride + dstXBytes;
-            MemoryUtil.memCopy(srcBase + srcOffset, dstBase + dstOffset, rowBytes);
-        }
+        markDirty(rectX, rectY, rectWidth, rectHeight);
     }
 
     void markDirty(int x, int y, int width, int height) {
@@ -136,17 +102,8 @@ final class TextureRenderer {
 
     void dispose() {
         tex.delete();
-        MemoryUtil.memFree(copyScratch);
-        copyScratch = null;
         MemoryUtil.memFree(imageBuffer);
         imageBuffer = null;
-    }
-
-    private void ensureCopyScratch(int size) {
-        if (copyScratch == null || copyScratch.capacity() < size) {
-            MemoryUtil.memFree(copyScratch);
-            copyScratch = MemoryUtil.memAlloc(size);
-        }
     }
 
     private void upload(int x, int y, int width, int height) {

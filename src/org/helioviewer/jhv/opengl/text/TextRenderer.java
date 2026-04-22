@@ -41,53 +41,42 @@ package org.helioviewer.jhv.opengl.text;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLTexture;
-import org.helioviewer.jhv.opengl.text.packrect.BackingStoreManager;
-import org.helioviewer.jhv.opengl.text.packrect.Rect;
-import org.helioviewer.jhv.opengl.text.packrect.RectanglePacker;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.stb.STBTTFontinfo;
 import org.lwjgl.stb.STBTruetype;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
-// Originally based on JOGL TextRenderer. This version now mixes the original
-// packing and rendering structure with STB glyph rasterization.
+// Originally based on JOGL TextRenderer. This version uses STB rasterization
+// and a fixed glyph atlas per renderer.
 public final class TextRenderer {
-    // Start a bit larger to reduce early atlas growth, repacking, and glyph re-upload churn.
-    private static final int kSize = 512;
+    private static final int kAtlasWidth = 256;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
+
     private final float fontSize;
-    private RectanglePacker packer;
-    private boolean haveMaxSize;
     private final STBTTFontinfo fontInfo;
     private final float scale;
+    private final TextureRenderer atlas;
     private final GlyphProducer glyphProducer;
-
-    // Need to keep track of whether we're in a beginRendering() /
-    // endRendering() cycle so we can re-enter the exact same state if
-    // we have to reallocate the backing store
-    private boolean inBeginEndPair;
-    private boolean isOrthoMode;
-    private int beginRenderingWidth;
-    private int beginRenderingHeight;
+    private final boolean[] loggedMissingGlyphs = new boolean[Character.MAX_VALUE + 1];
 
     public TextRenderer(float size, ByteBuffer fontData) {
         fontSize = size;
-        packer = new RectanglePacker(new Manager(), kSize, kSize);
         fontInfo = STBTTFontinfo.create();
         if (!STBTruetype.stbtt_InitFont(fontInfo, fontData)) {
             fontInfo.free();
@@ -95,6 +84,7 @@ public final class TextRenderer {
         }
         scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, fontSize);
         glyphProducer = new GlyphProducer();
+        atlas = buildAtlas();
     }
 
     public float getFontSize() {
@@ -102,12 +92,15 @@ public final class TextRenderer {
     }
 
     public void beginRendering(int width, int height) {
-        beginRendering(true, width, height);
+        GL.glDisable(GL.DEPTH_TEST);
+
+        Transform.pushProjection();
+        Transform.setOrtho2DProjection(0, width, 0, height);
+        Transform.pushView();
+        Transform.setIdentityView();
     }
 
-    public void begin3DRendering() {
-        beginRendering(false, 0, 0);
-    }
+    public void begin3DRendering() {}
 
     public void setColor(float[] color) {
         flush();
@@ -130,8 +123,6 @@ public final class TextRenderer {
     }
 
     public void draw(String str, Matrix4f transform, float scaleFactor) {
-        // The matrix places the local text frame in 3D. Transform the local origin and the unit x/y axes once,
-        // then build all glyph corners from that transformed basis instead of re-transforming each corner.
         transform.transformPosition(0, 0, 0, transformedOrigin);
         transform.transformPosition(1, 0, 0, transformedBasisX);
         transform.transformPosition(0, 1, 0, transformedBasisY);
@@ -161,97 +152,25 @@ public final class TextRenderer {
     }
 
     public void endRendering() {
-        endRendering(true);
+        flush();
+        GL.glEnable(GL.DEPTH_TEST);
+
+        Transform.popView();
+        Transform.popProjection();
     }
 
     public void end3DRendering() {
-        endRendering(false);
+        flush();
     }
 
     public void dispose() {
-        packer.dispose();
-        packer = null;
         fontInfo.free();
+        atlas.dispose();
         glslTexture.dispose();
     }
 
-    //----------------------------------------------------------------------
-    // Internals only below this point
-    //
-
     private record Bounds(double minX, double minY, double width, double height) {}
-
-    private Bounds normalize(Bounds src) {
-        // Give ourselves a boundary around each entity on the backing
-        // store in order to prevent bleeding of nearby Strings due to
-        // the fact that we use linear filtering
-
-        // NOTE that this boundary is quite heuristic and is related
-        // to how far away in 3D we may view the text --
-        // heuristically, 1.5% of the font's height
-        int boundary = (int) Math.max(1, 0.015 * fontSize);
-
-        return new Bounds((int) Math.floor(src.minX - boundary),
-                (int) Math.floor(src.minY - boundary),
-                (int) Math.ceil(src.width + 2 * boundary),
-                (int) Math.ceil(src.height) + 2 * boundary);
-    }
-
-    private void beginRendering(boolean ortho, int width, int height) {
-        inBeginEndPair = true;
-        isOrthoMode = ortho;
-        beginRenderingWidth = width;
-        beginRenderingHeight = height;
-
-        internal_beginRendering(ortho, width, height);
-
-        if (!haveMaxSize) {
-            // Set the maximum texture size in the RectanglePacker to keep it from expanding too large
-            packer.setMaxSize(GL.maxTextureSize, GL.maxTextureSize);
-            haveMaxSize = true;
-        }
-    }
-
-    private void endRendering(boolean ortho) {
-        flush();
-
-        inBeginEndPair = false;
-        internal_endRendering(ortho);
-    }
-
-    private void internal_beginRendering(boolean ortho, int width, int height) {
-        if (ortho) {
-            GL.glDisable(GL.DEPTH_TEST);
-
-            Transform.pushProjection();
-            Transform.setOrtho2DProjection(0, width, 0, height);
-            Transform.pushView();
-            Transform.setIdentityView();
-        }
-    }
-
-    private void internal_endRendering(boolean ortho) {
-        if (ortho) {
-            GL.glEnable(GL.DEPTH_TEST);
-
-            Transform.popView();
-            Transform.popProjection();
-        }
-    }
-
-    // Data associated with each rectangle of text
-    private record TextData(
-            int originX,
-            int originY,
-            int origRectWidth,
-            int origRectHeight,
-            int origRectMinX,
-            int origRectMinY) {
-        // The following must be defined and used VERY precisely. This is
-        // the offset from the upper-left corner of this rectangle (Java
-        // 2D coordinate system) at which the string must be rasterized in
-        // order to fit within the rectangle -- the leftmost point of the
-        // baseline.
+    private record TextData(int originX, int originY, int origRectWidth, int origRectHeight, int origRectMinX, int origRectMinY) {
         TextData(int originX, int originY, Bounds origRect) {
             this(originX, originY,
                     (int) origRect.width,
@@ -259,101 +178,66 @@ public final class TextRenderer {
                     (int) -origRect.minX,
                     (int) -origRect.minY);
         }
+    }
+    private record GlyphRect(int x, int y, int w, int h) {}
+    private record StbGlyphData(int glyphIndex, int x0, int y0, int x1, int y1) {
+        int width() {
+            return x1 - x0;
+        }
 
+        int height() {
+            return y1 - y0;
+        }
+    }
+    private record GlyphLayout(Glyph glyph, TextData data, int rectWidth, int rectHeight) {}
+
+    private Bounds normalize(Bounds src) {
+        int boundary = (int) Math.max(1, 0.015 * fontSize);
+        return new Bounds((int) Math.floor(src.minX - boundary),
+                (int) Math.floor(src.minY - boundary),
+                (int) Math.ceil(src.width + 2 * boundary),
+                (int) Math.ceil(src.height) + 2 * boundary);
     }
 
-    private final class Manager implements BackingStoreManager {
+    private TextureRenderer buildAtlas() {
+        List<GlyphLayout> layouts = new ArrayList<>(glyphProducer.glyphs.size());
+        int atlasWidth = kAtlasWidth;
 
-        @Override
-        public Object allocateBackingStore(int w, int h) {
-            return new TextureRenderer(MathUtils.nextPowerOfTwo(w), MathUtils.nextPowerOfTwo(h));
+        for (Glyph glyph : glyphProducer.glyphs) {
+            Bounds origBBox = new Bounds(glyph.backendData.x0, glyph.backendData.y0, glyph.backendData.width(), glyph.backendData.height());
+            Bounds bbox = normalize(origBBox);
+            TextData data = new TextData((int) -bbox.minX, (int) -bbox.minY, origBBox);
+            int rectWidth = (int) bbox.width;
+            int rectHeight = (int) bbox.height;
+            atlasWidth = Math.max(atlasWidth, MathUtils.nextPowerOfTwo(rectWidth));
+            layouts.add(new GlyphLayout(glyph, data, rectWidth, rectHeight));
         }
 
-        @Override
-        public void deleteBackingStore(Object backingStore) {
-            ((TextureRenderer) backingStore).dispose();
-        }
-
-        @Override
-        public boolean preExpand(Rect cause, int attemptNumber) {
-            // Only try this one time; clear out potentially obsolete entries
-            // NOTE: this heuristic and the fact that it clears the used bit
-            // of all entries seems to cause cycling of entries in some
-            // situations, where the backing store becomes small compared to
-            // the amount of text on the screen (see the TextFlow demo) and
-            // the entries continually cycle in and out of the backing
-            // store, decreasing performance. If we added a little age
-            // information to the entries, and only cleared out entries
-            // above a certain age, this behavior would be eliminated.
-            // However, it seems the system usually stabilizes itself, so
-            // for now we'll just keep things simple. Note that if we don't
-            // clear the used bit here, the backing store tends to increase
-            // very quickly to its maximum size, at least with the TextFlow
-            // demo when the text is being continually re-laid out.
-            if (attemptNumber == 0) {
-                if (inBeginEndPair) {
-                    // Draw any outstanding glyphs
-                    flush();
-                }
-                return true;
+        int x = 0;
+        int y = 0;
+        int rowHeight = 0;
+        for (GlyphLayout layout : layouts) {
+            if (x > 0 && x + layout.rectWidth > atlasWidth) {
+                y += rowHeight;
+                x = 0;
+                rowHeight = 0;
             }
-            return false;
+            layout.glyph.textData = layout.data;
+            layout.glyph.glyphRectForTextureMapping = new GlyphRect(x, y, layout.rectWidth, layout.rectHeight);
+            x += layout.rectWidth;
+            rowHeight = Math.max(rowHeight, layout.rectHeight);
         }
 
-        @Override
-        public boolean additionFailed(Rect cause, int attemptNumber) {
-            // Heavy hammer -- might consider doing something different
-            packer.clear();
-            glyphProducer.clearAllCacheEntries();
-            return attemptNumber == 0;
-        }
-
-        @Override
-        public boolean canCompact() {
-            return true;
-        }
-
-        @Override
-        public void beginMovement(Object oldBackingStore, Object newBackingStore) {
-            // Exit the begin / end pair if necessary
-            if (inBeginEndPair) {
-                // Draw any outstanding glyphs
-                flush();
-                internal_endRendering(isOrthoMode);
-            }
-        }
-
-        @Override
-        public void move(Object oldBackingStore, Rect oldLocation, Object newBackingStore, Rect newLocation) {
-            TextureRenderer oldRenderer = (TextureRenderer) oldBackingStore;
-            TextureRenderer newRenderer = (TextureRenderer) newBackingStore;
-            if (oldRenderer == newRenderer) {
-                // Movement on the same backing store -- easy case
-                newRenderer.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
-                        oldLocation.h(), newLocation.x() - oldLocation.x(),
-                        newLocation.y() - oldLocation.y());
-            } else {
-                newRenderer.copyFrom(oldRenderer, oldLocation.x(), oldLocation.y(), oldLocation.w(), oldLocation.h(), newLocation.x(), newLocation.y());
-            }
-        }
-
-        @Override
-        public void endMovement(Object oldBackingStore, Object newBackingStore) {
-            // Sync the whole surface
-            TextureRenderer newRenderer = (TextureRenderer) newBackingStore;
-            newRenderer.markDirty(0, 0, newRenderer.getWidth(), newRenderer.getHeight());
-            // Re-enter the begin / end pair if necessary
-            if (inBeginEndPair) {
-                internal_beginRendering(isOrthoMode, beginRenderingWidth, beginRenderingHeight);
-            }
-        }
+        TextureRenderer renderer = new TextureRenderer(atlasWidth, MathUtils.nextPowerOfTwo(y + rowHeight));
+        for (GlyphLayout layout : layouts)
+            rasterizeGlyph(renderer, layout.glyph);
+        return renderer;
     }
 
     private @Nullable Glyph createGlyph(char unicodeID) {
         int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, unicodeID);
-        if (glyphIndex == 0) {
+        if (glyphIndex == 0)
             return null;
-        }
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer advanceWidth = stack.mallocInt(1);
@@ -371,18 +255,11 @@ public final class TextRenderer {
         }
     }
 
-    private void uploadGlyph(Glyph glyph) {
+    private void rasterizeGlyph(TextureRenderer renderer, Glyph glyph) {
+        GlyphRect rect = glyph.glyphRectForTextureMapping;
+        TextData data = glyph.textData;
         StbGlyphData glyphData = glyph.backendData;
-        Bounds origBBox = new Bounds(glyphData.x0, glyphData.y0, glyphData.width(), glyphData.height());
-        Bounds bbox = normalize(origBBox);
-        int originX = (int) -bbox.minX;
-        int originY = (int) -bbox.minY;
-        Rect rect = new Rect(0, 0, (int) bbox.width, (int) bbox.height, new TextData(originX, originY, origBBox));
-        packer.add(rect);
-        glyph.glyphRectForTextureMapping = rect;
 
-        TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
-        TextData data = (TextData) rect.getUserData();
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer ignoredWidth = stack.mallocInt(1);
             IntBuffer ignoredHeight = stack.mallocInt(1);
@@ -392,9 +269,9 @@ public final class TextRenderer {
                     ignoredWidth, ignoredHeight, ignoredXOffset, ignoredYOffset);
             if (bitmap != null) {
                 try {
-                    int bitmapX = rect.x() + (data.originX() - data.origRectMinX());
-                    int bitmapY = rect.y() + (data.originY() - data.origRectMinY());
-                    renderer.drawGlyphMask(rect, bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
+                    int bitmapX = rect.x + (data.originX - data.origRectMinX);
+                    int bitmapY = rect.y + (data.originY - data.origRectMinY);
+                    renderer.drawGlyphMask(rect.x, rect.y, rect.w, rect.h, bitmapX, bitmapY, glyphData.width(), glyphData.height(), bitmap);
                 } finally {
                     STBTruetype.stbtt_FreeBitmap(bitmap);
                 }
@@ -404,16 +281,6 @@ public final class TextRenderer {
 
     private float getKerning(int leftGlyphCode, int rightGlyphCode) {
         return STBTruetype.stbtt_GetGlyphKernAdvance(fontInfo, leftGlyphCode, rightGlyphCode) * scale;
-    }
-
-    private record StbGlyphData(int glyphIndex, int x0, int y0, int x1, int y1) {
-        int width() {
-            return x1 - x0;
-        }
-
-        int height() {
-            return y1 - y0;
-        }
     }
 
     private interface CoordPut {
@@ -428,7 +295,7 @@ public final class TextRenderer {
     }
 
     private final class SurfacePut implements CoordPut {
-        private static final float epsilon = 0.125f; // should depend on triangle size
+        private static final float epsilon = 0.125f;
 
         @Override
         public void put(float x, float y, float z, float w, float c0, float c1) {
@@ -458,27 +325,14 @@ public final class TextRenderer {
         coordPut = surfacePut;
     }
 
-    // Glyph-by-glyph rendering support
-
-    /**
-     * A Glyph represents a single unicode glyph and knows how to upload itself
-     * to the backing store on demand.
-     */
-
     private final class Glyph {
-        // This glyph's unicode ID.
         private final int unicodeID;
-        // The glyph code in the font.
         private final int glyphCode;
-        // The advance of this glyph.
         private final float advance;
-        // Backend-specific glyph data used for rasterization.
         private final StbGlyphData backendData;
-        // The rectangle of this glyph on the backing store, or null
-        // if it has been cleared due to space pressure
-        private Rect glyphRectForTextureMapping;
+        private GlyphRect glyphRectForTextureMapping;
+        private TextData textData;
 
-        // Creates a Glyph representing an individual Unicode character
         Glyph(int unicodeIDValue, int glyphCodeValue, float advanceValue, StbGlyphData glyphBackendData) {
             unicodeID = unicodeIDValue;
             glyphCode = glyphCodeValue;
@@ -486,77 +340,59 @@ public final class TextRenderer {
             backendData = glyphBackendData;
         }
 
-        // Returns this glyph's unicode ID
         int getUnicodeID() {
             return unicodeID;
         }
 
-        // Returns this glyph's (font-specific) glyph code
         int getGlyphCode() {
             return glyphCode;
         }
 
-        // Draws this glyph and returns the (x) advance for this glyph
         float draw3D(float inX, float inY, float z, float scaleFactor) {
-            // This is the code path taken for individual glyphs
-            if (glyphRectForTextureMapping == null) {
-                upload();
-            }
+            GlyphRect rect = glyphRectForTextureMapping;
+            TextData data = textData;
+            int width = data.origRectWidth;
+            int height = data.origRectHeight;
+            float x = inX - (scaleFactor * data.origRectMinX);
+            float y = inY - (scaleFactor * (height - data.origRectMinY));
 
-            TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
-            Rect rect = glyphRectForTextureMapping;
-            TextData data = (TextData) rect.getUserData();
-            //data.markUsed();
+            int texturex = rect.x + (data.originX - data.origRectMinX);
+            int texturey = atlas.getHeight() - rect.y - height - (data.originY - data.origRectMinY);
 
-            int width = data.origRectWidth();
-            int height = data.origRectHeight();
-            float x = inX - (scaleFactor * data.origRectMinX());
-            float y = inY - (scaleFactor * (height - data.origRectMinY()));
+            float tx1 = texturex / (float) atlas.getWidth();
+            float ty1 = 1f - texturey / (float) atlas.getHeight();
+            float tx2 = (texturex + width) / (float) atlas.getWidth();
+            float ty2 = 1f - (texturey + height) / (float) atlas.getHeight();
 
-            int texturex = rect.x() + (data.originX() - data.origRectMinX());
-            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origRectMinY());
-
-            float tx1 = texturex / (float) renderer.getWidth();
-            float ty1 = 1f - texturey / (float) renderer.getHeight();
-            float tx2 = (texturex + width) / (float) renderer.getWidth();
-            float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
-
-            coordPut.put(x, y, z, 1, tx1, ty1); // A
-            coordPut.put(x + (width * scaleFactor), y, z, 1, tx2, ty1); // B
-            coordPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
-            coordPut.put(x, y, z, 1, tx1, ty1); // A
-            coordPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2); // C
-            coordPut.put(x, y + (height * scaleFactor), z, 1, tx1, ty2); // D
+            coordPut.put(x, y, z, 1, tx1, ty1);
+            coordPut.put(x + (width * scaleFactor), y, z, 1, tx2, ty1);
+            coordPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2);
+            coordPut.put(x, y, z, 1, tx1, ty1);
+            coordPut.put(x + (width * scaleFactor), y + (height * scaleFactor), z, 1, tx2, ty2);
+            coordPut.put(x, y + (height * scaleFactor), z, 1, tx1, ty2);
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
-            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
+            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts)
                 drawVertices();
-            }
 
             return advance;
         }
 
         float draw3D(Vector3f origin, Vector3f basisX, Vector3f basisY, float inX, float inY, float scaleFactor) {
-            if (glyphRectForTextureMapping == null) {
-                upload();
-            }
+            GlyphRect rect = glyphRectForTextureMapping;
+            TextData data = textData;
+            int width = data.origRectWidth;
+            int height = data.origRectHeight;
+            float x = inX - (scaleFactor * data.origRectMinX);
+            float y = inY - (scaleFactor * (height - data.origRectMinY));
 
-            TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
-            Rect rect = glyphRectForTextureMapping;
-            TextData data = (TextData) rect.getUserData();
+            int texturex = rect.x + (data.originX - data.origRectMinX);
+            int texturey = atlas.getHeight() - rect.y - height - (data.originY - data.origRectMinY);
 
-            int width = data.origRectWidth();
-            int height = data.origRectHeight();
-            float x = inX - (scaleFactor * data.origRectMinX());
-            float y = inY - (scaleFactor * (height - data.origRectMinY()));
-
-            int texturex = rect.x() + (data.originX() - data.origRectMinX());
-            int texturey = renderer.getHeight() - rect.y() - height - (data.originY() - data.origRectMinY());
-
-            float tx1 = texturex / (float) renderer.getWidth();
-            float ty1 = 1f - texturey / (float) renderer.getHeight();
-            float tx2 = (texturex + width) / (float) renderer.getWidth();
-            float ty2 = 1f - (texturey + height) / (float) renderer.getHeight();
+            float tx1 = texturex / (float) atlas.getWidth();
+            float ty1 = 1f - texturey / (float) atlas.getHeight();
+            float tx2 = (texturex + width) / (float) atlas.getWidth();
+            float ty2 = 1f - (texturey + height) / (float) atlas.getHeight();
 
             float x1 = x + (width * scaleFactor);
             float y1 = y + (height * scaleFactor);
@@ -566,80 +402,57 @@ public final class TextRenderer {
             transformedC.set(origin).fma(x1, basisX).fma(y1, basisY);
             transformedD.set(origin).fma(x, basisX).fma(y1, basisY);
 
-            coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, tx1, ty1); // A
-            coordPut.put(transformedB.x, transformedB.y, transformedB.z, 1, tx2, ty1); // B
-            coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, tx2, ty2); // C
-            coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, tx1, ty1); // A
-            coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, tx2, ty2); // C
-            coordPut.put(transformedD.x, transformedD.y, transformedD.z, 1, tx1, ty2); // D
+            coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, tx1, ty1);
+            coordPut.put(transformedB.x, transformedB.y, transformedB.z, 1, tx2, ty1);
+            coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, tx2, ty2);
+            coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, tx1, ty1);
+            coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, tx2, ty2);
+            coordPut.put(transformedD.x, transformedD.y, transformedD.z, 1, tx1, ty2);
 
             outstandingGlyphsVerticesPipeline += kVertsPerQuad;
-            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts) {
+            if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts)
                 drawVertices();
-            }
 
             return advance;
         }
-
-        // Notifies this glyph that it's been cleared out of the cache
-        void clear() {
-            glyphRectForTextureMapping = null;
-        }
-
-        private void upload() {
-            uploadGlyph(this);
-        }
-
     }
 
     private final class GlyphProducer {
-        private static final int undefined = -2;
-        // The mapping from unicode character to font-specific glyph ID
-        private final int[] unicodes2Glyphs;
-        // The mapping from glyph ID to Glyph
-        private final Glyph[] glyphCache;
+        private final Glyph[] glyphsByChar = new Glyph[Character.MAX_VALUE + 1];
+        private final List<Glyph> glyphs = new ArrayList<>();
+        private final Glyph fallbackGlyph;
 
         GlyphProducer() {
-            unicodes2Glyphs = new int[10000]; // highest character we can draw
-            glyphCache = new Glyph[65536];
-            clearAllCacheEntries();
-        }
-
-        void clearAllCacheEntries() {
-            for (Glyph glyph : glyphCache) {
-                if (glyph != null)
-                    glyph.clear();
+            String supportedGlyphs = TextFonts.glyphs();
+            for (int i = 0; i < supportedGlyphs.length(); i++) {
+                char ch = supportedGlyphs.charAt(i);
+                Glyph glyph = createGlyph(ch);
+                if (glyph != null) {
+                    glyphsByChar[ch] = glyph;
+                    glyphs.add(glyph);
+                }
             }
-            Arrays.fill(glyphCache, null);
-            Arrays.fill(unicodes2Glyphs, undefined);
+            fallbackGlyph = glyphsByChar[TextFonts.mapGlyph('\0')];
+            if (fallbackGlyph == null)
+                throw new IllegalStateException("Fallback glyph '?' is missing from the font");
         }
 
-        private void register(Glyph glyph) {
-            unicodes2Glyphs[glyph.getUnicodeID()] = glyph.getGlyphCode();
-            glyphCache[glyph.getGlyphCode()] = glyph;
-        }
-
-        // Returns a glyph object for this single glyph. Returns null if the
-        // unicode or glyph ID would be out of bounds of the glyph cache.
         @Nullable
         Glyph getGlyph(char unicodeID) {
-            if (unicodeID >= unicodes2Glyphs.length) {
-                return null;
-            }
-
-            int glyphID = unicodes2Glyphs[unicodeID];
-            if (glyphID != undefined) {
-                return glyphCache[glyphID];
-            }
-
-            // Must fabricate the glyph
-            Glyph glyph = createGlyph(unicodeID);
-            if (glyph == null) {
-                return null;
-            }
-            register(glyph);
-            return glyph;
+            char mapped = TextFonts.mapGlyph(unicodeID);
+            if (mapped != unicodeID)
+                logMissingGlyph(unicodeID);
+            Glyph glyph = glyphsByChar[mapped];
+            return glyph != null ? glyph : fallbackGlyph;
         }
+    }
+
+    private void logMissingGlyph(char ch) {
+        if (loggedMissingGlyphs[ch])
+            return;
+        loggedMissingGlyphs[ch] = true;
+        String display = Character.isISOControl(ch) ? "" : " '" + ch + "'";
+        Log.warn("Missing fixed-atlas glyph" + display + " (U+" + String.format("%04X", (int) ch) + "), using '?'");
     }
 
     private static final GLSLTexture glslTexture = new GLSLTexture();
@@ -650,13 +463,11 @@ public final class TextRenderer {
 
     private void drawVertices() {
         if (outstandingGlyphsVerticesPipeline > 0) {
-            ((TextureRenderer) packer.getBackingStore()).bind();
-
+            atlas.bind();
             glslTexture.init();
             glslTexture.setCoord(coordBuf);
             glslTexture.renderTexture(GL.TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }
-
 }

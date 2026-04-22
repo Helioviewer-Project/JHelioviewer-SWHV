@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.opengl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
@@ -9,51 +11,40 @@ import org.helioviewer.jhv.opengl.text.TextFonts;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public class GLText {
-    private static final int MIN = 10;
-    private static final int MAX = 144;
-    private static final int STEP = 2;
-    private static final int SIZE = (MAX - MIN) / STEP + 1;
-    private static final TextRenderer[] renderers = new TextRenderer[SIZE];
+    private static final int[] RENDERER_SIZES = {10, 12, 14, 16, 20, 24, 32, 48, 64};
+    private static final Map<Integer, TextRenderer> renderers = new HashMap<>();
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
 
     public static TextRenderer getRenderer(int size) {
-        int idx = rendererIndex(size);
+        int physicalSize = physicalSize(rendererSize(size));
+        TextRenderer renderer = renderers.get(physicalSize);
+        if (renderer != null)
+            return renderer;
 
-        if (renderers[idx] == null) {
-            renderers[idx] = new TextRenderer(rendererSize(idx), TextFonts.loadCanvasFontData());
-            // precache for grid text
-            renderers[idx].draw("-0123456789.", 0, 0, 0, 0);
-        }
-        return renderers[idx];
+        renderer = new TextRenderer(physicalSize, TextFonts.loadCanvasFontData());
+        renderers.put(physicalSize, renderer);
+        return renderer;
     }
 
     public static void dispose() {
-        for (int i = 0; i < renderers.length; i++) {
-            if (renderers[i] != null) {
-                renderers[i].dispose();
-                renderers[i] = null;
-            }
-        }
+        for (TextRenderer renderer : renderers.values())
+            renderer.dispose();
+        renderers.clear();
         TextFonts.dispose();
     }
 
-    private static int rendererIndex(int size) {
-        size = physicalSize(size);
-        if (size <= MIN)
-            return 0;
-        if (size >= MAX)
-            return SIZE - 1;
-        return (size - MIN + STEP - 1) / STEP;
-    }
-
-    private static float rendererSize(int idx) {
-        return idx * STEP + MIN;
+    private static int rendererSize(int logicalSize) {
+        for (int rendererSize : RENDERER_SIZES) {
+            if (logicalSize <= rendererSize)
+                return rendererSize;
+        }
+        return RENDERER_SIZES[RENDERER_SIZES.length - 1];
     }
 
     private static int physicalSize(int logicalSize) {
-        return (int) (logicalSize * Display.pixelScale[1]);
+        return logicalSize * Math.max(1, (int) Math.round(Display.pixelScale[1]));
     }
 
     private static final int TEXT_SIZE_NORMAL = 14;

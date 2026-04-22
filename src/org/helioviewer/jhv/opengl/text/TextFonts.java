@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,13 +17,30 @@ import org.lwjgl.system.MemoryUtil;
 
 public final class TextFonts {
     private static final String CANVAS_FONT_RESOURCE = "/fonts/DejaVuSansCondensed.ttf";
+    private static final String GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 +-.,:;/()[]|?☉";
+    private static final char FALLBACK_GLYPH = '?';
+    private static final boolean[] supportedGlyphs = new boolean[Character.MAX_VALUE + 1];
     private static final Map<String, ByteBuffer> fontDataByPath = new HashMap<>();
     private static final Map<String, STBTTFontinfo> fontInfoByPath = new HashMap<>();
+
+    static {
+        Arrays.fill(supportedGlyphs, false);
+        for (int i = 0; i < GLYPHS.length(); i++)
+            supportedGlyphs[GLYPHS.charAt(i)] = true;
+    }
 
     private TextFonts() {}
 
     public static ByteBuffer loadCanvasFontData() {
         return fontData(CANVAS_FONT_RESOURCE).duplicate();
+    }
+
+    static String glyphs() {
+        return GLYPHS;
+    }
+
+    static char mapGlyph(char ch) {
+        return supportedGlyphs[ch] ? ch : FALLBACK_GLYPH;
     }
 
     private static ByteBuffer fontData(String resourcePath) {
@@ -56,7 +74,7 @@ public final class TextFonts {
             int previousGlyphIndex = 0;
             int len = str.length();
             for (int i = 0; i < len; i++) {
-                int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, str.charAt(i));
+                int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, mapGlyph(str.charAt(i)));
                 if (glyphIndex == 0)
                     continue;
                 if (previousGlyphIndex != 0)
