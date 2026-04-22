@@ -22,6 +22,23 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
         interaction = _interaction;
     }
 
+    private static PointerEvent synthesizePointer(MouseEvent e) {
+        return new PointerEvent(
+                (int) (e.getX() * Display.pixelScale[0] + .5),
+                (int) (e.getY() * Display.pixelScale[1] + .5),
+                e.getButton(),
+                e.getClickCount(),
+                e.getModifiersEx());
+    }
+
+    private static ScrollEvent synthesizeScroll(MouseWheelEvent e) {
+        return new ScrollEvent(e.getPreciseWheelRotation());
+    }
+
+    private static KeyInputEvent synthesizeKey(KeyEvent e) {
+        return new KeyInputEvent(e.getKeyCode(), e.getModifiersEx());
+    }
+
     private static MouseEvent synthesizeMouse(MouseEvent e) {
         return new MouseEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
                 (int) (e.getX() * Display.pixelScale[0] + .5),
@@ -40,10 +57,11 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e1) {
-        MouseEvent e = synthesizeMouse(e1);
-        Display.setActiveViewport(e.getX(), e.getY());
+        PointerEvent e = synthesizePointer(e1);
+        MouseEvent mouse = synthesizeMouse(e1);
+        Display.setActiveViewport(e.x(), e.y());
         interaction.mouseClicked(e);
-        mouseListeners.forEach(listener -> listener.mouseClicked(e));
+        mouseListeners.forEach(listener -> listener.mouseClicked(mouse));
     }
 
     @Override
@@ -60,25 +78,28 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mousePressed(MouseEvent e1) {
-        MouseEvent e = synthesizeMouse(e1);
-        Viewport vp = Display.setActiveViewport(e.getX(), e.getY());
+        PointerEvent e = synthesizePointer(e1);
+        MouseEvent mouse = synthesizeMouse(e1);
+        Viewport vp = Display.setActiveViewport(e.x(), e.y());
         interaction.mousePressed(e, vp);
-        mouseListeners.forEach(listener -> listener.mousePressed(e));
+        mouseListeners.forEach(listener -> listener.mousePressed(mouse));
     }
 
     @Override
     public void mouseReleased(MouseEvent e1) {
-        MouseEvent e = synthesizeMouse(e1);
+        PointerEvent e = synthesizePointer(e1);
+        MouseEvent mouse = synthesizeMouse(e1);
         interaction.mouseReleased(e);
-        mouseListeners.forEach(listener -> listener.mouseReleased(e));
+        mouseListeners.forEach(listener -> listener.mouseReleased(mouse));
     }
 
     @Override
     public void mouseDragged(MouseEvent e1) {
-        MouseEvent e = synthesizeMouse(e1);
-        Viewport vp = Display.setActiveViewport(e.getX(), e.getY());
+        PointerEvent e = synthesizePointer(e1);
+        MouseEvent mouse = synthesizeMouse(e1);
+        Viewport vp = Display.setActiveViewport(e.x(), e.y());
         interaction.mouseDragged(e, vp);
-        mouseMotionListeners.forEach(listener -> listener.mouseDragged(e));
+        mouseMotionListeners.forEach(listener -> listener.mouseDragged(mouse));
     }
 
     @Override
@@ -92,13 +113,13 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
     public void mouseWheelMoved(MouseWheelEvent e1) {
         // MouseWheelEvent e = synthesizeMouseWheel(e1);
         // Display.setActiveViewport(e.getX(), e.getY());
-        interaction.mouseWheelMoved(e1);
+        interaction.mouseWheelMoved(synthesizeScroll(e1));
         mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e1));
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        interaction.keyPressed(e);
+        interaction.keyPressed(synthesizeKey(e));
         keyListeners.forEach(listener -> listener.keyPressed(e));
     }
 
@@ -109,7 +130,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void keyReleased(KeyEvent e) {
-        interaction.keyReleased(e);
+        interaction.keyReleased(synthesizeKey(e));
         keyListeners.forEach(listener -> listener.keyReleased(e));
     }
 
