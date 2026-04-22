@@ -18,7 +18,8 @@ import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.input.InputPlugin;
+import org.helioviewer.jhv.input.InputPointerListener;
+import org.helioviewer.jhv.input.InputPointerMotionListener;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -58,7 +59,7 @@ public class ViewpointLayer extends AbstractLayer {
     private final ViewpointLayerOptions optionsPanel;
     private final HoverListener hoverListener = new HoverListener();
 
-    private final class HoverListener implements InputPlugin {
+    private final class HoverListener implements InputPointerListener, InputPointerMotionListener {
         @Override
         public void mouseMoved(PointerEvent e) {
             handleMouseMoved(e);
@@ -220,12 +221,12 @@ public class ViewpointLayer extends AbstractLayer {
         super.setEnabled(_enabled);
 
         if (enabled) {
-            JHVFrame.getInputController().addPlugin(hoverListener);
+            JHVFrame.getInputController().addListener(hoverListener);
             optionsPanel.activate();
             optionsPanel.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
-            JHVFrame.getInputController().removePlugin(hoverListener);
+            JHVFrame.getInputController().removeListener(hoverListener);
             optionsPanel.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
                 Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer, Camera.ViewpointApplyMode.KEEP_TRANSFORM);

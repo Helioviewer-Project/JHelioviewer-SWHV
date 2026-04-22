@@ -73,18 +73,26 @@ public class InputController {
     private final HashSet<InputScrollListener> scrollListeners = new HashSet<>();
     private final HashSet<InputKeyListener> inputKeyListeners = new HashSet<>();
 
-    public void addPlugin(InputPlugin plugin) {
-        pointerListeners.add(plugin);
-        pointerMotionListeners.add(plugin);
-        scrollListeners.add(plugin);
-        inputKeyListeners.add(plugin);
+    public void addListener(Object listener) {
+        if (listener instanceof InputPointerListener pointerListener)
+            pointerListeners.add(pointerListener);
+        if (listener instanceof InputPointerMotionListener pointerMotionListener)
+            pointerMotionListeners.add(pointerMotionListener);
+        if (listener instanceof InputScrollListener scrollListener)
+            scrollListeners.add(scrollListener);
+        if (listener instanceof InputKeyListener inputKeyListener)
+            inputKeyListeners.add(inputKeyListener);
     }
 
-    public void removePlugin(InputPlugin plugin) {
-        pointerListeners.remove(plugin);
-        pointerMotionListeners.remove(plugin);
-        scrollListeners.remove(plugin);
-        inputKeyListeners.remove(plugin);
+    public void removeListener(Object listener) {
+        if (listener instanceof InputPointerListener pointerListener)
+            pointerListeners.remove(pointerListener);
+        if (listener instanceof InputPointerMotionListener pointerMotionListener)
+            pointerMotionListeners.remove(pointerMotionListener);
+        if (listener instanceof InputScrollListener scrollListener)
+            scrollListeners.remove(scrollListener);
+        if (listener instanceof InputKeyListener inputKeyListener)
+            inputKeyListeners.remove(inputKeyListener);
     }
 
 }
