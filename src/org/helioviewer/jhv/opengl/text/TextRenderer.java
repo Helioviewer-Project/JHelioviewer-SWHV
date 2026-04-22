@@ -131,9 +131,6 @@ public class TextRenderer {
      */
     public TextRenderer(float size, ByteBuffer fontData) {
         fontSize = size;
-
-        // FIXME: consider adjusting the size based on font size
-        // (it will already automatically resize if necessary)
         packer = new RectanglePacker(new Manager(), kSize, kSize);
         textBackend = new StbTextBackend(fontData, fontSize);
         glyphProducer = new GlyphProducer();
@@ -298,18 +295,6 @@ public class TextRenderer {
         }
     }
 
-    private static Bounds preNormalize(Bounds src) {
-        // Need to round to integer coordinates
-        // Also give ourselves a little slop around the reported
-        // bounds of glyphs because it looks like neither the visual
-        // nor the pixel bounds works perfectly well
-        int minX = (int) Math.floor(src.minX) - 1;
-        int minY = (int) Math.floor(src.minY) - 1;
-        int maxX = (int) Math.ceil(src.maxX()) + 1;
-        int maxY = (int) Math.ceil(src.maxY()) + 1;
-        return new Bounds(minX, minY, maxX - minX, maxY - minY);
-    }
-
     private Bounds normalize(Bounds src) {
         // Give ourselves a boundary around each entity on the backing
         // store in order to prevent bleeding of nearby Strings due to
@@ -401,19 +386,6 @@ public class TextRenderer {
         int origOriginY() {
             return origRectMinY;
         }
-/*
-        boolean used() {
-            return used;
-        }
-
-        void markUsed() {
-            used = true;
-        }
-
-        void clearUsed() {
-            used = false;
-        }
-*/
     }
 
     private final class Manager implements BackingStoreManager {
