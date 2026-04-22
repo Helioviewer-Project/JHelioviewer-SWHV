@@ -3,15 +3,13 @@ package org.helioviewer.jhv.input;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 import org.helioviewer.jhv.display.Display;
 
-public final class AwtInputAdapter implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
     private final InputController inputController;
 
     public AwtInputAdapter(InputController _inputController) {
@@ -28,22 +26,19 @@ public final class AwtInputAdapter implements MouseListener, MouseMotionListener
                 e.isPopupTrigger());
     }
 
-    private static ScrollEvent synthesizeScroll(MouseWheelEvent e) {
-        return new ScrollEvent(e.getPreciseWheelRotation());
-    }
-
     private static KeyInputEvent synthesizeKey(KeyEvent e) {
-        return new KeyInputEvent(e.getKeyCode(), e.isShiftDown());
+        return new KeyInputEvent(switch (e.getKeyCode()) {
+            case KeyEvent.VK_BACK_SPACE -> KeyInputEvent.Key.BACKSPACE;
+            case KeyEvent.VK_DELETE -> KeyInputEvent.Key.DELETE;
+            case KeyEvent.VK_N -> KeyInputEvent.Key.N;
+            case KeyEvent.VK_P -> KeyInputEvent.Key.P;
+            default -> KeyInputEvent.Key.OTHER;
+        }, e.isShiftDown());
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         inputController.mouseClicked(synthesizePointer(e));
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        inputController.mouseEntered(synthesizePointer(e));
     }
 
     @Override
@@ -74,7 +69,7 @@ public final class AwtInputAdapter implements MouseListener, MouseMotionListener
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        inputController.mouseWheelMoved(synthesizeScroll(e));
+        inputController.mouseWheelMoved(new ScrollEvent(e.getPreciseWheelRotation()));
     }
 
     @Override
@@ -83,9 +78,7 @@ public final class AwtInputAdapter implements MouseListener, MouseMotionListener
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-        inputController.keyTyped(synthesizeKey(e));
-    }
+    public void keyTyped(KeyEvent e) {}
 
     @Override
     public void keyReleased(KeyEvent e) {

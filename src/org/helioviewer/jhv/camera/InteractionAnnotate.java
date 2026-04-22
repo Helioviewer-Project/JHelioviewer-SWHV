@@ -133,10 +133,10 @@ class InteractionAnnotate implements Interaction.Type {
 
     @Override
     public void keyPressed(KeyInputEvent e) {
-        if (e.isBackspace() || e.isDelete()) {
+        if (e.key() == KeyInputEvent.Key.BACKSPACE || e.key() == KeyInputEvent.Key.DELETE) {
             remove();
             MovieDisplay.display();
-        } else if (e.isN() && activeIndex >= 0 && !anns.isEmpty()) {
+        } else if (e.key() == KeyInputEvent.Key.N && activeIndex >= 0 && !anns.isEmpty()) {
             activeIndex++;
             activeIndex %= anns.size();
             MovieDisplay.display();
