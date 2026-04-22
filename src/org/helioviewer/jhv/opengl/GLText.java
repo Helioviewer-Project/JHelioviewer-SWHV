@@ -9,7 +9,7 @@ import org.helioviewer.jhv.opengl.text.TextFonts;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public class GLText {
-    private static final int[] RENDERER_SIZES = createRendererSizes();
+    private static final int[] RENDERER_SIZES = {8, 16, 32, 64, 128};
     private static final TextRenderer[] renderers = new TextRenderer[RENDERER_SIZES.length];
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
@@ -21,7 +21,7 @@ public class GLText {
         if (renderers[idx] == null) {
             renderers[idx] = new TextRenderer(rendererSize(idx), TextFonts.loadCanvasFontData());
             // precache for grid text
-            renderers[idx].draw3D("-0123456789.", 0, 0, 0, 0);
+            renderers[idx].draw("-0123456789.", 0, 0, 0, 0);
         }
         return renderers[idx];
     }
@@ -56,22 +56,6 @@ public class GLText {
         return RENDERER_SIZES[idx];
     }
 
-    private static int[] createRendererSizes() {
-        int[] sizes = new int[45];
-        int idx = 0;
-        idx = appendRange(sizes, idx, 10, 24, 1);
-        idx = appendRange(sizes, idx, 26, 48, 2);
-        idx = appendRange(sizes, idx, 52, 96, 4);
-        appendRange(sizes, idx, 104, 144, 8);
-        return sizes;
-    }
-
-    private static int appendRange(int[] sizes, int offset, int start, int end, int step) {
-        for (int size = start; size <= end; size += step)
-            sizes[offset++] = size;
-        return offset;
-    }
-
     private static final int TEXT_SIZE_NORMAL = 14;
 
     private static final int LEFT_MARGIN_TEXT = 0;//10;
@@ -84,11 +68,11 @@ public class GLText {
             return;
 
         TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
-        float fontSize = renderer.getFontSize();
+        float textSize = rendererSize(rendererIndex(TEXT_SIZE_NORMAL));
+        float textScaleFactor = textSize / renderer.getFontSize();
 
         double boundW = 0;
         int ct = 0;
-        float textSize = rendererSize(rendererIndex(TEXT_SIZE_NORMAL));
         for (String txt : txts) {
             double w = TextFonts.measureCanvasWidth(textSize, txt);
             if (boundW < w)
@@ -97,7 +81,7 @@ public class GLText {
         }
 
         float w = (float) (boundW + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
-        float h = (float) (fontSize * 1.1 * ct + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
+        float h = (float) (textSize * 1.1 * ct + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
         int textInit_x = pt_x;
         int textInit_y = pt_y;
 
@@ -105,19 +89,19 @@ public class GLText {
         if (w + pt_x - LEFT_MARGIN_TEXT > vp.width) {
             textInit_x -= (int) (w + pt_x - LEFT_MARGIN_TEXT - vp.width);
         }
-        if (h + pt_y - fontSize - TOP_MARGIN_TEXT > vp.height) {
-            textInit_y -= (int) (h + pt_y - fontSize - TOP_MARGIN_TEXT - vp.height);
+        if (h + pt_y - textSize - TOP_MARGIN_TEXT > vp.height) {
+            textInit_y -= (int) (h + pt_y - textSize - TOP_MARGIN_TEXT - vp.height);
         }
         // float left = textInit_x - LEFT_MARGIN_TEXT;
-        // float bottom = textInit_y - fontSize - TOP_MARGIN_TEXT;
+        // float bottom = textInit_y - textSize - TOP_MARGIN_TEXT;
 
-        int deltaY = 0, dY = (int) (fontSize * 1.1);
+        int deltaY = 0, dY = (int) (textSize * 1.1);
         renderer.beginRendering(vp.width, vp.height);
         for (String txt : txts) {
             renderer.setColor(shadowColor);
-            renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY);
+            renderer.draw(txt, textInit_x + shadowOffset[0], vp.height - textInit_y + shadowOffset[1] - deltaY, 0, textScaleFactor);
             renderer.setColor(Colors.LightGrayFloat);
-            renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY);
+            renderer.draw(txt, textInit_x, vp.height - textInit_y - deltaY, 0, textScaleFactor);
             deltaY += dY;
         }
         renderer.endRendering();

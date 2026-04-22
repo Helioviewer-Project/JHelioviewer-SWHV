@@ -134,16 +134,9 @@ public class TextRenderer {
     }
 
     /**
-     * Draws the supplied string at the given orthographic position.
-     */
-    public void draw(String str, int x, int y) {
-        draw3D(str, x, y, 0, 1);
-    }
-
-    /**
      * Draws the supplied string at the given 3D location.
      */
-    public void draw3D(String str, float x, float y, float z, float scaleFactor) {
+    public void draw(String str, float x, float y, float z, float scaleFactor) {
         int len = str.length();
         Glyph previousGlyph = null;
         for (int i = 0; i < len; ++i) {
@@ -158,7 +151,7 @@ public class TextRenderer {
         }
     }
 
-    public void draw3D(String str, Matrix4f transform, float scaleFactor) {
+    public void draw(String str, Matrix4f transform, float scaleFactor) {
         // The matrix places the local text frame in 3D. Transform the local origin and the unit x/y axes once,
         // then build all glyph corners from that transformed basis instead of re-transforming each corner.
         transform.transformPosition(0, 0, 0, transformedOrigin);
@@ -166,10 +159,10 @@ public class TextRenderer {
         transform.transformPosition(0, 1, 0, transformedBasisY);
         transformedBasisX.sub(transformedOrigin);
         transformedBasisY.sub(transformedOrigin);
-        draw3D(str, transformedOrigin, transformedBasisX, transformedBasisY, scaleFactor);
+        draw(str, transformedOrigin, transformedBasisX, transformedBasisY, scaleFactor);
     }
 
-    public void draw3D(String str, Vector3f origin, Vector3f basisX, Vector3f basisY, float scaleFactor) {
+    public void draw(String str, Vector3f origin, Vector3f basisX, Vector3f basisY, float scaleFactor) {
         float x = 0;
         int len = str.length();
         Glyph previousGlyph = null;
