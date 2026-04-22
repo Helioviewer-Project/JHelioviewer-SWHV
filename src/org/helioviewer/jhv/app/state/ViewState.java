@@ -18,8 +18,7 @@ import org.json.JSONObject;
 
 public final class ViewState {
 
-    private ViewState() {
-    }
+    private ViewState() {}
 
     public interface ModeListener {
         void modeStateChanged();
@@ -115,18 +114,14 @@ public final class ViewState {
     }
 
     public record ModeData(ProjectionMode projection, Interaction.AnnotationMode annotationMode, boolean multiview,
-                           boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {
-    }
+                           boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {}
 
-    public record MovieData(boolean available, boolean playing, int maxFrame, int activeFrame, boolean recording) {
-    }
+    public record MovieData(boolean available, boolean playing, int maxFrame, int activeFrame, boolean recording) {}
 
     public record PlaybackData(Movie.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit,
-                               int firstFrame, int lastFrame) {
-    }
+                               int firstFrame, int lastFrame) {}
 
-    public record RecordingData(RecordingMode mode, RecordingSize size) {
-    }
+    public record RecordingData(RecordingMode mode, RecordingSize size) {}
 
     private static final ArrayList<ModeListener> modeListeners = new ArrayList<>();
     private static final ArrayList<MovieListener> movieListeners = new ArrayList<>();

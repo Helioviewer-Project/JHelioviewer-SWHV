@@ -74,8 +74,7 @@ class LoadZip implements Callable<Void> {
     private static class Callback implements FutureCallback<Void> {
 
         @Override
-        public void onSuccess(Void result) {
-        }
+        public void onSuccess(Void result) {}
 
         @Override
         public void onFailure(@Nonnull Throwable t) {

@@ -16,8 +16,7 @@ public final class HoldRepeat {
 
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new JHVThread.NamedThreadFactory("JHV-HoldRepeat"));
 
-    private HoldRepeat() {
-    }
+    private HoldRepeat() {}
 
     public static void install(AbstractButton button, int repeatMs) {
         final ScheduledFuture<?>[] future = {null};

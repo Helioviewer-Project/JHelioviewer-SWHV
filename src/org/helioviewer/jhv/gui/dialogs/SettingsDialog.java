@@ -190,8 +190,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         VideoFormat videoFormat = VideoFormat.H264;
         try {
             videoFormat = VideoFormat.valueOf(Settings.getProperty("video.format"));
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         comboVideo.setSelectedItem(videoFormat);
         comboVideo.addActionListener(e -> Settings.setProperty("video.format", ((VideoFormat) Objects.requireNonNull(comboVideo.getSelectedItem())).name()));
         settings.add(comboVideo, c);

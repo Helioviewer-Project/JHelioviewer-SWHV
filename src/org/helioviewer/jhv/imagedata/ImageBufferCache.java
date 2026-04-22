@@ -16,8 +16,7 @@ public final class ImageBufferCache {
             .weigher((Object key, ImageBuffer value) -> value.byteSize())
             .build();
 
-    private ImageBufferCache() {
-    }
+    private ImageBufferCache() {}
 
     @Nullable
     public static ImageBuffer get(Object key) {

@@ -12,8 +12,7 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
 
-    private GLRenderer() {
-    }
+    private GLRenderer() {}
 
     public static void init() {
         GL.glDisable(GL.TEXTURE_2D);

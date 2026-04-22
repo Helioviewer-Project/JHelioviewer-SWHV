@@ -109,8 +109,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     // Overrides updateUI, to keep own SliderUI
     @Override
-    public void updateUI() {
-    }
+    public void updateUI() {}
 
     @Override
     public void repaint() {
@@ -164,8 +163,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-    }
+    public void mouseClicked(MouseEvent e) {}
 
     @Override
     public void mouseEntered(MouseEvent e) {

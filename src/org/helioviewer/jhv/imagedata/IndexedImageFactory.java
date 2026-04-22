@@ -12,8 +12,7 @@ import java.nio.ShortBuffer;
 
 public class IndexedImageFactory {
 
-    private IndexedImageFactory() {
-    }
+    private IndexedImageFactory() {}
 
     public static BufferedImage createIndexed(Buffer buffer, int width, int height, IndexColorModel cm) {
         BufferedImage temp = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_INDEXED, cm);

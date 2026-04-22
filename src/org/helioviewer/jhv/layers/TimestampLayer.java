@@ -98,8 +98,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void init() {
-    }
+    public void init() {}
 
     @Override
     public void remove() {
@@ -117,8 +116,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void dispose() {
-    }
+    public void dispose() {}
 
     private JPanel optionsPanel() {
         JHVSlider slider = new JHVSlider(MIN_SCALE, MAX_SCALE, scale);

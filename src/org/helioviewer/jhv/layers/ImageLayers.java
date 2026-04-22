@@ -22,8 +22,7 @@ import org.astrogrid.samp.SampUtils;
 
 public final class ImageLayers {
 
-    private ImageLayers() {
-    }
+    private ImageLayers() {}
 
     static boolean areEnabled() {
         for (ImageLayer layer : Layers.getImageLayers()) {

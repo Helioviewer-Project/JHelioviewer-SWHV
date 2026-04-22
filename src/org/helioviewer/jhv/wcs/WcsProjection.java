@@ -5,8 +5,7 @@ import org.helioviewer.jhv.math.Vec3;
 
 public final class WcsProjection {
 
-    private WcsProjection() {
-    }
+    private WcsProjection() {}
 
     public static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double x, double y) {
         Vec3 plane = wcsHeader.crota.rotateVector(new Vec3(x, y, 0));
@@ -118,8 +117,7 @@ public final class WcsProjection {
         return maxEta;
     }
 
-    private record RadialAndDerivative(double radial, double derivative) {
-    }
+    private record RadialAndDerivative(double radial, double derivative) {}
 
     private static RadialAndDerivative zpnRadialAndDerivative(float[] pv2, double eta) {
         double radial = pv2[pv2.length - 1];

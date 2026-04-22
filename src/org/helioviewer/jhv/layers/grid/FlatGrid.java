@@ -38,8 +38,7 @@ public class FlatGrid {
     private Axis yAxis = Axis.EMPTY;
 
     // Step and inclusive bounds of one flat axis.
-    private record AxisSignature(double step, double first, double last) {
-    }
+    private record AxisSignature(double step, double first, double last) {}
 
     // Built axis labels, zero-axis flags, and positions.
     private record Axis(AxisSignature signature, String[] labels, boolean[] axisFlags, double[] positions) {
@@ -48,8 +47,7 @@ public class FlatGrid {
 
     // Projection and camera state that invalidates the cached flat grid.
     private record FlatGridKey(ProjectionMode mode, GridType gridType, double aspect, double cameraWidth,
-                               double translationX, double translationY) {
-    }
+                               double translationX, double translationY) {}
 
     public void init() {
         shape.init();

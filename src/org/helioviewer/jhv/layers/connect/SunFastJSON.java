@@ -57,10 +57,8 @@ public class SunFastJSON {
         return SunJSONTypes.getGeometryBuffer(jg.type, coords, colors, thickness);
     }
 
-    private record JObject(String type, String time, List<JGeometry> geometry) {
-    }
+    private record JObject(String type, String time, List<JGeometry> geometry) {}
 
-    private record JGeometry(String type, List<double[]> coordinates, List<int[]> colors, double thickness) {
-    }
+    private record JGeometry(String type, List<double[]> coordinates, List<int[]> colors, double thickness) {}
 
 }

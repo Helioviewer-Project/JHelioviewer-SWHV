@@ -10,8 +10,7 @@ public class MappedImageFactory {
 
     private static final AbstractOwnedDataBuffer.BackendKind BACKEND_KIND = AbstractOwnedDataBuffer.BackendKind.MAPPED_FILE;
 
-    private MappedImageFactory() {
-    }
+    private MappedImageFactory() {}
 
     /*
         public static BufferedImage copyImage(BufferedImage bi) throws IOException {

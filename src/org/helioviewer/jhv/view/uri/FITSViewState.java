@@ -87,8 +87,7 @@ public final class FITSViewState {
     private static double alpha = Math.pow(10, 3);
     private static final ArrayList<Listener> listeners = new ArrayList<>();
 
-    private FITSViewState() {
-    }
+    private FITSViewState() {}
 
     public static void refresh() {
         URIView.clearURICache();

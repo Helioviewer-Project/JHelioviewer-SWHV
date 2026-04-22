@@ -13,8 +13,7 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public final class Tasks {
 
-    private Tasks() {
-    }
+    private Tasks() {}
 
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                        @Nonnull FailureHandler onFailure) {
@@ -36,8 +35,7 @@ public final class Tasks {
         return submit(logContext, task, onSuccess, (ctx, t) -> defaultOnFailure(ctx, t, errorMessage));
     }
 
-    public static void doNothing(Object ignoredResult) {
-    }
+    public static void doNothing(Object ignoredResult) {}
 
     @FunctionalInterface
     public interface FailureHandler {

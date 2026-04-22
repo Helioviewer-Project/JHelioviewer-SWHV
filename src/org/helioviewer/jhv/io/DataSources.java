@@ -114,11 +114,9 @@ public class DataSources {
         }
     }
 
-    private record DatasetId(String server, int sourceId) {
-    }
+    private record DatasetId(String server, int sourceId) {}
 
-    private record Source(String observatory, String dataset) {
-    }
+    private record Source(String observatory, String dataset) {}
 
     private static final Map<DatasetId, Source> datasetMap = new ConcurrentHashMap<>();
 

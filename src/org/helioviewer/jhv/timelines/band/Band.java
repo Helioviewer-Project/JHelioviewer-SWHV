@@ -27,8 +27,7 @@ import org.json.JSONObject;
 
 public final class Band extends AbstractTimelineLayer {
 
-    record Data(BandType bandType, long[] dates, float[] values) {
-    }
+    record Data(BandType bandType, long[] dates, float[] values) {}
 
     private record Polyline(int[] xPoints, int[] yPoints) {
         int length() {

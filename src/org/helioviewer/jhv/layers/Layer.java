@@ -11,23 +11,17 @@ import org.json.JSONObject;
 
 public interface Layer {
 
-    default void render(Camera camera, Viewport vp) {
-    }
+    default void render(Camera camera, Viewport vp) {}
 
-    default void renderScale(Camera camera, Viewport vp) {
-    }
+    default void renderScale(Camera camera, Viewport vp) {}
 
-    default void renderFloat(Camera camera, Viewport vp) {
-    }
+    default void renderFloat(Camera camera, Viewport vp) {}
 
-    default void renderFullFloat(Camera camera, Viewport vp) {
-    }
+    default void renderFullFloat(Camera camera, Viewport vp) {}
 
-    default void renderMiniview(Camera camera, Viewport vp) {
-    }
+    default void renderMiniview(Camera camera, Viewport vp) {}
 
-    default void prerender() {
-    }
+    default void prerender() {}
 
     void remove();
 

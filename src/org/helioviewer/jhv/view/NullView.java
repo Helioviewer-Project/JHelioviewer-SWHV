@@ -43,8 +43,7 @@ public class NullView implements View {
     }
 
     @Override
-    public void setFilter(ImageFilter.Type t) {
-    }
+    public void setFilter(ImageFilter.Type t) {}
 
     @Override
     public ImageFilter.Type getFilter() {
@@ -52,8 +51,7 @@ public class NullView implements View {
     }
 
     @Override
-    public void setDataHandler(View.DataHandler dataHandler) {
-    }
+    public void setDataHandler(View.DataHandler dataHandler) {}
 
     @Override
     public JHVTime getFrameTime(int frame) {

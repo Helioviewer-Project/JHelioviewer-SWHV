@@ -207,12 +207,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             }
 
             @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-            }
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
 
             @Override
-            public void popupMenuCanceled(PopupMenuEvent e) {
-            }
+            public void popupMenuCanceled(PopupMenuEvent e) {}
         });
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
@@ -259,8 +257,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     }
 
     @Override
-    public void setAvailabilityEnabled(boolean enabled) {
-    }
+    public void setAvailabilityEnabled(boolean enabled) {}
 
     private boolean checkSanity() {
         long start = getStartTime();

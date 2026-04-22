@@ -135,8 +135,7 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
     }
 
     @Override
-    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-    }
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {}
 
     private static final JHVTransferHandler instance = new JHVTransferHandler();
 
@@ -144,7 +143,6 @@ public class JHVTransferHandler extends TransferHandler implements ClipboardOwne
         return instance;
     }
 
-    private JHVTransferHandler() {
-    }
+    private JHVTransferHandler() {}
 
 }

@@ -12,8 +12,7 @@ import org.helioviewer.jhv.wcs.ImageBounds;
 
 public final class ImageLayerBounds {
 
-    private ImageLayerBounds() {
-    }
+    private ImageLayerBounds() {}
 
     public static double getLargestPhysicalHeight() {
         if (!Display.mode.isOrthographic())

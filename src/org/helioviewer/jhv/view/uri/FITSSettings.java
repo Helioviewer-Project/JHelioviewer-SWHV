@@ -28,8 +28,7 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 @SuppressWarnings("serial")
 public final class FITSSettings {
 
-    private FITSSettings() {
-    }
+    private FITSSettings() {}
 
     public static final class SettingsDialog extends JDialog implements Interfaces.ShowableDialog, FITSViewState.Listener {
 

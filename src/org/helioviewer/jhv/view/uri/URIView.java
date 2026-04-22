@@ -25,8 +25,7 @@ import org.helioviewer.jhv.view.DecodeExecutor;
 
 public class URIView extends BaseView {
 
-    private record DecodeKey(DataUri uri, ImageFilter.Type filter) {
-    }
+    private record DecodeKey(DataUri uri, ImageFilter.Type filter) {}
 
     static void clearURICache() {
         ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey);

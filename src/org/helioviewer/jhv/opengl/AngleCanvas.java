@@ -326,8 +326,7 @@ public final class AngleCanvas extends Canvas {
             Point canvasOnScreen = getLocationOnScreen();
             Point contentOnScreen = contentPane.getLocationOnScreen();
             return new Rectangle(canvasOnScreen.x - contentOnScreen.x, canvasOnScreen.y - contentOnScreen.y, width, height);
-        } catch (IllegalComponentStateException ignore) {
-        }
+        } catch (IllegalComponentStateException ignore) {}
 
         int x = 0;
         int y = 0;

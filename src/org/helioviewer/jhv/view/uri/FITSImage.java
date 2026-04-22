@@ -82,8 +82,7 @@ public class FITSImage implements URIImageReader {
     private static final int SAMPLE = 4;
     private static final int MIN_SAMPLES = 10;
 
-    private record SampleBuffer(float[] values, int length) {
-    }
+    private record SampleBuffer(float[] values, int length) {}
 
     private static SampleBuffer sampleImage(PixType pixType, long blank, double bzero, double bscale, int width, int height, Object[] pixData) {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
@@ -152,8 +151,7 @@ public class FITSImage implements URIImageReader {
                     }
                 }
             }
-            case BYTE -> {
-            }
+            case BYTE -> {}
         }
         return new SampleBuffer(samples, sampleLen);
     }
