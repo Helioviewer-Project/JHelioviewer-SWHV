@@ -10,6 +10,7 @@ import org.lwjgl.system.MemoryUtil;
 
 class TextureRenderer {
     private ByteBuffer imageBuffer;
+    private ByteBuffer copyScratch;
 
     private final GLTexture tex;
     private boolean dirty;
@@ -79,14 +80,14 @@ class TextureRenderer {
         long base = MemoryUtil.memAddress(imageBuffer);
         int rowStride = imageWidth * 4;
         long rowBytes = (long) width * 4;
-        ByteBuffer scratch = MemoryUtil.memAlloc((int) rowBytes);
+        ensureCopyScratch((int) rowBytes);
         for (int row = 0; row < height; row++) {
             long srcOffset = (long) ((srcY + row) * rowStride + (srcX * 4));
             long dstOffset = (long) ((dstY + row) * rowStride + (dstX * 4));
-            MemoryUtil.memCopy(base + srcOffset, MemoryUtil.memAddress(scratch), rowBytes);
-            MemoryUtil.memCopy(MemoryUtil.memAddress(scratch), base + dstOffset, rowBytes);
+            long scratchAddress = MemoryUtil.memAddress(copyScratch);
+            MemoryUtil.memCopy(base + srcOffset, scratchAddress, rowBytes);
+            MemoryUtil.memCopy(scratchAddress, base + dstOffset, rowBytes);
         }
-        MemoryUtil.memFree(scratch);
     }
 
     void copyFrom(TextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
@@ -131,8 +132,17 @@ class TextureRenderer {
 
     void dispose() {
         tex.delete();
+        MemoryUtil.memFree(copyScratch);
+        copyScratch = null;
         MemoryUtil.memFree(imageBuffer);
         imageBuffer = null;
+    }
+
+    private void ensureCopyScratch(int size) {
+        if (copyScratch == null || copyScratch.capacity() < size) {
+            MemoryUtil.memFree(copyScratch);
+            copyScratch = MemoryUtil.memAlloc(size);
+        }
     }
 
     private void upload(int x, int y, int width, int height) {
