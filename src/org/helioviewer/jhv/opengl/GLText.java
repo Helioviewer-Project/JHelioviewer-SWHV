@@ -44,7 +44,7 @@ public class GLText {
     }
 
     private static int physicalSize(int logicalSize) {
-        return logicalSize * Math.max(1, (int) Math.round(Display.pixelScale[1]));
+        return logicalSize * (Display.pixelScale[1] < 1.5f ? 1 : 2);
     }
 
     private static final int TEXT_SIZE_NORMAL = 14;
@@ -63,16 +63,14 @@ public class GLText {
         float textScaleFactor = textSize / renderer.getFontSize();
 
         double boundW = 0;
-        int ct = 0;
         for (String txt : txts) {
             double w = renderer.measureWidth(txt) * textScaleFactor;
             if (boundW < w)
                 boundW = w;
-            ct++;
         }
 
         float w = (float) (boundW + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
-        float h = (float) (textSize * 1.1 * ct + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
+        float h = (float) (textSize * 1.1 * txts.size() + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
         int textInit_x = pt_x;
         int textInit_y = pt_y;
 

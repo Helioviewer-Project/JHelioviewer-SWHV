@@ -73,13 +73,11 @@ public final class TextRenderer {
         Glyph previousGlyph = null;
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
-            if (glyph != null) {
-                if (previousGlyph != null)
-                    x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
-                float advance = glyph.draw3D(x, y, z, scaleFactor);
-                x += advance * scaleFactor;
-                previousGlyph = glyph;
-            }
+            if (previousGlyph != null)
+                x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+            float advance = glyph.draw3D(x, y, z, scaleFactor);
+            x += advance * scaleFactor;
+            previousGlyph = glyph;
         }
     }
 
@@ -98,12 +96,10 @@ public final class TextRenderer {
         Glyph previousGlyph = null;
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
-            if (glyph != null) {
-                if (previousGlyph != null)
-                    width += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode());
-                width += glyph.advance;
-                previousGlyph = glyph;
-            }
+            if (previousGlyph != null)
+                width += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode());
+            width += glyph.advance;
+            previousGlyph = glyph;
         }
         return width;
     }
@@ -114,13 +110,11 @@ public final class TextRenderer {
         Glyph previousGlyph = null;
         for (int i = 0; i < len; ++i) {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
-            if (glyph != null) {
-                if (previousGlyph != null)
-                    x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
-                float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
-                x += advance * scaleFactor;
-                previousGlyph = glyph;
-            }
+            if (previousGlyph != null)
+                x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+            float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
+            x += advance * scaleFactor;
+            previousGlyph = glyph;
         }
     }
 
@@ -228,7 +222,7 @@ public final class TextRenderer {
             STBTruetype.stbtt_GetGlyphBitmapBox(fontInfo, glyphIndex, scale, scale, x0, y0, x1, y1);
 
             StbGlyphData glyphData = new StbGlyphData(glyphIndex, x0.get(0), y0.get(0), x1.get(0), y1.get(0));
-            return new Glyph(unicodeID, glyphIndex, advanceWidth.get(0) * scale, glyphData);
+            return new Glyph(glyphIndex, advanceWidth.get(0) * scale, glyphData);
         }
     }
 
@@ -303,22 +297,16 @@ public final class TextRenderer {
     }
 
     private final class Glyph {
-        private final int unicodeID;
         private final int glyphCode;
         private final float advance;
         private final StbGlyphData backendData;
         private GlyphRect glyphRectForTextureMapping;
         private TextData textData;
 
-        Glyph(int unicodeIDValue, int glyphCodeValue, float advanceValue, StbGlyphData glyphBackendData) {
-            unicodeID = unicodeIDValue;
+        Glyph(int glyphCodeValue, float advanceValue, StbGlyphData glyphBackendData) {
             glyphCode = glyphCodeValue;
             advance = advanceValue;
             backendData = glyphBackendData;
-        }
-
-        int getUnicodeID() {
-            return unicodeID;
         }
 
         int getGlyphCode() {
@@ -414,7 +402,6 @@ public final class TextRenderer {
                 throw new IllegalStateException("Fallback glyph '?' is missing from the font");
         }
 
-        @Nullable
         Glyph getGlyph(char unicodeID) {
             char mapped = TextFonts.mapGlyph(unicodeID);
             if (mapped != unicodeID)

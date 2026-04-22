@@ -3,16 +3,11 @@ package org.helioviewer.jhv.opengl.text;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.helioviewer.jhv.io.FileUtils;
 
-import org.lwjgl.stb.STBTTFontinfo;
-import org.lwjgl.stb.STBTruetype;
-import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 public final class TextFonts {
@@ -21,10 +16,8 @@ public final class TextFonts {
     private static final char FALLBACK_GLYPH = '?';
     private static final boolean[] supportedGlyphs = new boolean[Character.MAX_VALUE + 1];
     private static final Map<String, ByteBuffer> fontDataByPath = new HashMap<>();
-    private static final Map<String, STBTTFontinfo> fontInfoByPath = new HashMap<>();
 
     static {
-        Arrays.fill(supportedGlyphs, false);
         for (int i = 0; i < GLYPHS.length(); i++)
             supportedGlyphs[GLYPHS.charAt(i)] = true;
     }
@@ -59,57 +52,9 @@ public final class TextFonts {
         }
     }
 
-    public static float measureCanvasWidth(float pixelHeight, String str) {
-        return measureWidth(CANVAS_FONT_RESOURCE, pixelHeight, str);
-    }
-
-    private static float measureWidth(String resourcePath, float pixelHeight, String str) {
-        STBTTFontinfo fontInfo = fontInfo(resourcePath);
-        float scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, pixelHeight);
-        float width = 0;
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer advanceWidth = stack.mallocInt(1);
-            IntBuffer ignoredLeftBearing = stack.mallocInt(1);
-            int previousGlyphIndex = 0;
-            int len = str.length();
-            for (int i = 0; i < len; i++) {
-                int glyphIndex = STBTruetype.stbtt_FindGlyphIndex(fontInfo, mapGlyph(str.charAt(i)));
-                if (glyphIndex == 0)
-                    continue;
-                if (previousGlyphIndex != 0)
-                    width += STBTruetype.stbtt_GetGlyphKernAdvance(fontInfo, previousGlyphIndex, glyphIndex) * scale;
-                STBTruetype.stbtt_GetGlyphHMetrics(fontInfo, glyphIndex, advanceWidth, ignoredLeftBearing);
-                width += advanceWidth.get(0) * scale;
-                previousGlyphIndex = glyphIndex;
-            }
-        }
-
-        return width;
-    }
-
     public static void dispose() {
-        for (STBTTFontinfo fontInfo : fontInfoByPath.values())
-            fontInfo.free();
-        fontInfoByPath.clear();
-
         for (ByteBuffer fontData : fontDataByPath.values())
             MemoryUtil.memFree(fontData);
         fontDataByPath.clear();
-    }
-
-    private static STBTTFontinfo fontInfo(String resourcePath) {
-        STBTTFontinfo fontInfo = fontInfoByPath.get(resourcePath);
-        if (fontInfo != null)
-            return fontInfo;
-
-        fontInfo = STBTTFontinfo.create();
-        if (!STBTruetype.stbtt_InitFont(fontInfo, fontData(resourcePath))) {
-            fontInfo.free();
-            throw new IllegalStateException("Failed to initialize font " + resourcePath);
-        }
-
-        fontInfoByPath.put(resourcePath, fontInfo);
-        return fontInfo;
     }
 }
