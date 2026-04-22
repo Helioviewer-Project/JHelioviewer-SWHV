@@ -9,11 +9,8 @@ import org.helioviewer.jhv.opengl.text.TextFonts;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public class GLText {
-    private static final int MIN = 10;
-    private static final int MAX = 144;
-    private static final int STEP = 1;
-    private static final int SIZE = (MAX - MIN) / STEP + 1;
-    private static final TextRenderer[] renderers = new TextRenderer[SIZE];
+    private static final int[] RENDERER_SIZES = createRendererSizes();
+    private static final TextRenderer[] renderers = new TextRenderer[RENDERER_SIZES.length];
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
@@ -30,7 +27,7 @@ public class GLText {
     }
 
     public static void dispose() {
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < renderers.length; i++) {
             if (renderers[i] != null) {
                 renderers[i].dispose();
                 renderers[i] = null;
@@ -41,17 +38,38 @@ public class GLText {
 
     private static int rendererIndex(int size) {
         size = (int) (size * Display.pixelScale[1]);
+        if (size <= RENDERER_SIZES[0])
+            return 0;
 
-        int idx = (size - MIN) / STEP;
-        if (idx < 0)
-            idx = 0;
-        else if (idx >= SIZE)
-            idx = SIZE - 1;
-        return idx;
+        int lastIndex = RENDERER_SIZES.length - 1;
+        if (size >= RENDERER_SIZES[lastIndex])
+            return lastIndex;
+
+        for (int i = 1; i < RENDERER_SIZES.length; i++) {
+            if (size <= RENDERER_SIZES[i])
+                return i;
+        }
+        return lastIndex;
     }
 
     private static float rendererSize(int idx) {
-        return idx * STEP + MIN;
+        return RENDERER_SIZES[idx];
+    }
+
+    private static int[] createRendererSizes() {
+        int[] sizes = new int[45];
+        int idx = 0;
+        idx = appendRange(sizes, idx, 10, 24, 1);
+        idx = appendRange(sizes, idx, 26, 48, 2);
+        idx = appendRange(sizes, idx, 52, 96, 4);
+        appendRange(sizes, idx, 104, 144, 8);
+        return sizes;
+    }
+
+    private static int appendRange(int[] sizes, int offset, int start, int end, int step) {
+        for (int size = start; size <= end; size += step)
+            sizes[offset++] = size;
+        return offset;
     }
 
     private static final int TEXT_SIZE_NORMAL = 14;
