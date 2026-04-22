@@ -2,8 +2,7 @@ package org.helioviewer.jhv.math;
 
 public final class PolarBasis {
 
-    private PolarBasis() {
-    }
+    private PolarBasis() {}
 
     public static double x(double radius, double angleRadians) {
         return -radius * Math.sin(angleRadians);

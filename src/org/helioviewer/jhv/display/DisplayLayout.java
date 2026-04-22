@@ -2,8 +2,7 @@ package org.helioviewer.jhv.display;
 
 public class DisplayLayout {
 
-    private DisplayLayout() {
-    }
+    private DisplayLayout() {}
 
     static Viewport fullViewport(int x, int y, int width, int height, int fullHeight) {
         return viewport(-1, x, y, width, height, fullHeight);

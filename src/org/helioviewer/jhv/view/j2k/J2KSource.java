@@ -180,8 +180,7 @@ abstract class J2KSource {
             if (stream != null) {
                 try {
                     stream.Destroy();
-                } catch (KduException ignore) {
-                }
+                } catch (KduException ignore) {}
             }
             if (inputBox != null) {
                 inputBox.Close();

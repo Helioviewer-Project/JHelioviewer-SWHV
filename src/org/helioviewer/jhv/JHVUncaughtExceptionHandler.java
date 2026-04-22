@@ -20,8 +20,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final JHVUncaughtExceptionHandler instance = new JHVUncaughtExceptionHandler();
 
-    private JHVUncaughtExceptionHandler() {
-    }
+    private JHVUncaughtExceptionHandler() {}
 
     // This method should be called once when the application starts
     public static void setupHandlerForThread() {

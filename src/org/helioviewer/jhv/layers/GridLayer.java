@@ -103,8 +103,7 @@ public final class GridLayer extends AbstractLayer {
         String strGridType = jo.optString("type", Display.gridType.toString());
         try {
             Display.setGridType(GridType.valueOf(strGridType));
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
     }
 
     public GridLayer(JSONObject jo) {

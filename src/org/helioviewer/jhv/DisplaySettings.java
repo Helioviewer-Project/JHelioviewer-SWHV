@@ -18,15 +18,13 @@ public class DisplaySettings {
         TimeMode setTimeMode = TimeMode.Observer;
         try {
             setTimeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         timeMode = setTimeMode;
 
         UITheme setUITheme = UITheme.Dark;
         try {
             setUITheme = UITheme.valueOf(Settings.getProperty("display.theme"));
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         uiTheme = setUITheme;
     }
 

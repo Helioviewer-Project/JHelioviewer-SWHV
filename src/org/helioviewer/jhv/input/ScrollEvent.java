@@ -1,4 +1,3 @@
 package org.helioviewer.jhv.input;
 
-public record ScrollEvent(double preciseWheelRotation) {
-}
+public record ScrollEvent(double preciseWheelRotation) {}

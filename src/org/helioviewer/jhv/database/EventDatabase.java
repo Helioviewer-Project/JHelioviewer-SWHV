@@ -36,8 +36,7 @@ public class EventDatabase {
     private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedClassThreadFactory(EventDatabaseThread.class, "EventDatabase"));
 
     public record Event2Db(byte[] compressedJson, long start, long end, long archiv, String uid,
-                           List<JHVDatabaseParam> paramList) {
-    }
+                           List<JHVDatabaseParam> paramList) {}
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
@@ -492,8 +491,7 @@ public class EventDatabase {
         return last_timestamp;
     }
 
-    private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {
-    }
+    private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
     public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) {
         try {

@@ -97,8 +97,7 @@ public class JPIPCacheManager {
         for (String dir : dirs) { // delete old versions
             try {
                 FileUtils.deleteDir(Path.of(JHVDirectory.CACHE.getPath(), dir));
-            } catch (Exception ignore) {
-            }
+            } catch (Exception ignore) {}
         }
     }
 

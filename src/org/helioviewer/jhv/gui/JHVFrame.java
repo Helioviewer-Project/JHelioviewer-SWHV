@@ -38,8 +38,7 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 
 public final class JHVFrame {
 
-    private JHVFrame() {
-    }
+    private JHVFrame() {}
 
     @SuppressWarnings("serial")
     private static final class FixedWidthPanel extends JPanel {
@@ -218,8 +217,7 @@ public final class JHVFrame {
             int value = Integer.parseInt(raw.trim());
             if (value > 0)
                 return value;
-        } catch (NumberFormatException ignore) {
-        }
+        } catch (NumberFormatException ignore) {}
         return fallback;
     }
 

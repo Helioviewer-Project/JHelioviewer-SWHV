@@ -28,8 +28,7 @@ class HEKParser {
 
     private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
-    private record HgsPoint(double longitudeDeg, double latitudeDeg) {
-    }
+    private record HgsPoint(double longitudeDeg, double latitudeDeg) {}
 
     static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
         List<HgsPoint> hgsBoundedBox = null;
@@ -93,8 +92,7 @@ class HEKParser {
             try {
                 if (waveCM)
                     waveValue = formatter1.get().format(Double.parseDouble(waveValue) * (1e-2 /*m*/ * 1e9 /*nm*/)) + "nm";
-            } catch (Exception ignore) {
-            }
+            } catch (Exception ignore) {}
             currentEvent.addParameter("obs_meanwavel", waveValue, full);
         }
 
@@ -133,8 +131,7 @@ class HEKParser {
                         type = "Reference Link";
                         ok = true;
                     }
-                    default -> {
-                    }
+                    default -> {}
                 }
             } else if (lowerKey.equals("ref_url")) {
                 url = value;

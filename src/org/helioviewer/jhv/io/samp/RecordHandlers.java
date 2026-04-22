@@ -8,8 +8,7 @@ import org.astrogrid.samp.Message;
 
 final class RecordHandlers {
 
-    private RecordHandlers() {
-    }
+    private RecordHandlers() {}
 
     static void register(SampClient client) {
         client.addMessageHandler(new SampClient.JHVSampHandler("jhv.record.set", (senderId, sender, msg) -> {

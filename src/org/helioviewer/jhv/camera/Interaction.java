@@ -77,11 +77,9 @@ public class Interaction {
 
         void mouseDragged(PointerEvent e, Viewport vp);
 
-        default void mouseReleased(PointerEvent e) {
-        }
+        default void mouseReleased(PointerEvent e) {}
 
-        default void keyPressed(KeyInputEvent e) {
-        }
+        default void keyPressed(KeyInputEvent e) {}
     }
 
     private final Camera camera;

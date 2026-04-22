@@ -36,8 +36,7 @@ import kdu_jni.KduException;
 
 public class J2KView extends BaseView {
 
-    private record DecodeKey(J2KParams.Decode params, ImageFilter.Type filter) {
-    }
+    private record DecodeKey(J2KParams.Decode params, ImageFilter.Type filter) {}
 
     private static final AtomicInteger globalSerial = new AtomicInteger();
 

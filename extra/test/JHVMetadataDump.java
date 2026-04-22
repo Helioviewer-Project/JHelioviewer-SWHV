@@ -71,8 +71,7 @@ public final class JHVMetadataDump {
         }
     }
 
-    private JHVMetadataDump() {
-    }
+    private JHVMetadataDump() {}
 
     private static ImageHDU findImageHdu(Fits fits, Integer requestedHdu) throws Exception {
         BasicHDU<?>[] hdus = fits.read();

@@ -236,8 +236,7 @@ public final class DataSourcesTree extends JTree {
         }
 
         @Override
-        public void clearSelection() {
-        }
+        public void clearSelection() {}
 
     }
 

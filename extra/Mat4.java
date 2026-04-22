@@ -24,8 +24,7 @@ class Mat4 {
         m[15] = M15;
     }
 
-    private Mat4() {
-    }
+    private Mat4() {}
 
     public Mat4(Mat4 mat) {
         set(mat);

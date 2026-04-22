@@ -50,12 +50,10 @@ public class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void mouseDragged(Camera camera, Viewport vp, int x, int y) {
-    }
+    public void mouseDragged(Camera camera, Viewport vp, int x, int y) {}
 
     @Override
-    public void mouseReleased() {
-    }
+    public void mouseReleased() {}
 
     @Override
     public boolean beingDragged() {

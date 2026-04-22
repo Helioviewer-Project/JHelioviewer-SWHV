@@ -13,8 +13,7 @@ final class WcsInterpreter {
             double unitPerPixelX,
             double unitPerPixelY,
             double arcsecPerPixelX,
-            double arcsecPerPixelY) {
-    }
+            double arcsecPerPixelY) {}
 
     private record PixelAxes(
             double arcsecX,
@@ -24,15 +23,13 @@ final class WcsInterpreter {
             double pc11,
             double pc12,
             double pc21,
-            double pc22) {
-    }
+            double pc22) {}
 
     private record SurfaceCd(
             double cd11,
             double cd12,
             double cd21,
-            double cd22) {
-    }
+            double cd22) {}
 
     private record WcsInput(
             double cdelt1,
@@ -44,11 +41,9 @@ final class WcsInterpreter {
             double pc11,
             double pc12,
             double pc21,
-            double pc22) {
-    }
+            double pc22) {}
 
-    private WcsInterpreter() {
-    }
+    private WcsInterpreter() {}
 
     static Result read(MetaDataContainer m) {
         String ctype1 = m.getString("CTYPE1").orElse("");

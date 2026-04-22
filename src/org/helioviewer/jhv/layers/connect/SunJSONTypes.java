@@ -58,8 +58,7 @@ public class SunJSONTypes {
     }
 
     /**/
-    record GeometryBuffer(BufType type, double thickness, BufVertex vexBuf) {
-    }
+    record GeometryBuffer(BufType type, double thickness, BufVertex vexBuf) {}
 
     /**/
     private enum BufType {point, line} // type in BufVertex

@@ -44,14 +44,11 @@ public interface TimelineLayer {
 
     void fetchData(TimeAxis selectedAxis);
 
-    default void yaxisChanged() {
-    }
+    default void yaxisChanged() {}
 
-    default void zoomToFitAxis() {
-    }
+    default void zoomToFitAxis() {}
 
-    default void resetAxis() {
-    }
+    default void resetAxis() {}
 
     default boolean highLightChanged(Point p) {
         return false;

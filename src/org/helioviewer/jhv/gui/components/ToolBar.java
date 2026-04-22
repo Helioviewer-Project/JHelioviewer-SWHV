@@ -114,8 +114,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
         try {
             displayMode = DisplayMode.valueOf(Settings.getProperty("display.toolbar").toUpperCase());
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         setDisplayMode(displayMode);
         ViewState.addModeListener(this);
     }
@@ -138,8 +137,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         Interaction.Mode interactionMode = JHVFrame.getInteraction().getMode();
         try {
             interactionMode = Interaction.Mode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
 
         Dimension dim = new Dimension(32, 32);
 

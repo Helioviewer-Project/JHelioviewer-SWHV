@@ -53,8 +53,7 @@ class ViewpointLayerOptionsExpert extends JPanel implements TimeListener.Selecti
         if (jo != null) {
             try {
                 frame = Frame.valueOf(jo.optString("frame"));
-            } catch (Exception ignore) {
-            }
+            } catch (Exception ignore) {}
             relative = jo.optBoolean("relativeLongitude", relative);
             ja = jo.optJSONArray("objects");
             sync = jo.optBoolean("syncInterval", sync);

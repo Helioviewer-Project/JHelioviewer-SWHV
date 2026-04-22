@@ -14,8 +14,7 @@ final class AngleLibraries {
     private static final String METAL_HOST_LIBRARY = "libjhvmetalhost.dylib";
     private static final Path MACOS_NATIVE_DIR = Path.of("lib", "natives-macos");
 
-    private AngleLibraries() {
-    }
+    private AngleLibraries() {}
 
     static Path libraryPath(String fileName) {
         if (Platform.isMacOS() && METAL_HOST_LIBRARY.equals(fileName)) {

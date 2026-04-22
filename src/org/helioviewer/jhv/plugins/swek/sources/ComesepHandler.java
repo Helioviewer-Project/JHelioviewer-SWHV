@@ -114,8 +114,7 @@ public class ComesepHandler extends SWEKHandler {
                     if (lowKey.equals("atstrongest")) {
                         try {
                             value = TimeUtils.format(Long.parseLong(value) * 1000L);
-                        } catch (Exception ignore) {
-                        }
+                        } catch (Exception ignore) {}
                     }
                     currentEvent.addParameter(lowKey, value, true);
                 }

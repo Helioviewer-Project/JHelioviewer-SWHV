@@ -43,8 +43,7 @@ public class GOESLevel {
                     default:
                         break;
                 }
-            } catch (Exception ignore) {
-            }
+            } catch (Exception ignore) {}
         }
         return 1; // for log
     }
