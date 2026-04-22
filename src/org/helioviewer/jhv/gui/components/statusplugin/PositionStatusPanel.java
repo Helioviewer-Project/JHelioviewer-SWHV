@@ -10,7 +10,6 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -18,6 +17,7 @@ import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.swing.TransferAccess;
 
 @SuppressWarnings("serial")
 public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements InputPointerListener, InputPointerMotionListener {
@@ -144,7 +144,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void maybeCopyToClipboard(PointerEvent e) {
         if (e.popupTrigger() || e.button() == 3)
-            JHVTransferHandler.getInstance().toClipboard(camera.getViewpoint().time.toString() + getText());
+            TransferAccess.writeClipboard(camera.getViewpoint().time.toString() + getText());
     }
 
 }
