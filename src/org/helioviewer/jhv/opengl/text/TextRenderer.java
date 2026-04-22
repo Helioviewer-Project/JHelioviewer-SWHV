@@ -41,7 +41,6 @@ package org.helioviewer.jhv.opengl.text;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-//import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
@@ -106,18 +105,7 @@ import org.lwjgl.system.MemoryUtil;
  * @author Kenneth Russell
  */
 public class TextRenderer {
-
-    private static final boolean DRAW_BBOXES = false;
-
     private static final int kSize = 256;
-
-    // Every certain number of render cycles, flush the strings which
-    // haven't been used recently
-    //private static final int CYCLES_PER_FLUSH = 100;
-
-    // The amount of vertical dead space on the backing store before we
-    // force a compaction
-    //private static final float MAX_VERTICAL_FRAGMENTATION = 0.7f;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
@@ -125,10 +113,7 @@ public class TextRenderer {
     private RectanglePacker packer;
     private boolean haveMaxSize;
     private final StbTextBackend textBackend;
-    private TextureRenderer cachedBackingStore;
     private final GlyphProducer glyphProducer;
-
-    //private int numRenderCycles;
 
     // Need to keep track of whether we're in a beginRendering() /
     // endRendering() cycle so we can re-enter the exact same state if
@@ -295,7 +280,6 @@ public class TextRenderer {
     public void dispose() {
         packer.dispose();
         packer = null;
-        cachedBackingStore = null;
         textBackend.dispose();
         glslTexture.dispose();
     }
@@ -343,11 +327,7 @@ public class TextRenderer {
     }
 
     private TextureRenderer getBackingStore() {
-        TextureRenderer renderer = (TextureRenderer) packer.getBackingStore();
-        if (renderer != cachedBackingStore) {
-            cachedBackingStore = renderer;
-        }
-        return cachedBackingStore;
+        return (TextureRenderer) packer.getBackingStore();
     }
 
     private void beginRendering(boolean ortho, int width, int height) {
@@ -370,12 +350,6 @@ public class TextRenderer {
 
         inBeginEndPair = false;
         internal_endRendering(ortho);
-/*
-        if (++numRenderCycles >= CYCLES_PER_FLUSH) {
-            numRenderCycles = 0;
-            clearUnusedEntries();
-        }
-*/
     }
 
     private void internal_beginRendering(boolean ortho, int width, int height) {
@@ -397,35 +371,6 @@ public class TextRenderer {
             Transform.popProjection();
         }
     }
-/*
-    void clearUnusedEntries() {
-        ArrayList<Rect> deadRects = new ArrayList<>();
-        // Iterate through the contents of the backing store, removing
-        // text strings that haven't been used recently
-        packer.visit(rect -> {
-            TextData data = (TextData) rect.getUserData();
-            if (data.used()) {
-                data.clearUsed();
-            } else {
-                deadRects.add(rect);
-            }
-        });
-
-        deadRects.forEach(rect -> {
-            packer.remove(rect);
-            int unicodeToClearFromCache = ((TextData) rect.getUserData()).unicodeID;
-            if (unicodeToClearFromCache > 0) {
-                glyphProducer.clearCacheEntry(unicodeToClearFromCache);
-            }
-        });
-
-        // If we removed dead rectangles this cycle, try to do a compaction
-        if (!deadRects.isEmpty() && packer.verticalFragmentationRatio() > MAX_VERTICAL_FRAGMENTATION) {
-            packer.compact();
-        }
-    }
-*/
-
     // Data associated with each rectangle of text
     private static record TextData(
             int originX,
@@ -433,20 +378,18 @@ public class TextRenderer {
             int origRectWidth,
             int origRectHeight,
             int origRectMinX,
-            int origRectMinY,
-            int unicodeID) {
+            int origRectMinY) {
         // The following must be defined and used VERY precisely. This is
         // the offset from the upper-left corner of this rectangle (Java
         // 2D coordinate system) at which the string must be rasterized in
         // order to fit within the rectangle -- the leftmost point of the
         // baseline.
-        TextData(int originX, int originY, Bounds origRect, int unicodeID) {
+        TextData(int originX, int originY, Bounds origRect) {
             this(originX, originY,
                     (int) origRect.width,
                     (int) origRect.height,
                     (int) -origRect.minX,
-                    (int) -origRect.minY,
-                    unicodeID);
+                    (int) -origRect.minY);
         }
 
         // The following three methods are used to locate the glyph
@@ -506,7 +449,6 @@ public class TextRenderer {
                     // Draw any outstanding glyphs
                     flush();
                 }
-                //clearUnusedEntries();
                 return true;
             }
             return false;
@@ -602,7 +544,7 @@ public class TextRenderer {
             Bounds bbox = normalize(origBBox);
             int originX = (int) -bbox.minX;
             int originY = (int) -bbox.minY;
-            Rect rect = new Rect(0, 0, (int) bbox.width, (int) bbox.height, new TextData(originX, originY, origBBox, glyph.unicodeID));
+            Rect rect = new Rect(0, 0, (int) bbox.width, (int) bbox.height, new TextData(originX, originY, origBBox));
             packer.add(rect);
             glyph.glyphRectForTextureMapping = rect;
 
