@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +18,9 @@ import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.input.InputPointerListener;
+import org.helioviewer.jhv.input.InputPointerMotionListener;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
@@ -56,17 +57,19 @@ public class ViewpointLayer extends AbstractLayer {
     private final double[] rotatedHoverPoint = new double[3];
 
     private final ViewpointLayerOptions optionsPanel;
-    private final MouseAdapter hoverListener = new MouseAdapter() {
+    private final HoverListener hoverListener = new HoverListener();
+
+    private final class HoverListener implements InputPointerListener, InputPointerMotionListener {
         @Override
-        public void mouseMoved(MouseEvent e) {
+        public void mouseMoved(PointerEvent e) {
             handleMouseMoved(e);
         }
 
         @Override
-        public void mouseExited(MouseEvent e) {
+        public void mouseExited(PointerEvent e) {
             handleMouseExited();
         }
-    };
+    }
 
     private JHVTime viewpointTime = Sun.StartEarth.time;
 
@@ -148,7 +151,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
     }
 
-    private void handleMouseMoved(MouseEvent e) {
+    private void handleMouseMoved(PointerEvent e) {
         if (!optionsPanel.isHeliospheric()) {
             clearHoverTextIfNeeded();
             return;
@@ -164,8 +167,8 @@ public class ViewpointLayer extends AbstractLayer {
         long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
-        mouseX = e.getX();
-        mouseY = e.getY();
+        mouseX = e.x();
+        mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
         double mousePlaneX = CameraHelper.computeUpX(camera, vp, mouseX);
