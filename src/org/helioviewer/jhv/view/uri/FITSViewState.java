@@ -98,10 +98,6 @@ public final class FITSViewState {
         return new Data(clippingMode, zContrast, clippingMin, clippingMax, scalingMode, gamma, beta, alpha);
     }
 
-    public static void setZContrastIndex(int value) {
-        setZContrastIndex(value, false);
-    }
-
     public static void setZContrastIndex(int value, boolean adjusting) {
         int newZContrast = 4 * clamp(value, Z_CONTRAST_SLIDER_MIN, Z_CONTRAST_SLIDER_MAX);
         if (updateZContrast(newZContrast) && clippingMode == ClippingMode.ZScale && !adjusting)
@@ -136,28 +132,16 @@ public final class FITSViewState {
         refresh();
     }
 
-    public static void setGammaIndex(int value) {
-        setGammaIndex(value, false);
-    }
-
     public static void setGammaIndex(int value, boolean adjusting) {
         double newGamma = 10. / clamp(value, GAMMA_SLIDER_MIN, GAMMA_SLIDER_MAX);
         if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma && !adjusting)
             refresh();
     }
 
-    public static void setBetaIndex(int value) {
-        setBetaIndex(value, false);
-    }
-
     public static void setBetaIndex(int value, boolean adjusting) {
         double newBeta = 1. / (1 << clamp(value, BETA_SLIDER_MIN, BETA_SLIDER_MAX));
         if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta && !adjusting)
             refresh();
-    }
-
-    public static void setAlphaIndex(int value) {
-        setAlphaIndex(value, false);
     }
 
     public static void setAlphaIndex(int value, boolean adjusting) {
