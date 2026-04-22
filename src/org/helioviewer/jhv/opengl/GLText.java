@@ -65,7 +65,7 @@ public class GLText {
         double boundW = 0;
         int ct = 0;
         for (String txt : txts) {
-            double w = TextFonts.measureCanvasWidth(textSize, txt);
+            double w = renderer.measureWidth(txt) * textScaleFactor;
             if (boundW < w)
                 boundW = w;
             ct++;
