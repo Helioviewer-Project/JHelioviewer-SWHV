@@ -83,6 +83,7 @@ public class InputController implements MouseListener, MouseMotionListener, Mous
 
     @Override
     public void mousePressed(MouseEvent e1) {
+        ((Component) e1.getSource()).requestFocusInWindow();
         PointerEvent e = synthesizePointer(e1);
         MouseEvent mouse = synthesizeMouse(e1);
         Viewport vp = Display.setActiveViewport(e.x(), e.y());
