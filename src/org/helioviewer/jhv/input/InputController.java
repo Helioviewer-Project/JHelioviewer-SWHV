@@ -1,13 +1,5 @@
 package org.helioviewer.jhv.input;
 
-import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 
 import org.helioviewer.jhv.camera.Interaction;
@@ -21,133 +13,65 @@ public class InputController {
         interaction = _interaction;
     }
 
-    private static PointerEvent synthesizePointer(MouseEvent e) {
-        return new PointerEvent(
-                (int) (e.getX() * Display.pixelScale[0] + .5),
-                (int) (e.getY() * Display.pixelScale[1] + .5),
-                e.getButton(),
-                e.getClickCount(),
-                e.isShiftDown());
-    }
-
-    private static ScrollEvent synthesizeScroll(MouseWheelEvent e) {
-        return new ScrollEvent(e.getPreciseWheelRotation());
-    }
-
-    private static KeyInputEvent synthesizeKey(KeyEvent e) {
-        return new KeyInputEvent(e.getKeyCode(), e.isShiftDown());
-    }
-
-    private static MouseEvent synthesizeMouse(MouseEvent e) {
-        return new MouseEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                (int) (e.getX() * Display.pixelScale[0] + .5),
-                (int) (e.getY() * Display.pixelScale[1] + .5),
-                e.getClickCount(), e.isPopupTrigger(), e.getButton());
-    }
-
-    /* Could be useful if pointer position would matter
-    private static MouseWheelEvent synthesizeMouseWheel(MouseWheelEvent e) {
-        return new MouseWheelEvent((Component) e.getSource(), e.getID(), e.getWhen(), e.getModifiersEx(),
-                (int) (e.getX() * Display.pixelScale[0] + .5),
-                (int) (e.getY() * Display.pixelScale[1] + .5),
-                e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
-    }
-    */
-
-    public void mouseClicked(MouseEvent e1) {
-        PointerEvent e = synthesizePointer(e1);
-        MouseEvent mouse = synthesizeMouse(e1);
+    public void mouseClicked(PointerEvent e) {
         Display.setActiveViewport(e.x(), e.y());
         interaction.mouseClicked(e);
         pointerListeners.forEach(listener -> listener.mouseClicked(e));
-        mouseListeners.forEach(listener -> listener.mouseClicked(mouse));
     }
 
-    public void mouseEntered(MouseEvent e1) {
-        PointerEvent pointer = synthesizePointer(e1);
-        MouseEvent e = synthesizeMouse(e1);
-        pointerListeners.forEach(listener -> listener.mouseEntered(pointer));
-        mouseListeners.forEach(listener -> listener.mouseEntered(e));
+    public void mouseEntered(PointerEvent e) {
+        pointerListeners.forEach(listener -> listener.mouseEntered(e));
     }
 
-    public void mouseExited(MouseEvent e1) {
-        PointerEvent pointer = synthesizePointer(e1);
-        MouseEvent e = synthesizeMouse(e1);
-        pointerListeners.forEach(listener -> listener.mouseExited(pointer));
-        mouseListeners.forEach(listener -> listener.mouseExited(e));
+    public void mouseExited(PointerEvent e) {
+        pointerListeners.forEach(listener -> listener.mouseExited(e));
     }
 
-    public void mousePressed(MouseEvent e1) {
-        ((Component) e1.getSource()).requestFocusInWindow();
-        PointerEvent e = synthesizePointer(e1);
-        MouseEvent mouse = synthesizeMouse(e1);
+    public void mousePressed(PointerEvent e) {
         Viewport vp = Display.setActiveViewport(e.x(), e.y());
         interaction.mousePressed(e, vp);
         pointerListeners.forEach(listener -> listener.mousePressed(e));
-        mouseListeners.forEach(listener -> listener.mousePressed(mouse));
     }
 
-    public void mouseReleased(MouseEvent e1) {
-        PointerEvent e = synthesizePointer(e1);
-        MouseEvent mouse = synthesizeMouse(e1);
+    public void mouseReleased(PointerEvent e) {
         interaction.mouseReleased(e);
         pointerListeners.forEach(listener -> listener.mouseReleased(e));
-        mouseListeners.forEach(listener -> listener.mouseReleased(mouse));
     }
 
-    public void mouseDragged(MouseEvent e1) {
-        PointerEvent e = synthesizePointer(e1);
-        MouseEvent mouse = synthesizeMouse(e1);
+    public void mouseDragged(PointerEvent e) {
         Viewport vp = Display.setActiveViewport(e.x(), e.y());
         interaction.mouseDragged(e, vp);
         pointerMotionListeners.forEach(listener -> listener.mouseDragged(e));
-        mouseMotionListeners.forEach(listener -> listener.mouseDragged(mouse));
     }
 
-    public void mouseMoved(MouseEvent e1) {
-        PointerEvent pointer = synthesizePointer(e1);
-        MouseEvent e = synthesizeMouse(e1);
-        Display.setActiveViewport(pointer.x(), pointer.y());
-        pointerMotionListeners.forEach(listener -> listener.mouseMoved(pointer));
-        mouseMotionListeners.forEach(listener -> listener.mouseMoved(e));
+    public void mouseMoved(PointerEvent e) {
+        Display.setActiveViewport(e.x(), e.y());
+        pointerMotionListeners.forEach(listener -> listener.mouseMoved(e));
     }
 
-    public void mouseWheelMoved(MouseWheelEvent e1) {
-        // MouseWheelEvent e = synthesizeMouseWheel(e1);
-        // Display.setActiveViewport(e.getX(), e.getY());
-        ScrollEvent scroll = synthesizeScroll(e1);
-        interaction.mouseWheelMoved(scroll);
-        scrollListeners.forEach(listener -> listener.mouseWheelMoved(scroll));
-        mouseWheelListeners.forEach(listener -> listener.mouseWheelMoved(e1));
+    public void mouseWheelMoved(ScrollEvent e) {
+        interaction.mouseWheelMoved(e);
+        scrollListeners.forEach(listener -> listener.mouseWheelMoved(e));
     }
 
-    public void keyPressed(KeyEvent e) {
-        KeyInputEvent key = synthesizeKey(e);
-        interaction.keyPressed(key);
-        inputKeyListeners.forEach(listener -> listener.keyPressed(key));
-        keyListeners.forEach(listener -> listener.keyPressed(e));
+    public void keyPressed(KeyInputEvent e) {
+        interaction.keyPressed(e);
+        inputKeyListeners.forEach(listener -> listener.keyPressed(e));
     }
 
-    public void keyTyped(KeyEvent e) {
-        inputKeyListeners.forEach(listener -> listener.keyTyped(synthesizeKey(e)));
-        keyListeners.forEach(listener -> listener.keyTyped(e));
+    public void keyTyped(KeyInputEvent e) {
+        inputKeyListeners.forEach(listener -> listener.keyTyped(e));
     }
 
-    public void keyReleased(KeyEvent e) {
-        KeyInputEvent key = synthesizeKey(e);
-        interaction.keyReleased(key);
-        inputKeyListeners.forEach(listener -> listener.keyReleased(key));
-        keyListeners.forEach(listener -> listener.keyReleased(e));
+    public void keyReleased(KeyInputEvent e) {
+        interaction.keyReleased(e);
+        inputKeyListeners.forEach(listener -> listener.keyReleased(e));
     }
 
     private final HashSet<InputPointerListener> pointerListeners = new HashSet<>();
     private final HashSet<InputPointerMotionListener> pointerMotionListeners = new HashSet<>();
     private final HashSet<InputScrollListener> scrollListeners = new HashSet<>();
     private final HashSet<InputKeyListener> inputKeyListeners = new HashSet<>();
-    private final HashSet<MouseListener> mouseListeners = new HashSet<>();
-    private final HashSet<MouseMotionListener> mouseMotionListeners = new HashSet<>();
-    private final HashSet<MouseWheelListener> mouseWheelListeners = new HashSet<>();
-    private final HashSet<KeyListener> keyListeners = new HashSet<>();
 
     public void addPlugin(Object plugin) {
         if (plugin instanceof InputPointerListener ipl)
@@ -158,14 +82,6 @@ public class InputController {
             scrollListeners.add(isl);
         if (plugin instanceof InputKeyListener ikl)
             inputKeyListeners.add(ikl);
-        if (plugin instanceof MouseListener ml)
-            mouseListeners.add(ml);
-        if (plugin instanceof MouseMotionListener mml)
-            mouseMotionListeners.add(mml);
-        if (plugin instanceof MouseWheelListener mwl)
-            mouseWheelListeners.add(mwl);
-        if (plugin instanceof KeyListener kl)
-            keyListeners.add(kl);
     }
 
     public void removePlugin(Object plugin) {
@@ -177,14 +93,6 @@ public class InputController {
             scrollListeners.remove(plugin);
         if (plugin instanceof InputKeyListener)
             inputKeyListeners.remove(plugin);
-        if (plugin instanceof MouseListener)
-            mouseListeners.remove(plugin);
-        if (plugin instanceof MouseMotionListener)
-            mouseMotionListeners.remove(plugin);
-        if (plugin instanceof MouseWheelListener)
-            mouseWheelListeners.remove(plugin);
-        if (plugin instanceof KeyListener)
-            keyListeners.remove(plugin);
     }
 
 }
