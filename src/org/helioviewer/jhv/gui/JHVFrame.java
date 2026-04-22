@@ -149,7 +149,7 @@ public final class JHVFrame {
         carringtonStatus = new CarringtonStatusPanel();
         FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
         PositionStatusPanel positionStatus = new PositionStatusPanel();
-        inputController.addPlugin(positionStatus);
+        inputController.addListener(positionStatus);
 
         StatusPanel statusPanel = new StatusPanel(5, 5);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);

@@ -12,14 +12,15 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.StatusPanel;
-import org.helioviewer.jhv.input.InputPlugin;
+import org.helioviewer.jhv.input.InputPointerListener;
+import org.helioviewer.jhv.input.InputPointerMotionListener;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
 @SuppressWarnings("serial")
-public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements InputPlugin {
+public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements InputPointerListener, InputPointerMotionListener {
 
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanHpc = String.format("%7s,%7s", "--", "--");
@@ -125,12 +126,6 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     public void mouseMoved(PointerEvent e) {
         update(e.x(), e.y());
     }
-
-    @Override
-    public void mouseEntered(PointerEvent e) {}
-
-    @Override
-    public void mouseExited(PointerEvent e) {}
 
     @Override
     public void mouseClicked(PointerEvent e) {
