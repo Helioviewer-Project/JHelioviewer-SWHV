@@ -9,8 +9,11 @@ import org.helioviewer.jhv.opengl.text.TextFonts;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public class GLText {
-    private static final int[] RENDERER_SIZES = {8, 16, 32, 64, 128};
-    private static final TextRenderer[] renderers = new TextRenderer[RENDERER_SIZES.length];
+    private static final int MIN = 10;
+    private static final int MAX = 144;
+    private static final int STEP = 2;
+    private static final int SIZE = (MAX - MIN) / STEP + 1;
+    private static final TextRenderer[] renderers = new TextRenderer[SIZE];
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
     public static final int[] shadowOffset = {2, -2};
@@ -37,23 +40,20 @@ public class GLText {
     }
 
     private static int rendererIndex(int size) {
-        size = (int) (size * Display.pixelScale[1]);
-        if (size <= RENDERER_SIZES[0])
+        size = physicalSize(size);
+        if (size <= MIN)
             return 0;
-
-        int lastIndex = RENDERER_SIZES.length - 1;
-        if (size >= RENDERER_SIZES[lastIndex])
-            return lastIndex;
-
-        for (int i = 1; i < RENDERER_SIZES.length; i++) {
-            if (size <= RENDERER_SIZES[i])
-                return i;
-        }
-        return lastIndex;
+        if (size >= MAX)
+            return SIZE - 1;
+        return (size - MIN + STEP - 1) / STEP;
     }
 
     private static float rendererSize(int idx) {
-        return RENDERER_SIZES[idx];
+        return idx * STEP + MIN;
+    }
+
+    private static int physicalSize(int logicalSize) {
+        return (int) (logicalSize * Display.pixelScale[1]);
     }
 
     private static final int TEXT_SIZE_NORMAL = 14;
@@ -68,7 +68,7 @@ public class GLText {
             return;
 
         TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
-        float textSize = rendererSize(rendererIndex(TEXT_SIZE_NORMAL));
+        int textSize = physicalSize(TEXT_SIZE_NORMAL);
         float textScaleFactor = textSize / renderer.getFontSize();
 
         double boundW = 0;
