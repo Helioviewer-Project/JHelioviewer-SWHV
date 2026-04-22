@@ -1,9 +1,5 @@
 package org.helioviewer.jhv.gui.components.statusplugin;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -16,12 +12,15 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.components.StatusPanel;
+import org.helioviewer.jhv.input.InputPointerListener;
+import org.helioviewer.jhv.input.InputPointerMotionListener;
+import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
 @SuppressWarnings("serial")
-public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements MouseListener, MouseMotionListener {
+public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements InputPointerListener, InputPointerMotionListener {
 
     private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanHpc = String.format("%7s,%7s", "--", "--");
@@ -119,40 +118,38 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
-        update(e.getX(), e.getY());
+    public void mouseDragged(PointerEvent e) {
+        update(e.x(), e.y());
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-        update(e.getX(), e.getY());
+    public void mouseMoved(PointerEvent e) {
+        update(e.x(), e.y());
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-    }
+    public void mouseEntered(PointerEvent e) {}
 
     @Override
-    public void mouseExited(MouseEvent e) {
-    }
+    public void mouseExited(PointerEvent e) {}
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(PointerEvent e) {
         maybeCopyToClipboard(e);
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(PointerEvent e) {
         maybeCopyToClipboard(e);
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(PointerEvent e) {
         maybeCopyToClipboard(e);
     }
 
-    private void maybeCopyToClipboard(MouseEvent e) {
-        if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+    private void maybeCopyToClipboard(PointerEvent e) {
+        if (e.button() == 3)
             JHVTransferHandler.getInstance().toClipboard(camera.getViewpoint().time.toString() + getText());
     }
 
