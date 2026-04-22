@@ -291,8 +291,9 @@ public class TextRenderer {
             Transform.popProjection();
         }
     }
+
     // Data associated with each rectangle of text
-    private static record TextData(
+    private record TextData(
             int originX,
             int originY,
             int origRectWidth,

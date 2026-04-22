@@ -51,7 +51,7 @@ class TextureRenderer {
         int rowStride = imageWidth * 4;
         long clearBytes = (long) width * 4;
         for (int row = 0; row < height; row++) {
-            long offset = (long) ((y + row) * rowStride + (x * 4));
+            long offset = (long) (y + row) * rowStride + (long) x * 4;
             MemoryUtil.memSet(base + offset, 0, clearBytes);
         }
     }
@@ -82,8 +82,8 @@ class TextureRenderer {
         long rowBytes = (long) width * 4;
         ensureCopyScratch((int) rowBytes);
         for (int row = 0; row < height; row++) {
-            long srcOffset = (long) ((srcY + row) * rowStride + (srcX * 4));
-            long dstOffset = (long) ((dstY + row) * rowStride + (dstX * 4));
+            long srcOffset = (long) (srcY + row) * rowStride + (long) srcX * 4;
+            long dstOffset = (long) (dstY + row) * rowStride + (long) dstX * 4;
             long scratchAddress = MemoryUtil.memAddress(copyScratch);
             MemoryUtil.memCopy(base + srcOffset, scratchAddress, rowBytes);
             MemoryUtil.memCopy(scratchAddress, base + dstOffset, rowBytes);
@@ -97,8 +97,8 @@ class TextureRenderer {
         int dstRowStride = imageWidth * 4;
         long rowBytes = (long) width * 4;
         for (int row = 0; row < height; row++) {
-            long srcOffset = (long) ((srcY + row) * srcRowStride + (srcX * 4));
-            long dstOffset = (long) ((dstY + row) * dstRowStride + (dstX * 4));
+            long srcOffset = (long) (srcY + row) * srcRowStride + (long) srcX * 4;
+            long dstOffset = (long) (dstY + row) * dstRowStride + (long) dstX * 4;
             MemoryUtil.memCopy(srcBase + srcOffset, dstBase + dstOffset, rowBytes);
         }
     }
