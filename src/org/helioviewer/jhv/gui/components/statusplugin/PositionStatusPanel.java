@@ -149,7 +149,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     }
 
     private void maybeCopyToClipboard(PointerEvent e) {
-        if (e.button() == 3)
+        if (e.popupTrigger() || e.button() == 3)
             JHVTransferHandler.getInstance().toClipboard(camera.getViewpoint().time.toString() + getText());
     }
 

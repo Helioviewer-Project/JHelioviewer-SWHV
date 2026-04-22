@@ -24,7 +24,8 @@ public final class AwtInputAdapter implements MouseListener, MouseMotionListener
                 (int) (e.getY() * Display.pixelScale[1] + .5),
                 e.getButton(),
                 e.getClickCount(),
-                e.isShiftDown());
+                e.isShiftDown(),
+                e.isPopupTrigger());
     }
 
     private static ScrollEvent synthesizeScroll(MouseWheelEvent e) {
