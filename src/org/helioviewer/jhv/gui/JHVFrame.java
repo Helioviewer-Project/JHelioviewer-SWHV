@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
@@ -30,6 +31,7 @@ import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.swing.AwtInputAdapter;
+import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
@@ -173,7 +175,19 @@ public final class JHVFrame {
     private static JFrame createFrame() {
         JFrame frame = new JFrame(JHVGlobals.programName);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.setTransferHandler(JHVTransferHandler.getInstance());
+        frame.setTransferHandler(new TransferHandler() {
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return support.isDrop() && TransferAccess.canImport(support.getTransferable());
+            }
+
+            @Override
+            public boolean importData(TransferSupport support) {
+                if (!canImport(support))
+                    return false;
+                return TransferAccess.importTransferable(support.getTransferable());
+            }
+        });
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

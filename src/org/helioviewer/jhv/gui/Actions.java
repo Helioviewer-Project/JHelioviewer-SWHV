@@ -28,6 +28,7 @@ import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
@@ -164,7 +165,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JHVTransferHandler.readClipboard();
+            TransferAccess.readClipboard();
         }
     }
 

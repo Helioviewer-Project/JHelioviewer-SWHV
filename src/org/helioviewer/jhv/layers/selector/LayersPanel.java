@@ -25,7 +25,6 @@ import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVTransferHandler;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.base.TableValue;
@@ -34,6 +33,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.swing.TransferAccess;
 
 @SuppressWarnings("serial")
 public final class LayersPanel extends JPanel {
@@ -199,7 +199,7 @@ public final class LayersPanel extends JPanel {
                 if (model.getValueAt(grid.getSelectedRow(), 0) instanceof Layer layer) {
                     String timeString = layer.getTimeString();
                     if (timeString != null)
-                        JHVTransferHandler.getInstance().toClipboard(timeString);
+                        TransferAccess.writeClipboard(timeString);
                 }
             }
         });
