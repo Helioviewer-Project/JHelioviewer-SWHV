@@ -28,6 +28,7 @@ import org.helioviewer.jhv.gui.components.statusplugin.CarringtonStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
+import org.helioviewer.jhv.input.AwtInputAdapter;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -99,6 +100,7 @@ public final class JHVFrame {
 
     private static AngleCanvas renderCanvas;
     private static RenderStartupHost renderHost;
+    private static AwtInputAdapter awtInputAdapter;
     private static InputController inputController;
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
@@ -136,6 +138,7 @@ public final class JHVFrame {
         interaction = new Interaction(Display.getCamera());
         ViewState.initFromInteraction();
         inputController = new InputController(interaction);
+        awtInputAdapter = new AwtInputAdapter(inputController);
 
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -264,10 +267,10 @@ public final class JHVFrame {
         renderCanvas = new AngleCanvas();
         renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
         renderCanvas.setWhiteBackground(whiteBackground);
-        renderCanvas.addMouseListener(inputController);
-        renderCanvas.addMouseMotionListener(inputController);
-        renderCanvas.addMouseWheelListener(inputController);
-        renderCanvas.addKeyListener(inputController);
+        renderCanvas.addMouseListener(awtInputAdapter);
+        renderCanvas.addMouseMotionListener(awtInputAdapter);
+        renderCanvas.addMouseWheelListener(awtInputAdapter);
+        renderCanvas.addKeyListener(awtInputAdapter);
         renderHost.attachCanvas(renderCanvas);
     }
 
