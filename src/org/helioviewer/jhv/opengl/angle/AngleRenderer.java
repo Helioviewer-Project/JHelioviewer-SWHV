@@ -17,8 +17,7 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 public final class AngleRenderer {
-    private record PlatformConfig(int backendType, String eglLibrary, String openGlesLibrary) {
-    }
+    private record PlatformConfig(int backendType, String eglLibrary, String openGlesLibrary) {}
 
     private static boolean lwjglConfigured;
     private static boolean rendererInitialized;

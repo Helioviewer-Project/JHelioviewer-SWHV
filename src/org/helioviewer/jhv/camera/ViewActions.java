@@ -10,8 +10,7 @@ import org.helioviewer.jhv.math.Quat;
 
 public final class ViewActions {
 
-    private ViewActions() {
-    }
+    private ViewActions() {}
 
     public static void zoomFit() {
         CameraHelper.zoomToFit(Display.getCamera());

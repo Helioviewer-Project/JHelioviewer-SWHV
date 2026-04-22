@@ -6,8 +6,7 @@ import org.helioviewer.jhv.display.Viewport;
 
 public class RasterLine {
 
-    private RasterLine() {
-    }
+    private RasterLine() {}
 
     // Example:
     // BufVertex vexBuf = new BufVertex(RasterLine.vertexCount(2) * GLSLShape.stride);

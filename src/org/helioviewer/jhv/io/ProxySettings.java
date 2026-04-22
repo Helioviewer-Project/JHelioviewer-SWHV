@@ -50,8 +50,7 @@ public class ProxySettings {
 
                             if (user != null && pass != null && Integer.toString(getRequestingPort()).equals(port))
                                 return new PasswordAuthentication(user, pass.toCharArray());
-                        } catch (Exception ignore) {
-                        }
+                        } catch (Exception ignore) {}
                     }
                     return null;
                 }
@@ -66,13 +65,11 @@ public class ProxySettings {
             try {
                 int proxyPort = Integer.parseInt(System.getProperty(port));
                 return new Proxy(type, InetSocketAddress.createUnresolved(proxyHost, proxyPort));
-            } catch (Exception ignore) {
-            }
+            } catch (Exception ignore) {}
         }
         return null;
     }
 
-    public static void init() {
-    }
+    public static void init() {}
 
 }

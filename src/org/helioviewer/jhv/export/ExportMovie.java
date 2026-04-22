@@ -121,8 +121,7 @@ public final class ExportMovie implements Movie.Listener {
             VideoFormat format = VideoFormat.H264;
             try {
                 format = VideoFormat.valueOf(Settings.getProperty("video.format"));
-            } catch (Exception ignore) {
-            }
+            } catch (Exception ignore) {}
             exporter = new MovieExporter(format, canvasWidth, exportHeight, fps);
 
             if (mode == ViewState.RecordingMode.LOOP) {
@@ -195,7 +194,6 @@ public final class ExportMovie implements Movie.Listener {
         }
     }
 
-    private ExportMovie() {
-    }
+    private ExportMovie() {}
 
 }

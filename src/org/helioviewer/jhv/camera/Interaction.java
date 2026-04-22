@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.camera;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
@@ -15,6 +12,9 @@ import org.helioviewer.jhv.camera.annotate.AnnotateLoop;
 import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.input.KeyInputEvent;
+import org.helioviewer.jhv.input.PointerEvent;
+import org.helioviewer.jhv.input.ScrollEvent;
 
 import org.json.JSONObject;
 
@@ -73,15 +73,13 @@ public class Interaction {
     }
 
     interface Type {
-        void mousePressed(MouseEvent e, Viewport vp, AnnotationMode annotationMode);
+        void mousePressed(PointerEvent e, Viewport vp, AnnotationMode annotationMode);
 
-        void mouseDragged(MouseEvent e, Viewport vp);
+        void mouseDragged(PointerEvent e, Viewport vp);
 
-        default void mouseReleased(MouseEvent e) {
-        }
+        default void mouseReleased(PointerEvent e) {}
 
-        default void keyPressed(KeyEvent e) {
-        }
+        default void keyPressed(KeyInputEvent e) {}
     }
 
     private final Camera camera;
@@ -132,15 +130,15 @@ public class Interaction {
         };
     }
 
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        zoom.zoom(camera, e.getPreciseWheelRotation());
+    public void mouseWheelMoved(ScrollEvent e) {
+        zoom.zoom(camera, e.preciseWheelRotation());
     }
 
-    public void mouseDragged(MouseEvent e, Viewport vp) {
+    public void mouseDragged(PointerEvent e, Viewport vp) {
         getType().mouseDragged(e, vp);
     }
 
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(PointerEvent e) {
         if (interactionAnnotate.hasPendingAnnotateable())
             interactionAnnotate.mouseReleased(e);
         else
@@ -148,28 +146,28 @@ public class Interaction {
         annotate = false;
     }
 
-    public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2) {
+    public void mouseClicked(PointerEvent e) {
+        if (e.clickCount() == 2) {
             camera.reset();
         }
     }
 
-    public void mousePressed(MouseEvent e, Viewport vp) {
-        if (e.isShiftDown()) {
+    public void mousePressed(PointerEvent e, Viewport vp) {
+        if (e.shiftDown()) {
             annotate = true;
         }
         getType().mousePressed(e, vp, annotationMode);
     }
 
-    public void keyPressed(KeyEvent e) {
-        if (e.isShiftDown()) {
+    public void keyPressed(KeyInputEvent e) {
+        if (e.shiftDown()) {
             annotate = true;
         }
         getType().keyPressed(e);
     }
 
-    public void keyReleased(KeyEvent e) {
-        annotate = e.isShiftDown();
+    public void keyReleased(KeyInputEvent e) {
+        annotate = e.shiftDown();
     }
 
     public void clearAnnotations() {

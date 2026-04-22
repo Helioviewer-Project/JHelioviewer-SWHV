@@ -2,8 +2,7 @@ package org.helioviewer.jhv.math;
 
 public final class SphericalCoords {
 
-    private SphericalCoords() {
-    }
+    private SphericalCoords() {}
 
     public static double radius(double x, double y, double z) {
         return Math.sqrt(x * x + y * y + z * z);

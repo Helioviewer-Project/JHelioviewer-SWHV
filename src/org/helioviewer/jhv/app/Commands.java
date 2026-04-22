@@ -15,28 +15,24 @@ import org.helioviewer.jhv.time.JHVTime;
 
 public final class Commands {
 
-    private Commands() {
-    }
+    private Commands() {}
 
     public record PlaybackInput(
             @Nullable String advanceMode,
             @Nullable String speed,
             @Nullable String speedUnit,
             @Nullable String firstFrame,
-            @Nullable String lastFrame) {
-    }
+            @Nullable String lastFrame) {}
 
     public record RecordStartInput(
             @Nullable String mode,
             @Nullable String size,
             @Nullable String advanceMode,
             @Nullable String speed,
-            @Nullable String speedUnit) {
-    }
+            @Nullable String speedUnit) {}
 
     public record OperationContext(Class<?> owner, @Nullable String clientId, @Nullable String requestId,
-                                   @Nullable String mtype) {
-    }
+                                   @Nullable String mtype) {}
 
     public interface CompletionListener {
         void loadStateFinished(@Nullable OperationContext context, boolean success, String message);

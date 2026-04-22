@@ -27,18 +27,15 @@ public interface View {
         return null;
     }
 
-    default void abolish() {
-    }
+    default void abolish() {}
 
-    default void clearCache() {
-    }
+    default void clearCache() {}
 
     void setFilter(ImageFilter.Type t);
 
     ImageFilter.Type getFilter();
 
-    default void decode(Position viewpoint, double pixFactor, float factor) {
-    }
+    default void decode(Position viewpoint, double pixFactor, float factor) {}
 
     @Nullable
     default String getBaseName() {

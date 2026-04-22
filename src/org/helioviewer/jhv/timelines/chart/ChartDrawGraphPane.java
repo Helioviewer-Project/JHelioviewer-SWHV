@@ -414,8 +414,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
     public void mouseExited(MouseEvent e) {
@@ -450,8 +449,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 }
             }
             case MOVIELINE -> DrawController.setMovieFrame(p);
-            case NODRAG -> {
-            }
+            case NODRAG -> {}
         }
         dragMode = DragMode.NODRAG;
         mousePressedPosition = null;
@@ -470,8 +468,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                     DrawController.moveY(p, p.y - mousePressedPosition.y);
                 }
                 case MOVIELINE -> DrawController.setMovieFrame(p);
-                case NODRAG -> {
-                }
+                case NODRAG -> {}
             }
         }
         mousePressedPosition = p;

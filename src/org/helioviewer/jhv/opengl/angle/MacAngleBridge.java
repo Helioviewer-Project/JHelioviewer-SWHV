@@ -11,8 +11,7 @@ import java.lang.invoke.MethodHandle;
 
 @SuppressWarnings("restricted")
 public final class MacAngleBridge {
-    public record Host(long handle, long layer) {
-    }
+    public record Host(long handle, long layer) {}
 
     private static final Arena ARENA = Arena.ofShared();
     private static final Linker LINKER = Linker.nativeLinker();
@@ -30,8 +29,7 @@ public final class MacAngleBridge {
     private static final MethodHandle DESTROY = downcall("jhv_metal_host_destroy",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
-    private MacAngleBridge() {
-    }
+    private MacAngleBridge() {}
 
     public static void prewarm() {
         // Force class initialization and native symbol resolution before the first canvas attach.

@@ -84,8 +84,7 @@ class DrawControllerOptions extends JPanel {
         long end = DrawController.selectedAxis.end();
 
         switch (zoom) {
-            case CUSTOM -> {
-            }
+            case CUSTOM -> {}
             case All -> DrawController.setSelectedInterval(availableInterval.start(), availableInterval.end());
             case Year -> setZoom(end, (long) (365.25 * TimeUtils.DAY_IN_MILLIS * value));
             case Month -> setZoom(end, (long) (30.6001 * TimeUtils.DAY_IN_MILLIS * value));

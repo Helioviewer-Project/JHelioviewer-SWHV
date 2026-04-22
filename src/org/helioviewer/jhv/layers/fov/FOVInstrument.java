@@ -15,7 +15,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 import org.json.JSONObject;
 
@@ -85,7 +85,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         centerY = _centerY;
     }
 
-    void render(Viewport vp, double distance, double pixFactor, byte[] color, JhvTextRenderer renderer) {
+    void render(Viewport vp, double distance, double pixFactor, byte[] color, TextRenderer renderer) {
         if (!checkBox.isSelected())
             return;
 

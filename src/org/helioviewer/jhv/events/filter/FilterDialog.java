@@ -42,8 +42,7 @@ public final class FilterDialog extends JDialog implements FocusListener, Window
     }
 
     @Override
-    public void focusGained(FocusEvent e) {
-    }
+    public void focusGained(FocusEvent e) {}
 
     @Override
     public void focusLost(FocusEvent e) {
@@ -51,8 +50,7 @@ public final class FilterDialog extends JDialog implements FocusListener, Window
     }
 
     @Override
-    public void windowGainedFocus(WindowEvent e) {
-    }
+    public void windowGainedFocus(WindowEvent e) {}
 
     @Override
     public void windowLostFocus(WindowEvent e) {

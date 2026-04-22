@@ -63,12 +63,10 @@ class CarringtonPicker extends JideButton implements PopupMenuListener {
     }
 
     @Override
-    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-    }
+    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
 
     @Override
-    public void popupMenuCanceled(PopupMenuEvent e) {
-    }
+    public void popupMenuCanceled(PopupMenuEvent e) {}
 
     private void setTimeFromCarrington(long _time) {
         setTime(_time);

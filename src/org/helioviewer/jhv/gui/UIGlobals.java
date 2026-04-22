@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -82,13 +81,6 @@ public class UIGlobals {
         // UIManager.put("Component.arrowType", "triangle");
 
         sansFont = new Font("SansSerif", Font.PLAIN, (int) defaultSize);
-        try (InputStream is = FileUtils.getResource("/fonts/DejaVuSansCondensed.ttf")) {
-            canvasFont = Font.createFont(Font.TRUETYPE_FONT, is);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(canvasFont);
-        } catch (Exception e) {
-            Log.warn("Font not loaded correctly, fallback to default", e);
-            canvasFont = sansFont;
-        }
 
         try (InputStream is = FileUtils.getResource("/fonts/materialdesignicons-webfont.ttf")) {
             uiFontMDI = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -175,7 +167,6 @@ public class UIGlobals {
     public static Font uiFontMonoSmall;
 
     public static Font uiFontMDI;
-    public static Font canvasFont;
 
     public static Cursor openHandCursor;
     public static Cursor closedHandCursor;
@@ -184,8 +175,6 @@ public class UIGlobals {
     public static Color backColor;
     public static Color midColor;
 
-    public static final boolean canBrowse = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
-    public static final boolean canOpen = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN);
     public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
     // Timelines panel colors

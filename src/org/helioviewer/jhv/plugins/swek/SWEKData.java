@@ -32,8 +32,7 @@ class SWEKData {
             if (p != null) {
                 return Double.parseDouble(p.getParameterValue());
             }
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         return 500;
     }
 
@@ -43,8 +42,7 @@ class SWEKData {
             if (p != null) {
                 return Double.parseDouble(p.getParameterValue());
             }
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         return 0;
     }
 
@@ -54,8 +52,7 @@ class SWEKData {
             if (p != null) {
                 return Double.parseDouble(p.getParameterValue());
             }
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
         return 0;
     }
 

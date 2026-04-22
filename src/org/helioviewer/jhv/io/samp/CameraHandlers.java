@@ -6,8 +6,7 @@ import org.helioviewer.jhv.app.Commands;
 
 final class CameraHandlers {
 
-    private CameraHandlers() {
-    }
+    private CameraHandlers() {}
 
     static void register(SampClient client) {
         client.addMessageHandler(commandHandler("jhv.view.zoom-in", Commands::zoomIn));

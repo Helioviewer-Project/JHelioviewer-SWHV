@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
@@ -29,6 +30,8 @@ import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.swing.AwtInputAdapter;
+import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
@@ -37,8 +40,7 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 
 public final class JHVFrame {
 
-    private JHVFrame() {
-    }
+    private JHVFrame() {}
 
     @SuppressWarnings("serial")
     private static final class FixedWidthPanel extends JPanel {
@@ -99,6 +101,7 @@ public final class JHVFrame {
 
     private static AngleCanvas renderCanvas;
     private static RenderStartupHost renderHost;
+    private static AwtInputAdapter awtInputAdapter;
     private static InputController inputController;
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
@@ -136,6 +139,7 @@ public final class JHVFrame {
         interaction = new Interaction(Display.getCamera());
         ViewState.initFromInteraction();
         inputController = new InputController(interaction);
+        awtInputAdapter = new AwtInputAdapter(inputController);
 
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -146,7 +150,7 @@ public final class JHVFrame {
         carringtonStatus = new CarringtonStatusPanel();
         FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
         PositionStatusPanel positionStatus = new PositionStatusPanel();
-        inputController.addPlugin(positionStatus);
+        inputController.addListener(positionStatus);
 
         StatusPanel statusPanel = new StatusPanel(5, 5);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
@@ -171,7 +175,19 @@ public final class JHVFrame {
     private static JFrame createFrame() {
         JFrame frame = new JFrame(JHVGlobals.programName);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.setTransferHandler(JHVTransferHandler.getInstance());
+        frame.setTransferHandler(new TransferHandler() {
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return support.isDrop() && TransferAccess.canImport(support.getTransferable());
+            }
+
+            @Override
+            public boolean importData(TransferSupport support) {
+                if (!canImport(support))
+                    return false;
+                return TransferAccess.importTransferable(support.getTransferable());
+            }
+        });
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -215,8 +231,7 @@ public final class JHVFrame {
             int value = Integer.parseInt(raw.trim());
             if (value > 0)
                 return value;
-        } catch (NumberFormatException ignore) {
-        }
+        } catch (NumberFormatException ignore) {}
         return fallback;
     }
 
@@ -264,10 +279,10 @@ public final class JHVFrame {
         renderCanvas = new AngleCanvas();
         renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
         renderCanvas.setWhiteBackground(whiteBackground);
-        renderCanvas.addMouseListener(inputController);
-        renderCanvas.addMouseMotionListener(inputController);
-        renderCanvas.addMouseWheelListener(inputController);
-        renderCanvas.addKeyListener(inputController);
+        renderCanvas.addMouseListener(awtInputAdapter);
+        renderCanvas.addMouseMotionListener(awtInputAdapter);
+        renderCanvas.addMouseWheelListener(awtInputAdapter);
+        renderCanvas.addKeyListener(awtInputAdapter);
         renderHost.attachCanvas(renderCanvas);
     }
 

@@ -14,8 +14,7 @@ import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
 public final class Load {
 
-    private Load() {
-    }
+    private Load() {}
 
     public static void cdf(@Nonnull List<URI> uris) {
         if (!uris.isEmpty())
@@ -58,8 +57,7 @@ public final class Load {
 
     public static void sunJSON(@Nullable Object input) {
         switch (input) {
-            case null -> {
-            }
+            case null -> {}
             case URI uri -> sunJSON(uri);
             case String json -> sunJSON(json);
             default -> sunJSON(requireURIList("sunJSON", input));
@@ -135,8 +133,7 @@ public final class Load {
             Consumer<URI> uriLoader,
             Consumer<List<URI>> listLoader) {
         switch (input) {
-            case null -> {
-            }
+            case null -> {}
             case URI uri -> uriLoader.accept(uri);
             default -> listLoader.accept(requireURIList(operation, input));
         }
@@ -148,8 +145,7 @@ public final class Load {
             Consumer<URI> uriLoader,
             Consumer<String> jsonLoader) {
         switch (input) {
-            case null -> {
-            }
+            case null -> {}
             case URI uri -> uriLoader.accept(uri);
             case String json -> jsonLoader.accept(json);
             default -> throw new IllegalArgumentException(operation + " accepts URI or String");

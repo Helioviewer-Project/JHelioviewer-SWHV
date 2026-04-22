@@ -52,8 +52,7 @@ import org.json.JSONObject;
 
 // has to be public for state
 public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
-    private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {
-    }
+    private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {}
 
     private final SWEKPopupController controller = new SWEKPopupController();
     private final JPanel optionsPanel;
@@ -443,11 +442,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             JHVEventCache.registerHandler(this);
             Movie.addTimeRangeListener(this);
             Movie.addTimeListener(controller);
-            JHVFrame.getInputController().addPlugin(controller);
+            JHVFrame.getInputController().addListener(controller);
             requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
             controller.resetHover();
-            JHVFrame.getInputController().removePlugin(controller);
+            JHVFrame.getInputController().removeListener(controller);
             Movie.removeTimeListener(controller);
             Movie.removeTimeRangeListener(this);
             JHVEventCache.unregisterHandler(this);

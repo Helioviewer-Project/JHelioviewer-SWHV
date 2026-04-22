@@ -203,8 +203,7 @@ class J2KReader implements Runnable {
                 if (completionLevel.isComplete(0)) {
                     try {
                         socket.close();
-                    } catch (IOException ignore) {
-                    }
+                    } catch (IOException ignore) {}
                     return;
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading

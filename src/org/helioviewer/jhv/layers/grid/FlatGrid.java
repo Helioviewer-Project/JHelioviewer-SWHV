@@ -17,7 +17,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.RasterLine;
-import org.helioviewer.jhv.opengl.text.JhvTextRenderer;
+import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public class FlatGrid {
 
@@ -38,8 +38,7 @@ public class FlatGrid {
     private Axis yAxis = Axis.EMPTY;
 
     // Step and inclusive bounds of one flat axis.
-    private record AxisSignature(double step, double first, double last) {
-    }
+    private record AxisSignature(double step, double first, double last) {}
 
     // Built axis labels, zero-axis flags, and positions.
     private record Axis(AxisSignature signature, String[] labels, boolean[] axisFlags, double[] positions) {
@@ -48,8 +47,7 @@ public class FlatGrid {
 
     // Projection and camera state that invalidates the cached flat grid.
     private record FlatGridKey(ProjectionMode mode, GridType gridType, double aspect, double cameraWidth,
-                               double translationX, double translationY) {
-    }
+                               double translationX, double translationY) {}
 
     public void init() {
         shape.init();
@@ -95,18 +93,18 @@ public class FlatGrid {
     }
 
     private void drawLabels(Camera camera, int size, Viewport vp) {
-        JhvTextRenderer renderer = GLText.getRenderer(size);
-        float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFont().getSize2D();
+        TextRenderer renderer = GLText.getRenderer(size);
+        float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize();
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();
         for (int i = 0; i < xAxis.labels().length; i++) {
             if (xAxis.axisFlags()[i])
                 continue;
             double x = RasterLine.snapVertical(camera, vp, xAxis.positions()[i]);
-            renderer.draw3D(xAxis.labels()[i], (float) (vp.aspect * x), 0, 0, textScaleFactor);
+            renderer.draw(xAxis.labels()[i], (float) (vp.aspect * x), 0, 0, textScaleFactor);
         }
         for (int i = 0; i < yAxis.labels().length; i++) {
-            renderer.draw3D(yAxis.labels()[i], 0, (float) RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]), 0, textScaleFactor);
+            renderer.draw(yAxis.labels()[i], 0, (float) RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]), 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }

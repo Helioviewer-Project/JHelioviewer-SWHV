@@ -18,8 +18,7 @@ final class CompatibleImageUtils {
         DataBuffer create(int type, int size, int numBanks) throws IOException;
     }
 
-    private CompatibleImageUtils() {
-    }
+    private CompatibleImageUtils() {}
 
     static BufferedImage createCompatibleImage(int width, int height, int type, DataBufferFactory dataBufferFactory) {
         try {
