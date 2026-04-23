@@ -554,8 +554,10 @@ public final class ViewState {
     }
 
     public static void addPlaybackConfigListener(PlaybackConfigListener listener) {
-        if (!playbackConfigListeners.contains(listener))
+        if (!playbackConfigListeners.contains(listener)) {
             playbackConfigListeners.add(listener);
+            listener.playbackConfigChanged();
+        }
     }
 
     public static void removePlaybackConfigListener(PlaybackConfigListener listener) {
@@ -563,8 +565,10 @@ public final class ViewState {
     }
 
     public static void addPlaybackRangeListener(PlaybackRangeListener listener) {
-        if (!playbackRangeListeners.contains(listener))
+        if (!playbackRangeListeners.contains(listener)) {
             playbackRangeListeners.add(listener);
+            listener.playbackRangeChanged();
+        }
     }
 
     public static void removePlaybackRangeListener(PlaybackRangeListener listener) {
@@ -572,8 +576,10 @@ public final class ViewState {
     }
 
     public static void addRecordingConfigListener(RecordingConfigListener listener) {
-        if (!recordingConfigListeners.contains(listener))
+        if (!recordingConfigListeners.contains(listener)) {
             recordingConfigListeners.add(listener);
+            listener.recordingConfigChanged();
+        }
     }
 
     public static void removeRecordingConfigListener(RecordingConfigListener listener) {

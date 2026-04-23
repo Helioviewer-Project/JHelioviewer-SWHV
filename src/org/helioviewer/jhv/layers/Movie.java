@@ -74,7 +74,7 @@ public class Movie {
 
     public static void setMaster(ImageLayer layer) {
         if (layer == null) {
-            pause();
+            movieTimer.stop();
             ExportMovie.shallStop();
             playbackFirstTime = TimeUtils.START;
             playbackLastTime = TimeUtils.START;

@@ -210,7 +210,7 @@ public final class State {
                             ViewState.ModeData modeData) implements FutureCallback<Void> {
 
         private void applyRestoredPlaybackState() {
-            ViewState.applyMode(modeData);
+            ViewState.applyMode(modeData); // this applies projection again
             Commands.seekTime(time);
             Display.getCamera().refresh();
         }
@@ -241,8 +241,7 @@ public final class State {
     public static void load(@Nullable Commands.OperationContext context, JSONObject jo) {
         try {
             ViewState.ModeData modeData = ViewState.readModeJson(jo);
-            // to be loaded before viewpoint
-            ViewState.setProjection(modeData.projection());
+            ViewState.setProjection(modeData.projection()); // to be set before viewpoint
             loadTimelines(jo);
             loadLayers(jo, context, modeData);
             JSONObject plugins = jo.optJSONObject("plugins");

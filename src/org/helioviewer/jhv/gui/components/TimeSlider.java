@@ -99,7 +99,6 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void setMaximum(int maximum) {
         super.setMaximum(maximum);
-        Commands.setPlaybackRange(getMinimum(), maximum);
         repaint();
     }
 
