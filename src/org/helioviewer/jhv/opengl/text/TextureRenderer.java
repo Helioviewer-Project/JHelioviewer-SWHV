@@ -77,6 +77,5 @@ final class TextureRenderer {
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, imageWidth);
         GL.glTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, imageWidth, imageHeight, GL.RGBA, GL.UNSIGNED_BYTE, imageBuffer);
         GL.glGenerateMipmap(GL.TEXTURE_2D);
-        imageBuffer.rewind();
     }
 }

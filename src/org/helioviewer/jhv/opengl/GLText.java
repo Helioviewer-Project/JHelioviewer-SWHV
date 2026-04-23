@@ -11,7 +11,7 @@ import org.helioviewer.jhv.opengl.text.TextFonts;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 public final class GLText {
-    private static final int[] RENDERER_SIZES = {10, 12, 14, 16, 20, 24, 32, 48, 64};
+    private static final int[] RENDERER_SIZES = {10, 12, 14, 16, 20, 24, 32, 48, 64, 80};
     private static final Map<Integer, TextRenderer> renderers = new HashMap<>();
 
     public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
@@ -20,7 +20,8 @@ public final class GLText {
     private GLText() {}
 
     public static TextRenderer getRenderer(int size) {
-        int physicalSize = physicalSize(rendererSize(size));
+        int rendererSize = rendererSize(size);
+        int physicalSize = physicalSize(rendererSize);
         TextRenderer renderer = renderers.get(physicalSize);
         if (renderer != null)
             return renderer;

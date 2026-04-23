@@ -2,8 +2,6 @@ package org.helioviewer.jhv.opengl.text;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +22,7 @@ import org.lwjgl.system.MemoryStack;
 // Originally based on JOGL TextRenderer from the Sun/JogAmp codebase.
 // This version uses STB rasterization and a fixed glyph atlas per renderer.
 public final class TextRenderer {
-    private static final int kAtlasWidth = 256;
+    private static final int kAtlasWidth = 512;
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
@@ -174,21 +172,25 @@ public final class TextRenderer {
     }
 
     private TextureRenderer buildAtlas() {
-        int atlasWidth = kAtlasWidth;
-
-        for (Glyph glyph : glyphProducer.glyphs) {
+        Glyph[] glyphs = glyphProducer.glyphs;
+        int glyphCount = glyphProducer.glyphCount;
+        int maxRectWidth = kAtlasWidth;
+        for (int i = 0; i < glyphCount; i++) {
+            Glyph glyph = glyphs[i];
             Bounds origBBox = new Bounds(glyph.backendData.x0, glyph.backendData.y0, glyph.backendData.width(), glyph.backendData.height());
             Bounds bbox = normalize(origBBox);
             glyph.textData = new TextData((int) -bbox.minX, (int) -bbox.minY, origBBox);
             glyph.atlasRectWidth = (int) bbox.width;
             glyph.atlasRectHeight = (int) bbox.height;
-            atlasWidth = Math.max(atlasWidth, MathUtils.nextPowerOfTwo(glyph.atlasRectWidth));
+            maxRectWidth = Math.max(maxRectWidth, glyph.atlasRectWidth);
         }
+        int atlasWidth = MathUtils.nextPowerOfTwo(maxRectWidth);
 
         int atlasHeight = 0;
         int x = 0;
         int rowHeight = 0;
-        for (Glyph glyph : glyphProducer.glyphs) {
+        for (int i = 0; i < glyphCount; i++) {
+            Glyph glyph = glyphs[i];
             if (x > 0 && x + glyph.atlasRectWidth > atlasWidth) {
                 atlasHeight += rowHeight;
                 x = 0;
@@ -203,7 +205,8 @@ public final class TextRenderer {
         x = 0;
         int y = 0;
         rowHeight = 0;
-        for (Glyph glyph : glyphProducer.glyphs) {
+        for (int i = 0; i < glyphCount; i++) {
+            Glyph glyph = glyphs[i];
             if (x > 0 && x + glyph.atlasRectWidth > atlasWidth) {
                 y += rowHeight;
                 x = 0;
@@ -395,7 +398,8 @@ public final class TextRenderer {
 
     private final class GlyphProducer {
         private final Glyph[] glyphsByChar = new Glyph[Character.MAX_VALUE + 1];
-        private final List<Glyph> glyphs = new ArrayList<>();
+        private final Glyph[] glyphs = new Glyph[TextFonts.glyphs().length()];
+        private int glyphCount;
         private final Glyph fallbackGlyph;
 
         GlyphProducer() {
@@ -405,7 +409,7 @@ public final class TextRenderer {
                 Glyph glyph = createGlyph(ch);
                 if (glyph != null) {
                     glyphsByChar[ch] = glyph;
-                    glyphs.add(glyph);
+                    glyphs[glyphCount++] = glyph;
                 }
             }
             fallbackGlyph = glyphsByChar[TextFonts.fallbackGlyph()];
