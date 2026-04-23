@@ -24,6 +24,7 @@ import javax.swing.event.PopupMenuListener;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
@@ -34,6 +35,7 @@ import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -43,7 +45,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, ViewState.PlaybackStateListener {
+public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, Movie.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
@@ -225,8 +227,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         add(JHVFrame.getLayersPanel());
 
         setEnabledState(false);
-        ViewState.addPlaybackStateListener(this);
-        playbackStateChanged();
+        Movie.addStatusListener(this);
+        ExportMovie.addStatusListener(this);
+        ViewState.addPlaybackConfigListener(this);
+        ViewState.addRecordingConfigListener(this);
+        playbackConfigChanged();
+        recordingConfigChanged();
     }
 
     @Override
@@ -347,8 +353,32 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     }
 
     @Override
-    public void playbackStateChanged() {
-        ViewState.MovieData movieData = ViewState.movieData();
+    public void movieStatusChanged() {
+        boolean available = Movie.isAvailable();
+        boolean playing = Movie.isPlaying();
+
+        setEnabledState(available);
+
+        if (available && playing) {
+            playButton.setText(Buttons.pause);
+            playButton.setToolTipText("Pause movie");
+        } else {
+            playButton.setText(Buttons.play);
+            playButton.setToolTipText("Play movie");
+        }
+    }
+
+    @Override
+    public void recordingStatusChanged() {
+        boolean recording = ExportMovie.isRecording();
+        if (recordButton.isSelected() != recording)
+            recordButton.setSelected(recording);
+        ComponentUtils.setEnabled(modePanel, !recording);
+        ComponentUtils.setEnabled(recordPanel, !recording);
+    }
+
+    @Override
+    public void playbackConfigChanged() {
         ViewState.PlaybackData playbackData = ViewState.playbackData();
 
         if (advanceModeComboBox.getSelectedItem() != playbackData.advanceMode())
@@ -363,7 +393,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         if (speedUnitComboBox.getSelectedItem() != playbackData.speedUnit())
             speedUnitComboBox.setSelectedItem(playbackData.speedUnit());
+    }
 
+    @Override
+    public void recordingConfigChanged() {
         ViewState.RecordingData recordingData = ViewState.recordingData();
         switch (recordingData.mode()) {
             case LOOP -> loopButton.setSelected(true);
@@ -372,28 +405,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         }
         if (recordSizeComboBox.getSelectedItem() != recordingData.size())
             recordSizeComboBox.setSelectedItem(recordingData.size());
-        if (recordButton.isSelected() != movieData.recording())
-            recordButton.setSelected(movieData.recording());
-        ComponentUtils.setEnabled(modePanel, !movieData.recording());
-        ComponentUtils.setEnabled(recordPanel, !movieData.recording());
-
-        boolean available = movieData.available();
-        if (timeSlider.getMaximum() != (available ? movieData.maxFrame() : 0)) {
-            timeSlider.setMaximum(available ? movieData.maxFrame() : 0);
-            timeSlider.repaint();
-        }
-        setEnabledState(available);
-        if (!available && movieData.recording())
-            Commands.recordStop();
-
-        if (available && movieData.playing()) {
-            playButton.setText(Buttons.pause);
-            playButton.setToolTipText("Pause movie");
-        } else {
-            playButton.setText(Buttons.play);
-            playButton.setToolTipText("Play movie");
-        }
-
     }
 
 }

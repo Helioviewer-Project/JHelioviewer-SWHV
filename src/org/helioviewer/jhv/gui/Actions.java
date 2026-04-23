@@ -17,7 +17,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
-import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
@@ -27,6 +26,7 @@ import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -235,7 +235,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (ViewState.movieData().playing())
+            if (Movie.isPlaying())
                 Commands.pause();
             Commands.previousFrame();
         }
@@ -248,7 +248,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (ViewState.movieData().playing())
+            if (Movie.isPlaying())
                 Commands.pause();
             Commands.nextFrame();
         }

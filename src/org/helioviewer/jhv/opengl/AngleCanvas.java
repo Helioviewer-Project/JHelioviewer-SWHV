@@ -25,7 +25,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.opengl.angle.WinAngleBridge;
@@ -169,7 +168,7 @@ public final class AngleCanvas extends Canvas {
         angleRenderer.render(whiteBackground);
 
         Camera camera = Display.getCamera();
-        if (Movie.isRecording())
+        if (ExportMovie.isRecording())
             ExportMovie.handleMovieExport(camera);
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
