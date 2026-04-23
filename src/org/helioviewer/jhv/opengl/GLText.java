@@ -20,13 +20,13 @@ public final class GLText {
     private GLText() {}
 
     public static TextRenderer getRenderer(int size) {
-        int rendererSize = rendererSize(size);
-        int physicalSize = physicalSize(rendererSize);
+        int logicalBucketSize = logicalBucketSize(size);
+        int physicalSize = physicalSize(logicalBucketSize);
         TextRenderer renderer = renderers.get(physicalSize);
         if (renderer != null)
             return renderer;
 
-        renderer = new TextRenderer(physicalSize, TextFonts.loadCanvasFontData());
+        renderer = new TextRenderer(physicalSize, TextFonts.fontData());
         renderers.put(physicalSize, renderer);
         return renderer;
     }
@@ -38,7 +38,7 @@ public final class GLText {
         TextFonts.dispose();
     }
 
-    private static int rendererSize(int logicalSize) {
+    private static int logicalBucketSize(int logicalSize) {
         for (int rendererSize : RENDERER_SIZES) {
             if (logicalSize <= rendererSize)
                 return rendererSize;
@@ -52,18 +52,13 @@ public final class GLText {
 
     private static final int TEXT_SIZE_NORMAL = 14;
 
-    private static final int LEFT_MARGIN_TEXT = 0;
-    private static final int RIGHT_MARGIN_TEXT = 0;
-    private static final int TOP_MARGIN_TEXT = 0;
-    private static final int BOTTOM_MARGIN_TEXT = 0;
-
     public static void drawTextFloat(Viewport vp, List<String> txts, int pt_x, int pt_y) {
         if (txts.isEmpty())
             return;
 
         TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
-        int textSize = physicalSize(TEXT_SIZE_NORMAL);
-        float textScaleFactor = textSize / renderer.getFontSize();
+        int physicalTextSize = physicalSize(TEXT_SIZE_NORMAL);
+        float textScaleFactor = physicalTextSize / renderer.getFontSize();
 
         double boundW = 0;
         for (String txt : txts) {
@@ -72,20 +67,20 @@ public final class GLText {
                 boundW = w;
         }
 
-        float w = (float) (boundW + LEFT_MARGIN_TEXT + RIGHT_MARGIN_TEXT);
-        float h = (float) (textSize * 1.1 * txts.size() + BOTTOM_MARGIN_TEXT + TOP_MARGIN_TEXT);
+        float w = (float) boundW;
+        float h = (float) (physicalTextSize * 1.1 * txts.size());
         int textInit_x = pt_x;
         int textInit_y = pt_y;
 
         // Correct if out of view
-        if (w + pt_x - LEFT_MARGIN_TEXT > vp.width) {
-            textInit_x -= (int) (w + pt_x - LEFT_MARGIN_TEXT - vp.width);
+        if (w + pt_x > vp.width) {
+            textInit_x -= (int) (w + pt_x - vp.width);
         }
-        if (h + pt_y - textSize - TOP_MARGIN_TEXT > vp.height) {
-            textInit_y -= (int) (h + pt_y - textSize - TOP_MARGIN_TEXT - vp.height);
+        if (h + pt_y - physicalTextSize > vp.height) {
+            textInit_y -= (int) (h + pt_y - physicalTextSize - vp.height);
         }
 
-        int deltaY = 0, dY = (int) (textSize * 1.1);
+        int deltaY = 0, dY = (int) (physicalTextSize * 1.1);
         renderer.beginRendering(vp.width, vp.height);
         for (String txt : txts) {
             renderer.setColor(shadowColor);

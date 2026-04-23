@@ -184,30 +184,30 @@ public final class TextRenderer {
             glyph.atlasRectHeight = (int) bbox.height;
             maxRectWidth = Math.max(maxRectWidth, glyph.atlasRectWidth);
         }
-        int atlasWidth = MathUtils.nextPowerOfTwo(maxRectWidth);
+        int textureWidth = MathUtils.nextPowerOfTwo(maxRectWidth);
 
-        int atlasHeight = 0;
+        int textureHeight = 0;
         int x = 0;
         int rowHeight = 0;
         for (int i = 0; i < glyphCount; i++) {
             Glyph glyph = glyphs[i];
-            if (x > 0 && x + glyph.atlasRectWidth > atlasWidth) {
-                atlasHeight += rowHeight;
+            if (x > 0 && x + glyph.atlasRectWidth > textureWidth) {
+                textureHeight += rowHeight;
                 x = 0;
                 rowHeight = 0;
             }
             x += glyph.atlasRectWidth;
             rowHeight = Math.max(rowHeight, glyph.atlasRectHeight);
         }
-        atlasHeight += rowHeight;
+        textureHeight += rowHeight;
 
-        TextureRenderer renderer = new TextureRenderer(atlasWidth, MathUtils.nextPowerOfTwo(atlasHeight));
+        TextureRenderer renderer = new TextureRenderer(textureWidth, MathUtils.nextPowerOfTwo(textureHeight));
         x = 0;
         int y = 0;
         rowHeight = 0;
         for (int i = 0; i < glyphCount; i++) {
             Glyph glyph = glyphs[i];
-            if (x > 0 && x + glyph.atlasRectWidth > atlasWidth) {
+            if (x > 0 && x + glyph.atlasRectWidth > textureWidth) {
                 y += rowHeight;
                 x = 0;
                 rowHeight = 0;
