@@ -9,6 +9,8 @@
 - Major internal groundwork to replace the backend renderer
 - Major internal refactoring of image buffers and their caching
 - Restructuring of application flow around explicit commands, with those commands exposed through SAMP (see `docs/jhv-samp-commands.md`)
+- Remove font rendering dependency on Java2D and remove vendored code to handle glyphs caching
+- Clarify the interface between AWT and the core input of application
 
 ## JHelioviewer 4.8.1 (2026-04-19)
 

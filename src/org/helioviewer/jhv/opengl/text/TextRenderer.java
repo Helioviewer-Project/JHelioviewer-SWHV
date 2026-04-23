@@ -428,12 +428,18 @@ public final class TextRenderer {
     }
 
     private final class SurfacePut implements CoordPut {
-        private static final float epsilon = 0.125f; // should depend on triangle size
+        private static final float epsilon = 0.03f;
 
         @Override
         public void put(float x, float y, float z, float w, float c0, float c1) {
             float n = 1 - x * x - y * y;
-            coordBuf.putCoord(x, y, n > 0 ? epsilon + (float) Math.sqrt(n) : epsilon, w, c0, c1);
+            if (n > 0) {
+                float scale = 1 + epsilon;
+                float zSurface = (float) Math.sqrt(n);
+                coordBuf.putCoord(x * scale, y * scale, zSurface * scale, w, c0, c1);
+            } else {
+                coordBuf.putCoord(x, y, epsilon, w, c0, c1);
+            }
         }
     }
 
