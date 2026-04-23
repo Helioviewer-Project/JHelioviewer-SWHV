@@ -2,6 +2,7 @@ package org.helioviewer.jhv.export;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,13 +22,19 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 public final class ExportMovie implements Movie.Listener {
 
+    public interface StatusListener {
+        void recordingStatusChanged();
+    }
+
     private static final ExportMovie instance = new ExportMovie();
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("JHV-EncodeMovie"));
+    private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
 
     private static MovieExporter exporter;
     private static GLGrab grabber;
 
     private static ViewState.RecordingMode mode;
+    private static boolean recording;
     private static boolean shallStop;
     private static @Nullable Commands.OperationContext operationContext;
 
@@ -79,7 +86,7 @@ public final class ExportMovie implements Movie.Listener {
     private static final int MACROBLOCK = 8;
 
     public static void start(@Nullable Commands.OperationContext context, @Nullable Commands.RecordStartInput input) {
-        if (Movie.isRecording())
+        if (isRecording())
             return;
         operationContext = context;
 
@@ -94,7 +101,8 @@ public final class ExportMovie implements Movie.Listener {
     }
 
     public static void start(int _w, int _h, boolean isInternal, int fps, ViewState.RecordingMode _mode) {
-        Movie.startRecording();
+        recording = true;
+        notifyStatusChanged();
         shallStop = false;
 
         int scrw = 1;
@@ -133,7 +141,8 @@ public final class ExportMovie implements Movie.Listener {
     }
 
     private static void stop() {
-        Movie.stopRecording();
+        recording = false;
+        notifyStatusChanged();
         if (mode == ViewState.RecordingMode.LOOP) {
             Movie.removeFrameListener(instance);
         }
@@ -158,10 +167,29 @@ public final class ExportMovie implements Movie.Listener {
     }
 
     public static void shallStop() {
-        if (!Movie.isRecording())
+        if (!isRecording())
             return;
         shallStop = true;
         MovieDisplay.display(); // force detach
+    }
+
+    public static boolean isRecording() {
+        return recording;
+    }
+
+    public static void addStatusListener(StatusListener listener) {
+        if (!statusListeners.contains(listener)) {
+            statusListeners.add(listener);
+            listener.recordingStatusChanged();
+        }
+    }
+
+    public static void removeStatusListener(StatusListener listener) {
+        statusListeners.remove(listener);
+    }
+
+    private static void notifyStatusChanged() {
+        statusListeners.forEach(StatusListener::recordingStatusChanged);
     }
 
     private record FrameConsumer(MovieExporter movieExporter, BufferedImage mainImage, BufferedImage eveImage,

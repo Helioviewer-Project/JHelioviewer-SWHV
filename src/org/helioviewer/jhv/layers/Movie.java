@@ -11,6 +11,7 @@ import javax.swing.Timer;
 
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -24,6 +25,10 @@ public class Movie {
 
     public interface Listener {
         void frameChanged(int frame, boolean last);
+    }
+
+    public interface StatusListener {
+        void movieStatusChanged();
     }
 
     public static final int FPS_RELATIVE_DEFAULT = 20;
@@ -70,16 +75,18 @@ public class Movie {
     public static void setMaster(ImageLayer layer) {
         if (layer == null) {
             pause();
+            ExportMovie.shallStop();
             playbackFirstTime = TimeUtils.START;
             playbackLastTime = TimeUtils.START;
-            ViewState.clearMovie();
+            ViewState.setPlaybackRange(0, 0);
         } else {
             View view = layer.getView();
             playbackFirstTime = view.getFirstTime();
             playbackLastTime = view.getLastTime();
-            ViewState.setMovieAvailable(view.getMaximumFrameNumber());
+            ViewState.setPlaybackRange(0, view.getMaximumFrameNumber());
             syncTime(playbackFirstTime);
         }
+        notifyStatusChanged();
         timeRangeChanged();
     }
 
@@ -183,13 +190,13 @@ public class Movie {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null && layer.getView().isMultiFrame()) {
             movieTimer.restart();
-            ViewState.setMoviePlaying(true);
+            notifyStatusChanged();
         }
     }
 
     public static void pause() {
         movieTimer.stop();
-        ViewState.setMoviePlaying(false);
+        notifyStatusChanged();
         MovieDisplay.render(1); /* ! force update for on the fly resolution change */
     }
 
@@ -236,8 +243,22 @@ public class Movie {
         return lastTimestamp;
     }
 
+    public static boolean isAvailable() {
+        ImageLayer layer = Layers.getActiveImageLayer();
+        return layer != null && layer.getView().isMultiFrame();
+    }
+
+    public static int getMaximumFrameNumber() {
+        ImageLayer layer = Layers.getActiveImageLayer();
+        return layer == null ? 0 : layer.getView().getMaximumFrameNumber();
+    }
+
+    private static void notifyStatusChanged() {
+        statusListeners.forEach(StatusListener::movieStatusChanged);
+    }
+
     private static void syncTime(JHVTime dateTime) {
-        if (recording && notDone)
+        if (ExportMovie.isRecording() && notDone)
             return;
 
         lastTimestamp = dateTime;
@@ -254,11 +275,12 @@ public class Movie {
 
         frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
 
-        if (recording)
+        if (ExportMovie.isRecording())
             notDone = true;
     }
 
     private static final ArrayList<Listener> frameListeners = new ArrayList<>();
+    private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
     private static final ArrayList<TimeListener.Change> timeListeners = new ArrayList<>();
     private static final ArrayList<TimeListener.Range> timeRangeListeners = new ArrayList<>();
 
@@ -269,6 +291,17 @@ public class Movie {
 
     public static void removeFrameListener(Listener listener) {
         frameListeners.remove(listener);
+    }
+
+    public static void addStatusListener(StatusListener listener) {
+        if (!statusListeners.contains(listener)) {
+            statusListeners.add(listener);
+            listener.movieStatusChanged();
+        }
+    }
+
+    public static void removeStatusListener(StatusListener listener) {
+        statusListeners.remove(listener);
     }
 
     public static void addTimeListener(TimeListener.Change listener) {
@@ -317,25 +350,10 @@ public class Movie {
         currentAdvanceMode = mode;
     }
 
-    private static boolean recording;
     private static boolean notDone;
 
     public static void grabDone() {
         notDone = false;
-    }
-
-    public static void startRecording() {
-        recording = true;
-        ViewState.movieRecordingChanged();
-    }
-
-    public static void stopRecording() {
-        recording = false;
-        ViewState.movieRecordingChanged();
-    }
-
-    public static boolean isRecording() {
-        return recording;
     }
 
 }

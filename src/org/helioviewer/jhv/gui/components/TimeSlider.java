@@ -37,7 +37,7 @@ import org.helioviewer.jhv.view.View;
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Movie.Listener, ViewState.PlaybackRangeListener {
+public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Movie.Listener, Movie.StatusListener, ViewState.PlaybackRangeListener {
 
     private enum DragMode {
         Frame, Range, RangeStart, RangeEnd
@@ -74,6 +74,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         Movie.addFrameListener(this);
+        Movie.addStatusListener(this);
         UITimer.register(this);
         ViewState.addPlaybackRangeListener(this);
 
@@ -186,7 +187,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void mousePressed(MouseEvent e) {
-        wasPlaying = ViewState.movieData().playing();
+        wasPlaying = Movie.isPlaying();
         if (wasPlaying)
             Commands.pause();
         dragMode = dragModeFor(e);
@@ -262,6 +263,15 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void playbackRangeChanged() {
         repaint();
+    }
+
+    @Override
+    public void movieStatusChanged() {
+        int maximum = Movie.isAvailable() ? Movie.getMaximumFrameNumber() : 0;
+        if (getMaximum() != maximum) {
+            setMaximum(maximum);
+            repaint();
+        }
     }
 
     // Extension of BasicSliderUI overriding some drawing functions.

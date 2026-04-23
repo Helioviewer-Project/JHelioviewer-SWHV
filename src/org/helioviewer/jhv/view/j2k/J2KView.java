@@ -13,6 +13,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -242,7 +243,7 @@ public class J2KView extends BaseView {
 
     protected J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
         ResolutionSet.Level res;
-        if (Movie.isRecording()) { // all bets are off
+        if (ExportMovie.isRecording()) { // all bets are off
             res = completionLevel.getResolutionSet(frame).getLevel(0);
             factor = 1;
         } else {
