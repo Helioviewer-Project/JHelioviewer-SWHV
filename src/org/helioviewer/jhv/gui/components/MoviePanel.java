@@ -231,8 +231,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         ExportMovie.addStatusListener(this);
         ViewState.addPlaybackConfigListener(this);
         ViewState.addRecordingConfigListener(this);
-        playbackConfigChanged();
-        recordingConfigChanged();
     }
 
     @Override
