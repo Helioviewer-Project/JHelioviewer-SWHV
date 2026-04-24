@@ -1,13 +1,14 @@
 package org.helioviewer.jhv.view.j2k;
 
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
+import java.nio.ByteBuffer;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Callable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageFilter;
+
+import org.lwjgl.system.MemoryUtil;
 
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
@@ -63,6 +64,9 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 
             J2KParams.SubImage subImage = params.subImage();
             int frame = params.frame();
+            // Measurements for compositor on 4k AIA tiles were up to about 10x faster than
+            // kdu_region_decompressor/region output (~23ms vs ~200ms). Compositor stays on
+            // Kakadu's optimized 32-bit path; region uses general channel-buffer conversion.
             compositor = createCompositor(source, params.factor() < 1 ? qualityLow : qualityHigh);
             DecodeScratch scratch = localScratch.get();
 
@@ -92,12 +96,12 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
 
             int[] srcStride = scratch.srcStride;
             long addr = compositorBuf.Get_buf(srcStride, false);
-            MemorySegment nativeBuffer = wrapNativeBuffer(addr, 4L * srcStride[0] * actualHeight);
+            ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, Math.toIntExact(4L * srcStride[0] * actualHeight));
 
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
             ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
             byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
-            MemorySegment outSegment = MemorySegment.ofArray(outBuffer);
+            ByteBuffer outByteBuffer = ByteBuffer.wrap(outBuffer);
 
             Kdu_dims newRegion = scratch.newRegion;
             newRegion.From_u32(0, 0, 0, 0);
@@ -117,15 +121,10 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 int srcIdx = 0;
 
                 if (numComps < 3) {
-                    for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                        for (int i = 0; i < newWidth; ++i) {
-                            outBuffer[dstIdx + i] = nativeBuffer.get(ValueLayout.JAVA_BYTE, 4L * (srcIdx + i));
-                        }
-                    }
+                    gatherGray(nativeBuffer, outBuffer, srcStride[0], actualWidth, srcIdx, dstIdx, newWidth, newHeight);
                 } else {
                     for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
-                        outSegment.asSlice(4L * dstIdx, 4L * newWidth)
-                                .copyFrom(nativeBuffer.asSlice(4L * srcIdx, 4L * newWidth));
+                        outByteBuffer.put(4 * dstIdx, nativeBuffer, 4 * srcIdx, 4 * newWidth);
                     }
                 }
             }
@@ -151,9 +150,20 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         }
     }
 
-    @SuppressWarnings("restricted")
-    private static MemorySegment wrapNativeBuffer(long addr, long bytes) {
-        return MemorySegment.ofAddress(addr).reinterpret(bytes);
+    private static void gatherGray(ByteBuffer src, byte[] dst, int srcStride, int dstStride,
+            int srcIdx, int dstIdx, int width, int height) {
+        for (int j = 0; j < height; ++j, dstIdx += dstStride, srcIdx += srcStride) {
+            int srcByte = 4 * srcIdx;
+            int i = 0;
+            for (; i <= width - 4; i += 4, srcByte += 16) { // doesn't help much, more is definitely harmful
+                dst[dstIdx + i] = src.get(srcByte);
+                dst[dstIdx + i + 1] = src.get(srcByte + 4);
+                dst[dstIdx + i + 2] = src.get(srcByte + 8);
+                dst[dstIdx + i + 3] = src.get(srcByte + 12);
+            }
+            for (; i < width; ++i, srcByte += 4)
+                dst[dstIdx + i] = src.get(srcByte);
+        }
     }
 
     private static Kdu_region_compositor createCompositor(Jpx_source source, Kdu_quality_limiter quality) throws KduException {
