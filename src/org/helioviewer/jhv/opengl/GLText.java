@@ -23,8 +23,7 @@ public class GLText {
 
         if (renderers[idx] == null) {
             renderers[idx] = new TextRenderer(rendererSize(idx), TextFonts.loadCanvasFontData());
-            // precache for grid text
-            renderers[idx].draw("-0123456789.", 0, 0, 0, 0);
+            renderers[idx].precache("-0123456789.");
         }
         return renderers[idx];
     }

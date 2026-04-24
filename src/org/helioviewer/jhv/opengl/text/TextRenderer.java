@@ -101,6 +101,15 @@ public final class TextRenderer {
         return fontSize;
     }
 
+    public void precache(String str) {
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
+            Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
+            if (glyph != null && glyph.glyphRectForTextureMapping == null)
+                uploadGlyph(glyph);
+        }
+    }
+
     public void beginRendering(int width, int height) {
         beginRendering(true, width, height);
     }
@@ -330,8 +339,7 @@ public final class TextRenderer {
             if (oldRenderer == newRenderer) {
                 // Movement on the same backing store -- easy case
                 newRenderer.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
-                        oldLocation.h(), newLocation.x() - oldLocation.x(),
-                        newLocation.y() - oldLocation.y());
+                        oldLocation.h(), newLocation.x(), newLocation.y());
             } else {
                 newRenderer.copyFrom(oldRenderer, oldLocation.x(), oldLocation.y(), oldLocation.w(), oldLocation.h(), newLocation.x(), newLocation.y());
             }
@@ -660,7 +668,7 @@ public final class TextRenderer {
 
             glslTexture.init();
             glslTexture.setCoord(coordBuf);
-            glslTexture.renderTexture(GL.TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
+            glslTexture.renderTextTexture(GL.TRIANGLES, textColor, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }

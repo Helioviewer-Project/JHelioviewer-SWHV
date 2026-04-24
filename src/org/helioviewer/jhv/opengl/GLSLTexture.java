@@ -25,12 +25,20 @@ public class GLSLTexture extends VAO1 {
     }
 
     public void renderTexture(int mode, float[] color, int first, int toDraw) {
+        render(mode, color, first, toDraw, GLSLTextureShader.texture);
+    }
+
+    public void renderTextTexture(int mode, float[] color, int first, int toDraw) {
+        render(mode, color, first, toDraw, GLSLTextureShader.text);
+    }
+
+    private void render(int mode, float[] color, int first, int toDraw, GLSLTextureShader shader) {
         if (count == 0 || toDraw > count)
             return;
 
-        GLSLTextureShader.texture.use();
-        GLSLTextureShader.texture.bindParams(color);
-        GLSLTextureShader.texture.bindMVP();
+        shader.use();
+        shader.bindParams(color);
+        shader.bindMVP();
 
         bind();
         GL.glDrawArrays(mode, first, toDraw);

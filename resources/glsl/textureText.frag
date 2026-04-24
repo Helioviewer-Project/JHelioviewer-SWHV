@@ -9,5 +9,5 @@ uniform vec4 color;
 uniform sampler2D image;
 
 void main(void) {
-    outColor = color * texture(image, fragCoord);
+    outColor = color * texture(image, fragCoord).r;
 }
