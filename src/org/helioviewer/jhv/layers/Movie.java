@@ -254,8 +254,6 @@ public class Movie {
 
         frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
 
-        ViewState.setMovieActiveFrame(activeFrame);
-
         if (recording)
             notDone = true;
     }
