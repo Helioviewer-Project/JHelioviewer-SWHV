@@ -9,5 +9,8 @@ uniform vec4 color;
 uniform sampler2D image;
 
 void main(void) {
-    outColor = color * texture(image, fragCoord).r;
+    float coverage = texture(image, fragCoord).r;
+    if (coverage <= 0.0)
+        discard;
+    outColor = color * coverage;
 }
