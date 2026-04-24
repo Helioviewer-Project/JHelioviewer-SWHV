@@ -75,7 +75,7 @@ final class TextureRenderer {
         markDirty(rect.x(), rect.y(), rect.w(), rect.h());
     }
 
-    void copyArea(int srcX, int srcY, int width, int height, int dstX, int dstY) {
+    void copyArea(int srcX, int srcY, int width, int height, int deltaX, int deltaY) {
         long base = MemoryUtil.memAddress(imageBuffer);
         int rowStride = imageWidth;
         long rowBytes = width;
@@ -83,7 +83,7 @@ final class TextureRenderer {
         long scratchAddress = MemoryUtil.memAddress(copyScratch);
         for (int row = 0; row < height; row++) {
             long srcOffset = (long) (srcY + row) * rowStride + srcX;
-            long dstOffset = (long) (dstY + row) * rowStride + dstX;
+            long dstOffset = (long) (srcY + deltaY + row) * rowStride + srcX + deltaX;
             MemoryUtil.memCopy(base + srcOffset, scratchAddress, rowBytes);
             MemoryUtil.memCopy(scratchAddress, base + dstOffset, rowBytes);
         }

@@ -110,6 +110,22 @@ public final class TextRenderer {
         }
     }
 
+    public float measureWidth(String str) {
+        float width = 0;
+        int len = str.length();
+        Glyph previousGlyph = null;
+        for (int i = 0; i < len; i++) {
+            Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
+            if (glyph != null) {
+                if (previousGlyph != null)
+                    width += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode());
+                width += glyph.advance;
+                previousGlyph = glyph;
+            }
+        }
+        return width;
+    }
+
     public void beginRendering(int width, int height) {
         beginRendering(true, width, height);
     }
@@ -339,7 +355,8 @@ public final class TextRenderer {
             if (oldRenderer == newRenderer) {
                 // Movement on the same backing store -- easy case
                 newRenderer.copyArea(oldLocation.x(), oldLocation.y(), oldLocation.w(),
-                        oldLocation.h(), newLocation.x(), newLocation.y());
+                        oldLocation.h(), newLocation.x() - oldLocation.x(),
+                        newLocation.y() - oldLocation.y());
             } else {
                 newRenderer.copyFrom(oldRenderer, oldLocation.x(), oldLocation.y(), oldLocation.w(), oldLocation.h(), newLocation.x(), newLocation.y());
             }
@@ -656,7 +673,7 @@ public final class TextRenderer {
         }
     }
 
-    private static final GLSLTexture glslTexture = new GLSLTexture();
+    private final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
 
     private int outstandingGlyphsVerticesPipeline = 0;
