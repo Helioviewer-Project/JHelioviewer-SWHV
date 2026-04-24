@@ -353,6 +353,10 @@ public final class GL {
         GLES30.glTexSubImage2D(target, level, x, y, width, height, inputFormat, inputType, offset);
     }
 
+    public static void glUniform1f(int location, float value) {
+        GLES30.glUniform1f(location, value);
+    }
+
     public static void glUniform1fv(int location, float[] values) {
         GLES30.glUniform1fv(location, values);
     }

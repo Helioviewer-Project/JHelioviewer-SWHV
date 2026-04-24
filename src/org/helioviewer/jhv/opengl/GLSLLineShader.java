@@ -10,9 +10,6 @@ class GLSLLineShader extends GLSLShader {
     private int iaspectRef;
     private int thicknessRef;
 
-    private final float[] iaspect = {1};
-    private final float[] thickness = {0.05f};
-
     private GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
@@ -33,10 +30,8 @@ class GLSLLineShader extends GLSLShader {
     }
 
     void bindParams(double aspect, double _thickness) {
-        iaspect[0] = (float) (1 / aspect);
-        GL.glUniform1fv(iaspectRef, iaspect);
-        thickness[0] = (float) (0.5 * _thickness);
-        GL.glUniform1fv(thicknessRef, thickness);
+        GL.glUniform1f(iaspectRef, (float) (1 / aspect));
+        GL.glUniform1f(thicknessRef, (float) (0.5 * _thickness));
     }
 
     void bindMVP() {
