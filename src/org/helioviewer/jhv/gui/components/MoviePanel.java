@@ -43,7 +43,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, ViewState.MovieListener {
+public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, ViewState.PlaybackStateListener {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
@@ -225,8 +225,8 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         add(JHVFrame.getLayersPanel());
 
         setEnabledState(false);
-        ViewState.addMovieListener(this);
-        movieStateChanged();
+        ViewState.addPlaybackStateListener(this);
+        playbackStateChanged();
     }
 
     @Override
@@ -347,7 +347,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     }
 
     @Override
-    public void movieStateChanged() {
+    public void playbackStateChanged() {
         ViewState.MovieData movieData = ViewState.movieData();
         ViewState.PlaybackData playbackData = ViewState.playbackData();
 
@@ -394,10 +394,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
             playButton.setToolTipText("Play movie");
         }
 
-        int activeFrame = available ? movieData.activeFrame() : 0;
-        timeSlider.setAllowFrame(false);
-        timeSlider.setValue(activeFrame);
-        timeSlider.setAllowFrame(true);
     }
 
 }

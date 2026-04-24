@@ -24,8 +24,8 @@ public final class ViewState {
         void modeStateChanged();
     }
 
-    public interface MovieListener {
-        void movieStateChanged();
+    public interface PlaybackStateListener {
+        void playbackStateChanged();
     }
 
     public interface PlaybackRangeListener {
@@ -116,7 +116,7 @@ public final class ViewState {
     public record ModeData(ProjectionMode projection, Interaction.AnnotationMode annotationMode, boolean multiview,
                            boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {}
 
-    public record MovieData(boolean available, boolean playing, int maxFrame, int activeFrame, boolean recording) {}
+    public record MovieData(boolean available, boolean playing, int maxFrame, boolean recording) {}
 
     public record PlaybackData(Movie.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit,
                                int firstFrame, int lastFrame) {}
@@ -124,7 +124,7 @@ public final class ViewState {
     public record RecordingData(RecordingMode mode, RecordingSize size) {}
 
     private static final ArrayList<ModeListener> modeListeners = new ArrayList<>();
-    private static final ArrayList<MovieListener> movieListeners = new ArrayList<>();
+    private static final ArrayList<PlaybackStateListener> playbackStateListeners = new ArrayList<>();
     private static final ArrayList<PlaybackRangeListener> playbackRangeListeners = new ArrayList<>();
     private static boolean suppressModeNotifications;
 
@@ -138,7 +138,6 @@ public final class ViewState {
     private static boolean moviePlaying;
     private static boolean movieAvailable;
     private static int movieMaxFrame;
-    private static int movieActiveFrame;
     public static final int PLAYBACK_SPEED_MIN = 1;
     public static final int PLAYBACK_SPEED_MAX = 120;
     private static Movie.AdvanceMode playbackAdvanceMode = Movie.AdvanceMode.Loop;
@@ -154,7 +153,7 @@ public final class ViewState {
     }
 
     public static MovieData movieData() {
-        return new MovieData(movieAvailable, moviePlaying, movieMaxFrame, movieActiveFrame, Movie.isRecording());
+        return new MovieData(movieAvailable, moviePlaying, movieMaxFrame, Movie.isRecording());
     }
 
     public static PlaybackData playbackData() {
@@ -383,7 +382,7 @@ public final class ViewState {
             return;
 
         moviePlaying = newMoviePlaying;
-        notifyMovieListeners();
+        notifyPlaybackStateListeners();
     }
 
     public static void setMovieAvailable(int newMovieMaxFrame) {
@@ -397,36 +396,22 @@ public final class ViewState {
         applyPlaybackRangeState(0, maxFrame);
         notifyPlaybackRangeListeners();
         if (changed)
-            notifyMovieListeners();
+            notifyPlaybackStateListeners();
     }
 
     public static void clearMovie() {
-        boolean changed = movieAvailable || movieMaxFrame != 0 || movieActiveFrame != 0 || moviePlaying || Movie.isRecording();
+        boolean changed = movieAvailable || movieMaxFrame != 0 || moviePlaying || Movie.isRecording();
         movieAvailable = false;
         movieMaxFrame = 0;
-        movieActiveFrame = 0;
         moviePlaying = false;
         applyPlaybackRangeState(0, 0);
         notifyPlaybackRangeListeners();
         if (changed)
-            notifyMovieListeners();
-    }
-
-    public static void setMovieActiveFrame(int newMovieActiveFrame) {
-        int maxFrame = movieAvailable ? movieMaxFrame : 0;
-        int activeFrame = Math.clamp(newMovieActiveFrame, 0, maxFrame);
-        if (activeFrame != newMovieActiveFrame)
-            Log.warn("Clamping invalid movie active frame " + newMovieActiveFrame + " to " + activeFrame);
-
-        if (movieActiveFrame == activeFrame)
-            return;
-
-        movieActiveFrame = activeFrame;
-        notifyMovieListeners();
+            notifyPlaybackStateListeners();
     }
 
     public static void movieRecordingChanged() {
-        notifyMovieListeners();
+        notifyPlaybackStateListeners();
     }
 
     public static void setPlaybackAdvanceMode(Movie.AdvanceMode newPlaybackAdvanceMode) {
@@ -435,7 +420,7 @@ public final class ViewState {
 
         playbackAdvanceMode = newPlaybackAdvanceMode;
         Movie.setAdvanceMode(newPlaybackAdvanceMode);
-        notifyMovieListeners();
+        notifyPlaybackStateListeners();
     }
 
     public static void setPlaybackSpeed(int newPlaybackSpeed, PlaybackSpeedUnit newPlaybackSpeedUnit) {
@@ -451,7 +436,7 @@ public final class ViewState {
             Movie.setDesiredRelativeSpeed(playbackSpeed);
         else
             Movie.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
-        notifyMovieListeners();
+        notifyPlaybackStateListeners();
     }
 
     private static void applyPlaybackUpdate(
@@ -572,7 +557,7 @@ public final class ViewState {
             return;
 
         recordingMode = newRecordingMode;
-        notifyMovieListeners();
+        notifyPlaybackStateListeners();
     }
 
     public static void setRecordingSize(RecordingSize newRecordingSize) {
@@ -580,7 +565,7 @@ public final class ViewState {
             return;
 
         recordingSize = newRecordingSize;
-        notifyMovieListeners();
+        notifyPlaybackStateListeners();
     }
 
     private static void applyRecordingUpdate(
@@ -609,13 +594,13 @@ public final class ViewState {
         modeListeners.remove(listener);
     }
 
-    public static void addMovieListener(MovieListener listener) {
-        if (!movieListeners.contains(listener))
-            movieListeners.add(listener);
+    public static void addPlaybackStateListener(PlaybackStateListener listener) {
+        if (!playbackStateListeners.contains(listener))
+            playbackStateListeners.add(listener);
     }
 
-    public static void removeMovieListener(MovieListener listener) {
-        movieListeners.remove(listener);
+    public static void removePlaybackStateListener(PlaybackStateListener listener) {
+        playbackStateListeners.remove(listener);
     }
 
     public static void addPlaybackRangeListener(PlaybackRangeListener listener) {
@@ -633,8 +618,8 @@ public final class ViewState {
         modeListeners.forEach(ModeListener::modeStateChanged);
     }
 
-    private static void notifyMovieListeners() {
-        movieListeners.forEach(MovieListener::movieStateChanged);
+    private static void notifyPlaybackStateListeners() {
+        playbackStateListeners.forEach(PlaybackStateListener::playbackStateChanged);
     }
 
     private static void notifyPlaybackRangeListeners() {

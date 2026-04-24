@@ -30,13 +30,14 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.view.View;
 
 // Extension of JSlider displaying the caching status on the track.
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, ViewState.PlaybackRangeListener {
+public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Movie.Listener, ViewState.PlaybackRangeListener {
 
     private enum DragMode {
         Frame, Range, RangeStart, RangeEnd
@@ -72,6 +73,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
+        Movie.addFrameListener(this);
         UITimer.register(this);
         ViewState.addPlaybackRangeListener(this);
 
@@ -135,6 +137,13 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         super.setValue(n);
         if (allowSetFrame)
             Commands.seekFrame(n);
+    }
+
+    @Override
+    public void frameChanged(int frame, boolean last) {
+        setAllowFrame(false);
+        setValue(frame);
+        setAllowFrame(true);
     }
 
     @Override
