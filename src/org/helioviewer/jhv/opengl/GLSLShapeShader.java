@@ -10,8 +10,6 @@ class GLSLShapeShader extends GLSLShader {
     private int refModelViewProjectionMatrix;
     private int factorRef;
 
-    private final float[] factor = {1};
-
     private GLSLShapeShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
@@ -33,8 +31,7 @@ class GLSLShapeShader extends GLSLShader {
     }
 
     void bindParams(double _factor) {
-        factor[0] = (float) _factor;
-        GL.glUniform1fv(factorRef, factor);
+        GL.glUniform1f(factorRef, (float) _factor);
     }
 
     void bindMVP() {
