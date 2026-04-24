@@ -5,6 +5,7 @@ import org.helioviewer.jhv.camera.Transform;
 class GLSLTextureShader extends GLSLShader {
 
     static final GLSLTextureShader texture = new GLSLTextureShader("/glsl/texture.vert", "/glsl/texture.frag");
+    static final GLSLTextureShader text = new GLSLTextureShader("/glsl/texture.vert", "/glsl/textureText.frag");
 
     private int refModelViewProjectionMatrix;
     private int colorRef;
@@ -15,10 +16,12 @@ class GLSLTextureShader extends GLSLShader {
 
     public static void init() {
         texture._init(false);
+        text._init(false);
     }
 
     public static void dispose() {
         texture._dispose();
+        text._dispose();
     }
 
     @Override
