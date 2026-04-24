@@ -48,24 +48,23 @@ final class TextureRenderer {
 
     void clear(int x, int y, int width, int height) {
         long base = MemoryUtil.memAddress(imageBuffer);
-        int rowStride = imageWidth;
         long clearBytes = width;
         for (int row = 0; row < height; row++) {
-            long offset = (long) (y + row) * rowStride + x;
+            long offset = (long) (y + row) * imageWidth + x;
             MemoryUtil.memSet(base + offset, 0, clearBytes);
         }
     }
 
-    void drawMask(int x, int y, int width, int height, ByteBuffer mask) {
-        int rowStride = imageWidth;
+    private void drawMask(int x, int y, int width, int height, ByteBuffer mask) {
         int start = mask.position();
+        long srcBase = MemoryUtil.memAddress(mask) + start;
+        long dstBase = MemoryUtil.memAddress(imageBuffer);
+        long rowBytes = width;
         for (int row = 0; row < height; row++) {
-            int imageOffset = (y + row) * rowStride + x;
-            for (int col = 0; col < width; col++) {
-                imageBuffer.put(imageOffset + col, mask.get(start + row * width + col));
-            }
+            long srcOffset = (long) row * width;
+            long dstOffset = (long) (y + row) * imageWidth + x;
+            MemoryUtil.memCopy(srcBase + srcOffset, dstBase + dstOffset, rowBytes);
         }
-        imageBuffer.rewind();
     }
 
     void drawGlyphMask(Rect rect, int bitmapX, int bitmapY, int glyphWidth, int glyphHeight, ByteBuffer mask) {
@@ -92,12 +91,10 @@ final class TextureRenderer {
     void copyFrom(TextureRenderer other, int srcX, int srcY, int width, int height, int dstX, int dstY) {
         long srcBase = MemoryUtil.memAddress(other.imageBuffer);
         long dstBase = MemoryUtil.memAddress(imageBuffer);
-        int srcRowStride = other.imageWidth;
-        int dstRowStride = imageWidth;
         long rowBytes = width;
         for (int row = 0; row < height; row++) {
-            long srcOffset = (long) (srcY + row) * srcRowStride + srcX;
-            long dstOffset = (long) (dstY + row) * dstRowStride + dstX;
+            long srcOffset = (long) (srcY + row) * other.imageWidth + srcX;
+            long dstOffset = (long) (dstY + row) * imageWidth + dstX;
             MemoryUtil.memCopy(srcBase + srcOffset, dstBase + dstOffset, rowBytes);
         }
     }
@@ -147,8 +144,9 @@ final class TextureRenderer {
     private void upload(int x, int y, int width, int height) {
         GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 1);
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, imageWidth);
-        GL.glTexSubImage2D(GL.TEXTURE_2D, 0, x, y, width, height, GL.RED, GL.UNSIGNED_BYTE, imageBuffer.position(y * imageWidth + x));
+        ByteBuffer uploadBuffer = imageBuffer.duplicate();
+        uploadBuffer.position(y * imageWidth + x);
+        GL.glTexSubImage2D(GL.TEXTURE_2D, 0, x, y, width, height, GL.RED, GL.UNSIGNED_BYTE, uploadBuffer);
         GL.glGenerateMipmap(GL.TEXTURE_2D);
-        imageBuffer.rewind();
     }
 }

@@ -118,7 +118,7 @@ public final class TextRenderer {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
                 if (previousGlyph != null)
-                    width += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode());
+                    width += getKerning(previousGlyph.glyphCode, glyph.glyphCode);
                 width += glyph.advance;
                 previousGlyph = glyph;
             }
@@ -146,7 +146,7 @@ public final class TextRenderer {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
                 if (previousGlyph != null)
-                    x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+                    x += getKerning(previousGlyph.glyphCode, glyph.glyphCode) * scaleFactor;
                 float advance = glyph.draw3D(x, y, z, scaleFactor);
                 x += advance * scaleFactor;
                 previousGlyph = glyph;
@@ -173,7 +173,7 @@ public final class TextRenderer {
             Glyph glyph = glyphProducer.getGlyph(str.charAt(i));
             if (glyph != null) {
                 if (previousGlyph != null)
-                    x += getKerning(previousGlyph.getGlyphCode(), glyph.getGlyphCode()) * scaleFactor;
+                    x += getKerning(previousGlyph.glyphCode, glyph.glyphCode) * scaleFactor;
                 float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
                 x += advance * scaleFactor;
                 previousGlyph = glyph;
@@ -392,7 +392,7 @@ public final class TextRenderer {
             STBTruetype.stbtt_GetGlyphBitmapBox(fontInfo, glyphIndex, scale, scale, x0, y0, x1, y1);
 
             StbGlyphData glyphData = new StbGlyphData(glyphIndex, x0.get(0), y0.get(0), x1.get(0), y1.get(0));
-            return new Glyph(unicodeID, glyphIndex, advanceWidth.get(0) * scale, glyphData);
+            return new Glyph(glyphIndex, advanceWidth.get(0) * scale, glyphData);
         }
     }
 
@@ -497,8 +497,6 @@ public final class TextRenderer {
      */
 
     private final class Glyph {
-        // This glyph's unicode ID.
-        private final int unicodeID;
         // The glyph code in the font.
         private final int glyphCode;
         // The advance of this glyph.
@@ -510,21 +508,10 @@ public final class TextRenderer {
         private Rect glyphRectForTextureMapping;
 
         // Creates a Glyph representing an individual Unicode character
-        Glyph(int unicodeIDValue, int glyphCodeValue, float advanceValue, StbGlyphData glyphBackendData) {
-            unicodeID = unicodeIDValue;
+        Glyph(int glyphCodeValue, float advanceValue, StbGlyphData glyphBackendData) {
             glyphCode = glyphCodeValue;
             advance = advanceValue;
             backendData = glyphBackendData;
-        }
-
-        // Returns this glyph's unicode ID
-        int getUnicodeID() {
-            return unicodeID;
-        }
-
-        // Returns this glyph's (font-specific) glyph code
-        int getGlyphCode() {
-            return glyphCode;
         }
 
         // Draws this glyph and returns the (x) advance for this glyph
@@ -624,14 +611,14 @@ public final class TextRenderer {
     }
 
     private final class GlyphProducer {
-        private static final int undefined = -2;
+        private static final int UNDEFINED_GLYPH = -2;
         // The mapping from unicode character to font-specific glyph ID
-        private final int[] unicodes2Glyphs;
+        private final int[] unicodeToGlyphCode;
         // The mapping from glyph ID to Glyph
         private final Glyph[] glyphCache;
 
         GlyphProducer() {
-            unicodes2Glyphs = new int[10000]; // highest character we can draw
+            unicodeToGlyphCode = new int[10000]; // highest character we can draw
             glyphCache = new Glyph[65536];
             clearAllCacheEntries();
         }
@@ -642,25 +629,25 @@ public final class TextRenderer {
                     glyph.clear();
             }
             Arrays.fill(glyphCache, null);
-            Arrays.fill(unicodes2Glyphs, undefined);
+            Arrays.fill(unicodeToGlyphCode, UNDEFINED_GLYPH);
         }
 
-        private void register(Glyph glyph) {
-            unicodes2Glyphs[glyph.getUnicodeID()] = glyph.getGlyphCode();
-            glyphCache[glyph.getGlyphCode()] = glyph;
+        private void register(char unicodeID, Glyph glyph) {
+            unicodeToGlyphCode[unicodeID] = glyph.glyphCode;
+            glyphCache[glyph.glyphCode] = glyph;
         }
 
         // Returns a glyph object for this single glyph. Returns null if the
         // unicode or glyph ID would be out of bounds of the glyph cache.
         @Nullable
         Glyph getGlyph(char unicodeID) {
-            if (unicodeID >= unicodes2Glyphs.length) {
+            if (unicodeID >= unicodeToGlyphCode.length) {
                 return null;
             }
 
-            int glyphID = unicodes2Glyphs[unicodeID];
-            if (glyphID != undefined) {
-                return glyphCache[glyphID];
+            int glyphCode = unicodeToGlyphCode[unicodeID];
+            if (glyphCode != UNDEFINED_GLYPH) {
+                return glyphCache[glyphCode];
             }
 
             // Must fabricate the glyph
@@ -668,7 +655,7 @@ public final class TextRenderer {
             if (glyph == null) {
                 return null;
             }
-            register(glyph);
+            register(unicodeID, glyph);
             return glyph;
         }
     }
