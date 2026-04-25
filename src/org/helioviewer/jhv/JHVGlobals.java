@@ -52,30 +52,34 @@ public class JHVGlobals {
         Log.info(versionDetail);
     }
 
-    // Attempts to create the necessary directories if they do not exist, should not use Log
-    public static void createDirs() {
-        JHVDirectory[] dirs = JHVDirectory.values();
-        for (JHVDirectory dir : dirs) {
-            File f = dir.getFile();
-            if (!f.exists()) {
-                f.mkdirs();
-            }
-        }
+    static void createPersistentDirs() {
+        for (JHVDirectory dir : JHVDirectory.values()) {
+            if (dir == JHVDirectory.CACHE || dir == JHVDirectory.DOWNLOADS)
+                continue;
 
+            File f = dir.getFile();
+            if (!f.isDirectory() && !f.mkdirs())
+                throw new IllegalStateException("Failed to create directory: " + f);
+        }
+    }
+
+    static void createCacheDirs() {
+        File cacheDir = JHVDirectory.CACHE.getFile();
         try {
-            File cacheDir = JHVDirectory.CACHE.getFile();
+            if (!cacheDir.isDirectory() && !cacheDir.mkdirs())
+                throw new IllegalStateException("Failed to create directory: " + cacheDir);
+
+            File downloadsDir = JHVDirectory.DOWNLOADS.getFile();
+            if (!downloadsDir.isDirectory() && !downloadsDir.mkdirs())
+                throw new IllegalStateException("Failed to create directory: " + downloadsDir);
+
             libCacheDir = FileUtils.tempDir(cacheDir, "lib").getAbsolutePath();
             dataCacheDir = FileUtils.tempDir(cacheDir, "data").getAbsolutePath();
             fileCacheDir = FileUtils.tempDir(cacheDir, "file");
             clientCacheDir = FileUtils.tempDir(cacheDir, "client");
             exportCacheDir = FileUtils.tempDir(cacheDir, "export");
         } catch (Exception e) {
-            String cacheDir = System.getProperty("java.io.tmpdir");
-            libCacheDir = cacheDir;
-            dataCacheDir = cacheDir;
-            fileCacheDir = new File(cacheDir);
-            clientCacheDir = new File(cacheDir);
-            exportCacheDir = new File(cacheDir);
+            throw new IllegalStateException("Failed to initialize cache directory: " + cacheDir, e);
         }
     }
 

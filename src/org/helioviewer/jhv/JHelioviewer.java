@@ -44,12 +44,14 @@ public class JHelioviewer {
 
         // Set the platform
         Platform.init();
-        // This attempts to create the necessary directories for the application
-        JHVGlobals.createDirs();
+        // Create persistent directories, including Logs, before installing the uncaught exception handler.
+        JHVGlobals.createPersistentDirs();
         // Uncaught runtime errors are displayed in a dialog box in addition
         JHVUncaughtExceptionHandler.setupHandlerForThread();
         // Init log
         Log.init();
+        // Create transient cache directories after logging is available. On Windows this may need an ASCII-safe path.
+        JHVGlobals.createCacheDirs();
         // Information log message
         Log.info("JHelioviewer started with command-line options: " + String.join(" ", args));
 

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 // An enum containing all the directories mapped in a system independent way. If
 // a new directory is required, just add it here, and it will be created at startup.
@@ -17,9 +18,7 @@ public enum JHVDirectory {
     CACHE {
         @Override
         public String getPath() {
-            // transient files, access problem for non-ASCII username on Windows
-            String cacheRoot = Platform.isWindows() ? System.getProperty("java.io.tmpdir") + File.separator + "JHelioviewer-SWHV" + File.separator : HOME.getPath();
-            return cacheRoot + "Cache" + File.separator;
+            return transientRoot() + "Cache" + File.separator;
         }
     },
     // The JHV state directory
@@ -61,9 +60,7 @@ public enum JHVDirectory {
     DOWNLOADS {
         @Override
         public String getPath() {
-            // access problem for non-ASCII username on Windows
-            String downRoot = Platform.isWindows() ? System.getProperty("java.io.tmpdir") + File.separator + "JHelioviewer-SWHV" + File.separator : HOME.getPath();
-            return downRoot + "Downloads" + File.separator;
+            return transientRoot() + "Downloads" + File.separator;
         }
     };
 
@@ -73,6 +70,44 @@ public enum JHVDirectory {
     // A File representation of the path of the directory
     public File getFile() {
         return new File(getPath());
+    }
+
+    private static String transientRoot() {
+        if (!Platform.isWindows())
+            return HOME.getPath();
+
+        String tmp = System.getProperty("java.io.tmpdir");
+        String root = appendJHV(tmp);
+        if (isUsableAsciiDirectory(root))
+            return root;
+
+        String systemRoot = System.getenv("SystemRoot");
+        if (systemRoot != null) {
+            root = appendJHV(systemRoot + File.separator + "Temp");
+            if (isUsableAsciiDirectory(root))
+                return root;
+        }
+
+        String programData = System.getenv("ProgramData");
+        root = appendJHV(programData);
+        if (isUsableAsciiDirectory(root))
+            return root;
+
+        throw new IllegalStateException("No writable ASCII temporary directory found. Set java.io.tmpdir to an ASCII path.");
+    }
+
+    private static boolean isUsableAsciiDirectory(String path) {
+        if (path == null || !StandardCharsets.US_ASCII.newEncoder().canEncode(path))
+            return false;
+
+        File dir = new File(path);
+        return (dir.isDirectory() || dir.mkdirs()) && dir.canWrite();
+    }
+
+    private static String appendJHV(String path) {
+        if (path == null)
+            return null;
+        return path + File.separator + "JHelioviewer-SWHV" + File.separator;
     }
 
 }
