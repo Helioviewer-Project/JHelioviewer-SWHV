@@ -369,10 +369,6 @@ public final class GL {
         GLES30.glUniform1i(location, value);
     }
 
-    public static void glUniform2f(int location, float v0, float v1) {
-        GLES30.glUniform2f(location, v0, v1);
-    }
-
     public static void glUniform3fv(int location, float[] values) {
         GLES30.glUniform3fv(location, values);
     }

@@ -151,7 +151,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
     }
 
     private static void gatherGray(ByteBuffer src, byte[] dst, int srcStride, int dstStride,
-            int srcIdx, int dstIdx, int width, int height) {
+                                   int srcIdx, int dstIdx, int width, int height) {
         for (int j = 0; j < height; ++j, dstIdx += dstStride, srcIdx += srcStride) {
             int srcByte = 4 * srcIdx;
             int i = 0;

@@ -62,19 +62,11 @@ public class GLSLSolarShader extends GLSLShader {
         logpolar._init(logpolar.hasCommon);
     }
 
-    private static void setupUBO(int programID, String blockName, int uboID, int binding) {
-        int blockIndex = GL.glGetUniformBlockIndex(programID, blockName);
-        if (blockIndex < 0)
-            return;
-        GL.glUniformBlockBinding(programID, blockIndex, binding);
-        GL.glBindBufferBase(GL.UNIFORM_BUFFER, binding, uboID);
-    }
-
-    static void setupCommonBlocks(int programID) {
-        setupUBO(programID, "WCSBlock", wcsBO.getID(), 0);
-        setupUBO(programID, "ProjectionBlock", projectionBO.getID(), 1);
-        setupUBO(programID, "ScreenBlock", screenBO.getID(), 2);
-        setupUBO(programID, "DisplayBlock", displayBO.getID(), 3);
+    private static void setupCommonBlocks(int programID) {
+        setupUBO(programID, "WCSBlock", wcsBO.getID(), UBO.WCS);
+        setupUBO(programID, "ProjectionBlock", projectionBO.getID(), UBO.PROJECTION);
+        setupUBO(programID, "ScreenBlock", screenBO.getID(), UBO.SOLAR_SCREEN);
+        setupUBO(programID, "DisplayBlock", displayBO.getID(), UBO.DISPLAY);
     }
 
     @Override

@@ -6,6 +6,25 @@ import org.helioviewer.jhv.io.FileUtils;
 abstract class GLSLShader {
     private static final String COMMON_FRAGMENT = "/glsl/solarCommon.frag";
 
+    protected static final class UBO {
+        static final int WCS = 0;
+        static final int PROJECTION = 1;
+        static final int SOLAR_SCREEN = 2;
+        static final int DISPLAY = 3;
+        static final int LINE_SCREEN = 4;
+
+        private UBO() {
+        }
+    }
+
+    protected static void setupUBO(int programID, String blockName, int uboID, int binding) {
+        int blockIndex = GL.glGetUniformBlockIndex(programID, blockName);
+        if (blockIndex < 0)
+            return;
+        GL.glUniformBlockBinding(programID, blockIndex, binding);
+        GL.glBindBufferBase(GL.UNIFORM_BUFFER, binding, uboID);
+    }
+
     private int progID;
     private int vertexID;
     private int fragmentID;
