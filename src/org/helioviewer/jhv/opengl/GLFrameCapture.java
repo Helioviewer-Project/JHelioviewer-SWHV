@@ -23,7 +23,7 @@ final class GLFrameCapture {
     GLFrameCapture(int captureW, int captureH) {
         int frameWidth = Math.max(1, captureW);
         int frameHeight = Math.max(1, captureH);
-        int frameSamples = Math.clamp(GL.SAMPLES, 0, GL.glGetInteger(GL.MAX_SAMPLES));
+        int frameSamples = GL.SAMPLES > 1 ? Math.clamp(GL.SAMPLES, 0, GL.glGetInteger(GL.MAX_SAMPLES)) : 0;
         int colorInternalFormat = GL.RGB8;
         int colorPixelFormat = GL.RGB;
         int resolveFbo = 0;

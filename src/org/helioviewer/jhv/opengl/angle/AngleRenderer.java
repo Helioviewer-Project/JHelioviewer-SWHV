@@ -62,7 +62,7 @@ public final class AngleRenderer {
             if (!EGL15.eglBindAPI(EGL15.EGL_OPENGL_ES_API))
                 throw eglError("eglBindAPI");
 
-            int samples = Math.max(0, GL.SAMPLES);
+            int samples = GL.SAMPLES > 1 ? GL.SAMPLES : 0;
             long config = chooseConfig(stack, newDisplay, samples);
             if (config == 0L)
                 throw eglError("eglChooseConfig");
