@@ -100,7 +100,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (!geometryMap.isEmpty()) {
             SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
             updateTimestamp(g.time());
-            g.render(geometryLine, geometryPoint, vp.aspect, CameraHelper.getPixelFactor(camera, vp));
+            g.render(geometryLine, geometryPoint, vp, CameraHelper.getPixelFactor(camera, vp));
         }
     }
 
@@ -133,7 +133,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         Display.mode.emitMapVertex(ctx, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
 
         hcsLine.setVertex(hcsBuf);
-        hcsLine.renderLine(ctx.vp().aspect, LINEWIDTH);
+        hcsLine.renderLine(ctx.vp(), LINEWIDTH);
     }
 
     private static SphericalPoint interpolateToSpherical(long t, Position.Cartesian prev, Position.Cartesian next) {
@@ -154,7 +154,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.lowerValue(time), footpointMap.higherValue(time));
         AnnotateCross.drawCross(ctx, point.longitude(), point.latitude(), footpointColor, footpointBuf);
         footpointLine.setVertex(footpointBuf);
-        footpointLine.renderLine(ctx.vp().aspect, LINEWIDTH);
+        footpointLine.renderLine(ctx.vp(), LINEWIDTH);
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -45,10 +46,10 @@ public class SunJSONTypes {
             return time;
         }
 
-        public void render(GLSLLine lines, GLSLShape points, double aspect, double factor) {
+        public void render(GLSLLine lines, GLSLShape points, Viewport vp, double factor) {
             linesMap.forEach((thickness, vexBuf) -> {
                 lines.setVertexRepeatable(vexBuf);
-                lines.renderLine(aspect, thickness * factor * 0.5e-2 /* TBD */);
+                lines.renderLine(vp, thickness * factor * 0.5e-2 /* TBD */);
             });
             if (pointsBuf != null) {
                 points.setVertexRepeatable(pointsBuf);

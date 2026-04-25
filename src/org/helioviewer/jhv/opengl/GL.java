@@ -217,6 +217,10 @@ public final class GL {
         GLES30.glDepthFunc(func);
     }
 
+    public static void glDepthMask(boolean flag) {
+        GLES30.glDepthMask(flag);
+    }
+
     public static void glDetachShader(int program, int shader) {
         GLES30.glDetachShader(program, shader);
     }
@@ -363,6 +367,10 @@ public final class GL {
 
     public static void glUniform1i(int location, int value) {
         GLES30.glUniform1i(location, value);
+    }
+
+    public static void glUniform2f(int location, float v0, float v1) {
+        GLES30.glUniform2f(location, v0, v1);
     }
 
     public static void glUniform3fv(int location, float[] values) {

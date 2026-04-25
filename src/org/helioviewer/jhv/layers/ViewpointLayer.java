@@ -322,7 +322,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         orbits.setVertex(orbitBuf);
-        orbits.renderLine(vp.aspect, LINEWIDTH_ORBIT);
+        orbits.renderLine(vp, LINEWIDTH_ORBIT);
 
         planets.setVertex(planetBuf);
         planets.renderPoints(pointFactor);
@@ -368,7 +368,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         spiral.setVertex(spiralBuf);
-        spiral.renderLine(vp.aspect, LINEWIDTH_SPIRAL);
+        spiral.renderLine(vp, LINEWIDTH_SPIRAL);
     }
 
 }
