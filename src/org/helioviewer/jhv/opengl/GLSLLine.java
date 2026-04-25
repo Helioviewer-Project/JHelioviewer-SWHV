@@ -41,7 +41,6 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
 
         GLSLLineShader.line.use();
         GLSLLineShader.line.bindParams(vp, thickness);
-        GLSLLineShader.line.bindMVP();
 
         bind();
         GL.glDepthMask(false);

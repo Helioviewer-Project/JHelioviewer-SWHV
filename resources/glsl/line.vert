@@ -9,10 +9,15 @@ out vec2 segmentStart;
 out vec2 segmentEnd;
 out float halfWidthPixels;
 
-uniform mat4 ModelViewProjectionMatrix;
-uniform vec2 viewportOrigin;
-uniform vec2 viewportSize;
-uniform float thickness;
+struct Screen {
+    mat4 mvp;
+    vec4 viewport;
+    float thickness;
+};
+
+layout(std140) uniform ScreenBlock {
+    Screen screen;
+};
 
 const float dir[2] = float[2](1.0, -1.0);
 // Must cover at least the fragment shader AA ramp width.
@@ -23,9 +28,12 @@ const float aaPixels = 1.0;
 // two vertices at the current endpoint and two at the next endpoint.
 // https://developer.apple.com/forums/thread/86098
 void main(void) {
+    vec2 viewportOrigin = screen.viewport.xy;
+    vec2 viewportSize = screen.viewport.zw;
+
     // Project both segment endpoints.
-    vec4 curr = ModelViewProjectionMatrix * Vertex;
-    vec4 next = ModelViewProjectionMatrix * NextVertex;
+    vec4 curr = screen.mvp * Vertex;
+    vec4 next = screen.mvp * NextVertex;
 
     // Convert clip space to NDC [-1, 1], then to framebuffer pixels. The
     // fragment shader compares against gl_FragCoord, so these endpoints must be
@@ -42,8 +50,8 @@ void main(void) {
     vec2 normal = len > 0.0 ? vec2(-delta.y, delta.x) / len : vec2(0.0);
 
     // Java passes a full width, GLSLLineShader halves it. Convert that NDC half-width
-    // to pixels; NDC height 2.0 maps to viewportSize.y pixels.
-    halfWidthPixels = thickness * viewportSize.y * 0.5;
+    // to pixels; NDC height 2.0 maps to viewport height in pixels.
+    halfWidthPixels = screen.thickness * viewportSize.y * 0.5;
 
     // Vertex IDs 0/1 use the current endpoint, 2/3 use the next endpoint.
     // Even/odd IDs select the two sides of the expanded rectangle.
