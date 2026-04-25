@@ -8,6 +8,7 @@ import org.lwjgl.system.MemoryUtil;
 
 final class GLFrameCapture {
     private static final int[] DEPTH_FORMATS = {GL.DEPTH_COMPONENT32, GL.DEPTH_COMPONENT24, GL.DEPTH_COMPONENT16};
+    private static final int EXPORT_SAMPLES = 4;
 
     private final int width;
     private final int height;
@@ -23,7 +24,7 @@ final class GLFrameCapture {
     GLFrameCapture(int captureW, int captureH) {
         int frameWidth = Math.max(1, captureW);
         int frameHeight = Math.max(1, captureH);
-        int frameSamples = GL.SAMPLES > 1 ? Math.clamp(GL.SAMPLES, 0, GL.glGetInteger(GL.MAX_SAMPLES)) : 0;
+        int frameSamples = Math.clamp(EXPORT_SAMPLES, 0, GL.glGetInteger(GL.MAX_SAMPLES));
         int colorInternalFormat = GL.RGB8;
         int colorPixelFormat = GL.RGB;
         int resolveFbo = 0;
