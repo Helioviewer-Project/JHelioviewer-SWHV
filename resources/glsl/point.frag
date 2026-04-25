@@ -13,5 +13,9 @@ void main(void) {
 
     float radius = sqrt(radius2);
     float delta = fwidth(radius);
-    outColor = vec4(fragColor.rgb, fragColor.a * (1.0 - smoothstep(1.0 - delta, 1.0, radius)));
+
+    float coverage = 1.0 - smoothstep(1.0 - delta, 1.0, radius);
+    if (coverage <= 0.0)
+        discard;
+    outColor = fragColor * coverage;
 }
