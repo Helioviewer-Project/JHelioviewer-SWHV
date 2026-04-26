@@ -214,12 +214,15 @@ public final class GridLayer extends AbstractLayer {
 
         renderer.begin3DRendering();
 
+        // need flushes for state toggle
+        lonLabels.forEach(lonLabel -> renderer.draw(lonLabel.txt, lonLabel.origin, lonLabel.basisX, lonLabel.basisY, textScaleFactor));
+        renderer.flush();
+
         GL.glDisable(GL.CULL_FACE);
         latLabels.forEach(label -> renderer.draw(label.txt, label.x, label.y, z, textScaleFactor));
         renderer.flush();
         GL.glEnable(GL.CULL_FACE);
 
-        lonLabels.forEach(lonLabel -> renderer.draw(lonLabel.txt, lonLabel.origin, lonLabel.basisX, lonLabel.basisY, textScaleFactor));
         renderer.end3DRendering();
     }
 
