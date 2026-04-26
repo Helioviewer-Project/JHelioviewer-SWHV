@@ -9,7 +9,7 @@ in float halfWidthPixels;
 out vec4 outColor;
 
 // Must not exceed the geometry fringe reserved by the vertex shader.
-const float aaPixels = 1.0;
+const float aaPixels = 1.5;
 
 // Distance to the finite segment is used instead of distance to the infinite
 // supporting line. That keeps the same AA treatment at the long sides and at
