@@ -113,7 +113,7 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
-        double pixFactor = Math.cbrt(CameraHelper.getPixelFactor(camera, vp)); // temperate scaling of planets
+        double pointFactor = CameraHelper.getTemperedPointFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
 
         Transform.pushView();
@@ -125,7 +125,7 @@ public class ViewpointLayer extends AbstractLayer {
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
             GL.glDisable(GL.DEPTH_TEST);
-            renderPlanets(vp, positionLoads, pixFactor);
+            renderPlanets(vp, positionLoads, pointFactor);
             GL.glEnable(GL.DEPTH_TEST);
         }
 

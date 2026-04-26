@@ -43,7 +43,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final double ORTHO_RADIUS = 1.01;
-    private static final float SIZE_POINT = 0.01f;
+    private static final float SIZE_POINT = 0.02f;
 
     private final byte[] sswColor = Colors.bytes(164, 48, 42);
     private final byte[] fswColor = Colors.bytes(74, 136, 92);
@@ -119,7 +119,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private static void putConnectivity(MapContext ctx, List<Vec3> points, byte[] color, BufVertex vexBuf) {
-        points.forEach(v -> Display.mode.emitMapPoint(ctx, v, 2 * SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
+        points.forEach(v -> Display.mode.emitMapPoint(ctx, v, SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
     }
 
     private void drawHCS(MapContext ctx) {
