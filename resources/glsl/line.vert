@@ -21,7 +21,7 @@ layout(std140) uniform ScreenBlock {
 
 const float dir[2] = float[2](1.0, -1.0);
 // Must cover at least the fragment shader AA ramp width.
-const float aaPixels = 1.0;
+const float aaPixels = 1.5;
 
 // ANGLE on macOS does not expose wide/smooth native GL lines reliably. Each
 // logical line segment is rendered as one instanced four-vertex strip instead:
