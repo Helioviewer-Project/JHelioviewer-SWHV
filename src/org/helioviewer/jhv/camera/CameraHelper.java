@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.math.Quat;
@@ -30,9 +31,17 @@ public class CameraHelper {
         return computeNormalizedY(vp, screenY) * width - camera.getTranslationY();
     }
 
-    public static double getPixelFactor(Camera camera, Viewport vp) {
+    private static double getLogicalPixelFactor(Camera camera, Viewport vp) {
         double width = camera.getCameraWidth();
-        return vp.height / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
+        return (vp.height / Display.pixelScale[1]) / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
+    }
+
+    public static double getPixelFactor(Camera camera, Viewport vp) {
+        return Display.pixelScale[1] * getLogicalPixelFactor(camera, vp);
+    }
+
+    public static double getTemperedPointFactor(Camera camera, Viewport vp) {
+        return Display.pixelScale[1] * Math.cbrt(getLogicalPixelFactor(camera, vp));
     }
 
     public static double getImagePixelFactor(Camera camera, Viewport vp) {

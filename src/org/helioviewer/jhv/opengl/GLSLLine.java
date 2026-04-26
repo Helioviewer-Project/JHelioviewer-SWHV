@@ -43,6 +43,7 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
         GLSLLineShader.line.bindParams(vp, thickness);
 
         bind();
+        // Keep depth testing, but do not let translucent AA fringe pixels write depth.
         GL.glDepthMask(false);
         GL.glDrawArraysInstanced(GL.TRIANGLE_STRIP, 0, 4, count);
         GL.glDepthMask(true);
