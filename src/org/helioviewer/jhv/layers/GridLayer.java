@@ -29,6 +29,7 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -134,19 +135,24 @@ public final class GridLayer extends AbstractLayer {
         Position viewpoint = camera.getViewpoint();
         float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        double pixelsPerSolarRadius = textScale * pixFactor;
+        double logicalPixelsPerSolarRadius = textScale * pixFactor / Display.pixelScale[1];
+
+        // correct order: grid lines -> Earth indicators -> grid labels -> radial grid
+        Quat gridQuat = Display.gridType.toCarrington(viewpoint);
 
         Transform.pushView();
-        Transform.rotateViewInverse(Display.gridType.toCarrington(viewpoint));
-        {
-            gridLine.renderLine(vp, LINEWIDTH);
-            if (showLabels) {
-                drawGridText((int) pixelsPerSolarRadius, ztext);
-            }
-        }
+        Transform.rotateViewInverse(gridQuat);
+        gridLine.renderLine(vp, LINEWIDTH);
         Transform.popView();
 
         drawEarthCircles(vp, pixFactor, Sun.getEarth(viewpoint.time));
+
+        if (showLabels) {
+            Transform.pushView();
+            Transform.rotateViewInverse(gridQuat);
+            drawGridText((int) logicalPixelsPerSolarRadius, ztext);
+            Transform.popView();
+        }
 
         if (showRadial) {
             Transform.pushView();
@@ -156,12 +162,12 @@ public final class GridLayer extends AbstractLayer {
                     radialCircleLineFar.renderLine(vp, LINEWIDTH);
                     radialThickLineFar.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabelsFar, pixelsPerSolarRadius * RADIAL_UNIT_FAR, ztext, R_LABEL_POS_FAR);
+                        drawRadialGridText(radialLabelsFar, logicalPixelsPerSolarRadius * RADIAL_UNIT_FAR, ztext, R_LABEL_POS_FAR);
                 } else {
                     radialCircleLine.renderLine(vp, LINEWIDTH);
                     radialThickLine.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabels, pixelsPerSolarRadius * RADIAL_UNIT, ztext, R_LABEL_POS);
+                        drawRadialGridText(radialLabels, logicalPixelsPerSolarRadius * RADIAL_UNIT, ztext, R_LABEL_POS);
                 }
             }
             Transform.popView();
