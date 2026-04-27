@@ -8,7 +8,7 @@ import java.nio.ShortBuffer;
 import org.lwjgl.opengles.GLES30;
 
 public final class GL {
-    public static final int SAMPLES = 0; // values greater than 1 request MSAA.
+    public static final int SAMPLES = 4; // values greater than 1 request MSAA.
     public static String version = "";
     public static int maxTextureSize;
 
