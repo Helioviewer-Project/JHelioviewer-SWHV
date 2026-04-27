@@ -1,9 +1,13 @@
 #version 300 es
 
-layout(location = 0) in vec4 Vertex;
-layout(location = 1) in vec4 Color;
-layout(location = 2) in vec4 NextVertex;
-layout(location = 3) in vec4 NextColor;
+layout(location = 0) in vec4 PrevVertex;
+layout(location = 1) in vec4 PrevColor;
+layout(location = 2) in vec4 CurrVertex;
+layout(location = 3) in vec4 CurrColor;
+layout(location = 4) in vec4 NextVertex;
+layout(location = 5) in vec4 NextColor;
+layout(location = 6) in vec4 FollowVertex;
+layout(location = 7) in vec4 FollowColor;
 out vec4 fragColor;
 out vec2 segmentStart;
 out vec2 segmentEnd;
@@ -20,52 +24,75 @@ layout(std140) uniform ScreenBlock {
 };
 
 const float dir[2] = float[2](1.0, -1.0);
-// Must cover at least the fragment shader AA ramp width.
+
+// Each logical line segment is rendered as an instanced rectangle in
+// framebuffer space. The fragment shader then computes distance to the segment
+// in pixels, giving stable AA without relying on native wide/smooth GL lines.
 const float aaPixels = 1.5;
 
-// ANGLE on macOS does not expose wide/smooth native GL lines reliably. Each
-// logical line segment is rendered as one instanced four-vertex strip instead:
-// two vertices at the current endpoint and two at the next endpoint.
-// https://developer.apple.com/forums/thread/86098
+vec3 safeDirection(vec3 from, vec3 to, vec3 fallback) {
+    vec3 delta = to - from;
+    float len = length(delta);
+    return len > 0.0 ? delta / len : fallback;
+}
+
+float joinOverlap(vec3 incoming, vec3 outgoing, float radius) {
+    float cosAngle = clamp(dot(incoming, outgoing), -1.0, 1.0);
+    float sinAngle = length(cross(incoming, outgoing));
+
+    // Extend neighboring segment rectangles until their visible stroke edges
+    // meet. This is r * tan(theta / 2), written as r * sin(theta)/(1+cos(theta)).
+    return radius * sinAngle / max(1.0 + cosAngle, 1.0e-4);
+}
+
 void main(void) {
     vec2 viewportOrigin = screen.viewport.xy;
     vec2 viewportSize = screen.viewport.zw;
+    vec2 ndcToPixel = 0.5 * viewportSize;
+    vec2 pixelToNdc = 1.0 / ndcToPixel;
 
-    // Project both segment endpoints.
-    vec4 curr = screen.mvp * Vertex;
+    vec4 curr = screen.mvp * CurrVertex;
     vec4 next = screen.mvp * NextVertex;
 
-    // Convert clip space to NDC [-1, 1], then to framebuffer pixels. The
-    // fragment shader compares against gl_FragCoord, so these endpoints must be
-    // in framebuffer coordinates, including the viewport offset.
-    vec2 currNdc = curr.xy / curr.w;
-    vec2 nextNdc = next.xy / next.w;
-    segmentStart = viewportOrigin + (currNdc * 0.5 + 0.5) * viewportSize;
-    segmentEnd = viewportOrigin + (nextNdc * 0.5 + 0.5) * viewportSize;
+    vec2 currPixel = viewportOrigin + (curr.xy / curr.w + 1.0) * ndcToPixel;
+    vec2 nextPixel = viewportOrigin + (next.xy / next.w + 1.0) * ndcToPixel;
 
-    // Compute the line normal in framebuffer pixels. At this point pixels are square,
-    // so no aspect correction is needed.
-    vec2 delta = segmentEnd - segmentStart;
-    float len = length(delta);
-    vec2 normal = len > 0.0 ? vec2(-delta.y, delta.x) / len : vec2(0.0);
+    vec2 segmentDelta = nextPixel - currPixel;
+    float segmentLength = length(segmentDelta);
+    vec2 segmentTangent = segmentLength > 0.0 ? segmentDelta / segmentLength : vec2(0.0);
+    vec2 segmentNormal = vec2(-segmentTangent.y, segmentTangent.x);
 
-    // Java passes a full width, GLSLLineShader halves it. Convert that NDC half-width
-    // to pixels; NDC height 2.0 maps to viewport height in pixels.
+    // GLSLLineShader passes half the requested line width in NDC. Convert it
+    // to framebuffer pixels so the fragment shader can use gl_FragCoord.
     halfWidthPixels = screen.thickness * viewportSize.y * 0.5;
 
-    // Vertex IDs 0/1 use the current endpoint, 2/3 use the next endpoint.
-    // Even/odd IDs select the two sides of the expanded rectangle.
+    // The AA shader shades finite segments. Without a small geometric overlap
+    // at polyline joins, tiny cracks can appear between independently rendered
+    // segment rectangles. Compute the join angle in the line's geometry space,
+    // not screen space: any 3D arc can become edge-on, making projected
+    // neighbor directions collapse even though the curve is well behaved.
+    bool hasPrev = PrevColor.a > 0.0;
+    bool hasFollow = FollowColor.a > 0.0;
+    vec3 segmentDirection = safeDirection(CurrVertex.xyz, NextVertex.xyz, vec3(0.0));
+    vec3 prevDirection = safeDirection(PrevVertex.xyz, CurrVertex.xyz, segmentDirection);
+    vec3 followDirection = safeDirection(NextVertex.xyz, FollowVertex.xyz, segmentDirection);
+    float visibleRadius = halfWidthPixels + 0.5 * aaPixels;
+    float startOverlap = hasPrev ? joinOverlap(prevDirection, segmentDirection, visibleRadius) : 0.0;
+    float endOverlap = hasFollow ? joinOverlap(segmentDirection, followDirection, visibleRadius) : 0.0;
+
+    segmentStart = currPixel - segmentTangent * startOverlap;
+    segmentEnd = nextPixel + segmentTangent * endOverlap;
+
     int idx = (gl_VertexID >> 1) & 0x1;
     vec4 pos = idx == 0 ? curr : next;
-    vec4 color = idx == 0 ? Color : NextColor;
+    vec4 color = idx == 0 ? CurrColor : NextColor;
     float side = dir[gl_VertexID & 0x1];
+    float endpointOverlap = idx == 0 ? -startOverlap : endOverlap;
 
-    // Expand the segment rectangle by the line half-width plus one pixel of AA
-    // fringe. This gives the fragment shader real geometry to shade outside
-    // the nominal line edge. Multiplying by pos.w converts the NDC offset back
-    // to clip space.
-    vec2 offsetNdc = 2.0 * normal * (halfWidthPixels + aaPixels) / viewportSize;
-
-    gl_Position = vec4(pos.xy + side * offsetNdc * pos.w, pos.zw);
+    // Reserve geometry for both the nominal stroke and the AA fringe. The
+    // fragment shader decides final coverage; this only guarantees pixels exist
+    // for it to shade.
+    vec2 offsetNdc = (side * segmentNormal * (halfWidthPixels + aaPixels) + segmentTangent * endpointOverlap) * pixelToNdc;
+    gl_Position = vec4(pos.xy + offsetNdc * pos.w, pos.zw);
     fragColor = color;
 }
