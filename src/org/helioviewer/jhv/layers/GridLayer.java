@@ -129,15 +129,12 @@ public final class GridLayer extends AbstractLayer {
             gridNeedsInit = false;
         }
 
-        if (showAxis)
-            axesLine.renderLine(vp, LINEWIDTH_AXES);
-
         Position viewpoint = camera.getViewpoint();
         float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         double logicalPixelsPerSolarRadius = textScale * pixFactor / Display.pixelScale[1];
 
-        // correct order: grid lines -> Earth indicators -> grid labels -> radial grid
+        // correct order: grid lines -> Earth indicators -> axis -> grid labels -> radial grid
         Quat gridQuat = Display.gridType.toCarrington(viewpoint);
 
         Transform.pushView();
@@ -146,6 +143,9 @@ public final class GridLayer extends AbstractLayer {
         Transform.popView();
 
         drawEarthCircles(vp, pixFactor, Sun.getEarth(viewpoint.time));
+
+        if (showAxis)
+            axesLine.renderLine(vp, LINEWIDTH_AXES);
 
         if (showLabels) {
             Transform.pushView();
