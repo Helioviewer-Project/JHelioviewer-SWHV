@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620">
+  <defs>
+    <pattern id="pixelGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#d8d8d8" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#444"/>
+    </marker>
+    <style>
+      .title { font: 700 18px sans-serif; fill: #111; }
+      .label { font: 13px sans-serif; fill: #222; }
+      .small { font: 11px sans-serif; fill: #333; }
+      .bad { fill: #b00020; }
+      .good { fill: #087f23; }
+      .panel { fill: #fff; stroke: #ccc; }
+      .vertex { fill: #ff9800; stroke: #7a3b00; stroke-width: 1.5; }
+      .centerline { fill: none; stroke: #ff9800; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .thin { fill: none; stroke: #555; stroke-width: 1.5; }
+      .danger { fill: none; stroke: #b00020; stroke-width: 2; stroke-dasharray: 4 3; }
+      .safe { fill: none; stroke: #087f23; stroke-width: 2; }
+      .dirBad { stroke: #b00020; stroke-width: 4; stroke-linecap: round; }
+      .dirGood { stroke: #087f23; stroke-width: 3; stroke-linecap: round; }
+      .triA { fill: #5aa2ff; fill-opacity: 0.30; stroke: #124f9f; stroke-width: 2; }
+      .triB { fill: #c7deff; fill-opacity: 0.55; stroke: #124f9f; stroke-width: 2; }
+      .quad2 { fill: #00a86b; fill-opacity: 0.12; stroke: #087f5b; stroke-width: 2; }
+      .corner { fill: #fff; stroke: #124f9f; stroke-width: 1.5; }
+      .quad { fill: #3f8cff; fill-opacity: 0.14; stroke: #1f5fbf; stroke-width: 2; }
+      .edge { fill: none; stroke: #1f5fbf; stroke-width: 2; stroke-dasharray: 5 5; }
+      .sample { fill: #fff; stroke: #111; stroke-width: 1.2; }
+      .sampleLine { fill: none; stroke: #111; stroke-width: 1.2; stroke-dasharray: 3 3; }
+      .covered { fill: #333; fill-opacity: 0.65; stroke: #777; stroke-width: 1; }
+      .partial { fill: #333; fill-opacity: 0.25; stroke: #777; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect width="1100" height="620" fill="#fafafa"/>
+  <text x="30" y="36" class="title">JHV GL line rendering: stable joins and shader antialiasing</text>
+
+  <g transform="translate(30,65)">
+    <rect x="0" y="0" width="500" height="240" class="panel"/>
+    <text x="16" y="28" class="title">1. CPU emits a padded polyline</text>
+    <text x="16" y="52" class="label">Each visible segment is drawn with its neighboring vertices available.</text>
+    <text x="16" y="72" class="small">That local context is enough to close joins without CPU tessellation.</text>
+
+    <path class="centerline" d="M90,170 C150,90 235,80 300,145 C345,190 395,185 440,120"/>
+    <circle cx="90" cy="170" r="6" class="vertex"/>
+    <circle cx="205" cy="104" r="6" class="vertex"/>
+    <circle cx="300" cy="145" r="6" class="vertex"/>
+    <circle cx="440" cy="120" r="6" class="vertex"/>
+    <text x="68" y="193" class="small">Prev</text>
+    <text x="186" y="94" class="small">Curr</text>
+    <text x="286" y="167" class="small">Next</text>
+    <text x="421" y="112" class="small">Follow</text>
+    <line x1="205" y1="104" x2="300" y2="145" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="218" y="132" class="small">visible segment</text>
+  </g>
+
+  <g transform="translate(570,65)">
+    <rect x="0" y="0" width="500" height="240" class="panel"/>
+    <text x="16" y="28" class="title">2. Vertex shader: compute overlap from the 3D bend</text>
+    <text x="16" y="52" class="label">Projection can make a valid 3D neighbor vector nearly zero on screen.</text>
+
+    <text x="52" y="82" class="bad small">Wrong: measure after projection</text>
+    <line x1="92" y1="145" x2="218" y2="145" class="thin"/>
+    <circle cx="142" cy="145" r="6" class="vertex"/>
+    <circle cx="151" cy="146" r="4" class="vertex"/>
+    <circle cx="159" cy="146" r="4" class="vertex"/>
+    <line x1="142" y1="145" x2="151" y2="146" class="dirBad"/>
+    <line x1="151" y1="146" x2="159" y2="146" class="dirBad"/>
+    <path d="M128,112 C145,96 166,98 182,116" class="danger"/>
+    <text x="52" y="174" class="bad small">projected neighbor is nearly zero</text>
+    <text x="52" y="191" class="bad small">join angle becomes unstable</text>
+
+    <text x="270" y="82" class="good small">Right: measure before projection</text>
+    <polyline points="276,168 344,104 416,168" class="centerline"/>
+    <circle cx="306" cy="140" r="6" class="vertex"/>
+    <circle cx="344" cy="104" r="6" class="vertex"/>
+    <circle cx="384" cy="140" r="6" class="vertex"/>
+    <line x1="344" y1="104" x2="306" y2="140" class="dirGood"/>
+    <line x1="344" y1="104" x2="384" y2="140" class="dirGood"/>
+    <path d="M320,126 A46,46 0 0 1 368,126" class="safe"/>
+    <text x="270" y="188" class="good small">geometry-space angle controls overlap</text>
+
+    <text x="250" y="222" text-anchor="middle" class="small">The vertex shader derives overlap before projection and applies it to the screen-space quad.</text>
+  </g>
+
+  <g transform="translate(30,340)">
+    <rect x="0" y="0" width="500" height="240" class="panel"/>
+    <text x="16" y="28" class="title">3. Vertex shader: expand segment to quad</text>
+    <text x="16" y="52" class="label">The shader emits a triangle strip: four vertices forming two triangles.</text>
+
+    <polygon class="triA" points="75,121 75,89 305,121"/>
+    <polygon class="triB" points="75,89 305,121 305,89"/>
+    <line x1="75" y1="89" x2="305" y2="121" stroke="#124f9f" stroke-width="3"/>
+    <polygon class="quad2" points="256,107 272,79 410,156 395,184"/>
+
+    <path class="centerline" d="M95,105 L285,105 L385,160"/>
+    <circle cx="95" cy="105" r="5" class="vertex"/>
+    <circle cx="285" cy="105" r="5" class="vertex"/>
+    <circle cx="385" cy="160" r="5" class="vertex"/>
+    <circle cx="75" cy="121" r="4" class="corner"/>
+    <circle cx="75" cy="89" r="4" class="corner"/>
+    <circle cx="305" cy="121" r="4" class="corner"/>
+    <circle cx="305" cy="89" r="4" class="corner"/>
+
+    <line x1="285" y1="105" x2="260" y2="105" stroke="#087f23" stroke-width="4"/>
+    <line x1="285" y1="105" x2="312" y2="120" stroke="#087f23" stroke-width="4"/>
+    <text x="61" y="137" class="small">v0</text>
+    <text x="61" y="84" class="small">v1</text>
+    <text x="309" y="137" class="small">v2</text>
+    <text x="309" y="84" class="small">v3</text>
+    <text x="112" y="117" class="small">triangle 0</text>
+    <text x="206" y="94" class="small">triangle 1</text>
+    <text x="72" y="205" class="good small">Each segment is a screen-space rectangle, extended into the join.</text>
+    <text x="72" y="224" class="small">Neighboring finite distance fields then meet instead of cracking.</text>
+  </g>
+
+  <g transform="translate(570,340)">
+    <rect x="0" y="0" width="500" height="240" class="panel"/>
+    <rect x="20" y="60" width="210" height="140" fill="url(#pixelGrid)" stroke="#bbb"/>
+    <text x="16" y="28" class="title">4. Fragment shader: distance-field antialiasing</text>
+    <text x="16" y="52" class="label">Each fragment uses its framebuffer pixel center to measure distance to the segment.</text>
+
+    <polygon points="48,150 165,92 184,130 67,188" class="quad"/>
+    <line x1="58" y1="169" x2="175" y2="111" stroke="#ff9800" stroke-width="3"/>
+    <line x1="48" y1="150" x2="165" y2="92" class="edge"/>
+    <line x1="67" y1="188" x2="184" y2="130" class="edge"/>
+
+    <rect x="60" y="140" width="20" height="20" class="partial"/>
+    <rect x="80" y="140" width="20" height="20" class="covered"/>
+    <rect x="100" y="140" width="20" height="20" class="covered"/>
+    <rect x="120" y="120" width="20" height="20" class="covered"/>
+    <rect x="140" y="120" width="20" height="20" class="partial"/>
+    <rect x="160" y="120" width="20" height="20" fill="#fff" stroke="#999"/>
+    <circle cx="70" cy="150" r="3" class="sample"/>
+    <circle cx="90" cy="150" r="3" class="sample"/>
+    <circle cx="110" cy="150" r="3" class="sample"/>
+    <circle cx="130" cy="130" r="3" class="sample"/>
+    <circle cx="150" cy="130" r="3" class="sample"/>
+    <circle cx="170" cy="130" r="3" class="sample"/>
+    <line x1="70" y1="150" x2="78" y2="159" class="sampleLine"/>
+    <line x1="90" y1="150" x2="92" y2="152" class="sampleLine"/>
+    <line x1="110" y1="150" x2="107" y2="144" class="sampleLine"/>
+    <line x1="130" y1="130" x2="130" y2="133" class="sampleLine"/>
+    <line x1="150" y1="130" x2="146" y2="125" class="sampleLine"/>
+    <line x1="170" y1="130" x2="158" y2="120" class="sampleLine"/>
+    <text x="49" y="136" class="small">AA fringe</text>
+    <text x="94" y="174" class="small">line core</text>
+    <text x="158" y="114" class="small">discard</text>
+    <text x="58" y="80" class="small">grid cells = magnified pixels</text>
+    <text x="40" y="218" class="small">pixel center -> distance to segment -> output alpha</text>
+
+    <rect x="260" y="80" width="18" height="18" class="covered"/>
+    <text x="288" y="94" class="small">inside core: opaque</text>
+    <rect x="260" y="110" width="18" height="18" class="partial"/>
+    <text x="288" y="124" class="small">inside fringe: partial alpha</text>
+    <rect x="260" y="140" width="18" height="18" fill="#fff" stroke="#999"/>
+    <text x="288" y="154" class="small">outside fringe: discarded</text>
+    <text x="250" y="188" class="small">The smooth edge is computed in the shader.</text>
+  </g>
+</svg>
