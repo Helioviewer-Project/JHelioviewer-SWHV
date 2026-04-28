@@ -14,8 +14,8 @@ void main(void) {
 
     vec2 screenTexSize = 1.0 / fwidth(fragCoord);
     float screenPxRange = max(0.5 * dot(unitRange, screenTexSize), 1.0);
-    float alpha = clamp(screenPxRange * signedDistance + 0.5, 0.0, 1.0);
-    if (alpha <= 0.0)
+    float coverage = clamp(screenPxRange * signedDistance + 0.5, 0.0, 1.0);
+    if (coverage <= 0.0)
         discard;
-    outColor = color * alpha;
+    outColor = color * coverage;
 }

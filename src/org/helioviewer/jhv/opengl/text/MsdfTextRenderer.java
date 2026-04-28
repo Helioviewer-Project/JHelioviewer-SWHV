@@ -306,7 +306,7 @@ public final class MsdfTextRenderer {
 
             glslTexture.init();
             glslTexture.setCoord(coordBuf);
-            glslTexture.renderMsdfTexture(GL.TRIANGLES, textColor, unitRangeX, unitRangeY, 0, outstandingGlyphsVerticesPipeline);
+            glslTexture.renderSdfTexture(GL.TRIANGLES, textColor, unitRangeX, unitRangeY, 0, outstandingGlyphsVerticesPipeline);
             outstandingGlyphsVerticesPipeline = 0;
         }
     }
