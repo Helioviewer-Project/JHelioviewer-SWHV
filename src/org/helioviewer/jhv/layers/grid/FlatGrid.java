@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.GridType;
@@ -17,7 +16,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.RasterLine;
-import org.helioviewer.jhv.opengl.text.TextRenderer;
+import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
 
 public class FlatGrid {
 
@@ -60,10 +59,8 @@ public class FlatGrid {
     public void render(Camera camera, Viewport vp, boolean showLabels) {
         rebuildIfNeeded(camera, vp);
         shape.renderShape(GL.TRIANGLES);
-        if (showLabels) {
-            int labelSize = (int) (TEXT_SCALE * CameraHelper.getPixelFactor(camera, vp));
-            drawLabels(camera, labelSize, vp);
-        }
+        if (showLabels)
+            drawLabels(camera, vp);
     }
 
     private static FlatGridKey key(Camera camera, Viewport vp) {
@@ -92,8 +89,8 @@ public class FlatGrid {
                 !Objects.equals(yAxis.signature(), ySignature);
     }
 
-    private void drawLabels(Camera camera, int size, Viewport vp) {
-        TextRenderer renderer = GLText.getRenderer(size);
+    private void drawLabels(Camera camera, Viewport vp) {
+        MsdfTextRenderer renderer = GLText.getMsdfRenderer();
         float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize();
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();

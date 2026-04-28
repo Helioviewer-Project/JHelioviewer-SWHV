@@ -31,7 +31,7 @@ import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.text.TextRenderer;
+import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
@@ -145,7 +145,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
             Transform.rotateView(Quat.createAxisZ(rot[2]));
         }
 
-        TextRenderer renderer = GLText.getRenderer(48);
+        MsdfTextRenderer renderer = GLText.getMsdfRenderer();
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();
         renderer.setSurfacePut();

@@ -12,7 +12,7 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
-import org.helioviewer.jhv.opengl.text.TextRenderer;
+import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
 
 import org.json.JSONObject;
 
@@ -68,7 +68,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         centerY = _centerY;
     }
 
-    void putGeometry(double distance, byte[] color, TextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
+    void putGeometry(double distance, byte[] color, MsdfTextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
         if (!checkBox.isSelected())
             return;
 

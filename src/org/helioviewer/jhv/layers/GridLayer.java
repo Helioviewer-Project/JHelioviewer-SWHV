@@ -34,7 +34,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.text.TextRenderer;
+import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
 
 import org.json.JSONObject;
 
@@ -132,7 +132,6 @@ public final class GridLayer extends AbstractLayer {
         Position viewpoint = camera.getViewpoint();
         float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        double logicalPixelsPerSolarRadius = textScale * pixFactor / Display.pixelScale[1];
 
         // correct order: grid lines -> Earth indicators -> axis -> grid labels -> radial grid
         Quat gridQuat = Display.gridType.toCarrington(viewpoint);
@@ -150,7 +149,7 @@ public final class GridLayer extends AbstractLayer {
         if (showLabels) {
             Transform.pushView();
             Transform.rotateViewInverse(gridQuat);
-            drawGridText((int) logicalPixelsPerSolarRadius, ztext);
+            drawGridText(ztext);
             Transform.popView();
         }
 
@@ -162,12 +161,12 @@ public final class GridLayer extends AbstractLayer {
                     radialCircleLineFar.renderLine(vp, LINEWIDTH);
                     radialThickLineFar.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabelsFar, logicalPixelsPerSolarRadius * RADIAL_UNIT_FAR, ztext, R_LABEL_POS_FAR);
+                        drawRadialGridText(radialLabelsFar, ztext, R_LABEL_POS_FAR);
                 } else {
                     radialCircleLine.renderLine(vp, LINEWIDTH);
                     radialThickLine.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabels, logicalPixelsPerSolarRadius * RADIAL_UNIT, ztext, R_LABEL_POS);
+                        drawRadialGridText(radialLabels, ztext, R_LABEL_POS);
                 }
             }
             Transform.popView();
@@ -191,14 +190,14 @@ public final class GridLayer extends AbstractLayer {
         Transform.popView();
     }
 
-    private static void drawRadialGridText(List<GridLabel> labels, double size, float z, float[] labelPos) {
+    private static void drawRadialGridText(List<GridLabel> labels, float z, float[] labelPos) {
+        MsdfTextRenderer renderer = GLText.getMsdfRenderer();
+        renderer.setColor(Colors.MiddleGrayFloat);
+        float textScaleFactor = textScale / renderer.getFontSize();
         float fuzz = 0.75f;
+
         GL.glDisable(GL.CULL_FACE);
         for (float rsize : labelPos) {
-            TextRenderer renderer = GLText.getRenderer((int) (fuzz * rsize * size));
-            renderer.setColor(Colors.MiddleGrayFloat);
-            float textScaleFactor = textScale / renderer.getFontSize();
-
             renderer.begin3DRendering();
             labels.forEach(label -> renderer.draw(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
             renderer.end3DRendering();
@@ -206,8 +205,8 @@ public final class GridLayer extends AbstractLayer {
         GL.glEnable(GL.CULL_FACE);
     }
 
-    private void drawGridText(int size, float z) {
-        TextRenderer renderer = GLText.getRenderer(size);
+    private void drawGridText(float z) {
+        MsdfTextRenderer renderer = GLText.getMsdfRenderer();
         renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFontSize();
