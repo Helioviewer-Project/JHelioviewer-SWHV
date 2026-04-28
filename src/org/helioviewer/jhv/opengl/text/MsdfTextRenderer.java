@@ -19,7 +19,6 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLTexture;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,7 +41,6 @@ public final class MsdfTextRenderer {
     private final Map<Long, Float> kerning = new HashMap<>();
     private final Set<Integer> missingGlyphs = new HashSet<>();
     private final float fontSize;
-    private final float lineHeight;
     private final float unitRangeX;
     private final float unitRangeY;
 
@@ -51,9 +49,6 @@ public final class MsdfTextRenderer {
     private int outstandingGlyphsVerticesPipeline;
     private final BufCoord coordBuf = new BufCoord(kTotalBufferSizeVerts);
 
-    private final Vector3f transformedOrigin = new Vector3f();
-    private final Vector3f transformedBasisX = new Vector3f();
-    private final Vector3f transformedBasisY = new Vector3f();
     private final Vector3f transformedA = new Vector3f();
     private final Vector3f transformedB = new Vector3f();
     private final Vector3f transformedC = new Vector3f();
@@ -66,7 +61,6 @@ public final class MsdfTextRenderer {
             Atlas atlas = loadAtlas();
             texture = new AtlasTexture(ATLAS_IMAGE, atlas.width, atlas.height);
             fontSize = atlas.size;
-            lineHeight = atlas.lineHeight * atlas.size;
             unitRangeX = atlas.distanceRange / atlas.width;
             unitRangeY = atlas.distanceRange / atlas.height;
             validateCharset();
@@ -77,19 +71,6 @@ public final class MsdfTextRenderer {
 
     public float getFontSize() {
         return fontSize;
-    }
-
-    public float getLineHeight() {
-        return lineHeight;
-    }
-
-    public void precache(String str) {
-        int len = str.length();
-        for (int offset = 0; offset < len;) {
-            int codePoint = str.codePointAt(offset);
-            getGlyph(codePoint);
-            offset += Character.charCount(codePoint);
-        }
     }
 
     public float measureWidth(String str) {
@@ -138,15 +119,6 @@ public final class MsdfTextRenderer {
             }
             offset += Character.charCount(codePoint);
         }
-    }
-
-    public void draw(String str, Matrix4f transform, float scaleFactor) {
-        transform.transformPosition(0, 0, 0, transformedOrigin);
-        transform.transformPosition(1, 0, 0, transformedBasisX);
-        transform.transformPosition(0, 1, 0, transformedBasisY);
-        transformedBasisX.sub(transformedOrigin);
-        transformedBasisY.sub(transformedOrigin);
-        draw(str, transformedOrigin, transformedBasisX, transformedBasisY, scaleFactor);
     }
 
     public void draw(String str, Vector3f origin, Vector3f basisX, Vector3f basisY, float scaleFactor) {
@@ -233,9 +205,6 @@ public final class MsdfTextRenderer {
         float distanceRange = atlasJson.getFloat("distanceRange");
         float size = atlasJson.getFloat("size");
 
-        JSONObject metrics = json.getJSONObject("metrics");
-        float lineHeight = metrics.getFloat("lineHeight");
-
         JSONArray glyphArray = json.getJSONArray("glyphs");
         for (int i = 0; i < glyphArray.length(); i++) {
             JSONObject glyphJson = glyphArray.getJSONObject(i);
@@ -260,7 +229,7 @@ public final class MsdfTextRenderer {
             }
         }
 
-        return new Atlas(width, height, distanceRange, size, lineHeight);
+        return new Atlas(width, height, distanceRange, size);
     }
 
     private void validateCharset() throws IOException {
@@ -329,7 +298,7 @@ public final class MsdfTextRenderer {
         void put(float x, float y, float z, float w, float c0, float c1);
     }
 
-    private record Atlas(int width, int height, float distanceRange, float size, float lineHeight) {}
+    private record Atlas(int width, int height, float distanceRange, float size) {}
 
     private final class Glyph {
         private final int codePoint;
@@ -344,7 +313,7 @@ public final class MsdfTextRenderer {
         private final float u1;
         private final float v1;
 
-        Glyph(int glyphCodePoint, float glyphAdvance) {
+        private Glyph(int glyphCodePoint, float glyphAdvance) {
             codePoint = glyphCodePoint;
             advance = glyphAdvance;
             visible = false;
@@ -358,7 +327,7 @@ public final class MsdfTextRenderer {
             v1 = 0;
         }
 
-        Glyph(int glyphCodePoint, float glyphAdvance, float size, int atlasWidth, int atlasHeight,
+        private Glyph(int glyphCodePoint, float glyphAdvance, float size, int atlasWidth, int atlasHeight,
                 JSONObject planeBounds, JSONObject atlasBounds) {
             codePoint = glyphCodePoint;
             advance = glyphAdvance;
@@ -373,7 +342,7 @@ public final class MsdfTextRenderer {
             v1 = 1f - atlasBounds.getFloat("top") / atlasHeight;
         }
 
-        float draw3D(float inX, float inY, float z, float scaleFactor) {
+        private float draw3D(float inX, float inY, float z, float scaleFactor) {
             if (visible) {
                 float xLeft = inX + x0 * scaleFactor;
                 float xRight = inX + x1 * scaleFactor;
@@ -391,7 +360,7 @@ public final class MsdfTextRenderer {
             return advance;
         }
 
-        float draw3D(Vector3f origin, Vector3f basisX, Vector3f basisY, float inX, float inY, float scaleFactor) {
+        private float draw3D(Vector3f origin, Vector3f basisX, Vector3f basisY, float inX, float inY, float scaleFactor) {
             if (visible) {
                 float xLeft = inX + x0 * scaleFactor;
                 float xRight = inX + x1 * scaleFactor;
@@ -469,11 +438,11 @@ public final class MsdfTextRenderer {
             GL.glGenerateMipmap(GL.TEXTURE_2D);
         }
 
-        void bind() {
+        private void bind() {
             texture.bind();
         }
 
-        void dispose() {
+        private void dispose() {
             texture.delete();
         }
     }
