@@ -30,6 +30,7 @@ public final class MsdfTextRenderer {
     private static final String ATLAS_IMAGE = "/msdf/atlas-128.png";
     private static final String ATLAS_JSON = "/msdf/atlas-128.json";
     private static final String ATLAS_CHARSET = "/msdf/charset";
+    private static final int FALLBACK_CODE_POINT = '?';
 
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
@@ -200,6 +201,12 @@ public final class MsdfTextRenderer {
         }
 
         JSONObject atlasJson = json.getJSONObject("atlas");
+        String type = atlasJson.getString("type");
+        if (!"sdf".equals(type))
+            throw new IOException(ATLAS_JSON + " must contain a single-channel SDF atlas, found: " + type);
+        if (atlasJson.optFloat("distanceRangeMiddle", 0) != 0)
+            throw new IOException(ATLAS_JSON + " must use a symmetric SDF distance range");
+
         int width = atlasJson.getInt("width");
         int height = atlasJson.getInt("height");
         float distanceRange = atlasJson.getFloat("distanceRange");
@@ -229,6 +236,9 @@ public final class MsdfTextRenderer {
             }
         }
 
+        if (!glyphs.containsKey(FALLBACK_CODE_POINT))
+            throw new IOException(ATLAS_JSON + " is missing fallback glyph " + describeCodePoint(FALLBACK_CODE_POINT));
+
         return new Atlas(width, height, distanceRange, size);
     }
 
@@ -251,9 +261,12 @@ public final class MsdfTextRenderer {
 
     private Glyph getGlyph(int codePoint) {
         Glyph glyph = glyphs.get(codePoint);
-        if (glyph == null && missingGlyphs.add(codePoint))
-            Log.warn("MSDF glyph absent from atlas: " + describeCodePoint(codePoint));
-        return glyph;
+        if (glyph != null)
+            return glyph;
+
+        if (missingGlyphs.add(codePoint))
+            Log.warn("MSDF glyph absent from atlas: " + describeCodePoint(codePoint) + ", using '?'");
+        return glyphs.get(FALLBACK_CODE_POINT);
     }
 
     private static String describeCodePoint(int codePoint) {
