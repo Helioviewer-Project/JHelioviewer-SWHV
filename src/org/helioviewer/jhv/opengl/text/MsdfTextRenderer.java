@@ -405,7 +405,7 @@ public final class MsdfTextRenderer {
                 IntBuffer width = stack.mallocInt(1);
                 IntBuffer height = stack.mallocInt(1);
                 IntBuffer ignoredChannels = stack.mallocInt(1);
-                ByteBuffer pixels = STBImage.stbi_load_from_memory(encoded, width, height, ignoredChannels, 3);
+                ByteBuffer pixels = STBImage.stbi_load_from_memory(encoded, width, height, ignoredChannels, 1);
                 if (pixels == null)
                     throw new IOException("Failed to decode " + resource + ": " + STBImage.stbi_failure_reason());
 
@@ -434,7 +434,7 @@ public final class MsdfTextRenderer {
             GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
             GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
             GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-            GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.RGB8, expectedWidth, expectedHeight, 0, GL.RGB, GL.UNSIGNED_BYTE, pixels);
+            GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.R8, expectedWidth, expectedHeight, 0, GL.RED, GL.UNSIGNED_BYTE, pixels);
             GL.glGenerateMipmap(GL.TEXTURE_2D);
         }
 
