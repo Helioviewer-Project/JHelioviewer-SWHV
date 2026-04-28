@@ -8,13 +8,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
-import org.helioviewer.jhv.opengl.GLSLLine;
-import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 
 import org.json.JSONObject;
@@ -25,10 +22,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
     enum FOVType {RECTANGULAR, CIRCULAR}
 
     private final FOVShape fov = new FOVShape();
-    private final GLSLLine fovLine = new GLSLLine(true);
-    private final BufVertex lineBuf = new BufVertex((4 * (FOVShape.RECT_SUBDIVS + 1) + 2) * GLSLLine.stride);
-    private final GLSLShape center = new GLSLShape(true);
-    private final BufVertex centerBuf = new BufVertex(GLSLShape.stride);
 
     private final String name;
     private final FOVType type;
@@ -67,16 +60,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         return panel;
     }
 
-    void init() {
-        fovLine.init();
-        center.init();
-    }
-
-    void dispose() {
-        fovLine.dispose();
-        center.dispose();
-    }
-
     void setCenterX(double _centerX) {
         centerX = _centerX;
     }
@@ -85,7 +68,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         centerY = _centerY;
     }
 
-    void render(Viewport vp, double distance, double pixFactor, byte[] color, TextRenderer renderer) {
+    void putGeometry(double distance, byte[] color, TextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
         if (!checkBox.isSelected())
             return;
 
@@ -102,12 +85,6 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
             double halfSide = wide / Math.sqrt(2);
             FOVText.drawLabel(renderer, name, (centerX - halfSide) * distance, (centerY - halfSide) * distance, halfSide * distance);
         }
-
-        center.setVertex(centerBuf);
-        center.renderPoints(pixFactor);
-
-        fovLine.setVertex(lineBuf);
-        fovLine.renderLine(vp, FOVPlatform.LINEWIDTH_FOV);
     }
 
     boolean isEnabled() {

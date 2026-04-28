@@ -26,8 +26,10 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
+import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.TextRenderer;
 import org.helioviewer.jhv.time.JHVTime;
@@ -37,11 +39,15 @@ import org.json.JSONObject;
 @SuppressWarnings("serial")
 class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
 
-    static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
+    private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final int SUBDIVISIONS = 180; // divisible by 4 so quarter-turn arcs align to exact step ranges
     private static final double HEMI_RADIUS = Sun.Radius + LINEWIDTH_FOV; // avoid intersecting solar surface
 
     private final GLSLLine hemiLine = new GLSLLine(false);
+    private final GLSLLine instrumentLines = new GLSLLine(true);
+    private final GLSLShape instrumentCenters = new GLSLShape(true);
+    private final BufVertex lineBuf = new BufVertex(8 * (4 * (FOVShape.RECT_SUBDIVS + 1) + 2) * GLSLLine.stride);
+    private final BufVertex centerBuf = new BufVertex(8 * GLSLShape.stride);
 
     private final String name;
     private final String observer;
@@ -97,7 +103,7 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         }
     }
 
-    private void initHemiLine() {
+    private void putHemiLine() {
         int no_points = 2 * (SUBDIVISIONS + 3);
         BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
         GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, null, color, Colors.White, vexBuf);
@@ -108,14 +114,15 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
 
     void init() {
         hemiLine.init();
-        initHemiLine();
-
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).init());
+        putHemiLine();
+        instrumentLines.init();
+        instrumentCenters.init();
     }
 
     void dispose() {
         hemiLine.dispose();
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).dispose());
+        instrumentLines.dispose();
+        instrumentCenters.dispose();
     }
 
     void render(Camera camera, Viewport vp) {
@@ -144,7 +151,12 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         renderer.setSurfacePut();
 
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).render(vp, obsPosition.distance, pixFactor, color, renderer));
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).putGeometry(obsPosition.distance, color, renderer, lineBuf, centerBuf));
+
+        instrumentCenters.setVertex(centerBuf);
+        instrumentCenters.renderPoints(pixFactor);
+        instrumentLines.setVertex(lineBuf);
+        instrumentLines.renderLine(vp, LINEWIDTH_FOV);
 
         renderer.setDirectPut();
         renderer.end3DRendering();
