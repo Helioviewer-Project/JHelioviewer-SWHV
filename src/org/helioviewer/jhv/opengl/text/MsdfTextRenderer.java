@@ -1,15 +1,13 @@
 package org.helioviewer.jhv.opengl.text;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import javax.imageio.ImageIO;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
@@ -25,6 +23,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 public final class MsdfTextRenderer {
     private static final String ATLAS_IMAGE = "/msdf/atlas-128.png";
@@ -433,39 +434,47 @@ public final class MsdfTextRenderer {
         private final GLTexture texture = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
 
         AtlasTexture(String resource, int expectedWidth, int expectedHeight) throws IOException {
-            BufferedImage image;
+            ByteBuffer encoded;
             try (InputStream input = FileUtils.getResource(resource)) {
-                image = ImageIO.read(input);
-            }
-            if (image == null)
-                throw new IOException("Failed to decode " + resource);
-            if (image.getWidth() != expectedWidth || image.getHeight() != expectedHeight) {
-                throw new IOException(resource + " dimensions " + image.getWidth() + "x" + image.getHeight()
-                        + " do not match atlas JSON " + expectedWidth + "x" + expectedHeight);
+                byte[] bytes = input.readAllBytes();
+                encoded = MemoryUtil.memAlloc(bytes.length);
+                encoded.put(bytes).flip();
             }
 
-            ByteBuffer pixels = ByteBuffer.allocateDirect(expectedWidth * expectedHeight * 3);
-            for (int y = 0; y < expectedHeight; y++) {
-                for (int x = 0; x < expectedWidth; x++) {
-                    int argb = image.getRGB(x, y);
-                    pixels.put((byte) ((argb >> 16) & 0xff));
-                    pixels.put((byte) ((argb >> 8) & 0xff));
-                    pixels.put((byte) (argb & 0xff));
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                IntBuffer width = stack.mallocInt(1);
+                IntBuffer height = stack.mallocInt(1);
+                IntBuffer channels = stack.mallocInt(1);
+                ByteBuffer pixels = STBImage.stbi_load_from_memory(encoded, width, height, channels, 3);
+                if (pixels == null)
+                    throw new IOException("Failed to decode " + resource + ": " + STBImage.stbi_failure_reason());
+
+                try {
+                    int actualWidth = width.get(0);
+                    int actualHeight = height.get(0);
+                    if (actualWidth != expectedWidth || actualHeight != expectedHeight) {
+                        throw new IOException(resource + " dimensions " + actualWidth + "x" + actualHeight
+                                + " do not match atlas JSON " + expectedWidth + "x" + expectedHeight);
+                    }
+
+                    texture.bind();
+                    GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 1);
+                    GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, expectedWidth);
+                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
+                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 15);
+                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
+                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+                    GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.RGB8, expectedWidth, expectedHeight, 0,
+                            GL.RGB, GL.UNSIGNED_BYTE, pixels);
+                    GL.glGenerateMipmap(GL.TEXTURE_2D);
+                } finally {
+                    STBImage.stbi_image_free(pixels);
                 }
+            } finally {
+                MemoryUtil.memFree(encoded);
             }
-            pixels.flip();
-
-            texture.bind();
-            GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 1);
-            GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, expectedWidth);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 15);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-            GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.RGB8, expectedWidth, expectedHeight, 0, GL.RGB, GL.UNSIGNED_BYTE, pixels);
-            GL.glGenerateMipmap(GL.TEXTURE_2D);
         }
 
         void bind() {
