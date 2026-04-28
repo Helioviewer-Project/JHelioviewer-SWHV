@@ -35,20 +35,16 @@ public final class MsdfTextRenderer {
     private static final int kVertsPerQuad = 6;
     private static final int kQuadsPerBuffer = 100;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
+    private static final float SURFACE_EPSILON = 0.03f;
 
     private final AtlasTexture texture;
     private final Map<Integer, Glyph> glyphs = new HashMap<>();
-    private final Map<KerningPair, Float> kerning = new HashMap<>();
+    private final Map<Long, Float> kerning = new HashMap<>();
     private final Set<Integer> missingGlyphs = new HashSet<>();
     private final float fontSize;
     private final float lineHeight;
     private final float unitRangeX;
     private final float unitRangeY;
-
-    private boolean inBeginEndPair;
-    private boolean isOrthoMode;
-    private int beginRenderingWidth;
-    private int beginRenderingHeight;
 
     private final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
@@ -197,18 +193,11 @@ public final class MsdfTextRenderer {
     }
 
     private void beginRendering(boolean ortho, int width, int height) {
-        inBeginEndPair = true;
-        isOrthoMode = ortho;
-        beginRenderingWidth = width;
-        beginRenderingHeight = height;
-
         internal_beginRendering(ortho, width, height);
     }
 
     private void endRendering(boolean ortho) {
         flush();
-
-        inBeginEndPair = false;
         internal_endRendering(ortho);
     }
 
@@ -267,7 +256,7 @@ public final class MsdfTextRenderer {
                 int left = kerningJson.getInt("unicode1");
                 int right = kerningJson.getInt("unicode2");
                 float advance = kerningJson.getFloat("advance") * size;
-                kerning.put(new KerningPair(left, right), advance);
+                kerning.put(kerningKey(left, right), advance);
             }
         }
 
@@ -303,7 +292,11 @@ public final class MsdfTextRenderer {
     }
 
     private float getKerning(int leftCodePoint, int rightCodePoint) {
-        return kerning.getOrDefault(new KerningPair(leftCodePoint, rightCodePoint), 0f);
+        return kerning.getOrDefault(kerningKey(leftCodePoint, rightCodePoint), 0f);
+    }
+
+    private static long kerningKey(int leftCodePoint, int rightCodePoint) {
+        return ((long) leftCodePoint << Integer.SIZE) | Integer.toUnsignedLong(rightCodePoint);
     }
 
     private void putDirect(float x, float y, float z, float w, float c0, float c1) {
@@ -313,11 +306,11 @@ public final class MsdfTextRenderer {
     private void putSurface(float x, float y, float z, float w, float c0, float c1) {
         float n = 1 - x * x - y * y;
         if (n > 0) {
-            float scale = 1 + 0.03f;
+            float scale = 1 + SURFACE_EPSILON;
             float zSurface = (float) Math.sqrt(n);
             coordBuf.putCoord(x * scale, y * scale, zSurface * scale, w, c0, c1);
         } else {
-            coordBuf.putCoord(x, y, 0.03f, w, c0, c1);
+            coordBuf.putCoord(x, y, SURFACE_EPSILON, w, c0, c1);
         }
     }
 
@@ -337,8 +330,6 @@ public final class MsdfTextRenderer {
     }
 
     private record Atlas(int width, int height, float distanceRange, float size, float lineHeight) {}
-
-    private record KerningPair(int left, int right) {}
 
     private final class Glyph {
         private final int codePoint;
@@ -444,37 +435,38 @@ public final class MsdfTextRenderer {
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 IntBuffer width = stack.mallocInt(1);
                 IntBuffer height = stack.mallocInt(1);
-                IntBuffer channels = stack.mallocInt(1);
-                ByteBuffer pixels = STBImage.stbi_load_from_memory(encoded, width, height, channels, 3);
+                IntBuffer ignoredChannels = stack.mallocInt(1);
+                ByteBuffer pixels = STBImage.stbi_load_from_memory(encoded, width, height, ignoredChannels, 3);
                 if (pixels == null)
                     throw new IOException("Failed to decode " + resource + ": " + STBImage.stbi_failure_reason());
 
                 try {
-                    int actualWidth = width.get(0);
-                    int actualHeight = height.get(0);
-                    if (actualWidth != expectedWidth || actualHeight != expectedHeight) {
-                        throw new IOException(resource + " dimensions " + actualWidth + "x" + actualHeight
-                                + " do not match atlas JSON " + expectedWidth + "x" + expectedHeight);
-                    }
-
-                    texture.bind();
-                    GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 1);
-                    GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, expectedWidth);
-                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
-                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 15);
-                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
-                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                    GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-                    GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.RGB8, expectedWidth, expectedHeight, 0,
-                            GL.RGB, GL.UNSIGNED_BYTE, pixels);
-                    GL.glGenerateMipmap(GL.TEXTURE_2D);
+                    upload(resource, expectedWidth, expectedHeight, width.get(0), height.get(0), pixels);
                 } finally {
                     STBImage.stbi_image_free(pixels);
                 }
             } finally {
                 MemoryUtil.memFree(encoded);
             }
+        }
+
+        private void upload(String resource, int expectedWidth, int expectedHeight, int actualWidth, int actualHeight, ByteBuffer pixels) throws IOException {
+            if (actualWidth != expectedWidth || actualHeight != expectedHeight) {
+                throw new IOException(resource + " dimensions " + actualWidth + "x" + actualHeight + " do not match atlas JSON "
+                        + expectedWidth + "x" + expectedHeight);
+            }
+
+            texture.bind();
+            GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 1);
+            GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, expectedWidth);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 15);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+            GL.glTexImage2D(GL.TEXTURE_2D, 0, GL.RGB8, expectedWidth, expectedHeight, 0, GL.RGB, GL.UNSIGNED_BYTE, pixels);
+            GL.glGenerateMipmap(GL.TEXTURE_2D);
         }
 
         void bind() {
