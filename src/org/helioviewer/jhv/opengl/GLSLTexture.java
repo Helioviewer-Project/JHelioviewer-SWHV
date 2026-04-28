@@ -32,6 +32,19 @@ public class GLSLTexture extends VAO1 {
         render(mode, color, first, toDraw, GLSLTextureShader.text);
     }
 
+    public void renderMsdfTexture(int mode, float[] color, float unitRangeX, float unitRangeY, int first, int toDraw) {
+        if (count == 0 || toDraw > count)
+            return;
+
+        GLSLTextureShader shader = GLSLTextureShader.msdf;
+        shader.use();
+        shader.bindMsdfParams(color, unitRangeX, unitRangeY);
+        shader.bindMVP();
+
+        bind();
+        GL.glDrawArrays(mode, first, toDraw);
+    }
+
     private void render(int mode, float[] color, int first, int toDraw, GLSLTextureShader shader) {
         if (count == 0 || toDraw > count)
             return;

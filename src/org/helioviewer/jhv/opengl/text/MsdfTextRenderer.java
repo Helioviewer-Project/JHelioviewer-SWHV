@@ -182,6 +182,8 @@ public final class MsdfTextRenderer {
             Transform.setOrtho2DProjection(0, width, 0, height);
             Transform.pushView();
             Transform.setIdentityView();
+        } else {
+            GL.glDepthMask(false);
         }
     }
 
@@ -191,6 +193,8 @@ public final class MsdfTextRenderer {
 
             Transform.popView();
             Transform.popProjection();
+        } else {
+            GL.glDepthMask(true);
         }
     }
 

@@ -5,74 +5,49 @@ import java.util.List;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.text.TextFonts;
-import org.helioviewer.jhv.opengl.text.TextRenderer;
+import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
 
-public class GLText {
-    private static final int MIN = 10;
-    private static final int MAX = 144;
-    private static final int STEP = 2;
-    private static final int SIZE = (MAX - MIN) / STEP + 1;
-    private static final TextRenderer[] renderers = new TextRenderer[SIZE];
+public final class GLText {
+    public static final float[] SHADOW_COLOR = {0.1f, 0.1f, 0.1f, 0.75f};
+    public static final int SHADOW_OFFSET_X = 2;
+    public static final int SHADOW_OFFSET_Y = -2;
+    private static final int FLOAT_TEXT_SIZE = 14;
+    private static final float FLOAT_TEXT_LINE_HEIGHT = 1.1f;
 
-    public static final float[] shadowColor = {0.1f, 0.1f, 0.1f, 0.75f};
-    public static final int[] shadowOffset = {2, -2};
+    private static MsdfTextRenderer msdfRenderer;
 
-    public static TextRenderer getRenderer(int size) {
-        int idx = rendererIndex(size);
+    private GLText() {}
 
-        if (renderers[idx] == null) {
-            renderers[idx] = new TextRenderer(rendererSize(idx), TextFonts.loadCanvasFontData());
-            renderers[idx].precache("-0123456789.");
-        }
-        return renderers[idx];
+    public static MsdfTextRenderer getMsdfRenderer() {
+        if (msdfRenderer == null)
+            msdfRenderer = new MsdfTextRenderer();
+        return msdfRenderer;
     }
 
     public static void dispose() {
-        for (int i = 0; i < renderers.length; i++) {
-            if (renderers[i] != null) {
-                renderers[i].dispose();
-                renderers[i] = null;
-            }
+        if (msdfRenderer != null) {
+            msdfRenderer.dispose();
+            msdfRenderer = null;
         }
-        TextFonts.dispose();
     }
 
-    private static int rendererIndex(int size) {
-        size = physicalSize(size);
-        if (size <= MIN)
-            return 0;
-        if (size >= MAX)
-            return SIZE - 1;
-        return (size - MIN + STEP - 1) / STEP;
-    }
-
-    private static float rendererSize(int idx) {
-        return idx * STEP + MIN;
-    }
-
-    private static int physicalSize(int logicalSize) {
+    private static int logicalToPhysicalSize(int logicalSize) {
         return (int) (logicalSize * Display.pixelScale[1]);
     }
-
-    private static final int TEXT_SIZE_NORMAL = 14;
-
-    private static final float LINE_HEIGHT = 1.1f;
 
     public static void drawTextFloat(Viewport vp, List<String> lines, int x, int y) {
         if (lines.isEmpty())
             return;
 
-        TextRenderer renderer = getRenderer(TEXT_SIZE_NORMAL);
-        int textSize = physicalSize(TEXT_SIZE_NORMAL);
+        MsdfTextRenderer renderer = getMsdfRenderer();
+        int textSize = logicalToPhysicalSize(FLOAT_TEXT_SIZE);
         float textScaleFactor = textSize / renderer.getFontSize();
-        int lineStep = (int) (textSize * LINE_HEIGHT);
+        int lineStep = (int) (textSize * FLOAT_TEXT_LINE_HEIGHT);
 
         float width = 0;
-        for (String line : lines) {
+        for (String line : lines)
             width = Math.max(width, renderer.measureWidth(line) * textScaleFactor);
-        }
-        float height = textSize * LINE_HEIGHT * lines.size();
+        float height = textSize * FLOAT_TEXT_LINE_HEIGHT * lines.size();
 
         int textX = x;
         int textY = y;
@@ -84,8 +59,8 @@ public class GLText {
         renderer.beginRendering(vp.width, vp.height);
         int baselineY = vp.height - textY;
         for (String line : lines) {
-            renderer.setColor(shadowColor);
-            renderer.draw(line, textX + shadowOffset[0], baselineY + shadowOffset[1], 0, textScaleFactor);
+            renderer.setColor(SHADOW_COLOR);
+            renderer.draw(line, textX + SHADOW_OFFSET_X, baselineY + SHADOW_OFFSET_Y, 0, textScaleFactor);
             renderer.setColor(Colors.LightGrayFloat);
             renderer.draw(line, textX, baselineY, 0, textScaleFactor);
             baselineY -= lineStep;
