@@ -34,7 +34,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
+import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 
 import org.json.JSONObject;
 
@@ -191,7 +191,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     private static void drawRadialGridText(List<GridLabel> labels, float z, float[] labelPos) {
-        MsdfTextRenderer renderer = GLText.getMsdfRenderer();
+        SdfTextRenderer renderer = GLText.renderer();
         renderer.setColor(Colors.MiddleGrayFloat);
         float textScaleFactor = textScale / renderer.getFontSize();
         float fuzz = 0.75f;
@@ -206,7 +206,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     private void drawGridText(float z) {
-        MsdfTextRenderer renderer = GLText.getMsdfRenderer();
+        SdfTextRenderer renderer = GLText.renderer();
         renderer.setColor(Colors.WhiteFloat);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = textScale / renderer.getFontSize();
