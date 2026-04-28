@@ -5,7 +5,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
+import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 
 public final class GLText {
     public static final float[] SHADOW_COLOR = {0.1f, 0.1f, 0.1f, 0.75f};
@@ -14,20 +14,20 @@ public final class GLText {
     private static final int FLOAT_TEXT_SIZE = 14;
     private static final float FLOAT_TEXT_LINE_HEIGHT = 1.1f;
 
-    private static MsdfTextRenderer msdfRenderer;
+    private static SdfTextRenderer renderer;
 
     private GLText() {}
 
-    public static MsdfTextRenderer getMsdfRenderer() {
-        if (msdfRenderer == null)
-            msdfRenderer = new MsdfTextRenderer();
-        return msdfRenderer;
+    public static SdfTextRenderer renderer() {
+        if (renderer == null)
+            renderer = new SdfTextRenderer();
+        return renderer;
     }
 
     public static void dispose() {
-        if (msdfRenderer != null) {
-            msdfRenderer.dispose();
-            msdfRenderer = null;
+        if (renderer != null) {
+            renderer.dispose();
+            renderer = null;
         }
     }
 
@@ -39,7 +39,7 @@ public final class GLText {
         if (lines.isEmpty())
             return;
 
-        MsdfTextRenderer renderer = getMsdfRenderer();
+        SdfTextRenderer renderer = renderer();
         int textSize = logicalToPhysicalSize(FLOAT_TEXT_SIZE);
         float textScaleFactor = textSize / renderer.getFontSize();
         int lineStep = (int) (textSize * FLOAT_TEXT_LINE_HEIGHT);

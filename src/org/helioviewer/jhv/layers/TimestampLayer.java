@@ -18,7 +18,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.text.MsdfTextRenderer;
+import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 
 import org.json.JSONObject;
 
@@ -80,7 +80,7 @@ public class TimestampLayer extends AbstractLayer {
         int deltaX = (int) (vp.height * 0.01);
         int deltaY = top ? (int) (vp.height - Display.pixelScale[1] * deltaX - size) : deltaX; //!
 
-        MsdfTextRenderer renderer = GLText.getMsdfRenderer();
+        SdfTextRenderer renderer = GLText.renderer();
         float textScaleFactor = size / renderer.getFontSize();
         renderer.beginRendering(vp.width, vp.height);
         renderer.setColor(GLText.SHADOW_COLOR);

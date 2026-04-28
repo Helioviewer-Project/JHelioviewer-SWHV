@@ -26,10 +26,10 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-public final class MsdfTextRenderer {
-    private static final String ATLAS_IMAGE = "/msdf/atlas-128.png";
-    private static final String ATLAS_JSON = "/msdf/atlas-128.json";
-    private static final String ATLAS_CHARSET = "/msdf/charset";
+public final class SdfTextRenderer {
+    private static final String ATLAS_IMAGE = "/sdf/atlas-128.png";
+    private static final String ATLAS_JSON = "/sdf/atlas-128.json";
+    private static final String ATLAS_CHARSET = "/sdf/charset";
     private static final int FALLBACK_CODE_POINT = '?';
 
     private static final int kVertsPerQuad = 6;
@@ -57,7 +57,7 @@ public final class MsdfTextRenderer {
 
     private CoordPut coordPut = this::putDirect;
 
-    public MsdfTextRenderer() {
+    public SdfTextRenderer() {
         try {
             Atlas atlas = loadAtlas();
             texture = new AtlasTexture(ATLAS_IMAGE, atlas.width, atlas.height);
