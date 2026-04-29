@@ -263,11 +263,11 @@ public final class AngleCanvas extends Canvas {
     private void detach() {
         try {
             if (angleRenderer != null)
-                angleRenderer.destroy();
+                angleRenderer.remove();
         } finally {
             angleRenderer = null;
             try {
-                if (Platform.isMacOS())
+                if (Platform.isMacOS() && macHostHandle != 0L)
                     MacAngleBridge.destroy(macHostHandle);
             } finally {
                 macHostHandle = 0L;

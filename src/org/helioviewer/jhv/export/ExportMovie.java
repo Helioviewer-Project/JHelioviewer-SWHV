@@ -57,6 +57,11 @@ public final class ExportMovie implements Movie.Listener {
         }
     }
 
+    public static void dispose() {
+        if (grabber != null)
+            grabber.dispose();
+    }
+
     public static void handleMovieExport(Camera camera) {
         BufferedImage screen = null;
         BufferedImage eve = null;
