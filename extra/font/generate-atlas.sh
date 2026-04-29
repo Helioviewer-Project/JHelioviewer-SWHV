@@ -1,10 +1,10 @@
 #!/bin/sh
 set -eu
 
-SDF_ATLAS_GEN=${SDF_ATLAS_GEN:-/tmp/jhv-msdf-atlas-gen-build/bin/msdf-atlas-gen}
+SDF_ATLAS_GEN=${SDF_ATLAS_GEN:-$HOME/git/jhv-msdf-atlas-gen-build/bin/msdf-atlas-gen}
 
 "$SDF_ATLAS_GEN" \
-    -font extra/DejaVuSansCondensed.ttf \
+    -font extra/font/DejaVuSansCondensed.ttf \
     -charset resources/sdf/charset \
     -type sdf \
     -format png \
