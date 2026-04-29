@@ -32,9 +32,9 @@ public final class SdfTextRenderer {
     private static final String ATLAS_CHARSET = "/sdf/charset";
     private static final int FALLBACK_CODE_POINT = '?';
 
-    private static final int kVertsPerQuad = 6;
-    private static final int kQuadsPerBuffer = 512;
-    private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
+    private static final int VERTICES_PER_QUAD = 6;
+    private static final int QUADS_PER_BUFFER = 512;
+    private static final int TOTAL_BUFFER_VERTICES = QUADS_PER_BUFFER * VERTICES_PER_QUAD;
     private static final float SURFACE_EPSILON = 0.03f;
 
     private final AtlasTexture texture;
@@ -47,8 +47,8 @@ public final class SdfTextRenderer {
 
     private final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
-    private int outstandingGlyphsVerticesPipeline;
-    private final BufCoord coordBuf = new BufCoord(kTotalBufferSizeVerts);
+    private int queuedVertices;
+    private final BufCoord coordBuf = new BufCoord(TOTAL_BUFFER_VERTICES);
 
     private final Vector3f transformedA = new Vector3f();
     private final Vector3f transformedB = new Vector3f();
@@ -59,7 +59,7 @@ public final class SdfTextRenderer {
 
     public SdfTextRenderer() {
         try {
-            Atlas atlas = loadAtlas();
+            AtlasMetadata atlas = loadAtlas();
             texture = new AtlasTexture(ATLAS_IMAGE, atlas.width, atlas.height);
             fontSize = atlas.size;
             unitRangeX = atlas.distanceRange / atlas.width;
@@ -111,7 +111,7 @@ public final class SdfTextRenderer {
             Glyph glyph = getGlyph(codePoint);
             if (previousGlyph != null)
                 x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
-            float advance = glyph.draw3D(x, y, z, scaleFactor);
+            float advance = glyph.draw(x, y, z, scaleFactor);
             x += advance * scaleFactor;
             previousGlyph = glyph;
             offset += Character.charCount(codePoint);
@@ -127,7 +127,7 @@ public final class SdfTextRenderer {
             Glyph glyph = getGlyph(codePoint);
             if (previousGlyph != null)
                 x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
-            float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
+            float advance = glyph.draw(origin, basisX, basisY, x, 0, scaleFactor);
             x += advance * scaleFactor;
             previousGlyph = glyph;
             offset += Character.charCount(codePoint);
@@ -184,7 +184,7 @@ public final class SdfTextRenderer {
         }
     }
 
-    private Atlas loadAtlas() throws IOException {
+    private AtlasMetadata loadAtlas() throws IOException {
         JSONObject json;
         try (InputStream input = FileUtils.getResource(ATLAS_JSON)) {
             json = JSONUtils.get(input);
@@ -221,15 +221,15 @@ public final class SdfTextRenderer {
                 JSONObject kerningJson = kerningArray.getJSONObject(i);
                 int left = kerningJson.getInt("unicode1");
                 int right = kerningJson.getInt("unicode2");
-                float advance = kerningJson.getFloat("advance") * size;
-                kerning.put(kerningKey(left, right), advance);
+                float kerningAdvance = kerningJson.getFloat("advance") * size;
+                kerning.put(kerningKey(left, right), kerningAdvance);
             }
         }
 
         if (!glyphs.containsKey(FALLBACK_CODE_POINT))
             throw new IOException(ATLAS_JSON + " is missing fallback glyph " + describeCodePoint(FALLBACK_CODE_POINT));
 
-        return new Atlas(width, height, distanceRange, size);
+        return new AtlasMetadata(width, height, distanceRange, size);
     }
 
     private void validateCharset() throws IOException {
@@ -287,13 +287,13 @@ public final class SdfTextRenderer {
     }
 
     private void drawVertices() {
-        if (outstandingGlyphsVerticesPipeline > 0) {
+        if (queuedVertices > 0) {
             texture.bind();
 
             glslTexture.init();
             glslTexture.setCoord(coordBuf);
-            glslTexture.renderSdfTexture(GL.TRIANGLES, textColor, unitRangeX, unitRangeY, 0, outstandingGlyphsVerticesPipeline);
-            outstandingGlyphsVerticesPipeline = 0;
+            glslTexture.renderSdfTexture(GL.TRIANGLES, textColor, unitRangeX, unitRangeY, 0, queuedVertices);
+            queuedVertices = 0;
         }
     }
 
@@ -301,7 +301,7 @@ public final class SdfTextRenderer {
         void put(float x, float y, float z, float w, float c0, float c1);
     }
 
-    private record Atlas(int width, int height, float distanceRange, float size) {}
+    private record AtlasMetadata(int width, int height, float distanceRange, float size) {}
 
     private final class Glyph {
         private final int codePoint;
@@ -338,7 +338,7 @@ public final class SdfTextRenderer {
             v1 = 1f - atlasBounds.getFloat("top") / atlasHeight;
         }
 
-        private float draw3D(float inX, float inY, float z, float scaleFactor) {
+        private float draw(float inX, float inY, float z, float scaleFactor) {
             if (drawable) {
                 float xLeft = inX + x0 * scaleFactor;
                 float xRight = inX + x1 * scaleFactor;
@@ -351,12 +351,12 @@ public final class SdfTextRenderer {
                 coordPut.put(xLeft, yBottom, z, 1, u0, v0); // A
                 coordPut.put(xRight, yTop, z, 1, u1, v1); // C
                 coordPut.put(xLeft, yTop, z, 1, u0, v1); // D
-                glyphQueued();
+                queueGlyphVertices();
             }
             return advance;
         }
 
-        private float draw3D(Vector3f origin, Vector3f basisX, Vector3f basisY, float inX, float inY, float scaleFactor) {
+        private float draw(Vector3f origin, Vector3f basisX, Vector3f basisY, float inX, float inY, float scaleFactor) {
             if (drawable) {
                 float xLeft = inX + x0 * scaleFactor;
                 float xRight = inX + x1 * scaleFactor;
@@ -374,15 +374,15 @@ public final class SdfTextRenderer {
                 coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, u0, v0); // A
                 coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, u1, v1); // C
                 coordPut.put(transformedD.x, transformedD.y, transformedD.z, 1, u0, v1); // D
-                glyphQueued();
+                queueGlyphVertices();
             }
             return advance;
         }
     }
 
-    private void glyphQueued() {
-        outstandingGlyphsVerticesPipeline += kVertsPerQuad;
-        if (outstandingGlyphsVerticesPipeline >= kTotalBufferSizeVerts)
+    private void queueGlyphVertices() {
+        queuedVertices += VERTICES_PER_QUAD;
+        if (queuedVertices >= TOTAL_BUFFER_VERTICES)
             drawVertices();
     }
 
