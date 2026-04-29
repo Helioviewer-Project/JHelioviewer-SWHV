@@ -249,6 +249,11 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
 
     public static void dispose() {
         layers.forEach(Layer::dispose);
+        newLayers.clear();
+        newLayers.addAll(layers);
+    }
+
+    public static void remove() {
         newLayers = layers;
         layers = new LayerList();
         setActiveImageLayer(null);
