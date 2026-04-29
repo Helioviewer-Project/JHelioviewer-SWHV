@@ -33,7 +33,7 @@ public final class SdfTextRenderer {
     private static final int FALLBACK_CODE_POINT = '?';
 
     private static final int kVertsPerQuad = 6;
-    private static final int kQuadsPerBuffer = 100;
+    private static final int kQuadsPerBuffer = 512;
     private static final int kTotalBufferSizeVerts = kQuadsPerBuffer * kVertsPerQuad;
     private static final float SURFACE_EPSILON = 0.03f;
 
@@ -66,7 +66,7 @@ public final class SdfTextRenderer {
             unitRangeY = atlas.distanceRange / atlas.height;
             validateCharset();
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load MSDF atlas", e);
+            throw new IllegalStateException("Failed to load SDF atlas", e);
         }
     }
 
@@ -78,15 +78,13 @@ public final class SdfTextRenderer {
         float width = 0;
         Glyph previousGlyph = null;
         int len = str.length();
-        for (int offset = 0; offset < len;) {
+        for (int offset = 0; offset < len; ) {
             int codePoint = str.codePointAt(offset);
             Glyph glyph = getGlyph(codePoint);
-            if (glyph != null) {
-                if (previousGlyph != null)
-                    width += getKerning(previousGlyph.codePoint, glyph.codePoint);
-                width += glyph.advance;
-                previousGlyph = glyph;
-            }
+            if (previousGlyph != null)
+                width += getKerning(previousGlyph.codePoint, glyph.codePoint);
+            width += glyph.advance;
+            previousGlyph = glyph;
             offset += Character.charCount(codePoint);
         }
         return width;
@@ -108,16 +106,14 @@ public final class SdfTextRenderer {
     public void draw(String str, float x, float y, float z, float scaleFactor) {
         int len = str.length();
         Glyph previousGlyph = null;
-        for (int offset = 0; offset < len;) {
+        for (int offset = 0; offset < len; ) {
             int codePoint = str.codePointAt(offset);
             Glyph glyph = getGlyph(codePoint);
-            if (glyph != null) {
-                if (previousGlyph != null)
-                    x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
-                float advance = glyph.draw3D(x, y, z, scaleFactor);
-                x += advance * scaleFactor;
-                previousGlyph = glyph;
-            }
+            if (previousGlyph != null)
+                x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
+            float advance = glyph.draw3D(x, y, z, scaleFactor);
+            x += advance * scaleFactor;
+            previousGlyph = glyph;
             offset += Character.charCount(codePoint);
         }
     }
@@ -126,16 +122,14 @@ public final class SdfTextRenderer {
         float x = 0;
         int len = str.length();
         Glyph previousGlyph = null;
-        for (int offset = 0; offset < len;) {
+        for (int offset = 0; offset < len; ) {
             int codePoint = str.codePointAt(offset);
             Glyph glyph = getGlyph(codePoint);
-            if (glyph != null) {
-                if (previousGlyph != null)
-                    x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
-                float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
-                x += advance * scaleFactor;
-                previousGlyph = glyph;
-            }
+            if (previousGlyph != null)
+                x += getKerning(previousGlyph.codePoint, glyph.codePoint) * scaleFactor;
+            float advance = glyph.draw3D(origin, basisX, basisY, x, 0, scaleFactor);
+            x += advance * scaleFactor;
+            previousGlyph = glyph;
             offset += Character.charCount(codePoint);
         }
     }
@@ -166,15 +160,6 @@ public final class SdfTextRenderer {
     }
 
     private void beginRendering(boolean ortho, int width, int height) {
-        internal_beginRendering(ortho, width, height);
-    }
-
-    private void endRendering(boolean ortho) {
-        flush();
-        internal_endRendering(ortho);
-    }
-
-    private void internal_beginRendering(boolean ortho, int width, int height) {
         if (ortho) {
             GL.glDisable(GL.DEPTH_TEST);
 
@@ -187,7 +172,8 @@ public final class SdfTextRenderer {
         }
     }
 
-    private void internal_endRendering(boolean ortho) {
+    private void endRendering(boolean ortho) {
+        flush();
         if (ortho) {
             GL.glEnable(GL.DEPTH_TEST);
 
@@ -255,10 +241,10 @@ public final class SdfTextRenderer {
             charset = charset.substring(1, charset.length() - 1);
 
         int len = charset.length();
-        for (int offset = 0; offset < len;) {
+        for (int offset = 0; offset < len; ) {
             int codePoint = charset.codePointAt(offset);
             if (!glyphs.containsKey(codePoint))
-                Log.warn("MSDF charset glyph absent from atlas: " + describeCodePoint(codePoint));
+                Log.warn("SDF charset glyph absent from atlas: " + describeCodePoint(codePoint));
             offset += Character.charCount(codePoint);
         }
     }
@@ -269,7 +255,7 @@ public final class SdfTextRenderer {
             return glyph;
 
         if (missingGlyphs.add(codePoint))
-            Log.warn("MSDF glyph absent from atlas: " + describeCodePoint(codePoint) + ", using '?'");
+            Log.warn("SDF glyph absent from atlas: " + describeCodePoint(codePoint) + ", using '?'");
         return glyphs.get(FALLBACK_CODE_POINT);
     }
 
@@ -320,7 +306,7 @@ public final class SdfTextRenderer {
     private final class Glyph {
         private final int codePoint;
         private final float advance;
-        private final boolean visible;
+        private final boolean drawable;
         private final float x0;
         private final float y0;
         private final float x1;
@@ -330,25 +316,18 @@ public final class SdfTextRenderer {
         private final float u1;
         private final float v1;
 
-        private Glyph(int glyphCodePoint, float glyphAdvance) {
+        private Glyph(int glyphCodePoint, float glyphAdvance) { // glyph which only advances the pen.
             codePoint = glyphCodePoint;
             advance = glyphAdvance;
-            visible = false;
-            x0 = 0;
-            y0 = 0;
-            x1 = 0;
-            y1 = 0;
-            u0 = 0;
-            v0 = 0;
-            u1 = 0;
-            v1 = 0;
+            drawable = false;
+            x0 = y0 = x1 = y1 = u0 = v0 = u1 = v1 = 0;
         }
 
         private Glyph(int glyphCodePoint, float glyphAdvance, float size, int atlasWidth, int atlasHeight,
-                JSONObject planeBounds, JSONObject atlasBounds) {
+                      JSONObject planeBounds, JSONObject atlasBounds) {
             codePoint = glyphCodePoint;
             advance = glyphAdvance;
-            visible = true;
+            drawable = true;
             x0 = planeBounds.getFloat("left") * size;
             y0 = planeBounds.getFloat("bottom") * size;
             x1 = planeBounds.getFloat("right") * size;
@@ -360,7 +339,7 @@ public final class SdfTextRenderer {
         }
 
         private float draw3D(float inX, float inY, float z, float scaleFactor) {
-            if (visible) {
+            if (drawable) {
                 float xLeft = inX + x0 * scaleFactor;
                 float xRight = inX + x1 * scaleFactor;
                 float yBottom = inY + y0 * scaleFactor;
@@ -378,7 +357,7 @@ public final class SdfTextRenderer {
         }
 
         private float draw3D(Vector3f origin, Vector3f basisX, Vector3f basisY, float inX, float inY, float scaleFactor) {
-            if (visible) {
+            if (drawable) {
                 float xLeft = inX + x0 * scaleFactor;
                 float xRight = inX + x1 * scaleFactor;
                 float yBottom = inY + y0 * scaleFactor;
