@@ -125,7 +125,7 @@ public final class GLRenderer {
         }
 
         boolean hpcMode = Display.mode.isHpc();
-        Region hpcBounds = hpcMode ? getCenteredHpcScaleBounds() : null;
+        Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
             if (hpcMode) {
                 double halfWidth = 0.5 * hpcBounds.width;
@@ -147,17 +147,6 @@ public final class GLRenderer {
         Viewport vp = Display.fullViewport;
         GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
         Layers.renderFullFloat(camera, vp);
-    }
-
-    private static Region getCenteredHpcScaleBounds() {
-        Region bounds = ImageLayerBounds.getLargestHpcBounds();
-        double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
-        double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
-        if (halfWidth <= 0)
-            halfWidth = 5;
-        if (halfHeight <= 0)
-            halfHeight = 5;
-        return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
     }
 
 }

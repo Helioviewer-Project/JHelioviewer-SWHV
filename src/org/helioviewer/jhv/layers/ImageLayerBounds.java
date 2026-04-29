@@ -54,11 +54,22 @@ public final class ImageLayerBounds {
         return visibleHeight > 0 ? cameraWidth / visibleHeight : 0;
     }
 
+    public static Region getCenteredHpcScaleBounds() {
+        Region bounds = getLargestHpcBounds();
+        double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
+        double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
+        if (halfWidth <= 0)
+            halfWidth = 5;
+        if (halfHeight <= 0)
+            halfHeight = 5;
+        return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
+    }
+
     private static double visibleMapHeight(Viewport vp) {
         if (Display.mode.isOrthographic())
             return 1;
         if (Display.mode.isHpc()) {
-            Region bounds = getLargestHpcBounds();
+            Region bounds = getCenteredHpcScaleBounds();
             double halfWidth = 0.5 * bounds.width;
             double halfHeight = 0.5 * bounds.height;
             halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
@@ -69,7 +80,7 @@ public final class ImageLayerBounds {
         return Math.abs(scale.getInterpolatedYValue(1) - scale.getInterpolatedYValue(0));
     }
 
-    public static Region getLargestHpcBounds() {
+    private static Region getLargestHpcBounds() {
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
         double minY = Double.POSITIVE_INFINITY;
