@@ -82,7 +82,7 @@ public final class AngleRenderer {
             GLES.createCapabilities();
             glesInitialized = true;
             GL.initInfo();
-            initSharedJhvRenderer();
+            initRenderer();
         } catch (RuntimeException | Error e) {
             if (glesInitialized)
                 GLES.destroy();
@@ -117,30 +117,28 @@ public final class AngleRenderer {
     }
 
     public void destroy() {
-        boolean current = EGL15.eglMakeCurrent(display, surface, surface, context);
+        if (!EGL15.eglMakeCurrent(display, surface, surface, context))
+            throw eglError("eglMakeCurrent");
+
         try {
-            if (current)
-                disposeSharedJhvRenderer();
-            else
-                rendererInitialized = false;
+            disposeRenderer();
         } finally {
             EGL15.eglMakeCurrent(display, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT);
-            if (current)
-                GLES.destroy();
+            GLES.destroy();
             EGL15.eglDestroySurface(display, surface);
             EGL15.eglDestroyContext(display, context);
             EGL15.eglTerminate(display);
         }
     }
 
-    private static synchronized void initSharedJhvRenderer() {
+    private static synchronized void initRenderer() {
         if (rendererInitialized)
             return;
         GLRenderer.init();
         rendererInitialized = true;
     }
 
-    private static synchronized void disposeSharedJhvRenderer() {
+    private static synchronized void disposeRenderer() {
         if (!rendererInitialized)
             return;
         GLRenderer.dispose();
