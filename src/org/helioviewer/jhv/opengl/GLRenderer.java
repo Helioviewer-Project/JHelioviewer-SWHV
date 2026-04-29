@@ -5,6 +5,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
@@ -67,6 +68,7 @@ public final class GLRenderer {
     public static void dispose() {
         Layers.dispose();
         JHVFrame.getInteraction().disposeAnnotations();
+        ExportMovie.dispose();
         GLText.dispose();
 
         GLSLSolar.quad.dispose();

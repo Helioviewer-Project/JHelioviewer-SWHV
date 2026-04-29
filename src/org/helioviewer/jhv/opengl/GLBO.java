@@ -11,9 +11,9 @@ import org.helioviewer.jhv.base.BufferUtils;
 class GLBO {
 
     private final int target;
-    private int bufferID;
     private final int usage;
 
+    private int bufferID;
     private float[] lastFloatData;
     private int lastFloatCount = -1;
 

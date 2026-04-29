@@ -85,7 +85,7 @@ public final class AngleRenderer {
             initRenderer();
         } catch (RuntimeException | Error e) {
             if (glesInitialized)
-                GLES.destroy();
+                GLES.setCapabilities(null);
             if (newDisplay != EGL15.EGL_NO_DISPLAY) {
                 EGL15.eglMakeCurrent(newDisplay, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT);
                 if (newSurface != EGL15.EGL_NO_SURFACE)
@@ -103,7 +103,7 @@ public final class AngleRenderer {
         try {
             render(false);
         } catch (RuntimeException | Error e) {
-            destroy();
+            dispose();
             throw e;
         }
     }
@@ -116,7 +116,7 @@ public final class AngleRenderer {
             throw eglError("eglSwapBuffers");
     }
 
-    public void destroy() {
+    public void dispose() {
         destroy(false);
     }
 
@@ -131,8 +131,8 @@ public final class AngleRenderer {
         try {
             disposeRenderer(removeLayers);
         } finally {
+            GLES.setCapabilities(null);
             EGL15.eglMakeCurrent(display, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT);
-            GLES.destroy();
             EGL15.eglDestroySurface(display, surface);
             EGL15.eglDestroyContext(display, context);
             EGL15.eglTerminate(display);
