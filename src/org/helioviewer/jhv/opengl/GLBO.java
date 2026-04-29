@@ -11,7 +11,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 class GLBO {
 
     private final int target;
-    private final int bufferID;
+    private int bufferID;
     private final int usage;
 
     private float[] lastFloatData;
@@ -24,7 +24,12 @@ class GLBO {
     }
 
     void delete() {
+        if (bufferID == -1)
+            return;
         GL.glDeleteBuffer(bufferID);
+        bufferID = -1;
+        lastFloatData = null;
+        lastFloatCount = -1;
     }
 
     void bind() {

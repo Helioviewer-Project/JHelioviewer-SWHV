@@ -38,6 +38,8 @@ public class GLTexture {
     }
 
     public void delete() {
+        if (texID == -1)
+            return;
         GL.glDeleteTexture(texID);
         pbo.delete();
         texID = -1;
