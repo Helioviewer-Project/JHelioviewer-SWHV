@@ -117,11 +117,19 @@ public final class AngleRenderer {
     }
 
     public void destroy() {
+        destroy(false);
+    }
+
+    public void remove() {
+        destroy(true);
+    }
+
+    private void destroy(boolean removeLayers) {
         if (!EGL15.eglMakeCurrent(display, surface, surface, context))
             throw eglError("eglMakeCurrent");
 
         try {
-            disposeRenderer();
+            disposeRenderer(removeLayers);
         } finally {
             EGL15.eglMakeCurrent(display, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT);
             GLES.destroy();
@@ -131,17 +139,20 @@ public final class AngleRenderer {
         }
     }
 
-    private static synchronized void initRenderer() {
+    private static void initRenderer() {
         if (rendererInitialized)
             return;
         GLRenderer.init();
         rendererInitialized = true;
     }
 
-    private static synchronized void disposeRenderer() {
+    private static void disposeRenderer(boolean removeLayers) {
         if (!rendererInitialized)
             return;
-        GLRenderer.dispose();
+        if (removeLayers)
+            GLRenderer.remove();
+        else
+            GLRenderer.dispose();
         rendererInitialized = false;
     }
 
