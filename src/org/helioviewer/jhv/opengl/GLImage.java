@@ -1,10 +1,12 @@
 package org.helioviewer.jhv.opengl;
 
 import java.nio.ByteBuffer;
+import java.util.Set;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.metadata.DetectorMask;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -70,6 +72,11 @@ public class GLImage {
             diffTex.bind();
             diffTex.copyImageBuffer(prevFrame.getImageBuffer(), GL.LINEAR);
         }
+    }
+
+    public void collectImageBuffers(Set<ImageBuffer> retained) {
+        if (uploadedImageData != null)
+            retained.add(uploadedImageData.getImageBuffer());
     }
 
     private final float[] color = new float[4];

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
@@ -13,6 +14,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
@@ -337,6 +339,17 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         return imageData;
     }
 
+    void collectImageBuffers(Set<ImageBuffer> retained) {
+        if (imageData != null)
+            retained.add(imageData.getImageBuffer());
+        if (prevImageData != null)
+            retained.add(prevImageData.getImageBuffer());
+        if (baseImageData != null)
+            retained.add(baseImageData.getImageBuffer());
+        if (glImage != null)
+            glImage.collectImageBuffers(retained);
+    }
+
     @Nonnull
     public MetaData getMetaData() { //!
         return imageData == null ? view.getMetaData(view.getFirstTime()) : imageData.getMetaData();
@@ -346,6 +359,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     public void handleData(ImageData newImageData) {
         if (removed)
             return;
+        newImageData.getImageBuffer().allowExplicitFree();
         setImageData(newImageData);
         JHVFrame.getLayers().fireTimeUpdated(this);
         ImageLayers.displaySynced(imageData.getViewpoint());
