@@ -331,6 +331,7 @@ public class J2KView extends BaseView {
     }
 
     private void sendDataToHandler(J2KParams.Decode decodeParams, Position viewpoint, ImageBuffer imageBuffer) {
+        imageBuffer.protectFromExplicitFree();
         int frame = decodeParams.frame();
         MetaData m = metaData[frame];
         J2KParams.SubImage roi = decodeParams.subImage();

@@ -26,6 +26,7 @@ public class ImageBuffer {
     public final int height;
     public final Format format;
     public final Buffer buffer;
+    private volatile boolean explicitFreeProtected;
 
     private static final class ArenaState implements Runnable {
         private Arena arena;
@@ -69,6 +70,21 @@ public class ImageBuffer {
 
     public int byteSize() {
         return width * height * format.bytes;
+    }
+
+    public void protectFromExplicitFree() {
+        explicitFreeProtected = true;
+    }
+
+    public void allowExplicitFree() {
+        explicitFreeProtected = false;
+    }
+
+    boolean free() {
+        if (explicitFreeProtected)
+            return false;
+        cleanable.clean();
+        return true;
     }
 
     private static Buffer allocate(Arena arena, byte[] data) {

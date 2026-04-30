@@ -2,7 +2,9 @@ package org.helioviewer.jhv.layers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -11,6 +13,8 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.imagedata.ImageBufferCache;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.time.JHVTime;
@@ -154,6 +158,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         removeLayers();
         initLayers();
         layers.forEach(Layer::prerender);
+        reapImageBuffers();
     }
 
     public static void render(Camera camera, Viewport vp) {
@@ -263,6 +268,12 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
     public static void forEachImageLayer(Consumer<? super ImageLayer> action) {
         for (int i = 0; i < layers.imageLayersCount; i++)
             action.accept((ImageLayer) layers.get(i));
+    }
+
+    private static void reapImageBuffers() {
+        Set<ImageBuffer> retained = Collections.newSetFromMap(new IdentityHashMap<>());
+        forEachImageLayer(layer -> layer.collectImageBuffers(retained));
+        ImageBufferCache.reap(retained);
     }
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
