@@ -10,7 +10,6 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
-import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 
 import kdu_jni.KduException;
 
@@ -160,17 +159,21 @@ class J2KReader implements Runnable {
                     boolean downloadComplete = false;
                     {
                         String key = cacheKey[currentStep];
-                        JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
-                        if (stream == null) { // not in JPIP cache
-                            JPIPResponse res = socket.request(stepQueries[currentStep], cache, currentStep);
-                            if (res.isResponseComplete()) { // downloaded
-                                downloadComplete = true;
-                                if (key != null && (stream = cache.get(currentStep)) != null)
-                                    JPIPCacheManager.put(key, level, stream);
-                            }
-                        } else {
+                        if (key != null && JPIPCacheManager.restore(key, level, cache, currentStep)) {
                             downloadComplete = true;
-                            cache.put(currentStep, stream);
+                        } else { // not in JPIP cache
+                            if (key == null) {
+                                JPIPResponse res = socket.request(stepQueries[currentStep], cache, currentStep);
+                                downloadComplete = res.isResponseComplete();
+                            } else {
+                                try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
+                                    JPIPResponse res = socket.request(stepQueries[currentStep], cache, currentStep, writer);
+                                    if (res.isResponseComplete()) { // downloaded
+                                        downloadComplete = true;
+                                        writer.commit();
+                                    }
+                                }
+                            }
                         }
                     }
 
