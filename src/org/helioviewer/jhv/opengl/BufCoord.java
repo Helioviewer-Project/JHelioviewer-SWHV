@@ -2,40 +2,46 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 
+import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Vec3;
 
 public class BufCoord {
 
-    private static final int chunk = 72;
+    private static final int chunk = 6 * 4 * 8;
 
     private int count;
     private int length;
-    private float[] array;
-    private Buffer buffer;
+    private int capacity;
+    private FloatBuffer buffer;
 
     public BufCoord(int size) {
-        array = new float[size * 6];
-        buffer = FloatBuffer.wrap(array);
+        capacity = size * 6;
+        buffer = BufferUtils.newFloatBuffer(capacity);
     }
 
     private void ensure(int delta) {
-        int size = array.length;
-        if (length + delta > size) {
-            array = Arrays.copyOf(array, Math.max(length + delta, size + chunk));
-            buffer = FloatBuffer.wrap(array);
-        }
+        if (length + delta <= capacity)
+            return;
+
+        FloatBuffer oldBuffer = buffer;
+        oldBuffer.position(0);
+        oldBuffer.limit(length);
+
+        capacity = Math.max(length + delta, capacity + chunk);
+        buffer = BufferUtils.newFloatBuffer(capacity);
+        buffer.put(oldBuffer);
+        buffer.clear();
     }
 
     public void putCoord(float x, float y, float z, float w, float c0, float c1) {
         ensure(6);
-        array[length++] = x;
-        array[length++] = y;
-        array[length++] = z;
-        array[length++] = w;
-        array[length++] = c0;
-        array[length++] = c1;
+        buffer.put(length++, x);
+        buffer.put(length++, y);
+        buffer.put(length++, z);
+        buffer.put(length++, w);
+        buffer.put(length++, c0);
+        buffer.put(length++, c1);
 
         count++;
     }
@@ -55,9 +61,11 @@ public class BufCoord {
     public void clear() {
         length = 0;
         count = 0;
+        buffer.clear();
     }
 
-    public Buffer toBuffer() {
+    public Buffer toBuffer() { // Call clear() before appending again.
+        buffer.position(0);
         return buffer.limit(length);
     }
 
