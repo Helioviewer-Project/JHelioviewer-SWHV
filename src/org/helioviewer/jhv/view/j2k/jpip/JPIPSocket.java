@@ -6,6 +6,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 
@@ -108,6 +110,10 @@ public final class JPIPSocket extends HTTPSocket {
     }
 
     public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
+        return request(queryStr, cache, frame, null);
+    }
+
+    public JPIPResponse request(String queryStr, JPIPCache cache, int frame, @Nullable JPIPCacheManager.Writer writer) throws KduException, IOException {
         writeRequest(queryStr);
 
         Map<String, String> header = readHeader();
@@ -116,7 +122,7 @@ public final class JPIPSocket extends HTTPSocket {
 
         JPIPResponse jpipRes = new JPIPResponse(header.get("JPIP-cnew"));
         try (InputStream in = getInputStream(header)) {
-            jpipRes.readSegments(in, cache, frame);
+            jpipRes.readSegments(in, cache, frame, writer);
         }
 
         if ("close".equals(header.get("Connection"))) {
