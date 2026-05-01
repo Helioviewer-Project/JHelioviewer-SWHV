@@ -319,11 +319,6 @@ public class JPIPCacheManager {
     }
 
     private static void commitTempFile(String key, int level, Path tempFile, long writerGeneration) {
-        if (!enabled) {
-            deleteFile(tempFile);
-            return;
-        }
-
         try {
             synchronized (cacheLock) {
                 if (!enabled) {
