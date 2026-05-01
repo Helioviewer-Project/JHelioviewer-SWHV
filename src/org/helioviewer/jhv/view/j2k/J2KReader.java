@@ -97,6 +97,19 @@ class J2KReader implements Runnable {
         return stepQueries;
     }
 
+    private boolean readStep(String query, String key, int level, int frame) throws KduException, IOException {
+        if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
+            return true;
+
+        try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
+            JPIPResponse res = socket.request(query, frame, cache, writer);
+            boolean complete = res.isResponseComplete();
+            if (complete)
+                writer.commit();
+            return complete;
+        }
+    }
+
     @Override
     public void run() {
         while (!isAbolished) {
@@ -156,19 +169,7 @@ class J2KReader implements Runnable {
                         continue;
                     }
 
-                    String key = cacheKey[currentStep];
-                    boolean downloadComplete;
-                    if (key != null && JPIPCacheManager.restore(key, level, cache, currentStep)) {
-                        downloadComplete = true;
-                    } else {
-                        try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
-                            JPIPResponse res = socket.request(stepQueries[currentStep], currentStep, cache, writer);
-                            downloadComplete = res.isResponseComplete();
-                            if (downloadComplete)
-                                writer.commit();
-                        }
-                    }
-
+                    boolean downloadComplete = readStep(stepQueries[currentStep], cacheKey[currentStep], level, currentStep);
                     if (downloadComplete) {
                         // mark query as complete
                         completeSteps++;
@@ -224,5 +225,4 @@ class J2KReader implements Runnable {
     }
 
     private int retries = 0;
-
 }

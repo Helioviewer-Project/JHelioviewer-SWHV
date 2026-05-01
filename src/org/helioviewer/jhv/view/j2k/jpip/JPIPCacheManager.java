@@ -66,7 +66,7 @@ public class JPIPCacheManager {
     private static long generation;
     private static volatile boolean enabled;
     private static boolean failureLogged;
-    private static final Writer NOOP_WRITER = new Writer();
+    public static final Writer NOOP_WRITER = new Writer();
 
     public static void init() {
         synchronized (cacheLock) {
@@ -107,9 +107,6 @@ public class JPIPCacheManager {
     }
 
     public static boolean restore(@Nonnull String key, int level, @Nonnull JPIPCache cache, int frame) {
-        if (!enabled)
-            return false;
-
         try {
             synchronized (cacheLock) {
                 if (!enabled)
@@ -148,7 +145,7 @@ public class JPIPCacheManager {
 
     @Nonnull
     public static Writer writer(@Nullable String key, int level) {
-        if (key == null || !enabled)
+        if (key == null)
             return NOOP_WRITER;
 
         Path tempFile = null;
@@ -178,10 +175,6 @@ public class JPIPCacheManager {
                 deleteFile(tempFile);
             return NOOP_WRITER;
         }
-    }
-
-    static Writer noopWriter() {
-        return NOOP_WRITER;
     }
 
     private static void read(Path file, JPIPCache cache, int frame) throws IOException, KduException {
