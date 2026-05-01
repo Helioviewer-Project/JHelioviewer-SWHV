@@ -156,24 +156,16 @@ class J2KReader implements Runnable {
                         continue;
                     }
 
-                    boolean downloadComplete = false;
-                    {
-                        String key = cacheKey[currentStep];
-                        if (key != null && JPIPCacheManager.restore(key, level, cache, currentStep)) {
-                            downloadComplete = true;
-                        } else { // not in JPIP cache
-                            if (key == null) {
-                                JPIPResponse res = socket.request(stepQueries[currentStep], cache, currentStep);
-                                downloadComplete = res.isResponseComplete();
-                            } else {
-                                try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
-                                    JPIPResponse res = socket.request(stepQueries[currentStep], cache, currentStep, writer);
-                                    if (res.isResponseComplete()) { // downloaded
-                                        downloadComplete = true;
-                                        writer.commit();
-                                    }
-                                }
-                            }
+                    String key = cacheKey[currentStep];
+                    boolean downloadComplete;
+                    if (key != null && JPIPCacheManager.restore(key, level, cache, currentStep)) {
+                        downloadComplete = true;
+                    } else {
+                        try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
+                            JPIPResponse res = socket.request(stepQueries[currentStep], currentStep, cache, writer);
+                            downloadComplete = res.isResponseComplete();
+                            if (downloadComplete)
+                                writer.commit();
                         }
                     }
 

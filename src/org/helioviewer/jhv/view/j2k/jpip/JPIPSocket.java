@@ -6,8 +6,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.view.j2k.jpip.http.HTTPSocket;
 
@@ -38,7 +36,7 @@ public final class JPIPSocket extends HTTPSocket {
 
         jpipPath = uri.getPath();
 
-        JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache, 0); // deliberately short
+        JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), 0, cache, JPIPCacheManager.writer(null, 0)); // deliberately short
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -89,16 +87,17 @@ public final class JPIPSocket extends HTTPSocket {
     }
 
     public void init(JPIPCache cache) throws KduException, IOException {
+        JPIPCacheManager.Writer writer = JPIPCacheManager.writer(null, 0);
         JPIPResponse res;
         String req = createQuery(META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
         do {
-            res = request(req, cache, 0);
+            res = request(req, 0, cache, writer);
         } while (!res.isResponseComplete());
 
         // prime first image
         req = createLayerQuery(0, "64,64");
         do {
-            res = request(req, cache, 0);
+            res = request(req, 0, cache, writer);
         } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
     }
 
@@ -109,11 +108,7 @@ public final class JPIPSocket extends HTTPSocket {
         write("GET " + jpipPath + '?' + queryStr + httpHeader);
     }
 
-    public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
-        return request(queryStr, cache, frame, null);
-    }
-
-    public JPIPResponse request(String queryStr, JPIPCache cache, int frame, @Nullable JPIPCacheManager.Writer writer) throws KduException, IOException {
+    public JPIPResponse request(String queryStr, int frame, JPIPCache cache, JPIPCacheManager.Writer writer) throws KduException, IOException {
         writeRequest(queryStr);
 
         Map<String, String> header = readHeader();
