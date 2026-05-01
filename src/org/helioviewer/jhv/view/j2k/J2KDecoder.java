@@ -98,10 +98,13 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             long addr = compositorBuf.Get_buf(srcStride, false);
             ByteBuffer nativeBuffer = MemoryUtil.memByteBuffer(addr, Math.toIntExact(4L * srcStride[0] * actualHeight));
 
+            boolean gray = numComps < 3;
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
-            ImageBuffer.Format format = numComps < 3 ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
-            byte[] outBuffer = new byte[actualWidth * actualHeight * format.bytes];
-            ByteBuffer outByteBuffer = ByteBuffer.wrap(outBuffer);
+            ImageBuffer.Format format = gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
+            // Allocate direct buffer for no-filter gray, heap buffer otherwise.
+            ImageBuffer outImageBuffer = filterType == ImageFilter.Type.None ? new ImageBuffer(actualWidth, actualHeight, format) : null;
+            byte[] outBuffer = outImageBuffer == null ? new byte[actualWidth * actualHeight * format.bytes] : null;
+            ByteBuffer outByteBuffer = outImageBuffer == null ? ByteBuffer.wrap(outBuffer) : (ByteBuffer) outImageBuffer.buffer;
 
             Kdu_dims newRegion = scratch.newRegion;
             newRegion.From_u32(0, 0, 0, 0);
@@ -120,8 +123,8 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 int dstIdx = newX + newY * actualWidth;
                 int srcIdx = 0;
 
-                if (numComps < 3) {
-                    gatherGray(nativeBuffer, outBuffer, srcStride[0], actualWidth, srcIdx, dstIdx, newWidth, newHeight);
+                if (gray) {
+                    gatherGray(nativeBuffer, outByteBuffer, srcStride[0], actualWidth, srcIdx, dstIdx, newWidth, newHeight);
                 } else {
                     for (int j = 0; j < newHeight; ++j, dstIdx += actualWidth, srcIdx += srcStride[0]) {
                         outByteBuffer.put(4 * dstIdx, nativeBuffer, 4 * srcIdx, 4 * newWidth);
@@ -134,7 +137,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-            return new ImageBuffer(actualWidth, actualHeight, format, outBuffer, filterType);
+            return outImageBuffer == null ? new ImageBuffer(actualWidth, actualHeight, format, outBuffer, filterType) : outImageBuffer;
         } catch (KduException e) {
             recreateThreadEnv = true;
             throw e;
@@ -150,19 +153,19 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         }
     }
 
-    private static void gatherGray(ByteBuffer src, byte[] dst, int srcStride, int dstStride,
+    private static void gatherGray(ByteBuffer src, ByteBuffer dst, int srcStride, int dstStride,
                                    int srcIdx, int dstIdx, int width, int height) {
         for (int j = 0; j < height; ++j, dstIdx += dstStride, srcIdx += srcStride) {
             int srcByte = 4 * srcIdx;
             int i = 0;
             for (; i <= width - 4; i += 4, srcByte += 16) { // doesn't help much, more is definitely harmful
-                dst[dstIdx + i] = src.get(srcByte);
-                dst[dstIdx + i + 1] = src.get(srcByte + 4);
-                dst[dstIdx + i + 2] = src.get(srcByte + 8);
-                dst[dstIdx + i + 3] = src.get(srcByte + 12);
+                dst.put(dstIdx + i, src.get(srcByte));
+                dst.put(dstIdx + i + 1, src.get(srcByte + 4));
+                dst.put(dstIdx + i + 2, src.get(srcByte + 8));
+                dst.put(dstIdx + i + 3, src.get(srcByte + 12));
             }
             for (; i < width; ++i, srcByte += 4)
-                dst[dstIdx + i] = src.get(srcByte);
+                dst.put(dstIdx + i, src.get(srcByte));
         }
     }
 
