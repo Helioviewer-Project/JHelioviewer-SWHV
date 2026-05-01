@@ -65,7 +65,8 @@ public class JPIPCacheManager {
     private static Thread hook;
     private static long generation;
     private static volatile boolean enabled;
-    private static final Writer DISCARD_WRITER = new Writer();
+    private static boolean failureLogged;
+    private static final Writer NOOP_WRITER = new Writer();
 
     public static void init() {
         synchronized (cacheLock) {
@@ -90,6 +91,7 @@ public class JPIPCacheManager {
                 trimStreamCache();
 
                 levelCache = levelManager.getCache("JPIPLevel", String.class, Integer.class);
+                failureLogged = false;
                 generation++;
                 enabled = true;
             } catch (IOException | RuntimeException e) {
@@ -147,13 +149,13 @@ public class JPIPCacheManager {
     @Nonnull
     public static Writer writer(@Nullable String key, int level) {
         if (key == null || !enabled)
-            return DISCARD_WRITER;
+            return NOOP_WRITER;
 
         Path tempFile = null;
         try {
             synchronized (cacheLock) {
                 if (!enabled)
-                    return DISCARD_WRITER;
+                    return NOOP_WRITER;
 
                 Files.createDirectories(streamCacheDir);
                 Path file = streamPath(key);
@@ -171,11 +173,15 @@ public class JPIPCacheManager {
                 return new Writer(key, level, tempFile, out, append && Files.size(file) > HEADER_BYTES, generation);
             }
         } catch (Exception e) {
-            Log.error(e);
+            disableAfterFailure(e);
             if (tempFile != null)
                 deleteFile(tempFile);
-            return DISCARD_WRITER;
+            return NOOP_WRITER;
         }
+    }
+
+    static Writer noopWriter() {
+        return NOOP_WRITER;
     }
 
     private static void read(Path file, JPIPCache cache, int frame) throws IOException, KduException {
@@ -341,8 +347,18 @@ public class JPIPCacheManager {
                 trimStreamCache();
             }
         } catch (Exception e) {
-            Log.error(e);
+            disableAfterFailure(e);
             deleteFile(tempFile);
+        }
+    }
+
+    private static void disableAfterFailure(Exception e) {
+        synchronized (cacheLock) {
+            if (!failureLogged) {
+                Log.error(e);
+                failureLogged = true;
+            }
+            closeUnlocked();
         }
     }
 
@@ -388,7 +404,7 @@ public class JPIPCacheManager {
                     out.write(seg.data, 0, seg.length);
                 hasRecords = true;
             } catch (Exception e) {
-                Log.error(e);
+                disableAfterFailure(e);
                 close();
             }
         }

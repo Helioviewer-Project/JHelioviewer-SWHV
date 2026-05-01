@@ -36,7 +36,7 @@ public final class JPIPSocket extends HTTPSocket {
 
         jpipPath = uri.getPath();
 
-        JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), 0, cache, JPIPCacheManager.writer(null, 0)); // deliberately short
+        JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), 0, cache, JPIPCacheManager.noopWriter()); // deliberately short
         String cnew = res.getCNew();
         if (cnew == null)
             throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -87,7 +87,7 @@ public final class JPIPSocket extends HTTPSocket {
     }
 
     public void init(JPIPCache cache) throws KduException, IOException {
-        JPIPCacheManager.Writer writer = JPIPCacheManager.writer(null, 0);
+        JPIPCacheManager.Writer writer = JPIPCacheManager.noopWriter();
         JPIPResponse res;
         String req = createQuery(META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
         do {
