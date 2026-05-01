@@ -21,6 +21,7 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.LocationChecker;
 import org.helioviewer.jhv.io.samp.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
+import org.helioviewer.jhv.metadata.DetectorMask;
 import org.helioviewer.jhv.view.j2k.KakaduMessageSystem;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
@@ -49,6 +50,7 @@ class JHVInit {
 
         FitsFactory.setUseHierarch(true);
         FitsFactory.setLongStringsEnabled(true);
+        DetectorMask.loadBuiltins();
     }
 
     @SuppressWarnings("restricted")
