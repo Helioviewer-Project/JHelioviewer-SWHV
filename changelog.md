@@ -6,9 +6,9 @@
 - Support arbitrary masks in detector frame
 
 ### Technical
-- Major internal groundwork to replace the backend renderer
-- Major internal refactoring of image buffers and their caching
-- Draw anti-aliased lines during live render without relying on MSAA
+- Major internal groundwork to render through ANGLE with the native backend renderer of each platform (DirectX11, Metal, OpenGL)
+- Major internal refactoring of image buffers and their caching lifetime (see `docs/image-buffer-cache.md`)
+- Draw anti-aliased lines during live render without relying on MSAA (see `docs/line-rendering-sketch.png`)
 - Reimplement font rendering using a fixed glyph atlas and the SDF algorithm
 - Eliminate small rendering glitches
 - Restructuring of application flow around explicit commands, with those commands exposed through SAMP (see `docs/jhv-samp-commands.md`)
