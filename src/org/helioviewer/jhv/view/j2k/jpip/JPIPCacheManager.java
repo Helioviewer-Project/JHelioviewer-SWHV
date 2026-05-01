@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
@@ -64,6 +65,7 @@ public class JPIPCacheManager {
     private static Thread hook;
     private static long generation;
     private static volatile boolean enabled;
+    private static final Writer DISCARD_WRITER = new Writer();
 
     public static void init() {
         synchronized (cacheLock) {
@@ -143,15 +145,15 @@ public class JPIPCacheManager {
     }
 
     @Nonnull
-    public static Writer writer(@Nonnull String key, int level) {
-        if (!enabled)
-            return new Writer();
+    public static Writer writer(@Nullable String key, int level) {
+        if (key == null || !enabled)
+            return DISCARD_WRITER;
 
         Path tempFile = null;
         try {
             synchronized (cacheLock) {
                 if (!enabled)
-                    return new Writer();
+                    return DISCARD_WRITER;
 
                 Files.createDirectories(streamCacheDir);
                 Path file = streamPath(key);
@@ -172,7 +174,7 @@ public class JPIPCacheManager {
             Log.error(e);
             if (tempFile != null)
                 deleteFile(tempFile);
-            return new Writer();
+            return DISCARD_WRITER;
         }
     }
 
