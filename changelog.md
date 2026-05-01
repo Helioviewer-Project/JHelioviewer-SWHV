@@ -4,8 +4,8 @@
 ## JHelioviewer 5.0 (pending)
 
 ### Display and rendering
-- Render through ANGLE using the native backend renderer of each platform (DirectX11, Metal, OpenGL ES)
-- Replace the old JOGL-based rendering path with LWJGL/OpenGL ES infrastructure
+- Render through ANGLE using the native backend renderer of each platform (DirectX11, Metal, OpenGL)
+- Replace the JOGL-based rendering path with LWJGL/OpenGL ES infrastructure
 - Improve line rendering with shader antialiasing during live display (see `docs/line-rendering-sketch.png`)
 - Improve text rendering with a fixed SDF glyph atlas
 - Improve grid, FOV, SWEK, PFSS, point, and overlay rendering details
@@ -14,8 +14,9 @@
 
 ### Image loading and playback
 - Support arbitrary detector-frame masks, including the bundled EUI occulting mask
-- Improve image-buffer caching and lifetime management to free native buffers promptly on cache eviction (see `docs/image-buffer-cache.md`)
-- Avoid an extra heap copy for the common unfiltered J2K decode path
+- Centralize caching and lifetime management of image-buffers. Move decoded image storage to direct/native buffers for GL upload
+  and free them promptly on cache eviction (see `docs/image-buffer-cache.md`)
+- Avoid extra heap copies for the common unfiltered J2K decode path
 - Replace serialized JPIP stream caching with compact segment log files
 - Disable JPIP disk caching for the rest of the run after persistent-cache write/commit failures
 
@@ -26,15 +27,10 @@
 
 ### Interaction and UI
 - Decouple AWT input events from core application input handling
-- Improve movie panel, timeline, toolbar, popup, and focus behavior
 - Make transient cache paths ASCII-safe on Windows
 
 ### Technical
-- Centralize decoded image buffer caching across J2K and URI views
-- Move decoded image storage toward direct/native buffers for GL upload
-- Add documentation for image-buffer cache ownership and GL line rendering
 - Update bundled libraries, native rendering libraries, and supporting tools
-- Remove obsolete JOGL/GL3 plumbing and dead rendering paths
 - Various bug fixes, cleanups, and internal refactoring
 
 ## JHelioviewer 4.8.1 (2026-04-19)
