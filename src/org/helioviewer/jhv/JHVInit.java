@@ -91,8 +91,8 @@ class JHVInit {
                 "solo_ANC_soc-sc-fk_V09.tf",
                 "solo_ANC_soc-sci-fk_V08.tf",
                 "solo_ANC_soc-sclk-fict_20000101_V01.tsc",
-                "solo_ANC_soc-orbit-stp_20200210-20301120_397_V1_00507_V01.bsp",
-                "solo_ANC_soc-default-att-stp_20200210-20301120_397_V1_00507_V01.bc");
+                "solo_ANC_soc-orbit-stp_20200210-20301120_408_V1_00536_V01.bsp",
+                "solo_ANC_soc-default-att-stp_20200210-20301120_408_V1_00536_V01.bc");
 
         List<String> builtinKernels = kernels.parallelStream().map(k -> { // order does not matter
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
