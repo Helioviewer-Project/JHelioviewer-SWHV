@@ -11,12 +11,13 @@ native memory, because GL upload can consume native buffers directly. The cache
 therefore has two responsibilities: it avoids unnecessary decoding, and it keeps
 the native memory used by decoded images within a predictable budget.
 
-The `Cleaner` registered by `ImageBuffer` remains the final safety net. It is not
-the primary cache-eviction mechanism. Playback tests whose decoded working set is
-larger than the cache can otherwise leave too much native memory alive while the
-VM waits for GC to discover unreachable buffers.
+The `Cleaner` registered by `ImageBuffer` remains the final safety net, but it
+cannot be the primary cache-eviction mechanism. Playback tests with working sets
+larger than the cache show that relying on GC alone is not enough: native
+allocations can grow faster than unreachable `ImageBuffer` instances are
+discovered and cleaned, eventually exhausting OS virtual memory.
 
-## Historical Context
+## Background
 
 Before JHV 5, image upload went through JOGL APIs that accepted Java heap
 buffers. If GL needed native memory, the copy from heap to native storage was
@@ -36,14 +37,15 @@ budget global and measurable. The price is that eviction has to respect data
 that may already have left the cache path but not yet reached its final owner on
 the EDT.
 
-The cleanup contract exists for that handoff window. Eviction must be aggressive
-enough to free native memory without waiting for GC, but it must not free a
-buffer that is still queued for publication, retained by an `ImageLayer`, or
-uploaded by `GLImage`.
+The cleanup contract exists for the short interval where a buffer has left the
+cache but has not yet been accepted by the layer/rendering state. During that
+window, cache eviction may happen, but explicit native cleanup must not.
 
 ## Decode Paths
 
-The producers of `ImageBuffer` do not all have the same constraints.
+The producers of `ImageBuffer` do not all have the same constraints. The policy
+is to produce native buffers directly where that removes a hot-path copy, and to
+keep heap arrays where Java-side decoding or filtering still needs them.
 
 Unfiltered J2K data is the critical playback path. `J2KDecoder` writes Kakadu
 compositor output directly into the final native `ImageBuffer`, so the decoded
@@ -100,9 +102,9 @@ temporary reference held by worker threads or the EDT.
 - Retired buffers are tracked weakly, so failed or dropped handoffs do not keep
   buffers alive just because they passed through the cache cleanup machinery.
 
-## Maintenance Notes
+## Fragile Points
 
-Several tempting changes break the ownership model:
+The following changes look local, but alter ownership semantics:
 
 - Treating `get()` or `put()` as UI ownership would conflate cache access with
   publishing a buffer to a layer.
@@ -114,6 +116,7 @@ Several tempting changes break the ownership model:
 - Failed handoffs are not tracked exhaustively. They are rare strays and are
   left to the weak reference plus `Cleaner` fallback by design.
 
-Changing this contract requires checking all decode-to-layer handoff paths and
-all render-side references that can keep an `ImageBuffer` alive. In particular,
-check `J2KView`, `URIView`, `ImageLayer`, `Layers`, and `GLImage` together.
+Changes to this contract should be reviewed across the whole decode-to-render
+path, not just in the class being edited. In particular, check `J2KView`,
+`URIView`, `ImageLayer`, `Layers`, `GLImage`, and any non-layer
+`View.DataHandler` implementation that receives `ImageBuffer`.
