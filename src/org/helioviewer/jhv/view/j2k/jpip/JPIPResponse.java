@@ -134,7 +134,7 @@ public class JPIPResponse {
         return seg;
     }
 
-    void readSegments(InputStream in, JPIPCache cache, int frame, JPIPCacheManager.Writer writer) throws KduException, IOException {
+    void readSegments(InputStream in, int frame, JPIPCache cache, JPIPCacheManager.Writer writer) throws KduException, IOException {
         JPIPSegment seg;
         while ((seg = readSegment(in)) != null) {
             if (seg.isEOR) {

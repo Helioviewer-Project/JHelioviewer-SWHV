@@ -117,7 +117,7 @@ public final class JPIPSocket extends HTTPSocket {
 
         JPIPResponse jpipRes = new JPIPResponse(header.get("JPIP-cnew"));
         try (InputStream in = getInputStream(header)) {
-            jpipRes.readSegments(in, cache, frame, writer);
+            jpipRes.readSegments(in, frame, cache, writer);
         }
 
         if ("close".equals(header.get("Connection"))) {
