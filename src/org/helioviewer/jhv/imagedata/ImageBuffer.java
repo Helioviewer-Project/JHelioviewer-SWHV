@@ -4,6 +4,7 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class ImageBuffer {
@@ -48,6 +49,16 @@ public class ImageBuffer {
         this(_width, _height, _format, data, ImageFilter.Type.None);
     }
 
+    public ImageBuffer(int _width, int _height, Format _format) {
+        width = _width;
+        height = _height;
+        format = _format;
+
+        Arena arena = Arena.ofShared();
+        cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
+        buffer = allocate(arena, _width * _height * _format.bytes, _format);
+    }
+
     public ImageBuffer(int _width, int _height, Format _format, byte[] data, ImageFilter.Type filterType) {
         width = _width;
         height = _height;
@@ -55,7 +66,7 @@ public class ImageBuffer {
 
         Arena arena = Arena.ofShared();
         cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
-        buffer = allocate(arena, filter(format, data, _width, _height, filterType));
+        buffer = allocateFrom(arena, filter(format, data, _width, _height, filterType));
     }
 
     public ImageBuffer(int _width, int _height, Format _format, short[] data, ImageFilter.Type filterType) {
@@ -65,7 +76,7 @@ public class ImageBuffer {
 
         Arena arena = Arena.ofShared();
         cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
-        buffer = allocate(arena, filter(format, data, _width, _height, filterType));
+        buffer = allocateFrom(arena, filter(format, data, _width, _height, filterType));
     }
 
     public int byteSize() {
@@ -87,11 +98,16 @@ public class ImageBuffer {
         return true;
     }
 
-    private static Buffer allocate(Arena arena, byte[] data) {
+    private static Buffer allocate(Arena arena, int byteSize, Format format) {
+        ByteBuffer byteBuffer = arena.allocate(byteSize).asByteBuffer();
+        return format == Format.Gray16 ? byteBuffer.order(ByteOrder.nativeOrder()).asShortBuffer() : byteBuffer;
+    }
+
+    private static Buffer allocateFrom(Arena arena, byte[] data) {
         return arena.allocateFrom(ValueLayout.JAVA_BYTE, data).asByteBuffer();
     }
 
-    private static Buffer allocate(Arena arena, short[] data) {
+    private static Buffer allocateFrom(Arena arena, short[] data) {
         return arena.allocateFrom(ValueLayout.JAVA_SHORT, data)
                 .asByteBuffer()
                 .order(ByteOrder.nativeOrder())
