@@ -3,16 +3,39 @@
 
 ## JHelioviewer 5.0 (pending)
 
-- Support arbitrary masks in detector frame
+### Display and rendering
+- Render through ANGLE using the native backend renderer of each platform (DirectX11, Metal, OpenGL ES)
+- Replace the old JOGL-based rendering path with LWJGL/OpenGL ES infrastructure
+- Improve line rendering with shader antialiasing during live display (see `docs/line-rendering-sketch.png`)
+- Improve text rendering with a fixed SDF glyph atlas
+- Improve grid, FOV, SWEK, PFSS, point, and overlay rendering details
+- Use MSAA specifically for frame/movie export quality
+- Preserve layers across GL/ANGLE context recreation
+
+### Image loading and playback
+- Support arbitrary detector-frame masks, including the bundled EUI occulting mask
+- Improve image-buffer caching and lifetime management to free native buffers promptly on cache eviction (see `docs/image-buffer-cache.md`)
+- Avoid an extra heap copy for the common unfiltered J2K decode path
+- Replace serialized JPIP stream caching with compact segment log files
+- Disable JPIP disk caching for the rest of the run after persistent-cache write/commit failures
+
+### Application control and integration
+- Restructure viewer, playback, recording, and state changes around explicit application commands
+- Expose playback, recording, load-state, view, seek, and camera commands through SAMP (see `docs/jhv-samp-commands.md`)
+- Add completion notifications for command-driven state loads and recordings
+
+### Interaction and UI
+- Decouple AWT input events from core application input handling
+- Improve movie panel, timeline, toolbar, popup, and focus behavior
+- Make transient cache paths ASCII-safe on Windows
 
 ### Technical
-- Major internal groundwork to render through ANGLE with the native backend renderer of each platform (DirectX11, Metal, OpenGL)
-- Major internal refactoring of image buffers and their caching lifetime (see `docs/image-buffer-cache.md`)
-- Draw anti-aliased lines during live render without relying on MSAA (see `docs/line-rendering-sketch.png`)
-- Reimplement font rendering using a fixed glyph atlas and the SDF algorithm
-- Eliminate small rendering glitches
-- Restructuring of application flow around explicit commands, with those commands exposed through SAMP (see `docs/jhv-samp-commands.md`)
-- Clarify the interface between AWT and the core input of application
+- Centralize decoded image buffer caching across J2K and URI views
+- Move decoded image storage toward direct/native buffers for GL upload
+- Add documentation for image-buffer cache ownership and GL line rendering
+- Update bundled libraries, native rendering libraries, and supporting tools
+- Remove obsolete JOGL/GL3 plumbing and dead rendering paths
+- Various bug fixes, cleanups, and internal refactoring
 
 ## JHelioviewer 4.8.1 (2026-04-19)
 
