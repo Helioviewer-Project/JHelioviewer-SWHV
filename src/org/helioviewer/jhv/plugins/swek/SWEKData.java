@@ -27,33 +27,26 @@ class SWEKData {
     }
 
     static double readCMESpeed(JHVEvent evt) {
-        JHVEventParameter p = evt.getParameter("cme_radiallinvel");
-        try {
-            if (p != null) {
-                return Double.parseDouble(p.getParameterValue());
-            }
-        } catch (Exception ignore) {}
-        return 500;
+        return readDouble(evt, "cme_radiallinvel", 500);
     }
 
     static double readCMEPrincipalAngleDegree(JHVEvent evt) {
-        JHVEventParameter p = evt.getParameter("event_coord1");
-        try {
-            if (p != null) {
-                return Double.parseDouble(p.getParameterValue());
-            }
-        } catch (Exception ignore) {}
-        return 0;
+        return readDouble(evt, "event_coord1", 0);
     }
 
     static double readCMEAngularWidthDegree(JHVEvent evt) {
-        JHVEventParameter p = evt.getParameter("cme_angularwidth");
+        return readDouble(evt, "cme_angularwidth", 0);
+    }
+
+    private static double readDouble(JHVEvent evt, String parameter, double fallback) {
+        JHVEventParameter p = evt.getParameter(parameter);
+        if (p == null)
+            return fallback;
         try {
-            if (p != null) {
-                return Double.parseDouble(p.getParameterValue());
-            }
-        } catch (Exception ignore) {}
-        return 0;
+            return Double.parseDouble(p.getParameterValue());
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
     }
 
 }
