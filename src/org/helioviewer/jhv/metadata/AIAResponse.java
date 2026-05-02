@@ -69,12 +69,15 @@ public class AIAResponse {
         if (!loaded)
             return 1;
 
+        PassBand p = passBands.get(pass);
+        if (p == null)
+            return 1;
+
         for (Response r : response.get(pass)) {
             if (milli >= r.t_start && milli < r.t_stop) {
                 double factor = 1 / (r.reff_area * (1 + r.eff_area_p1 * (milli - r.t_start) / TimeUtils.DAY_IN_MILLIS));
                 // System.out.println(">>> degradation " + (1 / factor));
 
-                PassBand p = passBands.get(pass);
                 return p.isSqrt ?
                         Math.sqrt(factor) :
                         1 + Math.log10(factor) / Math.log10(p.dataMax);
