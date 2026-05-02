@@ -42,12 +42,11 @@ public final class SideContentPane extends JComponent {
     }
 
     public void remove(JComponent component) {
-        if (map.containsKey(component)) {
-            super.remove(map.get(component));
-            map.remove(component);
-        } else {
+        CollapsiblePane pane = map.remove(component);
+        if (pane != null)
+            super.remove(pane);
+        else
             super.remove(component);
-        }
     }
 
 }
