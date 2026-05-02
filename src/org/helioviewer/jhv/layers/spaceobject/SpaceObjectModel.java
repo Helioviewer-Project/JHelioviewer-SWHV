@@ -53,7 +53,7 @@ class SpaceObjectModel extends AbstractTableModel {
 
     void refresh(SpaceObjectElement element) {
         Integer idx = elementRows.get(element);
-        if (idx >= 0)
+        if (idx != null)
             fireTableRowsUpdated(idx, idx);
     }
 
