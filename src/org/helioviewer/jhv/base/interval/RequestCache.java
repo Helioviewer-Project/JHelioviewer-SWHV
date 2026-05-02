@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.base.interval;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class RequestCache {
@@ -56,7 +55,7 @@ public class RequestCache {
         if (size <= 1)
             return intervals;
 
-        Collections.sort(intervals);
+        intervals.sort(null);
 
         List<Interval> result = new ArrayList<>();
         Interval prev = intervals.getFirst();

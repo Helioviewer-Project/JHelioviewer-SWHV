@@ -32,16 +32,8 @@ public record Interval(long start, long end) implements Comparable<Interval> {
 
     @Override
     public int compareTo(@Nonnull Interval o) {
-        if (start < o.start) {
-            return -1;
-        }
-        if (start == o.start && end < o.end) {
-            return -1;
-        }
-        if (start == o.start && end == o.end) {
-            return 0;
-        }
-        return 1;
+        int cmp = Long.compare(start, o.start);
+        return cmp != 0 ? cmp : Long.compare(end, o.end);
     }
 
 }
