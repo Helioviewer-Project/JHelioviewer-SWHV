@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedMap;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.Pair;
@@ -64,8 +64,9 @@ public class JHVEventCache {
 
     public static void addEvent(JHVEvent event) {
         Integer id = event.getUniqueID();
-        if (relEvents.containsKey(id)) {
-            relEvents.get(id).swapEvent(event, events);
+        JHVRelatedEvents relatedEvents = relEvents.get(id);
+        if (relatedEvents != null) {
+            relatedEvents.swapEvent(event, events);
         } else {
             createNewRelatedEvent(event);
         }
@@ -82,14 +83,20 @@ public class JHVEventCache {
         Iterator<Pair<Integer, Integer>> iterator = assocs.iterator();
         while (iterator.hasNext()) {
             Pair<Integer, Integer> tocheck = iterator.next();
-            if (tocheck.left() == uid && relEvents.containsKey(tocheck.right())) {
-                merge(rEvent, relEvents.get(tocheck.right()));
-                rEvent.addAssociation(tocheck);
-                iterator.remove();
-            } else if (tocheck.right() == uid && relEvents.containsKey(tocheck.left())) {
-                merge(rEvent, relEvents.get(tocheck.left()));
-                rEvent.addAssociation(tocheck);
-                iterator.remove();
+            if (tocheck.left() == uid) {
+                JHVRelatedEvents found = relEvents.get(tocheck.right());
+                if (found != null) {
+                    merge(rEvent, found);
+                    rEvent.addAssociation(tocheck);
+                    iterator.remove();
+                }
+            } else if (tocheck.right() == uid) {
+                JHVRelatedEvents found = relEvents.get(tocheck.left());
+                if (found != null) {
+                    merge(rEvent, found);
+                    rEvent.addAssociation(tocheck);
+                    iterator.remove();
+                }
             }
         }
     }
@@ -108,9 +115,9 @@ public class JHVEventCache {
     }
 
     static void addAssociation(Pair<Integer, Integer> association) {
-        if (relEvents.containsKey(association.left()) && relEvents.containsKey(association.right())) {
-            JHVRelatedEvents ll = relEvents.get(association.left());
-            JHVRelatedEvents rr = relEvents.get(association.right());
+        JHVRelatedEvents ll = relEvents.get(association.left());
+        JHVRelatedEvents rr = relEvents.get(association.right());
+        if (ll != null && rr != null) {
             if (ll != rr) {
                 merge(ll, rr);
                 ll.addAssociation(association);
@@ -126,16 +133,15 @@ public class JHVEventCache {
         for (SWEKSupplier evt : activeEventTypes) {
             TreeMap<Long, List<JHVRelatedEvents>> supplierMap = events.get(evt);
             if (supplierMap != null) {
-                // Find all events starting after (start - max duration)
-                SortedMap<Long, List<JHVRelatedEvents>> relevantRange =
-                        supplierMap.tailMap(start - MAX_EVENT_DURATION);
+                // Find all events that can overlap the requested range.
+                NavigableMap<Long, List<JHVRelatedEvents>> relevantRange =
+                        supplierMap.subMap(start - MAX_EVENT_DURATION, true, end, true);
 
                 for (List<JHVRelatedEvents> list : relevantRange.values()) {
                     for (JHVRelatedEvents event : list) {
                         if (event.getStart() <= end && event.getEnd() >= start) {
                             result.add(event);
                         }
-                        if (event.getStart() > end) break;
                     }
                 }
             }
