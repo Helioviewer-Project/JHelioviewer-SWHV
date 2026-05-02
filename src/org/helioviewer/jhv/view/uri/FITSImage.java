@@ -2,12 +2,7 @@ package org.helioviewer.jhv.view.uri;
 
 import java.io.File;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
+import java.nio.Buffer;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -165,64 +160,6 @@ public class FITSImage implements URIImageReader {
                     }
                 }
             }
-            case ShortBuffer inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        short raw = inData.get(line + i);
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case IntBuffer inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        int raw = inData.get(line + i);
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case LongBuffer inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        long raw = inData.get(line + i);
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case FloatBuffer inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = floatPixel(inData.get(line + i), bzero, bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
-            case DoubleBuffer inData -> {
-                for (int j = 0; j < height; j += stepH) {
-                    int line = width * j;
-                    for (int i = 0; i < width; i += stepW) {
-                        float v = floatPixel(inData.get(line + i), bzero, bscale);
-                        if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
-                            samples[sampleLen++] = v;
-                        }
-                    }
-                }
-            }
             default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
         }
         return new SampleBuffer(samples, sampleLen);
@@ -294,54 +231,6 @@ public class FITSImage implements URIImageReader {
                     processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
                 }
             });
-            case ShortBuffer inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    short raw = inData.get(inLine + i);
-                    float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
-                }
-            });
-            case IntBuffer inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    int raw = inData.get(inLine + i);
-                    float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
-                }
-            });
-            case LongBuffer inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    long raw = inData.get(inLine + i);
-                    float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
-                }
-            });
-            case FloatBuffer inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    float v = floatPixel(inData.get(inLine + i), bzero, bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
-                }
-            });
-            case DoubleBuffer inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    float v = floatPixel(inData.get(inLine + i), bzero, bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
-                }
-            });
             default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
         }
     }
@@ -370,12 +259,19 @@ public class FITSImage implements URIImageReader {
     @SuppressWarnings("deprecation")
     private static Object readFlatPixels(BasicHDU<?> hdu, int[] axes) throws Exception {
         if (hdu instanceof CompressedImageHDU chdu) {
-            return chdu.getUncompressedData();
+            return unwrapPixelBuffer(chdu.getUncompressedData(), axes[0] * axes[1]);
         } else if (hdu instanceof ImageHDU ihdu) {
             return ihdu.getData().getTiler().getTile(new int[]{0, 0}, axes);
         } else {
             throw new Exception("Unsupported FITS HDU: " + hdu.getClass().getSimpleName());
         }
+    }
+
+    private static Object unwrapPixelBuffer(Buffer buffer, int expectedPixels) throws Exception {
+        if (!buffer.hasArray() || buffer.arrayOffset() != 0 || buffer.position() != 0 || buffer.remaining() < expectedPixels) {
+            throw new Exception("Unsupported compressed FITS pixel buffer: " + buffer.getClass().getSimpleName());
+        }
+        return buffer.array();
     }
 
     private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter.Type filterType) throws Exception {
@@ -386,12 +282,6 @@ public class FITSImage implements URIImageReader {
             byte[] outData = new byte[width * height];
             for (int j = 0; j < height; j++) {
                 System.arraycopy(inData, width * j, outData, width * (height - 1 - j), width);
-            }
-            return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, outData, filterType);
-        } else if (pixels instanceof ByteBuffer inData) {
-            byte[] outData = new byte[width * height];
-            for (int j = 0; j < height; j++) {
-                inData.get(width * j, outData, width * (height - 1 - j), width);
             }
             return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, outData, filterType);
         }
