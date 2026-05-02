@@ -25,15 +25,10 @@ public class PluginManager {
     }
 
     public static void loadState(JSONObject jo) {
-        for (String name : jo.keySet()) {
-            for (Plugin plugin : plugins) {
-                if (name.equals(plugin.toString())) {
-                    JSONObject po = jo.optJSONObject(name);
-                    if (po != null) {
-                        plugin.loadState(po);
-                    }
-                }
-            }
+        for (Plugin plugin : plugins) {
+            JSONObject po = jo.optJSONObject(plugin.toString());
+            if (po != null)
+                plugin.loadState(po);
         }
     }
 
