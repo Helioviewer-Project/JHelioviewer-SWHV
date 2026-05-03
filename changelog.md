@@ -31,7 +31,7 @@
 
 ### Technical
 - Update bundled libraries, native rendering libraries, and supporting tools
-- Various bug fixes, cleanups, and internal refactoring
+- Various bug fixes, cleanups, and major internal refactoring
 
 ## JHelioviewer 4.8.1 (2026-04-19)
 
