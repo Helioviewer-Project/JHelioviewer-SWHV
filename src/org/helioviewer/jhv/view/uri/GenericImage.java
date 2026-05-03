@@ -95,11 +95,11 @@ class GenericImage implements URIImageReader {
 
         switch (image.getType()) {
             case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> {
-                return new ImageBuffer(w, h, ImageBuffer.Format.Gray8,
+                return ImageBuffer.fromBytes(w, h, ImageBuffer.Format.Gray8,
                         ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filterType);
             }
             case BufferedImage.TYPE_USHORT_GRAY -> {
-                return new ImageBuffer(w, h, ImageBuffer.Format.Gray16,
+                return ImageBuffer.fromShorts(w, h, ImageBuffer.Format.Gray16,
                         ((DataBufferUShort) image.getRaster().getDataBuffer()).getData(), filterType);
             }
             default -> {
@@ -114,7 +114,7 @@ class GenericImage implements URIImageReader {
                     // avoidable native -> heap -> native copy.
                     byte[] buffer = new byte[w * h * 4];
                     NativeImageFactory.getByteBuffer(conv).get(buffer);
-                    return new ImageBuffer(w, h, ImageBuffer.Format.RGBA32, buffer);
+                    return ImageBuffer.fromBytes(w, h, ImageBuffer.Format.RGBA32, buffer);
                 } finally {
                     NativeImageFactory.free(conv);
                 }
