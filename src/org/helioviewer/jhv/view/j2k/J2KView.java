@@ -32,6 +32,7 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 
 import kdu_jni.KduException;
 
@@ -67,10 +68,12 @@ public class J2KView extends BaseView {
 
         try {
             boolean isJP2 = dataUri.format() == Image.JP2;
+            JPIPCache jpipCache = null;
             switch (dataUri.format()) {
                 case Image.JPIP -> {
-                    reader = new J2KReader(dataUri.uri());
-                    source = new J2KSource.Remote(reader.getCache());
+                    jpipCache = new JPIPCache();
+                    reader = new J2KReader(dataUri.uri(), jpipCache);
+                    source = new J2KSource.Remote(jpipCache);
                 }
                 case Image.JP2, Image.JPX -> {
                     reader = null;
@@ -125,7 +128,7 @@ public class J2KView extends BaseView {
             if (isJP2)
                 source.close(); // JP2, close asap
 
-            abolishable = reaper.register(cleanerToken, new J2KAbolisher(serial, reader, source));
+            abolishable = reaper.register(cleanerToken, new J2KAbolisher(serial, reader, source, jpipCache));
         } catch (Exception e) {
             String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
             throw new Exception(msg + ": " + dataUri, e);
@@ -136,7 +139,7 @@ public class J2KView extends BaseView {
         ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == aSerial);
     }
 
-    private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
+    private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource, JPIPCache aCache) implements Runnable {
         @Override
         public void run() {
             // reader abolish may take too long in stressed conditions
@@ -146,8 +149,9 @@ public class J2KView extends BaseView {
                         aReader.stop();
                     }
                     aSource.closeWhenUnused();
-                    if (aReader != null) {
-                        aReader.destroyCache();
+                    if (aCache != null) {
+                        aCache.Close();
+                        aCache.Native_destroy();
                     }
                     clearCache(aSerial);
                 } catch (KduException e) {

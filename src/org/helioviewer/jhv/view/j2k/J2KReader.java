@@ -16,7 +16,7 @@ import kdu_jni.KduException;
 class J2KReader implements Runnable {
 
     private final ArrayBlockingQueue<J2KParams.Read> signalQueue = new ArrayBlockingQueue<>(1);
-    private final JPIPCache cache = new JPIPCache();
+    private final JPIPCache cache;
     private final URI uri;
     private final Thread myThread;
 
@@ -24,8 +24,9 @@ class J2KReader implements Runnable {
     private JPIPSocket socket;
     private String[] cacheKey;
 
-    J2KReader(URI _uri) throws KduException, IOException {
+    J2KReader(URI _uri, JPIPCache _cache) throws KduException, IOException {
         uri = _uri;
+        cache = _cache;
 
         socket = new JPIPSocket(uri, cache);
         try {
@@ -38,10 +39,6 @@ class J2KReader implements Runnable {
         myThread = new Thread(this, "Reader " + uri);
         myThread.setDaemon(true);
         myThread.start();
-    }
-
-    JPIPCache getCache() {
-        return cache;
     }
 
     void setCacheKey(String[] _cacheKey) {
@@ -66,11 +63,6 @@ class J2KReader implements Runnable {
                 Log.error(e);
             }
         }
-    }
-
-    void destroyCache() throws KduException {
-        cache.Close();
-        cache.Native_destroy();
     }
 
     synchronized void signal(J2KParams.Read params) {
