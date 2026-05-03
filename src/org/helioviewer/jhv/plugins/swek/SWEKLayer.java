@@ -503,7 +503,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         JCheckBox check = new JCheckBox("Icons", icons);
         check.setHorizontalTextPosition(SwingConstants.LEFT);
         check.addActionListener(e -> {
-            icons = !icons;
+            icons = check.isSelected();
             MovieDisplay.display();
         });
 

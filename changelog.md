@@ -16,7 +16,7 @@
 - Support arbitrary detector-frame masks, including the bundled EUI occulting mask
 - Centralize caching and lifetime management of image-buffers. Move decoded image storage to direct/native buffers for GL upload
   and free them promptly on cache eviction (see `docs/image-buffer-cache.md`)
-- Avoid extra heap copies for the common unfiltered J2K decode path
+- Avoid extra heap copies for the common unfiltered image decode paths
 - Replace serialized JPIP stream caching with compact segment log files
 - Disable JPIP disk caching for the rest of the run after persistent-cache write/commit failures
 
