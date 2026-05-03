@@ -117,6 +117,8 @@ class PfssLoader {
                 int colZ = findColumn(hdu, "FIELDLINEz");
                 int colS = findColumn(hdu, "FIELDLINEs");
                 int rows = hdu.getNRows();
+                if (rows % points != 0)
+                    throw new Exception("Inconsistent PFSS table");
 
                 float[] lineX = new float[rows];
                 float[] lineY = new float[rows];
