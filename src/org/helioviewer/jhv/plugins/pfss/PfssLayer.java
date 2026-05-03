@@ -126,18 +126,21 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     private int lastDetail;
     private boolean lastFixedColor;
     private double lastRadius;
+    private boolean lastWhiteBackground;
 
     private void renderData(Viewport vp, PfssLoader.Data data) {
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();
+        boolean whiteBackground = JHVFrame.isWhiteBackground();
 
-        if (lastData != data || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius) {
+        if (lastData != data || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius || lastWhiteBackground != whiteBackground) {
             lastDetail = detail;
             lastFixedColor = fixedColor;
             lastRadius = radius;
+            lastWhiteBackground = whiteBackground;
 
-            PfssLine.calculatePositions(data, detail, fixedColor, radius, lineBuf);
+            PfssLine.calculatePositions(data, detail, fixedColor, radius, whiteBackground, lineBuf);
             glslLine.setVertex(lineBuf);
 
             pfssTime = data.dateObs();
