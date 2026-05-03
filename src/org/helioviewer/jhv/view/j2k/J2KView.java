@@ -143,9 +143,12 @@ public class J2KView extends BaseView {
             JHVThread.create(() -> {
                 try {
                     if (aReader != null) {
-                        aReader.abolish();
+                        aReader.stop();
                     }
                     aSource.closeWhenUnused();
+                    if (aReader != null) {
+                        aReader.destroyCache();
+                    }
                     clearCache(aSerial);
                 } catch (KduException e) {
                     Log.error(e);

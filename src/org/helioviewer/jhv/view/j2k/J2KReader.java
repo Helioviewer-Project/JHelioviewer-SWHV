@@ -49,7 +49,7 @@ class J2KReader implements Runnable {
     }
 
     // runs in abolish thread
-    void abolish() throws KduException {
+    void stop() {
         synchronized (this) {
             if (isAbolished)
                 return;
@@ -66,7 +66,9 @@ class J2KReader implements Runnable {
                 Log.error(e);
             }
         }
+    }
 
+    void destroyCache() throws KduException {
         cache.Close();
         cache.Native_destroy();
     }
