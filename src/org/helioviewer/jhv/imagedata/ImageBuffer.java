@@ -1,12 +1,11 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.lang.foreign.Arena;
-import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+
+import org.lwjgl.system.MemoryUtil;
 
 public final class ImageBuffer {
 
@@ -28,9 +27,6 @@ public final class ImageBuffer {
     public final Buffer buffer;
 
     private final Cleaner.Cleanable cleanable;
-    @SuppressWarnings("FieldCanBeLocal")
-    // Cleaner tracks reachability of this token; the cleanup action must not capture this ImageBuffer.
-    private final Object cleanerToken = new Object();
     private volatile boolean explicitFreeProtected;
 
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data) {
@@ -41,29 +37,34 @@ public final class ImageBuffer {
         if (format == Format.Gray16)
             throw new IllegalArgumentException("Gray16 image buffers must be created from short data");
         byte[] filtered = format == Format.RGBA32 ? data : ImageFilter.filter(data, width, height, filterType);
-        Arena arena = Arena.ofShared();
-        return new ImageBuffer(width, height, format, arena, allocateFrom(arena, filtered));
+        return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
     public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter.Type filterType) {
         if (format != Format.Gray16)
             throw new IllegalArgumentException("Only Gray16 image buffers can be created from short data");
         short[] filtered = ImageFilter.filter(data, width, height, filterType);
-        Arena arena = Arena.ofShared();
-        return new ImageBuffer(width, height, format, arena, allocateFrom(arena, filtered));
+        return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
     public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter.Type filterType) {
         return new WriteBuffer(width, height, format, filterType);
     }
 
-    private ImageBuffer(int _width, int _height, Format _format, Arena arena, Buffer _buffer) {
+    private ImageBuffer(int _width, int _height, Format _format, ByteBuffer _buffer) {
+        this(_width, _height, _format, _buffer, MemoryUtil.memAddress(_buffer));
+    }
+
+    private ImageBuffer(int _width, int _height, Format _format, ShortBuffer _buffer) {
+        this(_width, _height, _format, _buffer, MemoryUtil.memAddress(_buffer));
+    }
+
+    private ImageBuffer(int _width, int _height, Format _format, Buffer _buffer, long address) {
         width = _width;
         height = _height;
         format = _format;
         buffer = _buffer;
-
-        cleanable = cleaner.register(cleanerToken, new ArenaState(arena));
+        cleanable = cleaner.register(buffer, new BufferState(address));
     }
 
     public int byteSize() {
@@ -102,8 +103,7 @@ public final class ImageBuffer {
             filterType = _filterType;
 
             if (usesDirectBuffer(format, filterType)) {
-                Arena arena = Arena.ofShared();
-                directBuffer = new ImageBuffer(width, height, format, arena, allocate(arena, byteSize(width, height, format), format));
+                directBuffer = allocate(width, height, format);
                 byteArray = null;
                 shortArray = null;
                 writeBuffer = directBuffer.buffer;
@@ -141,36 +141,40 @@ public final class ImageBuffer {
         }
     }
 
-    private static final class ArenaState implements Runnable {
-        private Arena arena;
+    private static final class BufferState implements Runnable {
+        private long address;
 
-        private ArenaState(Arena _arena) {
-            arena = _arena;
+        private BufferState(long _address) {
+            address = _address;
         }
 
         @Override
         public void run() {
-            if (arena == null)
+            if (address == 0)
                 return;
-            arena.close();
-            arena = null;
+            MemoryUtil.nmemFree(address);
+            address = 0;
         }
     }
 
-    private static Buffer allocate(Arena arena, int byteSize, Format format) {
-        ByteBuffer byteBuffer = arena.allocate(byteSize).asByteBuffer();
-        return format == Format.Gray16 ? byteBuffer.order(ByteOrder.nativeOrder()).asShortBuffer() : byteBuffer;
+    private static ImageBuffer allocate(int width, int height, Format format) {
+        int byteSize = byteSize(width, height, format);
+        return switch (format) {
+            case Gray8, RGBA32 -> new ImageBuffer(width, height, format, MemoryUtil.memAlloc(byteSize));
+            case Gray16 -> new ImageBuffer(width, height, format, MemoryUtil.memAllocShort(byteSize / Short.BYTES));
+        };
     }
 
-    private static Buffer allocateFrom(Arena arena, byte[] data) {
-        return arena.allocateFrom(ValueLayout.JAVA_BYTE, data).asByteBuffer();
+    private static ByteBuffer allocateFrom(byte[] data) {
+        ByteBuffer buffer = MemoryUtil.memAlloc(data.length);
+        buffer.put(data);
+        return buffer.flip();
     }
 
-    private static Buffer allocateFrom(Arena arena, short[] data) {
-        return arena.allocateFrom(ValueLayout.JAVA_SHORT, data)
-                .asByteBuffer()
-                .order(ByteOrder.nativeOrder())
-                .asShortBuffer();
+    private static ShortBuffer allocateFrom(short[] data) {
+        ShortBuffer buffer = MemoryUtil.memAllocShort(data.length);
+        buffer.put(data);
+        return buffer.flip();
     }
 
     private static int byteSize(int width, int height, Format format) {
