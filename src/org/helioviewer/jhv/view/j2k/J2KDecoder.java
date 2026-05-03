@@ -101,10 +101,8 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             boolean gray = numComps < 3;
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
             ImageBuffer.Format format = gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
-            // Allocate direct buffer for no-filter gray, heap buffer otherwise.
-            ImageBuffer outImageBuffer = filterType == ImageFilter.Type.None ? new ImageBuffer(actualWidth, actualHeight, format) : null;
-            byte[] outBuffer = outImageBuffer == null ? new byte[actualWidth * actualHeight * format.bytes] : null;
-            ByteBuffer outByteBuffer = outImageBuffer == null ? ByteBuffer.wrap(outBuffer) : (ByteBuffer) outImageBuffer.buffer;
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filterType);
+            ByteBuffer outByteBuffer = outBuffer.byteBuffer();
 
             Kdu_dims newRegion = scratch.newRegion;
             newRegion.From_u32(0, 0, 0, 0);
@@ -137,7 +135,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-            return outImageBuffer == null ? new ImageBuffer(actualWidth, actualHeight, format, outBuffer, filterType) : outImageBuffer;
+            return outBuffer.finish();
         } catch (KduException e) {
             recreateThreadEnv = true;
             throw e;

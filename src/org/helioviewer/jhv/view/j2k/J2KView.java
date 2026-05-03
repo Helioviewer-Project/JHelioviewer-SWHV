@@ -43,7 +43,8 @@ public class J2KView extends BaseView {
 
     private static final Cleaner reaper = Cleaner.create();
     private final Cleaner.Cleanable abolishable;
-    // cleaner tracks reachability of this token
+    @SuppressWarnings("FieldCanBeLocal")
+    // Cleaner tracks reachability of this token; the cleanup action must not capture this J2KView.
     private final Object cleanerToken = new Object();
 
     private final APIRequest request;

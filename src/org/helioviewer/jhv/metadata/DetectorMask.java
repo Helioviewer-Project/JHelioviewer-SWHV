@@ -9,7 +9,7 @@ import org.helioviewer.jhv.view.uri.FITSImage;
 
 public final class DetectorMask {
 
-    private static final ImageBuffer BUILTIN_NONE = new ImageBuffer(1, 1, ImageBuffer.Format.Gray8, new byte[]{(byte) 0xFF});
+    private static final ImageBuffer BUILTIN_NONE = ImageBuffer.fromBytes(1, 1, ImageBuffer.Format.Gray8, new byte[]{(byte) 0xFF});
     private static final String EUI_OCCULTED_RESOURCE = "/data/eui_mask_2x2_1504.fits";
 
     public static final DetectorMask NONE = new DetectorMask(BUILTIN_NONE);

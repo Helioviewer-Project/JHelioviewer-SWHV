@@ -3,6 +3,8 @@ package org.helioviewer.jhv.view.uri;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -165,19 +167,19 @@ public class FITSImage implements URIImageReader {
         return new SampleBuffer(samples, sampleLen);
     }
 
-    private static void processPixel(short[] outData, int outIdx, float v, float minV, float maxV, float range,
+    private static void processPixel(ShortBuffer outData, int outIdx, float v, float minV, float maxV, float range,
                                      FITSViewState.Data state, double scale) {
         if (v == BAD_PIXEL) {
-            outData[outIdx] = 0;
+            outData.put(outIdx, (short) 0);
         } else {
             v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
             float d = v - minV;
             double mapped = state.mapScaled(d, range);
-            outData[outIdx] = (short) Math.clamp((int) (scale * mapped + .5), 0, 65535);
+            outData.put(outIdx, (short) Math.clamp((int) (scale * mapped + .5), 0, 65535));
         }
     }
 
-    private static void convertPixels(Object pixels, short[] outData, long blank, double bzero, double bscale,
+    private static void convertPixels(Object pixels, ShortBuffer outData, long blank, double bzero, double bscale,
                                       int width, int height, float minV, float maxV, float range,
                                       FITSViewState.Data state, double scale) throws Exception {
         boolean hasBlank = blank != BLANK;
@@ -279,11 +281,12 @@ public class FITSImage implements URIImageReader {
         int width = axes[1];
 
         if (pixels instanceof byte[] inData) {
-            byte[] outData = new byte[width * height];
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filterType);
+            ByteBuffer outData = outBuffer.byteBuffer();
             for (int j = 0; j < height; j++) {
-                System.arraycopy(inData, width * j, outData, width * (height - 1 - j), width);
+                outData.put(width * (height - 1 - j), inData, width * j, width);
             }
-            return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, outData, filterType);
+            return outBuffer.finish();
         }
 
         long blank = header.getLongValue(Standard.BLANK, BLANK);
@@ -302,7 +305,7 @@ public class FITSImage implements URIImageReader {
                 SampleBuffer sampleData = sampleImage(pixels, blank, bzero, bscale, width, height);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                    return new ImageBuffer(width, height, ImageBuffer.Format.Gray8, new byte[width * height], filterType);
+                    return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filterType).finish();
 
                 if (autoMode) {
                     int kMin = Math.clamp((int) (MIN_MULT * sampleLen), 0, sampleLen - 1);
@@ -326,16 +329,16 @@ public class FITSImage implements URIImageReader {
         }
         // System.out.println(">>> " + min + ' ' + max);
 
-        short[] outData = new short[width * height];
+        ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16, filterType);
         double scale = state.scaleFactor(min, max);
         float minV = min;
         float maxV = max;
         float range = maxV - minV;
 
         //Stopwatch sw = Stopwatch.createStarted();
-        convertPixels(pixels, outData, blank, bzero, bscale, width, height, minV, maxV, range, state, scale);
+        convertPixels(pixels, outBuffer.shortBuffer(), blank, bzero, bscale, width, height, minV, maxV, range, state, scale);
         //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
-        return new ImageBuffer(width, height, ImageBuffer.Format.Gray16, outData, filterType);
+        return outBuffer.finish();
     }
 
     private static final String nl = System.lineSeparator();
