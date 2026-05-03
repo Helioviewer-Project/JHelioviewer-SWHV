@@ -48,7 +48,7 @@ public final class MainContentPanel extends JPanel {
 
     // Adds a plug-in and the associated GUI to the container. The GUI will be displayed below the main component.
     public void addPlugin(Interfaces.MainContentPanelPlugin plugin) {
-        if (plugin == null || pluginList.contains(plugin)) {
+        if (plugin == null || pluginList.contains(plugin) || plugin.getVisualInterfaces().isEmpty()) {
             return;
         }
         ComponentUtils.setVisible(plugin.getVisualInterfaces().getFirst(), collapsiblePane.toggleButton.isSelected());
@@ -59,7 +59,8 @@ public final class MainContentPanel extends JPanel {
     // Removes a plug-in and the associated GUI from the container
     public void removePlugin(Interfaces.MainContentPanelPlugin plugin) {
         if (pluginList.remove(plugin)) {
-            ComponentUtils.setVisible(plugin.getVisualInterfaces().getFirst(), false);
+            if (!plugin.getVisualInterfaces().isEmpty())
+                ComponentUtils.setVisible(plugin.getVisualInterfaces().getFirst(), false);
             updateLayout();
         }
     }
