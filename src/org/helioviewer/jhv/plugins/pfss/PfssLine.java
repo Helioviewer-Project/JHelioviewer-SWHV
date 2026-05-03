@@ -6,25 +6,30 @@ import org.helioviewer.jhv.opengl.BufVertex;
 class PfssLine {
 
     private static final byte[] openFieldColor = Colors.Red;
-    private static final byte[] loopColor = Colors.White;
     private static final byte[] insideFieldColor = Colors.Blue;
 
-    private static void computeBrightColor(float b, byte[] brightColor) {
+    private static void computeBrightColor(float b, boolean whiteBackground, byte[] brightColor) {
+        byte midpoint = whiteBackground ? 0 : (byte) 255;
+        float t = Math.abs(b);
         if (b > 0) {
-            byte bb = (byte) (255 * (1f - b));
-            brightColor[0] = (byte) 255;
+            byte bb = mix(midpoint, (byte) 0, t);
+            brightColor[0] = mix(midpoint, (byte) 255, t);
             brightColor[1] = bb;
             brightColor[2] = bb;
         } else {
-            byte bb = (byte) (255 * (1f + b));
+            byte bb = mix(midpoint, (byte) 0, t);
             brightColor[0] = bb;
             brightColor[1] = bb;
-            brightColor[2] = (byte) 255;
+            brightColor[2] = mix(midpoint, (byte) 255, t);
         }
         brightColor[3] = (byte) 255;
     }
 
-    static void calculatePositions(PfssLoader.Data data, int detail, boolean fixedColor, double radius, BufVertex vexBuf) {
+    private static byte mix(byte from, byte to, float t) {
+        return (byte) ((from & 0xFF) + t * ((to & 0xFF) - (from & 0xFF)));
+    }
+
+    static void calculatePositions(PfssLoader.Data data, int detail, boolean fixedColor, double radius, boolean whiteBackground, BufVertex vexBuf) {
         float[] lineX = data.lineX();
         float[] lineY = data.lineY();
         float[] lineZ = data.lineZ();
@@ -32,8 +37,9 @@ class PfssLine {
         int points = data.points();
         int nlines = lineX.length / points;
 
-        byte[] brightColor = new byte[4];
+        byte[] loopColor = whiteBackground ? Colors.Black : Colors.White;
         byte[] oneColor = loopColor;
+        byte[] brightColor = new byte[4];
 
         for (int j = 0; j < nlines; j++) {
             if (j % (PfssSettings.MAX_DETAIL + 1) <= detail) {
@@ -45,7 +51,7 @@ class PfssLine {
                     double r = Math.sqrt(x * x + y * y + z * z);
 
                     float b = lineS[idx]; // this can be index in LUT
-                    computeBrightColor(b, brightColor);
+                    computeBrightColor(b, whiteBackground, brightColor);
 
                     if (i == 0) {
                         vexBuf.putVertex(x, z, -y, 1, Colors.Null);

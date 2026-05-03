@@ -297,6 +297,10 @@ public final class JHVFrame {
             renderCanvas.setWhiteBackground(whiteBackground);
     }
 
+    public static boolean isWhiteBackground() {
+        return whiteBackground;
+    }
+
     public static int getFramerate() {
         return renderCanvas != null ? renderCanvas.getFramerate() : 0;
     }
