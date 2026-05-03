@@ -139,7 +139,8 @@ public class J2KView extends BaseView {
         ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == aSerial);
     }
 
-    private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource, JPIPCache aCache) implements Runnable {
+    private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource,
+                                JPIPCache aCache) implements Runnable {
         @Override
         public void run() {
             // reader abolish may take too long in stressed conditions
