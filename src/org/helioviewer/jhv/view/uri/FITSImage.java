@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 import org.helioviewer.jhv.base.ArrayUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageFilter;
+import org.helioviewer.jhv.math.MathUtils;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -21,7 +22,6 @@ import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
-//import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;
 
@@ -167,22 +167,46 @@ public class FITSImage implements URIImageReader {
         return new SampleBuffer(samples, sampleLen);
     }
 
-    private static void processPixel(ShortBuffer outData, int outIdx, float v, float minV, float maxV, float range,
-                                     FITSViewState.Data state, double scale) {
+    private interface PixelScaler {
+        double map(float d);
+    }
+
+    private record PixelMapping(PixelScaler scaler, double scale) {}
+
+    private static PixelMapping pixelMapping(FITSViewState.Data state, float range) {
+        return switch (state.scalingMode()) {
+            case Gamma -> {
+                double gamma = state.gamma();
+                yield new PixelMapping(d -> Math.pow(d, gamma), 65535. / Math.pow(range, gamma));
+            }
+            case Beta -> {
+                double beta = state.beta();
+                yield new PixelMapping(d -> MathUtils.asinh(d * beta), 65535. / MathUtils.asinh(range * beta));
+            }
+            case Alpha -> {
+                double alpha = state.alpha();
+                yield new PixelMapping(d -> Math.log1p(d / range * alpha), 65535. / Math.log1p(alpha));
+            }
+        };
+    }
+
+    private static void processPixel(ShortBuffer outData, int outIdx, float v, float min, float max,
+                                     PixelScaler scaler, double scale) {
         if (v == BAD_PIXEL) {
             outData.put(outIdx, (short) 0);
         } else {
-            v = Math.clamp(v, minV, maxV); // sampling may have missed extremes
-            float d = v - minV;
-            double mapped = state.mapScaled(d, range);
+            v = Math.clamp(v, min, max); // sampling may have missed extremes
+            double mapped = scaler.map(v - min);
             outData.put(outIdx, (short) Math.clamp((int) (scale * mapped + .5), 0, 65535));
         }
     }
 
     private static void convertPixels(Object pixels, ShortBuffer outData, long blank, double bzero, double bscale,
-                                      int width, int height, float minV, float maxV, float range,
-                                      FITSViewState.Data state, double scale) throws Exception {
+                                      int width, int height, float min, float max, FITSViewState.Data state) throws Exception {
+        PixelMapping mapping = pixelMapping(state, max - min);
         boolean hasBlank = blank != BLANK;
+        PixelScaler scaler = mapping.scaler();
+        double scale = mapping.scale();
 
         switch (pixels) {
             case short[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -192,7 +216,7 @@ public class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     short raw = inData[inLine + i];
                     float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
+                    processPixel(outData, outIdx, v, min, max, scaler, scale);
                 }
             });
             case int[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -202,7 +226,7 @@ public class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     int raw = inData[inLine + i];
                     float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
+                    processPixel(outData, outIdx, v, min, max, scaler, scale);
                 }
             });
             case long[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -212,7 +236,7 @@ public class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     long raw = inData[inLine + i];
                     float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
+                    processPixel(outData, outIdx, v, min, max, scaler, scale);
                 }
             });
             case float[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -221,7 +245,7 @@ public class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(inData[inLine + i], bzero, bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
+                    processPixel(outData, outIdx, v, min, max, scaler, scale);
                 }
             });
             case double[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -230,7 +254,7 @@ public class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(inData[inLine + i], bzero, bscale);
-                    processPixel(outData, outIdx, v, minV, maxV, range, state, scale);
+                    processPixel(outData, outIdx, v, min, max, scaler, scale);
                 }
             });
             default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
@@ -330,14 +354,7 @@ public class FITSImage implements URIImageReader {
         // System.out.println(">>> " + min + ' ' + max);
 
         ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16, filterType);
-        double scale = state.scaleFactor(min, max);
-        float minV = min;
-        float maxV = max;
-        float range = maxV - minV;
-
-        //Stopwatch sw = Stopwatch.createStarted();
-        convertPixels(pixels, outBuffer.shortBuffer(), blank, bzero, bscale, width, height, minV, maxV, range, state, scale);
-        //System.out.println(">>> " + sw.elapsed().toNanos() / 1e9);
+        convertPixels(pixels, outBuffer.shortBuffer(), blank, bzero, bscale, width, height, min, max, state);
         return outBuffer.finish();
     }
 

@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.uri;
 import java.util.ArrayList;
 
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.math.MathUtils;
 
 public final class FITSViewState {
 
@@ -57,22 +56,6 @@ public final class FITSViewState {
 
         public int alphaIndex() {
             return clamp((int) Math.log10(alpha), ALPHA_SLIDER_MIN, ALPHA_SLIDER_MAX);
-        }
-
-        public double mapScaled(float d, float range) {
-            return switch (scalingMode) {
-                case Gamma -> Math.pow(d, gamma);
-                case Beta -> MathUtils.asinh(d * beta);
-                case Alpha -> Math.log1p(d / range * alpha);
-            };
-        }
-
-        public double scaleFactor(float min, float max) {
-            return switch (scalingMode) {
-                case Gamma -> 65535. / Math.pow(max - min, gamma);
-                case Beta -> 65535. / MathUtils.asinh((max - min) * beta);
-                case Alpha -> 65535. / Math.log1p(alpha);
-            };
         }
     }
 
