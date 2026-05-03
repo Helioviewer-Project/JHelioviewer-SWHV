@@ -141,7 +141,11 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
 
     public void remove(Layer layer) {
         int row = layers.indexOf(layer);
-        layers.remove(layer);
+        if (row < 0)
+            return;
+
+        layers.remove(row);
+        newLayers.remove(layer);
         removedLayers.add(layer);
 
         if (layer == activeLayer) {
@@ -149,8 +153,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
             setActiveImageLayer(count == 0 ? null : (ImageLayer) layers.get(count - 1));
         }
 
-        if (row >= 0)
-            fireTableRowsDeleted(row, row);
+        fireTableRowsDeleted(row, row);
         MovieDisplay.display();
     }
 
@@ -293,6 +296,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
 
     public static void clear() {
         removedLayers.addAll(layers);
+        newLayers.clear();
         layers = new LayerList();
         setActiveImageLayer(null);
     }
