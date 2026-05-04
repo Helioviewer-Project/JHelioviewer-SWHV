@@ -7,16 +7,24 @@ import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-class InteractionAnnotate implements Interaction.Type {
+class InteractionAnnotate {
 
     private final Camera camera;
+    private AnnotationMode annotationMode = AnnotationMode.Cross;//Rectangle;
 
     InteractionAnnotate(Camera _camera) {
         camera = _camera;
     }
 
-    @Override
-    public void mousePressed(PointerEvent e, Viewport vp, AnnotationMode annotationMode) {
+    void setAnnotationMode(AnnotationMode _annotationMode) {
+        annotationMode = _annotationMode;
+    }
+
+    AnnotationMode getAnnotationMode() {
+        return annotationMode;
+    }
+
+    public void mousePressed(PointerEvent e, Viewport vp) {
         Annotateable annotateable = annotationMode.generate(null);
         Annotations.start(annotateable);
         annotateable.mousePressed(camera, vp, e.x(), e.y());
@@ -26,7 +34,6 @@ class InteractionAnnotate implements Interaction.Type {
         MovieDisplay.display();
     }
 
-    @Override
     public void mouseDragged(PointerEvent e, Viewport vp) {
         Annotateable pending = Annotations.pending();
         if (pending != null && pending.isDraggable()) {
@@ -40,12 +47,10 @@ class InteractionAnnotate implements Interaction.Type {
         MovieDisplay.display();
     }
 
-    @Override
-    public void mouseReleased(PointerEvent e) {
+    public void mouseReleased() {
         finishAnnotateable();
     }
 
-    @Override
     public void keyPressed(KeyInputEvent e) {
         if (e.key() == KeyInputEvent.Key.BACKSPACE || e.key() == KeyInputEvent.Key.DELETE) {
             Annotations.removeActive();

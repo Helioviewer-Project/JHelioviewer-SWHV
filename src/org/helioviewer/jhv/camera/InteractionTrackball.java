@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -20,7 +19,7 @@ abstract class InteractionTrackball implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(PointerEvent e, Viewport vp, AnnotationMode annotationMode) {
+    public void mousePressed(PointerEvent e, Viewport vp) {
         trackballRadius2 = CameraHelper.selectTrackballRadius2(camera, vp, e.x(), e.y());
         lastMouseX = e.x();
         lastMouseY = e.y();
@@ -42,7 +41,7 @@ abstract class InteractionTrackball implements Interaction.Type {
     }
 
     @Override
-    public void mouseReleased(PointerEvent e) {
+    public void mouseReleased() {
         dragStartSet = false;
     }
 
