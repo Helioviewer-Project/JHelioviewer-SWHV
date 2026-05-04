@@ -35,10 +35,6 @@ public final class Annotations {
 
     private Annotations() {}
 
-    static Interaction.Type interaction(Camera camera) {
-        return new InteractionAnnotate(camera);
-    }
-
     static void start(Annotateable annotateable) {
         pending = annotateable;
     }
