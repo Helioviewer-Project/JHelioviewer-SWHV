@@ -15,6 +15,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
 public class JHVRelatedEvents implements ClickableDrawable {
@@ -101,6 +102,7 @@ public class JHVRelatedEvents implements ClickableDrawable {
 
     private static void fireHighlightChanged() {
         listeners.forEach(JHVEventListener.Highlight::highlightChanged);
+        MovieDisplay.display();
     }
 
     public JHVEvent getClosestTo(long timestamp) {
