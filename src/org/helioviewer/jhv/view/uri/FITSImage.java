@@ -75,8 +75,6 @@ public class FITSImage implements URIImageReader {
         }
     }
 
-    private static final long BLANK = 0; // in case it doesn't exist, very unlikely value
-
     private static float floatPixel(double v, double bzero, double bscale) {
         if (Double.isNaN(v)) {
             return BAD_PIXEL;
@@ -93,16 +91,13 @@ public class FITSImage implements URIImageReader {
 
     private record SampleBuffer(float[] values, int length) {}
 
-    private static SampleBuffer sampleImage(Object pixels, long blank, double bzero, double bscale, int width,
-                                            int height) throws Exception {
+    private static SampleBuffer sampleImage(Object pixels, boolean hasBlank, long blank, double bzero, double bscale, int width, int height) throws Exception {
         int stepW = Math.max(SAMPLE * width / 1024, 1);
         int stepH = Math.max(SAMPLE * height / 1024, 1);
         int sampleRows = (height + stepH - 1) / stepH;
         int sampleCols = (width + stepW - 1) / stepW;
         float[] samples = new float[sampleRows * sampleCols];
         int sampleLen = 0;
-        boolean hasBlank = blank != BLANK;
-
         switch (pixels) {
             case short[] inData -> {
                 for (int j = 0; j < height; j += stepH) {
@@ -200,9 +195,7 @@ public class FITSImage implements URIImageReader {
         return (short) Math.clamp((int) (scale * mapped + .5), 0, 65535);
     }
 
-    private static short[] shortLookup(long blank, double bzero, double bscale, float min, float max,
-                                       PixelMapping mapping) {
-        boolean hasBlank = blank != BLANK;
+    private static short[] shortLookup(boolean hasBlank, long blank, double bzero, double bscale, float min, float max, PixelMapping mapping) {
         PixelScaler scaler = mapping.scaler();
         double scale = mapping.scale();
         short[] lookup = new short[1 << 16];
@@ -215,16 +208,15 @@ public class FITSImage implements URIImageReader {
         return lookup;
     }
 
-    private static void convertPixels(Object pixels, ShortBuffer outData, long blank, double bzero, double bscale,
+    private static void convertPixels(Object pixels, ShortBuffer outData, boolean hasBlank, long blank, double bzero, double bscale,
                                       int width, int height, float min, float max, FITSViewState.Data state) throws Exception {
         PixelMapping mapping = pixelMapping(state, max - min);
-        boolean hasBlank = blank != BLANK;
         PixelScaler scaler = mapping.scaler();
         double scale = mapping.scale();
 
         switch (pixels) {
             case short[] inData -> {
-                short[] lookup = shortLookup(blank, bzero, bscale, min, max, mapping);
+                short[] lookup = shortLookup(hasBlank, blank, bzero, bscale, min, max, mapping);
                 IntStream.range(0, height).parallel().forEach(j -> {
                     int inLine = width * j;
                     int outLine = width * (height - 1 - j);
@@ -326,7 +318,8 @@ public class FITSImage implements URIImageReader {
             return outBuffer.finish();
         }
 
-        long blank = header.getLongValue(Standard.BLANK, BLANK);
+        boolean hasBlank = header.containsKey(Standard.BLANK);
+        long blank = hasBlank ? header.getLongValue(Standard.BLANK) : 0;
         double bzero = header.getDoubleValue(Standard.BZERO, 0);
         double bscale = header.getDoubleValue(Standard.BSCALE, 1);
         FITSViewState.Data state = FITSViewState.data();
@@ -339,7 +332,7 @@ public class FITSImage implements URIImageReader {
                 max = (float) state.clippingMax();
             } else {
                 boolean autoMode = state.clippingMode() == FITSViewState.ClippingMode.Auto;
-                SampleBuffer sampleData = sampleImage(pixels, blank, bzero, bscale, width, height);
+                SampleBuffer sampleData = sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                     return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filterType).finish();
@@ -367,7 +360,7 @@ public class FITSImage implements URIImageReader {
         // System.out.println(">>> " + min + ' ' + max);
 
         ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16, filterType);
-        convertPixels(pixels, outBuffer.shortBuffer(), blank, bzero, bscale, width, height, min, max, state);
+        convertPixels(pixels, outBuffer.shortBuffer(), hasBlank, blank, bzero, bscale, width, height, min, max, state);
         return outBuffer.finish();
     }
 
