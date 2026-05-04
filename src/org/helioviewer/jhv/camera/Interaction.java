@@ -1,15 +1,11 @@
 package org.helioviewer.jhv.camera;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.input.ScrollEvent;
-
-import org.json.JSONObject;
 
 public class Interaction {
 
@@ -26,8 +22,7 @@ public class Interaction {
     }
 
     private final Camera camera;
-    private final Annotations annotations;
-    private final InteractionAnnotate interactionAnnotate;
+    private final Type interactionAnnotate;
     private final InteractionAxis interactionAxis;
     private final InteractionPan interactionPan;
     private final InteractionRotate interactionRotate;
@@ -39,8 +34,7 @@ public class Interaction {
 
     public Interaction(Camera _camera) {
         camera = _camera;
-        annotations = new Annotations();
-        interactionAnnotate = new InteractionAnnotate(camera, annotations);
+        interactionAnnotate = Annotations.interaction(camera);
         interactionAxis = new InteractionAxis(camera);
         interactionPan = new InteractionPan(camera);
         interactionRotate = new InteractionRotate(camera);
@@ -84,7 +78,7 @@ public class Interaction {
     }
 
     public void mouseReleased(PointerEvent e) {
-        if (interactionAnnotate.hasPendingAnnotateable())
+        if (Annotations.hasPending())
             interactionAnnotate.mouseReleased(e);
         else
             getType().mouseReleased(e);
@@ -113,39 +107,6 @@ public class Interaction {
 
     public void keyReleased(KeyInputEvent e) {
         annotate = e.shiftDown();
-    }
-
-    public void clearAnnotations() {
-        annotations.clear();
-    }
-
-    public void zoomAnnotations() {
-        annotations.zoom(camera);
-    }
-
-    public void initAnnotations() {
-        annotations.init();
-    }
-
-    public void disposeAnnotations() {
-        annotations.dispose();
-    }
-
-    public void drawAnnotations(Viewport vp) {
-        annotations.render(camera, vp);
-    }
-
-    @Nullable
-    public Object getAnnotationData() {
-        return annotations.getAnnotationData();
-    }
-
-    public JSONObject saveAnnotations() {
-        return annotations.toJson();
-    }
-
-    public void loadAnnotations(JSONObject jo) {
-        annotations.fromJson(jo);
     }
 
 }

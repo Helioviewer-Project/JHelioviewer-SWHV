@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;

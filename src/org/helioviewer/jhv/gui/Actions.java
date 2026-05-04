@@ -17,6 +17,8 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
+import org.helioviewer.jhv.camera.Annotations;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
@@ -53,7 +55,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JHVFrame.getInteraction().clearAnnotations();
+            Annotations.clear();
             MovieDisplay.display();
         }
     }
@@ -372,7 +374,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JHVFrame.getInteraction().zoomAnnotations();
+            Annotations.zoom(Display.getCamera());
             MovieDisplay.render(1);
         }
     }

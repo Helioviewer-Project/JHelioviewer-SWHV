@@ -1,12 +1,12 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.base.Region;
+import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
@@ -35,7 +35,7 @@ public final class GLRenderer {
         GLSLShapeShader.init();
         GLSLTextureShader.init();
 
-        JHVFrame.getInteraction().initAnnotations();
+        Annotations.init();
     }
 
     public static void reshape(int glWidth, int glHeight) {
@@ -67,7 +67,7 @@ public final class GLRenderer {
 
     public static void dispose() {
         Layers.dispose();
-        JHVFrame.getInteraction().disposeAnnotations();
+        Annotations.dispose();
         ExportMovie.dispose();
         GLText.dispose();
 
@@ -95,7 +95,7 @@ public final class GLRenderer {
             GLSLSolar.quad.render();
 
             Layers.render(camera, vp);
-            JHVFrame.getInteraction().drawAnnotations(vp);
+            Annotations.render(camera, vp);
             Layers.renderFloat(camera, vp);
         }
     }
@@ -138,7 +138,7 @@ public final class GLRenderer {
             GLSLSolarShader.bindScreen(vp);
 
             Layers.renderScale(camera, vp);
-            JHVFrame.getInteraction().drawAnnotations(vp);
+            Annotations.render(camera, vp);
             Layers.renderFloat(camera, vp);
         }
     }

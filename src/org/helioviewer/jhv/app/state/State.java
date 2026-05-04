@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -52,7 +53,7 @@ public final class State {
         JSONObject main = new JSONObject();
         main.put("time", Movie.getTime());
         ViewState.writeModeJson(main);
-        main.put("annotations", JHVFrame.getInteraction().saveAnnotations());
+        main.put("annotations", Annotations.toJson());
 
         JSONArray ja = new JSONArray();
         for (Layer layer : Layers.getLayers()) {
@@ -185,7 +186,7 @@ public final class State {
             }
         }
 
-        JHVFrame.getInteraction().loadAnnotations(data.optJSONObject("annotations"));
+        Annotations.fromJson(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         EDTCallbackExecutor.pool.submit(
