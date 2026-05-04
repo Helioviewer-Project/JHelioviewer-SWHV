@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.camera.annotate.Annotateable;
+import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -17,7 +18,7 @@ class InteractionAnnotate implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(PointerEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
+    public void mousePressed(PointerEvent e, Viewport vp, AnnotationMode annotationMode) {
         Annotateable annotateable = annotationMode.generate(null);
         annotations.start(annotateable);
         annotateable.mousePressed(camera, vp, e.x(), e.y());

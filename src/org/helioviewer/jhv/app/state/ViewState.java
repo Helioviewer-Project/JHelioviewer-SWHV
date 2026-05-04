@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.camera.Interaction;
+import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -117,7 +118,7 @@ public final class ViewState {
         }
     }
 
-    public record ModeData(ProjectionMode projection, Interaction.AnnotationMode annotationMode, boolean multiview,
+    public record ModeData(ProjectionMode projection, AnnotationMode annotationMode, boolean multiview,
                            boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {}
 
     public record PlaybackData(Movie.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit,
@@ -132,7 +133,7 @@ public final class ViewState {
     private static boolean suppressModeNotifications;
 
     private static ProjectionMode projection = Display.mode;
-    private static Interaction.AnnotationMode annotationMode = Interaction.AnnotationMode.Cross;
+    private static AnnotationMode annotationMode = AnnotationMode.Cross;
     private static boolean multiview = Display.multiview;
     private static boolean tracking = Display.getCamera().getTrackingMode();
     private static boolean refresh = ImageLayers.getRefreshMode();
@@ -174,7 +175,7 @@ public final class ViewState {
     public static ModeData readModeJson(JSONObject source) {
         ModeData current = modeData();
         ProjectionMode projectionValue = current.projection();
-        Interaction.AnnotationMode annotationModeValue = current.annotationMode();
+        AnnotationMode annotationModeValue = current.annotationMode();
         boolean multiviewValue = current.multiview();
         boolean trackingValue = current.tracking();
         boolean refreshValue = current.refresh();
@@ -188,7 +189,7 @@ public final class ViewState {
             Log.warn("Ignoring invalid projection state value: " + projectionName, e);
         }
         try {
-            annotationModeValue = Interaction.AnnotationMode.valueOf(annotationModeName);
+            annotationModeValue = AnnotationMode.valueOf(annotationModeName);
         } catch (IllegalArgumentException e) {
             Log.warn("Ignoring invalid annotation mode state value: " + annotationModeName, e);
         }
@@ -238,7 +239,7 @@ public final class ViewState {
 
     private static void applyModeUpdate(
             @Nullable ProjectionMode projection,
-            @Nullable Interaction.AnnotationMode annotationMode,
+            @Nullable AnnotationMode annotationMode,
             @Nullable Boolean multiview,
             @Nullable Boolean tracking,
             @Nullable Boolean refresh,
@@ -265,7 +266,7 @@ public final class ViewState {
             @Nullable String differentialRotation) {
         applyModeUpdate(
                 parseEnum(projection, ProjectionMode.class, "projection"),
-                parseEnum(annotationMode, Interaction.AnnotationMode.class, "annotation mode"),
+                parseEnum(annotationMode, AnnotationMode.class, "annotation mode"),
                 parseBoolean(multiview, "multiview"),
                 parseBoolean(tracking, "tracking"),
                 parseBoolean(refresh, "refresh"),
@@ -291,11 +292,11 @@ public final class ViewState {
             annotationMode = JHVFrame.getInteraction().getAnnotationMode();
     }
 
-    public static Interaction.AnnotationMode getAnnotationMode() {
+    public static AnnotationMode getAnnotationMode() {
         return annotationMode;
     }
 
-    public static void setAnnotationMode(Interaction.AnnotationMode newAnnotationMode) {
+    public static void setAnnotationMode(AnnotationMode newAnnotationMode) {
         if (annotationMode == newAnnotationMode)
             return;
 

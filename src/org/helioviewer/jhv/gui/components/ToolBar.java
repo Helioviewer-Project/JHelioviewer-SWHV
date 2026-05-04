@@ -20,6 +20,7 @@ import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.Interaction;
+import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -122,7 +123,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private JideToggleButton coronaButton;
     private JideToggleButton diffRotationButton;
     private JideToggleButton multiviewButton;
-    private final EnumMap<Interaction.AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(Interaction.AnnotationMode.class);
+    private final EnumMap<AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(AnnotationMode.class);
     private final EnumMap<ProjectionMode, JRadioButtonMenuItem> projectionItems = new EnumMap<>(ProjectionMode.class);
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
@@ -235,7 +236,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
         JideSplitButton annotationButton = toolSplitButton(ANNOTATION);
         ButtonGroup annotationGroup = new ButtonGroup();
-        for (Interaction.AnnotationMode mode : Interaction.AnnotationMode.values()) {
+        for (AnnotationMode mode : AnnotationMode.values()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(mode.toString());
             if (mode == ViewState.getAnnotationMode())
                 item.setSelected(true);

@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
+import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
+import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
@@ -124,7 +125,7 @@ final class Annotations {
     }
 
     private static Annotateable generate(JSONObject jo) {
-        return Interaction.AnnotationMode.generate(jo.optString("type", Interaction.AnnotationMode.Rectangle.toString()), jo);
+        return AnnotationMode.generate(jo.optString("type", AnnotationMode.Rectangle.toString()), jo);
     }
 
     JSONObject toJson() {
