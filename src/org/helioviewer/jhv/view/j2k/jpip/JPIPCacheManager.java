@@ -22,7 +22,6 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
@@ -47,7 +46,7 @@ import kdu_jni.KduException;
 public class JPIPCacheManager {
 
     static {
-        Logger.getLogger("org.ehcache").setLevel(Level.WARNING); // shutup Ehcache info logs
+        Log.setLoggerLevel("org.ehcache", Level.WARNING); // shut-up Ehcache info logs
     }
 
     private static final int MAGIC = 0x4A504950; // JPIP

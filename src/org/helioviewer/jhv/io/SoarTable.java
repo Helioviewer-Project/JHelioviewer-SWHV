@@ -4,7 +4,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.helioviewer.jhv.Log;
 
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.RowSequence;
@@ -15,7 +16,7 @@ import uk.ac.starlink.votable.VOTableBuilder;
 class SoarTable {
 
     static {
-        Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING); // shut-up info logs
+        Log.setLoggerLevel("uk.ac.starlink", Level.WARNING); // shut-up info logs
     }
 
     public static List<SoarClient.DataItem> get(URI uri) throws Exception {

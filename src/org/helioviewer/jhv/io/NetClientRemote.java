@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 //import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
-//import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Log;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
@@ -30,7 +29,7 @@ class NetClientRemote implements NetClient {
     private static final Dispatcher dispatcher;
 
     static {
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+        Log.setLoggerLevel(OkHttpClient.class.getName(), Level.FINE);
         dispatcher = new Dispatcher();
         dispatcher.setMaxRequestsPerHost(8);
     }
