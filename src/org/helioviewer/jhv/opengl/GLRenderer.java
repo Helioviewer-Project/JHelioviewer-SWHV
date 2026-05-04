@@ -63,6 +63,9 @@ public final class GLRenderer {
         } else
             renderSceneScale(camera);
         renderFullFloatScene(camera);
+
+        if (ExportMovie.isRecording())
+            ExportMovie.handleMovieExport(camera);
     }
 
     public static void dispose() {
