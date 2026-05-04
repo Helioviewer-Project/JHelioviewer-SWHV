@@ -18,35 +18,41 @@ import org.helioviewer.jhv.opengl.GLSLShape;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-final class Annotations {
+public final class Annotations {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
 
-    private final ArrayList<Annotateable> annotations = new ArrayList<>();
-    private final GLSLLine annotationsLine = new GLSLLine(true);
-    private final BufVertex annotationsBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64kB
-    private final GLSLLine transformedLine = new GLSLLine(true);
-    private final BufVertex transformedBuf = new BufVertex(512 * GLSLLine.stride); // pre-allocate 5 FOV
-    private final GLSLShape center = new GLSLShape(true);
-    private final BufVertex centerBuf = new BufVertex(8 * GLSLShape.stride);
+    private static final ArrayList<Annotateable> annotations = new ArrayList<>();
+    private static final GLSLLine annotationsLine = new GLSLLine(true);
+    private static final BufVertex annotationsBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64kB
+    private static final GLSLLine transformedLine = new GLSLLine(true);
+    private static final BufVertex transformedBuf = new BufVertex(512 * GLSLLine.stride); // pre-allocate 5 FOV
+    private static final GLSLShape center = new GLSLShape(true);
+    private static final BufVertex centerBuf = new BufVertex(8 * GLSLShape.stride);
 
-    private Annotateable pending;
-    private int activeIndex = -1;
+    private static Annotateable pending;
+    private static int activeIndex = -1;
 
-    void start(Annotateable annotateable) {
+    private Annotations() {}
+
+    static Interaction.Type interaction(Camera camera) {
+        return new InteractionAnnotate(camera);
+    }
+
+    static void start(Annotateable annotateable) {
         pending = annotateable;
     }
 
     @Nullable
-    Annotateable pending() {
+    static Annotateable pending() {
         return pending;
     }
 
-    boolean hasPending() {
+    static boolean hasPending() {
         return pending != null;
     }
 
-    void finishPending() {
+    static void finishPending() {
         if (pending != null && pending.beingDragged()) {
             pending.mouseReleased();
             annotations.add(pending);
@@ -55,14 +61,14 @@ final class Annotations {
         pending = null;
     }
 
-    void removeActive() {
+    static void removeActive() {
         if (activeIndex >= 0 && activeIndex < annotations.size()) {
             annotations.remove(activeIndex);
             activeIndex = annotations.size() - 1;
         }
     }
 
-    boolean selectNext() {
+    static boolean selectNext() {
         if (activeIndex < 0 || annotations.isEmpty())
             return false;
 
@@ -71,7 +77,7 @@ final class Annotations {
         return true;
     }
 
-    void render(Camera camera, Viewport vp) {
+    public static void render(Camera camera, Viewport vp) {
         if (pending == null && annotations.isEmpty())
             return;
 
@@ -105,20 +111,20 @@ final class Annotations {
     }
 
     @Nullable
-    Object getAnnotationData() {
+    public static Object getAnnotationData() {
         if (pending == null)
             return activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex).getData() : null;
         else
             return pending.getData();
     }
 
-    void zoom(Camera camera) {
+    public static void zoom(Camera camera) {
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
         if (activeAnnotation instanceof AnnotateFOV annotationFOV)
             annotationFOV.zoom(camera, Display.getActiveViewport());
     }
 
-    void clear() {
+    public static void clear() {
         pending = null;
         annotations.clear();
         activeIndex = -1;
@@ -128,13 +134,13 @@ final class Annotations {
         return AnnotationMode.generate(jo.optString("type", AnnotationMode.Rectangle.toString()), jo);
     }
 
-    JSONObject toJson() {
+    public static JSONObject toJson() {
         JSONArray ja = new JSONArray();
         annotations.forEach(annotation -> ja.put(annotation.toJson()));
         return new JSONObject().put("activeIndex", activeIndex).put("annotateables", ja);
     }
 
-    void fromJson(JSONObject jo) {
+    public static void fromJson(JSONObject jo) {
         clear();
         if (jo == null)
             return;
@@ -153,13 +159,13 @@ final class Annotations {
         }
     }
 
-    void init() {
+    public static void init() {
         annotationsLine.init();
         transformedLine.init();
         center.init();
     }
 
-    void dispose() {
+    public static void dispose() {
         annotationsLine.dispose();
         transformedLine.dispose();
         center.dispose();

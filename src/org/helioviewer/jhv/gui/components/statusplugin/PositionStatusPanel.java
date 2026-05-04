@@ -5,11 +5,11 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -53,7 +53,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
                 Position viewpoint = camera.getViewpoint();
 
-                Object annData = JHVFrame.getInteraction().getAnnotationData();
+                Object annData = Annotations.getAnnotationData();
                 if (annData instanceof String str) {
                     annStr = str;
                 } /* else if (r > 1 && annData instanceof Vec3 annv) {
