@@ -83,6 +83,7 @@ public class Interaction {
     }
 
     private final Camera camera;
+    private final Annotations annotations;
     private final InteractionAnnotate interactionAnnotate;
     private final InteractionAxis interactionAxis;
     private final InteractionPan interactionPan;
@@ -95,7 +96,8 @@ public class Interaction {
 
     public Interaction(Camera _camera) {
         camera = _camera;
-        interactionAnnotate = new InteractionAnnotate(camera);
+        annotations = new Annotations();
+        interactionAnnotate = new InteractionAnnotate(camera, annotations);
         interactionAxis = new InteractionAxis(camera);
         interactionPan = new InteractionPan(camera);
         interactionRotate = new InteractionRotate(camera);
@@ -171,36 +173,36 @@ public class Interaction {
     }
 
     public void clearAnnotations() {
-        interactionAnnotate.clear();
+        annotations.clear();
     }
 
     public void zoomAnnotations() {
-        interactionAnnotate.zoom();
+        annotations.zoom(camera);
     }
 
     public void initAnnotations() {
-        interactionAnnotate.init();
+        annotations.init();
     }
 
     public void disposeAnnotations() {
-        interactionAnnotate.dispose();
+        annotations.dispose();
     }
 
     public void drawAnnotations(Viewport vp) {
-        interactionAnnotate.draw(vp);
+        annotations.render(camera, vp);
     }
 
     @Nullable
     public Object getAnnotationData() {
-        return interactionAnnotate.getAnnotationData();
+        return annotations.getAnnotationData();
     }
 
     public JSONObject saveAnnotations() {
-        return interactionAnnotate.toJson();
+        return annotations.toJson();
     }
 
     public void loadAnnotations(JSONObject jo) {
-        interactionAnnotate.fromJson(jo);
+        annotations.fromJson(jo);
     }
 
 }
