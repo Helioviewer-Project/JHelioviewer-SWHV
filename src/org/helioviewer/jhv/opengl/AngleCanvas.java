@@ -187,7 +187,7 @@ public final class AngleCanvas extends Canvas {
 
         Rectangle bounds = hostBounds();
         long newHostHandle = 0L;
-        long newNativeWindowHandle;
+        long newNativeWindowHandle = 0L;
         try {
             if (Platform.isMacOS()) {
                 MacAngleBridge.Host host = MacAngleBridge.create(this, bounds.x, bounds.y, bounds.width, bounds.height);
@@ -197,15 +197,11 @@ public final class AngleCanvas extends Canvas {
                 newNativeWindowHandle = host.layer();
             } else if (Platform.isWindows()) {
                 newNativeWindowHandle = WinAngleBridge.hwnd(this);
-                if (newNativeWindowHandle == 0L)
-                    return;
             } else if (Platform.isLinux()) {
                 newNativeWindowHandle = X11AngleBridge.drawable(this);
-                if (newNativeWindowHandle == 0L)
-                    return;
-            } else {
-                return;
             }
+            if (newNativeWindowHandle == 0L)
+                return;
 
             AngleRenderer renderer = new AngleRenderer(newNativeWindowHandle);
             macHostHandle = newHostHandle;
