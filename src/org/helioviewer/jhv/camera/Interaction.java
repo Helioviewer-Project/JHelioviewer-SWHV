@@ -22,7 +22,7 @@ public class Interaction {
     }
 
     private final Camera camera;
-    private final Type interactionAnnotate;
+    private final InteractionAnnotate interactionAnnotate;
     private final InteractionAxis interactionAxis;
     private final InteractionPan interactionPan;
     private final InteractionRotate interactionRotate;
@@ -34,7 +34,7 @@ public class Interaction {
 
     public Interaction(Camera _camera) {
         camera = _camera;
-        interactionAnnotate = Annotations.interaction(camera);
+        interactionAnnotate = new InteractionAnnotate(camera);
         interactionAxis = new InteractionAxis(camera);
         interactionPan = new InteractionPan(camera);
         interactionRotate = new InteractionRotate(camera);
