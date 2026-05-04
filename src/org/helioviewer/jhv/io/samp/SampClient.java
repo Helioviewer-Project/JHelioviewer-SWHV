@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 
@@ -28,7 +27,7 @@ import org.astrogrid.samp.hub.HubServiceMode;
 public final class SampClient extends HubConnector {
 
     static {
-        Logger.getLogger("org.astrogrid.samp").setLevel(Level.WARNING); // shut-up SAMP info logs
+        Log.setLoggerLevel("org.astrogrid.samp", Level.WARNING); // shut-up SAMP info logs
     }
 
     private static SampClient instance; // keep instance built at startup

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
@@ -36,7 +35,7 @@ import uk.ac.starlink.table.StarTableFactory;
 public final class GaiaClient {
 
     static {
-        Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING); // shut-up info logs
+        Log.setLoggerLevel("uk.ac.starlink", Level.WARNING); // shut-up info logs
     }
 
     private GaiaClient() {}

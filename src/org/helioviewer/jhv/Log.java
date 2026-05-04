@@ -2,6 +2,7 @@ package org.helioviewer.jhv;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -18,6 +19,7 @@ public class Log {
 
     private static final Level loggedLevel = Level.INFO;
     private static final Logger root = Logger.getLogger("");
+    private static final HashMap<String, Logger> configuredLoggers = new HashMap<>();
 
     private static final String filename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".log";
 
@@ -35,6 +37,11 @@ public class Log {
         LogManager.getLogManager().reset();
         root.addHandler(fileHandler);
         root.addHandler(consoleHandler);
+    }
+
+    public static void setLoggerLevel(String name, Level level) {
+        Logger logger = configuredLoggers.computeIfAbsent(name, Logger::getLogger);
+        logger.setLevel(level);
     }
 
     private static class LogFormatter extends Formatter {
