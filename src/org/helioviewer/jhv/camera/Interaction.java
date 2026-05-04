@@ -12,13 +12,11 @@ public class Interaction {
     public enum Mode {PAN, ROTATE, AXIS}
 
     interface Type {
-        void mousePressed(PointerEvent e, Viewport vp, AnnotationMode annotationMode);
+        void mousePressed(PointerEvent e, Viewport vp);
 
         void mouseDragged(PointerEvent e, Viewport vp);
 
-        default void mouseReleased(PointerEvent e) {}
-
-        default void keyPressed(KeyInputEvent e) {}
+        default void mouseReleased() {}
     }
 
     private final Camera camera;
@@ -29,8 +27,7 @@ public class Interaction {
     private final Zoom zoom;
 
     private Mode mode = Mode.ROTATE;
-    private AnnotationMode annotationMode = AnnotationMode.Cross;//Rectangle;
-    private boolean annotate = false;
+    private boolean annotating = false;
 
     public Interaction(Camera _camera) {
         camera = _camera;
@@ -51,17 +48,15 @@ public class Interaction {
     }
 
     public void setAnnotationMode(AnnotationMode _annotationMode) {
-        annotationMode = _annotationMode;
-        // Settings.setProperty("display.interaction.annotation", annotationMode.toString());
+        interactionAnnotate.setAnnotationMode(_annotationMode);
+        // Settings.setProperty("display.interaction.annotation", _annotationMode.toString());
     }
 
     public AnnotationMode getAnnotationMode() {
-        return annotationMode;
+        return interactionAnnotate.getAnnotationMode();
     }
 
     private Type getType() {
-        if (annotate)
-            return interactionAnnotate;
         return switch (mode) {
             case PAN -> interactionPan;
             case ROTATE -> interactionRotate;
@@ -69,20 +64,27 @@ public class Interaction {
         };
     }
 
+    private boolean isAnnotating() {
+        return annotating || Annotations.hasPending();
+    }
+
     public void mouseWheelMoved(ScrollEvent e) {
         zoom.zoom(camera, e.preciseWheelRotation());
     }
 
     public void mouseDragged(PointerEvent e, Viewport vp) {
-        getType().mouseDragged(e, vp);
+        if (isAnnotating())
+            interactionAnnotate.mouseDragged(e, vp);
+        else
+            getType().mouseDragged(e, vp);
     }
 
     public void mouseReleased(PointerEvent e) {
-        if (Annotations.hasPending())
-            interactionAnnotate.mouseReleased(e);
+        if (isAnnotating())
+            interactionAnnotate.mouseReleased();
         else
-            getType().mouseReleased(e);
-        annotate = false;
+            getType().mouseReleased();
+        annotating = false;
     }
 
     public void mouseClicked(PointerEvent e) {
@@ -93,20 +95,24 @@ public class Interaction {
 
     public void mousePressed(PointerEvent e, Viewport vp) {
         if (e.shiftDown()) {
-            annotate = true;
+            annotating = true;
         }
-        getType().mousePressed(e, vp, annotationMode);
+        if (annotating)
+            interactionAnnotate.mousePressed(e, vp);
+        else
+            getType().mousePressed(e, vp);
     }
 
     public void keyPressed(KeyInputEvent e) {
         if (e.shiftDown()) {
-            annotate = true;
+            annotating = true;
         }
-        getType().keyPressed(e);
+        if (annotating)
+            interactionAnnotate.keyPressed(e);
     }
 
     public void keyReleased(KeyInputEvent e) {
-        annotate = e.shiftDown();
+        annotating = e.shiftDown();
     }
 
 }
