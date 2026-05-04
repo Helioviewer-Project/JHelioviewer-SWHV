@@ -2,15 +2,8 @@ package org.helioviewer.jhv.camera;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.camera.annotate.AnnotateCircle;
-import org.helioviewer.jhv.camera.annotate.AnnotateCross;
-import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
-import org.helioviewer.jhv.camera.annotate.AnnotateLine;
-import org.helioviewer.jhv.camera.annotate.AnnotateLoop;
-import org.helioviewer.jhv.camera.annotate.AnnotateRectangle;
-import org.helioviewer.jhv.camera.annotate.Annotateable;
+import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -21,56 +14,6 @@ import org.json.JSONObject;
 public class Interaction {
 
     public enum Mode {PAN, ROTATE, AXIS}
-
-    public enum AnnotationMode {
-        Rectangle {
-            @Override
-            Annotateable generate(JSONObject jo) {
-                return new AnnotateRectangle(jo);
-            }
-        },
-        Circle {
-            @Override
-            Annotateable generate(JSONObject jo) {
-                return new AnnotateCircle(jo);
-            }
-        },
-        Cross {
-            @Override
-            Annotateable generate(JSONObject jo) {
-                return new AnnotateCross(jo);
-            }
-        },
-        FOV {
-            @Override
-            Annotateable generate(JSONObject jo) {
-                return new AnnotateFOV(jo);
-            }
-        },
-        Line {
-            @Override
-            Annotateable generate(JSONObject jo) {
-                return new AnnotateLine(jo);
-            }
-        },
-        Loop {
-            @Override
-            Annotateable generate(JSONObject jo) {
-                return new AnnotateLoop(jo);
-            }
-        };
-
-        abstract Annotateable generate(JSONObject jo);
-
-        static Annotateable generate(String type, JSONObject jo) {
-            try {
-                return valueOf(type).generate(jo);
-            } catch (IllegalArgumentException e) {
-                Log.warn("Unknown annotation type: " + type, e);
-                return Rectangle.generate(jo);
-            }
-        }
-    }
 
     interface Type {
         void mousePressed(PointerEvent e, Viewport vp, AnnotationMode annotationMode);

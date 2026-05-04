@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -16,7 +17,7 @@ class InteractionPan implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(PointerEvent e, Viewport vp, Interaction.AnnotationMode annotationMode) {
+    public void mousePressed(PointerEvent e, Viewport vp, AnnotationMode annotationMode) {
         lastX = e.x();
         lastY = e.y();
         dragStartSet = true;
