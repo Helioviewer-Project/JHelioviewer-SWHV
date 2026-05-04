@@ -200,10 +200,9 @@ public final class AngleCanvas extends Canvas {
                 if (newNativeWindowHandle == 0L)
                     return;
             } else if (Platform.isLinux()) {
-                X11AngleBridge.Surface surface = X11AngleBridge.surface(this);
-                if (surface == null)
+                newNativeWindowHandle = X11AngleBridge.drawable(this);
+                if (newNativeWindowHandle == 0L)
                     return;
-                newNativeWindowHandle = surface.drawable();
             } else {
                 return;
             }

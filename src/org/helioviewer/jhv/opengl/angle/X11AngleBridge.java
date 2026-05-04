@@ -5,21 +5,18 @@ import java.awt.Canvas;
 import org.lwjgl.system.jawt.JAWTX11DrawingSurfaceInfo;
 
 public final class X11AngleBridge {
-    public record Surface(long display, long drawable) {}
-
     private X11AngleBridge() {}
 
-    public static Surface surface(Canvas canvas) {
-        return AngleJAWT.withPlatformInfo(canvas, platformInfo -> {
+    public static long drawable(Canvas canvas) {
+        Long drawable = AngleJAWT.withPlatformInfo(canvas, platformInfo -> {
             if (platformInfo == 0L)
-                return null;
+                return 0L;
 
             JAWTX11DrawingSurfaceInfo surfaceInfo = JAWTX11DrawingSurfaceInfo.create(platformInfo);
             long display = surfaceInfo.display();
-            long drawable = surfaceInfo.drawable();
-            if (display == 0L || drawable == 0L)
-                return null;
-            return new Surface(display, drawable);
+            long x11Drawable = surfaceInfo.drawable();
+            return display == 0L || x11Drawable == 0L ? 0L : x11Drawable;
         });
+        return drawable == null ? 0L : drawable;
     }
 }
