@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
@@ -15,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.Interaction;
@@ -30,13 +32,17 @@ import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
-import org.helioviewer.jhv.swing.AwtInputAdapter;
-import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.opengl.AngleCanvas;
+import org.helioviewer.jhv.opengl.angle.AngleRenderer;
+import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
+import org.helioviewer.jhv.swing.AwtInputAdapter;
+import org.helioviewer.jhv.swing.TransferAccess;
+import org.helioviewer.jhv.threads.Tasks;
 
 public final class JHVFrame {
 
@@ -169,7 +175,38 @@ public final class JHVFrame {
 
         Movie.setMaster(Layers.getActiveImageLayer()); //! for nullImageLayer
 
+        // Prewarm ANGLE off the EDT, then return here via attachAndRender() to attach the real render canvas.
+        startAngleWarmup();
         return mainFrame;
+    }
+
+    private static void startAngleWarmup() {
+        Tasks.submit("angle-warmup", () -> {
+            if (Platform.isMacOS())
+                MacAngleBridge.prewarm();
+            AngleRenderer.prewarm();
+            return null;
+        }, ignored -> EventQueue.invokeLater(JHVFrame::attachAndRender), (context, error) -> {
+            Log.warn("ANGLE warmup failed", error);
+            EventQueue.invokeLater(JHVFrame::attachAndRender);
+        });
+    }
+
+    private static void attachAndRender() {
+        if (renderCanvas != null) // impossible
+            return;
+
+        renderCanvas = new AngleCanvas();
+        renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
+        renderCanvas.setWhiteBackground(whiteBackground);
+        renderCanvas.addMouseListener(awtInputAdapter);
+        renderCanvas.addMouseMotionListener(awtInputAdapter);
+        renderCanvas.addMouseWheelListener(awtInputAdapter);
+        renderCanvas.addKeyListener(awtInputAdapter);
+        renderHost.attachCanvas(renderCanvas);
+        // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
+        renderCanvas.requestRender();
+        MovieDisplay.setRequester(renderCanvas::requestRender);
     }
 
     private static JFrame createFrame() {
@@ -270,25 +307,6 @@ public final class JHVFrame {
 
     public static Component getRenderComponent() {
         return renderCanvas != null ? renderCanvas : renderHost;
-    }
-
-    public static void attachRenderCanvas() {
-        if (renderCanvas != null)
-            return;
-
-        renderCanvas = new AngleCanvas();
-        renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
-        renderCanvas.setWhiteBackground(whiteBackground);
-        renderCanvas.addMouseListener(awtInputAdapter);
-        renderCanvas.addMouseMotionListener(awtInputAdapter);
-        renderCanvas.addMouseWheelListener(awtInputAdapter);
-        renderCanvas.addKeyListener(awtInputAdapter);
-        renderHost.attachCanvas(renderCanvas);
-    }
-
-    public static void requestRender() {
-        if (renderCanvas != null)
-            renderCanvas.requestRender();
     }
 
     public static void setWhiteBackground(boolean whiteBackground) {
