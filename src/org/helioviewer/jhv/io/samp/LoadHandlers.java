@@ -44,14 +44,12 @@ final class LoadHandlers {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURI(msg, consumer));
     }
 
-    private static AbstractMessageHandler uriListHandler(String type, Consumer<URI> singleConsumer,
-                                                         Consumer<List<URI>> listConsumer) {
+    private static AbstractMessageHandler uriListHandler(String type, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) ->
                 loadURIList(msg, singleConsumer, listConsumer));
     }
 
-    private static AbstractMessageHandler uriOrValueHandler(String type, Consumer<URI> uriConsumer,
-                                                            Consumer<String> valueConsumer) {
+    private static AbstractMessageHandler uriOrValueHandler(String type, Consumer<URI> uriConsumer, Consumer<String> valueConsumer) {
         return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> {
             Object url = msg.getParam("url");
             if (url != null) {
@@ -68,17 +66,19 @@ final class LoadHandlers {
 
     private static void loadState(Message msg, String senderId) throws Exception {
         String requestId = SampClient.optionalString(msg, "requestId");
-        Commands.OperationContext context =
-                new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.load.state");
+        Commands.OperationContext context = new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.load.state");
+
         Object input = msg.getParam("url");
         if (input != null) {
             invokeLoadState(context, toURI(input.toString()));
             return;
         }
-
         String value = SampClient.optionalString(msg, "value");
-        if (value != null)
+        if (value != null) {
             invokeLoadState(context, value);
+            return;
+        }
+        Commands.notifyLoadStateFinished(context, false, "Missing jhv.load.state url or value.");
     }
 
     private static void invokeLoadState(Commands.OperationContext context, Object input) {
@@ -101,8 +101,7 @@ final class LoadHandlers {
         EventQueue.invokeLater(() -> consumer.accept(uri));
     }
 
-    private static void loadURIList(Message msg, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer)
-            throws Exception {
+    private static void loadURIList(Message msg, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer) throws Exception {
         Object url = msg.getParam("url");
         if (!(url instanceof Iterable<?> urls)) {
             loadURI(msg, singleConsumer);
