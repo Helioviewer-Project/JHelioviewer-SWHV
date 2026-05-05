@@ -13,7 +13,6 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
@@ -139,7 +138,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private void activateView() {
         optionsPanel.downloadVisible(!isLocal());
         setEnabled(true); // enable optionsPanel
-        JHVFrame.getLayersPanel().setOptionsPanel(this);
 
         CameraHelper.zoomToFit(Display.getMiniCamera());
         Layers.setActiveImageLayer(this);
@@ -148,6 +146,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             ImageLayers.arrangeMultiView(true);
         }
         optionsPanel.setLUT(view.getDefaultLUT());
+        Layers.fireLayerUpdated(this);
     }
 
     private void unsetView() {
