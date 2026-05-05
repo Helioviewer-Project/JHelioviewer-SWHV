@@ -381,7 +381,7 @@ Accepted parameters:
 - `speedUnit`
 
 This message starts recording using the resulting recording and playback state.
-If recording is already active, it returns immediately.
+If recording is already active, JHV sends a failure completion.
 
 Omitted parameters leave the existing recording or playback configuration
 unchanged. Invalid strings are warned about and ignored. Out-of-range numeric
@@ -462,6 +462,7 @@ Response:
   sent the request
 - `samp.mtype`: `jhv.load.state.completed`
 - `samp.params` always includes:
+  - `clientId`: public SAMP id of the client that sent the request
   - `mtype`: `jhv.load.state`
   - `status`: `success` or `failure`
   - `message`
@@ -474,6 +475,7 @@ Success example:
 {
   "samp.mtype": "jhv.load.state.completed",
   "samp.params": {
+    "clientId": "cli#1",
     "requestId": "abc-123",
     "mtype": "jhv.load.state",
     "status": "success",
@@ -488,6 +490,7 @@ Failure example:
 {
   "samp.mtype": "jhv.load.state.completed",
   "samp.params": {
+    "clientId": "cli#1",
     "requestId": "abc-123",
     "mtype": "jhv.load.state",
     "status": "failure",
@@ -526,6 +529,7 @@ Response:
   sent the start request
 - `samp.mtype`: `jhv.record.start.completed`
 - `samp.params` always includes:
+  - `clientId`: public SAMP id of the client that sent the start request
   - `mtype`: `jhv.record.start`
   - `status`: `success` or `failure`
   - `message`
@@ -540,6 +544,7 @@ Success example:
 {
   "samp.mtype": "jhv.record.start.completed",
   "samp.params": {
+    "clientId": "cli#1",
     "requestId": "rec-1",
     "mtype": "jhv.record.start",
     "status": "success",
@@ -555,6 +560,7 @@ Failure example:
 {
   "samp.mtype": "jhv.record.start.completed",
   "samp.params": {
+    "clientId": "cli#1",
     "requestId": "rec-1",
     "mtype": "jhv.record.start",
     "status": "failure",
