@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
@@ -46,7 +47,6 @@ public final class LayersPanel extends JPanel {
     private static final int DOWNLOAD_COL = 3;
     private static final int REMOVE_COL = 4;
 
-    private static final int NUMBER_COLUMNS = LayersTableModel.NUMBER_COLUMNS;
     private static final int NUMBEROFVISIBLEROWS = 9;
 
     private final LayersTable grid;
@@ -76,7 +76,7 @@ public final class LayersPanel extends JPanel {
             super.tableChanged(e);
             if (e.getType() == TableModelEvent.INSERT) {
                 int row = e.getLastRow();
-                if (getValueAt(row, 0) instanceof ImageLayer)
+                if (row >= 0 && row < getRowCount() && getValueAt(row, 0) instanceof ImageLayer)
                     setRowSelectionInterval(row, row);
             }
         }
@@ -147,9 +147,19 @@ public final class LayersPanel extends JPanel {
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                setOptionsPanel((Layer) grid.getValueAt(grid.getSelectedRow(), 0));
-            }
+            if (!e.getValueIsAdjusting())
+                refreshSelectedOptionsPanel();
+        });
+
+        model.addTableModelListener(e -> {
+            if (e.getType() != TableModelEvent.UPDATE || e.getColumn() == TIME_COL)
+                return;
+
+            int row = grid.getSelectedRow();
+            if (row >= 0
+                    && e.getFirstRow() <= row
+                    && row <= e.getLastRow())
+                refreshSelectedOptionsPanel();
         });
 
         grid.addMouseListener(new MouseAdapter() {
@@ -167,17 +177,15 @@ public final class LayersPanel extends JPanel {
                 if (v.col == ENABLED_COL) {
                     layer.setEnabled(!layer.isEnabled());
                     model.updateCell(v.row, v.col);
-                    if (grid.getSelectedRow() == v.row)
-                        setOptionsPanel(layer);
                     MovieDisplay.render(1);
                 } else if (v.col == TITLE_COL && layer instanceof ImageLayer il) {
                     Layers.setActiveImageLayer(il);
                     grid.repaint(); // multiple rows involved
                 } else if (v.col == REMOVE_COL && layer.isDeletable()) {
+                    boolean selected = selectedLayer() == layer;
                     Layers.remove(layer);
-                    int idx = grid.getSelectedRow();
-                    if (v.row <= idx)
-                        grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
+                    if (selected)
+                        selectExistingRow(v.row);
                 }
             }
         });
@@ -197,7 +205,8 @@ public final class LayersPanel extends JPanel {
         grid.getActionMap().put("copy_time", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (model.getValueAt(grid.getSelectedRow(), 0) instanceof Layer layer) {
+                Layer layer = selectedLayer();
+                if (layer != null) {
                     String timeString = layer.getTimeString();
                     if (timeString != null)
                         TransferAccess.writeClipboard(timeString);
@@ -221,7 +230,30 @@ public final class LayersPanel extends JPanel {
         return grid.getRowHeight();
     }
 
-    public void setOptionsPanel(Layer layer) {
+    @Nullable
+    private Layer selectedLayer() {
+        int row = grid.getSelectedRow();
+        if (row < 0 || row >= grid.getRowCount())
+            return null;
+        return grid.getValueAt(row, 0) instanceof Layer layer ? layer : null;
+    }
+
+    private void selectExistingRow(int preferredRow) {
+        int rowCount = grid.getRowCount();
+        if (rowCount == 0) {
+            setOptionsPanel(null);
+            return;
+        }
+        int row = Math.min(preferredRow, rowCount - 1);
+        grid.getSelectionModel().setSelectionInterval(row, row);
+        refreshSelectedOptionsPanel();
+    }
+
+    private void refreshSelectedOptionsPanel() {
+        setOptionsPanel(selectedLayer());
+    }
+
+    public void setOptionsPanel(@Nullable Layer layer) {
         optionsPanelWrapper.removeAll();
         Component optionsPanel = layer == null ? null : layer.getOptionsPanel();
         if (optionsPanel != null) {
@@ -230,10 +262,6 @@ public final class LayersPanel extends JPanel {
         }
         revalidate();
         repaint();
-    }
-
-    public void refresh() {
-        grid.repaint();
     }
 
 }
