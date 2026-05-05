@@ -57,6 +57,8 @@ class InteractionAnnotate {
             MovieDisplay.display();
         } else if (e.key() == KeyInputEvent.Key.N && Annotations.selectNext()) {
             MovieDisplay.display();
+        } else if (e.key() == KeyInputEvent.Key.P && Annotations.selectPrevious()) {
+            MovieDisplay.display();
         }
     }
 

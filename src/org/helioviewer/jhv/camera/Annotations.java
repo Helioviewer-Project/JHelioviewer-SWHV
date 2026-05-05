@@ -73,6 +73,16 @@ public final class Annotations {
         return true;
     }
 
+    static boolean selectPrevious() {
+        if (activeIndex < 0 || annotations.isEmpty())
+            return false;
+
+        activeIndex--;
+        if (activeIndex < 0)
+            activeIndex = annotations.size() - 1;
+        return true;
+    }
+
     public static void render(Camera camera, Viewport vp) {
         if (pending == null && annotations.isEmpty())
             return;
