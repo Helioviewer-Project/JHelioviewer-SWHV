@@ -68,30 +68,24 @@ final class LoadHandlers {
         String requestId = SampClient.optionalString(msg, "requestId");
         Commands.OperationContext context = new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.load.state");
 
-        Object input = msg.getParam("url");
-        if (input != null) {
-            invokeLoadState(context, toURI(input.toString()));
-            return;
-        }
-        String value = SampClient.optionalString(msg, "value");
-        if (value != null) {
-            invokeLoadState(context, value);
-            return;
-        }
-        Commands.notifyLoadStateFinished(context, false, "Missing jhv.load.state url or value.");
-    }
-
-    private static void invokeLoadState(Commands.OperationContext context, Object input) {
-        EventQueue.invokeLater(() -> {
-            try {
-                if (input instanceof URI uri)
-                    Commands.loadState(context, uri);
-                else
-                    Commands.loadState(context, input.toString());
-            } catch (Exception e) {
-                Log.warn("jhv.load.state", e);
+        try {
+            Object input = msg.getParam("url");
+            if (input != null) {
+                URI uri = toURI(input.toString());
+                EventQueue.invokeLater(() -> Commands.loadState(context, uri));
+                return;
             }
-        });
+            String value = SampClient.optionalString(msg, "value");
+            if (value != null) {
+                EventQueue.invokeLater(() -> Commands.loadState(context, value));
+                return;
+            }
+            Commands.notifyLoadStateFinished(context, false, "Missing jhv.load.state url or value.");
+        } catch (Exception e) {
+            Log.warn("jhv.load.state", e);
+            String message = e.getMessage() == null || e.getMessage().isBlank() ? "State load failed." : e.getMessage();
+            Commands.notifyLoadStateFinished(context, false, message);
+        }
     }
 
     private static void loadURI(Message msg, Consumer<URI> consumer) throws Exception {
