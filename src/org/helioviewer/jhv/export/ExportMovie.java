@@ -91,8 +91,11 @@ public final class ExportMovie implements Movie.Listener {
     private static final int MACROBLOCK = 8;
 
     public static void start(@Nullable Commands.OperationContext context, @Nullable Commands.RecordStartInput input) {
-        if (isRecording())
+        if (isRecording()) {
+            if (context != null)
+                Commands.notifyRecordingFinished(context, false, "Recording already in progress.", null);
             return;
+        }
         operationContext = context;
 
         if (input != null)
