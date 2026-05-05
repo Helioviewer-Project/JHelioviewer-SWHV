@@ -7,24 +7,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-import javax.swing.table.AbstractTableModel;
-
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
-import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.layers.selector.Reorderable;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.NullView;
 
-@SuppressWarnings({"serial", "unchecked"})
-public class Layers extends AbstractTableModel implements Reorderable, TimeListener.Selection {
+@SuppressWarnings("unchecked")
+public final class Layers {
 
+    @SuppressWarnings("serial")
     private static class LayerList extends ArrayList<Layer> {
 
         int imageLayersCount;
@@ -70,12 +66,25 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
 
     }
 
+    interface Listener {
+        void rowsInserted(int firstRow, int lastRow);
+
+        void rowsDeleted(int firstRow, int lastRow);
+
+        void cellUpdated(int row, int col);
+
+        void timeUpdated(Layer layer);
+    }
+
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
+
     private static final NullImageLayer nullImageLayer = new NullImageLayer(NullView.create(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli,
             TimeUtils.defaultCadence(TimeUtils.START.milli - 2 * TimeUtils.DAY_IN_MILLIS, TimeUtils.START.milli)));
     private static ImageLayer activeLayer = nullImageLayer;
 
-    @Override
-    public void timeSelectionChanged(long start, long end) {
+    public static final TimeListener.Selection timeSelectionListener = Layers::timeSelectionChanged;
+
+    private static void timeSelectionChanged(long start, long end) {
         nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
         // Replacing the placeholder NullView also needs a full Movie resync when it is active.
         if (activeLayer == nullImageLayer)
@@ -101,7 +110,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
     private static MiniviewLayer miniviewLayer;
     private static ConnectionLayer connectionLayer;
 
-    private Layers() {
+    static {
         add(new ViewpointLayer(null));
         add(new ConnectionLayer(null));
         add(new GridLayer(null));
@@ -123,7 +132,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         return connectionLayer;
     }
 
-    public void add(Layer layer) {
+    public static void add(Layer layer) {
         layers.add(layer);
         newLayers.add(layer);
 
@@ -135,11 +144,11 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
             connectionLayer = cl;
 
         int row = layers.indexOf(layer);
-        fireTableRowsInserted(row, row);
+        listeners.forEach(listener -> listener.rowsInserted(row, row));
         MovieDisplay.display(); // e.g., PFSS layer
     }
 
-    public void remove(Layer layer) {
+    public static void remove(Layer layer) {
         int row = layers.indexOf(layer);
         if (row < 0)
             return;
@@ -153,7 +162,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
             setActiveImageLayer(count == 0 ? null : (ImageLayer) layers.get(count - 1));
         }
 
-        fireTableRowsDeleted(row, row);
+        listeners.forEach(listener -> listener.rowsDeleted(row, row));
         MovieDisplay.display();
     }
 
@@ -194,7 +203,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         removedLayers.clear();
     }
 
-    private static void insertRow(int row, Layer rowData) {
+    static void insertRow(int row, Layer rowData) {
         if (row > layers.size()) {
             layers.add(rowData);
         } else {
@@ -202,8 +211,7 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         }
     }
 
-    @Override
-    public void reorder(int fromIndex, int toIndex) {
+    static void reorder(int fromIndex, int toIndex) {
         if (toIndex > layers.size()) {
             return;
         }
@@ -226,19 +234,11 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         }
     }
 
-    @Override
-    public int getRowCount() {
+    static int getRowCount() {
         return layers.size();
     }
 
-    @Override
-    public int getColumnCount() {
-        return LayersPanel.NUMBER_COLUMNS;
-    }
-
-    @Nullable
-    @Override
-    public Object getValueAt(int row, int col) {
+    static Object getValueAt(int row) {
         try {
             return layers.get(row);
         } catch (Exception e) {
@@ -246,13 +246,18 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         }
     }
 
-    public void updateCell(int row, int col) {
+    static void updateCell(int row, int col) {
         if (row >= 0) // negative row breaks model
-            fireTableCellUpdated(row, col);
+            listeners.forEach(listener -> listener.cellUpdated(row, col));
     }
 
-    public void fireTimeUpdated(Layer layer) {
-        updateCell(layers.indexOf(layer), LayersPanel.TIME_COL);
+    public static void fireTimeUpdated(Layer layer) {
+        listeners.forEach(listener -> listener.timeUpdated(layer));
+    }
+
+    static void addListener(Listener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     public static void dispose() {
@@ -301,10 +306,6 @@ public class Layers extends AbstractTableModel implements Reorderable, TimeListe
         setActiveImageLayer(null);
     }
 
-    private static Layers instance;
-
-    public static Layers getInstance() {
-        return instance == null ? instance = new Layers() : instance;
-    }
+    private Layers() {}
 
 }

@@ -32,6 +32,7 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.LayersTableModel;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.swing.TransferAccess;
 
@@ -42,11 +43,11 @@ public final class LayersPanel extends JPanel {
 
     private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
-    public static final int TIME_COL = 2;
+    public static final int TIME_COL = LayersTableModel.TIME_COL;
     private static final int DOWNLOAD_COL = 3;
     private static final int REMOVE_COL = 4;
 
-    public static final int NUMBER_COLUMNS = 5;
+    public static final int NUMBER_COLUMNS = LayersTableModel.NUMBER_COLUMNS;
     private static final int NUMBEROFVISIBLEROWS = 9;
 
     private final LayersTable grid;
@@ -103,7 +104,7 @@ public final class LayersPanel extends JPanel {
 
     }
 
-    public LayersPanel(Layers model) {
+    public LayersPanel(LayersTableModel model) {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -173,7 +174,7 @@ public final class LayersPanel extends JPanel {
                     Layers.setActiveImageLayer(il);
                     grid.repaint(); // multiple rows involved
                 } else if (v.col == REMOVE_COL && layer.isDeletable()) {
-                    model.remove(layer);
+                    Layers.remove(layer);
                     int idx = grid.getSelectedRow();
                     if (v.row <= idx)
                         grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);

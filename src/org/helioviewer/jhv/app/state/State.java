@@ -19,7 +19,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -159,7 +158,7 @@ public final class State {
             if (o instanceof JSONObject jo) {
                 try {
                     if (json2Object(jo) instanceof Layer layer) {
-                        JHVFrame.getLayers().add(layer);
+                        Layers.add(layer);
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
