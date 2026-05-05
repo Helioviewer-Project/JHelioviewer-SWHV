@@ -26,6 +26,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -198,11 +199,15 @@ public final class State {
         @Override
         public Void call() throws Exception {
             for (ImageLayer layer : newLayers) {
-                while (!layer.isLoadedForState()) {
+                while (isLoadingForState(layer)) {
                     Thread.sleep(1000);
                 }
             }
             return null;
+        }
+
+        private static boolean isLoadingForState(ImageLayer layer) throws Exception {
+            return EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && !layer.isLoadedForState());
         }
     }
 
