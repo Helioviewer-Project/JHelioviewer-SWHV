@@ -32,7 +32,6 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersTableModel;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.swing.TransferAccess;
 
@@ -43,11 +42,11 @@ public final class LayersPanel extends JPanel {
 
     private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
-    public static final int TIME_COL = LayersTableModel.TIME_COL;
+    private static final int TIME_COL = LayersTableModel.TIME_COL;
     private static final int DOWNLOAD_COL = 3;
     private static final int REMOVE_COL = 4;
 
-    public static final int NUMBER_COLUMNS = LayersTableModel.NUMBER_COLUMNS;
+    private static final int NUMBER_COLUMNS = LayersTableModel.NUMBER_COLUMNS;
     private static final int NUMBEROFVISIBLEROWS = 9;
 
     private final LayersTable grid;
@@ -104,8 +103,9 @@ public final class LayersPanel extends JPanel {
 
     }
 
-    public LayersPanel(LayersTableModel model) {
+    public LayersPanel() {
         setLayout(new GridBagLayout());
+        LayersTableModel model = new LayersTableModel();
 
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;

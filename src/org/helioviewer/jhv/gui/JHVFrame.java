@@ -34,7 +34,6 @@ import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.LayersTableModel;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
@@ -129,7 +128,7 @@ public final class JHVFrame {
         renderCanvas = null;
         renderHost = new RenderStartupHost();
 
-        layersPanel = new LayersPanel(new LayersTableModel());
+        layersPanel = new LayersPanel();
 
         leftPane = new SideContentPane();
         leftPane.add("Image Layers", MoviePanel.getInstance(), true);

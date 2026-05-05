@@ -66,12 +66,10 @@ public final class Layers {
 
     }
 
-    interface Listener {
-        void rowsInserted(int firstRow, int lastRow);
+    public interface Listener {
+        void layerAdded(int index);
 
-        void rowsDeleted(int firstRow, int lastRow);
-
-        void cellUpdated(int row, int col);
+        void layerRemoved(int index);
 
         void timeUpdated(Layer layer);
     }
@@ -144,7 +142,7 @@ public final class Layers {
             connectionLayer = cl;
 
         int row = layers.indexOf(layer);
-        listeners.forEach(listener -> listener.rowsInserted(row, row));
+        listeners.forEach(listener -> listener.layerAdded(row));
         MovieDisplay.display(); // e.g., PFSS layer
     }
 
@@ -162,7 +160,7 @@ public final class Layers {
             setActiveImageLayer(count == 0 ? null : (ImageLayer) layers.get(count - 1));
         }
 
-        listeners.forEach(listener -> listener.rowsDeleted(row, row));
+        listeners.forEach(listener -> listener.layerRemoved(row));
         MovieDisplay.display();
     }
 
@@ -203,7 +201,7 @@ public final class Layers {
         removedLayers.clear();
     }
 
-    static void insertRow(int row, Layer rowData) {
+    private static void insertRow(int row, Layer rowData) {
         if (row > layers.size()) {
             layers.add(rowData);
         } else {
@@ -211,7 +209,7 @@ public final class Layers {
         }
     }
 
-    static void reorder(int fromIndex, int toIndex) {
+    public static void reorderImageLayer(int fromIndex, int toIndex) {
         if (toIndex > layers.size()) {
             return;
         }
@@ -234,11 +232,11 @@ public final class Layers {
         }
     }
 
-    static int getRowCount() {
+    public static int size() {
         return layers.size();
     }
 
-    static Object getValueAt(int row) {
+    public static Layer get(int row) {
         try {
             return layers.get(row);
         } catch (Exception e) {
@@ -246,16 +244,11 @@ public final class Layers {
         }
     }
 
-    static void updateCell(int row, int col) {
-        if (row >= 0) // negative row breaks model
-            listeners.forEach(listener -> listener.cellUpdated(row, col));
-    }
-
     public static void fireTimeUpdated(Layer layer) {
         listeners.forEach(listener -> listener.timeUpdated(layer));
     }
 
-    static void addListener(Listener listener) {
+    public static void addListener(Listener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }

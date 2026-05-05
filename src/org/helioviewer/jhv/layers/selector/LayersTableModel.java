@@ -1,23 +1,24 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.selector;
 
 import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
-import org.helioviewer.jhv.layers.selector.Reorderable;
+import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.Layers;
 
 @SuppressWarnings("serial")
-public final class LayersTableModel extends AbstractTableModel implements Layers.Listener, Reorderable {
+final class LayersTableModel extends AbstractTableModel implements Layers.Listener, Reorderable {
 
-    public static final int TIME_COL = 2;
-    public static final int NUMBER_COLUMNS = 5;
+    static final int TIME_COL = 2;
+    static final int NUMBER_COLUMNS = 5;
 
-    public LayersTableModel() {
+    LayersTableModel() {
         Layers.addListener(this);
     }
 
     @Override
     public int getRowCount() {
-        return Layers.getRowCount();
+        return Layers.size();
     }
 
     @Override
@@ -28,28 +29,23 @@ public final class LayersTableModel extends AbstractTableModel implements Layers
     @Nullable
     @Override
     public Object getValueAt(int row, int col) {
-        return Layers.getValueAt(row);
+        return Layers.get(row);
     }
 
     @Override
     public void reorder(int fromIndex, int toIndex) {
-        Layers.reorder(fromIndex, toIndex);
+        Layers.reorderImageLayer(fromIndex, toIndex);
         fireTableDataChanged();
     }
 
     @Override
-    public void rowsInserted(int firstRow, int lastRow) {
-        fireTableRowsInserted(firstRow, lastRow);
+    public void layerAdded(int index) {
+        fireTableRowsInserted(index, index);
     }
 
     @Override
-    public void rowsDeleted(int firstRow, int lastRow) {
-        fireTableRowsDeleted(firstRow, lastRow);
-    }
-
-    @Override
-    public void cellUpdated(int row, int col) {
-        fireTableCellUpdated(row, col);
+    public void layerRemoved(int index) {
+        fireTableRowsDeleted(index, index);
     }
 
     @Override
