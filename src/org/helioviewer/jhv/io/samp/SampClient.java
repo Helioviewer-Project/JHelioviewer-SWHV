@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io.samp;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +22,16 @@ import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.DefaultClientProfile;
 import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
+import org.astrogrid.samp.client.SampException;
 import org.astrogrid.samp.hub.Hub;
+import org.astrogrid.samp.hub.HubProfile;
 import org.astrogrid.samp.hub.HubServiceMode;
+import org.astrogrid.samp.web.ClientAuthorizers;
+import org.astrogrid.samp.web.HubSwingClientAuthorizer;
+import org.astrogrid.samp.web.ListMessageRestriction;
+import org.astrogrid.samp.web.WebCredentialPresenter;
+import org.astrogrid.samp.web.WebHubProfile;
+import org.astrogrid.samp.xmlrpc.StandardHubProfile;
 
 public final class SampClient extends HubConnector {
 
@@ -57,7 +66,7 @@ public final class SampClient extends HubConnector {
             if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
                 try {
                     if (Hub.getRunningHubs().length == 0) {
-                        Hub.runHub(HubServiceMode.NO_GUI);
+                        Hub.runHub(HubServiceMode.NO_GUI, hubProfiles(true), null);
                     }
                 } catch (Exception e) {
                     Log.warn(e);
@@ -65,6 +74,15 @@ public final class SampClient extends HubConnector {
             }
             instance = new SampClient(DefaultClientProfile.getProfile());
         }, "JHV-StartSamp").start();
+    }
+
+    private static HubProfile[] hubProfiles(boolean webProfilePopup) throws IOException, SampException {
+        return new HubProfile[]{
+                new StandardHubProfile(),
+                new WebHubProfile(new WebHubProfile.ServerFactory(),
+                        webProfilePopup ? new HubSwingClientAuthorizer(null, WebCredentialPresenter.INSTANCE) : ClientAuthorizers.TRUE,
+                        ListMessageRestriction.DEFAULT, WebHubProfile.createKeyGenerator(), true)
+        };
     }
 
     @FunctionalInterface
