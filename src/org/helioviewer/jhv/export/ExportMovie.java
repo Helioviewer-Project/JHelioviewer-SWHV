@@ -109,8 +109,6 @@ public final class ExportMovie implements Movie.Listener {
     }
 
     public static void start(int _w, int _h, boolean isInternal, int fps, ViewState.RecordingMode _mode) {
-        recording = true;
-        notifyStatusChanged();
         shallStop = false;
 
         int scrw = 1;
@@ -132,6 +130,9 @@ public final class ExportMovie implements Movie.Listener {
         if (mode == ViewState.RecordingMode.SHOT) {
             exporter = new MovieExporter(VideoFormat.PNG, canvasWidth, exportHeight, fps);
             shallStop = true;
+
+            recording = true;
+            notifyStatusChanged();
             MovieDisplay.render(1);
         } else {
             VideoFormat format = VideoFormat.H264;
@@ -143,6 +144,9 @@ public final class ExportMovie implements Movie.Listener {
             if (mode == ViewState.RecordingMode.LOOP) {
                 Movie.addFrameListener(instance);
                 Commands.seekFrame(0);
+
+                recording = true;
+                notifyStatusChanged();
                 Commands.play();
             }
         }
