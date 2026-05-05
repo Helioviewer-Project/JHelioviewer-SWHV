@@ -34,6 +34,7 @@ import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.LayersTableModel;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
@@ -116,7 +117,6 @@ public final class JHVFrame {
     private static CarringtonStatusPanel carringtonStatus;
 
     private static LayersPanel layersPanel;
-    private static Layers layers;
 
     private static MenuBar menuBar;
     private static boolean whiteBackground;
@@ -129,8 +129,7 @@ public final class JHVFrame {
         renderCanvas = null;
         renderHost = new RenderStartupHost();
 
-        layers = Layers.getInstance();
-        layersPanel = new LayersPanel(layers);
+        layersPanel = new LayersPanel(new LayersTableModel());
 
         leftPane = new SideContentPane();
         leftPane.add("Image Layers", MoviePanel.getInstance(), true);
@@ -337,10 +336,6 @@ public final class JHVFrame {
 
     public static CarringtonStatusPanel getCarringtonStatusPanel() {
         return carringtonStatus;
-    }
-
-    public static Layers getLayers() {
-        return layers;
     }
 
     public static LayersPanel getLayersPanel() {

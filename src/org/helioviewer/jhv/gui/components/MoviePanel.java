@@ -188,7 +188,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         c.gridx = 3;
         recordPanel.add(recordSizeComboBox, c);
 
-        timeSelectorPanel.addListener(Layers.getInstance());
+        timeSelectorPanel.addListener(Layers.timeSelectionListener);
 
         add(sliderPanel);
         add(secondLine);

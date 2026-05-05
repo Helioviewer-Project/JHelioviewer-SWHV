@@ -45,7 +45,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     public static ImageLayer create(JSONObject jo) {
         ImageLayer imageLayer = new ImageLayer(jo);
-        JHVFrame.getLayers().add(imageLayer);
+        Layers.add(imageLayer);
         return imageLayer;
     }
 
@@ -102,7 +102,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     public void unload() {
         if (view.getBaseName() == null)
-            JHVFrame.getLayers().remove(this);
+            Layers.remove(this);
         cancelLoadTask();
     }
 
@@ -361,7 +361,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             return;
         newImageData.getImageBuffer().allowExplicitFree();
         setImageData(newImageData);
-        JHVFrame.getLayers().fireTimeUpdated(this);
+        Layers.fireTimeUpdated(this);
         ImageLayers.displaySynced(imageData.getViewpoint());
     }
 

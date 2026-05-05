@@ -74,7 +74,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private void updateTimestamp(JHVTime timestamp) {
         if (!timestamp.equals(lastTimestamp)) {
             lastTimestamp = timestamp;
-            JHVFrame.getLayers().fireTimeUpdated(this);
+            Layers.fireTimeUpdated(this);
         }
     }
 

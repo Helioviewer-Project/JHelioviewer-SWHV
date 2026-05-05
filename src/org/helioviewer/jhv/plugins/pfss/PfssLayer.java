@@ -8,6 +8,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -144,7 +145,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
             glslLine.setVertex(lineBuf);
 
             pfssTime = data.dateObs();
-            JHVFrame.getLayers().fireTimeUpdated(this);
+            Layers.fireTimeUpdated(this);
         }
         glslLine.renderLine(vp, LINEWIDTH);
     }

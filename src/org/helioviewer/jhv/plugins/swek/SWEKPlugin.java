@@ -7,6 +7,7 @@ import javax.swing.JTree;
 
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 
@@ -40,7 +41,7 @@ public class SWEKPlugin extends Plugin {
     public void install() {
         JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         JHVFrame.getLeftContentPane().revalidate();
-        JHVFrame.getLayers().add(layer);
+        Layers.add(layer);
         Timelines.getLayers().add(etl);
     }
 
@@ -48,7 +49,7 @@ public class SWEKPlugin extends Plugin {
     public void uninstall() {
         JHVFrame.getLeftContentPane().remove(swekPanel);
         JHVFrame.getLeftContentPane().revalidate();
-        JHVFrame.getLayers().remove(layer);
+        Layers.remove(layer);
         Timelines.getLayers().remove(etl);
     }
 
