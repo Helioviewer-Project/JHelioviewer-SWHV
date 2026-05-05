@@ -146,6 +146,8 @@ public final class SampClient extends HubConnector {
         if (instance == null)
             return;
         Message msg = new Message(completionMType);
+        if (context.clientId() != null)
+            msg.addParam("clientId", context.clientId());
         if (context.requestId() != null)
             msg.addParam("requestId", context.requestId());
         if (context.mtype() != null)
