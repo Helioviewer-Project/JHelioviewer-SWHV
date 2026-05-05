@@ -97,7 +97,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         cancelLoadTask();
         worker = LoadLayer.submit(this, req);
-        JHVFrame.getLayersPanel().refresh(); // give feedback asap
+        Layers.fireLayerUpdated(this); // give feedback asap
     }
 
     public void unload() {
