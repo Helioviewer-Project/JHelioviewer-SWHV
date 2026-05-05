@@ -71,6 +71,8 @@ public final class Layers {
 
         void layerRemoved(int index);
 
+        void layerUpdated(Layer layer);
+
         void timeUpdated(Layer layer);
     }
 
@@ -246,6 +248,10 @@ public final class Layers {
 
     public static void fireTimeUpdated(Layer layer) {
         listeners.forEach(listener -> listener.timeUpdated(layer));
+    }
+
+    public static void fireLayerUpdated(Layer layer) {
+        listeners.forEach(listener -> listener.layerUpdated(layer));
     }
 
     public static void addListener(Listener listener) {
