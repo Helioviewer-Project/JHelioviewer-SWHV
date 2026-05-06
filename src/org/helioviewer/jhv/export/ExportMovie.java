@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.export;
 
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -101,14 +100,12 @@ public final class ExportMovie implements Movie.Listener {
         if (input != null)
             ViewState.applyRecordStartUpdate(input.mode(), input.size(), input.advanceMode(), input.speed(), input.speedUnit());
 
-        ViewState.RecordingData recordingData = ViewState.recordingData();
         ViewState.PlaybackData playbackData = ViewState.playbackData();
-        Dimension size = recordingData.size().getSize();
         int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
-        start(size.width, size.height, recordingData.size().isInternal(), fps, recordingData.mode());
+        startRecording(ViewState.recordingData(), fps);
     }
 
-    public static void start(int _w, int _h, boolean isInternal, int fps, ViewState.RecordingMode _mode) {
+    private static void startRecording(ViewState.RecordingData recordingData, int fps) {
         shallStop = false;
 
         int scrw = 1;
@@ -118,10 +115,15 @@ public final class ExportMovie implements Movie.Listener {
             scrh = EVEImage.getHeight();
         }
 
-        mode = _mode;
-        int canvasWidth = mode == ViewState.RecordingMode.SHOT ? _w : (_w / MACROBLOCK) * MACROBLOCK;
+        ViewState.Size size = recordingData.size().getSize();
+        int width = size.width();
+        int height = size.height();
+        boolean internal = size.internal();
+
+        mode = recordingData.mode();
+        int canvasWidth = mode == ViewState.RecordingMode.SHOT ? width : (width / MACROBLOCK) * MACROBLOCK;
         int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
-        int canvasHeight = isInternal ? _h - sh : _h;
+        int canvasHeight = internal ? height - sh : height;
         int exportHeight = mode == ViewState.RecordingMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
 
         canvasHeight = exportHeight - sh;

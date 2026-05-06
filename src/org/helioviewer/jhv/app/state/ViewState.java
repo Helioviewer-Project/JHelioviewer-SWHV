@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.app.state;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
@@ -81,33 +80,27 @@ public final class ViewState {
     }
 
     public enum RecordingSize {
-        ORIGINAL("On screen", 0, 0, false),
-        H1024("1024×1024", 1024, 1024, true),
-        H1080("1920×1080", 1920, 1080, true),
-        H2048("2048×2048", 2048, 2048, true),
-        H2160("3840×2160", 3840, 2160, true),
-        H4096("4096×4096", 4096, 4096, true);
+        ORIGINAL("On screen", 0, 0),
+        H1024("1024×1024", 1024, 1024),
+        H1080("1920×1080", 1920, 1080),
+        H2048("2048×2048", 2048, 2048),
+        H2160("3840×2160", 3840, 2160),
+        H4096("4096×4096", 4096, 4096);
 
         private final String label;
         private final int width;
         private final int height;
-        private final boolean internal;
 
-        RecordingSize(String _label, int _width, int _height, boolean _internal) {
+        RecordingSize(String _label, int _width, int _height) {
             label = _label;
             width = _width;
             height = _height;
-            internal = _internal;
         }
 
-        public boolean isInternal() {
-            return internal;
-        }
-
-        public Dimension getSize() {
+        public Size getSize() {
             if (this == ORIGINAL)
-                return new Dimension(Display.fullViewport.width, Display.fullViewport.height);
-            return new Dimension(width, height);
+                return new Size(Display.fullViewport.width, Display.fullViewport.height, false);
+            return new Size(width, height, true);
         }
 
         @Override
@@ -123,6 +116,8 @@ public final class ViewState {
                                int firstFrame, int lastFrame) {}
 
     public record RecordingData(RecordingMode mode, RecordingSize size) {}
+
+    public record Size(int width, int height, boolean internal) {}
 
     private static final ArrayList<ModeListener> modeListeners = new ArrayList<>();
     private static final ArrayList<PlaybackConfigListener> playbackConfigListeners = new ArrayList<>();
