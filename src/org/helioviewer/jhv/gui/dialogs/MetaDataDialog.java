@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
@@ -151,7 +150,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
             exportFitsButton.addActionListener(e -> JHVThread.create(() -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     writer.write(xml, 0, xml.length());
-                    EventQueue.invokeLater(() -> CompletionNotifications.fileReady(path.toString()));
+                    CompletionNotifications.fileReady(path.toString());
                 } catch (Exception ex) {
                     Log.error("Failed to write metadata", ex);
                 }
