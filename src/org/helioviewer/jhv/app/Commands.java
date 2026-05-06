@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.app;
 
+import java.awt.EventQueue;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -204,12 +205,12 @@ public final class Commands {
     }
 
     public static void notifyLoadStateFinished(@Nullable OperationContext context, boolean success, String message) {
-        completionListeners.forEach(listener -> listener.loadStateFinished(context, success, message));
+        EventQueue.invokeLater(() -> completionListeners.forEach(listener -> listener.loadStateFinished(context, success, message)));
     }
 
     public static void notifyRecordingFinished(@Nullable OperationContext context, boolean success, String message,
                                                @Nullable String output) {
-        completionListeners.forEach(listener -> listener.recordingFinished(context, success, message, output));
+        EventQueue.invokeLater(() -> completionListeners.forEach(listener -> listener.recordingFinished(context, success, message, output)));
     }
 
 }
