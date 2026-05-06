@@ -143,12 +143,12 @@ public final class ExportMovie implements Movie.Listener {
             } catch (Exception ignore) {}
             exporter = new MovieExporter(format, canvasWidth, exportHeight, fps);
 
+            recording = true;
+            notifyStatusChanged();
+
             if (mode == ViewState.RecordingMode.LOOP) {
                 Movie.addFrameListener(instance);
                 Commands.seekFrame(0);
-
-                recording = true;
-                notifyStatusChanged();
                 Commands.play();
             }
         }
