@@ -46,8 +46,8 @@ public final class GLRenderer {
             miniview.reshapeViewport();
     }
 
-    public static void display(boolean whiteBackground) {
-        if (whiteBackground)
+    public static void display() {
+        if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
         else
             GL.glClearColor(0, 0, 0, 0);

@@ -5,8 +5,8 @@ import java.awt.Component;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
@@ -133,7 +133,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
         int detail = optionsPanel.getDetail();
         boolean fixedColor = optionsPanel.getFixedColor();
         double radius = optionsPanel.getRadius();
-        boolean whiteBackground = JHVFrame.isWhiteBackground();
+        boolean whiteBackground = Display.whiteBackground;
 
         if (lastData != data || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius || lastWhiteBackground != whiteBackground) {
             lastDetail = detail;

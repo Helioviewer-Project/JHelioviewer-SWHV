@@ -33,7 +33,6 @@ import org.helioviewer.jhv.opengl.angle.X11AngleBridge;
 public final class AngleCanvas extends Canvas {
     private long macHostHandle;
     private long nativeWindowHandle;
-    private boolean whiteBackground;
     private AngleRenderer angleRenderer;
     private boolean displayPending;
     private boolean hostUpdatePending;
@@ -164,17 +163,13 @@ public final class AngleCanvas extends Canvas {
             lastGlWidth = glWidth;
             lastGlHeight = glHeight;
         }
-        angleRenderer.render(whiteBackground);
+        angleRenderer.render();
 
         Camera camera = Display.getCamera();
         Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
         JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
 
         fpsCount++;
-    }
-
-    public void setWhiteBackground(boolean white) {
-        whiteBackground = white;
     }
 
     // Create the platform-native host/window handle and ANGLE renderer on first use.

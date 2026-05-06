@@ -9,6 +9,7 @@ public class Display {
 
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
+    public static boolean whiteBackground = false;
 
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
