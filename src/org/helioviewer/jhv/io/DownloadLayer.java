@@ -12,8 +12,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.Tasks;
 
@@ -69,7 +69,7 @@ public class DownloadLayer {
     private static void onSuccess(ImageLayer layer, Path result) {
         layer.doneDownload();
         LoadLayer.submit(layer, List.of(result.toUri()));
-        JHVGlobals.displayNotification(result.toString());
+        CompletionNotifications.fileReady(result.toString());
     }
 
     private static void onFailure(ImageLayer layer, Throwable t) {
