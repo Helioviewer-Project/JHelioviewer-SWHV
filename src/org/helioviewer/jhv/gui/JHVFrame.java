@@ -117,8 +117,6 @@ public final class JHVFrame {
     private static LayersPanel layersPanel;
 
     private static MenuBar menuBar;
-    private static boolean whiteBackground;
-
     public static JFrame prepare() {
         mainFrame = createFrame();
         CompletionNotifications.init();
@@ -195,7 +193,6 @@ public final class JHVFrame {
 
         renderCanvas = new AngleCanvas();
         renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
-        renderCanvas.setWhiteBackground(whiteBackground);
         renderCanvas.addMouseListener(awtInputAdapter);
         renderCanvas.addMouseMotionListener(awtInputAdapter);
         renderCanvas.addMouseWheelListener(awtInputAdapter);
@@ -304,16 +301,6 @@ public final class JHVFrame {
 
     public static Component getRenderComponent() {
         return renderCanvas != null ? renderCanvas : renderHost;
-    }
-
-    public static void setWhiteBackground(boolean whiteBackground) {
-        JHVFrame.whiteBackground = whiteBackground;
-        if (renderCanvas != null)
-            renderCanvas.setWhiteBackground(whiteBackground);
-    }
-
-    public static boolean isWhiteBackground() {
-        return whiteBackground;
     }
 
     public static int getFramerate() {

@@ -101,17 +101,17 @@ public final class AngleRenderer {
         context = newContext;
         surface = newSurface;
         try {
-            render(false);
+            render();
         } catch (RuntimeException | Error e) {
             dispose();
             throw e;
         }
     }
 
-    public void render(boolean whiteBackground) {
+    public void render() {
         if (!EGL15.eglMakeCurrent(display, surface, surface, context))
             throw eglError("eglMakeCurrent");
-        GLRenderer.display(whiteBackground);
+        GLRenderer.display();
         if (!EGL15.eglSwapBuffers(display, surface))
             throw eglError("eglSwapBuffers");
     }
