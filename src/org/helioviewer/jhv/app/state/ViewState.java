@@ -9,7 +9,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -286,11 +285,6 @@ public final class ViewState {
         notifyModeListeners();
     }
 
-    public static void initFromInteraction() {
-        if (JHVFrame.getInteraction() != null)
-            annotationMode = JHVFrame.getInteraction().getAnnotationMode();
-    }
-
     public static AnnotationMode getAnnotationMode() {
         return annotationMode;
     }
@@ -300,8 +294,6 @@ public final class ViewState {
             return;
 
         annotationMode = newAnnotationMode;
-        if (JHVFrame.getInteraction() != null)
-            JHVFrame.getInteraction().setAnnotationMode(newAnnotationMode);
         notifyModeListeners();
     }
 

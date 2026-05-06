@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -45,15 +44,6 @@ public class Interaction {
 
     public Mode getMode() {
         return mode;
-    }
-
-    public void setAnnotationMode(AnnotationMode _annotationMode) {
-        interactionAnnotate.setAnnotationMode(_annotationMode);
-        // Settings.setProperty("display.interaction.annotation", _annotationMode.toString());
-    }
-
-    public AnnotationMode getAnnotationMode() {
-        return interactionAnnotate.getAnnotationMode();
     }
 
     private Type getType() {
