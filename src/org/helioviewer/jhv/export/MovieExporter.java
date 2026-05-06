@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.export;
 
-import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -103,7 +102,6 @@ class MovieExporter {
         try {
             String outPath = prefix + format.extension;
             runFFmpeg(buildCommand(outPath));
-            notifyFinished(outPath);
             return outPath;
         } catch (Exception e) {
             deleteOutputs();
@@ -149,14 +147,6 @@ class MovieExporter {
         int exitCode = process.exitValue();
         if (exitCode != 0)
             throw new Exception("FFmpeg exit code " + exitCode);
-    }
-
-    private void notifyFinished(String outPath) {
-        String ready = " is ready in " + JHVGlobals.urify(JHVDirectory.EXPORTS.getPath()) + '.';
-        if (format == VideoFormat.PNG) // don't know name and how many
-            EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording" + ready));
-        else
-            EventQueue.invokeLater(() -> JHVGlobals.displayNotificationEx("Recording " + JHVGlobals.urify(outPath) + ready));
     }
 
     private void deleteOutputs() throws Exception {

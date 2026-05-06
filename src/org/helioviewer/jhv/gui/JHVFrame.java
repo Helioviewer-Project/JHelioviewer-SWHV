@@ -121,6 +121,7 @@ public final class JHVFrame {
 
     public static JFrame prepare() {
         mainFrame = createFrame();
+        CompletionNotifications.init();
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 

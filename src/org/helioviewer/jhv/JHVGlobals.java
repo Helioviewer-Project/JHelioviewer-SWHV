@@ -8,7 +8,6 @@ import java.util.Properties;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 
@@ -109,19 +108,6 @@ public class JHVGlobals {
         } catch (Exception e) {
             Log.warn(e);
         }
-    }
-
-    public static void displayNotification(String path) {
-        displayNotificationEx("File " + urify(path) + " is ready.");
-    }
-
-    public static String urify(String uri) {
-        String openURI = new File(uri).toURI().toString();
-        return "<a href=\"" + openURI + "\">" + uri + "</a>";
-    }
-
-    public static void displayNotificationEx(String text) {
-        new TextDialog("Ready", text, false).showDialog();
     }
 
 }

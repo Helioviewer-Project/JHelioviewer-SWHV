@@ -18,9 +18,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.XMLUtils;
+import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
@@ -151,7 +151,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
             exportFitsButton.addActionListener(e -> JHVThread.create(() -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     writer.write(xml, 0, xml.length());
-                    EventQueue.invokeLater(() -> JHVGlobals.displayNotification(path.toString()));
+                    EventQueue.invokeLater(() -> CompletionNotifications.fileReady(path.toString()));
                 } catch (Exception ex) {
                     Log.error("Failed to write metadata", ex);
                 }
