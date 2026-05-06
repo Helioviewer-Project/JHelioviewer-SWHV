@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui;
 
+import java.awt.EventQueue;
 import java.io.File;
 
 import javax.annotation.Nullable;
@@ -34,7 +35,7 @@ public final class CompletionNotifications {
     }
 
     public static void fileReady(String path) {
-        show("File " + urify(path) + " is ready.");
+        EventQueue.invokeLater(() -> show("File " + urify(path) + " is ready."));
     }
 
     private static String urify(String uri) {

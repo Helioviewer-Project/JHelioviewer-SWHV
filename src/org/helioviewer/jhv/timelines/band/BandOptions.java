@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.BufferedWriter;
@@ -78,7 +77,7 @@ class BandOptions extends JPanel {
             JHVThread.create(() -> {
                 try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                     jo.write(writer);
-                    EventQueue.invokeLater(() -> CompletionNotifications.fileReady(path.toString()));
+                    CompletionNotifications.fileReady(path.toString());
                 } catch (Exception ex) {
                     Log.error("Failed to write JSON", ex);
                 }
