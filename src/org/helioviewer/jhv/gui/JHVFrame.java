@@ -18,7 +18,6 @@ import javax.swing.TransferHandler;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Platform;
-import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
@@ -141,7 +140,6 @@ public final class JHVFrame {
         leftPaneHost.add(leftScrollPane, BorderLayout.CENTER);
 
         interaction = new Interaction(Display.getCamera());
-        ViewState.initFromInteraction();
         inputController = new InputController(interaction);
         awtInputAdapter = new AwtInputAdapter(inputController);
 
