@@ -5,13 +5,13 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -39,7 +39,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     private static long currentTime;
 
     private static boolean locked;
-    private static final Timer layersUpdater = new Timer(1000 / 2, e -> syncLockedLayers());
+    private static final EDTTimer layersUpdater = new EDTTimer(1000 / 2, DrawController::syncLockedLayers);
 
     static {
         layersUpdater.setRepeats(false);
