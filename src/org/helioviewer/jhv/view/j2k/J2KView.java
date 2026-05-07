@@ -265,7 +265,7 @@ public class J2KView extends BaseView {
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
-            reader.signal(new J2KParams.Read(this, decodeParams, viewpoint, priority));
+            reader.signal(new J2KParams.Read(this, (J2KSource.Remote) source, decodeParams, viewpoint, priority));
             currentLevel = level;
         }
     }
