@@ -1,17 +1,15 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.export.ExportMovie;
+import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -163,23 +161,7 @@ public class Movie {
         }
     }
 
-    private static class RelativeTimeAdvanceListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            relativeTimeAdvance();
-        }
-    }
-
-    private static class AbsoluteTimeAdvanceListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            absoluteTimeAdvance();
-        }
-    }
-
-    private static final RelativeTimeAdvanceListener relativeTimeAdvanceListener = new RelativeTimeAdvanceListener();
-    private static final AbsoluteTimeAdvanceListener absoluteTimeAdvanceListener = new AbsoluteTimeAdvanceListener();
-    private static final Timer movieTimer = new Timer(1000 / FPS_RELATIVE_DEFAULT, relativeTimeAdvanceListener);
+    private static final EDTTimer movieTimer = new EDTTimer(1000 / FPS_RELATIVE_DEFAULT, Movie::relativeTimeAdvance);
 
     public static boolean isPlaying() {
         return movieTimer.isRunning();
@@ -326,17 +308,13 @@ public class Movie {
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
-        for (ActionListener listener : movieTimer.getActionListeners())
-            movieTimer.removeActionListener(listener);
-        movieTimer.addActionListener(relativeTimeAdvanceListener);
+        movieTimer.setTask(Movie::relativeTimeAdvance);
         movieTimer.setDelay(1000 / fps);
         deltaT = 0;
     }
 
     public static void setDesiredAbsoluteSpeed(int sec) {
-        for (ActionListener listener : movieTimer.getActionListeners())
-            movieTimer.removeActionListener(listener);
-        movieTimer.addActionListener(absoluteTimeAdvanceListener);
+        movieTimer.setTask(Movie::absoluteTimeAdvance);
         movieTimer.setDelay(1000 / FPS_ABSOLUTE);
         deltaT = 1000 / FPS_ABSOLUTE * sec;
     }

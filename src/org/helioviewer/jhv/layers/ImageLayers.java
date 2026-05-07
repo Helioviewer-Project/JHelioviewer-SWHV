@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.annotation.Nullable;
-import javax.swing.Timer;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
@@ -15,6 +14,7 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.astrogrid.samp.Message;
@@ -175,11 +175,11 @@ public final class ImageLayers {
         diffRotationMode = b;
     }
 
-    private static final Timer refreshTimer;
+    private static final EDTTimer refreshTimer;
     private static final int timerDelay = 15 * (int) TimeUtils.MINUTE_IN_MILLIS;
 
     static {
-        refreshTimer = new Timer(timerDelay, e -> refreshLayersSpan());
+        refreshTimer = new EDTTimer(timerDelay, ImageLayers::refreshLayersSpan);
         refreshTimer.setInitialDelay(0);
     }
 
