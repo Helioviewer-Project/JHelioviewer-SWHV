@@ -269,9 +269,9 @@ abstract class J2KSource {
 
     abstract void doInitResolutionState() throws KduException;
 
-    static class Local extends J2KSource {
+    private static final AtomicBoolean full = new AtomicBoolean(true);
 
-        private static final AtomicBoolean full = new AtomicBoolean(true);
+    static class Local extends J2KSource {
 
         private final String path;
         private ResolutionSet[] resolutionSet;
@@ -319,8 +319,6 @@ abstract class J2KSource {
     }
 
     static class Remote extends J2KSource {
-
-        private static final AtomicBoolean full = new AtomicBoolean(true);
 
         private final JPIPCache cache = new JPIPCache();
         private ResolutionSet[] resolutionSet;
@@ -401,8 +399,8 @@ abstract class J2KSource {
 
         @SuppressWarnings("try")
         void setFramePartial(int frame) throws KduException {
-            try (Use ignored = use()) {
-                if (resolutionSet[frame] == null) {
+            if (resolutionSet[frame] == null) {
+                try (Use ignored = use()) {
                     resolutionSet[frame] = readResolutionSet(frame);
                 }
             }
