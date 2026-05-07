@@ -23,10 +23,10 @@ class J2KReader implements Runnable {
     private JPIPSocket socket;
     private String[] cacheKey;
 
-    J2KReader(URI _uri, J2KSource.Remote _source) throws KduException, IOException {
+    J2KReader(URI _uri, J2KSource.Remote source) throws KduException, IOException {
         uri = _uri;
 
-        JPIPCache cache = _source.cache();
+        JPIPCache cache = source.cache();
         socket = new JPIPSocket(uri, cache);
         try {
             socket.init(cache);
@@ -116,25 +116,24 @@ class J2KReader implements Runnable {
             }
 
             J2KView view = params.view();
-            CompletionLevel completionLevel = view.completionLevel();
-            int numFrames = cacheKey.length;
+            J2KSource.Remote source = params.source();
 
             int frame = params.decodeParams().frame();
             int level = params.decodeParams().level();
-
-            ResolutionSet.Level resLevel = view.getResolutionLevel(frame, level);
+            ResolutionSet.Level resLevel = source.completionLevel().getResolutionSet(frame).getLevel(level);
             int width = resLevel.width();
             int height = resLevel.height();
 
             view.setDownloading(true);
 
             try {
-                J2KSource.Remote source = params.source();
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
                     socket = new JPIPSocket(uri, source.cache());
                 }
+
                 // choose cache strategy
+                int numFrames = cacheKey.length;
                 boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority();
 
                 // build query based on strategy
@@ -147,7 +146,7 @@ class J2KReader implements Runnable {
                 } else {
                     stepQueries = createMultiQuery(numFrames, fSiz);
 
-                    int partial = completionLevel.getPartialUntil();
+                    int partial = source.completionLevel().getPartialUntil();
                     currentStep = partial < numFrames - 1 ? partial : frame;
                 }
 
@@ -170,11 +169,11 @@ class J2KReader implements Runnable {
                         completeSteps++;
                         stepQueries[currentStep] = null;
 
-                        completionLevel.setFrameComplete(currentStep, level); // tell the completion level
+                        source.completionLevel().setFrameComplete(currentStep, level); // tell the completion level
                         if (singleFrame)
                             view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
                     } else {
-                        completionLevel.setFramePartial(currentStep); // tell the completion level
+                        source.completionLevel().setFramePartial(currentStep); // tell the completion level
                     }
 
                     UITimer.completionChanged();
@@ -191,14 +190,14 @@ class J2KReader implements Runnable {
                 view.setDownloading(false);
 
                 // suicide if fully done
-                if (completionLevel.isComplete(0)) {
+                if (source.completionLevel().isComplete(0)) {
                     try {
                         socket.close();
                     } catch (IOException ignore) {}
                     return;
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && !stopReading && !completionLevel.isComplete(level)) {
+                if (singleFrame && !stopReading && !source.completionLevel().isComplete(level)) {
                     signal(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only
