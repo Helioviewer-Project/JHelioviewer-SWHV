@@ -16,7 +16,6 @@ import kdu_jni.KduException;
 class J2KReader implements Runnable {
 
     private final ArrayBlockingQueue<J2KParams.Read> signalQueue = new ArrayBlockingQueue<>(1);
-    private final J2KSource.Remote source;
     private final URI uri;
     private final Thread myThread;
 
@@ -26,11 +25,11 @@ class J2KReader implements Runnable {
 
     J2KReader(URI _uri, J2KSource.Remote _source) throws KduException, IOException {
         uri = _uri;
-        source = _source;
 
-        socket = new JPIPSocket(uri, cache());
+        JPIPCache cache = _source.cache();
+        socket = new JPIPSocket(uri, cache);
         try {
-            socket.init(cache());
+            socket.init(cache);
         } catch (Exception e) {
             initCloseSocket();
             throw new IOException("Error in the server communication: " + e.getMessage(), e);
@@ -91,12 +90,8 @@ class J2KReader implements Runnable {
         return stepQueries;
     }
 
-    private JPIPCache cache() {
-        return source.cache();
-    }
-
-    private boolean readStep(String query, String key, int level, int frame) throws KduException, IOException {
-        JPIPCache cache = cache();
+    private boolean readStep(J2KSource.Remote source, String query, String key, int level, int frame) throws KduException, IOException {
+        JPIPCache cache = source.cache();
         if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
             return true;
 
@@ -134,9 +129,10 @@ class J2KReader implements Runnable {
             view.setDownloading(true);
 
             try {
+                J2KSource.Remote source = params.source();
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    socket = new JPIPSocket(uri, cache());
+                    socket = new JPIPSocket(uri, source.cache());
                 }
                 // choose cache strategy
                 boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority();
@@ -168,7 +164,7 @@ class J2KReader implements Runnable {
                         continue;
                     }
 
-                    boolean downloadComplete = readStep(stepQueries[currentStep], cacheKey[currentStep], level, currentStep);
+                    boolean downloadComplete = readStep(source, stepQueries[currentStep], cacheKey[currentStep], level, currentStep);
                     if (downloadComplete) {
                         // mark query as complete
                         completeSteps++;
@@ -203,7 +199,7 @@ class J2KReader implements Runnable {
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && !stopReading && !completionLevel.isComplete(level)) {
-                    signal(new J2KParams.Read(params.view(), params.decodeParams(), params.viewpoint(), false));
+                    signal(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;
