@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.view.View;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 
 import kdu_jni.Jp2_input_box;
 import kdu_jni.Jp2_palette;
@@ -17,7 +18,6 @@ import kdu_jni.Jpx_meta_manager;
 import kdu_jni.Jpx_metanode;
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
-import kdu_jni.Kdu_cache;
 import kdu_jni.Kdu_channel_mapping;
 import kdu_jni.Kdu_codestream;
 import kdu_jni.Kdu_coords;
@@ -55,10 +55,10 @@ abstract class J2KSource {
 
     static class Remote extends J2KSource {
 
-        private final Kdu_cache cache;
+        private final JPIPCache cache = new JPIPCache();
 
-        Remote(Kdu_cache _cache) {
-            cache = _cache;
+        JPIPCache cache() {
+            return cache;
         }
 
         @Override
@@ -70,9 +70,17 @@ abstract class J2KSource {
             super.isClosed = false;
         }
 
+        @Override
+        void destroy() throws KduException {
+            cache.Close();
+            cache.Native_destroy();
+        }
+
     }
 
     abstract void open() throws KduException;
+
+    void destroy() throws KduException {}
 
     synchronized boolean beginUse() {
         if (closing)

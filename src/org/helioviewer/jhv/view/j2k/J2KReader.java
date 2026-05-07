@@ -16,7 +16,7 @@ import kdu_jni.KduException;
 class J2KReader implements Runnable {
 
     private final ArrayBlockingQueue<J2KParams.Read> signalQueue = new ArrayBlockingQueue<>(1);
-    private final JPIPCache cache;
+    private final J2KSource.Remote source;
     private final URI uri;
     private final Thread myThread;
 
@@ -24,13 +24,13 @@ class J2KReader implements Runnable {
     private JPIPSocket socket;
     private String[] cacheKey;
 
-    J2KReader(URI _uri, JPIPCache _cache) throws KduException, IOException {
+    J2KReader(URI _uri, J2KSource.Remote _source) throws KduException, IOException {
         uri = _uri;
-        cache = _cache;
+        source = _source;
 
-        socket = new JPIPSocket(uri, cache);
+        socket = new JPIPSocket(uri, cache());
         try {
-            socket.init(cache);
+            socket.init(cache());
         } catch (Exception e) {
             initCloseSocket();
             throw new IOException("Error in the server communication: " + e.getMessage(), e);
@@ -91,7 +91,12 @@ class J2KReader implements Runnable {
         return stepQueries;
     }
 
+    private JPIPCache cache() {
+        return source.cache();
+    }
+
     private boolean readStep(String query, String key, int level, int frame) throws KduException, IOException {
+        JPIPCache cache = cache();
         if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
             return true;
 
@@ -131,7 +136,7 @@ class J2KReader implements Runnable {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    socket = new JPIPSocket(uri, cache);
+                    socket = new JPIPSocket(uri, cache());
                 }
                 // choose cache strategy
                 boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority();
