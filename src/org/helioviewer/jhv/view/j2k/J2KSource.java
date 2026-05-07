@@ -402,7 +402,9 @@ abstract class J2KSource {
         @SuppressWarnings("try")
         void setFramePartial(int frame) throws KduException {
             try (Use ignored = use()) {
-                storeFrameResolutionSet(frame, readResolutionSet(frame));
+                if (resolutionSet[frame] == null) {
+                    resolutionSet[frame] = readResolutionSet(frame);
+                }
             }
         }
 
@@ -413,12 +415,6 @@ abstract class J2KSource {
 
             if (resolutionSet[frame] != null)
                 resolutionSet[frame].setComplete(level);
-        }
-
-        private void storeFrameResolutionSet(int frame, ResolutionSet frameResolutionSet) {
-            if (resolutionSet[frame] == null) {
-                resolutionSet[frame] = frameResolutionSet;
-            }
         }
 
     }
