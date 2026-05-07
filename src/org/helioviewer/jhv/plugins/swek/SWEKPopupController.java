@@ -25,7 +25,7 @@ import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.opengl.GLHelper;
+import org.helioviewer.jhv.swing.AwtInputAdapter;
 import org.helioviewer.jhv.time.TimeListener;
 
 class SWEKPopupController implements InputPointerListener, InputPointerMotionListener, TimeListener.Change {
@@ -97,7 +97,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             Component canvas = component();
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(currentTime));
             hekPopUp.pack();
-            hekPopUp.setLocation(calcWindowPosition(canvas, GLHelper.GL2AWTPoint(e.x(), e.y()), hekPopUp.getWidth(), hekPopUp.getHeight()));
+            hekPopUp.setLocation(calcWindowPosition(canvas, AwtInputAdapter.toAwtPoint(e), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
 
             canvas.setCursor(helpCursor);

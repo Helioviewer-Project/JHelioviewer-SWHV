@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.swing;
 
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -28,6 +29,10 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
                 e.getClickCount(),
                 e.isShiftDown(),
                 e.isPopupTrigger());
+    }
+
+    public static Point toAwtPoint(PointerEvent e) {
+        return new Point((int) (e.x() / Display.pixelScale[0] + .5), (int) (e.y() / Display.pixelScale[1] + .5));
     }
 
     private static KeyInputEvent synthesizeKey(KeyEvent e) {
