@@ -1,9 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import java.awt.Point;
-
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.math.Quat;
 
 public class GLHelper {
@@ -52,10 +49,6 @@ public class GLHelper {
         BufVertex vexBuf = new BufVertex(4 * GLSLShape.stride);
         vexBuf.putQuad2DStrip((float) x0, (float) y0, (float) (x0 + w), (float) (y0 + h), color);
         rectangle.setVertex(vexBuf);
-    }
-
-    public static Point GL2AWTPoint(int x, int y) {
-        return new Point((int) (x / Display.pixelScale[0] + .5), (int) (y / Display.pixelScale[1] + .5));
     }
 
 }
