@@ -247,7 +247,7 @@ configuration unchanged. Invalid strings are warned about and ignored.
 
 Expected string domains:
 
-- `advanceMode`: `Loop`, `Stop`, `Swing`, `SwingDown`
+- `advanceMode`: `Loop`, `Stop`, `Swing`
 - `speedUnit`: `FRAMES_PER_SECOND`, `MINUTES_PER_SECOND`, `HOURS_PER_SECOND`, `DAYS_PER_SECOND`
 
 `speed`, `firstFrame`, and `lastFrame` are decimal integer strings.
@@ -391,7 +391,7 @@ Expected string domains:
 
 - `mode`: `LOOP`, `SHOT`, `FREE`
 - `size`: `ORIGINAL`, `H1024`, `H1080`, `H2048`, `H2160`, `H4096`
-- `advanceMode`: `Loop`, `Stop`, `Swing`, `SwingDown`
+- `advanceMode`: `Loop`, `Stop`, `Swing`
 - `speedUnit`: `FRAMES_PER_SECOND`, `MINUTES_PER_SECOND`, `HOURS_PER_SECOND`, `DAYS_PER_SECOND`
 
 These values are matched with Java `valueOf(...)`, so spelling and case must

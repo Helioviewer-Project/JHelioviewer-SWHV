@@ -36,7 +36,6 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.Movie.AdvanceMode;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
@@ -66,7 +65,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private final JideButton advancedButton;
     private final JHVSpinner speedSpinner;
     private final JComboBox<ViewState.PlaybackSpeedUnit> speedUnitComboBox;
-    private final JComboBox<AdvanceMode> advanceModeComboBox;
+    private final JComboBox<Movie.AdvanceMode> advanceModeComboBox;
     private final JRadioButton loopButton;
     private final JRadioButton shotButton;
     private final JRadioButton freeButton;
@@ -145,8 +144,8 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         // Animation mode
         modePanel.add(new JLabel(" and ", JLabel.RIGHT));
 
-        advanceModeComboBox = new JComboBox<>(new AdvanceMode[]{AdvanceMode.Loop, AdvanceMode.Stop, AdvanceMode.Swing, AdvanceMode.SwingDown});
-        advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((AdvanceMode) advanceModeComboBox.getSelectedItem()));
+        advanceModeComboBox = new JComboBox<>(new Movie.AdvanceMode[]{Movie.AdvanceMode.Loop, Movie.AdvanceMode.Stop, Movie.AdvanceMode.Swing});
+        advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((Movie.AdvanceMode) advanceModeComboBox.getSelectedItem()));
         modePanel.add(advanceModeComboBox);
 
         // Record

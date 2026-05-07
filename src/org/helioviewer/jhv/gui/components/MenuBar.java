@@ -10,7 +10,6 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.Actions;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.LogDialog;
 import org.helioviewer.jhv.gui.dialogs.SettingsDialog;
