@@ -19,9 +19,9 @@ interface CompletionLevel {
     @Nullable
     AtomicBoolean getFrameStatus(int frame, int level);
 
-    void setFrameComplete(int frame, int level) throws KduException;
+    void setFrameComplete(J2KSource source, int frame, int level) throws KduException;
 
-    void setFramePartial(int frame) throws KduException;
+    void setFramePartial(J2KSource source, int frame) throws KduException;
 
     class Local implements CompletionLevel {
 
@@ -59,23 +59,21 @@ interface CompletionLevel {
         }
 
         @Override
-        public void setFrameComplete(int frame, int level) {}
+        public void setFrameComplete(J2KSource source, int frame, int level) {}
 
         @Override
-        public void setFramePartial(int frame) {}
+        public void setFramePartial(J2KSource source, int frame) {}
 
     }
 
     class Remote implements CompletionLevel {
 
-        private final J2KSource source;
         private final int maxFrame;
         private final ResolutionSet[] resolutionSet;
 
         private int partialUntil = 0;
 
-        Remote(J2KSource _source, int _maxFrame) throws KduException {
-            source = _source;
+        Remote(J2KSource source, int _maxFrame) throws KduException {
             maxFrame = _maxFrame;
             resolutionSet = new ResolutionSet[maxFrame + 1];
             resolutionSet[0] = source.getResolutionSet(0);
@@ -132,17 +130,17 @@ interface CompletionLevel {
         }
 
         @Override
-        public void setFrameComplete(int frame, int level) throws KduException {
+        public void setFrameComplete(J2KSource source, int frame, int level) throws KduException {
             if (fullyComplete)
                 return;
 
-            setFramePartial(frame);
+            setFramePartial(source, frame);
             if (resolutionSet[frame] != null)
                 resolutionSet[frame].setComplete(level);
         }
 
         @Override
-        public void setFramePartial(int frame) throws KduException {
+        public void setFramePartial(J2KSource source, int frame) throws KduException {
             if (resolutionSet[frame] == null) {
                 resolutionSet[frame] = source.getResolutionSet(frame);
             }
