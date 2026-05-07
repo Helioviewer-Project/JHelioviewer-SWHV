@@ -140,14 +140,11 @@ interface CompletionLevel {
         }
 
         @Override
+        @SuppressWarnings("try")
         public void setFramePartial(J2KSource source, int frame) throws KduException {
             if (resolutionSet[frame] == null) {
-                if (!source.beginUse())
-                    return;
-                try {
+                try (J2KSource.Use ignored = source.use()) {
                     resolutionSet[frame] = source.getResolutionSet(frame);
-                } finally {
-                    source.endUse();
                 }
             }
         }

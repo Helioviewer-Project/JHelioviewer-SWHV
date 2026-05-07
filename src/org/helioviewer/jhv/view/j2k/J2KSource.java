@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CancellationException;
 
 import javax.annotation.Nullable;
 
@@ -124,6 +125,19 @@ abstract class J2KSource {
         users--;
         if (users == 0)
             notifyAll();
+    }
+
+    Use use() {
+        if (!beginUse())
+            throw new CancellationException("J2KSource access cancelled after close");
+        return new Use(this);
+    }
+
+    record Use(J2KSource source) implements AutoCloseable {
+        @Override
+        public void close() {
+            source.endUse();
+        }
     }
 
     void close() throws KduException {
