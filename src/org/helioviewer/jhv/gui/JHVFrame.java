@@ -117,6 +117,7 @@ public final class JHVFrame {
     private static LayersPanel layersPanel;
 
     private static MenuBar menuBar;
+
     public static JFrame prepare() {
         mainFrame = createFrame();
         CompletionNotifications.init();

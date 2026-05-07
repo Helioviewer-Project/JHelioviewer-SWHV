@@ -321,8 +321,13 @@ public class ViewpointLayer extends AbstractLayer {
             planetBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], SIZE_PLANET, color);
         }
 
-        orbits.setVertex(orbitBuf);
-        orbits.renderLine(vp, LINEWIDTH_ORBIT);
+        // Avoid GLSLLine warning: must have at least 2 vertices + 2 sentinels to draw.
+        if (orbitBuf.getCount() >= 4) {
+            orbits.setVertex(orbitBuf);
+            orbits.renderLine(vp, LINEWIDTH_ORBIT);
+        } else {
+            orbitBuf.clear();
+        }
 
         planets.setVertex(planetBuf);
         planets.renderPoints(pointFactor);
