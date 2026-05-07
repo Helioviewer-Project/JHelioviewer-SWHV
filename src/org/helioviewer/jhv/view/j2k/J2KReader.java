@@ -3,7 +3,6 @@ package org.helioviewer.jhv.view.j2k;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CancellationException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
@@ -91,10 +90,9 @@ class J2KReader implements Runnable {
         return stepQueries;
     }
 
+    @SuppressWarnings("try")
     private boolean readStep(J2KSource.Remote source, String query, String key, int level, int frame) throws KduException, IOException {
-        if (!source.beginUse())
-            throw new CancellationException("Read cancelled after source close");
-        try {
+        try (J2KSource.Use ignored = source.use()) {
             JPIPCache cache = source.cache();
             if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
                 return true;
@@ -106,12 +104,11 @@ class J2KReader implements Runnable {
                     writer.commit();
                 return complete;
             }
-        } finally {
-            source.endUse();
         }
     }
 
     @Override
+    @SuppressWarnings("try")
     public void run() {
         while (!isAbolished) {
             J2KParams.Read params;
@@ -136,12 +133,8 @@ class J2KReader implements Runnable {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    if (!source.beginUse())
-                        throw new CancellationException("Read cancelled after source close");
-                    try {
+                    try (J2KSource.Use ignored = source.use()) {
                         socket = new JPIPSocket(uri, source.cache());
-                    } finally {
-                        source.endUse();
                     }
                 }
 
