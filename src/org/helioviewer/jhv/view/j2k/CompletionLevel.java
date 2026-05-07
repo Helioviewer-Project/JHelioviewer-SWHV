@@ -19,9 +19,9 @@ interface CompletionLevel {
     @Nullable
     AtomicBoolean getFrameStatus(int frame, int level);
 
-    void setFrameComplete(J2KSource source, int frame, int level) throws KduException;
+    void setFrameComplete(int frame, int level);
 
-    void setFramePartial(J2KSource source, int frame) throws KduException;
+    void setFramePartial(int frame, ResolutionSet frameResolutionSet);
 
     class Local implements CompletionLevel {
 
@@ -33,7 +33,7 @@ interface CompletionLevel {
             maxFrame = _maxFrame;
             resolutionSet = new ResolutionSet[maxFrame + 1];
             for (int i = 0; i <= maxFrame; ++i) {
-                resolutionSet[i] = source.getResolutionSet(i);
+                resolutionSet[i] = source.readResolutionSet(i);
                 resolutionSet[i].setComplete(0);
             }
         }
@@ -59,10 +59,10 @@ interface CompletionLevel {
         }
 
         @Override
-        public void setFrameComplete(J2KSource source, int frame, int level) {}
+        public void setFrameComplete(int frame, int level) {}
 
         @Override
-        public void setFramePartial(J2KSource source, int frame) {}
+        public void setFramePartial(int frame, ResolutionSet frameResolutionSet) {}
 
     }
 
@@ -76,7 +76,7 @@ interface CompletionLevel {
         Remote(J2KSource source, int _maxFrame) throws KduException {
             maxFrame = _maxFrame;
             resolutionSet = new ResolutionSet[maxFrame + 1];
-            resolutionSet[0] = source.getResolutionSet(0);
+            resolutionSet[0] = source.readResolutionSet(0);
         }
 
         @Override
@@ -130,22 +130,18 @@ interface CompletionLevel {
         }
 
         @Override
-        public void setFrameComplete(J2KSource source, int frame, int level) throws KduException {
+        public void setFrameComplete(int frame, int level) {
             if (fullyComplete)
                 return;
 
-            setFramePartial(source, frame);
             if (resolutionSet[frame] != null)
                 resolutionSet[frame].setComplete(level);
         }
 
         @Override
-        @SuppressWarnings("try")
-        public void setFramePartial(J2KSource source, int frame) throws KduException {
+        public void setFramePartial(int frame, ResolutionSet frameResolutionSet) {
             if (resolutionSet[frame] == null) {
-                try (J2KSource.Use ignored = source.use()) {
-                    resolutionSet[frame] = source.getResolutionSet(frame);
-                }
+                resolutionSet[frame] = frameResolutionSet;
             }
         }
 

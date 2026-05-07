@@ -95,7 +95,7 @@ public class J2KView extends BaseView {
                     metaData[i] = new FitsMetaData(new XMLMetaDataContainer(xmlMetaData[i]));
                 } catch (Exception e) {
                     xmlMetaData[i] = EMPTY_METAXML;
-                    ResolutionSet.Level level = source.getResolutionSet(i).getLevel(0);
+                    ResolutionSet.Level level = source.readResolutionSet(i).getLevel(0);
                     metaData[i] = new BasicMetaData(level.width(), level.height(), dataUri.baseName());
                     Log.warn("Helioviewer metadata missing for layer " + i, e);
                 }
@@ -196,7 +196,7 @@ public class J2KView extends BaseView {
     public boolean setNearestFrame(JHVTime time) {
         int frame = frameMap.nearestValue(time);
         if (frame != targetFrame) {
-            if (frame > source.completionLevel().getPartialUntil())
+            if (frame > source.getPartialUntil())
                 return false;
             targetFrame = frame;
         }
@@ -242,12 +242,12 @@ public class J2KView extends BaseView {
     protected J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
         ResolutionSet.Level res;
         if (ExportMovie.isRecording()) { // all bets are off
-            res = source.completionLevel().getResolutionSet(frame).getLevel(0);
+            res = source.resolutionSet(frame).getLevel(0);
             factor = 1;
         } else {
             MetaData m = metaData[frame];
             int reqHeight = (int) (m.getPhysicalRegion().height * pixFactor + .5);
-            res = source.completionLevel().getResolutionSet(frame).getNextLevel(reqHeight, reqHeight);
+            res = source.resolutionSet(frame).getNextLevel(reqHeight, reqHeight);
         }
 
         return new J2KParams.Decode(serial, frame, res.subImage(), res.level(), factor);
@@ -268,7 +268,7 @@ public class J2KView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
-        AtomicBoolean status = source.completionLevel().getFrameStatus(decodeParams.frame(), decodeParams.level()); // before signalling to reader
+        AtomicBoolean status = source.getFrameStatus(decodeParams.frame(), decodeParams.level()); // before signalling to reader
         boolean cacheResult = status != null && status.get();
         if (reader != null && !cacheResult) {
             signalReader(decodeParams, viewpoint);
@@ -298,7 +298,7 @@ public class J2KView extends BaseView {
 
     private void submitDecode(J2KParams.Decode decodeParams, Position viewpoint, boolean cacheResult) {
         DecodeKey key = new DecodeKey(decodeParams, filterType);
-        int numComps = source.completionLevel().getResolutionSet(decodeParams.frame()).numComps;
+        int numComps = source.resolutionSet(decodeParams.frame()).numComps;
         try {
             executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, cacheResult));
         } catch (RejectedExecutionException ignore) {
@@ -346,12 +346,12 @@ public class J2KView extends BaseView {
     @Nullable
     @Override
     public AtomicBoolean getFrameCompletion(int frame) {
-        return source.completionLevel().getFrameStatus(frame, currentLevel);
+        return source.getFrameStatus(frame, currentLevel);
     }
 
     @Override
     public boolean isComplete() {
-        return source.completionLevel().isComplete(currentLevel);
+        return source.isComplete(currentLevel);
     }
 
     @Nonnull
@@ -361,7 +361,7 @@ public class J2KView extends BaseView {
     }
 
     public ResolutionSet.Level getResolutionLevel(int frame, int level) {
-        return source.completionLevel().getResolutionSet(frame).getLevel(level);
+        return source.resolutionSet(frame).getLevel(level);
     }
 
 }

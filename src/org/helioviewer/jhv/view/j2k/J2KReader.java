@@ -124,7 +124,7 @@ class J2KReader implements Runnable {
 
             int frame = params.decodeParams().frame();
             int level = params.decodeParams().level();
-            ResolutionSet.Level resLevel = source.completionLevel().getResolutionSet(frame).getLevel(level);
+            ResolutionSet.Level resLevel = source.resolutionSet(frame).getLevel(level);
             int width = resLevel.width();
             int height = resLevel.height();
 
@@ -152,7 +152,7 @@ class J2KReader implements Runnable {
                 } else {
                     stepQueries = createMultiQuery(numFrames, fSiz);
 
-                    int partial = source.completionLevel().getPartialUntil();
+                    int partial = source.getPartialUntil();
                     currentStep = partial < numFrames - 1 ? partial : frame;
                 }
 
@@ -175,11 +175,11 @@ class J2KReader implements Runnable {
                         completeSteps++;
                         stepQueries[currentStep] = null;
 
-                        source.completionLevel().setFrameComplete(source, currentStep, level); // tell the completion level
+                        source.setFrameComplete(currentStep, level);
                         if (singleFrame)
                             view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
                     } else {
-                        source.completionLevel().setFramePartial(source, currentStep); // tell the completion level
+                        source.setFramePartial(currentStep);
                     }
 
                     UITimer.completionChanged();
@@ -196,14 +196,14 @@ class J2KReader implements Runnable {
                 view.setDownloading(false);
 
                 // suicide if fully done
-                if (source.completionLevel().isComplete(0)) {
+                if (source.isComplete(0)) {
                     try {
                         socket.close();
                     } catch (IOException ignore) {}
                     return;
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && !stopReading && !source.completionLevel().isComplete(level)) {
+                if (singleFrame && !stopReading && !source.isComplete(level)) {
                     signal(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only

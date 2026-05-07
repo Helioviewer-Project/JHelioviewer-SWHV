@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view.j2k;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
@@ -106,8 +107,33 @@ abstract class J2KSource {
         completionLevel = createCompletionLevel();
     }
 
-    CompletionLevel completionLevel() {
-        return completionLevel;
+    int getPartialUntil() {
+        return completionLevel.getPartialUntil();
+    }
+
+    ResolutionSet resolutionSet(int frame) {
+        return completionLevel.getResolutionSet(frame);
+    }
+
+    boolean isComplete(int level) {
+        return completionLevel.isComplete(level);
+    }
+
+    @Nullable
+    AtomicBoolean getFrameStatus(int frame, int level) {
+        return completionLevel.getFrameStatus(frame, level);
+    }
+
+    @SuppressWarnings("try")
+    void setFramePartial(int frame) throws KduException {
+        try (Use ignored = use()) {
+            completionLevel.setFramePartial(frame, readResolutionSet(frame));
+        }
+    }
+
+    void setFrameComplete(int frame, int level) throws KduException {
+        setFramePartial(frame);
+        completionLevel.setFrameComplete(frame, level);
     }
 
     int maxFrame() {
@@ -180,7 +206,7 @@ abstract class J2KSource {
         return temp[0];
     }
 
-    ResolutionSet getResolutionSet(int frame) throws KduException {
+    ResolutionSet readResolutionSet(int frame) throws KduException {
         Jpx_input_box inputBox = null;
         Kdu_codestream stream = null;
         try {
