@@ -32,6 +32,8 @@ abstract class J2KSource {
     private boolean isClosed = true;
     private boolean closing;
     private int users;
+    private CompletionLevel completionLevel;
+    private int maxFrame;
 
     static class Local extends J2KSource {
 
@@ -49,6 +51,12 @@ abstract class J2KSource {
             super.jp2Src.Open(path, true);
             super.jpxSrc.Open(super.jp2Src, false);
             super.isClosed = false;
+            super.initCompletionLevel();
+        }
+
+        @Override
+        CompletionLevel createCompletionLevel() throws KduException {
+            return new CompletionLevel.Local(this, maxFrame());
         }
 
     }
@@ -68,6 +76,7 @@ abstract class J2KSource {
             super.jp2Src.Open(cache);
             super.jpxSrc.Open(super.jp2Src, false);
             super.isClosed = false;
+            super.initCompletionLevel();
         }
 
         @Override
@@ -76,11 +85,33 @@ abstract class J2KSource {
             cache.Native_destroy();
         }
 
+        @Override
+        CompletionLevel createCompletionLevel() throws KduException {
+            return new CompletionLevel.Remote(this, maxFrame());
+        }
+
     }
 
     abstract void open() throws KduException;
 
+    abstract CompletionLevel createCompletionLevel() throws KduException;
+
     void destroy() throws KduException {}
+
+    private void initCompletionLevel() throws KduException {
+        if (completionLevel != null)
+            return;
+        maxFrame = getNumberLayers() - 1;
+        completionLevel = createCompletionLevel();
+    }
+
+    CompletionLevel completionLevel() {
+        return completionLevel;
+    }
+
+    int maxFrame() {
+        return maxFrame;
+    }
 
     synchronized boolean beginUse() {
         if (closing)
@@ -129,7 +160,7 @@ abstract class J2KSource {
         return isJP2;
     }
 
-    int getNumberLayers() throws KduException {
+    private int getNumberLayers() throws KduException {
         int[] temp = new int[1];
         jpxSrc.Count_compositing_layers(temp);
         return temp[0];
