@@ -415,7 +415,7 @@ public final class ViewState {
             @Nullable String firstFrame,
             @Nullable String lastFrame) {
         applyPlaybackUpdate(
-                parseEnum(advanceMode, Movie.AdvanceMode.class, "playback advance mode"),
+                parseAdvanceMode(advanceMode),
                 parseInteger(speed, "playback speed"),
                 parseEnum(speedUnit, PlaybackSpeedUnit.class, "playback speed unit"),
                 parseInteger(firstFrame, "playback first frame"),
@@ -496,6 +496,15 @@ public final class ViewState {
             Log.warn("Ignoring invalid " + name + " value: " + value, e);
             return null;
         }
+    }
+
+    private static @Nullable Movie.AdvanceMode parseAdvanceMode(@Nullable String value) {
+        Movie.AdvanceMode mode = parseEnum(value, Movie.AdvanceMode.class, "playback advance mode");
+        if (mode == Movie.AdvanceMode.SwingDown) {
+            Log.warn("Ignoring internal playback advance mode value: " + value);
+            return null;
+        }
+        return mode;
     }
 
     public static void setRecordingMode(RecordingMode newRecordingMode) {
