@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.view.View;
@@ -34,7 +35,7 @@ abstract class J2KSource {
     private boolean isClosed = true;
     private boolean closing;
     private int users;
-    private CompletionLevel completionLevel;
+    private CompletionState completionState;
     private int maxFrame;
 
     static class Local extends J2KSource {
@@ -57,8 +58,8 @@ abstract class J2KSource {
         }
 
         @Override
-        CompletionLevel createCompletionLevel() throws KduException {
-            return new CompletionLevel.Local(this, maxFrame());
+        CompletionState createCompletionState() throws KduException {
+            return new LocalCompletionState(this, maxFrame());
         }
 
     }
@@ -88,56 +89,197 @@ abstract class J2KSource {
         }
 
         @Override
-        CompletionLevel createCompletionLevel() throws KduException {
-            return new CompletionLevel.Remote(this, maxFrame());
+        CompletionState createCompletionState() throws KduException {
+            return new RemoteCompletionState(this, maxFrame());
         }
 
     }
 
     abstract void open() throws KduException;
 
-    abstract CompletionLevel createCompletionLevel() throws KduException;
+    abstract CompletionState createCompletionState() throws KduException;
 
     void destroy() throws KduException {}
 
     private void initCompletionLevel() throws KduException {
-        if (completionLevel != null)
+        if (completionState != null)
             return;
         maxFrame = getNumberLayers() - 1;
-        completionLevel = createCompletionLevel();
+        completionState = createCompletionState();
     }
 
     int getPartialUntil() {
-        return completionLevel.getPartialUntil();
+        return completionState.getPartialUntil();
     }
 
     ResolutionSet resolutionSet(int frame) {
-        return completionLevel.getResolutionSet(frame);
+        return completionState.resolutionSet(frame);
     }
 
     boolean isComplete(int level) {
-        return completionLevel.isComplete(level);
+        return completionState.isComplete(level);
     }
 
     @Nullable
     AtomicBoolean getFrameStatus(int frame, int level) {
-        return completionLevel.getFrameStatus(frame, level);
+        return completionState.getFrameStatus(frame, level);
     }
 
     @SuppressWarnings("try")
     void setFramePartial(int frame) throws KduException {
         try (Use ignored = use()) {
-            completionLevel.setFramePartial(frame, readResolutionSet(frame));
+            completionState.setFramePartial(frame, readResolutionSet(frame));
         }
     }
 
     void setFrameComplete(int frame, int level) throws KduException {
         setFramePartial(frame);
-        completionLevel.setFrameComplete(frame, level);
+        completionState.setFrameComplete(frame, level);
     }
 
     int maxFrame() {
         return maxFrame;
+    }
+
+    private interface CompletionState {
+
+        int getPartialUntil();
+
+        ResolutionSet resolutionSet(int frame);
+
+        boolean isComplete(int level);
+
+        @Nullable
+        AtomicBoolean getFrameStatus(int frame, int level);
+
+        void setFrameComplete(int frame, int level);
+
+        void setFramePartial(int frame, ResolutionSet frameResolutionSet);
+
+    }
+
+    private static class LocalCompletionState implements CompletionState {
+
+        private static final AtomicBoolean full = new AtomicBoolean(true);
+        private final ResolutionSet[] resolutionSet;
+        private final int maxFrame;
+
+        LocalCompletionState(J2KSource source, int _maxFrame) throws KduException {
+            maxFrame = _maxFrame;
+            resolutionSet = new ResolutionSet[maxFrame + 1];
+            for (int i = 0; i <= maxFrame; ++i) {
+                resolutionSet[i] = source.readResolutionSet(i);
+                resolutionSet[i].setComplete(0);
+            }
+        }
+
+        @Override
+        public int getPartialUntil() {
+            return maxFrame;
+        }
+
+        @Override
+        public ResolutionSet resolutionSet(int frame) {
+            return resolutionSet[frame];
+        }
+
+        @Override
+        public boolean isComplete(int level) {
+            return true;
+        }
+
+        @Override
+        public AtomicBoolean getFrameStatus(int frame, int level) {
+            return full;
+        }
+
+        @Override
+        public void setFrameComplete(int frame, int level) {}
+
+        @Override
+        public void setFramePartial(int frame, ResolutionSet frameResolutionSet) {}
+
+    }
+
+    private static class RemoteCompletionState implements CompletionState {
+
+        private final int maxFrame;
+        private final ResolutionSet[] resolutionSet;
+
+        private int partialUntil = 0;
+
+        RemoteCompletionState(J2KSource source, int _maxFrame) throws KduException {
+            maxFrame = _maxFrame;
+            resolutionSet = new ResolutionSet[maxFrame + 1];
+            resolutionSet[0] = source.readResolutionSet(0);
+        }
+
+        @Override
+        public int getPartialUntil() {
+            int i;
+            for (i = partialUntil; i <= maxFrame; i++) {
+                if (resolutionSet[i] == null)
+                    break;
+            }
+            partialUntil = Math.max(0, i - 1);
+            return partialUntil;
+        }
+
+        @Override
+        public ResolutionSet resolutionSet(int frame) {
+            if (resolutionSet[frame] == null) {
+                Log.error("resolutionSet[" + frame + "] is null"); // never happened?
+                return resolutionSet[0];
+            }
+            return resolutionSet[frame];
+        }
+
+        private boolean fullyComplete;
+        private static final AtomicBoolean full = new AtomicBoolean(true);
+
+        @Override
+        public boolean isComplete(int level) {
+            if (fullyComplete)
+                return true;
+
+            for (int i = 0; i <= maxFrame; i++) {
+                if (resolutionSet[i] == null)
+                    return false;
+                AtomicBoolean status = resolutionSet[i].getComplete(level);
+                if (status == null || !status.get())
+                    return false;
+            }
+            if (level == 0)
+                fullyComplete = true;
+            return true;
+        }
+
+        @Nullable
+        @Override
+        public AtomicBoolean getFrameStatus(int frame, int level) {
+            if (fullyComplete)
+                return full;
+            if (resolutionSet[frame] == null)
+                return null;
+            return resolutionSet[frame].getComplete(level);
+        }
+
+        @Override
+        public void setFrameComplete(int frame, int level) {
+            if (fullyComplete)
+                return;
+
+            if (resolutionSet[frame] != null)
+                resolutionSet[frame].setComplete(level);
+        }
+
+        @Override
+        public void setFramePartial(int frame, ResolutionSet frameResolutionSet) {
+            if (resolutionSet[frame] == null) {
+                resolutionSet[frame] = frameResolutionSet;
+            }
+        }
+
     }
 
     synchronized boolean beginUse() {
