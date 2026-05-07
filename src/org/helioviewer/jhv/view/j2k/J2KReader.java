@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.j2k;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CancellationException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.UITimer;
@@ -91,16 +92,22 @@ class J2KReader implements Runnable {
     }
 
     private boolean readStep(J2KSource.Remote source, String query, String key, int level, int frame) throws KduException, IOException {
-        JPIPCache cache = source.cache();
-        if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
-            return true;
+        if (!source.beginUse())
+            throw new CancellationException("Read cancelled after source close");
+        try {
+            JPIPCache cache = source.cache();
+            if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
+                return true;
 
-        try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
-            JPIPResponse res = socket.request(query, frame, cache, writer);
-            boolean complete = res.isResponseComplete();
-            if (complete)
-                writer.commit();
-            return complete;
+            try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
+                JPIPResponse res = socket.request(query, frame, cache, writer);
+                boolean complete = res.isResponseComplete();
+                if (complete)
+                    writer.commit();
+                return complete;
+            }
+        } finally {
+            source.endUse();
         }
     }
 
@@ -129,7 +136,13 @@ class J2KReader implements Runnable {
             try {
                 if (socket.isClosed()) {
                     // System.out.println(">>> reconnect");
-                    socket = new JPIPSocket(uri, source.cache());
+                    if (!source.beginUse())
+                        throw new CancellationException("Read cancelled after source close");
+                    try {
+                        socket = new JPIPSocket(uri, source.cache());
+                    } finally {
+                        source.endUse();
+                    }
                 }
 
                 // choose cache strategy
