@@ -98,7 +98,7 @@ class RadioJ2KData implements View.DataHandler {
         if (willDraw && view != null) {
             Rectangle roi = getROI(xAxis);
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
-                view.setRegion(roi);
+                view.setDecodeRegion(roi.x, roi.y, roi.width, roi.height);
                 view.decode(null, 1, last_resolution);
             }
         }
