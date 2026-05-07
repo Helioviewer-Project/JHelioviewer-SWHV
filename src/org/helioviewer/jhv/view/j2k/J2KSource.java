@@ -31,282 +31,29 @@ abstract class J2KSource {
 
     private final Jp2_threadsafe_family_src jp2Src = new Jp2_threadsafe_family_src();
     private final Jpx_source jpxSrc = new Jpx_source();
-    private boolean isJP2;
+    private final boolean isJP2;
     private boolean isClosed = true;
     private boolean closing;
     private int users;
-    private CompletionState completionState;
     private int maxFrame;
+    private boolean resolutionStateInitialized;
 
-    static class Local extends J2KSource {
-
-        private final String path;
-
-        Local(String _path, boolean isJP2) {
-            path = _path;
-            super.isJP2 = isJP2;
-        }
-
-        @Override
-        void open() throws KduException {
-            if (!super.isClosed)
-                return;
-            super.jp2Src.Open(path, true);
-            super.jpxSrc.Open(super.jp2Src, false);
-            super.isClosed = false;
-            super.initCompletionLevel();
-        }
-
-        @Override
-        CompletionState createCompletionState() throws KduException {
-            return new LocalCompletionState(this, maxFrame());
-        }
-
+    private J2KSource(boolean _isJP2) {
+        isJP2 = _isJP2;
     }
 
-    static class Remote extends J2KSource {
+    // Source lifecycle
 
-        private final JPIPCache cache = new JPIPCache();
-
-        JPIPCache cache() {
-            return cache;
-        }
-
-        @Override
-        void open() throws KduException {
-            if (!super.isClosed)
-                return;
-            super.jp2Src.Open(cache);
-            super.jpxSrc.Open(super.jp2Src, false);
-            super.isClosed = false;
-            super.initCompletionLevel();
-        }
-
-        @Override
-        void destroy() throws KduException {
-            cache.Close();
-            cache.Native_destroy();
-        }
-
-        @Override
-        CompletionState createCompletionState() throws KduException {
-            return new RemoteCompletionState(this, maxFrame());
-        }
-
+    final void open() throws KduException {
+        if (!isClosed)
+            return;
+        doOpenFamilySource();
+        jpxSrc.Open(jp2Src, false);
+        isClosed = false;
+        initResolutionStateOnce();
     }
-
-    abstract void open() throws KduException;
-
-    abstract CompletionState createCompletionState() throws KduException;
 
     void destroy() throws KduException {}
-
-    private void initCompletionLevel() throws KduException {
-        if (completionState != null)
-            return;
-        maxFrame = getNumberLayers() - 1;
-        completionState = createCompletionState();
-    }
-
-    int getPartialUntil() {
-        return completionState.getPartialUntil();
-    }
-
-    ResolutionSet resolutionSet(int frame) {
-        return completionState.resolutionSet(frame);
-    }
-
-    boolean isComplete(int level) {
-        return completionState.isComplete(level);
-    }
-
-    @Nullable
-    AtomicBoolean getFrameStatus(int frame, int level) {
-        return completionState.getFrameStatus(frame, level);
-    }
-
-    @SuppressWarnings("try")
-    void setFramePartial(int frame) throws KduException {
-        try (Use ignored = use()) {
-            completionState.setFramePartial(frame, readResolutionSet(frame));
-        }
-    }
-
-    void setFrameComplete(int frame, int level) throws KduException {
-        setFramePartial(frame);
-        completionState.setFrameComplete(frame, level);
-    }
-
-    int maxFrame() {
-        return maxFrame;
-    }
-
-    private interface CompletionState {
-
-        int getPartialUntil();
-
-        ResolutionSet resolutionSet(int frame);
-
-        boolean isComplete(int level);
-
-        @Nullable
-        AtomicBoolean getFrameStatus(int frame, int level);
-
-        void setFrameComplete(int frame, int level);
-
-        void setFramePartial(int frame, ResolutionSet frameResolutionSet);
-
-    }
-
-    private static class LocalCompletionState implements CompletionState {
-
-        private static final AtomicBoolean full = new AtomicBoolean(true);
-        private final ResolutionSet[] resolutionSet;
-        private final int maxFrame;
-
-        LocalCompletionState(J2KSource source, int _maxFrame) throws KduException {
-            maxFrame = _maxFrame;
-            resolutionSet = new ResolutionSet[maxFrame + 1];
-            for (int i = 0; i <= maxFrame; ++i) {
-                resolutionSet[i] = source.readResolutionSet(i);
-                resolutionSet[i].setComplete(0);
-            }
-        }
-
-        @Override
-        public int getPartialUntil() {
-            return maxFrame;
-        }
-
-        @Override
-        public ResolutionSet resolutionSet(int frame) {
-            return resolutionSet[frame];
-        }
-
-        @Override
-        public boolean isComplete(int level) {
-            return true;
-        }
-
-        @Override
-        public AtomicBoolean getFrameStatus(int frame, int level) {
-            return full;
-        }
-
-        @Override
-        public void setFrameComplete(int frame, int level) {}
-
-        @Override
-        public void setFramePartial(int frame, ResolutionSet frameResolutionSet) {}
-
-    }
-
-    private static class RemoteCompletionState implements CompletionState {
-
-        private final int maxFrame;
-        private final ResolutionSet[] resolutionSet;
-
-        private int partialUntil = 0;
-
-        RemoteCompletionState(J2KSource source, int _maxFrame) throws KduException {
-            maxFrame = _maxFrame;
-            resolutionSet = new ResolutionSet[maxFrame + 1];
-            resolutionSet[0] = source.readResolutionSet(0);
-        }
-
-        @Override
-        public int getPartialUntil() {
-            int i;
-            for (i = partialUntil; i <= maxFrame; i++) {
-                if (resolutionSet[i] == null)
-                    break;
-            }
-            partialUntil = Math.max(0, i - 1);
-            return partialUntil;
-        }
-
-        @Override
-        public ResolutionSet resolutionSet(int frame) {
-            if (resolutionSet[frame] == null) {
-                Log.error("resolutionSet[" + frame + "] is null"); // never happened?
-                return resolutionSet[0];
-            }
-            return resolutionSet[frame];
-        }
-
-        private boolean fullyComplete;
-        private static final AtomicBoolean full = new AtomicBoolean(true);
-
-        @Override
-        public boolean isComplete(int level) {
-            if (fullyComplete)
-                return true;
-
-            for (int i = 0; i <= maxFrame; i++) {
-                if (resolutionSet[i] == null)
-                    return false;
-                AtomicBoolean status = resolutionSet[i].getComplete(level);
-                if (status == null || !status.get())
-                    return false;
-            }
-            if (level == 0)
-                fullyComplete = true;
-            return true;
-        }
-
-        @Nullable
-        @Override
-        public AtomicBoolean getFrameStatus(int frame, int level) {
-            if (fullyComplete)
-                return full;
-            if (resolutionSet[frame] == null)
-                return null;
-            return resolutionSet[frame].getComplete(level);
-        }
-
-        @Override
-        public void setFrameComplete(int frame, int level) {
-            if (fullyComplete)
-                return;
-
-            if (resolutionSet[frame] != null)
-                resolutionSet[frame].setComplete(level);
-        }
-
-        @Override
-        public void setFramePartial(int frame, ResolutionSet frameResolutionSet) {
-            if (resolutionSet[frame] == null) {
-                resolutionSet[frame] = frameResolutionSet;
-            }
-        }
-
-    }
-
-    synchronized boolean beginUse() {
-        if (closing)
-            return false;
-        users++;
-        return true;
-    }
-
-    synchronized void endUse() {
-        users--;
-        if (users == 0)
-            notifyAll();
-    }
-
-    Use use() {
-        if (!beginUse())
-            throw new CancellationException("J2KSource access cancelled after close");
-        return new Use(this);
-    }
-
-    record Use(J2KSource source) implements AutoCloseable {
-        @Override
-        public void close() {
-            source.endUse();
-        }
-    }
 
     void close() throws KduException {
         if (isClosed)
@@ -334,18 +81,38 @@ abstract class J2KSource {
         close();
     }
 
-    Jpx_source jpxSource() {
-        return jpxSrc;
+    // Native access guards
+
+    Use use() {
+        if (!beginUse())
+            throw new CancellationException("J2KSource access cancelled after close");
+        return new Use(this);
     }
 
-    boolean isJP2() {
-        return isJP2;
+    synchronized boolean beginUse() {
+        if (closing)
+            return false;
+        users++;
+        return true;
     }
 
-    private int getNumberLayers() throws KduException {
-        int[] temp = new int[1];
-        jpxSrc.Count_compositing_layers(temp);
-        return temp[0];
+    synchronized void endUse() {
+        users--;
+        if (users == 0)
+            notifyAll();
+    }
+
+    record Use(J2KSource source) implements AutoCloseable {
+        @Override
+        public void close() {
+            source.endUse();
+        }
+    }
+
+    // Source information and native handles
+
+    int maxFrame() {
+        return maxFrame;
     }
 
     ResolutionSet readResolutionSet(int frame) throws KduException {
@@ -459,6 +226,201 @@ abstract class J2KSource {
             xmlBox.Close(); // harmless if already closed
             xmlBox.Native_destroy();
         }
+    }
+
+    Jpx_source jpxSource() {
+        return jpxSrc;
+    }
+
+    boolean isJP2() {
+        return isJP2;
+    }
+
+    // Progressive completion state
+
+    abstract int getPartialUntil();
+
+    abstract ResolutionSet resolutionSet(int frame);
+
+    abstract boolean isComplete(int level);
+
+    @Nullable
+    abstract AtomicBoolean getFrameStatus(int frame, int level);
+
+    // Initialization internals
+
+    private void initResolutionStateOnce() throws KduException {
+        if (resolutionStateInitialized)
+            return;
+        maxFrame = getNumberLayers() - 1;
+        doInitResolutionState();
+        resolutionStateInitialized = true;
+    }
+
+    private int getNumberLayers() throws KduException {
+        int[] temp = new int[1];
+        jpxSrc.Count_compositing_layers(temp);
+        return temp[0];
+    }
+
+    // Internal subclass hooks
+
+    abstract void doOpenFamilySource() throws KduException;
+
+    abstract void doInitResolutionState() throws KduException;
+
+    static class Local extends J2KSource {
+
+        private static final AtomicBoolean full = new AtomicBoolean(true);
+
+        private final String path;
+        private ResolutionSet[] resolutionSet;
+
+        Local(String _path, boolean isJP2) {
+            super(isJP2);
+            path = _path;
+        }
+
+        @Override
+        void doOpenFamilySource() throws KduException {
+            super.jp2Src.Open(path, true);
+        }
+
+        @Override
+        void doInitResolutionState() throws KduException {
+            resolutionSet = new ResolutionSet[maxFrame() + 1];
+            for (int i = 0; i <= maxFrame(); ++i) {
+                resolutionSet[i] = readResolutionSet(i);
+                resolutionSet[i].setComplete(0);
+            }
+        }
+
+        @Override
+        int getPartialUntil() {
+            return maxFrame();
+        }
+
+        @Override
+        ResolutionSet resolutionSet(int frame) {
+            return resolutionSet[frame];
+        }
+
+        @Override
+        boolean isComplete(int level) {
+            return true;
+        }
+
+        @Nullable
+        @Override
+        AtomicBoolean getFrameStatus(int frame, int level) {
+            return full;
+        }
+
+    }
+
+    static class Remote extends J2KSource {
+
+        private static final AtomicBoolean full = new AtomicBoolean(true);
+
+        private final JPIPCache cache = new JPIPCache();
+        private ResolutionSet[] resolutionSet;
+        private int partialUntil = 0;
+        private boolean fullyComplete;
+
+        Remote() {
+            super(false);
+        }
+
+        JPIPCache cache() {
+            return cache;
+        }
+
+        @Override
+        void doOpenFamilySource() throws KduException {
+            super.jp2Src.Open(cache);
+        }
+
+        @Override
+        void destroy() throws KduException {
+            cache.Close();
+            cache.Native_destroy();
+        }
+
+        @Override
+        void doInitResolutionState() throws KduException {
+            resolutionSet = new ResolutionSet[maxFrame() + 1];
+            resolutionSet[0] = readResolutionSet(0);
+        }
+
+        @Override
+        int getPartialUntil() {
+            int i;
+            for (i = partialUntil; i <= maxFrame(); i++) {
+                if (resolutionSet[i] == null)
+                    break;
+            }
+            partialUntil = Math.max(0, i - 1);
+            return partialUntil;
+        }
+
+        @Override
+        ResolutionSet resolutionSet(int frame) {
+            if (resolutionSet[frame] == null) {
+                Log.error("resolutionSet[" + frame + "] is null"); // never happened?
+                return resolutionSet[0];
+            }
+            return resolutionSet[frame];
+        }
+
+        @Override
+        boolean isComplete(int level) {
+            if (fullyComplete)
+                return true;
+
+            for (int i = 0; i <= maxFrame(); i++) {
+                if (resolutionSet[i] == null)
+                    return false;
+                AtomicBoolean status = resolutionSet[i].getComplete(level);
+                if (status == null || !status.get())
+                    return false;
+            }
+            if (level == 0)
+                fullyComplete = true;
+            return true;
+        }
+
+        @Nullable
+        @Override
+        AtomicBoolean getFrameStatus(int frame, int level) {
+            if (fullyComplete)
+                return full;
+            if (resolutionSet[frame] == null)
+                return null;
+            return resolutionSet[frame].getComplete(level);
+        }
+
+        @SuppressWarnings("try")
+        void setFramePartial(int frame) throws KduException {
+            try (Use ignored = use()) {
+                storeFrameResolutionSet(frame, readResolutionSet(frame));
+            }
+        }
+
+        void setFrameComplete(int frame, int level) throws KduException {
+            setFramePartial(frame);
+            if (fullyComplete)
+                return;
+
+            if (resolutionSet[frame] != null)
+                resolutionSet[frame].setComplete(level);
+        }
+
+        private void storeFrameResolutionSet(int frame, ResolutionSet frameResolutionSet) {
+            if (resolutionSet[frame] == null) {
+                resolutionSet[frame] = frameResolutionSet;
+            }
+        }
+
     }
 
     private static String xmlBox2String(Jp2_input_box xmlBox) throws KduException {
