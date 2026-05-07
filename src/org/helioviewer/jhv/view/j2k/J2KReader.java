@@ -169,11 +169,11 @@ class J2KReader implements Runnable {
                         completeSteps++;
                         stepQueries[currentStep] = null;
 
-                        source.completionLevel().setFrameComplete(currentStep, level); // tell the completion level
+                        source.completionLevel().setFrameComplete(source, currentStep, level); // tell the completion level
                         if (singleFrame)
                             view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
                     } else {
-                        source.completionLevel().setFramePartial(currentStep); // tell the completion level
+                        source.completionLevel().setFramePartial(source, currentStep); // tell the completion level
                     }
 
                     UITimer.completionChanged();
