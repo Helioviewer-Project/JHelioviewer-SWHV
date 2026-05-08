@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.base.lut;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,6 +16,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.io.FileUtils;
@@ -57,8 +59,8 @@ public record LUT(String name, ByteBuffer rgba) {
         }
     }
 
-    private static final Map<String, LUT> standardLuts = loadStandardLuts();
-    private static final List<ColorRule> colorRules = readColorRules(standardLuts);
+    private static final Map<String, LUT> luts = loadLuts();
+    private static final List<ColorRule> colorRules = readColorRules(luts);
 
     public LUT(String name, int[] lut8) {
         this(name, packArgbToRgba(lut8));
@@ -130,18 +132,20 @@ public record LUT(String name, ByteBuffer rgba) {
         return rgba;
     }
 
-    private static Map<String, LUT> loadStandardLuts() {
-        Map<String, LUT> luts = LUTReader.read("/luts/standard-luts.txt");
+    private static Map<String, LUT> loadLuts() {
+        Map<String, LUT> loadedLuts = LUTReader.read("/luts/standard-luts.txt");
 
         for (String file : GGR_LUTS) {
             try (InputStream is = FileUtils.getResource("/luts/" + file + ".ggr")) {
                 LUT l = readGimpGradient(is);
-                luts.put(l.name, l);
+                loadedLuts.put(l.name, l);
             } catch (Exception e) {
                 Log.warn("Could not restore gimp gradient file " + file, e);
             }
         }
-        return luts;
+
+        LUTReader.read(new File(JHVDirectory.SETTINGS.getPath(), "user-luts.txt"), loadedLuts);
+        return loadedLuts;
     }
 
     private static LUT readGimpGradient(InputStream is) throws Exception {
@@ -153,7 +157,7 @@ public record LUT(String name, ByteBuffer rgba) {
         return new LUT(gg.getName(), lut8);
     }
 
-    private static List<ColorRule> readColorRules(Map<String, LUT> standardLuts) {
+    private static List<ColorRule> readColorRules(Map<String, LUT> availableLuts) {
         try (InputStream is = FileUtils.getResource("/settings/colors.js");
              BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             JSONArray rules = new JSONArray(new JSONTokener(in));
@@ -162,7 +166,7 @@ public record LUT(String name, ByteBuffer rgba) {
                 try {
                     JSONObject rule = rules.getJSONObject(i);
                     String colorName = rule.getString("color");
-                    LUT lut = standardLuts.get(colorName);
+                    LUT lut = availableLuts.get(colorName);
                     if (lut == null) {
                         Log.warn("Rule " + i + " for the default color table references missing LUT " + colorName);
                         continue;
@@ -189,22 +193,22 @@ public record LUT(String name, ByteBuffer rgba) {
 
     @Nonnull
     public static LUT gray() { // invariant default for images
-        return standardLuts.get("Gray");
+        return luts.get("Gray");
     }
 
     @Nonnull
     public static LUT spectral() { // invariant default for radio
-        return standardLuts.get("Spectral");
+        return luts.get("Spectral");
     }
 
     @Nonnull
     public static String[] names() {
-        return standardLuts.keySet().toArray(String[]::new);
+        return luts.keySet().toArray(String[]::new);
     }
 
     @Nullable
     public static LUT get(String name) {
-        return standardLuts.get(name);
+        return luts.get(name);
     }
 
     @Nullable
