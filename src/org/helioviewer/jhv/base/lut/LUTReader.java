@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.base.lut;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -75,6 +77,17 @@ final class LUTReader {
             Log.warn("Could not read LUT resource " + resourcePath, e);
         }
         return luts;
+    }
+
+    static void read(File file, Map<String, LUT> luts) {
+        if (!file.isFile())
+            return;
+
+        try (InputStream is = new FileInputStream(file)) {
+            parse(is, luts);
+        } catch (IOException e) {
+            Log.warn("Could not read LUT file " + file, e);
+        }
     }
 
     private static void parse(InputStream is, Map<String, LUT> luts) throws IOException {

@@ -3,6 +3,8 @@
 
 ## JHelioviewer 5.0.1 (pending)
 
+- Load user color lookup tables from `$HOME/JHelioviewer-SWHV/Settings/user-luts.txt`
+
 ## JHelioviewer 5.0 (2026-05-08)
 
 ### Display and rendering
