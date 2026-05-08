@@ -56,8 +56,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private final JideSplitButton addLayerButton;
 
     private static TimeSlider timeSlider;
-    private final JideButton prevFrameButton;
-    private final JideButton nextFrameButton;
     private final JideButton playButton;
 
     private final RecordButton recordButton;
@@ -94,7 +92,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 1, 0));
         int small = 18, big = 26;
 
-        prevFrameButton = new JideButton(Buttons.backward);
+        JideButton prevFrameButton = new JideButton(Buttons.backward);
         prevFrameButton.setFont(Buttons.getMaterialFont(small));
         prevFrameButton.setToolTipText("Step to previous frame");
         prevFrameButton.addActionListener(Actions.PREVIOUS_FRAME);
@@ -107,7 +105,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         playButton.addActionListener(Actions.PLAY_PAUSE);
         buttonPanel.add(playButton);
 
-        nextFrameButton = new JideButton(Buttons.forward);
+        JideButton nextFrameButton = new JideButton(Buttons.forward);
         nextFrameButton.setFont(Buttons.getMaterialFont(small));
         nextFrameButton.setToolTipText("Step to next frame");
         nextFrameButton.addActionListener(Actions.NEXT_FRAME);
@@ -225,7 +223,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         add(JHVFrame.getLayersPanel());
 
-        setEnabledState(false);
         Movie.addStatusListener(this);
         ExportMovie.addStatusListener(this);
         ViewState.addPlaybackConfigListener(this);
@@ -306,18 +303,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         }
     }
 
-    private void setEnabledState(boolean enabled) {
-        advanceModeComboBox.setEnabled(enabled);
-        timeSlider.setEnabled(enabled);
-        playButton.setEnabled(enabled);
-        nextFrameButton.setEnabled(enabled);
-        prevFrameButton.setEnabled(enabled);
-        recordButton.setEnabled(enabled);
-        speedSpinner.setEnabled(enabled);
-        speedUnitComboBox.setEnabled(enabled);
-        advancedButton.setEnabled(enabled);
-    }
-
     public void setAdvanced(boolean advanced) {
         isAdvanced = advanced;
         advancedButton.setText(advanced ? Buttons.optionsDown : Buttons.optionsRight);
@@ -351,12 +336,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     @Override
     public void movieStatusChanged() {
-        boolean available = Movie.isAvailable();
         boolean playing = Movie.isPlaying();
 
-        setEnabledState(available);
-
-        if (available && playing) {
+        if (playing) {
             playButton.setText(Buttons.pause);
             playButton.setToolTipText("Pause movie");
         } else {
