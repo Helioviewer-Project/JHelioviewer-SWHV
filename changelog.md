@@ -1,7 +1,9 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 5.0 (pending)
+## JHelioviewer 5.0.1 (pending)
+
+## JHelioviewer 5.0 (2026-05-08)
 
 ### Display and rendering
 - Render through ANGLE using the native backend renderer of each platform (DirectX11, Metal, OpenGL)
