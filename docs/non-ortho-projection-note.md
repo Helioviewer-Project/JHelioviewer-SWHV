@@ -81,7 +81,7 @@ This note documents the convention used by the non-orthographic display modes (`
   - overlay/image misalignment
   - incorrect mouse picking
 - `HPC` render sampling is validated against Astropy for the supported
-  source-observer `TAN`, `AZP`, and six-term primary-branch `ZPN` image/WCS
+  source-observer `TAN`, `ARC`, `AZP`, and six-term primary-branch `ZPN` image/WCS
   paths.
 - That validation does **not** cover Java-side overlay behavior such as
   viewpoint-space projection of Carrington surface coordinates or
@@ -99,6 +99,7 @@ This note documents the convention used by the non-orthographic display modes (`
   mode distinctions through helpers rather than raw enum equality checks.
 - `HPC` extent inversion is exact for:
   - `TAN`
+  - `ARC`
   - `AZP`
   - six-term `ZPN` on its primary monotonic branch
 - Unsupported projection codes fall back to `TAN` on both the Java and GLSL

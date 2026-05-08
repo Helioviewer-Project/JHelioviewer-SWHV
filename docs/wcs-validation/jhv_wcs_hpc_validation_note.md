@@ -2,9 +2,9 @@
 title: |
    | SWHV CCN4
    | WCS and HPC Validation Note
-subtitle: SWHV-ROB-TN-001-CCN4 v2.0
-subject: SWHV CCN4 
-date: SWHV-ROB-TN-001-CCN4 - Version 2.0 - 2026-03-31
+subtitle: SWHV-ROB-TN-001-CCN4 v2.1
+subject: SWHV CCN4
+date: SWHV-ROB-TN-001-CCN4 - Version 2.1 - 2026-05-08
 lof: true
 lot: false
 ---
@@ -24,8 +24,8 @@ and Calabretta, "Representations of world coordinates in FITS" ([A&A 395,
 1061-1075,
 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1061G/abstract)).
 
-In this work, a new `TAN` path was implemented together with `AZP`, six-term
-`ZPN`, and support for `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`
+In this work, a new `TAN` path was implemented together with `ARC`, `AZP`,
+six-term `ZPN`, and support for `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`
 surface maps, using the FITS celestial-coordinate projection formalism of
 Calabretta & Greisen
 ([A&A 395, 1077-1122, 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1077C/abstract)).
@@ -78,7 +78,7 @@ examples.
 
 The work reported here includes:
 
-- validating `formal-TAN`, `AZP`, and six-term `ZPN` (primary
+- validating `formal-TAN`, `ARC`, `AZP`, and six-term `ZPN` (primary
   branch only) against Astropy, including round-trip checks.
 - validating the `HPC` sampling path against Astropy.
 - validating `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface-map cases
@@ -86,7 +86,7 @@ The work reported here includes:
 
 Main conclusions:
 
-- `formal-TAN`, `AZP`, and six-term `ZPN` are validated against
+- `formal-TAN`, `ARC`, `AZP`, and six-term `ZPN` are validated against
   Astropy, including the tested inverse mappings.
 - The available `AZP` validation files are non-slanted (`gamma = 0`), so
   slanted `AZP` is implemented but not directly tested in the runs reported
@@ -114,7 +114,7 @@ Bottom line:
 - `simple-TAN` will be kept in JHV `Orthographic` mode for data designated as
   `TAN` in the metadata.
 - `HPC` mode was added (with the noted caveat about the viewpoint).
-- support for `AZP` and `ZPN` data was added (with the noted caveat about the
+- support for `ARC`, `AZP`, and `ZPN` data was added (with the noted caveat about the
   heliospheric imagers).
 - support for `CAR` and `CEA` surface maps was added (with the noted caveat
   about the display modes).
@@ -124,7 +124,7 @@ Bottom line:
   `Polar`, and `LogPolar`, they follow the corresponding JHV display
   projection. In `Orthographic`, they are derived purely from the inferred 3D
   scene point and therefore do not, in general, reflect the image `TAN`,
-  `AZP`, `ZPN`, `CAR`, or `CEA` WCS.
+  `ARC`, `AZP`, `ZPN`, `CAR`, or `CEA` WCS.
 
 # The validator
 
@@ -153,7 +153,7 @@ display geometry. In `HPC` mode, that geometry is the `HPC` display plane; in
 that display point, JHV derives the helioprojective coordinates needed to
 evaluate the image WCS. For zenithal FITS data in the formal WCS paths, this
 means using the inverse form of the relevant projection model, such as `TAN`,
-`AZP`, or `ZPN`, and then applying the linear WCS terms (`CRVAL`, `CRPIX`,
+`ARC`, `AZP`, or `ZPN`, and then applying the linear WCS terms (`CRVAL`, `CRPIX`,
 `CDELT`, and `PC`/`CROTA`) to obtain the source-image coordinates. The screen
 pixel is then produced by sampling the source image at those coordinates with
 interpolation. In this sense, the WCS projection determines how image
@@ -201,6 +201,7 @@ Included in the validator:
   - `PV2_0..PV2_5`
 - the shared WCS projection math for:
   - `TAN`
+  - `ARC`
   - `AZP`
   - six-term `ZPN` (primary branch only)
   - `CAR`
@@ -209,6 +210,8 @@ Included in the validator:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
 - the raw image-footprint `HPC` bounds and the centered `HPC` display bounds
   used in the validation runs reported here
+- the `ARC` observer-image WCS interpretation used for the tested
+  `HPLN-ARC / HPLT-ARC` case
 - the `CAR` and `CEA` source WCS interpretation used for
   `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface maps
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
@@ -258,6 +261,8 @@ In this validator, Astropy is the external reference for:
 - inverse `TAN`
   - plane -> helioprojective, checked by round-trip against Astropy's forward
     WCS
+- inverse `ARC`
+  - plane -> helioprojective, checked by the same round-trip strategy
 - inverse `AZP`
   - plane -> helioprojective, checked by round-trip against Astropy's forward
     WCS
@@ -354,6 +359,7 @@ The comparison covers the representative FITS/HDU cases drawn from
 the documented validation suite, including:
 
 - `TAN`
+- `ARC`
 - `AZP`
 - `ZPN`
 - `CAR`
@@ -411,8 +417,8 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
   extra/test/data/20241224_194245_d4c2A.fts
 ```
 
-This mode reports forward WCS errors on sampled points. For `TAN` and `AZP`,
-the samples are generic world/helioprojective points. For `ZPN`, `CAR`, and
+This mode reports forward WCS errors on sampled points. For `TAN`, `ARC`, and
+`AZP`, the samples are generic world/helioprojective points. For `ZPN`, `CAR`, and
 `CEA`, the validator uses pixel-derived world samples so that edge, pole, and
 seam cases are covered more systematically. It is not tied to the displayed
 solar disk or to the full image frame.
@@ -456,7 +462,24 @@ It validates:
 - `TAN plane -> helioprojective`
 - round-trip error
 
-4. Inverse `AZP`
+4. Inverse `ARC`
+
+```text
+python3 extra/test/validate_jhv_wcs_against_astropy.py \
+  extra/test/data/PUNCH_L3_CAM_20260425001600_v0k.fits \
+  --hdu 1 \
+  --inverse-arc
+```
+
+This mode validates inverse `ARC` on sampled projection-plane points. It is not
+an on-disk or full-image-grid test.
+
+It validates:
+
+- `ARC plane -> helioprojective`
+- round-trip error
+
+5. Inverse `AZP`
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -472,7 +495,7 @@ It validates:
 - `AZP plane -> helioprojective`
 - round-trip error
 
-5. Inverse primary-branch `ZPN`
+6. Inverse primary-branch `ZPN`
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -488,7 +511,7 @@ It validates:
 - `ZPN plane -> helioprojective`
 - round-trip error on the primary monotonic branch
 
-6. `HPC` render comparison
+7. `HPC` render comparison
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -526,7 +549,7 @@ Interpretation:
 - HI2 can show a slightly larger absolute `px` error because `AZP`
   magnification near the finite valid edge becomes extremely large
 
-7. Inverse `CAR`
+8. Inverse `CAR`
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -542,7 +565,7 @@ It validates:
 - `CAR plane -> world lon/lat`
 - round-trip error
 
-8. Inverse `CEA`
+9. Inverse `CEA`
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py \
@@ -709,7 +732,23 @@ Astropy as the external WCS reference.
   therefore not a direct measurement of the `simple-TAN`
   small-angle-approximation error alone.
 
-3. `AZP` is correct for the tested non-slanted HI files.
+3. `ARC` is correct for the tested PUNCH observer-image file.
+
+- JHV `world -> helioprojective -> ARC plane -> pixel`
+- `ARC plane -> helioprojective angles`
+- matches Astropy to numerical precision on:
+  - `extra/test/data/PUNCH_L3_CAM_20260425001600_v0k.fits`
+- representative measured results include:
+  - forward sampled check on the same file:
+    - `2.66e-4 mas` max (`3.278956e-09 px`)
+    - `projection_max_error_internal=2.785048e-10`
+  - full pixel-center check on the same file:
+    - `2.23e-5 mas` max (`2.751221e-10 px`)
+  - inverse `ARC` on the same file:
+    - `2.05e-7 mas` max
+    - `roundtrip_plane_max_error_internal=2.421718e-11`
+
+4. `AZP` is correct for the tested non-slanted HI files.
 
 - JHV `world -> helioprojective -> AZP plane -> pixel`
 - `AZP plane -> helioprojective angles`
@@ -724,7 +763,7 @@ Astropy as the external WCS reference.
     - `1.02e-7 mas` max
     - `roundtrip_plane_max_error_internal=4.263256e-14`
 
-4. Six-term `ZPN` is correct for the tested PSP/WISPR files.
+5. Six-term `ZPN` is correct for the tested PSP/WISPR files.
 
 - JHV `world -> helioprojective -> ZPN plane -> pixel`
 - `ZPN plane -> helioprojective angles`
@@ -747,7 +786,7 @@ sampling path rather than for the FITS projection formulas alone.
 For zenithal image data, the deterministic part of the mapping is:
 
 1. image pixel or WCS-plane coordinate
-2. inverse WCS (`TAN`, `AZP`, `ZPN`)
+2. inverse WCS (`TAN`, `ARC`, `AZP`, `ZPN`)
 3. helioprojective angles
 4. observer-frame `HPC` ray
 
