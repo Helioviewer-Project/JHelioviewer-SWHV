@@ -13,10 +13,11 @@ precision highp float;
 #define BOOST 1. / (0.2 * 2.)
 
 const float WCS_PROJECTION_TAN = 0.;
-const float WCS_PROJECTION_AZP = 1.;
-const float WCS_PROJECTION_ZPN = 2.;
-const float WCS_PROJECTION_CAR = 3.;
-const float WCS_PROJECTION_CEA = 4.;
+const float WCS_PROJECTION_ARC = 1.;
+const float WCS_PROJECTION_AZP = 2.;
+const float WCS_PROJECTION_ZPN = 3.;
+const float WCS_PROJECTION_CAR = 4.;
+const float WCS_PROJECTION_CEA = 5.;
 
 out vec4 outColor;
 
@@ -274,30 +275,19 @@ vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
         nativeY / cosNativeDistance);
 }
 
-float wrapDeltaLongitude(float lon, float lon0) {
-    return mod(lon - lon0 + PI, TWOPI) - PI;
-}
+vec2 projectArcToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
+    float nativeX;
+    float nativeY;
+    float cosNativeDistance;
+    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
+    float nativeRadius = length(vec2(nativeX, nativeY));
+    if (nativeRadius == 0.)
+        return vec2(0.);
 
-// Surface-map forward projections used by Latitudinal and Orthographic.
-vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad) {
-    // CAR is a direct surface lon/lat map, not observer-image geometry.
-    float lon = atan(world.x, world.z);
-    float lat = asin(clamp(world.y / length(world), -1., 1.));
-    vec2 referenceAngles = crval / planeUnitsPerRad;
-    return vec2(
-        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceAngles.x),
-        planeUnitsPerRad * (lat - referenceAngles.y));
-}
-
-vec2 projectCeaToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
-    // CEA is a direct surface lon/lat map with equal-area latitude scaling.
-    float lon = atan(world.x, world.z);
-    float lat = asin(clamp(world.y / length(world), -1., 1.));
-    float lambda = max(abs(PV[1]), 1e-12);
-    vec2 referenceCoord = crval / planeUnitsPerRad;
-    return vec2(
-        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceCoord.x),
-        planeUnitsPerRad * (sin(lat) / lambda - referenceCoord.y));
+    float nativeDistance = acos(clamp(cosNativeDistance, -1., 1.));
+    return planeUnitsPerRad * vec2(
+        nativeDistance * nativeX / nativeRadius,
+        nativeDistance * nativeY / nativeRadius);
 }
 
 vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
@@ -359,10 +349,38 @@ vec2 projectZpnToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
         radial * nativeY / nativeRadius);
 }
 
+float wrapDeltaLongitude(float lon, float lon0) {
+    return mod(lon - lon0 + PI, TWOPI) - PI;
+}
+
+// Surface-map forward projections used by Latitudinal and Orthographic.
+vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad) {
+    // CAR is a direct surface lon/lat map, not observer-image geometry.
+    float lon = atan(world.x, world.z);
+    float lat = asin(clamp(world.y / length(world), -1., 1.));
+    vec2 referenceAngles = crval / planeUnitsPerRad;
+    return vec2(
+        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceAngles.x),
+        planeUnitsPerRad * (lat - referenceAngles.y));
+}
+
+vec2 projectCeaToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
+    // CEA is a direct surface lon/lat map with equal-area latitude scaling.
+    float lon = atan(world.x, world.z);
+    float lat = asin(clamp(world.y / length(world), -1., 1.));
+    float lambda = max(abs(PV[1]), 1e-12);
+    vec2 referenceCoord = crval / planeUnitsPerRad;
+    return vec2(
+        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceCoord.x),
+        planeUnitsPerRad * (sin(lat) / lambda - referenceCoord.y));
+}
+
 // Projection-space to texture-space mapping.
 vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
     if (projection.projectionCode == WCS_PROJECTION_TAN)
         return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
+    if (projection.projectionCode == WCS_PROJECTION_ARC)
+        return projectArcToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
     if (projection.projectionCode == WCS_PROJECTION_AZP)
         return projectAzpToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
     if (projection.projectionCode == WCS_PROJECTION_ZPN)

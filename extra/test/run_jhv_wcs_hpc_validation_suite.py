@@ -47,6 +47,22 @@ RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--inverse-tan"),
     ),
     ValidationRun(
+        "forward_arc_punch",
+        (str(DATA / "PUNCH_L3_CAM_20260425001600_v0k.fits"), "--hdu", "1"),
+    ),
+    ValidationRun(
+        "all_pixels_arc_punch",
+        (str(DATA / "PUNCH_L3_CAM_20260425001600_v0k.fits"), "--hdu", "1", "--all-pixels"),
+    ),
+    ValidationRun(
+        "inverse_arc_punch",
+        (str(DATA / "PUNCH_L3_CAM_20260425001600_v0k.fits"), "--hdu", "1", "--inverse-arc"),
+    ),
+    ValidationRun(
+        "hpc_render_compare_arc_punch",
+        (str(DATA / "PUNCH_L3_CAM_20260425001600_v0k.fits"), "--hdu", "1", "--hpc-render-compare", "--render-size", "2048"),
+    ),
+    ValidationRun(
         "inverse_azp",
         (str(DATA / "20250622_000831_s4h1A.fts"), "--inverse-azp"),
     ),

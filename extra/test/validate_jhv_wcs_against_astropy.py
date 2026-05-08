@@ -257,8 +257,8 @@ def ensure_supported_projection(header) -> None:
     ctype1, ctype2 = ctype_pair(header)
     if ctype1[-3:] != ctype2[-3:]:
         raise ValueError(f"Mismatched projection types: {ctype1!r} / {ctype2!r}")
-    if not (ctype1.endswith("TAN") or ctype1.endswith("AZP") or ctype1.endswith("ZPN") or ctype1.endswith("CAR") or ctype1.endswith("CEA")):
-        raise ValueError(f"Only TAN, AZP, ZPN, CAR, and CEA FITS files are supported right now, got {ctype1!r} / {ctype2!r}")
+    if not (ctype1.endswith("TAN") or ctype1.endswith("ARC") or ctype1.endswith("AZP") or ctype1.endswith("ZPN") or ctype1.endswith("CAR") or ctype1.endswith("CEA")):
+        raise ValueError(f"Only TAN, ARC, AZP, ZPN, CAR, and CEA FITS files are supported right now, got {ctype1!r} / {ctype2!r}")
 
 
 # Shared geometric and projection math.
@@ -399,6 +399,18 @@ def projectAzpToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) ->
     )
 
 
+def projectArcToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    native_x, native_y, cos_native_distance = nativeZenithalCoordinates(helioprojective, meta)
+    native_radius = math.hypot(native_x, native_y)
+    if native_radius == 0.0:
+        return (0.0, 0.0)
+    native_distance = math.acos(max(-1.0, min(1.0, cos_native_distance)))
+    return (
+        meta.plane_units_per_rad * native_distance * native_x / native_radius,
+        meta.plane_units_per_rad * native_distance * native_y / native_radius,
+    )
+
+
 def zpnRadialAndDerivative(eta_rad: float, meta: JHVMeta) -> tuple[float, float]:
     return zpn_radial(meta, eta_rad), zpn_radial_derivative(meta, eta_rad)
 
@@ -473,6 +485,10 @@ def zpn_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -
     return projectZpnToWcsPlane(world_rad, meta)
 
 
+def arc_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    return projectArcToWcsPlane(world_rad, meta)
+
+
 def azp_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     gamma = math.radians(meta.pv2[2])
     x = plane_internal[0] / meta.plane_units_per_rad
@@ -540,6 +556,29 @@ def zpn_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMe
     return (lon, lat)
 
 
+def arc_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    x = plane_internal[0] / meta.plane_units_per_rad
+    y = plane_internal[1] / meta.plane_units_per_rad
+    radial = math.hypot(x, y)
+
+    lon0 = meta.crval_internal_x / meta.plane_units_per_rad
+    lat0 = meta.crval_internal_y / meta.plane_units_per_rad
+    if radial == 0.0:
+        return (lon0, lat0)
+
+    native_distance = radial
+    native_radius = math.sin(native_distance)
+    cos_native_distance = math.cos(native_distance)
+    native_x = native_radius * x / radial
+    native_y = native_radius * y / radial
+
+    sin_lat0 = math.sin(lat0)
+    cos_lat0 = math.cos(lat0)
+    lat = math.asin(cos_native_distance * sin_lat0 + native_y * cos_lat0)
+    lon = lon0 + math.atan2(native_x, cos_native_distance * cos_lat0 - native_y * sin_lat0)
+    return (lon, lat)
+
+
 def project_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     if meta.projection == "CAR":
         world_xyz = (
@@ -557,6 +596,8 @@ def project_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMet
         return projectCeaToWcsPlane(world_xyz, meta)
     if meta.projection == "TAN":
         return tan_world_to_plane_internal(world_rad, meta)
+    if meta.projection == "ARC":
+        return arc_world_to_plane_internal(world_rad, meta)
     if meta.projection == "AZP":
         return azp_world_to_plane_internal(world_rad, meta)
     if meta.projection == "ZPN":
@@ -582,6 +623,8 @@ def project_plane_internal_to_world(plane_internal: tuple[float, float], meta: J
         )
     if meta.projection == "TAN":
         return project_plane_internal_to_world_tan(plane_internal, meta)
+    if meta.projection == "ARC":
+        return arc_plane_internal_to_world(plane_internal, meta)
     if meta.projection == "AZP":
         return azp_plane_internal_to_world(plane_internal, meta)
     if meta.projection == "ZPN":
@@ -634,6 +677,17 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         cosc = sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon
         x = meta.plane_units_per_rad * (cos_lat * sin_delta_lon / cosc)
         y = meta.plane_units_per_rad * ((cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon) / cosc)
+        return np.column_stack((x, y))
+
+    if meta.projection == "ARC":
+        a = cos_lat * sin_delta_lon
+        b = cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon
+        c = np.hypot(a, b)
+        eta = np.arccos(np.clip(sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon, -1.0, 1.0))
+        x = meta.plane_units_per_rad * eta * a / c
+        y = meta.plane_units_per_rad * eta * b / c
+        x = np.where(c == 0.0, 0.0, x)
+        y = np.where(c == 0.0, 0.0, y)
         return np.column_stack((x, y))
 
     if meta.projection == "AZP":
@@ -1153,6 +1207,8 @@ def clipHpcGeometry(hpc_xy: tuple[float, float]) -> bool:
 def projectHelioprojectiveToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     if meta.projection == "TAN":
         return projectTanToWcsPlane(helioprojective, meta)
+    if meta.projection == "ARC":
+        return projectArcToWcsPlane(helioprojective, meta)
     if meta.projection == "AZP":
         return projectAzpToWcsPlane(helioprojective, meta)
     if meta.projection == "ZPN":
@@ -2453,16 +2509,20 @@ def run_inverse_validation(
     inverse_tan: bool,
     inverse_azp: bool,
     inverse_zpn: bool,
+    inverse_arc: bool,
     inverse_car: bool,
     inverse_cea: bool,
 ) -> int:
-    inverse_mode_count = sum(1 for enabled in (inverse_tan, inverse_azp, inverse_zpn, inverse_car, inverse_cea) if enabled)
+    inverse_mode_count = sum(1 for enabled in (inverse_tan, inverse_arc, inverse_azp, inverse_zpn, inverse_car, inverse_cea) if enabled)
     if inverse_mode_count > 1:
-        raise ValueError("Choose at most one of --inverse-tan, --inverse-azp, --inverse-zpn, --inverse-car, or --inverse-cea")
+        raise ValueError("Choose at most one of --inverse-tan, --inverse-arc, --inverse-azp, --inverse-zpn, --inverse-car, or --inverse-cea")
 
     if inverse_tan:
         expected_projection = "TAN"
         mode_name = "inverse_tan"
+    elif inverse_arc:
+        expected_projection = "ARC"
+        mode_name = "inverse_arc"
     elif inverse_azp:
         expected_projection = "AZP"
         mode_name = "inverse_azp"
@@ -2671,7 +2731,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Validate the current JHV image/WCS projection code paths against astropy.wcs. "
-            "The script covers the formal TAN/AZP/ZPN/CAR/CEA image path, the inverse TAN/AZP/ZPN/CAR/CEA branches "
+            "The script covers the formal TAN/ARC/AZP/ZPN/CAR/CEA image path, the inverse TAN/ARC/AZP/ZPN/CAR/CEA branches "
             "implemented by JHV where the validator has coverage, the centered HPC display-bounds logic, and the existing orthographic/HPC/TAN "
             "comparison modes already used by this branch. It does not validate newer Java overlay-only behavior "
             "such as viewpoint-space external-point projection or visible-hemisphere clipping."
@@ -2684,6 +2744,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--report-worst", type=int, default=5, help="How many worst samples to print")
     parser.add_argument("--all-pixels", action="store_true", help="Validate all pixel centers instead of random 3D samples")
     parser.add_argument("--inverse-tan", action="store_true", help="Validate the TAN inverse plane->world mapping")
+    parser.add_argument("--inverse-arc", action="store_true", help="Validate the ARC inverse plane->world mapping")
     parser.add_argument("--inverse-azp", action="store_true", help="Validate the AZP inverse plane->world mapping")
     parser.add_argument("--inverse-zpn", action="store_true", help="Validate the primary-branch ZPN inverse plane->world mapping")
     parser.add_argument("--inverse-car", action="store_true", help="Validate the CAR inverse plane->world mapping")
@@ -2806,7 +2867,7 @@ def main() -> int:
             image_data,
         )
 
-    if args.inverse_tan or args.inverse_azp or args.inverse_zpn or args.inverse_car or args.inverse_cea:
+    if args.inverse_tan or args.inverse_azp or args.inverse_zpn or args.inverse_arc or args.inverse_car or args.inverse_cea:
         return run_inverse_validation(
             args.fits_file,
             projection_wcs,
@@ -2818,6 +2879,7 @@ def main() -> int:
             args.inverse_tan,
             args.inverse_azp,
             args.inverse_zpn,
+            args.inverse_arc,
             args.inverse_car,
             args.inverse_cea,
         )

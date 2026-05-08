@@ -137,7 +137,13 @@ public final class JHVMetadataDump {
         platformInit.setAccessible(true);
         platformInit.invoke(null);
 
-        JHVGlobals.createDirs();
+        Method createPersistentDirs = JHVGlobals.class.getDeclaredMethod("createPersistentDirs");
+        createPersistentDirs.setAccessible(true);
+        createPersistentDirs.invoke(null);
+
+        Method createCacheDirs = JHVGlobals.class.getDeclaredMethod("createCacheDirs");
+        createCacheDirs.setAccessible(true);
+        createCacheDirs.invoke(null);
 
         Class<?> init = Class.forName("org.helioviewer.jhv.JHVInit");
         Method loadSpice = init.getDeclaredMethod("loadSpice");

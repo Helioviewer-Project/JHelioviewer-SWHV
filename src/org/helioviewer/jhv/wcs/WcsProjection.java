@@ -13,6 +13,8 @@ public final class WcsProjection {
     }
 
     private static Vec2 inverseWcsPlaneToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
+        if (wcsHeader.projection == WcsHeader.Projection.ARC)
+            return inverseArcToHelioprojective(wcsHeader, planeX, planeY);
         if (wcsHeader.projection == WcsHeader.Projection.AZP)
             return inverseAzpToHelioprojective(wcsHeader, planeX, planeY);
         if (wcsHeader.projection == WcsHeader.Projection.ZPN)
@@ -30,6 +32,21 @@ public final class WcsProjection {
         double cosNativeDistance = 1 / Math.sqrt(1 + rho * rho);
         double nativeX = x * cosNativeDistance;
         double nativeY = y * cosNativeDistance;
+        return nativeToHelioprojective(wcsHeader, nativeX, nativeY, cosNativeDistance);
+    }
+
+    private static Vec2 inverseArcToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
+        double x = planeX / wcsHeader.unitsPerRad;
+        double y = planeY / wcsHeader.unitsPerRad;
+        double radial = Math.sqrt(x * x + y * y);
+        if (radial == 0)
+            return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
+
+        double nativeDistance = radial;
+        double nativeRadius = Math.sin(nativeDistance);
+        double nativeX = nativeRadius * x / radial;
+        double nativeY = nativeRadius * y / radial;
+        double cosNativeDistance = Math.cos(nativeDistance);
         return nativeToHelioprojective(wcsHeader, nativeX, nativeY, cosNativeDistance);
     }
 
