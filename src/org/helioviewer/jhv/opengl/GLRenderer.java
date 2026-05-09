@@ -91,7 +91,7 @@ public final class GLRenderer {
     static void renderScene(Camera camera) {
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            camera.projectionOrtho(vp.aspect);
+            camera.projectionOrtho(vp);
             GLSLSolarShader.bindScreen(vp);
 
             GLSLSolarShader.sphere.use();
@@ -110,7 +110,7 @@ public final class GLRenderer {
             Camera miniCamera = Display.getMiniCamera();
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            miniCamera.projectionOrtho2D(vp.aspect);
+            miniCamera.projectionOrtho2D(vp);
             GLSLSolarShader.bindScreen(vp);
 
             GL.glDisable(GL.DEPTH_TEST);
@@ -137,7 +137,7 @@ public final class GLRenderer {
                 GridScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            camera.projectionOrtho2D(vp.aspect);
+            camera.projectionOrtho2D(vp);
             GLSLSolarShader.bindScreen(vp);
 
             Layers.renderScale(camera, vp);

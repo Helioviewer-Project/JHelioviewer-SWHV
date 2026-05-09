@@ -63,14 +63,16 @@ public class Camera {
         updateViewpoint = _updateViewpoint;
     }
 
-    public void projectionOrtho2D(double aspect) {
-        Transform.setup((float) (cameraWidth * aspect), (float) cameraWidth, -1, 1, (float) translation.x, (float) translation.y);
+    public void projectionOrtho2D(Viewport vp) {
+        double width = getCameraWidth(vp);
+        Transform.setup((float) (width * vp.aspect), (float) width, -1, 1, (float) translation.x, (float) translation.y);
         Transform.cacheMVP();
     }
 
-    public void projectionOrtho(double aspect) {
-        float clip = cameraWidth < 32 ? clipNarrow : clipWide;
-        Transform.setup((float) (cameraWidth * aspect), (float) cameraWidth, -clip, clip, (float) translation.x, (float) translation.y);
+    public void projectionOrtho(Viewport vp) {
+        double width = getCameraWidth(vp);
+        float clip = width < 32 ? clipNarrow : clipWide;
+        Transform.setup((float) (width * vp.aspect), (float) width, -clip, clip, (float) translation.x, (float) translation.y);
         Transform.rotateView(rotation);
         Transform.cacheMVP();
     }
@@ -170,11 +172,15 @@ public class Camera {
     }
 
     public double getCameraWidth(Viewport vp) {
-        return cameraWidth;
+        return cameraWidth * vp.zoom;
     }
 
     public void zoom(double wr) {
-        setFOV(fov * Math.exp(ZOOM_STEP * wr)); // smoother, direction-symmetric zooming via exponential scaling
+        setFOV(fov * zoomFactor(wr));
+    }
+
+    public static double zoomFactor(double wr) {
+        return Math.exp(ZOOM_STEP * wr); // smoother, direction-symmetric zooming via exponential scaling
     }
 
     public void timeChanged(JHVTime date) {
