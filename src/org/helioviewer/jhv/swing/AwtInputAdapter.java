@@ -78,7 +78,10 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        inputController.mouseWheelMoved(new ScrollEvent(e.getPreciseWheelRotation()));
+        inputController.mouseWheelMoved(new ScrollEvent(
+                (int) (e.getX() * Display.pixelScale[0] + .5),
+                (int) (e.getY() * Display.pixelScale[1] + .5),
+                e.getPreciseWheelRotation()));
     }
 
     @Override
