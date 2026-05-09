@@ -20,9 +20,7 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.Platform;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
@@ -165,9 +163,7 @@ public final class AngleCanvas extends Canvas {
         }
         angleRenderer.render();
 
-        Camera camera = Display.getCamera();
-        Layers.getViewpointLayer().updateTime(camera.getViewpoint().time);
-        JHVFrame.getZoomStatusPanel().update(camera.getCameraWidth(), camera.getViewpoint().distance, Display.mode);
+        Layers.getViewpointLayer().updateTime(Display.getCamera().getViewpoint().time);
 
         fpsCount++;
     }

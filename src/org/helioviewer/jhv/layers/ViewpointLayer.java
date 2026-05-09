@@ -260,7 +260,6 @@ public class ViewpointLayer extends AbstractLayer {
             return;
 
         viewpointTime = _viewpointTime;
-        JHVFrame.getCarringtonStatusPanel().update(viewpointTime);
         Layers.fireTimeUpdated(this);
     }
 
