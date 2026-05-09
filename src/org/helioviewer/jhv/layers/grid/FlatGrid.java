@@ -64,7 +64,7 @@ public class FlatGrid {
     }
 
     private static FlatGridKey key(Camera camera, Viewport vp) {
-        return new FlatGridKey(Display.mode, Display.gridType, vp.aspect, camera.getCameraWidth(), camera.getTranslationX(), camera.getTranslationY());
+        return new FlatGridKey(Display.mode, Display.gridType, vp.aspect, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY());
     }
 
     private void rebuildIfNeeded(Camera camera, Viewport vp) {

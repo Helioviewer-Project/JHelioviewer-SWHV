@@ -22,17 +22,17 @@ public class CameraHelper {
     }
 
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
-        double width = camera.getCameraWidth();
+        double width = camera.getCameraWidth(vp);
         return computeNormalizedX(vp, screenX) * width * vp.aspect - camera.getTranslationX();
     }
 
     public static double computeUpY(Camera camera, Viewport vp, double screenY) {
-        double width = camera.getCameraWidth();
+        double width = camera.getCameraWidth(vp);
         return computeNormalizedY(vp, screenY) * width - camera.getTranslationY();
     }
 
     private static double getLogicalPixelFactor(Camera camera, Viewport vp) {
-        double width = camera.getCameraWidth();
+        double width = camera.getCameraWidth(vp);
         return (vp.height / Display.pixelScale[1]) / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
     }
 
@@ -45,7 +45,7 @@ public class CameraHelper {
     }
 
     public static double getImagePixelFactor(Camera camera, Viewport vp) {
-        return vp.height / camera.getCameraWidth();
+        return vp.height / camera.getCameraWidth(vp);
     }
 
     static double selectTrackballRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
@@ -53,14 +53,14 @@ public class CameraHelper {
         double up1y = computeUpY(camera, vp, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
         if (radius2 > 0.5 * Sun.Radius2) {
-            double r = 0.5 * camera.getCameraWidth();
+            double r = 0.5 * camera.getCameraWidth(vp);
             return r * r;
         }
         return Sun.Radius2;
     }
 
     static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
-        double width = camera.getCameraWidth();
+        double width = camera.getCameraWidth(vp);
         double tx = camera.getTranslationX();
         double ty = camera.getTranslationY();
         double widthAspect = width * vp.aspect;

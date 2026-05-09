@@ -5,6 +5,7 @@ import java.util.HashSet;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
@@ -168,7 +169,7 @@ public class Camera {
         return tracking;
     }
 
-    public double getCameraWidth() {
+    public double getCameraWidth(Viewport vp) {
         return cameraWidth;
     }
 
