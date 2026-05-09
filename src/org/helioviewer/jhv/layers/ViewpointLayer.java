@@ -31,7 +31,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
 
-public class ViewpointLayer extends AbstractLayer {
+public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     private static final double DELTA_ORBIT = 2 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
@@ -255,11 +255,12 @@ public class ViewpointLayer extends AbstractLayer {
         return viewpointTime.toString();
     }
 
-    public void updateTime(JHVTime _viewpointTime) {
-        if (viewpointTime.milli == _viewpointTime.milli)
+    @Override
+    public void viewpointChanged(Position viewpoint) {
+        if (viewpointTime.milli == viewpoint.time.milli)
             return;
 
-        viewpointTime = _viewpointTime;
+        viewpointTime = viewpoint.time;
         Layers.fireTimeUpdated(this);
     }
 
@@ -270,6 +271,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void init() {
+        Display.getCamera().addListener(this);
         orbits.init();
         planets.init();
         spiral.init();
@@ -277,6 +279,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void dispose() {
+        Display.getCamera().removeListener(this);
         orbits.dispose();
         planets.dispose();
         spiral.dispose();

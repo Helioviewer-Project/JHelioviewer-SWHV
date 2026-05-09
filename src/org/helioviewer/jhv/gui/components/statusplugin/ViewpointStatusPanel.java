@@ -8,13 +8,12 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.time.JHVTime;
-import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin implements Interfaces.LazyComponent {
 
     private double distance;
-    private JHVTime time = TimeUtils.START;
+    private JHVTime time = Sun.StartEarth.time;
 
     public ViewpointStatusPanel() {
         lazyRepaint();
