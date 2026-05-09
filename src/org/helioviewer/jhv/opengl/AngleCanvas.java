@@ -21,7 +21,6 @@ import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.opengl.angle.WinAngleBridge;
@@ -162,9 +161,6 @@ public final class AngleCanvas extends Canvas {
             lastGlHeight = glHeight;
         }
         angleRenderer.render();
-
-        Layers.getViewpointLayer().updateTime(Display.getCamera().getViewpoint().time);
-
         fpsCount++;
     }
 
