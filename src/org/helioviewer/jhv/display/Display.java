@@ -10,6 +10,7 @@ public class Display {
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
     public static boolean whiteBackground = false;
+    public static boolean separateViewportZoom = false;
 
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
@@ -100,8 +101,12 @@ public class Display {
     }
 
     public static void reshapeAll() {
+        Viewport[] oldViewports = viewports;
         activeViewport = 0;
         viewports = DisplayLayout.viewports(glWidth, glHeight, countEnabledLayers());
+        int count = Math.min(oldViewports.length, viewports.length);
+        for (int i = 0; i < count; i++)
+            viewports[i].zoom = oldViewports[i].zoom;
     }
 
     private static boolean showCorona = true;

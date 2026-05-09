@@ -5,6 +5,7 @@
 
 - Add `HPLN/HPLT-ARC` WCS projection support
 - Load user color lookup tables from `$HOME/JHelioviewer-SWHV/Settings/user-luts.txt`
+- Add option to zoom multiview panels separately
 
 ## JHelioviewer 5.0 (2026-05-08)
 

@@ -205,6 +205,17 @@ public class Actions {
         }
     }
 
+    public static class SeparateMultiviewZoom extends AbstractAction {
+        public SeparateMultiviewZoom() {
+            super("Separate Multiview Zoom");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Display.separateViewportZoom = !Display.separateViewportZoom;
+        }
+    }
+
     public static class Rotate90Camera extends AbstractAction {
         private final String axis;
 
