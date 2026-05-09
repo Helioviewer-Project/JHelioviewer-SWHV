@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 class Zoom {
@@ -15,13 +16,13 @@ class Zoom {
     private double velocity = 0;
     private double lastWheelDelta = 0;
 
-    void zoom(Camera camera, double wheelDelta) {
+    void zoom(Viewport vp, double wheelDelta) {
         if (wheelDelta == 0) {
             return;
         }
         if (applyWheel(wheelDelta)) return;
 
-        camera.zoom(velocity);
+        vp.zoom *= Camera.zoomFactor(velocity);
         if (velocity < 0)
             MovieDisplay.render(1);
         else

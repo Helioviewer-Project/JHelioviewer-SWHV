@@ -46,7 +46,8 @@ public final class InputController {
     }
 
     public void mouseWheelMoved(ScrollEvent e) {
-        interaction.mouseWheelMoved(e);
+        Viewport vp = Display.setActiveViewport(e.x(), e.y());
+        interaction.mouseWheelMoved(e, vp);
     }
 
     public void keyPressed(KeyInputEvent e) {

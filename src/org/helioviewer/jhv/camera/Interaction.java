@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -58,8 +59,8 @@ public class Interaction {
         return annotating || Annotations.hasPending();
     }
 
-    public void mouseWheelMoved(ScrollEvent e) {
-        zoom.zoom(camera, e.preciseWheelRotation());
+    public void mouseWheelMoved(ScrollEvent e, Viewport vp) {
+        zoom.zoom(vp, e.preciseWheelRotation());
     }
 
     public void mouseDragged(PointerEvent e, Viewport vp) {
@@ -79,6 +80,7 @@ public class Interaction {
 
     public void mouseClicked(PointerEvent e) {
         if (e.clickCount() == 2) {
+            Display.resetViewportZoom();
             camera.reset();
         }
     }

@@ -4,6 +4,7 @@ public class Viewport {
 
     public final double aspect;
     public final int idx;
+    public double zoom = 1;
 
     public final int width;
     public final int height;

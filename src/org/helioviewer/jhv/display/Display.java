@@ -80,6 +80,11 @@ public class Display {
         return viewports;
     }
 
+    public static void resetViewportZoom() {
+        for (Viewport viewport : viewports)
+            viewport.zoom = 1;
+    }
+
     private static int countEnabledLayers() {
         int ct = 0;
         if (multiview) {
