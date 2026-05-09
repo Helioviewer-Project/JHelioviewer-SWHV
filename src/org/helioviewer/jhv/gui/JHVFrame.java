@@ -26,10 +26,9 @@ import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.SideContentPane;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.gui.components.ToolBar;
-import org.helioviewer.jhv.gui.components.statusplugin.CarringtonStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
-import org.helioviewer.jhv.gui.components.statusplugin.ZoomStatusPanel;
+import org.helioviewer.jhv.gui.components.statusplugin.ViewpointStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -111,9 +110,6 @@ public final class JHVFrame {
     private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
 
-    private static ZoomStatusPanel zoomStatus;
-    private static CarringtonStatusPanel carringtonStatus;
-
     private static LayersPanel layersPanel;
 
     private static MenuBar menuBar;
@@ -148,8 +144,7 @@ public final class JHVFrame {
         centerPanel.add(leftPaneHost, BorderLayout.WEST);
         centerPanel.add(mainContentPanel, BorderLayout.CENTER);
 
-        zoomStatus = new ZoomStatusPanel();
-        carringtonStatus = new CarringtonStatusPanel();
+        ViewpointStatusPanel viewpointStatus = new ViewpointStatusPanel();
         FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
         PositionStatusPanel positionStatus = new PositionStatusPanel();
         inputController.addListener(positionStatus);
@@ -157,8 +152,7 @@ public final class JHVFrame {
         StatusPanel statusPanel = new StatusPanel(5, 5);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
         statusPanel.addPlugin(positionStatus, StatusPanel.Alignment.RIGHT);
-        statusPanel.addPlugin(zoomStatus, StatusPanel.Alignment.RIGHT);
-        statusPanel.addPlugin(carringtonStatus, StatusPanel.Alignment.RIGHT);
+        statusPanel.addPlugin(viewpointStatus, StatusPanel.Alignment.RIGHT);
 
         ToolBar toolBar = new ToolBar();
 
@@ -314,14 +308,6 @@ public final class JHVFrame {
 
     public static InputController getInputController() {
         return inputController;
-    }
-
-    public static ZoomStatusPanel getZoomStatusPanel() {
-        return zoomStatus;
-    }
-
-    public static CarringtonStatusPanel getCarringtonStatusPanel() {
-        return carringtonStatus;
     }
 
     public static LayersPanel getLayersPanel() {
