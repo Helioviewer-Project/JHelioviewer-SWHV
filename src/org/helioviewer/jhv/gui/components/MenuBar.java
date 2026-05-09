@@ -56,6 +56,12 @@ public final class MenuBar extends JMenuBar {
         viewMenu.add(new Actions.ZoomIn());
         viewMenu.add(new Actions.ZoomOut());
         viewMenu.addSeparator();
+
+        JCheckBoxMenuItem separateMultiviewZoom = new JCheckBoxMenuItem(new Actions.SeparateMultiviewZoom());
+        separateMultiviewZoom.setState(Display.separateViewportZoom);
+        viewMenu.add(separateMultiviewZoom);
+
+        viewMenu.addSeparator();
         viewMenu.add(new Actions.ResetCameraAxis());
         viewMenu.add(new Actions.ResetCamera());
         viewMenu.addSeparator();

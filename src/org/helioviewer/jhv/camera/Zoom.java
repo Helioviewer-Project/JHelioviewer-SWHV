@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
@@ -22,7 +23,13 @@ class Zoom {
         }
         if (applyWheel(wheelDelta)) return;
 
-        vp.zoom *= Camera.zoomFactor(velocity);
+        double factor = Camera.zoomFactor(velocity);
+        if (Display.separateViewportZoom) {
+            vp.zoom *= factor;
+        } else {
+            for (Viewport viewport : Display.getViewports())
+                viewport.zoom *= factor;
+        }
         if (velocity < 0)
             MovieDisplay.render(1);
         else
