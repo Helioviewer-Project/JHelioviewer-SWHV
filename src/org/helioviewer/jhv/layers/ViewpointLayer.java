@@ -175,7 +175,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
         double mousePlaneY = CameraHelper.computeUpY(camera, vp, mouseY);
         Quat dragRotation = camera.getDragRotation();
 
-        double halfWidth = camera.getCameraWidth() / 2;
+        double halfWidth = camera.getCameraWidth(vp) / 2;
         double hoverThreshold2 = (0.01 * halfWidth) * (0.01 * halfWidth);
         double cosRelativeLon = Math.cos(-relativeLon);
         double sinRelativeLon = Math.sin(-relativeLon);

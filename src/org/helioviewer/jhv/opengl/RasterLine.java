@@ -38,20 +38,20 @@ public class RasterLine {
     }
 
     private static double snapVerticalCenter(Camera camera, Viewport vp, double centerX) {
-        double widthAspect = camera.getCameraWidth() * vp.aspect;
+        double widthAspect = camera.getCameraWidth(vp) * vp.aspect;
         double screenX = vp.x + vp.width * ((centerX + camera.getTranslationX()) / widthAspect + 0.5);
         double snappedScreenX = Math.rint(screenX - 0.5) + 0.5;
         return CameraHelper.computeUpX(camera, vp, snappedScreenX);
     }
 
     private static double snapHorizontalCenter(Camera camera, Viewport vp, double centerY) {
-        double width = camera.getCameraWidth();
+        double width = camera.getCameraWidth(vp);
         double screenY = vp.yAWT + vp.height * (0.5 - (centerY + camera.getTranslationY()) / width);
         double snappedScreenY = Math.rint(screenY - 0.5) + 0.5;
         return CameraHelper.computeUpY(camera, vp, snappedScreenY);
     }
 
     private static double halfThickness(Camera camera, Viewport vp, double thicknessPixels) {
-        return 0.5 * thicknessPixels * camera.getCameraWidth() / vp.height;
+        return 0.5 * thicknessPixels * camera.getCameraWidth(vp) / vp.height;
     }
 }
