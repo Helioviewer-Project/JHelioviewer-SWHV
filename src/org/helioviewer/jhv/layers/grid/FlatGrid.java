@@ -26,7 +26,7 @@ public class FlatGrid {
     private static final double THICKNESS_PIXELS = 1.5;
     private static final double[] ANGULAR_STEPS = {0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 45, 90, 180};
     private static final double[] LINEAR_STEP_FACTORS = {1, 2, 5, 10};
-    private static final double TARGET_DIVISIONS = 8;
+    private static final double TARGET_GRID_PIXELS = 12 * TEXT_SIZE;
     private static final byte[] GRID_COLOR = Colors.Red;
     private static final byte[] AXIS_COLOR = Colors.Green;
 
@@ -71,8 +71,16 @@ public class FlatGrid {
     private void rebuildIfNeeded(Camera camera, Viewport vp) {
         FlatGridKey flatGridKey = key(camera, vp);
         GridScale scale = Display.mode.scale;
-        AxisSignature xSignature = buildAxisSignature(true, scale.getInterpolatedXValue(0), scale.getInterpolatedXValue(1));
-        AxisSignature ySignature = buildAxisSignature(Display.mode.isHpc() || Display.mode.isLatitudinal(), scale.getInterpolatedYValue(0), scale.getInterpolatedYValue(1));
+
+        double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
+        double yCenter = 0.5 - camera.getTranslationY();
+        double halfWidth = 0.5 * camera.getCameraWidth(vp);
+        AxisSignature xSignature = buildAxisSignature(true,
+                scale.getInterpolatedXValue(Math.clamp(xCenter - halfWidth, 0, 1)),
+                scale.getInterpolatedXValue(Math.clamp(xCenter + halfWidth, 0, 1)), vp.width);
+        AxisSignature ySignature = buildAxisSignature(Display.mode.isHpc() || Display.mode.isLatitudinal(),
+                scale.getInterpolatedYValue(Math.clamp(yCenter - halfWidth, 0, 1)),
+                scale.getInterpolatedYValue(Math.clamp(yCenter + halfWidth, 0, 1)), vp.height);
         if (!needsRebuild(flatGridKey, xSignature, ySignature))
             return;
 
@@ -93,8 +101,9 @@ public class FlatGrid {
     private void drawLabels(Camera camera, Viewport vp) {
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
-        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * camera.getCameraWidth(vp) / vp.height;
+        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(camera.getCameraWidth(vp), 1) / vp.height;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
+        float labelOffset = (float) (0.1 * worldTextHeight);
 
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();
@@ -102,10 +111,11 @@ public class FlatGrid {
             if (xAxis.axisFlags()[i])
                 continue;
             double x = RasterLine.snapVertical(camera, vp, xAxis.positions()[i]);
-            renderer.draw(xAxis.labels()[i], (float) (vp.aspect * x), 0, 0, textScaleFactor);
+            renderer.draw(xAxis.labels()[i], (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
         }
         for (int i = 0; i < yAxis.labels().length; i++) {
-            renderer.draw(yAxis.labels()[i], 0, (float) RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]), 0, textScaleFactor);
+            double y = RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]);
+            renderer.draw(yAxis.labels()[i], 0, (float) y + labelOffset, 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }
@@ -125,12 +135,13 @@ public class FlatGrid {
         shape.setVertex(vexBuf);
     }
 
-    private static AxisSignature buildAxisSignature(boolean angular, double start, double stop) {
+    private static AxisSignature buildAxisSignature(boolean angular, double start, double stop, int pixels) {
         double range = Math.abs(stop - start);
         if (!Double.isFinite(range) || range <= Math.ulp(1.0))
             return new AxisSignature(0, start, start);
 
-        double step = angular ? chooseAngularStep(range) : chooseLinearStep(range);
+        double targetDivisions = Math.max(1, pixels / TARGET_GRID_PIXELS);
+        double step = angular ? chooseAngularStep(range, targetDivisions) : chooseLinearStep(range, targetDivisions);
         double lo = Math.min(start, stop);
         double hi = Math.max(start, stop);
         double first = Math.ceil(lo / step) * step;
@@ -164,8 +175,8 @@ public class FlatGrid {
         return new Axis(signature, labels, axisFlags, positions);
     }
 
-    private static double chooseAngularStep(double range) {
-        double target = range / TARGET_DIVISIONS;
+    private static double chooseAngularStep(double range, double targetDivisions) {
+        double target = range / targetDivisions;
         for (double step : ANGULAR_STEPS) {
             if (step >= target)
                 return step;
@@ -173,13 +184,14 @@ public class FlatGrid {
         return ANGULAR_STEPS[ANGULAR_STEPS.length - 1];
     }
 
-    private static double chooseLinearStep(double range) {
+    private static double chooseLinearStep(double range, double targetDivisions) {
         if (!Double.isFinite(range) || range <= Math.ulp(1.0))
             return 1;
-        double base = Math.pow(10, Math.floor(Math.log10(range / TARGET_DIVISIONS)));
+        double target = range / targetDivisions;
+        double base = Math.pow(10, Math.floor(Math.log10(target)));
         for (double factor : LINEAR_STEP_FACTORS) {
             double step = factor * base;
-            if (step >= range / TARGET_DIVISIONS)
+            if (step >= target)
                 return step;
         }
         return 10 * base;
