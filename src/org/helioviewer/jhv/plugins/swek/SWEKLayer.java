@@ -80,6 +80,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private final GLSLTexture glslTexture = new GLSLTexture();
     private final BufCoord texBuf = new BufCoord(4 * 8);
 
+    private long cachedEventsTime = Long.MIN_VALUE;
+    private long cachedEventsStart = Long.MIN_VALUE;
+    private long cachedEventsEnd = Long.MIN_VALUE;
+    private List<JHVRelatedEvents> cachedActiveEvents = List.of();
+
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
             icons = jo.optBoolean("icons", icons);
@@ -357,11 +362,28 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
+    private List<JHVRelatedEvents> activeEvents() {
+        long time = controller.currentTime;
+        long start = Movie.getStartTime();
+        long end = Movie.getEndTime();
+        if (time != cachedEventsTime || start != cachedEventsStart || end != cachedEventsEnd) {
+            cachedEventsTime = time;
+            cachedEventsStart = start;
+            cachedEventsEnd = end;
+            cachedActiveEvents = SWEKData.getActiveEvents(time);
+        }
+        return cachedActiveEvents;
+    }
+
+    private void invalidateActiveEvents() {
+        cachedEventsTime = Long.MIN_VALUE;
+    }
+
     @Override
     public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+        List<JHVRelatedEvents> evs = activeEvents();
         if (evs.isEmpty())
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
@@ -387,7 +409,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void renderScale(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        List<JHVRelatedEvents> evs = SWEKData.getActiveEvents(controller.currentTime);
+        List<JHVRelatedEvents> evs = activeEvents();
         if (evs.isEmpty())
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
@@ -446,6 +468,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
             controller.resetHover();
+            invalidateActiveEvents();
             JHVFrame.getInputController().removeListener(controller);
             Movie.removeTimeListener(controller);
             Movie.removeTimeRangeListener(this);
@@ -482,19 +505,23 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     @Override
     public void timeRangeChanged(long start, long end) {
+        invalidateActiveEvents();
         requestEvents(false, start, end);
     }
 
     @Override
     public void newEventsReceived() {
-        if (enabled)
+        if (enabled) {
+            invalidateActiveEvents();
             MovieDisplay.display();
+        }
     }
 
     @Override
     public void cacheUpdated() {
         if (!enabled)
             return;
+        invalidateActiveEvents();
         requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
     }
 
