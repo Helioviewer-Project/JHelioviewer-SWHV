@@ -156,9 +156,7 @@ public final class LayersPanel extends JPanel {
                 return;
 
             int row = grid.getSelectedRow();
-            if (row >= 0
-                    && e.getFirstRow() <= row
-                    && row <= e.getLastRow())
+            if (row >= 0 && e.getFirstRow() <= row && row <= e.getLastRow())
                 refreshSelectedOptionsPanel();
         });
 

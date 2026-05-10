@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -148,9 +149,8 @@ public final class TimelinePanel extends JPanel {
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                setOptionsPanel((TimelineLayer) grid.getValueAt(grid.getSelectedRow(), 0));
-            }
+            if (!e.getValueIsAdjusting())
+                refreshSelectedOptionsPanel();
         });
 
         grid.addMouseListener(new MouseAdapter() {
@@ -168,9 +168,7 @@ public final class TimelinePanel extends JPanel {
                     DrawController.graphAreaChanged();
                 } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
                     model.remove(timeline);
-                    int idx = grid.getSelectedRow();
-                    if (v.row <= idx)
-                        grid.getSelectionModel().setSelectionInterval(idx - 1, idx - 1);
+                    selectExistingRow(v.row);
                 }
             }
         });
@@ -182,7 +180,30 @@ public final class TimelinePanel extends JPanel {
         add(optionsPanelWrapper, gc);
     }
 
-    private void setOptionsPanel(TimelineLayer timeline) {
+    @Nullable
+    private TimelineLayer selectedLayer() {
+        int row = grid.getSelectedRow();
+        if (row < 0 || row >= grid.getRowCount())
+            return null;
+        return grid.getValueAt(row, 0) instanceof TimelineLayer timeline ? timeline : null;
+    }
+
+    private void selectExistingRow(int preferredRow) {
+        int rowCount = grid.getRowCount();
+        if (rowCount == 0) {
+            setOptionsPanel(null);
+            return;
+        }
+        int row = Math.min(preferredRow, rowCount - 1);
+        grid.getSelectionModel().setSelectionInterval(row, row);
+        refreshSelectedOptionsPanel();
+    }
+
+    private void refreshSelectedOptionsPanel() {
+        setOptionsPanel(selectedLayer());
+    }
+
+    private void setOptionsPanel(@Nullable TimelineLayer timeline) {
         optionsPanelWrapper.removeAll();
         JPanel optionsPanel = timeline == null ? null : timeline.getOptionsPanel();
         if (optionsPanel != null) {
