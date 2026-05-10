@@ -20,7 +20,8 @@ import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 
 public class FlatGrid {
 
-    private static final float TEXT_SCALE = GridLabel.textScale;
+    //private static final float TEXT_SCALE = GridLabel.textScale; // scalable text
+    private static final int TEXT_SIZE = 12;
     private static final DecimalFormat FORMATTER = MathUtils.numberFormatter("0", 2);
     private static final double THICKNESS_PIXELS = 1.5;
     private static final double[] ANGULAR_STEPS = {0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 45, 90, 180};
@@ -91,7 +92,10 @@ public class FlatGrid {
 
     private void drawLabels(Camera camera, Viewport vp) {
         SdfTextRenderer renderer = GLText.renderer();
-        float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize();
+        //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
+        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * camera.getCameraWidth(vp) / vp.height;
+        float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
+
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();
         for (int i = 0; i < xAxis.labels().length; i++) {
