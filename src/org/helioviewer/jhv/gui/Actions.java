@@ -212,7 +212,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Display.separateViewportZoom = !Display.separateViewportZoom;
+            Display.setSeparateViewportZoom(!Display.separateViewportZoom);
         }
     }
 

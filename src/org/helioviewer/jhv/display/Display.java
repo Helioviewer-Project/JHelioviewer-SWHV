@@ -10,7 +10,6 @@ public class Display {
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
     public static boolean whiteBackground = false;
-    public static boolean separateViewportZoom = false;
 
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
@@ -107,6 +106,14 @@ public class Display {
         int count = Math.min(oldViewports.length, viewports.length);
         for (int i = 0; i < count; i++)
             viewports[i].zoom = oldViewports[i].zoom;
+    }
+
+    public static boolean separateViewportZoom = false;
+
+    public static void setSeparateViewportZoom(boolean separate) {
+        separateViewportZoom = separate;
+        if (!separateViewportZoom)
+            resetViewportZoom();
     }
 
     private static boolean showCorona = true;
