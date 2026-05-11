@@ -198,7 +198,7 @@ public final class TimelinePanel extends JPanel {
     @Nullable
     private TimelineLayer selectedLayer() {
         int row = grid.getSelectedRow();
-        if (row < 0 || row >= grid.getRowCount())
+        if (row < 0)
             return null;
         return grid.getValueAt(row, 0) instanceof TimelineLayer timeline ? timeline : null;
     }
