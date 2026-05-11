@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers.selector;
 
-import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.layers.Layer;
@@ -18,7 +17,7 @@ final class LayersTableModel extends AbstractTableModel implements Layers.Listen
 
     @Override
     public int getRowCount() {
-        return Layers.size();
+        return Layers.getLayers().size();
     }
 
     @Override
@@ -26,10 +25,9 @@ final class LayersTableModel extends AbstractTableModel implements Layers.Listen
         return NUMBER_COLUMNS;
     }
 
-    @Nullable
     @Override
     public Object getValueAt(int row, int col) {
-        return Layers.get(row);
+        return Layers.getLayers().get(row);
     }
 
     @Override

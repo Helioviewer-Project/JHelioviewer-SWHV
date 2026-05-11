@@ -77,7 +77,7 @@ public final class LayersPanel extends JPanel {
             super.tableChanged(e);
             if (e.getType() == TableModelEvent.INSERT) {
                 int row = e.getLastRow();
-                if (row >= 0 && row < getRowCount() && getValueAt(row, 0) instanceof ImageLayer)
+                if (row >= 0 && getValueAt(row, 0) instanceof ImageLayer)
                     setRowSelectionInterval(row, row);
             }
         }
@@ -246,7 +246,7 @@ public final class LayersPanel extends JPanel {
     @Nullable
     private Layer selectedLayer() {
         int row = grid.getSelectedRow();
-        if (row < 0 || row >= grid.getRowCount())
+        if (row < 0)
             return null;
         return grid.getValueAt(row, 0) instanceof Layer layer ? layer : null;
     }
