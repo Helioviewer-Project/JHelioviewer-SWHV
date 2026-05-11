@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -75,21 +76,35 @@ public final class TimelinePanel extends JPanel {
 
         @Override
         public void repaint() {
-            dirty = true;
+            dirty().setBounds(0, 0, getWidth(), getHeight());
+            dirtyValid = true;
         }
 
         @Override
         public void repaint(int x, int y, int width, int height) {
-            dirty = true;
+            if (!dirtyValid) {
+                dirty().setBounds(x, y, width, height);
+                dirtyValid = true;
+            } else {
+                dirty().add(x, y);
+                dirty().add(x + width, y + height);
+            }
         }
 
-        private boolean dirty = false;
+        private Rectangle dirty = null;
+        private boolean dirtyValid = false;
+
+        private Rectangle dirty() {
+            if (dirty == null)
+                dirty = new Rectangle();
+            return dirty;
+        }
 
         @Override
         public void lazyRepaint() {
-            if (dirty) {
-                super.repaint();
-                dirty = false;
+            if (dirtyValid) {
+                super.repaint(dirty.x, dirty.y, dirty.width, dirty.height);
+                dirtyValid = false;
             }
         }
 
