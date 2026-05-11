@@ -32,12 +32,11 @@ class RadioJ2KData implements View.DataHandler {
     private final int j2kWidth;
     private final int j2kHeight;
     private final boolean willDraw;
-    private final Runnable rowUpdated;
 
     private BufferedImage bufferedImage;
     private Region region;
 
-    RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor, Runnable _rowUpdated) throws Exception {
+    RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor) throws Exception {
         try {
             ResolutionSet.Level resLevel = _view.getResolutionLevel(0, 0);
             j2kWidth = resLevel.width();
@@ -56,7 +55,6 @@ class RadioJ2KData implements View.DataHandler {
             view.setDataHandler(this);
             executor = _executor;
             willDraw = startDate == start; // didn't get closest
-            rowUpdated = _rowUpdated;
         } catch (Exception e) {
             _executor.abolish();
             _view.abolish();
@@ -90,7 +88,7 @@ class RadioJ2KData implements View.DataHandler {
         bufferedImage = IndexedImageFactory.createIndexed(copyBuffer((ByteBuffer) imageBuffer.buffer), w, h, RadioData.getColorModel());
         imageBuffer.allowExplicitFree();
         if (!hadData)
-            rowUpdated.run();
+            RadioData.dataUpdated();
         DrawController.drawRequest();
     }
 

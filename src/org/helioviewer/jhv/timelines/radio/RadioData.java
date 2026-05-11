@@ -57,12 +57,14 @@ public final class RadioData extends AbstractTimelineLayer {
                     v.removeData();
             }).build();
     private static final HashSet<Long> downloading = new HashSet<>();
+    private static RadioData currentInstance;
 
     private final LUTComboBox lutCombo;
     private final JPanel optionsPanel;
     private static IndexColorModel colorModel;
 
     public RadioData(JSONObject jo) {
+        currentInstance = this;
         LUT lut = LUT.spectral();
         if (jo != null) {
             LUT configured = LUT.get(jo.optString("colormap", lut.name()));
@@ -106,6 +108,8 @@ public final class RadioData extends AbstractTimelineLayer {
 
     private static void clearCache() {
         cache.invalidateAll();
+        downloading.clear();
+        DrawController.drawRequest();
     }
 
     private void requestAndOpenIntervals(long start) {
@@ -113,16 +117,15 @@ public final class RadioData extends AbstractTimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
-                Tasks.submit(Long.toString(date), new RadioJPXDownload(this, date), result -> onSuccessRadioJPX(date, result), (logContext, t) -> onFailureRadioJPX(date, t));
+                Tasks.submit(Long.toString(date), new RadioJPXDownload(date), result -> onSuccessRadioJPX(date, result), (logContext, t) -> onFailureRadioJPX(date, t));
             }
         }
     }
 
-    private record RadioJPXDownload(RadioData owner, long date) implements Callable<RadioJ2KData> {
+    private record RadioJPXDownload(long date) implements Callable<RadioJ2KData> {
 
         RadioJPXDownload {
-            downloading.add(date);
-            Timelines.getLayers().updateRow(owner);
+            downloadStarted(date);
         }
 
         @Override
@@ -133,15 +136,20 @@ public final class RadioData extends AbstractTimelineLayer {
                 throw new Exception("Invalid data format");
 
             DecodeExecutor executor = new DecodeExecutor();
-            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime(), executor, owner::dataUpdated);
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime(), executor);
         }
 
+    }
+
+    private static void downloadStarted(long date) {
+        downloading.add(date);
+        refreshRow();
     }
 
     private void onSuccessRadioJPX(long date, @Nonnull RadioJ2KData result) {
         doneRadioJPX(date);
         cache.put(date, result);
-        result.requestData(DrawController.selectedAxis);
+        fetchData(DrawController.selectedAxis);
     }
 
     private void onFailureRadioJPX(long date, @Nonnull Throwable t) {
@@ -149,13 +157,18 @@ public final class RadioData extends AbstractTimelineLayer {
         Log.error(Throwables.getStackTraceAsString(t));
     }
 
-    private void doneRadioJPX(long date) {
+    private static void doneRadioJPX(long date) {
         downloading.remove(date);
-        Timelines.getLayers().updateRow(this);
+        refreshRow();
     }
 
-    private void dataUpdated() {
-        Timelines.getLayers().updateRow(this);
+    private static void refreshRow() {
+        if (currentInstance != null)
+            Timelines.getLayers().updateRow(currentInstance);
+    }
+
+    static void dataUpdated() {
+        refreshRow();
     }
 
     @Override
@@ -171,6 +184,9 @@ public final class RadioData extends AbstractTimelineLayer {
     @Override
     public void remove() {
         clearCache();
+        if (currentInstance == this)
+            currentInstance = null;
+        refreshRow();
     }
 
     @Override
@@ -178,6 +194,7 @@ public final class RadioData extends AbstractTimelineLayer {
         super.setEnabled(_enabled);
         if (!enabled)
             clearCache();
+        refreshRow();
     }
 
     @Override
