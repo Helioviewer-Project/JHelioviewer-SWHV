@@ -254,7 +254,7 @@ public final class Layers {
         newLayers.addAll(layers);
     }
 
-    public static void remove() {
+    public static void resetForReinit() {
         newLayers = layers;
         layers = new LayerList();
         setActiveImageLayer(null);

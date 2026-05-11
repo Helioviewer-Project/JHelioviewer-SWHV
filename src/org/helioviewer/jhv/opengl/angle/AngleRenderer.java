@@ -150,7 +150,7 @@ public final class AngleRenderer {
         if (!rendererInitialized)
             return;
         if (removeLayers)
-            GLRenderer.remove();
+            GLRenderer.resetForReinit();
         else
             GLRenderer.dispose();
         rendererInitialized = false;

@@ -83,9 +83,9 @@ public final class GLRenderer {
         JHVGLException.checkErrors("GLRenderer.dispose()");
     }
 
-    public static void remove() {
+    public static void resetForReinit() {
         dispose();
-        Layers.remove();
+        Layers.resetForReinit();
     }
 
     static void renderScene(Camera camera) {
