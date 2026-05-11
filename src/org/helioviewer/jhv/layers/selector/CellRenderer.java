@@ -2,16 +2,15 @@ package org.helioviewer.jhv.layers.selector;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Rectangle;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayer;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -38,7 +37,7 @@ class CellRenderer {
     static final class Loading extends DefaultTableCellRenderer {
 
         private final Font font = Buttons.getMaterialFont(getFont().getSize2D());
-        private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
+        private final BusyIndicator over = new BusyIndicator();
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -49,10 +48,12 @@ class CellRenderer {
             // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof Layer layer) {
                 if (layer.isDownloading()) {
-                    table.repaint(); // lazy
+                    Rectangle rect = table.getCellRect(row, column, false);
+                    table.repaint(rect.x, rect.y, rect.width, rect.height);
 
                     over.setForeground(label.getForeground());
-                    over.setView(label);
+                    over.setBackground(label.getBackground());
+                    over.setOpaque(label.isOpaque());
                     return over;
                 } else if (layer.isLocal()) {
                     label.setFont(font);
