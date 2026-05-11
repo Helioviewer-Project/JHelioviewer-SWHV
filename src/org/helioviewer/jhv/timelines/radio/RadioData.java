@@ -122,7 +122,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
         RadioJPXDownload {
             downloading.add(date);
-            Timelines.getLayers().updateLoadingCell(owner);
+            Timelines.getLayers().updateRow(owner);
         }
 
         @Override
@@ -133,7 +133,7 @@ public final class RadioData extends AbstractTimelineLayer {
                 throw new Exception("Invalid data format");
 
             DecodeExecutor executor = new DecodeExecutor();
-            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime(), executor);
+            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime(), executor, owner::dataUpdated);
         }
 
     }
@@ -151,7 +151,11 @@ public final class RadioData extends AbstractTimelineLayer {
 
     private void doneRadioJPX(long date) {
         downloading.remove(date);
-        Timelines.getLayers().updateLoadingCell(RadioData.this);
+        Timelines.getLayers().updateRow(this);
+    }
+
+    private void dataUpdated() {
+        Timelines.getLayers().updateRow(this);
     }
 
     @Override
