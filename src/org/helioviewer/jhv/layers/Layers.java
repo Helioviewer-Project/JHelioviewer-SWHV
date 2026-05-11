@@ -234,18 +234,6 @@ public final class Layers {
         }
     }
 
-    public static int size() {
-        return layers.size();
-    }
-
-    public static Layer get(int row) {
-        try {
-            return layers.get(row);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public static void fireTimeUpdated(Layer layer) {
         listeners.forEach(listener -> listener.timeUpdated(layer));
     }
