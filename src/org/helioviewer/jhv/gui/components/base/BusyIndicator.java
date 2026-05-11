@@ -8,45 +8,52 @@ import java.awt.RenderingHints;
 import java.awt.geom.Line2D;
 
 import javax.swing.JComponent;
-import javax.swing.plaf.LayerUI;
 
 @SuppressWarnings("serial")
-public class BusyIndicator extends LayerUI<JComponent> {
+public class BusyIndicator extends JComponent {
+
+    private static final AlphaComposite[] alphas = new AlphaComposite[12];
+    private static final double dangle = Math.PI / 30;
+    private static double angle;
+
+    static {
+        for (int i = 0; i < alphas.length; i++)
+            alphas[i] = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (11 - i) / 11f);
+    }
 
     @Override
-    public void paint(Graphics g1, JComponent c) {
-        super.paint(g1, c);
+    protected void paintComponent(Graphics g1) {
+        if (isOpaque()) {
+            g1.setColor(getBackground());
+            g1.fillRect(0, 0, getWidth(), getHeight());
+        }
 
-        int w = c.getWidth();
-        int h = c.getHeight();
+        int w = getWidth();
+        int h = getHeight();
         double s = Math.min(w, h) / 4.;
         if (s < 1)
             return;
         double cx = w / 2.;
         double cy = h / 2.;
 
-        Graphics2D g = (Graphics2D) g1;
+        Graphics2D g = (Graphics2D) g1.create();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         g.setStroke(new BasicStroke((float) (s / 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.rotate(angle, cx, cy);
-        g.setColor(c.getForeground());
+        g.setColor(getForeground());
 
         Line2D line = new Line2D.Double(cx + s, cy, cx + s * 2, cy);
         for (int i = 0; i < 12; i++) {
             g.draw(line);
             g.rotate(-Math.PI / 6, cx, cy);
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (11 - i) / 11f));
+            g.setComposite(alphas[i]);
         }
+        g.dispose();
     }
 
-    private static final double dangle = Math.PI / 30;
-    private static double angle;
-
     public static void incrementAngle() {
-        angle += dangle;
-        if (angle > 2 * Math.PI)
-            angle = 0;
+        angle = (angle + dangle) % (2 * Math.PI);
     }
 
 }

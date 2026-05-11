@@ -9,16 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayer;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.UITimer;
 
 @SuppressWarnings("serial")
 public final class SWEKGroup extends DefaultMutableTreeNode implements Interfaces.JHVCell {
@@ -35,8 +33,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
     private final boolean containsParameterFilter;
 
     private final JPanel panel;
-    private final JLayer<JComponent> over = new JLayer<>(null, UITimer.busyIndicator);
-    private final JLabel loadingLabel = new JLabel("    ");
+    private final BusyIndicator busyIndicator = new BusyIndicator();
     private final Timer loadingTimer; // handles the loading animation
 
     private HashMap<String, String> databaseFields;
@@ -48,7 +45,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
         treeModel = _treeModel;
 
         loadingTimer = new Timer(500, e -> {
-            over.repaint();
+            busyIndicator.repaint();
             treeModel.nodeChanged(this); // notify to repaint
         });
         containsParameterFilter = checkFilters(parameterList);
@@ -61,7 +58,10 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
         panel.setOpaque(false);
         panel.add(label, BorderLayout.LINE_START);
         panel.setPreferredSize(new Dimension(RIGHT_ALIGNMENT, size)); //!
-        panel.add(over, BorderLayout.LINE_END);
+        busyIndicator.setOpaque(false);
+        busyIndicator.setVisible(false);
+        busyIndicator.setPreferredSize(new Dimension(size, size));
+        panel.add(busyIndicator, BorderLayout.LINE_END);
     }
 
     public Map<String, String> getAllDatabaseFields() {
@@ -130,7 +130,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
 
     void startedDownload() {
         if (!loadingTimer.isRunning()) {
-            over.setView(loadingLabel);
+            busyIndicator.setVisible(true);
             loadingTimer.start();
             treeModel.nodeChanged(this); // notify to repaint
         }
@@ -139,7 +139,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
     void stoppedDownload() {
         if (loadingTimer.isRunning()) {
             loadingTimer.stop();
-            over.setView(null);
+            busyIndicator.setVisible(false);
             treeModel.nodeChanged(this); // notify to repaint
         }
     }

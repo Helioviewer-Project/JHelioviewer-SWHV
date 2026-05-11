@@ -10,7 +10,6 @@ import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 public class UITimer {
 
     private static final ArrayList<Interfaces.LazyComponent> lazyComponents = new ArrayList<>();
-    public static final BusyIndicator busyIndicator = new BusyIndicator();
 
     public static void start() {
         new Timer(1000 / 10, e -> action()).start();
