@@ -21,11 +21,7 @@ public class TimelineLayers extends AbstractTableModel {
         return extLayers;
     }
 
-    public void downloadStarted(TimelineLayer tl) {
-        updateCell(layers.indexOf(tl), TimelinePanel.LOADING_COL);
-    }
-
-    public void downloadFinished(TimelineLayer tl) {
+    public void updateLoadingCell(TimelineLayer tl) {
         updateCell(layers.indexOf(tl), TimelinePanel.LOADING_COL);
     }
 
@@ -72,14 +68,9 @@ public class TimelineLayers extends AbstractTableModel {
         return TimelinePanel.NUMBEROFCOLUMNS;
     }
 
-    @Nullable
     @Override
     public Object getValueAt(int row, int col) {
-        try {
-            return layers.get(row);
-        } catch (Exception e) {
-            return null;
-        }
+        return layers.get(row);
     }
 
     @Nullable

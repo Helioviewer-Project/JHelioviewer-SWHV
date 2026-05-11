@@ -122,7 +122,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
         RadioJPXDownload {
             downloading.add(date);
-            Timelines.getLayers().downloadStarted(owner);
+            Timelines.getLayers().updateLoadingCell(owner);
         }
 
         @Override
@@ -151,7 +151,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
     private void doneRadioJPX(long date) {
         downloading.remove(date);
-        Timelines.getLayers().downloadFinished(RadioData.this);
+        Timelines.getLayers().updateLoadingCell(RadioData.this);
     }
 
     @Override
