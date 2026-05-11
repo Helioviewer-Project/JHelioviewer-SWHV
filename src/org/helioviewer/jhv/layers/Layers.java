@@ -299,10 +299,22 @@ public final class Layers {
     }
 
     public static void clear() {
+        int count = layers.size();
+
         removedLayers.addAll(layers);
         newLayers.clear();
+
+        viewpointLayer = null;
+        miniviewLayer = null;
+        connectionLayer = null;
+
         layers = new LayerList();
         setActiveImageLayer(null);
+
+        for (int i = count - 1; i >= 0; i--) {
+            int row = i;
+            listeners.forEach(listener -> listener.layerRemoved(row));
+        }
     }
 
     private Layers() {}
