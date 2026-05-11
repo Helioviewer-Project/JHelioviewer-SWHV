@@ -283,10 +283,12 @@ public final class Band extends AbstractTimelineLayer {
         updateGraph();
     }
 
-    void addToCache(float[] values, long[] dates) {
+    boolean addToCache(float[] values, long[] dates) {
+        boolean hadData = bandCache.hasData();
         bandCache.addToCache(yAxis, values, dates);
         updateGraph();
         DrawController.drawRequest();
+        return !hadData && bandCache.hasData();
     }
 
     @Override

@@ -21,6 +21,12 @@ public class TimelineLayers extends AbstractTableModel {
         return extLayers;
     }
 
+    public void updateRow(TimelineLayer tl) {
+        int row = layers.indexOf(tl);
+        if (row >= 0)
+            fireTableRowsUpdated(row, row);
+    }
+
     public void updateLoadingCell(TimelineLayer tl) {
         updateCell(layers.indexOf(tl), TimelinePanel.LOADING_COL);
     }

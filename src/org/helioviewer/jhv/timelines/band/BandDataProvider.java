@@ -28,11 +28,13 @@ public class BandDataProvider {
             return;
         pruneFinished(band);
         intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(baseUrl, interval.start(), interval.end())));
+        Timelines.getLayers().updateRow(band);
     }
 
     static void stopDownloads(Band band) {
         workers.get(band).forEach(worker -> worker.cancel(true));
         workers.removeAll(band);
+        Timelines.getLayers().updateRow(band);
     }
 
     static boolean isDownloadActive(Band band) {
@@ -53,7 +55,9 @@ public class BandDataProvider {
 
     private static void onSuccess(BandResponse result) {
         Band band = Band.createFromType(result.bandType);
-        band.addToCache(result.values, result.dates);
+        boolean hasDataChanged = band.addToCache(result.values, result.dates);
+        if (hasDataChanged)
+            Timelines.getLayers().updateRow(band);
         Timelines.getLayers().add(band);
     }
 
