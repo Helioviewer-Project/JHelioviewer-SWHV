@@ -1,30 +1,40 @@
 package org.helioviewer.jhv.gui.components.timeselector;
 
-import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JMenuItem;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
 import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
-import org.helioviewer.jhv.gui.components.base.MenuScroller;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideButton;
 
 @SuppressWarnings("serial")
-class CarringtonPicker extends JideButton implements PopupMenuListener {
+class CarringtonPicker extends JideButton {
 
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
     private final JPopupMenu popup = new JPopupMenu();
-    private final MenuScroller scroller = new MenuScroller(popup, 15, 100);
+    private final JList<Integer> list = new JList<>(new AbstractListModel<>() {
+        @Override
+        public int getSize() {
+            return Carrington.CR_start.length;
+        }
+
+        @Override
+        public Integer getElementAt(int index) {
+            return index + Carrington.CR_MINIMAL;
+        }
+    });
 
     private long time;
 
@@ -32,41 +42,43 @@ class CarringtonPicker extends JideButton implements PopupMenuListener {
         setText("CR");
         setToolTipText("Select Carrington rotation");
 
-        ButtonGroup group = new ButtonGroup();
-        for (int i = 0; i < Carrington.CR_start.length; i++) {
-            JRadioButtonMenuItem item = new JRadioButtonMenuItem(Integer.toString(i + Carrington.CR_MINIMAL));
-            item.addActionListener(e -> setTimeFromCarrington(Carrington.CR_start[Integer.parseInt(item.getText()) - Carrington.CR_MINIMAL]));
-            group.add(item);
-            popup.add(item);
-        }
-        popup.addPopupMenuListener(this);
+        list.setVisibleRowCount(15);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int index = list.locationToIndex(e.getPoint());
+                if (index >= 0) {
+                    setTimeFromCarrington(Carrington.CR_start[index]);
+                    popup.setVisible(false);
+                }
+            }
+        });
+        list.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "selectCarrington");
+        list.getActionMap().put("selectCarrington", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int index = list.getSelectedIndex();
+                if (index >= 0) {
+                    setTimeFromCarrington(Carrington.CR_start[index]);
+                    popup.setVisible(false);
+                }
+            }
+        });
 
+        popup.add(new JScrollPane(list));
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL);
+                cr = Math.clamp(cr, 0, Carrington.CR_start.length - 1);
+                list.setSelectedIndex(cr);
+                list.ensureIndexIsVisible(cr);
+                // setTimeFromCarrington(Carrington.CR_start[cr]); // snap TimeSelector to current CR
                 popup.show(e.getComponent(), 0, e.getComponent().getHeight());
             }
         });
     }
-
-    @Override
-    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-        int cr = (int) Math.round(Carrington.time2CR(new JHVTime(time)) - Carrington.CR_MINIMAL);
-        cr = Math.clamp(cr, 0, Carrington.CR_start.length - 1);
-
-        Component component = popup.getComponent(cr);
-        if (component instanceof JMenuItem jmi) {
-            jmi.setSelected(true);
-            setTimeFromCarrington(Carrington.CR_start[cr]);
-        }
-        scroller.keepVisible(cr + 1);
-    }
-
-    @Override
-    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
-
-    @Override
-    public void popupMenuCanceled(PopupMenuEvent e) {}
 
     private void setTimeFromCarrington(long _time) {
         setTime(_time);
