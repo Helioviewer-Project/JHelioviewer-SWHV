@@ -64,13 +64,23 @@ class SWEKDownloader implements FilterManager.Listener {
         FilterManager.addListener(this);
     }
 
+    private static void updateGroupBusy(SWEKGroup group) {
+        for (SWEKSupplier supplier : workerMap.keySet()) {
+            if (supplier.getGroup() == group && !workerMap.get(supplier).isEmpty()) {
+                group.startedDownload();
+                return;
+            }
+        }
+        group.stoppedDownload();
+    }
+
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         workerMap.get(supplier).forEach(worker -> {
             worker.stopWorker();
             JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
         });
         JHVEventCache.removeSupplier(supplier, keepActive);
-        supplier.getGroup().stoppedDownload();
+        updateGroupBusy(supplier.getGroup());
     }
 
     private static void workerForcedToStop(SWEKSupplier supplier, Worker worker) {
@@ -80,8 +90,7 @@ class SWEKDownloader implements FilterManager.Listener {
 
     private static void workerFinished(SWEKSupplier supplier, Worker worker) {
         workerMap.remove(supplier, worker);
-        if (workerMap.get(supplier).isEmpty())
-            supplier.getGroup().stoppedDownload();
+        updateGroupBusy(supplier.getGroup());
     }
 
     static void activateSupplier(SWEKSupplier supplier, boolean active) {
@@ -108,13 +117,14 @@ class SWEKDownloader implements FilterManager.Listener {
 
     static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
         List<SWEK.Param> params = defineParameters(supplier);
+        SWEKGroup group = supplier.getGroup();
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
                 if (intt.start() < System.currentTimeMillis() + SIXHOURS) {
                     Worker worker = new Worker(supplier, params, intt.start(), intt.end());
                     downloadPool.execute(worker);
                     workerMap.put(supplier, worker);
-                    supplier.getGroup().startedDownload();
+                    updateGroupBusy(group);
                 }
             }
         }
