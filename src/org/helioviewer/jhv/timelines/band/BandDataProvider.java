@@ -43,42 +43,29 @@ public class BandDataProvider {
     }
 
     public static void loadBand(JSONObject jo) {
-        Tasks.submit("band", new BandLoad(jo), BandDataProvider::onSuccess, BandDataProvider::onFailure);
+        Tasks.submit("band", new BandLoad(jo), BandDataProvider::acceptData, BandDataProvider::onFailure);
     }
 
-    private record BandLoad(JSONObject jo) implements Callable<BandResponse> {
-        @Override
-        public BandResponse call() throws Exception {
-            return new BandResponse(jo);
-        }
-    }
-
-    private static void onSuccess(BandResponse result) {
-        Band band = Band.createFromType(result.bandType);
-        boolean hasDataChanged = band.addToCache(result.values, result.dates);
+    static void acceptData(Band.Data line) {
+        Band band = Band.createFromType(line.bandType());
+        boolean hasDataChanged = band.addToCache(line.values(), line.dates());
+        Timelines.getLayers().add(band);
         if (hasDataChanged)
             Timelines.getLayers().updateRow(band);
-        Timelines.getLayers().add(band);
     }
 
-    private static void onFailure(String ignoredLogContext, Throwable t) {
-        Log.error(t);
-    }
-
-    private static class BandResponse {
-
-        final BandType bandType;
-        final long[] dates;
-        final float[] values;
-
-        BandResponse(JSONObject jo) throws Exception {
+    private record BandLoad(JSONObject jo) implements Callable<Band.Data> {
+        @Override
+        public Band.Data call() throws Exception {
             JSONObject bo = jo.optJSONObject("bandType");
             if (bo == null)
                 throw new Exception("Missing bandType: " + jo);
-            bandType = new BandType(bo);
+            BandType bandType = new BandType(bo);
 
             double multiplier = jo.optDouble("multiplier", 1);
             JSONArray data = jo.optJSONArray("data");
+            long[] dates;
+            float[] values;
             if (data != null) {
                 int len = data.length();
                 values = new float[len];
@@ -92,8 +79,12 @@ public class BandDataProvider {
                 dates = new long[0];
                 values = new float[0];
             }
+            return new Band.Data(bandType, dates, values);
         }
+    }
 
+    private static void onFailure(String ignoredLogContext, Throwable t) {
+        Log.error(t);
     }
 
 }

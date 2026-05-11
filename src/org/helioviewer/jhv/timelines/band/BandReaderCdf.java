@@ -14,7 +14,6 @@ import java.util.Set;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
@@ -42,11 +41,7 @@ public class BandReaderCdf {
             return;
 
         EventQueue.invokeLater(() -> {
-            for (Band.Data line : lines) {
-                Band band = Band.createFromType(line.bandType());
-                band.addToCache(line.values(), dates);
-                Timelines.getLayers().add(band);
-            }
+            lines.forEach(BandDataProvider::acceptData);
             DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
         });
     }

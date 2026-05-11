@@ -79,11 +79,8 @@ public class BandReaderHapi {
     }
 
     private static void onSuccessData(Band.Data line) {
-        if (line != null) {
-            Band band = Band.createFromType(line.bandType());
-            band.addToCache(line.values(), line.dates());
-            Timelines.getLayers().add(band);
-        }
+        if (line != null)
+            BandDataProvider.acceptData(line);
     }
 
     private static void onSuccessCatalog(@Nonnull Catalog catalog) {
