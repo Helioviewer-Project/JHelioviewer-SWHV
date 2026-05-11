@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.events;
 
+import java.awt.EventQueue;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -128,20 +129,23 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
         return panel;
     }
 
-    void startedDownload() {
-        if (!loadingTimer.isRunning()) {
-            busyIndicator.setVisible(true);
+    private void setDownloading(boolean downloading) {
+        if (loadingTimer.isRunning() == downloading)
+            return;
+        busyIndicator.setVisible(downloading);
+        if (downloading)
             loadingTimer.start();
-            treeModel.nodeChanged(this); // notify to repaint
-        }
+        else
+            loadingTimer.stop();
+        treeModel.nodeChanged(this); // notify to repaint
+    }
+
+    void startedDownload() {
+        EventQueue.invokeLater(() -> setDownloading(true));
     }
 
     void stoppedDownload() {
-        if (loadingTimer.isRunning()) {
-            loadingTimer.stop();
-            busyIndicator.setVisible(false);
-            treeModel.nodeChanged(this); // notify to repaint
-        }
+        EventQueue.invokeLater(() -> setDownloading(false));
     }
 
 }
