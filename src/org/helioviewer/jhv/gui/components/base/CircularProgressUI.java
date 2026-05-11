@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
@@ -23,15 +22,6 @@ public class CircularProgressUI extends BasicProgressBarUI {
     }
 
     @Override
-    protected Rectangle getBox(Rectangle r) {
-        if (r != null) {
-            r.setBounds(progressBar.getBounds());
-            return r;
-        }
-        return progressBar.getBounds();
-    }
-
-    @Override
     protected void paintDeterminate(Graphics g, JComponent c) {
         doPaint((Graphics2D) g, 360. * progressBar.getPercentComplete());
     }
@@ -44,10 +34,9 @@ public class CircularProgressUI extends BasicProgressBarUI {
     private static final double THICK_FACTOR = 1 / 8.;
 
     private void doPaint(Graphics2D g, double degree) {
-        Rectangle r = progressBar.getBounds();
-        double sz = Math.min(r.width, r.height) * (1 - 3 * THICK_FACTOR);
-        double cx = r.width * .5;
-        double cy = r.height * .5;
+        double sz = Math.min(progressBar.getWidth(), progressBar.getHeight()) * (1 - 3 * THICK_FACTOR);
+        double cx = progressBar.getWidth() * .5;
+        double cy = progressBar.getHeight() * .5;
         double or = sz * .5;
         double ir = or * .5;
 
