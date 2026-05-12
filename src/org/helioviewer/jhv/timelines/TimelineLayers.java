@@ -52,24 +52,20 @@ public class TimelineLayers extends AbstractTableModel {
         DrawController.graphAreaChanged();
     }
 
-    public void clear() {
-        replaceAll(Collections.emptyList());
-    }
-
-    public void replaceAll(List<TimelineLayer> newLayers) {
-        ArrayList<TimelineLayer> uniqueLayers = new ArrayList<>();
+    public void restore(List<TimelineLayer> newLayers) {
+        ArrayList<TimelineLayer> restoredLayers = new ArrayList<>();
         for (TimelineLayer layer : newLayers) {
-            if (!uniqueLayers.contains(layer)) // avoid band duplication via file load
-                uniqueLayers.add(layer);
+            if (!restoredLayers.contains(layer)) // avoid duplicated bands in restored state
+                restoredLayers.add(layer);
         }
 
         for (TimelineLayer layer : layers) {
-            if (!uniqueLayers.contains(layer))
+            if (!restoredLayers.contains(layer))
                 layer.remove();
         }
 
         layers.clear();
-        layers.addAll(uniqueLayers);
+        layers.addAll(restoredLayers);
         fireTableDataChanged();
         DrawController.graphAreaChanged();
     }

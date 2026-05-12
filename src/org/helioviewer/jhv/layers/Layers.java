@@ -137,17 +137,20 @@ public final class Layers {
     public static void add(Layer layer) {
         layers.add(layer);
         newLayers.add(layer);
+        cacheLayer(layer);
 
+        int row = layers.indexOf(layer);
+        listeners.forEach(listener -> listener.layerAdded(row, layer));
+        MovieDisplay.display(); // e.g., PFSS layer
+    }
+
+    private static void cacheLayer(Layer layer) {
         if (layer instanceof ViewpointLayer vl)
             viewpointLayer = vl;
         else if (layer instanceof MiniviewLayer ml)
             miniviewLayer = ml;
         else if (layer instanceof ConnectionLayer cl)
             connectionLayer = cl;
-
-        int row = layers.indexOf(layer);
-        listeners.forEach(listener -> listener.layerAdded(row, layer));
-        MovieDisplay.display(); // e.g., PFSS layer
     }
 
     public static void remove(Layer layer) {
@@ -289,16 +292,24 @@ public final class Layers {
         return Collections.unmodifiableList(layers);
     }
 
-    public static void clear() {
+    public static void restore(List<Layer> restoredLayers) {
         layers.forEach(Layers::detach);
         layers.clear();
+
+        newLayers.addAll(restoredLayers);
 
         viewpointLayer = null;
         miniviewLayer = null;
         connectionLayer = null;
 
+        for (Layer layer : restoredLayers) {
+            layers.add(layer);
+            cacheLayer(layer);
+        }
+
         setActiveImageLayer(null);
         listeners.forEach(Listener::layersCleared);
+        MovieDisplay.display();
     }
 
     private Layers() {}
