@@ -1,36 +1,26 @@
 package org.helioviewer.jhv.layers.fov;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
-import org.helioviewer.jhv.layers.fov.FOVInstrument.FOVType;
-
-import org.json.JSONObject;
 
 @SuppressWarnings("serial")
 public final class FOVTreePane extends JScrollPane {
 
-    private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
-    private final List<FOVPlatform> platforms = new ArrayList<>();
+    private final DefaultMutableTreeNode root;
+    private final JTree tree;
 
-    public FOVTreePane(JSONObject jo) {
-        JSONObject empty = new JSONObject();
-        if (jo == null)
-            jo = empty;
-        buildCatalog(jo, empty);
-
-        JTree tree = new JTree(root);
+    public FOVTreePane(FOVCatalog catalog) {
+        root = catalog.root();
+        tree = new JTree(root);
         tree.setRootVisible(false);
         tree.setEditable(true);
         tree.setShowsRootHandles(true);
@@ -46,66 +36,17 @@ public final class FOVTreePane extends JScrollPane {
         setPreferredSize(new Dimension(-1, 120));
     }
 
-    private void buildCatalog(JSONObject jo, JSONObject empty) {
-        addSolarOrbiter(jo, empty);
-        addStereoAhead(jo, empty);
-        addEarthOrbit(jo, empty);
-    }
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        tree.setEnabled(enabled);
 
-    private void addSolarOrbiter(JSONObject jo, JSONObject empty) {
-        String uiName = "Solar Orbiter";
-        JSONObject jpo = jo.optJSONObject(uiName, empty);
-        FOVPlatform plat = new FOVPlatform(uiName, "SOLO", SpaceObject.SOLO.getColor(), jpo);
-        plat.add(new FOVInstrument("EUI/HRI", FOVType.RECTANGULAR, 0, 16.6 / 60., 16.6 / 60., jpo));
-        plat.add(new FOVInstrument("EUI/FSI", FOVType.RECTANGULAR, 0, 228 / 60., 228 / 60., jpo));
-        plat.add(new FOVInstrument("Metis", FOVType.CIRCULAR, 3.2, 6.8, 6.8, jpo));
-        plat.add(new FOVInstrument("PHI/HRT", FOVType.RECTANGULAR, 0, 0.28, 0.28, jpo));
-        plat.add(new FOVInstrument("PHI/FDT", FOVType.RECTANGULAR, 0, 2, 2, jpo));
-        plat.add(new FOVInstrument("SPICE", FOVType.RECTANGULAR, 0, 16 / 60., 11 / 60., jpo));
-        plat.add(new FOVInstrument("STIX", FOVType.RECTANGULAR, 0, 2, 2, jpo));
-        addPlatform(plat);
-    }
-
-    private void addStereoAhead(JSONObject jo, JSONObject empty) {
-        String uiName = "STEREO Ahead";
-        JSONObject jpo = jo.optJSONObject(uiName, empty);
-        FOVPlatform plat = new FOVPlatform(uiName, "STEREO AHEAD", SpaceObject.STA.getColor(), jpo);
-        plat.add(new FOVInstrument("EUVI", FOVType.RECTANGULAR, 0, 1.5877740 * 2048 / 3600., 1.5877740 * 2048 / 3600., jpo));
-        plat.add(new FOVInstrument("COR1", FOVType.RECTANGULAR, 0, 15.008600 * 512 / 3600., 15.008600 * 512 / 3600., jpo));
-        plat.add(new FOVInstrument("COR2", FOVType.CIRCULAR, 0, 14.700000 * 2048 / 3600., 14.700000 * 2048 / 3600., jpo));
-        addPlatform(plat);
-    }
-
-    private void addEarthOrbit(JSONObject jo, JSONObject empty) {
-        String uiName = "Earth orbit";
-        JSONObject jpo = jo.optJSONObject(uiName, empty);
-        FOVPlatform plat = new FOVPlatform(uiName, "EARTH", Colors.Blue, jpo); // Earth approximate
-        plat.add(new FOVInstrument("AIA", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
-        plat.add(new FOVInstrument("HMI", FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
-        plat.add(new FOVInstrument("SWAP", FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600., jpo));
-        plat.add(new FOVInstrument("ASPIICS", FOVType.RECTANGULAR, .5850334, 1.6, 1.6, jpo));
-        addPlatform(plat);
-    }
-
-    private void addPlatform(FOVPlatform platform) {
-        platforms.add(platform);
-        root.add(platform);
-    }
-
-    public void init() {
-        platforms.forEach(FOVPlatform::init);
-    }
-
-    public void dispose() {
-        platforms.forEach(FOVPlatform::dispose);
-    }
-
-    public void render(Camera camera, Viewport vp) {
-        platforms.forEach(platform -> platform.render(camera, vp));
-    }
-
-    public void serialize(JSONObject jo) {
-        platforms.forEach(platform -> jo.put(platform.toString(), platform.toJson()));
+        Enumeration<?> nodes = root.breadthFirstEnumeration();
+        while (nodes.hasMoreElements()) {
+            Object node = nodes.nextElement();
+            if (node instanceof Interfaces.JHVCell cell)
+                ComponentUtils.setEnabled(cell.getComponent(), enabled);
+        }
     }
 
 }
