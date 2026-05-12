@@ -47,6 +47,11 @@ final class LayersTableModel extends AbstractTableModel implements Layers.Listen
     }
 
     @Override
+    public void layersCleared() {
+        fireTableDataChanged();
+    }
+
+    @Override
     public void layerUpdated(Layer layer) {
         int row = Layers.getLayers().indexOf(layer);
         if (row >= 0)
