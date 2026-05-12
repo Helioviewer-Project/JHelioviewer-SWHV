@@ -4,38 +4,40 @@ import java.awt.Component;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.fov.FOVCatalog;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
 
 import org.json.JSONObject;
 
 public class FOVLayer extends AbstractLayer {
 
-    private final FOVTreePane treePane;
+    private final FOVCatalog catalog;
+    private FOVTreePane treePane;
 
     @Override
     public void serialize(JSONObject jo) {
-        treePane.serialize(jo);
+        catalog.serialize(jo);
     }
 
     public FOVLayer(JSONObject jo) {
-        treePane = new FOVTreePane(jo);
+        catalog = new FOVCatalog(jo);
     }
 
     @Override
     public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        treePane.render(camera, vp);
+        catalog.render(camera, vp);
     }
 
     @Override
     public void init() {
-        treePane.init();
+        catalog.init();
     }
 
     @Override
     public void dispose() {
-        treePane.dispose();
+        catalog.dispose();
     }
 
     @Override
@@ -45,6 +47,8 @@ public class FOVLayer extends AbstractLayer {
 
     @Override
     public Component getOptionsPanel() {
+        if (treePane == null)
+            treePane = new FOVTreePane(catalog);
         return treePane;
     }
 
