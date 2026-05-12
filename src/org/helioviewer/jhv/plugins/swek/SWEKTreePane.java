@@ -99,7 +99,8 @@ final class SWEKTreePane extends JPanel {
     private Component createGroupComponent(SWEKGroup group) {
         JLabel label = new JLabel(group.getName());
         int size = label.getPreferredSize().height;
-        label.setIcon(new ImageIcon(group.getIcon().getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
+        ImageIcon icon = SWEKIconBank.getIcon(group.getIconKey());
+        label.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
 
         BusyIndicator busyIndicator = new BusyIndicator();
         busyIndicator.setOpaque(false);

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -16,7 +15,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode {
 
     private final String name;
     private final List<SWEK.Parameter> parameterList;
-    private final ImageIcon icon;
+    private final String iconKey;
     private final DefaultTreeModel treeModel;
 
     private final boolean containsParameterFilter;
@@ -24,10 +23,10 @@ public final class SWEKGroup extends DefaultMutableTreeNode {
 
     private HashMap<String, String> databaseFields;
 
-    public SWEKGroup(String _name, List<SWEK.Parameter> _parameterList, ImageIcon _icon, DefaultTreeModel _treeModel) {
+    public SWEKGroup(String _name, List<SWEK.Parameter> _parameterList, String _iconKey, DefaultTreeModel _treeModel) {
         name = _name.intern();
         parameterList = _parameterList;
-        icon = _icon;
+        iconKey = _iconKey;
         treeModel = _treeModel;
         containsParameterFilter = checkFilters(parameterList);
     }
@@ -87,8 +86,8 @@ public final class SWEKGroup extends DefaultMutableTreeNode {
         return false;
     }
 
-    public ImageIcon getIcon() {
-        return icon;
+    public String getIconKey() {
+        return iconKey;
     }
 
     private void setDownloading(boolean _downloading) {

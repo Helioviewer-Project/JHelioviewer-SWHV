@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
@@ -81,8 +80,8 @@ public class JHVRelatedEvents implements ClickableDrawable {
     }
 
     @Nonnull
-    public ImageIcon getIcon() {
-        return supplier.getGroup().getIcon();
+    public SWEKGroup getGroup() {
+        return supplier.getGroup();
     }
 
     void highlight(boolean isHighlighted) {

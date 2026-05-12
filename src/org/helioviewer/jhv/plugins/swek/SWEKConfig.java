@@ -8,9 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -19,7 +17,6 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
-import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;
@@ -99,7 +96,7 @@ class SWEKConfig {
     }
 
     private static SWEKGroup parseGroup(JSONObject obj, DefaultTreeModel dtm) {
-        SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIcon(obj), dtm);
+        SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIconKey(obj), dtm);
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
             JSONObject supplier = suppliersArray.getJSONObject(i);
@@ -108,16 +105,15 @@ class SWEKConfig {
         return group;
     }
 
-    @Nonnull
-    private static ImageIcon parseEventIcon(JSONObject obj) {
+    private static String parseEventIconKey(JSONObject obj) {
         String eventIconValue = obj.getString("icon");
         try {
             URI eventIconURI = new URI(eventIconValue);
-            return "iconbank".equals(eventIconURI.getScheme()) ? SWEKIconBank.getIcon(eventIconURI.getHost()) : SWEKIconBank.getIcon("Other");
+            return "iconbank".equals(eventIconURI.getScheme()) ? eventIconURI.getHost() : "Other";
         } catch (URISyntaxException e) {
             Log.warn(eventIconValue, e);
         }
-        return IconBank.getBlank();
+        return "Other";
     }
 
     @Nullable

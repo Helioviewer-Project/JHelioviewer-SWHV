@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -14,13 +15,15 @@ import javax.swing.JTextArea;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
+import org.helioviewer.jhv.plugins.swek.SWEKIconBank;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 class EventDescriptionPanel extends JPanel {
 
     EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
-        JLabel labelIcon = new JLabel(revent.getIcon());
+        ImageIcon icon = SWEKIconBank.getIcon(revent.getGroup().getIconKey());
+        JLabel labelIcon = new JLabel(icon);
 
         JTextArea textStartTime = new JTextArea(TimeUtils.formatShort(event.start));
         textStartTime.setOpaque(false);
