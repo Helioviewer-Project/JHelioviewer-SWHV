@@ -52,7 +52,7 @@ final class SWEKTreePane extends JPanel {
         tree.setSelectionModel(null);
         tree.setCellRenderer(new Renderer());
         tree.setCellEditor(new Editor());
-        tree.setRowHeight(0); // force calculation of nodes heights
+        // tree.setRowHeight(0); // force calculation of nodes heights
         for (int i = 0; i < tree.getRowCount(); i++)
             tree.expandRow(i);
 

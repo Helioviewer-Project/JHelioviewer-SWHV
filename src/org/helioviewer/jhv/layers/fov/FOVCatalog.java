@@ -3,8 +3,6 @@ package org.helioviewer.jhv.layers.fov;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -14,7 +12,6 @@ import org.json.JSONObject;
 
 public final class FOVCatalog {
 
-    private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
     private final List<FOVPlatform> platforms = new ArrayList<>();
 
     public FOVCatalog(JSONObject jo) {
@@ -24,8 +21,8 @@ public final class FOVCatalog {
         buildCatalog(jo, empty);
     }
 
-    DefaultMutableTreeNode root() {
-        return root;
+    List<FOVPlatform> platforms() {
+        return platforms;
     }
 
     private void buildCatalog(JSONObject jo, JSONObject empty) {
@@ -71,7 +68,6 @@ public final class FOVCatalog {
 
     private void addPlatform(FOVPlatform platform) {
         platforms.add(platform);
-        root.add(platform);
     }
 
     public void init() {
