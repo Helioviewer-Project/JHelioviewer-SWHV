@@ -103,7 +103,7 @@ public final class AngleRenderer {
         try {
             render();
         } catch (RuntimeException | Error e) {
-            dispose();
+            destroy();
             throw e;
         }
     }
@@ -116,20 +116,18 @@ public final class AngleRenderer {
             throw eglError("eglSwapBuffers");
     }
 
-    public void dispose() {
-        destroy(false);
-    }
-
-    public void remove() {
-        destroy(true);
-    }
-
-    private void destroy(boolean removeLayers) {
+    public void destroy() {
         if (!EGL15.eglMakeCurrent(display, surface, surface, context))
             throw eglError("eglMakeCurrent");
 
         try {
-            disposeRenderer(removeLayers);
+            if (rendererInitialized) {
+                try {
+                    GLRenderer.dispose();
+                } finally {
+                    rendererInitialized = false;
+                }
+            }
         } finally {
             GLES.setCapabilities(null);
             EGL15.eglMakeCurrent(display, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_SURFACE, EGL15.EGL_NO_CONTEXT);
@@ -146,16 +144,6 @@ public final class AngleRenderer {
         rendererInitialized = true;
     }
 
-    private static void disposeRenderer(boolean removeLayers) {
-        if (!rendererInitialized)
-            return;
-        if (removeLayers)
-            GLRenderer.resetForReinit();
-        else
-            GLRenderer.dispose();
-        rendererInitialized = false;
-    }
-
     private static synchronized void ensureLwjglAngleConfigured(PlatformConfig platform) {
         if (lwjglConfigured)
             return;
@@ -169,7 +157,7 @@ public final class AngleRenderer {
         return stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, platform.backendType(), EGL15.EGL_NONE);
     }
 
-    private long chooseConfig(MemoryStack stack, long display, int samples) {
+    private static long chooseConfig(MemoryStack stack, long display, int samples) {
         for (int depthBits : DEPTH_PREFERENCES) {
             if (samples > 0) {
                 long config = chooseConfig(stack, display, depthBits, samples);
@@ -185,7 +173,7 @@ public final class AngleRenderer {
         return 0L;
     }
 
-    private long chooseConfig(MemoryStack stack, long display, int depthBits, int samples) {
+    private static long chooseConfig(MemoryStack stack, long display, int depthBits, int samples) {
         PointerBuffer configOut = stack.mallocPointer(1);
         IntBuffer numConfigs = stack.mallocInt(1);
         int attributeCount = samples > 0 ? 19 : 15;
@@ -209,7 +197,7 @@ public final class AngleRenderer {
         return configOut.get(0);
     }
 
-    private void logChosenConfig(MemoryStack stack, long display, long config) {
+    private static void logChosenConfig(MemoryStack stack, long display, long config) {
         IntBuffer attribValue = stack.mallocInt(1);
         int red = configAttrib(attribValue, display, config, EGL15.EGL_RED_SIZE);
         int green = configAttrib(attribValue, display, config, EGL15.EGL_GREEN_SIZE);
@@ -227,7 +215,7 @@ public final class AngleRenderer {
                 + " samples=" + samples);
     }
 
-    private int configAttrib(IntBuffer value, long display, long config, int attribute) {
+    private static int configAttrib(IntBuffer value, long display, long config, int attribute) {
         if (!EGL15.eglGetConfigAttrib(display, config, attribute, value))
             throw eglError("eglGetConfigAttrib");
         return value.get(0);

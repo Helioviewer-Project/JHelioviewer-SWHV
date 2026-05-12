@@ -67,9 +67,9 @@ public final class Layers {
     }
 
     public interface Listener {
-        void layerAdded(int index);
+        void layerAdded(int index, Layer layer);
 
-        void layerRemoved(int index);
+        void layerRemoved(int index, Layer layer);
 
         void layerUpdated(Layer layer);
 
@@ -144,7 +144,7 @@ public final class Layers {
             connectionLayer = cl;
 
         int row = layers.indexOf(layer);
-        listeners.forEach(listener -> listener.layerAdded(row));
+        listeners.forEach(listener -> listener.layerAdded(row, layer));
         MovieDisplay.display(); // e.g., PFSS layer
     }
 
@@ -154,16 +154,20 @@ public final class Layers {
             return;
 
         layers.remove(row);
-        newLayers.remove(layer);
-        removedLayers.add(layer);
+        detach(layer);
 
         if (layer == activeLayer) {
             int count = layers.imageLayersCount;
             setActiveImageLayer(count == 0 ? null : (ImageLayer) layers.get(count - 1));
         }
 
-        listeners.forEach(listener -> listener.layerRemoved(row));
+        listeners.forEach(listener -> listener.layerRemoved(row, layer));
         MovieDisplay.display();
+    }
+
+    private static void detach(Layer layer) {
+        if (!newLayers.remove(layer))
+            removedLayers.add(layer);
     }
 
     public static void prerender() {
@@ -249,15 +253,9 @@ public final class Layers {
 
     public static void dispose() {
         removeLayers();
-        layers.forEach(Layer::dispose);
+        layers.stream().filter(layer -> !newLayers.contains(layer)).forEach(Layer::dispose);
         newLayers.clear();
         newLayers.addAll(layers);
-    }
-
-    public static void resetForReinit() {
-        newLayers = layers;
-        layers = new LayerList();
-        setActiveImageLayer(null);
     }
 
     public static void forEachImageLayer(Consumer<? super ImageLayer> action) {
@@ -287,22 +285,18 @@ public final class Layers {
     }
 
     public static void clear() {
-        int count = layers.size();
-
-        removedLayers.addAll(layers);
-        newLayers.clear();
+        for (int i = layers.size() - 1; i >= 0; i--) {
+            int row = i;
+            Layer layer = layers.remove(i);
+            detach(layer);
+            listeners.forEach(listener -> listener.layerRemoved(row, layer));
+        }
 
         viewpointLayer = null;
         miniviewLayer = null;
         connectionLayer = null;
 
-        layers = new LayerList();
         setActiveImageLayer(null);
-
-        for (int i = count - 1; i >= 0; i--) {
-            int row = i;
-            listeners.forEach(listener -> listener.layerRemoved(row));
-        }
     }
 
     private Layers() {}
