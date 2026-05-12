@@ -82,11 +82,11 @@ final class SWEKTreePane extends JPanel {
         if (value instanceof SWEKGroup group) {
             if (group.isDownloading() && !loadingTimer.isRunning())
                 loadingTimer.start();
-            component = groupComponents.computeIfAbsent(group, this::createGroupComponent);
+            component = groupComponents.computeIfAbsent(group, SWEKTreePane::createGroupComponent);
             if (component instanceof JPanel panel && panel.getComponentCount() > 1)
                 panel.getComponent(1).setVisible(group.isDownloading());
         } else if (value instanceof SWEKSupplier supplier) {
-            component = supplierComponents.computeIfAbsent(supplier, this::createSupplierComponent);
+            component = supplierComponents.computeIfAbsent(supplier, SWEKTreePane::createSupplierComponent);
             if (component instanceof JPanel panel && panel.getComponent(0) instanceof JCheckBox checkBox)
                 checkBox.setSelected(supplier.isActive());
         }
@@ -96,7 +96,7 @@ final class SWEKTreePane extends JPanel {
         return component;
     }
 
-    private Component createGroupComponent(SWEKGroup group) {
+    private static Component createGroupComponent(SWEKGroup group) {
         JLabel label = new JLabel(group.getName());
         int size = label.getPreferredSize().height;
         ImageIcon icon = SWEKIconBank.getIcon(group.getIconKey());
@@ -115,7 +115,7 @@ final class SWEKTreePane extends JPanel {
         return panel;
     }
 
-    private Component createSupplierComponent(SWEKSupplier supplier) {
+    private static Component createSupplierComponent(SWEKSupplier supplier) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
