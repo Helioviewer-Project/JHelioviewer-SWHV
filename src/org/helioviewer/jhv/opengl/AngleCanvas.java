@@ -242,7 +242,7 @@ public final class AngleCanvas extends Canvas {
     private void detach() {
         try {
             if (angleRenderer != null)
-                angleRenderer.remove();
+                angleRenderer.destroy();
         } finally {
             angleRenderer = null;
             try {

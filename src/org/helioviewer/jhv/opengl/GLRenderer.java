@@ -83,11 +83,6 @@ public final class GLRenderer {
         JHVGLException.checkErrors("GLRenderer.dispose()");
     }
 
-    public static void resetForReinit() {
-        dispose();
-        Layers.resetForReinit();
-    }
-
     static void renderScene(Camera camera) {
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);

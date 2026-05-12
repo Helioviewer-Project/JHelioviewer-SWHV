@@ -37,12 +37,12 @@ final class LayersTableModel extends AbstractTableModel implements Layers.Listen
     }
 
     @Override
-    public void layerAdded(int index) {
+    public void layerAdded(int index, Layer layer) {
         fireTableRowsInserted(index, index);
     }
 
     @Override
-    public void layerRemoved(int index) {
+    public void layerRemoved(int index, Layer layer) {
         fireTableRowsDeleted(index, index);
     }
 

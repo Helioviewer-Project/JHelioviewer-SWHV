@@ -246,7 +246,7 @@ public final class LayersPanel extends JPanel {
     @Nullable
     private Layer selectedLayer() {
         int row = grid.getSelectedRow();
-        if (row < 0)
+        if (row < 0 || row >= grid.getRowCount())
             return null;
         return grid.getValueAt(row, 0) instanceof Layer layer ? layer : null;
     }
