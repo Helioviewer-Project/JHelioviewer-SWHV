@@ -71,6 +71,8 @@ public final class Layers {
 
         void layerRemoved(int index, Layer layer);
 
+        void layersCleared();
+
         void layerUpdated(Layer layer);
 
         void timeUpdated(Layer layer);
@@ -285,18 +287,15 @@ public final class Layers {
     }
 
     public static void clear() {
-        for (int i = layers.size() - 1; i >= 0; i--) {
-            int row = i;
-            Layer layer = layers.remove(i);
-            detach(layer);
-            listeners.forEach(listener -> listener.layerRemoved(row, layer));
-        }
+        layers.forEach(Layers::detach);
+        layers.clear();
 
         viewpointLayer = null;
         miniviewLayer = null;
         connectionLayer = null;
 
         setActiveImageLayer(null);
+        listeners.forEach(Listener::layersCleared);
     }
 
     private Layers() {}
