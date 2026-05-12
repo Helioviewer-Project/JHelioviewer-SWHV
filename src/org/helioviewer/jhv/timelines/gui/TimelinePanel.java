@@ -61,11 +61,6 @@ public final class TimelinePanel extends JPanel {
         }
 
         @Override
-        public void clearSelection() {
-            // prevent losing selection
-        }
-
-        @Override
         public void tableChanged(TableModelEvent e) {
             super.tableChanged(e);
             if (e.getType() == TableModelEvent.INSERT) {
@@ -198,7 +193,7 @@ public final class TimelinePanel extends JPanel {
     @Nullable
     private TimelineLayer selectedLayer() {
         int row = grid.getSelectedRow();
-        if (row < 0 || row >= grid.getRowCount())
+        if (row < 0)
             return null;
         return grid.getValueAt(row, 0) instanceof TimelineLayer timeline ? timeline : null;
     }
