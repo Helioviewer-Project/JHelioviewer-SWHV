@@ -1,28 +1,16 @@
 package org.helioviewer.jhv.events;
 
 import java.awt.EventQueue;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Image;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.helioviewer.jhv.gui.components.base.BusyIndicator;
-import org.helioviewer.jhv.gui.Interfaces;
-
 @SuppressWarnings("serial")
-public final class SWEKGroup extends DefaultMutableTreeNode implements Interfaces.JHVCell {
-
-    static final int RIGHT_ALIGNMENT = 300;
+public final class SWEKGroup extends DefaultMutableTreeNode {
 
     private static List<SWEK.RelatedEvents> relatedEvents;
 
@@ -32,10 +20,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
     private final DefaultTreeModel treeModel;
 
     private final boolean containsParameterFilter;
-
-    private final JPanel panel;
-    private final BusyIndicator busyIndicator = new BusyIndicator();
-    private final Timer loadingTimer; // handles the loading animation
+    private boolean downloading;
 
     private HashMap<String, String> databaseFields;
 
@@ -44,25 +29,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
         parameterList = _parameterList;
         icon = _icon;
         treeModel = _treeModel;
-
-        loadingTimer = new Timer(500, e -> {
-            busyIndicator.repaint();
-            treeModel.nodeChanged(this); // notify to repaint
-        });
         containsParameterFilter = checkFilters(parameterList);
-
-        JLabel label = new JLabel(name);
-        int size = label.getPreferredSize().height;
-        label.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
-
-        panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        panel.add(label, BorderLayout.LINE_START);
-        panel.setPreferredSize(new Dimension(RIGHT_ALIGNMENT, size)); //!
-        busyIndicator.setOpaque(false);
-        busyIndicator.setVisible(false);
-        busyIndicator.setPreferredSize(new Dimension(size, size));
-        panel.add(busyIndicator, BorderLayout.LINE_END);
     }
 
     public Map<String, String> getAllDatabaseFields() {
@@ -107,7 +74,7 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
         return parameterList;
     }
 
-    boolean containsFilter() {
+    public boolean containsFilter() {
         return containsParameterFilter;
     }
 
@@ -124,20 +91,15 @@ public final class SWEKGroup extends DefaultMutableTreeNode implements Interface
         return icon;
     }
 
-    @Override
-    public Component getComponent() {
-        return panel;
+    private void setDownloading(boolean _downloading) {
+        if (downloading == _downloading)
+            return;
+        downloading = _downloading;
+        treeModel.nodeChanged(this); // notify to repaint
     }
 
-    private void setDownloading(boolean downloading) {
-        if (loadingTimer.isRunning() == downloading)
-            return;
-        busyIndicator.setVisible(downloading);
-        if (downloading)
-            loadingTimer.start();
-        else
-            loadingTimer.stop();
-        treeModel.nodeChanged(this); // notify to repaint
+    public boolean isDownloading() {
+        return downloading;
     }
 
     void startedDownload() {
