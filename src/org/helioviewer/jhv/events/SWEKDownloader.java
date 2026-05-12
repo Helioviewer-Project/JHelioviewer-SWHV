@@ -103,7 +103,7 @@ class SWEKDownloader implements FilterManager.Listener {
     @Override
     public void filtersChanged(SWEKSupplier supplier) {
         stopDownloadSupplier(supplier, true);
-        if (supplier.isSelected()) {
+        if (supplier.isActive()) {
             startDownloadSupplier(supplier, JHVEventCache.getAllRequestIntervals(supplier));
         }
     }

@@ -1,12 +1,6 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JTree;
-
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.components.base.JHVTreeCell;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -15,26 +9,12 @@ import org.json.JSONObject;
 
 public class SWEKPlugin extends Plugin {
 
-    private static final JPanel swekPanel = new JPanel(new BorderLayout());
-
     private static final SWEKLayer layer = new SWEKLayer(null);
     private static final EventTimelineLayer etl = new EventTimelineLayer();
+    private final SWEKTreePane swekPanel = new SWEKTreePane(SWEKConfig.load());
 
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
-
-        JTree tree = new JTree(SWEKConfig.load());
-        tree.setRootVisible(false);
-        tree.setEditable(true);
-        tree.setShowsRootHandles(true);
-        tree.setSelectionModel(null);
-        tree.setCellRenderer(new JHVTreeCell.Renderer());
-        tree.setCellEditor(new JHVTreeCell.Editor());
-        tree.setRowHeight(0); // force calculation of nodes heights
-        for (int i = 0; i < tree.getRowCount(); i++) {
-            tree.expandRow(i);
-        }
-        swekPanel.add(tree);
     }
 
     @Override
