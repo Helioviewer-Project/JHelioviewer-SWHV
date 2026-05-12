@@ -1,15 +1,10 @@
 package org.helioviewer.jhv.gui;
 
-import java.awt.Component;
 import java.util.List;
 
 import javax.swing.JComponent;
 
 public class Interfaces {
-
-    public interface JHVCell {
-        Component getComponent();
-    }
 
     public interface LazyComponent {
         void lazyRepaint();
