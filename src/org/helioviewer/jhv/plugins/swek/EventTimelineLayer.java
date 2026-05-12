@@ -204,7 +204,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         g.setColor(event.getColor());
         g.fillRect(x0, y, w, spacePerLine);
 
-        ImageIcon icon = event.getIcon();
+        ImageIcon icon = SWEKIconBank.getIcon(event.getGroup().getIconKey());
         g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
         if (hl && mousePosition != null) {
@@ -231,7 +231,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         g.setColor(UIGlobals.TL_TEXT_COLOR);
 
         y += 5;
-        ImageIcon icon = event.getIcon();
+        ImageIcon icon = SWEKIconBank.getIcon(event.getGroup().getIconKey());
         g.drawImage(icon.getImage(), mouseX + 8, y - 2, mouseX + 24, y + 14, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
         for (String txt : txts) {

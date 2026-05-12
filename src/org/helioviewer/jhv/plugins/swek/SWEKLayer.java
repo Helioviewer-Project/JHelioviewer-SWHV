@@ -102,7 +102,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         String key = group.getName();
         GLTexture tex = iconCacheId.get(key);
         if (tex == null) {
-            ImageIcon icon = group.getIcon();
+            ImageIcon icon = SWEKIconBank.getIcon(group.getIconKey());
             BufferedImage bi = NativeImageFactory.createRGBAPremultipliedImage(icon.getIconWidth(), icon.getIconHeight());
             try {
                 Graphics g = bi.createGraphics();

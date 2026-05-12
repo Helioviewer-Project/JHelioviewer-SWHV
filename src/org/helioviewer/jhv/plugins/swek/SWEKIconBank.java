@@ -8,12 +8,12 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.gui.IconBank;
 
-class SWEKIconBank {
+public final class SWEKIconBank {
 
     private static final HashMap<String, ImageIcon> iconBank = new HashMap<>();
 
     @Nonnull
-    static ImageIcon getIcon(String iconName) {
+    public static ImageIcon getIcon(String iconName) {
         ImageIcon icon = iconBank.get(iconName);
         icon = icon == null ? iconBank.get("Other") : icon;
         return icon == null ? IconBank.getBlank() : icon;
