@@ -18,7 +18,7 @@ public final class FITSViewState {
         Gamma, Beta, Alpha
     }
 
-    public static final double CLIP_LIMIT = 1e12;
+    public static final double CLIP_LIMIT = 1e20;
     public static final int GAMMA_SLIDER_MIN = 10;
     public static final int GAMMA_SLIDER_MAX = 40;
     public static final int BETA_SLIDER_MIN = 1;
