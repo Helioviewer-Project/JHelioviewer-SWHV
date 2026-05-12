@@ -42,11 +42,10 @@ public final class WcsProjection {
         if (radial == 0)
             return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
 
-        double nativeDistance = radial;
-        double nativeRadius = Math.sin(nativeDistance);
+        double nativeRadius = Math.sin(radial);
         double nativeX = nativeRadius * x / radial;
         double nativeY = nativeRadius * y / radial;
-        double cosNativeDistance = Math.cos(nativeDistance);
+        double cosNativeDistance = Math.cos(radial);
         return nativeToHelioprojective(wcsHeader, nativeX, nativeY, cosNativeDistance);
     }
 
