@@ -146,8 +146,7 @@ public final class State {
                 }
             }
         }
-        Timelines.getLayers().clear();
-        newList.forEach(layer -> Timelines.getLayers().add(layer));
+        Timelines.getLayers().replaceAll(newList);
     }
 
     private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context,
