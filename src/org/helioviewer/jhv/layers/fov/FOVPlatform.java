@@ -1,13 +1,7 @@
 package org.helioviewer.jhv.layers.fov;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
 import java.util.Enumeration;
 
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -20,9 +14,6 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.components.base.JHVSpinner;
-import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -37,8 +28,10 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
+class FOVPlatform extends DefaultMutableTreeNode {
 
+    static final double MIN_CENTER_ARCMIN = -60;
+    static final double MAX_CENTER_ARCMIN = 60;
     private static final double LINEWIDTH_FOV = GLSLLine.LINEWIDTH_BASIC;
     private static final int SUBDIVISIONS = 180; // divisible by 4 so quarter-turn arcs align to exact step ranges
     private static final double HEMI_RADIUS = Sun.Radius + LINEWIDTH_FOV; // avoid intersecting solar surface
@@ -54,9 +47,8 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
     private final byte[] color;
     private final boolean isSOLO;
 
-    private final JPanel panel;
-    private final JHVSpinner spinnerX;
-    private final JHVSpinner spinnerY;
+    private double centerX;
+    private double centerY;
 
     FOVPlatform(String _name, String _observer, byte[] _color, JSONObject jo) {
         name = _name;
@@ -64,52 +56,25 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         color = _color;
         isSOLO = "SOLO".equals(observer);
 
-        double centerX = jo.optDouble("centerX", 0);
-        double centerY = jo.optDouble("centerY", 0);
-
-        spinnerX = createSpinner(centerX);
-        spinnerX.addChangeListener(e -> setCenterX((Double) spinnerX.getValue()));
-        spinnerY = createSpinner(centerY);
-        spinnerY.addChangeListener(e -> setCenterY((Double) spinnerY.getValue()));
-
-        JPanel spinnerXPanel = new JPanel(new BorderLayout());
-        spinnerXPanel.setOpaque(false);
-        spinnerXPanel.add(new JLabel("    \u03B4x ", JLabel.RIGHT), BorderLayout.LINE_START);
-        spinnerXPanel.add(spinnerX, BorderLayout.LINE_END);
-
-        JPanel spinnerYPanel = new JPanel(new BorderLayout());
-        spinnerYPanel.setOpaque(false);
-        spinnerYPanel.add(new JLabel("    \u03B4y ", JLabel.RIGHT), BorderLayout.LINE_START);
-        spinnerYPanel.add(spinnerY, BorderLayout.LINE_END);
-
-        panel = new JPanel(new GridLayout(1, 3, 0, 0));
-        panel.setOpaque(false);
-        panel.add(new JLabel(name));
-        panel.add(spinnerXPanel);
-        panel.add(spinnerYPanel);
-    }
-
-    @Override
-    public Component getComponent() {
-        return panel;
+        centerX = sanitizeCenter(jo.optDouble("centerX", 0));
+        centerY = sanitizeCenter(jo.optDouble("centerY", 0));
     }
 
     @Override
     public void add(MutableTreeNode newChild) {
         super.add(newChild);
         if (newChild instanceof FOVInstrument instrument) {
-            instrument.setCenterX(control2Center(((Number) spinnerX.getValue()).doubleValue()));
-            instrument.setCenterY(control2Center(((Number) spinnerY.getValue()).doubleValue()));
+            instrument.setCenterX(control2Center(centerX));
+            instrument.setCenterY(control2Center(centerY));
         }
     }
 
     private void putHemiLine() {
-        int no_points = 2 * (SUBDIVISIONS + 3);
-        BufVertex vexBuf = new BufVertex(no_points * GLSLLine.stride);
-        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, null, color, Colors.White, vexBuf);
-        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS / 2, Quat.X90, color, Colors.White, vexBuf);
-        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, SUBDIVISIONS / 4, 3 * SUBDIVISIONS / 4, Quat.Y90, color, Colors.White, vexBuf);
-        hemiLine.setVertex(vexBuf);
+        BufVertex buf = new BufVertex(2 * (SUBDIVISIONS + 3) * GLSLLine.stride);
+        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS, null, color, Colors.White, buf);
+        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, 0, SUBDIVISIONS / 2, Quat.X90, color, Colors.White, buf);
+        GLHelper.emitCircle(HEMI_RADIUS, SUBDIVISIONS, SUBDIVISIONS / 4, 3 * SUBDIVISIONS / 4, Quat.Y90, color, Colors.White, buf);
+        hemiLine.setVertex(buf);
     }
 
     void init() {
@@ -150,11 +115,10 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         renderer.begin3DRendering();
         renderer.setSurfacePut();
 
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).putGeometry(obsPosition.distance, color, renderer, lineBuf, centerBuf));
 
         instrumentCenters.setVertex(centerBuf);
-        instrumentCenters.renderPoints(pixFactor);
+        instrumentCenters.renderPoints(CameraHelper.getPixelFactor(camera, vp));
         instrumentLines.setVertex(lineBuf);
         instrumentLines.renderLine(vp, LINEWIDTH_FOV);
 
@@ -177,30 +141,36 @@ class FOVPlatform extends DefaultMutableTreeNode implements Interfaces.JHVCell {
         return Math.tan(v * (Math.PI / 180. / 60.));
     }
 
-    private void setCenterX(double controlX) {
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterX(control2Center(controlX)));
+    private static double sanitizeCenter(double value) {
+        if (!Double.isFinite(value))
+            return 0;
+        return Math.clamp(value, MIN_CENTER_ARCMIN, MAX_CENTER_ARCMIN);
+    }
+
+    double getCenterX() {
+        return centerX;
+    }
+
+    double getCenterY() {
+        return centerY;
+    }
+
+    void setCenterX(double centerX) {
+        this.centerX = centerX;
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterX(control2Center(centerX)));
         MovieDisplay.display();
     }
 
-    private void setCenterY(double controlY) {
-        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterY(control2Center(controlY)));
+    void setCenterY(double centerY) {
+        this.centerY = centerY;
+        children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterY(control2Center(centerY)));
         MovieDisplay.display();
-    }
-
-    private static final double min = -60;
-    private static final double max = 60;
-
-    private static JHVSpinner createSpinner(double val) {
-        JHVSpinner spinner = new JHVSpinner(val, min, max, 0.1);
-        JFormattedTextField f = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-        f.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u2032", min, max));
-        return spinner;
     }
 
     JSONObject toJson() {
         JSONObject jo = new JSONObject();
-        jo.put("centerX", spinnerX.getValue());
-        jo.put("centerY", spinnerY.getValue());
+        jo.put("centerX", centerX);
+        jo.put("centerY", centerY);
 
         Enumeration<TreeNode> e = children();
         while (e.hasMoreElements()) {

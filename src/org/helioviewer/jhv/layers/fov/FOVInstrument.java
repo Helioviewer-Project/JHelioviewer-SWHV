@@ -1,15 +1,7 @@
 package org.helioviewer.jhv.layers.fov;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.FOVShape;
 import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
@@ -17,10 +9,11 @@ import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 import org.json.JSONObject;
 
 @SuppressWarnings("serial")
-class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell {
+class FOVInstrument extends DefaultMutableTreeNode {
 
     enum FOVType {RECTANGULAR, CIRCULAR}
 
+    private static final double TEXT_SCALE = 0.075;
     private final FOVShape fov = new FOVShape();
 
     private final String name;
@@ -29,8 +22,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
     private final double wide;
     private final double high;
 
-    private final JPanel panel;
-    private final JCheckBox checkBox;
+    private boolean enabled;
 
     private double centerX = 0;
     private double centerY = 0;
@@ -41,23 +33,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
         inner = 0.5 * Math.tan(innerDeg * (Math.PI / 180.));
         wide = 0.5 * Math.tan(wideDeg * (Math.PI / 180.));
         high = 0.5 * Math.tan(highDeg * (Math.PI / 180.));
-
-        panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-
-        boolean enabled = jo.optBoolean(name, false);
-        checkBox = new JCheckBox(name, enabled);
-        checkBox.addActionListener(e -> MovieDisplay.display());
-        checkBox.setFocusPainted(false);
-        checkBox.setOpaque(false);
-
-        panel.add(checkBox, BorderLayout.LINE_START);
-        panel.add(new JLabel("      "), BorderLayout.LINE_END); // avoid ellipsis on Windows
-    }
-
-    @Override
-    public Component getComponent() {
-        return panel;
+        enabled = jo.optBoolean(name, false);
     }
 
     void setCenterX(double _centerX) {
@@ -69,7 +45,7 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
     }
 
     void putGeometry(double distance, byte[] color, SdfTextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
-        if (!checkBox.isSelected())
+        if (!enabled)
             return;
 
         fov.setCenter(centerX * distance, centerY * distance);
@@ -79,16 +55,28 @@ class FOVInstrument extends DefaultMutableTreeNode implements Interfaces.JHVCell
             fov.putCircLine(inner * distance, false, color, lineBuf);
         if (type == FOVType.RECTANGULAR) {
             fov.putRectLine(wide * distance, high * distance, false, color, lineBuf);
-            FOVText.drawLabel(renderer, name, (centerX - wide) * distance, (centerY - high) * distance, high * distance);
+            float x = (float) ((centerX - wide) * distance);
+            float y = (float) ((centerY - high) * distance);
+            double labelSize = high * distance;
+            float scaleFactor = (float) (TEXT_SCALE / renderer.getFontSize() * labelSize);
+            renderer.draw(name, x, y, 0, scaleFactor); // using SurfacePut
         } else {
             fov.putCircLine(wide * distance, false, color, lineBuf);
             double halfSide = wide / Math.sqrt(2);
-            FOVText.drawLabel(renderer, name, (centerX - halfSide) * distance, (centerY - halfSide) * distance, halfSide * distance);
+            float x = (float) ((centerX - halfSide) * distance);
+            float y = (float) ((centerY - halfSide) * distance);
+            double labelSize = halfSide * distance;
+            float scaleFactor = (float) (TEXT_SCALE / renderer.getFontSize() * labelSize);
+            renderer.draw(name, x, y, 0, scaleFactor); // using SurfacePut
         }
     }
 
     boolean isEnabled() {
-        return checkBox.isSelected();
+        return enabled;
+    }
+
+    void setEnabled(boolean _enabled) {
+        enabled = _enabled;
     }
 
     @Override
