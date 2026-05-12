@@ -118,7 +118,7 @@ public final class FOVTreePane extends JScrollPane {
         return spinner;
     }
 
-    private final class Renderer extends DefaultTreeCellRenderer {
+    private static final class Renderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -129,7 +129,7 @@ public final class FOVTreePane extends JScrollPane {
 
     }
 
-    private final class Editor extends DefaultCellEditor {
+    private static final class Editor extends DefaultCellEditor {
 
         Editor() {
             super(new JCheckBox());
@@ -147,11 +147,10 @@ public final class FOVTreePane extends JScrollPane {
 
         private final Component component;
 
-        TreeNodeComponent(Object userObject, Component component) {
+        TreeNodeComponent(Object userObject, Component _component) {
             super(userObject);
-            this.component = component;
+            component = _component;
         }
-
     }
 
 }

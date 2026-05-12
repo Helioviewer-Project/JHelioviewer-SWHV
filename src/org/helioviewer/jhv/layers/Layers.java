@@ -255,7 +255,10 @@ public final class Layers {
 
     public static void dispose() {
         removeLayers();
-        layers.stream().filter(layer -> !newLayers.contains(layer)).forEach(Layer::dispose);
+        for (Layer layer : layers) {
+            if (!newLayers.contains(layer))
+                layer.dispose();
+        }
         newLayers.clear();
         newLayers.addAll(layers);
     }
