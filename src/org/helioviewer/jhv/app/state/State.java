@@ -146,18 +146,18 @@ public final class State {
                 }
             }
         }
-        Timelines.getLayers().replaceAll(newList);
+        Timelines.getLayers().restore(newList);
     }
 
     private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context,
                                    ViewState.ModeData modeData) {
-        Layers.clear();
+        ArrayList<Layer> restoredLayers = new ArrayList<>();
 
         for (Object o : data.getJSONArray("layers")) {
             if (o instanceof JSONObject jo) {
                 try {
                     if (json2Object(jo) instanceof Layer layer) {
-                        Layers.add(layer);
+                        restoredLayers.add(layer);
                         layer.setEnabled(jo.optBoolean("enabled", false));
                     }
                 } catch (Exception e) { // don't stop for a broken one
@@ -175,7 +175,8 @@ public final class State {
                     continue;
 
                 try {
-                    ImageLayer layer = ImageLayer.create(jd);
+                    ImageLayer layer = ImageLayer.createDetached(jd);
+                    restoredLayers.add(layer);
                     newLayers.put(layer, jo.optBoolean("enabled", false));
                     if (jo.optBoolean("master", false))
                         masterLayer = layer;
@@ -185,6 +186,7 @@ public final class State {
             }
         }
 
+        Layers.restore(restoredLayers);
         Annotations.fromJson(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));

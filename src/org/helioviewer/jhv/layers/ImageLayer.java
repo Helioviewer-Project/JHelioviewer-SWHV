@@ -43,9 +43,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     protected View view;
 
     public static ImageLayer create(JSONObject jo) {
-        ImageLayer imageLayer = new ImageLayer(jo);
+        ImageLayer imageLayer = createDetached(jo);
         Layers.add(imageLayer);
         return imageLayer;
+    }
+
+    // Only for state restore, which batches layer registration.
+    public static ImageLayer createDetached(JSONObject jo) {
+        return new ImageLayer(jo);
     }
 
     @Override
