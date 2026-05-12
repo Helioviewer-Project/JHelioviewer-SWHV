@@ -53,8 +53,23 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public void clear() {
-        layers.forEach(TimelineLayer::remove);
+        replaceAll(Collections.emptyList());
+    }
+
+    public void replaceAll(List<TimelineLayer> newLayers) {
+        ArrayList<TimelineLayer> uniqueLayers = new ArrayList<>();
+        for (TimelineLayer layer : newLayers) {
+            if (!uniqueLayers.contains(layer)) // avoid band duplication via file load
+                uniqueLayers.add(layer);
+        }
+
+        for (TimelineLayer layer : layers) {
+            if (!uniqueLayers.contains(layer))
+                layer.remove();
+        }
+
         layers.clear();
+        layers.addAll(uniqueLayers);
         fireTableDataChanged();
         DrawController.graphAreaChanged();
     }
