@@ -23,8 +23,8 @@ import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
+import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.io.samp.SampClient;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
 
@@ -135,7 +135,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             add(Box.createHorizontalStrut(90), 0);
         }
 
-        Interaction.Mode interactionMode = JHVFrame.getInteraction().getMode();
+        Interaction.Mode interactionMode = InputController.getMode();
         try {
             interactionMode = Interaction.Mode.valueOf(Settings.getProperty("display.interaction").toUpperCase());
         } catch (Exception ignore) {}
@@ -177,11 +177,11 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         ButtonGroup group = new ButtonGroup();
 
         JideToggleButton pan = toolToggleButton(PAN);
-        pan.addActionListener(e -> JHVFrame.getInteraction().setMode(Interaction.Mode.PAN));
+        pan.addActionListener(e -> InputController.setMode(Interaction.Mode.PAN));
         JideToggleButton rotate = toolToggleButton(ROTATE);
-        rotate.addActionListener(e -> JHVFrame.getInteraction().setMode(Interaction.Mode.ROTATE));
+        rotate.addActionListener(e -> InputController.setMode(Interaction.Mode.ROTATE));
         JideToggleButton axis = toolToggleButton(AXIS);
-        axis.addActionListener(e -> JHVFrame.getInteraction().setMode(Interaction.Mode.AXIS));
+        axis.addActionListener(e -> InputController.setMode(Interaction.Mode.AXIS));
 
         group.add(pan);
         group.add(rotate);
@@ -197,7 +197,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             case AXIS -> axis.setSelected(true);
             case ROTATE -> rotate.setSelected(true);
         }
-        JHVFrame.getInteraction().setMode(interactionMode);
+        InputController.setMode(interactionMode);
 
         trackingButton = toolToggleButton(TRACK);
         trackingButton.setSelected(ViewState.isTracking());
