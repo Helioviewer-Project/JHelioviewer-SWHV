@@ -185,6 +185,11 @@ class ImageLayerOptions extends JPanel {
         lutPanel.setLUT(lut);
     }
 
+    void refresh(ImageLayer layer) {
+        downloadButton.setVisible(!layer.isLocal());
+        lutPanel.setLUT(layer.getView().getDefaultLUT());
+    }
+
     private void downloadProgress(int value) {
         if (value < 0)
             progressBar.setIndeterminate(true);
@@ -217,10 +222,6 @@ class ImageLayerOptions extends JPanel {
             downloadProgress = null;
             downloadDone();
         }
-    }
-
-    void downloadVisible(boolean visible) {
-        downloadButton.setVisible(visible);
     }
 
 }

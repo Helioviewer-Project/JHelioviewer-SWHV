@@ -141,8 +141,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     private void activateView() {
-        optionsPanel.downloadVisible(!isLocal());
-        setEnabled(true); // enable optionsPanel
+        glImage.setLUT(view.getDefaultLUT(), glImage.getInvertLUT());
+        setEnabled(true);
 
         CameraHelper.zoomToFit(Display.getMiniCamera());
         Layers.setActiveImageLayer(this);
@@ -150,7 +150,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
         }
-        optionsPanel.setLUT(view.getDefaultLUT());
         Layers.fireLayerUpdated(this);
     }
 
@@ -295,6 +294,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public Component getOptionsPanel() {
+        optionsPanel.refresh(this);
         return optionsPanel;
     }
 
