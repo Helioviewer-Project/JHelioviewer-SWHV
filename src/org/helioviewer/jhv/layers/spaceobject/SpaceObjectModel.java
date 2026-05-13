@@ -12,7 +12,7 @@ import javax.swing.table.AbstractTableModel;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 
 @SuppressWarnings("serial")
-class SpaceObjectModel extends AbstractTableModel {
+public class SpaceObjectModel extends AbstractTableModel {
 
     private final List<SpaceObjectElement> elements = new ArrayList<>();
     private final Map<SpaceObject, Integer> targetRows = new HashMap<>();
@@ -43,11 +43,15 @@ class SpaceObjectModel extends AbstractTableModel {
         return false;
     }
 
-    int indexOf(SpaceObject object) {
+    public int indexOf(SpaceObject object) {
         return targetRows.getOrDefault(object, -1);
     }
 
-    SpaceObjectElement elementAt(int row) {
+    public int indexOf(SpaceObjectElement element) {
+        return elementRows.getOrDefault(element, -1);
+    }
+
+    public SpaceObjectElement elementAt(int row) {
         return elements.get(row);
     }
 

@@ -1,43 +1,20 @@
 package org.helioviewer.jhv.layers.spaceobject;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
 import javax.annotation.Nullable;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.components.base.TableValue;
 
 import org.json.JSONArray;
 
-@SuppressWarnings("serial")
-public final class SpaceObjectContainer extends JScrollPane {
-
-    private static final int ICON_WIDTH = 12;
-    private static final int NUMBEROFVISIBLEROWS = 5;
-
-    private static final int SELECTED_COL = 0;
-    private static final int OBJECT_COL = 1;
-    private static final int STATUS_COL = 2;
+public final class SpaceObjectContainer {
 
     private final boolean exclusive;
     private final UpdateViewpoint uv;
     private final SpaceObject observer;
     private final SpaceObjectModel model;
-    private final JTable grid;
 
     private SpaceObjectElement highlighted;
     private Frame frame;
@@ -54,73 +31,37 @@ public final class SpaceObjectContainer extends JScrollPane {
 
         model = new SpaceObjectModel(observer);
 
-        grid = new JTable(model);
-        grid.setTableHeader(null);
-        grid.setShowHorizontalLines(true);
-        grid.setRowSelectionAllowed(true);
-        grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        grid.setColumnSelectionAllowed(false);
-        grid.setIntercellSpacing(new Dimension(0, 0));
-
-        if (exclusive)
-            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedExclusiveRenderer());
-        else
-            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedRenderer());
-        grid.getColumnModel().getColumn(SELECTED_COL).setPreferredWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(SELECTED_COL).setMaxWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(OBJECT_COL).setCellRenderer(new ObjectRenderer());
-        grid.getColumnModel().getColumn(STATUS_COL).setCellRenderer(new StatusRenderer());
-
-        grid.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (!isEnabled())
-                    return;
-                TableValue v = TableValue.tableValueAtPoint(grid, e.getPoint());
-                if (v == null || !(v.value instanceof SpaceObjectElement soe))
-                    return;
-
-                highlighted = soe;
-                if (v.col == SELECTED_COL)
-                    selectElement(highlighted);
-                Display.getCamera().refresh(); // full camera refresh to update viewpoint for relative longitude
-            }
-        });
-
-        setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, getBackground().brighter()));
-
-        setViewportView(grid);
-        getViewport().setBackground(grid.getBackground());
-        setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
-
         PositionLoad.removeAll(uv);
 
-        ListSelectionModel selectionModel = grid.getSelectionModel();
         int len = ja.length();
         for (int i = 0; i < len; i++)
-            selectTarget(SpaceObject.get(ja.optString(i, "Earth")), selectionModel);
+            selectTarget(SpaceObject.get(ja.optString(i, "Earth")));
     }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        grid.setEnabled(enabled);
-        setWheelScrollingEnabled(enabled);
-        getHorizontalScrollBar().setEnabled(enabled);
-        getVerticalScrollBar().setEnabled(enabled);
+    public SpaceObjectModel getModel() {
+        return model;
     }
 
-    private void selectTarget(SpaceObject target, ListSelectionModel selectionModel) {
+    public boolean isExclusive() {
+        return exclusive;
+    }
+
+    @Nullable
+    public SpaceObjectElement getHighlightedElement() {
+        return highlighted;
+    }
+
+    public void setHighlightedElement(SpaceObjectElement element) {
+        highlighted = element;
+    }
+
+    private void selectTarget(SpaceObject target) {
         if (target == null)
             return;
         int idx = model.indexOf(target);
         if (idx != -1) { // found
-            selectionModel.setSelectionInterval(idx, idx); // highlight in table
             SpaceObjectElement element = model.elementAt(idx);
             selectElement(element);
-            highlighted = element;
         }
     }
 
@@ -146,7 +87,8 @@ public final class SpaceObjectContainer extends JScrollPane {
         model.forEachSelected(element -> element.load(uv, observer, frame, startTime, endTime));
     }
 
-    private void selectElement(SpaceObjectElement element) {
+    public void selectElement(SpaceObjectElement element) {
+        highlighted = element;
         if (exclusive) {
             if (element.isSelected()) // avoid reload on re-clicking same
                 return;
@@ -168,57 +110,6 @@ public final class SpaceObjectContainer extends JScrollPane {
         JSONArray ja = new JSONArray();
         model.forEachSelected(ja::put);
         return ja;
-    }
-
-    private static class ObjectRenderer extends DefaultTableCellRenderer {
-        @Override
-        public void setValue(Object value) {
-            if (value instanceof SpaceObjectElement element) {
-                setText(element.toString());
-                setToolTipText("Select for spiral");
-            }
-        }
-    }
-
-    private static class SelectedRenderer extends DefaultTableCellRenderer {
-
-        private final JCheckBox checkBox = new JCheckBox();
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof SpaceObjectElement element) {
-                checkBox.setSelected(element.isSelected());
-            }
-            checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            return checkBox;
-        }
-
-    }
-
-    private static class SelectedExclusiveRenderer extends DefaultTableCellRenderer {
-
-        private final JRadioButton radio = new JRadioButton();
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof SpaceObjectElement element) {
-                radio.setSelected(element.isSelected());
-            }
-            radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            return radio;
-        }
-
-    }
-
-    private static class StatusRenderer extends DefaultTableCellRenderer {
-        @Override
-        public void setValue(Object value) {
-            if (value instanceof SpaceObjectElement element) {
-                String status = element.getStatus();
-                setText(status);
-                setToolTipText(status);
-            }
-        }
     }
 
 }
