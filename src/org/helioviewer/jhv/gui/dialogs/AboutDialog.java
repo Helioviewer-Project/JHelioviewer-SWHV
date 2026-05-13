@@ -21,6 +21,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.opengl.GL;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -116,7 +117,7 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
                     Log.error(ex);
                 }
             } else {
-                JHVGlobals.openURL(e.getURL().toString());
+                DesktopIntegration.openURL(e.getURL().toString());
             }
         }
     }

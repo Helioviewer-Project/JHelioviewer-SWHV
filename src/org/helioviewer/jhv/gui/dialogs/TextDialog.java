@@ -8,10 +8,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -37,7 +37,7 @@ public class TextDialog extends StandardDialog implements Interfaces.ShowableDia
         HTMLPane pane = new HTMLPane();
         pane.setOpaque(false);
         pane.setText(text);
-        pane.addHyperlinkListener(JHVGlobals.hyperOpenURL);
+        pane.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panel.add(pane);
