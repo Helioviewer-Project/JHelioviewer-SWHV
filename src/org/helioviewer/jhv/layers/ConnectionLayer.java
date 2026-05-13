@@ -1,17 +1,9 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.awt.FileDialog;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.io.File;
-import java.net.URI;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 import javax.annotation.Nullable;
-import javax.swing.JButton;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
@@ -21,7 +13,6 @@ import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity.Connectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
@@ -62,8 +53,6 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private final GLSLLine geometryLine = new GLSLLine(true);
     private final GLSLShape geometryPoint = new GLSLShape(true);
 
-    private final JPanel optionsPanel;
-
     private Connectivity connectivity;
     private List<Vec3> hcs;
     private TimeMap<Position.Cartesian> footpointMap;
@@ -81,9 +70,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     @Override
     public void serialize(JSONObject jo) {}
 
-    public ConnectionLayer(JSONObject ignoredJo) {
-        optionsPanel = optionsPanel();
-    }
+    public ConnectionLayer(JSONObject ignoredJo) {}
 
     @Override
     public void render(Camera camera, Viewport vp) {
@@ -192,7 +179,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
     @Override
     public Component getOptionsPanel() {
-        return optionsPanel;
+        return null;
     }
 
     @Override
@@ -233,53 +220,13 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         MovieDisplay.display();
     }
 
-    private JPanel optionsPanel() {
-        JButton clearBtn = new JButton("Clear all");
-        clearBtn.addActionListener(e -> {
-            connectivity = null;
-            hcs = null;
-            footpointMap = null;
-            geometryMap.clear();
-            lastTimestamp = null;
-            MovieDisplay.display();
-        });
-
-        JButton connectivityBtn = new JButton("Connectivity");
-        connectivityBtn.addActionListener(e -> load(LoadConnectivity::submit));
-
-        JButton hcsBtn = new JButton("HCS");
-        hcsBtn.addActionListener(e -> load(LoadHCS::submit));
-
-        JButton footpointBtn = new JButton("Footpoint");
-        footpointBtn.addActionListener(e -> load(LoadFootpoint::submit));
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints c0 = new GridBagConstraints();
-        c0.anchor = GridBagConstraints.LINE_END;
-        c0.weightx = 1.;
-        c0.weighty = 1.;
-        c0.gridy = 0;
-
-        c0.gridx = 0;
-        panel.add(clearBtn, c0);
-        c0.gridx = 1;
-        panel.add(connectivityBtn, c0);
-        c0.gridx = 2;
-        panel.add(hcsBtn, c0);
-        c0.gridx = 3;
-        panel.add(footpointBtn, c0);
-
-        return panel;
-    }
-
-    private void load(BiConsumer<URI, ConnectionLayer> consumer) {
-        FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
-        fileDialog.setMultipleMode(false);
-        fileDialog.setVisible(true);
-
-        File[] fileNames = fileDialog.getFiles();
-        if (fileNames.length > 0 && fileNames[0].isFile())
-            consumer.accept(fileNames[0].toURI(), this);
+    public void clear() {
+        connectivity = null;
+        hcs = null;
+        footpointMap = null;
+        geometryMap.clear();
+        lastTimestamp = null;
+        MovieDisplay.display();
     }
 
 }
