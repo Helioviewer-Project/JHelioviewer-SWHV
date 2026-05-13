@@ -16,7 +16,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -220,12 +220,12 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
         super.setEnabled(_enabled);
 
         if (enabled) {
-            JHVFrame.getInputController().addListener(hoverListener);
+            InputController.addListener(hoverListener);
             options.activate();
             options.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
-            JHVFrame.getInputController().removeListener(hoverListener);
+            InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
                 Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer, Camera.ViewpointApplyMode.KEEP_TRANSFORM);

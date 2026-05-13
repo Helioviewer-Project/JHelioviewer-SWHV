@@ -18,8 +18,6 @@ import javax.swing.TransferHandler;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Platform;
-import org.helioviewer.jhv.camera.Interaction;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -106,8 +104,6 @@ public final class JHVFrame {
     private static AngleCanvas renderCanvas;
     private static RenderStartupHost renderHost;
     private static AwtInputAdapter awtInputAdapter;
-    private static InputController inputController;
-    private static Interaction interaction;
     private static MainContentPanel mainContentPanel;
 
     private static LayersPanel layersPanel;
@@ -135,9 +131,7 @@ public final class JHVFrame {
         leftPaneHost = new FixedWidthPanel();
         leftPaneHost.add(leftScrollPane, BorderLayout.CENTER);
 
-        interaction = new Interaction(Display.getCamera());
-        inputController = new InputController(interaction);
-        awtInputAdapter = new AwtInputAdapter(inputController);
+        awtInputAdapter = new AwtInputAdapter();
 
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -147,7 +141,7 @@ public final class JHVFrame {
         ViewpointStatusPanel viewpointStatus = new ViewpointStatusPanel();
         FramerateStatusPanel framerateStatus = new FramerateStatusPanel();
         PositionStatusPanel positionStatus = new PositionStatusPanel();
-        inputController.addListener(positionStatus);
+        InputController.addListener(positionStatus);
 
         StatusPanel statusPanel = new StatusPanel(5, 5);
         statusPanel.addPlugin(framerateStatus, StatusPanel.Alignment.LEFT);
@@ -306,16 +300,8 @@ public final class JHVFrame {
         return mainContentPanel;
     }
 
-    public static InputController getInputController() {
-        return inputController;
-    }
-
     public static LayersPanel getLayersPanel() {
         return layersPanel;
-    }
-
-    public static Interaction getInteraction() {
-        return interaction;
     }
 
     public static MenuBar getMenuBar() {

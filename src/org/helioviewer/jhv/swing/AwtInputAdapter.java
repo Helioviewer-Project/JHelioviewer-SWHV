@@ -15,11 +15,6 @@ import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.input.ScrollEvent;
 
 public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
-    private final InputController inputController;
-
-    public AwtInputAdapter(InputController _inputController) {
-        inputController = _inputController;
-    }
 
     private static PointerEvent synthesizePointer(MouseEvent e) {
         return new PointerEvent(
@@ -47,38 +42,38 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        inputController.mouseClicked(synthesizePointer(e));
+        InputController.mouseClicked(synthesizePointer(e));
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        inputController.mouseExited(synthesizePointer(e));
+        InputController.mouseExited(synthesizePointer(e));
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         ((Component) e.getSource()).requestFocusInWindow();
-        inputController.mousePressed(synthesizePointer(e));
+        InputController.mousePressed(synthesizePointer(e));
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        inputController.mouseReleased(synthesizePointer(e));
+        InputController.mouseReleased(synthesizePointer(e));
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        inputController.mouseDragged(synthesizePointer(e));
+        InputController.mouseDragged(synthesizePointer(e));
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        inputController.mouseMoved(synthesizePointer(e));
+        InputController.mouseMoved(synthesizePointer(e));
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        inputController.mouseWheelMoved(new ScrollEvent(
+        InputController.mouseWheelMoved(new ScrollEvent(
                 (int) (e.getX() * Display.pixelScale[0] + .5),
                 (int) (e.getY() * Display.pixelScale[1] + .5),
                 e.getPreciseWheelRotation()));
@@ -86,7 +81,7 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        inputController.keyPressed(synthesizeKey(e));
+        InputController.keyPressed(synthesizeKey(e));
     }
 
     @Override
@@ -94,6 +89,6 @@ public final class AwtInputAdapter extends MouseAdapter implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        inputController.keyReleased(synthesizeKey(e));
+        InputController.keyReleased(synthesizeKey(e));
     }
 }

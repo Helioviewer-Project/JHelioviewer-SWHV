@@ -23,8 +23,8 @@ import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
+import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -451,12 +451,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             JHVEventCache.registerHandler(this);
             Movie.addTimeRangeListener(this);
             Movie.addTimeListener(controller);
-            JHVFrame.getInputController().addListener(controller);
+            InputController.addListener(controller);
             requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
             controller.resetHover();
             invalidateActiveEvents();
-            JHVFrame.getInputController().removeListener(controller);
+            InputController.removeListener(controller);
             Movie.removeTimeListener(controller);
             Movie.removeTimeRangeListener(this);
             JHVEventCache.unregisterHandler(this);

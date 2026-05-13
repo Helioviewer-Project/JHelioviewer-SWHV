@@ -7,72 +7,79 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 
 public final class InputController {
-    private final Interaction interaction;
 
-    public InputController(Interaction _interaction) {
-        interaction = _interaction;
+    private static final Interaction interaction = new Interaction(Display.getCamera());
+
+    public static Interaction.Mode getMode() {
+        return interaction.getMode();
     }
 
-    public void mouseClicked(PointerEvent e) {
+    public static void setMode(Interaction.Mode mode) {
+        interaction.setMode(mode);
+    }
+
+    public static void mouseClicked(PointerEvent e) {
         Display.setActiveViewport(e.x(), e.y());
         interaction.mouseClicked(e);
         pointerListeners.forEach(listener -> listener.mouseClicked(e));
     }
 
-    public void mouseExited(PointerEvent e) {
+    public static void mouseExited(PointerEvent e) {
         pointerListeners.forEach(listener -> listener.mouseExited(e));
     }
 
-    public void mousePressed(PointerEvent e) {
+    public static void mousePressed(PointerEvent e) {
         Viewport vp = Display.setActiveViewport(e.x(), e.y());
         interaction.mousePressed(e, vp);
         pointerListeners.forEach(listener -> listener.mousePressed(e));
     }
 
-    public void mouseReleased(PointerEvent e) {
+    public static void mouseReleased(PointerEvent e) {
         interaction.mouseReleased(e);
         pointerListeners.forEach(listener -> listener.mouseReleased(e));
     }
 
-    public void mouseDragged(PointerEvent e) {
+    public static void mouseDragged(PointerEvent e) {
         Viewport vp = Display.setActiveViewport(e.x(), e.y());
         interaction.mouseDragged(e, vp);
         pointerMotionListeners.forEach(listener -> listener.mouseDragged(e));
     }
 
-    public void mouseMoved(PointerEvent e) {
+    public static void mouseMoved(PointerEvent e) {
         Display.setActiveViewport(e.x(), e.y());
         pointerMotionListeners.forEach(listener -> listener.mouseMoved(e));
     }
 
-    public void mouseWheelMoved(ScrollEvent e) {
+    public static void mouseWheelMoved(ScrollEvent e) {
         Viewport vp = Display.setActiveViewport(e.x(), e.y());
         interaction.mouseWheelMoved(e, vp);
     }
 
-    public void keyPressed(KeyInputEvent e) {
+    public static void keyPressed(KeyInputEvent e) {
         interaction.keyPressed(e);
     }
 
-    public void keyReleased(KeyInputEvent e) {
+    public static void keyReleased(KeyInputEvent e) {
         interaction.keyReleased(e);
     }
 
-    private final HashSet<InputPointerListener> pointerListeners = new HashSet<>();
-    private final HashSet<InputPointerMotionListener> pointerMotionListeners = new HashSet<>();
+    private static final HashSet<InputPointerListener> pointerListeners = new HashSet<>();
+    private static final HashSet<InputPointerMotionListener> pointerMotionListeners = new HashSet<>();
 
-    public void addListener(Object listener) {
+    public static void addListener(Object listener) {
         if (listener instanceof InputPointerListener pointerListener)
             pointerListeners.add(pointerListener);
         if (listener instanceof InputPointerMotionListener pointerMotionListener)
             pointerMotionListeners.add(pointerMotionListener);
     }
 
-    public void removeListener(Object listener) {
+    public static void removeListener(Object listener) {
         if (listener instanceof InputPointerListener pointerListener)
             pointerListeners.remove(pointerListener);
         if (listener instanceof InputPointerMotionListener pointerMotionListener)
             pointerMotionListeners.remove(pointerMotionListener);
     }
+
+    private InputController() {}
 
 }
