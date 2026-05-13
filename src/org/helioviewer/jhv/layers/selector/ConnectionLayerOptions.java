@@ -17,7 +17,7 @@ import org.helioviewer.jhv.layers.connect.LoadFootpoint;
 import org.helioviewer.jhv.layers.connect.LoadHCS;
 
 @SuppressWarnings("serial")
-final class ConnectionLayerOptions extends JPanel implements LayerOptions.OptionsPanel {
+final class ConnectionLayerOptions extends JPanel {
 
     ConnectionLayerOptions(ConnectionLayer layer) {
         JButton clearBtn = new JButton("Clear all");
