@@ -20,7 +20,7 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.GridLayer;
 
 @SuppressWarnings("serial")
-final class GridLayerOptions extends JPanel implements LayerOptions.OptionsPanel {
+final class GridLayerOptions extends JPanel {
 
     GridLayerOptions(GridLayer layer) {
         setLayout(new GridBagLayout());

@@ -104,8 +104,8 @@ public final class Layers {
         Movie.setMaster(activeLayer);
     }
 
-    private static LayerList layers = new LayerList();
-    private static LayerList newLayers = new LayerList();
+    private static final LayerList layers = new LayerList();
+    private static final LayerList newLayers = new LayerList();
     private static final ArrayList<Layer> removedLayers = new ArrayList<>();
 
     private static ViewpointLayer viewpointLayer;

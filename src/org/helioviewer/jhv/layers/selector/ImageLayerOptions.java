@@ -30,7 +30,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-final class ImageLayerOptions extends JPanel implements LayerOptions.OptionsPanel {
+final class ImageLayerOptions extends JPanel {
 
     private final LUTPanel lutPanel;
     private final SlitPanel slitPanel;
@@ -190,7 +190,6 @@ final class ImageLayerOptions extends JPanel implements LayerOptions.OptionsPane
         deltaCRVAL2Panel.setVisible(visibility);
     }
 
-    @Override
     public void refresh(Layer layer) {
         ImageLayer imageLayer = (ImageLayer) layer;
         downloadButton.setVisible(!imageLayer.isLocal());
