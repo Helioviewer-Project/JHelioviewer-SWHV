@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Frame;
@@ -35,8 +33,8 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         }
     }
 
-    private final ViewpointLayerOptionsExpert locationOptionPanel;
-    private final ViewpointLayerOptionsExpert equatorialOptionPanel;
+    private final ViewpointLayerOptionsExpert locationOptions;
+    private final ViewpointLayerOptionsExpert equatorialOptions;
 
     private CameraMode cameraMode;
 
@@ -47,8 +45,8 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
             joLocation = jo.optJSONObject("location");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        locationOptionPanel = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
-        equatorialOptionPanel = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
+        locationOptions = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
+        equatorialOptions = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
 
         cameraMode = CameraMode.Location;
         if (jo != null) {
@@ -64,12 +62,12 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     void serialize(JSONObject jo) {
         jo.put("mode", cameraMode.name());
         jo.put("camera", Display.getCamera().toJson());
-        jo.put("location", locationOptionPanel.toJson());
-        jo.put("equatorial", equatorialOptionPanel.toJson());
+        jo.put("location", locationOptions.toJson());
+        jo.put("equatorial", equatorialOptions.toJson());
     }
 
     boolean isDownloading() {
-        return locationOptionPanel.isDownloading() || equatorialOptionPanel.isDownloading();
+        return locationOptions.isDownloading() || equatorialOptions.isDownloading();
     }
 
     public CameraMode getCameraMode() {
@@ -81,12 +79,12 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         applyCurrentViewpoint(mode);
     }
 
-    public Component getCurrentOptionPanel() {
-        return switch (cameraMode) {
-            case ObserverAt1au -> null;
-            case Location -> locationOptionPanel;
-            case Heliosphere -> equatorialOptionPanel;
-        };
+    public ViewpointLayerOptionsExpert getLocationOptions() {
+        return locationOptions;
+    }
+
+    public ViewpointLayerOptionsExpert getEquatorialOptions() {
+        return equatorialOptions;
     }
 
     void applyCurrentViewpoint(Camera.ViewpointApplyMode mode) {
@@ -103,8 +101,8 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
 
     @Override
     public void timeRangeChanged(long start, long end) {
-        locationOptionPanel.setTimespan(start, end);
-        equatorialOptionPanel.setTimespan(start, end);
+        locationOptions.setTimespan(start, end);
+        equatorialOptions.setTimespan(start, end);
     }
 
     boolean isHeliospheric() {
@@ -113,15 +111,15 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
 
     @Nullable
     PositionLoad getHighlightedLoad() {
-        return isHeliospheric() ? equatorialOptionPanel.getHighlightedLoad() : null;
+        return isHeliospheric() ? equatorialOptions.getHighlightedLoad() : null;
     }
 
     int getSpiralSpeed() {
-        return isHeliospheric() ? equatorialOptionPanel.getSpiralSpeed() : 0;
+        return isHeliospheric() ? equatorialOptions.getSpiralSpeed() : 0;
     }
 
     boolean isRelative() {
-        return isHeliospheric() && equatorialOptionPanel.isRelative();
+        return isHeliospheric() && equatorialOptions.isRelative();
     }
 
 }
