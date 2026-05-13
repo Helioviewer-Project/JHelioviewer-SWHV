@@ -13,6 +13,7 @@ import javax.swing.SwingConstants;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.layers.ViewpointLayerOptions;
 import org.helioviewer.jhv.layers.ViewpointLayerOptions.CameraMode;
 
@@ -33,8 +34,8 @@ final class ViewpointLayerOptionsPanel extends JPanel {
     private final ViewpointLayerOptionsExpertPanel equatorialPanel;
     private Component currentOptionPanel;
 
-    ViewpointLayerOptionsPanel(ViewpointLayerOptions _options) {
-        options = _options;
+    ViewpointLayerOptionsPanel(ViewpointLayer layer) {
+        options = layer.getOptions();
         locationPanel = new ViewpointLayerOptionsExpertPanel(options.getLocationOptions());
         equatorialPanel = new ViewpointLayerOptionsExpertPanel(options.getEquatorialOptions());
         setLayout(new GridBagLayout());

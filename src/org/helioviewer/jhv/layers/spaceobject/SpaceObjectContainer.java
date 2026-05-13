@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers.spaceobject;
 
+import java.util.function.IntConsumer;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Frame;
@@ -38,17 +40,24 @@ public final class SpaceObjectContainer {
             selectTarget(SpaceObject.get(ja.optString(i, "Earth")));
     }
 
-    public SpaceObjectModel getModel() {
-        return model;
+    public int size() {
+        return model.size();
+    }
+
+    public SpaceObjectElement elementAt(int row) {
+        return model.elementAt(row);
+    }
+
+    public void addRefreshListener(IntConsumer listener) {
+        model.addRefreshListener(listener);
     }
 
     public boolean isExclusive() {
         return exclusive;
     }
 
-    @Nullable
-    public SpaceObjectElement getHighlightedElement() {
-        return highlighted;
+    public int getHighlightedIndex() {
+        return highlighted == null ? -1 : model.indexOf(highlighted);
     }
 
     public void setHighlightedElement(SpaceObjectElement element) {

@@ -31,7 +31,7 @@ final class SpaceObjectContainerPanel extends JScrollPane {
     private final JTable grid;
 
     SpaceObjectContainerPanel(SpaceObjectContainer container) {
-        grid = new JTable(new SpaceObjectTableModel(container.getModel()));
+        grid = new JTable(new SpaceObjectTableModel(container));
         grid.setTableHeader(null);
         grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
@@ -48,12 +48,9 @@ final class SpaceObjectContainerPanel extends JScrollPane {
         grid.getColumnModel().getColumn(OBJECT_COL).setCellRenderer(new ObjectRenderer());
         grid.getColumnModel().getColumn(STATUS_COL).setCellRenderer(new StatusRenderer());
 
-        SpaceObjectElement highlighted = container.getHighlightedElement();
-        if (highlighted != null) {
-            int row = container.getModel().indexOf(highlighted);
-            if (row != -1)
-                grid.getSelectionModel().setSelectionInterval(row, row);
-        }
+        int row = container.getHighlightedIndex();
+        if (row != -1)
+            grid.getSelectionModel().setSelectionInterval(row, row);
 
         grid.addMouseListener(new MouseAdapter() {
             @Override
