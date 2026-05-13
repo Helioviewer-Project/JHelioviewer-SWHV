@@ -6,7 +6,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -78,37 +77,25 @@ public final class LayersPanel extends JPanel {
             }
         }
 
+        // Repaint the whole table because ImageLayers can have heterogenous frame names.
+
         @Override
         public void repaint() {
-            dirty().setBounds(0, 0, getWidth(), getHeight());
-            dirtyValid = true;
+            dirty = true;
         }
 
         @Override
         public void repaint(int x, int y, int width, int height) {
-            if (!dirtyValid) {
-                dirty().setBounds(x, y, width, height);
-                dirtyValid = true;
-            } else {
-                dirty().add(x, y);
-                dirty().add(x + width, y + height);
-            }
+            dirty = true;
         }
 
-        private Rectangle dirty = null;
-        private boolean dirtyValid = false;
-
-        private Rectangle dirty() {
-            if (dirty == null)
-                dirty = new Rectangle();
-            return dirty;
-        }
+        private boolean dirty = false;
 
         @Override
         public void lazyRepaint() {
-            if (dirtyValid) {
-                super.repaint(dirty.x, dirty.y, dirty.width, dirty.height);
-                dirtyValid = false;
+            if (dirty) {
+                super.repaint();
+                dirty = false;
             }
         }
 
