@@ -17,76 +17,94 @@ import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
 
-class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
-
-    private static final JHVUncaughtExceptionHandler instance = new JHVUncaughtExceptionHandler();
+class JHVUncaughtExceptionHandler {
 
     private JHVUncaughtExceptionHandler() {}
 
     // This method should be called once when the application starts
-    public static void setupHandlerForThread() {
-        Thread.setDefaultUncaughtExceptionHandler(instance);
+    public static void setupHandlerForThread(boolean headless) {
+        Thread.setDefaultUncaughtExceptionHandler(headless ? new Headless() : new GUI());
     }
 
-    private static void showErrorDialog(String msg) {
-        HTMLPane report = new HTMLPane();
-        report.setOpaque(false);
-        report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
-        report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
-        report.setText("Fatal error detected." +
-                "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
-                "or use it to open an issue at <a href='" + JHVGlobals.bugURL + "'>" + JHVGlobals.bugURL + "</a>.<br/>");
+    private abstract static class Base implements Thread.UncaughtExceptionHandler {
+        private final AtomicBoolean alreadySent = new AtomicBoolean(false);
 
-        JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the error report to the clipboard.");
-        copyToClipboard.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent me) {
-                TransferAccess.writeClipboard(msg);
-                JOptionPane.showMessageDialog(null, "Error report copied to clipboard.");
-            }
-        });
-
-        JTextArea textArea = new JTextArea();
-        textArea.setText(msg);
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(600, 400));
-
-        Object[] objects = new Object[]{report, copyToClipboard, new JSeparator(), scrollPane};
-
-        JOptionPane optionPane = new JOptionPane();
-        optionPane.setMessage(objects);
-        optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
-        optionPane.setOptions(new String[]{"Quit JHelioviewer", "Continue"});
-        optionPane.createDialog("JHelioviewer: Fatal Error").setVisible(true);
-
-        if ("Quit JHelioviewer".equals(optionPane.getValue()))
-            System.exit(1);
-    }
-
-    private final AtomicBoolean alreadySent = new AtomicBoolean(false);
-
-    // we do not use the logger here, since it should work even before logging initialization
-    @Override
-    public void uncaughtException(Thread t, Throwable e) {
-        String className = e.getClass().getCanonicalName() + '\n';
-        StringBuilder stackTrace = new StringBuilder(className);
-        for (StackTraceElement el : e.getStackTrace()) {
-            stackTrace.append("at ").append(el).append('\n');
+        @Override
+        public final void uncaughtException(Thread t, Throwable e) {
+            if (alreadySent.compareAndSet(false, true))
+                handle(format(t, e));
         }
 
-        String msg = "";
-        msg += "Uncaught Exception in " + JHVGlobals.userAgent;
-        msg += "\nThread: " + t;
-        msg += "\nMessage: " + e.getMessage();
-        msg += "\nStacktrace:\n";
-        msg += stackTrace + "\n";
-        msg += "Log:\n" + Log.get();
+        // Do not use the logger here; this must work even before logging initialization.
+        private static String format(Thread t, Throwable e) {
+            String className = e.getClass().getCanonicalName() + '\n';
+            StringBuilder stackTrace = new StringBuilder(className);
+            for (StackTraceElement el : e.getStackTrace()) {
+                stackTrace.append("at ").append(el).append('\n');
+            }
 
-        if (alreadySent.compareAndSet(false, true)) {
-            String errorMsg = msg;
-            EventQueue.invokeLater(() -> showErrorDialog(errorMsg));
+            String msg = "";
+            msg += "Uncaught Exception in " + JHVGlobals.userAgent;
+            msg += "\nThread: " + t;
+            msg += "\nMessage: " + e.getMessage();
+            msg += "\nStacktrace:\n";
+            msg += stackTrace + "\n";
+            msg += "Log:\n" + Log.get();
+            return msg;
+        }
+
+        protected abstract void handle(String msg);
+    }
+
+    private static final class GUI extends Base {
+        @Override
+        protected void handle(String msg) {
+            EventQueue.invokeLater(() -> showErrorDialog(msg));
+        }
+
+        private static void showErrorDialog(String msg) {
+            HTMLPane report = new HTMLPane();
+            report.setOpaque(false);
+            report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
+            report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
+            report.setText("Fatal error detected." +
+                    "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
+                    "or use it to open an issue at <a href='" + JHVGlobals.bugURL + "'>" + JHVGlobals.bugURL + "</a>.<br/>");
+
+            JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the error report to the clipboard.");
+            copyToClipboard.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent me) {
+                    TransferAccess.writeClipboard(msg);
+                    JOptionPane.showMessageDialog(null, "Error report copied to clipboard.");
+                }
+            });
+
+            JTextArea textArea = new JTextArea();
+            textArea.setText(msg);
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(600, 400));
+
+            Object[] objects = new Object[]{report, copyToClipboard, new JSeparator(), scrollPane};
+
+            JOptionPane optionPane = new JOptionPane();
+            optionPane.setMessage(objects);
+            optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+            optionPane.setOptions(new String[]{"Quit JHelioviewer", "Continue"});
+            optionPane.createDialog("JHelioviewer: Fatal Error").setVisible(true);
+
+            if ("Quit JHelioviewer".equals(optionPane.getValue()))
+                System.exit(1);
+        }
+    }
+
+    private static final class Headless extends Base {
+        @Override
+        protected void handle(String msg) {
+            System.err.println(msg);
+            System.exit(1);
         }
     }
 

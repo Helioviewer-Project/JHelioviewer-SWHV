@@ -38,7 +38,10 @@ public class JHelioviewer {
         // Per default, the US locale should be used
         Locale.setDefault(Locale.US);
 
-        if (isHeadless())
+        boolean headless = isHeadless();
+        if (headless)
+            JHVUncaughtExceptionHandler.setupHandlerForThread(true);
+        if (headless)
             throw new Exception("This application cannot run in a headless configuration.");
 
         // Set the platform
@@ -46,7 +49,7 @@ public class JHelioviewer {
         // Create persistent directories, including Logs, before installing the uncaught exception handler.
         JHVGlobals.createPersistentDirs();
         // Uncaught runtime errors are displayed in a dialog box in addition
-        JHVUncaughtExceptionHandler.setupHandlerForThread();
+        JHVUncaughtExceptionHandler.setupHandlerForThread(false);
         // Init log
         Log.init();
         // Create transient cache directories after logging is available. On Windows this may need an ASCII-safe path.
