@@ -2,17 +2,11 @@ package org.helioviewer.jhv.layers;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayLayout;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -21,8 +15,8 @@ import org.json.JSONObject;
 
 public final class MiniviewLayer extends AbstractLayer {
 
-    private static final int MIN_SCALE = 5;
-    private static final int MAX_SCALE = 15;
+    public static final int MIN_SCALE = 5;
+    public static final int MAX_SCALE = 15;
     private int scale = 10;
 
     private static final byte[] colorCircle = Colors.bytes(Color.RED, 0.2);
@@ -30,7 +24,6 @@ public final class MiniviewLayer extends AbstractLayer {
     private final GLSLShape circle = new GLSLShape(false);
     private final GLSLShape rectangle = new GLSLShape(false);
 
-    private final JPanel optionsPanel;
     private Viewport miniViewport = DisplayLayout.viewport(0, 0, 0, 100, 100, 100);
 
     @Override
@@ -43,7 +36,6 @@ public final class MiniviewLayer extends AbstractLayer {
             scale = Math.clamp(jo.optInt("scale", scale), MIN_SCALE, MAX_SCALE);
         else
             setEnabled(true);
-        optionsPanel = optionsPanel();
         reshapeViewport();
     }
 
@@ -66,7 +58,7 @@ public final class MiniviewLayer extends AbstractLayer {
 
     @Override
     public Component getOptionsPanel() {
-        return optionsPanel;
+        return null;
     }
 
     @Override
@@ -92,27 +84,14 @@ public final class MiniviewLayer extends AbstractLayer {
         return miniViewport;
     }
 
-    private JPanel optionsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        JHVSlider slider = new JHVSlider(MIN_SCALE, MAX_SCALE, scale);
-        slider.addChangeListener(e -> {
-            scale = slider.getValue();
-            reshapeViewport();
-            MovieDisplay.display();
-        });
+    public int getScale() {
+        return scale;
+    }
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridy = 0;
-        c.anchor = GridBagConstraints.LINE_END;
-        c.gridx = 0;
-        panel.add(new JLabel("Size", JLabel.RIGHT), c);
-        c.anchor = GridBagConstraints.LINE_START;
-        c.gridx = 1;
-        panel.add(slider, c);
-
-        return panel;
+    public void setScale(int _scale) {
+        scale = _scale;
+        reshapeViewport();
+        MovieDisplay.display();
     }
 
 }
