@@ -29,10 +29,14 @@ final class ViewpointLayerOptionsPanel extends JPanel {
             If "Use movie time interval" is unselected, the viewpoint time is interpolated in the configured time interval.""";
 
     private final ViewpointLayerOptions options;
+    private final ViewpointLayerOptionsExpertPanel locationPanel;
+    private final ViewpointLayerOptionsExpertPanel equatorialPanel;
     private Component currentOptionPanel;
 
     ViewpointLayerOptionsPanel(ViewpointLayerOptions _options) {
         options = _options;
+        locationPanel = new ViewpointLayerOptionsExpertPanel(options.getLocationOptions());
+        equatorialPanel = new ViewpointLayerOptionsExpertPanel(options.getEquatorialOptions());
         setLayout(new GridBagLayout());
 
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 8, 0));
@@ -43,7 +47,7 @@ final class ViewpointLayerOptionsPanel extends JPanel {
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
                     options.setCameraMode(mode, Camera.ViewpointApplyMode.RESET);
-                    switchOptionsPanel(options.getCurrentOptionPanel());
+                    switchOptionsPanel(getCurrentOptionPanel());
                 }
             });
             radioPanel.add(radio);
@@ -65,7 +69,15 @@ final class ViewpointLayerOptionsPanel extends JPanel {
         c.gridy = 0;
         add(radioPanel, c);
 
-        switchOptionsPanel(options.getCurrentOptionPanel());
+        switchOptionsPanel(getCurrentOptionPanel());
+    }
+
+    private Component getCurrentOptionPanel() {
+        return switch (options.getCameraMode()) {
+            case ObserverAt1au -> null;
+            case Location -> locationPanel;
+            case Heliosphere -> equatorialPanel;
+        };
     }
 
     private void switchOptionsPanel(Component newOptionPanel) {
