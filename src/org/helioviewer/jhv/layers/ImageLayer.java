@@ -417,6 +417,11 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         return worker == null && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
     }
 
+    private void cancelAsyncTasks() {
+        cancelLoadTask();
+        cancelDownloadTask();
+    }
+
     private void cancelLoadTask() {
         if (worker != null) {
             worker.cancel(true);
@@ -433,24 +438,11 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
     }
 
-    private void cancelAsyncTasks() {
-        cancelLoadTask();
-        cancelDownloadTask();
-    }
-
-    public void startDownload() {
+    public void startDownload(DownloadLayer.Progress progress) {
         cancelDownloadTask();
         APIRequest req = view.getAPIRequest();
         if (req != null && view.getBaseName() != null) // should not happen
-            downloadTask = DownloadLayer.submit(req, this, view.getBaseName());
-    }
-
-    public void doneDownload() {
-        optionsPanel.downloadDone();
-    }
-
-    public void progressDownload(int percent) {
-        optionsPanel.downloadProgress(percent);
+            downloadTask = DownloadLayer.submit(req, this, view.getBaseName(), progress);
     }
 
 }

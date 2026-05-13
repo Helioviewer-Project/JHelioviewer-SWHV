@@ -14,6 +14,7 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
+import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.layers.filters.*;
 
 import com.jidesoft.swing.JideButton;
@@ -32,6 +33,7 @@ class ImageLayerOptions extends JPanel {
 
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
+    private DownloadProgress downloadProgress;
 
     ImageLayerOptions(ImageLayer layer) {
         DifferencePanel differencePanel = new DifferencePanel(layer);
@@ -104,9 +106,13 @@ class ImageLayerOptions extends JPanel {
                 downloadButton.add(progressBar);
                 downloadButton.setToolTipText("Stop download");
 
-                layer.startDownload();
-            } else
+                downloadProgress = new DownloadProgress();
+                layer.startDownload(downloadProgress);
+            } else {
                 layer.cancelDownloadTask();
+                if (downloadProgress != null)
+                    downloadProgress.done();
+            }
         });
 
         progressBar.setUI(new CircularProgressUI());
@@ -179,7 +185,7 @@ class ImageLayerOptions extends JPanel {
         lutPanel.setLUT(lut);
     }
 
-    void downloadProgress(int value) {
+    private void downloadProgress(int value) {
         if (value < 0)
             progressBar.setIndeterminate(true);
         else {
@@ -188,13 +194,29 @@ class ImageLayerOptions extends JPanel {
         }
     }
 
-    void downloadDone() {
+    private void downloadDone() {
         downloadButton.remove(progressBar);
         progressBar.setIndeterminate(false);
         progressBar.setValue(0);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.setText(Buttons.download);
         downloadButton.setSelected(false);
+    }
+
+    private final class DownloadProgress implements DownloadLayer.Progress {
+        @Override
+        public void progress(int percent) {
+            if (downloadProgress == this)
+                downloadProgress(percent);
+        }
+
+        @Override
+        public void done() {
+            if (downloadProgress != this)
+                return;
+            downloadProgress = null;
+            downloadDone();
+        }
     }
 
     void downloadVisible(boolean visible) {

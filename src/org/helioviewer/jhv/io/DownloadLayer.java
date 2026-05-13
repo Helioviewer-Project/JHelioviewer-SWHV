@@ -15,6 +15,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.Tasks;
 
 import okio.Buffer;
@@ -24,15 +25,24 @@ import okio.Okio;
 
 public class DownloadLayer {
 
+    public interface Progress {
+        void progress(int percent);
+
+        void done();
+    }
+
     @Nullable
-    public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName) {
+    public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName, @Nonnull Progress progress) {
         Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), baseName);
-        return Tasks.submit(baseName, new LayerDownload(req, layer, dstPath), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
+        return Tasks.submit(baseName,
+                new LayerDownload(req, progress, dstPath),
+                result -> onSuccess(layer, progress, result),
+                (logContext, t) -> onFailure(progress, t));
     }
 
     private static final int BUFSIZ = 1024 * 1024;
 
-    private record LayerDownload(APIRequest req, ImageLayer layer, Path dstPath) implements Callable<Path> {
+    private record LayerDownload(APIRequest req, Progress progress, Path dstPath) implements Callable<Path> {
         @Override
         public Path call() throws Exception {
             URI uri = new URI(req.toFileRequest());
@@ -49,7 +59,7 @@ public class DownloadLayer {
                         count++;
                         if (count % 8 == 0) { // approx 8MB with BUFSIZ=1MB
                             int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
-                            EventQueue.invokeLater(() -> layer.progressDownload(percent));
+                            EventQueue.invokeLater(() -> progress.progress(percent));
                         }
                     }
                     sink.flush();
@@ -66,14 +76,18 @@ public class DownloadLayer {
         }
     }
 
-    private static void onSuccess(ImageLayer layer, Path result) {
-        layer.doneDownload();
+    private static void onSuccess(ImageLayer layer, Progress progress, Path result) {
+        progress.done();
         LoadLayer.submit(layer, List.of(result.toUri()));
         CompletionNotifications.fileReady(result.toString());
     }
 
-    private static void onFailure(ImageLayer layer, Throwable t) {
-        layer.doneDownload();
+    private static void onFailure(Progress progress, Throwable t) {
+        progress.done();
+        if (JHVThread.isInterrupted(t)) {
+            Log.warn(t);
+            return;
+        }
         Log.error(t);
     }
 
