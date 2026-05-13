@@ -56,7 +56,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
     private final double[] hoverPoint = new double[3];
     private final double[] rotatedHoverPoint = new double[3];
 
-    private final ViewpointLayerOptions optionsPanel;
+    private final ViewpointLayerOptions options;
     private final HoverListener hoverListener = new HoverListener();
 
     private final class HoverListener implements InputPointerListener, InputPointerMotionListener {
@@ -74,14 +74,14 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
     private JHVTime viewpointTime = Sun.StartEarth.time;
 
     public ViewpointLayer(JSONObject jo) {
-        optionsPanel = new ViewpointLayerOptions(jo);
+        options = new ViewpointLayerOptions(jo);
     }
 
     public double getRelativeLongitude(long time, long start, long end) {
         double relativeLon = 0;
 
-        PositionLoad control = optionsPanel.getHighlightedLoad();
-        if (control != null && optionsPanel.isRelative()) {
+        PositionLoad control = options.getHighlightedLoad();
+        if (control != null && options.isRelative()) {
             PositionResponse response = control.getResponse();
             if (response != null) {
                 response.interpolateLatitudinal(time, start, end, lati);
@@ -95,10 +95,10 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
     public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        if (!optionsPanel.isHeliospheric())
+        if (!options.isHeliospheric())
             return;
 
-        PositionLoad control = optionsPanel.getHighlightedLoad();
+        PositionLoad control = options.getHighlightedLoad();
         double relativeLon = 0;
         int spiralSpeed = 0;
 
@@ -108,8 +108,8 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
             if (response != null) {
                 long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
                 response.interpolateLatitudinal(time, start, end, lati);
-                spiralSpeed = optionsPanel.getSpiralSpeed(); // only if we have control point
-                relativeLon = optionsPanel.isRelative() ? lati[1] : 0;
+                spiralSpeed = options.getSpiralSpeed(); // only if we have control point
+                relativeLon = options.isRelative() ? lati[1] : 0;
             }
         }
 
@@ -152,7 +152,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
     }
 
     private void handleMouseMoved(PointerEvent e) {
-        if (!optionsPanel.isHeliospheric()) {
+        if (!options.isHeliospheric()) {
             clearHoverTextIfNeeded();
             return;
         }
@@ -222,12 +222,12 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
         if (enabled) {
             JHVFrame.getInputController().addListener(hoverListener);
-            optionsPanel.activate();
-            optionsPanel.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
+            options.activate();
+            options.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
             JHVFrame.getInputController().removeListener(hoverListener);
-            optionsPanel.deactivate();
+            options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
                 Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer, Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         }
@@ -241,7 +241,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public Component getOptionsPanel() {
-        return optionsPanel;
+        return null;
     }
 
     @Override
@@ -266,7 +266,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public boolean isDownloading() {
-        return optionsPanel.isDownloading();
+        return options.isDownloading();
     }
 
     @Override
@@ -287,7 +287,11 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public void serialize(JSONObject jo) {
-        optionsPanel.serialize(jo);
+        options.serialize(jo);
+    }
+
+    public ViewpointLayerOptions getOptions() {
+        return options;
     }
 
     private static long getStep(double dist) { // decrease interpolation step proportionally with distance, stop at 3au
