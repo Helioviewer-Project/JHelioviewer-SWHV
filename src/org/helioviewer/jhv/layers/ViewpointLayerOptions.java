@@ -1,14 +1,8 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Component;
 
 import javax.annotation.Nullable;
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
@@ -16,18 +10,13 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
 
-import com.jidesoft.swing.JideButton;
+public final class ViewpointLayerOptions implements TimeListener.Range {
 
-@SuppressWarnings("serial")
-class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
-
-    private enum CameraMode {
+    public enum CameraMode {
         ObserverAt1au("Observer at 1au", UpdateViewpoint.observerAt1au),
         Location("Location", UpdateViewpoint.location),
         Heliosphere("Heliosphere", UpdateViewpoint.equatorial);
@@ -50,19 +39,8 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     private final ViewpointLayerOptionsExpert equatorialOptionPanel;
 
     private CameraMode cameraMode;
-    private ViewpointLayerOptionsExpert currentOptionPanel;
 
-    private static final String explanation = """
-            <b>Observer at 1au</b>: view from the active observer, but at 1au fixed distance.
-            <b>Location</b>: view from selected object.
-            <b>Heliosphere</b>: view onto the solar equatorial plane.
-            
-            If "Use movie time interval" is unselected, the viewpoint time is interpolated in the configured time interval.""";
-
-    ViewpointLayerOptions(JSONObject jo) {
-        setLayout(new GridBagLayout());
-
-        // create panels before potential camera change
+    public ViewpointLayerOptions(JSONObject jo) {
         JSONObject joLocation = null;
         JSONObject joEquatorial = null;
         if (jo != null) {
@@ -81,37 +59,6 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
             if (jc != null)
                 Display.getCamera().fromJson(jc);
         }
-        switchOptionsPanel(optionPanelForCurrentMode());
-
-        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 8, 0));
-        ButtonGroup modeGroup = new ButtonGroup();
-        for (CameraMode mode : CameraMode.values()) {
-            JRadioButton radio = new JRadioButton(mode.toString(), mode == cameraMode);
-            radio.setHorizontalTextPosition(SwingConstants.LEFT);
-            radio.addItemListener(e -> {
-                if (radio.isSelected()) {
-                    cameraMode = mode;
-                    applyCurrentViewpoint(Camera.ViewpointApplyMode.RESET);
-                }
-            });
-            radioPanel.add(radio);
-            modeGroup.add(radio);
-        }
-
-        JideButton info = new JideButton(Buttons.info);
-        info.setToolTipText("Show viewpoint info");
-        info.addActionListener(e -> new TextDialog("Viewpoint Options Information", explanation, false).showDialog());
-        radioPanel.add(info);
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.CENTER;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.weightx = 1;
-        c.weighty = 1;
-
-        c.gridy = 0;
-        add(radioPanel, c);
     }
 
     void serialize(JSONObject jo) {
@@ -121,33 +68,20 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
         jo.put("equatorial", equatorialOptionPanel.toJson());
     }
 
-    private void switchOptionsPanel(ViewpointLayerOptionsExpert newOptionPanel) {
-        if (currentOptionPanel == newOptionPanel)
-            return;
-
-        if (currentOptionPanel != null) {
-            remove(currentOptionPanel);
-        }
-
-        if (newOptionPanel != null) {
-            GridBagConstraints c = new GridBagConstraints();
-            c.weightx = 1;
-            c.weighty = 1;
-            c.fill = GridBagConstraints.BOTH;
-            c.gridx = 0;
-            c.gridy = 2;
-            add(newOptionPanel, c);
-        }
-        currentOptionPanel = newOptionPanel;
-        revalidate();
-        repaint();
-    }
-
     boolean isDownloading() {
         return locationOptionPanel.isDownloading() || equatorialOptionPanel.isDownloading();
     }
 
-    private ViewpointLayerOptionsExpert optionPanelForCurrentMode() {
+    public CameraMode getCameraMode() {
+        return cameraMode;
+    }
+
+    public void setCameraMode(CameraMode _cameraMode, Camera.ViewpointApplyMode mode) {
+        cameraMode = _cameraMode;
+        applyCurrentViewpoint(mode);
+    }
+
+    public Component getCurrentOptionPanel() {
         return switch (cameraMode) {
             case ObserverAt1au -> null;
             case Location -> locationOptionPanel;
@@ -156,7 +90,6 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     }
 
     void applyCurrentViewpoint(Camera.ViewpointApplyMode mode) {
-        switchOptionsPanel(optionPanelForCurrentMode());
         Display.getCamera().setViewpointUpdate(cameraMode.update, mode);
     }
 
@@ -175,7 +108,7 @@ class ViewpointLayerOptions extends JPanel implements TimeListener.Range {
     }
 
     boolean isHeliospheric() {
-        return currentOptionPanel == equatorialOptionPanel;
+        return cameraMode == CameraMode.Heliosphere;
     }
 
     @Nullable
