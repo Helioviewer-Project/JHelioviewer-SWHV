@@ -24,6 +24,7 @@ import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.plugins.PluginManager;
+import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
 import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.time.JHVTime;
@@ -248,7 +249,12 @@ public final class State {
         try {
             ViewState.ModeData modeData = ViewState.readModeJson(jo);
             ViewState.setProjection(modeData.projection()); // to be set before viewpoint
-            loadTimelines(jo);
+
+            if (PluginManager.isActive(EVEPlugin.class))
+                loadTimelines(jo);
+            else
+                Log.info("Skipping timeline state because EVEPlugin is inactive");
+
             loadLayers(jo, context, modeData);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)

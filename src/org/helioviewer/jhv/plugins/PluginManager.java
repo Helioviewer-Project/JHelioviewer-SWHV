@@ -14,6 +14,14 @@ public class PluginManager {
         return Collections.unmodifiableList(plugins);
     }
 
+    public static boolean isActive(Class<? extends Plugin> type) {
+        for (Plugin plugin : plugins) {
+            if (plugin.getClass() == type)
+                return plugin.isActive();
+        }
+        return false;
+    }
+
     public static void addPlugin(Plugin plugin) {
         for (Plugin existing : plugins) {
             if (existing.getClass() == plugin.getClass())
