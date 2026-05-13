@@ -8,15 +8,36 @@ import java.awt.desktop.QuitHandler;
 import java.io.File;
 import java.net.URI;
 
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+import org.helioviewer.jhv.Log;
+
 public final class DesktopIntegration {
 
     public static final boolean canBrowse = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     public static final boolean canOpen = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN);
     public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
+    public static final HyperlinkListener hyperOpenURL = e -> {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED && e.getURL() != null)
+            openURL(e.getURL().toString());
+    };
+
     private DesktopIntegration() {}
 
-    public static void openURI(URI uri) throws Exception {
+    public static void openURL(String url) {
+        try {
+            if (url == null)
+                return;
+
+            openURI(new URI(url));
+        } catch (Exception e) {
+            Log.warn(e);
+        }
+    }
+
+    private static void openURI(URI uri) throws Exception {
         if ("file".equalsIgnoreCase(uri.getScheme()) && canOpen)
             Desktop.getDesktop().open(new File(uri));
         else if (canBrowse)

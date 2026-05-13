@@ -2,14 +2,9 @@ package org.helioviewer.jhv;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Properties;
 
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.swing.DesktopIntegration;
 
 import org.apache.tika.Tika;
 
@@ -87,27 +82,5 @@ public class JHVGlobals {
     public static File fileCacheDir;
     public static File clientCacheDir;
     public static File exportCacheDir;
-
-    public static final HyperOpenURL hyperOpenURL = new HyperOpenURL();
-
-    private static class HyperOpenURL implements HyperlinkListener {
-        @Override
-        public void hyperlinkUpdate(HyperlinkEvent e) {
-            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED && e.getURL() != null) {
-                openURL(e.getURL().toString());
-            }
-        }
-    }
-
-    public static void openURL(String url) {
-        try {
-            if (url == null)
-                return;
-
-            DesktopIntegration.openURI(new URI(url));
-        } catch (Exception e) {
-            Log.warn(e);
-        }
-    }
 
 }

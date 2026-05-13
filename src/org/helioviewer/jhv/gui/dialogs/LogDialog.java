@@ -16,6 +16,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
 
 public class LogDialog implements Interfaces.ShowableDialog {
@@ -26,7 +27,7 @@ public class LogDialog implements Interfaces.ShowableDialog {
 
         HTMLPane report = new HTMLPane();
         report.setOpaque(false);
-        report.addHyperlinkListener(JHVGlobals.hyperOpenURL);
+        report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setText("If you encounter a problem, please attach this log to the problem description and open an issue at <a href='" + JHVGlobals.bugURL + "'>" + JHVGlobals.bugURL + "</a>.<br/>");
 

@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.ExitHooks;
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
@@ -157,7 +156,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JHVGlobals.openURL(urlToOpen);
+            DesktopIntegration.openURL(urlToOpen);
         }
     }
 
@@ -313,7 +312,7 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             String baseURL = "https://www.lmsal.com/get_aia_data/?";
-            JHVGlobals.openURL(baseURL + ImageLayers.getSDOCutoutString());
+            DesktopIntegration.openURL(baseURL + ImageLayers.getSDOCutoutString());
         }
     }
 

@@ -9,8 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 
 @SuppressWarnings("serial")
 class PfssLayerOptions extends JPanel {
@@ -47,7 +47,7 @@ class PfssLayerOptions extends JPanel {
 
         JButton availabilityButton = new JButton("Available data");
         availabilityButton.setToolTipText("Click here to check the PFSS data availability");
-        availabilityButton.addActionListener(e -> JHVGlobals.openURL(PfssSettings.AVAILABILITY_URL));
+        availabilityButton.addActionListener(e -> DesktopIntegration.openURL(PfssSettings.AVAILABILITY_URL));
 
         c0.gridy = 1;
         c0.anchor = GridBagConstraints.LINE_START;

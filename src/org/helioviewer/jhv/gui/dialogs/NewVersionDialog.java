@@ -40,7 +40,7 @@ public class NewVersionDialog extends TextDialog {
         AbstractAction download = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JHVGlobals.openURL(JHVGlobals.downloadURL);
+                DesktopIntegration.openURL(JHVGlobals.downloadURL);
                 setVisible(false);
             }
         };

@@ -14,10 +14,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableRowSorter;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 
 @SuppressWarnings("serial")
 class ParameterTablePanel extends JPanel {
@@ -78,7 +78,7 @@ class ParameterTablePanel extends JPanel {
 
                 String url = extractURL(t, col, row);
                 if (url != null) {
-                    JHVGlobals.openURL(url);
+                    DesktopIntegration.openURL(url);
                 }
             }
         };

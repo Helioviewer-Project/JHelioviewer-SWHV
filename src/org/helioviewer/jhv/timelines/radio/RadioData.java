@@ -17,7 +17,6 @@ import javax.annotation.Nonnull;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
@@ -26,6 +25,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -282,7 +282,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
     private static JPanel optionsPanel(LUTComboBox combo) {
         JButton availabilityBtn = new JButton("Available data");
-        availabilityBtn.addActionListener(e -> JHVGlobals.openURL(DataSources.getServerSetting("ROB", "availability.images") +
+        availabilityBtn.addActionListener(e -> DesktopIntegration.openURL(DataSources.getServerSetting("ROB", "availability.images") +
                 "ID=" + APIRequest.CallistoID));
 
         JPanel panel = new JPanel(new GridBagLayout());

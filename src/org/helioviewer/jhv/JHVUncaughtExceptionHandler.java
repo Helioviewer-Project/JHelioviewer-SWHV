@@ -14,6 +14,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
 
 class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
@@ -30,7 +31,7 @@ class JHVUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static void showErrorDialog(String msg) {
         HTMLPane report = new HTMLPane();
         report.setOpaque(false);
-        report.addHyperlinkListener(JHVGlobals.hyperOpenURL);
+        report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
         report.setText("Fatal error detected." +
                 "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
