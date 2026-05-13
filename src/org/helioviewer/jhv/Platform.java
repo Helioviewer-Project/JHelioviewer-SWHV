@@ -1,26 +1,13 @@
 package org.helioviewer.jhv;
 
-import javax.swing.JOptionPane;
-
 public class Platform {
-
-    private static void die(String msg) {
-        JOptionPane optionPane = new JOptionPane();
-        optionPane.setMessage(msg);
-        optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
-        optionPane.setOptions(new String[]{"Quit JHelioviewer"});
-        optionPane.createDialog(null, "JHelioviewer").setVisible(true);
-        System.exit(1);
-    }
 
     // Reads the builtin Java properties to determine the platform and set simplified properties used by JHV
     static void init() {
         String os = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
-        if (os == null || arch == null) {
-            die("Could not determine platform. OS: " + os + " - arch: " + arch);
-            return; // avoid warnings from static analysis
-        }
+        if (os == null || arch == null)
+            throw new IllegalStateException("Could not determine platform. OS: " + os + " - arch: " + arch);
 
         os = os.toLowerCase();
         arch = arch.toLowerCase();
@@ -30,7 +17,7 @@ public class Platform {
         else if (arch.contains("aarch64"))
             jhvArch = "aarch64";
         else
-            die("Please install Java 64-bit to run JHelioviewer.");
+            throw new IllegalStateException("Please install Java 64-bit to run JHelioviewer.");
 
         if (os.contains("windows"))
             isWindows = true;
@@ -39,7 +26,7 @@ public class Platform {
         else if (os.contains("linux"))
             isLinux = true;
         else
-            die("Could not determine platform. OS: " + os + " - arch: " + arch);
+            throw new IllegalStateException("Could not determine platform. OS: " + os + " - arch: " + arch);
 
         resourceDir = buildResourceDir();
     }

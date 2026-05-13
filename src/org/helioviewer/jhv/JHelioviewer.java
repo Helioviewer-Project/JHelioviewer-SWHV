@@ -25,7 +25,7 @@ import org.helioviewer.jhv.threads.Tasks;
 
 public class JHelioviewer {
 
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
         System.setProperty("apple.awt.application.appearance", "NSAppearanceNameDarkAqua");
         System.setProperty("apple.awt.application.name", "JHelioviewer");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -38,18 +38,16 @@ public class JHelioviewer {
         // Per default, the US locale should be used
         Locale.setDefault(Locale.US);
 
-        boolean headless = isHeadless();
-        if (headless)
-            JHVUncaughtExceptionHandler.setupHandlerForThread(true);
-        if (headless)
+        JHVGlobals.headless = isHeadless();
+        // Uncaught runtime errors are reported to the GUI or stderr, depending on startup mode.
+        JHVUncaughtExceptionHandler.setupHandlerForThread(JHVGlobals.headless);
+        if (JHVGlobals.headless)
             throw new Exception("This application cannot run in a headless configuration.");
 
         // Set the platform
         Platform.init();
-        // Create persistent directories, including Logs, before installing the uncaught exception handler.
+        // Create persistent directories, including Logs.
         JHVGlobals.createPersistentDirs();
-        // Uncaught runtime errors are displayed in a dialog box in addition
-        JHVUncaughtExceptionHandler.setupHandlerForThread(false);
         // Init log
         Log.init();
         // Create transient cache directories after logging is available. On Windows this may need an ASCII-safe path.
