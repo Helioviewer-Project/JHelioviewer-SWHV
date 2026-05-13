@@ -36,7 +36,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final GLImage glImage;
     private final DecodeExecutor executor;
-    private final ImageLayerOptions optionsPanel;
 
     private boolean removed;
     private Future<?> worker;
@@ -67,7 +66,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         view = _view;
         glImage = null;
         executor = null;
-        optionsPanel = null;
     }
 
     private ImageLayer(JSONObject jo) {
@@ -90,7 +88,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
                     glImage.fromJson(imageParams);
             }
         }
-        optionsPanel = new ImageLayerOptions(this);
     }
 
     public void load(APIRequest req) {
@@ -294,8 +291,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public Component getOptionsPanel() {
-        optionsPanel.refresh(this);
-        return optionsPanel;
+        return null;
     }
 
     @Override
@@ -431,7 +427,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private Future<?> downloadTask;
 
-    void cancelDownloadTask() {
+    public void cancelDownloadTask() {
         if (downloadTask != null) {
             downloadTask.cancel(true);
             downloadTask = null;

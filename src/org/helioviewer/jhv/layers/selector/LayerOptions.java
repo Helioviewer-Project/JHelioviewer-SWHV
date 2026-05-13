@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.layers.ConnectionLayer;
 import org.helioviewer.jhv.layers.FOVLayer;
 import org.helioviewer.jhv.layers.GridLayer;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
@@ -30,6 +31,7 @@ final class LayerOptions implements Layers.Listener {
         register(ConnectionLayer.class, layer -> new ConnectionLayerOptions((ConnectionLayer) layer));
         register(FOVLayer.class, layer -> new FOVLayerOptions((FOVLayer) layer));
         register(GridLayer.class, layer -> new GridLayerOptions((GridLayer) layer));
+        register(ImageLayer.class, layer -> new ImageLayerOptions((ImageLayer) layer));
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
         Layers.addListener(listener);
@@ -51,8 +53,6 @@ final class LayerOptions implements Layers.Listener {
             if (panel != null)
                 panels.put(layer, panel);
         }
-        if (panel instanceof OptionsPanel optionsPanel)
-            optionsPanel.refresh(layer);
         return panel;
     }
 
@@ -76,7 +76,10 @@ final class LayerOptions implements Layers.Listener {
     }
 
     @Override
-    public void layerUpdated(Layer layer) {}
+    public void layerUpdated(Layer layer) {
+        if (layer instanceof ImageLayer && panels.get(layer) instanceof OptionsPanel optionsPanel)
+            optionsPanel.refresh(layer);
+    }
 
     @Override
     public void timeUpdated(Layer layer) {}
