@@ -175,8 +175,6 @@ public class UIGlobals {
     public static Color backColor;
     public static Color midColor;
 
-    public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
-
     // Timelines panel colors
     public static Color TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR;
     public static Color TL_SELECTED_INTERVAL_BACKGROUND_COLOR;

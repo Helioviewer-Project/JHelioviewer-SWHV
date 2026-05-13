@@ -12,8 +12,8 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.timelines.Timelines;
 
 @SuppressWarnings("serial")
@@ -22,7 +22,7 @@ public class TimelineActions {
     public static class NewLayer extends Actions.AbstractKeyAction {
 
         public NewLayer() {
-            super("New Timeline...", KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
+            super("New Timeline...", KeyStroke.getKeyStroke(KeyEvent.VK_N, DesktopIntegration.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
@@ -35,7 +35,7 @@ public class TimelineActions {
     public static class OpenLocalFile extends Actions.AbstractKeyAction {
 
         public OpenLocalFile() {
-            super("Open Timeline...", KeyStroke.getKeyStroke(KeyEvent.VK_O, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
+            super("Open Timeline...", KeyStroke.getKeyStroke(KeyEvent.VK_O, DesktopIntegration.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override

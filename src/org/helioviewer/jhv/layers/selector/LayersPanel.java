@@ -35,6 +35,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
 
 @SuppressWarnings("serial")
@@ -209,7 +210,7 @@ public final class LayersPanel extends JPanel {
             }
         });
 
-        grid.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, UIGlobals.menuShortcutMask, false), "copy_time");
+        grid.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, DesktopIntegration.menuShortcutMask, false), "copy_time");
         grid.getActionMap().put("copy_time", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
