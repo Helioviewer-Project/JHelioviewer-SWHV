@@ -30,6 +30,7 @@ import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
@@ -62,7 +63,7 @@ public class Actions {
 
     public static class ExitProgram extends AbstractKeyAction {
         public ExitProgram() {
-            super("Quit", KeyStroke.getKeyStroke(KeyEvent.VK_Q, UIGlobals.menuShortcutMask));
+            super("Quit", KeyStroke.getKeyStroke(KeyEvent.VK_Q, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -87,7 +88,7 @@ public class Actions {
 
     public static class NewLayer extends AbstractKeyAction {
         public NewLayer() {
-            super("New Image Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask));
+            super("New Image Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_N, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -98,7 +99,7 @@ public class Actions {
 
     public static class NewSoarLayer extends AbstractKeyAction {
         public NewSoarLayer() {
-            super("New SOAR Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_N, UIGlobals.menuShortcutMask | InputEvent.SHIFT_DOWN_MASK));
+            super("New SOAR Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_N, DesktopIntegration.menuShortcutMask | InputEvent.SHIFT_DOWN_MASK));
         }
 
         @Override
@@ -120,7 +121,7 @@ public class Actions {
 
     public static class OpenLocalFile extends AbstractKeyAction {
         public OpenLocalFile() {
-            super("Open Image Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_O, UIGlobals.menuShortcutMask));
+            super("Open Image Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_O, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -162,7 +163,7 @@ public class Actions {
 
     public static class Paste extends AbstractKeyAction {
         public Paste() {
-            super("Paste", KeyStroke.getKeyStroke(KeyEvent.VK_V, UIGlobals.menuShortcutMask));
+            super("Paste", KeyStroke.getKeyStroke(KeyEvent.VK_V, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -184,7 +185,7 @@ public class Actions {
 
     public static class ReloadSources extends AbstractKeyAction {
         public ReloadSources() {
-            super("Reload Datasets Listings", KeyStroke.getKeyStroke(KeyEvent.VK_R, UIGlobals.menuShortcutMask));
+            super("Reload Datasets Listings", KeyStroke.getKeyStroke(KeyEvent.VK_R, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -232,7 +233,7 @@ public class Actions {
 
     private static class PlayPauseAction extends AbstractKeyAction {
         PlayPauseAction() {
-            super("Play/Pause Movie", KeyStroke.getKeyStroke(KeyEvent.VK_P, UIGlobals.menuShortcutMask));
+            super("Play/Pause Movie", KeyStroke.getKeyStroke(KeyEvent.VK_P, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -243,7 +244,7 @@ public class Actions {
 
     private static class PreviousFrameAction extends AbstractKeyAction {
         PreviousFrameAction() {
-            super("Step to Previous Frame", KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
+            super("Step to Previous Frame", KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, DesktopIntegration.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
@@ -256,7 +257,7 @@ public class Actions {
 
     private static class NextFrameAction extends AbstractKeyAction {
         NextFrameAction() {
-            super("Step to Next Frame", KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
+            super("Step to Next Frame", KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, DesktopIntegration.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
@@ -269,7 +270,7 @@ public class Actions {
 
     public static class SaveState extends AbstractKeyAction {
         public SaveState() {
-            super("Save State", KeyStroke.getKeyStroke(KeyEvent.VK_S, UIGlobals.menuShortcutMask));
+            super("Save State", KeyStroke.getKeyStroke(KeyEvent.VK_S, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -280,7 +281,7 @@ public class Actions {
 
     public static class SaveStateAs extends AbstractKeyAction {
         public SaveStateAs() {
-            super("Save State As...", KeyStroke.getKeyStroke(KeyEvent.VK_S, UIGlobals.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
+            super("Save State As...", KeyStroke.getKeyStroke(KeyEvent.VK_S, DesktopIntegration.menuShortcutMask | InputEvent.ALT_DOWN_MASK));
         }
 
         @Override
@@ -343,7 +344,7 @@ public class Actions {
 
     public static class WindowMinimize extends AbstractKeyAction {
         public WindowMinimize() {
-            super("Minimize", KeyStroke.getKeyStroke(KeyEvent.VK_M, UIGlobals.menuShortcutMask));
+            super("Minimize", KeyStroke.getKeyStroke(KeyEvent.VK_M, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -369,7 +370,7 @@ public class Actions {
 
     public static class ZoomFit extends AbstractKeyAction {
         public ZoomFit() {
-            super("Zoom to Fit", KeyStroke.getKeyStroke(KeyEvent.VK_9, UIGlobals.menuShortcutMask));
+            super("Zoom to Fit", KeyStroke.getKeyStroke(KeyEvent.VK_9, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -392,7 +393,7 @@ public class Actions {
 
     public static class ZoomIn extends AbstractKeyAction {
         public ZoomIn() {
-            super("Zoom In", KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, UIGlobals.menuShortcutMask));
+            super("Zoom In", KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -403,7 +404,7 @@ public class Actions {
 
     public static class ZoomOneToOne extends AbstractKeyAction {
         public ZoomOneToOne() {
-            super("Actual Size", KeyStroke.getKeyStroke(KeyEvent.VK_0, UIGlobals.menuShortcutMask));
+            super("Actual Size", KeyStroke.getKeyStroke(KeyEvent.VK_0, DesktopIntegration.menuShortcutMask));
         }
 
         @Override
@@ -414,7 +415,7 @@ public class Actions {
 
     public static class ZoomOut extends AbstractKeyAction {
         public ZoomOut() {
-            super("Zoom Out", KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, UIGlobals.menuShortcutMask));
+            super("Zoom Out", KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, DesktopIntegration.menuShortcutMask));
         }
 
         @Override

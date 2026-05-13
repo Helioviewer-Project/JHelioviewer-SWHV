@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.swing;
 
 import java.awt.Desktop;
+import java.awt.Toolkit;
 import java.awt.desktop.AboutHandler;
 import java.awt.desktop.PreferencesHandler;
 import java.awt.desktop.QuitHandler;
@@ -11,6 +12,7 @@ public final class DesktopIntegration {
 
     public static final boolean canBrowse = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     public static final boolean canOpen = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN);
+    public static final int menuShortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
     private DesktopIntegration() {}
 
