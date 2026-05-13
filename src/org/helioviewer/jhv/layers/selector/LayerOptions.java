@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
+import org.helioviewer.jhv.layers.TimestampLayer;
 
 final class LayerOptions implements Layers.Listener {
 
@@ -24,6 +25,7 @@ final class LayerOptions implements Layers.Listener {
 
     static {
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
+        register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
         Layers.addListener(listener);
     }
 
