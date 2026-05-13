@@ -13,7 +13,7 @@ import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.layers.TimestampLayer;
 
 @SuppressWarnings("serial")
-final class TimestampLayerOptions extends JPanel {
+final class TimestampLayerOptions extends JPanel implements LayerOptions.OptionsPanel {
 
     TimestampLayerOptions(TimestampLayer layer) {
         JHVSlider slider = new JHVSlider(TimestampLayer.MIN_SCALE, TimestampLayer.MAX_SCALE, layer.getScale());

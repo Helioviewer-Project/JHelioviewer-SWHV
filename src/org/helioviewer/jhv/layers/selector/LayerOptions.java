@@ -9,6 +9,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.layers.ConnectionLayer;
+import org.helioviewer.jhv.layers.FOVLayer;
 import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -27,6 +28,7 @@ final class LayerOptions implements Layers.Listener {
 
     static {
         register(ConnectionLayer.class, layer -> new ConnectionLayerOptions((ConnectionLayer) layer));
+        register(FOVLayer.class, layer -> new FOVLayerOptions((FOVLayer) layer));
         register(GridLayer.class, layer -> new GridLayerOptions((GridLayer) layer));
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
