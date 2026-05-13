@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
@@ -24,8 +22,6 @@ public interface Layer {
     default void prerender() {}
 
     void remove();
-
-    Component getOptionsPanel();
 
     String getName();
 

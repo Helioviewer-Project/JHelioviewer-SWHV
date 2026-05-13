@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -248,11 +247,6 @@ public final class GridLayer extends AbstractLayer {
     @Override
     public void remove() {
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

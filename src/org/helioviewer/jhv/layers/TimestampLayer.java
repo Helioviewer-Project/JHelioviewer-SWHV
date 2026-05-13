@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
-
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
@@ -118,11 +116,6 @@ public class TimestampLayer extends AbstractLayer {
     @Override
     public void remove() {
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

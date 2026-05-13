@@ -58,7 +58,7 @@ public final class LayerOptions implements Layers.Listener {
     @Nullable
     private static Component createOptionsPanel(Layer layer) {
         Function<Layer, Component> provider = providers.get(layer.getClass());
-        return provider == null ? layer.getOptionsPanel() : provider.apply(layer);
+        return provider == null ? null : provider.apply(layer);
     }
 
     @Override

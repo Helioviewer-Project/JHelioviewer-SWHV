@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -175,11 +174,6 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (!enabled) {
             lastTimestamp = null;
         }
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

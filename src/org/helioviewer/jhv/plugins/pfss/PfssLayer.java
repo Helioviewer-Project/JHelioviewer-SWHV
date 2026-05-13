@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.plugins.pfss;
 
-import java.awt.Component;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
@@ -65,11 +63,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     public void remove() {
         setEnabled(false);
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

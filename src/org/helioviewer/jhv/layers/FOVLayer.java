@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
-
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.fov.FOVCatalog;
@@ -41,11 +39,6 @@ public class FOVLayer extends AbstractLayer {
     @Override
     public void remove() {
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override
