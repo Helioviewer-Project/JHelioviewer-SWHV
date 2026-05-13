@@ -1,14 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
@@ -18,7 +10,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.opengl.GLText;
 import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 
@@ -26,14 +17,12 @@ import org.json.JSONObject;
 
 public class TimestampLayer extends AbstractLayer {
 
-    private static final int MIN_SCALE = 50;
-    private static final int MAX_SCALE = 300;
+    public static final int MIN_SCALE = 50;
+    public static final int MAX_SCALE = 300;
 
     private int scale = 100;
     private boolean extra = false;
     private boolean top = false;
-
-    private final JPanel optionsPanel;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -51,7 +40,6 @@ public class TimestampLayer extends AbstractLayer {
     public TimestampLayer(JSONObject jo) {
         if (jo != null)
             deserialize(jo);
-        optionsPanel = optionsPanel();
     }
 
     @Override
@@ -134,7 +122,7 @@ public class TimestampLayer extends AbstractLayer {
 
     @Override
     public Component getOptionsPanel() {
-        return optionsPanel;
+        return null;
     }
 
     @Override
@@ -145,56 +133,31 @@ public class TimestampLayer extends AbstractLayer {
     @Override
     public void dispose() {}
 
-    private JPanel optionsPanel() {
-        JHVSlider slider = new JHVSlider(MIN_SCALE, MAX_SCALE, scale);
-        slider.addChangeListener(e -> {
-            scale = slider.getValue();
-            MovieDisplay.display();
-        });
+    public int getScale() {
+        return scale;
+    }
 
-        JPanel panelSlider = new JPanel(new GridBagLayout());
-        GridBagConstraints c0 = new GridBagConstraints();
-        c0.weightx = 1;
-        c0.weighty = 1;
-        c0.gridy = 0;
-        c0.anchor = GridBagConstraints.LINE_END;
-        c0.gridx = 0;
-        panelSlider.add(new JLabel("Size", JLabel.RIGHT), c0);
-        c0.anchor = GridBagConstraints.LINE_START;
-        c0.gridx = 1;
-        panelSlider.add(slider, c0);
+    public void setScale(int _scale) {
+        scale = _scale;
+        MovieDisplay.display();
+    }
 
-        JPanel panelCheck = new JPanel(new GridBagLayout());
-        GridBagConstraints c1 = new GridBagConstraints();
-        c1.weightx = 1;
-        c1.weighty = 1;
-        c1.gridy = 0;
-        c1.anchor = GridBagConstraints.LINE_END;
-        c1.gridx = 0;
-        JCheckBox showExtra = new JCheckBox("Extra info", extra);
-        showExtra.setHorizontalTextPosition(SwingConstants.LEFT);
-        showExtra.addActionListener(e -> {
-            extra = showExtra.isSelected();
-            MovieDisplay.display();
-        });
-        panelCheck.add(showExtra, c1);
+    public boolean isExtra() {
+        return extra;
+    }
 
-        c1.anchor = GridBagConstraints.LINE_START;
-        c1.gridx = 1;
-        JCheckBox showTop = new JCheckBox("Top", top);
-        showTop.setHorizontalTextPosition(SwingConstants.LEFT);
-        showTop.addActionListener(e -> {
-            top = showTop.isSelected();
-            MovieDisplay.display();
-        });
-        panelCheck.add(showTop, c1);
+    public void setExtra(boolean _extra) {
+        extra = _extra;
+        MovieDisplay.display();
+    }
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(panelSlider);
-        panel.add(panelCheck);
+    public boolean isTop() {
+        return top;
+    }
 
-        return panel;
+    public void setTop(boolean _top) {
+        top = _top;
+        MovieDisplay.display();
     }
 
 }
