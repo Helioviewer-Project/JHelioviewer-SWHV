@@ -11,32 +11,18 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
 class PfssLayerOptions extends JPanel {
 
-    private int detail;
-    private boolean fixedColor;
-    private double radius;
-
-    PfssLayerOptions(int _detail, boolean _fixedColor, double _radius) {
-        detail = _detail;
-        fixedColor = _fixedColor;
-        radius = _radius;
+    PfssLayerOptions(PfssLayer layer) {
         setLayout(new GridBagLayout());
 
-        JHVSpinner levelSpinner = new JHVSpinner(detail, 0, PfssSettings.MAX_DETAIL, 1);
-        levelSpinner.addChangeListener(e -> {
-            detail = (Integer) levelSpinner.getValue();
-            MovieDisplay.display();
-        });
+        JHVSpinner levelSpinner = new JHVSpinner(layer.getDetail(), 0, PfssSettings.MAX_DETAIL, 1);
+        levelSpinner.addChangeListener(e -> layer.setDetail((Integer) levelSpinner.getValue()));
 
-        JHVSpinner radiusSpinner = new JHVSpinner(radius, 1.099999999999999, PfssSettings.MAX_RADIUS, 0.1);
-        radiusSpinner.addChangeListener(e -> {
-            radius = (Double) radiusSpinner.getValue();
-            MovieDisplay.display();
-        });
+        JHVSpinner radiusSpinner = new JHVSpinner(layer.getRadius(), 1.099999999999999, PfssSettings.MAX_RADIUS, 0.1);
+        radiusSpinner.addChangeListener(e -> layer.setRadius((Double) radiusSpinner.getValue()));
 
         GridBagConstraints c0 = new GridBagConstraints();
         c0.weightx = 1.;
@@ -51,12 +37,9 @@ class PfssLayerOptions extends JPanel {
         c0.anchor = GridBagConstraints.LINE_START;
         add(createSpinnerPanel("Radius", radiusSpinner), c0);
 
-        JCheckBox fixedColors = new JCheckBox("Fixed colors", fixedColor);
+        JCheckBox fixedColors = new JCheckBox("Fixed colors", layer.getFixedColor());
         fixedColors.setHorizontalTextPosition(SwingConstants.LEFT);
-        fixedColors.addActionListener(e -> {
-            fixedColor = fixedColors.isSelected();
-            MovieDisplay.display();
-        });
+        fixedColors.addActionListener(e -> layer.setFixedColor(fixedColors.isSelected()));
 
         c0.gridx = 2;
         c0.anchor = GridBagConstraints.LINE_END;
@@ -77,18 +60,6 @@ class PfssLayerOptions extends JPanel {
         panel.add(new JLabel(label, JLabel.RIGHT));
         panel.add(spinner);
         return panel;
-    }
-
-    int getDetail() {
-        return detail;
-    }
-
-    boolean getFixedColor() {
-        return fixedColor;
-    }
-
-    double getRadius() {
-        return radius;
     }
 
 }
