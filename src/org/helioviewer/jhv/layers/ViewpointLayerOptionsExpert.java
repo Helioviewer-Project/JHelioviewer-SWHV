@@ -31,8 +31,8 @@ public final class ViewpointLayerOptionsExpert {
 
     private Frame frame;
 
-    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, SpaceObject observer, Frame _frame, boolean exclusive) {
-        this.exclusive = exclusive;
+    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, SpaceObject observer, Frame _frame, boolean _exclusive) {
+        exclusive = _exclusive;
         frame = _frame;
 
         JSONArray ja = null;

@@ -7,14 +7,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.swing.table.AbstractTableModel;
-
 import org.helioviewer.jhv.astronomy.SpaceObject;
 
-@SuppressWarnings("serial")
-public class SpaceObjectModel extends AbstractTableModel {
+public class SpaceObjectModel {
 
     private final List<SpaceObjectElement> elements = new ArrayList<>();
+    private final List<Consumer<SpaceObjectElement>> refreshListeners = new ArrayList<>();
     private final Map<SpaceObject, Integer> targetRows = new HashMap<>();
     private final Map<SpaceObjectElement, Integer> elementRows = new HashMap<>();
 
@@ -55,25 +53,16 @@ public class SpaceObjectModel extends AbstractTableModel {
         return elements.get(row);
     }
 
-    void refresh(SpaceObjectElement element) {
-        Integer idx = elementRows.get(element);
-        if (idx != null)
-            fireTableRowsUpdated(idx, idx);
-    }
-
-    @Override
-    public int getRowCount() {
+    public int size() {
         return elements.size();
     }
 
-    @Override
-    public int getColumnCount() {
-        return 3;
+    public void addRefreshListener(Consumer<SpaceObjectElement> listener) {
+        refreshListeners.add(listener);
     }
 
-    @Override
-    public Object getValueAt(int row, int column) {
-        return elements.get(row);
+    void refresh(SpaceObjectElement element) {
+        refreshListeners.forEach(listener -> listener.accept(element));
     }
 
 }
