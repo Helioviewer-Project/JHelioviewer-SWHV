@@ -156,6 +156,8 @@ final class ImageLayerOptions extends JPanel {
         addToGridBag(c, deltaCRVAL1Panel);
         c.gridy++;
         addToGridBag(c, deltaCRVAL2Panel);
+        // Usually refreshed through ImageLayer activation; initialize here too in case that activation already happened before panel creation.
+        refresh(layer);
     }
 
     private void addToGridBag(GridBagConstraints c, FilterDetails details) {
@@ -197,9 +199,9 @@ final class ImageLayerOptions extends JPanel {
     }
 
     private void downloadProgress(int value) {
-        if (value < 0)
+        if (value < 0) {
             progressBar.setIndeterminate(true);
-        else {
+        } else {
             progressBar.setIndeterminate(false);
             progressBar.setValue(value);
         }
