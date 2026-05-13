@@ -12,7 +12,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
-class SpaceObjectElement implements Interfaces.StatusReceiver {
+public class SpaceObjectElement implements Interfaces.StatusReceiver {
 
     private final SpaceObject target;
     private final SpaceObjectModel model;
@@ -53,7 +53,7 @@ class SpaceObjectElement implements Interfaces.StatusReceiver {
         return load != null && load.isDownloading();
     }
 
-    boolean isSelected() {
+    public boolean isSelected() {
         return selected;
     }
 
@@ -64,7 +64,7 @@ class SpaceObjectElement implements Interfaces.StatusReceiver {
         return idx < 0 ? null : loads.get(idx);
     }
 
-    String getStatus() {
+    public String getStatus() {
         return status;
     }
 

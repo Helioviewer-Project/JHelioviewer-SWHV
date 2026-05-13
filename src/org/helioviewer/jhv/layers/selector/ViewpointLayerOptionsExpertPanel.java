@@ -48,7 +48,7 @@ final class ViewpointLayerOptionsExpertPanel extends JPanel {
         c.gridy = 1;
         add(timeSelectorPanel, c);
         c.gridy = 2;
-        add(options.getContainer(), c);
+        add(new SpaceObjectContainerPanel(options.getContainer()), c);
         if (options.hasFrameOptions()) {
             c.gridy = 3;
             add(createFramePanel(), c);
