@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -237,11 +236,6 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
     public void remove() {
         setEnabled(false);
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

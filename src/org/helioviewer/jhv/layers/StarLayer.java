@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -98,11 +97,6 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     public void remove() {
         setEnabled(false);
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

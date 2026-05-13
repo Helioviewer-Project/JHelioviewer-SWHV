@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import java.awt.Color;
-import java.awt.Component;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
@@ -54,11 +53,6 @@ public final class MiniviewLayer extends AbstractLayer {
     @Override
     public void remove() {
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

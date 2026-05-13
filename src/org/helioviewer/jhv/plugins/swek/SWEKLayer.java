@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
@@ -437,11 +436,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void remove() {
         setEnabled(false);
         dispose();
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override

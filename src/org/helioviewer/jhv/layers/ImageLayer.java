@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers;
 
-import java.awt.Component;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -287,11 +286,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         double gridLon = gridType.toLongitude(metaViewpoint);
         double lon = gridType == GridType.Viewpoint ? gridLon - cameraViewpoint.lon : metaViewpoint.lon - gridLon;
         return (lon + 3. * Math.PI) % (2. * Math.PI); // centered
-    }
-
-    @Override
-    public Component getOptionsPanel() {
-        return null;
     }
 
     @Override
