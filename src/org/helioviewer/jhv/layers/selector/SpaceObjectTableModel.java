@@ -2,30 +2,23 @@ package org.helioviewer.jhv.layers.selector;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectModel;
+import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 
 @SuppressWarnings("serial")
 final class SpaceObjectTableModel extends AbstractTableModel {
 
     private static final int COLUMNS = 3;
 
-    private final SpaceObjectModel model;
+    private final SpaceObjectContainer container;
 
-    SpaceObjectTableModel(SpaceObjectModel _model) {
-        model = _model;
-        model.addRefreshListener(this::refresh);
-    }
-
-    private void refresh(SpaceObjectElement element) {
-        int row = model.indexOf(element);
-        if (row != -1)
-            fireTableRowsUpdated(row, row);
+    SpaceObjectTableModel(SpaceObjectContainer _container) {
+        container = _container;
+        container.addRefreshListener(row -> fireTableRowsUpdated(row, row));
     }
 
     @Override
     public int getRowCount() {
-        return model.size();
+        return container.size();
     }
 
     @Override
@@ -35,7 +28,7 @@ final class SpaceObjectTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        return model.elementAt(row);
+        return container.elementAt(row);
     }
 
 }

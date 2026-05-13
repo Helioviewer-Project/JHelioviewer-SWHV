@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 
 import org.helioviewer.jhv.astronomy.SpaceObject;
 
-public class SpaceObjectModel {
+final class SpaceObjectModel {
 
     private final List<SpaceObjectElement> elements = new ArrayList<>();
-    private final List<Consumer<SpaceObjectElement>> refreshListeners = new ArrayList<>();
+    private final List<IntConsumer> refreshListeners = new ArrayList<>();
     private final Map<SpaceObject, Integer> targetRows = new HashMap<>();
     private final Map<SpaceObjectElement, Integer> elementRows = new HashMap<>();
 
@@ -57,12 +58,14 @@ public class SpaceObjectModel {
         return elements.size();
     }
 
-    public void addRefreshListener(Consumer<SpaceObjectElement> listener) {
+    public void addRefreshListener(IntConsumer listener) {
         refreshListeners.add(listener);
     }
 
     void refresh(SpaceObjectElement element) {
-        refreshListeners.forEach(listener -> listener.accept(element));
+        int row = elementRows.getOrDefault(element, -1);
+        if (row != -1)
+            refreshListeners.forEach(listener -> listener.accept(row));
     }
 
 }

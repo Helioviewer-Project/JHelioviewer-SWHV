@@ -32,7 +32,7 @@ public final class LayerOptions implements Layers.Listener {
         register(ImageLayer.class, layer -> new ImageLayerOptions((ImageLayer) layer));
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
-        register(ViewpointLayer.class, layer -> new ViewpointLayerOptionsPanel(((ViewpointLayer) layer).getOptions()));
+        register(ViewpointLayer.class, layer -> new ViewpointLayerOptionsPanel((ViewpointLayer) layer));
         Layers.addListener(listener);
     }
 
