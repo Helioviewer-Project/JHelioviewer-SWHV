@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.layers.selector;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -10,18 +10,27 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
 import org.helioviewer.jhv.io.DownloadLayer;
-import org.helioviewer.jhv.layers.filters.*;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.filters.ChannelMixerPanel;
+import org.helioviewer.jhv.layers.filters.DifferencePanel;
+import org.helioviewer.jhv.layers.filters.FilterDetails;
+import org.helioviewer.jhv.layers.filters.ImageFilterPanel;
+import org.helioviewer.jhv.layers.filters.InnerMaskPanel;
+import org.helioviewer.jhv.layers.filters.LUTPanel;
+import org.helioviewer.jhv.layers.filters.LevelsPanel;
+import org.helioviewer.jhv.layers.filters.SliderFilterPanel;
+import org.helioviewer.jhv.layers.filters.SlitPanel;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-class ImageLayerOptions extends JPanel {
+final class ImageLayerOptions extends JPanel implements LayerOptions.OptionsPanel {
 
     private final LUTPanel lutPanel;
     private final SlitPanel slitPanel;
@@ -181,13 +190,11 @@ class ImageLayerOptions extends JPanel {
         deltaCRVAL2Panel.setVisible(visibility);
     }
 
-    void setLUT(LUT lut) {
-        lutPanel.setLUT(lut);
-    }
-
-    void refresh(ImageLayer layer) {
-        downloadButton.setVisible(!layer.isLocal());
-        lutPanel.setLUT(layer.getView().getDefaultLUT());
+    @Override
+    public void refresh(Layer layer) {
+        ImageLayer imageLayer = (ImageLayer) layer;
+        downloadButton.setVisible(!imageLayer.isLocal());
+        lutPanel.setLUT(imageLayer.getView().getDefaultLUT());
     }
 
     private void downloadProgress(int value) {
