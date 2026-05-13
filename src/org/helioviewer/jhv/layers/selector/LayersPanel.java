@@ -263,7 +263,7 @@ public final class LayersPanel extends JPanel {
 
     public void setOptionsPanel(@Nullable Layer layer) {
         optionsPanelWrapper.removeAll();
-        Component optionsPanel = layer == null ? null : layer.getOptionsPanel();
+        Component optionsPanel = layer == null ? null : LayerOptions.getOptionsPanel(layer);
         if (optionsPanel != null) {
             ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
             optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
