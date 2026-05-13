@@ -65,10 +65,13 @@ public class Log {
 
     public static String get() {
         try {
-            return Files.readString(Path.of(filename));
+            Path path = Path.of(filename);
+            if (!Files.isRegularFile(path))
+                return "Log file not initialized";
+            return Files.readString(path);
         } catch (Exception e) {
-            Log.error(e);
-            return "Unable to retrieve log";
+            String message = e.getMessage();
+            return message == null || message.isBlank() ? "Unable to retrieve log" : "Unable to retrieve log: " + message;
         }
     }
 
