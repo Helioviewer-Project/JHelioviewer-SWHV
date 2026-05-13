@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.MiniviewLayer;
 
 final class LayerOptions implements Layers.Listener {
 
@@ -22,6 +23,7 @@ final class LayerOptions implements Layers.Listener {
     private static final LayerOptions listener = new LayerOptions();
 
     static {
+        register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         Layers.addListener(listener);
     }
 
