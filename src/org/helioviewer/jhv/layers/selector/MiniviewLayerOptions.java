@@ -10,7 +10,7 @@ import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 
 @SuppressWarnings("serial")
-final class MiniviewLayerOptions extends JPanel {
+final class MiniviewLayerOptions extends JPanel implements LayerOptions.OptionsPanel {
 
     MiniviewLayerOptions(MiniviewLayer layer) {
         super(new GridBagLayout());

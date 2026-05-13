@@ -5,14 +5,12 @@ import java.awt.Component;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.fov.FOVCatalog;
-import org.helioviewer.jhv.layers.fov.FOVTreePane;
 
 import org.json.JSONObject;
 
 public class FOVLayer extends AbstractLayer {
 
     private final FOVCatalog catalog;
-    private FOVTreePane treePane;
 
     @Override
     public void serialize(JSONObject jo) {
@@ -47,14 +45,16 @@ public class FOVLayer extends AbstractLayer {
 
     @Override
     public Component getOptionsPanel() {
-        if (treePane == null)
-            treePane = new FOVTreePane(catalog);
-        return treePane;
+        return null;
     }
 
     @Override
     public String getName() {
         return "FOV";
+    }
+
+    public FOVCatalog getCatalog() {
+        return catalog;
     }
 
 }

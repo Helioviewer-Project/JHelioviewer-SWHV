@@ -23,7 +23,7 @@ import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
-public final class FOVTreePane extends JScrollPane {
+public class FOVTreePane extends JScrollPane {
 
     private final DefaultMutableTreeNode root;
     private final JTree tree;
