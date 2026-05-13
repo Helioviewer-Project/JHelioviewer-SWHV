@@ -7,7 +7,6 @@ import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
@@ -20,8 +19,12 @@ import org.json.JSONObject;
 //import com.google.common.base.Stopwatch;
 import com.google.common.collect.ArrayListMultimap;
 
-public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject target, boolean isHCI,
+public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject target, boolean isHCI,
                            Future<PositionResponse> future) {
+
+    public interface StatusReceiver {
+        void setStatus(String status);
+    }
 
     private record LoadPosition(SpaceObject observer, SpaceObject target, Frame frame, long start,
                                 long end) implements Callable<PositionResponse> {
@@ -86,7 +89,7 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
         loads.get(uv).removeIf(load -> load.future.isCancelled() || (load.future.isDone() && load.getResponse() == null));
     }
 
-    public static PositionLoad submit(UpdateViewpoint uv, Interfaces.StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
+    public static PositionLoad submit(UpdateViewpoint uv, StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         pruneFailedLoads(uv);
         receiver.setStatus("Loading...");
 
@@ -98,11 +101,11 @@ public record PositionLoad(Interfaces.StatusReceiver receiver, SpaceObject targe
         return load;
     }
 
-    private static void onSuccess(Interfaces.StatusReceiver receiver) {
+    private static void onSuccess(StatusReceiver receiver) {
         receiver.setStatus("Loaded");
     }
 
-    private static void onFailure(Interfaces.StatusReceiver receiver, Throwable t) {
+    private static void onFailure(StatusReceiver receiver, Throwable t) {
         if (!JHVThread.isInterrupted(t))
             receiver.setStatus(t.getMessage());
     }
