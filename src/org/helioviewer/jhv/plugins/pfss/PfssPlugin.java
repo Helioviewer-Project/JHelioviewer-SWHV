@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss;
 
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.selector.LayerOptions;
 import org.helioviewer.jhv.plugins.Plugin;
 
 import org.json.JSONObject;
@@ -20,12 +21,14 @@ public class PfssPlugin extends Plugin {
 
     @Override
     public void install() {
+        LayerOptions.register(PfssLayer.class, layer -> new PfssLayerOptions((PfssLayer) layer));
         Layers.add(layer);
     }
 
     @Override
     public void uninstall() {
         Layers.remove(layer);
+        LayerOptions.unregister(PfssLayer.class);
         pfssCache.clear();
     }
 

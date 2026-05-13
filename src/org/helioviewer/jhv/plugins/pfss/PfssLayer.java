@@ -10,6 +10,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
@@ -22,32 +23,30 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
     private final PfssCache cache = PfssPlugin.getPfssCache();
-    private final PfssLayerOptions optionsPanel;
     private final GLSLLine glslLine = new GLSLLine(true);
     private final BufVertex lineBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
+
+    private int detail = 0;
+    private boolean fixedColor = false;
+    private double radius = PfssSettings.MAX_RADIUS;
 
     private PfssLoader.Data lastData;
     private JHVTime pfssTime;
     private long currentTime;
 
     public PfssLayer(JSONObject jo) {
-        int detail = 0;
-        boolean fixedColor = false;
-        double radius = PfssSettings.MAX_RADIUS;
-
         if (jo != null) {
             detail = Math.clamp(jo.optInt("detail", detail), 0, PfssSettings.MAX_DETAIL);
             fixedColor = jo.optBoolean("fixedColor", fixedColor);
             radius = Math.clamp(jo.optDouble("radius", radius), 1.1, PfssSettings.MAX_RADIUS);
         }
-        optionsPanel = new PfssLayerOptions(detail, fixedColor, radius);
     }
 
     @Override
     public void serialize(JSONObject jo) {
-        jo.put("detail", optionsPanel.getDetail());
-        jo.put("fixedColor", optionsPanel.getFixedColor());
-        jo.put("radius", optionsPanel.getRadius());
+        jo.put("detail", detail);
+        jo.put("fixedColor", fixedColor);
+        jo.put("radius", radius);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     @Override
     public Component getOptionsPanel() {
-        return optionsPanel;
+        return null;
     }
 
     @Override
@@ -130,9 +129,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
     private boolean lastWhiteBackground;
 
     private void renderData(Viewport vp, PfssLoader.Data data) {
-        int detail = optionsPanel.getDetail();
-        boolean fixedColor = optionsPanel.getFixedColor();
-        double radius = optionsPanel.getRadius();
         boolean whiteBackground = Display.whiteBackground;
 
         if (lastData != data || lastDetail != detail || lastFixedColor != fixedColor || lastRadius != radius || lastWhiteBackground != whiteBackground) {
@@ -148,6 +144,33 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
             Layers.fireTimeUpdated(this);
         }
         glslLine.renderLine(vp, LINEWIDTH);
+    }
+
+    int getDetail() {
+        return detail;
+    }
+
+    void setDetail(int _detail) {
+        detail = _detail;
+        MovieDisplay.display();
+    }
+
+    boolean getFixedColor() {
+        return fixedColor;
+    }
+
+    void setFixedColor(boolean _fixedColor) {
+        fixedColor = _fixedColor;
+        MovieDisplay.display();
+    }
+
+    double getRadius() {
+        return radius;
+    }
+
+    void setRadius(double _radius) {
+        radius = _radius;
+        MovieDisplay.display();
     }
 
 }
