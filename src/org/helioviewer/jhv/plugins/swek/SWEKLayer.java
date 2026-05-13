@@ -2,8 +2,6 @@ package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -11,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
@@ -55,7 +50,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {}
 
     private final SWEKPopupController controller = new SWEKPopupController();
-    private final JPanel optionsPanel;
 
     private static final int DIVPOINTS = 10;
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
@@ -90,7 +84,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             icons = jo.optBoolean("icons", icons);
         else
             setEnabled(true);
-        optionsPanel = optionsPanel();
     }
 
     @Override
@@ -448,7 +441,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     @Override
     public Component getOptionsPanel() {
-        return optionsPanel;
+        return null;
     }
 
     @Override
@@ -525,24 +518,13 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
     }
 
-    private JPanel optionsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        JCheckBox check = new JCheckBox("Icons", icons);
-        check.setHorizontalTextPosition(SwingConstants.LEFT);
-        check.addActionListener(e -> {
-            icons = check.isSelected();
-            MovieDisplay.display();
-        });
+    boolean isIcons() {
+        return icons;
+    }
 
-        GridBagConstraints c0 = new GridBagConstraints();
-        c0.anchor = GridBagConstraints.CENTER;
-        c0.weightx = 1.;
-        c0.weighty = 1.;
-        c0.gridy = 0;
-        c0.gridx = 0;
-        panel.add(check, c0);
-
-        return panel;
+    void setIcons(boolean _icons) {
+        icons = _icons;
+        MovieDisplay.display();
     }
 
 }
