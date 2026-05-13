@@ -2,6 +2,7 @@ package org.helioviewer.jhv.plugins.swek;
 
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.selector.LayerOptions;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 
@@ -21,16 +22,20 @@ public class SWEKPlugin extends Plugin {
     public void install() {
         JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         JHVFrame.getLeftContentPane().revalidate();
+
+        LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
         Layers.add(layer);
         Timelines.getLayers().add(etl);
     }
 
     @Override
     public void uninstall() {
+        Timelines.getLayers().remove(etl);
+        Layers.remove(layer);
+        LayerOptions.unregister(SWEKLayer.class);
+
         JHVFrame.getLeftContentPane().remove(swekPanel);
         JHVFrame.getLeftContentPane().revalidate();
-        Layers.remove(layer);
-        Timelines.getLayers().remove(etl);
     }
 
     @Override
