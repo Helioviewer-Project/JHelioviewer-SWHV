@@ -15,6 +15,7 @@ import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
+import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -255,7 +256,16 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     @Nullable
     @Override
     public ClickableDrawable getDrawableUnderMouse() {
-        return eventUnderMouse == null ? null : eventUnderMouse.event;
+        if (eventUnderMouse == null)
+            return null;
+
+        JHVRelatedEvents event = eventUnderMouse.event;
+        return (location, timestamp) -> {
+            SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(timestamp));
+            dialog.pack();
+            dialog.setLocation(location);
+            dialog.setVisible(true);
+        };
     }
 
 }
