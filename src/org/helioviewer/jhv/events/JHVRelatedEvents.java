@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.events;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +12,9 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 
-public class JHVRelatedEvents implements ClickableDrawable {
+public class JHVRelatedEvents {
 
     private static final Colors.Data eventColors = new Colors.Data();
     private static final ArrayList<JHVEventListener.Highlight> listeners = new ArrayList<>();
@@ -167,11 +164,4 @@ public class JHVRelatedEvents implements ClickableDrawable {
         addToMap(eventsMap);
     }
 
-    @Override
-    public void clicked(Point loc, long ts) {
-        SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(this, getClosestTo(ts));
-        dialog.pack();
-        dialog.setLocation(loc);
-        dialog.setVisible(true);
-    }
 }
