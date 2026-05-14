@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.Tasks;
@@ -27,6 +26,8 @@ public class DownloadLayer {
 
     public interface Progress {
         void progress(int percent);
+
+        void success(String result);
 
         void done();
     }
@@ -79,7 +80,7 @@ public class DownloadLayer {
     private static void onSuccess(ImageLayer layer, Progress progress, Path result) {
         progress.done();
         LoadLayer.submit(layer, List.of(result.toUri()));
-        CompletionNotifications.fileReady(result.toString());
+        progress.success(result.toString());
     }
 
     private static void onFailure(Progress progress, Throwable t) {

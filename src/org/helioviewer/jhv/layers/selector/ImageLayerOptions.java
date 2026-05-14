@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
@@ -221,6 +222,11 @@ final class ImageLayerOptions extends JPanel {
         public void progress(int percent) {
             if (downloadProgress == this)
                 downloadProgress(percent);
+        }
+
+        @Override
+        public void success(String result) {
+            CompletionNotifications.fileReady(result);
         }
 
         @Override
