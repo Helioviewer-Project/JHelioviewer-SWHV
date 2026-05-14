@@ -17,6 +17,7 @@ import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
@@ -113,6 +114,7 @@ public final class JHVFrame {
     public static JFrame prepare() {
         mainFrame = createFrame();
         CompletionNotifications.init();
+        Message.setHandler(new MessageHandler());
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 

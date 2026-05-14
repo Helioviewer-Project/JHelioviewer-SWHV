@@ -7,8 +7,8 @@ import javax.swing.JOptionPane;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
 import org.helioviewer.jhv.threads.JHVThread;
 

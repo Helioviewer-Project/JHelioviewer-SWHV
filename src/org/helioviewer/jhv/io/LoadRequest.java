@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.gui.Message;
+import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.threads.Tasks;

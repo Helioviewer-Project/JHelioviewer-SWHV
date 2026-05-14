@@ -7,9 +7,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.threads.Tasks;
 
 import org.json.JSONObject;

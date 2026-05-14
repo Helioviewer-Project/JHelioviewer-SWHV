@@ -7,12 +7,12 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.SpiceMath;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.math.MathUtils;

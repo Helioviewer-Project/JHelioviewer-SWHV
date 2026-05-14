@@ -9,8 +9,8 @@ import java.util.concurrent.Callable;
 
 import javax.swing.JFrame;
 
+import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.Message;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
