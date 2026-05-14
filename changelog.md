@@ -1,11 +1,13 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 5.0.1 (pending)
+## JHelioviewer 5.1.0 (pending)
 
-- Add `HPLN/HPLT-ARC` WCS projection support
+- Add `ARC` WCS projection support
 - Load user color lookup tables from `$HOME/JHelioviewer-SWHV/Settings/user-luts.txt`
 - Add option to zoom multiview panels separately
+- Set IAS as default image data server, remove the automatic setting, and restore the preference in Settings
+- Various bug fixes, cleanups, and major internal refactoring
 
 ## JHelioviewer 5.0 (2026-05-08)
 
