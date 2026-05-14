@@ -220,13 +220,11 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
         super.setEnabled(_enabled);
 
         if (enabled) {
-            Display.getCamera().addListener(this);
             InputController.addListener(hoverListener);
             options.activate();
             options.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
-            Display.getCamera().removeListener(this);
             InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
@@ -267,6 +265,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public void init() {
+        Display.getCamera().addListener(this);
         orbits.init();
         planets.init();
         spiral.init();
@@ -274,6 +273,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public void dispose() {
+        Display.getCamera().removeListener(this);
         orbits.dispose();
         planets.dispose();
         spiral.dispose();
