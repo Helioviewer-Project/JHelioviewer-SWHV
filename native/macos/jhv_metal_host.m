@@ -86,6 +86,25 @@ static CGFloat jhv_window_scale(CALayer *windowLayer) {
     return windowScale;
 }
 
+const char *jhv_metal_device_info(void) {
+    static char info[256];
+
+    @autoreleasepool {
+        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+        if (device == nil) {
+            snprintf(info, sizeof(info), "available=false reason=no default Metal device");
+            return info;
+        }
+
+        const char *name = device.name.UTF8String;
+        snprintf(info, sizeof(info),
+                 "MTLGPUFamilyMac2=%s name=\"%s\"",
+                 [device supportsFamily:MTLGPUFamilyMac2] ? "true" : "false",
+                 name != NULL ? name : "");
+        return info;
+    }
+}
+
 void *jhv_metal_host_create(void *surfaceLayersPtr, double x, double y, double width, double height) {
     __block void *result = NULL;
     jhv_run_on_main_sync(^{

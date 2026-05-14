@@ -9,6 +9,8 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
+import org.helioviewer.jhv.Log;
+
 @SuppressWarnings("restricted")
 public final class MacAngleBridge {
     public record Host(long handle, long layer) {}
@@ -28,11 +30,25 @@ public final class MacAngleBridge {
                     ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
     private static final MethodHandle DESTROY = downcall("jhv_metal_host_destroy",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+    private static final MethodHandle DEVICE_INFO = downcall("jhv_metal_device_info",
+            FunctionDescriptor.of(ValueLayout.ADDRESS));
 
     private MacAngleBridge() {}
 
     public static void prewarm() {
         // Force class initialization and native symbol resolution before the first canvas attach.
+        Log.info("Metal device: " + deviceInfo());
+    }
+
+    private static String deviceInfo() {
+        try {
+            MemorySegment info = (MemorySegment) DEVICE_INFO.invokeExact();
+            if (info.address() == 0L)
+                return "unavailable";
+            return info.reinterpret(Long.MAX_VALUE).getString(0);
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to query Metal device info", t);
+        }
     }
 
     public static Host create(Canvas canvas, double x, double y, double width, double height) {
