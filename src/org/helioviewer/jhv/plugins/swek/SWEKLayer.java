@@ -323,9 +323,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
+    private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y, long currentTime) {
         List<String> txts = new ArrayList<>();
-        long currentTime = swekContext.currentTime();
         for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
             if (name != "event_description" && name != "event_title") { // interned
@@ -342,10 +341,9 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         lineThick.renderLine(vp, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(List<JHVRelatedEvents> evs) {
+    private void renderIcons(List<JHVRelatedEvents> evs, long currentTime) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
-        long currentTime = swekContext.currentTime();
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (Display.mode.isLatitudinal() && evt.isCactus())
@@ -356,8 +354,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private List<JHVRelatedEvents> activeEvents() {
-        long time = swekContext.currentTime();
+    private List<JHVRelatedEvents> activeEvents(long time) {
         long start = Movie.getStartTime();
         long end = Movie.getEndTime();
         if (time != cachedEventsTime || start != cachedEventsStart || end != cachedEventsEnd) {
@@ -377,11 +374,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        List<JHVRelatedEvents> evs = activeEvents();
+        long currentTime = camera.getViewpoint().time.milli;
+        List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
-        long currentTime = swekContext.currentTime();
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -396,7 +393,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(evs);
+            renderIcons(evs, currentTime);
         }
     }
 
@@ -404,11 +401,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void renderScale(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        List<JHVRelatedEvents> evs = activeEvents();
+        long currentTime = camera.getViewpoint().time.milli;
+        List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
-        long currentTime = swekContext.currentTime();
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -423,7 +420,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(evs);
+            renderIcons(evs, currentTime);
         }
     }
 
@@ -432,7 +429,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (!enabled)
             return;
         if (swekContext.mouseOverJHVEvent() != null) {
-            drawText(vp, swekContext.mouseOverJHVEvent(), swekContext.mouseOverX(), swekContext.mouseOverY());
+            drawText(vp, swekContext.mouseOverJHVEvent(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
         }
     }
 
@@ -454,14 +451,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         if (enabled) {
             JHVEventCache.registerHandler(this);
-            Movie.addTimeListener(swekContext);
             Movie.addTimeRangeListener(this);
             requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
             invalidateActiveEvents();
             JHVEventCache.highlight(null);
             Movie.removeTimeRangeListener(this);
-            Movie.removeTimeListener(swekContext);
             JHVEventCache.unregisterHandler(this);
         }
     }

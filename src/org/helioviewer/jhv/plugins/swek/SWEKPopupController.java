@@ -38,10 +38,6 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     private final Camera camera;
 
     private Cursor lastCursor;
-    private JHVRelatedEvents mouseOverJHVEvent;
-    private int mouseOverX;
-    private int mouseOverY;
-    private long currentTime;
 
     SWEKPopupController(SWEKContext _swekContext) {
         swekContext = _swekContext;
@@ -98,11 +94,10 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
     @Override
     public void mouseClicked(PointerEvent e) {
-        currentTime = swekContext.currentTime();
-        mouseOverJHVEvent = swekContext.mouseOverJHVEvent();
+        JHVRelatedEvents mouseOverJHVEvent = swekContext.mouseOverJHVEvent();
         if (swekContext.isEnabled() && mouseOverJHVEvent != null) {
             Component canvas = component();
-            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(currentTime));
+            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(swekContext.mouseOverTime()));
             hekPopUp.pack();
             hekPopUp.setLocation(calcWindowPosition(canvas, AwtInputAdapter.toAwtPoint(e), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
@@ -117,13 +112,12 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     }
 
     void resetHover() {
-        mouseOverJHVEvent = null;
         swekContext.clearHover();
         JHVEventCache.highlight(null);
         component().setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
     }
 
-    private double computeDistSun(JHVEvent evt) {
+    private static double computeDistSun(JHVEvent evt, long currentTime) {
         double speed = SWEKData.readCMESpeed(evt);
         double distSun = 2.4;
         distSun += speed * (currentTime - evt.start) / Sun.RadiusMeter;
@@ -137,17 +131,17 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             return;
         }
 
-        currentTime = swekContext.currentTime();
+        long currentTime = camera.getViewpoint().time.milli;
         List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
         if (activeEvents.isEmpty()) {
             resetHover();
             return;
         }
 
-        mouseOverJHVEvent = null;
+        JHVRelatedEvents mouseOverJHVEvent = null;
 
-        mouseOverX = e.x();
-        mouseOverY = e.y();
+        int mouseOverX = e.x();
+        int mouseOverY = e.y();
 
         Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();
@@ -162,7 +156,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
-                    double distSun = computeDistSun(evt);
+                    double distSun = computeDistSun(evt, currentTime);
                     Quat q = pi.getEarth().toQuat();
                     pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
 
@@ -188,7 +182,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 Vec2 tf = null;
                 if ((Display.mode.isPolar() || Display.mode.isLogPolar()) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
-                    double distSun = computeDistSun(evt);
+                    double distSun = computeDistSun(evt, currentTime);
                     tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle) * vp.aspect, Display.mode.scale.getYValueInv(distSun));
                 } else {
                     Vec3 pt = pi.centralPoint();
@@ -209,7 +203,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             }
         }
 
-        swekContext.setMouseOver(mouseOverX, mouseOverY, mouseOverJHVEvent);
+        swekContext.setMouseOver(mouseOverX, mouseOverY, currentTime, mouseOverJHVEvent);
         Component canvas = component();
         JHVEventCache.highlight(mouseOverJHVEvent);
         Cursor cursor = canvas.getCursor();
