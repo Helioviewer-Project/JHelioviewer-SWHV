@@ -62,7 +62,7 @@ public class LoadSunJSON {
 
     private static void onFailure(String ignoredLogContext, Throwable t) {
         Log.error(Throwables.getStackTraceAsString(t));
-        Message.err("An error occurred opening the remote file.", t.getMessage());
+        Message.err("Error getting the data", t.getMessage());
     }
 
 }

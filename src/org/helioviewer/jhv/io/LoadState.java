@@ -29,7 +29,7 @@ class LoadState {
     }
 
     private static void onFailure(@Nullable Commands.OperationContext context, String logContext, Throwable error) {
-        String errorMessage = "An error occurred opening the remote file.";
+        String errorMessage = "Error getting the data";
         Log.error(logContext, error);
         Message.err(errorMessage, error.getMessage());
         String message = error.getMessage() == null || error.getMessage().isBlank() ? errorMessage : error.getMessage();
