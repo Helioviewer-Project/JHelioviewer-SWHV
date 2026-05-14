@@ -11,9 +11,9 @@ import org.json.JSONObject;
 public class SWEKPlugin extends Plugin {
 
     private static final SWEKLayer layer = new SWEKLayer(null);
-    private static final EventTimelineLayer etl = new EventTimelineLayer();
-    private final SWEKTreePane swekPanel = new SWEKTreePane(SWEKConfig.load());
-    private final SWEKPopupController popupController = new SWEKPopupController(layer.getContext());
+    private EventTimelineLayer etl;
+    private SWEKTreePane swekPanel;
+    private SWEKPopupController popupController;
 
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
@@ -21,25 +21,40 @@ public class SWEKPlugin extends Plugin {
 
     @Override
     public void install() {
-        JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
-        JHVFrame.getLeftContentPane().revalidate();
-
-        LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
         layer.setEnabled(true);
-        popupController.install();
         Layers.add(layer);
-        Timelines.getLayers().add(etl);
     }
 
     @Override
     public void uninstall() {
-        Timelines.getLayers().remove(etl);
         Layers.remove(layer);
+    }
+
+    @Override
+    public void installGUI() {
+        etl = new EventTimelineLayer();
+        swekPanel = new SWEKTreePane(SWEKConfig.load());
+        popupController = new SWEKPopupController(layer.getContext());
+
+        JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
+        JHVFrame.getLeftContentPane().revalidate();
+
+        LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
+        popupController.install();
+        Timelines.getLayers().add(etl);
+    }
+
+    @Override
+    public void uninstallGUI() {
+        Timelines.getLayers().remove(etl);
         popupController.uninstall();
         LayerOptions.unregister(SWEKLayer.class);
 
         JHVFrame.getLeftContentPane().remove(swekPanel);
         JHVFrame.getLeftContentPane().revalidate();
+        swekPanel = null;
+        popupController = null;
+        etl = null;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.plugins;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 
 import org.json.JSONObject;
@@ -19,6 +20,10 @@ public abstract class Plugin {
     public abstract void install();
 
     public abstract void uninstall();
+
+    public void installGUI() {}
+
+    public void uninstallGUI() {}
 
     public abstract void saveState(JSONObject jo);
 
@@ -45,9 +50,21 @@ public abstract class Plugin {
         active = !active;
         Settings.setProperty("plugins." + this + ".active", Boolean.toString(active));
         if (active)
-            install();
+            activate();
         else
-            uninstall();
+            deactivate();
+    }
+
+    public final void activate() {
+        install();
+        if (!JHVGlobals.headless)
+            installGUI();
+    }
+
+    public final void deactivate() {
+        if (!JHVGlobals.headless)
+            uninstallGUI();
+        uninstall();
     }
 
     @Override

@@ -21,7 +21,13 @@ public class EVEPlugin extends Plugin {
     }
 
     @Override
-    public void install() {
+    public void install() {}
+
+    @Override
+    public void uninstall() {}
+
+    @Override
+    public void installGUI() {
         tl.installTimelines();
         BandReaderHapi.requestCatalog();
         JHVFrame.getMenuBar().getMenu(0).add(newItem, 3);
@@ -29,7 +35,7 @@ public class EVEPlugin extends Plugin {
     }
 
     @Override
-    public void uninstall() {
+    public void uninstallGUI() {
         tl.uninstallTimelines();
         JHVFrame.getMenuBar().getMenu(0).remove(newItem);
         JHVFrame.getMenuBar().getMenu(0).remove(openItem);

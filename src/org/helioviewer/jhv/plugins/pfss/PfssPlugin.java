@@ -21,15 +21,23 @@ public class PfssPlugin extends Plugin {
 
     @Override
     public void install() {
-        LayerOptions.register(PfssLayer.class, layer -> new PfssLayerOptions((PfssLayer) layer));
         Layers.add(layer);
     }
 
     @Override
     public void uninstall() {
         Layers.remove(layer);
-        LayerOptions.unregister(PfssLayer.class);
         pfssCache.clear();
+    }
+
+    @Override
+    public void installGUI() {
+        LayerOptions.register(PfssLayer.class, layer -> new PfssLayerOptions((PfssLayer) layer));
+    }
+
+    @Override
+    public void uninstallGUI() {
+        LayerOptions.unregister(PfssLayer.class);
     }
 
     @Override
