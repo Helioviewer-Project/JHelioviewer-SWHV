@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.io.FileUtils;
-import org.helioviewer.jhv.io.LocationChecker;
 import org.helioviewer.jhv.io.samp.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
 import org.helioviewer.jhv.metadata.DetectorMask;
@@ -30,7 +29,6 @@ import nom.tam.fits.FitsFactory;
 class JHVInit {
 
     static void init() throws Exception {
-        LocationChecker.setProximityServer();
         SampClient.init();
         ExitHooks.attach();
 

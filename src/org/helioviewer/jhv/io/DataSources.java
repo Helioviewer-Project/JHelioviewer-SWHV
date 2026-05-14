@@ -76,7 +76,7 @@ public class DataSources {
         serverSettings = builder.buildKeepingLast(); // Avoid crash on duplicated server names
     }
 
-    static Set<String> getServers() {
+    public static Set<String> getServers() {
         return serverSettings.keySet();
     }
 
