@@ -83,7 +83,7 @@ public class Camera {
         viewpoint = updateViewpoint.update(time);
         updateRotation();
         updateWidth();
-        listeners.forEach(l -> l.viewpointChanged(viewpoint));
+        // listeners.forEach(l -> l.viewpointChanged(viewpoint));
     }
 
     private void updateRotation() {

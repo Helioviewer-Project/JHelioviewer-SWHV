@@ -30,7 +30,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
 
-public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
+public class ViewpointLayer extends AbstractLayer {
 
     private static final double DELTA_ORBIT = 2 * 60 * 1000 * Sun.MeanEarthDistanceInv;
     private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
@@ -92,10 +92,17 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public void render(Camera camera, Viewport vp) {
+        if (vp.idx == 0) // once!
+            updateTime(camera.getViewpoint().time);
+
         if (!isVisible[vp.idx])
             return;
         if (!options.isHeliospheric())
             return;
+
+        long time = camera.getViewpoint().time.milli;
+        long start = Movie.getStartTime();
+        long end = Movie.getEndTime();
 
         PositionLoad control = options.getHighlightedLoad();
         double relativeLon = 0;
@@ -105,7 +112,6 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
         if (control != null) {
             PositionResponse response = control.getResponse();
             if (response != null) {
-                long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
                 response.interpolateLatitudinal(time, start, end, lati);
                 spiralSpeed = options.getSpiralSpeed(); // only if we have control point
                 relativeLon = options.isRelative() ? lati[1] : 0;
@@ -124,7 +130,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
         List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
         if (!positionLoads.isEmpty()) {
             GL.glDisable(GL.DEPTH_TEST);
-            renderPlanets(vp, positionLoads, pointFactor);
+            renderPlanets(vp, positionLoads, pointFactor, time, start, end);
             GL.glEnable(GL.DEPTH_TEST);
         }
 
@@ -163,7 +169,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
             return;
         }
 
-        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        long time = camera.getViewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
         mouseX = e.x();
@@ -249,12 +255,11 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
         return viewpointTime.toString();
     }
 
-    @Override
-    public void viewpointChanged(Position viewpoint) {
-        if (viewpointTime.milli == viewpoint.time.milli)
+    private void updateTime(JHVTime _viewpointTime) {
+        if (viewpointTime.milli == _viewpointTime.milli)
             return;
 
-        viewpointTime = viewpoint.time;
+        viewpointTime = _viewpointTime;
         Layers.fireTimeUpdated(this);
     }
 
@@ -265,7 +270,6 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public void init() {
-        Display.getCamera().addListener(this);
         orbits.init();
         planets.init();
         spiral.init();
@@ -273,7 +277,6 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     @Override
     public void dispose() {
-        Display.getCamera().removeListener(this);
         orbits.dispose();
         planets.dispose();
         spiral.dispose();
@@ -294,8 +297,7 @@ public class ViewpointLayer extends AbstractLayer implements Camera.Listener {
 
     private final float[] xyzw = {0, 0, 0, 1};
 
-    private void renderPlanets(Viewport vp, List<PositionLoad> positionLoads, double pointFactor) {
-        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+    private void renderPlanets(Viewport vp, List<PositionLoad> positionLoads, double pointFactor, long time, long start, long end) {
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
             if (response == null)
