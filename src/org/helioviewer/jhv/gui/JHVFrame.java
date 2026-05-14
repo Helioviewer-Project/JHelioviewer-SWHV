@@ -29,6 +29,7 @@ import org.helioviewer.jhv.gui.components.statusplugin.FramerateStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.PositionStatusPanel;
 import org.helioviewer.jhv.gui.components.statusplugin.ViewpointStatusPanel;
 import org.helioviewer.jhv.input.InputController;
+import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
@@ -113,8 +114,11 @@ public final class JHVFrame {
 
     public static JFrame prepare() {
         mainFrame = createFrame();
+
         CompletionNotifications.init();
         Message.setHandler(new MessageHandler());
+        UpdateChecker.setHandler(new UpdateCheckHandler());
+
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
 
