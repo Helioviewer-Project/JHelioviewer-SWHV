@@ -32,6 +32,7 @@ public final class AngleRenderer {
     private final long display;
     private final long context;
     private final long surface;
+    private final PlatformConfig platform;
 
     // Front-load LWJGL/ANGLE library setup and EGL capability discovery before the first real renderer is created.
     public static void prewarm() {
@@ -39,7 +40,7 @@ public final class AngleRenderer {
     }
 
     public AngleRenderer(long nativeWindowHandle) {
-        PlatformConfig platform = platformConfig();
+        platform = platformConfig();
         ensureLwjglAngleConfigured(platform);
 
         long newDisplay = EGL15.EGL_NO_DISPLAY;
@@ -53,6 +54,7 @@ public final class AngleRenderer {
             newDisplay = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, 0L, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
             if (newDisplay == EGL15.EGL_NO_DISPLAY)
                 throw eglError("eglGetPlatformDisplay");
+            display = newDisplay;
 
             IntBuffer major = stack.mallocInt(1);
             IntBuffer minor = stack.mallocInt(1);
@@ -66,7 +68,7 @@ public final class AngleRenderer {
             long config = chooseConfig(stack, newDisplay, samples);
             if (config == 0L)
                 throw eglError("eglChooseConfig");
-            logChosenConfig(stack, newDisplay, config);
+            logChosenConfig(stack, config);
 
             IntBuffer contextAttrs = stack.ints(EGL15.EGL_CONTEXT_CLIENT_VERSION, 3, EGL15.EGL_NONE);
             newContext = EGL15.eglCreateContext(newDisplay, config, EGL15.EGL_NO_CONTEXT, contextAttrs);
@@ -97,7 +99,6 @@ public final class AngleRenderer {
             throw e;
         }
 
-        display = newDisplay;
         context = newContext;
         surface = newSurface;
         try {
@@ -197,16 +198,16 @@ public final class AngleRenderer {
         return configOut.get(0);
     }
 
-    private static void logChosenConfig(MemoryStack stack, long display, long config) {
+    private void logChosenConfig(MemoryStack stack, long config) {
         IntBuffer attribValue = stack.mallocInt(1);
-        int red = configAttrib(attribValue, display, config, EGL15.EGL_RED_SIZE);
-        int green = configAttrib(attribValue, display, config, EGL15.EGL_GREEN_SIZE);
-        int blue = configAttrib(attribValue, display, config, EGL15.EGL_BLUE_SIZE);
-        int alpha = configAttrib(attribValue, display, config, EGL15.EGL_ALPHA_SIZE);
-        int depth = configAttrib(attribValue, display, config, EGL15.EGL_DEPTH_SIZE);
-        int stencil = configAttrib(attribValue, display, config, EGL15.EGL_STENCIL_SIZE);
-        int sampleBuffers = configAttrib(attribValue, display, config, EGL15.EGL_SAMPLE_BUFFERS);
-        int samples = configAttrib(attribValue, display, config, EGL15.EGL_SAMPLES);
+        int red = configAttrib(attribValue, config, EGL15.EGL_RED_SIZE);
+        int green = configAttrib(attribValue, config, EGL15.EGL_GREEN_SIZE);
+        int blue = configAttrib(attribValue, config, EGL15.EGL_BLUE_SIZE);
+        int alpha = configAttrib(attribValue, config, EGL15.EGL_ALPHA_SIZE);
+        int depth = configAttrib(attribValue, config, EGL15.EGL_DEPTH_SIZE);
+        int stencil = configAttrib(attribValue, config, EGL15.EGL_STENCIL_SIZE);
+        int sampleBuffers = configAttrib(attribValue, config, EGL15.EGL_SAMPLE_BUFFERS);
+        int samples = configAttrib(attribValue, config, EGL15.EGL_SAMPLES);
 
         Log.info("ANGLE EGL config: rgba=" + red + "/" + green + "/" + blue + "/" + alpha
                 + " depth=" + depth
@@ -215,15 +216,27 @@ public final class AngleRenderer {
                 + " samples=" + samples);
     }
 
-    private static int configAttrib(IntBuffer value, long display, long config, int attribute) {
+    private int configAttrib(IntBuffer value, long config, int attribute) {
         if (!EGL15.eglGetConfigAttrib(display, config, attribute, value))
             throw eglError("eglGetConfigAttrib");
         return value.get(0);
     }
 
-    private static RuntimeException eglError(String step) {
+    private RuntimeException eglError(String step) {
         int code = EGL15.eglGetError();
-        return new RuntimeException(step + " failed with EGL error 0x" + Integer.toHexString(code));
+        String backend = backendName(platform.backendType());
+        if (code == EGL15.EGL_SUCCESS)
+            return new RuntimeException(step + " failed without EGL error; backend=" + backend);
+        return new RuntimeException(step + " failed with EGL error 0x" + Integer.toHexString(code) + "; backend=" + backend);
+    }
+
+    private static String backendName(int backendType) {
+        return switch (backendType) {
+            case EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE -> "D3D11";
+            case EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE -> "Metal";
+            case EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE -> "OpenGL";
+            default -> "0x" + Integer.toHexString(backendType);
+        };
     }
 
     private static PlatformConfig platformConfig() {
