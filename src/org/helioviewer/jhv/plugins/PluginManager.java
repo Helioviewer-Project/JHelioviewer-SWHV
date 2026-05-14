@@ -29,7 +29,7 @@ public class PluginManager {
         }
         plugins.add(plugin);
         if (plugin.isActive())
-            plugin.install();
+            plugin.activate();
     }
 
     public static void loadState(JSONObject jo) {
