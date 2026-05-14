@@ -20,6 +20,7 @@ public class Settings {
             setProperty("display.time", "Observer");
             setProperty("update.next", "0");
             setProperty("video.format", "H264");
+            setProperty("dataSources.defaultServer", "IAS");
         }
     };
     private static final Properties settings = new Properties(defaults);
@@ -37,9 +38,9 @@ public class Settings {
             setProperty("path.local", JHVDirectory.DOWNLOADS.getPath());
         if (getProperty("path.state") == null)
             setProperty("path.state", JHVDirectory.STATES.getPath());
-        String server = getProperty("default.server");
+        String server = getProperty("dataSources.defaultServer");
         if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
-            setProperty("default.server", "GSFC");
+            setProperty("dataSources.defaultServer", "IAS");
     }
 
     public static void setProperty(String key, String val) {

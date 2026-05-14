@@ -145,7 +145,7 @@ public final class DataSourcesTree extends JTree {
             }
         }
 
-        boolean preferred = server.equals(Settings.getProperty("default.server"));
+        boolean preferred = server.equals(Settings.getProperty("dataSources.defaultServer"));
         if (preferred && parser.getDefault() != null) {
             Object obj = parser.getDefault().getUserObject();
             if (obj instanceof SourceItem si) {

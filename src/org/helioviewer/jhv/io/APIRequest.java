@@ -60,7 +60,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
     public static APIRequest fromJson(JSONObject jo) {
         String _server = jo.optString("server", "");
         if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
-            _server = Settings.getProperty("default.server");
+            _server = Settings.getProperty("dataSources.defaultServer");
 
         int _sourceId = jo.optInt("sourceId", 10);
 
@@ -83,7 +83,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
 
         String _server = jo.optString("server", "");
         if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
-            _server = Settings.getProperty("default.server");
+            _server = Settings.getProperty("dataSources.defaultServer");
         if (_server == null || DataSources.getServerSetting(_server, "API.getDataSources") == null) // very unlikely
             throw new Exception("Unknown server");
 
