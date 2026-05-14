@@ -24,7 +24,6 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
-import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -48,8 +47,6 @@ import org.json.JSONObject;
 public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
     private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {}
 
-    private final SWEKPopupController controller = new SWEKPopupController();
-
     private static final int DIVPOINTS = 10;
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_HIGHLIGHT = 2 * LINEWIDTH;
@@ -63,6 +60,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     private static final float[][] texCoord = {{0, 1}, {1, 1}, {0, 0}, {1, 0}};
 
+    private final SWEKContext swekContext = new SWEKContext();
     private boolean icons = true;
 
     private final GLSLLine lineEvent = new GLSLLine(true);
@@ -81,8 +79,10 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public SWEKLayer(JSONObject jo) {
         if (jo != null)
             icons = jo.optBoolean("icons", icons);
-        else
-            setEnabled(true);
+    }
+
+    SWEKContext getContext() {
+        return swekContext;
     }
 
     @Override
@@ -325,7 +325,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y) {
         List<String> txts = new ArrayList<>();
-        for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(controller.currentTime).getSimpleVisibleEventParameters()) {
+        long currentTime = swekContext.currentTime();
+        for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(currentTime).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
             if (name != "event_description" && name != "event_title") { // interned
                 txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
@@ -344,8 +345,9 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private void renderIcons(List<JHVRelatedEvents> evs) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
+        long currentTime = swekContext.currentTime();
         for (JHVRelatedEvents evtr : evs) {
-            JHVEvent evt = evtr.getClosestTo(controller.currentTime);
+            JHVEvent evt = evtr.getClosestTo(currentTime);
             if (Display.mode.isLatitudinal() && evt.isCactus())
                 continue;
             bindTexture(evtr.getSupplier().getGroup());
@@ -355,7 +357,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     private List<JHVRelatedEvents> activeEvents() {
-        long time = controller.currentTime;
+        long time = swekContext.currentTime();
         long start = Movie.getStartTime();
         long end = Movie.getEndTime();
         if (time != cachedEventsTime || start != cachedEventsStart || end != cachedEventsEnd) {
@@ -379,11 +381,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (evs.isEmpty())
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
+        long currentTime = swekContext.currentTime();
 
         for (JHVRelatedEvents evtr : evs) {
-            JHVEvent evt = evtr.getClosestTo(controller.currentTime);
+            JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus()) {
-                drawCactusArc(evtr, evt, controller.currentTime);
+                drawCactusArc(evtr, evt, currentTime);
             } else {
                 drawPolygon(ctx, evtr, evt);
                 if (icons) {
@@ -405,11 +408,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (evs.isEmpty())
             return;
         MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
+        long currentTime = swekContext.currentTime();
 
         for (JHVRelatedEvents evtr : evs) {
-            JHVEvent evt = evtr.getClosestTo(controller.currentTime);
+            JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus() && (Display.mode.isPolar() || Display.mode.isLogPolar())) {
-                drawCactusArcScale(vp, evtr, evt, controller.currentTime, Display.mode.scale);
+                drawCactusArcScale(vp, evtr, evt, currentTime, Display.mode.scale);
             } else {
                 drawPolygon(ctx, evtr, evt);
                 if (icons) {
@@ -427,8 +431,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void renderFullFloat(Camera camera, Viewport vp) {
         if (!enabled)
             return;
-        if (SWEKPopupController.mouseOverJHVEvent != null) {
-            drawText(vp, SWEKPopupController.mouseOverJHVEvent, SWEKPopupController.mouseOverX, SWEKPopupController.mouseOverY);
+        if (swekContext.mouseOverJHVEvent() != null) {
+            drawText(vp, swekContext.mouseOverJHVEvent(), swekContext.mouseOverX(), swekContext.mouseOverY());
         }
     }
 
@@ -446,19 +450,18 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
+        swekContext.setEnabled(enabled);
 
         if (enabled) {
             JHVEventCache.registerHandler(this);
+            Movie.addTimeListener(swekContext);
             Movie.addTimeRangeListener(this);
-            Movie.addTimeListener(controller);
-            InputController.addListener(controller);
             requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
         } else {
-            controller.resetHover();
             invalidateActiveEvents();
-            InputController.removeListener(controller);
-            Movie.removeTimeListener(controller);
+            JHVEventCache.highlight(null);
             Movie.removeTimeRangeListener(this);
+            Movie.removeTimeListener(swekContext);
             JHVEventCache.unregisterHandler(this);
         }
     }

@@ -13,6 +13,7 @@ public class SWEKPlugin extends Plugin {
     private static final SWEKLayer layer = new SWEKLayer(null);
     private static final EventTimelineLayer etl = new EventTimelineLayer();
     private final SWEKTreePane swekPanel = new SWEKTreePane(SWEKConfig.load());
+    private final SWEKPopupController popupController = new SWEKPopupController(layer.getContext());
 
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
@@ -24,6 +25,8 @@ public class SWEKPlugin extends Plugin {
         JHVFrame.getLeftContentPane().revalidate();
 
         LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
+        layer.setEnabled(true);
+        popupController.install();
         Layers.add(layer);
         Timelines.getLayers().add(etl);
     }
@@ -32,6 +35,7 @@ public class SWEKPlugin extends Plugin {
     public void uninstall() {
         Timelines.getLayers().remove(etl);
         Layers.remove(layer);
+        popupController.uninstall();
         LayerOptions.unregister(SWEKLayer.class);
 
         JHVFrame.getLeftContentPane().remove(swekPanel);

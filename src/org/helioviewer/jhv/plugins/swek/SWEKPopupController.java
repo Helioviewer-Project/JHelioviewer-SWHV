@@ -18,6 +18,7 @@ import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -26,34 +27,38 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.swing.AwtInputAdapter;
-import org.helioviewer.jhv.time.TimeListener;
 
-class SWEKPopupController implements InputPointerListener, InputPointerMotionListener, TimeListener.Change {
+class SWEKPopupController implements InputPointerListener, InputPointerMotionListener {
 
     private static final Cursor helpCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     private static final int xOffset = 12;
     private static final int yOffset = 12;
 
+    private final SWEKContext swekContext;
     private final Camera camera;
 
     private Cursor lastCursor;
+    private JHVRelatedEvents mouseOverJHVEvent;
+    private int mouseOverX;
+    private int mouseOverY;
+    private long currentTime;
 
-    static JHVRelatedEvents mouseOverJHVEvent = null;
-    static int mouseOverX;
-    static int mouseOverY;
-    long currentTime;
-
-    SWEKPopupController() {
+    SWEKPopupController(SWEKContext _swekContext) {
+        swekContext = _swekContext;
         camera = Display.getCamera();
+    }
+
+    void install() {
+        InputController.addListener(this);
+    }
+
+    void uninstall() {
+        InputController.removeListener(this);
+        resetHover();
     }
 
     private static Component component() {
         return JHVFrame.getRenderComponent();
-    }
-
-    @Override
-    public void timeChanged(long milli) {
-        currentTime = milli;
     }
 
     private Point calcWindowPosition(Component component, Point p, int hekWidth, int hekHeight) {
@@ -93,7 +98,9 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
     @Override
     public void mouseClicked(PointerEvent e) {
-        if (mouseOverJHVEvent != null) {
+        currentTime = swekContext.currentTime();
+        mouseOverJHVEvent = swekContext.mouseOverJHVEvent();
+        if (swekContext.isEnabled() && mouseOverJHVEvent != null) {
             Component canvas = component();
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(currentTime));
             hekPopUp.pack();
@@ -111,6 +118,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
     void resetHover() {
         mouseOverJHVEvent = null;
+        swekContext.clearHover();
         JHVEventCache.highlight(null);
         component().setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
     }
@@ -124,6 +132,12 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
     @Override
     public void mouseMoved(PointerEvent e) {
+        if (!swekContext.isEnabled()) {
+            resetHover();
+            return;
+        }
+
+        currentTime = swekContext.currentTime();
         List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
         if (activeEvents.isEmpty()) {
             resetHover();
@@ -195,6 +209,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             }
         }
 
+        swekContext.setMouseOver(mouseOverX, mouseOverY, mouseOverJHVEvent);
         Component canvas = component();
         JHVEventCache.highlight(mouseOverJHVEvent);
         Cursor cursor = canvas.getCursor();
