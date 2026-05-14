@@ -40,7 +40,7 @@ public class LoadConnectivity {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        Tasks.submit(uri.toString(), new ConnectivityLoad(uri), receiver::setConnectivity, "An error occurred opening the remote file.");
+        Tasks.submit(uri.toString(), new ConnectivityLoad(uri), receiver::setConnectivity, "Error getting the data");
     }
 
     private record ConnectivityLoad(URI uri) implements Callable<Connectivity> {

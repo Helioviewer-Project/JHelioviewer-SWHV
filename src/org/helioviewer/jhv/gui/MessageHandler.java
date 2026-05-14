@@ -8,6 +8,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.gui.components.base.HTMLPane;
+import org.helioviewer.jhv.swing.DesktopIntegration;
 
 final class MessageHandler implements Message.Handler {
 
@@ -38,8 +40,14 @@ final class MessageHandler implements Message.Handler {
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(600, 400));
 
+            HTMLPane report = new HTMLPane();
+            report.setOpaque(false);
+            report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
+            String url = "https://github.com/Helioviewer-Project/api/issues/new";
+            report.setText("If this is a JPIP connection failure, you can open a bug report for the<br>Helioviewer server at <a href='" + url + "'>" + url + "</a>.");
+
             JOptionPane optionPane = new JOptionPane();
-            optionPane.setMessage(scrollPane);
+            optionPane.setMessage(new Object[]{report, scrollPane});
             optionPane.setMessageType(type);
             optionPane.setOptions(new String[]{"Close"});
             optionPane.createDialog(JHVFrame.getFrame(), title).setVisible(true);

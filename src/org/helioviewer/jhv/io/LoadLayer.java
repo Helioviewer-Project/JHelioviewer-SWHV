@@ -67,7 +67,7 @@ public class LoadLayer {
         layer.unload();
 
         Log.error(Throwables.getStackTraceAsString(t));
-        Message.err("An error occurred opening the remote file.", t.getMessage());
+        Message.err("Error getting the data", t.getMessage());
     }
 
     private static View loadUri(DecodeExecutor executor, List<URI> uriList) throws Exception {

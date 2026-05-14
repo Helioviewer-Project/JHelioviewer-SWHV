@@ -289,7 +289,7 @@ public final class GaiaClient {
     private static void onFailure(Receiver receiver, Position viewpoint, Throwable t) {
         receiver.setStarsFailed(viewpoint);
         Log.error(t);
-        Message.err("An error occurred querying the server", t.getMessage());
+        Message.err("Error getting the data", t.getMessage());
     }
 
 }

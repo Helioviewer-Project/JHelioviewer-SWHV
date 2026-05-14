@@ -34,7 +34,7 @@ public final class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        Tasks.submit("soar", new QueryItems(adql), receiver::setSoarResponseItems, "An error occurred querying the server");
+        Tasks.submit("soar", new QueryItems(adql), receiver::setSoarResponseItems, "Error getting the data");
     }
 
     public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
