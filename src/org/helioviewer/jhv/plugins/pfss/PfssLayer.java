@@ -16,7 +16,7 @@ import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
 
-public class PfssLayer extends AbstractLayer implements TimeListener.Change, TimeListener.Range { // has to be public for state
+public class PfssLayer extends AbstractLayer implements TimeListener.Range { // has to be public for state
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
@@ -30,7 +30,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
 
     private PfssLoader.Data lastData;
     private JHVTime pfssTime;
-    private long currentTime;
 
     public PfssLayer(JSONObject jo) {
         if (jo != null) {
@@ -53,7 +52,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
             return;
 
         PfssLoader.Data data;
-        if ((data = cache.getNearestData(currentTime)) == null)
+        if ((data = cache.getNearestData(camera.getViewpoint().time.milli)) == null)
             return;
         renderData(vp, data);
         lastData = data;
@@ -81,19 +80,12 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Change, Tim
         super.setEnabled(_enabled);
 
         if (enabled) {
-            Movie.addTimeListener(this);
             Movie.addTimeRangeListener(this);
         } else {
-            Movie.removeTimeListener(this);
             Movie.removeTimeRangeListener(this);
             pfssTime = null;
             lastData = null;
         }
-    }
-
-    @Override
-    public void timeChanged(long milli) {
-        currentTime = milli;
     }
 
     @Override
