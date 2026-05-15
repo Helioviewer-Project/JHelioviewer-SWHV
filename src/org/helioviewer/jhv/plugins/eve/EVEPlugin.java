@@ -12,9 +12,9 @@ import org.json.JSONObject;
 
 public class EVEPlugin extends Plugin {
 
-    private final Timelines tl = new Timelines();
-    private final JMenuItem newItem = new JMenuItem(new TimelineActions.NewLayer());
-    private final JMenuItem openItem = new JMenuItem(new TimelineActions.OpenLocalFile());
+    private Timelines tl;
+    private JMenuItem newItem;
+    private JMenuItem openItem;
 
     public EVEPlugin() {
         super("Timelines", "Visualize 1D and 2D time series");
@@ -28,17 +28,24 @@ public class EVEPlugin extends Plugin {
 
     @Override
     public void installGUI() {
+        tl = new Timelines();
         tl.installTimelines();
-        BandReaderHapi.requestCatalog();
+        newItem = new JMenuItem(new TimelineActions.NewLayer());
+        openItem = new JMenuItem(new TimelineActions.OpenLocalFile());
         JHVFrame.getMenuBar().getMenu(0).add(newItem, 3);
         JHVFrame.getMenuBar().getMenu(0).add(openItem, 5);
+
+        BandReaderHapi.requestCatalog();
     }
 
     @Override
     public void uninstallGUI() {
-        tl.uninstallTimelines();
-        JHVFrame.getMenuBar().getMenu(0).remove(newItem);
         JHVFrame.getMenuBar().getMenu(0).remove(openItem);
+        JHVFrame.getMenuBar().getMenu(0).remove(newItem);
+        openItem = null;
+        newItem = null;
+        tl.uninstallTimelines();
+        tl = null;
     }
 
     @Override
