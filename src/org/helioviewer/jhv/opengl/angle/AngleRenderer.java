@@ -19,6 +19,19 @@ import org.lwjgl.system.MemoryUtil;
 public final class AngleRenderer {
     private record PlatformConfig(int backendType, String eglLibrary, String openGlesLibrary) {}
 
+    private enum SurfaceKind {
+        WINDOW(EGL15.EGL_WINDOW_BIT, true),
+        PBUFFER(EGL15.EGL_PBUFFER_BIT, false);
+
+        private final int eglBit;
+        private final boolean swapBuffers;
+
+        SurfaceKind(int _eglBit, boolean _swapBuffers) {
+            eglBit = _eglBit;
+            swapBuffers = _swapBuffers;
+        }
+    }
+
     private static boolean lwjglConfigured;
     private static boolean rendererInitialized;
 
@@ -32,6 +45,7 @@ public final class AngleRenderer {
     private final long display;
     private final long context;
     private final long surface;
+    private final boolean swapBuffers;
     private final PlatformConfig platform;
 
     // Front-load LWJGL/ANGLE library setup and EGL capability discovery before the first real renderer is created.
@@ -40,7 +54,22 @@ public final class AngleRenderer {
     }
 
     public AngleRenderer(long nativeWindowHandle) {
+        this(SurfaceKind.WINDOW, nativeWindowHandle, 0, 0);
+        try {
+            render();
+        } catch (RuntimeException | Error e) {
+            destroy();
+            throw e;
+        }
+    }
+
+    public static AngleRenderer pbuffer(int width, int height) {
+        return new AngleRenderer(SurfaceKind.PBUFFER, 0L, width, height);
+    }
+
+    private AngleRenderer(SurfaceKind surfaceKind, long nativeWindowHandle, int pbufferWidth, int pbufferHeight) {
         platform = platformConfig();
+        swapBuffers = surfaceKind.swapBuffers;
         ensureLwjglAngleConfigured(platform);
 
         long newDisplay = EGL15.EGL_NO_DISPLAY;
@@ -65,7 +94,7 @@ public final class AngleRenderer {
                 throw eglError("eglBindAPI");
 
             int samples = GL.SAMPLES > 1 ? GL.SAMPLES : 0;
-            long config = chooseConfig(stack, newDisplay, samples);
+            long config = chooseConfig(stack, newDisplay, samples, surfaceKind.eglBit);
             if (config == 0L)
                 throw eglError("eglChooseConfig");
             logChosenConfig(stack, config);
@@ -75,9 +104,18 @@ public final class AngleRenderer {
             if (newContext == EGL15.EGL_NO_CONTEXT)
                 throw eglError("eglCreateContext");
 
-            newSurface = EGL15.eglCreateWindowSurface(newDisplay, config, nativeWindowHandle, stack.ints(EGL15.EGL_NONE));
-            if (newSurface == EGL15.EGL_NO_SURFACE)
-                throw eglError("eglCreateWindowSurface");
+            if (surfaceKind == SurfaceKind.WINDOW) {
+                newSurface = EGL15.eglCreateWindowSurface(newDisplay, config, nativeWindowHandle, stack.ints(EGL15.EGL_NONE));
+                if (newSurface == EGL15.EGL_NO_SURFACE)
+                    throw eglError("eglCreateWindowSurface");
+            } else {
+                newSurface = EGL15.eglCreatePbufferSurface(newDisplay, config, stack.ints(
+                        EGL15.EGL_WIDTH, pbufferWidth,
+                        EGL15.EGL_HEIGHT, pbufferHeight,
+                        EGL15.EGL_NONE));
+                if (newSurface == EGL15.EGL_NO_SURFACE)
+                    throw eglError("eglCreatePbufferSurface");
+            }
 
             if (!EGL15.eglMakeCurrent(newDisplay, newSurface, newSurface, newContext))
                 throw eglError("eglMakeCurrent");
@@ -101,19 +139,13 @@ public final class AngleRenderer {
 
         context = newContext;
         surface = newSurface;
-        try {
-            render();
-        } catch (RuntimeException | Error e) {
-            destroy();
-            throw e;
-        }
     }
 
     public void render() {
         if (!EGL15.eglMakeCurrent(display, surface, surface, context))
             throw eglError("eglMakeCurrent");
         GLRenderer.display();
-        if (!EGL15.eglSwapBuffers(display, surface))
+        if (swapBuffers && !EGL15.eglSwapBuffers(display, surface))
             throw eglError("eglSwapBuffers");
     }
 
@@ -158,28 +190,28 @@ public final class AngleRenderer {
         return stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, platform.backendType(), EGL15.EGL_NONE);
     }
 
-    private static long chooseConfig(MemoryStack stack, long display, int samples) {
+    private static long chooseConfig(MemoryStack stack, long display, int samples, int surfaceType) {
         for (int depthBits : DEPTH_PREFERENCES) {
             if (samples > 0) {
-                long config = chooseConfig(stack, display, depthBits, samples);
+                long config = chooseConfig(stack, display, depthBits, samples, surfaceType);
                 if (config != 0L)
                     return config;
             }
         }
         for (int depthBits : DEPTH_PREFERENCES) {
-            long config = chooseConfig(stack, display, depthBits, 0);
+            long config = chooseConfig(stack, display, depthBits, 0, surfaceType);
             if (config != 0L)
                 return config;
         }
         return 0L;
     }
 
-    private static long chooseConfig(MemoryStack stack, long display, int depthBits, int samples) {
+    private static long chooseConfig(MemoryStack stack, long display, int depthBits, int samples, int surfaceType) {
         PointerBuffer configOut = stack.mallocPointer(1);
         IntBuffer numConfigs = stack.mallocInt(1);
         int attributeCount = samples > 0 ? 19 : 15;
         IntBuffer configAttrs = stack.mallocInt(attributeCount);
-        configAttrs.put(EGL15.EGL_SURFACE_TYPE).put(EGL15.EGL_WINDOW_BIT);
+        configAttrs.put(EGL15.EGL_SURFACE_TYPE).put(surfaceType);
         configAttrs.put(EGL15.EGL_RENDERABLE_TYPE).put(EGL_OPENGL_ES3_BIT);
         configAttrs.put(EGL15.EGL_RED_SIZE).put(8);
         configAttrs.put(EGL15.EGL_GREEN_SIZE).put(8);
