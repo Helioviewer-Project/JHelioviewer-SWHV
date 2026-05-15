@@ -205,12 +205,16 @@ public final class Commands {
     }
 
     public static void notifyLoadStateFinished(@Nullable OperationContext context, boolean success, String message) {
-        EventQueue.invokeLater(() -> completionListeners.forEach(listener -> listener.loadStateFinished(context, success, message)));
+        for (CompletionListener listener : List.copyOf(completionListeners)) { // snapshot listeners
+            EventQueue.invokeLater(() -> listener.loadStateFinished(context, success, message));
+        }
     }
 
     public static void notifyRecordingFinished(@Nullable OperationContext context, boolean success, String message,
                                                @Nullable String output) {
-        EventQueue.invokeLater(() -> completionListeners.forEach(listener -> listener.recordingFinished(context, success, message, output)));
+        for (CompletionListener listener : List.copyOf(completionListeners)) { // snapshot listeners
+            EventQueue.invokeLater(() -> listener.recordingFinished(context, success, message, output));
+        }
     }
 
 }
