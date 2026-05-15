@@ -10,5 +10,10 @@
       "label": "Institut d'Astrophysique Spatiale Test Server",
       "api": "https://inf-helio-test-api.ias.u-psud.fr/v2/",
     },
+    {
+      "name": "ESAC",
+      "label": "European Space Astronomy Center",
+      "api": "https://soar.esac.esa.int/jpip-api/v2/",
+    },
   ]
 }
