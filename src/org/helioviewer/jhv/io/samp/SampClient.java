@@ -61,12 +61,12 @@ public final class SampClient extends HubConnector {
         }
     };
 
-    public static void init() {
+    public static void init(boolean webProfilePopup) {
         JHVThread.create(() -> {
             if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
                 try {
                     if (Hub.getRunningHubs().length == 0) {
-                        Hub.runHub(HubServiceMode.NO_GUI, hubProfiles(true), null);
+                        Hub.runHub(HubServiceMode.NO_GUI, hubProfiles(webProfilePopup), null);
                     }
                 } catch (Exception e) {
                     Log.warn(e);
