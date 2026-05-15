@@ -99,14 +99,14 @@ public class JHelioviewer {
             frame.setVisible(true);
             UITimer.start();
 
-            Tasks.submit("init", new Init(), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
+            Tasks.submit("init", new Init(true), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
         });
     }
 
-    private record Init() implements Callable<Void> {
+    private record Init(boolean webProfilePopup) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
-            JHVInit.init();
+            JHVInit.init(webProfilePopup);
             return null;
         }
     }

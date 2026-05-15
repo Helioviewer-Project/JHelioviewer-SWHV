@@ -28,8 +28,8 @@ import nom.tam.fits.FitsFactory;
 
 class JHVInit {
 
-    static void init() throws Exception {
-        SampClient.init();
+    static void init(boolean webProfilePopup) throws Exception {
+        SampClient.init(webProfilePopup);
         ExitHooks.attach();
 
         loadLibs(Platform.getResourceDir());
