@@ -26,6 +26,7 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.Actions;
+import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -296,7 +297,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSelected()) {
-                Commands.recordStart(null, null);
+                Commands.recordStart(CompletionNotifications.recordingContext(), null);
             } else {
                 Commands.recordStop();
             }

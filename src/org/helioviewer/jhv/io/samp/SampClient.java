@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.io.samp;
 
+import java.awt.EventQueue;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -17,7 +17,6 @@ import org.helioviewer.jhv.threads.JHVThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
-import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.DefaultClientProfile;
 import org.astrogrid.samp.client.HubConnection;
@@ -40,26 +39,6 @@ public final class SampClient extends HubConnector {
     }
 
     private static SampClient instance; // keep instance built at startup
-    private static final Commands.CompletionListener completionListener = new Commands.CompletionListener() {
-        @Override
-        public void loadStateFinished(@Nullable Commands.OperationContext context, boolean success, String message) {
-            if (context == null || context.owner() != SampClient.class || context.clientId() == null)
-                return;
-            if (!"jhv.load.state".equals(context.mtype()))
-                return;
-            notifyCompletion(context, "jhv.load.state.completed", success, message, null);
-        }
-
-        @Override
-        public void recordingFinished(@Nullable Commands.OperationContext context, boolean success, String message,
-                                      @Nullable String output) {
-            if (context == null || context.owner() != SampClient.class || context.clientId() == null)
-                return;
-            if (!"jhv.record.start".equals(context.mtype()))
-                return;
-            notifyCompletion(context, "jhv.record.start.completed", success, message, output);
-        }
-    };
 
     public static void init(boolean webProfilePopup) {
         JHVThread.create(() -> {
@@ -85,38 +64,6 @@ public final class SampClient extends HubConnector {
         };
     }
 
-    @FunctionalInterface
-    interface CheckedHandler {
-        void accept(String senderId, String senderName, Message msg) throws Exception;
-    }
-
-    static final class JHVSampHandler extends AbstractMessageHandler {
-
-        private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1"); // allow SAMP messages from web
-        private final String type;
-        private final CheckedHandler consumer;
-
-        JHVSampHandler(String _type, CheckedHandler _consumer) {
-            super(Collections.singletonMap(_type, harmless));
-            type = _type;
-            consumer = _consumer;
-        }
-
-        @Nullable
-        @Override
-        public Map<?, ?> processCall(HubConnection c, String senderId, Message msg) {
-            try {
-                String sender = c.getMetadata(senderId).getName();
-                // Log.info("{\"sender\": \"" + sender + "\",\"message\": " + SampUtils.toJson(msg, false));
-                consumer.accept(senderId, sender, msg);
-            } catch (Exception e) {
-                Log.warn(type, e);
-            }
-            return null;
-        }
-
-    }
-
     private SampClient(ClientProfile _profile) {
         super(_profile);
 
@@ -136,9 +83,15 @@ public final class SampClient extends HubConnector {
         CameraHandlers.register(this);
 
         declareSubscriptions(computeSubscriptions());
-        Commands.addCompletionListener(completionListener);
 
         setAutoconnect(10);
+    }
+
+    static Commands.OperationContext operationContext(String senderId, Message msg, String mtype, String completionMType) {
+        String requestId = SampHandlers.optionalString(msg, "requestId");
+        return new Commands.OperationContext(SampClient.class, senderId, requestId, mtype,
+                (context, success, message, output) -> EventQueue.invokeLater(() ->
+                        notifyCompletion(context, completionMType, success, message, output)));
     }
 
     private static void notifyCompletion(Commands.OperationContext context, String completionMType,
@@ -180,11 +133,6 @@ public final class SampClient extends HubConnector {
         } catch (Exception e) {
             Log.warn(e);
         }
-    }
-
-    static @Nullable String optionalString(Message msg, String key) {
-        Object value = msg.getParam(key);
-        return value == null ? null : value.toString();
     }
 
 }

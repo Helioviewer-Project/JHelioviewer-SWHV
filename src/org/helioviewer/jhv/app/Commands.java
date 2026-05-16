@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.app;
 
-import java.awt.EventQueue;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,16 +34,22 @@ public final class Commands {
             @Nullable String speedUnit) {}
 
     public record OperationContext(Class<?> owner, @Nullable String clientId, @Nullable String requestId,
-                                   @Nullable String mtype) {}
+                                   @Nullable String mtype, @Nullable Completion completion) {
+        public OperationContext(Class<?> owner, @Nullable String clientId, @Nullable String requestId,
+                                @Nullable String mtype) {
+            this(owner, clientId, requestId, mtype, null);
+        }
 
-    public interface CompletionListener {
-        void loadStateFinished(@Nullable OperationContext context, boolean success, String message);
-
-        void recordingFinished(@Nullable OperationContext context, boolean success, String message,
-                               @Nullable String output);
+        public void complete(boolean success, String message, @Nullable String output) {
+            if (completion != null)
+                completion.finished(this, success, message, output);
+        }
     }
 
-    private static final ArrayList<CompletionListener> completionListeners = new ArrayList<>();
+    @FunctionalInterface
+    public interface Completion {
+        void finished(OperationContext context, boolean success, String message, @Nullable String output);
+    }
 
     public static void setViewStateRaw(
             @Nullable String projection,
@@ -214,26 +218,15 @@ public final class Commands {
         ViewActions.rotateView90(axis);
     }
 
-    public static void addCompletionListener(CompletionListener listener) {
-        if (!completionListeners.contains(listener))
-            completionListeners.add(listener);
-    }
-
-    public static void removeCompletionListener(CompletionListener listener) {
-        completionListeners.remove(listener);
-    }
-
     public static void notifyLoadStateFinished(@Nullable OperationContext context, boolean success, String message) {
-        for (CompletionListener listener : List.copyOf(completionListeners)) { // snapshot listeners
-            EventQueue.invokeLater(() -> listener.loadStateFinished(context, success, message));
-        }
+        if (context != null)
+            context.complete(success, message, null);
     }
 
     public static void notifyRecordingFinished(@Nullable OperationContext context, boolean success, String message,
                                                @Nullable String output) {
-        for (CompletionListener listener : List.copyOf(completionListeners)) { // snapshot listeners
-            EventQueue.invokeLater(() -> listener.recordingFinished(context, success, message, output));
-        }
+        if (context != null)
+            context.complete(success, message, output);
     }
 
 }

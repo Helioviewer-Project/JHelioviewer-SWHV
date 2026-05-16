@@ -11,26 +11,25 @@ final class RecordHandlers {
     private RecordHandlers() {}
 
     static void register(SampClient client) {
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.record.set", (senderId, sender, msg) -> {
-            String mode = SampClient.optionalString(msg, "mode");
-            String size = SampClient.optionalString(msg, "size");
+        client.addMessageHandler(SampHandlers.create("jhv.record.set", (senderId, sender, msg) -> {
+            String mode = SampHandlers.optionalString(msg, "mode");
+            String size = SampHandlers.optionalString(msg, "size");
             EventQueue.invokeLater(() -> Commands.setRecordingRaw(mode, size));
         }));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.record.start",
+        client.addMessageHandler(SampHandlers.create("jhv.record.start",
                 (senderId, sender, msg) -> recordStart(msg, senderId)));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.record.stop",
+        client.addMessageHandler(SampHandlers.create("jhv.record.stop",
                 (senderId, sender, msg) -> EventQueue.invokeLater(Commands::recordStop)));
     }
 
     private static void recordStart(Message msg, String senderId) {
-        String requestId = SampClient.optionalString(msg, "requestId");
-        Commands.OperationContext context = new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.record.start");
+        Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.record.start", "jhv.record.start.completed");
         Commands.RecordStartInput input = new Commands.RecordStartInput(
-                SampClient.optionalString(msg, "mode"),
-                SampClient.optionalString(msg, "size"),
-                SampClient.optionalString(msg, "advanceMode"),
-                SampClient.optionalString(msg, "speed"),
-                SampClient.optionalString(msg, "speedUnit"));
+                SampHandlers.optionalString(msg, "mode"),
+                SampHandlers.optionalString(msg, "size"),
+                SampHandlers.optionalString(msg, "advanceMode"),
+                SampHandlers.optionalString(msg, "speed"),
+                SampHandlers.optionalString(msg, "speedUnit"));
         EventQueue.invokeLater(() -> Commands.recordStart(context, input));
     }
 }
