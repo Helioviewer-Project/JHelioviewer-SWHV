@@ -31,7 +31,7 @@ final class LoadHandlers {
         }));
         // advertise we can load CDF, although we can do only MAG and SWA
         client.addMessageHandler(singleURIHandler("table.load.cdf", Commands::loadCDF));
-        client.addMessageHandler(uriListHandler("jhv.load.image", Commands::loadImage, Commands::loadImage));
+        client.addMessageHandler(LoadImageHandler.create());
         client.addMessageHandler(uriListHandler("jhv.load.cdf", Commands::loadCDF, Commands::loadCDF));
         // Add handler for the HAPI csv files
         client.addMessageHandler(uriListHandler("jhv.load.hapi", Commands::loadHapi, Commands::loadHapi));
@@ -87,24 +87,24 @@ final class LoadHandlers {
         }
     }
 
-    private static void loadURI(Message msg, Consumer<URI> consumer) throws Exception {
+    private static boolean loadURI(Message msg, Consumer<URI> consumer) throws Exception {
         URI uri = requiredURI(msg);
         if (uri == null)
-            return;
+            return false;
         EventQueue.invokeLater(() -> consumer.accept(uri));
+        return true;
     }
 
-    private static void loadURIList(Message msg, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer) throws Exception {
+    static boolean loadURIList(Message msg, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer) throws Exception {
         Object url = msg.getParam("url");
-        if (!(url instanceof Iterable<?> urls)) {
-            loadURI(msg, singleConsumer);
-            return;
-        }
+        if (!(url instanceof Iterable<?> urls))
+            return loadURI(msg, singleConsumer);
 
         ArrayList<URI> uris = new ArrayList<>();
         for (Object obj : urls)
             uris.add(toURI(obj.toString()));
         EventQueue.invokeLater(() -> listConsumer.accept(uris));
+        return true;
     }
 
     private static URI toURI(String url) throws Exception {
