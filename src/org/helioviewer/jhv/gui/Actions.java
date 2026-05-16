@@ -24,7 +24,6 @@ import org.helioviewer.jhv.gui.dialogs.SoarDialog;
 import org.helioviewer.jhv.gui.dialogs.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
-import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
@@ -141,7 +140,7 @@ public class Actions {
                     if (f.isFile() && f.canRead()) // cannot select directories anyway
                         uris.add(f.toURI());
                 }
-                Load.image(uris);
+                Commands.loadImage(uris);
             }
         }
     }

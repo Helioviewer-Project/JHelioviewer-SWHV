@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
@@ -27,25 +26,6 @@ public final class Load {
 
     public static void cdf(@Nullable Object input) {
         dispatchURIOrURIList("cdf", input, Load::cdf, Load::cdf);
-    }
-
-    public static void image(@Nonnull List<URI> uris) {
-        if (!uris.isEmpty()) {
-            FileUtils.resolveURIListOffEDT(uris, "JHV-LoadDirectory", resolved -> {
-                if (!resolved.isEmpty()) {
-                    ImageLayer layer = ImageLayer.create(null);
-                    layer.load(resolved);
-                }
-            });
-        }
-    }
-
-    public static void image(@Nonnull URI uri) {
-        image(List.of(uri));
-    }
-
-    public static void image(@Nullable Object input) {
-        dispatchURIOrURIList("image", input, Load::image, Load::image);
     }
 
     public static void sunJSON(@Nonnull List<URI> uris) {
