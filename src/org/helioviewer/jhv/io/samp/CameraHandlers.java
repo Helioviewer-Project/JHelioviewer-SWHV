@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import org.helioviewer.jhv.app.Commands;
 
+import org.astrogrid.samp.client.AbstractMessageHandler;
+
 final class CameraHandlers {
 
     private CameraHandlers() {}
@@ -15,11 +17,11 @@ final class CameraHandlers {
         client.addMessageHandler(commandHandler("jhv.view.zoom-1-to-1", Commands::zoomOneToOne));
         client.addMessageHandler(commandHandler("jhv.view.reset", Commands::resetView));
         client.addMessageHandler(commandHandler("jhv.view.reset-axis", Commands::resetViewAxis));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.view.rotate90",
-                (senderId, sender, msg) -> EventQueue.invokeLater(() -> Commands.rotateView90(SampClient.optionalString(msg, "axis")))));
+        client.addMessageHandler(SampHandlers.create("jhv.view.rotate90",
+                (senderId, sender, msg) -> EventQueue.invokeLater(() -> Commands.rotateView90(SampHandlers.optionalString(msg, "axis")))));
     }
 
-    private static SampClient.JHVSampHandler commandHandler(String type, Runnable command) {
-        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
+    private static AbstractMessageHandler commandHandler(String type, Runnable command) {
+        return SampHandlers.create(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
     }
 }

@@ -7,6 +7,7 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.astrogrid.samp.Message;
+import org.astrogrid.samp.client.AbstractMessageHandler;
 
 final class PlaybackHandlers {
 
@@ -19,26 +20,26 @@ final class PlaybackHandlers {
         client.addMessageHandler(commandHandler("jhv.playback.toggle", Commands::togglePlayback));
         client.addMessageHandler(commandHandler("jhv.playback.next-frame", Commands::nextFrame));
         client.addMessageHandler(commandHandler("jhv.playback.previous-frame", Commands::previousFrame));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.playback.seek-frame",
+        client.addMessageHandler(SampHandlers.create("jhv.playback.seek-frame",
                 (senderId, sender, msg) -> playbackSeekFrame(msg)));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.playback.seek-time",
+        client.addMessageHandler(SampHandlers.create("jhv.playback.seek-time",
                 (senderId, sender, msg) -> playbackSeekTime(msg)));
     }
 
-    private static SampClient.JHVSampHandler playbackSetHandler() {
-        return new SampClient.JHVSampHandler("jhv.playback.set", (senderId, sender, msg) -> {
+    private static AbstractMessageHandler playbackSetHandler() {
+        return SampHandlers.create("jhv.playback.set", (senderId, sender, msg) -> {
             Commands.PlaybackInput input = new Commands.PlaybackInput(
-                    SampClient.optionalString(msg, "advanceMode"),
-                    SampClient.optionalString(msg, "speed"),
-                    SampClient.optionalString(msg, "speedUnit"),
-                    SampClient.optionalString(msg, "firstFrame"),
-                    SampClient.optionalString(msg, "lastFrame"));
+                    SampHandlers.optionalString(msg, "advanceMode"),
+                    SampHandlers.optionalString(msg, "speed"),
+                    SampHandlers.optionalString(msg, "speedUnit"),
+                    SampHandlers.optionalString(msg, "firstFrame"),
+                    SampHandlers.optionalString(msg, "lastFrame"));
             EventQueue.invokeLater(() -> Commands.setPlayback(input));
         });
     }
 
     private static void playbackSeekFrame(Message msg) {
-        String frame = SampClient.optionalString(msg, "frame");
+        String frame = SampHandlers.optionalString(msg, "frame");
         if (frame == null)
             return;
         try {
@@ -50,7 +51,7 @@ final class PlaybackHandlers {
     }
 
     private static void playbackSeekTime(Message msg) {
-        String time = SampClient.optionalString(msg, "time");
+        String time = SampHandlers.optionalString(msg, "time");
         if (time == null)
             return;
         try {
@@ -61,7 +62,7 @@ final class PlaybackHandlers {
         }
     }
 
-    private static SampClient.JHVSampHandler commandHandler(String type, Runnable command) {
-        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
+    private static AbstractMessageHandler commandHandler(String type, Runnable command) {
+        return SampHandlers.create(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
     }
 }

@@ -20,12 +20,12 @@ final class LoadHandlers {
     static void register(SampClient client) {
         client.addMessageHandler(singleURIHandler("image.load.fits", Commands::loadImage));
         // load VOTable only from SOAR
-        client.addMessageHandler(new SampClient.JHVSampHandler("table.load.votable", (senderId, sender, msg) -> {
+        client.addMessageHandler(SampHandlers.create("table.load.votable", (senderId, sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender))
                 loadURI(msg, Commands::loadVOTable);
         }));
         // lie about support for FITS tables to get SOAR and SSA to send us (compressed) FITS
-        client.addMessageHandler(new SampClient.JHVSampHandler("table.load.fits", (senderId, sender, msg) -> {
+        client.addMessageHandler(SampHandlers.create("table.load.fits", (senderId, sender, msg) -> {
             if ("SolarOrbiterARchive".equals(sender) || "SSA".equals(sender))
                 loadURI(msg, Commands::loadImage);
         }));
@@ -37,20 +37,20 @@ final class LoadHandlers {
         client.addMessageHandler(uriListHandler("jhv.load.hapi", Commands::loadHapi, Commands::loadHapi));
         client.addMessageHandler(uriOrValueHandler("jhv.load.request", Commands::loadRequest, Commands::loadRequest));
         client.addMessageHandler(uriOrValueHandler("jhv.load.sunjson", Commands::loadSunJSON, Commands::loadSunJSON));
-        client.addMessageHandler(new SampClient.JHVSampHandler("jhv.load.state", (senderId, sender, msg) -> loadState(msg, senderId)));
+        client.addMessageHandler(SampHandlers.create("jhv.load.state", (senderId, sender, msg) -> loadState(msg, senderId)));
     }
 
     private static AbstractMessageHandler singleURIHandler(String type, Consumer<URI> consumer) {
-        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> loadURI(msg, consumer));
+        return SampHandlers.create(type, (senderId, sender, msg) -> loadURI(msg, consumer));
     }
 
     private static AbstractMessageHandler uriListHandler(String type, Consumer<URI> singleConsumer, Consumer<List<URI>> listConsumer) {
-        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) ->
+        return SampHandlers.create(type, (senderId, sender, msg) ->
                 loadURIList(msg, singleConsumer, listConsumer));
     }
 
     private static AbstractMessageHandler uriOrValueHandler(String type, Consumer<URI> uriConsumer, Consumer<String> valueConsumer) {
-        return new SampClient.JHVSampHandler(type, (senderId, sender, msg) -> {
+        return SampHandlers.create(type, (senderId, sender, msg) -> {
             Object url = msg.getParam("url");
             if (url != null) {
                 URI uri = toURI(url.toString());
@@ -58,15 +58,14 @@ final class LoadHandlers {
                 return;
             }
 
-            String value = SampClient.optionalString(msg, "value");
+            String value = SampHandlers.optionalString(msg, "value");
             if (value != null)
                 EventQueue.invokeLater(() -> valueConsumer.accept(value));
         });
     }
 
     private static void loadState(Message msg, String senderId) throws Exception {
-        String requestId = SampClient.optionalString(msg, "requestId");
-        Commands.OperationContext context = new Commands.OperationContext(SampClient.class, senderId, requestId, "jhv.load.state");
+        Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.load.state", "jhv.load.state.completed");
 
         try {
             Object input = msg.getParam("url");
@@ -75,7 +74,7 @@ final class LoadHandlers {
                 EventQueue.invokeLater(() -> Commands.loadState(context, uri));
                 return;
             }
-            String value = SampClient.optionalString(msg, "value");
+            String value = SampHandlers.optionalString(msg, "value");
             if (value != null) {
                 EventQueue.invokeLater(() -> Commands.loadState(context, value));
                 return;

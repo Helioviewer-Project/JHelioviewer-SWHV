@@ -11,27 +11,16 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 public final class CompletionNotifications {
 
-    private static boolean initialized;
-
-    private static final Commands.CompletionListener completionListener = new Commands.CompletionListener() {
-        @Override
-        public void loadStateFinished(@Nullable Commands.OperationContext context, boolean success, String message) {}
-
-        @Override
-        public void recordingFinished(@Nullable Commands.OperationContext context, boolean success, String message, @Nullable String output) {
-            if (success)
-                showRecordingFinished(output);
-        }
-    };
-
     private CompletionNotifications() {}
 
-    static void init() {
-        if (initialized)
-            return;
+    static void init() {}
 
-        initialized = true;
-        Commands.addCompletionListener(completionListener);
+    public static Commands.OperationContext recordingContext() {
+        return new Commands.OperationContext(CompletionNotifications.class, null, null, "record",
+                (context, success, message, output) -> {
+                    if (success)
+                        EventQueue.invokeLater(() -> showRecordingFinished(output));
+                });
     }
 
     public static void fileReady(String path) {
