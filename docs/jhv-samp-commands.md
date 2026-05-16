@@ -38,6 +38,7 @@ JHV accepts the following SAMP message types:
 ### View messages
 
 - `jhv.view.set`
+- `jhv.view.fits.set`
 
 ### Recording messages
 
@@ -67,6 +68,7 @@ Restrictions:
 These messages update only the fields they receive:
 
 - `jhv.view.set`
+- `jhv.view.fits.set`
 - `jhv.playback.set`
 - `jhv.record.set`
 - `jhv.record.start`
@@ -74,12 +76,13 @@ These messages update only the fields they receive:
 For these messages:
 
 - omitted parameters leave the existing JHV state unchanged
-- invalid string values are warned about and ignored
-- out-of-range numeric values are warned about and clamped
+- invalid string values are ignored
+- out-of-range numeric values are clamped
 
 JHV applies those rules at the state boundary. See
-[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) for the
-exact implementation.
+[ViewState.java](../src/org/helioviewer/jhv/app/state/ViewState.java) and
+[FITSViewState.java](../src/org/helioviewer/jhv/view/uri/FITSViewState.java)
+for the exact implementation.
 
 ### Immediate-action messages
 
@@ -117,6 +120,7 @@ These messages update real JHV state and leave the resulting state visible in
 the UI after execution:
 
 - `jhv.view.set`
+- `jhv.view.fits.set`
 - `jhv.playback.set`
 - `jhv.record.set`
 - `jhv.record.start`
@@ -256,7 +260,11 @@ Expected string domains:
 - `advanceMode`: `Loop`, `Stop`, `Swing`
 - `speedUnit`: `FRAMES_PER_SECOND`, `MINUTES_PER_SECOND`, `HOURS_PER_SECOND`, `DAYS_PER_SECOND`
 
-`speed`, `firstFrame`, and `lastFrame` are decimal integer strings.
+Numeric fields:
+
+- `speed`: decimal integer string, clamped to `1` through `120`
+- `firstFrame`: decimal integer string, clamped to `0` through `lastFrame`
+- `lastFrame`: decimal integer string, clamped to `0` or higher
 
 Example:
 
@@ -349,6 +357,36 @@ Example:
 }
 ```
 
+### `jhv.view.fits.set`
+
+Accepted parameters:
+
+- `value`
+
+`value` is a JSON string with the same shape produced by
+`FITSViewState.toJson()`. Omitted fields leave the existing FITS view state
+unchanged. Corrupted enum values fall back to the existing values, and numeric
+values are clamped to the supported ranges.
+
+Accepted keys:
+
+- `clippingMode`: `Auto`, `ZScale`, `Range`
+- `zContrast`: integer, clamped to `4` through `400`
+- `clippingMin`: number, clamped to `-1e20` through `1e20`
+- `clippingMax`: number, clamped to `-1e20` through `1e20`
+- `scalingMode`: `Gamma`, `Beta`, `Alpha`
+- `gamma`: number, clamped to `0.25` through `1.0`
+- `beta`: number, clamped to `0.000244140625` through `0.5`
+- `alpha`: number, clamped to `10` through `100000`
+
+Example:
+
+```json
+{
+  "value": "{\"clippingMode\":\"ZScale\",\"zContrast\":40,\"scalingMode\":\"Gamma\",\"gamma\":0.4545454545}"
+}
+```
+
 ### Recording Messages
 
 ### `jhv.record.set`
@@ -402,6 +440,8 @@ Expected string domains:
 
 These values are matched with Java `valueOf(...)`, so spelling and case must
 match the names above exactly.
+
+`speed` is a decimal integer string, clamped to `1` through `120`.
 
 Example:
 

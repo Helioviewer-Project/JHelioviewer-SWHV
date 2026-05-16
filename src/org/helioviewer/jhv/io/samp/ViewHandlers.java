@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import org.helioviewer.jhv.app.Commands;
 
+import org.json.JSONObject;
+
 final class ViewHandlers {
 
     private ViewHandlers() {}
@@ -19,6 +21,13 @@ final class ViewHandlers {
             String differentialRotation = SampHandlers.optionalString(msg, "differentialRotation");
             EventQueue.invokeLater(() -> Commands.setViewStateRaw(projection, annotationMode, multiview, tracking,
                     refresh, showCorona, differentialRotation));
+        }));
+        client.addMessageHandler(SampHandlers.create("jhv.view.fits.set", (senderId, sender, msg) -> {
+            String value = SampHandlers.optionalString(msg, "value");
+            if (value != null) {
+                JSONObject json = new JSONObject(value);
+                EventQueue.invokeLater(() -> Commands.setFITSViewState(json));
+            }
         }));
     }
 }
