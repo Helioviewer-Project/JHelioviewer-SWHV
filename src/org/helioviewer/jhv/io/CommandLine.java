@@ -44,7 +44,7 @@ public class CommandLine {
     public static void load() {
         // -load
         for (URI uri : getURIOptionValues("-load")) {
-            FileUtils.resolveURIListOffEDT(uri, "JHV-LoadDirectory", Load::image);
+            Commands.loadImage(uri);
         }
     }
 

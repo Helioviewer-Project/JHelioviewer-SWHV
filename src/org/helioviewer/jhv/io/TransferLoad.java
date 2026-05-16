@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.base.Regex;
 
 public final class TransferLoad {
@@ -69,7 +70,7 @@ public final class TransferLoad {
     private static void loadData(List<URI> imageUris, List<URI> jsonUris, List<URI> cdfUris) {
         EventQueue.invokeLater(() -> {
             Load.cdf(cdfUris);
-            Load.image(imageUris);
+            Commands.loadImage(imageUris);
             Load.sunJSON(jsonUris);
         });
     }

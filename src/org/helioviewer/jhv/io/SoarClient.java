@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -66,7 +67,7 @@ public final class SoarClient {
             }
         }
         Load.cdf(cdfUris);
-        Load.image(imageUris);
+        Commands.loadImage(imageUris);
     }
 
     static void submitTable(@Nonnull URI uri) {

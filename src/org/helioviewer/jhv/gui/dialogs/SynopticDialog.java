@@ -28,10 +28,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
+import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -84,7 +84,7 @@ public class SynopticDialog extends StandardDialog {
             if (selected.isEmpty())
                 return;
 
-            Load.image(selected);
+            Commands.loadImage(selected);
             setVisible(false);
         });
 
