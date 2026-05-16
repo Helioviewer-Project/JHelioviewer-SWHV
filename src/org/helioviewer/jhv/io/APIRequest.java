@@ -42,7 +42,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         return fileReq;
     }
 
-    String toJpipUrl() throws Exception {
+    public String toJpipRequest() throws Exception {
         String jsonReq = startTime == endTime ? "&json=true" : "&verbose=true&linked=true";
         return toFileRequest() + jsonReq + "&jpip=true";
     }
