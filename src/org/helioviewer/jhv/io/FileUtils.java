@@ -161,7 +161,7 @@ public class FileUtils {
         }
     }
 
-    private static List<URI> resolveURIList(URI uri) throws IOException {
+    private static List<URI> expandURI(URI uri) throws IOException {
         Path path;
         try {
             path = Path.of(uri);
@@ -174,21 +174,26 @@ public class FileUtils {
         return listDir(path);
     }
 
+    public static List<URI> resolveURIList(List<URI> uris) { // synchronous
+        List<URI> resolved = new ArrayList<>();
+        for (URI uri : uris) {
+            try {
+                resolved.addAll(expandURI(uri));
+            } catch (Exception e) {
+                Log.warn("Error reading directory: " + uri, e);
+                resolved.add(uri);
+            }
+        }
+        return resolved;
+    }
+
     public static void resolveURIListOffEDT(URI uri, String threadName, Consumer<List<URI>> callback) {
         resolveURIListOffEDT(List.of(uri), threadName, callback);
     }
 
     public static void resolveURIListOffEDT(List<URI> uris, String threadName, Consumer<List<URI>> callback) {
         JHVThread.create(() -> {
-            List<URI> resolved = new ArrayList<>();
-            for (URI uri : uris) {
-                try {
-                    resolved.addAll(resolveURIList(uri));
-                } catch (Exception e) {
-                    Log.warn("Error reading directory: " + uri, e);
-                    resolved.add(uri);
-                }
-            }
+            List<URI> resolved = resolveURIList(uris);
             EventQueue.invokeLater(() -> callback.accept(resolved));
         }, threadName).start();
     }
