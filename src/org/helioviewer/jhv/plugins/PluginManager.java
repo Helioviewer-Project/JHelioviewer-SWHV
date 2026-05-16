@@ -6,9 +6,16 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-public class PluginManager {
+public final class PluginManager {
 
     private static final List<Plugin> plugins = new ArrayList<>();
+    private static boolean guiEnabled;
+
+    private PluginManager() {}
+
+    public static void setGUIEnabled(boolean _guiEnabled) {
+        guiEnabled = _guiEnabled;
+    }
 
     public static List<Plugin> getPlugins() {
         return Collections.unmodifiableList(plugins);
@@ -29,7 +36,11 @@ public class PluginManager {
         }
         plugins.add(plugin);
         if (plugin.isActive())
-            plugin.activate();
+            plugin.activate(guiEnabled);
+    }
+
+    public static void setActive(Plugin plugin, boolean active) {
+        plugin.setActive(active, guiEnabled);
     }
 
     public static void loadState(JSONObject jo) {

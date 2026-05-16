@@ -17,6 +17,8 @@ import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.UpdateChecker;
+import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.opengl.AnglePbuffer;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
@@ -38,11 +40,9 @@ public class JHelioviewer {
         // Per default, the US locale should be used
         Locale.setDefault(Locale.US);
 
-        JHVGlobals.headless = isHeadless();
+        boolean headless = isHeadless();
         // Uncaught runtime errors are reported to the GUI or stderr, depending on startup mode.
-        JHVUncaughtExceptionHandler.setupHandlerForThread(JHVGlobals.headless);
-        if (JHVGlobals.headless)
-            throw new Exception("This application cannot run in a headless configuration.");
+        JHVUncaughtExceptionHandler.setupHandlerForThread(headless);
 
         // Set the platform
         Platform.init();
@@ -79,19 +79,20 @@ public class JHelioviewer {
             return;
         }
 
+        PluginManager.setGUIEnabled(!headless);
+        if (headless)
+            startHeadless();
+        else
+            startGUI();
+    }
+
+    private static void startGUI() {
         EventQueue.invokeLater(() -> {
             Log.info("Start main window");
             UIGlobals.setLaf();
             JFrame frame = JHVFrame.prepare();
 
-            try {
-                Log.info("Load enabled plugins");
-                PluginManager.addPlugin(new EVEPlugin());
-                PluginManager.addPlugin(new SWEKPlugin());
-                PluginManager.addPlugin(new PfssPlugin());
-            } catch (Exception e) {
-                Log.warn("Plugin load error", e);
-            }
+            loadPlugins(true);
 
             frame.pack();
             JHVFrame.stabilizeLeftPaneWidth();
@@ -101,6 +102,30 @@ public class JHelioviewer {
 
             Tasks.submit("init", new Init(true), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
         });
+    }
+
+    private static void startHeadless() throws InterruptedException {
+        HeadlessEDT.invokeLater(() -> {
+            Log.info("Start headless mode");
+            AnglePbuffer renderer = new AnglePbuffer();
+            MovieDisplay.setRenderRequester(renderer::requestRender);
+
+            loadPlugins(false);
+
+            Tasks.submit("init", new Init(false), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
+        });
+    }
+
+    private static void loadPlugins(boolean loadTimelines) {
+        try {
+            Log.info("Load enabled plugins");
+            if (loadTimelines)
+                PluginManager.addPlugin(new EVEPlugin());
+            PluginManager.addPlugin(new SWEKPlugin());
+            PluginManager.addPlugin(new PfssPlugin());
+        } catch (Exception e) {
+            Log.warn("Plugin load error", e);
+        }
     }
 
     private record Init(boolean webProfilePopup) implements Callable<Void> {

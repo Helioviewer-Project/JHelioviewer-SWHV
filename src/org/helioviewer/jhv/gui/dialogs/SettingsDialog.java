@@ -214,7 +214,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         c.gridx = 1;
         for (Plugin plugin : PluginManager.getPlugins()) {
             JCheckBox plugCheck = new JCheckBox("<html>" + plugin.getName() + "<br/><small>" + plugin.getDescription(), plugin.isActive());
-            plugCheck.addActionListener(e -> plugin.toggleActive());
+            plugCheck.addActionListener(e -> PluginManager.setActive(plugin, plugCheck.isSelected()));
             settings.add(plugCheck, c);
             c.gridy++;
         }
