@@ -175,6 +175,11 @@ Multiple URLs:
 }
 ```
 
+For `jhv.load.image`, clients may also send an optional `requestId` parameter.
+This is not a SAMP-standard field; it is part of JHV's application-level
+message contract and is used only so the client can correlate the eventual
+completion notification.
+
 ### URL-or-inline-value load payloads
 
 These message types accept either:
@@ -227,6 +232,7 @@ Behavior:
 - SAMP parameters are read as plain values and converted with `toString()`
 - for `jhv.load.image`, `jhv.load.cdf`, and `jhv.load.hapi`, the `url` array
   elements are each converted with `toString()`
+- for `jhv.load.image`, local directory URLs are expanded before loading
 - `table.load.votable` is additionally sender-restricted to `SolarOrbiterARchive`
 - `table.load.fits` is additionally sender-restricted to `SolarOrbiterARchive` and `SSA`
 
@@ -510,6 +516,71 @@ Notes:
   same client are ambiguous to correlate
 - clients that want reliable correlation should always send `requestId`
 
+## `jhv.load.image` Client Contract
+
+Request:
+
+- `samp.mtype`: `jhv.load.image`
+- `samp.params`:
+  - `url`: single URL/path string, or an array of URL/path strings
+  - optional `requestId`
+
+Response:
+
+- completion is sent as a targeted SAMP notify back to the same client that
+  sent the request
+- `samp.mtype`: `jhv.load.image.completed`
+- `samp.params` always includes:
+  - `clientId`: public SAMP id of the client that sent the request
+  - `mtype`: `jhv.load.image`
+  - `status`: `success` or `failure`
+  - `message`
+- `samp.params` additionally includes `requestId` if and only if the original
+  request supplied one
+
+Success example:
+
+```json
+{
+  "samp.mtype": "jhv.load.image.completed",
+  "samp.params": {
+    "clientId": "cli#1",
+    "requestId": "img-1",
+    "mtype": "jhv.load.image",
+    "status": "success",
+    "message": "Image loaded."
+  }
+}
+```
+
+Failure example:
+
+```json
+{
+  "samp.mtype": "jhv.load.image.completed",
+  "samp.params": {
+    "clientId": "cli#1",
+    "requestId": "img-1",
+    "mtype": "jhv.load.image",
+    "status": "failure",
+    "message": "Image load failed."
+  }
+}
+```
+
+Notes:
+
+- `success` means the image layer load reached the same loaded state used by
+  state restore, not just that JHV accepted the SAMP message
+- `failure` may come from:
+  - missing `url`
+  - an empty resolved file list
+  - the loaded layer being removed or failing before it reaches loaded state
+  - an exception while waiting for load completion
+- without `requestId`, multiple outstanding `jhv.load.image` requests from the
+  same client are ambiguous to correlate
+- clients that want reliable correlation should always send `requestId`
+
 ## `jhv.record.start` Client Contract
 
 Request:
@@ -592,6 +663,7 @@ Notes:
 Implemented completion messages:
 
 - `jhv.load.state.completed` is implemented as described above
+- `jhv.load.image.completed` is implemented as described above
 - `jhv.record.start.completed` is implemented as described above
 
 ## JHV State Document Format
