@@ -26,7 +26,7 @@ import com.google.common.escape.Escaper;
 import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
-public class FITSImage implements URIImageReader {
+public final class FITSImage implements URIImageReader {
 
     private static final int BAD_PIXEL = Integer.MIN_VALUE;
 

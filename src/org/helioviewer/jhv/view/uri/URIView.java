@@ -23,7 +23,7 @@ import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.DecodeCallback;
 import org.helioviewer.jhv.view.DecodeExecutor;
 
-public class URIView extends BaseView {
+public final class URIView extends BaseView {
 
     private record DecodeKey(DataUri uri, ImageFilter.Type filter) {}
 

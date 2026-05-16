@@ -25,7 +25,7 @@ import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 
 // essentially static; local or network cache
-class GenericImage implements URIImageReader {
+final class GenericImage implements URIImageReader {
 
     @Override
     public URIImageReader.Image readImage(File file) throws Exception {
