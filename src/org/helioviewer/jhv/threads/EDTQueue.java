@@ -37,4 +37,11 @@ public class EDTQueue {
         throw new InvocationTargetException(t);
     }
 
+    public static void invokeAndWait(Runnable r) throws InterruptedException, InvocationTargetException {
+        invokeAndWait(() -> {
+            r.run();
+            return null;
+        });
+    }
+
 }

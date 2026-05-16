@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.io;
+package org.helioviewer.jhv.layers;
 
 import java.net.SocketTimeoutException;
 import java.net.URI;
@@ -12,8 +12,12 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
-import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.view.DecodeExecutor;
@@ -27,20 +31,22 @@ import org.json.JSONObject;
 
 import com.google.common.base.Throwables;
 
-public class LoadLayer {
+final class ImageLayerLoader {
 
-    public static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req) {
+    private ImageLayerLoader() {}
+
+    static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req) {
         return Tasks.submit("request", new LoadRemote(layer, req), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
     }
 
-    public static void submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
-        Tasks.submit(uriList.toString(), new LoadURIImage(layer, uriList), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
+    static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
+        return Tasks.submit(uriList.toString(), new LoadURIImage(layer, uriList), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
     }
 
     private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
         @Override
         public View call() throws Exception {
-            URI uri = requestAPI(req.toJpipUrl());
+            URI uri = requestAPI(req.toJpipRequest());
             return uri == null ? null : createView(layer.getExecutor(), req, uri);
         }
     }

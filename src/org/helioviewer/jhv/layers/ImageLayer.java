@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers;
 
+import java.net.URI;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -17,7 +19,6 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadLayer;
-import org.helioviewer.jhv.io.LoadLayer;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
@@ -96,7 +97,16 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             return;
 
         cancelLoadTask();
-        worker = LoadLayer.submit(this, req);
+        worker = ImageLayerLoader.submit(this, req);
+        Layers.fireLayerUpdated(this); // give feedback asap
+    }
+
+    public void load(List<URI> uris) {
+        if (removed)
+            return;
+
+        cancelLoadTask();
+        worker = ImageLayerLoader.submit(this, uris);
         Layers.fireLayerUpdated(this); // give feedback asap
     }
 

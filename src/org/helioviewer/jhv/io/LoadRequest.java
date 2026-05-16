@@ -82,8 +82,7 @@ class LoadRequest {
             int len = ji.length();
             for (int i = 0; i < len; i++) {
                 APIRequest req = APIRequest.fromRequestJson(ji.getJSONObject(i));
-                ImageLayer layer = EDTQueue.invokeAndWait(() -> ImageLayer.create(null));
-                LoadLayer.submit(layer, req);
+                EDTQueue.invokeAndWait(() -> ImageLayer.create(null).load(req));
             }
         }
 

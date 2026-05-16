@@ -79,7 +79,7 @@ public class DownloadLayer {
 
     private static void onSuccess(ImageLayer layer, Progress progress, Path result) {
         progress.done();
-        LoadLayer.submit(layer, List.of(result.toUri()));
+        layer.load(List.of(result.toUri()));
         progress.success(result.toString());
     }
 

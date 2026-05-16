@@ -32,8 +32,10 @@ public final class Load {
     public static void image(@Nonnull List<URI> uris) {
         if (!uris.isEmpty()) {
             FileUtils.resolveURIListOffEDT(uris, "JHV-LoadDirectory", resolved -> {
-                if (!resolved.isEmpty())
-                    LoadLayer.submit(ImageLayer.create(null), resolved);
+                if (!resolved.isEmpty()) {
+                    ImageLayer layer = ImageLayer.create(null);
+                    layer.load(resolved);
+                }
             });
         }
     }

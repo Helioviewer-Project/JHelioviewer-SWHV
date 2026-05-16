@@ -189,8 +189,7 @@ public class FileUtils {
                     resolved.add(uri);
                 }
             }
-            List<URI> loadUris = resolved;
-            EventQueue.invokeLater(() -> callback.accept(loadUris));
+            EventQueue.invokeLater(() -> callback.accept(resolved));
         }, threadName).start();
     }
 
