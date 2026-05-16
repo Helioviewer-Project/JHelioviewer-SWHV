@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.layers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
 
@@ -14,6 +16,7 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -52,6 +55,22 @@ public final class ImageLayers {
                 return;
         }
         MovieDisplay.display();
+    }
+
+    public record WaitUntilLoaded(Collection<ImageLayer> newLayers) implements Callable<Void> {
+        @Override
+        public Void call() throws Exception {
+            for (ImageLayer layer : newLayers) {
+                while (isLoadingForState(layer)) {
+                    Thread.sleep(1000);
+                }
+            }
+            return null;
+        }
+
+        private static boolean isLoadingForState(ImageLayer layer) throws Exception {
+            return EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && !layer.isViewLoadFinished());
+        }
     }
 
     public static void arrangeMultiView(boolean multiview) {
