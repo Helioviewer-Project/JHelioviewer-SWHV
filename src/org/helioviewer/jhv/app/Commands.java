@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
@@ -141,19 +142,28 @@ public final class Commands {
         Load.sunJSON(json);
     }
 
-    public static void loadImage(URI uri) {
-        loadImage(List.of(uri));
+    public static CompletableFuture<ImageLayer> loadImage(URI uri) {
+        return loadImage(List.of(uri));
     }
 
-    public static void loadImage(List<URI> uris) {
-        if (!uris.isEmpty()) {
-            FileUtils.resolveURIListOffEDT(uris, "JHV-LoadDirectory", resolved -> {
-                if (!resolved.isEmpty()) {
-                    ImageLayer layer = ImageLayer.create(null);
-                    layer.load(resolved);
-                }
-            });
+    public static CompletableFuture<ImageLayer> loadImage(List<URI> uris) {
+        CompletableFuture<ImageLayer> future = new CompletableFuture<>();
+        if (uris.isEmpty()) {
+            future.complete(null);
+            return future;
         }
+
+        FileUtils.resolveURIListOffEDT(uris, "JHV-LoadDirectory", resolved -> {
+            if (resolved.isEmpty()) {
+                future.complete(null);
+                return;
+            }
+
+            ImageLayer layer = ImageLayer.create(null);
+            layer.load(resolved);
+            future.complete(layer);
+        });
+        return future;
     }
 
     public static void loadCDF(URI uri) {
