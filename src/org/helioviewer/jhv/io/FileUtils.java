@@ -175,14 +175,21 @@ public class FileUtils {
     }
 
     public static void resolveURIListOffEDT(URI uri, String threadName, Consumer<List<URI>> callback) {
+        resolveURIListOffEDT(List.of(uri), threadName, callback);
+    }
+
+    public static void resolveURIListOffEDT(List<URI> uris, String threadName, Consumer<List<URI>> callback) {
         JHVThread.create(() -> {
-            List<URI> uris = List.of(uri);
-            try {
-                uris = resolveURIList(uri);
-            } catch (Exception e) {
-                Log.warn("Error reading directory: " + uri, e);
+            List<URI> resolved = new ArrayList<>();
+            for (URI uri : uris) {
+                try {
+                    resolved.addAll(resolveURIList(uri));
+                } catch (Exception e) {
+                    Log.warn("Error reading directory: " + uri, e);
+                    resolved.add(uri);
+                }
             }
-            List<URI> loadUris = uris;
+            List<URI> loadUris = resolved;
             EventQueue.invokeLater(() -> callback.accept(loadUris));
         }, threadName).start();
     }

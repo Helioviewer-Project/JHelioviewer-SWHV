@@ -30,8 +30,12 @@ public final class Load {
     }
 
     public static void image(@Nonnull List<URI> uris) {
-        if (!uris.isEmpty())
-            LoadLayer.submit(ImageLayer.create(null), uris);
+        if (!uris.isEmpty()) {
+            FileUtils.resolveURIListOffEDT(uris, "JHV-LoadDirectory", resolved -> {
+                if (!resolved.isEmpty())
+                    LoadLayer.submit(ImageLayer.create(null), resolved);
+            });
+        }
     }
 
     public static void image(@Nonnull URI uri) {
