@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.plugins;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 
 import org.json.JSONObject;
@@ -14,7 +13,7 @@ public abstract class Plugin {
     protected Plugin(String _name, String _description) {
         name = _name;
         description = _description;
-        active = getActive();
+        active = loadActive();
     }
 
     public abstract void install();
@@ -41,28 +40,31 @@ public abstract class Plugin {
         return active;
     }
 
-    private boolean getActive() {
+    private boolean loadActive() {
         String p = Settings.getProperty("plugins." + this + ".active");
         return p == null || Boolean.parseBoolean(p);
     }
 
-    public void toggleActive() {
-        active = !active;
+    final void setActive(boolean _active, boolean guiEnabled) {
+        if (active == _active)
+            return;
+
+        active = _active;
         Settings.setProperty("plugins." + this + ".active", Boolean.toString(active));
         if (active)
-            activate();
+            activate(guiEnabled);
         else
-            deactivate();
+            deactivate(guiEnabled);
     }
 
-    public final void activate() {
+    final void activate(boolean guiEnabled) {
         install();
-        if (!JHVGlobals.headless)
+        if (guiEnabled)
             installGUI();
     }
 
-    public final void deactivate() {
-        if (!JHVGlobals.headless)
+    final void deactivate(boolean guiEnabled) {
+        if (guiEnabled)
             uninstallGUI();
         uninstall();
     }

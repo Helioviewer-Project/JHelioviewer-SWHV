@@ -21,7 +21,6 @@ public class JHVGlobals {
     public static String revision = "-1";
     public static String userAgent = "JHV/SWHV-";
     public static String versionDetail = "";
-    public static boolean headless;
 
     public static final Tika tika = new Tika();
     public static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
