@@ -14,6 +14,9 @@ import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.view.uri.FITSViewState;
+
+import org.json.JSONObject;
 
 public final class Commands {
 
@@ -61,6 +64,10 @@ public final class Commands {
             @Nullable String differentialRotation) {
         ViewState.applyModeUpdateRaw(projection, annotationMode, multiview, tracking, refresh, showCorona,
                 differentialRotation);
+    }
+
+    public static void setFITSViewState(JSONObject json) {
+        FITSViewState.fromJson(json);
     }
 
     public static void setPlayback(@Nullable PlaybackInput input) {
