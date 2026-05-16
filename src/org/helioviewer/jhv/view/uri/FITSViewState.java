@@ -4,31 +4,33 @@ import java.util.ArrayList;
 
 import org.helioviewer.jhv.layers.MovieDisplay;
 
+import org.json.JSONObject;
+
 public final class FITSViewState {
 
-    public interface Listener {
+    interface Listener {
         void fitsViewStateChanged();
     }
 
-    public enum ClippingMode {
+    enum ClippingMode {
         Auto, ZScale, Range
     }
 
-    public enum ScalingMode {
+    enum ScalingMode {
         Gamma, Beta, Alpha
     }
 
-    public static final double CLIP_LIMIT = 1e20;
-    public static final int GAMMA_SLIDER_MIN = 10;
-    public static final int GAMMA_SLIDER_MAX = 40;
-    public static final int BETA_SLIDER_MIN = 1;
-    public static final int BETA_SLIDER_MAX = 12;
-    public static final int ALPHA_SLIDER_MIN = 1;
-    public static final int ALPHA_SLIDER_MAX = 5;
-    public static final int Z_CONTRAST_SLIDER_MIN = 1;
-    public static final int Z_CONTRAST_SLIDER_MAX = 100;
+    static final double CLIP_LIMIT = 1e20;
+    static final int GAMMA_SLIDER_MIN = 10;
+    static final int GAMMA_SLIDER_MAX = 40;
+    static final int BETA_SLIDER_MIN = 1;
+    static final int BETA_SLIDER_MAX = 12;
+    static final int ALPHA_SLIDER_MIN = 1;
+    static final int ALPHA_SLIDER_MAX = 5;
+    static final int Z_CONTRAST_SLIDER_MIN = 1;
+    static final int Z_CONTRAST_SLIDER_MAX = 100;
 
-    public record Data(
+    record Data(
             ClippingMode clippingMode,
             int zContrast,
             double clippingMin,
@@ -39,11 +41,11 @@ public final class FITSViewState {
             double alpha) {
 
         public int zContrastIndex() {
-            return clamp(zContrast / 4, Z_CONTRAST_SLIDER_MIN, Z_CONTRAST_SLIDER_MAX);
+            return Math.clamp(zContrast / 4, Z_CONTRAST_SLIDER_MIN, Z_CONTRAST_SLIDER_MAX);
         }
 
         public int gammaIndex() {
-            return clamp((int) (10. / gamma), GAMMA_SLIDER_MIN, GAMMA_SLIDER_MAX);
+            return Math.clamp((int) (10. / gamma), GAMMA_SLIDER_MIN, GAMMA_SLIDER_MAX);
         }
 
         public double gammaDisplayValue() {
@@ -51,11 +53,11 @@ public final class FITSViewState {
         }
 
         public int betaIndex() {
-            return clamp((int) (Math.log(1 / beta) / Math.log(2)), BETA_SLIDER_MIN, BETA_SLIDER_MAX);
+            return Math.clamp((int) (Math.log(1 / beta) / Math.log(2)), BETA_SLIDER_MIN, BETA_SLIDER_MAX);
         }
 
         public int alphaIndex() {
-            return clamp((int) Math.log10(alpha), ALPHA_SLIDER_MIN, ALPHA_SLIDER_MAX);
+            return Math.clamp((int) Math.log10(alpha), ALPHA_SLIDER_MIN, ALPHA_SLIDER_MAX);
         }
     }
 
@@ -72,34 +74,67 @@ public final class FITSViewState {
 
     private FITSViewState() {}
 
-    public static void refresh() {
+    private static void refresh() {
         URIView.clearURICache();
         MovieDisplay.render(1);
     }
 
-    public static Data data() {
+    static Data data() {
         return new Data(clippingMode, zContrast, clippingMin, clippingMax, scalingMode, gamma, beta, alpha);
     }
 
-    public static void setZContrastIndex(int value, boolean adjusting) {
-        int newZContrast = 4 * clamp(value, Z_CONTRAST_SLIDER_MIN, Z_CONTRAST_SLIDER_MAX);
+    public static JSONObject toJson() {
+        Data data = data();
+        return new JSONObject()
+                .put("clippingMode", data.clippingMode().name())
+                .put("zContrast", data.zContrast())
+                .put("clippingMin", data.clippingMin())
+                .put("clippingMax", data.clippingMax())
+                .put("scalingMode", data.scalingMode().name())
+                .put("gamma", data.gamma())
+                .put("beta", data.beta())
+                .put("alpha", data.alpha());
+    }
+
+    public static void fromJson(JSONObject jo) {
+        if (jo == null)
+            return;
+
+        Data old = data();
+        zContrast = Math.clamp(jo.optInt("zContrast", zContrast), 4 * Z_CONTRAST_SLIDER_MIN, 4 * Z_CONTRAST_SLIDER_MAX);
+        clippingMin = Math.clamp(jo.optDouble("clippingMin", clippingMin), -CLIP_LIMIT, CLIP_LIMIT);
+        clippingMax = Math.clamp(jo.optDouble("clippingMax", clippingMax), -CLIP_LIMIT, CLIP_LIMIT);
+        clippingMode = readEnum(ClippingMode.class, jo.optString("clippingMode", clippingMode.name()), clippingMode);
+        scalingMode = readEnum(ScalingMode.class, jo.optString("scalingMode", scalingMode.name()), scalingMode);
+        gamma = Math.clamp(jo.optDouble("gamma", gamma), gammaFromSlider(GAMMA_SLIDER_MAX), gammaFromSlider(GAMMA_SLIDER_MIN));
+        beta = Math.clamp(jo.optDouble("beta", beta), betaFromSlider(BETA_SLIDER_MAX), betaFromSlider(BETA_SLIDER_MIN));
+        alpha = Math.clamp(jo.optDouble("alpha", alpha), alphaFromSlider(ALPHA_SLIDER_MIN), alphaFromSlider(ALPHA_SLIDER_MAX));
+
+        if (!old.equals(data())) {
+            notifyListeners();
+            refresh();
+        }
+    }
+
+    static void setZContrastIndex(int value, boolean adjusting) {
+        int newZContrast = 4 * Math.clamp(value, Z_CONTRAST_SLIDER_MIN, Z_CONTRAST_SLIDER_MAX);
         if (updateZContrast(newZContrast) && clippingMode == ClippingMode.ZScale && !adjusting)
             refresh();
     }
 
-    public static void setClippingMin(double value) {
-        double newClippingMin = clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
+    static void setClippingMin(double value) {
+        double newClippingMin = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
         if (updateClippingMin(newClippingMin) && clippingMode == ClippingMode.Range)
             refresh();
     }
 
-    public static void setClippingMax(double value) {
-        double newClippingMax = clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
+    static void setClippingMax(double value) {
+        double newClippingMax = Math.clamp(value, -CLIP_LIMIT, CLIP_LIMIT);
         if (updateClippingMax(newClippingMax) && clippingMode == ClippingMode.Range)
             refresh();
     }
 
-    public static void setClippingMode(ClippingMode newClippingMode) {
+    static void setClippingMode(ClippingMode newClippingMode) {
         if (clippingMode == newClippingMode)
             return;
         clippingMode = newClippingMode;
@@ -107,7 +142,7 @@ public final class FITSViewState {
         refresh();
     }
 
-    public static void setScalingMode(ScalingMode newScalingMode) {
+    static void setScalingMode(ScalingMode newScalingMode) {
         if (scalingMode == newScalingMode)
             return;
         scalingMode = newScalingMode;
@@ -115,29 +150,41 @@ public final class FITSViewState {
         refresh();
     }
 
-    public static void setGammaIndex(int value, boolean adjusting) {
-        double newGamma = 10. / clamp(value, GAMMA_SLIDER_MIN, GAMMA_SLIDER_MAX);
+    static void setGammaIndex(int value, boolean adjusting) {
+        double newGamma = gammaFromSlider(Math.clamp(value, GAMMA_SLIDER_MIN, GAMMA_SLIDER_MAX));
         if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma && !adjusting)
             refresh();
     }
 
-    public static void setBetaIndex(int value, boolean adjusting) {
-        double newBeta = 1. / (1 << clamp(value, BETA_SLIDER_MIN, BETA_SLIDER_MAX));
+    private static double gammaFromSlider(int value) {
+        return 10. / value;
+    }
+
+    static void setBetaIndex(int value, boolean adjusting) {
+        double newBeta = betaFromSlider(Math.clamp(value, BETA_SLIDER_MIN, BETA_SLIDER_MAX));
         if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta && !adjusting)
             refresh();
     }
 
-    public static void setAlphaIndex(int value, boolean adjusting) {
-        double newAlpha = Math.pow(10, clamp(value, ALPHA_SLIDER_MIN, ALPHA_SLIDER_MAX));
+    private static double betaFromSlider(int value) {
+        return 1. / (1 << value);
+    }
+
+    static void setAlphaIndex(int value, boolean adjusting) {
+        double newAlpha = alphaFromSlider(Math.clamp(value, ALPHA_SLIDER_MIN, ALPHA_SLIDER_MAX));
         if (updateAlpha(newAlpha) && scalingMode == ScalingMode.Alpha && !adjusting)
             refresh();
     }
 
-    public static void addListener(Listener listener) {
+    private static double alphaFromSlider(int value) {
+        return Math.pow(10, value);
+    }
+
+    static void addListener(Listener listener) {
         listeners.add(listener);
     }
 
-    public static void removeListener(Listener listener) {
+    static void removeListener(Listener listener) {
         listeners.remove(listener);
     }
 
@@ -193,11 +240,12 @@ public final class FITSViewState {
         return true;
     }
 
-    private static int clamp(int value, int min, int max) {
-        return Math.clamp(value, min, max);
+    private static <E extends Enum<E>> E readEnum(Class<E> type, String name, E fallback) {
+        try {
+            return Enum.valueOf(type, name);
+        } catch (RuntimeException e) {
+            return fallback;
+        }
     }
 
-    private static double clamp(double value, double min, double max) {
-        return Math.clamp(value, min, max);
-    }
 }

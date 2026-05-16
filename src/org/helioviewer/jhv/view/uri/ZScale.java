@@ -4,7 +4,7 @@ package org.helioviewer.jhv.view.uri;
 // Smithsonian Astrophysical Observatory, Cambridge, MA, USA
 // transcribed from SAOImageDS9/tksao/frame/fitsdata.C
 
-class ZScale {
+final class ZScale {
 
     private static final short GOOD_PIXEL = 0;
     private static final short BAD_PIXEL = 1;
