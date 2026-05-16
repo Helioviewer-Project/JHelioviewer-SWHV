@@ -56,8 +56,8 @@ class FOVPlatform extends DefaultMutableTreeNode {
         color = _color;
         isSOLO = "SOLO".equals(observer);
 
-        centerX = sanitizeCenter(jo.optDouble("centerX", 0));
-        centerY = sanitizeCenter(jo.optDouble("centerY", 0));
+        centerX = Math.clamp(jo.optDouble("centerX", 0), MIN_CENTER_ARCMIN, MAX_CENTER_ARCMIN);
+        centerY = Math.clamp(jo.optDouble("centerY", 0), MIN_CENTER_ARCMIN, MAX_CENTER_ARCMIN);
     }
 
     @Override
@@ -139,12 +139,6 @@ class FOVPlatform extends DefaultMutableTreeNode {
 
     private static double control2Center(double v) { // v in arcmin
         return Math.tan(v * (Math.PI / 180. / 60.));
-    }
-
-    private static double sanitizeCenter(double value) {
-        if (!Double.isFinite(value))
-            return 0;
-        return Math.clamp(value, MIN_CENTER_ARCMIN, MAX_CENTER_ARCMIN);
     }
 
     double getCenterX() {
