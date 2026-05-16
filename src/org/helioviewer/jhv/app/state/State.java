@@ -9,8 +9,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,13 +18,13 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -192,24 +190,8 @@ public final class State {
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
         EDTCallbackExecutor.pool.submit(
-                new WaitLoad(newLayers.keySet()),
+                new ImageLayers.WaitUntilLoaded(newLayers.keySet()),
                 new Callback(context, newLayers, masterLayer, time, modeData));
-    }
-
-    private record WaitLoad(Set<ImageLayer> newLayers) implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
-            for (ImageLayer layer : newLayers) {
-                while (isLoadingForState(layer)) {
-                    Thread.sleep(1000);
-                }
-            }
-            return null;
-        }
-
-        private static boolean isLoadingForState(ImageLayer layer) throws Exception {
-            return EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && !layer.isLoadedForState());
-        }
     }
 
     private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,

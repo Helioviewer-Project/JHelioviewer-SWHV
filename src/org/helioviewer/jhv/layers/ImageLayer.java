@@ -403,7 +403,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         return req == null ? view.getLastTime().milli : req.endTime();
     }
 
-    public boolean isLoadedForState() {
+    public boolean isViewLoadFinished() {
         return worker == null && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
     }
 
