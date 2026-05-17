@@ -21,14 +21,76 @@ public final class FITSViewState {
     }
 
     static final double CLIP_LIMIT = 1e20;
-    static final int GAMMA_SLIDER_MIN = 10;
-    static final int GAMMA_SLIDER_MAX = 40;
-    static final int BETA_SLIDER_MIN = 1;
-    static final int BETA_SLIDER_MAX = 12;
-    static final int ALPHA_SLIDER_MIN = 1;
-    static final int ALPHA_SLIDER_MAX = 5;
-    static final int Z_CONTRAST_SLIDER_MIN = 1;
-    static final int Z_CONTRAST_SLIDER_MAX = 100;
+    static final IntParameter Z_CONTRAST = new IntParameter(1, 100, 4);
+    static final GammaParameter GAMMA = new GammaParameter(10, 40);
+    static final BetaParameter BETA = new BetaParameter(1, 12);
+    static final AlphaParameter ALPHA = new AlphaParameter(1, 5);
+
+    interface IndexedParameter {
+        int minIndex();
+
+        int maxIndex();
+    }
+
+    record IntParameter(int minIndex, int maxIndex, int multiplier) implements IndexedParameter {
+        int toIndex(int value) {
+            return Math.clamp(value / multiplier, minIndex, maxIndex);
+        }
+
+        int fromIndex(int index) {
+            return multiplier * Math.clamp(index, minIndex, maxIndex);
+        }
+
+        int clampValue(int value) {
+            return Math.clamp(value, fromIndex(minIndex), fromIndex(maxIndex));
+        }
+    }
+
+    record GammaParameter(int minIndex, int maxIndex) implements IndexedParameter {
+        int toIndex(double value) {
+            return Math.clamp(Math.round(10. / value), minIndex, maxIndex);
+        }
+
+        double fromIndex(int index) {
+            return 10. / Math.clamp(index, minIndex, maxIndex);
+        }
+
+        double displayValue(int index) {
+            return index / 10.;
+        }
+
+        double clampValue(double value) {
+            return Math.clamp(value, fromIndex(maxIndex), fromIndex(minIndex));
+        }
+    }
+
+    record BetaParameter(int minIndex, int maxIndex) implements IndexedParameter {
+        int toIndex(double value) {
+            return Math.clamp(Math.round(Math.log(1 / value) / Math.log(2)), minIndex, maxIndex);
+        }
+
+        double fromIndex(int index) {
+            return 1. / (1 << Math.clamp(index, minIndex, maxIndex));
+        }
+
+        double clampValue(double value) {
+            return Math.clamp(value, fromIndex(maxIndex), fromIndex(minIndex));
+        }
+    }
+
+    record AlphaParameter(int minIndex, int maxIndex) implements IndexedParameter {
+        int toIndex(double value) {
+            return Math.clamp(Math.round(Math.log10(value)), minIndex, maxIndex);
+        }
+
+        double fromIndex(int index) {
+            return Math.pow(10, Math.clamp(index, minIndex, maxIndex));
+        }
+
+        double clampValue(double value) {
+            return Math.clamp(value, fromIndex(minIndex), fromIndex(maxIndex));
+        }
+    }
 
     record Data(
             ClippingMode clippingMode,
@@ -41,23 +103,23 @@ public final class FITSViewState {
             double alpha) {
 
         public int zContrastIndex() {
-            return Math.clamp(zContrast / 4, Z_CONTRAST_SLIDER_MIN, Z_CONTRAST_SLIDER_MAX);
+            return Z_CONTRAST.toIndex(zContrast);
         }
 
         public int gammaIndex() {
-            return Math.clamp((int) (10. / gamma), GAMMA_SLIDER_MIN, GAMMA_SLIDER_MAX);
+            return GAMMA.toIndex(gamma);
         }
 
         public double gammaDisplayValue() {
-            return gammaIndex() / 10.;
+            return GAMMA.displayValue(gammaIndex());
         }
 
         public int betaIndex() {
-            return Math.clamp((int) (Math.log(1 / beta) / Math.log(2)), BETA_SLIDER_MIN, BETA_SLIDER_MAX);
+            return BETA.toIndex(beta);
         }
 
         public int alphaIndex() {
-            return Math.clamp((int) Math.log10(alpha), ALPHA_SLIDER_MIN, ALPHA_SLIDER_MAX);
+            return ALPHA.toIndex(alpha);
         }
     }
 
@@ -101,14 +163,14 @@ public final class FITSViewState {
             return;
 
         Data old = data();
-        zContrast = Math.clamp(jo.optInt("zContrast", zContrast), 4 * Z_CONTRAST_SLIDER_MIN, 4 * Z_CONTRAST_SLIDER_MAX);
+        zContrast = Z_CONTRAST.clampValue(jo.optInt("zContrast", zContrast));
         clippingMin = Math.clamp(jo.optDouble("clippingMin", clippingMin), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMax = Math.clamp(jo.optDouble("clippingMax", clippingMax), -CLIP_LIMIT, CLIP_LIMIT);
         clippingMode = readEnum(ClippingMode.class, jo.optString("clippingMode", clippingMode.name()), clippingMode);
         scalingMode = readEnum(ScalingMode.class, jo.optString("scalingMode", scalingMode.name()), scalingMode);
-        gamma = Math.clamp(jo.optDouble("gamma", gamma), gammaFromSlider(GAMMA_SLIDER_MAX), gammaFromSlider(GAMMA_SLIDER_MIN));
-        beta = Math.clamp(jo.optDouble("beta", beta), betaFromSlider(BETA_SLIDER_MAX), betaFromSlider(BETA_SLIDER_MIN));
-        alpha = Math.clamp(jo.optDouble("alpha", alpha), alphaFromSlider(ALPHA_SLIDER_MIN), alphaFromSlider(ALPHA_SLIDER_MAX));
+        gamma = GAMMA.clampValue(jo.optDouble("gamma", gamma));
+        beta = BETA.clampValue(jo.optDouble("beta", beta));
+        alpha = ALPHA.clampValue(jo.optDouble("alpha", alpha));
 
         if (!old.equals(data())) {
             notifyListeners();
@@ -116,9 +178,9 @@ public final class FITSViewState {
         }
     }
 
-    static void setZContrastIndex(int value, boolean adjusting) {
-        int newZContrast = 4 * Math.clamp(value, Z_CONTRAST_SLIDER_MIN, Z_CONTRAST_SLIDER_MAX);
-        if (updateZContrast(newZContrast) && clippingMode == ClippingMode.ZScale && !adjusting)
+    static void setZContrastIndex(int value) {
+        int newZContrast = Z_CONTRAST.fromIndex(value);
+        if (updateZContrast(newZContrast) && clippingMode == ClippingMode.ZScale)
             refresh();
     }
 
@@ -150,34 +212,22 @@ public final class FITSViewState {
         refresh();
     }
 
-    static void setGammaIndex(int value, boolean adjusting) {
-        double newGamma = gammaFromSlider(Math.clamp(value, GAMMA_SLIDER_MIN, GAMMA_SLIDER_MAX));
-        if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma && !adjusting)
+    static void setGammaIndex(int value) {
+        double newGamma = GAMMA.fromIndex(value);
+        if (updateGamma(newGamma) && scalingMode == ScalingMode.Gamma)
             refresh();
     }
 
-    private static double gammaFromSlider(int value) {
-        return 10. / value;
-    }
-
-    static void setBetaIndex(int value, boolean adjusting) {
-        double newBeta = betaFromSlider(Math.clamp(value, BETA_SLIDER_MIN, BETA_SLIDER_MAX));
-        if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta && !adjusting)
+    static void setBetaIndex(int value) {
+        double newBeta = BETA.fromIndex(value);
+        if (updateBeta(newBeta) && scalingMode == ScalingMode.Beta)
             refresh();
     }
 
-    private static double betaFromSlider(int value) {
-        return 1. / (1 << value);
-    }
-
-    static void setAlphaIndex(int value, boolean adjusting) {
-        double newAlpha = alphaFromSlider(Math.clamp(value, ALPHA_SLIDER_MIN, ALPHA_SLIDER_MAX));
-        if (updateAlpha(newAlpha) && scalingMode == ScalingMode.Alpha && !adjusting)
+    static void setAlphaIndex(int value) {
+        double newAlpha = ALPHA.fromIndex(value);
+        if (updateAlpha(newAlpha) && scalingMode == ScalingMode.Alpha)
             refresh();
-    }
-
-    private static double alphaFromSlider(int value) {
-        return Math.pow(10, value);
     }
 
     static void addListener(Listener listener) {

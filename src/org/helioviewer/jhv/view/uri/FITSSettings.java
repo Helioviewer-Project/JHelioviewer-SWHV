@@ -78,10 +78,10 @@ public final class FITSSettings {
         public SettingsDialog() {
             super(JHVFrame.getFrame(), "FITS Settings", false);
             FITSViewState.Data initialState = FITSViewState.data();
-            gammaSlider = new JHVSlider(FITSViewState.GAMMA_SLIDER_MIN, FITSViewState.GAMMA_SLIDER_MAX, initialState.gammaIndex());
-            betaSlider = new JHVSlider(FITSViewState.BETA_SLIDER_MIN, FITSViewState.BETA_SLIDER_MAX, initialState.betaIndex());
-            alphaSlider = new JHVSlider(FITSViewState.ALPHA_SLIDER_MIN, FITSViewState.ALPHA_SLIDER_MAX, initialState.alphaIndex());
-            contrastSlider = new JHVSlider(FITSViewState.Z_CONTRAST_SLIDER_MIN, FITSViewState.Z_CONTRAST_SLIDER_MAX, initialState.zContrastIndex());
+            gammaSlider = createSlider(FITSViewState.GAMMA, initialState.gammaIndex());
+            betaSlider = createSlider(FITSViewState.BETA, initialState.betaIndex());
+            alphaSlider = createSlider(FITSViewState.ALPHA, initialState.alphaIndex());
+            contrastSlider = createSlider(FITSViewState.Z_CONTRAST, initialState.zContrastIndex());
             setLocationRelativeTo(JHVFrame.getFrame());
             setType(Window.Type.UTILITY);
             setResizable(false);
@@ -98,15 +98,15 @@ public final class FITSSettings {
 
             gammaSlider.addChangeListener(e -> {
                 int value = gammaSlider.getValue();
-                FITSViewState.setGammaIndex(value, gammaSlider.getValueIsAdjusting());
+                FITSViewState.setGammaIndex(value);
             });
             betaSlider.addChangeListener(e -> {
                 int value = betaSlider.getValue();
-                FITSViewState.setBetaIndex(value, betaSlider.getValueIsAdjusting());
+                FITSViewState.setBetaIndex(value);
             });
             alphaSlider.addChangeListener(e -> {
                 int value = alphaSlider.getValue();
-                FITSViewState.setAlphaIndex(value, alphaSlider.getValueIsAdjusting());
+                FITSViewState.setAlphaIndex(value);
             });
 
             bindScalingMode(gammaButton, gammaSlider, FITSViewState.ScalingMode.Gamma);
@@ -125,7 +125,7 @@ public final class FITSSettings {
             JPanel rangePanel = new JPanel(new BorderLayout());
             rangePanel.add(minClip, BorderLayout.LINE_START);
             rangePanel.add(maxClip, BorderLayout.LINE_END);
-            contrastSlider.addChangeListener(e -> FITSViewState.setZContrastIndex(contrastSlider.getValue(), contrastSlider.getValueIsAdjusting()));
+            contrastSlider.addChangeListener(e -> FITSViewState.setZContrastIndex(contrastSlider.getValue()));
 
             //
             JPanel content = new JPanel(new GridBagLayout());
@@ -230,6 +230,10 @@ public final class FITSSettings {
             Object value = field.getValue();
             if (value instanceof Number number)
                 setter.accept(number.doubleValue());
+        }
+
+        private static JHVSlider createSlider(FITSViewState.IndexedParameter parameter, int value) {
+            return new JHVSlider(parameter.minIndex(), parameter.maxIndex(), value);
         }
 
         private static void syncControl(JSlider slider, JLabel label, int value) {
