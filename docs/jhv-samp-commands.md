@@ -179,10 +179,13 @@ Multiple URLs:
 }
 ```
 
-For `jhv.load.image`, clients may also send an optional `requestId` parameter.
-This is not a SAMP-standard field; it is part of JHV's application-level
-message contract and is used only so the client can correlate the eventual
-completion notification.
+For `jhv.load.image`, clients may also send:
+
+- optional `requestId`: an application-level correlation id for the eventual
+  completion notification
+- optional `imageParams`: a JSON object or JSON string with the same shape as
+  serialized image-layer `imageParams`; these options are applied before the
+  indicated data is loaded
 
 ### URL-or-inline-value load payloads
 
@@ -564,6 +567,7 @@ Request:
 - `samp.params`:
   - `url`: single URL/path string, or an array of URL/path strings
   - optional `requestId`
+  - optional `imageParams`: image-layer options as a JSON object or JSON string
 
 Response:
 
@@ -612,8 +616,11 @@ Notes:
 
 - `success` means the image layer load reached the same loaded state used by
   state restore, not just that JHV accepted the SAMP message
+- `imageParams` is applied after creating the image layer and before loading
+  the indicated local or remote data
 - `failure` may come from:
   - missing `url`
+  - invalid `imageParams`
   - an empty resolved file list
   - the loaded layer being removed or failing before it reaches loaded state
   - an exception while waiting for load completion

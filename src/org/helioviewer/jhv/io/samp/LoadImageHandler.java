@@ -1,7 +1,10 @@
 package org.helioviewer.jhv.io.samp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -10,7 +13,9 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.threads.JHVThread;
 
+import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
+import org.json.JSONObject;
 
 final class LoadImageHandler {
 
@@ -19,12 +24,28 @@ final class LoadImageHandler {
     static AbstractMessageHandler create() {
         return SampHandlers.create("jhv.load.image", (senderId, sender, msg) -> {
             Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.load.image", "jhv.load.image.completed");
-            if (!LoadHandlers.loadURIList(msg,
-                    uri -> waitImageLoad(context, Commands.loadImage(uri)),
-                    uris -> waitImageLoad(context, Commands.loadImage(uris)))) {
-                context.complete(false, "Missing jhv.load.image url.", null);
+            try {
+                JSONObject imageParams = imageParams(msg);
+                if (!LoadHandlers.loadURIList(msg,
+                        uri -> waitImageLoad(context, Commands.loadImage(List.of(uri), imageParams)),
+                        uris -> waitImageLoad(context, Commands.loadImage(uris, imageParams)))) {
+                    context.complete(false, "Missing jhv.load.image url.", null);
+                }
+            } catch (Exception e) {
+                context.complete(false, message(e), null);
             }
         });
+    }
+
+    private static @Nullable JSONObject imageParams(Message msg) {
+        Object value = msg.getParam("imageParams");
+        if (value == null)
+            return null;
+        if (value instanceof JSONObject jo)
+            return jo;
+        if (value instanceof Map<?, ?> map)
+            return new JSONObject(map);
+        return new JSONObject(value.toString());
     }
 
     private static void waitImageLoad(Commands.OperationContext context, CompletableFuture<ImageLayer> future) {
