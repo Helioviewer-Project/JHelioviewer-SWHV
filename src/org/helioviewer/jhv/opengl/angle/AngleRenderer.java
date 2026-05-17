@@ -241,7 +241,8 @@ public final class AngleRenderer {
         int sampleBuffers = configAttrib(attribValue, config, EGL15.EGL_SAMPLE_BUFFERS);
         int samples = configAttrib(attribValue, config, EGL15.EGL_SAMPLES);
 
-        Log.info("ANGLE EGL config: rgba=" + red + "/" + green + "/" + blue + "/" + alpha
+        Log.info("ANGLE EGL config: backend=" + backendName(platform.backendType())
+                + " rgba=" + red + "/" + green + "/" + blue + "/" + alpha
                 + " depth=" + depth
                 + " stencil=" + stencil
                 + " sampleBuffers=" + sampleBuffers
