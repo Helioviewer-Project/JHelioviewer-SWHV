@@ -47,7 +47,7 @@ def empty_state() -> str:
 
 def movie_commands(path: str, size: str) -> list[dict]:
     return [
-        # send empty state to clear previously loaded image layers
+        # send empty or preferred state to clear previously loaded image layers
         command(
             "jhv.load.state",
             {
