@@ -2,10 +2,14 @@ package org.helioviewer.jhv.layers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
@@ -112,14 +116,19 @@ public final class Layers {
     private static MiniviewLayer miniviewLayer;
     private static ConnectionLayer connectionLayer;
 
+    // Layer constructors have side effects, so keep constructors here and build layers only when used.
+    private static final LinkedHashMap<Class<? extends Layer>, Supplier<? extends Layer>> DEFAULT_LAYERS = new LinkedHashMap<>();
+
     static {
-        add(new ViewpointLayer(null));
-        add(new ConnectionLayer(null));
-        add(new GridLayer(null));
-        add(new FOVLayer(null));
-        // add(new StarLayer(null));
-        add(new TimestampLayer(null));
-        add(new MiniviewLayer(null));
+        DEFAULT_LAYERS.put(ViewpointLayer.class, () -> new ViewpointLayer(null));
+        DEFAULT_LAYERS.put(ConnectionLayer.class, () -> new ConnectionLayer(null));
+        DEFAULT_LAYERS.put(GridLayer.class, () -> new GridLayer(null));
+        DEFAULT_LAYERS.put(FOVLayer.class, () -> new FOVLayer(null));
+        // DEFAULT_LAYERS.put(StarLayer.class, () -> new StarLayer(null));
+        DEFAULT_LAYERS.put(TimestampLayer.class, () -> new TimestampLayer(null));
+        DEFAULT_LAYERS.put(MiniviewLayer.class, () -> new MiniviewLayer(null));
+
+        DEFAULT_LAYERS.values().forEach(supplier -> add(supplier.get()));
     }
 
     public static ViewpointLayer getViewpointLayer() {
@@ -292,17 +301,45 @@ public final class Layers {
         return Collections.unmodifiableList(layers);
     }
 
+    private static ArrayList<Layer> normalizeRestoreList(List<Layer> restoredLayers) {
+        Map<Class<? extends Layer>, Layer> restoredDefaults = new HashMap<>();
+        ArrayList<Layer> restoredImageLayers = new ArrayList<>();
+        ArrayList<Layer> restoredOtherLayers = new ArrayList<>();
+
+        for (Layer layer : restoredLayers) {
+            Class<? extends Layer> type = layer.getClass();
+            if (layer instanceof ImageLayer) {
+                restoredImageLayers.add(layer);
+            } else if (DEFAULT_LAYERS.containsKey(type)) {
+                restoredDefaults.putIfAbsent(type, layer);
+            } else {
+                restoredOtherLayers.add(layer);
+            }
+        }
+
+        ArrayList<Layer> normalized = new ArrayList<>(restoredImageLayers);
+        for (Map.Entry<Class<? extends Layer>, Supplier<? extends Layer>> entry : DEFAULT_LAYERS.entrySet()) {
+            Layer layer = restoredDefaults.get(entry.getKey());
+            normalized.add(layer == null ? entry.getValue().get() : layer);
+        }
+        normalized.addAll(restoredOtherLayers);
+
+        return normalized;
+    }
+
     public static void restore(List<Layer> restoredLayers) {
+        ArrayList<Layer> normalizedLayers = normalizeRestoreList(restoredLayers);
+
         layers.forEach(Layers::detach);
         layers.clear();
 
-        newLayers.addAll(restoredLayers);
+        newLayers.addAll(normalizedLayers);
 
         viewpointLayer = null;
         miniviewLayer = null;
         connectionLayer = null;
 
-        for (Layer layer : restoredLayers) {
+        for (Layer layer : normalizedLayers) {
             layers.add(layer);
             cacheLayer(layer);
         }
