@@ -158,6 +158,10 @@ public final class Commands {
     }
 
     public static CompletableFuture<ImageLayer> loadImage(List<URI> uris) {
+        return loadImage(uris, null);
+    }
+
+    public static CompletableFuture<ImageLayer> loadImage(List<URI> uris, @Nullable JSONObject imageParams) {
         CompletableFuture<ImageLayer> future = new CompletableFuture<>();
         if (uris.isEmpty()) {
             future.complete(null);
@@ -170,9 +174,14 @@ public final class Commands {
                 return;
             }
 
-            ImageLayer layer = ImageLayer.create(null);
-            layer.load(resolved);
-            future.complete(layer);
+            try {
+                ImageLayer layer = ImageLayer.create(null);
+                layer.applyImageParams(imageParams);
+                layer.load(resolved);
+                future.complete(layer);
+            } catch (Exception e) {
+                future.completeExceptionally(e);
+            }
         });
         return future;
     }

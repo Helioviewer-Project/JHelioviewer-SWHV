@@ -79,15 +79,17 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         executor = new DecodeExecutor();
 
         if (jo != null) {
-            JSONObject apiRequest = jo.optJSONObject("APIRequest");
-            if (apiRequest != null) {
-                load(APIRequest.fromJson(apiRequest));
+            applyImageParams(jo.optJSONObject("imageParams"));
 
-                JSONObject imageParams = jo.optJSONObject("imageParams");
-                if (imageParams != null)
-                    glImage.fromJson(imageParams);
-            }
+            JSONObject apiRequest = jo.optJSONObject("APIRequest");
+            if (apiRequest != null)
+                load(APIRequest.fromJson(apiRequest));
         }
+    }
+
+    public void applyImageParams(@Nullable JSONObject imageParams) {
+        if (imageParams != null)
+            glImage.fromJson(imageParams);
     }
 
     public void load(APIRequest req) {
