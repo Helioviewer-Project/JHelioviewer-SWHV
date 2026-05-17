@@ -95,14 +95,29 @@ public final class ExportMovie implements Movie.Listener {
                 Commands.notifyRecordingFinished(context, false, "Recording already in progress.", null);
             return;
         }
+
         operationContext = context;
+        try {
+            if (input != null)
+                ViewState.applyRecordStartUpdate(input.mode(), input.size(), input.advanceMode(), input.speed(), input.speedUnit());
 
-        if (input != null)
-            ViewState.applyRecordStartUpdate(input.mode(), input.size(), input.advanceMode(), input.speed(), input.speedUnit());
-
-        ViewState.PlaybackData playbackData = ViewState.playbackData();
-        int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
-        startRecording(ViewState.recordingData(), fps);
+            ViewState.PlaybackData playbackData = ViewState.playbackData();
+            int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
+            startRecording(ViewState.recordingData(), fps);
+        } catch (Exception e) {
+            Log.error(e);
+            recording = false;
+            shallStop = false;
+            Movie.removeFrameListener(instance);
+            if (grabber != null) {
+                grabber.dispose();
+                grabber = null;
+            }
+            exporter = null;
+            notifyStatusChanged();
+            String message = e.getMessage() == null || e.getMessage().isBlank() ? "Recording failed." : e.getMessage();
+            recordingFinished(false, message, null);
+        }
     }
 
     private static void startRecording(ViewState.RecordingData recordingData, int fps) {
@@ -165,6 +180,9 @@ public final class ExportMovie implements Movie.Listener {
             disposeMovieWriter(true);
         } catch (Exception e) {
             Log.error(e);
+            exporter = null;
+            String message = e.getMessage() == null || e.getMessage().isBlank() ? "Recording failed." : e.getMessage();
+            recordingFinished(false, message, null);
         }
     }
 
