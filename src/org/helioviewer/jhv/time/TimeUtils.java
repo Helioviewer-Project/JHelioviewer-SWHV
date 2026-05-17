@@ -111,6 +111,9 @@ public class TimeUtils {
         }
     */
     public static long optParse(String date, long alt) {
+        if (date == null || date.isBlank())
+            return alt;
+
         String spice = Spice.timeParse2UTC(date);
         if (spice != null) { // understood by SPICE, may still fail Java parser
             try {
