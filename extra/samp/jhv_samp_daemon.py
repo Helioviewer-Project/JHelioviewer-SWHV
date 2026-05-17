@@ -12,7 +12,6 @@ from threading import Event
 
 from astropy.samp import SAMPIntegratedClient
 
-
 SOCKET = "/tmp/jhv-samp.sock"
 
 COMPLETIONS = {
@@ -73,7 +72,9 @@ class JHVSampQueue:
         return {"mtype": mtype, "status": "sent"}
 
     def notify(self, mtype: str, params: dict) -> None:
-        self.client.notify(self.jhv_id, {"samp.mtype": mtype, "samp.params": to_samp(params)})
+        self.client.notify(
+            self.jhv_id, {"samp.mtype": mtype, "samp.params": to_samp(params)}
+        )
 
     def request(self, mtype: str, params: dict) -> dict:
         request_id = str(uuid.uuid4())
@@ -117,7 +118,9 @@ class Handler(socketserver.StreamRequestHandler):
         try:
             request = json.loads(self.rfile.readline())
             commands = request if isinstance(request, list) else [request]
-            if not isinstance(commands, list) or not all(isinstance(command, dict) for command in commands):
+            if not isinstance(commands, list) or not all(
+                isinstance(command, dict) for command in commands
+            ):
                 raise ValueError("request must be a command or a list of commands")
             response = {"ok": True, "results": self.server.queue.execute(commands)}
         except Exception as e:
