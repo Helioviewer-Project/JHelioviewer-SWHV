@@ -260,7 +260,7 @@ public class GLImage {
     }
 
     public void setEnhanced(double _enhanced) {
-        enhanced = _enhanced;
+        enhanced = Math.clamp(_enhanced, 0, 3);
     }
 
     public void setDifferenceMode(DifferenceMode mode) {
@@ -311,18 +311,18 @@ public class GLImage {
         // setSector(jo.optDouble("sector0", sector0), jo.optDouble("sector1", sector1));
         setInnerMask(jo.optDouble("innerMask", innerMask));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
-        enhanced = jo.optDouble("enhanced", enhanced);
+        setEnhanced(jo.optDouble("enhanced", enhanced));
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
         try {
             diffMode = DifferenceMode.valueOf(strDiffMode);
         } catch (Exception ignore) {}
         JSONObject colorObject = jo.optJSONObject("color");
         if (colorObject != null) {
-            red = colorObject.optBoolean("red", true) ? 1 : 0;
-            green = colorObject.optBoolean("green", true) ? 1 : 0;
-            blue = colorObject.optBoolean("blue", true) ? 1 : 0;
+            red = colorObject.optBoolean("red", getRed()) ? 1 : 0;
+            green = colorObject.optBoolean("green", getGreen()) ? 1 : 0;
+            blue = colorObject.optBoolean("blue", getBlue()) ? 1 : 0;
         }
-        invertLUT = jo.optBoolean("invert", false);
+        invertLUT = jo.optBoolean("invert", invertLUT);
     }
 
     public JSONObject toJson() {
