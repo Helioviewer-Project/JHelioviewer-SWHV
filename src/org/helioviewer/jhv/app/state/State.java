@@ -237,10 +237,10 @@ public final class State {
             else
                 Log.info("Skipping timeline state because EVEPlugin is inactive");
 
-            loadLayers(jo, context, modeData);
             JSONObject plugins = jo.optJSONObject("plugins");
             if (plugins != null)
                 PluginManager.loadState(plugins);
+            loadLayers(jo, context, modeData);
         } catch (Exception e) {
             Log.error(e);
             String message = e.getMessage() == null || e.getMessage().isBlank() ? "State load failed." : e.getMessage();
