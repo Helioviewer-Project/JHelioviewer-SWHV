@@ -78,7 +78,7 @@ public class GLTexture {
 
         ImageBuffer.Format format = imageBuffer.format;
         int inputGLFormat = mapImageFormatToInputGLFormat(format);
-        int bppGLType = mapBytesPerPixelToGLType(format.bytes);
+        int bppGLType = mapImageFormatToInputGLType(format);
 
         if (w != previousWidth || h != previousHeight || previousInputFormat != inputGLFormat || previousInputType != bppGLType) {
             int internalGLFormat = mapImageFormatToInternalGLFormat(format);
@@ -112,23 +112,22 @@ public class GLTexture {
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
         return switch (format) {
             case Gray8 -> GL.R8;
-            case Gray16 -> GL.R16;
+            case Gray16F -> GL.R16F;
             case RGBA32 -> GL.RGBA;
         };
     }
 
     private static int mapImageFormatToInputGLFormat(ImageBuffer.Format format) {
         return switch (format) {
-            case Gray8, Gray16 -> GL.RED;
+            case Gray8, Gray16F -> GL.RED;
             case RGBA32 -> GL.RGBA;
         };
     }
 
-    private static int mapBytesPerPixelToGLType(int bytesPerPixel) {
-        return switch (bytesPerPixel) {
-            case 1, 4 -> GL.UNSIGNED_BYTE;
-            case 2 -> GL.UNSIGNED_SHORT;
-            default -> 0;
+    private static int mapImageFormatToInputGLType(ImageBuffer.Format format) {
+        return switch (format) {
+            case Gray8, RGBA32 -> GL.UNSIGNED_BYTE;
+            case Gray16F -> GL.HALF_FLOAT;
         };
     }
 
