@@ -68,6 +68,8 @@ def movie_commands(path: str, size: str) -> list[dict]:
                 ),
             },
         ),
+        # JHV will recurse if it's a directory
+        # use "url": [ as_url("arg1"), as_url("arg2"), ..., ] for multiple arguments
         command(
             "jhv.load.image",
             {
