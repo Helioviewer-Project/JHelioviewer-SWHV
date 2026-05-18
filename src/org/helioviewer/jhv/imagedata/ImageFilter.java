@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.util.stream.IntStream;
-
 //import com.google.common.base.Stopwatch;
 
 public class ImageFilter {
@@ -30,22 +28,26 @@ public class ImageFilter {
         int length = width * height;
 
         float[] data = new float[length];
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                data[idx] = ((array[idx] + 256) & 0xFF) * BDIV;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    data[idx] = ((array[idx] + 256) & 0xFF) * BDIV;
+                }
             }
         });
 
         float[] image = algorithm.filter(data, width, height);
 
         byte[] out = new byte[length];
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                out[idx] = (byte) Math.clamp(image[idx] * 255 + .5f, 0, 255);
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    out[idx] = (byte) Math.clamp(image[idx] * 255 + .5f, 0, 255);
+                }
             }
         });
 
@@ -56,22 +58,26 @@ public class ImageFilter {
         int length = width * height;
 
         float[] data = new float[length];
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                data[idx] = Float.float16ToFloat(array[idx]);
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    data[idx] = Float.float16ToFloat(array[idx]);
+                }
             }
         });
 
         float[] image = algorithm.filter(data, width, height);
 
         short[] out = new short[length];
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                out[idx] = Float.floatToFloat16(Math.clamp(image[idx], 0f, 1f));
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    out[idx] = Float.floatToFloat16(Math.clamp(image[idx], 0f, 1f));
+                }
             }
         });
 

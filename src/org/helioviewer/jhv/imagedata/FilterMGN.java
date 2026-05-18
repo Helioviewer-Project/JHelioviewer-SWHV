@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.imagedata;
 
-import java.util.stream.IntStream;
-
 import org.helioviewer.jhv.math.MathUtils;
 
 class FilterMGN implements ImageFilter.Algorithm {
@@ -94,10 +92,14 @@ class FilterMGN implements ImageFilter.Algorithm {
         }
 
         void gaussianConvImage(float[] dst, float[] src, int width, int height) {
-            IntStream.range(0, height).parallel().forEach(y ->
-                    gaussianConv(dst, src, width, 1, width * y, buffer.get()));
-            IntStream.range(0, width).parallel().forEach(x ->
-                    gaussianConv(dst, dst, height, width, x, buffer.get()));
+            ParallelRange.run(height, (from, to) -> {
+                for (int y = from; y < to; y++)
+                    gaussianConv(dst, src, width, 1, width * y, buffer.get());
+            });
+            ParallelRange.run(width, (from, to) -> {
+                for (int x = from; x < to; x++)
+                    gaussianConv(dst, dst, height, width, x, buffer.get());
+            });
         }
 
     }
@@ -111,21 +113,25 @@ class FilterMGN implements ImageFilter.Algorithm {
     private static void gaussNormAccumulate(float[] data, int width, int height, float weight, GaussFilter filter,
                                             float[] conv, float[] conv2, float[] accum) {
         filter.gaussianConvImage(conv, data, width, height);
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int i = rowBase; i < rowEnd; i++) {
-                float v = data[i] - conv[i];
-                conv[i] = v;
-                conv2[i] = v * v;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int i = rowBase; i < rowEnd; i++) {
+                    float v = data[i] - conv[i];
+                    conv[i] = v;
+                    conv2[i] = v * v;
+                }
             }
         });
         filter.gaussianConvImage(conv2, conv2, width, height);
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int i = rowBase; i < rowEnd; i++) {
-                accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int i = rowBase; i < rowEnd; i++) {
+                    accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
+                }
             }
         });
     }
@@ -151,11 +157,13 @@ class FilterMGN implements ImageFilter.Algorithm {
         }
 
         float[] image = new float[size];
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int i = rowBase; i < rowEnd; i++) {
-                image[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int i = rowBase; i < rowEnd; i++) {
+                    image[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
+                }
             }
         });
         return image;

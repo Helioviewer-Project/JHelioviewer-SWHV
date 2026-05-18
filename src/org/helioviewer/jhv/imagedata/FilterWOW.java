@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.imagedata;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 import org.helioviewer.jhv.math.MathUtils;
 
@@ -72,11 +71,13 @@ class FilterWOW implements ImageFilter.Algorithm {
     private static float median(float[] c, int width, int height) {
         int length = width * height;
         float[] w = new float[length];
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                w[idx] = Math.abs(c[idx]);
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    w[idx] = Math.abs(c[idx]);
+                }
             }
         });
         Arrays.parallelSort(w); // can be faster than serial quickSelect
@@ -84,104 +85,118 @@ class FilterWOW implements ImageFilter.Algorithm {
     }
 
     private static void subtractParallel(float[] base, float[] smooth, float[] detail, int width, int height) {
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                detail[idx] = base[idx] - smooth[idx];
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    detail[idx] = base[idx] - smooth[idx];
+                }
             }
         });
     }
 
     private static void denoiseParallel(float factor, float[] detail, int width, int height) {
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                float w = Math.abs(detail[idx]) * factor;
-                detail[idx] *= BOOST * w / (1 + w);
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    float w = Math.abs(detail[idx]) * factor;
+                    detail[idx] *= BOOST * w / (1 + w);
+                }
             }
         });
     }
 
     private static void synthesisParallel(float[] variance, float[] detail, float[] output, int width, int height) {
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                output[idx] += MathUtils.invSqrt(variance[idx]) * detail[idx];
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    output[idx] += MathUtils.invSqrt(variance[idx]) * detail[idx];
+                }
             }
         });
     }
 
     private static void blendParallel(float[] base, float[] original, float[] output, int width, int height) {
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowEnd = rowBase + width;
-            for (int idx = rowBase; idx < rowEnd; idx++) {
-                output[idx] = (output[idx] + base[idx]) * ONE_MINUS_MIX_FACTOR + original[idx] * MIX_FACTOR;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    output[idx] = (output[idx] + base[idx]) * ONE_MINUS_MIX_FACTOR + original[idx] * MIX_FACTOR;
+                }
             }
         });
     }
 
     private static void convolveHorizontal(float[] src, float[] dest, int width, int height, int step) {
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                float sum = 0;
-                int idx_m2 = mirroredIdx(x - 2 * step, width);
-                sum += src[rowBase + idx_m2] * FILTER0;
-                int idx_m1 = mirroredIdx(x - step, width);
-                sum += src[rowBase + idx_m1] * FILTER1;
-                sum += src[rowBase + x] * FILTER2;
-                int idx_p1 = mirroredIdx(x + step, width);
-                sum += src[rowBase + idx_p1] * FILTER3;
-                int idx_p2 = mirroredIdx(x + 2 * step, width);
-                sum += src[rowBase + idx_p2] * FILTER4;
-                dest[rowBase + x] = sum;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                for (int x = 0; x < width; x++) {
+                    float sum = 0;
+                    int idx_m2 = mirroredIdx(x - 2 * step, width);
+                    sum += src[rowBase + idx_m2] * FILTER0;
+                    int idx_m1 = mirroredIdx(x - step, width);
+                    sum += src[rowBase + idx_m1] * FILTER1;
+                    sum += src[rowBase + x] * FILTER2;
+                    int idx_p1 = mirroredIdx(x + step, width);
+                    sum += src[rowBase + idx_p1] * FILTER3;
+                    int idx_p2 = mirroredIdx(x + 2 * step, width);
+                    sum += src[rowBase + idx_p2] * FILTER4;
+                    dest[rowBase + x] = sum;
+                }
             }
         });
     }
 
     private static void convolveHorizontalSquared(float[] src, float[] dest, int width, int height, int step) {
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            for (int x = 0; x < width; x++) {
-                float sum = 0;
-                int idx_m2 = mirroredIdx(x - 2 * step, width);
-                float v_m2 = src[rowBase + idx_m2];
-                sum += v_m2 * v_m2 * FILTER0;
-                int idx_m1 = mirroredIdx(x - step, width);
-                float v_m1 = src[rowBase + idx_m1];
-                sum += v_m1 * v_m1 * FILTER1;
-                float v0 = src[rowBase + x];
-                sum += v0 * v0 * FILTER2;
-                int idx_p1 = mirroredIdx(x + step, width);
-                float v_p1 = src[rowBase + idx_p1];
-                sum += v_p1 * v_p1 * FILTER3;
-                int idx_p2 = mirroredIdx(x + 2 * step, width);
-                float v_p2 = src[rowBase + idx_p2];
-                sum += v_p2 * v_p2 * FILTER4;
-                dest[rowBase + x] = sum;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                for (int x = 0; x < width; x++) {
+                    float sum = 0;
+                    int idx_m2 = mirroredIdx(x - 2 * step, width);
+                    float v_m2 = src[rowBase + idx_m2];
+                    sum += v_m2 * v_m2 * FILTER0;
+                    int idx_m1 = mirroredIdx(x - step, width);
+                    float v_m1 = src[rowBase + idx_m1];
+                    sum += v_m1 * v_m1 * FILTER1;
+                    float v0 = src[rowBase + x];
+                    sum += v0 * v0 * FILTER2;
+                    int idx_p1 = mirroredIdx(x + step, width);
+                    float v_p1 = src[rowBase + idx_p1];
+                    sum += v_p1 * v_p1 * FILTER3;
+                    int idx_p2 = mirroredIdx(x + 2 * step, width);
+                    float v_p2 = src[rowBase + idx_p2];
+                    sum += v_p2 * v_p2 * FILTER4;
+                    dest[rowBase + x] = sum;
+                }
             }
         });
     }
 
     private static void convolveVertical(float[] src, float[] dest, int width, int height, int step) {
-        IntStream.range(0, height).parallel().forEach(y -> {
-            int rowBase = y * width;
-            int rowM2 = mirroredIdx(y - 2 * step, height) * width;
-            int rowM1 = mirroredIdx(y - step, height) * width;
-            int rowP1 = mirroredIdx(y + step, height) * width;
-            int rowP2 = mirroredIdx(y + 2 * step, height) * width;
-            for (int x = 0; x < width; x++) {
-                float sum = 0;
-                sum += src[rowM2 + x] * FILTER0;
-                sum += src[rowM1 + x] * FILTER1;
-                sum += src[rowBase + x] * FILTER2;
-                sum += src[rowP1 + x] * FILTER3;
-                sum += src[rowP2 + x] * FILTER4;
-                dest[rowBase + x] = sum;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowM2 = mirroredIdx(y - 2 * step, height) * width;
+                int rowM1 = mirroredIdx(y - step, height) * width;
+                int rowP1 = mirroredIdx(y + step, height) * width;
+                int rowP2 = mirroredIdx(y + 2 * step, height) * width;
+                for (int x = 0; x < width; x++) {
+                    float sum = 0;
+                    sum += src[rowM2 + x] * FILTER0;
+                    sum += src[rowM1 + x] * FILTER1;
+                    sum += src[rowBase + x] * FILTER2;
+                    sum += src[rowP1 + x] * FILTER3;
+                    sum += src[rowP2 + x] * FILTER4;
+                    dest[rowBase + x] = sum;
+                }
             }
         });
     }

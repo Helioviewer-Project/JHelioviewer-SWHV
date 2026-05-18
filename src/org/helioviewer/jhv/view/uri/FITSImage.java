@@ -6,11 +6,11 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 import org.helioviewer.jhv.base.ArrayUtils;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageFilter;
+import org.helioviewer.jhv.imagedata.ParallelRange;
 import org.helioviewer.jhv.math.MathUtils;
 
 import nom.tam.fits.BasicHDU;
@@ -217,51 +217,61 @@ public final class FITSImage implements URIImageReader {
         switch (pixels) {
             case short[] inData -> {
                 short[] lookup = halfFloatLookup(hasBlank, blank, bzero, bscale, min, max, mapping);
-                IntStream.range(0, height).parallel().forEach(j -> {
+                ParallelRange.run(height, (from, to) -> {
+                    for (int j = from; j < to; j++) {
+                        int inLine = width * j;
+                        int outLine = width * (height - 1 - j);
+
+                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                            outData.put(outIdx, lookup[inData[inLine + i] & 0xFFFF]);
+                        }
+                    }
+                });
+            }
+            case int[] inData -> ParallelRange.run(height, (from, to) -> {
+                for (int j = from; j < to; j++) {
                     int inLine = width * j;
                     int outLine = width * (height - 1 - j);
 
                     for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                        outData.put(outIdx, lookup[inData[inLine + i] & 0xFFFF]);
+                        int raw = inData[inLine + i];
+                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
                     }
-                });
-            }
-            case int[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
-
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    int raw = inData[inLine + i];
-                    float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
                 }
             });
-            case long[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
+            case long[] inData -> ParallelRange.run(height, (from, to) -> {
+                for (int j = from; j < to; j++) {
+                    int inLine = width * j;
+                    int outLine = width * (height - 1 - j);
 
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    long raw = inData[inLine + i];
-                    float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                    for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                        long raw = inData[inLine + i];
+                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                    }
                 }
             });
-            case float[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
+            case float[] inData -> ParallelRange.run(height, (from, to) -> {
+                for (int j = from; j < to; j++) {
+                    int inLine = width * j;
+                    int outLine = width * (height - 1 - j);
 
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    float v = floatPixel(inData[inLine + i], bzero, bscale);
-                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                    for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                        float v = floatPixel(inData[inLine + i], bzero, bscale);
+                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                    }
                 }
             });
-            case double[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
-                int inLine = width * j;
-                int outLine = width * (height - 1 - j);
+            case double[] inData -> ParallelRange.run(height, (from, to) -> {
+                for (int j = from; j < to; j++) {
+                    int inLine = width * j;
+                    int outLine = width * (height - 1 - j);
 
-                for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                    float v = floatPixel(inData[inLine + i], bzero, bscale);
-                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                    for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                        float v = floatPixel(inData[inLine + i], bzero, bscale);
+                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                    }
                 }
             });
             default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
