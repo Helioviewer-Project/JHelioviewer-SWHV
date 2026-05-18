@@ -11,13 +11,35 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.egl.EGL;
 import org.lwjgl.egl.EGL15;
 import org.lwjgl.opengles.GLES;
-import org.lwjgl.system.Configuration;
 import org.lwjgl.system.JNI;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 public final class AngleRenderer {
-    private record PlatformConfig(int backendType, String eglLibrary, String openGlesLibrary) {}
+    private enum Backend {
+        D3D11(EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE, "D3D11"),
+        METAL(EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE, "Metal"),
+        OPENGL(EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE, "OpenGL"),
+        VULKAN(EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE, "Vulkan");
+
+        private final int eglType;
+        private final String label;
+
+        Backend(int _eglType, String _label) {
+            eglType = _eglType;
+            label = _label;
+        }
+
+        private static Backend platform() {
+            if (Platform.isMacOS())
+                return METAL;
+            if (Platform.isWindows())
+                return D3D11;
+            if (Platform.isLinux())
+                return OPENGL;
+            throw new IllegalStateException("Unsupported ANGLE platform");
+        }
+    }
 
     private enum SurfaceKind {
         WINDOW(EGL15.EGL_WINDOW_BIT, true),
@@ -32,6 +54,13 @@ public final class AngleRenderer {
         }
     }
 
+    private static Backend selectBackend(SurfaceKind surfaceKind) {
+        // Pbuffer Vulkan is currently used only for external SwiftShader; if an ICD is configured, assume it is SwiftShader.
+        if (surfaceKind == SurfaceKind.PBUFFER && AngleLibraries.loadSwiftShader())
+            return Backend.VULKAN;
+        return Backend.platform();
+    }
+
     private static boolean lwjglConfigured;
     private static boolean rendererInitialized;
 
@@ -42,15 +71,16 @@ public final class AngleRenderer {
     private static final int EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE = 0x3208;
     private static final int EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE = 0x3489;
     private static final int EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE = 0x320D;
+    private static final int EGL_PLATFORM_ANGLE_TYPE_VULKAN_ANGLE = 0x3450;
     private final long display;
     private final long context;
     private final long surface;
     private final boolean swapBuffers;
-    private final PlatformConfig platform;
+    private final Backend backend;
 
     // Front-load LWJGL/ANGLE library setup and EGL capability discovery before the first real renderer is created.
     public static void prewarm() {
-        ensureLwjglAngleConfigured(platformConfig());
+        ensureLwjglAngleConfigured();
     }
 
     public AngleRenderer(long nativeWindowHandle) {
@@ -68,16 +98,16 @@ public final class AngleRenderer {
     }
 
     private AngleRenderer(SurfaceKind surfaceKind, long nativeWindowHandle, int pbufferWidth, int pbufferHeight) {
-        platform = platformConfig();
+        backend = selectBackend(surfaceKind);
         swapBuffers = surfaceKind.swapBuffers;
-        ensureLwjglAngleConfigured(platform);
+        ensureLwjglAngleConfigured();
 
         long newDisplay = EGL15.EGL_NO_DISPLAY;
         long newContext = EGL15.EGL_NO_CONTEXT;
         long newSurface = EGL15.EGL_NO_SURFACE;
         boolean glesInitialized = false;
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            PointerBuffer displayAttrs = displayAttrs(stack, platform);
+            PointerBuffer displayAttrs = stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, backend.eglType, EGL15.EGL_NONE);
             // LWJGL's checked wrappers reject native_display == 0 here, so call the function pointer directly.
             // display = org.lwjgl.egl.EGL15.eglGetPlatformDisplay(EGL_PLATFORM_ANGLE_ANGLE, 0L, displayAttrs);
             newDisplay = JNI.callPPP(EGL_PLATFORM_ANGLE_ANGLE, 0L, MemoryUtil.memAddressSafe(displayAttrs), EGL.getCapabilities().eglGetPlatformDisplay);
@@ -177,17 +207,12 @@ public final class AngleRenderer {
         rendererInitialized = true;
     }
 
-    private static synchronized void ensureLwjglAngleConfigured(PlatformConfig platform) {
+    private static synchronized void ensureLwjglAngleConfigured() {
         if (lwjglConfigured)
             return;
-        Configuration.EGL_LIBRARY_NAME.set(AngleLibraries.libraryPath(platform.eglLibrary()).toString());
-        Configuration.OPENGLES_LIBRARY_NAME.set(AngleLibraries.libraryPath(platform.openGlesLibrary()).toString());
+        AngleLibraries.configureLwjglAngleLibraries();
         EGL.getCapabilities();
         lwjglConfigured = true;
-    }
-
-    private static PointerBuffer displayAttrs(MemoryStack stack, PlatformConfig platform) {
-        return stack.pointers(EGL_PLATFORM_ANGLE_TYPE_ANGLE, platform.backendType(), EGL15.EGL_NONE);
     }
 
     private static long chooseConfig(MemoryStack stack, long display, int samples, int surfaceType) {
@@ -241,7 +266,7 @@ public final class AngleRenderer {
         int sampleBuffers = configAttrib(attribValue, config, EGL15.EGL_SAMPLE_BUFFERS);
         int samples = configAttrib(attribValue, config, EGL15.EGL_SAMPLES);
 
-        Log.info("ANGLE EGL config: backend=" + backendName(platform.backendType())
+        Log.info("ANGLE EGL config: backend=" + backend.label
                 + " rgba=" + red + "/" + green + "/" + blue + "/" + alpha
                 + " depth=" + depth
                 + " stencil=" + stencil
@@ -257,29 +282,9 @@ public final class AngleRenderer {
 
     private RuntimeException eglError(String step) {
         int code = EGL15.eglGetError();
-        String backend = backendName(platform.backendType());
         if (code == EGL15.EGL_SUCCESS)
-            return new RuntimeException(step + " failed without EGL error; backend=" + backend);
-        return new RuntimeException(step + " failed with EGL error 0x" + Integer.toHexString(code) + "; backend=" + backend);
-    }
-
-    private static String backendName(int backendType) {
-        return switch (backendType) {
-            case EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE -> "D3D11";
-            case EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE -> "Metal";
-            case EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE -> "OpenGL";
-            default -> "0x" + Integer.toHexString(backendType);
-        };
-    }
-
-    private static PlatformConfig platformConfig() {
-        if (Platform.isMacOS())
-            return new PlatformConfig(EGL_PLATFORM_ANGLE_TYPE_METAL_ANGLE, "libEGL.dylib", "libGLESv2.dylib");
-        if (Platform.isWindows())
-            return new PlatformConfig(EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE, "libEGL.dll", "libGLESv2.dll");
-        if (Platform.isLinux())
-            return new PlatformConfig(EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE, "libEGL.so", "libGLESv2.so");
-        throw new IllegalStateException("Unsupported ANGLE platform");
+            return new RuntimeException(step + " failed without EGL error; backend=" + backend.label);
+        return new RuntimeException(step + " failed with EGL error 0x" + Integer.toHexString(code) + "; backend=" + backend.label);
     }
 
 }
