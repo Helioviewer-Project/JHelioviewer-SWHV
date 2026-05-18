@@ -26,6 +26,7 @@ final class AngleLibraries {
         Configuration.OPENGLES_LIBRARY_NAME.set(libraryPath(openGlesLibrary()).toString());
     }
 
+    @SuppressWarnings("restricted")
     static synchronized boolean loadSwiftShader() {
         String icd = System.getenv(SWIFTSHADER_ICD_ENV);
         if (icd == null || icd.isBlank())
