@@ -24,7 +24,7 @@ public class ImageFilter {
         float[] filter(float[] data, int width, int height);
     }
 
-    private static final float BDIV = 1 / 255f, SDIV = 1 / 65535f;
+    private static final float BDIV = 1 / 255f;
 
     private static byte[] filter(byte[] array, int width, int height, Algorithm algorithm) {
         int length = width * height;
@@ -52,7 +52,7 @@ public class ImageFilter {
         return out;
     }
 
-    private static short[] filter(short[] array, int width, int height, Algorithm algorithm) {
+    private static short[] filterHalfFloat(short[] array, int width, int height, Algorithm algorithm) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -60,7 +60,7 @@ public class ImageFilter {
             int rowBase = y * width;
             int rowEnd = rowBase + width;
             for (int idx = rowBase; idx < rowEnd; idx++) {
-                data[idx] = ((array[idx] + 65536) & 0xFFFF) * SDIV;
+                data[idx] = Float.float16ToFloat(array[idx]);
             }
         });
 
@@ -71,7 +71,7 @@ public class ImageFilter {
             int rowBase = y * width;
             int rowEnd = rowBase + width;
             for (int idx = rowBase; idx < rowEnd; idx++) {
-                out[idx] = (short) Math.clamp(image[idx] * 65535 + .5f, 0, 65535);
+                out[idx] = Float.floatToFloat16(Math.clamp(image[idx], 0f, 1f));
             }
         });
 
@@ -82,8 +82,8 @@ public class ImageFilter {
         return type == Type.None ? data : filter(data, width, height, type.algorithm);
     }
 
-    static short[] filter(short[] data, int width, int height, Type type) {
-        return type == Type.None ? data : filter(data, width, height, type.algorithm);
+    static short[] filterHalfFloat(short[] data, int width, int height, Type type) {
+        return type == Type.None ? data : filterHalfFloat(data, width, height, type.algorithm);
     }
 
 }

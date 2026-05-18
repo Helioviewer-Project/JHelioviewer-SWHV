@@ -34,6 +34,7 @@ public final class GL {
     public static final int FRAMEBUFFER = GLES30.GL_FRAMEBUFFER;
     public static final int FRAMEBUFFER_COMPLETE = GLES30.GL_FRAMEBUFFER_COMPLETE;
     public static final int FUNC_ADD = GLES30.GL_FUNC_ADD;
+    public static final int HALF_FLOAT = GLES30.GL_HALF_FLOAT;
     public static final int INFO_LOG_LENGTH = GLES30.GL_INFO_LOG_LENGTH;
     public static final int INVALID_ENUM = GLES30.GL_INVALID_ENUM;
     public static final int INVALID_FRAMEBUFFER_OPERATION = GLES30.GL_INVALID_FRAMEBUFFER_OPERATION;
@@ -54,8 +55,7 @@ public final class GL {
     public static final int PIXEL_UNPACK_BUFFER = GLES30.GL_PIXEL_UNPACK_BUFFER;
     public static final int POINTS = GLES30.GL_POINTS;
     public static final int R8 = GLES30.GL_R8;
-    // ANGLE accepts this single-channel 16-bit normalized format, though LWJGL does not expose it on GLES30.
-    public static final int R16 = 0x822A;
+    public static final int R16F = GLES30.GL_R16F;
     public static final int READ_FRAMEBUFFER = GLES30.GL_READ_FRAMEBUFFER;
     public static final int RED = GLES30.GL_RED;
     public static final int RENDERBUFFER = GLES30.GL_RENDERBUFFER;
@@ -78,7 +78,6 @@ public final class GL {
     public static final int UNPACK_ALIGNMENT = GLES30.GL_UNPACK_ALIGNMENT;
     public static final int UNPACK_ROW_LENGTH = GLES30.GL_UNPACK_ROW_LENGTH;
     public static final int UNSIGNED_BYTE = GLES30.GL_UNSIGNED_BYTE;
-    public static final int UNSIGNED_SHORT = GLES30.GL_UNSIGNED_SHORT;
     public static final int VERSION = GLES30.GL_VERSION;
     public static final int VERTEX_SHADER = GLES30.GL_VERTEX_SHADER;
 

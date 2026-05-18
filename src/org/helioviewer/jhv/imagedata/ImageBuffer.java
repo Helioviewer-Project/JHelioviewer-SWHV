@@ -12,7 +12,7 @@ public final class ImageBuffer {
     private static final Cleaner cleaner = Cleaner.create();
 
     public enum Format {
-        Gray8(1), Gray16(2), RGBA32(4);
+        Gray8(1), Gray16F(2), RGBA32(4);
 
         public final int bytes;
 
@@ -34,16 +34,16 @@ public final class ImageBuffer {
     }
 
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter.Type filterType) {
-        if (format == Format.Gray16)
-            throw new IllegalArgumentException("Gray16 image buffers must be created from short data");
+        if (format == Format.Gray16F)
+            throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
         byte[] filtered = format == Format.RGBA32 ? data : ImageFilter.filter(data, width, height, filterType);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
     public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter.Type filterType) {
-        if (format != Format.Gray16)
-            throw new IllegalArgumentException("Only Gray16 image buffers can be created from short data");
-        short[] filtered = ImageFilter.filter(data, width, height, filterType);
+        if (format != Format.Gray16F)
+            throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
+        short[] filtered = ImageFilter.filterHalfFloat(data, width, height, filterType);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
@@ -107,7 +107,7 @@ public final class ImageBuffer {
                 byteArray = null;
                 shortArray = null;
                 writeBuffer = directBuffer.buffer;
-            } else if (format == Format.Gray16) {
+            } else if (format == Format.Gray16F) {
                 directBuffer = null;
                 byteArray = null;
                 shortArray = new short[width * height];
@@ -161,7 +161,7 @@ public final class ImageBuffer {
         int byteSize = byteSize(width, height, format);
         return switch (format) {
             case Gray8, RGBA32 -> new ImageBuffer(width, height, format, MemoryUtil.memAlloc(byteSize));
-            case Gray16 -> new ImageBuffer(width, height, format, MemoryUtil.memAllocShort(byteSize / Short.BYTES));
+            case Gray16F -> new ImageBuffer(width, height, format, MemoryUtil.memAllocShort(byteSize / Short.BYTES));
         };
     }
 

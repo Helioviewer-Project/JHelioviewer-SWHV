@@ -99,8 +99,8 @@ final class GenericImage implements URIImageReader {
                         ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filterType);
             }
             case BufferedImage.TYPE_USHORT_GRAY -> {
-                return ImageBuffer.fromShorts(w, h, ImageBuffer.Format.Gray16,
-                        ((DataBufferUShort) image.getRaster().getDataBuffer()).getData(), filterType);
+                return ImageBuffer.fromShorts(w, h, ImageBuffer.Format.Gray16F,
+                        halfFloat(((DataBufferUShort) image.getRaster().getDataBuffer()).getData()), filterType);
             }
             default -> {
                 BufferedImage conv = NativeImageFactory.createRGBAPremultipliedImage(w, h);
@@ -120,6 +120,13 @@ final class GenericImage implements URIImageReader {
                 }
             }
         }
+    }
+
+    private static short[] halfFloat(short[] data) {
+        short[] halfFloat = new short[data.length];
+        for (int i = 0; i < data.length; i++)
+            halfFloat[i] = Float.floatToFloat16((data[i] & 0xFFFF) / 65535f);
+        return halfFloat;
     }
 
     @Nullable

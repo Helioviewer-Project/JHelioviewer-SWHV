@@ -172,30 +172,30 @@ public final class FITSImage implements URIImageReader {
         return switch (state.scalingMode()) {
             case Gamma -> {
                 double gamma = state.gamma();
-                yield new PixelMapping(d -> Math.pow(d, gamma), 65535. / Math.pow(range, gamma));
+                yield new PixelMapping(d -> Math.pow(d, gamma), 1. / Math.pow(range, gamma));
             }
             case Beta -> {
                 double beta = state.beta();
-                yield new PixelMapping(d -> MathUtils.asinh(d * beta), 65535. / MathUtils.asinh(range * beta));
+                yield new PixelMapping(d -> MathUtils.asinh(d * beta), 1. / MathUtils.asinh(range * beta));
             }
             case Alpha -> {
                 double alpha = state.alpha();
-                yield new PixelMapping(d -> Math.log1p(d / range * alpha), 65535. / Math.log1p(alpha));
+                yield new PixelMapping(d -> Math.log1p(d / range * alpha), 1. / Math.log1p(alpha));
             }
         };
     }
 
-    private static short scalePixel(float v, float min, float max, PixelScaler scaler, double scale) {
+    private static short scalePixelToHalfFloat(float v, float min, float max, PixelScaler scaler, double scale) {
         if (v == BAD_PIXEL) {
             return 0;
         }
 
         v = Math.clamp(v, min, max); // sampling may have missed extremes
         double mapped = scaler.map(v - min);
-        return (short) Math.clamp((int) (scale * mapped + .5), 0, 65535);
+        return Float.floatToFloat16((float) Math.clamp(scale * mapped, 0, 1));
     }
 
-    private static short[] shortLookup(boolean hasBlank, long blank, double bzero, double bscale, float min, float max, PixelMapping mapping) {
+    private static short[] halfFloatLookup(boolean hasBlank, long blank, double bzero, double bscale, float min, float max, PixelMapping mapping) {
         PixelScaler scaler = mapping.scaler();
         double scale = mapping.scale();
         short[] lookup = new short[1 << 16];
@@ -203,7 +203,7 @@ public final class FITSImage implements URIImageReader {
         for (int i = 0; i < lookup.length; i++) {
             short raw = (short) i;
             float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-            lookup[i] = scalePixel(v, min, max, scaler, scale);
+            lookup[i] = scalePixelToHalfFloat(v, min, max, scaler, scale);
         }
         return lookup;
     }
@@ -216,7 +216,7 @@ public final class FITSImage implements URIImageReader {
 
         switch (pixels) {
             case short[] inData -> {
-                short[] lookup = shortLookup(hasBlank, blank, bzero, bscale, min, max, mapping);
+                short[] lookup = halfFloatLookup(hasBlank, blank, bzero, bscale, min, max, mapping);
                 IntStream.range(0, height).parallel().forEach(j -> {
                     int inLine = width * j;
                     int outLine = width * (height - 1 - j);
@@ -233,7 +233,7 @@ public final class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     int raw = inData[inLine + i];
                     float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    outData.put(outIdx, scalePixel(v, min, max, scaler, scale));
+                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
                 }
             });
             case long[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -243,7 +243,7 @@ public final class FITSImage implements URIImageReader {
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     long raw = inData[inLine + i];
                     float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                    outData.put(outIdx, scalePixel(v, min, max, scaler, scale));
+                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
                 }
             });
             case float[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -252,7 +252,7 @@ public final class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(inData[inLine + i], bzero, bscale);
-                    outData.put(outIdx, scalePixel(v, min, max, scaler, scale));
+                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
                 }
             });
             case double[] inData -> IntStream.range(0, height).parallel().forEach(j -> {
@@ -261,7 +261,7 @@ public final class FITSImage implements URIImageReader {
 
                 for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                     float v = floatPixel(inData[inLine + i], bzero, bscale);
-                    outData.put(outIdx, scalePixel(v, min, max, scaler, scale));
+                    outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
                 }
             });
             default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
@@ -359,7 +359,7 @@ public final class FITSImage implements URIImageReader {
         }
         // System.out.println(">>> " + min + ' ' + max);
 
-        ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16, filterType);
+        ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16F, filterType);
         convertPixels(pixels, outBuffer.shortBuffer(), hasBlank, blank, bzero, bscale, width, height, min, max, state);
         return outBuffer.finish();
     }
