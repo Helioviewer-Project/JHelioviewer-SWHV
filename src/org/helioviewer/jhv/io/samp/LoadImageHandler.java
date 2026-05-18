@@ -39,13 +39,12 @@ final class LoadImageHandler {
 
     private static @Nullable JSONObject imageParams(Message msg) {
         Object value = msg.getParam("imageParams");
-        if (value == null)
-            return null;
-        if (value instanceof JSONObject jo)
-            return jo;
-        if (value instanceof Map<?, ?> map)
-            return new JSONObject(map);
-        return new JSONObject(value.toString());
+        return switch (value) {
+            case null -> null;
+            case JSONObject jo -> jo;
+            case Map<?, ?> map -> new JSONObject(map);
+            default -> new JSONObject(value.toString());
+        };
     }
 
     private static void waitImageLoad(Commands.OperationContext context, CompletableFuture<ImageLayer> future) {
