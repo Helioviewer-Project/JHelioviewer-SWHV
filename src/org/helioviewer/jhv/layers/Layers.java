@@ -24,52 +24,6 @@ import org.helioviewer.jhv.view.NullView;
 @SuppressWarnings("unchecked")
 public final class Layers {
 
-    @SuppressWarnings("serial")
-    private static class LayerList extends ArrayList<Layer> {
-
-        int imageLayersCount;
-
-        @Override
-        public void clear() {
-            super.clear();
-            imageLayersCount = 0;
-        }
-
-        @Override
-        public Layer remove(int index) {
-            Layer ret = super.remove(index);
-            if (ret instanceof ImageLayer)
-                imageLayersCount--;
-            return ret;
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            boolean ret = super.remove(o);
-            if (ret && o instanceof ImageLayer)
-                imageLayersCount--;
-            return ret;
-        }
-
-        @Override
-        public boolean add(Layer e) {
-            if (e instanceof ImageLayer)
-                super.add(imageLayersCount++, e);
-            else
-                super.add(e);
-            return true;
-        }
-
-        @Override
-        public void add(int index, Layer e) { // only for DnD
-            if (!(e instanceof ImageLayer))
-                return;
-            super.add(index, e);
-            imageLayersCount++;
-        }
-
-    }
-
     public interface Listener {
         void layerAdded(int index, Layer layer);
 
@@ -108,7 +62,8 @@ public final class Layers {
         Movie.setMaster(activeLayer);
     }
 
-    private static final LayerList layers = new LayerList();
+    private static int imageLayersCount;
+    private static final ArrayList<Layer> layers = new ArrayList<>();
     private static final ArrayList<Layer> newLayers = new ArrayList<>();
     private static final ArrayList<Layer> removedLayers = new ArrayList<>();
 
@@ -144,7 +99,11 @@ public final class Layers {
     }
 
     public static void add(Layer layer) {
-        layers.add(layer);
+        if (layer instanceof ImageLayer) {
+            layers.add(imageLayersCount++, layer);
+        } else {
+            layers.add(layer);
+        }
         newLayers.add(layer);
         cacheLayer(layer);
 
@@ -168,11 +127,13 @@ public final class Layers {
             return;
 
         layers.remove(row);
+        if (layer instanceof ImageLayer) {
+            imageLayersCount--;
+        }
         detach(layer);
 
         if (layer == activeLayer) {
-            int count = layers.imageLayersCount;
-            setActiveImageLayer(count == 0 ? null : (ImageLayer) layers.get(count - 1));
+            setActiveImageLayer(imageLayersCount == 0 ? null : (ImageLayer) layers.get(imageLayersCount - 1));
         }
 
         listeners.forEach(listener -> listener.layerRemoved(row, layer));
@@ -230,7 +191,7 @@ public final class Layers {
             return;
         }
 
-        int target = Math.clamp(toIndex, 0, layers.imageLayersCount);
+        int target = Math.clamp(toIndex, 0, imageLayersCount);
         if (fromIndex < target)
             target--; // adjust insertion index after removal
         if (fromIndex == target)
@@ -268,7 +229,7 @@ public final class Layers {
     }
 
     public static void forEachImageLayer(Consumer<? super ImageLayer> action) {
-        for (int i = 0; i < layers.imageLayersCount; i++)
+        for (int i = 0; i < imageLayersCount; i++)
             action.accept((ImageLayer) layers.get(i));
     }
 
@@ -279,14 +240,14 @@ public final class Layers {
     }
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
-        if (layers.imageLayersCount == 0)
+        if (imageLayersCount == 0)
             nullImageLayer.getView().setNearestFrame(dateTime);
         else
             forEachImageLayer(layer -> layer.getView().setNearestFrame(dateTime));
     }
 
     public static List<ImageLayer> getImageLayers() {
-        return Collections.unmodifiableList((List<ImageLayer>) (Object) layers.subList(0, layers.imageLayersCount));
+        return Collections.unmodifiableList((List<ImageLayer>) (Object) layers.subList(0, imageLayersCount));
     }
 
     public static List<Layer> getLayers() {
@@ -321,6 +282,7 @@ public final class Layers {
 
         layers.forEach(Layers::detach);
         layers.clear();
+        imageLayersCount = 0;
 
         newLayers.addAll(normalizedLayers);
 
@@ -329,7 +291,11 @@ public final class Layers {
         connectionLayer = null;
 
         for (Layer layer : normalizedLayers) {
-            layers.add(layer);
+            if (layer instanceof ImageLayer) {
+                layers.add(imageLayersCount++, layer);
+            } else {
+                layers.add(layer);
+            }
             cacheLayer(layer);
         }
 
