@@ -26,6 +26,7 @@ import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.swing.DesktopIntegration;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -34,8 +35,6 @@ import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis.YAxisPositiveIdentityScale;
-import org.helioviewer.jhv.view.DecodeExecutor;
-import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 
 import org.json.JSONObject;
 
@@ -91,8 +90,8 @@ public final class RadioData extends AbstractTimelineLayer {
         jo.put("colormap", lutCombo.getColormap());
     }
 
-    private static IndexColorModel createIndexColorModelFromLUT(LUT lut2) {
-        int[] source = lut2.lut8();
+    private static IndexColorModel createIndexColorModelFromLUT(LUT lut) {
+        int[] source = lut.lut8();
         return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
@@ -117,16 +116,13 @@ public final class RadioData extends AbstractTimelineLayer {
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
+                downloadStarted(date);
                 Tasks.submit(Long.toString(date), new RadioJPXDownload(date), result -> onSuccessRadioJPX(date, result), (logContext, t) -> onFailureRadioJPX(date, t));
             }
         }
     }
 
     private record RadioJPXDownload(long date) implements Callable<RadioJ2KData> {
-
-        RadioJPXDownload {
-            downloadStarted(date);
-        }
 
         @Override
         public RadioJ2KData call() throws Exception {
@@ -135,8 +131,7 @@ public final class RadioData extends AbstractTimelineLayer {
             if (dataUri.format() != DataUri.Format.Image.JP2) // paranoia
                 throw new Exception("Invalid data format");
 
-            DecodeExecutor executor = new DecodeExecutor();
-            return new RadioJ2KData(new J2KViewCallisto(executor, req, dataUri), req.startTime(), executor);
+            return new RadioJ2KData(req, dataUri);
         }
 
     }
@@ -148,12 +143,20 @@ public final class RadioData extends AbstractTimelineLayer {
 
     private void onSuccessRadioJPX(long date, @Nonnull RadioJ2KData result) {
         doneRadioJPX(date);
+        if (currentInstance != this || !enabled) {
+            result.removeData();
+            return;
+        }
         cache.put(date, result);
         fetchData(DrawController.selectedAxis);
     }
 
     private void onFailureRadioJPX(long date, @Nonnull Throwable t) {
         doneRadioJPX(date);
+        if (JHVThread.isInterrupted(t)) {
+            Log.warn(t);
+            return;
+        }
         Log.error(Throwables.getStackTraceAsString(t));
     }
 

@@ -11,6 +11,8 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.IndexedImageFactory;
+import org.helioviewer.jhv.io.APIRequest;
+import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -22,8 +24,9 @@ import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
 class RadioJ2KData implements View.DataHandler {
 
-    private J2KViewCallisto view;
-    private DecodeExecutor executor;
+    private final DecodeExecutor executor = new DecodeExecutor();
+    private final J2KViewCallisto view;
+    private boolean disposed;
 
     private final long startDate;
     private final long endDate;
@@ -36,13 +39,16 @@ class RadioJ2KData implements View.DataHandler {
     private BufferedImage bufferedImage;
     private Region region;
 
-    RadioJ2KData(J2KViewCallisto _view, long start, DecodeExecutor _executor) throws Exception {
+    RadioJ2KData(APIRequest req, DataUri dataUri) throws Exception {
+        J2KViewCallisto v = null;
         try {
-            ResolutionSet.Level resLevel = _view.getResolutionLevel(0, 0);
+            v = new J2KViewCallisto(executor, req, dataUri);
+
+            ResolutionSet.Level resLevel = v.getResolutionLevel(0, 0);
             j2kWidth = resLevel.width();
             j2kHeight = resLevel.height();
 
-            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(_view.getXMLMetaData());
+            XMLMetaDataContainer hvMetaData = new XMLMetaDataContainer(v.getXMLMetaData());
             endFreq = hvMetaData.getRequiredDouble("STARTFRQ");
             startFreq = hvMetaData.getRequiredDouble("END-FREQ");
             startDate = TimeUtils.parse(hvMetaData.getRequiredString("DATE-OBS"));
@@ -51,25 +57,27 @@ class RadioJ2KData implements View.DataHandler {
                 throw new IllegalArgumentException("Invalid radio metadata range");
             }
 
-            view = _view;
-            view.setDataHandler(this);
-            executor = _executor;
-            willDraw = startDate == start; // didn't get closest
+            v.setDataHandler(this);
+            willDraw = startDate == req.startTime(); // didn't get closest
+            view = v;
         } catch (Exception e) {
-            _executor.abolish();
-            _view.abolish();
+            executor.abolish();
+            if (v != null) {
+                v.setDataHandler(null);
+                v.abolish();
+            }
             throw e;
         }
     }
 
     void removeData() {
-        if (view != null) {
-            executor.abolish();
-            view.setDataHandler(null);
-            view.abolish();
-            executor = null;
-            view = null;
+        if (disposed) {
+            return;
         }
+        disposed = true;
+        executor.abolish();
+        view.setDataHandler(null);
+        view.abolish();
         bufferedImage = null;
     }
 
@@ -98,7 +106,7 @@ class RadioJ2KData implements View.DataHandler {
     }
 
     void requestData(TimeAxis xAxis) {
-        if (willDraw && view != null) {
+        if (willDraw && !disposed) {
             Rectangle roi = getROI(xAxis);
             if (decodingNeeded && roi.width > 0 && roi.height > 0) {
                 view.setDecodeRegion(roi.x, roi.y, roi.width, roi.height);
