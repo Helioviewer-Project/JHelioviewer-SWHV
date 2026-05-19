@@ -104,7 +104,7 @@ public final class FITSImage implements URIImageReader {
                     int line = width * j;
                     for (int i = 0; i < width; i += stepW) {
                         short raw = inData[line + i];
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        float v = (hasBlank && raw == (short) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
                         if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
                             samples[sampleLen++] = v;
                         }
@@ -116,7 +116,7 @@ public final class FITSImage implements URIImageReader {
                     int line = width * j;
                     for (int i = 0; i < width; i += stepW) {
                         int raw = inData[line + i];
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
                         if (v != BAD_PIXEL && v != Float.MAX_VALUE) {
                             samples[sampleLen++] = v;
                         }
@@ -202,7 +202,7 @@ public final class FITSImage implements URIImageReader {
 
         for (int i = 0; i < lookup.length; i++) {
             short raw = (short) i;
-            float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+            float v = (hasBlank && raw == (short) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
             lookup[i] = scalePixelToHalfFloat(v, min, max, scaler, scale);
         }
         return lookup;
@@ -235,7 +235,7 @@ public final class FITSImage implements URIImageReader {
 
                     for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                         int raw = inData[inLine + i];
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                        float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
                         outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
                     }
                 }
