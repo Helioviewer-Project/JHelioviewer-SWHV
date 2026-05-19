@@ -51,19 +51,19 @@ final class ImageLayerLoader {
         cancelLoad();
         int gen = ++loadGeneration;
         loadFuture = Tasks.submit("request", () -> {
-            URI uri = requestAPI(req.toJpipRequest());
-            return uri == null ? null : createView(req, uri);
-        },
-        result -> onSuccess(result, gen),
-        (logContext, t) -> onFailure(t, gen));
+                    URI uri = requestAPI(req.toJpipRequest());
+                    return uri == null ? null : createView(req, uri);
+                },
+                result -> onSuccess(result, gen),
+                (logContext, t) -> onFailure(t, gen));
     }
 
     void load(List<URI> uriList) {
         cancelLoad();
         int gen = ++loadGeneration;
         loadFuture = Tasks.submit(uriList.toString(), () -> loadUri(uriList),
-            result -> onSuccess(result, gen),
-            (logContext, t) -> onFailure(t, gen));
+                result -> onSuccess(result, gen),
+                (logContext, t) -> onFailure(t, gen));
     }
 
     boolean isLoading() {

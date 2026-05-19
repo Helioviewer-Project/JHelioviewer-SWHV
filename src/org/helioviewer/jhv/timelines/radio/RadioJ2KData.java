@@ -125,6 +125,7 @@ class RadioJ2KData implements View.DataHandler {
     }
 
     private record DecodeState(float resolution, long paddedStart, long paddedEnd) {}
+
     private DecodeState lastState;
 
     private Rectangle getROI(TimeAxis xAxis) {
