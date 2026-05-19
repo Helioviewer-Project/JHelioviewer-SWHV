@@ -108,107 +108,81 @@ class RadioJ2KData implements View.DataHandler {
     void requestData(TimeAxis xAxis) {
         if (willDraw && !disposed) {
             Rectangle roi = getROI(xAxis);
-            if (decodingNeeded && roi.width > 0 && roi.height > 0) {
+            if (roi != null) {
                 view.setDecodeRegion(roi.x, roi.y, roi.width, roi.height);
-                view.decode(null, 1, last_resolution);
+                view.decode(null, 1, lastState.resolution);
             }
         }
     }
 
-    private float computeResolution(int height, TimeAxis xAxis) {
-        double pixPerTime = j2kWidth / (double) (endDate - startDate);
-        int width = (int) ((xAxis.end() - xAxis.start()) * pixPerTime + 0.5);
-        double pct = Math.min(width / (double) j2kWidth, 1);
-
-        double visibleImagePercentage = pct * height / j2kHeight;
-        if (visibleImagePercentage <= 0.03125)
-            return 1;
-        if (visibleImagePercentage <= 0.0625)
-            return 0.5f;
-        if (visibleImagePercentage <= 0.125)
-            return 0.25f;
-        if (visibleImagePercentage <= 0.25)
-            return 0.125f;
-        if (visibleImagePercentage <= 0.5)
-            return 0.0625f;
-        return 0.03125f;
+    private float computeResolution(TimeAxis xAxis) {
+        double pct = Math.min((xAxis.end() - xAxis.start()) / (double) (endDate - startDate), 1.0);
+        float res = 1f;
+        while (res > 0.03125f && pct > 0.03125f / res) {
+            res *= 0.5f;
+        }
+        return res;
     }
 
-    private boolean first = true;
-    private boolean decodingNeeded = false;
-    private float last_resolution = -1;
-    private long last_padded_start = -1;
-    private long last_padded_end = -1;
-    private int last_y0 = -1;
-    private int last_height = -1;
+    private record DecodeState(float resolution, long paddedStart, long paddedEnd) {}
+    private DecodeState lastState;
 
     private Rectangle getROI(TimeAxis xAxis) {
-        double visibleStartFreq = Math.max(startFreq, RadioData.yAxis.start());
-        double visibleEndFreq = Math.min(endFreq, RadioData.yAxis.end());
-
-        double pixPerFreq = j2kHeight / (endFreq - startFreq);
-        int y0 = (int) ((endFreq - visibleEndFreq) * pixPerFreq + 0.5);
-        int height = (int) ((visibleEndFreq - visibleStartFreq) * pixPerFreq + 0.5);
-
         long visibleStart = Math.max(startDate, xAxis.start());
         long visibleEnd = Math.min(endDate, xAxis.end());
-        float resolution = computeResolution(height, xAxis);
+        float resolution = computeResolution(xAxis);
 
-        if (last_resolution == resolution && y0 == last_y0 && height == last_height && visibleStart >= last_padded_start && visibleEnd <= last_padded_end) {
-            decodingNeeded = false;
-            return new Rectangle(0, 0, -1, -1);
+        if (lastState != null
+                && lastState.resolution == resolution
+                && visibleStart >= lastState.paddedStart
+                && visibleEnd <= lastState.paddedEnd) {
+            return null;
         }
-        decodingNeeded = true;
-
-        long ilen = xAxis.end() - xAxis.start();
-        long padded_start = xAxis.start() - ilen;
-        long padded_end = xAxis.end() + ilen;
 
         long newVisibleStart = startDate;
         long newVisibleEnd = endDate;
-        if (!first) {
-            newVisibleStart = Math.max(startDate, padded_start);
-            newVisibleEnd = Math.min(endDate, padded_end);
+        if (lastState != null) {
+            long margin = xAxis.end() - xAxis.start();
+            newVisibleStart = Math.max(startDate, xAxis.start() - margin);
+            newVisibleEnd = Math.min(endDate, xAxis.end() + margin);
         }
-        first = false;
 
         double pixPerTime = j2kWidth / (double) (endDate - startDate);
-        int x0 = (int) ((newVisibleStart - startDate) * pixPerTime + 0.5);
-        int width = (int) ((newVisibleEnd - newVisibleStart) * pixPerTime + 0.5);
+        int x0 = (int) Math.round((newVisibleStart - startDate) * pixPerTime);
+        int width = (int) Math.round((newVisibleEnd - newVisibleStart) * pixPerTime);
 
-        last_padded_end = newVisibleEnd;
-        last_padded_start = newVisibleStart;
-        last_y0 = y0;
-        last_height = height;
-        last_resolution = resolution;
+        if (width <= 0) {
+            return null;
+        }
 
-        return new Rectangle(x0, y0, width, height);
+        lastState = new DecodeState(resolution, newVisibleStart, newVisibleEnd);
+
+        return new Rectangle(x0, 0, width, j2kHeight);
     }
 
     void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
-        if (!willDraw)
+        if (!willDraw) {
             return;
-
-        if (hasData()) {
-            int sx0 = 0;
-            int sy0 = 0;
-            int sx1 = bufferedImage.getWidth();
-            int sy1 = bufferedImage.getHeight();
-            long imStart = (long) (startDate + (endDate - startDate) * region.llx / j2kWidth);
-            long imEnd = (long) (startDate + (endDate - startDate) * region.urx / j2kWidth);
-
-            double freqimStart = (startFreq + (endFreq - startFreq) * region.lly / j2kHeight);
-            double freqimEnd = (startFreq + (endFreq - startFreq) * region.ury / j2kHeight);
-
-            int dx0 = xAxis.value2pixel(ga.x, ga.width, imStart);
-            int dx1 = xAxis.value2pixel(ga.x, ga.width, imEnd);
-
-            int dy0 = RadioData.yAxis.value2pixel(ga.y, ga.height, freqimStart);
-            int dy1 = RadioData.yAxis.value2pixel(ga.y, ga.height, freqimEnd);
-
-            g.drawImage(bufferedImage, dx0, dy0, dx1, dy1, sx0, sy0, sx1, sy1, null);
-        } else
+        }
+        if (!hasData()) {
             RadioData.drawString(g, ga, xAxis, "Fetching data");
+            return;
+        }
+
+        long timeWidth = endDate - startDate;
+        long imStart = (long) (startDate + timeWidth * region.llx / j2kWidth);
+        long imEnd = (long) (startDate + timeWidth * region.urx / j2kWidth);
+
+        double freqWidth = endFreq - startFreq;
+        double freqimStart = startFreq + freqWidth * region.lly / j2kHeight;
+        double freqimEnd = startFreq + freqWidth * region.ury / j2kHeight;
+
+        g.drawImage(bufferedImage,
+                xAxis.value2pixel(ga.x, ga.width, imStart),
+                RadioData.yAxis.value2pixel(ga.y, ga.height, freqimStart),
+                xAxis.value2pixel(ga.x, ga.width, imEnd),
+                RadioData.yAxis.value2pixel(ga.y, ga.height, freqimEnd),
+                0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null);
     }
 
     void changeColormap(ColorModel cm) {
