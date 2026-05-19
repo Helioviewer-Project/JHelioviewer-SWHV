@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,7 +25,6 @@ import org.helioviewer.jhv.opengl.GLImage.DifferenceMode;
 import org.helioviewer.jhv.opengl.GLSLSolar;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 import org.helioviewer.jhv.view.BaseView;
-import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
@@ -35,10 +33,9 @@ import org.json.JSONObject;
 public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final GLImage glImage;
-    private final DecodeExecutor executor;
+    private final ImageLayerLoader loader;
 
     private boolean removed;
-    private Future<?> worker;
     protected View view;
 
     public static ImageLayer create(JSONObject jo) {
@@ -65,7 +62,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     protected ImageLayer(View _view) {
         view = _view;
         glImage = null;
-        executor = null;
+        loader = new ImageLayerLoader(v -> {}, () -> {});
     }
 
     private ImageLayer(JSONObject jo) {
@@ -76,7 +73,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
 
         glImage = new GLImage();
-        executor = new DecodeExecutor();
+        loader = new ImageLayerLoader(this::setView, this::unload);
 
         if (jo != null) {
             applyImageParams(jo.optJSONObject("imageParams"));
@@ -98,8 +95,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (req.equals(view.getAPIRequest()))
             return;
 
-        cancelLoadTask();
-        worker = ImageLayerLoader.submit(this, req);
+        loader.load(req);
         Layers.fireLayerUpdated(this); // give feedback asap
     }
 
@@ -107,15 +103,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (removed)
             return;
 
-        cancelLoadTask();
-        worker = ImageLayerLoader.submit(this, uris);
+        loader.load(uris);
         Layers.fireLayerUpdated(this); // give feedback asap
     }
 
     public void unload() {
         if (view.getBaseName() == null)
             Layers.remove(this);
-        cancelLoadTask();
+        loader.cancelLoad();
     }
 
     @Override
@@ -143,7 +138,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         ImageFilter.Type filterType = view.getFilter();
         unsetView();
         view = newView;
-        worker = null; // drop reference
+        loader.clearLoadFuture();
         view.setFilter(filterType);
         view.setDataHandler(this);
     }
@@ -162,7 +157,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     private void unsetView() {
-        cancelDownloadTask();
+        loader.cancelDownload();
 
         CameraHelper.zoomToFit(Display.getMiniCamera());
         view.setDataHandler(null);
@@ -174,8 +169,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     @Override
     public void remove() {
         removed = true;
-        cancelAsyncTasks();
-        executor.abolish();
+        loader.abolish();
         unsetView();
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
@@ -373,7 +367,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public boolean isDownloading() {
-        return worker != null || view.isDownloading();
+        return loader.isLoading() || view.isDownloading();
     }
 
     @Override
@@ -387,17 +381,12 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Nonnull
-    DecodeExecutor getExecutor() {
-        return executor;
-    }
-
-    @Nonnull
     public View getView() {
         return view;
     }
 
     public boolean isLoadingForTimespan() {
-        return worker != null;
+        return loader.isLoading();
     }
 
     public long getStartTime() {
@@ -411,35 +400,18 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     public boolean isViewLoadFinished() {
-        return worker == null && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
+        return !loader.isLoading() && view.getFrameCompletion(view.getMaximumFrameNumber()) != null;
     }
-
-    private void cancelAsyncTasks() {
-        cancelLoadTask();
-        cancelDownloadTask();
-    }
-
-    private void cancelLoadTask() {
-        if (worker != null) {
-            worker.cancel(true);
-            worker = null;
-        }
-    }
-
-    private Future<?> downloadTask;
 
     public void cancelDownloadTask() {
-        if (downloadTask != null) {
-            downloadTask.cancel(true);
-            downloadTask = null;
-        }
+        loader.cancelDownload();
     }
 
     public void startDownload(DownloadLayer.Progress progress) {
         cancelDownloadTask();
         APIRequest req = view.getAPIRequest();
         if (req != null && view.getBaseName() != null) // should not happen
-            downloadTask = DownloadLayer.submit(req, this, view.getBaseName(), progress);
+            loader.startDownload(req, this, view.getBaseName(), progress);
     }
 
 }

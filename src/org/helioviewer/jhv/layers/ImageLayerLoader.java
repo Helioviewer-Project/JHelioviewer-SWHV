@@ -4,8 +4,8 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,6 +15,7 @@ import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
+import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
@@ -33,56 +34,107 @@ import com.google.common.base.Throwables;
 
 final class ImageLayerLoader {
 
-    private ImageLayerLoader() {}
+    private final DecodeExecutor executor = new DecodeExecutor();
+    private final Consumer<View> onViewLoaded;
+    private final Runnable onUnload;
 
-    static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull APIRequest req) {
-        return Tasks.submit("request", new LoadRemote(layer, req), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
+    private Future<View> loadFuture;
+    private Future<?> downloadFuture;
+    private int loadGeneration;
+
+    ImageLayerLoader(@Nonnull Consumer<View> _onViewLoaded, @Nonnull Runnable _onUnload) {
+        onViewLoaded = _onViewLoaded;
+        onUnload = _onUnload;
     }
 
-    static Future<View> submit(@Nonnull ImageLayer layer, @Nonnull List<URI> uriList) {
-        return Tasks.submit(uriList.toString(), new LoadURIImage(layer, uriList), result -> onSuccess(layer, result), (logContext, t) -> onFailure(layer, t));
-    }
-
-    private record LoadRemote(ImageLayer layer, APIRequest req) implements Callable<View> {
-        @Override
-        public View call() throws Exception {
+    void load(APIRequest req) {
+        cancelLoad();
+        int gen = ++loadGeneration;
+        loadFuture = Tasks.submit("request", () -> {
             URI uri = requestAPI(req.toJpipRequest());
-            return uri == null ? null : createView(layer.getExecutor(), req, uri);
+            return uri == null ? null : createView(req, uri);
+        },
+        result -> onSuccess(result, gen),
+        (logContext, t) -> onFailure(t, gen));
+    }
+
+    void load(List<URI> uriList) {
+        cancelLoad();
+        int gen = ++loadGeneration;
+        loadFuture = Tasks.submit(uriList.toString(), () -> loadUri(uriList),
+            result -> onSuccess(result, gen),
+            (logContext, t) -> onFailure(t, gen));
+    }
+
+    boolean isLoading() {
+        return loadFuture != null;
+    }
+
+    void clearLoadFuture() {
+        loadFuture = null;
+    }
+
+    void startDownload(APIRequest req, ImageLayer layer, String baseName, DownloadLayer.Progress progress) {
+        cancelDownload();
+        downloadFuture = DownloadLayer.submit(req, layer, baseName, progress);
+    }
+
+    void cancelLoad() {
+        loadGeneration++; // Invalidate any pending callbacks
+        if (loadFuture != null) {
+            loadFuture.cancel(true);
+            loadFuture = null;
         }
     }
 
-    private record LoadURIImage(ImageLayer layer, List<URI> uriList) implements Callable<View> {
-        @Override
-        public View call() throws Exception {
-            return loadUri(layer.getExecutor(), uriList);
+    void cancelDownload() {
+        if (downloadFuture != null) {
+            downloadFuture.cancel(true);
+            downloadFuture = null;
         }
     }
 
-    private static void onSuccess(ImageLayer layer, View result) {
-        if (result != null) // LoadRemote can return null
-            layer.setView(result);
-        else
-            layer.unload();
+    void abolish() {
+        cancelLoad();
+        cancelDownload();
+        executor.abolish();
     }
 
-    private static void onFailure(ImageLayer layer, Throwable t) {
-        if (JHVThread.isInterrupted(t)) { // ignore
+    private void onSuccess(View result, int gen) {
+        if (gen != loadGeneration) {
+            if (result != null) {
+                result.abolish();
+            }
+            return;
+        }
+        if (result != null) {
+            onViewLoaded.accept(result);
+        } else {
+            onUnload.run();
+        }
+    }
+
+    private void onFailure(Throwable t, int gen) {
+        if (gen != loadGeneration) {
+            return;
+        }
+        if (JHVThread.isInterrupted(t)) {
             Log.warn(t);
             return;
         }
-        layer.unload();
+        onUnload.run();
 
         Log.error(Throwables.getStackTraceAsString(t));
         Message.err("Error getting the data", t.getMessage());
     }
 
-    private static View loadUri(DecodeExecutor executor, List<URI> uriList) throws Exception {
+    private View loadUri(List<URI> uriList) throws Exception {
         if (uriList.size() == 1) {
-            return createView(executor, null, uriList.getFirst());
+            return createView(null, uriList.getFirst());
         } else {
             List<View> views = uriList.parallelStream().map(uri -> {
                 try {
-                    return createView(executor, null, uri);
+                    return createView(null, uri);
                 } catch (Exception e) {
                     Log.warn(uri.toString(), e);
                     return null;
@@ -92,19 +144,19 @@ final class ImageLayerLoader {
         }
     }
 
-    private static View createView(DecodeExecutor executor, APIRequest req, URI uri) throws Exception {
+    private View createView(APIRequest req, URI uri) throws Exception {
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
             case Image.JPIP, Image.JP2, Image.JPX -> new J2KView(executor, req, dataUri);
             case Image.FITS, Image.PNG, Image.JPEG -> new URIView(executor, dataUri);
-            case Image.ZIP -> loadZip(executor, dataUri.uri());
+            case Image.ZIP -> loadZip(dataUri.uri());
             default -> throw new Exception("Unknown image type");
         };
     }
 
-    private static View loadZip(DecodeExecutor executor, URI uriZip) throws Exception {
+    private View loadZip(URI uriZip) throws Exception {
         List<URI> uriList = FileUtils.unZip(uriZip);
-        return loadUri(executor, uriList);
+        return loadUri(uriList);
     }
 
     @Nullable
@@ -140,5 +192,4 @@ final class ImageLayerLoader {
         }
         return new URI(data.getString("uri"));
     }
-
 }
