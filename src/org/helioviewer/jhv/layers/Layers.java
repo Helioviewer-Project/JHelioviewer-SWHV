@@ -109,7 +109,7 @@ public final class Layers {
     }
 
     private static final LayerList layers = new LayerList();
-    private static final LayerList newLayers = new LayerList();
+    private static final ArrayList<Layer> newLayers = new ArrayList<>();
     private static final ArrayList<Layer> removedLayers = new ArrayList<>();
 
     private static ViewpointLayer viewpointLayer;
@@ -221,14 +221,6 @@ public final class Layers {
         removedLayers.clear();
     }
 
-    private static void insertRow(int row, Layer rowData) {
-        if (row > layers.size()) {
-            layers.add(rowData);
-        } else {
-            layers.add(row, rowData);
-        }
-    }
-
     public static void reorderImageLayer(int fromIndex, int toIndex) {
         if (toIndex > layers.size()) {
             return;
@@ -245,7 +237,7 @@ public final class Layers {
             return;
 
         layers.remove(fromIndex);
-        insertRow(target, toMove);
+        layers.add(target, toMove);
 
         if (Display.multiview) {
             ImageLayers.arrangeMultiView(true);
@@ -303,27 +295,24 @@ public final class Layers {
 
     private static ArrayList<Layer> normalizeRestoreList(List<Layer> restoredLayers) {
         Map<Class<? extends Layer>, Layer> restoredDefaults = new HashMap<>();
-        ArrayList<Layer> restoredImageLayers = new ArrayList<>();
+        ArrayList<Layer> normalized = new ArrayList<>();
         ArrayList<Layer> restoredOtherLayers = new ArrayList<>();
 
         for (Layer layer : restoredLayers) {
-            Class<? extends Layer> type = layer.getClass();
             if (layer instanceof ImageLayer) {
-                restoredImageLayers.add(layer);
-            } else if (DEFAULT_LAYERS.containsKey(type)) {
-                restoredDefaults.putIfAbsent(type, layer);
+                normalized.add(layer);
+            } else if (DEFAULT_LAYERS.containsKey(layer.getClass())) {
+                restoredDefaults.putIfAbsent(layer.getClass(), layer);
             } else {
                 restoredOtherLayers.add(layer);
             }
         }
 
-        ArrayList<Layer> normalized = new ArrayList<>(restoredImageLayers);
         for (Map.Entry<Class<? extends Layer>, Supplier<? extends Layer>> entry : DEFAULT_LAYERS.entrySet()) {
             Layer layer = restoredDefaults.get(entry.getKey());
             normalized.add(layer == null ? entry.getValue().get() : layer);
         }
         normalized.addAll(restoredOtherLayers);
-
         return normalized;
     }
 
