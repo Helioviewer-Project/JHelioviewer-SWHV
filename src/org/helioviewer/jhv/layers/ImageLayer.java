@@ -54,7 +54,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public void serialize(JSONObject jo) {
-        APIRequest apiRequest = getAPIRequest();
+        APIRequest apiRequest = view.getAPIRequest();
         if (apiRequest != null) {
             jo.put("APIRequest", apiRequest.toJson());
             jo.put("imageParams", glImage.toJson());
@@ -95,7 +95,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     public void load(APIRequest req) {
         if (removed)
             return;
-        if (req.equals(getAPIRequest()))
+        if (req.equals(view.getAPIRequest()))
             return;
 
         cancelLoadTask();
@@ -131,7 +131,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
     }
 
-    public void setView(View _view) {
+    void setView(View _view) {
         if (removed) //!
             return;
 
@@ -378,7 +378,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public boolean isLocal() {
-        return getAPIRequest() == null;
+        return view.getAPIRequest() == null;
     }
 
     @Nonnull
@@ -387,7 +387,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Nonnull
-    public DecodeExecutor getExecutor() {
+    DecodeExecutor getExecutor() {
         return executor;
     }
 
@@ -396,22 +396,17 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         return view;
     }
 
-    @Nullable
-    public APIRequest getAPIRequest() {
-        return view.getAPIRequest();
-    }
-
     public boolean isLoadingForTimespan() {
         return worker != null;
     }
 
     public long getStartTime() {
-        APIRequest req = getAPIRequest(); // for locked timelines
+        APIRequest req = view.getAPIRequest(); // for locked timelines
         return req == null ? view.getFirstTime().milli : req.startTime();
     }
 
     public long getEndTime() {
-        APIRequest req = getAPIRequest(); // for locked timelines
+        APIRequest req = view.getAPIRequest(); // for locked timelines
         return req == null ? view.getLastTime().milli : req.endTime();
     }
 

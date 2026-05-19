@@ -103,7 +103,7 @@ public final class ImageLayers {
 
     public static void syncLayersSpan(long startTime, long endTime, int cadence) {
         for (ImageLayer layer : Layers.getImageLayers()) {
-            APIRequest req = layer.getAPIRequest();
+            APIRequest req = layer.getView().getAPIRequest();
             if (req == null)
                 continue;
             layer.load(new APIRequest(req.server(), req.sourceId(), startTime, endTime, cadence));
@@ -126,7 +126,7 @@ public final class ImageLayers {
         ImageLayer activeLayer = Layers.getActiveImageLayer();
         if (activeLayer != null) {
             APIRequest req;
-            if ((req = activeLayer.getAPIRequest()) != null) {
+            if ((req = activeLayer.getView().getAPIRequest()) != null) {
                 str.append("&cadence=").append(req.cadence()).append("&cadenceUnits=s");
             }
             ImageData id;
@@ -151,13 +151,14 @@ public final class ImageLayers {
     public static void getSAMPMessage(Message msg) {
         ImageData id;
         ImageLayer activeLayer = Layers.getActiveImageLayer();
-        if (activeLayer == null || activeLayer.getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
+        if (activeLayer == null || activeLayer.getView().getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
             return;
 
+        APIRequest req = activeLayer.getView().getAPIRequest();
         msg.addParam("timestamp", Movie.getTime().toString());
         msg.addParam("start", TimeUtils.format(Movie.getStartTime()));
         msg.addParam("end", TimeUtils.format(Movie.getEndTime()));
-        msg.addParam("cadence", SampUtils.encodeLong(activeLayer.getAPIRequest().cadence() * 1000L));
+        msg.addParam("cadence", SampUtils.encodeLong(req.cadence() * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
         Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
@@ -219,7 +220,7 @@ public final class ImageLayers {
     private static void refreshLayersSpan() {
         long now = System.currentTimeMillis();
         for (ImageLayer layer : Layers.getImageLayers()) {
-            APIRequest req = layer.getAPIRequest();
+            APIRequest req = layer.getView().getAPIRequest();
             if (req == null)
                 continue;
             layer.load(new APIRequest(req.server(), req.sourceId(), now - (req.endTime() - req.startTime()), now, req.cadence()));

@@ -9,7 +9,7 @@ public class NullImageLayer extends ImageLayer {
     }
 
     @Override
-    public void setView(View _view) {
+    void setView(View _view) {
         view = _view;
     }
 
