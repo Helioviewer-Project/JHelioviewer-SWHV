@@ -27,13 +27,26 @@ import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 // essentially static; local or network cache
 final class GenericImage implements URIImageReader {
 
-    @Override
-    public URIImageReader.Image readImage(File file) throws Exception {
+    private interface ReaderAction<T> {
+        T run(ImageReader reader) throws Exception;
+    }
+
+    private static <T> T withReader(File file, ReaderAction<T> action) throws Exception {
         try (ImageInputStream iis = new FileImageInputStream(file)) {
             ImageReader reader = getReader(iis);
             if (reader == null)
                 throw new Exception("No image reader found");
+            try {
+                return action.run(reader);
+            } finally {
+                reader.dispose();
+            }
+        }
+    }
 
+    @Override
+    public URIImageReader.Image readImage(File file) throws Exception {
+        return withReader(file, reader -> {
             String xml = null;
             // read metadata of first image
             try {
@@ -57,23 +70,14 @@ final class GenericImage implements URIImageReader {
             BufferedImage image = reader.read(0);
             LUT lut = readLUT(image);
             ImageBuffer imageBuffer = readBuffered(image, ImageFilter.Type.None);
-            reader.dispose();
 
             return new URIImageReader.Image(xml, imageBuffer, lut);
-        }
+        });
     }
 
     @Override
     public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType) throws Exception {
-        try (ImageInputStream iis = new FileImageInputStream(file)) {
-            ImageReader reader = getReader(iis);
-            if (reader == null)
-                throw new Exception("No image reader found");
-
-            ImageBuffer imageBuffer = readBuffered(reader.read(0), filterType);
-            reader.dispose();
-            return imageBuffer;
-        }
+        return withReader(file, reader -> readBuffered(reader.read(0), filterType));
     }
 
     @Nullable
