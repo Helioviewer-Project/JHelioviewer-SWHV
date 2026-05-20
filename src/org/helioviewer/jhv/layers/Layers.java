@@ -165,8 +165,8 @@ public final class Layers {
         layers.forEach(layer -> layer.renderFloat(ctx, vp, scale));
     }
 
-    public static void renderFullFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {
-        layers.forEach(layer -> layer.renderFullFloat(ctx, vp, scale));
+    public static void renderFullFloat(MapContext ctx, Viewport vp) {
+        layers.forEach(layer -> layer.renderFullFloat(ctx, vp));
     }
 
     public static void renderMiniview(MapContext ctx, Viewport vp, ProjectionScale scale) {
