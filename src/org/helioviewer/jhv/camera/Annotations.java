@@ -83,13 +83,12 @@ public final class Annotations {
         return true;
     }
 
-    public static void render(Camera camera, Viewport vp) {
+    public static void render(MapContext ctx) {
         if (pending == null && annotations.isEmpty())
             return;
 
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
 
-        MapContext ctx = Display.getMapContext(vp);
         annotations.forEach(annotation -> {
             boolean active = annotation == activeAnnotation;
             annotation.draw(ctx, active, annotationsBuf);
@@ -100,15 +99,15 @@ public final class Annotations {
             pending.drawTransformed(ctx, false, transformedBuf, centerBuf);
         }
         annotationsLine.setVertex(annotationsBuf);
-        annotationsLine.renderLine(vp, LINEWIDTH);
+        annotationsLine.renderLine(ctx.vp(), LINEWIDTH);
 
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
+        double pixFactor = CameraHelper.getPixelFactor(ctx.camera(), ctx.vp());
 
         Transform.pushView();
         if (ctx.isOrthographic())
             Transform.rotateViewInverse(ctx.viewpoint().toQuat());
         transformedLine.setVertex(transformedBuf);
-        transformedLine.renderLine(vp, LINEWIDTH);
+        transformedLine.renderLine(ctx.vp(), LINEWIDTH);
         center.setVertex(centerBuf);
         center.renderPoints(pixFactor);
 

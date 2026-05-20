@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers;
 
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.layers.fov.FOVCatalog;
 
 import org.json.JSONObject;
@@ -20,10 +19,10 @@ public class FOVLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
-        if (!isVisible[vp.idx])
+    public void render(MapContext ctx) {
+        if (!isVisible[ctx.vp().idx])
             return;
-        catalog.render(camera, vp);
+        catalog.render(ctx);
     }
 
     @Override

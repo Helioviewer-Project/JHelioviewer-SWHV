@@ -371,14 +371,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx) {
+        Viewport vp = ctx.vp();
         if (!isVisible[vp.idx])
             return;
-        long currentTime = camera.getViewpoint().time.milli;
+        long currentTime = ctx.camera().getViewpoint().time.milli;
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = Display.getMapContext(vp);
  
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -398,14 +398,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp) {
+    public void renderScale(MapContext ctx) {
+        Viewport vp = ctx.vp();
         if (!isVisible[vp.idx])
             return;
-        long currentTime = camera.getViewpoint().time.milli;
+        long currentTime = ctx.camera().getViewpoint().time.milli;
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = Display.getMapContext(vp);
  
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -425,11 +425,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp) {
+    public void renderFullFloat(MapContext ctx) {
         if (!enabled)
             return;
         if (swekContext.mouseOverJHVEvent() != null) {
-            drawText(vp, swekContext.mouseOverJHVEvent(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
+            drawText(ctx.vp(), swekContext.mouseOverJHVEvent(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
         }
     }
 

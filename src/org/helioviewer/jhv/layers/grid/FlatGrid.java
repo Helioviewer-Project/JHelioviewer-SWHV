@@ -6,9 +6,9 @@ import java.util.Objects;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.ProjectionMode;
+import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -46,8 +46,12 @@ public class FlatGrid {
     }
 
     // Projection and camera state that invalidates the cached flat grid.
-    private record FlatGridKey(ProjectionMode mode, GridType gridType, double aspect, double cameraWidth,
-                               double translationX, double translationY) {}
+    private record FlatGridKey(ProjectionScale scale, GridType gridType, double aspect, double cameraWidth,
+                               double translationX, double translationY) {
+        FlatGridKey(MapContext _ctx) {
+            this(_ctx.scale(), _ctx.gridType(), _ctx.vp().aspect, _ctx.camera().getCameraWidth(_ctx.vp()), _ctx.camera().getTranslationX(), _ctx.camera().getTranslationY());
+        }
+    }
 
     public void init() {
         shape.init();
@@ -57,20 +61,18 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(Camera camera, Viewport vp, boolean showLabels) {
-        rebuildIfNeeded(camera, vp);
+    public void render(MapContext ctx, boolean showLabels) {
+        rebuildIfNeeded(ctx);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(camera, vp);
+            drawLabels(ctx);
     }
 
-    private static FlatGridKey key(Camera camera, Viewport vp) {
-        return new FlatGridKey(Display.mode, Display.gridType, vp.aspect, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY());
-    }
-
-    private void rebuildIfNeeded(Camera camera, Viewport vp) {
-        FlatGridKey flatGridKey = key(camera, vp);
-        ProjectionScale scale = Display.mode.scale;
+    private void rebuildIfNeeded(MapContext ctx) {
+        FlatGridKey flatGridKey = new FlatGridKey(ctx);
+        Camera camera = ctx.camera();
+        ProjectionScale scale = ctx.scale();
+        Viewport vp = ctx.vp();
 
         double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
         double yCenter = 0.5 - camera.getTranslationY();
@@ -78,13 +80,13 @@ public class FlatGrid {
         AxisSignature xSignature = buildAxisSignature(true,
                 scale.getInterpolatedXValue(Math.clamp(xCenter - halfWidth, 0, 1)),
                 scale.getInterpolatedXValue(Math.clamp(xCenter + halfWidth, 0, 1)), vp.width);
-        AxisSignature ySignature = buildAxisSignature(Display.mode.isHpc() || Display.mode.isLatitudinal(),
+        AxisSignature ySignature = buildAxisSignature(ctx.isHpc() || ctx.isLatitudinal(),
                 scale.getInterpolatedYValue(Math.clamp(yCenter - halfWidth, 0, 1)),
                 scale.getInterpolatedYValue(Math.clamp(yCenter + halfWidth, 0, 1)), vp.height);
         if (!needsRebuild(flatGridKey, xSignature, ySignature))
             return;
 
-        boolean wrap0to360 = Display.gridType == GridType.Carrington;
+        boolean wrap0to360 = ctx.gridType() == GridType.Carrington;
         xAxis = buildAxis(scale, true, wrap0to360, xSignature);
         yAxis = buildAxis(scale, false, false, ySignature);
         rebuildShape(camera, vp);
@@ -98,7 +100,9 @@ public class FlatGrid {
                 !Objects.equals(yAxis.signature(), ySignature);
     }
 
-    private void drawLabels(Camera camera, Viewport vp) {
+    private void drawLabels(MapContext ctx) {
+        Camera camera = ctx.camera();
+        Viewport vp = ctx.vp();
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
         double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(camera.getCameraWidth(vp), 1) / vp.height;
