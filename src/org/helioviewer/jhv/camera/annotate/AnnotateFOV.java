@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -36,7 +37,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf) {
+    public void drawTransformed(MapContext ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -48,8 +49,8 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double dy = 0.5 * (p1.y - p0.y);
 
         fov.setCenter(p0.x + dx, p0.y + dy);
-        fov.putCenter(Display.mode.isHpc(), color, centerBuf);
-        fov.putRectLine(dx, dy, Display.mode.isHpc(), color, lineBuf);
+        fov.putCenter(ctx.isHpc(), color, centerBuf);
+        fov.putRectLine(dx, dy, ctx.isHpc(), color, lineBuf);
     }
 
     @Override
