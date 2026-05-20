@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.display;
 
-public class DisplayLayout {
+public final class DisplayLayout {
 
     private DisplayLayout() {}
 
@@ -12,35 +12,41 @@ public class DisplayLayout {
         return new Viewport(idx, x, y, width, height, fullHeight);
     }
 
-    static Viewport[] viewports(int width, int height, int count) {
-        return switch (count) {
-            case 2 -> new Viewport[]{
-                    viewport(0, 0, 0, width / 2, height, height),
-                    viewport(1, width / 2, 0, width / 2, height, height)};
-            case 3 -> new Viewport[]{
-                    viewport(0, 0, 0, width / 2, height / 2, height),
-                    viewport(1, width / 2, 0, width / 2, height / 2, height),
-                    viewport(2, 0, height / 2, width, height / 2, height)};
-            case 4 -> new Viewport[]{
-                    viewport(0, 0, 0, width / 2, height / 2, height),
-                    viewport(1, width / 2, 0, width / 2, height / 2, height),
-                    viewport(2, 0, height / 2, width / 2, height / 2, height),
-                    viewport(3, width / 2, height / 2, width / 2, height / 2, height)};
-            case 5 -> new Viewport[]{
-                    viewport(0, 0, 0, width / 3, height / 2, height),
-                    viewport(1, width / 3, 0, width / 3, height / 2, height),
-                    viewport(2, 2 * width / 3, 0, width / 3, height / 2, height),
-                    viewport(3, 0, height / 2, width / 2, height / 2, height),
-                    viewport(4, width / 2, height / 2, width / 2, height / 2, height)};
-            case 6 -> new Viewport[]{
-                    viewport(0, 0, 0, width / 3, height / 2, height),
-                    viewport(1, width / 3, 0, width / 3, height / 2, height),
-                    viewport(2, 2 * width / 3, 0, width / 3, height / 2, height),
-                    viewport(3, 0, height / 2, width / 3, height / 2, height),
-                    viewport(4, width / 3, height / 2, width / 3, height / 2, height),
-                    viewport(5, 2 * width / 3, height / 2, width / 3, height / 2, height)};
-            default -> new Viewport[]{viewport(0, 0, 0, width, height, height)};
-        };
-    }
+    private static final int[][] ROW_LAYOUTS = {
+            {}, // 0
+            {1}, // 1
+            {2}, // 2
+            {2, 1}, // 3
+            {2, 2}, // 4
+            {3, 2}, // 5
+            {3, 3}  // 6
+    };
 
+    static Viewport[] viewports(int width, int height, int count) {
+        if (count < 1 || count >= ROW_LAYOUTS.length) {
+            return new Viewport[]{viewport(0, 0, 0, width, height, height)};
+        }
+
+        Viewport[] vps = new Viewport[count];
+        int[] layout = ROW_LAYOUTS[count];
+        int numRows = layout.length;
+        int idx = 0;
+        int y = 0;
+
+        for (int r = 0; r < numRows; r++) {
+            int numCols = layout[r];
+            int nextY = ((r + 1) * height) / numRows;
+            int rowHeight = nextY - y;
+            int x = 0;
+
+            for (int c = 0; c < numCols; c++) {
+                int nextX = ((c + 1) * width) / numCols;
+                vps[idx] = viewport(idx, x, y, nextX - x, rowHeight, height);
+                x = nextX;
+                idx++;
+            }
+            y = nextY;
+        }
+        return vps;
+    }
 }
