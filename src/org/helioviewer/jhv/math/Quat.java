@@ -127,6 +127,11 @@ public class Quat {
         return l == 0 ? this : new Quat(w / l, x / l, y / l, z / l);
     }
 
+    private static Quat normalized(double w, double x, double y, double z) {
+        double l = Math.sqrt(w * w + x * x + y * y + z * z);
+        return !Double.isFinite(l) || l == 0 ? ZERO : new Quat(w / l, x / l, y / l, z / l);
+    }
+
     public Quat twist(Vec3 v) {
         double m = x * v.x + y * v.y + z * v.z; // / v.length(); assume v normalized
         return new Quat(w, m * v.x, m * v.y, m * v.z).normalize(); // required
@@ -182,7 +187,7 @@ public class Quat {
 
     public static Quat fromJson(JSONArray ja) {
         try {
-            return new Quat(ja.getDouble(0), ja.getDouble(1), ja.getDouble(2), ja.getDouble(3));
+            return normalized(ja.getDouble(0), ja.getDouble(1), ja.getDouble(2), ja.getDouble(3));
         } catch (Exception e) {
             return ZERO;
         }
