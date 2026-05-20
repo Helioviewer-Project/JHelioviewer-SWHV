@@ -13,6 +13,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
@@ -90,11 +91,11 @@ class FOVPlatform extends DefaultMutableTreeNode {
         instrumentCenters.dispose();
     }
 
-    void render(Camera camera, Viewport vp) {
+    void render(MapContext ctx) {
         if (!hasEnabled())
             return;
 
-        JHVTime time = camera.getViewpoint().time;
+        JHVTime time = ctx.viewpoint().time;
         Position obsPosition = Spice.getCarrington(observer, time);
         if (obsPosition == null)
             return;
@@ -102,7 +103,7 @@ class FOVPlatform extends DefaultMutableTreeNode {
         Transform.pushView();
         Transform.rotateViewInverse(obsPosition.toQuat());
 
-        hemiLine.renderLine(vp, LINEWIDTH_FOV);
+        hemiLine.renderLine(ctx.vp(), LINEWIDTH_FOV);
         double[] rot;
         if (isSOLO && null != (rot = Spice.getRotationEuler("SOLO_SRF", "SOLO_IAU_SUN_2009", time))) {
             // Default SOLO pointing is normal to orbit
@@ -118,9 +119,9 @@ class FOVPlatform extends DefaultMutableTreeNode {
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).putGeometry(obsPosition.distance, color, renderer, lineBuf, centerBuf));
 
         instrumentCenters.setVertex(centerBuf);
-        instrumentCenters.renderPoints(CameraHelper.getPixelFactor(camera, vp));
+        instrumentCenters.renderPoints(CameraHelper.getPixelFactor(ctx.camera(), ctx.vp()));
         instrumentLines.setVertex(lineBuf);
-        instrumentLines.renderLine(vp, LINEWIDTH_FOV);
+        instrumentLines.renderLine(ctx.vp(), LINEWIDTH_FOV);
 
         renderer.setDirectPut();
         renderer.end3DRendering();

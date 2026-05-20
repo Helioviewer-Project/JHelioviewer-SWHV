@@ -42,12 +42,13 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(Camera camera, Viewport vp) {
+    public void renderFloat(MapContext ctx) {
+        Viewport vp = ctx.vp();
         if (!isVisible[vp.idx])
             return;
 
         String text = "";
-        Position viewpoint = camera.getViewpoint();
+        Position viewpoint = ctx.camera().getViewpoint();
         if (Display.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {
@@ -60,7 +61,7 @@ public class TimestampLayer extends AbstractLayer {
         if (extra) {
             text += String.format(" | D\u2609: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
             if (!Display.multiview) {
-                text += " | FOV: " + formatFOV(camera, vp);
+                text += " | FOV: " + formatFOV(ctx);
             }
         }
 
@@ -79,11 +80,10 @@ public class TimestampLayer extends AbstractLayer {
         renderer.endRendering();
     }
 
-    private static String formatFOV(Camera camera, Viewport vp) {
-        MapContext ctx = Display.getMapContext(vp);
+    private static String formatFOV(MapContext ctx) {
         if (ctx.isHpc())
             return formatHpcFOV(ctx);
-        return formatOrthoFOV(camera.getCameraWidth(vp));
+        return formatOrthoFOV(ctx.camera().getCameraWidth(ctx.vp()));
     }
 
     private static String formatOrthoFOV(double r) {

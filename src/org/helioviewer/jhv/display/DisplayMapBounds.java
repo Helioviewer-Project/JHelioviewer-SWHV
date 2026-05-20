@@ -19,17 +19,20 @@ public final class DisplayMapBounds {
     private DisplayMapBounds() {}
 
     public static double oneToOneHeight(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
-        if (mode.isOrthographic())
+        if (mode == ProjectionMode.Orthographic)
             return metaData.getPhysicalRegion().height;
         return bounds(mode, gridType, cameraViewpoint, metaData).height;
     }
 
     private static Region bounds(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
-        if (mode.isOrthographic())
-            return metaData.getPhysicalRegion();
-        if (mode.isHpc())
-            return ImageBounds.hpc(metaData);
+        return switch (mode) {
+            case Orthographic -> metaData.getPhysicalRegion();
+            case HPC -> ImageBounds.hpc(metaData);
+            default -> calculateNonOrthoBounds(mode, gridType, cameraViewpoint, metaData);
+        };
+    }
 
+    private static Region calculateNonOrthoBounds(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
         WcsHeader wcsHeader = metaData.getWcsHeader();
         Region region = metaData.getPhysicalRegion();
         double x0 = region.llx;
@@ -54,11 +57,11 @@ public final class DisplayMapBounds {
         }
 
         if (!Double.isFinite(bounds[0]) || !Double.isFinite(bounds[1]) || !Double.isFinite(bounds[2]) || !Double.isFinite(bounds[3])) {
-            if (mode.isLatitudinal())
-                return new Region(-180, -90, 360, 180);
-            if (mode.isPolar() || mode.isLogPolar())
-                return new Region(0, 0, 360, 1);
-            return Region.DEFAULT;
+            return switch (mode) {
+                case Latitudinal -> new Region(-180, -90, 360, 180);
+                case Polar, LogPolar -> new Region(0, 0, 360, 1);
+                default -> Region.DEFAULT;
+            };
         }
         return regionFromBounds(bounds);
     }
@@ -72,7 +75,7 @@ public final class DisplayMapBounds {
         Vec3 rotated = mapRotation.rotateVector(world);
         double mapX;
         double mapY;
-        if (mode.isLatitudinal()) {
+        if (mode == ProjectionMode.Latitudinal) {
             mapX = Math.toDegrees(SphericalCoords.longitude(rotated));
             mapY = Math.toDegrees(SphericalCoords.latitude(rotated));
         } else {

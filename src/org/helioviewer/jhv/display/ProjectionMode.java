@@ -19,7 +19,7 @@ public enum ProjectionMode {
 
     public final GLSLSolarShader shader;
     public final ProjectionScale scale;
-    private final NonOrthoProjection.Kind nonOrthoKind;
+    final NonOrthoProjection.Kind nonOrthoKind;
 
     ProjectionMode(GLSLSolarShader _shader, ProjectionScale _scale) {
         this(_shader, _scale, null);
@@ -32,7 +32,7 @@ public enum ProjectionMode {
     }
 
     public MapContext createMapContext(Camera camera, Viewport vp, GridType gridType) {
-        return new NonOrthoMapContext(camera, vp, gridType, scale, nonOrthoKind);
+        return new NonOrthoMapContext(camera, vp, gridType, this);
     }
 
     public boolean isOrthographic() {

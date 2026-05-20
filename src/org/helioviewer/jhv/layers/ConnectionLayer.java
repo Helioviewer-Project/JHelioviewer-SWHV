@@ -72,10 +72,11 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public ConnectionLayer(JSONObject ignoredJo) {}
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx) {
+        Viewport vp = ctx.vp();
         if (!isVisible[vp.idx])
             return;
-        MapContext ctx = Display.getMapContext(vp);
+        Camera camera = ctx.camera();
         if (connectivity != null)
             drawConnectivity(ctx, camera);
         if (hcs != null)
@@ -84,15 +85,15 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
             drawFootpointInterpolated(ctx);
 
         if (!geometryMap.isEmpty()) {
-            SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(camera.getViewpoint().time);
+            SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(ctx.viewpoint().time);
             updateTimestamp(g.time());
             g.render(geometryLine, geometryPoint, vp, CameraHelper.getPixelFactor(camera, vp));
         }
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp) {
-        render(camera, vp);
+    public void renderScale(MapContext ctx) {
+        render(ctx);
     }
 
     private void drawConnectivity(MapContext ctx, Camera camera) {

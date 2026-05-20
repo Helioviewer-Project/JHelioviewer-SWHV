@@ -23,6 +23,11 @@ final class OrthoMapContext extends MapContext {
     }
 
     @Override
+    public ProjectionMode mode() {
+        return ProjectionMode.Orthographic;
+    }
+
+    @Override
     public boolean isOrthographic() {
         return true;
     }

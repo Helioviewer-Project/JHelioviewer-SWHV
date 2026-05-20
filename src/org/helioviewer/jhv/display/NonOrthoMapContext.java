@@ -8,15 +8,22 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 final class NonOrthoMapContext extends MapContext {
 
+    private final ProjectionMode mode;
     private final ProjectionScale scale;
     private final NonOrthoProjection.Kind kind;
     private final Quat rotation;
 
-    NonOrthoMapContext(Camera _camera, Viewport _vp, GridType _gridType, ProjectionScale _scale, NonOrthoProjection.Kind _kind) {
+    NonOrthoMapContext(Camera _camera, Viewport _vp, GridType _gridType, ProjectionMode _mode) {
         super(_camera, _vp, _gridType);
-        scale = _scale;
-        kind = _kind;
+        mode = _mode;
+        scale = _mode.scale;
+        kind = _mode.nonOrthoKind;
         rotation = _gridType.mapRotation(_camera.getViewpoint());
+    }
+
+    @Override
+    public ProjectionMode mode() {
+        return mode;
     }
 
     @Override

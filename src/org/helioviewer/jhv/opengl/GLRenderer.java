@@ -4,6 +4,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -92,9 +93,10 @@ public final class GLRenderer {
             GLSLSolarShader.sphere.use();
             GLSLSolar.quad.render();
 
-            Layers.render(camera, vp);
-            Annotations.render(camera, vp);
-            Layers.renderFloat(camera, vp);
+            MapContext ctx = Display.getMapContext(vp);
+            Layers.render(ctx);
+            Annotations.render(ctx);
+            Layers.renderFloat(ctx);
         }
     }
 
@@ -110,7 +112,7 @@ public final class GLRenderer {
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            Layers.renderMiniview(miniCamera, vp);
+            Layers.renderMiniview(Display.getMiniMapContext(vp));
             GL.glEnable(GL.DEPTH_TEST);
         }
     }
@@ -135,16 +137,17 @@ public final class GLRenderer {
             camera.projectionOrtho2D(vp);
             GLSLSolarShader.bindScreen(vp);
 
-            Layers.renderScale(camera, vp);
-            Annotations.render(camera, vp);
-            Layers.renderFloat(camera, vp);
+            MapContext ctx = Display.getMapContext(vp);
+            Layers.renderScale(ctx);
+            Annotations.render(ctx);
+            Layers.renderFloat(ctx);
         }
     }
 
     private static void renderFullFloatScene(Camera camera) {
         Viewport vp = Display.fullViewport;
         GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        Layers.renderFullFloat(camera, vp);
+        Layers.renderFullFloat(Display.getMapContext(vp));
     }
 
 }

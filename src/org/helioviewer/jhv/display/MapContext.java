@@ -23,6 +23,8 @@ public abstract class MapContext {
         return camera;
     }
 
+    public abstract ProjectionMode mode();
+
     public Viewport vp() {
         return vp;
     }

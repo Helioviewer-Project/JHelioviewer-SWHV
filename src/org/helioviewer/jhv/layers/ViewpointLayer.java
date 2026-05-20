@@ -15,6 +15,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
@@ -91,16 +92,17 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx) {
+        Viewport vp = ctx.vp();
         if (vp.idx == 0) // once!
-            updateTime(camera.getViewpoint().time);
+            updateTime(ctx.viewpoint().time);
 
         if (!isVisible[vp.idx])
             return;
         if (!options.isHeliospheric())
             return;
 
-        long time = camera.getViewpoint().time.milli;
+        long time = ctx.viewpoint().time.milli;
         long start = Movie.getStartTime();
         long end = Movie.getEndTime();
 
@@ -118,6 +120,7 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
+        Camera camera = ctx.camera();
         double pointFactor = CameraHelper.getTemperedPointFactor(camera, vp);
         Position viewpoint = camera.getViewpoint();
 
@@ -143,10 +146,10 @@ public class ViewpointLayer extends AbstractLayer {
     private int mouseX, mouseY;
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp) {
+    public void renderFullFloat(MapContext ctx) {
         if (!enabled)
             return;
-        GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(ctx.vp(), hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
 
     private void clearHoverTextIfNeeded() {

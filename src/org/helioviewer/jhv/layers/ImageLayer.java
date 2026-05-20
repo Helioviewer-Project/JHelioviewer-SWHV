@@ -12,6 +12,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -187,13 +188,13 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Override
-    public void renderMiniview(Camera camera, Viewport vp) {
-        render(camera, vp);
+    public void renderMiniview(MapContext ctx) {
+        render(ctx);
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp) {
-        render(camera, vp);
+    public void renderScale(MapContext ctx) {
+        render(ctx);
     }
 
     private final float[] crval0 = new float[2];
@@ -202,18 +203,20 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private final float[] latiGrid1 = new float[3];
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx) {
         if (imageData == null) {
             return;
         }
+        Viewport vp = ctx.vp();
         if (!isVisible[vp.idx])
             return;
 
-        GLSLSolarShader shader = Display.mode.shader;
+        GLSLSolarShader shader = ctx.mode().shader;
         shader.use();
         glImage.applyFilters();
 
-        Position cameraViewpoint = imageData.getViewpoint(); // camera at decode command moment
+        Camera camera = ctx.camera();
+        Position cameraViewpoint = imageData.getViewpoint(); // camera at decode moment
         Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
 
         MetaData meta0 = imageData.getMetaData();
@@ -269,9 +272,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
         Quat displayMap0 = Quat.ZERO;
         Quat displayMap1 = Quat.ZERO;
-        if (Display.mode.isLatitudinal()) {
-            displayMap0 = displayMap1 = Display.gridType.mapRotation(cameraViewpoint);
-            GridType gridType = Display.gridType;
+        if (ctx.isLatitudinal()) {
+            displayMap0 = displayMap1 = ctx.gridType().mapRotation(cameraViewpoint);
+            GridType gridType = ctx.gridType();
             latiGrid0[0] = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint0);
             latiGrid0[1] = (float) gridType.toLatitude(metaViewpoint0);
             latiGrid0[2] = (float) metaViewpoint0.lat;

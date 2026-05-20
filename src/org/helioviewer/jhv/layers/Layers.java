@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
@@ -152,24 +153,24 @@ public final class Layers {
         reapImageBuffers();
     }
 
-    public static void render(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.render(camera, vp));
+    public static void render(MapContext ctx) {
+        layers.forEach(layer -> layer.render(ctx));
     }
 
-    public static void renderScale(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.renderScale(camera, vp));
+    public static void renderScale(MapContext ctx) {
+        layers.forEach(layer -> layer.renderScale(ctx));
     }
 
-    public static void renderFloat(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.renderFloat(camera, vp));
+    public static void renderFloat(MapContext ctx) {
+        layers.forEach(layer -> layer.renderFloat(ctx));
     }
 
-    public static void renderFullFloat(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.renderFullFloat(camera, vp));
+    public static void renderFullFloat(MapContext ctx) {
+        layers.forEach(layer -> layer.renderFullFloat(ctx));
     }
 
-    public static void renderMiniview(Camera camera, Viewport miniview) {
-        layers.forEach(layer -> layer.renderMiniview(camera, miniview));
+    public static void renderMiniview(MapContext ctx) {
+        layers.forEach(layer -> layer.renderMiniview(ctx));
     }
 
     private static void initLayers() {

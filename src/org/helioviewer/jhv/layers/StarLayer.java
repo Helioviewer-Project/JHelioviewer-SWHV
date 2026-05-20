@@ -8,6 +8,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.stars.GaiaClient;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -52,10 +53,12 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx) {
+        Viewport vp = ctx.vp();
         if (!isVisible[vp.idx])
             return;
 
+        Camera camera = ctx.camera();
         Position viewpoint = camera.getViewpoint();
         BufVertex vexBuf = cache.getIfPresent(viewpoint);
         if (vexBuf == null)
