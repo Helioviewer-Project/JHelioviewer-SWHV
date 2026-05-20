@@ -9,6 +9,8 @@ import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -81,7 +83,7 @@ public final class Annotations {
         return true;
     }
 
-    public static void render(MapContext ctx) {
+    public static void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (pending == null && annotations.isEmpty())
             return;
 
@@ -89,23 +91,23 @@ public final class Annotations {
 
         annotations.forEach(annotation -> {
             boolean active = annotation == activeAnnotation;
-            annotation.draw(ctx, active, annotationsBuf);
+            annotation.draw(ctx, vp, scale, active, annotationsBuf);
             annotation.drawTransformed(ctx, active, transformedBuf, centerBuf);
         });
         if (pending != null) {
-            pending.draw(ctx, false, annotationsBuf);
+            pending.draw(ctx, vp, scale, false, annotationsBuf);
             pending.drawTransformed(ctx, false, transformedBuf, centerBuf);
         }
         annotationsLine.setVertex(annotationsBuf);
-        annotationsLine.renderLine(ctx.vp(), LINEWIDTH);
+        annotationsLine.renderLine(vp, LINEWIDTH);
 
-        double pixFactor = CameraHelper.getPixelFactor(ctx.camera(), ctx.vp());
+        double pixFactor = CameraHelper.getPixelFactor(ctx.camera(), vp);
 
         Transform.pushView();
         if (ctx.isOrthographic())
             Transform.rotateViewInverse(ctx.viewpoint().toQuat());
         transformedLine.setVertex(transformedBuf);
-        transformedLine.renderLine(ctx.vp(), LINEWIDTH);
+        transformedLine.renderLine(vp, LINEWIDTH);
         center.setVertex(centerBuf);
         center.renderPoints(pixFactor);
 

@@ -49,12 +49,12 @@ public final class Display {
         return miniCamera;
     }
 
-    public static MapContext getMapContext(Viewport vp) {
-        return mode.createMapContext(camera, vp, gridType);
+    public static MapContext getMapContext() {
+        return mode.createMapContext(camera, gridType);
     }
 
-    public static MapContext getMiniMapContext(Viewport vp) {
-        return mode.createMapContext(miniCamera, vp, gridType);
+    public static MapContext getMiniMapContext() {
+        return mode.createMapContext(miniCamera, gridType);
     }
 
     public static Vec3 mouseToSurface(Viewport vp, int x, int y) {

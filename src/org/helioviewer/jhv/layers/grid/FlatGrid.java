@@ -46,10 +46,10 @@ public class FlatGrid {
     }
 
     // Projection and camera state that invalidates the cached flat grid.
-    private record FlatGridKey(ProjectionScale scale, GridType gridType, double aspect, double cameraWidth,
+        private record FlatGridKey(ProjectionScale scale, GridType gridType, double aspect, double cameraWidth,
                                double translationX, double translationY) {
-        FlatGridKey(MapContext ctx) {
-            this(ctx.scale(), ctx.gridType(), ctx.vp().aspect, ctx.camera().getCameraWidth(ctx.vp()), ctx.camera().getTranslationX(), ctx.camera().getTranslationY());
+        FlatGridKey(MapContext ctx, Viewport vp, ProjectionScale scale) {
+            this(scale, ctx.gridType(), vp.aspect, ctx.camera().getCameraWidth(vp), ctx.camera().getTranslationX(), ctx.camera().getTranslationY());
         }
     }
 
@@ -61,18 +61,16 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(MapContext ctx, boolean showLabels) {
-        rebuildIfNeeded(ctx);
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale, boolean showLabels) {
+        rebuildIfNeeded(ctx, vp, scale);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(ctx);
+            drawLabels(ctx, vp);
     }
 
-    private void rebuildIfNeeded(MapContext ctx) {
-        FlatGridKey flatGridKey = new FlatGridKey(ctx);
+    private void rebuildIfNeeded(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        FlatGridKey flatGridKey = new FlatGridKey(ctx, vp, scale);
         Camera camera = ctx.camera();
-        ProjectionScale scale = ctx.scale();
-        Viewport vp = ctx.vp();
 
         double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
         double yCenter = 0.5 - camera.getTranslationY();
@@ -100,9 +98,8 @@ public class FlatGrid {
                 !Objects.equals(yAxis.signature(), ySignature);
     }
 
-    private void drawLabels(MapContext ctx) {
+    private void drawLabels(MapContext ctx, Viewport vp) {
         Camera camera = ctx.camera();
-        Viewport vp = ctx.vp();
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
         double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(camera.getCameraWidth(vp), 1) / vp.height;

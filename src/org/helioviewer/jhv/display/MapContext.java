@@ -10,13 +10,13 @@ import org.helioviewer.jhv.opengl.BufVertex;
 public abstract class MapContext {
 
     protected final Camera camera;
-    protected final Viewport vp;
     protected final GridType gridType;
+    protected final Position viewpoint;
 
-    protected MapContext(Camera _camera, Viewport _vp, GridType _gridType) {
+    protected MapContext(Camera _camera, GridType _gridType) {
         camera = _camera;
-        vp = _vp;
         gridType = _gridType;
+        viewpoint = _camera.getViewpoint();
     }
 
     public Camera camera() {
@@ -25,23 +25,15 @@ public abstract class MapContext {
 
     public abstract ProjectionMode mode();
 
-    public Viewport vp() {
-        return vp;
-    }
-
     public GridType gridType() {
         return gridType;
     }
 
     public Position viewpoint() {
-        return camera.getViewpoint();
+        return viewpoint;
     }
 
     public abstract Quat rotation();
-
-    public ProjectionScale scale() {
-        return mode().scale;
-    }
 
     public boolean isOrthographic() {
         return mode() == ProjectionMode.Orthographic;
@@ -63,7 +55,9 @@ public abstract class MapContext {
         return mode() == ProjectionMode.LogPolar;
     }
 
-    public abstract Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf);
+    public abstract Vec2 projectToScreen(Viewport vp, ProjectionScale scale, Vec3 v);
 
-    public abstract void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf);
+    public abstract Vec2 emitMapVertex(Viewport vp, ProjectionScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf);
+
+    public abstract void emitMapPoint(Viewport vp, ProjectionScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf);
 }

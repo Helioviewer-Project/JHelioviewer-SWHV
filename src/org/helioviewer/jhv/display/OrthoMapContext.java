@@ -8,8 +8,8 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 final class OrthoMapContext extends MapContext {
 
-    OrthoMapContext(Camera _camera, Viewport _vp, GridType _gridType) {
-        super(_camera, _vp, _gridType);
+    OrthoMapContext(Camera _camera, GridType _gridType) {
+        super(_camera, _gridType);
     }
 
     @Override
@@ -23,13 +23,18 @@ final class OrthoMapContext extends MapContext {
     }
 
     @Override
-    public Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
+    public Vec2 projectToScreen(Viewport vp, ProjectionScale scale, Vec3 v) {
+        throw new UnsupportedOperationException("Orthographic mode does not support projectToScreen()");
+    }
+
+    @Override
+    public Vec2 emitMapVertex(Viewport vp, ProjectionScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
         OrthoProjection.emitMapVertex(vertex, first, last, radius, color, vexBuf);
         return null;
     }
 
     @Override
-    public void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
+    public void emitMapPoint(Viewport vp, ProjectionScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
         OrthoProjection.emitMapPoint(vertex, size, radius, color, vexBuf);
     }
 }

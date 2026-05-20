@@ -6,6 +6,8 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.Viewport;
 
 import org.json.JSONObject;
 
@@ -77,8 +79,8 @@ public final class FOVCatalog {
         platforms.forEach(FOVPlatform::dispose);
     }
 
-    public void render(MapContext ctx) {
-        platforms.forEach(platform -> platform.render(ctx));
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        platforms.forEach(platform -> platform.render(ctx, vp, scale));
     }
 
     public void serialize(JSONObject jo) {

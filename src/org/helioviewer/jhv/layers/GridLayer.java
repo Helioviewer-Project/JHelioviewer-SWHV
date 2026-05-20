@@ -11,6 +11,7 @@ import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
@@ -104,8 +105,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapContext ctx) {
-        Viewport vp = ctx.vp();
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
@@ -159,10 +159,10 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderScale(MapContext ctx) {
-        if (!isVisible[ctx.vp().idx])
+    public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        if (!isVisible[vp.idx])
             return;
-        flatGrid.render(ctx, showLabels);
+        flatGrid.render(ctx, vp, scale, showLabels);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {

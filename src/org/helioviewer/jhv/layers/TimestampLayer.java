@@ -5,6 +5,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLText;
@@ -40,8 +41,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(MapContext ctx) {
-        Viewport vp = ctx.vp();
+    public void renderFloat(MapContext ctx, Viewport vp, ProjectionScale projectionScale) {
         if (!isVisible[vp.idx])
             return;
 
@@ -59,7 +59,7 @@ public class TimestampLayer extends AbstractLayer {
         if (extra) {
             text += String.format(" | D\u2609: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
             if (!Display.multiview) {
-                text += " | FOV: " + formatFOV(ctx);
+                text += " | FOV: " + formatFOV(ctx, vp, projectionScale);
             }
         }
 
@@ -78,10 +78,10 @@ public class TimestampLayer extends AbstractLayer {
         renderer.endRendering();
     }
 
-    private static String formatFOV(MapContext ctx) {
+    private static String formatFOV(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (ctx.isHpc())
-            return formatHpcFOV(ctx);
-        return formatOrthoFOV(ctx.camera().getCameraWidth(ctx.vp()));
+            return formatHpcFOV(ctx, vp, scale);
+        return formatOrthoFOV(ctx.camera().getCameraWidth(vp));
     }
 
     private static String formatOrthoFOV(double r) {
@@ -91,8 +91,7 @@ public class TimestampLayer extends AbstractLayer {
             return String.format("%6.4fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatHpcFOV(MapContext ctx) {
-        Viewport vp = ctx.vp();
+    private static String formatHpcFOV(MapContext ctx, Viewport vp, ProjectionScale scale) {
         int centerX = vp.x + vp.width / 2;
         int centerY = vp.yAWT + vp.height / 2;
 
@@ -101,10 +100,10 @@ public class TimestampLayer extends AbstractLayer {
         Vec2 bottom = ctx.mode().mouseToGrid(ctx.camera(), vp, ctx.gridType(), centerX, vp.yAWT + vp.height - 1);
         Vec2 top = ctx.mode().mouseToGrid(ctx.camera(), vp, ctx.gridType(), centerX, vp.yAWT);
 
-        double minX = ctx.scale().getInterpolatedXValue(0);
-        double maxX = ctx.scale().getInterpolatedXValue(1);
-        double minY = ctx.scale().getInterpolatedYValue(0);
-        double maxY = ctx.scale().getInterpolatedYValue(1);
+        double minX = scale.getInterpolatedXValue(0);
+        double maxX = scale.getInterpolatedXValue(1);
+        double minY = scale.getInterpolatedYValue(0);
+        double maxY = scale.getInterpolatedYValue(1);
 
         double width = Math.abs(Math.clamp(right.x, minX, maxX) - Math.clamp(left.x, minX, maxX));
         double height = Math.abs(Math.clamp(top.y, minY, maxY) - Math.clamp(bottom.y, minY, maxY));
