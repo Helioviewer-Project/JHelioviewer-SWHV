@@ -92,6 +92,7 @@ public class Spice {
     }
 
     private static final int[] axes = {3, 2, 1};
+    private static final double[][] IDENTITY_MATRIX = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
 
     @Nullable
     public static double[] getRotationEuler(String fromFrame, String toFrame, JHVTime time) {
@@ -107,7 +108,6 @@ public class Spice {
     public static final LoadingCache<JHVTime, double[][]> j2000ToSun = Caffeine.newBuilder().maximumSize(10000)
             .build(t -> getRotationMatrix("J2000", "SOLO_IAU_SUN_2009", t));
 
-    @Nullable
     private static double[][] getRotationMatrix(String fromFrame, String toFrame, JHVTime time) {
         try {
             double et = milli2et(time.milli);
@@ -115,7 +115,7 @@ public class Spice {
         } catch (Exception e) {
             Log.error(e);
         }
-        return null;
+        return IDENTITY_MATRIX;
     }
 
     /// /
