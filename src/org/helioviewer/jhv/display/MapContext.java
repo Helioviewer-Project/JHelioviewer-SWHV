@@ -2,7 +2,6 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -32,8 +31,6 @@ public abstract class MapContext {
     public Position viewpoint() {
         return viewpoint;
     }
-
-    public abstract Quat rotation();
 
     public boolean isOrthographic() {
         return mode() == ProjectionMode.Orthographic;
