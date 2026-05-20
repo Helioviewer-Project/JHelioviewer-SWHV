@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.display;
 
-public class Viewport {
+public final class Viewport {
 
     public final double aspect;
     public final int idx;

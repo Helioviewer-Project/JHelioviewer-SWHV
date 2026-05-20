@@ -92,7 +92,7 @@ public interface ProjectionScale {
 
     }
 
-    class ProjectionScaleLogY extends ProjectionScaleAbstract {
+    final class ProjectionScaleLogY extends ProjectionScaleAbstract {
 
         ProjectionScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
@@ -148,7 +148,7 @@ public interface ProjectionScale {
 
     }
 
-    class ProjectionScaleLati extends ProjectionScaleIdentity {
+    final class ProjectionScaleLati extends ProjectionScaleIdentity {
 
         ProjectionScaleLati(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);

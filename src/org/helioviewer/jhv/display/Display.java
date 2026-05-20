@@ -5,7 +5,9 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 
-public class Display {
+public final class Display {
+
+    private Display() {}
 
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
