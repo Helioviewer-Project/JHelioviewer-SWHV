@@ -156,7 +156,10 @@ public final class Annotations {
             activeIndex = jo.optInt("activeIndex", activeIndex);
             int len = ja.length();
             for (int i = 0; i < len; i++) {
-                annotations.add(generate(ja.getJSONObject(i)));
+                JSONObject obj = ja.optJSONObject(i);
+                if (obj != null) {
+                    annotations.add(generate(obj));
+                }
             }
             if (annotations.isEmpty())
                 activeIndex = -1;
