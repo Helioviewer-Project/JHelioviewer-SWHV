@@ -6,7 +6,7 @@ import org.helioviewer.jhv.math.Quat;
 public record MapContext(Position viewpoint, Viewport vp, ProjectionScale scale, GridType gridType, Quat rotation) {
 
     public MapContext(Position viewpoint, Viewport vp, ProjectionScale scale, GridType gridType) {
-        this(viewpoint, vp, scale, gridType, gridType.mapRotation(viewpoint));
+        this(viewpoint, vp, scale, gridType, scale.isOrtho() ? null : gridType.mapRotation(viewpoint));
     }
 
 }

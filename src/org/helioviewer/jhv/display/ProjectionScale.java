@@ -18,6 +18,10 @@ public interface ProjectionScale {
 
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
+    default boolean isOrtho() {
+        return this == ortho;
+    }
+
     ProjectionScale ortho = new ProjectionScaleIdentity(0, 0, 0, 0);
     ProjectionScale hpc = new ProjectionScaleIdentity(-5, 5, -5, 5);
     ProjectionScale lati = new ProjectionScaleLati(-180, 180, -90, 90);
@@ -30,6 +34,11 @@ public interface ProjectionScale {
         protected double xStop;
         protected double yStart;
         protected double yStop;
+
+        protected double xRange;
+        protected double yRange;
+        protected double invXRange;
+        protected double invYRange;
 
         ProjectionScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop) {
             set(_xStart, _xStop, _yStart, _yStop);
@@ -45,6 +54,11 @@ public interface ProjectionScale {
             yStop = scaleY(_yStop);
             if (yStart == yStop)
                 yStop = Math.nextUp(yStart);
+
+            xRange = xStop - xStart;
+            yRange = yStop - yStart;
+            invXRange = 1.0 / xRange;
+            invYRange = 1.0 / yRange;
         }
 
         @Override
@@ -54,22 +68,22 @@ public interface ProjectionScale {
 
         @Override
         public double getInterpolatedXValue(double v) {
-            return invScaleX(xStart + v * (xStop - xStart));
+            return invScaleX(xStart + v * xRange);
         }
 
         @Override
         public double getInterpolatedYValue(double v) {
-            return invScaleY(yStart + v * (yStop - yStart));
+            return invScaleY(yStart + v * yRange);
         }
 
         @Override
         public double getXValueInv(double v) {
-            return (scaleX(v) - xStart) / (xStop - xStart) - 0.5;
+            return (scaleX(v) - xStart) * invXRange - 0.5;
         }
 
         @Override
         public double getYValueInv(double v) {
-            return (scaleY(v) - yStart) / (yStop - yStart) - 0.5;
+            return (scaleY(v) - yStart) * invYRange - 0.5;
         }
 
         @Override
