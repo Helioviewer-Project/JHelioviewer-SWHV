@@ -9,7 +9,7 @@ import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
@@ -37,14 +37,14 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
-        MapContext ctx = Display.getMapContext(vp);
-        Vec2 coord = ctx.mouseToGrid(x, y);
+        ProjectionMode mode = Display.mode;
+        Vec2 coord = Display.mouseToGrid(vp, x, y);
 
-        if (ctx.isHpc()) {
+        if (mode == ProjectionMode.HPC) {
             setText(formatHpc(coord));
-        } else if (ctx.isLatitudinal()) {
+        } else if (mode == ProjectionMode.Latitudinal) {
             setText(formatLati(coord));
-        } else if (ctx.isPolar() || ctx.isLogPolar()) {
+        } else if (mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
             Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);

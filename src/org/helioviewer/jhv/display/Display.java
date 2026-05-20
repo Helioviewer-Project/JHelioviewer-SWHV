@@ -4,6 +4,8 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 
 public final class Display {
 
@@ -53,6 +55,22 @@ public final class Display {
 
     public static MapContext getMiniMapContext(Viewport vp) {
         return mode.createMapContext(miniCamera, vp, gridType);
+    }
+
+    public static Vec3 mouseToSurface(Viewport vp, int x, int y) {
+        return mode.mouseToSurface(camera, vp, gridType, x, y);
+    }
+
+    public static Vec2 mouseToGrid(Viewport vp, int x, int y) {
+        return mode.mouseToGrid(camera, vp, gridType, x, y);
+    }
+
+    public static Vec2 mouseToScreen(Viewport vp, int x, int y) {
+        return mode.mouseToScreen(camera, vp, gridType, x, y);
+    }
+
+    public static Vec2 projectToScreen(Viewport vp, Vec3 v) {
+        return mode.projectToScreen(camera, vp, gridType, v);
     }
 
     private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};

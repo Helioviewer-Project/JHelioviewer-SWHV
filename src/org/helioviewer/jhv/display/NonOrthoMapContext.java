@@ -32,26 +32,6 @@ final class NonOrthoMapContext extends MapContext {
     }
 
     @Override
-    public Vec2 projectToScreen(Vec3 v) {
-        return NonOrthoProjection.projectToScreen(kind, viewpoint(), scale, rotation, vp, v);
-    }
-
-    @Override
-    public Vec3 mouseToSurface(int x, int y) {
-        return NonOrthoProjection.mouseToSurface(kind, camera, vp, scale, gridType, x, y);
-    }
-
-    @Override
-    public Vec2 mouseToGrid(int x, int y) {
-        return NonOrthoProjection.mouseToGrid(camera, vp, scale, gridType, x, y);
-    }
-
-    @Override
-    public Vec2 mouseToScreen(int x, int y) {
-        return NonOrthoProjection.mouseToScreen(camera, vp, scale, gridType, x, y);
-    }
-
-    @Override
     public Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
         return NonOrthoProjection.emitMapVertex(kind, viewpoint(), scale, rotation, vp, vertex, previous, first, last, color, vexBuf);
     }

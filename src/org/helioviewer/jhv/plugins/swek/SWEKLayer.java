@@ -11,8 +11,8 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -259,7 +259,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = ctx.projectToScreen(pt);
+            Vec2 tf = ctx.mode().projectToScreen(ctx.camera(), ctx.vp(), ctx.gridType(), pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x, tf.y, sz, sz);
         }

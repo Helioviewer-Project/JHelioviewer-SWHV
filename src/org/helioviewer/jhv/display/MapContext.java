@@ -63,14 +63,6 @@ public abstract class MapContext {
         return mode() == ProjectionMode.LogPolar;
     }
 
-    public abstract Vec2 projectToScreen(Vec3 v);
-
-    public abstract Vec3 mouseToSurface(int x, int y);
-
-    public abstract Vec2 mouseToGrid(int x, int y);
-
-    public abstract Vec2 mouseToScreen(int x, int y);
-
     public abstract Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf);
 
     public abstract void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf);
