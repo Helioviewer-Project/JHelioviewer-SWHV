@@ -11,6 +11,7 @@ import java.sql.Statement;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.Log;
 
 public class EventDatabaseThread extends Thread {
 
@@ -50,7 +51,7 @@ public class EventDatabaseThread extends Thread {
             return connection;
 
         Path path = Path.of(JHVDirectory.CACHE.getPath(), "events.db");
-        boolean fexist = Files.isWritable(path);
+        boolean fexist = Files.exists(path);
         connection = DriverManager.getConnection("jdbc:sqlite:" + path);
 
         if (fexist) {
@@ -64,6 +65,8 @@ public class EventDatabaseThread extends Thread {
                         found_hash = rs.getInt(2);
                     }
                 }
+            } catch (Exception e) {
+                Log.warn("Could not read version table, database might be corrupted or outdated: " + e.getMessage());
             }
 
             if (found_version != CURRENT_VERSION_SCHEMA || EventDatabase.config_hash != found_hash) {
