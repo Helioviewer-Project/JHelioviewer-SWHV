@@ -16,6 +16,7 @@ import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
@@ -92,8 +93,7 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapContext ctx) {
-        Viewport vp = ctx.vp();
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (vp.idx == 0) // once!
             updateTime(ctx.viewpoint().time);
 
@@ -146,10 +146,10 @@ public class ViewpointLayer extends AbstractLayer {
     private int mouseX, mouseY;
 
     @Override
-    public void renderFullFloat(MapContext ctx) {
+    public void renderFullFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!enabled)
             return;
-        GLText.drawTextFloat(ctx.vp(), hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
     }
 
     private void clearHoverTextIfNeeded() {

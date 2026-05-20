@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -22,7 +23,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawCircle(MapContext ctx, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+    private void drawCircle(MapContext ctx, Viewport vp, ProjectionScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -43,12 +44,12 @@ public class AnnotateCircle extends AbstractAnnotateable {
                     center.x + cosr * u.x + sinr * v.x,
                     center.y + cosr * u.y + sinr * v.y,
                     center.z + cosr * u.z + sinr * v.z);
-            previous = ctx.emitMapVertex(vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            previous = ctx.emitMapVertex(vp, scale, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 
     @Override
-    public void draw(MapContext ctx, boolean active, BufVertex vexBuf) {
+    public void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -57,7 +58,7 @@ public class AnnotateCircle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawCircle(ctx, p0, p1, color, vexBuf);
+        drawCircle(ctx, vp, scale, p0, p1, color, vexBuf);
     }
 
     @Override

@@ -13,6 +13,8 @@ import java.util.function.Supplier;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
 import org.helioviewer.jhv.time.JHVTime;
@@ -151,24 +153,24 @@ public final class Layers {
         reapImageBuffers();
     }
 
-    public static void render(MapContext ctx) {
-        layers.forEach(layer -> layer.render(ctx));
+    public static void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.render(ctx, vp, scale));
     }
 
-    public static void renderScale(MapContext ctx) {
-        layers.forEach(layer -> layer.renderScale(ctx));
+    public static void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.renderScale(ctx, vp, scale));
     }
 
-    public static void renderFloat(MapContext ctx) {
-        layers.forEach(layer -> layer.renderFloat(ctx));
+    public static void renderFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.renderFloat(ctx, vp, scale));
     }
 
-    public static void renderFullFloat(MapContext ctx) {
-        layers.forEach(layer -> layer.renderFullFloat(ctx));
+    public static void renderFullFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.renderFullFloat(ctx, vp, scale));
     }
 
-    public static void renderMiniview(MapContext ctx) {
-        layers.forEach(layer -> layer.renderMiniview(ctx));
+    public static void renderMiniview(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.renderMiniview(ctx, vp, scale));
     }
 
     private static void initLayers() {

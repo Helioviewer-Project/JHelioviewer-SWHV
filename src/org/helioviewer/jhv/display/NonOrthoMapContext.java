@@ -9,16 +9,14 @@ import org.helioviewer.jhv.opengl.BufVertex;
 final class NonOrthoMapContext extends MapContext {
 
     private final ProjectionMode mode;
-    private final ProjectionScale scale;
     private final NonOrthoProjection.Kind kind;
     private final Quat rotation;
 
-    NonOrthoMapContext(Camera _camera, Viewport _vp, GridType _gridType, ProjectionMode _mode) {
-        super(_camera, _vp, _gridType);
+    NonOrthoMapContext(Camera _camera, GridType _gridType, ProjectionMode _mode) {
+        super(_camera, _gridType);
         mode = _mode;
-        scale = _mode.scale;
         kind = _mode.nonOrthoKind;
-        rotation = _gridType.mapRotation(_camera.getViewpoint());
+        rotation = _gridType.mapRotation(viewpoint());
     }
 
     @Override
@@ -32,12 +30,17 @@ final class NonOrthoMapContext extends MapContext {
     }
 
     @Override
-    public Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
+    public Vec2 projectToScreen(Viewport vp, ProjectionScale scale, Vec3 v) {
+        return NonOrthoProjection.projectToScreen(kind, viewpoint(), scale, rotation, vp, v);
+    }
+
+    @Override
+    public Vec2 emitMapVertex(Viewport vp, ProjectionScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
         return NonOrthoProjection.emitMapVertex(kind, viewpoint(), scale, rotation, vp, vertex, previous, first, last, color, vexBuf);
     }
 
     @Override
-    public void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
+    public void emitMapPoint(Viewport vp, ProjectionScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
         NonOrthoProjection.emitMapPoint(kind, viewpoint(), scale, rotation, vp, vertex, size, color, vexBuf);
     }
 }

@@ -85,18 +85,19 @@ public final class GLRenderer {
 
     static void renderScene() {
         Camera camera = Display.getCamera();
+        MapContext ctx = Display.getMapContext();
+        ProjectionScale scale = ProjectionScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp);
-            GLSLSolarShader.bindScreen(vp);
+            GLSLSolarShader.bindScreen(vp, scale);
 
             GLSLSolarShader.sphere.use();
             GLSLSolar.quad.render();
 
-            MapContext ctx = Display.getMapContext(vp);
-            Layers.render(ctx);
-            Annotations.render(ctx);
-            Layers.renderFloat(ctx);
+            Layers.render(ctx, vp, scale);
+            Annotations.render(ctx, vp, scale);
+            Layers.renderFloat(ctx, vp, scale);
         }
     }
 
@@ -108,11 +109,12 @@ public final class GLRenderer {
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             miniCamera.projectionOrtho2D(vp);
-            GLSLSolarShader.bindScreen(vp);
+            ProjectionScale scale = ProjectionScale.ortho;
+            GLSLSolarShader.bindScreen(vp, scale);
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            Layers.renderMiniview(Display.getMiniMapContext(vp));
+            Layers.renderMiniview(Display.getMiniMapContext(), vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
     }
@@ -127,28 +129,30 @@ public final class GLRenderer {
         boolean hpcMode = Display.mode == ProjectionMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
         Camera camera = Display.getCamera();
+        MapContext ctx = Display.getMapContext();
         for (Viewport vp : Display.getViewports()) {
+            ProjectionScale scale = Display.mode.scale;
             if (hpcMode) {
                 double halfWidth = 0.5 * hpcBounds.width;
                 double halfHeight = Math.max(0.5 * hpcBounds.height, halfWidth / vp.aspect);
                 halfWidth = halfHeight * vp.aspect;
                 ProjectionScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
+                scale = ProjectionScale.hpc;
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp);
-            GLSLSolarShader.bindScreen(vp);
+            GLSLSolarShader.bindScreen(vp, scale);
 
-            MapContext ctx = Display.getMapContext(vp);
-            Layers.renderScale(ctx);
-            Annotations.render(ctx);
-            Layers.renderFloat(ctx);
+            Layers.renderScale(ctx, vp, scale);
+            Annotations.render(ctx, vp, scale);
+            Layers.renderFloat(ctx, vp, scale);
         }
     }
 
     private static void renderFullFloatScene() {
         Viewport vp = Display.fullViewport;
         GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        Layers.renderFullFloat(Display.getMapContext(vp));
+        Layers.renderFullFloat(Display.getMapContext(), vp, Display.mode.scale);
     }
 
 }

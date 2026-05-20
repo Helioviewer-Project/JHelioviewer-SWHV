@@ -11,8 +11,8 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, ProjectionScale.ortho) {
         @Override
-        public MapContext createMapContext(Camera camera, Viewport vp, GridType gridType) {
-            return new OrthoMapContext(camera, vp, gridType);
+        public MapContext createMapContext(Camera camera, GridType gridType) {
+            return new OrthoMapContext(camera, gridType);
         }
 
         @Override
@@ -34,6 +34,7 @@ public enum ProjectionMode {
         public Vec2 projectToScreen(Camera camera, Viewport vp, GridType gridType, Vec3 v) {
             throw new UnsupportedOperationException("Orthographic mode does not support projectToScreen()");
         }
+
     },
     HPC(GLSLSolarShader.hpc, ProjectionScale.hpc, NonOrthoProjection.Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, ProjectionScale.lati, NonOrthoProjection.Kind.LATITUDINAL),
@@ -54,8 +55,8 @@ public enum ProjectionMode {
         nonOrthoKind = _nonOrthoKind;
     }
 
-    public MapContext createMapContext(Camera camera, Viewport vp, GridType gridType) {
-        return new NonOrthoMapContext(camera, vp, gridType, this);
+    public MapContext createMapContext(Camera camera, GridType gridType) {
+        return new NonOrthoMapContext(camera, gridType, this);
     }
 
     public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
