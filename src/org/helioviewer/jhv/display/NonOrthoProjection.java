@@ -62,16 +62,16 @@ final class NonOrthoProjection {
         return helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
-    static Vec2 projectToScreen(Kind kind, MapContext ctx, GridScale scale, Vec3 v) {
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), v, scale);
+    static Vec2 projectToScreen(Kind kind, MapContext ctx, Vec3 v) {
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), v, ctx.scale());
         return new Vec2(pt.x * ctx.vp().aspect, pt.y);
     }
 
-    static Vec2 emitMapVertex(Kind kind, MapContext ctx, GridScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
+    static Vec2 emitMapVertex(Kind kind, MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC)
-            return emitHpcVertex(ctx.viewpoint(), scale, ctx.vp(), vertex, previous, first, last, color, vexBuf);
+            return emitHpcVertex(ctx.viewpoint(), ctx.scale(), ctx.vp(), vertex, previous, first, last, color, vexBuf);
 
-        Vec2 current = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, scale);
+        Vec2 current = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, ctx.scale());
         if (first)
             emitProjectedVertex(ctx.vp(), current, Colors.Null, vexBuf);
         emitWrappedVertex(ctx.vp(), previous, current, color, vexBuf);
@@ -80,17 +80,17 @@ final class NonOrthoProjection {
         return current;
     }
 
-    static void emitMapPoint(Kind kind, MapContext ctx, GridScale scale, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
+    static void emitMapPoint(Kind kind, MapContext ctx, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC) {
-            emitHpcPoint(ctx.viewpoint(), scale, ctx.vp(), vertex, size, color, vexBuf);
+            emitHpcPoint(ctx.viewpoint(), ctx.scale(), ctx.vp(), vertex, size, color, vexBuf);
             return;
         }
 
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, scale);
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, ctx.scale());
         vexBuf.putVertex((float) (pt.x * ctx.vp().aspect), (float) pt.y, 0, (float) size, color);
     }
 
-    static Vec2 mouseToScreen(GridScale scale, Camera camera, Viewport vp, GridType gridType, int x, int y) {
+    static Vec2 mouseToScreen(Camera camera, Viewport vp, GridType gridType, GridScale scale, int x, int y) {
         Vec2 mouseGrid = mouseToGrid(scale, camera, vp, gridType, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
