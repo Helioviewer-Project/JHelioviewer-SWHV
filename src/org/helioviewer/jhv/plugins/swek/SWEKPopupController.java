@@ -187,12 +187,12 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = Display.projectToScreen(vp, pt);
+                        tf = mode.projectToScreen(camera, vp, Display.gridType, pt);
                     }
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = Display.mouseToScreen(vp, mouseOverX, mouseOverY);
+                    Vec2 mousepos = mode.mouseToScreen(camera, vp, Display.gridType, mouseOverX, mouseOverY);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {

@@ -44,7 +44,7 @@ public class AnnotateCross extends AbstractAnnotateable {
 
     @Override
     public void mousePressed(Camera camera, Viewport vp, int x, int y) {
-        Vec3 pt = mouseToSurface(vp, x, y);
+        Vec3 pt = mouseToSurface(camera, vp, x, y);
         if (pt != null)
             startPoint = pt;
     }
