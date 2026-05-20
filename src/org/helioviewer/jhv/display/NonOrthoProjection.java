@@ -25,7 +25,7 @@ final class NonOrthoProjection {
         };
     }
 
-    static Vec3 unproject(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Vec2 pt) {
+    static Vec3 unproject(Kind kind, Position viewpoint, Quat rotation, Vec2 pt) {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
             case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
@@ -36,7 +36,7 @@ final class NonOrthoProjection {
     static Vec3 mouseToSurface(Kind kind, Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
         Position viewpoint = camera.getViewpoint();
         Quat rotation = gridType.mapRotation(viewpoint);
-        return unproject(kind, viewpoint, scale, rotation, mouseToGrid(camera, vp, scale, gridType, x, y));
+        return unproject(kind, viewpoint, rotation, mouseToGrid(camera, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.

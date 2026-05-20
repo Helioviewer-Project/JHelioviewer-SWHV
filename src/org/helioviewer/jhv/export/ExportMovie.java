@@ -11,7 +11,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.Movie;
@@ -61,13 +60,13 @@ public final class ExportMovie implements Movie.Listener {
             grabber.dispose();
     }
 
-    public static void handleMovieExport(Camera camera) {
+    public static void handleMovieExport() {
         BufferedImage screen = null;
         BufferedImage eve = null;
         boolean submitted = false;
         try {
             screen = MappedImageFactory.createRGBImage(grabber.w, grabber.h);
-            grabber.renderFrame(camera, MappedImageFactory.getByteBuffer(screen));
+            grabber.renderFrame(MappedImageFactory.getByteBuffer(screen));
             eve = EVEImage == null ? null : NativeImageFactory.copyImage(EVEImage);
             encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
             submitted = true;
