@@ -48,8 +48,8 @@ public class FlatGrid {
     // Projection and camera state that invalidates the cached flat grid.
     private record FlatGridKey(ProjectionScale scale, GridType gridType, double aspect, double cameraWidth,
                                double translationX, double translationY) {
-        FlatGridKey(MapContext _ctx) {
-            this(_ctx.scale(), _ctx.gridType(), _ctx.vp().aspect, _ctx.camera().getCameraWidth(_ctx.vp()), _ctx.camera().getTranslationX(), _ctx.camera().getTranslationY());
+        FlatGridKey(MapContext ctx) {
+            this(ctx.scale(), ctx.gridType(), ctx.vp().aspect, ctx.camera().getCameraWidth(ctx.vp()), ctx.camera().getTranslationX(), ctx.camera().getTranslationY());
         }
     }
 

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.layers;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayMapBounds;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -15,7 +16,7 @@ public final class ImageLayerBounds {
     private ImageLayerBounds() {}
 
     public static double getLargestPhysicalHeight() {
-        if (!Display.mode.isOrthographic())
+        if (Display.mode != ProjectionMode.Orthographic)
             return 1;
 
         double size = 0;
@@ -47,7 +48,7 @@ public final class ImageLayerBounds {
         double physicalHeight = metaData.getPhysicalRegion().height;
         double imageHeight = DisplayMapBounds.oneToOneHeight(Display.mode, Display.gridType, imageData.getViewpoint(), metaData);
         double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / physicalHeight;
-        if (Display.mode.isOrthographic())
+        if (Display.mode == ProjectionMode.Orthographic)
             return cameraWidth;
 
         double visibleHeight = visibleMapHeight(vp);
@@ -66,9 +67,9 @@ public final class ImageLayerBounds {
     }
 
     private static double visibleMapHeight(Viewport vp) {
-        if (Display.mode.isOrthographic())
+        if (Display.mode == ProjectionMode.Orthographic)
             return 1;
-        if (Display.mode.isHpc()) {
+        if (Display.mode == ProjectionMode.HPC) {
             Region bounds = getCenteredHpcScaleBounds();
             double halfWidth = 0.5 * bounds.width;
             double halfHeight = 0.5 * bounds.height;

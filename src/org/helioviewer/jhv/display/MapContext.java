@@ -44,23 +44,23 @@ public abstract class MapContext {
     }
 
     public boolean isOrthographic() {
-        return mode().isOrthographic();
+        return mode() == ProjectionMode.Orthographic;
     }
 
     public boolean isHpc() {
-        return mode().isHpc();
+        return mode() == ProjectionMode.HPC;
     }
 
     public boolean isLatitudinal() {
-        return mode().isLatitudinal();
+        return mode() == ProjectionMode.Latitudinal;
     }
 
     public boolean isPolar() {
-        return mode().isPolar();
+        return mode() == ProjectionMode.Polar;
     }
 
     public boolean isLogPolar() {
-        return mode().isLogPolar();
+        return mode() == ProjectionMode.LogPolar;
     }
 
     public abstract Vec2 projectToScreen(Vec3 v);

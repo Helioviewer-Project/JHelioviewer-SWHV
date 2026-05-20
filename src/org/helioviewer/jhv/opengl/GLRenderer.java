@@ -5,6 +5,7 @@ import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -58,7 +59,7 @@ public final class GLRenderer {
 
         Camera camera = Display.getCamera();
 
-        if (Display.mode.isOrthographic()) {
+        if (Display.mode == ProjectionMode.Orthographic) {
             renderScene(camera);
             renderMiniview();
         } else
@@ -118,13 +119,13 @@ public final class GLRenderer {
     }
 
     static void renderSceneScale(Camera camera) {
-        if (Display.mode.isPolar()) {
+        if (Display.mode == ProjectionMode.Polar) {
             ProjectionScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
-        } else if (Display.mode.isLogPolar()) {
+        } else if (Display.mode == ProjectionMode.LogPolar) {
             ProjectionScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayerBounds.getLargestRadialSize()));
         }
 
-        boolean hpcMode = Display.mode.isHpc();
+        boolean hpcMode = Display.mode == ProjectionMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
             if (hpcMode) {
