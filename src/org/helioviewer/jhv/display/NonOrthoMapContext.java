@@ -12,11 +12,11 @@ final class NonOrthoMapContext extends MapContext {
     private final NonOrthoProjection.Kind kind;
     private final Quat rotation;
 
-    NonOrthoMapContext(Camera camera, Viewport vp, GridType gridType, ProjectionScale scale, NonOrthoProjection.Kind kind) {
-        super(camera, vp, gridType);
-        this.scale = scale;
-        this.kind = kind;
-        this.rotation = gridType.mapRotation(camera.getViewpoint());
+    NonOrthoMapContext(Camera _camera, Viewport _vp, GridType _gridType, ProjectionScale _scale, NonOrthoProjection.Kind _kind) {
+        super(_camera, _vp, _gridType);
+        scale = _scale;
+        kind = _kind;
+        rotation = _gridType.mapRotation(_camera.getViewpoint());
     }
 
     @Override
@@ -56,7 +56,7 @@ final class NonOrthoMapContext extends MapContext {
 
     @Override
     public Vec2 projectToScreen(Vec3 v) {
-        return NonOrthoProjection.projectToScreen(kind, this, v);
+        return NonOrthoProjection.projectToScreen(kind, viewpoint(), scale, rotation, vp, v);
     }
 
     @Override
@@ -76,11 +76,11 @@ final class NonOrthoMapContext extends MapContext {
 
     @Override
     public Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        return NonOrthoProjection.emitMapVertex(kind, this, vertex, previous, first, last, color, vexBuf);
+        return NonOrthoProjection.emitMapVertex(kind, viewpoint(), scale, rotation, vp, vertex, previous, first, last, color, vexBuf);
     }
 
     @Override
     public void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        NonOrthoProjection.emitMapPoint(kind, this, vertex, size, color, vexBuf);
+        NonOrthoProjection.emitMapPoint(kind, viewpoint(), scale, rotation, vp, vertex, size, color, vexBuf);
     }
 }
