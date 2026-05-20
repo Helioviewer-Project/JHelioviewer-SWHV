@@ -115,13 +115,14 @@ public record LUT(String name, ByteBuffer rgba) {
         int len = red.length;
         ByteBuffer rgba = BufferUtils.newByteBuffer(len * 4);
         for (int i = 0; i < len; i++) {
-            rgba.put((byte) ((red[i] + 0.5f) * 0xFF))
-                    .put((byte) ((green[i] + 0.5f) * 0xFF))
-                    .put((byte) ((blue[i] + 0.5f) * 0xFF))
-                    .put((byte) 0xFF);
+            rgba.put(channel(red[i])).put(channel(green[i])).put(channel(blue[i])).put((byte) 0xFF);
         }
         rgba.flip();
         return new LUT(name, rgba);
+    }
+
+    private static byte channel(float value) {
+        return (byte) ((Math.clamp(value, -0.5f, 0.5f) + 0.5f) * 0xFF);
     }
 
     private static ByteBuffer packArgbToRgba(int[] argb) {
