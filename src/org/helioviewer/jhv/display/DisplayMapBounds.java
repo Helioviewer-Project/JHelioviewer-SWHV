@@ -3,6 +3,7 @@ package org.helioviewer.jhv.display;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.PolarBasis;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -41,14 +42,15 @@ public final class DisplayMapBounds {
         };
 
         Position metaViewpoint = metaData.getViewpoint();
+        Quat mapRotation = gridType.mapRotation(cameraViewpoint);
         for (int i = 0; i <= EDGE_SAMPLES; i++) {
             double t = i / (double) EDGE_SAMPLES;
             double x = x0 + t * (x1 - x0);
             double y = y0 + t * (y1 - y0);
-            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x, y0);
-            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x, y1);
-            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x0, y);
-            updateBounds(bounds, wcsHeader, metaViewpoint, mode, gridType, cameraViewpoint, x1, y);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, mapRotation, x, y0);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, mapRotation, x, y1);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, mapRotation, x0, y);
+            updateBounds(bounds, wcsHeader, metaViewpoint, mode, mapRotation, x1, y);
         }
 
         if (!Double.isFinite(bounds[0]) || !Double.isFinite(bounds[1]) || !Double.isFinite(bounds[2]) || !Double.isFinite(bounds[3])) {
@@ -61,13 +63,13 @@ public final class DisplayMapBounds {
         return regionFromBounds(bounds);
     }
 
-    private static void updateBounds(double[] bounds, WcsHeader wcsHeader, Position metaViewpoint, ProjectionMode mode, GridType gridType, Position cameraViewpoint, double x, double y) {
+    private static void updateBounds(double[] bounds, WcsHeader wcsHeader, Position metaViewpoint, ProjectionMode mode, Quat mapRotation, double x, double y) {
         Vec2 helioprojective = WcsProjection.planeToHelioprojective(wcsHeader, x, y);
         Vec3 world = NonOrthoProjection.helioprojectiveToWorld(metaViewpoint, helioprojective.x, helioprojective.y);
         if (world == null)
             return;
 
-        Vec3 rotated = gridType.mapRotation(cameraViewpoint).rotateVector(world);
+        Vec3 rotated = mapRotation.rotateVector(world);
         double mapX;
         double mapY;
         if (mode.isLatitudinal()) {
