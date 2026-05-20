@@ -133,54 +133,63 @@ public final class State {
     private static void loadTimelines(JSONObject data) {
         ArrayList<TimelineLayer> newList = new ArrayList<>();
 
-        for (Object o : data.getJSONArray("timelines")) {
-            if (o instanceof JSONObject jo) {
-                try {
-                    if (deserialize2Object(jo) instanceof TimelineLayer layer) {
-                        newList.add(layer);
-                        layer.setEnabled(jo.optBoolean("enabled", true));
+        JSONArray timelines = data.optJSONArray("timelines");
+        if (timelines != null) {
+            for (Object o : timelines) {
+                if (o instanceof JSONObject jo) {
+                    try {
+                        if (deserialize2Object(jo) instanceof TimelineLayer layer) {
+                            newList.add(layer);
+                            layer.setEnabled(jo.optBoolean("enabled", true));
+                        }
+                    } catch (Exception e) { // don't stop for a broken one
+                        Log.error(e);
                     }
-                } catch (Exception e) { // don't stop for a broken one
-                    Log.error(e);
                 }
             }
         }
         Timelines.getLayers().restore(newList);
     }
 
-    private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context,
-                                   ViewState.ModeData modeData) {
+    private static void loadLayers(JSONObject data, @Nullable Commands.OperationContext context, ViewState.ModeData modeData) {
         ArrayList<Layer> restoredLayers = new ArrayList<>();
 
-        for (Object o : data.getJSONArray("layers")) {
-            if (o instanceof JSONObject jo) {
-                try {
-                    if (json2Object(jo) instanceof Layer layer) {
-                        restoredLayers.add(layer);
-                        layer.setEnabled(jo.optBoolean("enabled", false));
+        JSONArray layers = data.optJSONArray("layers");
+        if (layers != null) {
+            for (Object o : layers) {
+                if (o instanceof JSONObject jo) {
+                    try {
+                        if (json2Object(jo) instanceof Layer layer) {
+                            restoredLayers.add(layer);
+                            layer.setEnabled(jo.optBoolean("enabled", false));
+                        }
+                    } catch (Exception e) { // don't stop for a broken one
+                        Log.error("layers", e);
                     }
-                } catch (Exception e) { // don't stop for a broken one
-                    Log.error("layers", e);
                 }
             }
         }
 
         HashMap<ImageLayer, Boolean> newLayers = new HashMap<>();
         ImageLayer masterLayer = null;
-        for (Object o : data.getJSONArray("imageLayers")) {
-            if (o instanceof JSONObject jo) {
-                JSONObject jd = jo.optJSONObject("data");
-                if (jd == null)
-                    continue;
 
-                try {
-                    ImageLayer layer = ImageLayer.createDetached(jd);
-                    restoredLayers.add(layer);
-                    newLayers.put(layer, jo.optBoolean("enabled", false));
-                    if (jo.optBoolean("master", false))
-                        masterLayer = layer;
-                } catch (Exception e) { // don't stop for a broken one
-                    Log.error("imageLayers", e);
+        JSONArray imageLayers = data.optJSONArray("imageLayers");
+        if (imageLayers != null) {
+            for (Object o : imageLayers) {
+                if (o instanceof JSONObject jo) {
+                    JSONObject jd = jo.optJSONObject("data");
+                    if (jd == null)
+                        continue;
+
+                    try {
+                        ImageLayer layer = ImageLayer.createDetached(jd);
+                        restoredLayers.add(layer);
+                        newLayers.put(layer, jo.optBoolean("enabled", false));
+                        if (jo.optBoolean("master", false))
+                            masterLayer = layer;
+                    } catch (Exception e) { // don't stop for a broken one
+                        Log.error("imageLayers", e);
+                    }
                 }
             }
         }

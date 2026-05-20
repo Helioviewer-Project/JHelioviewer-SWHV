@@ -33,25 +33,13 @@ def as_url(value: str) -> str:
     return Path(value).expanduser().resolve().as_uri()
 
 
-def empty_state() -> str:
-    return json.dumps(
-        {
-            "org.helioviewer.jhv.state": {
-                "layers": [],
-                "imageLayers": [],
-                "timelines": [],
-            },
-        }
-    )
-
-
 def movie_commands(path: str, size: str) -> list[dict]:
     return [
         # send empty or preferred state to clear previously loaded image layers
         command(
             "jhv.load.state",
             {
-                "value": empty_state(),
+                "value": json.dumps({"org.helioviewer.jhv.state": {}}),
             },
         ),
         # those are global, no need to always set them
