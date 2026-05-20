@@ -27,38 +27,8 @@ final class NonOrthoMapContext extends MapContext {
     }
 
     @Override
-    public ProjectionScale scale() {
-        return scale;
-    }
-
-    @Override
     public Quat rotation() {
         return rotation;
-    }
-
-    @Override
-    public boolean isOrthographic() {
-        return false;
-    }
-
-    @Override
-    public boolean isHpc() {
-        return kind == NonOrthoProjection.Kind.HPC;
-    }
-
-    @Override
-    public boolean isLatitudinal() {
-        return kind == NonOrthoProjection.Kind.LATITUDINAL;
-    }
-
-    @Override
-    public boolean isPolar() {
-        return kind == NonOrthoProjection.Kind.POLAR && scale == ProjectionScale.polar;
-    }
-
-    @Override
-    public boolean isLogPolar() {
-        return kind == NonOrthoProjection.Kind.POLAR && scale == ProjectionScale.logpolar;
     }
 
     @Override
