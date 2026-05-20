@@ -93,11 +93,11 @@ public final class Annotations {
         annotations.forEach(annotation -> {
             boolean active = annotation == activeAnnotation;
             annotation.draw(ctx, active, annotationsBuf);
-            annotation.drawTransformed(active, transformedBuf, centerBuf);
+            annotation.drawTransformed(ctx, active, transformedBuf, centerBuf);
         });
         if (pending != null) {
             pending.draw(ctx, false, annotationsBuf);
-            pending.drawTransformed(false, transformedBuf, centerBuf);
+            pending.drawTransformed(ctx, false, transformedBuf, centerBuf);
         }
         annotationsLine.setVertex(annotationsBuf);
         annotationsLine.renderLine(vp, LINEWIDTH);
@@ -105,7 +105,7 @@ public final class Annotations {
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
 
         Transform.pushView();
-        if (Display.mode.isOrthographic())
+        if (ctx.isOrthographic())
             Transform.rotateViewInverse(ctx.viewpoint().toQuat());
         transformedLine.setVertex(transformedBuf);
         transformedLine.renderLine(vp, LINEWIDTH);
