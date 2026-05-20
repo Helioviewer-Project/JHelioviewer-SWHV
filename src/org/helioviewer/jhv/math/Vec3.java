@@ -87,7 +87,10 @@ public class Vec3 {
 
     public static Vec3 fromJson(JSONArray ja) {
         try {
-            return new Vec3(ja.getDouble(0), ja.getDouble(1), ja.getDouble(2));
+            double x = ja.getDouble(0);
+            double y = ja.getDouble(1);
+            double z = ja.getDouble(2);
+            return Double.isFinite(x) && Double.isFinite(y) && Double.isFinite(z) ? new Vec3(x, y, z) : ZERO;
         } catch (Exception e) {
             return ZERO;
         }

@@ -21,7 +21,9 @@ public class Vec2 {
 
     public static Vec2 fromJson(JSONArray ja) {
         try {
-            return new Vec2(ja.getDouble(0), ja.getDouble(1));
+            double x = ja.getDouble(0);
+            double y = ja.getDouble(1);
+            return Double.isFinite(x) && Double.isFinite(y) ? new Vec2(x, y) : ZERO;
         } catch (Exception e) {
             return ZERO;
         }
