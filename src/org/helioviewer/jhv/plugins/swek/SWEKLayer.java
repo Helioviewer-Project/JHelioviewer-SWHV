@@ -11,8 +11,6 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
@@ -379,7 +377,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
- 
+
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus()) {
@@ -406,7 +404,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
- 
+
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus() && (ctx.isPolar() || ctx.isLogPolar())) {

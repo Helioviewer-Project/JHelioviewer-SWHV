@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
