@@ -22,6 +22,26 @@ final class OrthoMapContext extends MapContext {
     }
 
     @Override
+    public boolean isHpc() {
+        return false;
+    }
+
+    @Override
+    public boolean isLatitudinal() {
+        return false;
+    }
+
+    @Override
+    public boolean isPolar() {
+        return false;
+    }
+
+    @Override
+    public boolean isLogPolar() {
+        return false;
+    }
+
+    @Override
     public Vec2 projectToScreen(Vec3 v) {
         throw new UnsupportedOperationException("Orthographic mode does not support projectToScreen()");
     }

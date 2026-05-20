@@ -75,7 +75,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
+        MapContext ctx = Display.getMapContext(vp);
         if (connectivity != null)
             drawConnectivity(ctx, camera);
         if (hcs != null)
@@ -105,18 +105,18 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private static void putConnectivity(MapContext ctx, List<Vec3> points, byte[] color, BufVertex vexBuf) {
-        points.forEach(v -> Display.mode.emitMapPoint(ctx, v, SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
+        points.forEach(v -> ctx.emitMapPoint(v, SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
     }
 
     private void drawHCS(MapContext ctx) {
         if (hcs.isEmpty())
             return;
         Vec3 first = hcs.getFirst();
-        Vec2 previous = Display.mode.emitMapVertex(ctx, first, null, true, false, ORTHO_RADIUS, hcsColor, hcsBuf);
+        Vec2 previous = ctx.emitMapVertex(first, null, true, false, ORTHO_RADIUS, hcsColor, hcsBuf);
         for (int i = 1; i < hcs.size(); i++) {
-            previous = Display.mode.emitMapVertex(ctx, hcs.get(i), previous, false, false, ORTHO_RADIUS, hcsColor, hcsBuf);
+            previous = ctx.emitMapVertex(hcs.get(i), previous, false, false, ORTHO_RADIUS, hcsColor, hcsBuf);
         }
-        Display.mode.emitMapVertex(ctx, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
+        ctx.emitMapVertex(first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
 
         hcsLine.setVertex(hcsBuf);
         hcsLine.renderLine(ctx.vp(), LINEWIDTH);

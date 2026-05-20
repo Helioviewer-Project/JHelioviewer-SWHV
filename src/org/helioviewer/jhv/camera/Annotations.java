@@ -89,8 +89,7 @@ public final class Annotations {
 
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
 
-        Position viewpoint = camera.getViewpoint();
-        MapContext ctx = new MapContext(viewpoint, vp, Display.mode.scale, Display.gridType);
+        MapContext ctx = Display.getMapContext(vp);
         annotations.forEach(annotation -> {
             boolean active = annotation == activeAnnotation;
             annotation.draw(ctx, active, annotationsBuf);
@@ -107,7 +106,7 @@ public final class Annotations {
 
         Transform.pushView();
         if (Display.mode.isOrthographic())
-            Transform.rotateViewInverse(viewpoint.toQuat());
+            Transform.rotateViewInverse(ctx.viewpoint().toQuat());
         transformedLine.setVertex(transformedBuf);
         transformedLine.renderLine(vp, LINEWIDTH);
         center.setVertex(centerBuf);

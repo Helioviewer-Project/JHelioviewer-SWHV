@@ -62,7 +62,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y) {
-        return Display.mode.mouseToSurface(camera, vp, Display.gridType, x, y);
+        return Display.getMapContext(vp).mouseToSurface(x, y);
     }
 
     @Nullable

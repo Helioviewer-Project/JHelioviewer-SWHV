@@ -65,6 +65,22 @@ public class MapContext {
         return tempScale == ProjectionScale.ortho;
     }
 
+    public boolean isHpc() {
+        return Display.mode.isHpc();
+    }
+
+    public boolean isLatitudinal() {
+        return Display.mode.isLatitudinal();
+    }
+
+    public boolean isPolar() {
+        return Display.mode.isPolar();
+    }
+
+    public boolean isLogPolar() {
+        return Display.mode.isLogPolar();
+    }
+
     public Vec2 projectToScreen(Vec3 v) {
         return Display.mode.projectToScreen(this, v);
     }

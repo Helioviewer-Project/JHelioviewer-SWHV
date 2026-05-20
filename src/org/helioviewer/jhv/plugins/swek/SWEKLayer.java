@@ -204,7 +204,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
                     Vec3 pt = new Vec3(xnew / r, ynew / r, znew / r);
-                    previous = Display.mode.emitMapVertex(ctx, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
+                    previous = ctx.emitMapVertex(pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
@@ -261,7 +261,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.projectToScreen(ctx, pt);
+            Vec2 tf = ctx.projectToScreen(pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x, tf.y, sz, sz);
         }
@@ -341,12 +341,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         lineThick.renderLine(vp, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(List<JHVRelatedEvents> evs, long currentTime) {
+    private void renderIcons(MapContext ctx, List<JHVRelatedEvents> evs, long currentTime) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
-            if (Display.mode.isLatitudinal() && evt.isCactus())
+            if (ctx.isLatitudinal() && evt.isCactus())
                 continue;
             bindTexture(evtr.getSupplier().getGroup());
             glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
@@ -378,8 +378,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
-
+        MapContext ctx = Display.getMapContext(vp);
+ 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus()) {
@@ -393,7 +393,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(evs, currentTime);
+            renderIcons(ctx, evs, currentTime);
         }
     }
 
@@ -405,11 +405,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
-
+        MapContext ctx = Display.getMapContext(vp);
+ 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
-            if (evt.isCactus() && (Display.mode.isPolar() || Display.mode.isLogPolar())) {
+            if (evt.isCactus() && (ctx.isPolar() || ctx.isLogPolar())) {
                 drawCactusArcScale(vp, evtr, evt, currentTime, ctx.scale());
             } else {
                 drawPolygon(ctx, evtr, evt);
@@ -420,7 +420,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(evs, currentTime);
+            renderIcons(ctx, evs, currentTime);
         }
     }
 

@@ -5,6 +5,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
@@ -79,8 +80,9 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     private static String formatFOV(Camera camera, Viewport vp) {
-        if (Display.mode == ProjectionMode.HPC)
-            return formatHpcFOV(camera, vp);
+        MapContext ctx = Display.getMapContext(vp);
+        if (ctx.isHpc())
+            return formatHpcFOV(ctx);
         return formatOrthoFOV(camera.getCameraWidth(vp));
     }
 
@@ -91,19 +93,20 @@ public class TimestampLayer extends AbstractLayer {
             return String.format("%6.4fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatHpcFOV(Camera camera, Viewport vp) {
+    private static String formatHpcFOV(MapContext ctx) {
+        Viewport vp = ctx.vp();
         int centerX = vp.x + vp.width / 2;
         int centerY = vp.yAWT + vp.height / 2;
 
-        Vec2 left = Display.mode.mouseToGrid(camera, vp, Display.gridType, vp.x, centerY);
-        Vec2 right = Display.mode.mouseToGrid(camera, vp, Display.gridType, vp.x + vp.width - 1, centerY);
-        Vec2 bottom = Display.mode.mouseToGrid(camera, vp, Display.gridType, centerX, vp.yAWT + vp.height - 1);
-        Vec2 top = Display.mode.mouseToGrid(camera, vp, Display.gridType, centerX, vp.yAWT);
+        Vec2 left = ctx.mouseToGrid(vp.x, centerY);
+        Vec2 right = ctx.mouseToGrid(vp.x + vp.width - 1, centerY);
+        Vec2 bottom = ctx.mouseToGrid(centerX, vp.yAWT + vp.height - 1);
+        Vec2 top = ctx.mouseToGrid(centerX, vp.yAWT);
 
-        double minX = Display.mode.scale.getInterpolatedXValue(0);
-        double maxX = Display.mode.scale.getInterpolatedXValue(1);
-        double minY = Display.mode.scale.getInterpolatedYValue(0);
-        double maxY = Display.mode.scale.getInterpolatedYValue(1);
+        double minX = ctx.scale().getInterpolatedXValue(0);
+        double maxX = ctx.scale().getInterpolatedXValue(1);
+        double minY = ctx.scale().getInterpolatedYValue(0);
+        double maxY = ctx.scale().getInterpolatedYValue(1);
 
         double width = Math.abs(Math.clamp(right.x, minX, maxX) - Math.clamp(left.x, minX, maxX));
         double height = Math.abs(Math.clamp(top.y, minY, maxY) - Math.clamp(bottom.y, minY, maxY));
