@@ -28,6 +28,10 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public record LUT(String name, ByteBuffer rgba) {
+    public LUT {
+        rgba = rgba.asReadOnlyBuffer();
+    }
+
     private static final String[] GGR_LUTS = {
             "AIA94", "AIA131", "AIA171", "AIA193", "AIA211",
             "AIA304", "AIA335", "AIA1600", "AIA1700", "AIA4500"
