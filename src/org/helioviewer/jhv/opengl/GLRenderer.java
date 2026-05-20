@@ -57,17 +57,15 @@ public final class GLRenderer {
 
         Layers.prerender();
 
-        Camera camera = Display.getCamera();
-
         if (Display.mode == ProjectionMode.Orthographic) {
-            renderScene(camera);
+            renderScene();
             renderMiniview();
         } else
-            renderSceneScale(camera);
-        renderFullFloatScene(camera);
+            renderSceneScale();
+        renderFullFloatScene();
 
         if (ExportMovie.isRecording())
-            ExportMovie.handleMovieExport(camera);
+            ExportMovie.handleMovieExport();
     }
 
     public static void dispose() {
@@ -85,7 +83,8 @@ public final class GLRenderer {
         JHVGLException.checkErrors("GLRenderer.dispose()");
     }
 
-    static void renderScene(Camera camera) {
+    static void renderScene() {
+        Camera camera = Display.getCamera();
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho(vp);
@@ -118,7 +117,7 @@ public final class GLRenderer {
         }
     }
 
-    static void renderSceneScale(Camera camera) {
+    static void renderSceneScale() {
         if (Display.mode == ProjectionMode.Polar) {
             ProjectionScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
         } else if (Display.mode == ProjectionMode.LogPolar) {
@@ -127,6 +126,7 @@ public final class GLRenderer {
 
         boolean hpcMode = Display.mode == ProjectionMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
+        Camera camera = Display.getCamera();
         for (Viewport vp : Display.getViewports()) {
             if (hpcMode) {
                 double halfWidth = 0.5 * hpcBounds.width;
@@ -145,7 +145,7 @@ public final class GLRenderer {
         }
     }
 
-    private static void renderFullFloatScene(Camera camera) {
+    private static void renderFullFloatScene() {
         Viewport vp = Display.fullViewport;
         GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
         Layers.renderFullFloat(Display.getMapContext(vp));
