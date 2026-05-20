@@ -8,6 +8,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
@@ -46,12 +47,8 @@ public class FlatGrid {
     }
 
     // Projection and camera state that invalidates the cached flat grid.
-        private record FlatGridKey(ProjectionScale scale, GridType gridType, double aspect, double cameraWidth,
-                               double translationX, double translationY) {
-        FlatGridKey(MapContext ctx, Viewport vp, ProjectionScale scale) {
-            this(scale, ctx.gridType(), vp.aspect, ctx.camera().getCameraWidth(vp), ctx.camera().getTranslationX(), ctx.camera().getTranslationY());
-        }
-    }
+    private record FlatGridKey(ProjectionMode mode, GridType gridType, double aspect, double cameraWidth,
+                               double translationX, double translationY) {}
 
     public void init() {
         shape.init();
@@ -62,15 +59,19 @@ public class FlatGrid {
     }
 
     public void render(MapContext ctx, Viewport vp, ProjectionScale scale, boolean showLabels) {
-        rebuildIfNeeded(ctx, vp, scale);
+        Camera camera = ctx.camera();
+        rebuildIfNeeded(ctx, camera, vp, scale);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(ctx, vp);
+            drawLabels(camera, vp);
     }
 
-    private void rebuildIfNeeded(MapContext ctx, Viewport vp, ProjectionScale scale) {
-        FlatGridKey flatGridKey = new FlatGridKey(ctx, vp, scale);
-        Camera camera = ctx.camera();
+    private static FlatGridKey key(MapContext ctx, Camera camera, Viewport vp) {
+        return new FlatGridKey(ctx.mode(), ctx.gridType(), vp.aspect, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY());
+    }
+
+    private void rebuildIfNeeded(MapContext ctx, Camera camera, Viewport vp, ProjectionScale scale) {
+        FlatGridKey flatGridKey = key(ctx, camera, vp);
 
         double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
         double yCenter = 0.5 - camera.getTranslationY();
@@ -98,8 +99,7 @@ public class FlatGrid {
                 !Objects.equals(yAxis.signature(), ySignature);
     }
 
-    private void drawLabels(MapContext ctx, Viewport vp) {
-        Camera camera = ctx.camera();
+    private void drawLabels(Camera camera, Viewport vp) {
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
         double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(camera.getCameraWidth(vp), 1) / vp.height;
