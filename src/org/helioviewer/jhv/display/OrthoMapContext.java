@@ -8,12 +8,7 @@ import org.helioviewer.jhv.opengl.BufVertex;
 final class OrthoMapContext extends MapContext {
 
     OrthoMapContext(Camera _camera, GridType _gridType) {
-        super(_camera, _gridType);
-    }
-
-    @Override
-    public ProjectionMode mode() {
-        return ProjectionMode.Orthographic;
+        super(_camera, ProjectionMode.Orthographic, _gridType);
     }
 
     @Override
