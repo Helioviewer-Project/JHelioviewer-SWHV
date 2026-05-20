@@ -7,34 +7,16 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
-public class MapContext {
+public abstract class MapContext {
 
     protected final Camera camera;
     protected final Viewport vp;
     protected final GridType gridType;
 
-    // Compatibility fields to support step-by-step migration of legacy callers
-    private final Position tempViewpoint;
-    private final ProjectionScale tempScale;
-    private final Quat tempRotation;
-
-    @Deprecated
-    public MapContext(Position viewpoint, Viewport vp, ProjectionScale scale, GridType gridType) {
-        this.camera = null;
-        this.vp = vp;
-        this.gridType = gridType;
-        this.tempViewpoint = viewpoint;
-        this.tempScale = scale;
-        this.tempRotation = scale.isOrtho() ? null : gridType.mapRotation(viewpoint);
-    }
-
-    protected MapContext(Camera camera, Viewport vp, GridType gridType) {
-        this.camera = camera;
-        this.vp = vp;
-        this.gridType = gridType;
-        this.tempViewpoint = null;
-        this.tempScale = null;
-        this.tempRotation = null;
+    protected MapContext(Camera _camera, Viewport _vp, GridType _gridType) {
+        camera = _camera;
+        vp = _vp;
+        gridType = _gridType;
     }
 
     public Camera camera() {
@@ -50,58 +32,32 @@ public class MapContext {
     }
 
     public Position viewpoint() {
-        return camera != null ? camera.getViewpoint() : tempViewpoint;
+        return camera.getViewpoint();
     }
 
-    public Quat rotation() {
-        return tempRotation;
-    }
+    public abstract Quat rotation();
 
-    public ProjectionScale scale() {
-        return tempScale;
-    }
+    public abstract ProjectionScale scale();
 
-    public boolean isOrthographic() {
-        return tempScale == ProjectionScale.ortho;
-    }
+    public abstract boolean isOrthographic();
 
-    public boolean isHpc() {
-        return Display.mode.isHpc();
-    }
+    public abstract boolean isHpc();
 
-    public boolean isLatitudinal() {
-        return Display.mode.isLatitudinal();
-    }
+    public abstract boolean isLatitudinal();
 
-    public boolean isPolar() {
-        return Display.mode.isPolar();
-    }
+    public abstract boolean isPolar();
 
-    public boolean isLogPolar() {
-        return Display.mode.isLogPolar();
-    }
+    public abstract boolean isLogPolar();
 
-    public Vec2 projectToScreen(Vec3 v) {
-        return Display.mode.projectToScreen(this, v);
-    }
+    public abstract Vec2 projectToScreen(Vec3 v);
 
-    public Vec3 mouseToSurface(int x, int y) {
-        return Display.mode.mouseToSurface(camera, vp, gridType, x, y);
-    }
+    public abstract Vec3 mouseToSurface(int x, int y);
 
-    public Vec2 mouseToGrid(int x, int y) {
-        return Display.mode.mouseToGrid(camera, vp, gridType, x, y);
-    }
+    public abstract Vec2 mouseToGrid(int x, int y);
 
-    public Vec2 mouseToScreen(int x, int y) {
-        return Display.mode.mouseToScreen(camera, this, x, y);
-    }
+    public abstract Vec2 mouseToScreen(int x, int y);
 
-    public Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        return Display.mode.emitMapVertex(this, vertex, previous, first, last, radius, color, vexBuf);
-    }
+    public abstract Vec2 emitMapVertex(Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf);
 
-    public void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        Display.mode.emitMapPoint(this, vertex, size, radius, color, vexBuf);
-    }
+    public abstract void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf);
 }
