@@ -3,7 +3,7 @@ package org.helioviewer.jhv.layers;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayMapBounds;
-import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.Vec2;
@@ -76,7 +76,7 @@ public final class ImageLayerBounds {
             return 2 * halfHeight;
         }
 
-        GridScale scale = Display.mode.scale;
+        ProjectionScale scale = Display.mode.scale;
         return Math.abs(scale.getInterpolatedYValue(1) - scale.getInterpolatedYValue(0));
     }
 

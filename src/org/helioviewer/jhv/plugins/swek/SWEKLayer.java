@@ -13,7 +13,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
@@ -267,7 +267,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, GridScale scale) {
+    private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, ProjectionScale scale) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double principalAngleDegree = params.principalAngleDegree();
@@ -378,7 +378,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType, Display.mode.scale);
+        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -405,7 +405,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType, Display.mode.scale);
+        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);

@@ -9,7 +9,7 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
 // through an explicit map basis shared by rendering and mouse unprojection.
 public enum ProjectionMode {
-    Orthographic(GLSLSolarShader.ortho, GridScale.ortho) {
+    Orthographic(GLSLSolarShader.ortho, ProjectionScale.ortho) {
         @Override
         public Vec2 projectToScreen(MapContext ctx, Vec3 v) {
             throw new UnsupportedOperationException("Orthographic mode does not use projectToScreen()");
@@ -41,20 +41,20 @@ public enum ProjectionMode {
             throw new UnsupportedOperationException("Orthographic mode does not use non-ortho mouseToScreen()");
         }
     },
-    HPC(GLSLSolarShader.hpc, GridScale.hpc, NonOrthoProjection.Kind.HPC),
-    Latitudinal(GLSLSolarShader.lati, GridScale.lati, NonOrthoProjection.Kind.LATITUDINAL),
-    LogPolar(GLSLSolarShader.logpolar, GridScale.logpolar, NonOrthoProjection.Kind.POLAR),
-    Polar(GLSLSolarShader.polar, GridScale.polar, NonOrthoProjection.Kind.POLAR);
+    HPC(GLSLSolarShader.hpc, ProjectionScale.hpc, NonOrthoProjection.Kind.HPC),
+    Latitudinal(GLSLSolarShader.lati, ProjectionScale.lati, NonOrthoProjection.Kind.LATITUDINAL),
+    LogPolar(GLSLSolarShader.logpolar, ProjectionScale.logpolar, NonOrthoProjection.Kind.POLAR),
+    Polar(GLSLSolarShader.polar, ProjectionScale.polar, NonOrthoProjection.Kind.POLAR);
 
     public final GLSLSolarShader shader;
-    public final GridScale scale;
+    public final ProjectionScale scale;
     private final NonOrthoProjection.Kind nonOrthoKind;
 
-    ProjectionMode(GLSLSolarShader _shader, GridScale _scale) {
+    ProjectionMode(GLSLSolarShader _shader, ProjectionScale _scale) {
         this(_shader, _scale, null);
     }
 
-    ProjectionMode(GLSLSolarShader _shader, GridScale _scale, NonOrthoProjection.Kind _nonOrthoKind) {
+    ProjectionMode(GLSLSolarShader _shader, ProjectionScale _scale, NonOrthoProjection.Kind _nonOrthoKind) {
         shader = _shader;
         scale = _scale;
         nonOrthoKind = _nonOrthoKind;
@@ -85,7 +85,7 @@ public enum ProjectionMode {
     }
 
     public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToSurface(nonOrthoKind, scale, camera, vp, gridType, x, y);
+        return NonOrthoProjection.mouseToSurface(nonOrthoKind, camera, vp, scale, gridType, x, y);
     }
 
     public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
@@ -97,10 +97,10 @@ public enum ProjectionMode {
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToGrid(scale, camera, vp, gridType, x, y);
+        return NonOrthoProjection.mouseToGrid(camera, vp, scale, gridType, x, y);
     }
 
     public Vec2 mouseToScreen(Camera camera, MapContext ctx, int x, int y) {
-        return NonOrthoProjection.mouseToScreen(camera, ctx.vp(), ctx.gridType(), ctx.scale(), x, y);
+        return NonOrthoProjection.mouseToScreen(camera, ctx.vp(), ctx.scale(), ctx.gridType(), x, y);
     }
 }
