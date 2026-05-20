@@ -11,10 +11,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
 import org.helioviewer.jhv.time.JHVTime;
