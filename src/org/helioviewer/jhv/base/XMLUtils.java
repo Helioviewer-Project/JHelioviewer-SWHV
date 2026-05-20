@@ -2,18 +2,53 @@ package org.helioviewer.jhv.base;
 
 import java.io.StringReader;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.helioviewer.jhv.Log;
 
 import org.w3c.dom.Document;
 //import org.w3c.dom.NamedNodeMap;
 //import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
-public class XMLUtils {
+public final class XMLUtils {
+    private static final DocumentBuilderFactory FACTORY = createFactory();
+    private static final ThreadLocal<DocumentBuilder> BUILDER = ThreadLocal.withInitial(() -> {
+        try {
+            return FACTORY.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    });
+
+    private static DocumentBuilderFactory createFactory() {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        setFeature(factory, "http://apache.org/xml/features/disallow-doctype-decl", true);
+        setFeature(factory, "http://xml.org/sax/features/external-general-entities", false);
+        setFeature(factory, "http://xml.org/sax/features/external-parameter-entities", false);
+        setFeature(factory, "http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+        return factory;
+    }
+
+    private static void setFeature(DocumentBuilderFactory factory, String feature, boolean value) {
+        try {
+            factory.setFeature(feature, value);
+        } catch (ParserConfigurationException e) {
+            Log.warn("XML parser does not support feature " + feature, e);
+        }
+    }
 
     public static Document parse(String xml) throws Exception {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+        DocumentBuilder builder = BUILDER.get();
+        builder.reset();
+        return builder.parse(new InputSource(new StringReader(xml)));
     }
+
+    private XMLUtils() {}
 
 /*
     private static void indent(int level) {
