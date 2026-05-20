@@ -152,7 +152,7 @@ public final class GLRenderer {
     private static void renderFullFloatScene() {
         Viewport vp = Display.fullViewport;
         GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        Layers.renderFullFloat(Display.getMapContext(), vp, Display.mode.scale);
+        Layers.renderFullFloat(Display.getMapContext(), vp);
     }
 
 }

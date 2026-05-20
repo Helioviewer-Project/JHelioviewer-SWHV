@@ -146,7 +146,7 @@ public class ViewpointLayer extends AbstractLayer {
     private int mouseX, mouseY;
 
     @Override
-    public void renderFullFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void renderFullFloat(MapContext ctx, Viewport vp) {
         if (!enabled)
             return;
         GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);

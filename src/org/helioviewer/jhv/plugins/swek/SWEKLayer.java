@@ -421,7 +421,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderFullFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void renderFullFloat(MapContext ctx, Viewport vp) {
         if (!enabled)
             return;
         if (swekContext.mouseOverJHVEvent() != null) {
