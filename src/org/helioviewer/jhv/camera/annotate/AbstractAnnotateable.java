@@ -48,9 +48,9 @@ abstract class AbstractAnnotateable implements Annotateable {
         if (arr != null)
             return Vec3.fromJson(arr);
         JSONObject obj = jo.optJSONObject(name);
-        if (obj == null || !obj.has("lon") || !obj.has("lat"))
+        if (obj == null)
             return null;
-        double lon = Math.toRadians(obj.getDouble("lon")), lat = Math.toRadians(obj.getDouble("lat"));
+        double lon = Math.toRadians(obj.optDouble("lon", 0)), lat = Math.toRadians(obj.optDouble("lat", 0));
         return SphericalCoords.unit(lon, lat);
     }
 
