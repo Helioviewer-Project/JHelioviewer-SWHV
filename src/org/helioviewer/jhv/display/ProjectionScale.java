@@ -18,10 +18,6 @@ public interface ProjectionScale {
 
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
-    default boolean isOrtho() {
-        return this == ortho;
-    }
-
     ProjectionScale ortho = new ProjectionScaleIdentity(0, 0, 0, 0);
     ProjectionScale hpc = new ProjectionScaleIdentity(-5, 5, -5, 5);
     ProjectionScale lati = new ProjectionScaleLati(-180, 180, -90, 90);

@@ -39,17 +39,29 @@ public abstract class MapContext {
 
     public abstract Quat rotation();
 
-    public abstract ProjectionScale scale();
+    public ProjectionScale scale() {
+        return mode().scale;
+    }
 
-    public abstract boolean isOrthographic();
+    public boolean isOrthographic() {
+        return mode().isOrthographic();
+    }
 
-    public abstract boolean isHpc();
+    public boolean isHpc() {
+        return mode().isHpc();
+    }
 
-    public abstract boolean isLatitudinal();
+    public boolean isLatitudinal() {
+        return mode().isLatitudinal();
+    }
 
-    public abstract boolean isPolar();
+    public boolean isPolar() {
+        return mode().isPolar();
+    }
 
-    public abstract boolean isLogPolar();
+    public boolean isLogPolar() {
+        return mode().isLogPolar();
+    }
 
     public abstract Vec2 projectToScreen(Vec3 v);
 

@@ -18,38 +18,8 @@ final class OrthoMapContext extends MapContext {
     }
 
     @Override
-    public ProjectionScale scale() {
-        return ProjectionScale.ortho;
-    }
-
-    @Override
     public ProjectionMode mode() {
         return ProjectionMode.Orthographic;
-    }
-
-    @Override
-    public boolean isOrthographic() {
-        return true;
-    }
-
-    @Override
-    public boolean isHpc() {
-        return false;
-    }
-
-    @Override
-    public boolean isLatitudinal() {
-        return false;
-    }
-
-    @Override
-    public boolean isPolar() {
-        return false;
-    }
-
-    @Override
-    public boolean isLogPolar() {
-        return false;
     }
 
     @Override
