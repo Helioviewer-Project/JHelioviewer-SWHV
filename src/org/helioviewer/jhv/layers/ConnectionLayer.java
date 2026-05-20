@@ -75,7 +75,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public void render(Camera camera, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType, Display.mode.scale);
+        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
         if (connectivity != null)
             drawConnectivity(ctx, camera);
         if (hcs != null)

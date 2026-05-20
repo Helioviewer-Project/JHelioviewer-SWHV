@@ -4,7 +4,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
@@ -117,9 +117,9 @@ public final class GLRenderer {
 
     static void renderSceneScale(Camera camera) {
         if (Display.mode.isPolar()) {
-            GridScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
+            ProjectionScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
         } else if (Display.mode.isLogPolar()) {
-            GridScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayerBounds.getLargestRadialSize()));
+            ProjectionScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayerBounds.getLargestRadialSize()));
         }
 
         boolean hpcMode = Display.mode.isHpc();
@@ -129,7 +129,7 @@ public final class GLRenderer {
                 double halfWidth = 0.5 * hpcBounds.width;
                 double halfHeight = Math.max(0.5 * hpcBounds.height, halfWidth / vp.aspect);
                 halfWidth = halfHeight * vp.aspect;
-                GridScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
+                ProjectionScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             camera.projectionOrtho2D(vp);

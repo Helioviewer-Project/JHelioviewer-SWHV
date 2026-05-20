@@ -90,7 +90,7 @@ public final class Annotations {
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
 
         Position viewpoint = camera.getViewpoint();
-        MapContext ctx = new MapContext(viewpoint, vp, Display.gridType, Display.mode.scale);
+        MapContext ctx = new MapContext(viewpoint, vp, Display.mode.scale, Display.gridType);
         annotations.forEach(annotation -> {
             boolean active = annotation == activeAnnotation;
             annotation.draw(ctx, active, annotationsBuf);

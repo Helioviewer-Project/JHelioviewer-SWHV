@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.display;
 
-public interface GridScale {
+public interface ProjectionScale {
 
     double getInterpolatedXDisplayValue(double v, GridType gridType);
 
@@ -18,20 +18,20 @@ public interface GridScale {
 
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
-    GridScale ortho = new GridScaleIdentity(0, 0, 0, 0);
-    GridScale hpc = new GridScaleIdentity(-5, 5, -5, 5);
-    GridScale lati = new GridScaleLati(-180, 180, -90, 90);
-    GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
-    GridScale logpolar = new GridScaleLogY(0, 360, 0.05, 1);
+    ProjectionScale ortho = new ProjectionScaleIdentity(0, 0, 0, 0);
+    ProjectionScale hpc = new ProjectionScaleIdentity(-5, 5, -5, 5);
+    ProjectionScale lati = new ProjectionScaleLati(-180, 180, -90, 90);
+    ProjectionScale polar = new ProjectionScaleIdentity(0, 360, 0, 0);
+    ProjectionScale logpolar = new ProjectionScaleLogY(0, 360, 0.05, 1);
 
-    abstract class GridScaleAbstract implements GridScale {
+    abstract class ProjectionScaleAbstract implements ProjectionScale {
 
         protected double xStart;
         protected double xStop;
         protected double yStart;
         protected double yStop;
 
-        GridScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop) {
+        ProjectionScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop) {
             set(_xStart, _xStop, _yStart, _yStop);
         }
 
@@ -92,9 +92,9 @@ public interface GridScale {
 
     }
 
-    class GridScaleLogY extends GridScaleAbstract {
+    class ProjectionScaleLogY extends ProjectionScaleAbstract {
 
-        GridScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop) {
+        ProjectionScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 
@@ -120,9 +120,9 @@ public interface GridScale {
 
     }
 
-    class GridScaleIdentity extends GridScaleAbstract {
+    class ProjectionScaleIdentity extends ProjectionScaleAbstract {
 
-        GridScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop) {
+        ProjectionScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 
@@ -148,9 +148,9 @@ public interface GridScale {
 
     }
 
-    class GridScaleLati extends GridScaleIdentity {
+    class ProjectionScaleLati extends ProjectionScaleIdentity {
 
-        GridScaleLati(double _xStart, double _xStop, double _yStart, double _yStop) {
+        ProjectionScaleLati(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 

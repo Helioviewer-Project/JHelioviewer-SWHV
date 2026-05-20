@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
@@ -70,7 +70,7 @@ public class FlatGrid {
 
     private void rebuildIfNeeded(Camera camera, Viewport vp) {
         FlatGridKey flatGridKey = key(camera, vp);
-        GridScale scale = Display.mode.scale;
+        ProjectionScale scale = Display.mode.scale;
 
         double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
         double yCenter = 0.5 - camera.getTranslationY();
@@ -149,7 +149,7 @@ public class FlatGrid {
         return new AxisSignature(step, first, last);
     }
 
-    private static Axis buildAxis(GridScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
+    private static Axis buildAxis(ProjectionScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
         String[] labels;
         double[] positions;
         boolean[] axisFlags;

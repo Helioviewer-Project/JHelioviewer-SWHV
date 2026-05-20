@@ -6,7 +6,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridScale;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.wcs.WcsHeader;
@@ -145,7 +145,7 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
-        GridScale scale = Display.mode.scale;
+        ProjectionScale scale = Display.mode.scale;
         screenBuf.put((float) scale.getInterpolatedXValue(0)).put((float) scale.getInterpolatedXValue(1));
         screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
 

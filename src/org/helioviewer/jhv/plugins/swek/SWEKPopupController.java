@@ -145,7 +145,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
         Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();
-        MapContext ctx = new MapContext(viewpoint, vp, Display.gridType, Display.mode.scale);
+        MapContext ctx = new MapContext(viewpoint, vp, Display.mode.scale, Display.gridType);
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();

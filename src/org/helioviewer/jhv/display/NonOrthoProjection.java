@@ -16,15 +16,15 @@ final class NonOrthoProjection {
 
     private NonOrthoProjection() {}
 
-    static Vec2 project(Kind kind, Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    static Vec2 project(Kind kind, Position viewpoint, ProjectionScale scale, GridType gridType, Vec3 v) {
         return switch (kind) {
             case HPC -> projectHpc(viewpoint, v, scale);
-            case LATITUDINAL -> projectLatitudinal(viewpoint, gridType, v, scale);
-            case POLAR -> projectPolar(viewpoint, gridType, v, scale);
+            case LATITUDINAL -> projectLatitudinal(viewpoint, scale, gridType, v);
+            case POLAR -> projectPolar(viewpoint, scale, gridType, v);
         };
     }
 
-    static Vec3 unproject(Kind kind, Position viewpoint, GridType gridType, Vec2 pt) {
+    static Vec3 unproject(Kind kind, Position viewpoint, ProjectionScale scale, GridType gridType, Vec2 pt) {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
             case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt.x, pt.y);
@@ -32,12 +32,12 @@ final class NonOrthoProjection {
         };
     }
 
-    static Vec3 mouseToSurface(Kind kind, GridScale scale, Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return unproject(kind, camera.getViewpoint(), gridType, mouseToGrid(scale, camera, vp, gridType, x, y));
+    static Vec3 mouseToSurface(Kind kind, Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        return unproject(kind, camera.getViewpoint(), scale, gridType, mouseToGrid(camera, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
-    private static Vec2 projectLatitudinal(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    private static Vec2 projectLatitudinal(Position viewpoint, ProjectionScale scale, GridType gridType, Vec3 v) {
         return projectLatitudinalVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
     }
 
@@ -45,7 +45,7 @@ final class NonOrthoProjection {
         return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectLatitudinalPoint(longitudeDeg, latitudeDeg));
     }
 
-    private static Vec2 projectPolar(Position viewpoint, GridType gridType, Vec3 v, GridScale scale) {
+    private static Vec2 projectPolar(Position viewpoint, ProjectionScale scale, GridType gridType, Vec3 v) {
         return projectPolarVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
     }
 
@@ -53,7 +53,7 @@ final class NonOrthoProjection {
         return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectPolarPoint(angleDeg, radius));
     }
 
-    private static Vec2 projectHpc(Position viewpoint, Vec3 v, GridScale scale) {
+    private static Vec2 projectHpc(Position viewpoint, Vec3 v, ProjectionScale scale) {
         // External solar points arrive in world space; HPC projection is defined in viewpoint space.
         return projectHpcViewpointSpace(toHpcViewpointSpace(viewpoint, v), viewpoint.distance, scale);
     }
@@ -63,7 +63,7 @@ final class NonOrthoProjection {
     }
 
     static Vec2 projectToScreen(Kind kind, MapContext ctx, Vec3 v) {
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), v, ctx.scale());
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.gridType(), v);
         return new Vec2(pt.x * ctx.vp().aspect, pt.y);
     }
 
@@ -71,7 +71,7 @@ final class NonOrthoProjection {
         if (kind == Kind.HPC)
             return emitHpcVertex(ctx.viewpoint(), ctx.scale(), ctx.vp(), vertex, previous, first, last, color, vexBuf);
 
-        Vec2 current = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, ctx.scale());
+        Vec2 current = project(kind, ctx.viewpoint(), ctx.scale(), ctx.gridType(), vertex);
         if (first)
             emitProjectedVertex(ctx.vp(), current, Colors.Null, vexBuf);
         emitWrappedVertex(ctx.vp(), previous, current, color, vexBuf);
@@ -86,18 +86,18 @@ final class NonOrthoProjection {
             return;
         }
 
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.gridType(), vertex, ctx.scale());
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.gridType(), vertex);
         vexBuf.putVertex((float) (pt.x * ctx.vp().aspect), (float) pt.y, 0, (float) size, color);
     }
 
-    static Vec2 mouseToScreen(Camera camera, Viewport vp, GridType gridType, GridScale scale, int x, int y) {
-        Vec2 mouseGrid = mouseToGrid(scale, camera, vp, gridType, x, y);
+    static Vec2 mouseToScreen(Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        Vec2 mouseGrid = mouseToGrid(camera, vp, scale, gridType, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
                 scale.getYValueInv(mouseGrid.y));
     }
 
-    static Vec2 mouseToGrid(GridScale scale, Camera camera, Viewport vp, GridType gridType, int x, int y) {
+    static Vec2 mouseToGrid(Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
         return new Vec2(
                 scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(camera, vp, x) / vp.aspect + 0.5, gridType),
                 scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));
@@ -135,7 +135,7 @@ final class NonOrthoProjection {
         return viewpoint.toQuat().rotateVector(v);
     }
 
-    private static Vec2 projectHpcViewpointSpace(Vec3 view, double observerDistance, GridScale scale) {
+    private static Vec2 projectHpcViewpointSpace(Vec3 view, double observerDistance, ProjectionScale scale) {
         double zeta = observerDistance - view.z;
         double longitude = Math.atan2(view.x, zeta);
         double latitude = Math.atan2(view.y, Math.sqrt(view.x * view.x + zeta * zeta));
@@ -148,14 +148,14 @@ final class NonOrthoProjection {
         return view.z >= 0;
     }
 
-    private static Vec2 projectVisibleHpcSurfacePoint(Position viewpoint, Vec3 vertex, GridScale scale) {
+    private static Vec2 projectVisibleHpcSurfacePoint(Position viewpoint, Vec3 vertex, ProjectionScale scale) {
         Vec3 view = toHpcViewpointSpace(viewpoint, vertex);
         if (!isVisibleHpcViewpointSpace(view))
             return null;
         return projectHpcViewpointSpace(view, viewpoint.distance, scale);
     }
 
-    private static Vec2 emitHpcVertex(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
+    private static Vec2 emitHpcVertex(Position viewpoint, ProjectionScale scale, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
         // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
         Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
         if (current == null) {
@@ -171,7 +171,7 @@ final class NonOrthoProjection {
         return current;
     }
 
-    private static void emitHpcPoint(Position viewpoint, GridScale scale, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
+    private static void emitHpcPoint(Position viewpoint, ProjectionScale scale, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
         // Skip back-side surface points in HPC instead of projecting them through the map.
         Vec2 pt = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
         if (pt == null)
@@ -210,7 +210,7 @@ final class NonOrthoProjection {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
-    private static Vec2 projectPolarVector(Vec3 v, GridScale scale) {
+    private static Vec2 projectPolarVector(Vec3 v, ProjectionScale scale) {
         double r = Math.sqrt(v.x * v.x + v.y * v.y);
         double theta = PolarBasis.angle(v);
         double scaledr = scale.getYValueInv(r);
@@ -226,7 +226,7 @@ final class NonOrthoProjection {
         return new Vec3(x, y, z);
     }
 
-    private static Vec2 projectLatitudinalVector(Vec3 v, GridScale scale) {
+    private static Vec2 projectLatitudinalVector(Vec3 v, ProjectionScale scale) {
         // Positive latitude corresponds to positive Y in the non-ortho map basis.
         double latitude = SphericalCoords.latitude(v);
         double longitude = SphericalCoords.longitude(v);
