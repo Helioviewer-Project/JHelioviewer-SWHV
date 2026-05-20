@@ -332,6 +332,8 @@ public final class FITSImage implements URIImageReader {
         long blank = hasBlank ? header.getLongValue(Standard.BLANK) : 0;
         double bzero = header.getDoubleValue(Standard.BZERO, 0);
         double bscale = header.getDoubleValue(Standard.BSCALE, 1);
+        if (!Double.isFinite(bzero) || !Double.isFinite(bscale))
+            throw new Exception("Invalid FITS BZERO/BSCALE");
         FITSViewState.Data state = FITSViewState.data();
 
         float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
