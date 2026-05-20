@@ -378,7 +378,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
+        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType, Display.mode.scale);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -405,12 +405,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType);
+        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.gridType, Display.mode.scale);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus() && (Display.mode.isPolar() || Display.mode.isLogPolar())) {
-                drawCactusArcScale(vp, evtr, evt, currentTime, Display.mode.scale);
+                drawCactusArcScale(vp, evtr, evt, currentTime, ctx.scale());
             } else {
                 drawPolygon(ctx, evtr, evt);
                 if (icons) {

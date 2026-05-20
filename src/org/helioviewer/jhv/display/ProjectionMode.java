@@ -37,7 +37,7 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec2 mouseToScreen(Camera camera, Viewport vp, GridType gridType, int x, int y) {
+        public Vec2 mouseToScreen(Camera camera, MapContext ctx, int x, int y) {
             throw new UnsupportedOperationException("Orthographic mode does not use non-ortho mouseToScreen()");
         }
     },
@@ -81,7 +81,7 @@ public enum ProjectionMode {
     }
 
     public Vec2 projectToScreen(MapContext ctx, Vec3 v) {
-        return NonOrthoProjection.projectToScreen(nonOrthoKind, ctx, scale, v);
+        return NonOrthoProjection.projectToScreen(nonOrthoKind, ctx, v);
     }
 
     public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
@@ -89,18 +89,18 @@ public enum ProjectionMode {
     }
 
     public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        return NonOrthoProjection.emitMapVertex(nonOrthoKind, ctx, scale, vertex, previous, first, last, color, vexBuf);
+        return NonOrthoProjection.emitMapVertex(nonOrthoKind, ctx, vertex, previous, first, last, color, vexBuf);
     }
 
     public void emitMapPoint(MapContext ctx, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        NonOrthoProjection.emitMapPoint(nonOrthoKind, ctx, scale, vertex, size, color, vexBuf);
+        NonOrthoProjection.emitMapPoint(nonOrthoKind, ctx, vertex, size, color, vexBuf);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
         return NonOrthoProjection.mouseToGrid(scale, camera, vp, gridType, x, y);
     }
 
-    public Vec2 mouseToScreen(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToScreen(scale, camera, vp, gridType, x, y);
+    public Vec2 mouseToScreen(Camera camera, MapContext ctx, int x, int y) {
+        return NonOrthoProjection.mouseToScreen(camera, ctx.vp(), ctx.gridType(), ctx.scale(), x, y);
     }
 }

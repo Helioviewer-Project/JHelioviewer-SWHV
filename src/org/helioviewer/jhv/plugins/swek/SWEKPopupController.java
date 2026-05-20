@@ -145,7 +145,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
         Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();
-        MapContext ctx = new MapContext(viewpoint, vp, Display.gridType);
+        MapContext ctx = new MapContext(viewpoint, vp, Display.gridType, Display.mode.scale);
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
@@ -183,7 +183,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 if ((Display.mode.isPolar() || Display.mode.isLogPolar()) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
                     double distSun = computeDistSun(evt, currentTime);
-                    tf = new Vec2(Display.mode.scale.getXValueInv(principalAngle) * vp.aspect, Display.mode.scale.getYValueInv(distSun));
+                    tf = new Vec2(ctx.scale().getXValueInv(principalAngle) * vp.aspect, ctx.scale().getYValueInv(distSun));
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
@@ -192,7 +192,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = Display.mode.mouseToScreen(camera, vp, Display.gridType, mouseOverX, mouseOverY);
+                    Vec2 mousepos = Display.mode.mouseToScreen(camera, ctx, mouseOverX, mouseOverY);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
