@@ -5,6 +5,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.math.PolarBasis;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -16,41 +17,43 @@ final class NonOrthoProjection {
 
     private NonOrthoProjection() {}
 
-    static Vec2 project(Kind kind, Position viewpoint, ProjectionScale scale, GridType gridType, Vec3 v) {
+    static Vec2 project(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Vec3 v) {
         return switch (kind) {
             case HPC -> projectHpc(viewpoint, v, scale);
-            case LATITUDINAL -> projectLatitudinal(viewpoint, scale, gridType, v);
-            case POLAR -> projectPolar(viewpoint, scale, gridType, v);
+            case LATITUDINAL -> projectLatitudinal(rotation, scale, v);
+            case POLAR -> projectPolar(rotation, scale, v);
         };
     }
 
-    static Vec3 unproject(Kind kind, Position viewpoint, ProjectionScale scale, GridType gridType, Vec2 pt) {
+    static Vec3 unproject(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Vec2 pt) {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
-            case LATITUDINAL -> unprojectLatitudinal(viewpoint, gridType, pt.x, pt.y);
-            case POLAR -> unprojectPolar(viewpoint, gridType, pt.x, pt.y);
+            case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
+            case POLAR -> unprojectPolar(rotation, pt.x, pt.y);
         };
     }
 
     static Vec3 mouseToSurface(Kind kind, Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
-        return unproject(kind, camera.getViewpoint(), scale, gridType, mouseToGrid(camera, vp, scale, gridType, x, y));
+        Position viewpoint = camera.getViewpoint();
+        Quat rotation = gridType.mapRotation(viewpoint);
+        return unproject(kind, viewpoint, scale, rotation, mouseToGrid(camera, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
-    private static Vec2 projectLatitudinal(Position viewpoint, ProjectionScale scale, GridType gridType, Vec3 v) {
-        return projectLatitudinalVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
+    private static Vec2 projectLatitudinal(Quat rotation, ProjectionScale scale, Vec3 v) {
+        return projectLatitudinalVector(rotation.rotateVector(v), scale);
     }
 
-    private static Vec3 unprojectLatitudinal(Position viewpoint, GridType gridType, double longitudeDeg, double latitudeDeg) {
-        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectLatitudinalPoint(longitudeDeg, latitudeDeg));
+    private static Vec3 unprojectLatitudinal(Quat rotation, double longitudeDeg, double latitudeDeg) {
+        return rotation.rotateInverseVector(unprojectLatitudinalPoint(longitudeDeg, latitudeDeg));
     }
 
-    private static Vec2 projectPolar(Position viewpoint, ProjectionScale scale, GridType gridType, Vec3 v) {
-        return projectPolarVector(gridType.mapRotation(viewpoint).rotateVector(v), scale);
+    private static Vec2 projectPolar(Quat rotation, ProjectionScale scale, Vec3 v) {
+        return projectPolarVector(rotation.rotateVector(v), scale);
     }
 
-    private static Vec3 unprojectPolar(Position viewpoint, GridType gridType, double angleDeg, double radius) {
-        return gridType.mapRotation(viewpoint).rotateInverseVector(unprojectPolarPoint(angleDeg, radius));
+    private static Vec3 unprojectPolar(Quat rotation, double angleDeg, double radius) {
+        return rotation.rotateInverseVector(unprojectPolarPoint(angleDeg, radius));
     }
 
     private static Vec2 projectHpc(Position viewpoint, Vec3 v, ProjectionScale scale) {
@@ -63,7 +66,7 @@ final class NonOrthoProjection {
     }
 
     static Vec2 projectToScreen(Kind kind, MapContext ctx, Vec3 v) {
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.gridType(), v);
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.rotation(), v);
         return new Vec2(pt.x * ctx.vp().aspect, pt.y);
     }
 
@@ -71,7 +74,7 @@ final class NonOrthoProjection {
         if (kind == Kind.HPC)
             return emitHpcVertex(ctx.viewpoint(), ctx.scale(), ctx.vp(), vertex, previous, first, last, color, vexBuf);
 
-        Vec2 current = project(kind, ctx.viewpoint(), ctx.scale(), ctx.gridType(), vertex);
+        Vec2 current = project(kind, ctx.viewpoint(), ctx.scale(), ctx.rotation(), vertex);
         if (first)
             emitProjectedVertex(ctx.vp(), current, Colors.Null, vexBuf);
         emitWrappedVertex(ctx.vp(), previous, current, color, vexBuf);
@@ -86,7 +89,7 @@ final class NonOrthoProjection {
             return;
         }
 
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.gridType(), vertex);
+        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.rotation(), vertex);
         vexBuf.putVertex((float) (pt.x * ctx.vp().aspect), (float) pt.y, 0, (float) size, color);
     }
 
