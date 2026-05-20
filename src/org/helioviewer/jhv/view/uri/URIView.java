@@ -115,8 +115,12 @@ public final class URIView extends BaseView {
         imageBuffer.protectFromExplicitFree();
         ImageData data = new ImageData(imageBuffer, metaData[0], imageRegion, viewpoint);
         EventQueue.invokeLater(() -> { // decouple from ImageLayers.displaySynced
-            if (dataHandler != null)
+            if (dataHandler != null) {
                 dataHandler.handleData(data);
+            } else {
+                // Free eagerly unsent buffers.
+                imageBuffer.allowExplicitFree();
+            }
         });
     }
 

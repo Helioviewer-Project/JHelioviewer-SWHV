@@ -338,8 +338,12 @@ public class J2KView extends BaseView {
 
         ImageData data = new ImageData(imageBuffer, m, r, viewpoint);
         EventQueue.invokeLater(() -> {
-            if (dataHandler != null)
+            if (dataHandler != null) {
                 dataHandler.handleData(data);
+            } else {
+                // Free eagerly unsent buffers.
+                imageBuffer.allowExplicitFree();
+            }
         });
     }
 
