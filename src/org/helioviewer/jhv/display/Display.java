@@ -47,6 +47,14 @@ public final class Display {
         return miniCamera;
     }
 
+    public static MapContext getMapContext(Viewport vp) {
+        return mode.createMapContext(camera, vp, gridType);
+    }
+
+    public static MapContext getMiniMapContext(Viewport vp) {
+        return mode.createMapContext(miniCamera, vp, gridType);
+    }
+
     private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};
     private static int activeViewport = 0;
 

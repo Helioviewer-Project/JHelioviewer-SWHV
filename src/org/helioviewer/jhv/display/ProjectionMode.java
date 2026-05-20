@@ -40,6 +40,11 @@ public enum ProjectionMode {
         public Vec2 mouseToScreen(Camera camera, MapContext ctx, int x, int y) {
             throw new UnsupportedOperationException("Orthographic mode does not use non-ortho mouseToScreen()");
         }
+
+        @Override
+        public MapContext createMapContext(Camera camera, Viewport vp, GridType gridType) {
+            return new OrthoMapContext(camera, vp, gridType);
+        }
     },
     HPC(GLSLSolarShader.hpc, ProjectionScale.hpc, NonOrthoProjection.Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, ProjectionScale.lati, NonOrthoProjection.Kind.LATITUDINAL),
@@ -58,6 +63,10 @@ public enum ProjectionMode {
         shader = _shader;
         scale = _scale;
         nonOrthoKind = _nonOrthoKind;
+    }
+
+    public MapContext createMapContext(Camera camera, Viewport vp, GridType gridType) {
+        return new NonOrthoMapContext(camera, vp, gridType, scale, nonOrthoKind);
     }
 
     public boolean isOrthographic() {
