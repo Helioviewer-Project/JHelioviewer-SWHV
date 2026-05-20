@@ -8,12 +8,14 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 public abstract class MapContext {
 
-    protected final Camera camera;
-    protected final GridType gridType;
-    protected final Position viewpoint;
+    private final Camera camera;
+    private final ProjectionMode mode;
+    private final GridType gridType;
+    private final Position viewpoint;
 
-    protected MapContext(Camera _camera, GridType _gridType) {
+    protected MapContext(Camera _camera, ProjectionMode _mode, GridType _gridType) {
         camera = _camera;
+        mode = _mode;
         gridType = _gridType;
         viewpoint = _camera.getViewpoint();
     }
@@ -22,7 +24,9 @@ public abstract class MapContext {
         return camera;
     }
 
-    public abstract ProjectionMode mode();
+    public ProjectionMode mode() {
+        return mode;
+    }
 
     public GridType gridType() {
         return gridType;
