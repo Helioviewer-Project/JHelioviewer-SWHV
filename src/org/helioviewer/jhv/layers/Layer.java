@@ -16,7 +16,7 @@ public interface Layer {
 
     default void renderFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {}
 
-    default void renderFullFloat(MapContext ctx, Viewport vp) {}
+    default void renderFullFloat(Viewport vp) {}
 
     default void renderMiniview(MapContext ctx, Viewport vp, ProjectionScale scale) {}
 
