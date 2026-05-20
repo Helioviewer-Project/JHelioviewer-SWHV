@@ -34,24 +34,4 @@ public enum ProjectionMode {
     public MapContext createMapContext(Camera camera, Viewport vp, GridType gridType) {
         return new NonOrthoMapContext(camera, vp, gridType, this);
     }
-
-    public boolean isOrthographic() {
-        return this == Orthographic;
-    }
-
-    public boolean isHpc() {
-        return this == HPC;
-    }
-
-    public boolean isLatitudinal() {
-        return this == Latitudinal;
-    }
-
-    public boolean isPolar() {
-        return this == Polar;
-    }
-
-    public boolean isLogPolar() {
-        return this == LogPolar;
-    }
 }
