@@ -69,8 +69,7 @@ class NetClientRemote implements NetClient {
         Request request = builder.build();
         //System.out.println(">>> " + url);
 
-        Response response = client.newBuilder().build() // avoid spurious connection leaked messages for LMSAL
-                .newCall(request).execute();
+        Response response = client.newCall(request).execute();
         isSuccessful = response.isSuccessful();
         if (!allowError && !isSuccessful) {
             String msg = response.toString();
