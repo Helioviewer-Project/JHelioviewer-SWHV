@@ -25,11 +25,6 @@ final class NonOrthoMapContext extends MapContext {
     }
 
     @Override
-    public Quat rotation() {
-        return rotation;
-    }
-
-    @Override
     public Vec2 projectToScreen(Viewport vp, ProjectionScale scale, Vec3 v) {
         return NonOrthoProjection.projectToScreen(kind, viewpoint(), scale, rotation, vp, v);
     }
