@@ -45,7 +45,7 @@ public class AnnotateLoop extends AbstractAnnotateable {
                     center.x + cosr * u.x + sinr * center.x,
                     center.y + cosr * u.y + sinr * center.y,
                     center.z + cosr * u.z + sinr * center.z);
-            previous = Display.mode.emitMapVertex(ctx, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            previous = ctx.emitMapVertex(vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 

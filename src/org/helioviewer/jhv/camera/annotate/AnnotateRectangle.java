@@ -34,22 +34,22 @@ public class AnnotateRectangle extends AbstractAnnotateable {
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, startLatitude, endLongitude, startLatitude);
-            previous = Display.mode.emitMapVertex(ctx, pc, previous, i == 0, false, ANNOTATION_RADIUS, color, vexBuf);
+            previous = ctx.emitMapVertex(pc, previous, i == 0, false, ANNOTATION_RADIUS, color, vexBuf);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, startLatitude, endLongitude, endLatitude);
-            previous = Display.mode.emitMapVertex(ctx, pc, previous, false, false, ANNOTATION_RADIUS, color, vexBuf);
+            previous = ctx.emitMapVertex(pc, previous, false, false, ANNOTATION_RADIUS, color, vexBuf);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, endLatitude, startLongitude, endLatitude);
-            previous = Display.mode.emitMapVertex(ctx, pc, previous, false, false, ANNOTATION_RADIUS, color, vexBuf);
+            previous = ctx.emitMapVertex(pc, previous, false, false, ANNOTATION_RADIUS, color, vexBuf);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, endLatitude, startLongitude, startLatitude);
-            previous = Display.mode.emitMapVertex(ctx, pc, previous, false, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            previous = ctx.emitMapVertex(pc, previous, false, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 

@@ -35,6 +35,26 @@ final class NonOrthoMapContext extends MapContext {
     }
 
     @Override
+    public boolean isHpc() {
+        return kind == NonOrthoProjection.Kind.HPC;
+    }
+
+    @Override
+    public boolean isLatitudinal() {
+        return kind == NonOrthoProjection.Kind.LATITUDINAL;
+    }
+
+    @Override
+    public boolean isPolar() {
+        return kind == NonOrthoProjection.Kind.POLAR && scale == ProjectionScale.polar;
+    }
+
+    @Override
+    public boolean isLogPolar() {
+        return kind == NonOrthoProjection.Kind.POLAR && scale == ProjectionScale.logpolar;
+    }
+
+    @Override
     public Vec2 projectToScreen(Vec3 v) {
         return NonOrthoProjection.projectToScreen(kind, this, v);
     }

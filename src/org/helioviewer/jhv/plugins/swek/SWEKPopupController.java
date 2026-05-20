@@ -145,14 +145,14 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
         Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();
-        MapContext ctx = new MapContext(viewpoint, vp, Display.mode.scale, Display.gridType);
+        MapContext ctx = Display.getMapContext(vp);
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
             if (pi == null)
                 continue;
 
-            if (Display.mode.isOrthographic()) {
+            if (ctx.isOrthographic()) {
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
@@ -180,19 +180,19 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 }
             } else {
                 Vec2 tf = null;
-                if ((Display.mode.isPolar() || Display.mode.isLogPolar()) && evt.isCactus()) {
+                if ((ctx.isPolar() || ctx.isLogPolar()) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
                     double distSun = computeDistSun(evt, currentTime);
                     tf = new Vec2(ctx.scale().getXValueInv(principalAngle) * vp.aspect, ctx.scale().getYValueInv(distSun));
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = Display.mode.projectToScreen(ctx, pt);
+                        tf = ctx.projectToScreen(pt);
                     }
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = Display.mode.mouseToScreen(camera, ctx, mouseOverX, mouseOverY);
+                    Vec2 mousepos = ctx.mouseToScreen(mouseOverX, mouseOverY);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
