@@ -22,7 +22,7 @@ public interface GridScale {
     GridScale hpc = new GridScaleIdentity(-5, 5, -5, 5);
     GridScale lati = new GridScaleLati(-180, 180, -90, 90);
     GridScale polar = new GridScaleIdentity(0, 360, 0, 0);
-    GridScale logpolar = new GridScaleLogY(0, 360, 0, 0);
+    GridScale logpolar = new GridScaleLogY(0, 360, 0.05, 1);
 
     abstract class GridScaleAbstract implements GridScale {
 
