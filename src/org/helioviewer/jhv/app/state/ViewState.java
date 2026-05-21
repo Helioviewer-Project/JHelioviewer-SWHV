@@ -128,7 +128,7 @@ public final class ViewState {
     private static ProjectionMode projection = Display.mode;
     private static AnnotationMode annotationMode = AnnotationMode.Cross;
     private static boolean multiview = Display.multiview;
-    private static boolean tracking = Display.getViewpointModel().getTrackingMode();
+    private static boolean tracking = Display.getTrackingMode();
     private static boolean refresh = ImageLayers.getRefreshMode();
     private static boolean showCorona = Display.getShowCorona();
     private static boolean differentialRotation = ImageLayers.getDiffRotationMode();

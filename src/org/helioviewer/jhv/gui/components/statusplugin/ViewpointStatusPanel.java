@@ -22,7 +22,7 @@ public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin impleme
 
     @Override
     public void lazyRepaint() {
-        Position viewpoint = Display.getViewpointModel().getViewpoint();
+        Position viewpoint = Display.getViewpoint();
         if (distance == viewpoint.distance && time.milli == viewpoint.time.milli)
             return;
 

@@ -57,8 +57,16 @@ public final class Display {
         return miniCamera;
     }
 
-    public static ViewpointModel getViewpointModel() {
-        return viewpointModel;
+    public static Position getViewpoint() {
+        return viewpointModel.getViewpoint();
+    }
+
+    public static UpdateViewpoint getViewpointUpdate() {
+        return viewpointModel.getUpdateViewpoint();
+    }
+
+    public static boolean getTrackingMode() {
+        return viewpointModel.getTrackingMode();
     }
 
     public static void addViewpointListener(ViewpointModel.Listener listener) {
@@ -70,7 +78,7 @@ public final class Display {
     }
 
     public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
-        getViewpointModel().setUpdateViewpoint(updateViewpoint);
+        viewpointModel.setUpdateViewpoint(updateViewpoint);
         switch (mode) {
             case RESET -> camera.reset();
             case KEEP_TRANSFORM -> camera.updateViewpoint(Movie.getTime());
@@ -78,7 +86,7 @@ public final class Display {
     }
 
     public static void setTrackingMode(boolean tracking) {
-        if (getViewpointModel().setTrackingMode(tracking))
+        if (viewpointModel.setTrackingMode(tracking))
             camera.refresh();
     }
 

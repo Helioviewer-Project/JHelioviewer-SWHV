@@ -33,7 +33,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
 
         camera.setTranslation(-(p0.x + dx), -(p0.y + dy));
         camera.resetDragRotation();
-        camera.setFOV(2 * Math.atan2(halfSize, Display.getViewpointModel().getViewpoint().distance));
+        camera.setFOV(2 * Math.atan2(halfSize, Display.getViewpoint().distance));
     }
 
     @Override

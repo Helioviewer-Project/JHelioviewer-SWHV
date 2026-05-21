@@ -161,7 +161,7 @@ public class CameraHelper {
         double size = ImageLayerBounds.getLargestPhysicalHeight();
         double newFOV = Camera.INITFOV;
         if (size != 0)
-            newFOV = 2. * Math.atan2(0.5 * size, Display.getViewpointModel().getViewpoint().distance);
+            newFOV = 2. * Math.atan2(0.5 * size, Display.getViewpoint().distance);
         camera.setFOV(newFOV);
     }
 
