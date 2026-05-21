@@ -18,7 +18,7 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
 
-    private static DisplayView displayView = Display.getCamera().displayView(Display.getViewpoint());
+    private static DisplayView displayView = Display.getDisplayView(Display.getViewpoint());
 
     private GLRenderer() {}
 
@@ -62,7 +62,7 @@ public final class GLRenderer {
     }
 
     public static void display(Position viewpoint) {
-        displayView = Display.getCamera().displayView(viewpoint);
+        displayView = Display.getDisplayView(viewpoint);
 
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
