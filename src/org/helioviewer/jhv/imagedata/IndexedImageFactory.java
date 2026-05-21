@@ -23,32 +23,23 @@ public class IndexedImageFactory {
     private static DataBuffer createDataBuffer(Buffer buffer) {
         switch (buffer) {
             case ByteBuffer byteBuffer -> {
-                ByteDataBuffer ret = new ByteDataBuffer();
-                ret.setBuffer(byteBuffer);
-                return ret;
+                return new ByteDataBuffer(byteBuffer);
             }
             case ShortBuffer shortBuffer -> {
-                UShortDataBuffer ret = new UShortDataBuffer();
-                ret.setBuffer(shortBuffer);
-                return ret;
+                return new UShortDataBuffer(shortBuffer);
             }
             case IntBuffer intBuffer -> {
-                IntDataBuffer ret = new IntDataBuffer();
-                ret.setBuffer(intBuffer);
-                return ret;
+                return new IntDataBuffer(intBuffer);
             }
             case null, default -> throw new IllegalArgumentException("Unsupported data type: " + buffer);
         }
     }
 
     private static class ByteDataBuffer extends DataBuffer {
-        private ByteBuffer buffer;
+        private final ByteBuffer buffer;
 
-        ByteDataBuffer() {
-            super(DataBuffer.TYPE_BYTE, 0, 0);
-        }
-
-        void setBuffer(ByteBuffer _buffer) {
+        ByteDataBuffer(ByteBuffer _buffer) {
+            super(DataBuffer.TYPE_BYTE, _buffer.limit());
             buffer = _buffer;
         }
 
@@ -64,13 +55,10 @@ public class IndexedImageFactory {
     }
 
     private static class UShortDataBuffer extends DataBuffer {
-        private ShortBuffer buffer;
+        private final ShortBuffer buffer;
 
-        UShortDataBuffer() {
-            super(DataBuffer.TYPE_USHORT, 0, 0);
-        }
-
-        void setBuffer(ShortBuffer _buffer) {
+        UShortDataBuffer(ShortBuffer _buffer) {
+            super(DataBuffer.TYPE_USHORT, _buffer.limit());
             buffer = _buffer;
         }
 
@@ -86,13 +74,10 @@ public class IndexedImageFactory {
     }
 
     private static class IntDataBuffer extends DataBuffer {
-        private IntBuffer buffer;
+        private final IntBuffer buffer;
 
-        IntDataBuffer() {
-            super(DataBuffer.TYPE_INT, 0, 0);
-        }
-
-        void setBuffer(IntBuffer _buffer) {
+        IntDataBuffer(IntBuffer _buffer) {
+            super(DataBuffer.TYPE_INT, _buffer.limit());
             buffer = _buffer;
         }
 
