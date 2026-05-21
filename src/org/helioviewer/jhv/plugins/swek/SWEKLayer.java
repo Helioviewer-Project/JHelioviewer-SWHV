@@ -372,7 +372,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
-        long currentTime = ctx.camera().getViewpoint().time.milli;
+        long currentTime = ctx.viewpoint().time.milli;
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
@@ -398,7 +398,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
-        long currentTime = ctx.camera().getViewpoint().time.milli;
+        long currentTime = ctx.viewpoint().time.milli;
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;

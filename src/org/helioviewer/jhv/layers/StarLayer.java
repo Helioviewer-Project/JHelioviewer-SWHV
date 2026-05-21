@@ -59,7 +59,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
             return;
 
         Camera camera = ctx.camera();
-        Position viewpoint = camera.getViewpoint();
+        Position viewpoint = ctx.viewpoint();
         BufVertex vexBuf = cache.getIfPresent(viewpoint);
         if (vexBuf == null)
             return;
