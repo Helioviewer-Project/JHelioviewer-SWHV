@@ -38,7 +38,7 @@ public final class SampClient extends HubConnector {
         Log.setLoggerLevel("org.astrogrid.samp", Level.WARNING); // shut-up SAMP info logs
     }
 
-    private static final SampClient instance = new SampClient(DefaultClientProfile.getProfile());
+    private static SampClient instance; // keep instance built at startup
 
     public static void init(boolean webProfilePopup) {
         JHVThread.create(() -> {
@@ -51,6 +51,7 @@ public final class SampClient extends HubConnector {
                     Log.warn(e);
                 }
             }
+            instance = new SampClient(DefaultClientProfile.getProfile());
         }, "JHV-StartSamp").start();
     }
 
@@ -95,6 +96,8 @@ public final class SampClient extends HubConnector {
 
     private static void notifyCompletion(Commands.OperationContext context, String completionMType,
                                          boolean success, String message, @Nullable String output) {
+        if (instance == null)
+            return;
         Message msg = new Message(completionMType);
         if (context.clientId() != null)
             msg.addParam("clientId", context.clientId());
@@ -116,6 +119,11 @@ public final class SampClient extends HubConnector {
     }
 
     public static void notifyRequestData() {
+        if (instance == null) {
+            Log.warn("SAMP client not initialized yet");
+            return;
+        }
+
         Message msg = new Message("jhv.vso.load");
         ImageLayers.getSAMPMessage(msg);
         try {
