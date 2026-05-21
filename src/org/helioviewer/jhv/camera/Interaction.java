@@ -19,7 +19,6 @@ public class Interaction {
         default void mouseReleased() {}
     }
 
-    private final Camera camera;
     private final InteractionAnnotate interactionAnnotate;
     private final InteractionAxis interactionAxis;
     private final InteractionPan interactionPan;
@@ -30,11 +29,10 @@ public class Interaction {
     private boolean annotating = false;
 
     public Interaction(Camera _camera) {
-        camera = _camera;
-        interactionAnnotate = new InteractionAnnotate(camera);
-        interactionAxis = new InteractionAxis(camera);
-        interactionPan = new InteractionPan(camera);
-        interactionRotate = new InteractionRotate(camera);
+        interactionAnnotate = new InteractionAnnotate(_camera);
+        interactionAxis = new InteractionAxis(_camera);
+        interactionPan = new InteractionPan(_camera);
+        interactionRotate = new InteractionRotate(_camera);
         zoom = new Zoom();
     }
 
