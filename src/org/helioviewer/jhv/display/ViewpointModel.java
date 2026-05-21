@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.display;
 
 import java.util.HashSet;
 
@@ -32,7 +32,7 @@ public final class ViewpointModel {
         listeners.remove(listener);
     }
 
-    Position update(JHVTime time) {
+    public Position update(JHVTime time) {
         viewpoint = updateViewpoint.update(time);
         // listeners.forEach(l -> l.viewpointChanged(viewpoint));
         return viewpoint;

@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.display.ViewpointModel;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
