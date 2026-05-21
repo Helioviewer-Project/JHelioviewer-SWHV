@@ -23,12 +23,12 @@ public class Camera {
     private Quat dragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
-    public DisplayView renderView(Position viewpoint) {
+    public RenderView renderView(Position viewpoint) {
         return view(viewpoint, cameraWidth);
     }
 
-    public DisplayView view(Position viewpoint, double width) {
-        return new DisplayView(viewpoint, width, Quat.rotate(dragRotation, viewpoint.toQuat()));
+    public RenderView view(Position viewpoint, double width) {
+        return new RenderView(viewpoint, width, Quat.rotate(dragRotation, viewpoint.toQuat()));
     }
 
     public void updateViewpoint(Position viewpoint) {

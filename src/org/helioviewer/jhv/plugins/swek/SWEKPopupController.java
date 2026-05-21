@@ -146,7 +146,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         int mouseOverY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        double displayWidth = GLRenderer.getDisplayView().cameraWidth(vp);
+        double displayWidth = GLRenderer.getRenderView().cameraWidth(vp);
         ProjectionMode mode = Display.mode;
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -189,12 +189,12 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = mode.projectToScreen(GLRenderer.getDisplayView(), vp, Display.gridType, pt);
+                        tf = mode.projectToScreen(GLRenderer.getRenderView(), vp, Display.gridType, pt);
                     }
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = mode.mouseToScreen(camera, GLRenderer.getDisplayView(), vp, Display.gridType, mouseOverX, mouseOverY);
+                    Vec2 mousepos = mode.mouseToScreen(camera, GLRenderer.getRenderView(), vp, Display.gridType, mouseOverX, mouseOverY);
                     double deltaX = Math.abs(tf.x - mousepos.x);
                     double deltaY = Math.abs(tf.y - mousepos.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
