@@ -133,7 +133,6 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         }
 
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
-        double displayWidth = GLRenderer.getDisplayView().cameraWidth(Display.getActiveViewport());
         long currentTime = viewpoint.time.milli;
         List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
         if (activeEvents.isEmpty()) {
@@ -147,7 +146,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         int mouseOverY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        displayWidth = GLRenderer.getDisplayView().cameraWidth(vp);
+        double displayWidth = GLRenderer.getDisplayView().cameraWidth(vp);
         ProjectionMode mode = Display.mode;
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);

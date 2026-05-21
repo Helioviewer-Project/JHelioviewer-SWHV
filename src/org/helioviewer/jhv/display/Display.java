@@ -125,10 +125,6 @@ public final class Display {
         return camera.displayView(viewpoint);
     }
 
-    public static MapContext getMapContext(Position viewpoint) {
-        return getMapContext(getDisplayView(viewpoint));
-    }
-
     public static MapContext getMapContext(DisplayView displayView) {
         return mode.createMapContext(camera, displayView, gridType);
     }

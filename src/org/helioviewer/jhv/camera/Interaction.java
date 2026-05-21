@@ -68,7 +68,7 @@ public class Interaction {
             getType().mouseDragged(e, vp);
     }
 
-    public void mouseReleased(PointerEvent e) {
+    public void mouseReleased() {
         if (isAnnotating())
             interactionAnnotate.mouseReleased();
         else

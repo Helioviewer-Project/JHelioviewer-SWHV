@@ -22,7 +22,7 @@ public class CameraHelper {
         return 0.5 - (screenY - vp.yAWT) / vp.height;
     }
 
-    public static double computeUpX(Camera camera, Viewport vp, double screenX) {
+    private static double computeUpX(Camera camera, Viewport vp, double screenX) {
         return computeUpX(vp, camera.getCameraWidth(vp), camera.getTranslationX(), screenX);
     }
 
@@ -30,7 +30,7 @@ public class CameraHelper {
         return computeNormalizedX(vp, screenX) * width * vp.aspect - tx;
     }
 
-    public static double computeUpY(Camera camera, Viewport vp, double screenY) {
+    private static double computeUpY(Camera camera, Viewport vp, double screenY) {
         return computeUpY(vp, camera.getCameraWidth(vp), camera.getTranslationY(), screenY);
     }
 
