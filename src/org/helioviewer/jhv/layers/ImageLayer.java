@@ -359,7 +359,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     public void handleData(ImageData newImageData) {
         if (removed)
             return;
-        newImageData.getImageBuffer().allowExplicitFree();
         setImageData(newImageData);
         Layers.fireTimeUpdated(this);
         MovieDisplay.display();

@@ -94,7 +94,6 @@ class RadioJ2KData implements View.DataHandler {
         region = imageData.getRegion();
         boolean hadData = bufferedImage != null;
         bufferedImage = IndexedImageFactory.createIndexed(copyBuffer((ByteBuffer) imageBuffer.buffer), w, h, RadioData.getColorModel());
-        imageBuffer.allowExplicitFree();
         if (!hadData)
             RadioData.dataUpdated();
         DrawController.drawRequest();
