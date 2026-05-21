@@ -128,7 +128,9 @@ public final class FitsMetaData extends CommonMetaData {
     private void identifyObservation(MetaDataContainer m) {
         observatory = m.getString("TELESCOP").orElse("");
         instrument = m.getString("INSTRUME").orElse("");
-        instrument = instrument.split("_", 2)[0];
+        int instrumentSuffix = instrument.indexOf('_');
+        if (instrumentSuffix != -1)
+            instrument = instrument.substring(0, instrumentSuffix);
         detector = m.getString("DETECTOR").orElse("");
         measurement = m.getString("WAVELNTH").orElse("");
 
