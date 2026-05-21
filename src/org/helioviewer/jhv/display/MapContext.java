@@ -41,6 +41,10 @@ public abstract class MapContext {
         return displayView.viewpoint();
     }
 
+    public Vec2 mouseToGrid(Viewport vp, int x, int y) {
+        return mode.mouseToGrid(camera, displayView, vp, gridType, x, y);
+    }
+
     public boolean isOrthographic() {
         return mode() == ProjectionMode.Orthographic;
     }
