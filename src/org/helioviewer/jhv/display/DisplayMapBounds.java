@@ -18,21 +18,21 @@ public final class DisplayMapBounds {
 
     private DisplayMapBounds() {}
 
-    public static double oneToOneHeight(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
+    public static double oneToOneHeight(ProjectionMode mode, Quat mapRotation, MetaData metaData) {
         if (mode == ProjectionMode.Orthographic)
             return metaData.getPhysicalRegion().height;
-        return bounds(mode, gridType, cameraViewpoint, metaData).height;
+        return bounds(mode, mapRotation, metaData).height;
     }
 
-    private static Region bounds(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
+    private static Region bounds(ProjectionMode mode, Quat mapRotation, MetaData metaData) {
         return switch (mode) {
             case Orthographic -> metaData.getPhysicalRegion();
             case HPC -> ImageBounds.hpc(metaData);
-            default -> calculateNonOrthoBounds(mode, gridType, cameraViewpoint, metaData);
+            default -> calculateNonOrthoBounds(mode, mapRotation, metaData);
         };
     }
 
-    private static Region calculateNonOrthoBounds(ProjectionMode mode, GridType gridType, Position cameraViewpoint, MetaData metaData) {
+    private static Region calculateNonOrthoBounds(ProjectionMode mode, Quat mapRotation, MetaData metaData) {
         WcsHeader wcsHeader = metaData.getWcsHeader();
         Region region = metaData.getPhysicalRegion();
         double x0 = region.llx;
@@ -45,7 +45,6 @@ public final class DisplayMapBounds {
         };
 
         Position metaViewpoint = metaData.getViewpoint();
-        Quat mapRotation = gridType.mapRotation(cameraViewpoint);
         for (int i = 0; i <= EDGE_SAMPLES; i++) {
             double t = i / (double) EDGE_SAMPLES;
             double x = x0 + t * (x1 - x0);
