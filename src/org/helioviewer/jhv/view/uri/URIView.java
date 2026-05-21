@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.view.uri;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.util.concurrent.Callable;
 
@@ -109,12 +108,9 @@ public final class URIView extends BaseView {
     }
 
     private void sendDataToHandler(ImageBuffer imageBuffer) {
-        imageBuffer.protectFromExplicitFree();
         ImageData data = new ImageData(imageBuffer, metaData[0], imageRegion);
-        EventQueue.invokeLater(() -> {
-            if (dataHandler != null)
-                dataHandler.handleData(data);
-        });
+        if (dataHandler != null)
+            dataHandler.handleData(data);
     }
 
     @Nonnull
