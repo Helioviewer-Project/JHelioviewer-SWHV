@@ -1,9 +1,6 @@
 package org.helioviewer.jhv.camera;
 
-import java.util.HashSet;
-
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Movie;
@@ -35,28 +32,20 @@ public class Camera {
     private Quat dragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
-    private boolean tracking;
+    private final ViewpointModel viewpointModel;
 
-    private Position viewpoint = Sun.StartEarth;
-    private UpdateViewpoint updateViewpoint;
-
-    public interface Listener {
-        void viewpointChanged(Position v);
-    }
-
-    private final HashSet<Listener> listeners = new HashSet<>();
+    public interface Listener extends ViewpointModel.Listener {}
 
     public void addListener(Listener listener) {
-        listeners.add(listener);
-        listener.viewpointChanged(viewpoint);
+        viewpointModel.addListener(listener);
     }
 
     public void removeListener(Listener listener) {
-        listeners.remove(listener);
+        viewpointModel.removeListener(listener);
     }
 
     public Camera(UpdateViewpoint _updateViewpoint) {
-        updateViewpoint = _updateViewpoint;
+        viewpointModel = new ViewpointModel(_updateViewpoint);
     }
 
     public DisplayView displayView(Position p) {
@@ -69,17 +58,16 @@ public class Camera {
     }
 
     private void updateCamera(JHVTime time) {
-        viewpoint = updateViewpoint.update(time);
+        Position viewpoint = viewpointModel.update(time);
         updateRotation();
-        updateWidth();
-        // listeners.forEach(l -> l.viewpointChanged(viewpoint));
+        updateWidth(viewpoint);
     }
 
     private void updateRotation() {
-        rotation = Quat.rotate(dragRotation, viewpoint.toQuat());
+        rotation = Quat.rotate(dragRotation, viewpointModel.getViewpoint().toQuat());
     }
 
-    private void updateWidth() {
+    private void updateWidth(Position viewpoint) {
         cameraWidth = 2 * viewpoint.distance * Math.tan(0.5 * fov);
     }
 
@@ -98,15 +86,15 @@ public class Camera {
     }
 
     public Position getViewpoint() {
-        return viewpoint;
+        return viewpointModel.getViewpoint();
     }
 
     public UpdateViewpoint getUpdateViewpoint() {
-        return updateViewpoint;
+        return viewpointModel.getUpdateViewpoint();
     }
 
     public void setViewpointUpdate(UpdateViewpoint _updateViewpoint, ViewpointApplyMode mode) {
-        updateViewpoint = _updateViewpoint;
+        viewpointModel.setUpdateViewpoint(_updateViewpoint);
         switch (mode) {
             case RESET -> reset();
             case KEEP_TRANSFORM -> updateCamera(Movie.getTime());
@@ -140,24 +128,23 @@ public class Camera {
     }
 
     public void resetDragRotationAxis() {
-        dragRotation = dragRotation.twist(updateViewpoint.dragAxis());
+        dragRotation = dragRotation.twist(viewpointModel.getUpdateViewpoint().dragAxis());
         updateRotation();
     }
 
     public void setFOV(double _fov) {
         fov = Math.clamp(_fov, MIN_FOV, MAX_FOV);
-        updateWidth();
+        updateWidth(viewpointModel.getViewpoint());
     }
 
     public void setTrackingMode(boolean _tracking) {
-        if (tracking != _tracking) {
-            tracking = _tracking;
+        if (viewpointModel.setTrackingMode(_tracking)) {
             refresh();
         }
     }
 
     public boolean getTrackingMode() {
-        return tracking;
+        return viewpointModel.getTrackingMode();
     }
 
     public double getCameraWidth(Viewport vp) {
@@ -173,7 +160,7 @@ public class Camera {
     }
 
     public void timeChanged(JHVTime date) {
-        if (!tracking) {
+        if (!viewpointModel.getTrackingMode()) {
             updateCamera(date);
         }
     }
