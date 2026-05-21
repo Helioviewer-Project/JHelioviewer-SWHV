@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 
 public class MathUtils {
 
+    private static final double LN_2 = Math.log(2);
+
     /**
      * Takes and returns the maximum value from the given args.
      *
@@ -111,6 +113,10 @@ public class MathUtils {
     */
 
     public static double asinh(double x) {
+        if (x < 0)
+            return -asinh(-x);
+        if (x > 1e8)
+            return Math.log(x) + LN_2;
         return Math.log(x + Math.sqrt(x * x + 1));
     }
 

@@ -124,7 +124,7 @@ public class Quat {
 
     public Quat normalize() {
         double l = Math.sqrt(w * w + x * x + y * y + z * z);
-        return l == 0 ? this : new Quat(w / l, x / l, y / l, z / l);
+        return !Double.isFinite(l) || l == 0 ? ZERO : new Quat(w / l, x / l, y / l, z / l);
     }
 
     private static Quat normalized(double w, double x, double y, double z) {
