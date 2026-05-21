@@ -13,8 +13,6 @@ public final class CompletionNotifications {
 
     private CompletionNotifications() {}
 
-    static void init() {}
-
     public static Commands.OperationContext recordingContext() {
         return new Commands.OperationContext(CompletionNotifications.class, null, null, "record",
                 (context, success, message, output) -> {
