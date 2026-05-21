@@ -69,6 +69,9 @@ public class JHVEvent {
     }
 
     public void addParameter(JHVEventParameter parameter, boolean visible, boolean configured, boolean full) {
+        if (allParametersArray == null)
+            throw new IllegalStateException("Cannot add parameters after finishParams");
+
         String key = parameter.getParameterName();
         if (!visible && !full) {
             if (key != "cme_radiallinvel" && key != "event_coord1" && key != "cme_angularwidth") {
@@ -106,7 +109,7 @@ public class JHVEvent {
         }
         simpleVisibleParameters = simple.toArray(new JHVEventParameter[0]);
 
-        allParametersArray = new ArrayList<>();
-        visibleParametersArray = new ArrayList<>();
+        allParametersArray = null;
+        visibleParametersArray = null;
     }
 }
