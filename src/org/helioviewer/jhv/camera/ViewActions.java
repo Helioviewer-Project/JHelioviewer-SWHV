@@ -16,7 +16,7 @@ public final class ViewActions {
 
     public static void zoomFit() {
         Display.resetViewportZoom();
-        CameraHelper.zoomToFit(Display.getCamera());
+        CameraHelper.zoomToFit(Display.getCamera(), Display.getViewpoint());
         MovieDisplay.render(1);
     }
 

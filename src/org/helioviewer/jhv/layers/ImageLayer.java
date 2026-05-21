@@ -148,7 +148,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         glImage.setLUT(view.getDefaultLUT(), glImage.getInvertLUT());
         setEnabled(true);
 
-        CameraHelper.zoomToFit(Display.getMiniCamera());
+        CameraHelper.zoomToFit(Display.getMiniCamera(), Display.getViewpoint());
         Layers.setActiveImageLayer(this);
 
         if (Display.multiview) {
@@ -160,7 +160,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private void unsetView() {
         loader.cancelDownload();
 
-        CameraHelper.zoomToFit(Display.getMiniCamera());
+        CameraHelper.zoomToFit(Display.getMiniCamera(), Display.getViewpoint());
         view.setDataHandler(null);
         view.abolish();
 
