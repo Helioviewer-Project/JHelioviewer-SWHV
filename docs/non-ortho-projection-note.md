@@ -116,6 +116,22 @@ This note documents the convention used by the non-orthographic display modes (`
 - In `Orthographic`, `CAR` and `CEA` wrap only the visible solar sphere and
   have no off-limb representation.
 
+## GLSL Improvements
+
+- For forward `ZPN` sampling, pass `WcsHeader.zpnUpperEta` through the spare
+  `ProjectionParams` float slot and use it to reject samples with
+  `nativeDistance > zpnUpperEta`. This lets `projectZpnToWcsPlane(...)` avoid
+  evaluating the derivative polynomial per fragment; Java already computes this
+  bound once per `WcsHeader` for inverse `ZPN`.
+- Upload WCS `crval` already converted to radians, or add radians alongside the
+  current plane-unit value. This would remove the per-fragment
+  `crval / planeUnitsPerRad` conversion from the TAN/ARC/AZP/ZPN and surface-map
+  GLSL paths.
+- Specialize `wcsPlaneToTexcoord(...)` and `wcsPlaneToWrappedXTexcoord(...)`
+  for inverse CROTA rotation of `vec3(plane, 0)`, keeping only the X/Y result.
+  This mirrors the Java `WcsProjection.planeToHelioprojective(...)` optimization
+  and avoids unnecessary 3D vector work in the shader.
+
 ## HPC Viewpoint Findings
 
 - Commit `2d5ef3435` changed Java `HPC` overlay semantics by rotating

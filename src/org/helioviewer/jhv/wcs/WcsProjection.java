@@ -1,15 +1,22 @@
 package org.helioviewer.jhv.wcs;
 
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.math.Vec3;
 
 public final class WcsProjection {
+
+    private static final int ZPN_BISECTION_STEPS = 50;
 
     private WcsProjection() {}
 
     public static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double x, double y) {
-        Vec3 plane = wcsHeader.crota.rotateVector(new Vec3(x, y, 0));
-        return inverseWcsPlaneToHelioprojective(wcsHeader, plane.x, plane.y);
+        Quat crota = wcsHeader.crota;
+        double vx = crota.w * x - crota.z * y;
+        double vy = crota.z * x + crota.w * y;
+        double vz = crota.x * y - crota.y * x;
+        double planeX = (vz * crota.y - vy * crota.z) * 2 + x;
+        double planeY = (vx * crota.z - vz * crota.x) * 2 + y;
+        return inverseWcsPlaneToHelioprojective(wcsHeader, planeX, planeY);
     }
 
     private static Vec2 inverseWcsPlaneToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
@@ -23,21 +30,21 @@ public final class WcsProjection {
     }
 
     private static Vec2 inverseTanToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
-        double x = planeX / wcsHeader.unitsPerRad;
-        double y = planeY / wcsHeader.unitsPerRad;
-        double rho = Math.sqrt(x * x + y * y);
-        if (rho == 0)
+        double x = planeX * wcsHeader.radPerUnit;
+        double y = planeY * wcsHeader.radPerUnit;
+        double rho2 = x * x + y * y;
+        if (rho2 == 0)
             return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
 
-        double cosNativeDistance = 1 / Math.sqrt(1 + rho * rho);
+        double cosNativeDistance = 1 / Math.sqrt(1 + rho2);
         double nativeX = x * cosNativeDistance;
         double nativeY = y * cosNativeDistance;
         return nativeToHelioprojective(wcsHeader, nativeX, nativeY, cosNativeDistance);
     }
 
     private static Vec2 inverseArcToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
-        double x = planeX / wcsHeader.unitsPerRad;
-        double y = planeY / wcsHeader.unitsPerRad;
+        double x = planeX * wcsHeader.radPerUnit;
+        double y = planeY * wcsHeader.radPerUnit;
         double radial = Math.sqrt(x * x + y * y);
         if (radial == 0)
             return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
@@ -50,18 +57,15 @@ public final class WcsProjection {
     }
 
     private static Vec2 inverseAzpToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
-        double x = planeX / wcsHeader.unitsPerRad;
-        double y = planeY / wcsHeader.unitsPerRad;
-        double radial = Math.sqrt(x * x + y * y);
-        if (radial == 0)
+        double x = planeX * wcsHeader.radPerUnit;
+        double y = planeY * wcsHeader.radPerUnit;
+        if (x * x + y * y == 0)
             return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
 
-        double mu = wcsHeader.pv2[1];
-        double gamma = Math.toRadians(wcsHeader.pv2[2]);
-        double sinGamma = Math.sin(gamma);
-        double cosGamma = Math.cos(gamma);
-        double muPlus1 = mu + 1;
-        double a = 1 + y * sinGamma / muPlus1;
+        double mu = wcsHeader.azpMu;
+        double cosGamma = wcsHeader.azpCosGamma;
+        double muPlus1 = wcsHeader.azpMuPlus1;
+        double a = 1 + y * wcsHeader.azpSinGamma / muPlus1;
         double k = (x * x + y * y * cosGamma * cosGamma) / (muPlus1 * muPlus1 * a * a);
         double discriminant = Math.max(0, 1 + k * (1 - mu * mu));
         double cosNativeDistance = (-k * mu + Math.sqrt(discriminant)) / (1 + k);
@@ -73,15 +77,15 @@ public final class WcsProjection {
 
     private static Vec2 nativeToHelioprojective(WcsHeader wcsHeader, double nativeX, double nativeY, double cosNativeDistance) {
         return new Vec2(
-                wcsHeader.phi0 + Math.atan2(nativeX, cosNativeDistance * Math.cos(wcsHeader.theta0) - nativeY * Math.sin(wcsHeader.theta0)),
-                Math.asin(cosNativeDistance * Math.sin(wcsHeader.theta0) + nativeY * Math.cos(wcsHeader.theta0)));
+                wcsHeader.phi0 + Math.atan2(nativeX, cosNativeDistance * wcsHeader.cosTheta0 - nativeY * wcsHeader.sinTheta0),
+                Math.asin(cosNativeDistance * wcsHeader.sinTheta0 + nativeY * wcsHeader.cosTheta0));
     }
 
     private static Vec2 inverseZpnToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
-        double x = planeX / wcsHeader.unitsPerRad;
-        double y = planeY / wcsHeader.unitsPerRad;
+        double x = planeX * wcsHeader.radPerUnit;
+        double y = planeY * wcsHeader.radPerUnit;
         double radial = Math.sqrt(x * x + y * y);
-        double nativeDistance = inverseZpnPrimaryBranch(wcsHeader.pv2, radial);
+        double nativeDistance = inverseZpnPrimaryBranch(wcsHeader, radial);
         if (nativeDistance == 0)
             return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
 
@@ -92,14 +96,13 @@ public final class WcsProjection {
         return nativeToHelioprojective(wcsHeader, nativeX, nativeY, cosNativeDistance);
     }
 
-    private static double inverseZpnPrimaryBranch(float[] pv2, double radial) {
-        double upper = zpnPrimaryBranchUpperEta(pv2);
+    private static double inverseZpnPrimaryBranch(WcsHeader wcsHeader, double radial) {
         double lo = 0;
-        double hi = upper;
-        double target = Math.clamp(radial, zpnRadialAndDerivative(pv2, lo).radial(), zpnRadialAndDerivative(pv2, hi).radial());
-        for (int i = 0; i < 64; i++) {
+        double hi = wcsHeader.zpnUpperEta;
+        double target = clampZpnRadial(radial, wcsHeader.zpnRadialLo, wcsHeader.zpnRadialHi);
+        for (int i = 0; i < ZPN_BISECTION_STEPS; i++) {
             double mid = 0.5 * (lo + hi);
-            if (zpnRadialAndDerivative(pv2, mid).radial() < target)
+            if (zpnRadial(wcsHeader.pv2, mid) < target)
                 lo = mid;
             else
                 hi = mid;
@@ -107,21 +110,31 @@ public final class WcsProjection {
         return 0.5 * (lo + hi);
     }
 
-    private static double zpnPrimaryBranchUpperEta(float[] pv2) {
+    private static double clampZpnRadial(double radial, double lo, double hi) {
+        if (!(lo <= hi))
+            return lo;
+        if (radial < lo)
+            return lo;
+        if (radial > hi)
+            return hi;
+        return radial;
+    }
+
+    static double zpnPrimaryBranchUpperEta(float[] pv2) {
         double maxEta = Math.PI;
         double prevEta = 0;
-        if (zpnRadialAndDerivative(pv2, prevEta).derivative() <= 0)
+        if (zpnDerivative(pv2, prevEta) <= 0)
             return 0;
 
         for (int i = 1; i <= 512; i++) {
             double eta = maxEta * i / 512.;
-            double derivative = zpnRadialAndDerivative(pv2, eta).derivative();
+            double derivative = zpnDerivative(pv2, eta);
             if (derivative <= 0) {
                 double lo = prevEta;
                 double hi = eta;
-                for (int j = 0; j < 64; j++) {
+                for (int j = 0; j < ZPN_BISECTION_STEPS; j++) {
                     double mid = 0.5 * (lo + hi);
-                    if (zpnRadialAndDerivative(pv2, mid).derivative() > 0)
+                    if (zpnDerivative(pv2, mid) > 0)
                         lo = mid;
                     else
                         hi = mid;
@@ -133,17 +146,18 @@ public final class WcsProjection {
         return maxEta;
     }
 
-    private record RadialAndDerivative(double radial, double derivative) {}
-
-    private static RadialAndDerivative zpnRadialAndDerivative(float[] pv2, double eta) {
+    static double zpnRadial(float[] pv2, double eta) {
         double radial = pv2[pv2.length - 1];
+        for (int i = pv2.length - 2; i >= 0; i--)
+            radial = radial * eta + pv2[i];
+        return radial;
+    }
+
+    private static double zpnDerivative(float[] pv2, double eta) {
         double derivative = pv2.length - 1;
         derivative *= pv2[pv2.length - 1];
-        for (int i = pv2.length - 2; i >= 1; i--) {
-            radial = radial * eta + pv2[i];
+        for (int i = pv2.length - 2; i >= 1; i--)
             derivative = derivative * eta + i * pv2[i];
-        }
-        radial = radial * eta + pv2[0];
-        return new RadialAndDerivative(radial, derivative);
+        return derivative;
     }
 }
