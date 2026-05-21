@@ -4,12 +4,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 public class SingleExecutor {
 
     private final ExecutorService executor;
 
-    public SingleExecutor(JHVThread.NamedClassThreadFactory factory) {
+    public SingleExecutor(ThreadFactory factory) {
         executor = Executors.newSingleThreadExecutor(factory);
     }
 

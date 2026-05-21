@@ -55,19 +55,4 @@ public class JHVThread {
         }
     }
 
-    public record NamedClassThreadFactory(Class<? extends Thread> clazz, String name) implements ThreadFactory {
-        @Override
-        public Thread newThread(@Nonnull Runnable r) {
-            Thread t;
-            try {
-                t = clazz.getConstructor(Runnable.class, String.class).newInstance(r, name);
-            } catch (Exception e) {
-                Log.error(e);
-                t = new Thread(r, name);
-            }
-            t.setDaemon(true);
-            return t;
-        }
-    }
-
 }

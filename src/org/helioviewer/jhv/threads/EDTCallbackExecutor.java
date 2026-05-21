@@ -14,14 +14,7 @@ public record EDTCallbackExecutor(ListeningExecutorService delegate) {
 
     public static final EDTCallbackExecutor pool = new EDTCallbackExecutor(MoreExecutors.listeningDecorator(JHVExecutor.cachedPool));
 
-    private static class EventQueueExecutor implements Executor {
-        @Override
-        public void execute(Runnable command) {
-            EventQueue.invokeLater(command);
-        }
-    }
-
-    private static final Executor eventQueue = new EventQueueExecutor();
+    private static final Executor eventQueue = EventQueue::invokeLater;
 
     public <T> ListenableFuture<T> submit(Callable<T> callable, FutureCallback<T> callback) {
         ListenableFuture<T> futureTask = delegate.submit(callable);

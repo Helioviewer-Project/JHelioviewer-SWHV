@@ -33,7 +33,7 @@ import org.helioviewer.jhv.threads.SingleExecutor;
 
 public class EventDatabase {
 
-    private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedClassThreadFactory(EventDatabaseThread.class, "EventDatabase"));
+    private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedThreadFactory("EventDatabase"));
 
     public record Event2Db(byte[] compressedJson, long start, long end, long archiv, String uid,
                            List<JHVDatabaseParam> paramList) {}
