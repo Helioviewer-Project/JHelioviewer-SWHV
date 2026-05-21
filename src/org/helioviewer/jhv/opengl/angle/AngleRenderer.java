@@ -4,6 +4,7 @@ import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;
 
@@ -165,10 +166,10 @@ public final class AngleRenderer {
         surface = newSurface;
     }
 
-    public void render() {
+    public void render(Position viewpoint) {
         if (!EGL15.eglMakeCurrent(display, surface, surface, context))
             throw eglError("eglMakeCurrent");
-        GLRenderer.display();
+        GLRenderer.display(viewpoint);
         if (swapBuffers && !EGL15.eglSwapBuffers(display, surface))
             throw eglError("eglSwapBuffers");
     }

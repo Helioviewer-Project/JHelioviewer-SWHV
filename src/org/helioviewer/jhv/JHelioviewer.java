@@ -108,7 +108,7 @@ public class JHelioviewer {
         HeadlessEDT.invokeLater(() -> {
             Log.info("Start headless mode");
             AnglePbuffer renderer = new AnglePbuffer();
-            MovieDisplay.setRenderRequestHandler(viewpoint -> renderer.requestRender());
+            MovieDisplay.setRenderRequestHandler(renderer::requestRender);
 
             loadPlugins(false);
 
