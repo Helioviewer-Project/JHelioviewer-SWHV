@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.display;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -7,8 +8,8 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 final class OrthoMapContext extends MapContext {
 
-    OrthoMapContext(Camera _camera, GridType _gridType) {
-        super(_camera, ProjectionMode.Orthographic, _gridType);
+    OrthoMapContext(Camera _camera, GridType _gridType, Position _viewpoint) {
+        super(_camera, ProjectionMode.Orthographic, _gridType, _viewpoint);
     }
 
     @Override

@@ -94,7 +94,7 @@ public final class GLRenderer {
 
     static void renderScene() {
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.getMapContext();
+        MapContext ctx = Display.getMapContext(displayedViewpoint);
         ProjectionScale scale = ProjectionScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -138,7 +138,7 @@ public final class GLRenderer {
         boolean hpcMode = Display.mode == ProjectionMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.getMapContext();
+        MapContext ctx = Display.getMapContext(displayedViewpoint);
         for (Viewport vp : Display.getViewports()) {
             ProjectionScale scale = Display.mode.scale;
             if (hpcMode) {
