@@ -13,7 +13,11 @@ import org.json.JSONObject;
 
 public class AIAResponse {
 
-    private record PassBand(String degradationFile, double dataMax, boolean isSqrt) {}
+    private record PassBand(String degradationFile, double dataMax, boolean isSqrt, double log10DataMax) {
+        PassBand(String degradationFile, double dataMax, boolean isSqrt) {
+            this(degradationFile, dataMax, isSqrt, Math.log10(dataMax));
+        }
+    }
 
     // https://github.com/Helioviewer-Project/jp2gen/blob/master/idl/sdo/aia/hvs_version5_aia.pro
     private static final Map<String, PassBand> passBands = Map.of(
@@ -80,7 +84,7 @@ public class AIAResponse {
 
                 return p.isSqrt ?
                         Math.sqrt(factor) :
-                        1 + Math.log10(factor) / Math.log10(p.dataMax);
+                        1 + Math.log10(factor) / p.log10DataMax;
             }
         }
         return 1;
