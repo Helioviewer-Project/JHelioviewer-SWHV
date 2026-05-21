@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
+import java.util.Optional;
+
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 final class WcsInterpreter {
@@ -89,18 +91,22 @@ final class WcsInterpreter {
     }
 
     private static WcsInput readWcsInput(MetaDataContainer m) {
+        Optional<Double> pc11 = m.getDouble("PC1_1");
+        Optional<Double> pc12 = m.getDouble("PC1_2");
+        Optional<Double> pc21 = m.getDouble("PC2_1");
+        Optional<Double> pc22 = m.getDouble("PC2_2");
+        boolean hasPc = pc11.isPresent() || pc12.isPresent() || pc21.isPresent() || pc22.isPresent();
         return new WcsInput(
                 m.getRequiredDouble("CDELT1"),
                 m.getRequiredDouble("CDELT2"),
                 m.getDouble("CRVAL1").orElse(0.),
                 m.getDouble("CRVAL2").orElse(0.),
                 m.getDouble("PV2_1").orElse(1.),
-                m.getDouble("PC1_1").isPresent() || m.getDouble("PC1_2").isPresent() ||
-                        m.getDouble("PC2_1").isPresent() || m.getDouble("PC2_2").isPresent(),
-                m.getDouble("PC1_1").orElse(1.),
-                m.getDouble("PC1_2").orElse(0.),
-                m.getDouble("PC2_1").orElse(0.),
-                m.getDouble("PC2_2").orElse(1.));
+                hasPc,
+                pc11.orElse(1.),
+                pc12.orElse(0.),
+                pc21.orElse(0.),
+                pc22.orElse(1.));
     }
 
     private static PixelAxes computePixelAxes(WcsInput wcs, MetaDataContainer m, boolean isSurfaceMap) {
