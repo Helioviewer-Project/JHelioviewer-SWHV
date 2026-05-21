@@ -26,6 +26,7 @@ import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.swing.AwtInputAdapter;
 
 class SWEKPopupController implements InputPointerListener, InputPointerMotionListener {
@@ -131,7 +132,9 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             return;
         }
 
-        long currentTime = camera.getViewpoint().time.milli;
+        Position viewpoint = GLRenderer.getDisplayedViewpoint();
+        double displayWidth = GLRenderer.getDisplayView().cameraWidth(Display.getActiveViewport());
+        long currentTime = viewpoint.time.milli;
         List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
         if (activeEvents.isEmpty()) {
             resetHover();
@@ -143,8 +146,8 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         int mouseOverX = e.x();
         int mouseOverY = e.y();
 
-        Position viewpoint = camera.getViewpoint();
         Viewport vp = Display.getActiveViewport();
+        displayWidth = GLRenderer.getDisplayView().cameraWidth(vp);
         ProjectionMode mode = Display.mode;
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
@@ -160,12 +163,12 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                     Quat q = pi.getEarth().toQuat();
                     pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
 
-                    hitpoint = CameraHelper.unprojectToOutputPlane(camera, vp, mouseOverX, mouseOverY, Quat.ZERO);
+                    hitpoint = CameraHelper.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
                     if (hitpoint != null) {
                         hitpoint = q.rotateInverseVector(hitpoint);
                     }
                 } else {
-                    hitpoint = CameraHelper.unprojectToOutputSphere(camera, vp, mouseOverX, mouseOverY, viewpoint.toQuat());
+                    hitpoint = CameraHelper.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpoint.toQuat());
                     pt = pi.centralPoint();
                 }
 

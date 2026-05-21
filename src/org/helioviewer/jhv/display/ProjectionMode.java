@@ -5,6 +5,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
@@ -18,12 +19,22 @@ public enum ProjectionMode {
 
         @Override
         public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-            return OrthoProjection.mouseToSurface(camera, vp, x, y);
+            return mouseToSurface(camera, GLRenderer.getDisplayView(), vp, gridType, x, y);
+        }
+
+        @Override
+        public Vec3 mouseToSurface(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+            return OrthoProjection.mouseToSurface(camera, displayView, vp, x, y);
         }
 
         @Override
         public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-            return OrthoProjection.mouseToGrid(camera, vp, gridType, x, y);
+            return mouseToGrid(camera, GLRenderer.getDisplayView(), vp, gridType, x, y);
+        }
+
+        @Override
+        public Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+            return OrthoProjection.mouseToGrid(camera, displayView, vp, gridType, x, y);
         }
 
         @Override
@@ -61,19 +72,35 @@ public enum ProjectionMode {
     }
 
     public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToSurface(nonOrthoKind, camera, vp, scale, gridType, x, y);
+        return mouseToSurface(camera, GLRenderer.getDisplayView(), vp, gridType, x, y);
+    }
+
+    public Vec3 mouseToSurface(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToSurface(nonOrthoKind, camera, displayView, vp, scale, gridType, x, y);
     }
 
     public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToGrid(camera, vp, scale, gridType, x, y);
+        return mouseToGrid(camera, GLRenderer.getDisplayView(), vp, gridType, x, y);
+    }
+
+    public Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToGrid(camera, displayView, vp, scale, gridType, x, y);
     }
 
     public Vec2 mouseToScreen(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToScreen(camera, vp, scale, gridType, x, y);
+        return mouseToScreen(camera, GLRenderer.getDisplayView(), vp, gridType, x, y);
+    }
+
+    public Vec2 mouseToScreen(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToScreen(camera, displayView, vp, scale, gridType, x, y);
     }
 
     public Vec2 projectToScreen(Camera camera, Viewport vp, GridType gridType, Vec3 v) {
-        Position viewpoint = camera.getViewpoint();
+        return projectToScreen(GLRenderer.getDisplayView(), vp, gridType, v);
+    }
+
+    public Vec2 projectToScreen(DisplayView displayView, Viewport vp, GridType gridType, Vec3 v) {
+        Position viewpoint = displayView.viewpoint();
         return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, scale, gridType.mapRotation(viewpoint), vp, v);
     }
 }

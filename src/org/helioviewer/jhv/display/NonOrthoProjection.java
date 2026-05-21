@@ -4,6 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
@@ -33,10 +34,10 @@ final class NonOrthoProjection {
         };
     }
 
-    static Vec3 mouseToSurface(Kind kind, Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
-        Position viewpoint = camera.getViewpoint();
+    static Vec3 mouseToSurface(Kind kind, Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        Position viewpoint = displayView.viewpoint();
         Quat rotation = gridType.mapRotation(viewpoint);
-        return unproject(kind, viewpoint, rotation, mouseToGrid(camera, vp, scale, gridType, x, y));
+        return unproject(kind, viewpoint, rotation, mouseToGrid(camera, displayView, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
@@ -93,17 +94,18 @@ final class NonOrthoProjection {
         vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
     }
 
-    static Vec2 mouseToScreen(Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
-        Vec2 mouseGrid = mouseToGrid(camera, vp, scale, gridType, x, y);
+    static Vec2 mouseToScreen(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        Vec2 mouseGrid = mouseToGrid(camera, displayView, vp, scale, gridType, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
                 scale.getYValueInv(mouseGrid.y));
     }
 
-    static Vec2 mouseToGrid(Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+    static Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        double width = displayView.cameraWidth(vp);
         return new Vec2(
-                scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(camera, vp, x) / vp.aspect + 0.5, gridType),
-                scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));
+                scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5, gridType),
+                scale.getInterpolatedYValue(CameraHelper.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
     static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {
