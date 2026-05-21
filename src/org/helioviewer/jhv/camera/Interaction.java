@@ -81,7 +81,7 @@ public class Interaction {
     public void mouseClicked(PointerEvent e) {
         if (e.clickCount() == 2) {
             Display.resetViewportZoom();
-            camera.reset();
+            Display.resetCamera();
         }
     }
 

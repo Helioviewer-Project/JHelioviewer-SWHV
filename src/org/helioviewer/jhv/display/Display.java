@@ -7,6 +7,7 @@ import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.time.JHVTime;
 
 public final class Display {
 
@@ -24,8 +25,8 @@ public final class Display {
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
         //CameraHelper.zoomToFit(miniCamera);
-        miniCamera.reset();
-        camera.reset();
+        resetCamera(miniCamera, miniViewpointModel);
+        resetCamera(camera, viewpointModel);
     }
 
     public static GridType gridType = GridType.Viewpoint;
@@ -46,7 +47,8 @@ public final class Display {
 
     private static final ViewpointModel viewpointModel = new ViewpointModel(UpdateViewpoint.observer);
     private static final Camera camera = new Camera(viewpointModel);
-    private static final Camera miniCamera = new Camera(new ViewpointModel(UpdateViewpoint.earthAt1au));
+    private static final ViewpointModel miniViewpointModel = new ViewpointModel(UpdateViewpoint.earthAt1au);
+    private static final Camera miniCamera = new Camera(miniViewpointModel);
 
     public static Camera getCamera() {
         return camera;
@@ -79,14 +81,35 @@ public final class Display {
     public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
         viewpointModel.setUpdateViewpoint(updateViewpoint);
         switch (mode) {
-            case RESET -> camera.reset();
-            case KEEP_TRANSFORM -> camera.updateViewpoint(Movie.getTime());
+            case RESET -> resetCamera();
+            case KEEP_TRANSFORM -> updateViewpoint(Movie.getTime());
         }
     }
 
     public static void setTrackingMode(boolean tracking) {
         if (viewpointModel.setTrackingMode(tracking))
-            camera.refresh();
+            refreshCamera();
+    }
+
+    public static void updateViewpoint(JHVTime time) {
+        camera.updateViewpoint(viewpointModel.update(time));
+    }
+
+    public static void timeChanged(JHVTime time) {
+        if (!viewpointModel.getTrackingMode())
+            updateViewpoint(time);
+    }
+
+    public static void refreshCamera() {
+        camera.refresh(viewpointModel.update(Movie.getTime()));
+    }
+
+    public static void resetCamera() {
+        resetCamera(camera, viewpointModel);
+    }
+
+    private static void resetCamera(Camera camera, ViewpointModel model) {
+        camera.reset(model.update(Movie.getTime()));
     }
 
     public static MapContext getMapContext(Position viewpoint) {

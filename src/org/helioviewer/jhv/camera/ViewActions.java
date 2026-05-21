@@ -46,7 +46,7 @@ public final class ViewActions {
 
     public static void resetView() {
         Display.resetViewportZoom();
-        Display.getCamera().reset();
+        Display.resetCamera();
     }
 
     public static void resetViewAxis() {
