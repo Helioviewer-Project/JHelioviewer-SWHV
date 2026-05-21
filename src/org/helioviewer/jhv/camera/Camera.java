@@ -55,29 +55,18 @@ public class Camera {
         listeners.remove(listener);
     }
 
-    /// /
-    private static final float clipNarrow = (float) (32 * Sun.Radius); // bit more than LASCO C3
-    private static final float clipWide = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
-
     public Camera(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
     }
 
-    public void projectionOrtho2D(Viewport vp) {
-        double width = getCameraWidth(vp);
-        Transform.setup((float) (width * vp.aspect), (float) width, -1, 1, (float) translation.x, (float) translation.y);
-        Transform.cacheMVP();
+    public DisplayView displayView(Position p) {
+        double width = 2 * p.distance * Math.tan(0.5 * fov);
+        return displayView(p, width);
     }
 
-    public void projectionOrtho(Viewport vp) {
-        double width = getCameraWidth(vp);
-        float clip = width < 32 ? clipNarrow : clipWide;
-        Transform.setup((float) (width * vp.aspect), (float) width, -clip, clip, (float) translation.x, (float) translation.y);
-        Transform.rotateView(rotation);
-        Transform.cacheMVP();
+    public DisplayView displayView(Position p, double width) {
+        return new DisplayView(p, width, Quat.rotate(dragRotation, p.toQuat()));
     }
-
-    /// /
 
     private void updateCamera(JHVTime time) {
         viewpoint = updateViewpoint.update(time);

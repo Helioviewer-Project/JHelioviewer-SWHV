@@ -4,6 +4,8 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.DisplayView;
+import org.helioviewer.jhv.camera.Projection;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionMode;
@@ -16,12 +18,16 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
 
-    private static Position displayedViewpoint = Display.getCamera().getViewpoint();
+    private static DisplayView displayView = Display.getCamera().displayView(Display.getCamera().getViewpoint());
 
     private GLRenderer() {}
 
     public static Position getDisplayedViewpoint() {
-        return displayedViewpoint;
+        return displayView.viewpoint();
+    }
+
+    public static DisplayView getDisplayView() {
+        return displayView;
     }
 
     public static void init() {
@@ -56,7 +62,7 @@ public final class GLRenderer {
     }
 
     public static void display(Position viewpoint) {
-        displayedViewpoint = viewpoint;
+        displayView = Display.getCamera().displayView(viewpoint);
 
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
@@ -94,11 +100,11 @@ public final class GLRenderer {
 
     static void renderScene() {
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.getMapContext(displayedViewpoint);
+        MapContext ctx = Display.getMapContext(displayView);
         ProjectionScale scale = ProjectionScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            camera.projectionOrtho(vp);
+            Projection.ortho(vp, displayView.cameraWidth(vp), camera.getTranslationX(), camera.getTranslationY(), displayView.viewRotation());
             GLSLSolarShader.bindScreen(vp, scale);
 
             GLSLSolarShader.sphere.use();
@@ -117,13 +123,14 @@ public final class GLRenderer {
             Camera miniCamera = Display.getMiniCamera();
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            miniCamera.projectionOrtho2D(vp);
+            Projection.ortho2D(vp, miniCamera.getCameraWidth(vp), miniCamera.getTranslationX(), miniCamera.getTranslationY());
             ProjectionScale scale = ProjectionScale.ortho;
             GLSLSolarShader.bindScreen(vp, scale);
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            MapContext ctx = Display.mode.createMapContext(miniCamera, Display.gridType, displayedViewpoint);
+            DisplayView miniView = miniCamera.displayView(displayView.viewpoint(), miniCamera.getCameraWidth(vp) / vp.zoom);
+            MapContext ctx = Display.mode.createMapContext(miniCamera, miniView, Display.gridType);
             Layers.renderMiniview(ctx, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
@@ -139,7 +146,7 @@ public final class GLRenderer {
         boolean hpcMode = Display.mode == ProjectionMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.getMapContext(displayedViewpoint);
+        MapContext ctx = Display.getMapContext(displayView);
         for (Viewport vp : Display.getViewports()) {
             ProjectionScale scale = Display.mode.scale;
             if (hpcMode) {
@@ -150,7 +157,7 @@ public final class GLRenderer {
                 scale = ProjectionScale.hpc;
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            camera.projectionOrtho2D(vp);
+            Projection.ortho2D(vp, displayView.cameraWidth(vp), camera.getTranslationX(), camera.getTranslationY());
             GLSLSolarShader.bindScreen(vp, scale);
 
             Layers.renderScale(ctx, vp, scale);

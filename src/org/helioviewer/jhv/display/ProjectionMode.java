@@ -2,6 +2,7 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
@@ -11,8 +12,8 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, ProjectionScale.ortho) {
         @Override
-        public MapContext createMapContext(Camera camera, GridType gridType, Position viewpoint) {
-            return new OrthoMapContext(camera, gridType, viewpoint);
+        public MapContext createMapContext(Camera camera, DisplayView displayView, GridType gridType) {
+            return new OrthoMapContext(camera, displayView, gridType);
         }
 
         @Override
@@ -55,8 +56,8 @@ public enum ProjectionMode {
         nonOrthoKind = _nonOrthoKind;
     }
 
-    public MapContext createMapContext(Camera camera, GridType gridType, Position viewpoint) {
-        return new NonOrthoMapContext(camera, gridType, this, viewpoint);
+    public MapContext createMapContext(Camera camera, DisplayView displayView, GridType gridType) {
+        return new NonOrthoMapContext(camera, displayView, gridType, this);
     }
 
     public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.display;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 
@@ -53,7 +54,11 @@ public final class Display {
     }
 
     public static MapContext getMapContext(Position viewpoint) {
-        return mode.createMapContext(camera, gridType, viewpoint);
+        return getMapContext(camera.displayView(viewpoint));
+    }
+
+    public static MapContext getMapContext(DisplayView displayView) {
+        return mode.createMapContext(camera, displayView, gridType);
     }
 
     private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};

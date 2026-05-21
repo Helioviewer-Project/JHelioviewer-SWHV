@@ -119,7 +119,7 @@ class FOVPlatform extends DefaultMutableTreeNode {
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).putGeometry(obsPosition.distance, color, renderer, lineBuf, centerBuf));
 
         instrumentCenters.setVertex(centerBuf);
-        instrumentCenters.renderPoints(CameraHelper.getPixelFactor(ctx.camera(), vp));
+        instrumentCenters.renderPoints(CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp)));
         instrumentLines.setVertex(lineBuf);
         instrumentLines.renderLine(vp, LINEWIDTH_FOV);
 
