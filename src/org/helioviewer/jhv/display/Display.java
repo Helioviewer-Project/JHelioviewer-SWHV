@@ -54,6 +54,14 @@ public final class Display {
         return camera.getViewpointModel();
     }
 
+    public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, Camera.ViewpointApplyMode mode) {
+        camera.setViewpointUpdate(updateViewpoint, mode);
+    }
+
+    public static void setTrackingMode(boolean tracking) {
+        camera.setTrackingMode(tracking);
+    }
+
     public static MapContext getMapContext(Position viewpoint) {
         return getMapContext(camera.displayView(viewpoint));
     }

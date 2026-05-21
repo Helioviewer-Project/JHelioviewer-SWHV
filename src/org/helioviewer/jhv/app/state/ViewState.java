@@ -315,7 +315,7 @@ public final class ViewState {
             return;
 
         tracking = newTracking;
-        Display.getCamera().setTrackingMode(newTracking);
+        Display.setTrackingMode(newTracking);
         notifyModeListeners();
     }
 
