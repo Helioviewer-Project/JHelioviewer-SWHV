@@ -123,7 +123,8 @@ public final class GLRenderer {
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            Layers.renderMiniview(Display.getMiniMapContext(), vp, scale);
+            MapContext ctx = Display.mode.createMapContext(miniCamera, Display.gridType, displayedViewpoint);
+            Layers.renderMiniview(ctx, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
     }
