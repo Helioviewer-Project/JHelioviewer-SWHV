@@ -25,10 +25,6 @@ public abstract class MapContext {
         return camera;
     }
 
-    public DisplayView displayView() {
-        return displayView;
-    }
-
     public double cameraWidth(Viewport vp) {
         return displayView.cameraWidth(vp);
     }
