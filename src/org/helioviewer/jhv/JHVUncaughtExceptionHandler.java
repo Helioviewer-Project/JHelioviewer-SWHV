@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
@@ -37,18 +39,15 @@ class JHVUncaughtExceptionHandler {
 
         // Do not use the logger here; this must work even before logging initialization.
         private static String format(Thread t, Throwable e) {
-            String className = e.getClass().getCanonicalName() + '\n';
-            StringBuilder stackTrace = new StringBuilder(className);
-            for (StackTraceElement el : e.getStackTrace()) {
-                stackTrace.append("at ").append(el).append('\n');
-            }
+            StringWriter stackTrace = new StringWriter();
+            e.printStackTrace(new PrintWriter(stackTrace));
 
             String msg = "";
             msg += "Uncaught Exception in " + JHVGlobals.userAgent;
             msg += "\nThread: " + t;
             msg += "\nMessage: " + e.getMessage();
             msg += "\nStacktrace:\n";
-            msg += stackTrace + "\n";
+            msg += stackTrace;
             msg += "Log:\n" + Log.get();
             return msg;
         }
