@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
@@ -15,7 +16,13 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
 
+    private static Position displayedViewpoint = Display.getCamera().getViewpoint();
+
     private GLRenderer() {}
+
+    public static Position getDisplayedViewpoint() {
+        return displayedViewpoint;
+    }
 
     public static void init() {
         GL.glEnable(GL.BLEND);
@@ -48,7 +55,9 @@ public final class GLRenderer {
             miniview.reshapeViewport();
     }
 
-    public static void display() {
+    public static void display(Position viewpoint) {
+        displayedViewpoint = viewpoint;
+
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
         else
