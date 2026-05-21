@@ -18,7 +18,7 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
 
-    private static DisplayView displayView = Display.getCamera().displayView(Display.getCamera().getViewpoint());
+    private static DisplayView displayView = Display.getCamera().displayView(Display.getViewpointModel().getViewpoint());
 
     private GLRenderer() {}
 

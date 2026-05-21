@@ -89,6 +89,10 @@ public class Camera {
         return viewpointModel.getViewpoint();
     }
 
+    public ViewpointModel getViewpointModel() {
+        return viewpointModel;
+    }
+
     public UpdateViewpoint getUpdateViewpoint() {
         return viewpointModel.getUpdateViewpoint();
     }

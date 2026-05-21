@@ -38,11 +38,11 @@ public final class ViewpointModel {
         return viewpoint;
     }
 
-    Position getViewpoint() {
+    public Position getViewpoint() {
         return viewpoint;
     }
 
-    UpdateViewpoint getUpdateViewpoint() {
+    public UpdateViewpoint getUpdateViewpoint() {
         return updateViewpoint;
     }
 
@@ -58,7 +58,7 @@ public final class ViewpointModel {
         return true;
     }
 
-    boolean getTrackingMode() {
+    public boolean getTrackingMode() {
         return tracking;
     }
 }
