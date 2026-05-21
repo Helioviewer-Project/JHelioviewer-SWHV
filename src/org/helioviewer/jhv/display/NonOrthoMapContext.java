@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.DisplayView;
+import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -12,8 +12,8 @@ final class NonOrthoMapContext extends MapContext {
     private final NonOrthoProjection.Kind kind;
     private final Quat rotation;
 
-    NonOrthoMapContext(Camera _camera, DisplayView _displayView, GridType _gridType, ProjectionMode _mode) {
-        super(_camera, _displayView, _mode, _gridType);
+    NonOrthoMapContext(Camera _camera, RenderView _renderView, GridType _gridType, ProjectionMode _mode) {
+        super(_camera, _renderView, _mode, _gridType);
         kind = _mode.nonOrthoKind;
         rotation = _gridType.mapRotation(viewpoint());
     }

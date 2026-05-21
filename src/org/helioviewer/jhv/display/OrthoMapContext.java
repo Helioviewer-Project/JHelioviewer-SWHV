@@ -1,15 +1,15 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.DisplayView;
+import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
 final class OrthoMapContext extends MapContext {
 
-    OrthoMapContext(Camera _camera, DisplayView _displayView, GridType _gridType) {
-        super(_camera, _displayView, ProjectionMode.Orthographic, _gridType);
+    OrthoMapContext(Camera _camera, RenderView _renderView, GridType _gridType) {
+        super(_camera, _renderView, ProjectionMode.Orthographic, _gridType);
     }
 
     @Override

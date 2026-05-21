@@ -39,7 +39,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
         ProjectionMode mode = Display.mode;
-        Vec2 coord = mode.mouseToGrid(camera, GLRenderer.getDisplayView(), vp, Display.gridType, x, y);
+        Vec2 coord = mode.mouseToGrid(camera, GLRenderer.getRenderView(), vp, Display.gridType, x, y);
 
         if (mode == ProjectionMode.HPC) {
             setText(formatHpc(coord));
@@ -48,7 +48,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         } else if (mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getDisplayView().cameraWidth(vp), x, y);
+            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp), x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {

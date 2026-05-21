@@ -2,7 +2,7 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.DisplayView;
+import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -10,13 +10,13 @@ import org.helioviewer.jhv.opengl.BufVertex;
 public abstract class MapContext {
 
     private final Camera camera;
-    private final DisplayView displayView;
+    private final RenderView renderView;
     private final ProjectionMode mode;
     private final GridType gridType;
 
-    protected MapContext(Camera _camera, DisplayView _displayView, ProjectionMode _mode, GridType _gridType) {
+    protected MapContext(Camera _camera, RenderView _renderView, ProjectionMode _mode, GridType _gridType) {
         camera = _camera;
-        displayView = _displayView;
+        renderView = _renderView;
         mode = _mode;
         gridType = _gridType;
     }
@@ -26,7 +26,7 @@ public abstract class MapContext {
     }
 
     public double cameraWidth(Viewport vp) {
-        return displayView.cameraWidth(vp);
+        return renderView.cameraWidth(vp);
     }
 
     public ProjectionMode mode() {
@@ -38,11 +38,11 @@ public abstract class MapContext {
     }
 
     public Position viewpoint() {
-        return displayView.viewpoint();
+        return renderView.viewpoint();
     }
 
     public Vec2 mouseToGrid(Viewport vp, int x, int y) {
-        return mode.mouseToGrid(camera, displayView, vp, gridType, x, y);
+        return mode.mouseToGrid(camera, renderView, vp, gridType, x, y);
     }
 
     public boolean isOrthographic() {

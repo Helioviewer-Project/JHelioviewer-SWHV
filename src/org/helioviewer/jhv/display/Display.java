@@ -4,7 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.DisplayView;
+import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
@@ -121,12 +121,12 @@ public final class Display {
         MovieDisplay.render(1);
     }
 
-    public static DisplayView renderView(Position viewpoint) {
+    public static RenderView renderView(Position viewpoint) {
         return camera.renderView(viewpoint);
     }
 
-    public static MapContext getMapContext(DisplayView displayView) {
-        return mode.createMapContext(camera, displayView, gridType);
+    public static MapContext getMapContext(RenderView renderView) {
+        return mode.createMapContext(camera, renderView, gridType);
     }
 
     private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};
