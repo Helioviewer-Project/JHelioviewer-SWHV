@@ -57,7 +57,7 @@ public class Camera {
         return new DisplayView(p, width, Quat.rotate(dragRotation, p.toQuat()));
     }
 
-    private void updateCamera(JHVTime time) {
+    public void updateViewpoint(JHVTime time) {
         Position viewpoint = viewpointModel.update(time);
         updateRotation();
         updateWidth(viewpoint);
@@ -72,7 +72,7 @@ public class Camera {
     }
 
     public void refresh() {
-        updateCamera(Movie.getTime());
+        updateViewpoint(Movie.getTime());
         MovieDisplay.render(1);
     }
 
@@ -80,21 +80,13 @@ public class Camera {
         translation = Vec2.ZERO;
         dragRotation = Quat.ZERO;
 
-        updateCamera(Movie.getTime());
+        updateViewpoint(Movie.getTime());
         CameraHelper.zoomToFit(this);
         MovieDisplay.render(1);
     }
 
     public ViewpointModel getViewpointModel() {
         return viewpointModel;
-    }
-
-    public void setViewpointUpdate(UpdateViewpoint _updateViewpoint, ViewpointApplyMode mode) {
-        viewpointModel.setUpdateViewpoint(_updateViewpoint);
-        switch (mode) {
-            case RESET -> reset();
-            case KEEP_TRANSFORM -> updateCamera(Movie.getTime());
-        }
     }
 
     public double getTranslationX() {
@@ -133,12 +125,6 @@ public class Camera {
         updateWidth(viewpointModel.getViewpoint());
     }
 
-    public void setTrackingMode(boolean _tracking) {
-        if (viewpointModel.setTrackingMode(_tracking)) {
-            refresh();
-        }
-    }
-
     public double getCameraWidth(Viewport vp) {
         return cameraWidth * vp.zoom;
     }
@@ -153,7 +139,7 @@ public class Camera {
 
     public void timeChanged(JHVTime date) {
         if (!viewpointModel.getTrackingMode()) {
-            updateCamera(date);
+            updateViewpoint(date);
         }
     }
 

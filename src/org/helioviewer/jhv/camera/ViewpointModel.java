@@ -46,11 +46,11 @@ public final class ViewpointModel {
         return updateViewpoint;
     }
 
-    void setUpdateViewpoint(UpdateViewpoint _updateViewpoint) {
+    public void setUpdateViewpoint(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
     }
 
-    boolean setTrackingMode(boolean _tracking) {
+    public boolean setTrackingMode(boolean _tracking) {
         if (tracking == _tracking)
             return false;
 
