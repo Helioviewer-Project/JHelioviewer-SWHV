@@ -1,45 +1,43 @@
 package org.helioviewer.jhv.metadata;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.XMLUtils;
 
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
 public class XMLMetaDataContainer implements MetaDataContainer {
 
-    private final Element meta;
+    private final Map<String, String> values = new HashMap<>();
 
     public XMLMetaDataContainer(String xml) throws Exception {
-        meta = (Element) XMLUtils.parse(xml).getElementsByTagName("meta").item(0);
+        Element meta = (Element) XMLUtils.parse(xml).getElementsByTagName("meta").item(0);
         if (meta == null)
             throw new Exception("XML metadata without meta tag");
-    }
 
-    @Nullable
-    private String getValueFromXML(String key) {
-        Element line = (Element) meta.getElementsByTagName(key).item(0);
-        if (line == null)
-            return null;
-
-        Node child = line.getFirstChild();
-        if (child instanceof CharacterData cd)
-            return cd.getData();
-        return null;
+        NodeList nodes = meta.getElementsByTagName("*");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element element = (Element) nodes.item(i);
+            Node child = element.getFirstChild();
+            if (child instanceof CharacterData cd)
+                values.putIfAbsent(element.getNodeName(), cd.getData());
+        }
     }
 
     @Nonnull
     @Override
     public Optional<String> getString(String key) {
-        return Optional.ofNullable(getValueFromXML(key));
+        return Optional.ofNullable(values.get(key));
     }
 
     @Nonnull
