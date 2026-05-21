@@ -7,6 +7,7 @@
 - Load user color lookup tables from `$HOME/JHelioviewer-SWHV/Settings/user-luts.txt`
 - Add option to zoom multiview panels separately
 - Set IAS as default image data server, remove the automatic setting, and restore the preference in Settings
+- Allow server-like headless operation, including full software rendering (see `extra/samp`)
 - Various bug fixes, cleanups, and major internal refactoring
 
 ## JHelioviewer 5.0 (2026-05-08)

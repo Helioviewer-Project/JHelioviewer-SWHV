@@ -38,14 +38,8 @@ heap-to-native copy in the decoder.
 
 The cache was centralized at the same time. Decoded image caches that had been
 local to `J2KView` and `URIView` now share `ImageBufferCache`, making the memory
-budget global and measurable. The tradeoff is that eviction has to respect data
-that may already have left the cache but has not yet reached its final owner on
-the EDT.
-
-The cleanup contract is mainly about that handoff window. A buffer can leave the
-cache, be queued toward the EDT, and only later be accepted by layer/rendering
-state. During that interval, cache eviction may happen, but explicit native
-cleanup must not.
+budget global and measurable. The tradeoff is that eviction has to respect image
+data that is still retained by layer state or already uploaded/rendering state.
 
 ## Decode Paths
 
@@ -78,17 +72,17 @@ path.
 ## Cleanup Policy
 
 Cache eviction does not close an `ImageBuffer` immediately. It retires the
-buffer. Retired buffers are then reaped later, once the rendering code reports
-that they are no longer retained.
+buffer. Retired buffers are then reaped later, after rendering code reports which
+buffers are still retained.
 
 The important distinction is between a buffer that merely exists transiently and
 a buffer that has entered the live image/render path. Only the latter is part of
-the deterministic cleanup contract. Rare buffers that are queued for delivery
-but never accepted by an `ImageLayer` are left to the `Cleaner` fallback.
+the deterministic cleanup contract. Buffers that are decoded but never accepted
+by an `ImageLayer` are left to normal reachability plus the `Cleaner` fallback.
 
 This keeps the cache cleanup path deliberately narrow. `ImageBufferCache` owns
-cache membership and retired-buffer cleanup; it does not try to model every
-temporary reference held by worker threads or the EDT.
+cache membership and retired-buffer cleanup; it does not try to model every short
+temporary reference held by decode or callback code.
 
 ## Ownership Contract
 
@@ -96,19 +90,20 @@ temporary reference held by worker threads or the EDT.
   operations. Cache access does not imply UI ownership.
 - Cache eviction retires an `ImageBuffer`; it does not immediately free the
   native memory.
-- `J2KView` and `URIView` protect an `ImageBuffer` from explicit cleanup only
-  when handing it toward `View.DataHandler.handleData()`.
-- `ImageLayer.handleData()` clears that protection only after accepting the
-  buffer into layer state.
+- `J2KView` and `URIView` deliver decoded buffers to
+  `View.DataHandler.handleData()` directly from the decode callback. The
+  callback itself is already scheduled on the EDT by `EDTCallbackExecutor`.
+- `ImageLayer.handleData()` accepts the `ImageData` into layer state and then
+  requests display/time updates.
 - Non-layer handlers that copy the image data and do not retain the
-  `ImageBuffer`, such as `RadioJ2KData`, must clear that protection after the
-  copy.
+  `ImageBuffer`, such as `RadioJ2KData`, do not participate in retained-buffer
+  tracking.
 - `Layers` collects buffers currently retained by `ImageLayer` and by uploaded
   `GLImage` state.
 - `ImageBufferCache.reap()` may explicitly free retired buffers only when they
-  are not protected and not in that retained set.
-- Retired buffers are tracked weakly, so failed or dropped handoffs do not keep
-  buffers alive just because they passed through the cache cleanup machinery.
+  are not in that retained set.
+- Retired buffers are tracked weakly, so retired-cache bookkeeping does not keep
+  buffers alive by itself.
 
 ## Fragile Points
 
@@ -117,11 +112,12 @@ The following changes look local, but alter ownership semantics:
 - Treating `get()` or `put()` as UI ownership would conflate cache access with
   publishing a buffer to a layer.
 - Freeing directly from the Caffeine removal listener would be too early,
-  because the buffer may be queued for EDT delivery or uploaded in `GLImage`.
+  because the buffer may still be retained by `ImageLayer` state or uploaded in
+  `GLImage`.
 - Grace periods are deliberately avoided. A fixed number of render passes is a
   guess, not an ownership rule.
-- Failed handoffs are not tracked exhaustively. They are rare strays and are
-  left to the weak reference plus `Cleaner` fallback by design.
+- Decode callback handoffs are not tracked as a separate ownership state. A
+  buffer becomes part of deterministic cleanup once a retaining owner reports it.
 
 Changes to this contract should be reviewed across the whole decode-to-render
 path, not just in the class being edited. In particular, check `J2KView`,
