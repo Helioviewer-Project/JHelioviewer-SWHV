@@ -61,6 +61,14 @@ public final class Display {
         return viewpointModel;
     }
 
+    public static void addViewpointListener(ViewpointModel.Listener listener) {
+        viewpointModel.addListener(listener);
+    }
+
+    public static void removeViewpointListener(ViewpointModel.Listener listener) {
+        viewpointModel.removeListener(listener);
+    }
+
     public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
         getViewpointModel().setUpdateViewpoint(updateViewpoint);
         switch (mode) {

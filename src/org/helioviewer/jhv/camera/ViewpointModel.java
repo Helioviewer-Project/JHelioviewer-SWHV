@@ -23,12 +23,12 @@ public final class ViewpointModel {
         updateViewpoint = _updateViewpoint;
     }
 
-    void addListener(Listener listener) {
+    public void addListener(Listener listener) {
         listeners.add(listener);
         listener.viewpointChanged(viewpoint);
     }
 
-    void removeListener(Listener listener) {
+    public void removeListener(Listener listener) {
         listeners.remove(listener);
     }
 
