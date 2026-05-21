@@ -46,9 +46,9 @@ public final class Display {
     }
 
     private static final ViewpointModel viewpointModel = new ViewpointModel(UpdateViewpoint.observer);
-    private static final Camera camera = new Camera(viewpointModel);
+    private static final Camera camera = new Camera();
     private static final ViewpointModel miniViewpointModel = new ViewpointModel(UpdateViewpoint.earthAt1au);
-    private static final Camera miniCamera = new Camera(miniViewpointModel);
+    private static final Camera miniCamera = new Camera();
 
     public static Camera getCamera() {
         return camera;

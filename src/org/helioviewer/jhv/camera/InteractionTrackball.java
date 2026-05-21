@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -34,7 +35,7 @@ abstract class InteractionTrackball implements Interaction.Type {
             return;
 
         Quat delta = CameraHelper.calcTrackballDelta(camera, vp, lastMouseX, lastMouseY, e.x(), e.y(), trackballRadius2);
-        camera.rotateDragRotation(adaptDelta(delta));
+        camera.rotateDragRotation(adaptDelta(delta), Display.getViewpoint());
         lastMouseX = e.x();
         lastMouseY = e.y();
         MovieDisplay.display();
