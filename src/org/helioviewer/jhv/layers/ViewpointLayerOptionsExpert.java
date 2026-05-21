@@ -103,7 +103,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setRelative(boolean _relative) {
         relative = _relative;
-        Display.getCamera().refresh(); // full camera refresh to update viewpoint
+        Display.refreshCamera(); // full camera refresh to update viewpoint
     }
 
     public int getSpiralSpeedValue() {

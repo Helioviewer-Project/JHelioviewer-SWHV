@@ -65,7 +65,7 @@ final class SpaceObjectContainerPanel extends JScrollPane {
                     container.selectElement(element);
                 else
                     container.setHighlightedElement(element);
-                Display.getCamera().refresh(); // full camera refresh to update viewpoint for relative longitude
+                Display.refreshCamera(); // full camera refresh to update viewpoint for relative longitude
             }
         });
 

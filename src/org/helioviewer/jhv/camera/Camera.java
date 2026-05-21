@@ -3,11 +3,9 @@ package org.helioviewer.jhv.camera;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.ViewpointModel;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,30 +40,29 @@ public class Camera {
         return new DisplayView(p, width, Quat.rotate(dragRotation, p.toQuat()));
     }
 
-    public void updateViewpoint(JHVTime time) {
-        Position viewpoint = viewpointModel.update(time);
-        updateRotation();
+    public void updateViewpoint(Position viewpoint) {
+        updateRotation(viewpoint);
         updateWidth(viewpoint);
     }
 
-    private void updateRotation() {
-        rotation = Quat.rotate(dragRotation, viewpointModel.getViewpoint().toQuat());
+    private void updateRotation(Position viewpoint) {
+        rotation = Quat.rotate(dragRotation, viewpoint.toQuat());
     }
 
     private void updateWidth(Position viewpoint) {
         cameraWidth = 2 * viewpoint.distance * Math.tan(0.5 * fov);
     }
 
-    public void refresh() {
-        updateViewpoint(Movie.getTime());
+    public void refresh(Position viewpoint) {
+        updateViewpoint(viewpoint);
         MovieDisplay.render(1);
     }
 
-    public void reset() {
+    public void reset(Position viewpoint) {
         translation = Vec2.ZERO;
         dragRotation = Quat.ZERO;
 
-        updateViewpoint(Movie.getTime());
+        updateViewpoint(viewpoint);
         CameraHelper.zoomToFit(this);
         MovieDisplay.render(1);
     }
@@ -88,17 +85,17 @@ public class Camera {
 
     public void rotateDragRotation(Quat _dragRotation) {
         dragRotation = Quat.rotate(dragRotation, _dragRotation);
-        updateRotation();
+        updateRotation(viewpointModel.getViewpoint());
     }
 
     public void resetDragRotation() {
         dragRotation = Quat.ZERO;
-        updateRotation();
+        updateRotation(viewpointModel.getViewpoint());
     }
 
     public void resetDragRotationAxis() {
         dragRotation = dragRotation.twist(viewpointModel.getUpdateViewpoint().dragAxis());
-        updateRotation();
+        updateRotation(viewpointModel.getViewpoint());
     }
 
     public void setFOV(double _fov) {
@@ -118,12 +115,6 @@ public class Camera {
         return Math.exp(ZOOM_STEP * wr); // smoother, direction-symmetric zooming via exponential scaling
     }
 
-    public void timeChanged(JHVTime date) {
-        if (!viewpointModel.getTrackingMode()) {
-            updateViewpoint(date);
-        }
-    }
-
     public JSONObject toJson() {
         JSONObject jo = new JSONObject();
         jo.put("translation", translation.toJson());
@@ -139,7 +130,7 @@ public class Camera {
         ja = jo.optJSONArray("dragRotation");
         if (ja != null) dragRotation = Quat.fromJson(ja);
         setFOV(jo.optDouble("fov", fov));
-        updateRotation();
+        updateRotation(viewpointModel.getViewpoint());
     }
 
 }

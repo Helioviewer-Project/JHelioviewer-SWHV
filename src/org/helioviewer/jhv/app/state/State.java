@@ -210,7 +210,7 @@ public final class State {
         private void applyRestoredPlaybackState() {
             ViewState.applyMode(modeData); // this applies projection again
             Commands.seekTime(time);
-            Display.getCamera().refresh();
+            Display.refreshCamera();
         }
 
         @Override
