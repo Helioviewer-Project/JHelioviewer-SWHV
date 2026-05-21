@@ -140,7 +140,9 @@ public final class DataSourcesTree extends JTree {
         String server = parser.getRoot().toString();
         for (String serverName : DataSources.getServers()) {
             if (serverName.equals(server)) {
-                reattach(nodes.get(serverName), parser.getRoot());
+                DefaultMutableTreeNode node = nodes.get(serverName);
+                reattach(node, parser.getRoot());
+                ((DefaultTreeModel) getModel()).nodeStructureChanged(node);
                 break;
             }
         }
