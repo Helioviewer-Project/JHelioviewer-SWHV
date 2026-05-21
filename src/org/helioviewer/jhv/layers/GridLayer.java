@@ -114,7 +114,7 @@ public final class GridLayer extends AbstractLayer {
         }
 
         Camera camera = ctx.camera();
-        Position viewpoint = camera.getViewpoint();
+        Position viewpoint = ctx.viewpoint();
         float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
         double pixFactor = CameraHelper.getPixelFactor(camera, vp);
 

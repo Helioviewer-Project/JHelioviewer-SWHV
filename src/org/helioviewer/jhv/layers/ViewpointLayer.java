@@ -122,7 +122,7 @@ public class ViewpointLayer extends AbstractLayer {
 
         Camera camera = ctx.camera();
         double pointFactor = CameraHelper.getTemperedPointFactor(camera, vp);
-        Position viewpoint = camera.getViewpoint();
+        Position viewpoint = ctx.viewpoint();
 
         Transform.pushView();
         Transform.rotateViewInverse(Quat.createXY(viewpoint.lat, viewpoint.lon + relativeLon));

@@ -46,7 +46,7 @@ public class TimestampLayer extends AbstractLayer {
             return;
 
         String text = "";
-        Position viewpoint = ctx.camera().getViewpoint();
+        Position viewpoint = ctx.viewpoint();
         if (Display.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {
