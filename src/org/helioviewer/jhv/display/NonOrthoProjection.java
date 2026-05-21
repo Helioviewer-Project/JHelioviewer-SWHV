@@ -95,16 +95,21 @@ final class NonOrthoProjection {
     }
 
     static Vec2 mouseToScreen(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
-        Vec2 mouseGrid = mouseToGrid(camera, displayView, vp, scale, gridType, x, y);
+        Vec2 mouseGrid = mouseToRawGrid(camera, displayView, vp, scale, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
                 scale.getYValueInv(mouseGrid.y));
     }
 
     static Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        Vec2 mouseGrid = mouseToRawGrid(camera, displayView, vp, scale, x, y);
+        return new Vec2(scale.getDisplayXValue(mouseGrid.x, gridType), mouseGrid.y);
+    }
+
+    private static Vec2 mouseToRawGrid(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, int x, int y) {
         double width = displayView.cameraWidth(vp);
         return new Vec2(
-                scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5, gridType),
+                scale.getInterpolatedXValue(CameraHelper.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
                 scale.getInterpolatedYValue(CameraHelper.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
