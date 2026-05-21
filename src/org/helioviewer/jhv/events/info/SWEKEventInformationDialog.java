@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -43,6 +44,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
         super(JHVFrame.getFrame(), revent.getSupplier().getGroup().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         event = _event;
         rEvent = revent;
