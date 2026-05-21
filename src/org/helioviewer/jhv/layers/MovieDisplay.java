@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.display.Display;
 
 public class MovieDisplay {
 
-    private static boolean missingRenderRequesterLogged;
-    private static Runnable requestRender = MovieDisplay::missingRenderRequester;
+    private static boolean missingHandlerLogged;
+    private static RenderRequestHandler renderRequestHandler = _ -> missingRenderRequester();
 
     public static void render(float decodeFactor) {
         if (ImageLayers.areEnabled())
@@ -15,18 +16,18 @@ public class MovieDisplay {
     }
 
     public static void display() {
-        requestRender.run();
+        renderRequestHandler.requestRender(Display.getCamera().getViewpoint());
     }
 
-    public static void setRenderRequester(Runnable _requestRender) {
-        requestRender = _requestRender;
+    public static void setRenderRequestHandler(RenderRequestHandler _renderRequestHandler) {
+        renderRequestHandler = _renderRequestHandler;
     }
 
     private static void missingRenderRequester() {
-        if (missingRenderRequesterLogged)
+        if (missingHandlerLogged)
             return;
-        missingRenderRequesterLogged = true;
-        Log.warn("No render requester installed");
+        missingHandlerLogged = true;
+        Log.warn("No render request handler installed");
     }
 
 }

@@ -195,7 +195,7 @@ public final class JHVFrame {
         renderHost.attachCanvas(renderCanvas);
         // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
         renderCanvas.requestRender();
-        MovieDisplay.setRenderRequester(renderCanvas::requestRender);
+        MovieDisplay.setRenderRequestHandler(viewpoint -> renderCanvas.requestRender());
     }
 
     private static JFrame createFrame() {
