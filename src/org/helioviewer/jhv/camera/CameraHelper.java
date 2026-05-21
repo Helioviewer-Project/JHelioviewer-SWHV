@@ -22,13 +22,19 @@ public class CameraHelper {
     }
 
     public static double computeUpX(Camera camera, Viewport vp, double screenX) {
-        double width = camera.getCameraWidth(vp);
-        return computeNormalizedX(vp, screenX) * width * vp.aspect - camera.getTranslationX();
+        return computeUpX(vp, camera.getCameraWidth(vp), camera.getTranslationX(), screenX);
+    }
+
+    public static double computeUpX(Viewport vp, double width, double tx, double screenX) {
+        return computeNormalizedX(vp, screenX) * width * vp.aspect - tx;
     }
 
     public static double computeUpY(Camera camera, Viewport vp, double screenY) {
-        double width = camera.getCameraWidth(vp);
-        return computeNormalizedY(vp, screenY) * width - camera.getTranslationY();
+        return computeUpY(vp, camera.getCameraWidth(vp), camera.getTranslationY(), screenY);
+    }
+
+    public static double computeUpY(Viewport vp, double width, double ty, double screenY) {
+        return computeNormalizedY(vp, screenY) * width - ty;
     }
 
     private static double getLogicalPixelFactor(Viewport vp, double width) {
@@ -95,51 +101,74 @@ public class CameraHelper {
 
     @Nullable
     private static Vec3 intersectSphere(Camera camera, Viewport vp, double screenX, double screenY) {
-        double up1x = computeUpX(camera, vp, screenX);
-        double up1y = computeUpY(camera, vp, screenY);
+        return intersectSphere(vp, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY(), screenX, screenY);
+    }
+
+    @Nullable
+    private static Vec3 intersectSphere(Viewport vp, double width, double tx, double ty, double screenX, double screenY) {
+        double up1x = computeUpX(vp, width, tx, screenX);
+        double up1y = computeUpY(vp, width, ty, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
         return radius2 > Sun.Radius2 ? null : new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
     }
 
     @Nullable
     private static Vec3 intersectPlane(Camera camera, Viewport vp, double screenX, double screenY, Vec3 planeNormal) {
+        return intersectPlane(vp, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY(), screenX, screenY, planeNormal);
+    }
+
+    @Nullable
+    private static Vec3 intersectPlane(Viewport vp, double width, double tx, double ty, double screenX, double screenY, Vec3 planeNormal) {
         double denom = planeNormal.z;
         if (Math.abs(denom) < PLANE_Z_EPS)
             return null;
 
-        double up1x = computeUpX(camera, vp, screenX);
-        double up1y = computeUpY(camera, vp, screenY);
+        double up1x = computeUpX(vp, width, tx, screenX);
+        double up1y = computeUpY(vp, width, ty, screenY);
         double zvalue = -(planeNormal.x * up1x + planeNormal.y * up1y) / denom;
         return new Vec3(up1x, up1y, zvalue);
     }
 
     @Nullable
     public static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
-        Quat dragRotation = camera.getDragRotation();
-        Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
-        Vec3 hitPoint = intersectSphere(camera, vp, screenX, screenY);
+        return unprojectToOutputSphere(camera, vp, camera.getCameraWidth(vp), screenX, screenY, outputRotation);
+    }
+
+    @Nullable
+    public static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
+        Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
+        Vec3 hitPoint = intersectSphere(vp, width, camera.getTranslationX(), camera.getTranslationY(), screenX, screenY);
         return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
     public static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
-        Quat dragRotation = camera.getDragRotation();
-        Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
-        Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
+        return unprojectToOutputPlane(camera, vp, camera.getCameraWidth(vp), screenX, screenY, outputRotation);
+    }
+
+    @Nullable
+    public static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
+        Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
+        Vec3 hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
         return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
     public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double x, double y) {
+        return unprojectToCurrentViewSphereOrPlane(camera, vp, camera.getCameraWidth(vp), x, y);
+    }
+
+    @Nullable
+    public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double width, double x, double y) {
         Quat dragRotation = camera.getDragRotation();
-        Vec3 hitPoint = intersectSphere(camera, vp, x, y);
+        Vec3 hitPoint = intersectSphere(vp, width, camera.getTranslationX(), camera.getTranslationY(), x, y);
         if (hitPoint != null) {
             Vec3 currentViewHitPoint = dragRotation.rotateInverseVector(hitPoint);
             if (currentViewHitPoint.z > 0.)
                 return currentViewHitPoint;
         }
 
-        hitPoint = intersectPlane(camera, vp, x, y, dragRotation.rotateVector(Vec3.ZAxis));
+        hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), x, y, dragRotation.rotateVector(Vec3.ZAxis));
         return hitPoint == null ? null : dragRotation.rotateInverseVector(hitPoint);
     }
 

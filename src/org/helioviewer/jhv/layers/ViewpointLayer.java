@@ -28,6 +28,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
@@ -172,18 +173,19 @@ public class ViewpointLayer extends AbstractLayer {
             return;
         }
 
-        long time = camera.getViewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        long time = GLRenderer.getDisplayedViewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
         mouseX = e.x();
         mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        double mousePlaneX = CameraHelper.computeUpX(camera, vp, mouseX);
-        double mousePlaneY = CameraHelper.computeUpY(camera, vp, mouseY);
+        double width = GLRenderer.getDisplayView().cameraWidth(vp);
+        double mousePlaneX = CameraHelper.computeUpX(vp, width, camera.getTranslationX(), mouseX);
+        double mousePlaneY = CameraHelper.computeUpY(vp, width, camera.getTranslationY(), mouseY);
         Quat dragRotation = camera.getDragRotation();
 
-        double halfWidth = camera.getCameraWidth(vp) / 2;
+        double halfWidth = width / 2;
         double hoverThreshold2 = (0.01 * halfWidth) * (0.01 * halfWidth);
         double cosRelativeLon = Math.cos(-relativeLon);
         double sinRelativeLon = Math.sin(-relativeLon);

@@ -18,6 +18,7 @@ import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.swing.TransferAccess;
 
 @SuppressWarnings("serial")
@@ -47,13 +48,13 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         } else if (mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getDisplayView().cameraWidth(vp), x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {
                 String annStr = "";
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
-                Position viewpoint = camera.getViewpoint();
+                Position viewpoint = GLRenderer.getDisplayedViewpoint();
 
                 Object annData = Annotations.getAnnotationData();
                 if (annData instanceof String str) {
@@ -146,7 +147,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void maybeCopyToClipboard(PointerEvent e) {
         if (e.popupTrigger() || e.button() == 3)
-            TransferAccess.writeClipboard(camera.getViewpoint().time.toString() + getText());
+            TransferAccess.writeClipboard(GLRenderer.getDisplayedViewpoint().time.toString() + getText());
     }
 
 }
