@@ -28,16 +28,6 @@ public class Camera {
 
     private final ViewpointModel viewpointModel;
 
-    public interface Listener extends ViewpointModel.Listener {}
-
-    public void addListener(Listener listener) {
-        viewpointModel.addListener(listener);
-    }
-
-    public void removeListener(Listener listener) {
-        viewpointModel.removeListener(listener);
-    }
-
     public Camera(ViewpointModel _viewpointModel) {
         viewpointModel = _viewpointModel;
     }
