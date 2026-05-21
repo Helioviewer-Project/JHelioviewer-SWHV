@@ -81,7 +81,7 @@ public class TimestampLayer extends AbstractLayer {
     private static String formatFOV(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (ctx.isHpc())
             return formatHpcFOV(ctx, vp, scale);
-        return formatOrthoFOV(ctx.camera().getCameraWidth(vp));
+        return formatOrthoFOV(ctx.cameraWidth(vp));
     }
 
     private static String formatOrthoFOV(double r) {

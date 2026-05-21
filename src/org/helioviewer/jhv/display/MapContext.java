@@ -2,6 +2,7 @@ package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -9,19 +10,27 @@ import org.helioviewer.jhv.opengl.BufVertex;
 public abstract class MapContext {
 
     private final Camera camera;
+    private final DisplayView displayView;
     private final ProjectionMode mode;
     private final GridType gridType;
-    private final Position viewpoint;
 
-    protected MapContext(Camera _camera, ProjectionMode _mode, GridType _gridType, Position _viewpoint) {
+    protected MapContext(Camera _camera, DisplayView _displayView, ProjectionMode _mode, GridType _gridType) {
         camera = _camera;
+        displayView = _displayView;
         mode = _mode;
         gridType = _gridType;
-        viewpoint = _viewpoint;
     }
 
     public Camera camera() {
         return camera;
+    }
+
+    public DisplayView displayView() {
+        return displayView;
+    }
+
+    public double cameraWidth(Viewport vp) {
+        return displayView.cameraWidth(vp);
     }
 
     public ProjectionMode mode() {
@@ -33,7 +42,7 @@ public abstract class MapContext {
     }
 
     public Position viewpoint() {
-        return viewpoint;
+        return displayView.viewpoint();
     }
 
     public boolean isOrthographic() {

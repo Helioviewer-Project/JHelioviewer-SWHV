@@ -101,7 +101,7 @@ public final class Annotations {
         annotationsLine.setVertex(annotationsBuf);
         annotationsLine.renderLine(vp, LINEWIDTH);
 
-        double pixFactor = CameraHelper.getPixelFactor(ctx.camera(), vp);
+            double pixFactor = CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         Transform.pushView();
         if (ctx.isOrthographic())

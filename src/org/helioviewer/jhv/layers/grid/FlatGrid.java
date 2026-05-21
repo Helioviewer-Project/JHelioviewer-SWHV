@@ -60,22 +60,23 @@ public class FlatGrid {
 
     public void render(MapContext ctx, Viewport vp, ProjectionScale scale, boolean showLabels) {
         Camera camera = ctx.camera();
-        rebuildIfNeeded(ctx, camera, vp, scale);
+        double width = ctx.cameraWidth(vp);
+        rebuildIfNeeded(ctx, camera, vp, scale, width);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(camera, vp);
+            drawLabels(camera, vp, width);
     }
 
-    private static FlatGridKey key(MapContext ctx, Camera camera, Viewport vp) {
-        return new FlatGridKey(ctx.mode(), ctx.gridType(), vp.aspect, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY());
+    private static FlatGridKey key(MapContext ctx, Camera camera, Viewport vp, double width) {
+        return new FlatGridKey(ctx.mode(), ctx.gridType(), vp.aspect, width, camera.getTranslationX(), camera.getTranslationY());
     }
 
-    private void rebuildIfNeeded(MapContext ctx, Camera camera, Viewport vp, ProjectionScale scale) {
-        FlatGridKey flatGridKey = key(ctx, camera, vp);
+    private void rebuildIfNeeded(MapContext ctx, Camera camera, Viewport vp, ProjectionScale scale, double width) {
+        FlatGridKey flatGridKey = key(ctx, camera, vp, width);
 
         double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
         double yCenter = 0.5 - camera.getTranslationY();
-        double halfWidth = 0.5 * camera.getCameraWidth(vp);
+        double halfWidth = 0.5 * width;
         AxisSignature xSignature = buildAxisSignature(true,
                 scale.getInterpolatedXValue(Math.clamp(xCenter - halfWidth, 0, 1)),
                 scale.getInterpolatedXValue(Math.clamp(xCenter + halfWidth, 0, 1)), vp.width);
@@ -88,7 +89,7 @@ public class FlatGrid {
         boolean wrap0to360 = ctx.gridType() == GridType.Carrington;
         xAxis = buildAxis(scale, true, wrap0to360, xSignature);
         yAxis = buildAxis(scale, false, false, ySignature);
-        rebuildShape(camera, vp);
+        rebuildShape(camera, vp, width);
 
         previousKey = flatGridKey;
     }
@@ -99,10 +100,10 @@ public class FlatGrid {
                 !Objects.equals(yAxis.signature(), ySignature);
     }
 
-    private void drawLabels(Camera camera, Viewport vp) {
+    private void drawLabels(Camera camera, Viewport vp, double width) {
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
-        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(camera.getCameraWidth(vp), 1) / vp.height;
+        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
 
@@ -111,27 +112,27 @@ public class FlatGrid {
         for (int i = 0; i < xAxis.labels().length; i++) {
             if (xAxis.axisFlags()[i])
                 continue;
-            double x = RasterLine.snapVertical(camera, vp, xAxis.positions()[i]);
+            double x = RasterLine.snapVertical(vp, width, camera.getTranslationX(), xAxis.positions()[i]);
             renderer.draw(xAxis.labels()[i], (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
         }
         for (int i = 0; i < yAxis.labels().length; i++) {
-            double y = RasterLine.snapHorizontal(camera, vp, yAxis.positions()[i]);
+            double y = RasterLine.snapHorizontal(vp, width, camera.getTranslationY(), yAxis.positions()[i]);
             renderer.draw(yAxis.labels()[i], 0, (float) y + labelOffset, 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }
 
-    private void rebuildShape(Camera camera, Viewport vp) {
+    private void rebuildShape(Camera camera, Viewport vp, double width) {
         int noPoints = RasterLine.vertexCount(xAxis.positions().length + yAxis.positions().length);
         BufVertex vexBuf = new BufVertex(noPoints * GLSLShape.stride);
 
         for (int i = 0; i < xAxis.positions().length; i++) {
             byte[] color = xAxis.axisFlags()[i] ? AXIS_COLOR : GRID_COLOR;
-            RasterLine.putVertical(camera, vp, vp.aspect * xAxis.positions()[i], -0.5, 0.5, THICKNESS_PIXELS, color, vexBuf);
+            RasterLine.putVertical(vp, width, camera.getTranslationX(), vp.aspect * xAxis.positions()[i], -0.5, 0.5, THICKNESS_PIXELS, color, vexBuf);
         }
         for (int i = 0; i < yAxis.positions().length; i++) {
             byte[] color = yAxis.axisFlags()[i] ? AXIS_COLOR : GRID_COLOR;
-            RasterLine.putHorizontal(camera, vp, -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], THICKNESS_PIXELS, color, vexBuf);
+            RasterLine.putHorizontal(vp, width, camera.getTranslationY(), -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], THICKNESS_PIXELS, color, vexBuf);
         }
         shape.setVertex(vexBuf);
     }

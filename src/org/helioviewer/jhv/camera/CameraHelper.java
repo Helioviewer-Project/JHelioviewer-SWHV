@@ -31,17 +31,28 @@ public class CameraHelper {
         return computeNormalizedY(vp, screenY) * width - camera.getTranslationY();
     }
 
-    private static double getLogicalPixelFactor(Camera camera, Viewport vp) {
-        double width = camera.getCameraWidth(vp);
+    private static double getLogicalPixelFactor(Viewport vp, double width) {
         return (vp.height / Display.pixelScale[1]) / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
+    }
+
+    private static double getLogicalPixelFactor(Camera camera, Viewport vp) {
+        return getLogicalPixelFactor(vp, camera.getCameraWidth(vp));
     }
 
     public static double getPixelFactor(Camera camera, Viewport vp) {
         return Display.pixelScale[1] * getLogicalPixelFactor(camera, vp);
     }
 
+    public static double getPixelFactor(Viewport vp, double width) {
+        return Display.pixelScale[1] * getLogicalPixelFactor(vp, width);
+    }
+
     public static double getTemperedPointFactor(Camera camera, Viewport vp) {
         return Display.pixelScale[1] * Math.cbrt(getLogicalPixelFactor(camera, vp));
+    }
+
+    public static double getTemperedPointFactor(Viewport vp, double width) {
+        return Display.pixelScale[1] * Math.cbrt(getLogicalPixelFactor(vp, width));
     }
 
     public static double getImagePixelFactor(Camera camera, Viewport vp) {

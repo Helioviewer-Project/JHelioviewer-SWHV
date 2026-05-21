@@ -86,7 +86,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (!geometryMap.isEmpty()) {
             SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(ctx.viewpoint().time);
             updateTimestamp(g.time());
-            g.render(geometryLine, geometryPoint, vp, CameraHelper.getPixelFactor(camera, vp));
+            g.render(geometryLine, geometryPoint, vp, CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp)));
         }
     }
 
@@ -101,7 +101,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         putConnectivity(ctx, vp, scale, connectivity.M, mColor, connectivityBuf);
 
         connectivityCenter.setVertex(connectivityBuf);
-        connectivityCenter.renderPoints(CameraHelper.getPixelFactor(camera, vp));
+        connectivityCenter.renderPoints(CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp)));
     }
 
     private static void putConnectivity(MapContext ctx, Viewport vp, ProjectionScale scale, List<Vec3> points, byte[] color, BufVertex vexBuf) {
