@@ -134,7 +134,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
         long currentTime = viewpoint.time.milli;
-        List<JHVRelatedEvents> activeEvents = SWEKData.getActiveEvents(currentTime);
+        List<JHVRelatedEvents> activeEvents = JHVEventCache.getEvents(currentTime, currentTime);
         if (activeEvents.isEmpty()) {
             resetHover();
             return;

@@ -359,7 +359,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             cachedEventsTime = time;
             cachedEventsStart = start;
             cachedEventsEnd = end;
-            cachedActiveEvents = SWEKData.getActiveEvents(time);
+            cachedActiveEvents = JHVEventCache.getEvents(time, time);
         }
         return cachedActiveEvents;
     }
