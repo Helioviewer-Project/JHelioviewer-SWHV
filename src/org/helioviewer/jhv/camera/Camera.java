@@ -2,7 +2,6 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -45,11 +44,6 @@ public class Camera {
 
     private void updateWidth(Position viewpoint) {
         cameraWidth = 2 * viewpoint.distance * Math.tan(0.5 * fov);
-    }
-
-    public void refresh(Position viewpoint) {
-        updateViewpoint(viewpoint);
-        MovieDisplay.render(1);
     }
 
     public void reset(Position viewpoint) {

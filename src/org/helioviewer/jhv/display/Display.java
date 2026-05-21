@@ -103,7 +103,8 @@ public final class Display {
     }
 
     public static void refreshCamera() {
-        camera.refresh(viewpointModel.update(Movie.getTime()));
+        camera.updateViewpoint(viewpointModel.update(Movie.getTime()));
+        MovieDisplay.render(1);
     }
 
     public static void resetCamera() {
