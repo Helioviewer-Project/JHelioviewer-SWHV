@@ -88,9 +88,14 @@ final class GenericImage implements URIImageReader {
 
         // pick the first available ImageReader
         ImageReader reader = readers.next();
-        // attach source to the reader
-        reader.setInput(iis, true);
-        return reader;
+        try {
+            // attach source to the reader
+            reader.setInput(iis, true);
+            return reader;
+        } catch (RuntimeException | Error e) {
+            reader.dispose();
+            throw e;
+        }
     }
 
     private static ImageBuffer readBuffered(BufferedImage image, ImageFilter.Type filterType) {

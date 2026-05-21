@@ -29,6 +29,7 @@ public class HTTPSocket {
     protected final String httpHeader;
 
     protected HTTPSocket(URI uri) throws IOException {
+        Socket openSocket = null;
         try {
             String host = uri.getHost();
 
@@ -36,12 +37,12 @@ public class HTTPSocket {
             switch (uri.getScheme().toLowerCase()) {
                 case "jpip" -> {
                     port = uri.getPort() <= 0 ? 80 : uri.getPort();
-                    socket = new Socket(ProxySettings.proxy);
+                    openSocket = new Socket(ProxySettings.proxy);
                 }
                 case "jpips" -> {
                     port = uri.getPort() <= 0 ? 443 : uri.getPort();
-                    socket = SSLSocketFactory.getDefault().createSocket();
-                    if (socket instanceof SSLSocket sslSocket) { // obviously
+                    openSocket = SSLSocketFactory.getDefault().createSocket();
+                    if (openSocket instanceof SSLSocket sslSocket) { // obviously
                         SSLParameters parameters = sslSocket.getSSLParameters();
                         parameters.setProtocols(new String[]{"TLSv1.3"});
                         parameters.setApplicationProtocols(new String[]{"http/1.1"}); // probably useless
@@ -52,14 +53,14 @@ public class HTTPSocket {
                 default -> throw new IOException("JPIP scheme not supported: " + uri);
             }
 
-            socket.setReceiveBufferSize(Math.max(262144 * 8, 2 * socket.getReceiveBufferSize()));
-            socket.setTrafficClass(0x10);
-            socket.setSoTimeout(TIMEOUT_READ);
-            socket.setKeepAlive(true);
-            socket.setTcpNoDelay(true);
-            socket.connect(new InetSocketAddress(host, port), TIMEOUT_CONNECT);
+            openSocket.setReceiveBufferSize(Math.max(262144 * 8, 2 * openSocket.getReceiveBufferSize()));
+            openSocket.setTrafficClass(0x10);
+            openSocket.setSoTimeout(TIMEOUT_READ);
+            openSocket.setKeepAlive(true);
+            openSocket.setTcpNoDelay(true);
+            openSocket.connect(new InetSocketAddress(host, port), TIMEOUT_CONNECT);
 
-            inputStream = socket.getInputStream();
+            InputStream openInputStream = openSocket.getInputStream();
 
             HashMap<String, String> hdr = new HashMap<>();
             hdr.put("User-Agent", JHVGlobals.userAgent);
@@ -70,8 +71,17 @@ public class HTTPSocket {
 
             StringBuilder sb = new StringBuilder();
             hdr.forEach((key, value) -> sb.append(key).append(": ").append(value).append("\r\n"));
-            httpHeader = " HTTP/1.1\r\n" + sb + "\r\n";
+            String header = " HTTP/1.1\r\n" + sb + "\r\n";
+
+            socket = openSocket;
+            inputStream = openInputStream;
+            httpHeader = header;
         } catch (Exception e) { // redirect all to IOException
+            if (openSocket != null)
+                try {
+                    openSocket.close();
+                } catch (IOException ignore) {
+                }
             throw new IOException(e);
         }
     }

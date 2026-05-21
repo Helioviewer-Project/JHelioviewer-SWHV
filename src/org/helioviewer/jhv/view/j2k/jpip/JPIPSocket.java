@@ -33,27 +33,34 @@ public final class JPIPSocket extends HTTPSocket {
 
     public JPIPSocket(URI uri, JPIPCache cache) throws KduException, IOException {
         super(uri);
+        try {
+            jpipPath = uri.getPath();
 
-        jpipPath = uri.getPath();
+            JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), 0, cache, JPIPCacheManager.NOOP_WRITER); // deliberately short
+            String cnew = res.getCNew();
+            if (cnew == null)
+                throw new IOException("The header 'JPIP-cnew' was not sent by the server");
 
-        JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), 0, cache, JPIPCacheManager.NOOP_WRITER); // deliberately short
-        String cnew = res.getCNew();
-        if (cnew == null)
-            throw new IOException("The header 'JPIP-cnew' was not sent by the server");
+            Map<String, String> map = new HashMap<>();
+            for (String part : Regex.Comma.split(cnew))
+                for (String cnewParam : cnewParams)
+                    if (part.startsWith(cnewParam + '='))
+                        map.put(cnewParam, part.substring(cnewParam.length() + 1));
 
-        Map<String, String> map = new HashMap<>();
-        for (String part : Regex.Comma.split(cnew))
-            for (String cnewParam : cnewParams)
-                if (part.startsWith(cnewParam + '='))
-                    map.put(cnewParam, part.substring(cnewParam.length() + 1));
+            jpipPath = '/' + map.get("path");
+            jpipChannelID = map.get("cid");
+            if (jpipChannelID == null)
+                throw new IOException("The channel id was not sent by the server");
 
-        jpipPath = '/' + map.get("path");
-        jpipChannelID = map.get("cid");
-        if (jpipChannelID == null)
-            throw new IOException("The channel id was not sent by the server");
-
-        if (!"http".equals(map.get("transport")))
-            throw new IOException("The client only supports HTTP transport");
+            if (!"http".equals(map.get("transport")))
+                throw new IOException("The client only supports HTTP transport");
+        } catch (KduException | IOException | RuntimeException | Error e) {
+            try {
+                super.close();
+            } catch (IOException ignore) {
+            }
+            throw e;
+        }
     }
 
     // Closes the JPIPChannel
