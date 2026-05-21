@@ -27,9 +27,7 @@ class FilterMGN implements ImageFilter.Algorithm {
         // Number of boxes
         private final int K;
 
-        private final ThreadLocal<float[]> buffer;
-
-        GaussFilter(float sigma, int _K, int N) {
+        GaussFilter(float sigma, int _K) {
             K = _K;
 
             int i = K - SII_MIN_K;
@@ -42,10 +40,6 @@ class FilterMGN implements ImageFilter.Algorithm {
 
             for (int k = 0; k < K; ++k)
                 weights[k] = weights0[i][k] / sum;
-
-            int pad = radii[0] + 1;
-            int bufferLength = N + 2 * pad;
-            buffer = ThreadLocal.withInitial(() -> new float[bufferLength]);
         }
 
         private static int extension(int N, int n) {
@@ -92,13 +86,16 @@ class FilterMGN implements ImageFilter.Algorithm {
         }
 
         void gaussianConvImage(float[] dst, float[] src, int width, int height) {
+            int pad = radii[0] + 1;
             ParallelRange.run(height, (from, to) -> {
+                float[] scratch = new float[width + 2 * pad];
                 for (int y = from; y < to; y++)
-                    gaussianConv(dst, src, width, 1, width * y, buffer.get());
+                    gaussianConv(dst, src, width, 1, width * y, scratch);
             });
             ParallelRange.run(width, (from, to) -> {
+                float[] scratch = new float[height + 2 * pad];
                 for (int x = from; x < to; x++)
-                    gaussianConv(dst, dst, height, width, x, buffer.get());
+                    gaussianConv(dst, dst, height, width, x, scratch);
             });
         }
 
@@ -146,10 +143,9 @@ class FilterMGN implements ImageFilter.Algorithm {
         float[] conv = new float[size];
         float[] conv2 = new float[size];
 
-        int maxDim = Math.max(width, height);
         GaussFilter[] filters = new GaussFilter[sigmas.length];
         for (int i = 0; i < sigmas.length; i++) {
-            filters[i] = new GaussFilter(sigmas[i], K, maxDim);
+            filters[i] = new GaussFilter(sigmas[i], K);
         }
 
         for (int i = 0; i < sigmas.length; i++) {
