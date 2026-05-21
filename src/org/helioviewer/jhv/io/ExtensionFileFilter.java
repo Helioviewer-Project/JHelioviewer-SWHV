@@ -44,7 +44,7 @@ public class ExtensionFileFilter {
 
             String testName = f.getName().toLowerCase();
             for (String ext : extensions) {
-                if (testName.endsWith(ext))
+                if (testName.endsWith("." + ext))
                     return true;
             }
             return false;
