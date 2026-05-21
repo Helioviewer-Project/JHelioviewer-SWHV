@@ -163,7 +163,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     private static class FitsModel extends DefaultTableModel {
 
         FitsModel() {
-            super(new String[0][0][0], new String[]{"Keyword", "Value", "Comment"});
+            super(new String[0][0], new String[]{"Keyword", "Value", "Comment"});
         }
 
         @Override
