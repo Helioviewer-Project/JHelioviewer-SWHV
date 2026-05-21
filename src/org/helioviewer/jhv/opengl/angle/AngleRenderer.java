@@ -85,12 +85,6 @@ public final class AngleRenderer {
 
     public AngleRenderer(long nativeWindowHandle) {
         this(SurfaceKind.WINDOW, nativeWindowHandle, 0, 0);
-        try {
-            render();
-        } catch (RuntimeException | Error e) {
-            destroy();
-            throw e;
-        }
     }
 
     public static AngleRenderer pbuffer(int width, int height) {
