@@ -3,10 +3,12 @@ package org.helioviewer.jhv.display;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.time.JHVTime;
 
 public final class Display {
@@ -110,6 +112,8 @@ public final class Display {
 
     private static void resetCamera(Camera camera, ViewpointModel model) {
         camera.reset(model.update(Movie.getTime()));
+        CameraHelper.zoomToFit(camera);
+        MovieDisplay.render(1);
     }
 
     public static MapContext getMapContext(Position viewpoint) {

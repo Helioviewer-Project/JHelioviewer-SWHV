@@ -57,8 +57,6 @@ public class Camera {
         dragRotation = Quat.ZERO;
 
         updateViewpoint(viewpoint);
-        CameraHelper.zoomToFit(this);
-        MovieDisplay.render(1);
     }
 
     public double getTranslationX() {
