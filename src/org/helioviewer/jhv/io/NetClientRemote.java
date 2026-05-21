@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 
+import okhttp3.Authenticator;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Dispatcher;
@@ -43,6 +44,7 @@ class NetClientRemote implements NetClient {
             .readTimeout(60, TimeUnit.SECONDS)
             .cache(new Cache(JHVGlobals.clientCacheDir, cacheSize))
             .dispatcher(dispatcher)
+            .proxyAuthenticator(Authenticator.JAVA_NET_AUTHENTICATOR)
             //.addInterceptor(logging)
             //.addInterceptor(new LoggingInterceptor())
             .build();
