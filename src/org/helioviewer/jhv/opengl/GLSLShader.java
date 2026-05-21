@@ -50,6 +50,7 @@ abstract class GLSLShader {
             use();
             initUniforms(progID);
         } catch (Exception e) {
+            _dispose();
             throw new JHVGLException("Cannot load shader", e);
         }
     }
@@ -88,48 +89,58 @@ abstract class GLSLShader {
 
     private static int attachShader(int shaderType, String text) {
         int id = GL.glCreateShader(shaderType);
-        GL.glShaderSource(id, text);
-        GL.glCompileShader(id);
+        try {
+            GL.glShaderSource(id, text);
+            GL.glCompileShader(id);
 
-        int compileStatus = GL.glGetShaderi(id, GL.COMPILE_STATUS);
-        if (compileStatus != 1) {
-            Log.error("Shader compile status: " + compileStatus);
-            int infoLogLength = GL.glGetShaderi(id, GL.INFO_LOG_LENGTH);
-            if (infoLogLength > 0) {
-                String log = GL.glGetShaderInfoLog(id, infoLogLength);
-                Log.error(log);
-                throw new JHVGLException("Cannot compile shader: " + log);
-            } else
-                throw new JHVGLException("Cannot compile shader: unknown reason");
+            int compileStatus = GL.glGetShaderi(id, GL.COMPILE_STATUS);
+            if (compileStatus != 1) {
+                Log.error("Shader compile status: " + compileStatus);
+                int infoLogLength = GL.glGetShaderi(id, GL.INFO_LOG_LENGTH);
+                if (infoLogLength > 0) {
+                    String log = GL.glGetShaderInfoLog(id, infoLogLength);
+                    Log.error(log);
+                    throw new JHVGLException("Cannot compile shader: " + log);
+                } else
+                    throw new JHVGLException("Cannot compile shader: unknown reason");
+            }
+            return id;
+        } catch (Exception e) {
+            GL.glDeleteShader(id);
+            throw e;
         }
-        return id;
     }
 
     private int initializeProgram() {
         int id = GL.glCreateProgram();
-        GL.glAttachShader(id, vertexID);
-        GL.glAttachShader(id, fragmentID);
-        GL.glLinkProgram(id);
+        try {
+            GL.glAttachShader(id, vertexID);
+            GL.glAttachShader(id, fragmentID);
+            GL.glLinkProgram(id);
 
-        int linkStatus = GL.glGetProgrami(id, GL.LINK_STATUS);
-        if (linkStatus != 1) {
-            Log.error("Shader link status: " + linkStatus);
-            int infoLogLength = GL.glGetProgrami(id, GL.INFO_LOG_LENGTH);
-            if (infoLogLength > 0) {
-                String log = GL.glGetProgramInfoLog(id, infoLogLength);
-                Log.error(log);
-                throw new JHVGLException("Cannot link shader: " + log);
-            } else
-                throw new JHVGLException("Cannot link shader: unknown reason");
+            int linkStatus = GL.glGetProgrami(id, GL.LINK_STATUS);
+            if (linkStatus != 1) {
+                Log.error("Shader link status: " + linkStatus);
+                int infoLogLength = GL.glGetProgrami(id, GL.INFO_LOG_LENGTH);
+                if (infoLogLength > 0) {
+                    String log = GL.glGetProgramInfoLog(id, infoLogLength);
+                    Log.error(log);
+                    throw new JHVGLException("Cannot link shader: " + log);
+                } else
+                    throw new JHVGLException("Cannot link shader: unknown reason");
+            }
+
+            GL.glDetachShader(id, vertexID);
+            GL.glDeleteShader(vertexID);
+            vertexID = 0;
+            GL.glDetachShader(id, fragmentID);
+            GL.glDeleteShader(fragmentID);
+            fragmentID = 0;
+            return id;
+        } catch (Exception e) {
+            GL.glDeleteProgram(id);
+            throw e;
         }
-
-        GL.glDetachShader(id, vertexID);
-        GL.glDeleteShader(vertexID);
-        vertexID = 0;
-        GL.glDetachShader(id, fragmentID);
-        GL.glDeleteShader(fragmentID);
-        fragmentID = 0;
-        return id;
     }
 
 }
