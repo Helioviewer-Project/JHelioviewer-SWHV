@@ -49,10 +49,6 @@ public final class Display {
         return miniCamera;
     }
 
-    public static MapContext getMapContext() {
-        return getMapContext(camera.getViewpoint());
-    }
-
     public static MapContext getMapContext(Position viewpoint) {
         return getMapContext(camera.displayView(viewpoint));
     }
