@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
@@ -35,7 +34,7 @@ public interface View {
 
     ImageFilter.Type getFilter();
 
-    default void decode(Position viewpoint, double pixFactor, float factor) {}
+    default void decode(double pixFactor, float factor) {}
 
     @Nullable
     default String getBaseName() {
