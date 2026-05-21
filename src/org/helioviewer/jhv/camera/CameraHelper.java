@@ -42,20 +42,8 @@ public class CameraHelper {
         return (vp.height / Display.pixelScale[1]) / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
     }
 
-    private static double getLogicalPixelFactor(Camera camera, Viewport vp) {
-        return getLogicalPixelFactor(vp, camera.getCameraWidth(vp));
-    }
-
-    public static double getPixelFactor(Camera camera, Viewport vp) {
-        return Display.pixelScale[1] * getLogicalPixelFactor(camera, vp);
-    }
-
     public static double getPixelFactor(Viewport vp, double width) {
         return Display.pixelScale[1] * getLogicalPixelFactor(vp, width);
-    }
-
-    public static double getTemperedPointFactor(Camera camera, Viewport vp) {
-        return Display.pixelScale[1] * Math.cbrt(getLogicalPixelFactor(camera, vp));
     }
 
     public static double getTemperedPointFactor(Viewport vp, double width) {
@@ -101,21 +89,11 @@ public class CameraHelper {
     }
 
     @Nullable
-    private static Vec3 intersectSphere(Camera camera, Viewport vp, double screenX, double screenY) {
-        return intersectSphere(vp, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY(), screenX, screenY);
-    }
-
-    @Nullable
     private static Vec3 intersectSphere(Viewport vp, double width, double tx, double ty, double screenX, double screenY) {
         double up1x = computeUpX(vp, width, tx, screenX);
         double up1y = computeUpY(vp, width, ty, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
         return radius2 > Sun.Radius2 ? null : new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
-    }
-
-    @Nullable
-    private static Vec3 intersectPlane(Camera camera, Viewport vp, double screenX, double screenY, Vec3 planeNormal) {
-        return intersectPlane(vp, camera.getCameraWidth(vp), camera.getTranslationX(), camera.getTranslationY(), screenX, screenY, planeNormal);
     }
 
     @Nullable

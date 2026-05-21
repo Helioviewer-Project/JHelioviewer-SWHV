@@ -5,7 +5,6 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
@@ -113,7 +112,6 @@ public final class GridLayer extends AbstractLayer {
             gridNeedsInit = false;
         }
 
-        Camera camera = ctx.camera();
         Position viewpoint = ctx.viewpoint();
         float ztext = 0;
         double pixFactor = CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp));

@@ -121,7 +121,6 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
-        Camera camera = ctx.camera();
         double pointFactor = CameraHelper.getTemperedPointFactor(vp, ctx.cameraWidth(vp));
         Position viewpoint = ctx.viewpoint();
 

@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.MapContext;
@@ -75,9 +74,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
-        Camera camera = ctx.camera();
         if (connectivity != null)
-            drawConnectivity(ctx, vp, scale, camera);
+            drawConnectivity(ctx, vp, scale);
         if (hcs != null)
             drawHCS(ctx, vp, scale);
         if (footpointMap != null)
@@ -95,7 +93,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         render(ctx, vp, scale);
     }
 
-    private void drawConnectivity(MapContext ctx, Viewport vp, ProjectionScale scale, Camera camera) {
+    private void drawConnectivity(MapContext ctx, Viewport vp, ProjectionScale scale) {
         putConnectivity(ctx, vp, scale, connectivity.SSW, sswColor, connectivityBuf);
         putConnectivity(ctx, vp, scale, connectivity.FSW, fswColor, connectivityBuf);
         putConnectivity(ctx, vp, scale, connectivity.M, mColor, connectivityBuf);
