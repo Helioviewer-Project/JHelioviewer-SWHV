@@ -13,11 +13,11 @@ public abstract class MapContext {
     private final GridType gridType;
     private final Position viewpoint;
 
-    protected MapContext(Camera _camera, ProjectionMode _mode, GridType _gridType) {
+    protected MapContext(Camera _camera, ProjectionMode _mode, GridType _gridType, Position _viewpoint) {
         camera = _camera;
         mode = _mode;
         gridType = _gridType;
-        viewpoint = _camera.getViewpoint();
+        viewpoint = _viewpoint;
     }
 
     public Camera camera() {
