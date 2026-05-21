@@ -121,8 +121,8 @@ public final class Display {
         MovieDisplay.render(1);
     }
 
-    public static DisplayView getDisplayView(Position viewpoint) {
-        return camera.displayView(viewpoint);
+    public static DisplayView renderView(Position viewpoint) {
+        return camera.renderView(viewpoint);
     }
 
     public static MapContext getMapContext(DisplayView displayView) {
