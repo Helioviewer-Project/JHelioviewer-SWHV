@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
@@ -70,14 +69,14 @@ public final class URIView extends BaseView {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor) {
+    public void decode(double pixFactor, float factor) {
         DecodeKey key = new DecodeKey(dataUri, filterType);
         ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
-            sendDataToHandler(imageBuffer, viewpoint);
+            sendDataToHandler(imageBuffer);
             return;
         }
-        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(key, viewpoint));
+        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(key));
     }
 
     private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
@@ -94,11 +93,9 @@ public final class URIView extends BaseView {
     private class Callback extends DecodeCallback {
 
         private final DecodeKey key;
-        private final Position viewpoint;
 
-        Callback(DecodeKey _key, Position _viewpoint) {
+        Callback(DecodeKey _key) {
             key = _key;
-            viewpoint = _viewpoint;
         }
 
         @Override
@@ -106,14 +103,14 @@ public final class URIView extends BaseView {
             if (key.filter() != filterType) return; // filter changed in-flight
 
             ImageBufferCache.put(key, result);
-            sendDataToHandler(result, viewpoint);
+            sendDataToHandler(result);
         }
 
     }
 
-    private void sendDataToHandler(ImageBuffer imageBuffer, Position viewpoint) {
+    private void sendDataToHandler(ImageBuffer imageBuffer) {
         imageBuffer.protectFromExplicitFree();
-        ImageData data = new ImageData(imageBuffer, metaData[0], imageRegion, viewpoint);
+        ImageData data = new ImageData(imageBuffer, metaData[0], imageRegion);
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);

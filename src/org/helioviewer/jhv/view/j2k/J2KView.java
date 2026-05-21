@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.export.ExportMovie;
@@ -255,52 +254,52 @@ public class J2KView extends BaseView {
 
     private int currentLevel = 10000;
 
-    protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
+    protected void signalReader(J2KParams.Decode decodeParams) {
         int level = decodeParams.level();
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
-            reader.signal(new J2KParams.Read(this, (J2KSource.Remote) source, decodeParams, viewpoint, priority));
+            reader.signal(new J2KParams.Read(this, (J2KSource.Remote) source, decodeParams, priority));
             currentLevel = level;
         }
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor) {
+    public void decode(double pixFactor, float factor) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
         AtomicBoolean status = source.getFrameStatus(decodeParams.frame(), decodeParams.level()); // before signalling to reader
         boolean cacheResult = status != null && status.get();
         if (reader != null && !cacheResult) {
-            signalReader(decodeParams, viewpoint);
+            signalReader(decodeParams);
         }
-        if (useCachedImage(decodeParams, viewpoint))
+        if (useCachedImage(decodeParams))
             return;
-        submitDecode(decodeParams, viewpoint, cacheResult);
+        submitDecode(decodeParams, cacheResult);
     }
 
-    void refreshDecodeFromReader(J2KParams.Decode decodeParams, Position viewpoint) {
+    void refreshDecodeFromReader(J2KParams.Decode decodeParams) {
         EventQueue.invokeLater(() -> {
             if (decodeParams.frame() == targetFrame) {
-                submitDecode(decodeParams, viewpoint, true);
+                submitDecode(decodeParams, true);
             }
         });
     }
 
-    private boolean useCachedImage(J2KParams.Decode decodeParams, Position viewpoint) {
+    private boolean useCachedImage(J2KParams.Decode decodeParams) {
         DecodeKey key = new DecodeKey(decodeParams, filterType);
         ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
-            sendDataToHandler(decodeParams, viewpoint, imageBuffer);
+            sendDataToHandler(decodeParams, imageBuffer);
             return true;
         }
         return false;
     }
 
-    private void submitDecode(J2KParams.Decode decodeParams, Position viewpoint, boolean cacheResult) {
+    private void submitDecode(J2KParams.Decode decodeParams, boolean cacheResult) {
         DecodeKey key = new DecodeKey(decodeParams, filterType);
         int numComps = source.resolutionSet(decodeParams.frame()).numComps;
         try {
-            executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, cacheResult));
+            executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, cacheResult));
         } catch (RejectedExecutionException ignore) {
             // Teardown may shut the executor down before a late refresh/resubmit reaches this point.
         }
@@ -309,12 +308,10 @@ public class J2KView extends BaseView {
     private class J2KCallback extends DecodeCallback {
 
         private final DecodeKey key;
-        private final Position viewpoint;
         private final boolean cacheResult;
 
-        J2KCallback(DecodeKey _key, Position _viewpoint, boolean _cacheResult) {
+        J2KCallback(DecodeKey _key, boolean _cacheResult) {
             key = _key;
-            viewpoint = _viewpoint;
             cacheResult = _cacheResult;
         }
 
@@ -323,12 +320,12 @@ public class J2KView extends BaseView {
             if (key.filter() != filterType) return; // filter changed in-flight
             if (cacheResult) ImageBufferCache.put(key, result);
 
-            sendDataToHandler(key.params(), viewpoint, result);
+            sendDataToHandler(key.params(), result);
         }
 
     }
 
-    private void sendDataToHandler(J2KParams.Decode decodeParams, Position viewpoint, ImageBuffer imageBuffer) {
+    private void sendDataToHandler(J2KParams.Decode decodeParams, ImageBuffer imageBuffer) {
         imageBuffer.protectFromExplicitFree();
         int frame = decodeParams.frame();
         MetaData m = metaData[frame];
@@ -336,7 +333,7 @@ public class J2KView extends BaseView {
         ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level());
         Region r = m.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
 
-        ImageData data = new ImageData(imageBuffer, m, r, viewpoint);
+        ImageData data = new ImageData(imageBuffer, m, r);
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);
