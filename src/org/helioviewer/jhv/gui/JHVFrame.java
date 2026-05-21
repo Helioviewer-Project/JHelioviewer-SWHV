@@ -115,7 +115,6 @@ public final class JHVFrame {
     public static JFrame prepare() {
         mainFrame = createFrame();
 
-        CompletionNotifications.init();
         Message.setHandler(new MessageHandler());
         UpdateChecker.setHandler(new UpdateCheckHandler());
 
