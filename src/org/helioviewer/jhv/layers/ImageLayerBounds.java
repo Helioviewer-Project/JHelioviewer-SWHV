@@ -10,6 +10,7 @@ import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
 public final class ImageLayerBounds {
@@ -47,7 +48,7 @@ public final class ImageLayerBounds {
         Viewport vp = Display.getActiveViewport();
         MetaData metaData = imageData.getMetaData();
         double physicalHeight = metaData.getPhysicalRegion().height;
-        Quat mapRotation = Display.gridType.mapRotation(imageData.getViewpoint());
+        Quat mapRotation = Display.gridType.mapRotation(GLRenderer.getDisplayedViewpoint());
         double imageHeight = DisplayMapBounds.oneToOneHeight(Display.mode, mapRotation, metaData);
         double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / physicalHeight;
         if (Display.mode == ProjectionMode.Orthographic)
