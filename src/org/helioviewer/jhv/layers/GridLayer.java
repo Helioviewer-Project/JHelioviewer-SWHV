@@ -115,7 +115,7 @@ public final class GridLayer extends AbstractLayer {
 
         Camera camera = ctx.camera();
         Position viewpoint = ctx.viewpoint();
-        float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
+        float ztext = 0;
         double pixFactor = CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         // correct order: grid lines -> Earth indicators -> axis -> grid labels -> radial grid
