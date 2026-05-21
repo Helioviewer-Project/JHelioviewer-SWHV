@@ -230,9 +230,8 @@ public final class FitsMetaData extends CommonMetaData {
         if (observatory.equals("SDO")) // SDO has slightly wrong position metadata, place it at Earth
             return earthPosition(dateObs, earth);
 
-        double distObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter).orElseGet(() -> earth.distance);
-        if (observatory.equals("SOHO"))
-            distObs *= Sun.L1Factor;
+        double distObs = m.getDouble("DSUN_OBS").map(d -> d / Sun.RadiusMeter)
+                .orElseGet(() -> observatory.equals("SOHO") ? earth.distance * Sun.L1Factor : earth.distance);
 
         if (distObs < 1) { // failure in metadata pipeline like SUVI L1b, place it at Earth
             Log.warn(String.join(" ", getDisplayName(), dateObs.toString(), "Unreliable DSUN_OBS:", String.valueOf(distObs)));
