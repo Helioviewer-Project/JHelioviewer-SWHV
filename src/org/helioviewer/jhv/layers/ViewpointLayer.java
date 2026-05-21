@@ -131,7 +131,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (spiralSpeed > 0)
             renderSpiral(vp, lati, spiralSpeed);
 
-        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointModel().getUpdateViewpoint());
+        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointUpdate());
         if (!positionLoads.isEmpty()) {
             GL.glDisable(GL.DEPTH_TEST);
             renderPlanets(vp, positionLoads, pointFactor, time, start, end);
@@ -167,7 +167,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         Camera camera = Display.getCamera();
-        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointModel().getUpdateViewpoint());
+        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointUpdate());
         if (positionLoads.isEmpty()) {
             clearHoverTextIfNeeded();
             return;

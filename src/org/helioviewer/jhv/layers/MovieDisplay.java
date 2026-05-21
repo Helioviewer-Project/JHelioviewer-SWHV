@@ -16,7 +16,7 @@ public class MovieDisplay {
     }
 
     public static void display() {
-        renderRequestHandler.requestRender(Display.getViewpointModel().getViewpoint());
+        renderRequestHandler.requestRender(Display.getViewpoint());
     }
 
     public static void setRenderRequestHandler(RenderRequestHandler _renderRequestHandler) {

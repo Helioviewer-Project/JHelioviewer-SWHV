@@ -38,7 +38,7 @@ public final class ViewActions {
         double cameraWidth = ImageLayerBounds.getOneToOneCameraWidth(layer);
         if (cameraWidth > 0) {
             Display.resetViewportZoom();
-            double fov = 2. * Math.atan2(0.5 * cameraWidth, Display.getViewpointModel().getViewpoint().distance);
+            double fov = 2. * Math.atan2(0.5 * cameraWidth, Display.getViewpoint().distance);
             camera.setFOV(fov);
         }
         MovieDisplay.render(1);
