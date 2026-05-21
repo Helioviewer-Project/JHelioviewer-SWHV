@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
@@ -215,9 +214,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         shader.use();
         glImage.applyFilters();
 
-        Camera camera = ctx.camera();
-        Position cameraViewpoint = imageData.getViewpoint(); // camera at decode moment
-        Quat q = Quat.rotate(camera.getDragRotation(), cameraViewpoint.toQuat());
+        Position decodeViewpoint = imageData.getViewpoint(); // camera at decode moment
+        Quat q = Quat.rotate(ctx.camera().getDragRotation(), decodeViewpoint.toQuat());
 
         MetaData meta0 = imageData.getMetaData();
         Position metaViewpoint0 = meta0.getViewpoint();
@@ -259,8 +257,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         float deltaT0 = 0, deltaT1 = 0;
         if (ImageLayers.getDiffRotationMode()) {
-            deltaT0 = (float) ((cameraViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9);
-            deltaT1 = (float) ((cameraViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
+            deltaT0 = (float) ((decodeViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9);
+            deltaT1 = (float) ((decodeViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
         }
 
         GLSLSolarShader.bindWCS(
@@ -273,12 +271,12 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         Quat displayMap0 = Quat.ZERO;
         Quat displayMap1 = Quat.ZERO;
         if (ctx.isLatitudinal()) {
-            displayMap0 = displayMap1 = ctx.gridType().mapRotation(cameraViewpoint);
+            displayMap0 = displayMap1 = ctx.gridType().mapRotation(decodeViewpoint);
             GridType gridType = ctx.gridType();
-            latiGrid0[0] = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint0);
+            latiGrid0[0] = (float) latiLongitude(gridType, decodeViewpoint, metaViewpoint0);
             latiGrid0[1] = (float) gridType.toLatitude(metaViewpoint0);
             latiGrid0[2] = (float) metaViewpoint0.lat;
-            latiGrid1[0] = (float) latiLongitude(gridType, cameraViewpoint, metaViewpoint1);
+            latiGrid1[0] = (float) latiLongitude(gridType, decodeViewpoint, metaViewpoint1);
             latiGrid1[1] = (float) gridType.toLatitude(metaViewpoint1);
             latiGrid1[2] = (float) metaViewpoint1.lat;
         }
@@ -291,9 +289,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         GLSLSolar.quad.render();
     }
 
-    private static double latiLongitude(GridType gridType, Position cameraViewpoint, Position metaViewpoint) {
+    private static double latiLongitude(GridType gridType, Position decodeViewpoint, Position metaViewpoint) {
         double gridLon = gridType.toLongitude(metaViewpoint);
-        double lon = gridType == GridType.Viewpoint ? gridLon - cameraViewpoint.lon : metaViewpoint.lon - gridLon;
+        double lon = gridType == GridType.Viewpoint ? gridLon - decodeViewpoint.lon : metaViewpoint.lon - gridLon;
         return (lon + 3. * Math.PI) % (2. * Math.PI); // centered
     }
 
