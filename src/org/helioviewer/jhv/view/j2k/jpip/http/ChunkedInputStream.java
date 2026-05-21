@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.j2k.jpip.http;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ProtocolException;
@@ -72,12 +73,13 @@ class ChunkedInputStream extends InputStream implements TotalLength {
 
             if (chunkLength > 0) {
                 int read = in.read(b, off, Math.min(chunkLength, len));
-                if (read != -1) {
-                    chunkLength -= read;
-                    totalLength += read;
-                    if (chunkLength == 0)
-                        LineRead.readCRLF(in);
-                }
+                if (read == -1)
+                    throw new EOFException("Premature EOF: expected " + chunkLength + " more bytes in chunk");
+
+                chunkLength -= read;
+                totalLength += read;
+                if (chunkLength == 0)
+                    LineRead.readCRLF(in);
                 return read;
             }
 
