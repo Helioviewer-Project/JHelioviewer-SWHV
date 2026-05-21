@@ -7,6 +7,7 @@ import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.camera.ViewpointModel;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.Movie;
 
 public final class Display {
 
@@ -55,11 +56,16 @@ public final class Display {
     }
 
     public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, Camera.ViewpointApplyMode mode) {
-        camera.setViewpointUpdate(updateViewpoint, mode);
+        getViewpointModel().setUpdateViewpoint(updateViewpoint);
+        switch (mode) {
+            case RESET -> camera.reset();
+            case KEEP_TRANSFORM -> camera.updateViewpoint(Movie.getTime());
+        }
     }
 
     public static void setTrackingMode(boolean tracking) {
-        camera.setTrackingMode(tracking);
+        if (getViewpointModel().setTrackingMode(tracking))
+            camera.refresh();
     }
 
     public static MapContext getMapContext(Position viewpoint) {
