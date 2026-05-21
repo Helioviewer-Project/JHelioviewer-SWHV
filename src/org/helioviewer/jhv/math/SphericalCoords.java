@@ -51,10 +51,11 @@ public final class SphericalCoords {
     }
 
     public static Vec3 vec3(double radius, double longitude, double latitude) {
+        double cosLat = Math.cos(latitude);
         return new Vec3(
-                x(radius, longitude, latitude),
+                radius * cosLat * Math.sin(longitude),
                 y(radius, latitude),
-                z(radius, longitude, latitude));
+                radius * cosLat * Math.cos(longitude));
     }
 
     public static Vec3 unit(double longitude, double latitude) {
