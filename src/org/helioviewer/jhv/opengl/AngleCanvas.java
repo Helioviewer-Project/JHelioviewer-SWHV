@@ -20,6 +20,7 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
@@ -119,18 +120,22 @@ public final class AngleCanvas extends Canvas {
     }
 
     public void requestRender() {
+        requestRender(GLRenderer.getDisplayedViewpoint());
+    }
+
+    public void requestRender(Position viewpoint) {
         if (displayPending)
             return;
 
         if (angleRenderer == null) {
-            scheduleHostUpdate(true);
+            scheduleHostUpdate(true, viewpoint);
             return;
         }
 
         displayPending = true;
         EventQueue.invokeLater(() -> {
             displayPending = false;
-            renderNow();
+            renderNow(viewpoint);
         });
     }
 
@@ -147,7 +152,7 @@ public final class AngleCanvas extends Canvas {
     }
 
     // Render one frame and keep the shared viewport state in sync with the canvas size.
-    private void renderNow() {
+    private void renderNow(Position viewpoint) {
         attachIfNeeded();
         if (angleRenderer == null)
             return;
@@ -160,7 +165,7 @@ public final class AngleCanvas extends Canvas {
             lastGlWidth = glWidth;
             lastGlHeight = glHeight;
         }
-        angleRenderer.render();
+        angleRenderer.render(viewpoint);
         fpsCount++;
     }
 
@@ -201,7 +206,7 @@ public final class AngleCanvas extends Canvas {
     }
 
     // Push the current AWT bounds to the native host, then trigger a redraw if needed.
-    private void updateHostFrame(boolean renderNeeded) {
+    private void updateHostFrame(boolean renderNeeded, Position viewpoint) {
         if (getWidth() <= 0 || getHeight() <= 0)
             return;
 
@@ -220,11 +225,11 @@ public final class AngleCanvas extends Canvas {
             MacAngleBridge.setFrame(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
         lastHostBounds = bounds;
         if (renderNeeded || pixelScaleChanged || lastGlWidth < 0 || lastGlHeight < 0)
-            requestRender();
+            requestRender(viewpoint);
     }
 
     // Coalesce host updates onto the EDT so move/resize bursts become one native update.
-    private void scheduleHostUpdate(boolean renderNeeded) {
+    private void scheduleHostUpdate(boolean renderNeeded, Position viewpoint) {
         hostRenderPending |= renderNeeded;
         if (hostUpdatePending || !isDisplayable())
             return;
@@ -234,8 +239,12 @@ public final class AngleCanvas extends Canvas {
             hostUpdatePending = false;
             boolean render = hostRenderPending;
             hostRenderPending = false;
-            updateHostFrame(render);
+            updateHostFrame(render, viewpoint);
         });
+    }
+
+    private void scheduleHostUpdate(boolean renderNeeded) {
+        scheduleHostUpdate(renderNeeded, GLRenderer.getDisplayedViewpoint());
     }
 
     // Tear down renderer and native host state, even if part of the shutdown path fails.

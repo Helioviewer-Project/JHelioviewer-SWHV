@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
 import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -83,31 +83,29 @@ public final class Annotations {
         return true;
     }
 
-    public static void render(Camera camera, Viewport vp) {
+    public static void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (pending == null && annotations.isEmpty())
             return;
 
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
 
-        Position viewpoint = camera.getViewpoint();
-        MapContext ctx = new MapContext(viewpoint, vp, Display.mode.scale, Display.gridType);
         annotations.forEach(annotation -> {
             boolean active = annotation == activeAnnotation;
-            annotation.draw(ctx, active, annotationsBuf);
-            annotation.drawTransformed(active, transformedBuf, centerBuf);
+            annotation.draw(ctx, vp, scale, active, annotationsBuf);
+            annotation.drawTransformed(ctx, active, transformedBuf, centerBuf);
         });
         if (pending != null) {
-            pending.draw(ctx, false, annotationsBuf);
-            pending.drawTransformed(false, transformedBuf, centerBuf);
+            pending.draw(ctx, vp, scale, false, annotationsBuf);
+            pending.drawTransformed(ctx, false, transformedBuf, centerBuf);
         }
         annotationsLine.setVertex(annotationsBuf);
         annotationsLine.renderLine(vp, LINEWIDTH);
 
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
+        double pixFactor = CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         Transform.pushView();
-        if (Display.mode.isOrthographic())
-            Transform.rotateViewInverse(viewpoint.toQuat());
+        if (ctx.isOrthographic())
+            Transform.rotateViewInverse(ctx.viewpoint().toQuat());
         transformedLine.setVertex(transformedBuf);
         transformedLine.renderLine(vp, LINEWIDTH);
         center.setVertex(centerBuf);

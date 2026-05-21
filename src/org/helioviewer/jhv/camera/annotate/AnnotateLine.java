@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -18,8 +18,8 @@ public class AnnotateLine extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawLine(double centerX, double centerY, double bw, double bh, byte[] color, BufVertex vexBuf) {
-        boolean flat = Display.mode.isHpc();
+    private static void drawLine(MapContext ctx, double centerX, double centerY, double bw, double bh, byte[] color, BufVertex vexBuf) {
+        boolean flat = ctx.isHpc();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             double y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
@@ -35,7 +35,7 @@ public class AnnotateLine extends AbstractAnnotateable {
     }
 
     @Override
-    public void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf) {
+    public void drawTransformed(MapContext ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -46,7 +46,7 @@ public class AnnotateLine extends AbstractAnnotateable {
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
 
-        drawLine(p0.x + dx, p0.y + dy, dx, dy, color, lineBuf);
+        drawLine(ctx, p0.x + dx, p0.y + dy, dx, dy, color, lineBuf);
     }
 
     @Override

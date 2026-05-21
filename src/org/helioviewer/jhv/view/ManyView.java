@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -73,8 +72,8 @@ public class ManyView implements View {
     }
 
     @Override
-    public void decode(Position viewpoint, double pixFactor, float factor) {
-        frameMap.indexedValue(targetFrame).view.decode(viewpoint, pixFactor, factor);
+    public void decode(double pixFactor, float factor) {
+        frameMap.indexedValue(targetFrame).view.decode(pixFactor, factor);
     }
 
     @Nullable

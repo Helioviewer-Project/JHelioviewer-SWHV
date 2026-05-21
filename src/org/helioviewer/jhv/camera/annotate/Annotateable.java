@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
 
@@ -14,9 +15,9 @@ public interface Annotateable {
     @Nullable
     Object getData();
 
-    void draw(MapContext ctx, boolean active, BufVertex vexBuf);
+    void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf);
 
-    void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf);
+    void drawTransformed(MapContext ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf);
 
     void mousePressed(Camera camera, Viewport vp, int x, int y);
 

@@ -4,6 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
@@ -14,8 +15,8 @@ final class OrthoProjection {
 
     private OrthoProjection() {}
 
-    static Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y) {
-        return CameraHelper.unprojectToOutputSphere(camera, vp, x, y, camera.getViewpoint().toQuat());
+    static Vec3 mouseToSurface(Camera camera, DisplayView displayView, Viewport vp, int x, int y) {
+        return CameraHelper.unprojectToOutputSphere(camera, vp, displayView.cameraWidth(vp), x, y, displayView.viewpoint().toQuat());
     }
 
     static void emitMapVertex(Vec3 vertex, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
@@ -30,13 +31,13 @@ final class OrthoProjection {
         vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), (float) size, color);
     }
 
-    static Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        Position viewpoint = camera.getViewpoint();
+    static Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+        Position viewpoint = displayView.viewpoint();
         Quat rotation = gridType == GridType.Viewpoint
                 ? Quat.ZERO
                 : Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
 
-        Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, x, y, rotation);
+        Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, displayView.cameraWidth(vp), x, y, rotation);
         if (p == null)
             return Vec2.NAN;
 

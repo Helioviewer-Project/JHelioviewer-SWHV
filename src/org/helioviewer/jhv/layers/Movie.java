@@ -243,7 +243,7 @@ public class Movie {
             return;
 
         lastTimestamp = dateTime;
-        Display.getCamera().timeChanged(dateTime);
+        Display.timeChanged(dateTime);
 
         Layers.setImageLayersNearestFrame(dateTime);
         MovieDisplay.render(1);

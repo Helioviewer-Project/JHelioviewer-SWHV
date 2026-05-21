@@ -4,10 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.ViewpointModel;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.stars.GaiaClient;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -18,7 +20,7 @@ import org.json.JSONObject;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-public final class StarLayer extends AbstractLayer implements Camera.Listener, GaiaClient.Receiver {
+public final class StarLayer extends AbstractLayer implements ViewpointModel.Listener, GaiaClient.Receiver {
 
     private final Cache<Position, BufVertex> cache = Caffeine.newBuilder().softValues().build();
     private final Set<Position> pending = new HashSet<>();
@@ -52,11 +54,11 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
 
-        Position viewpoint = camera.getViewpoint();
+        Position viewpoint = ctx.viewpoint();
         BufVertex vexBuf = cache.getIfPresent(viewpoint);
         if (vexBuf == null)
             return;
@@ -68,7 +70,7 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
-        points.renderPoints(CameraHelper.getPixelFactor(camera, vp));
+        points.renderPoints(CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp)));
         Transform.popView();
     }
 
@@ -76,9 +78,9 @@ public final class StarLayer extends AbstractLayer implements Camera.Listener, G
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
         if (enabled) {
-            Display.getCamera().addListener(this);
+            Display.addViewpointListener(this);
         } else {
-            Display.getCamera().removeListener(this);
+            Display.removeViewpointListener(this);
         }
     }
 

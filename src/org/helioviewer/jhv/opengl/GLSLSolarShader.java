@@ -5,7 +5,6 @@ import java.nio.FloatBuffer;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Transform;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
@@ -140,12 +139,11 @@ public class GLSLSolarShader extends GLSLShader {
         GL.glUniform3fv(latiGridRef, latiGridBuf);
     }
 
-    public static void bindScreen(Viewport vp) {
+    public static void bindScreen(Viewport vp, ProjectionScale scale) {
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
-        ProjectionScale scale = Display.mode.scale;
         screenBuf.put((float) scale.getInterpolatedXValue(0)).put((float) scale.getInterpolatedXValue(1));
         screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
 

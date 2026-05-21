@@ -5,11 +5,12 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
+import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
@@ -103,7 +104,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
@@ -111,12 +112,12 @@ public final class GridLayer extends AbstractLayer {
             gridNeedsInit = false;
         }
 
-        Position viewpoint = camera.getViewpoint();
-        float ztext = 0; //(float) (camera.getWidth() * PLANETEXT_Z);
-        double pixFactor = CameraHelper.getPixelFactor(camera, vp);
+        Position viewpoint = ctx.viewpoint();
+        float ztext = 0;
+        double pixFactor = CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         // correct order: grid lines -> Earth indicators -> axis -> grid labels -> radial grid
-        Quat gridQuat = Display.gridType.toCarrington(viewpoint);
+        Quat gridQuat = ctx.gridType().toCarrington(viewpoint);
 
         Transform.pushView();
         Transform.rotateViewInverse(gridQuat);
@@ -156,10 +157,10 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp) {
+    public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(camera, vp, showLabels);
+        flatGrid.render(ctx, vp, scale, showLabels);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {

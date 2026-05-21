@@ -35,7 +35,7 @@ public final class InputController {
     }
 
     public static void mouseReleased(PointerEvent e) {
-        interaction.mouseReleased(e);
+        interaction.mouseReleased();
         pointerListeners.forEach(listener -> listener.mouseReleased(e));
     }
 
