@@ -2,11 +2,11 @@ package org.helioviewer.jhv.display;
 
 public interface ProjectionScale {
 
-    double getInterpolatedXDisplayValue(double v, GridType gridType);
-
     double getInterpolatedXValue(double v);
 
     double getInterpolatedYValue(double v);
+
+    double getDisplayXValue(double v, GridType gridType);
 
     double getXValueInv(double v);
 
@@ -58,8 +58,8 @@ public interface ProjectionScale {
         }
 
         @Override
-        public double getInterpolatedXDisplayValue(double v, GridType gridType) {
-            return getInterpolatedXValue(v);
+        public double getDisplayXValue(double v, GridType gridType) {
+            return v;
         }
 
         @Override
@@ -165,11 +165,10 @@ public interface ProjectionScale {
         }
 
         @Override
-        public double getInterpolatedXDisplayValue(double v, GridType gridType) {
-            double ix = getInterpolatedXValue(v);
-            if (gridType == GridType.Carrington && ix < 0)
-                ix += 360;
-            return ix;
+        public double getDisplayXValue(double v, GridType gridType) {
+            if (gridType == GridType.Carrington && v < 0)
+                return v + 360;
+            return v;
         }
 
     }
