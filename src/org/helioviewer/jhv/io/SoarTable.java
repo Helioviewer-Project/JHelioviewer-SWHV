@@ -46,10 +46,15 @@ class SoarTable {
             try (RowSequence rseq = table.getRowSequence()) {
                 while (rseq.next()) {
                     Object[] row = rseq.getRow();
-                    items.add(new SoarClient.DataItem(
-                            (String) row[col_id],
-                            SoarClient.SoarFileFormat.valueOf((String) row[col_format]),
-                            ((Number) row[col_size]).longValue()));
+                    String format = (String) row[col_format];
+                    try {
+                        items.add(new SoarClient.DataItem(
+                                (String) row[col_id],
+                                SoarClient.SoarFileFormat.valueOf(format),
+                                ((Number) row[col_size]).longValue()));
+                    } catch (IllegalArgumentException e) {
+                        Log.warn("Ignoring unknown SOAR data format: " + format, e);
+                    }
                 }
             }
             return items;
