@@ -13,13 +13,12 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
 
-public class EventDatabaseThread extends Thread {
+final class EventDatabaseThread {
 
     private static final int CURRENT_VERSION_SCHEMA = 10;
     private static Connection connection;
 
-    public EventDatabaseThread(Runnable r, String name) {
-        super(r, name);
+    private EventDatabaseThread() {
     }
 
     private static void createSchema() throws Exception {
