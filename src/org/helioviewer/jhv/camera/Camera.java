@@ -20,7 +20,6 @@ public class Camera {
     private double fov = INITFOV;
 
     private Vec2 translation = Vec2.ZERO;
-    private Quat rotation = Quat.ZERO;
     private Quat dragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
@@ -34,12 +33,7 @@ public class Camera {
     }
 
     public void updateViewpoint(Position viewpoint) {
-        updateRotation(viewpoint);
         updateWidth(viewpoint);
-    }
-
-    private void updateRotation(Position viewpoint) {
-        rotation = Quat.rotate(dragRotation, viewpoint.toQuat());
     }
 
     private void updateWidth(Position viewpoint) {
@@ -69,19 +63,16 @@ public class Camera {
         return dragRotation;
     }
 
-    public void rotateDragRotation(Quat _dragRotation, Position viewpoint) {
+    public void rotateDragRotation(Quat _dragRotation) {
         dragRotation = Quat.rotate(dragRotation, _dragRotation);
-        updateRotation(viewpoint);
     }
 
-    public void resetDragRotation(Position viewpoint) {
+    public void resetDragRotation() {
         dragRotation = Quat.ZERO;
-        updateRotation(viewpoint);
     }
 
-    public void resetDragRotationAxis(Vec3 dragAxis, Position viewpoint) {
+    public void resetDragRotationAxis(Vec3 dragAxis) {
         dragRotation = dragRotation.twist(dragAxis);
-        updateRotation(viewpoint);
     }
 
     public void setFOV(double _fov, Position viewpoint) {
@@ -112,7 +103,6 @@ public class Camera {
         ja = jo.optJSONArray("dragRotation");
         if (ja != null) dragRotation = Quat.fromJson(ja);
         setFOV(jo.optDouble("fov", fov), viewpoint);
-        updateRotation(viewpoint);
     }
 
 }

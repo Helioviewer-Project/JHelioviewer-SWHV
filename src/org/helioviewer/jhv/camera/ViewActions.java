@@ -52,7 +52,7 @@ public final class ViewActions {
     }
 
     public static void resetViewAxis() {
-        Display.getCamera().resetDragRotationAxis(Display.getViewpointUpdate().dragAxis(), Display.getViewpoint());
+        Display.getCamera().resetDragRotationAxis(Display.getViewpointUpdate().dragAxis());
         MovieDisplay.display();
     }
 
@@ -69,7 +69,7 @@ public final class ViewActions {
     }
 
     private static void rotateView90(Quat rotation) {
-        Display.getCamera().rotateDragRotation(rotation, Display.getViewpoint());
+        Display.getCamera().rotateDragRotation(rotation);
         MovieDisplay.display();
     }
 
