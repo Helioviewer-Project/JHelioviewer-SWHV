@@ -88,7 +88,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     }
 
     void applyCurrentViewpoint(Camera.ViewpointApplyMode mode) {
-        Display.getCamera().setViewpointUpdate(cameraMode.update, mode);
+        Display.setViewpointUpdate(cameraMode.update, mode);
     }
 
     void activate() {

@@ -239,7 +239,7 @@ public class ViewpointLayer extends AbstractLayer {
             InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
-                Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer, Camera.ViewpointApplyMode.KEEP_TRANSFORM);
+                Display.setViewpointUpdate(UpdateViewpoint.observer, Camera.ViewpointApplyMode.KEEP_TRANSFORM);
         }
     }
 
