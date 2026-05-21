@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.layers.MovieDisplay;
@@ -39,8 +38,8 @@ public class Camera {
         viewpointModel.removeListener(listener);
     }
 
-    public Camera(UpdateViewpoint _updateViewpoint) {
-        viewpointModel = new ViewpointModel(_updateViewpoint);
+    public Camera(ViewpointModel _viewpointModel) {
+        viewpointModel = _viewpointModel;
     }
 
     public DisplayView displayView(Position p) {
@@ -78,10 +77,6 @@ public class Camera {
         updateViewpoint(Movie.getTime());
         CameraHelper.zoomToFit(this);
         MovieDisplay.render(1);
-    }
-
-    public ViewpointModel getViewpointModel() {
-        return viewpointModel;
     }
 
     public double getTranslationX() {
