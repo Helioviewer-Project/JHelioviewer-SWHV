@@ -114,7 +114,7 @@ public final class URIView extends BaseView {
     private void sendDataToHandler(ImageBuffer imageBuffer, Position viewpoint) {
         imageBuffer.protectFromExplicitFree();
         ImageData data = new ImageData(imageBuffer, metaData[0], imageRegion, viewpoint);
-        EventQueue.invokeLater(() -> { // decouple from ImageLayers.displaySynced
+        EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);
         });

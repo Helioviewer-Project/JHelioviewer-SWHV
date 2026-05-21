@@ -48,15 +48,6 @@ public final class ImageLayers {
         });
     }
 
-    static void displaySynced(Position viewpoint) { // coalesce layers
-        for (ImageLayer layer : Layers.getImageLayers()) {
-            ImageData id;
-            if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
-                return;
-        }
-        MovieDisplay.display();
-    }
-
     public record WaitUntilLoaded(Collection<ImageLayer> newLayers) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
