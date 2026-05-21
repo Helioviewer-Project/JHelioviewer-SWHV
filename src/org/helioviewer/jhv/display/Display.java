@@ -112,8 +112,9 @@ public final class Display {
     }
 
     private static void resetCamera(Camera camera, ViewpointModel model) {
-        camera.reset(model.update(Movie.getTime()));
-        CameraHelper.zoomToFit(camera);
+        Position viewpoint = model.update(Movie.getTime());
+        camera.reset(viewpoint);
+        CameraHelper.zoomToFit(camera, viewpoint);
         MovieDisplay.render(1);
     }
 

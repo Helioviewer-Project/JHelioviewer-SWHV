@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -157,12 +158,12 @@ public class CameraHelper {
         return hitPoint == null ? null : dragRotation.rotateInverseVector(hitPoint);
     }
 
-    public static void zoomToFit(Camera camera) {
+    public static void zoomToFit(Camera camera, Position viewpoint) {
         double size = ImageLayerBounds.getLargestPhysicalHeight();
         double newFOV = Camera.INITFOV;
         if (size != 0)
-            newFOV = 2. * Math.atan2(0.5 * size, Display.getViewpoint().distance);
-        camera.setFOV(newFOV, Display.getViewpoint());
+            newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
+        camera.setFOV(newFOV, viewpoint);
     }
 
 }
