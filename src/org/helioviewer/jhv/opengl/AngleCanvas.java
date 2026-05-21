@@ -49,7 +49,7 @@ public final class AngleCanvas extends Canvas {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                scheduleHostUpdate(true, GLRenderer.getDisplayedViewpoint());
+                scheduleHostUpdate(true);
             }
 
             @Override
@@ -58,18 +58,18 @@ public final class AngleCanvas extends Canvas {
                 // immediately and the aspect ratio does not lag behind the canvas size.
                 invalidateGlSize();
                 refreshPixelScale();
-                scheduleHostUpdate(true, GLRenderer.getDisplayedViewpoint());
+                scheduleHostUpdate(true);
             }
         });
         addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
             @Override
             public void ancestorMoved(HierarchyEvent e) {
-                scheduleHostUpdate(false, GLRenderer.getDisplayedViewpoint());
+                scheduleHostUpdate(false);
             }
 
             @Override
             public void ancestorResized(HierarchyEvent e) {
-                scheduleHostUpdate(true, GLRenderer.getDisplayedViewpoint());
+                scheduleHostUpdate(true);
             }
         });
     }
@@ -78,7 +78,7 @@ public final class AngleCanvas extends Canvas {
     public void addNotify() {
         super.addNotify();
         refreshPixelScale();
-        scheduleHostUpdate(true, GLRenderer.getDisplayedViewpoint());
+        scheduleHostUpdate(true);
     }
 
     @Override
@@ -97,7 +97,7 @@ public final class AngleCanvas extends Canvas {
             invalidateGlSize();
             refreshPixelScale();
         }
-        scheduleHostUpdate(sizeChanged, GLRenderer.getDisplayedViewpoint());
+        scheduleHostUpdate(sizeChanged);
     }
 
     @Override
@@ -241,6 +241,10 @@ public final class AngleCanvas extends Canvas {
             hostRenderPending = false;
             updateHostFrame(render, viewpoint);
         });
+    }
+
+    private void scheduleHostUpdate(boolean renderNeeded) {
+        scheduleHostUpdate(renderNeeded, GLRenderer.getDisplayedViewpoint());
     }
 
     // Tear down renderer and native host state, even if part of the shutdown path fails.
