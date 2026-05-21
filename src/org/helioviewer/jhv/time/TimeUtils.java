@@ -16,7 +16,6 @@ import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 public class TimeUtils {
 
-    private static final ZoneOffset ZERO = ZoneOffset.ofTotalSeconds(0);
     private static final DateTimeFormatter milliFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     public static final DateTimeFormatter sqlTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -58,7 +57,7 @@ public class TimeUtils {
     }
 
     public static String format(DateTimeFormatter formatter, long milli) {
-        return formatter.format(Instant.ofEpochMilli(milli).atOffset(ZERO));
+        return formatter.format(Instant.ofEpochMilli(milli).atOffset(ZoneOffset.UTC));
     }
 
     public static String format(long milli) { // always three digits milli
@@ -90,14 +89,14 @@ public class TimeUtils {
     }
 
     public static long parse(DateTimeFormatter formatter, String date) {
-        return LocalDateTime.parse(date, formatter).toInstant(ZERO).toEpochMilli();
+        return LocalDateTime.parse(date, formatter).toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     public static long parse(String date) {
         try {
-            return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
+            return LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZoneOffset.UTC).toEpochMilli();
         } catch (Exception ignore) { // for Angelos
-            return LocalDateTime.parse(date.replace(' ', 'T'), DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZERO).toEpochMilli();
+            return LocalDateTime.parse(date.replace(' ', 'T'), DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZoneOffset.UTC).toEpochMilli();
         }
     }
 
