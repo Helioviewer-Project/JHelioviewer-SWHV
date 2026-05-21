@@ -20,6 +20,8 @@ final class GLFrameCapture {
     private final int drawColorRenderbuffer;
     private final int drawDepthRenderbuffer;
     private final ByteBuffer rgbaReadback;
+    private final byte[] rgbaRow;
+    private final byte[] rgbRow;
 
     GLFrameCapture(int captureW, int captureH) {
         int frameWidth = Math.max(1, captureW);
@@ -34,6 +36,8 @@ final class GLFrameCapture {
         int drawDepthRbo = 0;
         int chosenDepthFormat;
         ByteBuffer readback = MemoryUtil.memAlloc(frameWidth * frameHeight * 4);
+        byte[] readbackRow = new byte[frameWidth * 4];
+        byte[] outputRow = new byte[frameWidth * 3];
 
         try {
             resolveFbo = GL.glGenFramebuffer();
@@ -97,6 +101,8 @@ final class GLFrameCapture {
         height = frameHeight;
         samples = frameSamples;
         rgbaReadback = readback;
+        rgbaRow = readbackRow;
+        rgbRow = outputRow;
         int depthFormat = chosenDepthFormat;
         Log.info("GLFrameCapture config: size=" + width + "x" + height
                 + " samples=" + samples
@@ -121,13 +127,21 @@ final class GLFrameCapture {
         rgbaReadback.clear();
         GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, rgbaReadback);
         rgbaReadback.limit(width * height * 4);
+
         buffer.clear();
-        while (rgbaReadback.remaining() >= 4) {
-            byte r = rgbaReadback.get();
-            byte g = rgbaReadback.get();
-            byte b = rgbaReadback.get();
-            rgbaReadback.get();
-            buffer.put(r).put(g).put(b);
+        for (int y = 0; y < height; y++) {
+            rgbaReadback.get(rgbaRow);
+
+            int src = 0;
+            int dst = 0;
+            for (int x = 0; x < width; x++) {
+                rgbRow[dst++] = rgbaRow[src++];
+                rgbRow[dst++] = rgbaRow[src++];
+                rgbRow[dst++] = rgbaRow[src++];
+                src++;
+            }
+
+            buffer.put(rgbRow);
         }
         buffer.flip();
         GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
