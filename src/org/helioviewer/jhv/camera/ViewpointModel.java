@@ -19,7 +19,7 @@ public final class ViewpointModel {
     private Position viewpoint = Sun.StartEarth;
     private UpdateViewpoint updateViewpoint;
 
-    ViewpointModel(UpdateViewpoint _updateViewpoint) {
+    public ViewpointModel(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
     }
 

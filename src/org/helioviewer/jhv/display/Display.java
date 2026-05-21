@@ -45,8 +45,9 @@ public final class Display {
         fullViewport = DisplayLayout.fullViewport(x, y, w, h, glHeight);
     }
 
-    private static final Camera camera = new Camera(UpdateViewpoint.observer);
-    private static final Camera miniCamera = new Camera(UpdateViewpoint.earthAt1au);
+    private static final ViewpointModel viewpointModel = new ViewpointModel(UpdateViewpoint.observer);
+    private static final Camera camera = new Camera(viewpointModel);
+    private static final Camera miniCamera = new Camera(new ViewpointModel(UpdateViewpoint.earthAt1au));
 
     public static Camera getCamera() {
         return camera;
@@ -57,7 +58,7 @@ public final class Display {
     }
 
     public static ViewpointModel getViewpointModel() {
-        return camera.getViewpointModel();
+        return viewpointModel;
     }
 
     public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
