@@ -14,11 +14,6 @@ import org.json.JSONObject;
 
 public class Camera {
 
-    public enum ViewpointApplyMode {
-        RESET,
-        KEEP_TRANSFORM
-    }
-
     public static final double ZOOM_MULTIPLIER_BUTTON = 1;
     private static final double ZOOM_STEP = 0.005;
 

@@ -13,6 +13,11 @@ public final class Display {
 
     private Display() {}
 
+    public enum ViewpointApplyMode {
+        RESET,
+        KEEP_TRANSFORM
+    }
+
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
     public static boolean whiteBackground = false;
@@ -55,7 +60,7 @@ public final class Display {
         return camera.getViewpointModel();
     }
 
-    public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, Camera.ViewpointApplyMode mode) {
+    public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
         getViewpointModel().setUpdateViewpoint(updateViewpoint);
         switch (mode) {
             case RESET -> camera.reset();
