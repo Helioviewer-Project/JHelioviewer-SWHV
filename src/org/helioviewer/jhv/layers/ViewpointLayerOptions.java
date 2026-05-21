@@ -54,7 +54,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
             } catch (Exception ignore) {}
             JSONObject jc = jo.optJSONObject("camera");
             if (jc != null)
-                Display.getCamera().fromJson(jc);
+                Display.getCamera().fromJson(jc, Display.getViewpoint());
         }
     }
 

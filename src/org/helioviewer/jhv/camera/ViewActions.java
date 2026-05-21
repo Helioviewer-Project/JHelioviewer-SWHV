@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -38,8 +39,9 @@ public final class ViewActions {
         double cameraWidth = ImageLayerBounds.getOneToOneCameraWidth(layer);
         if (cameraWidth > 0) {
             Display.resetViewportZoom();
-            double fov = 2. * Math.atan2(0.5 * cameraWidth, Display.getViewpoint().distance);
-            camera.setFOV(fov);
+            Position viewpoint = Display.getViewpoint();
+            double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
+            camera.setFOV(fov, viewpoint);
         }
         MovieDisplay.render(1);
     }
@@ -50,7 +52,7 @@ public final class ViewActions {
     }
 
     public static void resetViewAxis() {
-        Display.getCamera().resetDragRotationAxis();
+        Display.getCamera().resetDragRotationAxis(Display.getViewpointUpdate().dragAxis(), Display.getViewpoint());
         MovieDisplay.display();
     }
 
@@ -67,7 +69,7 @@ public final class ViewActions {
     }
 
     private static void rotateView90(Quat rotation) {
-        Display.getCamera().rotateDragRotation(rotation);
+        Display.getCamera().rotateDragRotation(rotation, Display.getViewpoint());
         MovieDisplay.display();
     }
 

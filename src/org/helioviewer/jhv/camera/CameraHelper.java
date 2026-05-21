@@ -162,7 +162,7 @@ public class CameraHelper {
         double newFOV = Camera.INITFOV;
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, Display.getViewpoint().distance);
-        camera.setFOV(newFOV);
+        camera.setFOV(newFOV, Display.getViewpoint());
     }
 
 }

@@ -1,11 +1,11 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.display.ViewpointModel;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,12 +24,6 @@ public class Camera {
     private Quat rotation = Quat.ZERO;
     private Quat dragRotation = Quat.ZERO;
     private double cameraWidth = 1;
-
-    private final ViewpointModel viewpointModel;
-
-    public Camera(ViewpointModel _viewpointModel) {
-        viewpointModel = _viewpointModel;
-    }
 
     public DisplayView displayView(Position p) {
         double width = 2 * p.distance * Math.tan(0.5 * fov);
@@ -83,32 +77,28 @@ public class Camera {
         return dragRotation;
     }
 
-    public void rotateDragRotation(Quat _dragRotation) {
+    public void rotateDragRotation(Quat _dragRotation, Position viewpoint) {
         dragRotation = Quat.rotate(dragRotation, _dragRotation);
-        updateRotation(viewpointModel.getViewpoint());
+        updateRotation(viewpoint);
     }
 
-    public void resetDragRotation() {
+    public void resetDragRotation(Position viewpoint) {
         dragRotation = Quat.ZERO;
-        updateRotation(viewpointModel.getViewpoint());
+        updateRotation(viewpoint);
     }
 
-    public void resetDragRotationAxis() {
-        dragRotation = dragRotation.twist(viewpointModel.getUpdateViewpoint().dragAxis());
-        updateRotation(viewpointModel.getViewpoint());
+    public void resetDragRotationAxis(Vec3 dragAxis, Position viewpoint) {
+        dragRotation = dragRotation.twist(dragAxis);
+        updateRotation(viewpoint);
     }
 
-    public void setFOV(double _fov) {
+    public void setFOV(double _fov, Position viewpoint) {
         fov = Math.clamp(_fov, MIN_FOV, MAX_FOV);
-        updateWidth(viewpointModel.getViewpoint());
+        updateWidth(viewpoint);
     }
 
     public double getCameraWidth(Viewport vp) {
         return cameraWidth * vp.zoom;
-    }
-
-    public void zoom(double wr) {
-        setFOV(fov * zoomFactor(wr));
     }
 
     public static double zoomFactor(double wr) {
@@ -123,14 +113,14 @@ public class Camera {
         return jo;
     }
 
-    public void fromJson(JSONObject jo) {
+    public void fromJson(JSONObject jo, Position viewpoint) {
         JSONArray ja;
         ja = jo.optJSONArray("translation");
         if (ja != null) translation = Vec2.fromJson(ja);
         ja = jo.optJSONArray("dragRotation");
         if (ja != null) dragRotation = Quat.fromJson(ja);
-        setFOV(jo.optDouble("fov", fov));
-        updateRotation(viewpointModel.getViewpoint());
+        setFOV(jo.optDouble("fov", fov), viewpoint);
+        updateRotation(viewpoint);
     }
 
 }
