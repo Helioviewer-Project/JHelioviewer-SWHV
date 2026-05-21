@@ -85,16 +85,8 @@ public class Camera {
         MovieDisplay.render(1);
     }
 
-    public Position getViewpoint() {
-        return viewpointModel.getViewpoint();
-    }
-
     public ViewpointModel getViewpointModel() {
         return viewpointModel;
-    }
-
-    public UpdateViewpoint getUpdateViewpoint() {
-        return viewpointModel.getUpdateViewpoint();
     }
 
     public void setViewpointUpdate(UpdateViewpoint _updateViewpoint, ViewpointApplyMode mode) {
@@ -145,10 +137,6 @@ public class Camera {
         if (viewpointModel.setTrackingMode(_tracking)) {
             refresh();
         }
-    }
-
-    public boolean getTrackingMode() {
-        return viewpointModel.getTrackingMode();
     }
 
     public double getCameraWidth(Viewport vp) {
