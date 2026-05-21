@@ -2,8 +2,9 @@ package org.helioviewer.jhv.plugins.pfss;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -47,12 +48,12 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
 
         PfssLoader.Data data;
-        if ((data = cache.getNearestData(camera.getViewpoint().time.milli)) == null)
+        if ((data = cache.getNearestData(ctx.viewpoint().time.milli)) == null)
             return;
         renderData(vp, data);
         lastData = data;

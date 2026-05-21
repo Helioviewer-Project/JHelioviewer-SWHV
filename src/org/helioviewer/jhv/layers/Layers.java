@@ -11,8 +11,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
@@ -152,24 +153,24 @@ public final class Layers {
         reapImageBuffers();
     }
 
-    public static void render(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.render(camera, vp));
+    public static void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.render(ctx, vp, scale));
     }
 
-    public static void renderScale(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.renderScale(camera, vp));
+    public static void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.renderScale(ctx, vp, scale));
     }
 
-    public static void renderFloat(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.renderFloat(camera, vp));
+    public static void renderFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.renderFloat(ctx, vp, scale));
     }
 
-    public static void renderFullFloat(Camera camera, Viewport vp) {
-        layers.forEach(layer -> layer.renderFullFloat(camera, vp));
+    public static void renderFullFloat(Viewport vp) {
+        layers.forEach(layer -> layer.renderFullFloat(vp));
     }
 
-    public static void renderMiniview(Camera camera, Viewport miniview) {
-        layers.forEach(layer -> layer.renderMiniview(camera, miniview));
+    public static void renderMiniview(MapContext ctx, Viewport vp, ProjectionScale scale) {
+        layers.forEach(layer -> layer.renderMiniview(ctx, vp, scale));
     }
 
     private static void initLayers() {

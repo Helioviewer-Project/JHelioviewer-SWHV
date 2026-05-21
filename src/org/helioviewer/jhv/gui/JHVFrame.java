@@ -115,7 +115,6 @@ public final class JHVFrame {
     public static JFrame prepare() {
         mainFrame = createFrame();
 
-        CompletionNotifications.init();
         Message.setHandler(new MessageHandler());
         UpdateChecker.setHandler(new UpdateCheckHandler());
 
@@ -195,7 +194,7 @@ public final class JHVFrame {
         renderHost.attachCanvas(renderCanvas);
         // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
         renderCanvas.requestRender();
-        MovieDisplay.setRenderRequester(renderCanvas::requestRender);
+        MovieDisplay.setRenderRequestHandler(renderCanvas::requestRender);
     }
 
     private static JFrame createFrame() {

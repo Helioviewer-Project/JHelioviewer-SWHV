@@ -27,7 +27,6 @@ public final class ImageBuffer {
     public final Buffer buffer;
 
     private final Cleaner.Cleanable cleanable;
-    private volatile boolean explicitFreeProtected;
 
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data) {
         return fromBytes(width, height, format, data, ImageFilter.Type.None);
@@ -71,17 +70,7 @@ public final class ImageBuffer {
         return byteSize(width, height, format);
     }
 
-    public void protectFromExplicitFree() {
-        explicitFreeProtected = true;
-    }
-
-    public void allowExplicitFree() {
-        explicitFreeProtected = false;
-    }
-
     boolean free() {
-        if (explicitFreeProtected)
-            return false;
         cleanable.clean();
         return true;
     }

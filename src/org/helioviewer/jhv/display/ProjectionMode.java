@@ -1,9 +1,10 @@
 package org.helioviewer.jhv.display;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
@@ -11,35 +12,30 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, ProjectionScale.ortho) {
         @Override
-        public Vec2 projectToScreen(MapContext ctx, Vec3 v) {
-            throw new UnsupportedOperationException("Orthographic mode does not use projectToScreen()");
+        public MapContext createMapContext(Camera camera, DisplayView displayView, GridType gridType) {
+            return new OrthoMapContext(camera, displayView, gridType);
         }
 
         @Override
-        public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-            return OrthoProjection.mouseToSurface(camera, vp, x, y);
+        public Vec3 mouseToSurface(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+            return OrthoProjection.mouseToSurface(camera, displayView, vp, x, y);
         }
 
         @Override
-        public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-            OrthoProjection.emitMapVertex(vertex, first, last, radius, color, vexBuf);
-            return previous;
+        public Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+            return OrthoProjection.mouseToGrid(camera, displayView, vp, gridType, x, y);
         }
 
         @Override
-        public void emitMapPoint(MapContext ctx, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-            OrthoProjection.emitMapPoint(vertex, size, radius, color, vexBuf);
+        public Vec2 mouseToScreen(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+            throw new UnsupportedOperationException("Orthographic mode does not support mouseToScreen()");
         }
 
         @Override
-        public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-            return OrthoProjection.mouseToGrid(camera, vp, gridType, x, y);
+        public Vec2 projectToScreen(DisplayView displayView, Viewport vp, GridType gridType, Vec3 v) {
+            throw new UnsupportedOperationException("Orthographic mode does not support projectToScreen()");
         }
 
-        @Override
-        public Vec2 mouseToScreen(Camera camera, MapContext ctx, int x, int y) {
-            throw new UnsupportedOperationException("Orthographic mode does not use non-ortho mouseToScreen()");
-        }
     },
     HPC(GLSLSolarShader.hpc, ProjectionScale.hpc, NonOrthoProjection.Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, ProjectionScale.lati, NonOrthoProjection.Kind.LATITUDINAL),
@@ -48,7 +44,7 @@ public enum ProjectionMode {
 
     public final GLSLSolarShader shader;
     public final ProjectionScale scale;
-    private final NonOrthoProjection.Kind nonOrthoKind;
+    final NonOrthoProjection.Kind nonOrthoKind;
 
     ProjectionMode(GLSLSolarShader _shader, ProjectionScale _scale) {
         this(_shader, _scale, null);
@@ -60,47 +56,24 @@ public enum ProjectionMode {
         nonOrthoKind = _nonOrthoKind;
     }
 
-    public boolean isOrthographic() {
-        return this == Orthographic;
+    public MapContext createMapContext(Camera camera, DisplayView displayView, GridType gridType) {
+        return new NonOrthoMapContext(camera, displayView, gridType, this);
     }
 
-    public boolean isHpc() {
-        return this == HPC;
+    public Vec3 mouseToSurface(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToSurface(nonOrthoKind, camera, displayView, vp, scale, gridType, x, y);
     }
 
-    public boolean isLatitudinal() {
-        return this == Latitudinal;
+    public Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToGrid(camera, displayView, vp, scale, gridType, x, y);
     }
 
-    public boolean isPolar() {
-        return this == Polar;
+    public Vec2 mouseToScreen(Camera camera, DisplayView displayView, Viewport vp, GridType gridType, int x, int y) {
+        return NonOrthoProjection.mouseToScreen(camera, displayView, vp, scale, gridType, x, y);
     }
 
-    public boolean isLogPolar() {
-        return this == LogPolar;
-    }
-
-    public Vec2 projectToScreen(MapContext ctx, Vec3 v) {
-        return NonOrthoProjection.projectToScreen(nonOrthoKind, ctx, v);
-    }
-
-    public Vec3 mouseToSurface(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToSurface(nonOrthoKind, camera, vp, scale, gridType, x, y);
-    }
-
-    public Vec2 emitMapVertex(MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        return NonOrthoProjection.emitMapVertex(nonOrthoKind, ctx, vertex, previous, first, last, color, vexBuf);
-    }
-
-    public void emitMapPoint(MapContext ctx, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        NonOrthoProjection.emitMapPoint(nonOrthoKind, ctx, vertex, size, color, vexBuf);
-    }
-
-    public Vec2 mouseToGrid(Camera camera, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToGrid(camera, vp, scale, gridType, x, y);
-    }
-
-    public Vec2 mouseToScreen(Camera camera, MapContext ctx, int x, int y) {
-        return NonOrthoProjection.mouseToScreen(camera, ctx.vp(), ctx.scale(), ctx.gridType(), x, y);
+    public Vec2 projectToScreen(DisplayView displayView, Viewport vp, GridType gridType, Vec3 v) {
+        Position viewpoint = displayView.viewpoint();
+        return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, scale, gridType.mapRotation(viewpoint), vp, v);
     }
 }

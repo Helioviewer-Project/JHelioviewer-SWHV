@@ -11,10 +11,8 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -178,7 +176,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawPolygon(MapContext ctx, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(MapContext ctx, Viewport vp, ProjectionScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -204,7 +202,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
                     Vec3 pt = new Vec3(xnew / r, ynew / r, znew / r);
-                    previous = Display.mode.emitMapVertex(ctx, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
+                    previous = ctx.emitMapVertex(vp, scale, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
                 }
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
@@ -254,14 +252,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(MapContext ctx, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIconScale(MapContext ctx, Viewport vp, ProjectionScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = Display.mode.projectToScreen(ctx, pt);
+            Vec2 tf = ctx.projectToScreen(vp, scale, pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x, tf.y, sz, sz);
         }
@@ -341,12 +339,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         lineThick.renderLine(vp, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(List<JHVRelatedEvents> evs, long currentTime) {
+    private void renderIcons(MapContext ctx, List<JHVRelatedEvents> evs, long currentTime) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
-            if (Display.mode.isLatitudinal() && evt.isCactus())
+            if (ctx.isLatitudinal() && evt.isCactus())
                 continue;
             bindTexture(evtr.getSupplier().getGroup());
             glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
@@ -371,21 +369,20 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
-        long currentTime = camera.getViewpoint().time.milli;
+        long currentTime = ctx.viewpoint().time.milli;
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus()) {
                 drawCactusArc(evtr, evt, currentTime);
             } else {
-                drawPolygon(ctx, evtr, evt);
+                drawPolygon(ctx, vp, scale, evtr, evt);
                 if (icons) {
                     drawIcon(evtr, evt);
                 }
@@ -393,39 +390,38 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(evs, currentTime);
+            renderIcons(ctx, evs, currentTime);
         }
     }
 
     @Override
-    public void renderScale(Camera camera, Viewport vp) {
+    public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!isVisible[vp.idx])
             return;
-        long currentTime = camera.getViewpoint().time.milli;
+        long currentTime = ctx.viewpoint().time.milli;
         List<JHVRelatedEvents> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
-        MapContext ctx = new MapContext(camera.getViewpoint(), vp, Display.mode.scale, Display.gridType);
 
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
-            if (evt.isCactus() && (Display.mode.isPolar() || Display.mode.isLogPolar())) {
-                drawCactusArcScale(vp, evtr, evt, currentTime, ctx.scale());
+            if (evt.isCactus() && (ctx.isPolar() || ctx.isLogPolar())) {
+                drawCactusArcScale(vp, evtr, evt, currentTime, scale);
             } else {
-                drawPolygon(ctx, evtr, evt);
+                drawPolygon(ctx, vp, scale, evtr, evt);
                 if (icons) {
-                    drawIconScale(ctx, evtr, evt);
+                    drawIconScale(ctx, vp, scale, evtr, evt);
                 }
             }
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(evs, currentTime);
+            renderIcons(ctx, evs, currentTime);
         }
     }
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp) {
+    public void renderFullFloat(Viewport vp) {
         if (!enabled)
             return;
         if (swekContext.mouseOverJHVEvent() != null) {

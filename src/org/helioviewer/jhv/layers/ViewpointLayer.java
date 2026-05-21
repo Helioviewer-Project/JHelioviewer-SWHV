@@ -15,6 +15,8 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
@@ -26,6 +28,7 @@ import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
@@ -91,16 +94,16 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(Camera camera, Viewport vp) {
+    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (vp.idx == 0) // once!
-            updateTime(camera.getViewpoint().time);
+            updateTime(ctx.viewpoint().time);
 
         if (!isVisible[vp.idx])
             return;
         if (!options.isHeliospheric())
             return;
 
-        long time = camera.getViewpoint().time.milli;
+        long time = ctx.viewpoint().time.milli;
         long start = Movie.getStartTime();
         long end = Movie.getEndTime();
 
@@ -118,8 +121,8 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
-        double pointFactor = CameraHelper.getTemperedPointFactor(camera, vp);
-        Position viewpoint = camera.getViewpoint();
+        double pointFactor = CameraHelper.getTemperedPointFactor(vp, ctx.cameraWidth(vp));
+        Position viewpoint = ctx.viewpoint();
 
         Transform.pushView();
         Transform.rotateViewInverse(Quat.createXY(viewpoint.lat, viewpoint.lon + relativeLon));
@@ -127,7 +130,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (spiralSpeed > 0)
             renderSpiral(vp, lati, spiralSpeed);
 
-        List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
+        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointUpdate());
         if (!positionLoads.isEmpty()) {
             GL.glDisable(GL.DEPTH_TEST);
             renderPlanets(vp, positionLoads, pointFactor, time, start, end);
@@ -143,7 +146,7 @@ public class ViewpointLayer extends AbstractLayer {
     private int mouseX, mouseY;
 
     @Override
-    public void renderFullFloat(Camera camera, Viewport vp) {
+    public void renderFullFloat(Viewport vp) {
         if (!enabled)
             return;
         GLText.drawTextFloat(vp, hoverText, mouseX + MOUSE_OFFSET_X, mouseY + MOUSE_OFFSET_Y);
@@ -163,24 +166,25 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         Camera camera = Display.getCamera();
-        List<PositionLoad> positionLoads = PositionLoad.get(camera.getUpdateViewpoint());
+        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointUpdate());
         if (positionLoads.isEmpty()) {
             clearHoverTextIfNeeded();
             return;
         }
 
-        long time = camera.getViewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        long time = GLRenderer.getDisplayedViewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
         mouseX = e.x();
         mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        double mousePlaneX = CameraHelper.computeUpX(camera, vp, mouseX);
-        double mousePlaneY = CameraHelper.computeUpY(camera, vp, mouseY);
+        double width = GLRenderer.getDisplayView().cameraWidth(vp);
+        double mousePlaneX = CameraHelper.computeUpX(vp, width, camera.getTranslationX(), mouseX);
+        double mousePlaneY = CameraHelper.computeUpY(vp, width, camera.getTranslationY(), mouseY);
         Quat dragRotation = camera.getDragRotation();
 
-        double halfWidth = camera.getCameraWidth(vp) / 2;
+        double halfWidth = width / 2;
         double hoverThreshold2 = (0.01 * halfWidth) * (0.01 * halfWidth);
         double cosRelativeLon = Math.cos(-relativeLon);
         double sinRelativeLon = Math.sin(-relativeLon);
@@ -228,13 +232,13 @@ public class ViewpointLayer extends AbstractLayer {
         if (enabled) {
             InputController.addListener(hoverListener);
             options.activate();
-            options.applyCurrentViewpoint(Camera.ViewpointApplyMode.KEEP_TRANSFORM);
+            options.applyCurrentViewpoint(Display.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
             InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
-                Display.getCamera().setViewpointUpdate(UpdateViewpoint.observer, Camera.ViewpointApplyMode.KEEP_TRANSFORM);
+                Display.setViewpointUpdate(UpdateViewpoint.observer, Display.ViewpointApplyMode.KEEP_TRANSFORM);
         }
     }
 

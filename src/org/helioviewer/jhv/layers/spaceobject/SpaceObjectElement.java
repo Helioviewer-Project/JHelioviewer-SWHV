@@ -71,7 +71,7 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
     public void setStatus(String _status) {
         status = _status;
         model.refresh(this);
-        Display.getCamera().refresh();
+        Display.refreshCamera();
     }
 
     @Override

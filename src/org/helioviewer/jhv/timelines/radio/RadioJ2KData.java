@@ -94,7 +94,6 @@ class RadioJ2KData implements View.DataHandler {
         region = imageData.getRegion();
         boolean hadData = bufferedImage != null;
         bufferedImage = IndexedImageFactory.createIndexed(copyBuffer((ByteBuffer) imageBuffer.buffer), w, h, RadioData.getColorModel());
-        imageBuffer.allowExplicitFree();
         if (!hadData)
             RadioData.dataUpdated();
         DrawController.drawRequest();
@@ -110,7 +109,7 @@ class RadioJ2KData implements View.DataHandler {
             Rectangle roi = getROI(xAxis);
             if (roi != null) {
                 view.setDecodeRegion(roi.x, roi.y, roi.width, roi.height);
-                view.decode(null, 1, lastState.resolution);
+                view.decode(1, lastState.resolution);
             }
         }
     }

@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
@@ -21,27 +22,32 @@ public class CameraHelper {
         return 0.5 - (screenY - vp.yAWT) / vp.height;
     }
 
-    public static double computeUpX(Camera camera, Viewport vp, double screenX) {
-        double width = camera.getCameraWidth(vp);
-        return computeNormalizedX(vp, screenX) * width * vp.aspect - camera.getTranslationX();
+    private static double computeUpX(Camera camera, Viewport vp, double screenX) {
+        return computeUpX(vp, camera.getCameraWidth(vp), camera.getTranslationX(), screenX);
     }
 
-    public static double computeUpY(Camera camera, Viewport vp, double screenY) {
-        double width = camera.getCameraWidth(vp);
-        return computeNormalizedY(vp, screenY) * width - camera.getTranslationY();
+    public static double computeUpX(Viewport vp, double width, double tx, double screenX) {
+        return computeNormalizedX(vp, screenX) * width * vp.aspect - tx;
     }
 
-    private static double getLogicalPixelFactor(Camera camera, Viewport vp) {
-        double width = camera.getCameraWidth(vp);
+    private static double computeUpY(Camera camera, Viewport vp, double screenY) {
+        return computeUpY(vp, camera.getCameraWidth(vp), camera.getTranslationY(), screenY);
+    }
+
+    public static double computeUpY(Viewport vp, double width, double ty, double screenY) {
+        return computeNormalizedY(vp, screenY) * width - ty;
+    }
+
+    private static double getLogicalPixelFactor(Viewport vp, double width) {
         return (vp.height / Display.pixelScale[1]) / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
     }
 
-    public static double getPixelFactor(Camera camera, Viewport vp) {
-        return Display.pixelScale[1] * getLogicalPixelFactor(camera, vp);
+    public static double getPixelFactor(Viewport vp, double width) {
+        return Display.pixelScale[1] * getLogicalPixelFactor(vp, width);
     }
 
-    public static double getTemperedPointFactor(Camera camera, Viewport vp) {
-        return Display.pixelScale[1] * Math.cbrt(getLogicalPixelFactor(camera, vp));
+    public static double getTemperedPointFactor(Viewport vp, double width) {
+        return Display.pixelScale[1] * Math.cbrt(getLogicalPixelFactor(vp, width));
     }
 
     public static double getImagePixelFactor(Camera camera, Viewport vp) {
@@ -49,9 +55,7 @@ public class CameraHelper {
     }
 
     static double selectTrackballRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
-        double up1x = computeUpX(camera, vp, screenX);
-        double up1y = computeUpY(camera, vp, screenY);
-        double radius2 = up1x * up1x + up1y * up1y;
+        double radius2 = screenPlaneRadius2(camera, vp, screenX, screenY);
         if (radius2 > 0.5 * Sun.Radius2) {
             double r = 0.5 * camera.getCameraWidth(vp);
             return r * r;
@@ -59,85 +63,89 @@ public class CameraHelper {
         return Sun.Radius2;
     }
 
+    private static double screenPlaneRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
+        double upX = computeUpX(camera, vp, screenX);
+        double upY = computeUpY(camera, vp, screenY);
+        return upX * upX + upY * upY;
+    }
+
     static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
         double width = camera.getCameraWidth(vp);
         double tx = camera.getTranslationX();
         double ty = camera.getTranslationY();
-        double widthAspect = width * vp.aspect;
-        double halfRadius2 = 0.5 * refRadius2;
-
-        double startUpX = ((startX - vp.x) / vp.width - 0.5) * widthAspect - tx;
-        double startUpY = (0.5 - (startY - vp.yAWT) / vp.height) * width - ty;
-        double startRadius2 = startUpX * startUpX + startUpY * startUpY;
-        double startZ = startRadius2 <= halfRadius2 ? Math.sqrt(refRadius2 - startRadius2) : halfRadius2 / Math.sqrt(startRadius2);
-
-        double endUpX = ((endX - vp.x) / vp.width - 0.5) * widthAspect - tx;
-        double endUpY = (0.5 - (endY - vp.yAWT) / vp.height) * width - ty;
-        double endRadius2 = endUpX * endUpX + endUpY * endUpY;
-        double endZ = endRadius2 <= halfRadius2 ? Math.sqrt(refRadius2 - endRadius2) : halfRadius2 / Math.sqrt(endRadius2);
 
         Quat dragRotation = camera.getDragRotation();
-        Vec3 start = dragRotation.rotateInverseVector(new Vec3(startUpX, startUpY, startZ));
-        Vec3 end = dragRotation.rotateInverseVector(new Vec3(endUpX, endUpY, endZ));
+        Vec3 start = dragRotation.rotateInverseVector(trackballPoint(vp, width, tx, ty, startX, startY, refRadius2));
+        Vec3 end = dragRotation.rotateInverseVector(trackballPoint(vp, width, tx, ty, endX, endY, refRadius2));
         return Quat.calcRotation(start, end);
     }
 
+    private static Vec3 trackballPoint(Viewport vp, double width, double tx, double ty, double screenX, double screenY, double refRadius2) {
+        double upX = computeUpX(vp, width, tx, screenX);
+        double upY = computeUpY(vp, width, ty, screenY);
+        double radius2 = upX * upX + upY * upY;
+        return new Vec3(upX, upY, trackballZ(radius2, refRadius2));
+    }
+
+    private static double trackballZ(double radius2, double refRadius2) {
+        double halfRadius2 = 0.5 * refRadius2;
+        return radius2 <= halfRadius2 ? Math.sqrt(refRadius2 - radius2) : halfRadius2 / Math.sqrt(radius2);
+    }
+
     @Nullable
-    private static Vec3 intersectSphere(Camera camera, Viewport vp, double screenX, double screenY) {
-        double up1x = computeUpX(camera, vp, screenX);
-        double up1y = computeUpY(camera, vp, screenY);
+    private static Vec3 intersectSphere(Viewport vp, double width, double tx, double ty, double screenX, double screenY) {
+        double up1x = computeUpX(vp, width, tx, screenX);
+        double up1y = computeUpY(vp, width, ty, screenY);
         double radius2 = up1x * up1x + up1y * up1y;
         return radius2 > Sun.Radius2 ? null : new Vec3(up1x, up1y, Math.sqrt(Sun.Radius2 - radius2));
     }
 
     @Nullable
-    private static Vec3 intersectPlane(Camera camera, Viewport vp, double screenX, double screenY, Vec3 planeNormal) {
+    private static Vec3 intersectPlane(Viewport vp, double width, double tx, double ty, double screenX, double screenY, Vec3 planeNormal) {
         double denom = planeNormal.z;
         if (Math.abs(denom) < PLANE_Z_EPS)
             return null;
 
-        double up1x = computeUpX(camera, vp, screenX);
-        double up1y = computeUpY(camera, vp, screenY);
+        double up1x = computeUpX(vp, width, tx, screenX);
+        double up1y = computeUpY(vp, width, ty, screenY);
         double zvalue = -(planeNormal.x * up1x + planeNormal.y * up1y) / denom;
         return new Vec3(up1x, up1y, zvalue);
     }
 
     @Nullable
-    public static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
-        Quat dragRotation = camera.getDragRotation();
-        Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
-        Vec3 hitPoint = intersectSphere(camera, vp, screenX, screenY);
+    public static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
+        Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
+        Vec3 hitPoint = intersectSphere(vp, width, camera.getTranslationX(), camera.getTranslationY(), screenX, screenY);
         return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
-    public static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double screenX, double screenY, Quat outputRotation) {
-        Quat dragRotation = camera.getDragRotation();
-        Quat frameRotation = Quat.rotate(dragRotation, outputRotation);
-        Vec3 hitPoint = intersectPlane(camera, vp, screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
+    public static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
+        Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
+        Vec3 hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
         return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
-    public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double x, double y) {
+    public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double width, double x, double y) {
         Quat dragRotation = camera.getDragRotation();
-        Vec3 hitPoint = intersectSphere(camera, vp, x, y);
+        Vec3 hitPoint = intersectSphere(vp, width, camera.getTranslationX(), camera.getTranslationY(), x, y);
         if (hitPoint != null) {
             Vec3 currentViewHitPoint = dragRotation.rotateInverseVector(hitPoint);
             if (currentViewHitPoint.z > 0.)
                 return currentViewHitPoint;
         }
 
-        hitPoint = intersectPlane(camera, vp, x, y, dragRotation.rotateVector(Vec3.ZAxis));
+        hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), x, y, dragRotation.rotateVector(Vec3.ZAxis));
         return hitPoint == null ? null : dragRotation.rotateInverseVector(hitPoint);
     }
 
-    public static void zoomToFit(Camera camera) {
+    public static void zoomToFit(Camera camera, Position viewpoint) {
         double size = ImageLayerBounds.getLargestPhysicalHeight();
         double newFOV = Camera.INITFOV;
         if (size != 0)
-            newFOV = 2. * Math.atan2(0.5 * size, camera.getViewpoint().distance);
-        camera.setFOV(newFOV);
+            newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
+        camera.setFOV(newFOV, viewpoint);
     }
 
 }

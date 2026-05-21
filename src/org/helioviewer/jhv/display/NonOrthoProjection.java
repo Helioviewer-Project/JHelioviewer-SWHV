@@ -4,6 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
+import org.helioviewer.jhv.camera.DisplayView;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
@@ -25,7 +26,7 @@ final class NonOrthoProjection {
         };
     }
 
-    static Vec3 unproject(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Vec2 pt) {
+    static Vec3 unproject(Kind kind, Position viewpoint, Quat rotation, Vec2 pt) {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
             case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
@@ -33,10 +34,10 @@ final class NonOrthoProjection {
         };
     }
 
-    static Vec3 mouseToSurface(Kind kind, Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
-        Position viewpoint = camera.getViewpoint();
+    static Vec3 mouseToSurface(Kind kind, Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        Position viewpoint = displayView.viewpoint();
         Quat rotation = gridType.mapRotation(viewpoint);
-        return unproject(kind, viewpoint, scale, rotation, mouseToGrid(camera, vp, scale, gridType, x, y));
+        return unproject(kind, viewpoint, rotation, mouseToGrid(camera, displayView, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
@@ -65,45 +66,51 @@ final class NonOrthoProjection {
         return helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
-    static Vec2 projectToScreen(Kind kind, MapContext ctx, Vec3 v) {
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.rotation(), v);
-        return new Vec2(pt.x * ctx.vp().aspect, pt.y);
+    static Vec2 projectToScreen(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Viewport vp, Vec3 v) {
+        Vec2 pt = project(kind, viewpoint, scale, rotation, v);
+        return new Vec2(pt.x * vp.aspect, pt.y);
     }
 
-    static Vec2 emitMapVertex(Kind kind, MapContext ctx, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
+    static Vec2 emitMapVertex(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC)
-            return emitHpcVertex(ctx.viewpoint(), ctx.scale(), ctx.vp(), vertex, previous, first, last, color, vexBuf);
+            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, first, last, color, vexBuf);
 
-        Vec2 current = project(kind, ctx.viewpoint(), ctx.scale(), ctx.rotation(), vertex);
+        Vec2 current = project(kind, viewpoint, scale, rotation, vertex);
         if (first)
-            emitProjectedVertex(ctx.vp(), current, Colors.Null, vexBuf);
-        emitWrappedVertex(ctx.vp(), previous, current, color, vexBuf);
+            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
+        emitWrappedVertex(vp, previous, current, color, vexBuf);
         if (last)
-            emitProjectedVertex(ctx.vp(), current, Colors.Null, vexBuf);
+            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
         return current;
     }
 
-    static void emitMapPoint(Kind kind, MapContext ctx, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
+    static void emitMapPoint(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC) {
-            emitHpcPoint(ctx.viewpoint(), ctx.scale(), ctx.vp(), vertex, size, color, vexBuf);
+            emitHpcPoint(viewpoint, scale, vp, vertex, size, color, vexBuf);
             return;
         }
 
-        Vec2 pt = project(kind, ctx.viewpoint(), ctx.scale(), ctx.rotation(), vertex);
-        vexBuf.putVertex((float) (pt.x * ctx.vp().aspect), (float) pt.y, 0, (float) size, color);
+        Vec2 pt = project(kind, viewpoint, scale, rotation, vertex);
+        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
     }
 
-    static Vec2 mouseToScreen(Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
-        Vec2 mouseGrid = mouseToGrid(camera, vp, scale, gridType, x, y);
+    static Vec2 mouseToScreen(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        Vec2 mouseGrid = mouseToRawGrid(camera, displayView, vp, scale, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
                 scale.getYValueInv(mouseGrid.y));
     }
 
-    static Vec2 mouseToGrid(Camera camera, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+    static Vec2 mouseToGrid(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, GridType gridType, int x, int y) {
+        Vec2 mouseGrid = mouseToRawGrid(camera, displayView, vp, scale, x, y);
+        return new Vec2(scale.getDisplayXValue(mouseGrid.x, gridType), mouseGrid.y);
+    }
+
+    private static Vec2 mouseToRawGrid(Camera camera, DisplayView displayView, Viewport vp, ProjectionScale scale, int x, int y) {
+        double width = displayView.cameraWidth(vp);
         return new Vec2(
-                scale.getInterpolatedXDisplayValue(CameraHelper.computeUpX(camera, vp, x) / vp.aspect + 0.5, gridType),
-                scale.getInterpolatedYValue(CameraHelper.computeUpY(camera, vp, y) + 0.5));
+                scale.getInterpolatedXValue(CameraHelper.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
+                scale.getInterpolatedYValue(CameraHelper.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
     static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {

@@ -8,10 +8,12 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.GLRenderer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,12 +64,12 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y) {
-        return Display.mode.mouseToSurface(camera, vp, Display.gridType, x, y);
+        return Display.mode.mouseToSurface(camera, GLRenderer.getDisplayView(), vp, Display.gridType, x, y);
     }
 
     @Nullable
     static Vec3 mouseToSky(Camera camera, Viewport vp, int x, int y) {
-        return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+        return CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getDisplayView().cameraWidth(vp), x, y);
     }
 
     @Nullable
@@ -82,10 +84,10 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void draw(MapContext ctx, boolean active, BufVertex vexBuf) {}
+    public void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf) {}
 
     @Override
-    public void drawTransformed(boolean active, BufVertex lineBuf, BufVertex centerBuf) {}
+    public void drawTransformed(MapContext ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {}
 
     @Override
     public void mousePressed(Camera camera, Viewport vp, int x, int y) {

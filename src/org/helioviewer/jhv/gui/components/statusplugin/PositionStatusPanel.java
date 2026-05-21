@@ -9,6 +9,7 @@ import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
@@ -17,6 +18,7 @@ import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.swing.TransferAccess;
 
 @SuppressWarnings("serial")
@@ -36,22 +38,23 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
-        Vec2 coord = Display.mode.mouseToGrid(camera, vp, Display.gridType, x, y);
+        ProjectionMode mode = Display.mode;
+        Vec2 coord = mode.mouseToGrid(camera, GLRenderer.getDisplayView(), vp, Display.gridType, x, y);
 
-        if (Display.mode.isHpc()) {
+        if (mode == ProjectionMode.HPC) {
             setText(formatHpc(coord));
-        } else if (Display.mode.isLatitudinal()) {
+        } else if (mode == ProjectionMode.Latitudinal) {
             setText(formatLati(coord));
-        } else if (Display.mode.isPolar() || Display.mode.isLogPolar()) {
+        } else if (mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, x, y);
+            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getDisplayView().cameraWidth(vp), x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {
                 String annStr = "";
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
-                Position viewpoint = camera.getViewpoint();
+                Position viewpoint = GLRenderer.getDisplayedViewpoint();
 
                 Object annData = Annotations.getAnnotationData();
                 if (annData instanceof String str) {
@@ -76,7 +79,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 double zeta = viewpoint.distance - v.z;
                 double px = (180 / Math.PI) * Math.atan2(v.x, zeta);
                 double py = (180 / Math.PI) * Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
-                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (camera.getUpdateViewpoint() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
+                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (Display.getViewpointUpdate() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
                 String ortho = formatOrtho(coord, r, pa, px, py);
                 setText(annStr.isEmpty() ? ortho : annStr + " | " + ortho);
             }
@@ -144,7 +147,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void maybeCopyToClipboard(PointerEvent e) {
         if (e.popupTrigger() || e.button() == 3)
-            TransferAccess.writeClipboard(camera.getViewpoint().time.toString() + getText());
+            TransferAccess.writeClipboard(GLRenderer.getDisplayedViewpoint().time.toString() + getText());
     }
 
 }

@@ -10,9 +10,10 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
+import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
@@ -90,11 +91,11 @@ class FOVPlatform extends DefaultMutableTreeNode {
         instrumentCenters.dispose();
     }
 
-    void render(Camera camera, Viewport vp) {
+    void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
         if (!hasEnabled())
             return;
 
-        JHVTime time = camera.getViewpoint().time;
+        JHVTime time = ctx.viewpoint().time;
         Position obsPosition = Spice.getCarrington(observer, time);
         if (obsPosition == null)
             return;
@@ -118,7 +119,7 @@ class FOVPlatform extends DefaultMutableTreeNode {
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).putGeometry(obsPosition.distance, color, renderer, lineBuf, centerBuf));
 
         instrumentCenters.setVertex(centerBuf);
-        instrumentCenters.renderPoints(CameraHelper.getPixelFactor(camera, vp));
+        instrumentCenters.renderPoints(CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp)));
         instrumentLines.setVertex(lineBuf);
         instrumentLines.renderLine(vp, LINEWIDTH_FOV);
 
