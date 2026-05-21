@@ -70,7 +70,7 @@ interface PropagationModel {
         }
 
         private static double getRSShift() {
-            return Sun.RadiusMilli * Display.getCamera().getViewpoint().distance;
+            return Sun.RadiusMilli * Display.getViewpointModel().getViewpoint().distance;
         }
 
     }
