@@ -231,6 +231,10 @@ public final class GaiaClient {
                 String.format("1=CONTAINS(POINT('ICRS',ra,dec), CIRCLE('ICRS',%d,%d,%d)) AND phot_g_mean_mag<%d", ra, dec, cone, mag);
     }
 
+    private static double optionalDouble(Object value) {
+        return value instanceof Number number ? number.doubleValue() : 0;
+    }
+
     private static List<Star> requestStars(String adql) throws Exception {
         String uri = queryTemplate.expand(UriTemplate.vars().set("QUERY", adql));
         try (NetClient nc = NetClient.of(new URI(uri));
@@ -244,10 +248,10 @@ public final class GaiaClient {
                         long source_id = ((Number) row[0]).longValue();
                         double ra = Math.toRadians(((Number) row[1]).doubleValue()); // [rad]
                         double dec = Math.toRadians(((Number) row[2]).doubleValue()); // [rad]
-                        double pmra = Math.toRadians(((Number) row[3]).doubleValue() / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
-                        double pmdec = Math.toRadians(((Number) row[4]).doubleValue() / (1000. * 3600.)); // [rad/yr]
-                        double px = ((Number) row[5]).doubleValue() / 1000.; // [arcsec]
-                        double rv = ((Number) row[6]).doubleValue(); // [km/s]
+                        double pmra = Math.toRadians(optionalDouble(row[3]) / (1000. * 3600.)) / Math.cos(dec); // [rad/yr], dRA/dt instead of cos(Dec)*dRA/dt
+                        double pmdec = Math.toRadians(optionalDouble(row[4]) / (1000. * 3600.)); // [rad/yr]
+                        double px = optionalDouble(row[5]) / 1000.; // [arcsec]
+                        double rv = optionalDouble(row[6]); // [km/s]
                         double mag = ((Number) row[7]).doubleValue();
 
                         pmra = Double.isFinite(pmra) ? pmra : 0;
