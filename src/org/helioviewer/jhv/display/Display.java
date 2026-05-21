@@ -26,7 +26,6 @@ public final class Display {
 
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
-        //CameraHelper.zoomToFit(miniCamera);
         resetCamera(miniCamera, miniViewpointModel);
         resetCamera(camera, viewpointModel);
     }
@@ -109,6 +108,10 @@ public final class Display {
 
     public static void resetCamera() {
         resetCamera(camera, viewpointModel);
+    }
+
+    public static void zoomMiniToFit() {
+        CameraHelper.zoomToFit(miniCamera, miniViewpointModel.getViewpoint());
     }
 
     private static void resetCamera(Camera camera, ViewpointModel model) {
