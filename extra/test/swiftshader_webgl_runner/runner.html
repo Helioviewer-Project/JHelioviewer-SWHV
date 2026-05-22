@@ -65,10 +65,12 @@ function createProgram(gl, vertexSource, fragmentSource) {
 function setUniform(gl, program, name, value) {
   const loc = gl.getUniformLocation(program, name);
   if (loc == null)
-    throw new Error(`Missing uniform ${name}`);
+    return;
   if (Array.isArray(value)) {
     if (value.length === 2)
       gl.uniform2fv(loc, value);
+    else if (value.length === 3)
+      gl.uniform3fv(loc, value);
     else if (value.length === 4)
       gl.uniform4fv(loc, value);
     else
@@ -112,10 +114,8 @@ function bindUniformBlocks(gl, program) {
   bindUniformBlock(gl, program, "DisplayBlock", 3, data);
 }
 
-function diagnosticFragment(commonSource, hpcSource) {
-  return `${commonSource}
-${stripMain(hpcSource)}
-
+function commonDiagnosticUniforms() {
+  return `
 in vec2 vScrpos;
 
 uniform vec4 uBoundsDeg;
@@ -127,8 +127,10 @@ uniform float uProjectionCode;
 uniform float uPlaneUnitsPerRadian;
 uniform float uObserverDistance;
 uniform float uPv[6];
+uniform vec3 uLatiGrid;
+uniform float uPolarLog;
 
-void main(void) {
+WCS diagnosticWcs(void) {
     WCS localWcs;
     localWcs.cameraDiff = vec4(0., 0., 0., 1.);
     localWcs.rect = uRect;
@@ -136,7 +138,10 @@ void main(void) {
     localWcs.crval = uCrval;
     localWcs.zpnUpperEta = uZpnUpperEta;
     localWcs.deltaT = 0.;
+    return localWcs;
+}
 
+ProjectionParams diagnosticProjection(void) {
     ProjectionParams localProjection;
     localProjection.projectionCode = uProjectionCode;
     localProjection.planeUnitsPerRadian = uPlaneUnitsPerRadian;
@@ -144,7 +149,18 @@ void main(void) {
     localProjection.padding0 = 0.;
     localProjection.sourceViewQuat = vec4(0., 0., 0., 1.);
     localProjection.displayMapQuat = vec4(0., 0., 0., 1.);
+    return localProjection;
+}
+`;
+}
 
+function hpcDiagnostic(commonSource, hpcSource) {
+  return `${commonSource}
+${stripMain(hpcSource)}
+
+${commonDiagnosticUniforms()}
+
+void main(void) {
     vec2 helioprojective = vec2(
         radians(mix(uBoundsDeg.x, uBoundsDeg.y, vScrpos.x)),
         radians(mix(uBoundsDeg.z, uBoundsDeg.w, vScrpos.y)));
@@ -152,8 +168,8 @@ void main(void) {
 
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(
-        localWcs,
-        localProjection,
+        diagnosticWcs(),
+        diagnosticProjection(),
         helioprojective,
         hpcXY,
         0.,
@@ -162,6 +178,76 @@ void main(void) {
     outColor = vec4(texCoord, enhancementFactor, 1.);
 }
 `;
+}
+
+function orthoDiagnostic(commonSource, orthoSource) {
+  return `${commonSource}
+${stripMain(orthoSource)}
+
+${commonDiagnosticUniforms()}
+
+void main(void) {
+    vec2 screenXY = vScrpos * 2. - 1.;
+    float radius2 = dot(screenXY, screenXY);
+    if (radius2 > 1.)
+        discard;
+
+    vec3 hitPoint = vec3(screenXY, sqrt(1. - radius2));
+    vec3 world = rotateOnDiskPoint(diagnosticWcs(), hitPoint);
+    clipOrthoGeometry(world);
+    vec2 texCoord = sampleOrthoTexcoord(world, diagnosticWcs(), diagnosticProjection(), uPv);
+    outColor = vec4(texCoord, world.z, 1.);
+}
+`;
+}
+
+function latiDiagnostic(commonSource, latiSource) {
+  return `${commonSource}
+${stripMain(latiSource)}
+
+${commonDiagnosticUniforms()}
+
+void main(void) {
+    vec2 texCoord = sampleLatiZenithalTexcoord(vScrpos, diagnosticWcs(), uLatiGrid);
+    outColor = vec4(texCoord, 1., 1.);
+}
+`;
+}
+
+function polarDiagnostic(commonSource, polarSource, functionName, radialExpression) {
+  return `${commonSource}
+${stripMain(polarSource)}
+
+${commonDiagnosticUniforms()}
+
+void main(void) {
+    float radialCoordinate = ${radialExpression};
+    vec2 texCoord = ${functionName}(uCrval, uCrota, uRect, vScrpos, radialCoordinate);
+    outColor = vec4(texCoord, radialCoordinate, 1.);
+}
+`;
+}
+
+function diagnosticFragment(job, commonSource) {
+  if (job.mode === "hpc")
+    return hpcDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarHpc.frag"), "utf8"));
+  if (job.mode === "ortho")
+    return orthoDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8"));
+  if (job.mode === "lati_zenithal")
+    return latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"));
+  if (job.mode === "polar")
+    return polarDiagnostic(
+        commonSource,
+        fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8"),
+        "samplePolarTexcoord",
+        "mix(uBoundsDeg.z, uBoundsDeg.w, vScrpos.y)");
+  if (job.mode === "logpolar")
+    return polarDiagnostic(
+        commonSource,
+        fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLogPolar.frag"), "utf8"),
+        "sampleLogPolarTexcoord",
+        "exp(mix(uBoundsDeg.z, uBoundsDeg.w, vScrpos.y))");
+  throw new Error(`Unsupported mode: ${job.mode}`);
 }
 
 function vertexShader() {
@@ -195,8 +281,7 @@ async function main() {
   }
 
   const commonSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarCommon.frag"), "utf8");
-  const hpcSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarHpc.frag"), "utf8");
-  const program = createProgram(gl, vertexShader(), diagnosticFragment(commonSource, hpcSource));
+  const program = createProgram(gl, vertexShader(), diagnosticFragment(job, commonSource));
   gl.useProgram(program);
   bindUniformBlocks(gl, program);
 
@@ -209,6 +294,8 @@ async function main() {
   setUniform(gl, program, "uPlaneUnitsPerRadian", job.planeUnitsPerRadian);
   setUniform(gl, program, "uObserverDistance", job.observerDistance);
   setUniform(gl, program, "uPv", job.pv2);
+  setUniform(gl, program, "uLatiGrid", job.latiGrid || [0, 0, 0]);
+  setUniform(gl, program, "uPolarLog", job.polarLog || 0);
 
   const tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -241,7 +328,7 @@ async function main() {
   gl.enableVertexAttribArray(0);
   gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   gl.viewport(0, 0, job.width, job.height);
-  gl.clearColor(-999., -999., 0., 0.);
+  gl.clearColor(0., 0., 0., 0.);
   gl.clear(gl.COLOR_BUFFER_BIT);
   const clearError = gl.getError();
   gl.drawArrays(gl.TRIANGLES, 0, 6);
