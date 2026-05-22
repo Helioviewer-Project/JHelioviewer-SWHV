@@ -403,8 +403,20 @@ def make_mode_job(
     sample_texture: bool,
     meta,
     backend: str,
+    diff_selfcheck: bool = False,
 ) -> dict:
-    job = common_job(mode, fits_file, render_size, output_dir, meta, bounds_for_mode(mode), sample_texture, backend)
+    job = common_job(
+        mode,
+        fits_file,
+        render_size,
+        output_dir,
+        meta,
+        bounds_for_mode(mode),
+        sample_texture,
+        backend,
+        f"{mode}_diff_selfcheck" if diff_selfcheck else None,
+        diff_selfcheck=diff_selfcheck,
+    )
     if mode == "lati_zenithal":
         job["latiGrid"] = [0.0, 0.0, 0.0]
     return job
@@ -690,7 +702,7 @@ def evaluate_hpc_diff_selfcheck(
             count += 1
 
     print(f"file={fits_file}")
-    print(f"mode=electron_hpc_diff_selfcheck size={render_size}")
+    print(f"mode=electron_{job['mode']}_diff_selfcheck size={render_size}")
     print(f"renderer={result['renderer']}")
     print(f"gl_errors=(clear={result.get('clearError')}, draw={result.get('drawError')}, read={result.get('readError')})")
     print_gl_setup_errors(result)
@@ -734,6 +746,94 @@ def compare_hpc_diff_selfcheck(
     return evaluate_hpc_diff_selfcheck(fits_file, render_size, max_error_px, max_sample_error, meta, job, result, pixels)
 
 
+def compare_hpc_projection_diff_selfcheck_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    backend: str,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename, hdu, _case_max_error_px in HPC_PROJECTION_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"Electron WebGL HPC diff selfcheck does not support projection {meta.projection!r} for {fits_file}")
+        bounds = hpc_bounds_degrees(meta, 1.0)
+        job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, True, backend, f"{name}_diff_selfcheck", True)
+        jobs.append(job)
+        metadata.append({
+            "fits_file": fits_file,
+            "meta": meta,
+        })
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        code = evaluate_hpc_diff_selfcheck(
+            info["fits_file"],
+            render_size,
+            max_error_px,
+            max_sample_error,
+            info["meta"],
+            job,
+            result,
+            pixels,
+        )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
+def compare_all_modes_diff_selfcheck(
+    fits_file: Path,
+    hdu: int | None,
+    render_size: int,
+    electron: Path,
+    output_dir: Path,
+    max_error_px: float,
+    max_sample_error: float,
+    backend: str,
+) -> int:
+    _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+    if meta.projection not in PROJECTION_CODES:
+        raise ValueError(f"Electron WebGL all-modes diff selfcheck does not support projection {meta.projection!r}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    bounds = hpc_bounds_degrees(meta, 1.0)
+    jobs = [
+        common_job("hpc", fits_file, render_size, output_dir, meta, bounds, True, backend, "hpc_diff_selfcheck", True),
+        *[
+            make_mode_job(mode, fits_file, render_size, output_dir, True, meta, backend, True)
+            for mode in ALL_MODES
+            if mode != "hpc"
+        ],
+    ]
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, result in zip(jobs, results, strict=True):
+        pixels = read_job_pixels(job)
+        code = evaluate_hpc_diff_selfcheck(
+            fits_file,
+            render_size,
+            max_error_px,
+            max_sample_error,
+            meta,
+            job,
+            result,
+            pixels,
+        )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate JHV GLSL WCS code by running it on Electron/WebGL")
     parser.add_argument("fits_file", type=Path, nargs="?")
@@ -746,7 +846,9 @@ def main() -> int:
     parser.add_argument("--sample-texture", action="store_true")
     parser.add_argument("--all-modes", action="store_true")
     parser.add_argument("--hpc-projection-cases", action="store_true")
+    parser.add_argument("--hpc-projection-cases-diff-selfcheck", action="store_true")
     parser.add_argument("--hpc-diff-selfcheck", action="store_true")
+    parser.add_argument("--all-modes-diff-selfcheck", action="store_true")
     parser.add_argument("--backend", choices=("default", "swiftshader"), default="default")
     parser.add_argument(
         "--mode",
@@ -766,11 +868,33 @@ def main() -> int:
             args.backend,
         )
 
+    if args.hpc_projection_cases_diff_selfcheck:
+        return compare_hpc_projection_diff_selfcheck_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.backend,
+        )
+
     if args.fits_file is None:
-        raise SystemExit("fits_file is required unless --hpc-projection-cases is used")
+        raise SystemExit("fits_file is required unless a projection-case batch option is used")
 
     if args.hpc_diff_selfcheck:
         return compare_hpc_diff_selfcheck(
+            args.fits_file,
+            args.hdu,
+            args.render_size,
+            args.electron,
+            args.output_dir,
+            args.max_error_px,
+            args.max_sample_error,
+            args.backend,
+        )
+
+    if args.all_modes_diff_selfcheck:
+        return compare_all_modes_diff_selfcheck(
             args.fits_file,
             args.hdu,
             args.render_size,

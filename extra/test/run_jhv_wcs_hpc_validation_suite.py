@@ -258,6 +258,16 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--hpc-diff-selfcheck", "--render-size", "256", "--backend", "default"),
         "electron",
     ),
+    ValidationRun(
+        "electron_default_hpc_projection_cases_diff_selfcheck",
+        ("--hpc-projection-cases-diff-selfcheck", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_all_modes_diff_selfcheck",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--all-modes-diff-selfcheck", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
 )
 
 
