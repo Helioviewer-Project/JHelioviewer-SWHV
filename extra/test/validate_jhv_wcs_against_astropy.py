@@ -331,6 +331,20 @@ def apply_center(v: tuple[float, float, float], shift: tuple[float, float], crot
     return rotate_vector_inverse(crota_quat, shifted)
 
 
+def rotate_plane_inverse(quat: tuple[float, float, float, float], vec: tuple[float, float]) -> tuple[float, float]:
+    qx, qy, qz, qw = quat
+    qx2 = qx * qx
+    qy2 = qy * qy
+    qz2 = qz * qz
+    qxqy = qx * qy
+    qwqz = qw * qz
+    x, y = vec
+    return (
+        x * (1.0 - 2.0 * (qy2 + qz2)) + y * 2.0 * (qxqy + qwqz),
+        x * 2.0 * (qxqy - qwqz) + y * (1.0 - 2.0 * (qx2 + qz2)),
+    )
+
+
 def nativeZenithalCoordinates(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float, float]:
     phi, theta = helioprojective
     phi0 = meta.crval_internal_x / meta.plane_units_per_rad
@@ -953,14 +967,34 @@ def wcsPlaneToPixelCenter(plane_internal: tuple[float, float], meta: JHVMeta) ->
     return plane_internal_to_pixel_center(plane_internal, meta)
 
 
+def wcsRect(meta: JHVMeta) -> tuple[float, float, float, float]:
+    width = meta.pixel_width * meta.unit_per_pixel_x
+    height = meta.pixel_height * meta.unit_per_pixel_y
+    return (
+        -meta.crpix1_gl * meta.unit_per_pixel_x,
+        -meta.crpix2_gl * meta.unit_per_pixel_y,
+        1.0 / width,
+        1.0 / height,
+    )
+
+
 def wcsPlaneToTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
-    texcoord = pixel_center_to_texcoord(*wcsPlaneToPixelCenter(plane_internal, meta), image2d)
+    centered = rotate_plane_inverse(crota_quaternion(meta), plane_internal)
+    rect = wcsRect(meta)
+    texcoord = (
+        rect[2] * (centered[0] - rect[0]),
+        rect[3] * (-centered[1] - rect[1]),
+    )
     return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
 
 
 def wcsPlaneToWrappedXTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
-    texcoord = pixel_center_to_texcoord(*plane_internal_to_pixel_center(plane_internal, meta, wrap_x=True), image2d)
-    texcoord = (texcoord[0] % 1.0, texcoord[1])
+    centered = rotate_plane_inverse(crota_quaternion(meta), plane_internal)
+    rect = wcsRect(meta)
+    texcoord = (
+        (rect[2] * (centered[0] - rect[0])) % 1.0,
+        rect[3] * (-centered[1] - rect[1]),
+    )
     return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
 
 

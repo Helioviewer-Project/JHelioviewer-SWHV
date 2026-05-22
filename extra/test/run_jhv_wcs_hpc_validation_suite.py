@@ -14,6 +14,7 @@ from pathlib import Path
 class ValidationRun:
     name: str
     args: tuple[str, ...]
+    validator: str = "wcs"
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,7 @@ class ValidationResult:
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
 VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_against_astropy.py"
+GLSL_VALIDATOR = SCRIPT_DIR / "validate_glsl_syntax.py"
 DATA = SCRIPT_DIR / "data"
 
 
@@ -34,6 +36,11 @@ DATA = SCRIPT_DIR / "data"
 # the documented mode examples and the representative result cases quoted in the
 # Results section.
 RUNS: tuple[ValidationRun, ...] = (
+    ValidationRun(
+        "glsl_syntax",
+        (),
+        "glsl",
+    ),
     ValidationRun(
         "forward_wcs_random_sample",
         (str(DATA / "20241224_194245_d4c2A.fts"),),
@@ -234,7 +241,8 @@ def selected_runs(only: list[str] | None) -> list[ValidationRun]:
 
 
 def run_case(run: ValidationRun) -> ValidationResult:
-    cmd = [sys.executable, str(VALIDATOR), *run.args]
+    validator = GLSL_VALIDATOR if run.validator == "glsl" else VALIDATOR
+    cmd = [sys.executable, str(validator), *run.args]
     completed = subprocess.run(
         cmd,
         cwd=REPO_ROOT,
@@ -250,7 +258,8 @@ def run_case(run: ValidationRun) -> ValidationResult:
 
 
 def print_result(result: ValidationResult) -> None:
-    cmd = [sys.executable, str(VALIDATOR), *result.run.args]
+    validator = GLSL_VALIDATOR if result.run.validator == "glsl" else VALIDATOR
+    cmd = [sys.executable, str(validator), *result.run.args]
     print(f"\n== {result.run.name} ==")
     print(" ".join(cmd))
     if result.stdout:

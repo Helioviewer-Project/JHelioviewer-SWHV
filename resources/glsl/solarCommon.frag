@@ -194,6 +194,18 @@ vec3 apply_center(const vec3 v, const vec2 shift, const vec4 quat) {
     return rotate_vector_inverse(quat, r);
 }
 
+vec2 rotate_plane_inverse(const vec4 quat, const vec2 vec) {
+    vec3 q = quat.xyz;
+    float qx2 = q.x * q.x;
+    float qy2 = q.y * q.y;
+    float qz2 = q.z * q.z;
+    float qxqy = q.x * q.y;
+    float qwqz = quat.w * q.z;
+    return vec2(
+        vec.x * (1. - 2. * (qy2 + qz2)) + vec.y * 2. * (qxqy + qwqz),
+        vec.x * 2. * (qxqy - qwqz) + vec.y * (1. - 2. * (qx2 + qz2)));
+}
+
 // Differential solar rotation.
 float differentialRotation(const float dt, const float theta) {
     float sinLat2 = sin(theta);
@@ -390,7 +402,7 @@ vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs,
 }
 
 vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 centered = rotate_vector_inverse(wcs.crota, vec3(plane, 0)).xy;
+    vec2 centered = rotate_plane_inverse(wcs.crota, plane);
     vec4 rect = wcs.rect;
     vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_coord(texcoord);
@@ -398,7 +410,7 @@ vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
 }
 
 vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 centered = rotate_vector_inverse(wcs.crota, vec3(plane, 0)).xy;
+    vec2 centered = rotate_plane_inverse(wcs.crota, plane);
     vec4 rect = wcs.rect;
     vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     texcoord.x = fract(texcoord.x);
