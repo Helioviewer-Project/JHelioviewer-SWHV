@@ -1,11 +1,8 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
-import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
@@ -18,7 +15,7 @@ public final class ViewActions {
 
     public static void zoomFit() {
         Display.resetViewportZoom();
-        ViewportProjection.zoomToFit(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
+        fitCameraToImageLayers(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
         DisplayFrame.render(1);
     }
 
@@ -73,6 +70,14 @@ public final class ViewActions {
     private static void rotateView90(Quat rotation) {
         Display.getCamera().rotateDragRotation(rotation);
         DisplayFrame.display();
+    }
+
+    static void fitCameraToImageLayers(Camera camera, Position viewpoint) {
+        double size = ImageLayerBounds.getLargestPhysicalHeight();
+        double newFOV = Camera.INITFOV;
+        if (size != 0)
+            newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
+        camera.setFOV(newFOV, viewpoint);
     }
 
     private static void zoomViewports(double wr) {
