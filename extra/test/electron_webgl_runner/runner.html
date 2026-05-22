@@ -374,7 +374,22 @@ void main(void) {
 `;
 }
 
-function latiDiffSelfcheckDiagnostic(commonSource, latiSource) {
+function latiTexcoordExpression(index, pv, grid) {
+  return `projection[${index}].projectionCode == WCS_PROJECTION_CAR
+            ? sampleLatiCarTexcoord(scrpos, wcs[${index}], projection[${index}])
+            : projection[${index}].projectionCode == WCS_PROJECTION_CEA
+            ? sampleLatiCeaTexcoord(scrpos, wcs[${index}], projection[${index}], ${pv})
+            : sampleLatiZenithalTexcoord(scrpos, wcs[${index}], ${grid})`;
+}
+
+function latiDiffSelfcheckDiagnostic(commonSource, latiSource, mode) {
+  const texcoordExpression = latiTexcoordExpression(0, "pv0", "latiGrid[0]");
+  const diffExpression = mode === "assign"
+      ? "texCoord"
+      : mode === "same-slot"
+      ? texcoordExpression
+      : latiTexcoordExpression(1, "pv1", "latiGrid[1]");
+
   return `${commonSource}
 ${stripMain(latiSource)}
 
@@ -383,16 +398,8 @@ void main(void) {
         discard;
 
     vec2 scrpos = getScrPos();
-    vec2 texCoord = projection[0].projectionCode == WCS_PROJECTION_CAR
-            ? sampleLatiCarTexcoord(scrpos, wcs[0], projection[0])
-            : projection[0].projectionCode == WCS_PROJECTION_CEA
-            ? sampleLatiCeaTexcoord(scrpos, wcs[0], projection[0], pv0)
-            : sampleLatiZenithalTexcoord(scrpos, wcs[0], latiGrid[0]);
-    vec2 diffTexCoord = projection[1].projectionCode == WCS_PROJECTION_CAR
-            ? sampleLatiCarTexcoord(scrpos, wcs[1], projection[1])
-            : projection[1].projectionCode == WCS_PROJECTION_CEA
-            ? sampleLatiCeaTexcoord(scrpos, wcs[1], projection[1], pv1)
-            : sampleLatiZenithalTexcoord(scrpos, wcs[1], latiGrid[1]);
+    vec2 texCoord = ${texcoordExpression};
+    vec2 diffTexCoord = ${diffExpression};
     outColor = vec4(texCoord, diffTexCoord);
 }
 `;
@@ -546,7 +553,7 @@ function diagnosticFragment(job, commonSource) {
         : orthoDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8"));
   if (job.mode === "lati_zenithal")
     return job.diffSelfcheck
-        ? latiDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"))
+        ? latiDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"), job.latiDiffSelfcheckMode || "normal")
         : latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"));
   if (job.mode === "polar") {
     const polarSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8");
