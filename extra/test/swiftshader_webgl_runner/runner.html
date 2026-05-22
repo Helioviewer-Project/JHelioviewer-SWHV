@@ -100,56 +100,93 @@ function bindUniformBlock(gl, program, name, binding, data) {
   gl.uniformBlockBinding(program, index, binding);
 }
 
+function putVec4(block, offset, values) {
+  block.set(values, offset);
+}
+
+function wcsBlock(job) {
+  const block = new Float32Array(32);
+  putVec4(block, 0, [0, 0, 0, 1]);
+  putVec4(block, 4, job.rect);
+  putVec4(block, 8, job.crota);
+  block[12] = job.crval[0];
+  block[13] = job.crval[1];
+  block[14] = job.zpnUpperEta;
+  block[15] = 0;
+
+  putVec4(block, 16, [0, 0, 0, 1]);
+  putVec4(block, 20, job.rect);
+  putVec4(block, 24, job.crota);
+  block[28] = job.crval[0];
+  block[29] = job.crval[1];
+  block[30] = job.zpnUpperEta;
+  block[31] = 0;
+  return block;
+}
+
+function projectionBlock(job) {
+  const block = new Float32Array(24);
+  block[0] = job.projectionCode;
+  block[1] = job.planeUnitsPerRadian;
+  block[2] = job.observerDistance;
+  block[3] = 0;
+  putVec4(block, 4, [0, 0, 0, 1]);
+  putVec4(block, 8, [0, 0, 0, 1]);
+
+  block[12] = job.projectionCode;
+  block[13] = job.planeUnitsPerRadian;
+  block[14] = job.observerDistance;
+  block[15] = 0;
+  putVec4(block, 16, [0, 0, 0, 1]);
+  putVec4(block, 20, [0, 0, 0, 1]);
+  return block;
+}
+
+function screenBlock(job) {
+  const block = new Float32Array(28);
+  const inverseScale = job.mode === "ortho" ? 1 : 0.5;
+  block[0] = inverseScale;    // inverseMVP[0][0]
+  block[5] = inverseScale;    // inverseMVP[1][1]
+  block[10] = 1;              // inverseMVP[2][2]
+  block[15] = 1;              // inverseMVP[3][3]
+  block[16] = 0;              // viewport.x
+  block[17] = 0;              // viewport.y
+  block[18] = job.width;      // viewport.width
+  block[19] = job.height;     // viewport.height
+  block[20] = 1;              // iaspect
+  block[21] = job.boundsDeg[0];
+  block[22] = job.boundsDeg[1];
+  block[23] = job.boundsDeg[2];
+  block[24] = job.boundsDeg[3];
+  return block;
+}
+
+function displayBlock() {
+  const block = new Float32Array(24);
+  block[0] = 1;      // color.r
+  block[1] = 1;      // color.g
+  block[2] = 1;      // color.b
+  block[3] = 1;      // color.a
+  block[16] = 0;     // brightness.x
+  block[17] = 1;     // brightness.y
+  block[18] = 0;     // radii.x
+  block[19] = 1e30;  // radii.y
+  block[20] = 0;     // slit.x
+  block[21] = 1;     // slit.y
+  return block;
+}
+
 function bindUniformBlocks(gl, program, job) {
-  bindUniformBlock(gl, program, "WCSBlock", 0);
-  bindUniformBlock(gl, program, "ProjectionBlock", 1);
-
-  const screen = new Float32Array(28);
-  screen[0] = 0.5;             // inverseMVP[0][0]
-  screen[5] = 0.5;             // inverseMVP[1][1]
-  screen[10] = 1;              // inverseMVP[2][2]
-  screen[15] = 1;              // inverseMVP[3][3]
-  screen[16] = 0;              // viewport.x
-  screen[17] = 0;              // viewport.y
-  screen[18] = job.width;      // viewport.width
-  screen[19] = job.height;     // viewport.height
-  screen[20] = 1;              // iaspect
-  screen[21] = job.boundsDeg[0];
-  screen[22] = job.boundsDeg[1];
-  screen[23] = job.boundsDeg[2];
-  screen[24] = job.boundsDeg[3];
-  bindUniformBlock(gl, program, "ScreenBlock", 2, screen);
-
-  const data = new Float32Array(24);
-  data[0] = 1;      // color.r
-  data[1] = 1;      // color.g
-  data[2] = 1;      // color.b
-  data[3] = 1;      // color.a
-  data[16] = 0;     // brightness.x
-  data[17] = 1;     // brightness.y
-  data[18] = 0;     // radii.x
-  data[19] = 1e30;  // radii.y
-  data[20] = 0;     // slit.x
-  data[21] = 1;     // slit.y
-
-  bindUniformBlock(gl, program, "DisplayBlock", 3, data);
+  bindUniformBlock(gl, program, "WCSBlock", 0, wcsBlock(job));
+  bindUniformBlock(gl, program, "ProjectionBlock", 1, projectionBlock(job));
+  bindUniformBlock(gl, program, "ScreenBlock", 2, screenBlock(job));
+  bindUniformBlock(gl, program, "DisplayBlock", 3, displayBlock());
 }
 
 function commonDiagnosticUniforms() {
   return `
-in vec2 vScrpos;
-
-uniform vec4 uBoundsDeg;
-uniform vec4 uRect;
-uniform vec4 uCrota;
-uniform vec2 uCrval;
-uniform float uZpnUpperEta;
-uniform float uProjectionCode;
-uniform float uPlaneUnitsPerRadian;
-uniform float uObserverDistance;
 uniform float uPv[6];
 uniform vec3 uLatiGrid;
-uniform float uPolarLog;
 uniform float uSampleTexture;
 
 void diagnosticOutput(const vec2 texCoord, const float aux) {
@@ -157,28 +194,6 @@ void diagnosticOutput(const vec2 texCoord, const float aux) {
         outColor = vec4(texCoord, texture(image, texCoord).r, 1.);
     else
         outColor = vec4(texCoord, aux, 1.);
-}
-
-WCS diagnosticWcs(void) {
-    WCS localWcs;
-    localWcs.cameraDiff = vec4(0., 0., 0., 1.);
-    localWcs.rect = uRect;
-    localWcs.crota = uCrota;
-    localWcs.crval = uCrval;
-    localWcs.zpnUpperEta = uZpnUpperEta;
-    localWcs.deltaT = 0.;
-    return localWcs;
-}
-
-ProjectionParams diagnosticProjection(void) {
-    ProjectionParams localProjection;
-    localProjection.projectionCode = uProjectionCode;
-    localProjection.planeUnitsPerRadian = uPlaneUnitsPerRadian;
-    localProjection.observerDistance = uObserverDistance;
-    localProjection.padding0 = 0.;
-    localProjection.sourceViewQuat = vec4(0., 0., 0., 1.);
-    localProjection.displayMapQuat = vec4(0., 0., 0., 1.);
-    return localProjection;
 }
 `;
 }
@@ -192,15 +207,15 @@ ${commonDiagnosticUniforms()}
 void main(void) {
     vec2 scrpos = getScrPos();
     vec2 helioprojective = screenToHelioprojective(scrpos);
-    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, uObserverDistance);
+    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, projection[0].observerDistance);
 
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(
-        diagnosticWcs(),
-        diagnosticProjection(),
+        wcs[0],
+        projection[0],
         helioprojective,
         hpcXY,
-        0.,
+        wcs[0].deltaT,
         uPv,
         enhancementFactor);
     diagnosticOutput(texCoord, enhancementFactor);
@@ -215,15 +230,17 @@ ${stripMain(orthoSource)}
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    vec2 screenXY = vScrpos * 2. - 1.;
-    float radius2 = dot(screenXY, screenXY);
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
+    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 upXY = up1.xy;
+    float radius2 = dot(upXY, upXY);
     if (radius2 > 1.)
         discard;
 
-    vec3 hitPoint = vec3(screenXY, sqrt(1. - radius2));
-    vec3 world = rotateOnDiskPoint(diagnosticWcs(), hitPoint);
+    vec3 hitPoint = vec3(upXY, sqrt(1. - radius2));
+    vec3 world = rotateOnDiskPoint(wcs[0], hitPoint);
     clipOrthoGeometry(world);
-    vec2 texCoord = sampleOrthoTexcoord(world, diagnosticWcs(), diagnosticProjection(), uPv);
+    vec2 texCoord = sampleOrthoTexcoord(world, wcs[0], projection[0], uPv);
     diagnosticOutput(texCoord, world.z);
 }
 `;
@@ -236,7 +253,8 @@ ${stripMain(latiSource)}
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    vec2 texCoord = sampleLatiZenithalTexcoord(vScrpos, diagnosticWcs(), uLatiGrid);
+    vec2 scrpos = getScrPos();
+    vec2 texCoord = sampleLatiZenithalTexcoord(scrpos, wcs[0], uLatiGrid);
     diagnosticOutput(texCoord, 1.);
 }
 `;
@@ -249,8 +267,9 @@ ${stripMain(polarSource)}
 ${commonDiagnosticUniforms()}
 
 void main(void) {
+    vec2 scrpos = getScrPos();
     float radialCoordinate = ${radialExpression};
-    vec2 texCoord = ${functionName}(uCrval, uCrota, uRect, vScrpos, radialCoordinate);
+    vec2 texCoord = ${functionName}(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
     diagnosticOutput(texCoord, radialCoordinate);
 }
 `;
@@ -324,26 +343,14 @@ function diagnosticFragment(job, commonSource) {
         commonSource,
         fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8"),
         "samplePolarTexcoord",
-        "mix(uBoundsDeg.z, uBoundsDeg.w, vScrpos.y)");
+        "screen.yStart + scrpos.y * (screen.yStop - screen.yStart)");
   if (job.mode === "logpolar")
     return polarDiagnostic(
         commonSource,
         fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLogPolar.frag"), "utf8"),
         "sampleLogPolarTexcoord",
-        "exp(mix(uBoundsDeg.z, uBoundsDeg.w, vScrpos.y))");
+        "exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart))");
   throw new Error(`Unsupported mode: ${job.mode}`);
-}
-
-function vertexShader() {
-  return `#version 300 es
-precision highp float;
-layout(location = 0) in vec2 aPosition;
-out vec2 vScrpos;
-void main(void) {
-    vScrpos = aPosition * 0.5 + 0.5;
-    gl_Position = vec4(aPosition, 0., 1.);
-}
-`;
 }
 
 function prepareFullscreenQuad(gl) {
@@ -352,15 +359,13 @@ function prepareFullscreenQuad(gl) {
   const vertexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,
-     1, -1,
-    -1,  1,
-    -1,  1,
-     1, -1,
-     1,  1,
+    -1, -1, 0, 1,
+     1, -1, 0, 1,
+    -1,  1, 0, 1,
+     1,  1, 0, 1,
   ]), gl.STATIC_DRAW);
   gl.enableVertexAttribArray(0);
-  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(0, 4, gl.FLOAT, false, 0, 0);
   return vao;
 }
 
@@ -375,17 +380,8 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   gl.bindVertexArray(quadVao);
   bindUniformBlocks(gl, program, job);
 
-  setUniform(gl, program, "uBoundsDeg", job.boundsDeg);
-  setUniform(gl, program, "uRect", job.rect);
-  setUniform(gl, program, "uCrota", job.crota);
-  setUniform(gl, program, "uCrval", job.crval);
-  setUniform(gl, program, "uZpnUpperEta", job.zpnUpperEta);
-  setUniform(gl, program, "uProjectionCode", job.projectionCode);
-  setUniform(gl, program, "uPlaneUnitsPerRadian", job.planeUnitsPerRadian);
-  setUniform(gl, program, "uObserverDistance", job.observerDistance);
   setUniform(gl, program, "uPv", job.pv2);
   setUniform(gl, program, "uLatiGrid", job.latiGrid || [0, 0, 0]);
-  setUniform(gl, program, "uPolarLog", job.polarLog || 0);
   setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
   setUniformInt(gl, program, "image", 0);
   let sourceTexture = null;
@@ -423,7 +419,7 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   gl.clearColor(0., 0., 0., 0.);
   gl.clear(gl.COLOR_BUFFER_BIT);
   const clearError = gl.getError();
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   const drawError = gl.getError();
 
   const pixels = new Float32Array(job.width * job.height * 4);
@@ -474,7 +470,7 @@ async function main() {
   const quadVao = prepareFullscreenQuad(gl);
 
   const commonSource = fs.readFileSync(path.join(jobs[0].repoRoot, "resources/glsl/solarCommon.frag"), "utf8");
-  const vertexSource = vertexShader();
+  const vertexSource = fs.readFileSync(path.join(jobs[0].repoRoot, "resources/glsl/solar.vert"), "utf8");
   const results = [];
   for (const job of jobs)
     results.push(renderJob(gl, commonSource, vertexSource, renderer, quadVao, job));
