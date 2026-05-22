@@ -422,7 +422,7 @@ def projectArcToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) ->
     native_radius = math.hypot(native_x, native_y)
     if native_radius == 0.0:
         return (0.0, 0.0)
-    native_distance = math.acos(max(-1.0, min(1.0, cos_native_distance)))
+    native_distance = math.atan2(native_radius, cos_native_distance)
     return (
         meta.plane_units_per_rad * native_distance * native_x / native_radius,
         meta.plane_units_per_rad * native_distance * native_y / native_radius,
@@ -434,7 +434,7 @@ def projectZpnToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) ->
     native_radius = math.hypot(native_x, native_y)
     if native_radius == 0.0:
         return (0.0, 0.0)
-    eta = math.acos(max(-1.0, min(1.0, cos_native_distance)))
+    eta = math.atan2(native_radius, cos_native_distance)
     if eta > zpn_primary_branch_upper_eta(meta):
         raise ValueError("Point is outside the primary forward ZPN branch")
     radial = zpn_radial(meta, eta)
@@ -1316,6 +1316,250 @@ def renderHpcTexcoords(
         diff_image2d if diff_image2d is not None else image2d,
     )
     return texcoord, diff_texcoord, enhancement_factor, diff_enhancement_factor, helioprojective, diff_hpc_xy
+
+
+def f32(value: float) -> float:
+    return float(np.float32(value))
+
+
+def sin32(value: float) -> float:
+    return f32(np.sin(np.float32(value)))
+
+
+def cos32(value: float) -> float:
+    return f32(np.cos(np.float32(value)))
+
+
+def sqrt32(value: float) -> float:
+    return f32(np.sqrt(np.float32(value)))
+
+
+def atan32(y: float, x: float) -> float:
+    return f32(np.arctan2(np.float32(y), np.float32(x)))
+
+
+def radians32(value: float) -> float:
+    return f32(np.deg2rad(np.float32(value)))
+
+
+def length32(x: float, y: float) -> float:
+    return sqrt32(f32(f32(x * x) + f32(y * y)))
+
+
+def screenToHelioprojectiveFloat32(scrpos: tuple[float, float], bounds_deg: tuple[float, float, float, float]) -> tuple[float, float]:
+    sx, sy = f32(scrpos[0]), f32(scrpos[1])
+    x0, x1, y0, y1 = [f32(v) for v in bounds_deg]
+    return (
+        radians32(f32(x0 + f32(sx * f32(x1 - x0)))),
+        radians32(f32(y0 + f32(sy * f32(y1 - y0)))),
+    )
+
+
+def helioprojectiveToObserverRayFloat32(helioprojective: tuple[float, float]) -> tuple[float, float, float]:
+    phi, theta = helioprojective
+    cos_phi = cos32(phi)
+    cos_theta = cos32(theta)
+    ray_sign = -1.0 if f32(cos_phi * cos_theta) < 0.0 else 1.0
+    return (
+        f32(ray_sign * f32(sin32(phi) * cos_theta)),
+        f32(ray_sign * sin32(theta)),
+        f32(-ray_sign * f32(cos_phi * cos_theta)),
+    )
+
+
+def helioprojectiveToWorldFloat32(helioprojective: tuple[float, float], observer_distance: float) -> tuple[bool, tuple[float, float, float]]:
+    ray = helioprojectiveToObserverRayFloat32(helioprojective)
+    observer_distance = f32(observer_distance)
+    b = f32(observer_distance * ray[2])
+    c = f32(f32(observer_distance * observer_distance) - 1.0)
+    discriminant = f32(f32(b * b) - c)
+    if discriminant < 0.0:
+        return False, (0.0, 0.0, 0.0)
+
+    root = sqrt32(discriminant)
+    t_near = f32(-b - root)
+    t_far = f32(-b + root)
+    t = t_near if t_near > 0.0 else t_far
+    if t <= 0.0:
+        return False, (0.0, 0.0, 0.0)
+
+    return True, (
+        f32(t * ray[0]),
+        f32(t * ray[1]),
+        f32(observer_distance + f32(t * ray[2])),
+    )
+
+
+def helioprojectiveToHpcXYFloat32(helioprojective: tuple[float, float], observer_distance: float) -> tuple[float, float]:
+    ray = helioprojectiveToObserverRayFloat32(helioprojective)
+    if ray[2] >= 0.0:
+        return (math.nan, math.nan)
+    scale = f32(-f32(observer_distance) / ray[2])
+    return f32(scale * ray[0]), f32(scale * ray[1])
+
+
+def worldToHelioprojectiveFloat32(world_xyz: tuple[float, float, float], observer_distance: float) -> tuple[float, float]:
+    x, y, z = [f32(v) for v in world_xyz]
+    zeta = f32(f32(observer_distance) - z)
+    return (
+        atan32(x, zeta),
+        atan32(y, sqrt32(f32(f32(x * x) + f32(zeta * zeta)))),
+    )
+
+
+def hpcEnhancementFactorFloat32(hpc_xy: tuple[float, float]) -> float:
+    return max(1.0, length32(hpc_xy[0], hpc_xy[1]))
+
+
+def clipHpcGeometryFloat32(hpc_xy: tuple[float, float]) -> bool:
+    if not math.isfinite(hpc_xy[0]) or not math.isfinite(hpc_xy[1]):
+        return False
+    radial2 = f32(f32(hpc_xy[0] * hpc_xy[0]) + f32(hpc_xy[1] * hpc_xy[1]))
+    return passes_sector(hpc_xy) and passes_radii(radial2) and passes_cutoff(hpc_xy)
+
+
+def nativeZenithalCoordinatesFloat32(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float, float]:
+    phi, theta = helioprojective
+    plane_units_per_rad = f32(meta.plane_units_per_rad)
+    phi0 = f32(f32(meta.crval_internal_x) / plane_units_per_rad)
+    theta0 = f32(f32(meta.crval_internal_y) / plane_units_per_rad)
+
+    sin_lat = sin32(theta)
+    cos_lat = cos32(theta)
+    sin_lat0 = sin32(theta0)
+    cos_lat0 = cos32(theta0)
+    delta_lon = f32(phi - phi0)
+    sin_delta_lon = sin32(delta_lon)
+    cos_delta_lon = cos32(delta_lon)
+
+    native_x = f32(cos_lat * sin_delta_lon)
+    native_y = f32(f32(cos_lat0 * sin_lat) - f32(f32(sin_lat0 * cos_lat) * cos_delta_lon))
+    cos_native_distance = f32(f32(sin_lat0 * sin_lat) + f32(f32(cos_lat0 * cos_lat) * cos_delta_lon))
+    return native_x, native_y, cos_native_distance
+
+
+def zpnRadialFloat32(meta: JHVMeta, eta_rad: float) -> float:
+    radial = f32(meta.pv2[-1])
+    eta = f32(eta_rad)
+    for coefficient in reversed(meta.pv2[:-1]):
+        radial = f32(f32(radial * eta) + f32(coefficient))
+    return radial
+
+
+def projectHelioprojectiveToWcsPlaneFloat32(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
+    native_x, native_y, cos_native_distance = nativeZenithalCoordinatesFloat32(helioprojective, meta)
+    plane_units_per_rad = f32(meta.plane_units_per_rad)
+
+    if meta.projection == "TAN":
+        if cos_native_distance <= 0.0:
+            raise ValueError("Point is outside the visible TAN hemisphere")
+        return (
+            f32(plane_units_per_rad * f32(native_x / cos_native_distance)),
+            f32(plane_units_per_rad * f32(native_y / cos_native_distance)),
+        )
+
+    native_radius = length32(native_x, native_y)
+    if native_radius == 0.0:
+        return (0.0, 0.0)
+
+    if meta.projection == "ARC":
+        native_distance = atan32(native_radius, cos_native_distance)
+        scale = f32(plane_units_per_rad * f32(native_distance / native_radius))
+        return f32(scale * native_x), f32(scale * native_y)
+
+    if meta.projection == "AZP":
+        mu = f32(meta.pv2[1])
+        gamma = radians32(meta.pv2[2])
+        if gamma == 0.0 and mu > 1.0 and f32(f32(mu * cos_native_distance) + 1.0) <= 0.0:
+            raise ValueError("Point is outside the primary forward AZP branch")
+        denom = f32(f32(mu + cos_native_distance) - f32(native_y * f32(math.tan(gamma))))
+        if denom <= 0.0:
+            raise ValueError("Point is on the AZP singularity")
+        radial = f32(f32(mu + 1.0) * f32(native_radius / denom))
+        return (
+            f32(plane_units_per_rad * f32(radial * f32(native_x / native_radius))),
+            f32(plane_units_per_rad * f32(radial * f32(native_y / f32(native_radius * cos32(gamma))))),
+        )
+
+    if meta.projection == "ZPN":
+        native_distance = atan32(native_radius, cos_native_distance)
+        if native_distance > f32(zpn_primary_branch_upper_eta(meta)):
+            raise ValueError("Point is outside the primary forward ZPN branch")
+        radial = zpnRadialFloat32(meta, native_distance)
+        if radial < 0.0:
+            raise ValueError("Point is outside the primary forward ZPN branch")
+        scale = f32(plane_units_per_rad * f32(radial / native_radius))
+        return f32(scale * native_x), f32(scale * native_y)
+
+    raise ValueError(f"HPC path does not support projection {meta.projection!r}")
+
+
+def rotatePlaneInverseFloat32(quat: tuple[float, float, float, float], vec: tuple[float, float]) -> tuple[float, float]:
+    qx, qy, qz, qw = [f32(v) for v in quat]
+    x, y = [f32(v) for v in vec]
+    qx2 = f32(qx * qx)
+    qy2 = f32(qy * qy)
+    qz2 = f32(qz * qz)
+    qxqy = f32(qx * qy)
+    qwqz = f32(qw * qz)
+    return (
+        f32(f32(x * f32(1.0 - f32(2.0 * f32(qy2 + qz2)))) + f32(y * f32(2.0 * f32(qxqy + qwqz)))),
+        f32(f32(x * f32(2.0 * f32(qxqy - qwqz))) + f32(y * f32(1.0 - f32(2.0 * f32(qx2 + qz2))))),
+    )
+
+
+def wcsPlaneToTexcoordFloat32(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
+    centered = rotatePlaneInverseFloat32(crota_quaternion(meta), plane_internal)
+    width = f32(f32(meta.pixel_width) * f32(meta.unit_per_pixel_x))
+    height = f32(f32(meta.pixel_height) * f32(meta.unit_per_pixel_y))
+    rect = (
+        f32(-f32(meta.crpix1_gl) * f32(meta.unit_per_pixel_x)),
+        f32(-f32(meta.crpix2_gl) * f32(meta.unit_per_pixel_y)),
+        f32(1.0 / width),
+        f32(1.0 / height),
+    )
+    texcoord = (
+        f32(rect[2] * f32(centered[0] - rect[0])),
+        f32(rect[3] * f32(-centered[1] - rect[1])),
+    )
+    return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
+
+
+def sampleHpcTexcoordFloat32(helioprojective: tuple[float, float], hpc_xy: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[tuple[float, float], float]:
+    enhancement_factor = 1.0
+    hp = helioprojective
+    hit, world = helioprojectiveToWorldFloat32(hp, meta.observer_distance)
+    if hit:
+        hp = worldToHelioprojectiveFloat32(world, meta.observer_distance)
+    else:
+        enhancement_factor = hpcEnhancementFactorFloat32(hpc_xy)
+
+    try:
+        plane = projectHelioprojectiveToWcsPlaneFloat32(hp, meta)
+    except ValueError:
+        return (math.nan, math.nan), enhancement_factor
+    return wcsPlaneToTexcoordFloat32(plane, meta, image2d), enhancement_factor
+
+
+def renderHpcTexcoordsFloat32(
+    scrpos: tuple[float, float],
+    bounds_deg: tuple[float, float, float, float],
+    meta: JHVMeta,
+    image2d: np.ndarray,
+) -> tuple[tuple[float, float], float, tuple[float, float], tuple[float, float]]:
+    clamped_scrpos = getScrPos(scrpos)
+    if not math.isfinite(clamped_scrpos[0]) or not math.isfinite(clamped_scrpos[1]):
+        nan2 = (math.nan, math.nan)
+        return nan2, math.nan, nan2, nan2
+
+    helioprojective = screenToHelioprojectiveFloat32(clamped_scrpos, bounds_deg)
+    hpc_xy = helioprojectiveToHpcXYFloat32(helioprojective, meta.observer_distance)
+    if not clipHpcGeometryFloat32(hpc_xy):
+        nan2 = (math.nan, math.nan)
+        return nan2, math.nan, helioprojective, nan2
+
+    texcoord, enhancement_factor = sampleHpcTexcoordFloat32(helioprojective, hpc_xy, meta, image2d)
+    return texcoord, enhancement_factor, helioprojective, hpc_xy
 
 
 # solarLati.frag mirror.
