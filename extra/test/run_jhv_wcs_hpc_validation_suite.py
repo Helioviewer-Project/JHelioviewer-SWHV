@@ -162,6 +162,38 @@ RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "mrzqs260301t2314c2308_169.fits"), "--surface-map-render-compare", "--surface-map-grid-factor", "4"),
     ),
     ValidationRun(
+        "latitudinal_zenithal_render",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--latitudinal-zenithal-render", "--render-size", "512"),
+    ),
+    ValidationRun(
+        "polar_render",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--polar-render", "--render-size", "512"),
+    ),
+    ValidationRun(
+        "logpolar_render",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--logpolar-render", "--render-size", "512"),
+    ),
+    ValidationRun(
+        "hpc_diff_selfcheck",
+        (str(DATA / "20241224_194245_d4c2A.fts"), "--hpc-diff-selfcheck", "--render-size", "512"),
+    ),
+    ValidationRun(
+        "latitudinal_diff_selfcheck",
+        (str(DATA / "sunerf_map.fits"), "--latitudinal-diff-selfcheck", "--render-size", "512"),
+    ),
+    ValidationRun(
+        "orthographic_diff_selfcheck",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--orthographic-diff-selfcheck", "--render-size", "512"),
+    ),
+    ValidationRun(
+        "polar_diff_selfcheck",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--polar-diff-selfcheck", "--render-size", "512"),
+    ),
+    ValidationRun(
+        "logpolar_diff_selfcheck",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--logpolar-diff-selfcheck", "--render-size", "512"),
+    ),
+    ValidationRun(
         "ortho_vs_hpc_screen_compare",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--ortho-vs-hpc-screen-compare", "--render-size", "4096"),
     ),

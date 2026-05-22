@@ -189,11 +189,6 @@ vec3 rotate_vector(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
 }
 
-vec3 apply_center(const vec3 v, const vec2 shift, const vec4 quat) {
-    vec3 r = vec3(v.xy - shift, v.z);
-    return rotate_vector_inverse(quat, r);
-}
-
 vec2 rotate_plane_inverse(const vec4 quat, const vec2 vec) {
     vec3 q = quat.xyz;
     float qx2 = q.x * q.x;

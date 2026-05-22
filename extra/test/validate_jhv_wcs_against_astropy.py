@@ -326,11 +326,6 @@ def rotate_vector_inverse(quat: tuple[float, float, float, float], vec: tuple[fl
     return quat_rotate_vector_inverse(quat, vec)
 
 
-def apply_center(v: tuple[float, float, float], shift: tuple[float, float], crota_quat: tuple[float, float, float, float]) -> tuple[float, float, float]:
-    shifted = (v[0] - shift[0], v[1] - shift[1], v[2])
-    return rotate_vector_inverse(crota_quat, shifted)
-
-
 def rotate_plane_inverse(quat: tuple[float, float, float, float], vec: tuple[float, float]) -> tuple[float, float]:
     qx, qy, qz, qw = quat
     qx2 = qx * qx
@@ -1405,15 +1400,12 @@ def sampleLatiZenithalTexcoord(
     if rotated_spherical[0] < 0.0:
         return (math.nan, math.nan)
 
-    centered = apply_center(
-        (rotated_spherical[1], rotated_spherical[2], 0.0),
-        (meta.crval_internal_x, meta.crval_internal_y),
+    centered = rotate_plane_inverse(
         crota_quaternion(meta),
+        (rotated_spherical[1] - meta.crval_internal_x, rotated_spherical[2] - meta.crval_internal_y),
     )
-    texcoord = (
-        (centered[0] - (-meta.crpix1_gl * meta.unit_per_pixel_x)) / (meta.pixel_width * meta.unit_per_pixel_x),
-        (-centered[1] - (-meta.crpix2_gl * meta.unit_per_pixel_y)) / (meta.pixel_height * meta.unit_per_pixel_y),
-    )
+    rect = wcsRect(meta)
+    texcoord = (rect[2] * (centered[0] - rect[0]), rect[3] * (-centered[1] - rect[1]))
     return texcoord if texcoord_in_bounds(texcoord) else (math.nan, math.nan)
 
 
@@ -1700,15 +1692,12 @@ def samplePolarTexcoord(
         if geometry_flat_dist > DISPLAY_CUTOFF[2] or geometry_flat_dist_alt > DISPLAY_CUTOFF[2]:
             return (math.nan, math.nan)
 
-    centered = apply_center(
-        (polar_xy[0], -polar_xy[1], 0.0),
-        (meta.crval_internal_x, meta.crval_internal_y),
+    centered = rotate_plane_inverse(
         crota_quaternion(meta),
+        (polar_xy[0] - meta.crval_internal_x, -polar_xy[1] - meta.crval_internal_y),
     )
-    texcoord = (
-        (centered[0] - (-meta.crpix1_gl * meta.unit_per_pixel_x)) / (meta.pixel_width * meta.unit_per_pixel_x),
-        (-centered[1] - (-meta.crpix2_gl * meta.unit_per_pixel_y)) / (meta.pixel_height * meta.unit_per_pixel_y),
-    )
+    rect = wcsRect(meta)
+    texcoord = (rect[2] * (centered[0] - rect[0]), rect[3] * (-centered[1] - rect[1]))
     return texcoord if texcoord_in_bounds(texcoord) else (math.nan, math.nan)
 
 
