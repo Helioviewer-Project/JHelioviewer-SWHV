@@ -3,7 +3,6 @@ package org.helioviewer.jhv.opengl;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Viewport;
 
 class GLSLLineShader extends GLSLShader {

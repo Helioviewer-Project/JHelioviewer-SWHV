@@ -11,13 +11,13 @@ import java.util.Set;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLTexture;
 import org.helioviewer.jhv.opengl.GLTexture;
+import org.helioviewer.jhv.opengl.Transform;
 
 import org.joml.Vector3f;
 import org.json.JSONArray;

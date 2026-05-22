@@ -5,7 +5,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Projection;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
@@ -105,7 +104,7 @@ public final class GLRenderer {
         ProjectionScale scale = ProjectionScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Projection.ortho(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY(), renderView.viewRotation());
+            Transform.ortho(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY(), renderView.viewRotation());
             GLSLSolarShader.bindScreen(vp, scale);
 
             GLSLSolarShader.sphere.use();
@@ -124,7 +123,7 @@ public final class GLRenderer {
             Camera miniCamera = Display.getMiniCamera();
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Projection.ortho2D(vp.aspect, miniCamera.getCameraWidth(vp.zoom), miniCamera.getTranslationX(), miniCamera.getTranslationY());
+            Transform.ortho2D(vp.aspect, miniCamera.getCameraWidth(vp.zoom), miniCamera.getTranslationX(), miniCamera.getTranslationY());
             ProjectionScale scale = ProjectionScale.ortho;
             GLSLSolarShader.bindScreen(vp, scale);
 
@@ -158,7 +157,7 @@ public final class GLRenderer {
                 scale = ProjectionScale.hpc;
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Projection.ortho2D(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY());
+            Transform.ortho2D(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY());
             GLSLSolarShader.bindScreen(vp, scale);
 
             Layers.renderScale(ctx, vp, scale);

@@ -12,7 +12,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
@@ -30,6 +29,7 @@ import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.Transform;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;

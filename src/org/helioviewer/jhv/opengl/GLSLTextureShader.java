@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.camera.Transform;
-
 class GLSLTextureShader extends GLSLShader {
 
     static final GLSLTextureShader texture = new GLSLTextureShader("/glsl/texture.vert", "/glsl/texture.frag");

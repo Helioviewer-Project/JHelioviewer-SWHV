@@ -10,7 +10,6 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -23,6 +22,7 @@ import org.helioviewer.jhv.opengl.GLHelper;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
+import org.helioviewer.jhv.opengl.Transform;
 import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 
