@@ -37,6 +37,13 @@ DEFAULT_ELECTRON = Path(os.environ.get(
     str(Path.home() / "electron-v42.1.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
 ))
 ALL_MODES = ("hpc", "ortho", "lati_zenithal", "polar", "logpolar")
+HPC_PROJECTION_CASES = (
+    ("arc_punch", "PUNCH_L3_CAM_20260425001600_v0k.fits", 1, 8.0),
+    ("azp_hi1", "20250622_000831_s4h1A.fts", None, 0.5),
+    ("azp_hi2", "20250622_000851_s4h2A.fts", None, 0.5),
+    ("zpn_wispr_1211", "psp_L3_wispr_20231227T150508_V1_1211.fits", None, 35.0),
+    ("zpn_wispr_2222", "psp_L3_wispr_20231227T150704_V1_2222.fits", None, 25.0),
+)
 
 PROJECTION_CODES = {
     "TAN": 0.0,
@@ -103,12 +110,14 @@ def common_job(
     meta,
     bounds: tuple[float, float, float, float],
     sample_texture: bool,
+    name: str | None = None,
 ) -> dict:
     output_kind = "sample" if sample_texture else "texcoord"
-    output_path = output_dir / f"{fits_file.stem}_swiftshader_{mode}_{output_kind}.rgba32f"
+    output_name = name if name is not None else mode
+    output_path = output_dir / f"{fits_file.stem}_swiftshader_{output_name}_{output_kind}.rgba32f"
     return {
         "mode": mode,
-        "name": mode,
+        "name": output_name,
         "repoRoot": str(REPO_ROOT),
         "width": render_size,
         "height": render_size,
@@ -560,9 +569,61 @@ def compare_batch(
     return 1 if failed else 0
 
 
+def compare_hpc_projection_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename, hdu, case_max_error_px in HPC_PROJECTION_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"SwiftShader HPC validation does not support projection {meta.projection!r} for {fits_file}")
+        bounds = hpc_bounds_degrees(meta, 1.0)
+        job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, name)
+        jobs.append(job)
+        metadata.append({
+            "fits_file": fits_file,
+            "image_data": image_data,
+            "meta": meta,
+            "pixel_wcs": pixel_wcs,
+            "bounds": bounds,
+            "max_error_px": case_max_error_px,
+        })
+
+    results = run_electron_jobs(electron, jobs)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        code = evaluate_hpc_shader_to_astropy(
+            info["fits_file"],
+            render_size,
+            max(max_error_px, info["max_error_px"]),
+            max_sample_error,
+            sample_texture,
+            info["image_data"],
+            info["meta"],
+            info["pixel_wcs"],
+            info["bounds"],
+            job,
+            result,
+            pixels,
+        )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate JHV GLSL WCS code by running it on Electron/ANGLE SwiftShader")
-    parser.add_argument("fits_file", type=Path)
+    parser.add_argument("fits_file", type=Path, nargs="?")
     parser.add_argument("--hdu", type=int, default=None)
     parser.add_argument("--render-size", type=int, default=512)
     parser.add_argument("--electron", type=Path, default=DEFAULT_ELECTRON)
@@ -571,12 +632,26 @@ def main() -> int:
     parser.add_argument("--max-sample-error", type=float, default=1e-3)
     parser.add_argument("--sample-texture", action="store_true")
     parser.add_argument("--all-modes", action="store_true")
+    parser.add_argument("--hpc-projection-cases", action="store_true")
     parser.add_argument(
         "--mode",
         choices=("hpc", "ortho", "lati_zenithal", "polar", "logpolar"),
         default="hpc",
     )
     args = parser.parse_args()
+
+    if args.hpc_projection_cases:
+        return compare_hpc_projection_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.sample_texture,
+        )
+
+    if args.fits_file is None:
+        raise SystemExit("fits_file is required unless --hpc-projection-cases is used")
 
     if args.all_modes:
         return compare_batch(
