@@ -664,7 +664,7 @@ def main() -> int:
     parser.add_argument("--sample-texture", action="store_true")
     parser.add_argument("--all-modes", action="store_true")
     parser.add_argument("--hpc-projection-cases", action="store_true")
-    parser.add_argument("--backend", choices=("swiftshader", "default"), default="swiftshader")
+    parser.add_argument("--backend", choices=("default", "swiftshader"), default="default")
     parser.add_argument(
         "--mode",
         choices=("hpc", "ortho", "lati_zenithal", "polar", "logpolar"),
