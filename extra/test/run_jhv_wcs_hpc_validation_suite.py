@@ -244,6 +244,16 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         "electron",
     ),
     ValidationRun(
+        "electron_default_tan_screen_cases",
+        ("--tan-screen-cases", "--render-size", "256", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_tan_screen_cases_sample_texture",
+        ("--tan-screen-cases", "--render-size", "128", "--sample-texture", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
         "electron_default_hpc_projection_cases",
         ("--hpc-projection-cases", "--render-size", "256", "--backend", "default"),
         "electron",

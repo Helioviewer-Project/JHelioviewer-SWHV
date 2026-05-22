@@ -70,6 +70,12 @@ SURFACE_MAP_CASES = (
     ("cea", "mrzqs260301t2314c2308_169.fits"),
 )
 
+TAN_SCREEN_CASES = (
+    ("sample171", "sample.171.fits", 1),
+    ("solo_eui", "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits", None),
+    ("cor2", "20241224_194245_d4c2A.fts", None),
+)
+
 
 def crota_quat(crota_rad: float) -> list[float]:
     half = 0.5 * crota_rad
@@ -276,7 +282,7 @@ def evaluate_hpc_shader_to_astropy(
     skipped = 0
 
     for iy in range(render_size):
-        sy = 1.0 - (iy + 0.5) / render_size
+        sy = (iy + 0.5) / render_size
         row_world_deg = np.empty((render_size, 2), dtype=np.float64)
         for ix in range(render_size):
             sx = (ix + 0.5) / render_size
@@ -507,7 +513,7 @@ def evaluate_shader_to_cpu(
     cpu_only = 0
 
     for iy in range(render_size):
-        sy = 1.0 - (iy + 0.5) / render_size
+        sy = (iy + 0.5) / render_size
         for ix in range(render_size):
             sx = (ix + 0.5) / render_size
             shader_texcoord = (float(pixels[iy, ix, 0]), float(pixels[iy, ix, 1]))
@@ -633,6 +639,86 @@ def compare_batch(
                 sample_texture,
                 image_data,
                 meta,
+                job,
+                result,
+                pixels,
+            )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
+def compare_tan_screen_case_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+    backend: str,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename, hdu in TAN_SCREEN_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"Electron WebGL TAN screen validation does not support projection {meta.projection!r} for {fits_file}")
+
+        bounds = hpc_bounds_degrees(meta, 1.0)
+        hpc_job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, backend, f"{name}_hpc")
+        jobs.append(hpc_job)
+        metadata.append({
+            "mode": "hpc",
+            "fits_file": fits_file,
+            "image_data": image_data,
+            "meta": meta,
+            "pixel_wcs": pixel_wcs,
+            "bounds": bounds,
+        })
+
+        ortho_job = make_mode_job("ortho", fits_file, render_size, output_dir, sample_texture, meta, backend)
+        ortho_job["name"] = f"{name}_ortho"
+        ortho_job["outputPath"] = str(output_dir / f"{fits_file.stem}_{backend}_{name}_ortho_{'sample' if sample_texture else 'texcoord'}.rgba32f")
+        jobs.append(ortho_job)
+        metadata.append({
+            "mode": "ortho",
+            "fits_file": fits_file,
+            "image_data": image_data,
+            "meta": meta,
+        })
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        if info["mode"] == "hpc":
+            code = evaluate_hpc_shader_to_astropy(
+                info["fits_file"],
+                render_size,
+                max_error_px,
+                max_sample_error,
+                sample_texture,
+                info["image_data"],
+                info["meta"],
+                info["pixel_wcs"],
+                info["bounds"],
+                job,
+                result,
+                pixels,
+            )
+        else:
+            code = evaluate_shader_to_cpu(
+                info["mode"],
+                info["fits_file"],
+                render_size,
+                max_error_px,
+                max_sample_error,
+                sample_texture,
+                info["image_data"],
+                info["meta"],
                 job,
                 result,
                 pixels,
@@ -1196,6 +1282,7 @@ def main() -> int:
     parser.add_argument("--max-sample-error", type=float, default=1e-3)
     parser.add_argument("--sample-texture", action="store_true")
     parser.add_argument("--all-modes", action="store_true")
+    parser.add_argument("--tan-screen-cases", action="store_true")
     parser.add_argument("--hpc-projection-cases", action="store_true")
     parser.add_argument("--hpc-render-cases", action="store_true")
     parser.add_argument("--surface-map-cases", action="store_true")
@@ -1216,6 +1303,17 @@ def main() -> int:
 
     if args.hpc_projection_cases:
         return compare_hpc_projection_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.sample_texture,
+            args.backend,
+        )
+
+    if args.tan_screen_cases:
+        return compare_tan_screen_case_batch(
             args.electron,
             args.output_dir,
             args.render_size,
