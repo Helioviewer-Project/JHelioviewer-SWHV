@@ -32,7 +32,7 @@ from validate_jhv_wcs_against_astropy import (
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
-RUNNER_DIR = SCRIPT_DIR / "swiftshader_webgl_runner"
+RUNNER_DIR = SCRIPT_DIR / "electron_webgl_runner"
 DEFAULT_ELECTRON = Path(os.environ.get(
     "JHV_ELECTRON",
     str(Path.home() / "electron-v42.1.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
@@ -84,14 +84,14 @@ def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
 
     if completed.returncode != 0 or result is None:
         raise RuntimeError(
-            "Electron SwiftShader runner failed\n"
+            "Electron WebGL runner failed\n"
             f"returncode={completed.returncode}\n"
             f"stdout={completed.stdout}\n"
             f"stderr={completed.stderr}"
         )
     if not result.get("ok"):
         raise RuntimeError(
-            "Electron SwiftShader runner reported failure\n"
+            "Electron WebGL runner reported failure\n"
             f"result={json.dumps(result, indent=2)}\n"
             f"stderr={completed.stderr}"
         )
@@ -100,7 +100,7 @@ def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
 
 def run_electron_jobs(electron: Path, jobs: list[dict], backend: str) -> list[dict]:
     with TemporaryDirectory() as temp_dir:
-        job_path = Path(temp_dir) / "swiftshader-jobs.json"
+        job_path = Path(temp_dir) / "electron-jobs.json"
         job_path.write_text(json.dumps({"jobs": jobs}))
         result = run_electron(electron, job_path, backend)
     return result["results"]
@@ -144,14 +144,14 @@ def common_job(
 
 def run_shader_job(electron: Path, backend: str, job: dict) -> tuple[dict, np.ndarray]:
     with TemporaryDirectory() as temp_dir:
-        job_path = Path(temp_dir) / "swiftshader-job.json"
+        job_path = Path(temp_dir) / "electron-job.json"
         job_path.write_text(json.dumps(job))
         result = run_electron(electron, job_path, backend)
 
     pixels = np.fromfile(job["outputPath"], dtype=np.float32)
     expected = job["width"] * job["height"] * 4
     if pixels.size != expected:
-        raise RuntimeError(f"Expected {expected} float values from SwiftShader, got {pixels.size}")
+        raise RuntimeError(f"Expected {expected} float values from Electron WebGL, got {pixels.size}")
     return result, pixels.reshape((job["height"], job["width"], 4))
 
 
@@ -159,7 +159,7 @@ def read_job_pixels(job: dict) -> np.ndarray:
     pixels = np.fromfile(job["outputPath"], dtype=np.float32)
     expected = job["width"] * job["height"] * 4
     if pixels.size != expected:
-        raise RuntimeError(f"Expected {expected} float values from SwiftShader, got {pixels.size}")
+        raise RuntimeError(f"Expected {expected} float values from Electron WebGL, got {pixels.size}")
     return pixels.reshape((job["height"], job["width"], 4))
 
 
@@ -197,7 +197,7 @@ def compare_hpc_shader_to_astropy(
 ) -> int:
     image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
     if meta.projection not in PROJECTION_CODES:
-        raise ValueError(f"SwiftShader HPC validation does not support projection {meta.projection!r}")
+        raise ValueError(f"Electron WebGL HPC validation does not support projection {meta.projection!r}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     bounds_deg = hpc_bounds_degrees(meta, 1.0)
@@ -316,7 +316,7 @@ def evaluate_hpc_shader_to_astropy(
                 float32_compare_count += 1
 
     print(f"file={fits_file}")
-    print(f"mode=swiftshader_hpc_{'sample' if sample_texture else 'render'}_compare size={render_size}")
+    print(f"mode=electron_hpc_{'sample' if sample_texture else 'render'}_compare size={render_size}")
     print(f"renderer={result['renderer']}")
     print(f"gl_errors=(clear={result.get('clearError')}, draw={result.get('drawError')}, read={result.get('readError')})")
     print_gl_setup_errors(result)
@@ -338,9 +338,9 @@ def evaluate_hpc_shader_to_astropy(
     print(f"shader_vs_float32_cpu_rms_error_px={math.sqrt(sum_shader_float32_px_err2 / float32_compare_count):.6e}" if float32_compare_count > 0 else "shader_vs_float32_cpu_rms_error_px=nan")
     print(f"float32_cpu_vs_astropy_max_error_px={max_float32_astropy_px_err:.6e}")
     print(f"float32_cpu_vs_astropy_rms_error_px={math.sqrt(sum_float32_astropy_px_err2 / float32_compare_count):.6e}" if float32_compare_count > 0 else "float32_cpu_vs_astropy_rms_error_px=nan")
-    print(f"swiftshader_rgba32f={job['outputPath']}")
+    print(f"electron_rgba32f={job['outputPath']}")
     if count == 0:
-        print("FAILED: no valid SwiftShader samples")
+        print("FAILED: no valid Electron WebGL samples")
         return 1
     if max_px_err > max_error_px:
         print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
@@ -380,7 +380,7 @@ def cpu_texcoord_for_mode(
         radial = math.exp(math.log(LOGPOLAR_MIN_RADIUS) + sy * (math.log(1.0) - math.log(LOGPOLAR_MIN_RADIUS)))
         texcoord, _ = renderPolarTexcoords((sx, sy), radial, meta, image_data, logpolar=True)
         return texcoord
-    raise ValueError(f"Unsupported SwiftShader mode: {mode}")
+    raise ValueError(f"Unsupported Electron WebGL mode: {mode}")
 
 
 def bounds_for_mode(mode: str) -> tuple[float, float, float, float]:
@@ -422,7 +422,7 @@ def compare_shader_to_cpu(
 ) -> int:
     image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
     if mode == "ortho" and meta.projection not in PROJECTION_CODES:
-        raise ValueError(f"SwiftShader Ortho validation does not support projection {meta.projection!r}")
+        raise ValueError(f"Electron WebGL Ortho validation does not support projection {meta.projection!r}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     job = make_mode_job(mode, fits_file, render_size, output_dir, sample_texture, meta, backend)
@@ -499,7 +499,7 @@ def evaluate_shader_to_cpu(
             count += 1
 
     print(f"file={fits_file}")
-    print(f"mode=swiftshader_{mode}_{'sample' if sample_texture else 'texcoord'}_compare size={render_size}")
+    print(f"mode=electron_{mode}_{'sample' if sample_texture else 'texcoord'}_compare size={render_size}")
     print(f"renderer={result['renderer']}")
     print(f"gl_errors=(clear={result.get('clearError')}, draw={result.get('drawError')}, read={result.get('readError')})")
     print_gl_setup_errors(result)
@@ -512,9 +512,9 @@ def evaluate_shader_to_cpu(
     if sample_texture:
         print(f"sample_max_error={max_sample_err:.6e}")
         print(f"sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "sample_rms_error=nan")
-    print(f"swiftshader_rgba32f={job['outputPath']}")
+    print(f"electron_rgba32f={job['outputPath']}")
     if count == 0:
-        print("FAILED: no comparable SwiftShader samples")
+        print("FAILED: no comparable Electron WebGL samples")
         return 1
     if shader_only or cpu_only:
         print("FAILED: shader/CPU validity masks differ")
@@ -616,7 +616,7 @@ def compare_hpc_projection_batch(
         fits_file = SCRIPT_DIR / "data" / filename
         image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
-            raise ValueError(f"SwiftShader HPC validation does not support projection {meta.projection!r} for {fits_file}")
+            raise ValueError(f"Electron WebGL HPC validation does not support projection {meta.projection!r} for {fits_file}")
         bounds = hpc_bounds_degrees(meta, 1.0)
         job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, backend, name)
         jobs.append(job)

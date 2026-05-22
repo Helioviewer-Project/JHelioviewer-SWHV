@@ -29,7 +29,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
 VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_against_astropy.py"
 GLSL_VALIDATOR = SCRIPT_DIR / "validate_glsl_syntax.py"
-SWIFTSHADER_VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_with_swiftshader.py"
+ELECTRON_VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_with_electron.py"
 DATA = SCRIPT_DIR / "data"
 
 
@@ -232,21 +232,21 @@ RUNS: tuple[ValidationRun, ...] = (
     ),
 )
 
-SWIFTSHADER_RUNS: tuple[ValidationRun, ...] = (
+ELECTRON_RUNS: tuple[ValidationRun, ...] = (
     ValidationRun(
-        "swiftshader_all_modes",
+        "electron_swiftshader_all_modes",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--all-modes"),
-        "swiftshader",
+        "electron",
     ),
     ValidationRun(
-        "swiftshader_all_modes_sample_texture",
+        "electron_swiftshader_all_modes_sample_texture",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--all-modes", "--sample-texture"),
-        "swiftshader",
+        "electron",
     ),
     ValidationRun(
-        "swiftshader_hpc_projection_cases",
+        "electron_swiftshader_hpc_projection_cases",
         ("--hpc-projection-cases", "--render-size", "256"),
-        "swiftshader",
+        "electron",
     ),
 )
 
@@ -278,17 +278,17 @@ def parse_args() -> argparse.Namespace:
         help="Number of validation runs to execute in parallel",
     )
     parser.add_argument(
-        "--include-swiftshader",
+        "--include-electron",
         action="store_true",
-        help="Include Electron/ANGLE SwiftShader shader-execution validation runs",
+        help="Include Electron/ANGLE shader-execution validation runs",
     )
     return parser.parse_args()
 
 
-def available_runs(include_swiftshader: bool, only: list[str] | None) -> list[ValidationRun]:
+def available_runs(include_electron: bool, only: list[str] | None) -> list[ValidationRun]:
     runs = list(RUNS)
-    if include_swiftshader or (only and any(name.startswith("swiftshader_") for name in only)):
-        runs.extend(SWIFTSHADER_RUNS)
+    if include_electron or (only and any(name.startswith("electron_swiftshader_") for name in only)):
+        runs.extend(ELECTRON_RUNS)
     return runs
 
 
@@ -306,8 +306,8 @@ def selected_runs(runs: list[ValidationRun], only: list[str] | None) -> list[Val
 def validator_for(run: ValidationRun) -> Path:
     if run.validator == "glsl":
         return GLSL_VALIDATOR
-    if run.validator == "swiftshader":
-        return SWIFTSHADER_VALIDATOR
+    if run.validator == "electron":
+        return ELECTRON_VALIDATOR
     return VALIDATOR
 
 
@@ -397,7 +397,7 @@ def run_parallel(runs: list[ValidationRun], keep_going: bool, jobs: int) -> list
 
 def main() -> int:
     args = parse_args()
-    all_runs = available_runs(args.include_swiftshader, args.only)
+    all_runs = available_runs(args.include_electron, args.only)
     if args.list:
         for run in all_runs:
             print(run.name)

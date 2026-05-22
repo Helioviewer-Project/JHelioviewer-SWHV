@@ -12,12 +12,12 @@ if (backend === "swiftshader") {
 
 const jobPath = process.argv[process.argv.length - 1];
 
-ipcMain.once("swiftshader-result", (_event, result) => {
+ipcMain.once("electron-result", (_event, result) => {
   console.log(JSON.stringify(result));
   app.quit();
 });
 
-ipcMain.handle("swiftshader-job", () => {
+ipcMain.handle("electron-job", () => {
   const payload = JSON.parse(fs.readFileSync(jobPath, "utf8"));
   payload.runnerDir = __dirname;
   return payload;

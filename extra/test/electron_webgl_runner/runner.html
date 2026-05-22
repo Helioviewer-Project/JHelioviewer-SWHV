@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 
 function fail(message, details) {
-  ipcRenderer.send("swiftshader-result", { ok: false, message, details });
+  ipcRenderer.send("electron-result", { ok: false, message, details });
 }
 
 function stripMain(source) {
@@ -452,7 +452,7 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
 }
 
 async function main() {
-  const payload = await ipcRenderer.invoke("swiftshader-job");
+  const payload = await ipcRenderer.invoke("electron-job");
   const jobs = payload.jobs || [payload];
   const canvas = document.getElementById("canvas");
   const gl = canvas.getContext("webgl2");
@@ -476,7 +476,7 @@ async function main() {
   for (const job of jobs)
     results.push(renderJob(gl, commonSource, vertexSource, renderer, quadVao, job));
 
-  ipcRenderer.send("swiftshader-result", payload.jobs ? { ok: true, results } : results[0]);
+  ipcRenderer.send("electron-result", payload.jobs ? { ok: true, results } : results[0]);
 }
 
 main().catch(error => fail(error.message, { stack: error.stack }));

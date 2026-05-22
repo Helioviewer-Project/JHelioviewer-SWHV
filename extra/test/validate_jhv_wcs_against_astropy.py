@@ -703,7 +703,7 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         a = cos_lat * sin_delta_lon
         b = cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon
         c = np.hypot(a, b)
-        eta = np.arccos(np.clip(sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon, -1.0, 1.0))
+        eta = np.arctan2(c, sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon)
         x = meta.plane_units_per_rad * eta * a / c
         y = meta.plane_units_per_rad * eta * b / c
         x = np.where(c == 0.0, 0.0, x)
@@ -734,7 +734,7 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         a = cos_lat * sin_delta_lon
         b = cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon
         c = np.hypot(a, b)
-        eta = np.arccos(np.clip(sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon, -1.0, 1.0))
+        eta = np.arctan2(c, sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon)
         radial = np.full_like(eta, meta.pv2[-1])
         for coefficient in reversed(meta.pv2[:-1]):
             radial = radial * eta + coefficient
