@@ -2,16 +2,16 @@ package org.helioviewer.jhv.display;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
-public class ViewportProjection {
+public final class ViewportProjection {
 
     private static final double PLANE_Z_EPS = 1e-8;
+
+    private ViewportProjection() {}
 
     private static double computeNormalizedX(Viewport vp, double screenX) {
         return (screenX - vp.x) / vp.width - 0.5;
@@ -137,14 +137,6 @@ public class ViewportProjection {
 
         hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), x, y, dragRotation.rotateVector(Vec3.ZAxis));
         return hitPoint == null ? null : dragRotation.rotateInverseVector(hitPoint);
-    }
-
-    public static void zoomToFit(Camera camera, Position viewpoint) {
-        double size = ImageLayerBounds.getLargestPhysicalHeight();
-        double newFOV = Camera.INITFOV;
-        if (size != 0)
-            newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
-        camera.setFOV(newFOV, viewpoint);
     }
 
 }

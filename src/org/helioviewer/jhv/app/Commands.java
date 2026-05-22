@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.camera.ViewActions;
+import org.helioviewer.jhv.display.ViewActions;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;

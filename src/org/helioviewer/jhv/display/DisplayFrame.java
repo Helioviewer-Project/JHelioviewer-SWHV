@@ -90,13 +90,13 @@ public final class DisplayFrame {
     }
 
     public static void zoomMiniToFit() {
-        ViewportProjection.zoomToFit(Display.getMiniCamera(), miniViewpointModel.getViewpoint());
+        ViewActions.fitCameraToImageLayers(Display.getMiniCamera(), miniViewpointModel.getViewpoint());
     }
 
     private static void resetCamera(Camera camera, ViewpointModel model) {
         Position viewpoint = model.update(Movie.getTime());
         camera.reset(viewpoint);
-        ViewportProjection.zoomToFit(camera, viewpoint);
+        ViewActions.fitCameraToImageLayers(camera, viewpoint);
     }
 
     public static void render(float decodeFactor) {
