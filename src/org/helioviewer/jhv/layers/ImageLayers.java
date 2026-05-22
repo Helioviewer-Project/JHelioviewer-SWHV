@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
@@ -35,14 +36,14 @@ public final class ImageLayers {
         return false;
     }
 
-    public static void decode(float factor) {
+    public static void decode(float factor, Position viewpoint) {
         Camera camera = Display.getCamera();
 
         Layers.forEachImageLayer(layer -> {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
                 double pixFactor = CameraHelper.getImagePixelFactor(camera, Display.getViewport(idx));
-                layer.getView().decode(pixFactor, factor);
+                layer.getView().decode(viewpoint, pixFactor, factor);
             }
         });
     }

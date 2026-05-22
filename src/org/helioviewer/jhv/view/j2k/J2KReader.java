@@ -177,7 +177,7 @@ class J2KReader implements Runnable {
 
                         source.setFrameComplete(currentStep, level);
                         if (singleFrame)
-                            view.refreshDecodeFromReader(params.decodeParams()); // refresh current image
+                            view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
                     } else {
                         source.setFramePartial(currentStep);
                     }
@@ -204,7 +204,7 @@ class J2KReader implements Runnable {
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && !stopReading && !source.isComplete(level)) {
-                    signal(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), false));
+                    signal(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;

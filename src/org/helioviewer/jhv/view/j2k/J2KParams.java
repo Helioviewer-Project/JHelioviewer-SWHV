@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.j2k;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.MathUtils;
 
 class J2KParams {
@@ -30,6 +31,6 @@ class J2KParams {
 
     record Decode(int serial, int frame, SubImage subImage, int level, float factor) {}
 
-    record Read(J2KView view, J2KSource.Remote source, Decode decodeParams, boolean priority) {}
+    record Read(J2KView view, J2KSource.Remote source, Decode decodeParams, Position viewpoint, boolean priority) {}
 
 }
