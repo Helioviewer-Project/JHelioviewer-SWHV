@@ -167,7 +167,7 @@ function displayBlock(job) {
   block[1] = 1;      // color.g
   block[2] = 1;      // color.b
   block[3] = 1;      // color.a
-  block[7] = job.diffSelfcheck ? 1 : 0; // isDiff
+  block[7] = job.diffSelfcheck || job.colorDiffSmoke ? 1 : 0; // isDiff
   block[16] = 0;     // brightness.x
   block[17] = 1;     // brightness.y
   block[18] = 0;     // radii.x
@@ -364,7 +364,11 @@ ${commonDiagnosticUniforms()}
 
 void main(void) {
     vec2 scrpos = getScrPos();
-    vec2 texCoord = sampleLatiZenithalTexcoord(scrpos, wcs[0], uLatiGrid);
+    vec2 texCoord = projection[0].projectionCode == WCS_PROJECTION_CAR
+            ? sampleLatiCarTexcoord(scrpos, wcs[0], projection[0])
+            : projection[0].projectionCode == WCS_PROJECTION_CEA
+            ? sampleLatiCeaTexcoord(scrpos, wcs[0], projection[0], pv0)
+            : sampleLatiZenithalTexcoord(scrpos, wcs[0], uLatiGrid);
     diagnosticOutput(texCoord, 1.);
 }
 `;
