@@ -25,6 +25,7 @@ public final class DisplayFrame {
 
     private static final ViewpointModel viewpointModel = new ViewpointModel(UpdateViewpoint.observer);
     private static final ViewpointModel miniViewpointModel = new ViewpointModel(UpdateViewpoint.earthAt1au);
+
     private static boolean missingHandlerLogged;
     private static Consumer<Position> renderRequestHandler = _ -> missingRenderRequestHandler();
 
@@ -112,14 +113,20 @@ public final class DisplayFrame {
     }
 
     public static void render(float decodeFactor) {
-        if (ImageLayers.areEnabled())
-            ImageLayers.decode(decodeFactor);
-        else
-            display();
+        Position viewpoint = getViewpoint();
+        if (ImageLayers.areEnabled()) {
+            ImageLayers.decode(decodeFactor, viewpoint);
+        } else {
+            renderRequestHandler.accept(viewpoint);
+        }
     }
 
     public static void display() {
-        renderRequestHandler.accept(getViewpoint());
+        display(getViewpoint());
+    }
+
+    public static void display(Position viewpoint) {
+        renderRequestHandler.accept(viewpoint);
     }
 
     public static void setRenderRequestHandler(Consumer<Position> _renderRequestHandler) {
