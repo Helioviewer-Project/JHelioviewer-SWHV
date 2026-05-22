@@ -117,8 +117,9 @@ def common_job(
     backend: str,
     name: str | None = None,
     diff_selfcheck: bool = False,
+    color_smoke: bool = False,
 ) -> dict:
-    output_kind = "sample" if sample_texture else "texcoord"
+    output_kind = "color" if color_smoke else "sample" if sample_texture else "texcoord"
     output_name = name if name is not None else mode
     output_path = output_dir / f"{fits_file.stem}_{backend}_{output_name}_{output_kind}.rgba32f"
     return {
@@ -139,6 +140,7 @@ def common_job(
         "pv2": list(meta.pv2),
         "sampleTexture": sample_texture,
         "diffSelfcheck": diff_selfcheck,
+        "colorSmoke": color_smoke,
         "textureWidth": min(meta.pixel_width, 512),
         "textureHeight": min(meta.pixel_height, 512),
     }
@@ -404,6 +406,7 @@ def make_mode_job(
     meta,
     backend: str,
     diff_selfcheck: bool = False,
+    color_smoke: bool = False,
 ) -> dict:
     job = common_job(
         mode,
@@ -416,6 +419,7 @@ def make_mode_job(
         backend,
         f"{mode}_diff_selfcheck" if diff_selfcheck else None,
         diff_selfcheck=diff_selfcheck,
+        color_smoke=color_smoke,
     )
     if mode == "lati_zenithal":
         job["latiGrid"] = [0.0, 0.0, 0.0]
@@ -834,6 +838,75 @@ def compare_all_modes_diff_selfcheck(
     return 1 if failed else 0
 
 
+def evaluate_color_smoke(
+    fits_file: Path,
+    render_size: int,
+    job: dict,
+    result: dict,
+    pixels: np.ndarray,
+) -> int:
+    alpha = pixels[:, :, 3]
+    rendered = alpha > 0.5
+    rendered_pixels = pixels[rendered]
+    count = int(rendered_pixels.shape[0])
+    skipped = int(render_size * render_size - count)
+    finite = bool(np.all(np.isfinite(rendered_pixels))) if count else False
+    in_range = bool(np.all((rendered_pixels >= -1e-5) & (rendered_pixels <= 1.00001))) if count else False
+
+    print(f"file={fits_file}")
+    print(f"mode=electron_{job['mode']}_color_smoke size={render_size}")
+    print(f"renderer={result['renderer']}")
+    print(f"gl_errors=(clear={result.get('clearError')}, draw={result.get('drawError')}, read={result.get('readError')})")
+    print_gl_setup_errors(result)
+    print(f"rendered_pixels={count}")
+    print(f"skipped_pixels={skipped}")
+    print(f"finite_pixels={finite}")
+    print(f"in_range_pixels={in_range}")
+    print(f"electron_rgba32f={job['outputPath']}")
+    if count == 0:
+        print("FAILED: no rendered color pixels")
+        return 1
+    if not finite:
+        print("FAILED: non-finite rendered color pixels")
+        return 1
+    if not in_range:
+        print("FAILED: rendered color pixels outside [0, 1]")
+        return 1
+    return 0
+
+
+def compare_all_modes_color_smoke(
+    fits_file: Path,
+    hdu: int | None,
+    render_size: int,
+    electron: Path,
+    output_dir: Path,
+    backend: str,
+) -> int:
+    _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+    if meta.projection not in PROJECTION_CODES:
+        raise ValueError(f"Electron WebGL all-modes color smoke does not support projection {meta.projection!r}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    bounds = hpc_bounds_degrees(meta, 1.0)
+    jobs = [
+        common_job("hpc", fits_file, render_size, output_dir, meta, bounds, True, backend, "hpc_color_smoke", color_smoke=True),
+        *[
+            make_mode_job(mode, fits_file, render_size, output_dir, True, meta, backend, color_smoke=True)
+            for mode in ALL_MODES
+            if mode != "hpc"
+        ],
+    ]
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, result in zip(jobs, results, strict=True):
+        pixels = read_job_pixels(job)
+        failed = failed or evaluate_color_smoke(fits_file, render_size, job, result, pixels) != 0
+
+    return 1 if failed else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate JHV GLSL WCS code by running it on Electron/WebGL")
     parser.add_argument("fits_file", type=Path, nargs="?")
@@ -849,6 +922,7 @@ def main() -> int:
     parser.add_argument("--hpc-projection-cases-diff-selfcheck", action="store_true")
     parser.add_argument("--hpc-diff-selfcheck", action="store_true")
     parser.add_argument("--all-modes-diff-selfcheck", action="store_true")
+    parser.add_argument("--all-modes-color-smoke", action="store_true")
     parser.add_argument("--backend", choices=("default", "swiftshader"), default="default")
     parser.add_argument(
         "--mode",
@@ -902,6 +976,16 @@ def main() -> int:
             args.output_dir,
             args.max_error_px,
             args.max_sample_error,
+            args.backend,
+        )
+
+    if args.all_modes_color_smoke:
+        return compare_all_modes_color_smoke(
+            args.fits_file,
+            args.hdu,
+            args.render_size,
+            args.electron,
+            args.output_dir,
             args.backend,
         )
 

@@ -268,6 +268,11 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--all-modes-diff-selfcheck", "--render-size", "128", "--backend", "default"),
         "electron",
     ),
+    ValidationRun(
+        "electron_default_all_modes_color_smoke",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--all-modes-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
 )
 
 

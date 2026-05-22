@@ -423,6 +423,20 @@ void main(void) {
 `;
 }
 
+function productionFragment(job, commonSource) {
+  if (job.mode === "hpc")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarHpc.frag"), "utf8")}`;
+  if (job.mode === "ortho")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8")}`;
+  if (job.mode === "lati_zenithal")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8")}`;
+  if (job.mode === "polar")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8")}`;
+  if (job.mode === "logpolar")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLogPolar.frag"), "utf8")}`;
+  throw new Error(`Unsupported mode: ${job.mode}`);
+}
+
 function bindSyntheticSourceTexture(gl, job, errors) {
   const width = job.textureWidth;
   const height = job.textureHeight;
@@ -447,6 +461,41 @@ function bindSyntheticSourceTexture(gl, job, errors) {
   errors.sourceWrapT = gl.getError();
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, width, height, 0, gl.RED, gl.HALF_FLOAT, data);
   errors.sourceImage = gl.getError();
+  return texture;
+}
+
+function bindIdentityLutTexture(gl, errors) {
+  const width = 256;
+  const data = new Uint8Array(width * 4);
+  for (let x = 0; x < width; x++) {
+    data[4 * x] = x;
+    data[4 * x + 1] = x;
+    data[4 * x + 2] = x;
+    data[4 * x + 3] = 255;
+  }
+
+  const texture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE2);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  errors.lutTexture = gl.getError();
+  return texture;
+}
+
+function bindWhiteMaskTexture(gl, errors) {
+  const texture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE3);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 1, 1, 0, gl.RED, gl.UNSIGNED_BYTE, new Uint8Array([255]));
+  errors.maskTexture = gl.getError();
   return texture;
 }
 
@@ -481,6 +530,8 @@ function floatToHalf(value) {
 }
 
 function diagnosticFragment(job, commonSource) {
+  if (job.colorSmoke)
+    return productionFragment(job, commonSource);
   if (job.mode === "hpc") {
     const hpcSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarHpc.frag"), "utf8");
     return job.diffSelfcheck ? hpcDiffSelfcheckDiagnostic(commonSource, hpcSource) : hpcDiagnostic(commonSource, hpcSource);
@@ -544,14 +595,18 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
   setUniformInt(gl, program, "image", 0);
   setUniformInt(gl, program, "diffImage", 1);
+  setUniformInt(gl, program, "lut", 2);
+  setUniformInt(gl, program, "mask", 3);
   let sourceTexture = null;
-  if (job.sampleTexture) {
+  if (job.sampleTexture || job.colorSmoke) {
     sourceTexture = bindSyntheticSourceTexture(gl, job, errors);
     errors.sourceTexture = gl.getError();
   } else {
     sourceTexture = bindDummySourceTexture(gl);
     errors.sourceTexture = gl.getError();
   }
+  const lutTexture = bindIdentityLutTexture(gl, errors);
+  const maskTexture = bindWhiteMaskTexture(gl, errors);
 
   const tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -576,6 +631,10 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
     gl.bindTexture(gl.TEXTURE_2D, sourceTexture);
     errors.rebindSource = gl.getError();
   }
+  gl.activeTexture(gl.TEXTURE2);
+  gl.bindTexture(gl.TEXTURE_2D, lutTexture);
+  gl.activeTexture(gl.TEXTURE3);
+  gl.bindTexture(gl.TEXTURE_2D, maskTexture);
 
   gl.viewport(0, 0, job.width, job.height);
   gl.clearColor(0., 0., 0., 0.);
@@ -593,6 +652,8 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   gl.deleteTexture(tex);
   if (sourceTexture != null)
     gl.deleteTexture(sourceTexture);
+  gl.deleteTexture(lutTexture);
+  gl.deleteTexture(maskTexture);
   gl.deleteFramebuffer(framebuffer);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.bindTexture(gl.TEXTURE_2D, null);
