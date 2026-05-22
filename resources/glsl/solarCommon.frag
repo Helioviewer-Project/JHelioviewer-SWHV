@@ -294,7 +294,7 @@ vec2 projectArcToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     if (nativeRadius == 0.)
         return vec2(0.);
 
-    float nativeDistance = acos(clamp(cosNativeDistance, -1., 1.));
+    float nativeDistance = atan(nativeRadius, cosNativeDistance);
     return planeUnitsPerRad * vec2(
         nativeDistance * nativeX / nativeRadius,
         nativeDistance * nativeY / nativeRadius);
@@ -343,7 +343,7 @@ vec2 projectZpnToWcsPlane(const vec2 helioprojective, const WCS wcs, const float
     if (nativeRadius == 0.)
         return vec2(0.);
 
-    float nativeDistance = acos(clamp(cosNativeDistance, -1., 1.));
+    float nativeDistance = atan(nativeRadius, cosNativeDistance);
     if (nativeDistance > wcs.zpnUpperEta)
         discard;
 
