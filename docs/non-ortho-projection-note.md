@@ -125,11 +125,6 @@ This note documents the convention used by the non-orthographic display modes (`
   current plane-unit value. This would remove the per-fragment
   `crval / planeUnitsPerRad` conversion from the TAN/ARC/AZP/ZPN and surface-map
   GLSL paths.
-- Specialize `wcsPlaneToTexcoord(...)` and `wcsPlaneToWrappedXTexcoord(...)`
-  for inverse CROTA rotation of `vec3(plane, 0)`, keeping only the X/Y result.
-  This mirrors the Java `WcsProjection.planeToHelioprojective(...)` optimization
-  and avoids unnecessary 3D vector work in the shader.
-
 ## HPC Viewpoint Findings
 
 - Commit `2d5ef3435` changed Java `HPC` overlay semantics by rotating
