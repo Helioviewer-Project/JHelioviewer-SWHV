@@ -114,6 +114,8 @@ public final class URIView extends BaseView {
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);
+            else
+                imageBuffer.allowExplicitFree();
         });
     }
 
