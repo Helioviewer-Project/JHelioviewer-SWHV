@@ -105,7 +105,7 @@ public final class GLRenderer {
         ProjectionScale scale = ProjectionScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Projection.ortho(vp, renderView.cameraWidth(vp), camera.getTranslationX(), camera.getTranslationY(), renderView.viewRotation());
+            Projection.ortho(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY(), renderView.viewRotation());
             GLSLSolarShader.bindScreen(vp, scale);
 
             GLSLSolarShader.sphere.use();
@@ -124,13 +124,13 @@ public final class GLRenderer {
             Camera miniCamera = Display.getMiniCamera();
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Projection.ortho2D(vp, miniCamera.getCameraWidth(vp), miniCamera.getTranslationX(), miniCamera.getTranslationY());
+            Projection.ortho2D(vp.aspect, miniCamera.getCameraWidth(vp.zoom), miniCamera.getTranslationX(), miniCamera.getTranslationY());
             ProjectionScale scale = ProjectionScale.ortho;
             GLSLSolarShader.bindScreen(vp, scale);
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            RenderView miniView = miniCamera.view(renderView.viewpoint(), miniCamera.getCameraWidth(vp) / vp.zoom);
+            RenderView miniView = miniCamera.view(renderView.viewpoint(), miniCamera.getCameraWidth(vp.zoom) / vp.zoom);
             MapContext ctx = Display.mode.createMapContext(miniCamera, miniView, Display.gridType);
             Layers.renderMiniview(ctx, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
@@ -158,7 +158,7 @@ public final class GLRenderer {
                 scale = ProjectionScale.hpc;
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Projection.ortho2D(vp, renderView.cameraWidth(vp), camera.getTranslationX(), camera.getTranslationY());
+            Projection.ortho2D(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY());
             GLSLSolarShader.bindScreen(vp, scale);
 
             Layers.renderScale(ctx, vp, scale);

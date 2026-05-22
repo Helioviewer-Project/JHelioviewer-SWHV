@@ -49,7 +49,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         } else if (mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp), x, y);
+            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {

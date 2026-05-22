@@ -107,7 +107,7 @@ final class NonOrthoProjection {
     }
 
     private static Vec2 mouseToRawGrid(Camera camera, RenderView renderView, Viewport vp, ProjectionScale scale, int x, int y) {
-        double width = renderView.cameraWidth(vp);
+        double width = renderView.cameraWidth(vp.zoom);
         return new Vec2(
                 scale.getInterpolatedXValue(CameraHelper.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
                 scale.getInterpolatedYValue(CameraHelper.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));

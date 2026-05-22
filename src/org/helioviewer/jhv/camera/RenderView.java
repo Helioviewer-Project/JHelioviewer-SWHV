@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 
 public final class RenderView {
@@ -20,8 +19,8 @@ public final class RenderView {
         return viewpoint;
     }
 
-    public double cameraWidth(Viewport vp) {
-        return cameraWidth * vp.zoom;
+    public double cameraWidth(double zoom) {
+        return cameraWidth * zoom;
     }
 
     public Quat viewRotation() {
