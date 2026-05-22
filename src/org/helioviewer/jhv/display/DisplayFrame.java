@@ -12,6 +12,8 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 
+import org.json.JSONObject;
+
 public final class DisplayFrame {
 
     private DisplayFrame() {}
@@ -75,6 +77,14 @@ public final class DisplayFrame {
 
     public static void resetCamera() {
         resetCamera(Display.getCamera(), viewpointModel);
+    }
+
+    public static JSONObject cameraToJson() {
+        return Display.getCamera().toJson();
+    }
+
+    public static void cameraFromJson(JSONObject json) {
+        Display.getCamera().fromJson(json, getViewpoint());
     }
 
     static void resetCameras() {
