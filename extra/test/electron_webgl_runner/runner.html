@@ -288,6 +288,74 @@ void main(void) {
 `;
 }
 
+function orthoDiffSelfcheckDiagnostic(commonSource, orthoSource) {
+  return `${commonSource}
+${stripMain(orthoSource)}
+
+void main(void) {
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
+    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 upXY = up1.xy;
+    bool surfaceMapMode = isSurfaceMap(projection[0]);
+    bool diffSurfaceMapMode = isSurfaceMap(projection[1]);
+
+    float radius2 = dot(upXY, upXY);
+    bool onDisk = radius2 <= 1.;
+    if (surfaceMapMode && !onDisk)
+        discard;
+    if (diffSurfaceMapMode && !onDisk)
+        discard;
+
+    vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
+
+    if (onDisk) {
+        hitPoint = vec3(upXY, sqrt(1. - radius2));
+        if (surfaceMapMode)
+            rotatedHitPoint = rotate_vector_inverse(projection[0].sourceViewQuat, hitPoint);
+        else
+            rotatedHitPoint = rotateOnDiskPoint(wcs[0], hitPoint);
+    }
+
+    if (!surfaceMapMode && rotatedHitPoint.z <= 0.) {
+        hitPoint = vec3(up1.xy, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
+        rotatedHitPoint = rotate_vector_inverse(wcs[0].cameraDiff, hitPoint);
+        if (onDisk && hitPoint.z < 0.)
+            discard;
+        if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.)
+            discard;
+    }
+
+    clipOrthoGeometry(rotatedHitPoint);
+    vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
+
+    vec3 diffHitPoint = vec3(0.);
+    vec3 diffRotatedHitPoint = vec3(0.);
+
+    if (onDisk) {
+        diffHitPoint = vec3(upXY, sqrt(1. - radius2));
+        if (diffSurfaceMapMode)
+            diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, diffHitPoint);
+        else
+            diffRotatedHitPoint = rotateOnDiskPoint(wcs[1], diffHitPoint);
+    }
+
+    if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
+        diffHitPoint = vec3(up1.xy, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
+        diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, diffHitPoint);
+        if (onDisk && diffHitPoint.z < 0.)
+            discard;
+        if (dot(diffRotatedHitPoint, diffRotatedHitPoint) <= 1.)
+            discard;
+    }
+
+    clipOrthoGeometry(diffRotatedHitPoint);
+    vec2 diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
+
+    outColor = vec4(texCoord, diffTexCoord);
+}
+`;
+}
+
 function latiDiagnostic(commonSource, latiSource) {
   return `${commonSource}
 ${stripMain(latiSource)}
@@ -298,6 +366,30 @@ void main(void) {
     vec2 scrpos = getScrPos();
     vec2 texCoord = sampleLatiZenithalTexcoord(scrpos, wcs[0], uLatiGrid);
     diagnosticOutput(texCoord, 1.);
+}
+`;
+}
+
+function latiDiffSelfcheckDiagnostic(commonSource, latiSource) {
+  return `${commonSource}
+${stripMain(latiSource)}
+
+void main(void) {
+    if (display.radii.x > 1.)
+        discard;
+
+    vec2 scrpos = getScrPos();
+    vec2 texCoord = projection[0].projectionCode == WCS_PROJECTION_CAR
+            ? sampleLatiCarTexcoord(scrpos, wcs[0], projection[0])
+            : projection[0].projectionCode == WCS_PROJECTION_CEA
+            ? sampleLatiCeaTexcoord(scrpos, wcs[0], projection[0], pv0)
+            : sampleLatiZenithalTexcoord(scrpos, wcs[0], latiGrid[0]);
+    vec2 diffTexCoord = projection[1].projectionCode == WCS_PROJECTION_CAR
+            ? sampleLatiCarTexcoord(scrpos, wcs[1], projection[1])
+            : projection[1].projectionCode == WCS_PROJECTION_CEA
+            ? sampleLatiCeaTexcoord(scrpos, wcs[1], projection[1], pv1)
+            : sampleLatiZenithalTexcoord(scrpos, wcs[1], latiGrid[1]);
+    outColor = vec4(texCoord, diffTexCoord);
 }
 `;
 }
@@ -313,6 +405,20 @@ void main(void) {
     float radialCoordinate = ${radialExpression};
     vec2 texCoord = ${functionName}(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
     diagnosticOutput(texCoord, radialCoordinate);
+}
+`;
+}
+
+function polarDiffSelfcheckDiagnostic(commonSource, polarSource, functionName, radialExpression) {
+  return `${commonSource}
+${stripMain(polarSource)}
+
+void main(void) {
+    vec2 scrpos = getScrPos();
+    float radialCoordinate = ${radialExpression};
+    vec2 texCoord = ${functionName}(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
+    vec2 diffTexCoord = ${functionName}(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, radialCoordinate);
+    outColor = vec4(texCoord, diffTexCoord);
 }
 `;
 }
@@ -380,21 +486,25 @@ function diagnosticFragment(job, commonSource) {
     return job.diffSelfcheck ? hpcDiffSelfcheckDiagnostic(commonSource, hpcSource) : hpcDiagnostic(commonSource, hpcSource);
   }
   if (job.mode === "ortho")
-    return orthoDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8"));
+    return job.diffSelfcheck
+        ? orthoDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8"))
+        : orthoDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8"));
   if (job.mode === "lati_zenithal")
-    return latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"));
-  if (job.mode === "polar")
-    return polarDiagnostic(
-        commonSource,
-        fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8"),
-        "samplePolarTexcoord",
-        "screen.yStart + scrpos.y * (screen.yStop - screen.yStart)");
-  if (job.mode === "logpolar")
-    return polarDiagnostic(
-        commonSource,
-        fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLogPolar.frag"), "utf8"),
-        "sampleLogPolarTexcoord",
-        "exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart))");
+    return job.diffSelfcheck
+        ? latiDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"))
+        : latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"));
+  if (job.mode === "polar") {
+    const polarSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8");
+    return job.diffSelfcheck
+        ? polarDiffSelfcheckDiagnostic(commonSource, polarSource, "samplePolarTexcoord", "screen.yStart + scrpos.y * (screen.yStop - screen.yStart)")
+        : polarDiagnostic(commonSource, polarSource, "samplePolarTexcoord", "screen.yStart + scrpos.y * (screen.yStop - screen.yStart)");
+  }
+  if (job.mode === "logpolar") {
+    const logPolarSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLogPolar.frag"), "utf8");
+    return job.diffSelfcheck
+        ? polarDiffSelfcheckDiagnostic(commonSource, logPolarSource, "sampleLogPolarTexcoord", "exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart))")
+        : polarDiagnostic(commonSource, logPolarSource, "sampleLogPolarTexcoord", "exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart))");
+  }
   throw new Error(`Unsupported mode: ${job.mode}`);
 }
 
@@ -429,6 +539,8 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   setUniform(gl, program, "pv0", job.pv2);
   setUniform(gl, program, "pv1", job.pv2);
   setUniform(gl, program, "uLatiGrid", job.latiGrid || [0, 0, 0]);
+  setUniform(gl, program, "latiGrid[0]", job.latiGrid || [0, 0, 0]);
+  setUniform(gl, program, "latiGrid[1]", job.latiGrid || [0, 0, 0]);
   setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
   setUniformInt(gl, program, "image", 0);
   setUniformInt(gl, program, "diffImage", 1);
