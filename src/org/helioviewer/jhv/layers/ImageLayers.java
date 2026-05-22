@@ -54,7 +54,7 @@ public final class ImageLayers {
             if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
                 return;
         }
-        DisplayFrame.display();
+        DisplayFrame.display(viewpoint);
     }
 
     public record WaitUntilLoaded(Collection<ImageLayer> newLayers) implements Callable<Void> {
