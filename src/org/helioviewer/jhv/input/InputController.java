@@ -2,9 +2,9 @@ package org.helioviewer.jhv.input;
 
 import java.util.HashSet;
 
-import org.helioviewer.jhv.camera.Interaction;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.interaction.Interaction;
 
 public final class InputController {
 

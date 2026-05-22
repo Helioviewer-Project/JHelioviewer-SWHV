@@ -1,7 +1,8 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.display.interaction;
 
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
@@ -9,22 +10,22 @@ import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.input.ScrollEvent;
 
-public class Interaction {
+public final class Interaction {
 
     public enum Mode {PAN, ROTATE, AXIS}
 
-    interface Type {
-        void mousePressed(PointerEvent e, Viewport vp);
+    abstract static class Type {
+        abstract void mousePressed(PointerEvent e, Viewport vp);
 
-        void mouseDragged(PointerEvent e, Viewport vp);
+        abstract void mouseDragged(PointerEvent e, Viewport vp);
 
-        default void mouseReleased() {}
+        void mouseReleased() {}
     }
 
     private final InteractionAnnotate interactionAnnotate;
-    private final InteractionAxis interactionAxis;
+    private final InteractionTrackball interactionAxis;
     private final InteractionPan interactionPan;
-    private final InteractionRotate interactionRotate;
+    private final InteractionTrackball interactionRotate;
     private final Zoom zoom;
 
     private Mode mode = Mode.ROTATE;
@@ -32,9 +33,9 @@ public class Interaction {
 
     public Interaction(Camera _camera) {
         interactionAnnotate = new InteractionAnnotate(_camera);
-        interactionAxis = new InteractionAxis(_camera);
+        interactionAxis = InteractionTrackball.axis(_camera);
         interactionPan = new InteractionPan(_camera);
-        interactionRotate = new InteractionRotate(_camera);
+        interactionRotate = InteractionTrackball.rotate(_camera);
         zoom = new Zoom();
     }
 

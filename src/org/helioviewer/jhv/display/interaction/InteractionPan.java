@@ -1,11 +1,12 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.display.interaction;
 
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.input.PointerEvent;
 
-class InteractionPan implements Interaction.Type {
+final class InteractionPan extends Interaction.Type {
 
     private final Camera camera;
     private int lastX;
@@ -17,14 +18,14 @@ class InteractionPan implements Interaction.Type {
     }
 
     @Override
-    public void mousePressed(PointerEvent e, Viewport vp) {
+    void mousePressed(PointerEvent e, Viewport vp) {
         lastX = e.x();
         lastY = e.y();
         dragStartSet = true;
     }
 
     @Override
-    public void mouseDragged(PointerEvent e, Viewport vp) {
+    void mouseDragged(PointerEvent e, Viewport vp) {
         if (!dragStartSet)
             return;
 
@@ -39,7 +40,7 @@ class InteractionPan implements Interaction.Type {
     }
 
     @Override
-    public void mouseReleased() {
+    void mouseReleased() {
         dragStartSet = false;
     }
 

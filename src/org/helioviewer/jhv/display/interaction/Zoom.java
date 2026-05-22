@@ -1,10 +1,11 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.display.interaction;
 
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
 
-class Zoom {
+final class Zoom {
 
     private static final int FRAMES_PER_SECOND = 500;
     private static final int MILLIS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
