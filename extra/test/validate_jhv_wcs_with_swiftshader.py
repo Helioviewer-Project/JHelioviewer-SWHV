@@ -36,6 +36,7 @@ DEFAULT_ELECTRON = Path(os.environ.get(
     "JHV_ELECTRON",
     str(Path.home() / "electron-v42.1.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
 ))
+ALL_MODES = ("hpc", "ortho", "lati_zenithal", "polar", "logpolar")
 
 PROJECTION_CODES = {
     "TAN": 0.0,
@@ -86,6 +87,14 @@ def run_electron(electron: Path, job_path: Path) -> dict:
     return result
 
 
+def run_electron_jobs(electron: Path, jobs: list[dict]) -> list[dict]:
+    with TemporaryDirectory() as temp_dir:
+        job_path = Path(temp_dir) / "swiftshader-jobs.json"
+        job_path.write_text(json.dumps({"jobs": jobs}))
+        result = run_electron(electron, job_path)
+    return result["results"]
+
+
 def common_job(
     mode: str,
     fits_file: Path,
@@ -99,6 +108,7 @@ def common_job(
     output_path = output_dir / f"{fits_file.stem}_swiftshader_{mode}_{output_kind}.rgba32f"
     return {
         "mode": mode,
+        "name": mode,
         "repoRoot": str(REPO_ROOT),
         "width": render_size,
         "height": render_size,
@@ -129,6 +139,14 @@ def run_shader_job(electron: Path, job: dict) -> tuple[dict, np.ndarray]:
     if pixels.size != expected:
         raise RuntimeError(f"Expected {expected} float values from SwiftShader, got {pixels.size}")
     return result, pixels.reshape((job["height"], job["width"], 4))
+
+
+def read_job_pixels(job: dict) -> np.ndarray:
+    pixels = np.fromfile(job["outputPath"], dtype=np.float32)
+    expected = job["width"] * job["height"] * 4
+    if pixels.size != expected:
+        raise RuntimeError(f"Expected {expected} float values from SwiftShader, got {pixels.size}")
+    return pixels.reshape((job["height"], job["width"], 4))
 
 
 def pixel_error(texcoord_a: tuple[float, float], texcoord_b: tuple[float, float], width: int, height: int) -> float:
@@ -170,6 +188,36 @@ def compare_hpc_shader_to_astropy(
     bounds_deg = hpc_bounds_degrees(meta, 1.0)
     job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds_deg, sample_texture)
     result, pixels = run_shader_job(electron, job)
+    return evaluate_hpc_shader_to_astropy(
+        fits_file,
+        render_size,
+        max_error_px,
+        max_sample_error,
+        sample_texture,
+        image_data,
+        meta,
+        pixel_wcs,
+        bounds_deg,
+        job,
+        result,
+        pixels,
+    )
+
+
+def evaluate_hpc_shader_to_astropy(
+    fits_file: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+    image_data: np.ndarray,
+    meta,
+    pixel_wcs,
+    bounds_deg: tuple[float, float, float, float],
+    job: dict,
+    result: dict,
+    pixels: np.ndarray,
+) -> int:
     texture_data = synthetic_texture(job["textureWidth"], job["textureHeight"]) if sample_texture else None
 
     max_px_err = 0.0
@@ -309,6 +357,20 @@ def bounds_for_mode(mode: str) -> tuple[float, float, float, float]:
     return (0.0, 1.0, 0.0, 1.0)
 
 
+def make_mode_job(
+    mode: str,
+    fits_file: Path,
+    render_size: int,
+    output_dir: Path,
+    sample_texture: bool,
+    meta,
+) -> dict:
+    job = common_job(mode, fits_file, render_size, output_dir, meta, bounds_for_mode(mode), sample_texture)
+    if mode == "lati_zenithal":
+        job["latiGrid"] = [0.0, 0.0, 0.0]
+    return job
+
+
 def compare_shader_to_cpu(
     mode: str,
     fits_file: Path,
@@ -325,11 +387,37 @@ def compare_shader_to_cpu(
         raise ValueError(f"SwiftShader Ortho validation does not support projection {meta.projection!r}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    job = common_job(mode, fits_file, render_size, output_dir, meta, bounds_for_mode(mode), sample_texture)
-    if mode == "lati_zenithal":
-        job["latiGrid"] = [0.0, 0.0, 0.0]
+    job = make_mode_job(mode, fits_file, render_size, output_dir, sample_texture, meta)
 
     result, pixels = run_shader_job(electron, job)
+    return evaluate_shader_to_cpu(
+        mode,
+        fits_file,
+        render_size,
+        max_error_px,
+        max_sample_error,
+        sample_texture,
+        image_data,
+        meta,
+        job,
+        result,
+        pixels,
+    )
+
+
+def evaluate_shader_to_cpu(
+    mode: str,
+    fits_file: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+    image_data: np.ndarray,
+    meta,
+    job: dict,
+    result: dict,
+    pixels: np.ndarray,
+) -> int:
     texture_data = synthetic_texture(job["textureWidth"], job["textureHeight"]) if sample_texture else None
 
     max_px_err = 0.0
@@ -402,6 +490,76 @@ def compare_shader_to_cpu(
     return 0
 
 
+def compare_batch(
+    fits_file: Path,
+    hdu: int | None,
+    render_size: int,
+    electron: Path,
+    output_dir: Path,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+) -> int:
+    image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for mode in ALL_MODES:
+        if mode == "hpc":
+            if meta.projection not in PROJECTION_CODES:
+                continue
+            bounds = hpc_bounds_degrees(meta, 1.0)
+            job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture)
+            jobs.append(job)
+            metadata.append({"mode": mode, "bounds": bounds})
+        else:
+            if mode == "ortho" and meta.projection not in PROJECTION_CODES:
+                continue
+            job = make_mode_job(mode, fits_file, render_size, output_dir, sample_texture, meta)
+            jobs.append(job)
+            metadata.append({"mode": mode})
+
+    results = run_electron_jobs(electron, jobs)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        mode = info["mode"]
+        if mode == "hpc":
+            code = evaluate_hpc_shader_to_astropy(
+                fits_file,
+                render_size,
+                max_error_px,
+                max_sample_error,
+                sample_texture,
+                image_data,
+                meta,
+                pixel_wcs,
+                info["bounds"],
+                job,
+                result,
+                pixels,
+            )
+        else:
+            mode_max_error = 1.0 if mode == "lati_zenithal" else max_error_px
+            code = evaluate_shader_to_cpu(
+                mode,
+                fits_file,
+                render_size,
+                mode_max_error,
+                max_sample_error,
+                sample_texture,
+                image_data,
+                meta,
+                job,
+                result,
+                pixels,
+            )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate JHV GLSL WCS code by running it on Electron/ANGLE SwiftShader")
     parser.add_argument("fits_file", type=Path)
@@ -412,12 +570,25 @@ def main() -> int:
     parser.add_argument("--max-error-px", type=float, default=0.5)
     parser.add_argument("--max-sample-error", type=float, default=1e-3)
     parser.add_argument("--sample-texture", action="store_true")
+    parser.add_argument("--all-modes", action="store_true")
     parser.add_argument(
         "--mode",
         choices=("hpc", "ortho", "lati_zenithal", "polar", "logpolar"),
         default="hpc",
     )
     args = parser.parse_args()
+
+    if args.all_modes:
+        return compare_batch(
+            args.fits_file,
+            args.hdu,
+            args.render_size,
+            args.electron,
+            args.output_dir,
+            args.max_error_px,
+            args.max_sample_error,
+            args.sample_texture,
+        )
 
     if args.mode != "hpc":
         return compare_shader_to_cpu(

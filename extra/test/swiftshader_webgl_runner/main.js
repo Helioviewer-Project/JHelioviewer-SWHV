@@ -15,9 +15,9 @@ ipcMain.once("swiftshader-result", (_event, result) => {
 });
 
 ipcMain.handle("swiftshader-job", () => {
-  const job = JSON.parse(fs.readFileSync(jobPath, "utf8"));
-  job.runnerDir = __dirname;
-  return job;
+  const payload = JSON.parse(fs.readFileSync(jobPath, "utf8"));
+  payload.runnerDir = __dirname;
+  return payload;
 });
 
 app.whenReady().then(async () => {
