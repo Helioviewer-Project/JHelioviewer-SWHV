@@ -15,9 +15,12 @@ import numpy as np
 
 from validate_jhv_wcs_against_astropy import (
     LATI_ZENITHAL_BOUNDS_DEG,
+    LATI_SURFACE_BOUNDS_DEG,
     LOGPOLAR_MIN_RADIUS,
     hpc_bounds_degrees,
+    is_surface_map_projection,
     load_validation_context,
+    pixel_center_error_px,
     renderHpcTexcoordsFloat32,
     renderHpcTexcoords,
     renderLatitudinalTexcoords,
@@ -51,7 +54,21 @@ PROJECTION_CODES = {
     "ARC": 1.0,
     "AZP": 2.0,
     "ZPN": 3.0,
+    "CAR": 4.0,
+    "CEA": 5.0,
 }
+
+HPC_RENDER_CASES = (
+    ("tan_cor2", "20241224_194245_d4c2A.fts", None, 0.3),
+    *HPC_PROJECTION_CASES,
+)
+
+SURFACE_MAP_CASES = (
+    ("car_sunerf", "sunerf_map.fits"),
+    ("car_hmi", "syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits"),
+    ("car_aia", "syn_AIA_171_2026-01-12T00-00-00_f_V3.fits"),
+    ("cea", "mrzqs260301t2314c2308_169.fits"),
+)
 
 
 def crota_quat(crota_rad: float) -> list[float]:
@@ -118,8 +135,9 @@ def common_job(
     name: str | None = None,
     diff_selfcheck: bool = False,
     color_smoke: bool = False,
+    color_diff_smoke: bool = False,
 ) -> dict:
-    output_kind = "color" if color_smoke else "sample" if sample_texture else "texcoord"
+    output_kind = "color_diff" if color_diff_smoke else "color" if color_smoke else "sample" if sample_texture else "texcoord"
     output_name = name if name is not None else mode
     output_path = output_dir / f"{fits_file.stem}_{backend}_{output_name}_{output_kind}.rgba32f"
     return {
@@ -141,6 +159,7 @@ def common_job(
         "sampleTexture": sample_texture,
         "diffSelfcheck": diff_selfcheck,
         "colorSmoke": color_smoke,
+        "colorDiffSmoke": color_diff_smoke,
         "textureWidth": min(meta.pixel_width, 512),
         "textureHeight": min(meta.pixel_height, 512),
     }
@@ -257,7 +276,7 @@ def evaluate_hpc_shader_to_astropy(
     skipped = 0
 
     for iy in range(render_size):
-        sy = (iy + 0.5) / render_size
+        sy = 1.0 - (iy + 0.5) / render_size
         row_world_deg = np.empty((render_size, 2), dtype=np.float64)
         for ix in range(render_size):
             sx = (ix + 0.5) / render_size
@@ -407,6 +426,7 @@ def make_mode_job(
     backend: str,
     diff_selfcheck: bool = False,
     color_smoke: bool = False,
+    color_diff_smoke: bool = False,
 ) -> dict:
     job = common_job(
         mode,
@@ -420,6 +440,7 @@ def make_mode_job(
         f"{mode}_diff_selfcheck" if diff_selfcheck else None,
         diff_selfcheck=diff_selfcheck,
         color_smoke=color_smoke,
+        color_diff_smoke=color_diff_smoke,
     )
     if mode == "lati_zenithal":
         job["latiGrid"] = [0.0, 0.0, 0.0]
@@ -486,7 +507,7 @@ def evaluate_shader_to_cpu(
     cpu_only = 0
 
     for iy in range(render_size):
-        sy = (iy + 0.5) / render_size
+        sy = 1.0 - (iy + 0.5) / render_size
         for ix in range(render_size):
             sx = (ix + 0.5) / render_size
             shader_texcoord = (float(pixels[iy, ix, 0]), float(pixels[iy, ix, 1]))
@@ -505,7 +526,11 @@ def evaluate_shader_to_cpu(
                 skipped += 1
                 continue
 
-            err = pixel_error(shader_texcoord, cpu_texcoord, meta.pixel_width, meta.pixel_height)
+            err = pixel_center_error_px(
+                texcoord_to_pixel_center(shader_texcoord, meta.pixel_width, meta.pixel_height),
+                texcoord_to_pixel_center(cpu_texcoord, meta.pixel_width, meta.pixel_height),
+                meta,
+            )
             max_px_err = max(max_px_err, float(err))
             sum_px_err2 += float(err * err)
             if sample_texture and texture_data is not None:
@@ -670,6 +695,191 @@ def compare_hpc_projection_batch(
     return 1 if failed else 0
 
 
+def compare_hpc_render_case_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+    backend: str,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename, hdu, case_max_error_px in HPC_RENDER_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"Electron WebGL HPC validation does not support projection {meta.projection!r} for {fits_file}")
+        bounds = hpc_bounds_degrees(meta, 1.0)
+        job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, backend, name)
+        jobs.append(job)
+        metadata.append({
+            "fits_file": fits_file,
+            "image_data": image_data,
+            "meta": meta,
+            "pixel_wcs": pixel_wcs,
+            "bounds": bounds,
+            "max_error_px": case_max_error_px,
+        })
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        code = evaluate_hpc_shader_to_astropy(
+            info["fits_file"],
+            render_size,
+            max(max_error_px, info["max_error_px"]),
+            max_sample_error,
+            sample_texture,
+            info["image_data"],
+            info["meta"],
+            info["pixel_wcs"],
+            info["bounds"],
+            job,
+            result,
+            pixels,
+        )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
+def evaluate_surface_map_shader_to_cpu(
+    fits_file: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+    image_data: np.ndarray,
+    meta,
+    job: dict,
+    result: dict,
+    pixels: np.ndarray,
+) -> int:
+    texture_data = synthetic_texture(job["textureWidth"], job["textureHeight"]) if sample_texture else None
+    max_px_err = 0.0
+    sum_px_err2 = 0.0
+    max_sample_err = 0.0
+    sum_sample_err2 = 0.0
+    count = 0
+    skipped = 0
+    shader_only = 0
+    cpu_only = 0
+
+    for iy in range(render_size):
+        sy = (iy + 0.5) / render_size
+        for ix in range(render_size):
+            sx = (ix + 0.5) / render_size
+            shader_texcoord = (float(pixels[iy, ix, 0]), float(pixels[iy, ix, 1]))
+            shader_valid = float(pixels[iy, ix, 3]) > 0.5 and is_finite_texcoord(shader_texcoord)
+            cpu_texcoord, _ = renderLatitudinalTexcoords((sx, sy), LATI_SURFACE_BOUNDS_DEG, meta, image_data)
+            cpu_valid = is_finite_texcoord(cpu_texcoord)
+
+            if not shader_valid and not cpu_valid:
+                skipped += 1
+                continue
+            if shader_valid != cpu_valid:
+                if shader_valid:
+                    shader_only += 1
+                else:
+                    cpu_only += 1
+                skipped += 1
+                continue
+
+            err = pixel_center_error_px(
+                texcoord_to_pixel_center(shader_texcoord, meta.pixel_width, meta.pixel_height),
+                texcoord_to_pixel_center(cpu_texcoord, meta.pixel_width, meta.pixel_height),
+                meta,
+            )
+            max_px_err = max(max_px_err, float(err))
+            sum_px_err2 += float(err * err)
+            if sample_texture and texture_data is not None:
+                sample_err = abs(float(pixels[iy, ix, 2]) - sample_texture_linear(texture_data, shader_texcoord, wrap_x=True))
+                max_sample_err = max(max_sample_err, float(sample_err))
+                sum_sample_err2 += float(sample_err * sample_err)
+            count += 1
+
+    print(f"file={fits_file}")
+    print(f"mode=electron_surface_map_{'sample' if sample_texture else 'texcoord'}_compare size={render_size}")
+    print(f"renderer={result['renderer']}")
+    print(f"gl_errors=(clear={result.get('clearError')}, draw={result.get('drawError')}, read={result.get('readError')})")
+    print_gl_setup_errors(result)
+    print(f"valid_samples={count}")
+    print(f"skipped_samples={skipped}")
+    print(f"shader_only_samples={shader_only}")
+    print(f"cpu_only_samples={cpu_only}")
+    print(f"shader_vs_cpu_max_error_px={max_px_err:.6e}")
+    print(f"shader_vs_cpu_rms_error_px={math.sqrt(sum_px_err2 / count):.6e}" if count > 0 else "shader_vs_cpu_rms_error_px=nan")
+    if sample_texture:
+        print(f"sample_max_error={max_sample_err:.6e}")
+        print(f"sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "sample_rms_error=nan")
+    print(f"electron_rgba32f={job['outputPath']}")
+    if count == 0:
+        print("FAILED: no comparable Electron WebGL samples")
+        return 1
+    if shader_only or cpu_only:
+        print("FAILED: shader/CPU validity masks differ")
+        return 1
+    if max_px_err > max_error_px:
+        print(f"FAILED: shader_vs_cpu_max_error_px exceeds {max_error_px:.6e}")
+        return 1
+    if sample_texture and max_sample_err > max_sample_error:
+        print(f"FAILED: sample_max_error exceeds {max_sample_error:.6e}")
+        return 1
+    return 0
+
+
+def compare_surface_map_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+    backend: str,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename in SURFACE_MAP_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, None)
+        if not is_surface_map_projection(meta):
+            raise ValueError(f"Electron WebGL surface-map validation does not support projection {meta.projection!r} for {fits_file}")
+        job = common_job("lati_zenithal", fits_file, render_size, output_dir, meta, LATI_SURFACE_BOUNDS_DEG, sample_texture, backend, name)
+        jobs.append(job)
+        metadata.append({
+            "fits_file": fits_file,
+            "image_data": image_data,
+            "meta": meta,
+        })
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        code = evaluate_surface_map_shader_to_cpu(
+            info["fits_file"],
+            render_size,
+            max_error_px,
+            max_sample_error,
+            sample_texture,
+            info["image_data"],
+            info["meta"],
+            job,
+            result,
+            pixels,
+        )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
 def evaluate_hpc_diff_selfcheck(
     fits_file: Path,
     render_size: int,
@@ -794,6 +1004,49 @@ def compare_hpc_projection_diff_selfcheck_batch(
     return 1 if failed else 0
 
 
+def compare_hpc_projection_color_smoke_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    backend: str,
+    diff_mode: bool = False,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename, hdu, _case_max_error_px in HPC_PROJECTION_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"Electron WebGL HPC color smoke does not support projection {meta.projection!r} for {fits_file}")
+        bounds = hpc_bounds_degrees(meta, 1.0)
+        suffix = "color_diff_smoke" if diff_mode else "color_smoke"
+        job = common_job(
+            "hpc",
+            fits_file,
+            render_size,
+            output_dir,
+            meta,
+            bounds,
+            True,
+            backend,
+            f"{name}_{suffix}",
+            color_smoke=not diff_mode,
+            color_diff_smoke=diff_mode,
+        )
+        jobs.append(job)
+        metadata.append({"fits_file": fits_file})
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        failed = failed or evaluate_color_smoke(info["fits_file"], render_size, job, result, pixels) != 0
+
+    return 1 if failed else 0
+
+
 def compare_all_modes_diff_selfcheck(
     fits_file: Path,
     hdu: int | None,
@@ -854,7 +1107,8 @@ def evaluate_color_smoke(
     in_range = bool(np.all((rendered_pixels >= -1e-5) & (rendered_pixels <= 1.00001))) if count else False
 
     print(f"file={fits_file}")
-    print(f"mode=electron_{job['mode']}_color_smoke size={render_size}")
+    mode_suffix = "color_diff_smoke" if job.get("colorDiffSmoke") else "color_smoke"
+    print(f"mode=electron_{job['mode']}_{mode_suffix} size={render_size}")
     print(f"renderer={result['renderer']}")
     print(f"gl_errors=(clear={result.get('clearError')}, draw={result.get('drawError')}, read={result.get('readError')})")
     print_gl_setup_errors(result)
@@ -882,6 +1136,7 @@ def compare_all_modes_color_smoke(
     electron: Path,
     output_dir: Path,
     backend: str,
+    diff_mode: bool = False,
 ) -> int:
     _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
     if meta.projection not in PROJECTION_CODES:
@@ -889,10 +1144,33 @@ def compare_all_modes_color_smoke(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     bounds = hpc_bounds_degrees(meta, 1.0)
+    suffix = "color_diff_smoke" if diff_mode else "color_smoke"
     jobs = [
-        common_job("hpc", fits_file, render_size, output_dir, meta, bounds, True, backend, "hpc_color_smoke", color_smoke=True),
+        common_job(
+            "hpc",
+            fits_file,
+            render_size,
+            output_dir,
+            meta,
+            bounds,
+            True,
+            backend,
+            f"hpc_{suffix}",
+            color_smoke=not diff_mode,
+            color_diff_smoke=diff_mode,
+        ),
         *[
-            make_mode_job(mode, fits_file, render_size, output_dir, True, meta, backend, color_smoke=True)
+            make_mode_job(
+                mode,
+                fits_file,
+                render_size,
+                output_dir,
+                True,
+                meta,
+                backend,
+                color_smoke=not diff_mode,
+                color_diff_smoke=diff_mode,
+            )
             for mode in ALL_MODES
             if mode != "hpc"
         ],
@@ -919,10 +1197,15 @@ def main() -> int:
     parser.add_argument("--sample-texture", action="store_true")
     parser.add_argument("--all-modes", action="store_true")
     parser.add_argument("--hpc-projection-cases", action="store_true")
+    parser.add_argument("--hpc-render-cases", action="store_true")
+    parser.add_argument("--surface-map-cases", action="store_true")
     parser.add_argument("--hpc-projection-cases-diff-selfcheck", action="store_true")
+    parser.add_argument("--hpc-projection-cases-color-smoke", action="store_true")
+    parser.add_argument("--hpc-projection-cases-color-diff-smoke", action="store_true")
     parser.add_argument("--hpc-diff-selfcheck", action="store_true")
     parser.add_argument("--all-modes-diff-selfcheck", action="store_true")
     parser.add_argument("--all-modes-color-smoke", action="store_true")
+    parser.add_argument("--all-modes-color-diff-smoke", action="store_true")
     parser.add_argument("--backend", choices=("default", "swiftshader"), default="default")
     parser.add_argument(
         "--mode",
@@ -942,6 +1225,28 @@ def main() -> int:
             args.backend,
         )
 
+    if args.hpc_render_cases:
+        return compare_hpc_render_case_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.sample_texture,
+            args.backend,
+        )
+
+    if args.surface_map_cases:
+        return compare_surface_map_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.sample_texture,
+            args.backend,
+        )
+
     if args.hpc_projection_cases_diff_selfcheck:
         return compare_hpc_projection_diff_selfcheck_batch(
             args.electron,
@@ -950,6 +1255,23 @@ def main() -> int:
             args.max_error_px,
             args.max_sample_error,
             args.backend,
+        )
+
+    if args.hpc_projection_cases_color_smoke:
+        return compare_hpc_projection_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+        )
+
+    if args.hpc_projection_cases_color_diff_smoke:
+        return compare_hpc_projection_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+            True,
         )
 
     if args.fits_file is None:
@@ -987,6 +1309,17 @@ def main() -> int:
             args.electron,
             args.output_dir,
             args.backend,
+        )
+
+    if args.all_modes_color_diff_smoke:
+        return compare_all_modes_color_smoke(
+            args.fits_file,
+            args.hdu,
+            args.render_size,
+            args.electron,
+            args.output_dir,
+            args.backend,
+            True,
         )
 
     if args.all_modes:

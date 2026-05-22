@@ -254,6 +254,21 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         "electron",
     ),
     ValidationRun(
+        "electron_default_hpc_render_cases",
+        ("--hpc-render-cases", "--render-size", "256", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_surface_map_cases",
+        ("--surface-map-cases", "--render-size", "256", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_surface_map_cases_sample_texture",
+        ("--surface-map-cases", "--render-size", "128", "--sample-texture", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
         "electron_default_hpc_diff_selfcheck",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--hpc-diff-selfcheck", "--render-size", "256", "--backend", "default"),
         "electron",
@@ -264,6 +279,16 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         "electron",
     ),
     ValidationRun(
+        "electron_default_hpc_projection_cases_color_smoke",
+        ("--hpc-projection-cases-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_hpc_projection_cases_color_diff_smoke",
+        ("--hpc-projection-cases-color-diff-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
         "electron_default_all_modes_diff_selfcheck",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--all-modes-diff-selfcheck", "--render-size", "128", "--backend", "default"),
         "electron",
@@ -271,6 +296,11 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
     ValidationRun(
         "electron_default_all_modes_color_smoke",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--all-modes-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_all_modes_color_diff_smoke",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--all-modes-color-diff-smoke", "--render-size", "128", "--backend", "default"),
         "electron",
     ),
 )
