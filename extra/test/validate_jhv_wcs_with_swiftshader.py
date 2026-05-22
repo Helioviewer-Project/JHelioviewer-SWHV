@@ -18,6 +18,7 @@ from validate_jhv_wcs_against_astropy import (
     LOGPOLAR_MIN_RADIUS,
     hpc_bounds_degrees,
     load_validation_context,
+    renderHpcTexcoordsFloat32,
     renderHpcTexcoords,
     renderLatitudinalTexcoords,
     renderOrthographicTexcoords,
@@ -38,11 +39,11 @@ DEFAULT_ELECTRON = Path(os.environ.get(
 ))
 ALL_MODES = ("hpc", "ortho", "lati_zenithal", "polar", "logpolar")
 HPC_PROJECTION_CASES = (
-    ("arc_punch", "PUNCH_L3_CAM_20260425001600_v0k.fits", 1, 8.0),
-    ("azp_hi1", "20250622_000831_s4h1A.fts", None, 0.5),
-    ("azp_hi2", "20250622_000851_s4h2A.fts", None, 0.5),
-    ("zpn_wispr_1211", "psp_L3_wispr_20231227T150508_V1_1211.fits", None, 35.0),
-    ("zpn_wispr_2222", "psp_L3_wispr_20231227T150704_V1_2222.fits", None, 25.0),
+    ("arc_punch", "PUNCH_L3_CAM_20260425001600_v0k.fits", 1, 0.3),
+    ("azp_hi1", "20250622_000831_s4h1A.fts", None, 0.2),
+    ("azp_hi2", "20250622_000851_s4h2A.fts", None, 0.2),
+    ("zpn_wispr_1211", "psp_L3_wispr_20231227T150508_V1_1211.fits", None, 0.2),
+    ("zpn_wispr_2222", "psp_L3_wispr_20231227T150704_V1_2222.fits", None, 0.2),
 )
 
 PROJECTION_CODES = {
@@ -237,8 +238,13 @@ def evaluate_hpc_shader_to_astropy(
     sum_shader_cpu_px_err2 = 0.0
     max_cpu_astropy_px_err = 0.0
     sum_cpu_astropy_px_err2 = 0.0
+    max_shader_float32_px_err = 0.0
+    sum_shader_float32_px_err2 = 0.0
+    max_float32_astropy_px_err = 0.0
+    sum_float32_astropy_px_err2 = 0.0
     count = 0
     cpu_compare_count = 0
+    float32_compare_count = 0
     skipped = 0
 
     for iy in range(render_size):
@@ -271,6 +277,7 @@ def evaluate_hpc_shader_to_astropy(
                 continue
 
             cpu_texcoord, _, _, _, _, _ = renderHpcTexcoords((sx, sy), bounds_deg, meta, image_data)
+            float32_texcoord, _, _, _ = renderHpcTexcoordsFloat32((sx, sy), bounds_deg, meta, image_data)
 
             err = max(abs(shader_px[0] - astro_px[ix, 0]), abs(shader_px[1] - astro_px[ix, 1]))
             max_px_err = max(max_px_err, float(err))
@@ -293,6 +300,16 @@ def evaluate_hpc_shader_to_astropy(
                 sum_cpu_astropy_px_err2 += float(cpu_astropy_err * cpu_astropy_err)
                 cpu_compare_count += 1
 
+            if math.isfinite(float32_texcoord[0]) and math.isfinite(float32_texcoord[1]):
+                float32_px = texcoord_to_pixel_center(float32_texcoord, meta.pixel_width, meta.pixel_height)
+                shader_float32_err = max(abs(shader_px[0] - float32_px[0]), abs(shader_px[1] - float32_px[1]))
+                float32_astropy_err = max(abs(float32_px[0] - astro_px[ix, 0]), abs(float32_px[1] - astro_px[ix, 1]))
+                max_shader_float32_px_err = max(max_shader_float32_px_err, float(shader_float32_err))
+                max_float32_astropy_px_err = max(max_float32_astropy_px_err, float(float32_astropy_err))
+                sum_shader_float32_px_err2 += float(shader_float32_err * shader_float32_err)
+                sum_float32_astropy_px_err2 += float(float32_astropy_err * float32_astropy_err)
+                float32_compare_count += 1
+
     print(f"file={fits_file}")
     print(f"mode=swiftshader_hpc_{'sample' if sample_texture else 'render'}_compare size={render_size}")
     print(f"renderer={result['renderer']}")
@@ -311,6 +328,11 @@ def evaluate_hpc_shader_to_astropy(
     print(f"shader_vs_cpu_rms_error_px={math.sqrt(sum_shader_cpu_px_err2 / cpu_compare_count):.6e}" if cpu_compare_count > 0 else "shader_vs_cpu_rms_error_px=nan")
     print(f"cpu_vs_astropy_max_error_px={max_cpu_astropy_px_err:.6e}")
     print(f"cpu_vs_astropy_rms_error_px={math.sqrt(sum_cpu_astropy_px_err2 / cpu_compare_count):.6e}" if cpu_compare_count > 0 else "cpu_vs_astropy_rms_error_px=nan")
+    print(f"float32_cpu_comparable_samples={float32_compare_count}")
+    print(f"shader_vs_float32_cpu_max_error_px={max_shader_float32_px_err:.6e}")
+    print(f"shader_vs_float32_cpu_rms_error_px={math.sqrt(sum_shader_float32_px_err2 / float32_compare_count):.6e}" if float32_compare_count > 0 else "shader_vs_float32_cpu_rms_error_px=nan")
+    print(f"float32_cpu_vs_astropy_max_error_px={max_float32_astropy_px_err:.6e}")
+    print(f"float32_cpu_vs_astropy_rms_error_px={math.sqrt(sum_float32_astropy_px_err2 / float32_compare_count):.6e}" if float32_compare_count > 0 else "float32_cpu_vs_astropy_rms_error_px=nan")
     print(f"swiftshader_rgba32f={job['outputPath']}")
     if count == 0:
         print("FAILED: no valid SwiftShader samples")

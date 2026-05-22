@@ -100,10 +100,25 @@ function bindUniformBlock(gl, program, name, binding, data) {
   gl.uniformBlockBinding(program, index, binding);
 }
 
-function bindUniformBlocks(gl, program) {
+function bindUniformBlocks(gl, program, job) {
   bindUniformBlock(gl, program, "WCSBlock", 0);
   bindUniformBlock(gl, program, "ProjectionBlock", 1);
-  bindUniformBlock(gl, program, "ScreenBlock", 2);
+
+  const screen = new Float32Array(28);
+  screen[0] = 0.5;             // inverseMVP[0][0]
+  screen[5] = 0.5;             // inverseMVP[1][1]
+  screen[10] = 1;              // inverseMVP[2][2]
+  screen[15] = 1;              // inverseMVP[3][3]
+  screen[16] = 0;              // viewport.x
+  screen[17] = 0;              // viewport.y
+  screen[18] = job.width;      // viewport.width
+  screen[19] = job.height;     // viewport.height
+  screen[20] = 1;              // iaspect
+  screen[21] = job.boundsDeg[0];
+  screen[22] = job.boundsDeg[1];
+  screen[23] = job.boundsDeg[2];
+  screen[24] = job.boundsDeg[3];
+  bindUniformBlock(gl, program, "ScreenBlock", 2, screen);
 
   const data = new Float32Array(24);
   data[0] = 1;      // color.r
@@ -175,9 +190,8 @@ ${stripMain(hpcSource)}
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    vec2 helioprojective = vec2(
-        radians(mix(uBoundsDeg.x, uBoundsDeg.y, vScrpos.x)),
-        radians(mix(uBoundsDeg.z, uBoundsDeg.w, vScrpos.y)));
+    vec2 scrpos = getScrPos();
+    vec2 helioprojective = screenToHelioprojective(scrpos);
     vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, uObserverDistance);
 
     float enhancementFactor;
@@ -359,7 +373,7 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   const program = createProgram(gl, vertexSource, diagnosticFragment(job, commonSource));
   gl.useProgram(program);
   gl.bindVertexArray(quadVao);
-  bindUniformBlocks(gl, program);
+  bindUniformBlocks(gl, program, job);
 
   setUniform(gl, program, "uBoundsDeg", job.boundsDeg);
   setUniform(gl, program, "uRect", job.rect);
