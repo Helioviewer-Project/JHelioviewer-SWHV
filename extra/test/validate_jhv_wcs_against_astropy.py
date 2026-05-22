@@ -19,6 +19,8 @@ from PIL import Image
 SUN_RADIUS_METER = 695700.0 * 1e3
 SUN_MEAN_EARTH_DISTANCE_METER = 149_597_870_700.0
 SUN_MEAN_EARTH_DISTANCE = SUN_MEAN_EARTH_DISTANCE_METER / SUN_RADIUS_METER
+SUN_EARTH_MASS_RATIO = 332946.0487
+SUN_L1_FACTOR = 1.0 - (1.0 / SUN_EARTH_MASS_RATIO / 3.0) ** (1.0 / 3.0)
 ARCSEC_PER_RAD = 180.0 * 3600.0 / math.pi
 LOGPOLAR_MIN_RADIUS = 0.05
 IDENTITY_QUAT = (0.0, 0.0, 0.0, 1.0)
@@ -32,6 +34,7 @@ DISPLAY_CUTOFF = (0.0, 0.0, -1.0)
 DISPLAY_RADII = (0.0, math.inf)
 DISPLAY_SLIT = (0.0, 1.0)
 PLANE_Z_EPS = 1e-8
+ZPN_BISECTION_STEPS = 50
 
 
 # Metadata / WCS interpretation.
@@ -183,7 +186,11 @@ def build_jhv_meta(header) -> JHVMeta:
     arcsec_per_pixel_y = float(header["CDELT2"]) * arcsec_y
 
     dsun_obs = header.get("DSUN_OBS")
-    observer_distance = dsun_obs / SUN_RADIUS_METER if dsun_obs is not None else earth_distance_solar_radii(header)
+    if dsun_obs is not None:
+        observer_distance = dsun_obs / SUN_RADIUS_METER
+    else:
+        earth_distance = earth_distance_solar_radii(header)
+        observer_distance = earth_distance * SUN_L1_FACTOR if header.get("TELESCOP") == "SOHO" else earth_distance
 
     if projection in SURFACE_MAP_PROJECTIONS:
         unit_per_arcsec = math.pi / (180.0 * 3600.0)
@@ -389,8 +396,10 @@ def projectAzpToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) ->
     native_radius = math.hypot(native_x, native_y)
     if native_radius == 0.0:
         return (0.0, 0.0)
+    if gamma == 0.0 and mu > 1.0 and mu * cos_native_distance + 1.0 <= 0.0:
+        raise ValueError("Point is outside the primary forward AZP branch")
     denom = mu + cos_native_distance - native_y * math.tan(gamma)
-    if denom == 0.0:
+    if denom <= 0.0:
         raise ValueError("Point is on the AZP singularity")
     radial = (mu + 1.0) * native_radius / denom
     return (
@@ -469,7 +478,7 @@ def zpn_primary_branch_upper_eta(meta: JHVMeta) -> float:
         if derivative <= 0.0:
             lo = prev_eta
             hi = eta
-            for _ in range(64):
+            for _ in range(ZPN_BISECTION_STEPS):
                 mid = 0.5 * (lo + hi)
                 if zpn_radial_derivative(meta, mid) > 0.0:
                     lo = mid
@@ -507,9 +516,7 @@ def azp_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMe
     mu_plus_1 = mu + 1.0
     a = 1.0 + y * sin_gamma / mu_plus_1
     k = (x * x + y * y * cos_gamma * cos_gamma) / (mu_plus_1 * mu_plus_1 * a * a)
-    discriminant = 1.0 + k * (1.0 - mu * mu)
-    if discriminant < 0.0:
-        raise ValueError("Plane point is outside the real AZP inverse branch")
+    discriminant = max(0.0, 1.0 + k * (1.0 - mu * mu))
     cos_native_distance = (-k * mu + math.sqrt(discriminant)) / (1.0 + k)
     denom = (mu + cos_native_distance) / a
     native_x = x * denom / mu_plus_1
@@ -532,8 +539,13 @@ def zpn_plane_internal_to_world(plane_internal: tuple[float, float], meta: JHVMe
     upper = zpn_primary_branch_upper_eta(meta)
     lo = 0.0
     hi = upper
-    target = min(max(radial_target, zpn_radial(meta, lo)), zpn_radial(meta, hi))
-    for _ in range(64):
+    radial_lo = zpn_radial(meta, lo)
+    radial_hi = zpn_radial(meta, hi)
+    if radial_lo > radial_hi:
+        target = radial_lo
+    else:
+        target = min(max(radial_target, radial_lo), radial_hi)
+    for _ in range(ZPN_BISECTION_STEPS):
         mid = 0.5 * (lo + hi)
         if zpn_radial(meta, mid) < target:
             lo = mid
@@ -634,12 +646,15 @@ def project_plane_internal_to_world(plane_internal: tuple[float, float], meta: J
 
 def helioprojective_to_observer_ray(world_rad: tuple[float, float]) -> np.ndarray:
     lon, lat = world_rad
+    cos_lon = math.cos(lon)
+    cos_lat = math.cos(lat)
+    sign = -1.0 if cos_lon * cos_lat < 0.0 else 1.0
     ray = np.array([
-        math.tan(lon),
-        math.tan(lat) / math.cos(lon),
-        -1.0,
+        sign * math.sin(lon) * cos_lat,
+        sign * math.sin(lat),
+        -sign * cos_lon * cos_lat,
     ], dtype=np.float64)
-    return ray / np.linalg.norm(ray)
+    return ray
 
 
 def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) -> np.ndarray:
@@ -677,6 +692,8 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         cosc = sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon
         x = meta.plane_units_per_rad * (cos_lat * sin_delta_lon / cosc)
         y = meta.plane_units_per_rad * ((cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon) / cosc)
+        x = np.where(cosc <= 0.0, np.nan, x)
+        y = np.where(cosc <= 0.0, np.nan, y)
         return np.column_stack((x, y))
 
     if meta.projection == "ARC":
@@ -696,12 +713,18 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         a = cos_lat * sin_delta_lon
         b = cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon
         c = np.hypot(a, b)
-        denom = mu + sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon - b * math.tan(gamma)
+        cosc = sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon
+        denom = mu + cosc - b * math.tan(gamma)
         radial = (mu + 1.0) * c / denom
         x = meta.plane_units_per_rad * radial * a / c
         y = meta.plane_units_per_rad * radial * b / (c * math.cos(gamma))
         x = np.where(c == 0.0, 0.0, x)
         y = np.where(c == 0.0, 0.0, y)
+        invalid = denom <= 0.0
+        if gamma == 0.0 and mu > 1.0:
+            invalid |= mu * cosc + 1.0 <= 0.0
+        x = np.where(invalid, np.nan, x)
+        y = np.where(invalid, np.nan, y)
         return np.column_stack((x, y))
 
     if meta.projection == "ZPN":
@@ -714,10 +737,17 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         for coefficient in meta.pv2:
             radial += coefficient * power
             power *= eta
+        derivative = np.zeros_like(eta)
+        power = np.ones_like(eta)
+        for index, coefficient in enumerate(meta.pv2[1:], start=1):
+            derivative += index * coefficient * power
+            power *= eta
         x = meta.plane_units_per_rad * radial * a / c
         y = meta.plane_units_per_rad * radial * b / c
         x = np.where(c == 0.0, 0.0, x)
         y = np.where(c == 0.0, 0.0, y)
+        x = np.where((radial < 0.0) | (derivative <= 0.0), np.nan, x)
+        y = np.where((radial < 0.0) | (derivative <= 0.0), np.nan, y)
         return np.column_stack((x, y))
 
     raise ValueError(f"Unsupported projection {meta.projection!r}")
