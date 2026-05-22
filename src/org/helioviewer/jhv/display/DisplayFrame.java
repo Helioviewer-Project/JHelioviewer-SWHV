@@ -7,7 +7,6 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
@@ -28,10 +27,6 @@ public final class DisplayFrame {
 
     private static boolean missingHandlerLogged;
     private static Consumer<Position> renderRequestHandler = _ -> missingRenderRequestHandler();
-
-    public static Position getViewpoint() {
-        return viewpointModel.getViewpoint();
-    }
 
     public static UpdateViewpoint getViewpointUpdate() {
         return viewpointModel.getUpdateViewpoint();
@@ -72,12 +67,13 @@ public final class DisplayFrame {
     }
 
     public static void refreshCamera() {
-        Display.getCamera().updateViewpoint(viewpointModel.update(Movie.getTime()));
+        updateViewpoint(Movie.getTime());
         render(1);
     }
 
     public static void resetCamera() {
         resetCamera(Display.getCamera(), viewpointModel);
+        render(1);
     }
 
     public static JSONObject cameraToJson() {
@@ -85,12 +81,13 @@ public final class DisplayFrame {
     }
 
     public static void cameraFromJson(JSONObject json) {
-        Display.getCamera().fromJson(json, getViewpoint());
+        Display.getCamera().fromJson(json, viewpointModel.getViewpoint());
     }
 
     static void resetCameras() {
         resetCamera(Display.getMiniCamera(), miniViewpointModel);
         resetCamera(Display.getCamera(), viewpointModel);
+        render(1);
     }
 
     public static void zoomMiniToFit() {
@@ -101,28 +98,18 @@ public final class DisplayFrame {
         Position viewpoint = model.update(Movie.getTime());
         camera.reset(viewpoint);
         CameraHelper.zoomToFit(camera, viewpoint);
-        render(1);
-    }
-
-    public static RenderView renderView(Position viewpoint) {
-        return Display.getCamera().renderView(viewpoint);
-    }
-
-    public static MapContext getMapContext(RenderView renderView) {
-        return Display.mode.createMapContext(Display.getCamera(), renderView, Display.gridType);
     }
 
     public static void render(float decodeFactor) {
-        Position viewpoint = getViewpoint();
-        if (ImageLayers.areEnabled()) {
+        Position viewpoint = viewpointModel.getViewpoint();
+        if (ImageLayers.areEnabled())
             ImageLayers.decode(decodeFactor, viewpoint);
-        } else {
-            renderRequestHandler.accept(viewpoint);
-        }
+        else
+            display(viewpoint);
     }
 
     public static void display() {
-        display(getViewpoint());
+        display(viewpointModel.getViewpoint());
     }
 
     public static void display(Position viewpoint) {

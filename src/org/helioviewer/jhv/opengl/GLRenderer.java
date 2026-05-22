@@ -1,13 +1,13 @@
 package org.helioviewer.jhv.opengl;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Projection;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -19,7 +19,7 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
 
-    private static RenderView renderView = DisplayFrame.renderView(DisplayFrame.getViewpoint());
+    private static RenderView renderView = Display.getCamera().renderView(Sun.StartEarth);
 
     private GLRenderer() {}
 
@@ -63,7 +63,7 @@ public final class GLRenderer {
     }
 
     public static void display(Position viewpoint) {
-        renderView = DisplayFrame.renderView(viewpoint);
+        renderView = Display.getCamera().renderView(viewpoint);
 
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
@@ -101,7 +101,7 @@ public final class GLRenderer {
 
     static void renderScene() {
         Camera camera = Display.getCamera();
-        MapContext ctx = DisplayFrame.getMapContext(renderView);
+        MapContext ctx = Display.mode.createMapContext(camera, renderView, Display.gridType);
         ProjectionScale scale = ProjectionScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -147,7 +147,7 @@ public final class GLRenderer {
         boolean hpcMode = Display.mode == ProjectionMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
         Camera camera = Display.getCamera();
-        MapContext ctx = DisplayFrame.getMapContext(renderView);
+        MapContext ctx = Display.mode.createMapContext(camera, renderView, Display.gridType);
         for (Viewport vp : Display.getViewports()) {
             ProjectionScale scale = Display.mode.scale;
             if (hpcMode) {
