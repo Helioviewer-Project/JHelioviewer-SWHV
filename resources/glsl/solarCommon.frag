@@ -224,7 +224,10 @@ vec3 observerPosition(const float observerDistance) {
 vec3 helioprojectiveToObserverRay(const vec2 helioprojective) {
     float phi = helioprojective.x;
     float theta = helioprojective.y;
-    return normalize(vec3(tan(phi), tan(theta) / cos(phi), -1.));
+    float cosPhi = cos(phi);
+    float cosTheta = cos(theta);
+    float raySign = cosPhi * cosTheta < 0. ? -1. : 1.;
+    return vec3(raySign * sin(phi) * cosTheta, raySign * sin(theta), -raySign * cosPhi * cosTheta);
 }
 
 vec3 helioprojectiveToHpcPlanePoint(const vec2 helioprojective, const float observerDistance) {

@@ -135,10 +135,10 @@ final class NonOrthoProjection {
     }
 
     private static Vec3 helioprojectiveRay(double longitude, double latitude) {
-        double x = Math.tan(longitude);
-        double y = Math.tan(latitude) / Math.cos(longitude);
-        double invLen = 1. / Math.sqrt(x * x + y * y + 1);
-        return new Vec3(x * invLen, y * invLen, -invLen); // normalized
+        double cosLon = Math.cos(longitude);
+        double cosLat = Math.cos(latitude);
+        double sign = cosLon * cosLat < 0 ? -1 : 1;
+        return new Vec3(sign * Math.sin(longitude) * cosLat, sign * Math.sin(latitude), -sign * cosLon * cosLat);
     }
 
     private static Vec3 toHpcViewpointSpace(Position viewpoint, Vec3 v) {
