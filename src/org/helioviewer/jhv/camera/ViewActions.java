@@ -9,6 +9,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.opengl.GLRenderer;
 
 public final class ViewActions {
 
@@ -16,7 +17,7 @@ public final class ViewActions {
 
     public static void zoomFit() {
         Display.resetViewportZoom();
-        CameraHelper.zoomToFit(Display.getCamera(), DisplayFrame.getViewpoint());
+        CameraHelper.zoomToFit(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
         DisplayFrame.render(1);
     }
 
@@ -39,7 +40,7 @@ public final class ViewActions {
         double cameraWidth = ImageLayerBounds.getOneToOneCameraWidth(layer);
         if (cameraWidth > 0) {
             Display.resetViewportZoom();
-            Position viewpoint = DisplayFrame.getViewpoint();
+            Position viewpoint = GLRenderer.getDisplayedViewpoint();
             double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
             camera.setFOV(fov, viewpoint);
         }
