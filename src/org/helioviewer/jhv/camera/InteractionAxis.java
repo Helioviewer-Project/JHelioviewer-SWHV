@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.camera;
 
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
@@ -17,7 +17,7 @@ class InteractionAxis extends InteractionTrackball {
     @Override
     public void mousePressed(PointerEvent e, Viewport vp) {
         super.mousePressed(e, vp);
-        dragAxis = Display.getViewpointUpdate().dragAxis();
+        dragAxis = DisplayFrame.getViewpointUpdate().dragAxis();
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.Projection;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -18,7 +19,7 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 
 public final class GLRenderer {
 
-    private static RenderView renderView = Display.renderView(Display.getViewpoint());
+    private static RenderView renderView = DisplayFrame.renderView(DisplayFrame.getViewpoint());
 
     private GLRenderer() {}
 
@@ -62,7 +63,7 @@ public final class GLRenderer {
     }
 
     public static void display(Position viewpoint) {
-        renderView = Display.renderView(viewpoint);
+        renderView = DisplayFrame.renderView(viewpoint);
 
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
@@ -100,7 +101,7 @@ public final class GLRenderer {
 
     static void renderScene() {
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.getMapContext(renderView);
+        MapContext ctx = DisplayFrame.getMapContext(renderView);
         ProjectionScale scale = ProjectionScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -146,7 +147,7 @@ public final class GLRenderer {
         boolean hpcMode = Display.mode == ProjectionMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.getMapContext(renderView);
+        MapContext ctx = DisplayFrame.getMapContext(renderView);
         for (Viewport vp : Display.getViewports()) {
             ProjectionScale scale = Display.mode.scale;
             if (hpcMode) {

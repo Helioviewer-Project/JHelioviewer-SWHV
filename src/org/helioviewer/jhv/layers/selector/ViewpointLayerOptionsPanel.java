@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.dialogs.TextDialog;
 import org.helioviewer.jhv.layers.ViewpointLayer;
@@ -47,7 +47,7 @@ final class ViewpointLayerOptionsPanel extends JPanel {
             radio.setHorizontalTextPosition(SwingConstants.LEFT);
             radio.addItemListener(e -> {
                 if (radio.isSelected()) {
-                    options.setCameraMode(mode, Display.ViewpointApplyMode.RESET);
+                    options.setCameraMode(mode, DisplayFrame.ViewpointApplyMode.RESET);
                     switchOptionsPanel(getCurrentOptionPanel());
                 }
             });

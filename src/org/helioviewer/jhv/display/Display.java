@@ -1,24 +1,12 @@
 package org.helioviewer.jhv.display;
 
-import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
-import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.MovieDisplay;
-import org.helioviewer.jhv.time.JHVTime;
 
 public final class Display {
 
     private Display() {}
-
-    public enum ViewpointApplyMode {
-        RESET,
-        KEEP_TRANSFORM
-    }
 
     public static ProjectionMode mode = ProjectionMode.Orthographic;
     public static boolean multiview = false;
@@ -26,8 +14,7 @@ public final class Display {
 
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
-        resetCamera(miniCamera, miniViewpointModel);
-        resetCamera(camera, viewpointModel);
+        DisplayFrame.resetCameras();
     }
 
     public static GridType gridType = GridType.Viewpoint;
@@ -46,9 +33,7 @@ public final class Display {
         fullViewport = DisplayLayout.fullViewport(x, y, w, h, glHeight);
     }
 
-    private static final ViewpointModel viewpointModel = new ViewpointModel(UpdateViewpoint.observer);
     private static final Camera camera = new Camera();
-    private static final ViewpointModel miniViewpointModel = new ViewpointModel(UpdateViewpoint.earthAt1au);
     private static final Camera miniCamera = new Camera();
 
     public static Camera getCamera() {
@@ -57,76 +42,6 @@ public final class Display {
 
     public static Camera getMiniCamera() {
         return miniCamera;
-    }
-
-    public static Position getViewpoint() {
-        return viewpointModel.getViewpoint();
-    }
-
-    public static UpdateViewpoint getViewpointUpdate() {
-        return viewpointModel.getUpdateViewpoint();
-    }
-
-    public static boolean getTrackingMode() {
-        return viewpointModel.getTrackingMode();
-    }
-
-    public static void addViewpointListener(ViewpointModel.Listener listener) {
-        viewpointModel.addListener(listener);
-    }
-
-    public static void removeViewpointListener(ViewpointModel.Listener listener) {
-        viewpointModel.removeListener(listener);
-    }
-
-    public static void setViewpointUpdate(UpdateViewpoint updateViewpoint, ViewpointApplyMode mode) {
-        viewpointModel.setUpdateViewpoint(updateViewpoint);
-        switch (mode) {
-            case RESET -> resetCamera();
-            case KEEP_TRANSFORM -> updateViewpoint(Movie.getTime());
-        }
-    }
-
-    public static void setTrackingMode(boolean tracking) {
-        if (viewpointModel.setTrackingMode(tracking))
-            refreshCamera();
-    }
-
-    public static void updateViewpoint(JHVTime time) {
-        camera.updateViewpoint(viewpointModel.update(time));
-    }
-
-    public static void timeChanged(JHVTime time) {
-        if (!viewpointModel.getTrackingMode())
-            updateViewpoint(time);
-    }
-
-    public static void refreshCamera() {
-        camera.updateViewpoint(viewpointModel.update(Movie.getTime()));
-        MovieDisplay.render(1);
-    }
-
-    public static void resetCamera() {
-        resetCamera(camera, viewpointModel);
-    }
-
-    public static void zoomMiniToFit() {
-        CameraHelper.zoomToFit(miniCamera, miniViewpointModel.getViewpoint());
-    }
-
-    private static void resetCamera(Camera camera, ViewpointModel model) {
-        Position viewpoint = model.update(Movie.getTime());
-        camera.reset(viewpoint);
-        CameraHelper.zoomToFit(camera, viewpoint);
-        MovieDisplay.render(1);
-    }
-
-    public static RenderView renderView(Position viewpoint) {
-        return camera.renderView(viewpoint);
-    }
-
-    public static MapContext getMapContext(RenderView renderView) {
-        return mode.createMapContext(camera, renderView, gridType);
     }
 
     private static Viewport[] viewports = {DisplayLayout.viewport(0, 0, 0, 100, 100, glHeight)};

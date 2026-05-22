@@ -15,6 +15,7 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -130,7 +131,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (spiralSpeed > 0)
             renderSpiral(vp, lati, spiralSpeed);
 
-        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointUpdate());
+        List<PositionLoad> positionLoads = PositionLoad.get(DisplayFrame.getViewpointUpdate());
         if (!positionLoads.isEmpty()) {
             GL.glDisable(GL.DEPTH_TEST);
             renderPlanets(vp, positionLoads, pointFactor, time, start, end);
@@ -166,7 +167,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         Camera camera = Display.getCamera();
-        List<PositionLoad> positionLoads = PositionLoad.get(Display.getViewpointUpdate());
+        List<PositionLoad> positionLoads = PositionLoad.get(DisplayFrame.getViewpointUpdate());
         if (positionLoads.isEmpty()) {
             clearHoverTextIfNeeded();
             return;
@@ -232,13 +233,13 @@ public class ViewpointLayer extends AbstractLayer {
         if (enabled) {
             InputController.addListener(hoverListener);
             options.activate();
-            options.applyCurrentViewpoint(Display.ViewpointApplyMode.KEEP_TRANSFORM);
+            options.applyCurrentViewpoint(DisplayFrame.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
             InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
-                Display.setViewpointUpdate(UpdateViewpoint.observer, Display.ViewpointApplyMode.KEEP_TRANSFORM);
+                DisplayFrame.setViewpointUpdate(UpdateViewpoint.observer, DisplayFrame.ViewpointApplyMode.KEEP_TRANSFORM);
         }
     }
 

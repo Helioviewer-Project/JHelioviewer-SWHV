@@ -3,7 +3,7 @@ package org.helioviewer.jhv.gui.components.statusplugin;
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
@@ -22,7 +22,7 @@ public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin impleme
 
     @Override
     public void lazyRepaint() {
-        Position viewpoint = Display.getViewpoint();
+        Position viewpoint = DisplayFrame.getViewpoint();
         if (distance == viewpoint.distance && time.milli == viewpoint.time.milli)
             return;
 

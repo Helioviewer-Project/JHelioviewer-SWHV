@@ -13,7 +13,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.components.base.TableValue;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
@@ -65,7 +65,7 @@ final class SpaceObjectContainerPanel extends JScrollPane {
                     container.selectElement(element);
                 else
                     container.setHighlightedElement(element);
-                Display.refreshCamera();
+                DisplayFrame.refreshCamera();
             }
         });
 
