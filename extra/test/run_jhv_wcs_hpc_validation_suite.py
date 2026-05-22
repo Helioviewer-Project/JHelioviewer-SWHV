@@ -29,6 +29,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
 VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_against_astropy.py"
 GLSL_VALIDATOR = SCRIPT_DIR / "validate_glsl_syntax.py"
+SWIFTSHADER_VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_with_swiftshader.py"
 DATA = SCRIPT_DIR / "data"
 
 
@@ -231,6 +232,19 @@ RUNS: tuple[ValidationRun, ...] = (
     ),
 )
 
+SWIFTSHADER_RUNS: tuple[ValidationRun, ...] = (
+    ValidationRun(
+        "swiftshader_hpc_sample",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_hpc_solo_eui",
+        (str(DATA / "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits"), "--render-size", "256"),
+        "swiftshader",
+    ),
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -258,22 +272,42 @@ def parse_args() -> argparse.Namespace:
         default=1,
         help="Number of validation runs to execute in parallel",
     )
+    parser.add_argument(
+        "--include-swiftshader",
+        action="store_true",
+        help="Include Electron/ANGLE SwiftShader shader-execution validation runs",
+    )
     return parser.parse_args()
 
 
-def selected_runs(only: list[str] | None) -> list[ValidationRun]:
+def available_runs(include_swiftshader: bool, only: list[str] | None) -> list[ValidationRun]:
+    runs = list(RUNS)
+    if include_swiftshader or (only and any(name.startswith("swiftshader_") for name in only)):
+        runs.extend(SWIFTSHADER_RUNS)
+    return runs
+
+
+def selected_runs(runs: list[ValidationRun], only: list[str] | None) -> list[ValidationRun]:
     if not only:
-        return list(RUNS)
+        return runs
     requested = set(only)
-    known = {run.name for run in RUNS}
+    known = {run.name for run in runs}
     missing = sorted(requested - known)
     if missing:
         raise SystemExit(f"Unknown run name(s): {', '.join(missing)}")
-    return [run for run in RUNS if run.name in requested]
+    return [run for run in runs if run.name in requested]
+
+
+def validator_for(run: ValidationRun) -> Path:
+    if run.validator == "glsl":
+        return GLSL_VALIDATOR
+    if run.validator == "swiftshader":
+        return SWIFTSHADER_VALIDATOR
+    return VALIDATOR
 
 
 def run_case(run: ValidationRun) -> ValidationResult:
-    validator = GLSL_VALIDATOR if run.validator == "glsl" else VALIDATOR
+    validator = validator_for(run)
     cmd = [sys.executable, str(validator), *run.args]
     completed = subprocess.run(
         cmd,
@@ -290,7 +324,7 @@ def run_case(run: ValidationRun) -> ValidationResult:
 
 
 def print_result(result: ValidationResult) -> None:
-    validator = GLSL_VALIDATOR if result.run.validator == "glsl" else VALIDATOR
+    validator = validator_for(result.run)
     cmd = [sys.executable, str(validator), *result.run.args]
     print(f"\n== {result.run.name} ==")
     print(" ".join(cmd))
@@ -358,12 +392,13 @@ def run_parallel(runs: list[ValidationRun], keep_going: bool, jobs: int) -> list
 
 def main() -> int:
     args = parse_args()
+    all_runs = available_runs(args.include_swiftshader, args.only)
     if args.list:
-        for run in RUNS:
+        for run in all_runs:
             print(run.name)
         return 0
 
-    runs = selected_runs(args.only)
+    runs = selected_runs(all_runs, args.only)
     if args.jobs < 1:
         raise SystemExit("--jobs must be at least 1")
 
