@@ -15,6 +15,7 @@ import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
+import org.helioviewer.jhv.opengl.Transform;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

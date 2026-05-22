@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.camera.Transform;
-
 class GLSLShapeShader extends GLSLShader {
 
     static final GLSLShapeShader point = new GLSLShapeShader("/glsl/point.vert", "/glsl/point.frag");

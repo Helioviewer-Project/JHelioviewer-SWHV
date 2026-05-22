@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -14,6 +13,7 @@ import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.layers.stars.GaiaClient;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
+import org.helioviewer.jhv.opengl.Transform;
 
 import org.json.JSONObject;
 

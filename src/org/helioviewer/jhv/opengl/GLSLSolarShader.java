@@ -4,7 +4,6 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;

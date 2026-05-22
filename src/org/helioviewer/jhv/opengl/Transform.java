@@ -1,7 +1,8 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.opengl;
 
 import java.nio.FloatBuffer;
 
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 
@@ -9,7 +10,10 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 
-public class Transform {
+public final class Transform {
+
+    private static final float CLIP_NARROW = (float) (32 * Sun.Radius); // bit more than LASCO C3
+    private static final float CLIP_WIDE = (float) (50 * Sun.MeanEarthDistance); // bit further than Pluto
 
     private static final FloatBuffer fb = BufferUtils.newFloatBuffer(16);
     private static final FloatBuffer mvp = BufferUtils.newFloatBuffer(16);
@@ -23,6 +27,8 @@ public class Transform {
 
     private static int projDepth;
     private static int viewDepth;
+
+    private Transform() {}
 
     public static void pushProjection() {
         proj.pushMatrix();
@@ -52,10 +58,6 @@ public class Transform {
         view.identity();
     }
 
-    public static void mulView(Matrix4f m) {
-        view.mulAffine(m);
-    }
-
     public static void rotateViewInverse(Quat q) {
         view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) -q.w));
     }
@@ -64,22 +66,30 @@ public class Transform {
         view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
     }
 
-    /// Only for Camera.java
+    static void ortho2D(double aspect, double width, double tx, double ty) {
+        setup((float) (width * aspect), (float) width, -1, 1, (float) tx, (float) ty);
+        cacheMVP();
+    }
 
-    static void setup(float width, float height, float zNear, float zFar, float x, float y) {
+    static void ortho(double aspect, double width, double tx, double ty, Quat rotation) {
+        float clip = width < 32 ? CLIP_NARROW : CLIP_WIDE;
+        setup((float) (width * aspect), (float) width, -clip, clip, (float) tx, (float) ty);
+        rotateView(rotation);
+        cacheMVP();
+    }
+
+    private static void setup(float width, float height, float zNear, float zFar, float x, float y) {
         proj.setOrthoSymmetric(width, height, zNear, zFar);
         view.translation(x, y, 0);
         proj.invertOrtho(invTrans).translateLocal(-x, -y, 0).get(inv);
     }
 
-    static void cacheMVP() {
+    private static void cacheMVP() {
         proj.mulOrthoAffine(view, mul); // assumes ortho
         mul.get(mvp);
     }
 
-    ///
-
-    public static FloatBuffer get() {
+    static FloatBuffer get() {
         if (projDepth == 0 && viewDepth == 0) {
             //System.out.println(">> hit");
             //Thread.dumpStack();
@@ -91,7 +101,7 @@ public class Transform {
         return fb;
     }
 
-    public static FloatBuffer getInverse() {
+    static FloatBuffer getInverse() {
         return inv;
     }
 
