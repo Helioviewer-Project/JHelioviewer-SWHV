@@ -33,6 +33,7 @@ public final class AngleCanvas extends Canvas {
     private long nativeWindowHandle;
     private AngleRenderer angleRenderer;
     private boolean displayPending;
+    private Position pendingViewpoint;
     private boolean hostUpdatePending;
     private boolean hostRenderPending;
     private int fps;
@@ -124,6 +125,7 @@ public final class AngleCanvas extends Canvas {
     }
 
     public void requestRender(Position viewpoint) {
+        pendingViewpoint = viewpoint;
         if (displayPending)
             return;
 
@@ -135,7 +137,9 @@ public final class AngleCanvas extends Canvas {
         displayPending = true;
         EventQueue.invokeLater(() -> {
             displayPending = false;
-            renderNow(viewpoint);
+            Position renderViewpoint = pendingViewpoint;
+            pendingViewpoint = null;
+            renderNow(renderViewpoint);
         });
     }
 

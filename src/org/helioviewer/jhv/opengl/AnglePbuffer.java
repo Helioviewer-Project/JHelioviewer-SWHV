@@ -12,15 +12,19 @@ public final class AnglePbuffer {
 
     private AngleRenderer angleRenderer;
     private boolean renderPending;
+    private Position pendingViewpoint;
 
     public void requestRender(Position viewpoint) {
+        pendingViewpoint = viewpoint;
         if (renderPending)
             return;
 
         renderPending = true;
         EventQueue.invokeLater(() -> {
             renderPending = false;
-            renderNow(viewpoint);
+            Position renderViewpoint = pendingViewpoint;
+            pendingViewpoint = null;
+            renderNow(renderViewpoint);
         });
     }
 
