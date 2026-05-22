@@ -128,6 +128,7 @@ public final class JHVMetadataDump {
                 .put("crota_rad", crotaRad(meta))
                 .put("observer_distance", meta.viewpoint.distance)
                 .put("projection", meta.wcsProjection.name())
+                .put("zpn_upper_eta", meta.getWcsHeader().zpnUpperEta)
                 .put("pv2", pv2);
     }
 

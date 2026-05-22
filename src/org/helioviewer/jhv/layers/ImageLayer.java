@@ -262,8 +262,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
 
         GLSLSolarShader.bindWCS(
-                cameraDiff0, imageData.getRegion(), crota0, crval0, deltaT0,
-                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, deltaT1);
+                cameraDiff0, imageData.getRegion(), crota0, crval0, (float) wcs0.zpnUpperEta, deltaT0,
+                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, (float) wcs1.zpnUpperEta, deltaT1);
         shader.bindPV(wcs0.pv2, wcs1.pv2);
 
         Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();

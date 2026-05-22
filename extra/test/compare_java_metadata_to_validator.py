@@ -119,6 +119,13 @@ def main() -> int:
             if mismatch is not None:
                 case_errors.append(mismatch)
 
+        py_zpn_upper_eta = validator.zpn_primary_branch_upper_eta(py_meta) if py_meta.projection == "ZPN" else 0.0
+        java_zpn_upper_eta = float(validator.np.float32(java_meta["zpn_upper_eta"]))
+        py_zpn_upper_eta = float(validator.np.float32(py_zpn_upper_eta))
+        mismatch = compare_scalars("zpn_upper_eta", java_zpn_upper_eta, py_zpn_upper_eta, 0.0, 0.0)
+        if mismatch is not None:
+            case_errors.append(mismatch)
+
         for index, (java_value, py_value) in enumerate(zip(java_meta["pv2"], py_meta.pv2, strict=True)):
             mismatch = compare_scalars(f"pv2[{index}]", float(java_value), float(py_value), 1e-6, 1e-7)
             if mismatch is not None:

@@ -97,17 +97,17 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindWCS(
-            Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float deltaT0,
-            Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float deltaT1) {
+            Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float zpnUpperEta0, float deltaT0,
+            Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float zpnUpperEta1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
         crota0.setFloatBuffer(wcsBuf);
-        wcsBuf.put(crval0).put(deltaT0).put(0);
+        wcsBuf.put(crval0).put(zpnUpperEta0).put(deltaT0);
 
         cameraDiff1.setFloatBuffer(wcsBuf);
         wcsBuf.put(r1.glslArray);
         crota1.setFloatBuffer(wcsBuf);
-        wcsBuf.put(crval1).put(deltaT1).put(0);
+        wcsBuf.put(crval1).put(zpnUpperEta1).put(deltaT1);
 
         wcsBO.setBufferDataIfChanged(wcsBuf.flip().limit(), WCS_SIZE, wcsBuf);
     }
