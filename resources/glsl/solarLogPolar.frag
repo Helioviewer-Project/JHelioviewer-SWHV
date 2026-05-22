@@ -5,7 +5,7 @@ vec2 sampleLogPolarTexcoord(const vec2 crval, const vec4 crota, const vec4 rect,
 
     // Effective polar map convention is 0 at north and increasing anti-clockwise.
     // This basis must stay consistent with the Java-side non-ortho projection after
-    // the subsequent apply_center(..., vec3(pos.x, -pos.y, 0.), ...) step.
+    // the subsequent rotate_plane_inverse(..., vec2(pos.x, -pos.y) - crval) step.
     float theta = -(scrpos.x * TWOPI + HALFPI);
     vec2 polarXY = vec2(cos(theta), sin(theta)) * radialCoordinate;
 
@@ -19,7 +19,7 @@ vec2 sampleLogPolarTexcoord(const vec2 crval, const vec4 crota, const vec4 rect,
             discard;
     }
 
-    vec3 centered = apply_center(vec3(polarXY.x, -polarXY.y, 0.), crval, crota);
+    vec2 centered = rotate_plane_inverse(crota, vec2(polarXY.x, -polarXY.y) - crval);
     vec2 texCoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_texture(texCoord);
     return texCoord;

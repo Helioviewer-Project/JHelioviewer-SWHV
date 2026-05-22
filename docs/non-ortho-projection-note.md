@@ -69,7 +69,7 @@ This note documents the convention used by the non-orthographic display modes (`
   - the Java polar projection expresses that convention directly
   - the GLSL polar/log-polar shaders keep the legacy internal
     `theta = -(...) - HALFPI` basis because it matches the image reprojection
-    path after `apply_center(..., vec3(pos.x, -pos.y, 0.), ...)`
+    path after `rotate_plane_inverse(..., vec2(pos.x, -pos.y) - crval)`
 - Remaining sign flips in GLSL, such as final texture-space Y inversion, belong
   to image/WCS sampling space and should not be confused with the map
   convention itself.

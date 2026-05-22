@@ -51,7 +51,7 @@ vec2 sampleLatiZenithalTexcoord(const vec2 scrpos, const WCS wcs, const vec3 gri
     if (rotatedSpherical.x < 0.)
         discard;
 
-    vec3 centered = apply_center(vec3(rotatedSpherical.y, rotatedSpherical.z, 0.), wcs.crval, wcs.crota);
+    vec2 centered = rotate_plane_inverse(wcs.crota, vec2(rotatedSpherical.y, rotatedSpherical.z) - wcs.crval);
     vec2 texCoord = wcs.rect.zw * vec2(centered.x - wcs.rect.x, -centered.y - wcs.rect.y);
     clamp_texture(texCoord);
     return texCoord;
