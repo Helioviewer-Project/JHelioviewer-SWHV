@@ -243,6 +243,26 @@ SWIFTSHADER_RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits"), "--render-size", "256"),
         "swiftshader",
     ),
+    ValidationRun(
+        "swiftshader_ortho_sample",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--mode", "ortho"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_lati_zenithal_sample",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--mode", "lati_zenithal", "--max-error-px", "1"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_polar_sample",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--mode", "polar"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_logpolar_sample",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--mode", "logpolar"),
+        "swiftshader",
+    ),
 )
 
 
