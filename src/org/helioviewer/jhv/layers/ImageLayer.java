@@ -363,7 +363,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         newImageData.getImageBuffer().allowExplicitFree();
         setImageData(newImageData);
         Layers.fireTimeUpdated(this);
-        DisplayFrame.display();
+        ImageLayers.displaySynced(imageData.getViewpoint());
     }
 
     @Override
