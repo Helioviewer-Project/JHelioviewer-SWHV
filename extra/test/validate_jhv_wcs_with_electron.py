@@ -116,6 +116,7 @@ def common_job(
     sample_texture: bool,
     backend: str,
     name: str | None = None,
+    diff_selfcheck: bool = False,
 ) -> dict:
     output_kind = "sample" if sample_texture else "texcoord"
     output_name = name if name is not None else mode
@@ -137,6 +138,7 @@ def common_job(
         "observerDistance": meta.observer_distance,
         "pv2": list(meta.pv2),
         "sampleTexture": sample_texture,
+        "diffSelfcheck": diff_selfcheck,
         "textureWidth": min(meta.pixel_width, 512),
         "textureHeight": min(meta.pixel_height, 512),
     }
@@ -652,6 +654,86 @@ def compare_hpc_projection_batch(
     return 1 if failed else 0
 
 
+def evaluate_hpc_diff_selfcheck(
+    fits_file: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    meta,
+    job: dict,
+    result: dict,
+    pixels: np.ndarray,
+) -> int:
+    texture_data = synthetic_texture(job["textureWidth"], job["textureHeight"])
+    max_px_err = 0.0
+    sum_px_err2 = 0.0
+    max_sample_err = 0.0
+    sum_sample_err2 = 0.0
+    count = 0
+    skipped = 0
+
+    for iy in range(render_size):
+        for ix in range(render_size):
+            texcoord = (float(pixels[iy, ix, 0]), float(pixels[iy, ix, 1]))
+            diff_texcoord = (float(pixels[iy, ix, 2]), float(pixels[iy, ix, 3]))
+            valid = is_finite_texcoord(texcoord) and is_finite_texcoord(diff_texcoord) and any(pixels[iy, ix] != 0.0)
+            if not valid:
+                skipped += 1
+                continue
+
+            px_err = pixel_error(texcoord, diff_texcoord, meta.pixel_width, meta.pixel_height)
+            sample_err = abs(sample_texture_linear(texture_data, texcoord) - sample_texture_linear(texture_data, diff_texcoord))
+            max_px_err = max(max_px_err, float(px_err))
+            max_sample_err = max(max_sample_err, float(sample_err))
+            sum_px_err2 += float(px_err * px_err)
+            sum_sample_err2 += float(sample_err * sample_err)
+            count += 1
+
+    print(f"file={fits_file}")
+    print(f"mode=electron_hpc_diff_selfcheck size={render_size}")
+    print(f"renderer={result['renderer']}")
+    print(f"gl_errors=(clear={result.get('clearError')}, draw={result.get('drawError')}, read={result.get('readError')})")
+    print_gl_setup_errors(result)
+    print(f"valid_samples={count}")
+    print(f"skipped_samples={skipped}")
+    print(f"diff_texcoord_max_error_px={max_px_err:.6e}")
+    print(f"diff_texcoord_rms_error_px={math.sqrt(sum_px_err2 / count):.6e}" if count > 0 else "diff_texcoord_rms_error_px=nan")
+    print(f"diff_sample_max_error={max_sample_err:.6e}")
+    print(f"diff_sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "diff_sample_rms_error=nan")
+    print(f"electron_rgba32f={job['outputPath']}")
+    if count == 0:
+        print("FAILED: no valid Electron WebGL diff samples")
+        return 1
+    if max_px_err > max_error_px:
+        print(f"FAILED: diff_texcoord_max_error_px exceeds {max_error_px:.6e}")
+        return 1
+    if max_sample_err > max_sample_error:
+        print(f"FAILED: diff_sample_max_error exceeds {max_sample_error:.6e}")
+        return 1
+    return 0
+
+
+def compare_hpc_diff_selfcheck(
+    fits_file: Path,
+    hdu: int | None,
+    render_size: int,
+    electron: Path,
+    output_dir: Path,
+    max_error_px: float,
+    max_sample_error: float,
+    backend: str,
+) -> int:
+    _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+    if meta.projection not in PROJECTION_CODES:
+        raise ValueError(f"Electron WebGL HPC diff selfcheck does not support projection {meta.projection!r}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    bounds = hpc_bounds_degrees(meta, 1.0)
+    job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, True, backend, "hpc_diff_selfcheck", True)
+    result, pixels = run_shader_job(electron, backend, job)
+    return evaluate_hpc_diff_selfcheck(fits_file, render_size, max_error_px, max_sample_error, meta, job, result, pixels)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate JHV GLSL WCS code by running it on Electron/WebGL")
     parser.add_argument("fits_file", type=Path, nargs="?")
@@ -664,6 +746,7 @@ def main() -> int:
     parser.add_argument("--sample-texture", action="store_true")
     parser.add_argument("--all-modes", action="store_true")
     parser.add_argument("--hpc-projection-cases", action="store_true")
+    parser.add_argument("--hpc-diff-selfcheck", action="store_true")
     parser.add_argument("--backend", choices=("default", "swiftshader"), default="default")
     parser.add_argument(
         "--mode",
@@ -685,6 +768,18 @@ def main() -> int:
 
     if args.fits_file is None:
         raise SystemExit("fits_file is required unless --hpc-projection-cases is used")
+
+    if args.hpc_diff_selfcheck:
+        return compare_hpc_diff_selfcheck(
+            args.fits_file,
+            args.hdu,
+            args.render_size,
+            args.electron,
+            args.output_dir,
+            args.max_error_px,
+            args.max_sample_error,
+            args.backend,
+        )
 
     if args.all_modes:
         return compare_batch(

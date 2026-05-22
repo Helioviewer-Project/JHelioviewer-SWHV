@@ -161,12 +161,13 @@ function screenBlock(job) {
   return block;
 }
 
-function displayBlock() {
+function displayBlock(job) {
   const block = new Float32Array(24);
   block[0] = 1;      // color.r
   block[1] = 1;      // color.g
   block[2] = 1;      // color.b
   block[3] = 1;      // color.a
+  block[7] = job.diffSelfcheck ? 1 : 0; // isDiff
   block[16] = 0;     // brightness.x
   block[17] = 1;     // brightness.y
   block[18] = 0;     // radii.x
@@ -180,7 +181,7 @@ function bindUniformBlocks(gl, program, job) {
   bindUniformBlock(gl, program, "WCSBlock", 0, wcsBlock(job));
   bindUniformBlock(gl, program, "ProjectionBlock", 1, projectionBlock(job));
   bindUniformBlock(gl, program, "ScreenBlock", 2, screenBlock(job));
-  bindUniformBlock(gl, program, "DisplayBlock", 3, displayBlock());
+  bindUniformBlock(gl, program, "DisplayBlock", 3, displayBlock(job));
 }
 
 function commonDiagnosticUniforms() {
@@ -219,6 +220,47 @@ void main(void) {
         uPv,
         enhancementFactor);
     diagnosticOutput(texCoord, enhancementFactor);
+}
+`;
+}
+
+function hpcDiffSelfcheckDiagnostic(commonSource, hpcSource) {
+  return `${commonSource}
+${stripMain(hpcSource)}
+
+void main(void) {
+    vec2 scrpos = getScrPos();
+    vec2 helioprojective = screenToHelioprojective(scrpos);
+
+    float observerDistance = projection[0].observerDistance;
+    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, observerDistance);
+    clipHpcGeometry(hpcXY);
+
+    float enhancementFactor;
+    vec2 texCoord = sampleHpcTexcoord(
+        wcs[0],
+        projection[0],
+        helioprojective,
+        hpcXY,
+        wcs[0].deltaT,
+        pv0,
+        enhancementFactor);
+
+    float diffObserverDistance = projection[1].observerDistance;
+    vec2 diffHpcXY = helioprojectiveToHpcXY(helioprojective, diffObserverDistance);
+    clipHpcGeometry(diffHpcXY);
+
+    float diffEnhancementFactor;
+    vec2 diffTexCoord = sampleHpcTexcoord(
+        wcs[1],
+        projection[1],
+        helioprojective,
+        diffHpcXY,
+        wcs[1].deltaT,
+        pv1,
+        diffEnhancementFactor);
+
+    outColor = vec4(texCoord, diffTexCoord);
 }
 `;
 }
@@ -333,8 +375,10 @@ function floatToHalf(value) {
 }
 
 function diagnosticFragment(job, commonSource) {
-  if (job.mode === "hpc")
-    return hpcDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarHpc.frag"), "utf8"));
+  if (job.mode === "hpc") {
+    const hpcSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarHpc.frag"), "utf8");
+    return job.diffSelfcheck ? hpcDiffSelfcheckDiagnostic(commonSource, hpcSource) : hpcDiagnostic(commonSource, hpcSource);
+  }
   if (job.mode === "ortho")
     return orthoDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8"));
   if (job.mode === "lati_zenithal")
@@ -382,9 +426,12 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   bindUniformBlocks(gl, program, job);
 
   setUniform(gl, program, "uPv", job.pv2);
+  setUniform(gl, program, "pv0", job.pv2);
+  setUniform(gl, program, "pv1", job.pv2);
   setUniform(gl, program, "uLatiGrid", job.latiGrid || [0, 0, 0]);
   setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
   setUniformInt(gl, program, "image", 0);
+  setUniformInt(gl, program, "diffImage", 1);
   let sourceTexture = null;
   if (job.sampleTexture) {
     sourceTexture = bindSyntheticSourceTexture(gl, job, errors);
@@ -412,6 +459,8 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   }
   if (sourceTexture != null) {
     gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, sourceTexture);
+    gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, sourceTexture);
     errors.rebindSource = gl.getError();
   }
