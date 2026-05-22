@@ -268,6 +268,18 @@ function bindSyntheticSourceTexture(gl, job, errors) {
   return texture;
 }
 
+function bindDummySourceTexture(gl) {
+  const texture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]));
+  return texture;
+}
+
 function floatToHalf(value) {
   if (value === 0)
     return 0;
@@ -320,28 +332,33 @@ void main(void) {
 `;
 }
 
-async function main() {
-  const job = await ipcRenderer.invoke("swiftshader-job");
+function prepareFullscreenQuad(gl) {
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  const vertexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1, -1,
+     1, -1,
+    -1,  1,
+    -1,  1,
+     1, -1,
+     1,  1,
+  ]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  return vao;
+}
+
+function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   const errors = {};
   const canvas = document.getElementById("canvas");
   canvas.width = job.width;
   canvas.height = job.height;
-  const gl = canvas.getContext("webgl2");
-  if (!gl) {
-    fail("WebGL2 unavailable");
-    return;
-  }
 
-  const debug = gl.getExtension("WEBGL_debug_renderer_info");
-  const renderer = debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
-  if (!gl.getExtension("EXT_color_buffer_float")) {
-    fail("EXT_color_buffer_float unavailable", { renderer });
-    return;
-  }
-
-  const commonSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarCommon.frag"), "utf8");
-  const program = createProgram(gl, vertexShader(), diagnosticFragment(job, commonSource));
+  const program = createProgram(gl, vertexSource, diagnosticFragment(job, commonSource));
   gl.useProgram(program);
+  gl.bindVertexArray(quadVao);
   bindUniformBlocks(gl, program);
 
   setUniform(gl, program, "uBoundsDeg", job.boundsDeg);
@@ -360,6 +377,9 @@ async function main() {
   let sourceTexture = null;
   if (job.sampleTexture) {
     sourceTexture = bindSyntheticSourceTexture(gl, job, errors);
+    errors.sourceTexture = gl.getError();
+  } else {
+    sourceTexture = bindDummySourceTexture(gl);
     errors.sourceTexture = gl.getError();
   }
 
@@ -385,20 +405,6 @@ async function main() {
     errors.rebindSource = gl.getError();
   }
 
-  const vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-  const vertexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,
-     1, -1,
-    -1,  1,
-    -1,  1,
-     1, -1,
-     1,  1,
-  ]), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(0);
-  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   gl.viewport(0, 0, job.width, job.height);
   gl.clearColor(0., 0., 0., 0.);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -410,8 +416,18 @@ async function main() {
   gl.readPixels(0, 0, job.width, job.height, gl.RGBA, gl.FLOAT, pixels);
   const readError = gl.getError();
   fs.writeFileSync(job.outputPath, Buffer.from(pixels.buffer));
-  ipcRenderer.send("swiftshader-result", {
+
+  gl.deleteProgram(program);
+  gl.deleteTexture(tex);
+  if (sourceTexture != null)
+    gl.deleteTexture(sourceTexture);
+  gl.deleteFramebuffer(framebuffer);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.bindTexture(gl.TEXTURE_2D, null);
+
+  return {
     ok: true,
+    name: job.name,
     renderer,
     version: gl.getParameter(gl.VERSION),
     clearError,
@@ -421,7 +437,35 @@ async function main() {
     outputPath: job.outputPath,
     width: job.width,
     height: job.height,
-  });
+  };
+}
+
+async function main() {
+  const payload = await ipcRenderer.invoke("swiftshader-job");
+  const jobs = payload.jobs || [payload];
+  const canvas = document.getElementById("canvas");
+  const gl = canvas.getContext("webgl2");
+  if (!gl) {
+    fail("WebGL2 unavailable");
+    return;
+  }
+
+  const debug = gl.getExtension("WEBGL_debug_renderer_info");
+  const renderer = debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+  if (!gl.getExtension("EXT_color_buffer_float")) {
+    fail("EXT_color_buffer_float unavailable", { renderer });
+    return;
+  }
+
+  const quadVao = prepareFullscreenQuad(gl);
+
+  const commonSource = fs.readFileSync(path.join(jobs[0].repoRoot, "resources/glsl/solarCommon.frag"), "utf8");
+  const vertexSource = vertexShader();
+  const results = [];
+  for (const job of jobs)
+    results.push(renderJob(gl, commonSource, vertexSource, renderer, quadVao, job));
+
+  ipcRenderer.send("swiftshader-result", payload.jobs ? { ok: true, results } : results[0]);
 }
 
 main().catch(error => fail(error.message, { stack: error.stack }));
