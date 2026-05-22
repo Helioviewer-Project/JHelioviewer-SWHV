@@ -2,10 +2,10 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.annotate.Annotateable;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 class InteractionAnnotate {
 
@@ -22,20 +22,20 @@ class InteractionAnnotate {
         if (!annotateable.isDraggable()) {
             finishAnnotateable();
         }
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public void mouseDragged(PointerEvent e, Viewport vp) {
         Annotateable pending = Annotations.pending();
         if (pending != null && pending.isDraggable()) {
             pending.mouseDragged(camera, vp, e.x(), e.y());
-            MovieDisplay.display();
+            DisplayFrame.display();
         }
     }
 
     private void finishAnnotateable() {
         Annotations.finishPending();
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public void mouseReleased() {
@@ -45,11 +45,11 @@ class InteractionAnnotate {
     public void keyPressed(KeyInputEvent e) {
         if (e.key() == KeyInputEvent.Key.BACKSPACE || e.key() == KeyInputEvent.Key.DELETE) {
             Annotations.removeActive();
-            MovieDisplay.display();
+            DisplayFrame.display();
         } else if (e.key() == KeyInputEvent.Key.N && Annotations.selectNext()) {
-            MovieDisplay.display();
+            DisplayFrame.display();
         } else if (e.key() == KeyInputEvent.Key.P && Annotations.selectPrevious()) {
-            MovieDisplay.display();
+            DisplayFrame.display();
         }
     }
 

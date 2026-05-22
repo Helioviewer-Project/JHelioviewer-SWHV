@@ -11,6 +11,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -26,7 +27,7 @@ public final class ImageLayers {
 
     private ImageLayers() {}
 
-    static boolean areEnabled() {
+    public static boolean areEnabled() {
         for (ImageLayer layer : Layers.getImageLayers()) {
             if (layer.isEnabled())
                 return true;
@@ -34,7 +35,7 @@ public final class ImageLayers {
         return false;
     }
 
-    static void decode(float factor) {
+    public static void decode(float factor) {
         Camera camera = Display.getCamera();
 
         Layers.forEachImageLayer(layer -> {
@@ -78,7 +79,7 @@ public final class ImageLayers {
             }
         }
         Display.reshapeAll();
-        MovieDisplay.render(1);
+        DisplayFrame.render(1);
     }
 
     @Nullable

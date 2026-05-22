@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -33,7 +34,6 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
 
@@ -173,7 +173,7 @@ public final class LayersPanel extends JPanel {
                 if (v.col == ENABLED_COL) {
                     layer.setEnabled(!layer.isEnabled());
                     model.updateCell(v.row, v.col);
-                    MovieDisplay.render(1);
+                    DisplayFrame.render(1);
                 } else if (v.col == TITLE_COL && layer instanceof ImageLayer il) {
                     Layers.setActiveImageLayer(il);
                     grid.repaint(); // multiple rows involved

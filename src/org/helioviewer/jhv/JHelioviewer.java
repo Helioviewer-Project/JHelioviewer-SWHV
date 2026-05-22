@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
 import javax.swing.JFrame;
 
 import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
@@ -17,7 +18,6 @@ import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.io.UpdateChecker;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.AnglePbuffer;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
@@ -108,7 +108,7 @@ public class JHelioviewer {
         HeadlessEDT.invokeLater(() -> {
             Log.info("Start headless mode");
             AnglePbuffer renderer = new AnglePbuffer();
-            MovieDisplay.setRenderRequestHandler(renderer::requestRender);
+            DisplayFrame.setRenderRequestHandler(renderer::requestRender);
 
             loadPlugins(false);
 

@@ -9,10 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLImage;
 
 import com.jidesoft.swing.JideButton;
@@ -31,7 +31,7 @@ public class DifferencePanel implements FilterDetails {
                 item.setSelected(true);
             item.addActionListener(e -> {
                 layer.getGLImage().setDifferenceMode(mode);
-                MovieDisplay.display();
+                DisplayFrame.display();
             });
             modeGroup.add(item);
             modePanel.add(item);

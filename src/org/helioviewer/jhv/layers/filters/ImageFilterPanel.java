@@ -9,11 +9,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 import com.jidesoft.swing.JideSplitButton;
 
@@ -37,7 +37,7 @@ public class ImageFilterPanel implements FilterDetails {
             item.addActionListener(e -> {
                 layer.getView().clearCache();
                 layer.getView().setFilter(type);
-                MovieDisplay.render(1);
+                DisplayFrame.render(1);
             });
             modeGroup.add(item);
             modePanel.add(item);
@@ -50,7 +50,7 @@ public class ImageFilterPanel implements FilterDetails {
             double value = slider.getValue() / 10.;
             layer.getGLImage().setEnhanced(value);
             label.setText(formatLabel(value));
-            MovieDisplay.display();
+            DisplayFrame.display();
         });
         JPanel enhancePanel = new JPanel(new BorderLayout());
         enhancePanel.add(slider, BorderLayout.LINE_START);

@@ -8,7 +8,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.Quat;
 
 public final class ViewActions {
@@ -18,17 +17,17 @@ public final class ViewActions {
     public static void zoomFit() {
         Display.resetViewportZoom();
         CameraHelper.zoomToFit(Display.getCamera(), DisplayFrame.getViewpoint());
-        MovieDisplay.render(1);
+        DisplayFrame.render(1);
     }
 
     public static void zoomIn() {
         zoomViewports(-Camera.ZOOM_MULTIPLIER_BUTTON);
-        MovieDisplay.render(1);
+        DisplayFrame.render(1);
     }
 
     public static void zoomOut() {
         zoomViewports(+Camera.ZOOM_MULTIPLIER_BUTTON);
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public static void zoomOneToOne() {
@@ -44,7 +43,7 @@ public final class ViewActions {
             double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
             camera.setFOV(fov, viewpoint);
         }
-        MovieDisplay.render(1);
+        DisplayFrame.render(1);
     }
 
     public static void resetView() {
@@ -54,7 +53,7 @@ public final class ViewActions {
 
     public static void resetViewAxis() {
         Display.getCamera().resetDragRotationAxis(DisplayFrame.getViewpointUpdate().dragAxis());
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public static void rotateView90(String axis) {
@@ -71,7 +70,7 @@ public final class ViewActions {
 
     private static void rotateView90(Quat rotation) {
         Display.getCamera().rotateDragRotation(rotation);
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     private static void zoomViewports(double wr) {

@@ -9,7 +9,6 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayFrame;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
 
@@ -44,7 +43,7 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
         if (load != null) {
             PositionLoad.remove(uv, load);
             load = null;
-            MovieDisplay.display();
+            DisplayFrame.display();
         }
     }
 

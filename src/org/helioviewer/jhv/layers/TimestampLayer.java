@@ -4,6 +4,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -132,7 +133,7 @@ public class TimestampLayer extends AbstractLayer {
 
     public void setScale(int _scale) {
         scale = _scale;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public boolean isExtra() {
@@ -141,7 +142,7 @@ public class TimestampLayer extends AbstractLayer {
 
     public void setExtra(boolean _extra) {
         extra = _extra;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public boolean isTop() {
@@ -150,7 +151,7 @@ public class TimestampLayer extends AbstractLayer {
 
     public void setTop(boolean _top) {
         top = _top;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
 }

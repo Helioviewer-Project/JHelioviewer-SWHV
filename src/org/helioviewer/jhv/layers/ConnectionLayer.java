@@ -8,6 +8,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.annotate.AnnotateCross;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -188,19 +189,19 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     @Override
     public void setConnectivity(Connectivity _connectivity) {
         connectivity = _connectivity;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     @Override
     public void setPositionMap(TimeMap<Position.Cartesian> _footpointMap) {
         footpointMap = _footpointMap;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     @Override
     public void setHCS(List<Vec3> _hcs) {
         hcs = _hcs;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     @Override
@@ -209,7 +210,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
 
         geometry.forEach(g -> geometryMap.put(g.time(), g));
         geometryMap.buildIndex();
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public void clear() {
@@ -218,7 +219,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         footpointMap = null;
         geometryMap.clear();
         lastTimestamp = null;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
 }

@@ -2,7 +2,7 @@ package org.helioviewer.jhv.view.uri;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.display.DisplayFrame;
 
 import org.json.JSONObject;
 
@@ -138,7 +138,7 @@ public final class FITSViewState {
 
     private static void refresh() {
         URIView.clearURICache();
-        MovieDisplay.render(1);
+        DisplayFrame.render(1);
     }
 
     static Data data() {

@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -24,7 +25,6 @@ import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
@@ -494,7 +494,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void newEventsReceived() {
         if (enabled) {
             invalidateActiveEvents();
-            MovieDisplay.display();
+            DisplayFrame.display();
         }
     }
 
@@ -512,7 +512,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     void setIcons(boolean _icons) {
         icons = _icons;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
 }

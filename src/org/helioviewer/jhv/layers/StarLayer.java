@@ -45,7 +45,7 @@ public final class StarLayer extends AbstractLayer implements ViewpointModel.Lis
     public void setStars(Position viewpoint, BufVertex pointsBuf) {
         pending.remove(viewpoint);
         cache.put(viewpoint, pointsBuf);
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     @Override

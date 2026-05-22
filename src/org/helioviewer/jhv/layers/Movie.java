@@ -178,7 +178,7 @@ public class Movie {
     public static void pause() {
         movieTimer.stop();
         notifyStatusChanged();
-        MovieDisplay.render(1); /* ! force update for on the fly resolution change */
+        DisplayFrame.render(1); /* ! force update for on the fly resolution change */
     }
 
     public static void toggle() {
@@ -246,7 +246,7 @@ public class Movie {
         DisplayFrame.timeChanged(dateTime);
 
         Layers.setImageLayersNearestFrame(dateTime);
-        MovieDisplay.render(1);
+        DisplayFrame.render(1);
 
         timeListeners.forEach(listener -> listener.timeChanged(lastTimestamp.milli));
 

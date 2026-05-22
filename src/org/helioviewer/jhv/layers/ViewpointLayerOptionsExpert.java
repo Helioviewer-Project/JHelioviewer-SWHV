@@ -112,7 +112,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setSpiralSpeed(int _spiralSpeed) {
         spiralSpeed = _spiralSpeed;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public boolean isSpiral() {
@@ -121,7 +121,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setSpiral(boolean _spiral) {
         spiral = _spiral;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     boolean isDownloading() {

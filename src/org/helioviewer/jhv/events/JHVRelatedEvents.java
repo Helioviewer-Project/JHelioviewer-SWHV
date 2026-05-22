@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.layers.MovieDisplay;
+import org.helioviewer.jhv.display.DisplayFrame;
 
 public class JHVRelatedEvents {
 
@@ -98,7 +98,7 @@ public class JHVRelatedEvents {
 
     private static void fireHighlightChanged() {
         listeners.forEach(JHVEventListener.Highlight::highlightChanged);
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public JHVEvent getClosestTo(long timestamp) {

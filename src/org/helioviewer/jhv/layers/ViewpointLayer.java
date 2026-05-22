@@ -156,7 +156,7 @@ public class ViewpointLayer extends AbstractLayer {
     private void clearHoverTextIfNeeded() {
         if (!hoverText.isEmpty()) {
             hoverText.clear();
-            MovieDisplay.display();
+            DisplayFrame.display();
         }
     }
 
@@ -217,7 +217,7 @@ public class ViewpointLayer extends AbstractLayer {
         clearHoverTextIfNeeded();
         if (name != null && minDist2 < hoverThreshold2) {
             hoverText.add(name);
-            MovieDisplay.display();
+            DisplayFrame.display();
         }
     }
 

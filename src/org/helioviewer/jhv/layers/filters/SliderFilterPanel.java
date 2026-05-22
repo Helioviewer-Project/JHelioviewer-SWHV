@@ -6,9 +6,9 @@ import java.util.function.IntFunction;
 
 import javax.swing.JLabel;
 
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.opengl.GLImage;
 
 public class SliderFilterPanel {
@@ -94,7 +94,7 @@ public class SliderFilterPanel {
                 int value = slider.getValue();
                 onValueChange.accept(value);
                 label.setText(formatter.apply(value));
-                MovieDisplay.display();
+                DisplayFrame.display();
             });
         }
 
