@@ -11,7 +11,6 @@ import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 import org.json.JSONObject;
 
@@ -343,7 +342,7 @@ public final class ViewState {
 
         showCorona = newShowCorona;
         Display.setShowCorona(newShowCorona);
-        MovieDisplay.display();
+        DisplayFrame.display();
         notifyModeListeners();
     }
 
@@ -357,7 +356,7 @@ public final class ViewState {
 
         differentialRotation = newDifferentialRotation;
         ImageLayers.setDiffRotationMode(newDifferentialRotation);
-        MovieDisplay.display();
+        DisplayFrame.display();
         notifyModeListeners();
     }
 

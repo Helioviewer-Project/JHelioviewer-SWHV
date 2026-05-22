@@ -8,6 +8,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -261,7 +262,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setShowAxis(boolean _showAxis) {
         showAxis = _showAxis;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public boolean isShowLabels() {
@@ -270,7 +271,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setShowLabels(boolean _showLabels) {
         showLabels = _showLabels;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public boolean isShowRadial() {
@@ -279,7 +280,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setShowRadial(boolean _showRadial) {
         showRadial = _showRadial;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public double getLonStep() {
@@ -290,7 +291,7 @@ public final class GridLayer extends AbstractLayer {
         lonStep = _lonStep;
         lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
         gridNeedsInit = true;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public double getLatStep() {
@@ -301,13 +302,13 @@ public final class GridLayer extends AbstractLayer {
         latStep = _latStep;
         latLabels = GridLabel.makeLatLabels(latStep);
         gridNeedsInit = true;
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     public void setGridType(GridType gridType) {
         Display.setGridType(gridType);
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
 }

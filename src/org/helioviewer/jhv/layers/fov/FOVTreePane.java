@@ -17,10 +17,10 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 @SuppressWarnings("serial")
 public final class FOVTreePane extends JScrollPane {
@@ -101,7 +101,7 @@ public final class FOVTreePane extends JScrollPane {
         JCheckBox checkBox = new JCheckBox(instrument.toString(), instrument.isEnabled());
         checkBox.addActionListener(e -> {
             instrument.setEnabled(checkBox.isSelected());
-            MovieDisplay.display();
+            DisplayFrame.display();
         });
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);

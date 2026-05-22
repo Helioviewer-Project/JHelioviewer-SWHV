@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 class Zoom {
 
@@ -31,9 +31,9 @@ class Zoom {
                 viewport.zoom *= factor;
         }
         if (velocity < 0)
-            MovieDisplay.render(1);
+            DisplayFrame.render(1);
         else
-            MovieDisplay.display();
+            DisplayFrame.display();
     }
 
     // Returns true when velocity is reset and no zoom should be applied.

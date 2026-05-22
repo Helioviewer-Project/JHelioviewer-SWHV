@@ -9,11 +9,11 @@ import javax.swing.JMenuBar;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.LogDialog;
 import org.helioviewer.jhv.gui.dialogs.SettingsDialog;
-import org.helioviewer.jhv.layers.MovieDisplay;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.view.uri.FITSSettings;
 
@@ -70,7 +70,7 @@ public final class MenuBar extends JMenuBar {
         JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
         white.addItemListener(e -> {
             Display.whiteBackground = white.getState();
-            MovieDisplay.display();
+            DisplayFrame.display();
         });
         viewMenu.add(white);
 

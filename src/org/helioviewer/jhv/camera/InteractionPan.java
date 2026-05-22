@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.PointerEvent;
-import org.helioviewer.jhv.layers.MovieDisplay;
 
 class InteractionPan implements Interaction.Type {
 
@@ -34,7 +34,7 @@ class InteractionPan implements Interaction.Type {
 
         double m = 1 / CameraHelper.getImagePixelFactor(camera, vp);
         camera.setTranslation(camera.getTranslationX() + x * m, camera.getTranslationY() - y * m);
-        MovieDisplay.display();
+        DisplayFrame.display();
     }
 
     @Override
