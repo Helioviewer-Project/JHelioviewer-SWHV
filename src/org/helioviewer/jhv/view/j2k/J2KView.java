@@ -326,6 +326,7 @@ public class J2KView extends BaseView {
     }
 
     private void sendDataToHandler(J2KParams.Decode decodeParams, ImageBuffer imageBuffer) {
+        imageBuffer.protectFromExplicitFree();
         int frame = decodeParams.frame();
         MetaData m = metaData[frame];
         J2KParams.SubImage roi = decodeParams.subImage();
@@ -333,8 +334,10 @@ public class J2KView extends BaseView {
         Region r = m.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
 
         ImageData data = new ImageData(imageBuffer, m, r);
-        if (dataHandler != null)
-            dataHandler.handleData(data);
+        EventQueue.invokeLater(() -> {
+            if (dataHandler != null)
+                dataHandler.handleData(data);
+        });
     }
 
     @Nullable
