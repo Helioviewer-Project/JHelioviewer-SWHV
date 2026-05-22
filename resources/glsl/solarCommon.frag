@@ -26,8 +26,8 @@ struct WCS {
     vec4 rect;
     vec4 crota;
     vec2 crval;
+    float zpnUpperEta;
     float deltaT; // not strictly WCS
-    float padding;
 };
 
 layout(std140) uniform WCSBlock {
@@ -320,31 +320,28 @@ vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
         radial * nativeY / (nativeRadius * cos(gamma)));
 }
 
-// Six-term ZPN forward projection on the primary monotone branch.
-void zpnRadialAndDerivative(const float eta, const float[6] PV, out float radial, out float derivative) {
-    radial = PV[5];
-    derivative = 5. * PV[5];
-    for (int i = 4; i >= 1; --i) {
+float zpnRadial(const float eta, const float[6] PV) {
+    float radial = PV[5];
+    for (int i = 4; i >= 0; --i)
         radial = radial * eta + PV[i];
-        derivative = derivative * eta + float(i) * PV[i];
-    }
-    radial = radial * eta + PV[0];
+    return radial;
 }
 
-vec2 projectZpnToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
+vec2 projectZpnToWcsPlane(const vec2 helioprojective, const WCS wcs, const float planeUnitsPerRad, const float[6] PV) {
     float nativeX;
     float nativeY;
     float cosNativeDistance;
-    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
+    nativeZenithalCoordinates(helioprojective, wcs.crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
     float nativeRadius = length(vec2(nativeX, nativeY));
     if (nativeRadius == 0.)
         return vec2(0.);
 
     float nativeDistance = acos(clamp(cosNativeDistance, -1., 1.));
-    float radial;
-    float derivative;
-    zpnRadialAndDerivative(nativeDistance, PV, radial, derivative);
-    if (radial < 0. || derivative <= 0.)
+    if (nativeDistance > wcs.zpnUpperEta)
+        discard;
+
+    float radial = zpnRadial(nativeDistance, PV);
+    if (radial < 0.)
         discard;
 
     return planeUnitsPerRad * vec2(
@@ -387,7 +384,7 @@ vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs,
     if (projection.projectionCode == WCS_PROJECTION_AZP)
         return projectAzpToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
     if (projection.projectionCode == WCS_PROJECTION_ZPN)
-        return projectZpnToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
+        return projectZpnToWcsPlane(helioprojective, wcs, projection.planeUnitsPerRadian, PV);
 
     return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
 }

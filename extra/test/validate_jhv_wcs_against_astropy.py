@@ -236,9 +236,9 @@ def build_jhv_meta(header) -> JHVMeta:
         )
         crota_rad = math.radians(float(crota_deg))
 
-    pv2 = [float(header.get(f"PV2_{i}", 0.0)) for i in range(6)]
+    pv2 = [float(np.float32(header.get(f"PV2_{i}", 0.0))) for i in range(6)]
     if projection == "CEA":
-        pv2[1] = float(header.get("PV2_1", 1.0))
+        pv2[1] = float(np.float32(header.get("PV2_1", 1.0)))
 
     return JHVMeta(
         pixel_width=pixel_width,
@@ -420,18 +420,16 @@ def projectArcToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) ->
     )
 
 
-def zpnRadialAndDerivative(eta_rad: float, meta: JHVMeta) -> tuple[float, float]:
-    return zpn_radial(meta, eta_rad), zpn_radial_derivative(meta, eta_rad)
-
-
 def projectZpnToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     native_x, native_y, cos_native_distance = nativeZenithalCoordinates(helioprojective, meta)
     native_radius = math.hypot(native_x, native_y)
     if native_radius == 0.0:
         return (0.0, 0.0)
     eta = math.acos(max(-1.0, min(1.0, cos_native_distance)))
-    radial, derivative = zpnRadialAndDerivative(eta, meta)
-    if radial < 0.0 or derivative <= 0.0:
+    if eta > zpn_primary_branch_upper_eta(meta):
+        raise ValueError("Point is outside the primary forward ZPN branch")
+    radial = zpn_radial(meta, eta)
+    if radial < 0.0:
         raise ValueError("Point is outside the primary forward ZPN branch")
     return (
         meta.plane_units_per_rad * radial * native_x / native_radius,
@@ -448,20 +446,16 @@ def azp_world_to_plane_internal(world_rad: tuple[float, float], meta: JHVMeta) -
 
 
 def zpn_radial(meta: JHVMeta, eta_rad: float) -> float:
-    radial = 0.0
-    power = 1.0
-    for coefficient in meta.pv2:
-        radial += coefficient * power
-        power *= eta_rad
+    radial = meta.pv2[-1]
+    for coefficient in reversed(meta.pv2[:-1]):
+        radial = radial * eta_rad + coefficient
     return radial
 
 
 def zpn_radial_derivative(meta: JHVMeta, eta_rad: float) -> float:
-    derivative = 0.0
-    power = 1.0
-    for index, coefficient in enumerate(meta.pv2[1:], start=1):
-        derivative += index * coefficient * power
-        power *= eta_rad
+    derivative = (len(meta.pv2) - 1) * meta.pv2[-1]
+    for index in range(len(meta.pv2) - 2, 0, -1):
+        derivative = derivative * eta_rad + index * meta.pv2[index]
     return derivative
 
 
@@ -732,22 +726,16 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
         b = cos_lat0 * sin_lat - sin_lat0 * cos_lat * cos_delta_lon
         c = np.hypot(a, b)
         eta = np.arccos(np.clip(sin_lat0 * sin_lat + cos_lat0 * cos_lat * cos_delta_lon, -1.0, 1.0))
-        radial = np.zeros_like(eta)
-        power = np.ones_like(eta)
-        for coefficient in meta.pv2:
-            radial += coefficient * power
-            power *= eta
-        derivative = np.zeros_like(eta)
-        power = np.ones_like(eta)
-        for index, coefficient in enumerate(meta.pv2[1:], start=1):
-            derivative += index * coefficient * power
-            power *= eta
+        radial = np.full_like(eta, meta.pv2[-1])
+        for coefficient in reversed(meta.pv2[:-1]):
+            radial = radial * eta + coefficient
         x = meta.plane_units_per_rad * radial * a / c
         y = meta.plane_units_per_rad * radial * b / c
         x = np.where(c == 0.0, 0.0, x)
         y = np.where(c == 0.0, 0.0, y)
-        x = np.where((radial < 0.0) | (derivative <= 0.0), np.nan, x)
-        y = np.where((radial < 0.0) | (derivative <= 0.0), np.nan, y)
+        invalid = (radial < 0.0) | (eta > zpn_primary_branch_upper_eta(meta))
+        x = np.where(invalid, np.nan, x)
+        y = np.where(invalid, np.nan, y)
         return np.column_stack((x, y))
 
     raise ValueError(f"Unsupported projection {meta.projection!r}")
