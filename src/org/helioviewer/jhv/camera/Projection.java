@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 
 public final class Projection {
@@ -11,14 +10,14 @@ public final class Projection {
 
     private Projection() {}
 
-    public static void ortho2D(Viewport vp, double width, double tx, double ty) {
-        Transform.setup((float) (width * vp.aspect), (float) width, -1, 1, (float) tx, (float) ty);
+    public static void ortho2D(double aspect, double width, double tx, double ty) {
+        Transform.setup((float) (width * aspect), (float) width, -1, 1, (float) tx, (float) ty);
         Transform.cacheMVP();
     }
 
-    public static void ortho(Viewport vp, double width, double tx, double ty, Quat rotation) {
+    public static void ortho(double aspect, double width, double tx, double ty, Quat rotation) {
         float clip = width < 32 ? CLIP_NARROW : CLIP_WIDE;
-        Transform.setup((float) (width * vp.aspect), (float) width, -clip, clip, (float) tx, (float) ty);
+        Transform.setup((float) (width * aspect), (float) width, -clip, clip, (float) tx, (float) ty);
         Transform.rotateView(rotation);
         Transform.cacheMVP();
     }

@@ -146,7 +146,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         int mouseOverY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        double displayWidth = GLRenderer.getRenderView().cameraWidth(vp);
+        double displayWidth = GLRenderer.getRenderView().cameraWidth(vp.zoom);
         ProjectionMode mode = Display.mode;
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);

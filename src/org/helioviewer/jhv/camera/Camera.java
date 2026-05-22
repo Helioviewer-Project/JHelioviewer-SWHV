@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -79,8 +78,8 @@ public class Camera {
         updateWidth(viewpoint);
     }
 
-    public double getCameraWidth(Viewport vp) {
-        return cameraWidth * vp.zoom;
+    public double getCameraWidth(double zoom) {
+        return cameraWidth * zoom;
     }
 
     public static double zoomFactor(double wr) {

@@ -23,7 +23,7 @@ public class CameraHelper {
     }
 
     private static double computeUpX(Camera camera, Viewport vp, double screenX) {
-        return computeUpX(vp, camera.getCameraWidth(vp), camera.getTranslationX(), screenX);
+        return computeUpX(vp, camera.getCameraWidth(vp.zoom), camera.getTranslationX(), screenX);
     }
 
     public static double computeUpX(Viewport vp, double width, double tx, double screenX) {
@@ -31,7 +31,7 @@ public class CameraHelper {
     }
 
     private static double computeUpY(Camera camera, Viewport vp, double screenY) {
-        return computeUpY(vp, camera.getCameraWidth(vp), camera.getTranslationY(), screenY);
+        return computeUpY(vp, camera.getCameraWidth(vp.zoom), camera.getTranslationY(), screenY);
     }
 
     public static double computeUpY(Viewport vp, double width, double ty, double screenY) {
@@ -51,13 +51,13 @@ public class CameraHelper {
     }
 
     public static double getImagePixelFactor(Camera camera, Viewport vp) {
-        return vp.height / camera.getCameraWidth(vp);
+        return vp.height / camera.getCameraWidth(vp.zoom);
     }
 
     static double selectTrackballRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
         double radius2 = screenPlaneRadius2(camera, vp, screenX, screenY);
         if (radius2 > 0.5 * Sun.Radius2) {
-            double r = 0.5 * camera.getCameraWidth(vp);
+            double r = 0.5 * camera.getCameraWidth(vp.zoom);
             return r * r;
         }
         return Sun.Radius2;
@@ -70,7 +70,7 @@ public class CameraHelper {
     }
 
     static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
-        double width = camera.getCameraWidth(vp);
+        double width = camera.getCameraWidth(vp.zoom);
         double tx = camera.getTranslationX();
         double ty = camera.getTranslationY();
 

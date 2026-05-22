@@ -26,7 +26,7 @@ public abstract class MapContext {
     }
 
     public double cameraWidth(Viewport vp) {
-        return renderView.cameraWidth(vp);
+        return renderView.cameraWidth(vp.zoom);
     }
 
     public ProjectionMode mode() {

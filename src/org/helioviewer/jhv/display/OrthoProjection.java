@@ -16,7 +16,7 @@ final class OrthoProjection {
     private OrthoProjection() {}
 
     static Vec3 mouseToSurface(Camera camera, RenderView renderView, Viewport vp, int x, int y) {
-        return CameraHelper.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp), x, y, renderView.viewpoint().toQuat());
+        return CameraHelper.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, renderView.viewpoint().toQuat());
     }
 
     static void emitMapVertex(Vec3 vertex, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
@@ -37,7 +37,7 @@ final class OrthoProjection {
                 ? Quat.ZERO
                 : Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
 
-        Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp), x, y, rotation);
+        Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, rotation);
         if (p == null)
             return Vec2.NAN;
 
