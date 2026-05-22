@@ -4,9 +4,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.annotate.AnnotateCross;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -137,7 +137,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         updateTimestamp(time);
 
         SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.lowerValue(time), footpointMap.higherValue(time));
-        AnnotateCross.drawCross(ctx, vp, scale, point.longitude(), point.latitude(), footpointColor, footpointBuf);
+        Annotations.drawCross(ctx, vp, scale, point.longitude(), point.latitude(), footpointColor, footpointBuf);
         footpointLine.setVertex(footpointBuf);
         footpointLine.renderLine(vp, LINEWIDTH);
     }

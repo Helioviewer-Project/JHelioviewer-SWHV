@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotate;
+package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.Log;
 
@@ -44,7 +44,7 @@ public enum AnnotationMode {
 
     public abstract Annotateable generate(JSONObject jo);
 
-    public static Annotateable generate(String type, JSONObject jo) {
+    static Annotateable generate(String type, JSONObject jo) {
         try {
             return valueOf(type).generate(jo);
         } catch (IllegalArgumentException e) {

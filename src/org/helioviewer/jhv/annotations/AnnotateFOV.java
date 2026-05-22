@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotate;
+package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
@@ -11,15 +11,15 @@ import org.helioviewer.jhv.opengl.GLRenderer;
 
 import org.json.JSONObject;
 
-public class AnnotateFOV extends AbstractAnnotateable {
+final class AnnotateFOV extends AbstractAnnotateable {
 
     private final FOVShape fov = new FOVShape();
 
-    public AnnotateFOV(JSONObject jo) {
+    AnnotateFOV(JSONObject jo) {
         super(jo);
     }
 
-    public void zoom(Camera camera, Viewport vp) {
+    void zoom(Camera camera, Viewport vp) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

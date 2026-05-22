@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotate;
+package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -10,11 +10,11 @@ import org.helioviewer.jhv.opengl.FOVShape;
 
 import org.json.JSONObject;
 
-public class AnnotateLine extends AbstractAnnotateable {
+final class AnnotateLine extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 32;
 
-    public AnnotateLine(JSONObject jo) {
+    AnnotateLine(JSONObject jo) {
         super(jo);
     }
 

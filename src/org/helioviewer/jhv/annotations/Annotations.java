@@ -1,12 +1,10 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.annotations;
 
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.camera.annotate.Annotateable;
-import org.helioviewer.jhv.camera.annotate.AnnotateFOV;
-import org.helioviewer.jhv.camera.annotate.AnnotationMode;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -37,20 +35,20 @@ public final class Annotations {
 
     private Annotations() {}
 
-    static void start(Annotateable annotateable) {
+    public static void start(Annotateable annotateable) {
         pending = annotateable;
     }
 
     @Nullable
-    static Annotateable pending() {
+    public static Annotateable pending() {
         return pending;
     }
 
-    static boolean hasPending() {
+    public static boolean hasPending() {
         return pending != null;
     }
 
-    static void finishPending() {
+    public static void finishPending() {
         if (pending != null && pending.beingDragged()) {
             pending.mouseReleased();
             annotations.add(pending);
@@ -59,14 +57,14 @@ public final class Annotations {
         pending = null;
     }
 
-    static void removeActive() {
+    public static void removeActive() {
         if (activeIndex >= 0 && activeIndex < annotations.size()) {
             annotations.remove(activeIndex);
             activeIndex = annotations.size() - 1;
         }
     }
 
-    static boolean selectNext() {
+    public static boolean selectNext() {
         if (activeIndex < 0 || annotations.isEmpty())
             return false;
 
@@ -75,7 +73,7 @@ public final class Annotations {
         return true;
     }
 
-    static boolean selectPrevious() {
+    public static boolean selectPrevious() {
         if (activeIndex < 0 || annotations.isEmpty())
             return false;
 
@@ -114,6 +112,10 @@ public final class Annotations {
         center.renderPoints(pixFactor);
 
         Transform.popView();
+    }
+
+    public static void drawCross(MapContext ctx, Viewport vp, ProjectionScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+        AnnotateCross.drawCross(ctx, vp, scale, longitude, latitude, color, vexBuf);
     }
 
     @Nullable

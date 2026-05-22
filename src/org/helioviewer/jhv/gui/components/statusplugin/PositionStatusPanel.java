@@ -2,10 +2,10 @@ package org.helioviewer.jhv.gui.components.statusplugin;
 
 import javax.annotation.Nonnull;
 
+import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;

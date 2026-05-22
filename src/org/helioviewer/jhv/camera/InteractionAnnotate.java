@@ -1,7 +1,8 @@
 package org.helioviewer.jhv.camera;
 
+import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.annotations.Annotateable;
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.camera.annotate.Annotateable;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;

@@ -18,9 +18,9 @@ import javax.swing.JToolBar;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.annotations.AnnotationMode;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.camera.Interaction;
-import org.helioviewer.jhv.camera.annotate.AnnotationMode;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;

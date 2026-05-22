@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotate;
+package org.helioviewer.jhv.annotations;
 
 import javax.annotation.Nullable;
 
@@ -13,13 +13,13 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 import org.json.JSONObject;
 
-public class AnnotateCircle extends AbstractAnnotateable {
+final class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
 
     private String diameterStr = null;
 
-    public AnnotateCircle(JSONObject jo) {
+    AnnotateCircle(JSONObject jo) {
         super(jo);
     }
 
