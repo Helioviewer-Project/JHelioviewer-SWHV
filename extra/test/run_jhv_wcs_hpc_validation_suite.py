@@ -243,6 +243,11 @@ SWIFTSHADER_RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--all-modes", "--sample-texture"),
         "swiftshader",
     ),
+    ValidationRun(
+        "swiftshader_hpc_projection_cases",
+        ("--hpc-projection-cases", "--render-size", "256"),
+        "swiftshader",
+    ),
 )
 
 
