@@ -128,15 +128,26 @@ public final class ViewportProjection {
     @Nullable
     public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double width, double x, double y) {
         Quat dragRotation = camera.getDragRotation();
-        Vec3 hitPoint = intersectSphere(vp, width, camera.getTranslationX(), camera.getTranslationY(), x, y);
-        if (hitPoint != null) {
+        double tx = camera.getTranslationX();
+        double ty = camera.getTranslationY();
+        double upX = computeUpX(vp, width, tx, x);
+        double upY = computeUpY(vp, width, ty, y);
+        double radius2 = upX * upX + upY * upY;
+
+        if (radius2 <= Sun.Radius2) {
+            Vec3 hitPoint = new Vec3(upX, upY, Math.sqrt(Sun.Radius2 - radius2));
             Vec3 currentViewHitPoint = dragRotation.rotateInverseVector(hitPoint);
             if (currentViewHitPoint.z > 0.)
                 return currentViewHitPoint;
         }
 
-        hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), x, y, dragRotation.rotateVector(Vec3.ZAxis));
-        return hitPoint == null ? null : dragRotation.rotateInverseVector(hitPoint);
+        Vec3 planeNormal = dragRotation.rotateVector(Vec3.ZAxis);
+        double denom = planeNormal.z;
+        if (Math.abs(denom) < PLANE_Z_EPS)
+            return null;
+
+        double zvalue = -(planeNormal.x * upX + planeNormal.y * upY) / denom;
+        return dragRotation.rotateInverseVector(new Vec3(upX, upY, zvalue));
     }
 
 }
