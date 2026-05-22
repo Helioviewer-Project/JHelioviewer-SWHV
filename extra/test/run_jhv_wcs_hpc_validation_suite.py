@@ -234,18 +234,23 @@ RUNS: tuple[ValidationRun, ...] = (
 
 ELECTRON_RUNS: tuple[ValidationRun, ...] = (
     ValidationRun(
-        "electron_swiftshader_all_modes",
-        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--all-modes"),
+        "electron_default_all_modes",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--all-modes", "--backend", "default"),
         "electron",
     ),
     ValidationRun(
-        "electron_swiftshader_all_modes_sample_texture",
-        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--all-modes", "--sample-texture"),
+        "electron_default_all_modes_sample_texture",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--all-modes", "--sample-texture", "--backend", "default"),
         "electron",
     ),
     ValidationRun(
-        "electron_swiftshader_hpc_projection_cases",
-        ("--hpc-projection-cases", "--render-size", "256"),
+        "electron_default_hpc_projection_cases",
+        ("--hpc-projection-cases", "--render-size", "256", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_hpc_projection_cases_sample_texture",
+        ("--hpc-projection-cases", "--render-size", "128", "--sample-texture", "--backend", "default"),
         "electron",
     ),
 )
@@ -287,7 +292,7 @@ def parse_args() -> argparse.Namespace:
 
 def available_runs(include_electron: bool, only: list[str] | None) -> list[ValidationRun]:
     runs = list(RUNS)
-    if include_electron or (only and any(name.startswith("electron_swiftshader_") for name in only)):
+    if include_electron or (only and any(name.startswith("electron_") for name in only)):
         runs.extend(ELECTRON_RUNS)
     return runs
 
