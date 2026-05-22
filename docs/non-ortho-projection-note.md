@@ -53,6 +53,9 @@ This note documents the convention used by the non-orthographic display modes (`
     observer ray with the unit sphere for on-disk differential rotation, and
     otherwise samples the source-image WCS directly from the same
     helioprojective angles
+  - Java and GLSL compute that observer ray with the direct sign-preserving
+    trig form, equivalent to the old normalized `tan(Tx), tan(Ty) / cos(Tx), -1`
+    vector but without the tangent/divide/normalize path
   - Java overlay emission clips to the visible hemisphere and does not wrap
     horizontally
 - `Latitudinal` uses `x = longitude`, `y = latitude`.
