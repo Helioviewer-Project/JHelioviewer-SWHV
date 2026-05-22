@@ -279,9 +279,10 @@ function bindSyntheticSourceTexture(gl, job, errors) {
   const width = job.textureWidth;
   const height = job.textureHeight;
   const data = new Uint16Array(width * height);
+  const scale = 1 / (width + 2 * height);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++)
-      data[y * width + x] = floatToHalf(x + 2 * y);
+      data[y * width + x] = floatToHalf((x + 2 * y) * scale);
   }
 
   const texture = gl.createTexture();

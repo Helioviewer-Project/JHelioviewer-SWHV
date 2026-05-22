@@ -2,10 +2,13 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const fs = require("fs");
 const path = require("path");
 
-app.commandLine.appendSwitch("use-gl", "angle");
-app.commandLine.appendSwitch("use-angle", "swiftshader");
-app.commandLine.appendSwitch("enable-unsafe-swiftshader");
-app.commandLine.appendSwitch("disable-gpu-sandbox");
+const backend = process.env.JHV_ELECTRON_GL_BACKEND || "swiftshader";
+if (backend === "swiftshader") {
+  app.commandLine.appendSwitch("use-gl", "angle");
+  app.commandLine.appendSwitch("use-angle", "swiftshader");
+  app.commandLine.appendSwitch("enable-unsafe-swiftshader");
+  app.commandLine.appendSwitch("disable-gpu-sandbox");
+}
 
 const jobPath = process.argv[process.argv.length - 1];
 
