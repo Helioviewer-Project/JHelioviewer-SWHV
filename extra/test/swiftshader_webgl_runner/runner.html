@@ -80,6 +80,12 @@ function setUniform(gl, program, name, value) {
   }
 }
 
+function setUniformInt(gl, program, name, value) {
+  const loc = gl.getUniformLocation(program, name);
+  if (loc != null)
+    gl.uniform1i(loc, value);
+}
+
 function bindUniformBlock(gl, program, name, binding, data) {
   const index = gl.getUniformBlockIndex(program, name);
   if (index === gl.INVALID_INDEX)
@@ -129,6 +135,14 @@ uniform float uObserverDistance;
 uniform float uPv[6];
 uniform vec3 uLatiGrid;
 uniform float uPolarLog;
+uniform float uSampleTexture;
+
+void diagnosticOutput(const vec2 texCoord, const float aux) {
+    if (uSampleTexture != 0.)
+        outColor = vec4(texCoord, texture(image, texCoord).r, 1.);
+    else
+        outColor = vec4(texCoord, aux, 1.);
+}
 
 WCS diagnosticWcs(void) {
     WCS localWcs;
@@ -175,7 +189,7 @@ void main(void) {
         0.,
         uPv,
         enhancementFactor);
-    outColor = vec4(texCoord, enhancementFactor, 1.);
+    diagnosticOutput(texCoord, enhancementFactor);
 }
 `;
 }
@@ -196,7 +210,7 @@ void main(void) {
     vec3 world = rotateOnDiskPoint(diagnosticWcs(), hitPoint);
     clipOrthoGeometry(world);
     vec2 texCoord = sampleOrthoTexcoord(world, diagnosticWcs(), diagnosticProjection(), uPv);
-    outColor = vec4(texCoord, world.z, 1.);
+    diagnosticOutput(texCoord, world.z);
 }
 `;
 }
@@ -209,7 +223,7 @@ ${commonDiagnosticUniforms()}
 
 void main(void) {
     vec2 texCoord = sampleLatiZenithalTexcoord(vScrpos, diagnosticWcs(), uLatiGrid);
-    outColor = vec4(texCoord, 1., 1.);
+    diagnosticOutput(texCoord, 1.);
 }
 `;
 }
@@ -223,9 +237,53 @@ ${commonDiagnosticUniforms()}
 void main(void) {
     float radialCoordinate = ${radialExpression};
     vec2 texCoord = ${functionName}(uCrval, uCrota, uRect, vScrpos, radialCoordinate);
-    outColor = vec4(texCoord, radialCoordinate, 1.);
+    diagnosticOutput(texCoord, radialCoordinate);
 }
 `;
+}
+
+function bindSyntheticSourceTexture(gl, job, errors) {
+  const width = job.textureWidth;
+  const height = job.textureHeight;
+  const data = new Uint16Array(width * height);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++)
+      data[y * width + x] = floatToHalf(x + 2 * y);
+  }
+
+  const texture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  errors.sourceBind = gl.getError();
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  errors.sourceMinFilter = gl.getError();
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  errors.sourceMagFilter = gl.getError();
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  errors.sourceWrapS = gl.getError();
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  errors.sourceWrapT = gl.getError();
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, width, height, 0, gl.RED, gl.HALF_FLOAT, data);
+  errors.sourceImage = gl.getError();
+  return texture;
+}
+
+function floatToHalf(value) {
+  if (value === 0)
+    return 0;
+
+  const sign = value < 0 ? 0x8000 : 0;
+  const absValue = Math.abs(value);
+  let exponent = Math.floor(Math.log2(absValue));
+  let mantissa = absValue / Math.pow(2, exponent) - 1;
+  exponent += 15;
+
+  if (exponent <= 0)
+    return sign;
+  if (exponent >= 31)
+    return sign | 0x7c00;
+
+  return sign | (exponent << 10) | Math.round(mantissa * 1024);
 }
 
 function diagnosticFragment(job, commonSource) {
@@ -264,6 +322,7 @@ void main(void) {
 
 async function main() {
   const job = await ipcRenderer.invoke("swiftshader-job");
+  const errors = {};
   const canvas = document.getElementById("canvas");
   canvas.width = job.width;
   canvas.height = job.height;
@@ -296,6 +355,13 @@ async function main() {
   setUniform(gl, program, "uPv", job.pv2);
   setUniform(gl, program, "uLatiGrid", job.latiGrid || [0, 0, 0]);
   setUniform(gl, program, "uPolarLog", job.polarLog || 0);
+  setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
+  setUniformInt(gl, program, "image", 0);
+  let sourceTexture = null;
+  if (job.sampleTexture) {
+    sourceTexture = bindSyntheticSourceTexture(gl, job, errors);
+    errors.sourceTexture = gl.getError();
+  }
 
   const tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -304,6 +370,7 @@ async function main() {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, job.width, job.height, 0, gl.RGBA, gl.FLOAT, null);
+  errors.outputTexture = gl.getError();
 
   const framebuffer = gl.createFramebuffer();
   gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
@@ -311,6 +378,11 @@ async function main() {
   if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
     fail("Framebuffer incomplete", { renderer });
     return;
+  }
+  if (sourceTexture != null) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, sourceTexture);
+    errors.rebindSource = gl.getError();
   }
 
   const vao = gl.createVertexArray();
@@ -345,6 +417,7 @@ async function main() {
     clearError,
     drawError,
     readError,
+    errors,
     outputPath: job.outputPath,
     width: job.width,
     height: job.height,

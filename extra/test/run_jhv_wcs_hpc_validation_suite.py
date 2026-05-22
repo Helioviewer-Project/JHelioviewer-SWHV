@@ -263,6 +263,31 @@ SWIFTSHADER_RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "256", "--mode", "logpolar"),
         "swiftshader",
     ),
+    ValidationRun(
+        "swiftshader_hpc_sample_texture",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--sample-texture"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_ortho_sample_texture",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--mode", "ortho", "--sample-texture"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_lati_zenithal_sample_texture",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--mode", "lati_zenithal", "--max-error-px", "1", "--sample-texture"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_polar_sample_texture",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--mode", "polar", "--sample-texture"),
+        "swiftshader",
+    ),
+    ValidationRun(
+        "swiftshader_logpolar_sample_texture",
+        (str(DATA / "sample.171.fits"), "--hdu", "1", "--render-size", "128", "--mode", "logpolar", "--sample-texture"),
+        "swiftshader",
+    ),
 )
 
 
