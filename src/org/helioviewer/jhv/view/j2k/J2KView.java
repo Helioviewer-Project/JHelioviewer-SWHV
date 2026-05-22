@@ -337,6 +337,8 @@ public class J2KView extends BaseView {
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);
+            else
+                imageBuffer.allowExplicitFree();
         });
     }
 
