@@ -13,9 +13,11 @@ class Zoom {
     private static final double SPEED_LIMIT = 25;
     private static final double ACCELERATION_LIMIT = 2;
     private static final double VELOCITY_SMOOTHING = 0.80;
+    private static final long GESTURE_TIMEOUT_MS = 200;
 
     private double velocity = 0;
     private double lastWheelDelta = 0;
+    private long lastWheelTime = 0;
 
     void zoom(Viewport vp, double wheelDelta) {
         if (wheelDelta == 0) {
@@ -38,8 +40,12 @@ class Zoom {
 
     // Returns true when velocity is reset and no zoom should be applied.
     private boolean applyWheel(double wheel) {
-        // Strong direction change in wheel stream: reset integration state.
-        if (lastWheelDelta != 0 && lastWheelDelta * wheel < 0) {
+        long now = System.currentTimeMillis();
+        boolean timedOut = lastWheelTime != 0 && now - lastWheelTime > GESTURE_TIMEOUT_MS;
+        lastWheelTime = now;
+
+        // New gesture or direction change in wheel stream: reset integration state.
+        if (timedOut || (lastWheelDelta != 0 && lastWheelDelta * wheel < 0)) {
             velocity = 0;
         }
         lastWheelDelta = wheel;
