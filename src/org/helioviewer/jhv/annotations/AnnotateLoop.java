@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotate;
+package org.helioviewer.jhv.annotations;
 
 import javax.annotation.Nullable;
 
@@ -13,13 +13,13 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 import org.json.JSONObject;
 
-public class AnnotateLoop extends AbstractAnnotateable {
+final class AnnotateLoop extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 45;
 
     private String heightStr = null;
 
-    public AnnotateLoop(JSONObject jo) {
+    AnnotateLoop(JSONObject jo) {
         super(jo);
     }
 

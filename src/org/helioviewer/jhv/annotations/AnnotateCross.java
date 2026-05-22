@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera.annotate;
+package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.MapContext;
@@ -11,15 +11,15 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 import org.json.JSONObject;
 
-public class AnnotateCross extends AbstractAnnotateable {
+final class AnnotateCross extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
 
-    public AnnotateCross(JSONObject jo) {
+    AnnotateCross(JSONObject jo) {
         super(jo);
     }
 
-    public static void drawCross(MapContext ctx, Viewport vp, ProjectionScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+    static void drawCross(MapContext ctx, Viewport vp, ProjectionScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
         double delta = 2.5 * Math.PI / 180;
         interpolatedDraw(ctx, vp, scale, longitude + delta, latitude, longitude - delta, latitude, color, vexBuf);
         interpolatedDraw(ctx, vp, scale, longitude, latitude + delta, longitude, latitude - delta, color, vexBuf);
