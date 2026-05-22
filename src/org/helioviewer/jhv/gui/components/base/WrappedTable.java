@@ -5,15 +5,22 @@ import java.awt.Dimension;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 
 @SuppressWarnings("serial")
 public class WrappedTable extends JTable {
 
+    private Timer updateTimer;
+
     @Override
     public void columnMarginChanged(ChangeEvent e) {
-        updateRowHeights();
+        if (updateTimer == null) {
+            updateTimer = new Timer(50, _ -> updateRowHeights());
+            updateTimer.setRepeats(false);
+        }
+        updateTimer.restart();
     }
 
     // don't delete
