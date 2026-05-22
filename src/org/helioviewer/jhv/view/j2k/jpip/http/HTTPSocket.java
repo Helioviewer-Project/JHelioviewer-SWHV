@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.view.j2k.jpip.http;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -60,7 +61,7 @@ public class HTTPSocket {
             openSocket.setTcpNoDelay(true);
             openSocket.connect(new InetSocketAddress(host, port), TIMEOUT_CONNECT);
 
-            InputStream openInputStream = openSocket.getInputStream();
+            InputStream openInputStream = new BufferedInputStream(openSocket.getInputStream());
 
             HashMap<String, String> hdr = new HashMap<>();
             hdr.put("User-Agent", JHVGlobals.userAgent);
