@@ -2,6 +2,7 @@ package org.helioviewer.jhv.camera;
 
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.input.PointerEvent;
 
 class InteractionPan implements Interaction.Type {
@@ -32,7 +33,7 @@ class InteractionPan implements Interaction.Type {
         lastX = e.x();
         lastY = e.y();
 
-        double m = 1 / CameraHelper.getImagePixelFactor(camera, vp);
+        double m = 1 / ViewportProjection.getImagePixelFactor(camera, vp);
         camera.setTranslation(camera.getTranslationX() + x * m, camera.getTranslationY() - y * m);
         DisplayFrame.display();
     }

@@ -1,16 +1,15 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.display;
 
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
-public class CameraHelper {
+public class ViewportProjection {
 
     private static final double PLANE_Z_EPS = 1e-8;
 
@@ -54,7 +53,7 @@ public class CameraHelper {
         return vp.height / camera.getCameraWidth(vp.zoom);
     }
 
-    static double selectTrackballRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
+    public static double selectTrackballRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
         double radius2 = screenPlaneRadius2(camera, vp, screenX, screenY);
         if (radius2 > 0.5 * Sun.Radius2) {
             double r = 0.5 * camera.getCameraWidth(vp.zoom);
@@ -69,7 +68,7 @@ public class CameraHelper {
         return upX * upX + upY * upY;
     }
 
-    static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
+    public static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
         double width = camera.getCameraWidth(vp.zoom);
         double tx = camera.getTranslationX();
         double ty = camera.getTranslationY();

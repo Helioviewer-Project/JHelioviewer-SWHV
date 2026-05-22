@@ -5,6 +5,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.Layers;
@@ -17,7 +18,7 @@ public final class ViewActions {
 
     public static void zoomFit() {
         Display.resetViewportZoom();
-        CameraHelper.zoomToFit(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
+        ViewportProjection.zoomToFit(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
         DisplayFrame.render(1);
     }
 

@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -101,7 +102,7 @@ public final class Annotations {
         annotationsLine.setVertex(annotationsBuf);
         annotationsLine.renderLine(vp, LINEWIDTH);
 
-        double pixFactor = CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp));
+        double pixFactor = ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         Transform.pushView();
         if (ctx.isOrthographic())

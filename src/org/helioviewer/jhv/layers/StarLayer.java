@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.ViewpointModel;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.layers.stars.GaiaClient;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -70,7 +70,7 @@ public final class StarLayer extends AbstractLayer implements ViewpointModel.Lis
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
-        points.renderPoints(CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp)));
+        points.renderPoints(ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp)));
         Transform.popView();
     }
 

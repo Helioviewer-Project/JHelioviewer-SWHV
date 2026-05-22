@@ -3,7 +3,6 @@ package org.helioviewer.jhv.display;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
@@ -16,7 +15,7 @@ final class OrthoProjection {
     private OrthoProjection() {}
 
     static Vec3 mouseToSurface(Camera camera, RenderView renderView, Viewport vp, int x, int y) {
-        return CameraHelper.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, renderView.viewpoint().toQuat());
+        return ViewportProjection.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, renderView.viewpoint().toQuat());
     }
 
     static void emitMapVertex(Vec3 vertex, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
@@ -37,7 +36,7 @@ final class OrthoProjection {
                 ? Quat.ZERO
                 : Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
 
-        Vec3 p = CameraHelper.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, rotation);
+        Vec3 p = ViewportProjection.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, rotation);
         if (p == null)
             return Vec2.NAN;
 

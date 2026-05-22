@@ -6,7 +6,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.time.JHVTime;
@@ -91,13 +90,13 @@ public final class DisplayFrame {
     }
 
     public static void zoomMiniToFit() {
-        CameraHelper.zoomToFit(Display.getMiniCamera(), miniViewpointModel.getViewpoint());
+        ViewportProjection.zoomToFit(Display.getMiniCamera(), miniViewpointModel.getViewpoint());
     }
 
     private static void resetCamera(Camera camera, ViewpointModel model) {
         Position viewpoint = model.update(Movie.getTime());
         camera.reset(viewpoint);
-        CameraHelper.zoomToFit(camera, viewpoint);
+        ViewportProjection.zoomToFit(camera, viewpoint);
     }
 
     public static void render(float decodeFactor) {

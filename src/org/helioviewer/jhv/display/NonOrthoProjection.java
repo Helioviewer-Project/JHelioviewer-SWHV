@@ -3,7 +3,6 @@ package org.helioviewer.jhv.display;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
@@ -109,8 +108,8 @@ final class NonOrthoProjection {
     private static Vec2 mouseToRawGrid(Camera camera, RenderView renderView, Viewport vp, ProjectionScale scale, int x, int y) {
         double width = renderView.cameraWidth(vp.zoom);
         return new Vec2(
-                scale.getInterpolatedXValue(CameraHelper.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
-                scale.getInterpolatedYValue(CameraHelper.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
+                scale.getInterpolatedXValue(ViewportProjection.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
+                scale.getInterpolatedYValue(ViewportProjection.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
     static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {

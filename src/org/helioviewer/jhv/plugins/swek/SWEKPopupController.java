@@ -8,10 +8,10 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVPositionInformation;
@@ -162,12 +162,12 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                     Quat q = pi.getEarth().toQuat();
                     pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
 
-                    hitpoint = CameraHelper.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
+                    hitpoint = ViewportProjection.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
                     if (hitpoint != null) {
                         hitpoint = q.rotateInverseVector(hitpoint);
                     }
                 } else {
-                    hitpoint = CameraHelper.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpoint.toQuat());
+                    hitpoint = ViewportProjection.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpoint.toQuat());
                     pt = pi.centralPoint();
                 }
 
