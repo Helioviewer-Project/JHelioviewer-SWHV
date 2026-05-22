@@ -12,13 +12,13 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -26,10 +26,10 @@ import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.opengl.GLText;
-import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
@@ -122,7 +122,7 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
-        double pointFactor = CameraHelper.getTemperedPointFactor(vp, ctx.cameraWidth(vp));
+        double pointFactor = ViewportProjection.getTemperedPointFactor(vp, ctx.cameraWidth(vp));
         Position viewpoint = ctx.viewpoint();
 
         Transform.pushView();
@@ -181,8 +181,8 @@ public class ViewpointLayer extends AbstractLayer {
 
         Viewport vp = Display.getActiveViewport();
         double width = GLRenderer.getRenderView().cameraWidth(vp.zoom);
-        double mousePlaneX = CameraHelper.computeUpX(vp, width, camera.getTranslationX(), mouseX);
-        double mousePlaneY = CameraHelper.computeUpY(vp, width, camera.getTranslationY(), mouseY);
+        double mousePlaneX = ViewportProjection.computeUpX(vp, width, camera.getTranslationX(), mouseX);
+        double mousePlaneY = ViewportProjection.computeUpY(vp, width, camera.getTranslationY(), mouseY);
         Quat dragRotation = camera.getDragRotation();
 
         double halfWidth = width / 2;

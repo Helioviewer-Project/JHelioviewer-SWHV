@@ -7,11 +7,11 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Annotations;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -49,7 +49,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         } else if (mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = CameraHelper.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
+            Vec3 v = ViewportProjection.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {

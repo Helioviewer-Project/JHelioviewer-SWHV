@@ -3,6 +3,7 @@ package org.helioviewer.jhv.camera;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
 
@@ -20,7 +21,7 @@ abstract class InteractionTrackball implements Interaction.Type {
 
     @Override
     public void mousePressed(PointerEvent e, Viewport vp) {
-        trackballRadius2 = CameraHelper.selectTrackballRadius2(camera, vp, e.x(), e.y());
+        trackballRadius2 = ViewportProjection.selectTrackballRadius2(camera, vp, e.x(), e.y());
         lastMouseX = e.x();
         lastMouseY = e.y();
         dragStartSet = true;
@@ -33,7 +34,7 @@ abstract class InteractionTrackball implements Interaction.Type {
         if ((e.x() == lastMouseX) && (e.y() == lastMouseY))
             return;
 
-        Quat delta = CameraHelper.calcTrackballDelta(camera, vp, lastMouseX, lastMouseY, e.x(), e.y(), trackballRadius2);
+        Quat delta = ViewportProjection.calcTrackballDelta(camera, vp, lastMouseX, lastMouseY, e.x(), e.y(), trackballRadius2);
         camera.rotateDragRotation(adaptDelta(delta));
         lastMouseX = e.x();
         lastMouseY = e.y();

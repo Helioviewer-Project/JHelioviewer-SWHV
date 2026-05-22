@@ -5,7 +5,6 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
@@ -13,6 +12,7 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
@@ -115,7 +115,7 @@ public final class GridLayer extends AbstractLayer {
 
         Position viewpoint = ctx.viewpoint();
         float ztext = 0;
-        double pixFactor = CameraHelper.getPixelFactor(vp, ctx.cameraWidth(vp));
+        double pixFactor = ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         // correct order: grid lines -> Earth indicators -> axis -> grid labels -> radial grid
         Quat gridQuat = ctx.gridType().toCarrington(viewpoint);
