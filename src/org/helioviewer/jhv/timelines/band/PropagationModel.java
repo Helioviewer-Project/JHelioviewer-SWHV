@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.timelines.band;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 interface PropagationModel {
@@ -70,7 +70,7 @@ interface PropagationModel {
         }
 
         private static double getRSShift() {
-            return Sun.RadiusMilli * DisplayFrame.getViewpoint().distance;
+            return Sun.RadiusMilli * GLRenderer.getDisplayedViewpoint().distance;
         }
 
     }
