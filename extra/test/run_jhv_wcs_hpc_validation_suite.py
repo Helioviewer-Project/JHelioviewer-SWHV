@@ -254,6 +254,21 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         "electron",
     ),
     ValidationRun(
+        "electron_default_tan_all_modes_cases",
+        ("--tan-all-modes-cases", "--render-size", "256", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_tan_all_modes_cases_sample_texture",
+        ("--tan-all-modes-cases", "--render-size", "128", "--sample-texture", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_tan_all_modes_cases_color_smoke",
+        ("--tan-all-modes-cases-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
         "electron_default_hpc_projection_cases",
         ("--hpc-projection-cases", "--render-size", "256", "--backend", "default"),
         "electron",
@@ -279,8 +294,23 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         "electron",
     ),
     ValidationRun(
+        "electron_default_surface_map_cases_diff_selfcheck",
+        ("--surface-map-cases-diff-selfcheck", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_surface_map_cases_color_smoke",
+        ("--surface-map-cases-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
         "electron_default_hpc_diff_selfcheck",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--hpc-diff-selfcheck", "--render-size", "256", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_hpc_diff_selfcheck_cor2",
+        (str(DATA / "20241224_194245_d4c2A.fts"), "--hpc-diff-selfcheck", "--render-size", "256", "--backend", "default"),
         "electron",
     ),
     ValidationRun(

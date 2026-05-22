@@ -17,6 +17,7 @@ from validate_jhv_wcs_against_astropy import (
     LATI_ZENITHAL_BOUNDS_DEG,
     LATI_SURFACE_BOUNDS_DEG,
     LOGPOLAR_MIN_RADIUS,
+    displayLatitudinalWorld,
     hpc_bounds_degrees,
     is_surface_map_projection,
     load_validation_context,
@@ -412,6 +413,47 @@ def cpu_texcoord_for_mode(
     raise ValueError(f"Unsupported Electron WebGL mode: {mode}")
 
 
+def expected_plane_internal_for_mode(
+    mode: str,
+    sx: float,
+    sy: float,
+    meta,
+) -> tuple[float, float]:
+    if mode == "ortho":
+        x = 2.0 * sx - 1.0
+        y = 2.0 * sy - 1.0
+        radius2 = x * x + y * y
+        if radius2 > 1.0:
+            return (math.nan, math.nan)
+        return (x - meta.crval_internal_x, y - meta.crval_internal_y)
+
+    if mode == "lati_zenithal":
+        longitude = sx * (2.0 * math.pi)
+        latitude = (sy - 0.5) * math.pi
+        if latitude < -0.5 * math.pi or latitude > 0.5 * math.pi:
+            return (math.nan, math.nan)
+        cos_latitude = math.cos(latitude)
+        spherical = (
+            cos_latitude * math.cos(longitude),
+            cos_latitude * math.sin(longitude),
+            math.sin(latitude),
+        )
+        if spherical[0] < 0.0:
+            return (math.nan, math.nan)
+        return (spherical[1] - meta.crval_internal_x, spherical[2] - meta.crval_internal_y)
+
+    if mode == "polar" or mode == "logpolar":
+        radial = math.exp(math.log(LOGPOLAR_MIN_RADIUS) + sy * (math.log(1.0) - math.log(LOGPOLAR_MIN_RADIUS))) if mode == "logpolar" else sy
+        if radial > 1.0 or radial < 0.0:
+            return (math.nan, math.nan)
+        theta = -(sx * 2.0 * math.pi + 0.5 * math.pi)
+        x = math.cos(theta) * radial
+        y = math.sin(theta) * radial
+        return (x - meta.crval_internal_x, -y - meta.crval_internal_y)
+
+    return (math.nan, math.nan)
+
+
 def bounds_for_mode(mode: str) -> tuple[float, float, float, float]:
     if mode == "lati_zenithal":
         return LATI_ZENITHAL_BOUNDS_DEG
@@ -465,7 +507,7 @@ def compare_shader_to_cpu(
     sample_texture: bool,
     backend: str,
 ) -> int:
-    image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+    image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
     if mode == "ortho" and meta.projection not in PROJECTION_CODES:
         raise ValueError(f"Electron WebGL Ortho validation does not support projection {meta.projection!r}")
 
@@ -482,6 +524,8 @@ def compare_shader_to_cpu(
         sample_texture,
         image_data,
         meta,
+        projection_wcs,
+        pixel_wcs,
         job,
         result,
         pixels,
@@ -497,6 +541,8 @@ def evaluate_shader_to_cpu(
     sample_texture: bool,
     image_data: np.ndarray,
     meta,
+    projection_wcs,
+    pixel_wcs,
     job: dict,
     result: dict,
     pixels: np.ndarray,
@@ -511,6 +557,9 @@ def evaluate_shader_to_cpu(
     skipped = 0
     shader_only = 0
     cpu_only = 0
+    astropy_count = 0
+    max_shader_astropy_px_err = 0.0
+    sum_shader_astropy_px_err2 = 0.0
 
     for iy in range(render_size):
         sy = (iy + 0.5) / render_size
@@ -545,6 +594,22 @@ def evaluate_shader_to_cpu(
                 sample_err = abs(shader_sample - cpu_sample)
                 max_sample_err = max(max_sample_err, float(sample_err))
                 sum_sample_err2 += float(sample_err * sample_err)
+            if projection_wcs is not None and pixel_wcs is not None:
+                expected_plane_internal = expected_plane_internal_for_mode(mode, sx, sy, meta)
+                if math.isfinite(expected_plane_internal[0]) and math.isfinite(expected_plane_internal[1]):
+                    expected_plane_deg = (
+                        math.degrees(expected_plane_internal[0] / meta.plane_units_per_rad),
+                        math.degrees(expected_plane_internal[1] / meta.plane_units_per_rad),
+                    )
+                    expected_world_deg = projection_wcs.wcs_pix2world([expected_plane_deg], 0)[0]
+                    astro_px = pixel_wcs.wcs_world2pix([expected_world_deg], 1)[0]
+                    if np.all(np.isfinite(astro_px)):
+                        shader_px = texcoord_to_pixel_center(shader_texcoord, meta.pixel_width, meta.pixel_height)
+                        astro_pixel_center = (float(astro_px[0] - 0.5), float(astro_px[1] - 0.5))
+                        astropy_err = pixel_center_error_px(shader_px, astro_pixel_center, meta)
+                        max_shader_astropy_px_err = max(max_shader_astropy_px_err, float(astropy_err))
+                        sum_shader_astropy_px_err2 += float(astropy_err * astropy_err)
+                        astropy_count += 1
             count += 1
 
     print(f"file={fits_file}")
@@ -558,6 +623,9 @@ def evaluate_shader_to_cpu(
     print(f"cpu_only_samples={cpu_only}")
     print(f"shader_vs_cpu_max_error_px={max_px_err:.6e}")
     print(f"shader_vs_cpu_rms_error_px={math.sqrt(sum_px_err2 / count):.6e}" if count > 0 else "shader_vs_cpu_rms_error_px=nan")
+    print(f"shader_vs_astropy_samples={astropy_count}")
+    print(f"shader_vs_astropy_max_error_px={max_shader_astropy_px_err:.6e}")
+    print(f"shader_vs_astropy_rms_error_px={math.sqrt(sum_shader_astropy_px_err2 / astropy_count):.6e}" if astropy_count > 0 else "shader_vs_astropy_rms_error_px=nan")
     if sample_texture:
         print(f"sample_max_error={max_sample_err:.6e}")
         print(f"sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "sample_rms_error=nan")
@@ -570,6 +638,9 @@ def evaluate_shader_to_cpu(
         return 1
     if max_px_err > max_error_px:
         print(f"FAILED: shader_vs_cpu_max_error_px exceeds {max_error_px:.6e}")
+        return 1
+    if astropy_count > 0 and max_shader_astropy_px_err > max_error_px:
+        print(f"FAILED: shader_vs_astropy_max_error_px exceeds {max_error_px:.6e}")
         return 1
     if sample_texture and max_sample_err > max_sample_error:
         print(f"FAILED: sample_max_error exceeds {max_sample_error:.6e}")
@@ -588,7 +659,7 @@ def compare_batch(
     sample_texture: bool,
     backend: str,
 ) -> int:
-    image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
+    image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     jobs: list[dict] = []
@@ -600,13 +671,13 @@ def compare_batch(
             bounds = hpc_bounds_degrees(meta, 1.0)
             job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, backend)
             jobs.append(job)
-            metadata.append({"mode": mode, "bounds": bounds})
+            metadata.append({"mode": mode, "pixel_wcs": pixel_wcs, "bounds": bounds})
         else:
             if mode == "ortho" and meta.projection not in PROJECTION_CODES:
                 continue
             job = make_mode_job(mode, fits_file, render_size, output_dir, sample_texture, meta, backend)
             jobs.append(job)
-            metadata.append({"mode": mode})
+            metadata.append({"mode": mode, "projection_wcs": projection_wcs, "pixel_wcs": pixel_wcs})
 
     results = run_electron_jobs(electron, jobs, backend)
     failed = False
@@ -622,7 +693,7 @@ def compare_batch(
                 sample_texture,
                 image_data,
                 meta,
-                pixel_wcs,
+                info["pixel_wcs"],
                 info["bounds"],
                 job,
                 result,
@@ -639,11 +710,162 @@ def compare_batch(
                 sample_texture,
                 image_data,
                 meta,
+                info["projection_wcs"],
+                info["pixel_wcs"],
                 job,
                 result,
                 pixels,
             )
         failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
+def compare_tan_all_modes_case_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    sample_texture: bool,
+    backend: str,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename, hdu in TAN_SCREEN_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"Electron WebGL TAN all-modes validation does not support projection {meta.projection!r} for {fits_file}")
+
+        for mode in ALL_MODES:
+            if mode == "hpc":
+                bounds = hpc_bounds_degrees(meta, 1.0)
+                job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, backend, f"{name}_hpc")
+                jobs.append(job)
+                metadata.append({
+                    "mode": mode,
+                    "fits_file": fits_file,
+                    "image_data": image_data,
+                    "meta": meta,
+                    "pixel_wcs": pixel_wcs,
+                    "bounds": bounds,
+                })
+            else:
+                job = make_mode_job(mode, fits_file, render_size, output_dir, sample_texture, meta, backend)
+                job["name"] = f"{name}_{mode}"
+                kind = "sample" if sample_texture else "texcoord"
+                job["outputPath"] = str(output_dir / f"{fits_file.stem}_{backend}_{name}_{mode}_{kind}.rgba32f")
+                jobs.append(job)
+                metadata.append({
+                    "mode": mode,
+                    "fits_file": fits_file,
+                    "image_data": image_data,
+                    "meta": meta,
+                    "projection_wcs": projection_wcs,
+                    "pixel_wcs": pixel_wcs,
+                })
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        mode = info["mode"]
+        if mode == "hpc":
+            code = evaluate_hpc_shader_to_astropy(
+                info["fits_file"],
+                render_size,
+                max_error_px,
+                max_sample_error,
+                sample_texture,
+                info["image_data"],
+                info["meta"],
+                info["pixel_wcs"],
+                info["bounds"],
+                job,
+                result,
+                pixels,
+            )
+        else:
+            mode_max_error = 1.0 if mode == "lati_zenithal" else max_error_px
+            code = evaluate_shader_to_cpu(
+                mode,
+                info["fits_file"],
+                render_size,
+                mode_max_error,
+                max_sample_error,
+                sample_texture,
+                info["image_data"],
+                info["meta"],
+                info["projection_wcs"],
+                info["pixel_wcs"],
+                job,
+                result,
+                pixels,
+            )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
+def compare_tan_all_modes_color_smoke_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    backend: str,
+    diff_mode: bool = False,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    suffix = "color_diff_smoke" if diff_mode else "color_smoke"
+    for name, filename, hdu in TAN_SCREEN_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"Electron WebGL TAN all-modes color smoke does not support projection {meta.projection!r} for {fits_file}")
+
+        for mode in ALL_MODES:
+            if mode == "hpc":
+                job = common_job(
+                    "hpc",
+                    fits_file,
+                    render_size,
+                    output_dir,
+                    meta,
+                    hpc_bounds_degrees(meta, 1.0),
+                    True,
+                    backend,
+                    f"{name}_hpc_{suffix}",
+                    color_smoke=not diff_mode,
+                    color_diff_smoke=diff_mode,
+                )
+            else:
+                job = make_mode_job(
+                    mode,
+                    fits_file,
+                    render_size,
+                    output_dir,
+                    True,
+                    meta,
+                    backend,
+                    color_smoke=not diff_mode,
+                    color_diff_smoke=diff_mode,
+                )
+                job["name"] = f"{name}_{mode}_{suffix}"
+                kind = "color_diff" if diff_mode else "color"
+                job["outputPath"] = str(output_dir / f"{fits_file.stem}_{backend}_{name}_{mode}_{suffix}_{kind}.rgba32f")
+            jobs.append(job)
+            metadata.append({"fits_file": fits_file})
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        failed = failed or evaluate_color_smoke(info["fits_file"], render_size, job, result, pixels) != 0
 
     return 1 if failed else 0
 
@@ -663,7 +885,7 @@ def compare_tan_screen_case_batch(
     metadata: list[dict] = []
     for name, filename, hdu in TAN_SCREEN_CASES:
         fits_file = SCRIPT_DIR / "data" / filename
-        image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
+        image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
         if meta.projection not in PROJECTION_CODES:
             raise ValueError(f"Electron WebGL TAN screen validation does not support projection {meta.projection!r} for {fits_file}")
 
@@ -688,6 +910,8 @@ def compare_tan_screen_case_batch(
             "fits_file": fits_file,
             "image_data": image_data,
             "meta": meta,
+            "projection_wcs": projection_wcs,
+            "pixel_wcs": pixel_wcs,
         })
 
     results = run_electron_jobs(electron, jobs, backend)
@@ -719,11 +943,73 @@ def compare_tan_screen_case_batch(
                 sample_texture,
                 info["image_data"],
                 info["meta"],
+                info["projection_wcs"],
+                info["pixel_wcs"],
                 job,
                 result,
                 pixels,
             )
         failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
+def compare_tan_screen_color_smoke_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    backend: str,
+    diff_mode: bool = False,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    suffix = "color_diff_smoke" if diff_mode else "color_smoke"
+    for name, filename, hdu in TAN_SCREEN_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, hdu)
+        if meta.projection not in PROJECTION_CODES:
+            raise ValueError(f"Electron WebGL TAN color smoke does not support projection {meta.projection!r} for {fits_file}")
+
+        hpc_job = common_job(
+            "hpc",
+            fits_file,
+            render_size,
+            output_dir,
+            meta,
+            hpc_bounds_degrees(meta, 1.0),
+            True,
+            backend,
+            f"{name}_hpc_{suffix}",
+            color_smoke=not diff_mode,
+            color_diff_smoke=diff_mode,
+        )
+        jobs.append(hpc_job)
+        metadata.append({"fits_file": fits_file})
+
+        ortho_job = make_mode_job(
+            "ortho",
+            fits_file,
+            render_size,
+            output_dir,
+            True,
+            meta,
+            backend,
+            color_smoke=not diff_mode,
+            color_diff_smoke=diff_mode,
+        )
+        ortho_job["name"] = f"{name}_ortho_{suffix}"
+        kind = "color_diff" if diff_mode else "color"
+        ortho_job["outputPath"] = str(output_dir / f"{fits_file.stem}_{backend}_{name}_ortho_{suffix}_{kind}.rgba32f")
+        jobs.append(ortho_job)
+        metadata.append({"fits_file": fits_file})
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        failed = failed or evaluate_color_smoke(info["fits_file"], render_size, job, result, pixels) != 0
 
     return 1 if failed else 0
 
@@ -842,6 +1128,7 @@ def evaluate_surface_map_shader_to_cpu(
     sample_texture: bool,
     image_data: np.ndarray,
     meta,
+    pixel_wcs,
     job: dict,
     result: dict,
     pixels: np.ndarray,
@@ -855,6 +1142,9 @@ def evaluate_surface_map_shader_to_cpu(
     skipped = 0
     shader_only = 0
     cpu_only = 0
+    astropy_count = 0
+    max_shader_astropy_px_err = 0.0
+    sum_shader_astropy_px_err2 = 0.0
 
     for iy in range(render_size):
         sy = (iy + 0.5) / render_size
@@ -887,6 +1177,21 @@ def evaluate_surface_map_shader_to_cpu(
                 sample_err = abs(float(pixels[iy, ix, 2]) - sample_texture_linear(texture_data, shader_texcoord, wrap_x=True))
                 max_sample_err = max(max_sample_err, float(sample_err))
                 sum_sample_err2 += float(sample_err * sample_err)
+            if pixel_wcs is not None:
+                world_xyz = displayLatitudinalWorld((sx, sy), LATI_SURFACE_BOUNDS_DEG)
+                if math.isfinite(world_xyz[0]) and math.isfinite(world_xyz[1]) and math.isfinite(world_xyz[2]):
+                    world_deg = (
+                        math.degrees(math.atan2(world_xyz[0], world_xyz[2])),
+                        math.degrees(math.asin(max(-1.0, min(1.0, world_xyz[1])))),
+                    )
+                    astro_px = pixel_wcs.wcs_world2pix([world_deg], 1)[0]
+                    if np.all(np.isfinite(astro_px)):
+                        shader_px = texcoord_to_pixel_center(shader_texcoord, meta.pixel_width, meta.pixel_height)
+                        astro_pixel_center = (float(astro_px[0] - 0.5), float(astro_px[1] - 0.5))
+                        astropy_err = pixel_center_error_px(shader_px, astro_pixel_center, meta)
+                        max_shader_astropy_px_err = max(max_shader_astropy_px_err, float(astropy_err))
+                        sum_shader_astropy_px_err2 += float(astropy_err * astropy_err)
+                        astropy_count += 1
             count += 1
 
     print(f"file={fits_file}")
@@ -900,6 +1205,9 @@ def evaluate_surface_map_shader_to_cpu(
     print(f"cpu_only_samples={cpu_only}")
     print(f"shader_vs_cpu_max_error_px={max_px_err:.6e}")
     print(f"shader_vs_cpu_rms_error_px={math.sqrt(sum_px_err2 / count):.6e}" if count > 0 else "shader_vs_cpu_rms_error_px=nan")
+    print(f"shader_vs_astropy_samples={astropy_count}")
+    print(f"shader_vs_astropy_max_error_px={max_shader_astropy_px_err:.6e}")
+    print(f"shader_vs_astropy_rms_error_px={math.sqrt(sum_shader_astropy_px_err2 / astropy_count):.6e}" if astropy_count > 0 else "shader_vs_astropy_rms_error_px=nan")
     if sample_texture:
         print(f"sample_max_error={max_sample_err:.6e}")
         print(f"sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "sample_rms_error=nan")
@@ -912,6 +1220,9 @@ def evaluate_surface_map_shader_to_cpu(
         return 1
     if max_px_err > max_error_px:
         print(f"FAILED: shader_vs_cpu_max_error_px exceeds {max_error_px:.6e}")
+        return 1
+    if astropy_count > 0 and max_shader_astropy_px_err > max_error_px:
+        print(f"FAILED: shader_vs_astropy_max_error_px exceeds {max_error_px:.6e}")
         return 1
     if sample_texture and max_sample_err > max_sample_error:
         print(f"FAILED: sample_max_error exceeds {max_sample_error:.6e}")
@@ -934,7 +1245,7 @@ def compare_surface_map_batch(
     metadata: list[dict] = []
     for name, filename in SURFACE_MAP_CASES:
         fits_file = SCRIPT_DIR / "data" / filename
-        image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, None)
+        image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, None)
         if not is_surface_map_projection(meta):
             raise ValueError(f"Electron WebGL surface-map validation does not support projection {meta.projection!r} for {fits_file}")
         job = common_job("lati_zenithal", fits_file, render_size, output_dir, meta, LATI_SURFACE_BOUNDS_DEG, sample_texture, backend, name)
@@ -943,6 +1254,7 @@ def compare_surface_map_batch(
             "fits_file": fits_file,
             "image_data": image_data,
             "meta": meta,
+            "pixel_wcs": pixel_wcs,
         })
 
     results = run_electron_jobs(electron, jobs, backend)
@@ -956,6 +1268,105 @@ def compare_surface_map_batch(
             max_sample_error,
             sample_texture,
             info["image_data"],
+            info["meta"],
+            info["pixel_wcs"],
+            job,
+            result,
+            pixels,
+        )
+        failed = failed or code != 0
+
+    return 1 if failed else 0
+
+
+def compare_surface_map_color_smoke_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    backend: str,
+    diff_mode: bool = False,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    suffix = "color_diff_smoke" if diff_mode else "color_smoke"
+    for name, filename in SURFACE_MAP_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, None)
+        if not is_surface_map_projection(meta):
+            raise ValueError(f"Electron WebGL surface-map color smoke does not support projection {meta.projection!r} for {fits_file}")
+        job = common_job(
+            "lati_zenithal",
+            fits_file,
+            render_size,
+            output_dir,
+            meta,
+            LATI_SURFACE_BOUNDS_DEG,
+            True,
+            backend,
+            f"{name}_{suffix}",
+            color_smoke=not diff_mode,
+            color_diff_smoke=diff_mode,
+        )
+        jobs.append(job)
+        metadata.append({"fits_file": fits_file})
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        failed = failed or evaluate_color_smoke(info["fits_file"], render_size, job, result, pixels) != 0
+
+    return 1 if failed else 0
+
+
+def compare_surface_map_diff_selfcheck_batch(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    backend: str,
+    selfcheck_mode: str,
+) -> int:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    jobs: list[dict] = []
+    metadata: list[dict] = []
+    for name, filename in SURFACE_MAP_CASES:
+        fits_file = SCRIPT_DIR / "data" / filename
+        _image_data, meta, _projection_wcs, _pixel_wcs = load_validation_context(fits_file, None)
+        if not is_surface_map_projection(meta):
+            raise ValueError(f"Electron WebGL surface-map diff selfcheck does not support projection {meta.projection!r} for {fits_file}")
+        job = common_job(
+            "lati_zenithal",
+            fits_file,
+            render_size,
+            output_dir,
+            meta,
+            LATI_SURFACE_BOUNDS_DEG,
+            True,
+            backend,
+            f"{name}_diff_selfcheck",
+            diff_selfcheck=True,
+        )
+        job["latiDiffSelfcheckMode"] = selfcheck_mode
+        jobs.append(job)
+        metadata.append({
+            "fits_file": fits_file,
+            "meta": meta,
+        })
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, info, result in zip(jobs, metadata, results, strict=True):
+        pixels = read_job_pixels(job)
+        code = evaluate_hpc_diff_selfcheck(
+            info["fits_file"],
+            render_size,
+            max_error_px,
+            max_sample_error,
             info["meta"],
             job,
             result,
@@ -1282,6 +1693,7 @@ def main() -> int:
     parser.add_argument("--max-sample-error", type=float, default=1e-3)
     parser.add_argument("--sample-texture", action="store_true")
     parser.add_argument("--all-modes", action="store_true")
+    parser.add_argument("--tan-all-modes-cases", action="store_true")
     parser.add_argument("--tan-screen-cases", action="store_true")
     parser.add_argument("--hpc-projection-cases", action="store_true")
     parser.add_argument("--hpc-render-cases", action="store_true")
@@ -1289,6 +1701,14 @@ def main() -> int:
     parser.add_argument("--hpc-projection-cases-diff-selfcheck", action="store_true")
     parser.add_argument("--hpc-projection-cases-color-smoke", action="store_true")
     parser.add_argument("--hpc-projection-cases-color-diff-smoke", action="store_true")
+    parser.add_argument("--tan-screen-cases-color-smoke", action="store_true")
+    parser.add_argument("--tan-screen-cases-color-diff-smoke", action="store_true")
+    parser.add_argument("--tan-all-modes-cases-color-smoke", action="store_true")
+    parser.add_argument("--tan-all-modes-cases-color-diff-smoke", action="store_true")
+    parser.add_argument("--surface-map-cases-color-smoke", action="store_true")
+    parser.add_argument("--surface-map-cases-color-diff-smoke", action="store_true")
+    parser.add_argument("--surface-map-cases-diff-selfcheck", action="store_true")
+    parser.add_argument("--surface-map-diff-selfcheck-mode", choices=("normal", "same-slot", "assign"), default="normal")
     parser.add_argument("--hpc-diff-selfcheck", action="store_true")
     parser.add_argument("--all-modes-diff-selfcheck", action="store_true")
     parser.add_argument("--all-modes-color-smoke", action="store_true")
@@ -1303,6 +1723,17 @@ def main() -> int:
 
     if args.hpc_projection_cases:
         return compare_hpc_projection_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.sample_texture,
+            args.backend,
+        )
+
+    if args.tan_all_modes_cases:
+        return compare_tan_all_modes_case_batch(
             args.electron,
             args.output_dir,
             args.render_size,
@@ -1370,6 +1801,68 @@ def main() -> int:
             args.render_size,
             args.backend,
             True,
+        )
+
+    if args.tan_screen_cases_color_smoke:
+        return compare_tan_screen_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+        )
+
+    if args.tan_screen_cases_color_diff_smoke:
+        return compare_tan_screen_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+            True,
+        )
+
+    if args.tan_all_modes_cases_color_smoke:
+        return compare_tan_all_modes_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+        )
+
+    if args.tan_all_modes_cases_color_diff_smoke:
+        return compare_tan_all_modes_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+            True,
+        )
+
+    if args.surface_map_cases_color_smoke:
+        return compare_surface_map_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+        )
+
+    if args.surface_map_cases_color_diff_smoke:
+        return compare_surface_map_color_smoke_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
+            True,
+        )
+
+    if args.surface_map_cases_diff_selfcheck:
+        return compare_surface_map_diff_selfcheck_batch(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.backend,
+            args.surface_map_diff_selfcheck_mode,
         )
 
     if args.fits_file is None:
