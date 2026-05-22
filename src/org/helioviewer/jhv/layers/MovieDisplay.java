@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 
 public class MovieDisplay {
 
@@ -16,7 +16,7 @@ public class MovieDisplay {
     }
 
     public static void display() {
-        renderRequestHandler.requestRender(Display.getViewpoint());
+        renderRequestHandler.requestRender(DisplayFrame.getViewpoint());
     }
 
     public static void setRenderRequestHandler(RenderRequestHandler _renderRequestHandler) {

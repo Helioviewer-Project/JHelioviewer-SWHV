@@ -7,6 +7,7 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
@@ -54,7 +55,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
             } catch (Exception ignore) {}
             JSONObject jc = jo.optJSONObject("camera");
             if (jc != null)
-                Display.getCamera().fromJson(jc, Display.getViewpoint());
+                Display.getCamera().fromJson(jc, DisplayFrame.getViewpoint());
         }
     }
 
@@ -73,7 +74,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         return cameraMode;
     }
 
-    public void setCameraMode(CameraMode _cameraMode, Display.ViewpointApplyMode mode) {
+    public void setCameraMode(CameraMode _cameraMode, DisplayFrame.ViewpointApplyMode mode) {
         cameraMode = _cameraMode;
         applyCurrentViewpoint(mode);
     }
@@ -86,8 +87,8 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         return equatorialOptions;
     }
 
-    void applyCurrentViewpoint(Display.ViewpointApplyMode mode) {
-        Display.setViewpointUpdate(cameraMode.update, mode);
+    void applyCurrentViewpoint(DisplayFrame.ViewpointApplyMode mode) {
+        DisplayFrame.setViewpointUpdate(cameraMode.update, mode);
     }
 
     void activate() {

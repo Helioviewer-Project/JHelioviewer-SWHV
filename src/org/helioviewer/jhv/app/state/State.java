@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.camera.Annotations;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
@@ -210,7 +210,7 @@ public final class State {
         private void applyRestoredPlaybackState() {
             ViewState.applyMode(modeData); // this applies projection again
             Commands.seekTime(time);
-            Display.refreshCamera();
+            DisplayFrame.refreshCamera();
         }
 
         @Override

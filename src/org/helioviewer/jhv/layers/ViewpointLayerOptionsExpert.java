@@ -6,7 +6,7 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -103,7 +103,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setRelative(boolean _relative) {
         relative = _relative;
-        Display.refreshCamera();
+        DisplayFrame.refreshCamera();
     }
 
     public int getSpiralSpeedValue() {

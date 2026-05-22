@@ -6,7 +6,7 @@ import java.util.Set;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.CameraHelper;
 import org.helioviewer.jhv.camera.Transform;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.ViewpointModel;
@@ -78,9 +78,9 @@ public final class StarLayer extends AbstractLayer implements ViewpointModel.Lis
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
         if (enabled) {
-            Display.addViewpointListener(this);
+            DisplayFrame.addViewpointListener(this);
         } else {
-            Display.removeViewpointListener(this);
+            DisplayFrame.removeViewpointListener(this);
         }
     }
 

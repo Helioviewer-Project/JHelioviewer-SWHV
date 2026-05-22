@@ -2,7 +2,7 @@ package org.helioviewer.jhv.camera.annotate;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
@@ -33,7 +33,7 @@ public class AnnotateFOV extends AbstractAnnotateable {
         double halfSize = 1.1 * Math.max(halfHeight, halfWidth); // give some margin
 
         camera.setTranslation(-(p0.x + dx), -(p0.y + dy));
-        Position viewpoint = Display.getViewpoint();
+        Position viewpoint = DisplayFrame.getViewpoint();
         camera.resetDragRotation();
         camera.setFOV(2 * Math.atan2(halfSize, viewpoint.distance), viewpoint);
     }

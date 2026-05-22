@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
@@ -243,7 +243,7 @@ public class Movie {
             return;
 
         lastTimestamp = dateTime;
-        Display.timeChanged(dateTime);
+        DisplayFrame.timeChanged(dateTime);
 
         Layers.setImageLayersNearestFrame(dateTime);
         MovieDisplay.render(1);
