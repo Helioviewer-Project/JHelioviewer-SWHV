@@ -2,9 +2,9 @@
 title: |
    | SWHV CCN4
    | WCS and HPC Validation Note
-subtitle: SWHV-ROB-TN-001-CCN4 v2.1
+subtitle: SWHV-ROB-TN-001-CCN4 v3.0
 subject: SWHV CCN4
-date: SWHV-ROB-TN-001-CCN4 - Version 2.1 - 2026-05-08
+date: SWHV-ROB-TN-001-CCN4 - Version 3.0 - 2026-05-25
 lof: true
 lot: false
 ---
@@ -13,19 +13,17 @@ lot: false
 
 # Summary
 
-This note describes the zenithal WCS and `HPC` work implemented in JHV, and
-the corresponding validation against Astropy and direct internal comparison
-tests. It also includes validation cases for surface maps described by FITS
-WCS axes `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`. The main focus of
-the note remains the zenithal
-projections and their use in `HPC`. For the general
-FITS/WCS header conventions used throughout, the primary reference is Greisen
-and Calabretta, "Representations of world coordinates in FITS" ([A&A 395,
-1061-1075,
+This note describes the zenithal WCS and `HPC` work in JHV and the validation
+against Astropy, Java/Python metadata checks, and direct GLSL checks. It also
+includes validation cases for surface maps described by FITS WCS axes
+`CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`. The main focus remains the
+zenithal projections and their use in `HPC`. For the general FITS/WCS header
+conventions used throughout, the primary reference is Greisen and Calabretta,
+"Representations of world coordinates in FITS" ([A&A 395, 1061-1075,
 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1061G/abstract)).
 
-In this work, a new `TAN` path was implemented together with `ARC`, `AZP`,
-six-term `ZPN`, and support for `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`
+JHV now has a new `TAN` path, `ARC`, `AZP`, six-term `ZPN`, and support for
+`CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA`
 surface maps, using the FITS celestial-coordinate projection formalism of
 Calabretta & Greisen
 ([A&A 395, 1077-1122, 2002](https://ui.adsabs.harvard.edu/abs/2002A%26A...395.1077C/abstract)).
@@ -38,116 +36,99 @@ then feeds those coordinates directly into the linear image transform, instead o
 first converting the 3D point to helioprojective angles and then applying the
 `formal-TAN` world-to-plane projection.
 
-An `HPC` projection mode was also implemented in JHV and validated as part of
-the same work; its solar-coordinate interpretation follows Thompson, "Coordinate
-systems for solar image data"
-([A&A 449, 791-803,
+An `HPC` projection mode was also added to JHV and is validated here. Its
+solar-coordinate interpretation follows Thompson, "Coordinate systems for solar
+image data" ([A&A 449, 791-803,
 2006](https://www.aanda.org/articles/aa/abs/2006/14/aa4262-05/aa4262-05.html)).
 Because `HPC` is fundamentally tied to a specific observer viewpoint, it is
 not a natural fit for the multi-viewpoint aspect of JHV.
 
-The `CAR` and `CEA` cases covered by this note are surface-map cases: they
+The `CAR` and `CEA` cases in this note are surface-map cases: they
 describe solar longitude/latitude on the sphere rather than observer-centered
-image geometry. They are therefore a natural fit for `Latitudinal` and for
+image geometry. They are a natural fit for `Latitudinal` and for
 wrapping the visible sphere in `Orthographic`, but not for `HPC`, `Polar`, or
 `LogPolar`.
 
 Heliospheric imager datasets often use `AZP` or `ZPN` projections. For these
-datasets, the validation in this note supports the correctness of the `HPC`
-WCS and sampling path. That conclusion does not extend automatically to
+datasets, these tests support the correctness of the `HPC` WCS and sampling
+path. That conclusion does not extend automatically to
 `Orthographic` mode, where wide-angle heliospheric images may still not display
 satisfactorily because their integration into the JHV 3D viewing model remains
 a separate problem.
 
-A dedicated validator was built in:
-
-- `extra/test/validate_jhv_wcs_against_astropy.py`
-
-Outside the renderer, it reproduces the parts of the JHV WCS/HPC mapping path
-covered by this note and compares them directly against Astropy wherever
-the result is fully defined by WCS.
-
-A companion script, `extra/test/compare_java_metadata_to_validator.py`,
-directly compares the derived WCS metadata quantities produced by the JHV Java
-code with the validator's Python metadata model on the representative FITS test
-files.
-
-The validator was applied to a variety of real instrument FITS files and
-metadata, including COR2, HI1, HI2, SDO/AIA, Solar Orbiter/EUI, and PSP/WISPR
-examples.
-
-The work reported here includes:
-
-- validating `formal-TAN`, `ARC`, `AZP`, and six-term `ZPN` (primary
-  branch only) against Astropy, including round-trip checks.
-- validating the `HPC` sampling path against Astropy.
-- validating `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface-map cases
-  against Astropy.
+The validation uses three checks. First, a Python model of the JHV WCS,
+reprojection, and sampling path is compared against Astropy wherever the result
+is fully defined by WCS. Second, the WCS metadata derived by the JHV Java code
+is compared with the same Python metadata model on the FITS test files. Third,
+the JHV GLES3 GLSL shader sources are run through an Electron/WebGL2 runner on
+Metal/ANGLE and SwiftShader. The FITS examples include COR2, HI1, HI2, AIA, EUI,
+and WISPR data.
 
 Main conclusions:
 
 - `formal-TAN`, `ARC`, `AZP`, and six-term `ZPN` are validated against
   Astropy, including the tested inverse mappings.
-- The available `AZP` validation files are non-slanted (`gamma = 0`), so
+- the available `AZP` validation files are non-slanted (`gamma = 0`), so
   slanted `AZP` is implemented but not directly tested in the runs reported
   here.
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
   path covered by this note.
 - the `CAR` and `CEA` cases are validated against Astropy for the source WCS
   interpretation and sampling path on full-Sun surface maps.
-- direct comparison between the `formal-TAN` path in `Orthographic` mode and
-  `HPC` shows that the two display geometries are not identical even with the
-  same observer viewpoint and `dragRotation = 0`.
-- the measured discrepancies between `formal-TAN` in `Orthographic` mode and
-  `HPC` are consistent with the theoretical geometric discrepancy derived in
+- the Electron/WebGL2 checks run the JHV GLSL coordinate path directly;
+  on Metal/ANGLE, the worst measured difference from the Python/Astropy
+  reference is about `0.002` source-image pixels.
+- `formal-TAN` in `Orthographic` mode and `HPC` are not the same display
+  geometry, even with the same observer viewpoint and `dragRotation = 0`.
+  The measured discrepancy matches the geometric difference derived in
   Appendix A.
 - on the sample TAN files, `simple-TAN` remains very close to the `HPC`
-  display geometry, which suggests it may be a better choice than
-  `formal-TAN` for JHV `Orthographic` mode when visual consistency with `HPC`
-  is preferred.
-- this note is therefore a validation/testing note, not a design note for
-  `Orthographic` embedding, playback policy, mouse-position reporting, or
-  synthetic overdrawing.
+  display geometry. It is kept in JHV `Orthographic` mode for data designated
+  as `TAN` in the metadata.
 
 Bottom line:
 
-- `simple-TAN` will be kept in JHV `Orthographic` mode for data designated as
-  `TAN` in the metadata.
-- `HPC` mode was added (with the noted caveat about the viewpoint).
-- support for `ARC`, `AZP`, and `ZPN` data was added (with the noted caveat about the
-  heliospheric imagers).
-- support for `CAR` and `CEA` surface maps was added (with the noted caveat
-  about the display modes).
+- `HPC` mode was added, with the viewpoint caveat above.
+- support for `ARC`, `AZP`, and `ZPN` data was added, with the caveat about
+  heliospheric imagers above.
+- support for `CAR` and `CEA` surface maps was added, with the display-mode
+  caveat above.
+- this is a validation note, not a design note for `Orthographic` embedding,
+  playback policy, mouse-position reporting, or synthetic overdrawing.
 - the position numbers reported in the panel at the bottom of the JHV window
   are display-geometry numbers derived from the mouse pointer position, not
   coordinates read back from the active image WCS. In `HPC`, `Latitudinal`,
-  `Polar`, and `LogPolar`, they follow the corresponding JHV display
-  projection. In `Orthographic`, they are derived purely from the inferred 3D
-  scene point and therefore do not, in general, reflect the image `TAN`,
-  `ARC`, `AZP`, `ZPN`, `CAR`, or `CEA` WCS.
+  `Polar`, and `LogPolar`, they follow the matching JHV display projection. In
+  `Orthographic`, they are derived purely from the inferred 3D scene point and
+  do not, in general, reflect the image WCS.
 
-# The validator
+# Validation approach
 
-For the validation modes in this note, the validator script provides a
-Python/CPU model of the relevant JHV WCS, reprojection, and source-sampling
-logic. Beyond derived WCS quantities, it mirrors key Java/GLSL renderer
-conventions used in the tested paths, including observer-image versus
-surface-map sampling, direct world-to-lon/lat projection for `CAR` and
-`CEA`, wrapped longitude sampling for full-width surface maps, the
-FITS-to-texture row flip, bottom-origin screen coordinates,
+For the Astropy-based validation modes in this note, the Python validator
+provides a Python/CPU model of the relevant JHV WCS, reprojection, and
+source-sampling logic. Beyond derived WCS quantities, it mirrors key Java/GLSL
+renderer conventions used in the tested paths, including the split between
+zenithal source-image and surface-map sampling, direct world-to-lon/lat
+projection for `CAR` and `CEA`, wrapped longitude sampling for full-width
+surface maps, the FITS-to-texture row flip, bottom-origin screen coordinates,
 texcoord/discard rules, and GLSL-style linear texture sampling. It does not
-execute the actual JHV renderer: important parts of the corresponding code
-run in GLSL on the GPU, so the validator re-expresses that logic in Python
-instead of running the Java/GLSL implementation itself. The reported
-agreement is therefore agreement between Astropy and that Python model,
-together with separate checks that the JHV Java metadata derivation matches
-the validator's metadata model. This is strong evidence that the modeled JHV
-path is correct, but it is not a direct execution-level proof of the full
-Java+GLSL renderer.
+execute the actual JHV renderer: important parts of that code
+run in GLSL on the GPU, so the Python validator re-expresses that logic in
+Python instead of running the Java/GLSL implementation itself. The reported
+agreement is between Astropy and that Python model, together with separate
+checks that the JHV Java metadata derivation matches the Python metadata model.
+This checks the modeled JHV path, but it does not execute the full Java+GLSL
+renderer.
 
-## JHV behavior modeled by the validator
+The rest of this section follows the same split:
 
-For each screen pixel, JHV first determines the corresponding point on the
+- Python/Astropy validation of the WCS and sampling model
+- Java/Python comparison of the derived metadata used by JHV
+- Electron/WebGL2 execution of the JHV GLES3 GLSL shader sources
+
+## JHV behavior modeled by the Python validator
+
+For each screen pixel, JHV first determines the matching point on the
 display geometry. In `HPC` mode, that geometry is the `HPC` display plane; in
 `Orthographic` mode, it is the 3D solar scene used by the ortho renderer. From
 that display point, JHV derives the helioprojective coordinates needed to
@@ -190,7 +171,7 @@ small-angle approximation to the helioprojective viewing angles, instead of
 first converting the 3D point to helioprojective coordinates and then applying
 the `formal-TAN` projection step.
 
-Included in the validator:
+Included in the Python validator:
 
 - FITS metadata parsing into the same effective quantities JHV uses:
   - `CRPIX`
@@ -209,15 +190,15 @@ Included in the validator:
 - the `HPC` image sampling path:
   - screen `HPC` coordinate -> helioprojective -> WCS plane -> source pixel
 - the raw image-footprint `HPC` bounds and the centered `HPC` display bounds
-  used in the validation runs reported here
-- the `ARC` observer-image WCS interpretation used for the tested
+  used in these validation runs
+- the `ARC` source-image WCS interpretation used for the tested
   `HPLN-ARC / HPLT-ARC` case
 - the `CAR` and `CEA` source WCS interpretation used for
   `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface maps
 - direct comparison between the `formal-TAN` path in `Orthographic` mode and
   `HPC` for the specific no-rotation comparison mode.
 
-Excluded:
+Excluded from the Python validator:
 
 - `dragRotation`
 - `cameraDiff`
@@ -227,8 +208,8 @@ Excluded:
 - mouse-position reporting or synthetic overdrawing such as annotations, grid
   overlays, and similar on-screen constructs
 - playback/view policy effects such as dynamic refitting of the visible `HPC`
-  box beyond the centered bounds logic explicitly reproduced by the validator,
-  or any other transient user-driven viewing state
+  box beyond the centered bounds logic explicitly reproduced by the Python
+  validator, or any other transient user-driven viewing state
 - `CAR`/`CEA` display-policy choices beyond the validated source-WCS
   interpretation and sampling path
 - Java overlay-only behavior such as:
@@ -237,20 +218,20 @@ Excluded:
   - transformed annotation drawing/picking behavior
 - full OpenGL rasterization state, blending, and UI behavior
 
-The validator therefore establishes:
+The Python validator checks:
 
-- whether the implemented reprojection and sampling math matches Astropy
-- whether the implemented `HPC` sampling map matches Astropy
+- whether the reprojection and sampling math matches Astropy
+- whether the `HPC` sampling map matches Astropy
 - whether the `CAR`/`CEA` source WCS interpretation and sampling path match
   Astropy
 - whether the `formal-TAN` path in `Orthographic` mode and `HPC` sample the
   same source pixels over the same rendered comparison frame.
 
-## Astropy-based validation scope
+## Python/Astropy validation scope
 
 Astropy can validate the parts of the mapping that are fully defined by WCS.
 
-In this validator, Astropy is the external reference for:
+Here, Astropy is the external reference for:
 
 - forward samples
   - JHV-style world/helioprojective -> WCS plane -> pixel
@@ -268,7 +249,7 @@ In this validator, Astropy is the external reference for:
     WCS
 - inverse `ZPN` (primary branch only)
   - plane -> helioprojective, checked by the same round-trip strategy on the
-  supported primary monotonic branch
+    supported primary monotonic branch
 - bounded `HPC` render comparison
   - the same `HPC` screen grid is run through the JHV sampling path and through
     Astropy `world -> pixel`
@@ -294,13 +275,13 @@ Not compared against Astropy:
   `HPC`
   - this is an internal JHV-to-JHV comparison
 
-## How to use the validator
+## Running the validation tools
 
-The main script is:
+The main Python validator is:
 
 - `extra/test/validate_jhv_wcs_against_astropy.py`
 
-The documented test set in this note can also be run as a suite with:
+The documented test set can also be run as a suite with:
 
 - `extra/test/run_jhv_wcs_hpc_validation_suite.py`
 
@@ -308,13 +289,13 @@ A companion Java/Python metadata-comparison check is also available:
 
 - `extra/test/compare_java_metadata_to_validator.py`
 
-Run it with:
+Run the Python validator with:
 
 ```text
 python3 extra/test/validate_jhv_wcs_against_astropy.py <fits-file> [mode]
 ```
 
-The validator uses three different comparison domains:
+The Python validator uses four comparison regions:
 
 - full image frame:
   - the actual FITS image pixel grid
@@ -327,16 +308,13 @@ The validator uses three different comparison domains:
   - a rendered longitude/latitude grid used for the additional `CAR`/`CEA`
     surface-map sampling checks
 
-### Direct Java/Python metadata comparison
+## Direct Java/Python metadata comparison
 
-The Astropy-based validator described above is intentionally an independent
-Python model of the relevant JHV WCS and sampling logic. That independence is
-useful for validation, but it also means that a pure Astropy agreement result
-does not by itself prove that the Java metadata path is
-interpreting FITS headers in the same way as the validator.
+The Python validator described above is intentionally independent of the Java
+metadata code. Astropy agreement alone does not prove that Java interprets the
+FITS headers in the same way as the Python model.
 
-To check that point directly, the work reported in this note also includes a
-small Java-side metadata dumper:
+To check that point, this note also uses a small Java-side metadata dumper:
 
 - `extra/test/JHVMetadataDump.java`
 
@@ -347,7 +325,7 @@ and a Python driver that compiles and runs that helper:
 The comparison driver:
 
 - compiles the JHV Java code and the `JHVMetadataDump.java` helper
-- opens representative FITS files from the documented validation suite
+- opens FITS files from the documented validation suite
 - instantiates `FitsMetaData` (the JHV class that interprets the FITS
   metadata into the derived image/WCS quantities used by the program) on the
   Java side
@@ -355,8 +333,8 @@ The comparison driver:
 - compares them field-by-field against the Python validator's
   `build_jhv_meta(...)`
 
-The comparison covers the representative FITS/HDU cases drawn from
-the documented validation suite, including:
+The comparison covers the FITS/HDU cases from the documented validation suite,
+including:
 
 - `TAN`
 - `ARC`
@@ -389,11 +367,11 @@ The compared derived quantities include:
   - `projection`
   - `pv2`
 
-This comparison is useful for catching Java-side metadata interpretation drift that may not be
-visible from the independent Astropy agreement alone.
+This comparison catches Java-side metadata interpretation drift that may not be
+visible from the Astropy agreement alone.
 
-In the code state documented here, this direct Java/Python metadata comparison
-passes on all representative cases used by the comparison script.
+In the code state documented here, this Java/Python metadata comparison agrees
+on all cases used by the comparison script.
 
 One caveat remains for the `observer_distance` field when `DSUN_OBS` is absent:
 
@@ -404,11 +382,51 @@ One caveat remains for the `observer_distance` field when `DSUN_OBS` is absent:
 Those two fallback ephemerides do not yield exactly the same observer
 distance. On the tested missing-`DSUN_OBS` cases, the difference is tiny, so
 the direct comparison accepts a small tolerance for `observer_distance` in that
-specific case. This does not affect the conclusion about WCS metadata
-interpretation, but it is worth stating explicitly so the comparison result is
-not over-interpreted.
+case. This does not affect the conclusion about WCS metadata interpretation.
 
-### Astropy-based validation modes
+## GLSL/Electron validation setup
+
+The Astropy/Python checks use double precision. The production renderer runs
+the projection and sampling formulas in GLES3/OpenGL ES GLSL, with uniform
+blocks, float32 arithmetic, texture sampling, and backend-specific shader
+compilation.
+
+To test the shader path outside the application, the suite also includes an
+Electron/WebGL2 runner:
+
+- `extra/test/validate_jhv_wcs_with_electron.py`
+- `extra/test/electron_webgl_runner/runner.html`
+
+The Electron runner:
+
+- starts the bundled Electron executable
+- creates a WebGL2 context
+- compiles the JHV shader sources from `resources/glsl`
+- binds UBO data matching the JHV `WCSBlock`, `ProjectionBlock`,
+  `ScreenBlock`, and `DisplayBlock` layouts
+- renders diagnostic or production shader variants into an `RGBA32F`
+  framebuffer
+- reads the float framebuffer back to Python
+- compares shader-generated texture coordinates and samples against the
+  Python/Astropy reference path
+
+The diagnostic variants are narrow on purpose: they expose texture coordinates
+and sampled values so they can be compared numerically. The "color smoke"
+variants compile and execute the production color/diff shader paths and check
+that the output is finite and nonblank.
+
+Two Electron backends were used for the results below:
+
+- `default`: Electron/ANGLE on macOS Metal, reported by WebGL as
+  `ANGLE Metal Renderer: Apple M3 Pro`
+- `swiftshader`: Electron/ANGLE on SwiftShader, a Vulkan software rendering
+  implementation
+
+The Metal backend corresponds to JHV's macOS rendering path. SwiftShader gives
+a second backend run, with larger coordinate differences in some projection
+paths because its transcendental/math behavior differs.
+
+## Astropy-based validation modes
 
 1. Forward WCS sampled validation
 
@@ -419,7 +437,7 @@ python3 extra/test/validate_jhv_wcs_against_astropy.py \
 
 This mode reports forward WCS errors on sampled points. For `TAN`, `ARC`, and
 `AZP`, the samples are generic world/helioprojective points. For `ZPN`, `CAR`, and
-`CEA`, the validator uses pixel-derived world samples so that edge, pole, and
+`CEA`, the Python validator uses pixel-derived world samples so that edge, pole, and
 seam cases are covered more systematically. It is not tied to the displayed
 solar disk or to the full image frame.
 
@@ -441,7 +459,7 @@ pixel-center error.
 
 For the `CAR` and `CEA` cases, the same mode also validates
 surface maps against Astropy over the full source image grid. In those cases,
-the validator uses the effective linear transform `PC * CDELT`, not bare
+the Python validator uses the effective linear transform `PC * CDELT`, not bare
 `CDELT`, and keeps the original axis types (`CRLN-CAR / CRLT-CAR` or
 `CRLN-CEA / CRLT-CEA`) when constructing the Astropy comparison WCS.
 
@@ -581,7 +599,7 @@ It validates:
 - `CEA plane -> world lon/lat`
 - round-trip error
 
-### Internal JHV comparison modes
+## Internal JHV comparison modes
 
 1. `formal-TAN` vs JHV `HPC`
 
@@ -678,14 +696,14 @@ Interpretation:
 
 # Results
 
-The primary discrepancy units reported in this note are angular sky errors,
-expressed in milliarcseconds or arcseconds as appropriate. Pixel errors are
-kept as secondary units because they are the quantities reported directly by
-the validator.
+The main discrepancy units in this note are angular sky errors, expressed in
+milliarcseconds or arcseconds. Pixel errors are kept as secondary units because
+they are the quantities reported directly by
+the Python validator.
 
 ## FITS projections
 
-These tests compare the implemented JHV projection paths directly against
+These tests compare the JHV projection code against
 Astropy as the external WCS reference.
 
 1. `formal-TAN` is correct.
@@ -693,7 +711,7 @@ Astropy as the external WCS reference.
 - JHV `world -> helioprojective -> TAN plane -> pixel`
 - `TAN plane -> helioprojective angles`
 - matches Astropy to numerical precision
-- representative measured results include:
+- measured results:
   - forward sampled check on `20241224_194245_d4c2A.fts`:
     - `1.00e-7 mas` max (`6.821210e-12 px`)
     - `projection_max_error_internal=1.012523e-13`
@@ -729,16 +747,16 @@ Astropy as the external WCS reference.
   everywhere. On the solar disk, `Orthographic` samples from the solar sphere.
   Outside the solar disk, `Orthographic` uses a flat image-view plane to
   sample the WCS projection instead. The off-limb part of the comparison is
-  therefore not a direct measurement of the `simple-TAN`
-  small-angle-approximation error alone.
+  not a direct measurement of the `simple-TAN` small-angle-approximation error
+  alone.
 
-3. `ARC` is correct for the tested PUNCH observer-image file.
+3. `ARC` is correct for the tested PUNCH source-image file.
 
 - JHV `world -> helioprojective -> ARC plane -> pixel`
 - `ARC plane -> helioprojective angles`
 - matches Astropy to numerical precision on:
   - `extra/test/data/PUNCH_L3_CAM_20260425001600_v0k.fits`
-- representative measured results include:
+- measured results:
   - forward sampled check on the same file:
     - `2.66e-4 mas` max (`3.278956e-09 px`)
     - `projection_max_error_internal=2.785048e-10`
@@ -756,7 +774,7 @@ Astropy as the external WCS reference.
 - the tested HI files are non-slanted: `PV2_2` is absent, so `gamma = 0`
 - JHV also implements slanted `AZP`, but that case is not validated by the
   sample set reported in this note
-- representative measured results include:
+- measured results:
   - full pixel-center check on `20250622_000831_s4h1A.fts`:
     - `1.72e-7 mas` max (`2.387424e-12 px`)
   - inverse `AZP` on the same file:
@@ -773,15 +791,15 @@ Astropy as the external WCS reference.
   - `extra/test/data/psp_L3_wispr_20231227T150704_V1_2222.fits`
 - the implementation keeps only the primary monotonic branch of the
   radial polynomial
-- a representative measured result on
+- measured result on
   `psp_L3_wispr_20231227T150704_V1_2222.fits`:
   - `1.15e-5 mas` max
   - `roundtrip_plane_max_error_internal=4.840572e-14`
 
 ## Astropy validation of JHV HPC rendering
 
-This subsection also compares JHV directly against Astropy, but for the `HPC`
-sampling path rather than for the FITS projection formulas alone.
+This section compares JHV against Astropy for the `HPC` sampling path, not only
+for the FITS projection formulas.
 
 For zenithal image data, the deterministic part of the mapping is:
 
@@ -793,8 +811,8 @@ For zenithal image data, the deterministic part of the mapping is:
 That intermediate `HPC` ray field is fully determined by FITS/WCS and the
 observer geometry.
 
-For testing purposes, the validator models this `HPC` sampling map over a
-bounded rendered `HPC` screen domain and compares it directly against Astropy.
+The Python validator models this `HPC` sampling map over a
+bounded rendered `HPC` screen domain and compares it against Astropy.
 
 Measured `HPC` validation results:
 
@@ -814,7 +832,7 @@ Measured `HPC` validation results:
 - PSP/WISPR 2222 (`ZPN`, `psp_L3_wispr_20231227T150704_V1_2222.fits`):
   - `1.79e-5 mas` max (`8.787993e-11 px`)
 
-The centered display bounds are intentionally slightly larger than the raw
+The centered display bounds are slightly larger than the raw
 image-footprint bounds because the JHV `HPC` screen mapping recenters
 the domain symmetrically about disk center and pads the shorter axis to the
 active display aspect.
@@ -848,7 +866,7 @@ Measured comparison result:
       (`1.629534e-01 px` max, `1.066298e-01 px` RMS)
     - theoretical max from Appendix A: `2.29 arcsec`
 
-These results support the following conclusions:
+These results show:
 
 - the `formal-TAN` path in `Orthographic` mode and `HPC` are not the same
   display geometry
@@ -894,7 +912,7 @@ This is again an internal JHV comparison. Its purpose is to show whether
 
 ## `CAR` surface-map validation
 
-This subsection reports the Astropy validation results for the tested
+This section reports the Astropy validation results for the tested
 full-Sun `CAR` surface-map case.
 
 - the validated files are:
@@ -904,11 +922,11 @@ full-Sun `CAR` surface-map case.
 - all three files are `CRLN-CAR / CRLT-CAR` surface maps
 - the correct effective scale comes from the linear WCS transform
   `PC * CDELT`, not from bare `CDELT`
-- the validator therefore keeps the original `CRLN-CAR / CRLT-CAR` axis types
+- the Python validator keeps the original `CRLN-CAR / CRLT-CAR` axis types
   and uses the effective linear transform when constructing the Astropy
   comparison WCS
 - JHV and Astropy agree to numerical precision
-- representative measured results on `extra/test/data/sunerf_map.fits`:
+- measured results on `extra/test/data/sunerf_map.fits`:
   - full pixel-center check:
     - `3.07e-7 mas` max (`1.705303e-13 px`)
   - forward sampled check:
@@ -917,7 +935,7 @@ full-Sun `CAR` surface-map case.
   - inverse `CAR` on the same file:
     - `inverse_world_max_error_deg=3.552714e-15`
     - `roundtrip_plane_max_error_internal=2.553513e-14`
-- representative measured results on
+- measured results on
   `extra/test/data/syn_HMI_hmi.m_720s_2026-02-25T00-00-00_a_V1.fits`:
   - full pixel-center check:
     - `4.09e-7 mas` max (`2.273737e-13 px`)
@@ -927,7 +945,7 @@ full-Sun `CAR` surface-map case.
   - inverse `CAR` on the same file:
     - `inverse_world_max_error_deg=5.684342e-14`
     - `roundtrip_plane_max_error_internal=8.881784e-16`
-- representative measured results on
+- measured results on
   `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits`:
   - full pixel-center check:
     - `6.14e-7 mas` max (`9.094947e-13 px`)
@@ -943,7 +961,7 @@ full-Sun `CAR` surface-map case.
 
 ## `CEA` surface-map validation
 
-This subsection reports the Astropy validation results for the tested
+This section reports the Astropy validation results for the tested
 full-Sun `CEA` surface-map case.
 
 - the validated file is:
@@ -953,11 +971,11 @@ full-Sun `CEA` surface-map case.
   `PC * CDELT`, not from bare `CDELT`
 - the second WCS axis is the `CEA` equal-area latitude coordinate, not direct
   angular latitude
-- the validator therefore keeps the original `CRLN-CEA / CRLT-CEA` axis types
+- the Python validator keeps the original `CRLN-CEA / CRLT-CEA` axis types
   and uses the effective linear transform when constructing the Astropy
   comparison WCS
 - JHV and Astropy agree to numerical precision
-- representative measured results on
+- measured results on
   `extra/test/data/mrzqs260301t2314c2308_169.fits`:
   - full pixel-center check:
     - `1.02e-7 mas` max (`5.684342e-14 px`)
@@ -973,7 +991,7 @@ full-Sun `CEA` surface-map case.
 
 ## Dense surface-map render compare
 
-In addition to the source-pixel and sampled WCS checks above, the validator
+In addition to the source-pixel and sampled WCS checks above, the Python validator
 includes a separate dense rendered surface-map comparison for the tested
 `CAR`/`CEA` files. This mode evaluates the simulated JHV sampling path and the
 Astropy reference on a longitude/latitude render grid at `4x` the source-map
@@ -1000,9 +1018,61 @@ source-pixel validation numbers reported above.
   - `pixel_center_rms_error_px=3.742207e-14`
   - `sample_max_abs_error=6.195933e-11`
 
-These dense rendered checks remain in the same numerical regime as the main
-`CAR`/`CEA` Astropy validation and support the conclusion that the modeled JHV
+These dense rendered checks stay in the same numerical range as the main
+`CAR`/`CEA` Astropy validation and show that the modeled JHV
 surface-map sampling path agrees with Astropy to numerical precision.
+
+## GLSL/Electron validation results
+
+The Electron tests run the JHV GLES3 GLSL shader sources through a WebGL2
+runner. These results measure the shader path in float32/backend
+arithmetic, not the double-precision mathematical model reported above.
+
+All pixel errors in this section are source-image coordinate errors. The shader
+produces the texture coordinate from which the image would be sampled; the
+Electron runner compares that coordinate with the Python/Astropy reference
+coordinate and converts the difference into the original FITS image pixel grid.
+The values below are not framebuffer pixels, screen pixels, or visible output
+distortion measured on the rendered image.
+
+The Metal/ANGLE run corresponds to JHV's macOS rendering path. Its worst
+GLSL-to-reference difference was `1.945496e-03` source-image pixels, on the
+`CAR` surface-map cases.
+
+Metal/ANGLE source-image pixel errors:
+
+| Case | Worst source-image px |
+|---|---:|
+| `TAN` AIA 171 orthographic | `4.649544e-04` |
+| `TAN` EUI FSI 174 orthographic | `2.876106e-04` |
+| `TAN` COR2 orthographic | `1.709235e-04` |
+| `HPC` AIA 171 | `1.008153e-03` |
+| `HPC` COR2 | `5.172269e-04` |
+| `HPC` PUNCH `ARC` | `9.909368e-04` |
+| `HPC` HI1 `AZP` | `2.553579e-04` |
+| `HPC` HI2 `AZP` | `2.742185e-04` |
+| `HPC` WISPR 1211 `ZPN` | `3.360559e-04` |
+| `HPC` WISPR 2222 `ZPN` | `2.698873e-04` |
+| SunERF `CAR` surface map | `7.295609e-04` |
+| HMI `CAR` surface map | `1.945496e-03` |
+| AIA `CAR` surface map | `1.945496e-03` |
+| `CEA` surface map | `5.835295e-05` |
+
+The same Electron suite was also run on SwiftShader, a Vulkan software
+rendering implementation. It shows larger coordinate differences in `HPC` and
+non-orthographic mappings.
+
+Backend maxima:
+
+| Family | Metal/ANGLE source-image px | SwiftShader source-image px |
+|---|---:|---:|
+| `TAN`/`ARC`/`AZP`/`ZPN` `HPC` render | `1.121007e-03` | `2.833492e-01` |
+| `TAN` orthographic | `4.649544e-04` | `4.862770e-04` |
+| surface maps | `1.945496e-03` | `2.964020e-02` |
+| latitudinal/polar/log-polar | `8.688674e-04` | `5.916016e-01` |
+
+The Metal result validates the production GLSL coordinate path to about
+`0.002` source-image pixels against the Python/Astropy reference.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
