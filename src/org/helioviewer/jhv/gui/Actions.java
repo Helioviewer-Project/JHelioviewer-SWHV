@@ -20,12 +20,12 @@ import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayFrame;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
+import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.gui.dialogs.SoarDialog;
 import org.helioviewer.jhv.gui.dialogs.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
-import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.swing.DesktopIntegration;
@@ -336,7 +336,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            UpdateChecker.check(true);
+            NewVersionDialog.check();
         }
     }
 

@@ -18,7 +18,6 @@ public class Settings {
             setProperty("display.normalizeAIA", "true");
             setProperty("display.normalizeRadius", "false");
             setProperty("display.time", "Observer");
-            setProperty("update.next", "0");
             setProperty("video.format", "H264");
             setProperty("dataSources.defaultServer", "IAS");
         }

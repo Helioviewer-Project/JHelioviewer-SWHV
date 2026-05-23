@@ -1,41 +1,55 @@
 package org.helioviewer.jhv.gui.dialogs;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.net.URI;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.swing.DesktopIntegration;
+import org.helioviewer.jhv.threads.JHVThread;
 
 import com.jidesoft.dialog.ButtonPanel;
+
+import okio.BufferedSource;
 
 @SuppressWarnings("serial")
 public class NewVersionDialog extends TextDialog {
 
-    // setting for check.update.next
-    private int nextCheck = 0;
-    // suspended startups when clicked remindMeLater
-    private static final int suspendedStarts = 5;
-    private final boolean verbose;
-
-    public NewVersionDialog(String _text, boolean _verbose) {
+    private NewVersionDialog(String _text) {
         super("New Version Available", _text, false);
-        verbose = _verbose;
+    }
+
+    public static void check() {
+        JHVThread.create(() -> {
+            try (NetClient nc = NetClient.of(new URI(JHVGlobals.downloadURL + "VERSION")); BufferedSource source = nc.getSource()) {
+                String version = source.readUtf8Line();
+                if (version == null || version.isEmpty())
+                    throw new Exception("Update Checker: Empty version string");
+
+                String runningVersion = JHVGlobals.version + '.' + JHVGlobals.revision;
+                if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
+                    Log.info("Found newer version " + version);
+                    EventQueue.invokeLater(() -> new NewVersionDialog(updateAvailableMessage(version, runningVersion)).showDialog());
+                } else {
+                    EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(null, upToDateMessage(runningVersion)));
+                }
+            } catch (Exception e) {
+                Log.warn(e);
+                Message.warn("Update check error", failedMessage(e));
+            }
+        }, "JHV-CheckUpdate").start();
     }
 
     @Override
     public ButtonPanel createButtonPanel() {
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
-        setDefaultCancelAction(close);
-
-        JButton closeBtn = new JButton(close);
-        closeBtn.setText("Close");
+        ButtonPanel panel = super.createButtonPanel();
 
         AbstractAction download = new AbstractAction() {
             @Override
@@ -51,25 +65,20 @@ public class NewVersionDialog extends TextDialog {
         downBtn.setText("Download");
         setInitFocusedComponent(downBtn);
 
-        ButtonPanel panel = new ButtonPanel();
-
-        if (!verbose) {
-            JButton laterBtn = new JButton("Remind me later");
-            laterBtn.addActionListener(e -> {
-                setVisible(false);
-                nextCheck = suspendedStarts;
-            });
-            panel.add(laterBtn, ButtonPanel.OTHER_BUTTON);
-        }
-
         panel.add(downBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
-        panel.add(closeBtn, ButtonPanel.CANCEL_BUTTON);
-
         return panel;
     }
 
-    public int getNextCheck() {
-        return nextCheck;
+    private static String updateAvailableMessage(String version, String runningVersion) {
+        return "JHelioviewer " + version + " is now available (you have " + runningVersion + ").";
+    }
+
+    private static String upToDateMessage(String runningVersion) {
+        return "You are running the latest JHelioviewer version (" + runningVersion + ')';
+    }
+
+    private static String failedMessage(Exception e) {
+        return "While checking for a newer version got " + e.getMessage();
     }
 
 }
