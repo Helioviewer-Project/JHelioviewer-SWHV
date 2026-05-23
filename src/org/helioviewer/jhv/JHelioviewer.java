@@ -17,7 +17,6 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ProxySettings;
-import org.helioviewer.jhv.io.UpdateChecker;
 import org.helioviewer.jhv.opengl.AnglePbuffer;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
@@ -139,7 +138,6 @@ public class JHelioviewer {
     private static void onSuccessInit(Void ignoredResult) {
         DataSources.loadSources(true);
         CommandLine.load();
-        UpdateChecker.check(false);
     }
 
     private static void onFailureInit(String ignoredLogContext, Throwable t) {
