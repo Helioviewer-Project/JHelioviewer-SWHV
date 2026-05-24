@@ -38,7 +38,8 @@ public class WrappedTable extends JTable {
                 if (dim != null && dim.height > height) // satisfy coverity
                     height = dim.height;
             }
-            setRowHeight(i, height);
+            if (height != getRowHeight(i))
+                setRowHeight(i, height);
         }
     }
 
