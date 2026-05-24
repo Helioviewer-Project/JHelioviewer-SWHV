@@ -2,10 +2,10 @@ package org.helioviewer.jhv.gui.dialogs;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
@@ -48,6 +48,8 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     private final WrappedTable fitsTable = new WrappedTable();
     private final HTMLPane basicArea = new HTMLPane();
     private final HTMLPane hvArea = new HTMLPane();
+    private String exportXml;
+    private String exportFilename;
 
     public MetaDataDialog() {
         super(JHVFrame.getFrame(), "Image Information");
@@ -67,6 +69,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         content.add(new JScrollPane(basicArea));
         content.add(new JScrollPane(fitsTable));
         content.add(new JScrollPane(hvArea));
+        exportFitsButton.addActionListener(_ -> exportFitsHeader());
     }
 
     @Override
@@ -113,7 +116,8 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         fitsModel.setRowCount(0);
         hvArea.setText("");
         hvArea.setPreferredSize(new Dimension(600, 100));
-        lastNodeSeen = null;
+        exportXml = null;
+        exportFilename = null;
         exportFitsButton.setEnabled(false);
 
         if (!(layer.getMetaData() instanceof FitsMetaData m)) {
@@ -135,29 +139,35 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
             StringBuilder hvSB = new StringBuilder();
             Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
             if (root != null)
-                readXMLData(hvSB, root);
+                readFitsXMLData(root);
             root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
             if (root != null)
-                readXMLData(hvSB, root);
+                readHelioviewerXMLData(hvSB, root);
             hvArea.setText(hvSB.toString());
 
-            Path path = Path.of(JHVDirectory.EXPORTS.getPath(),
-                    m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml");
+            exportXml = xml;
+            exportFilename = m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
             exportFitsButton.setEnabled(true);
-
-            for (ActionListener listener : exportFitsButton.getActionListeners())
-                exportFitsButton.removeActionListener(listener);
-            exportFitsButton.addActionListener(e -> JHVThread.create(() -> {
-                try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-                    writer.write(xml, 0, xml.length());
-                    CompletionNotifications.fileReady(path.toString());
-                } catch (Exception ex) {
-                    Log.error("Failed to write metadata", ex);
-                }
-            }, "JHV-ExportMetadata").start());
         } catch (Exception e) {
             Log.error(e);
         }
+    }
+
+    private void exportFitsHeader() {
+        String xml = exportXml;
+        String filename = exportFilename;
+        if (xml == null || filename == null)
+            return;
+
+        JHVThread.create(() -> {
+            Path path = Path.of(JHVDirectory.EXPORTS.getPath(), filename);
+            try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+                writer.write(xml, 0, xml.length());
+                CompletionNotifications.fileReady(path.toString());
+            } catch (Exception ex) {
+                Log.error("Failed to write metadata", ex);
+            }
+        }, "JHV-ExportMetadata").start();
     }
 
     private static class FitsModel extends DefaultTableModel {
@@ -178,53 +188,47 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
 
     }
 
-    private String lastNodeSeen;
+    private void readFitsXMLData(Node node) {
+        readXMLData(node, value -> fitsModel.addRow(new String[]{value.name, value.text, value.comment}));
+    }
 
-    private void readXMLData(StringBuilder hvSB, Node node) {
-        // get element name and value
+    private void readHelioviewerXMLData(StringBuilder hvSB, Node node) {
+        readXMLData(node, value -> hvSB.append(value.name).append(": ").append(value.text).append("<br/>"));
+    }
+
+    private void readXMLData(Node node, Consumer<NodeValue> consumer) {
         String nodeName = node.getNodeName();
-        String nodeValue = getElementValue(node);
-
-        Node attrNode;
-        NamedNodeMap attributes = node.getAttributes();
-        String nodeComment = attributes != null && (attrNode = attributes.getNamedItem("comment")) != null ? attrNode.getNodeValue() : "";
-
-        if ("COMMENT".equals(nodeName) || "HISTORY".equals(nodeName)) {
-            nodeValue = nodeComment;
-            nodeComment = "";
-        }
-
-        switch (nodeName) {
-            case "fits", "helioviewer" -> lastNodeSeen = nodeName;
-            default -> {
-                if ("fits".equals(lastNodeSeen))
-                    fitsModel.addRow(new String[]{nodeName, nodeValue, nodeComment});
-                else
-                    hvSB.append(nodeName).append(": ").append(nodeValue).append("<br/>");
+        if (!"fits".equals(nodeName) && !"helioviewer".equals(nodeName)) {
+            String text = getElementValue(node);
+            String comment = getNodeComment(node);
+            if ("COMMENT".equals(nodeName) || "HISTORY".equals(nodeName)) {
+                text = comment;
+                comment = "";
             }
+            consumer.accept(new NodeValue(nodeName, text, comment));
         }
 
-        // write the child nodes recursively
         NodeList children = node.getChildNodes();
         int len = children.getLength();
         for (int i = 0; i < len; i++) {
             Node child = children.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-                readXMLData(hvSB, child);
-            }
+            if (child.getNodeType() == Node.ELEMENT_NODE)
+                readXMLData(child, consumer);
         }
     }
 
-    /**
-     * A method that gets the value of a node element.
-     * <p>
-     * If the node itself has children and no text value, an empty string is
-     * returned. This is maybe an overkill for our purposes now, but takes into
-     * account the possibility of nested tags.
-     *
-     * @param elem Node to read
-     * @return value of the node
-     */
+    private record NodeValue(String name, String text, String comment) {}
+
+    private static String getNodeComment(Node node) {
+        Node attrNode;
+        NamedNodeMap attributes = node.getAttributes();
+        return attributes != null && (attrNode = attributes.getNamedItem("comment")) != null ? attrNode.getNodeValue() : "";
+    }
+
+    // A method that gets the value of a node element.
+    // If the node itself has children and no text value, an empty string is
+    // returned. This is maybe an overkill for our purposes now, but takes into
+    // account the possibility of nested tags.
     private static String getElementValue(Node elem) {
         if (elem != null && elem.hasChildNodes()) {
             for (Node child = elem.getFirstChild(); child != null; child = child.getNextSibling()) {
