@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -44,7 +43,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -56,10 +55,10 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
     private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"), JLabel.RIGHT);
 
     private void updateCacheSize() {
-        JHVThread.create(() -> {
-            long size = JPIPCacheManager.getSize();
-            EventQueue.invokeLater(() -> cacheSizeLabel.setText(cacheSizeText(String.format("%.1f", size / (1024 * 1024 * 1024.)))));
-        }, "JHV-CacheSize").start();
+        Tasks.submit("cache-size",
+                JPIPCacheManager::getSize,
+                size -> cacheSizeLabel.setText(cacheSizeText(String.format("%.1f", size / (1024 * 1024 * 1024.)))),
+                Log::error);
     }
 
     private static String cacheSizeText(String size) {
@@ -239,18 +238,17 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
             clearCache.setEnabled(false);
-            JHVThread.create(() -> {
-                try {
-                    JPIPCacheManager.clear();
-                } catch (Exception ex) {
-                    Log.error("JPIP cache clear error", ex);
-                } finally {
-                    EventQueue.invokeLater(() -> {
-                        clearCache.setEnabled(true);
-                        updateCacheSize();
-                    });
-                }
-            }, "JHV-ClearCache").start();
+            Tasks.submit("clear-cache", () -> {
+                JPIPCacheManager.clear();
+                return null;
+            }, _ -> {
+                clearCache.setEnabled(true);
+                updateCacheSize();
+            }, (logContext, t) -> {
+                Log.error(logContext, t);
+                clearCache.setEnabled(true);
+                updateCacheSize();
+            });
         });
 
         JPanel cache = new JPanel(new FlowLayout(FlowLayout.LEADING));
