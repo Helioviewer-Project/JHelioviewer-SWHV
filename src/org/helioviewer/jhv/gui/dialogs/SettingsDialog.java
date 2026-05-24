@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -43,6 +44,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -51,10 +53,17 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public final class SettingsDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
-    private final JLabel labelCache = new JLabel("The image cache currently uses 0.0GB on disk.", JLabel.RIGHT);
+    private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"), JLabel.RIGHT);
 
-    private void setLabelCache() {
-        labelCache.setText(String.format("The image cache currently uses %.1fGB on disk.", JPIPCacheManager.getSize() / (1024 * 1024 * 1024.)));
+    private void updateCacheSize() {
+        JHVThread.create(() -> {
+            long size = JPIPCacheManager.getSize();
+            EventQueue.invokeLater(() -> cacheSizeLabel.setText(cacheSizeText(String.format("%.1f", size / (1024 * 1024 * 1024.)))));
+        }, "JHV-CacheSize").start();
+    }
+
+    private static String cacheSizeText(String size) {
+        return "The image cache currently uses " + size + "GB on disk.";
     }
 
     private DefaultsSelectionPanel defaultsPanel;
@@ -102,7 +111,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
 
     @Override
     public void showDialog() {
-        setLabelCache();
+        updateCacheSize();
         pack();
         setLocationRelativeTo(JHVFrame.getFrame());
         setVisible(true);
@@ -219,24 +228,35 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
             c.gridy++;
         }
 
-        JPanel cache = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        JButton clearCache = new JButton("Clear Cache");
-        clearCache.addActionListener(e -> {
-            try {
-                JPIPCacheManager.clear();
-                setLabelCache();
-            } catch (Exception ex) {
-                Log.error("JPIP cache clear error", ex);
-            }
-        });
-        cache.add(labelCache);
-        cache.add(clearCache);
-
         JPanel paramsPanel = new JPanel(new BorderLayout());
         paramsPanel.add(settings, BorderLayout.PAGE_START);
-        paramsPanel.add(cache, BorderLayout.PAGE_END);
+        paramsPanel.add(createCachePanel(), BorderLayout.PAGE_END);
 
         return paramsPanel;
+    }
+
+    private JPanel createCachePanel() {
+        JButton clearCache = new JButton("Clear Cache");
+        clearCache.addActionListener(e -> {
+            clearCache.setEnabled(false);
+            JHVThread.create(() -> {
+                try {
+                    JPIPCacheManager.clear();
+                } catch (Exception ex) {
+                    Log.error("JPIP cache clear error", ex);
+                } finally {
+                    EventQueue.invokeLater(() -> {
+                        clearCache.setEnabled(true);
+                        updateCacheSize();
+                    });
+                }
+            }, "JHV-ClearCache").start();
+        });
+
+        JPanel cache = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        cache.add(cacheSizeLabel);
+        cache.add(clearCache);
+        return cache;
     }
 
     private static JPanel getStatePanel() {
