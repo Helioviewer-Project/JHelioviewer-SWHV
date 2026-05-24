@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -26,7 +28,7 @@ import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.FitsMetaData;
-import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.w3c.dom.Document;
@@ -50,6 +52,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     private final HTMLPane hvArea = new HTMLPane();
     private String exportXml;
     private String exportFilename;
+    private int metadataRequest;
 
     public MetaDataDialog() {
         super(JHVFrame.getFrame(), "Image Information");
@@ -131,26 +134,43 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 "Measurement: " + m.getMeasurement() + "<br/>" +
                 "Observation Date: " + m.getViewpoint().time);
 
-        try {
-            String xml = layer.getView().getXMLMetaData();
-            Document doc = XMLUtils.parse(xml);
+        int request = ++metadataRequest;
+        Tasks.submit("metadata", () -> parseMetadata(layer, m), parsed -> applyMetadata(request, parsed), Log::error);
+    }
 
-            // Send xml data to meta data dialog box
-            StringBuilder hvSB = new StringBuilder();
-            Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
-            if (root != null)
-                readFitsXMLData(root);
-            root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
-            if (root != null)
-                readHelioviewerXMLData(hvSB, root);
-            hvArea.setText(hvSB.toString());
+    private void applyMetadata(int request, ParsedMetadata parsed) {
+        if (request != metadataRequest)
+            return;
 
-            exportXml = xml;
-            exportFilename = m.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(m.getViewpoint().time.milli) + ".fits.xml";
-            exportFitsButton.setEnabled(true);
-        } catch (Exception e) {
-            Log.error(e);
+        for (NodeValue value : parsed.fits)
+            fitsModel.addRow(new String[]{value.name, value.text, value.comment});
+        hvArea.setText(parsed.helioviewer);
+
+        exportXml = parsed.exportXml;
+        exportFilename = parsed.exportFilename;
+        exportFitsButton.setEnabled(true);
+
+        if (isVisible()) {
+            fitsTable.updateRowHeights();
+            pack();
         }
+    }
+
+    private static ParsedMetadata parseMetadata(ImageLayer layer, FitsMetaData metadata) throws Exception {
+        String xml = layer.getView().getXMLMetaData();
+        Document doc = XMLUtils.parse(xml);
+
+        List<NodeValue> fits = new ArrayList<>();
+        StringBuilder helioviewer = new StringBuilder();
+        Node root = doc.getDocumentElement().getElementsByTagName("fits").item(0);
+        if (root != null)
+            readFitsXMLData(fits, root);
+        root = doc.getDocumentElement().getElementsByTagName("helioviewer").item(0);
+        if (root != null)
+            readHelioviewerXMLData(helioviewer, root);
+
+        String filename = metadata.getDisplayName().replace(' ', '_') + "__" + TimeUtils.formatFilename(metadata.getViewpoint().time.milli) + ".fits.xml";
+        return new ParsedMetadata(fits, helioviewer.toString(), xml, filename);
     }
 
     private void exportFitsHeader() {
@@ -159,15 +179,13 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         if (xml == null || filename == null)
             return;
 
-        JHVThread.create(() -> {
+        Tasks.submit("metadata-export", () -> {
             Path path = Path.of(JHVDirectory.EXPORTS.getPath(), filename);
             try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                 writer.write(xml, 0, xml.length());
-                CompletionNotifications.fileReady(path.toString());
-            } catch (Exception ex) {
-                Log.error("Failed to write metadata", ex);
             }
-        }, "JHV-ExportMetadata").start();
+            return path.toString();
+        }, CompletionNotifications::fileReady, (logContext, t) -> Log.error("Failed to write metadata", t));
     }
 
     private static class FitsModel extends DefaultTableModel {
@@ -188,15 +206,15 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
 
     }
 
-    private void readFitsXMLData(Node node) {
-        readXMLData(node, value -> fitsModel.addRow(new String[]{value.name, value.text, value.comment}));
+    private static void readFitsXMLData(List<NodeValue> fits, Node node) {
+        readXMLData(node, fits::add);
     }
 
-    private void readHelioviewerXMLData(StringBuilder hvSB, Node node) {
+    private static void readHelioviewerXMLData(StringBuilder hvSB, Node node) {
         readXMLData(node, value -> hvSB.append(value.name).append(": ").append(value.text).append("<br/>"));
     }
 
-    private void readXMLData(Node node, Consumer<NodeValue> consumer) {
+    private static void readXMLData(Node node, Consumer<NodeValue> consumer) {
         String nodeName = node.getNodeName();
         if (!"fits".equals(nodeName) && !"helioviewer".equals(nodeName)) {
             String text = getElementValue(node);
@@ -216,6 +234,8 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 readXMLData(child, consumer);
         }
     }
+
+    private record ParsedMetadata(List<NodeValue> fits, String helioviewer, String exportXml, String exportFilename) {}
 
     private record NodeValue(String name, String text, String comment) {}
 
