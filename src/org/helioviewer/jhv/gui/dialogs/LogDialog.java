@@ -18,13 +18,16 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
+import org.helioviewer.jhv.threads.Tasks;
 
 public class LogDialog implements Interfaces.ShowableDialog {
 
     @Override
     public void showDialog() {
-        String log = Log.get();
+        Tasks.submit("log", Log::get, LogDialog::showDialog, Log::error);
+    }
 
+    private static void showDialog(String log) {
         HTMLPane report = new HTMLPane();
         report.setOpaque(false);
         report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
@@ -34,23 +37,20 @@ public class LogDialog implements Interfaces.ShowableDialog {
         JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the log to the clipboard.");
         copyToClipboard.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent me) {
+            public void mousePressed(MouseEvent e) {
                 TransferAccess.writeClipboard(log);
                 JOptionPane.showMessageDialog(null, "Log copied to clipboard.");
             }
         });
 
-        JTextArea textArea = new JTextArea();
-        textArea.setText(log);
+        JTextArea textArea = new JTextArea(log);
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(600, 400));
 
-        Object[] objects = new Object[]{report, copyToClipboard, new JSeparator(), scrollPane};
-
         JOptionPane optionPane = new JOptionPane();
-        optionPane.setMessage(objects);
+        optionPane.setMessage(new Object[]{report, copyToClipboard, new JSeparator(), scrollPane});
         optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
         optionPane.setOptions(new String[]{"Close"});
         optionPane.createDialog(JHVFrame.getFrame(), "JHelioviewer Log").setVisible(true);
