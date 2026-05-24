@@ -25,6 +25,7 @@ import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.threads.EDTCallbackExecutor;
+import org.helioviewer.jhv.threads.JHVThread;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -41,11 +42,16 @@ public final class State {
     private State() {}
 
     public static void save(String dir, String file) {
-        try (BufferedWriter writer = Files.newBufferedWriter(Path.of(dir, file))) {
-            toJson().write(writer);
-        } catch (IOException e) {
-            Log.error(e);
-        }
+        JSONObject json = toJson();
+
+        JHVThread.create(() -> {
+            Path path = Path.of(dir, file);
+            try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+                json.write(writer);
+            } catch (IOException e) {
+                Log.error(e);
+            }
+        }, "JHV-SaveState").start();
     }
 
     private static JSONObject toJson() {
