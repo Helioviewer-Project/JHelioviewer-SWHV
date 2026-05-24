@@ -111,13 +111,9 @@ public final class WcsProjection {
     }
 
     private static double clampZpnRadial(double radial, double lo, double hi) {
-        if (!(lo <= hi))
+        if (lo > hi)
             return lo;
-        if (radial < lo)
-            return lo;
-        if (radial > hi)
-            return hi;
-        return radial;
+        return Math.clamp(radial, lo, hi);
     }
 
     static double zpnPrimaryBranchUpperEta(float[] pv2) {
