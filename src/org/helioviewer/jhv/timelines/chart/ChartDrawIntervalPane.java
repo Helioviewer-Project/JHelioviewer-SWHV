@@ -10,7 +10,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -24,13 +26,13 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 @SuppressWarnings("serial")
 class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMotionListener, DrawController.Listener {
 
-    private final Calendar calendar = Calendar.getInstance();
-
-    private boolean mouseOverInterval;
+    private boolean draggingInterval;
     private Point mousePressed;
 
     private int leftIntervalBorderPosition = -10;
     private int rightIntervalBorderPosition = -10;
+
+    private record LabelTick(long date, String text) {}
 
     private record IntervalPixels(TimeAxis interval, int width, double ratioX) {
 
@@ -132,18 +134,12 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         g.drawLine(min, offset + 9, max, offset + 9);
         g.drawLine(min, offset + 11, max, offset + 11);
 
-        int width = 1;
-        for (int x = min; x <= max; ++x) {
-            int mod4 = (x - min) % 4;
-            int mod12 = (x - min) % 12;
-
-            if (mod4 == 0) {
-                if (mod12 == 0) {
-                    g.fillRect(x, offset + 1, width, 10);
-                } else {
-                    g.fillRect(x, offset + 1, width, 2);
-                    g.fillRect(x, offset + 9, width, 2);
-                }
+        for (int x = min, tick = 0; x <= max; x += 4, tick++) {
+            if (tick % 3 == 0) {
+                g.fillRect(x, offset + 1, 1, 10);
+            } else {
+                g.fillRect(x, offset + 1, 1, 2);
+                g.fillRect(x, offset + 9, 1, 2);
             }
         }
     }
@@ -166,27 +162,30 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int tickTextWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
         int maxTicks = Math.max(2, (pixels.width() - tickTextWidth * 2) / tickTextWidth);
 
-        long ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 366 * 3;
-        if (pixels.contains(ts)) {
-            drawLabelsYear(g, selectedInterval, maxTicks, pixels);
-            return;
+        for (LabelTick tick : labelTicks(pixels, maxTicks)) {
+            drawLabel(g, selectedInterval, tick.text, tick.date, pixels);
         }
-        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 31 * 3;
-        if (pixels.contains(ts)) {
-            drawLabelsMonth(g, selectedInterval, maxTicks, pixels);
-            return;
-        }
-        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 3;
-        if (pixels.contains(ts)) {
-            drawLabelsDay(g, selectedInterval, maxTicks, pixels);
-            return;
-        }
-
-        drawLabelsTime(g, selectedInterval, maxTicks, pixels);
     }
 
-    private void drawLabelsTime(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+    private static List<LabelTick> labelTicks(IntervalPixels pixels, int maxTicks) {
         TimeAxis availableInterval = pixels.interval();
+        long ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 366 * 3;
+        if (pixels.contains(ts)) {
+            return yearTicks(availableInterval, maxTicks);
+        }
+
+        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 31 * 3;
+        if (pixels.contains(ts)) {
+            return monthTicks(availableInterval, maxTicks);
+        }
+
+        ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 3;
+        return pixels.contains(ts) ? dayTicks(availableInterval, maxTicks) : timeTicks(availableInterval, maxTicks);
+    }
+
+    private static List<LabelTick> timeTicks(TimeAxis availableInterval, int maxTicks) {
+        List<LabelTick> ticks = new ArrayList<>(maxTicks);
+        Calendar calendar = Calendar.getInstance();
         long timeDiff = availableInterval.end() - availableInterval.start();
         double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
@@ -203,12 +202,13 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
                 tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_NO_SEC, tickValue);
                 day = currentDay;
             }
-            drawLabel(g, selectedInterval, tickText, tickValue, pixels);
+            ticks.add(new LabelTick(tickValue, tickText));
         }
+        return ticks;
     }
 
-    private void drawLabelsDay(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
-        TimeAxis availableInterval = pixels.interval();
+    private static List<LabelTick> dayTicks(TimeAxis availableInterval, int maxTicks) {
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -229,18 +229,20 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int numberOfDays = (int) Math.round(diffMillis / (double) TimeUtils.DAY_IN_MILLIS);
         int tickCount = Math.min(numberOfDays, maxTicks);
         double ratioDays = Math.ceil(numberOfDays / (double) tickCount);
+        List<LabelTick> ticks = new ArrayList<>(tickCount);
         for (int i = 0; i < tickCount; ++i) {
             calendar.set(startYear, startMonth, startDay, 0, 0, 0);
             calendar.add(Calendar.DAY_OF_MONTH, (int) (i * ratioDays));
             long time = calendar.getTimeInMillis();
 
             String tickText = TimeUtils.format(DrawConstants.DAY_MONTH_YEAR_TIME_FORMAT, time);
-            drawLabel(g, selectedInterval, tickText, time, pixels);
+            ticks.add(new LabelTick(time, tickText));
         }
+        return ticks;
     }
 
-    private void drawLabelsMonth(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
-        TimeAxis availableInterval = pixels.interval();
+    private static List<LabelTick> monthTicks(TimeAxis availableInterval, int maxTicks) {
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -263,18 +265,20 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int tickCount = Math.min(numberOfMonths, maxTicks);
         double ratioMonth = Math.ceil(numberOfMonths / (double) tickCount);
 
+        List<LabelTick> ticks = new ArrayList<>(tickCount);
         for (int i = 0; i < tickCount; ++i) {
             calendar.set(startYear, startMonth, 1, 0, 0, 0);
             calendar.add(Calendar.MONTH, (int) (i * ratioMonth));
             long time = calendar.getTimeInMillis();
 
             String tickText = TimeUtils.format(DrawConstants.MONTH_YEAR_TIME_FORMAT, time);
-            drawLabel(g, selectedInterval, tickText, time, pixels);
+            ticks.add(new LabelTick(time, tickText));
         }
+        return ticks;
     }
 
-    private void drawLabelsYear(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
-        TimeAxis availableInterval = pixels.interval();
+    private static List<LabelTick> yearTicks(TimeAxis availableInterval, int maxTicks) {
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -290,13 +294,15 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
         int hTicks = Math.clamp(endYear - startYear + 1, 2, maxTicks);
         int yearDifference = (endYear - startYear) / (hTicks - 1);
+        List<LabelTick> ticks = new ArrayList<>(hTicks);
         for (int i = 0; i < hTicks; ++i) {
             calendar.set(startYear + i * yearDifference, Calendar.JANUARY, 1, 0, 0, 0);
             long time = calendar.getTimeInMillis();
 
             String tickText = TimeUtils.format(DrawConstants.YEAR_ONLY_TIME_FORMAT, time);
-            drawLabel(g, selectedInterval, tickText, time, pixels);
+            ticks.add(new LabelTick(time, tickText));
         }
+        return ticks;
     }
 
     private void drawLabel(Graphics2D g, TimeAxis selectedInterval, String tickText, long date, IntervalPixels pixels) {
@@ -359,8 +365,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private void updateCursor(Point p) {
-        mouseOverInterval = p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition;
-        if (mouseOverInterval) {
+        if (isInSelectedInterval(p)) {
             setCursor(UIGlobals.openHandCursor);
         } else if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -378,7 +383,8 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     @Override
     public void mousePressed(MouseEvent e) {
         mousePressed = e.getPoint();
-        if (mouseOverInterval) {
+        draggingInterval = isInSelectedInterval(mousePressed);
+        if (draggingInterval) {
             setCursor(UIGlobals.closedHandCursor);
         }
     }
@@ -386,19 +392,19 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     @Override
     public void mouseReleased(MouseEvent e) {
         Point p = e.getPoint();
-        if (mouseOverInterval) {
+        if (draggingInterval) {
             moveSelectedInterval(p);
-            setCursor(UIGlobals.openHandCursor);
+            updateCursor(p);
         }
+        draggingInterval = false;
         mousePressed = null;
-        // repaint();
     }
 
     // Mouse Motion Listener
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (mouseOverInterval) {
+        if (draggingInterval) {
             moveSelectedInterval(e.getPoint());
         }
     }
@@ -415,5 +421,9 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void drawMovieLineRequest() {}
+
+    private boolean isInSelectedInterval(Point p) {
+        return p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition;
+    }
 
 }
