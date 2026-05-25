@@ -165,6 +165,10 @@ public final class RadioData extends AbstractTimelineLayer {
         refreshRow();
     }
 
+    private static boolean canShow(TimeAxis timeAxis) {
+        return timeAxis.end() - timeAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
+    }
+
     private static void refreshRow() {
         if (currentInstance != null)
             Timelines.getLayers().updateRow(currentInstance);
@@ -237,7 +241,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
-        if (enabled && selectedAxis.end() - selectedAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
+        if (enabled && canShow(selectedAxis)) {
             cache.asMap().values().forEach(data -> data.requestData(selectedAxis));
             requestAndOpenIntervals(selectedAxis.start());
         }
@@ -248,17 +252,19 @@ public final class RadioData extends AbstractTimelineLayer {
         if (!enabled)
             return;
 
-        if (xAxis.end() - xAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS) {
-            drawString(g, graphArea, xAxis, "No data available");
-            cache.asMap().values().forEach(data -> data.draw(g, graphArea, xAxis));
+        if (canShow(xAxis)) {
+            drawString(g, graphArea, "No data available");
+            TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
+            YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
+            cache.asMap().values().forEach(data -> data.draw(g, graphArea, xMapper, yMapper));
         } else {
-            drawString(g, graphArea, xAxis, "Reduce the time interval to see the radio spectrograms.");
+            drawString(g, graphArea, "Reduce the time interval to see the radio spectrograms.");
         }
     }
 
     @Override
     public void zoomToFitAxis() {
-        yAxis.reset(400, 20);
+        resetAxis();
     }
 
     @Override
@@ -266,7 +272,7 @@ public final class RadioData extends AbstractTimelineLayer {
         yAxis.reset(400, 20);
     }
 
-    static void drawString(Graphics2D g, Rectangle ga, TimeAxis xAxis, String text) {
+    static void drawString(Graphics2D g, Rectangle ga, String text) {
         int dx0 = ga.x;
         int dx1 = ga.x + ga.width;
         int dwidth = dx1 - dx0;
