@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines.draw;
 
+import java.util.function.LongToIntFunction;
+
 import org.helioviewer.jhv.time.TimeUtils;
 
 public final class TimeAxis {
@@ -21,6 +23,12 @@ public final class TimeAxis {
 
     public int value2pixel(int x0, int w, long val) {
         return (int) ((double) w / (end - start) * (val - start) + x0);
+    }
+
+    public LongToIntFunction value2pixelMapper(int x0, int w) {
+        long s = start;
+        long e = end;
+        return val -> (int) ((double) w / (e - s) * (val - s) + x0);
     }
 
     public long pixel2value(int x0, int w, int x) {

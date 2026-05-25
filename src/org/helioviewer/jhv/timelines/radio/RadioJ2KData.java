@@ -180,9 +180,9 @@ class RadioJ2KData implements View.DataHandler {
 
         g.drawImage(bufferedImage,
                 xAxis.value2pixel(ga.x, ga.width, imStart),
-                RadioData.yAxis.value2pixel(ga.y, ga.height, freqimStart),
+                RadioData.yAxis.dataToPixel(ga.y, ga.height, freqimStart),
                 xAxis.value2pixel(ga.x, ga.width, imEnd),
-                RadioData.yAxis.value2pixel(ga.y, ga.height, freqimEnd),
+                RadioData.yAxis.dataToPixel(ga.y, ga.height, freqimEnd),
                 0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null);
     }
 
