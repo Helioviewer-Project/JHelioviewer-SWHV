@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
@@ -116,32 +115,25 @@ public class JHVRelatedEvents {
     }
 
     public List<JHVEvent> getNextEvents(JHVEvent event) {
-        List<JHVEvent> nEvents = new ArrayList<>();
-        int id = event.getUniqueID();
-        for (Pair<Integer, Integer> assoc : associations) {
-            if (assoc.left() == id) {
-                JHVEvent found = findEvent(assoc.right());
-                if (found != null) nEvents.add(found);
-            }
-        }
-        return nEvents;
+        return getAssociatedEvents(event.getUniqueID(), true);
     }
 
     public List<JHVEvent> getPreviousEvents(JHVEvent event) {
-        List<JHVEvent> pEvents = new ArrayList<>();
-        int id = event.getUniqueID();
-        for (Pair<Integer, Integer> assoc : associations) {
-            if (assoc.right() == id) {
-                JHVEvent found = findEvent(assoc.left());
-                if (found != null) pEvents.add(found);
-            }
-        }
-        return pEvents;
+        return getAssociatedEvents(event.getUniqueID(), false);
     }
 
-    @Nullable
-    private JHVEvent findEvent(int id) {
-        return eventsById.get(id);
+    private List<JHVEvent> getAssociatedEvents(int id, boolean next) {
+        List<JHVEvent> result = new ArrayList<>();
+        for (Pair<Integer, Integer> assoc : associations) {
+            Integer source = next ? assoc.left() : assoc.right();
+            if (source == id) {
+                Integer target = next ? assoc.right() : assoc.left();
+                JHVEvent found = eventsById.get(target);
+                if (found != null)
+                    result.add(found);
+            }
+        }
+        return result;
     }
 
     void addAssociation(Pair<Integer, Integer> association) {
