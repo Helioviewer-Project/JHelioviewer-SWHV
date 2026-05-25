@@ -15,7 +15,6 @@ import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry.YAxisHit;
 
@@ -118,37 +117,29 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     private static void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
         Rectangle graphArea = geometry.area();
         YAxisHit hit = geometry.yAxisHit(p);
-        int ct = -1;
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.showYAxis()) {
-                if (hit.targets(ct) || hit.outsideAxes()) {
-                    if (move) {
-                        tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
-                    }
-                    if (zoom) {
-                        tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.size().height - p.y - graphArea.y, graphArea.height);
-                    }
-                    tl.yaxisChanged();
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
+            if (hit.targets(axisIndex) || hit.outsideAxes()) {
+                if (move) {
+                    tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
                 }
-                ct++;
+                if (zoom) {
+                    tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.size().height - p.y - graphArea.y, graphArea.height);
+                }
+                tl.yaxisChanged();
             }
-        }
+        });
         drawRequest();
     }
 
     public static void resetAxis(Point p) {
         YAxisHit hit = geometry.yAxisHit(p);
-        int ct = -1;
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.showYAxis()) {
-                if (hit.targets(ct)) {
-                    tl.resetAxis();
-                } else if (hit.outsideAxes()) {
-                    tl.zoomToFitAxis();
-                }
-                ct++;
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
+            if (hit.targets(axisIndex)) {
+                tl.resetAxis();
+            } else if (hit.outsideAxes()) {
+                tl.zoomToFitAxis();
             }
-        }
+        });
         drawRequest();
     }
 
@@ -178,11 +169,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveAllAxes(double distanceY) {
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.showYAxis()) {
-                tl.getYAxis().shiftDownPixels(distanceY, geometry.area().height);
-            }
-        }
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> tl.getYAxis().shiftDownPixels(distanceY, geometry.area().height));
     }
 
     private static void setAvailableInterval() {

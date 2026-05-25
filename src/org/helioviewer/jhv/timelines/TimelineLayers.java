@@ -3,6 +3,7 @@ package org.helioviewer.jhv.timelines;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.ObjIntConsumer;
 
 import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
@@ -111,6 +112,16 @@ public class TimelineLayers extends AbstractTableModel {
         return ct;
     }
 
+    public static void forEachYAxis(ObjIntConsumer<TimelineLayer> consumer) {
+        int axisIndex = -1;
+        for (TimelineLayer tl : layers) {
+            if (tl.showYAxis()) {
+                consumer.accept(tl, axisIndex);
+                axisIndex++;
+            }
+        }
+    }
+
     public static int getNumberOfPropagationAxes() {
         int ct = 0;
         for (TimelineLayer tl : layers) {
@@ -119,6 +130,16 @@ public class TimelineLayers extends AbstractTableModel {
             }
         }
         return ct;
+    }
+
+    public static void forEachPropagated(ObjIntConsumer<TimelineLayer> consumer) {
+        int index = 0;
+        for (TimelineLayer tl : layers) {
+            if (tl.isPropagated()) {
+                consumer.accept(tl, index);
+                index++;
+            }
+        }
     }
 
 }
