@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.timelines.draw;
 
-import java.util.function.LongToIntFunction;
-
 import org.helioviewer.jhv.time.TimeUtils;
 
 public final class TimeAxis {
@@ -21,18 +19,16 @@ public final class TimeAxis {
         return end;
     }
 
-    public int value2pixel(int x0, int w, long val) {
-        return (int) ((double) w / (end - start) * (val - start) + x0);
+    public Mapper mapper(int x0, int width) {
+        return new Mapper(start, end, x0, width);
     }
 
-    public LongToIntFunction value2pixelMapper(int x0, int w) {
-        long s = start;
-        long e = end;
-        return val -> (int) ((double) w / (e - s) * (val - s) + x0);
+    public int value2pixel(int x0, int w, long val) {
+        return mapper(x0, w).toPixel(val);
     }
 
     public long pixel2value(int x0, int w, int x) {
-        return (long) (start + (end - start) / (double) w * (x - x0));
+        return mapper(x0, w).toValue(x);
     }
 
     void move(int w, double pixelDistance) {
@@ -68,6 +64,16 @@ public final class TimeAxis {
         if (end - start < TimeUtils.MINUTE_IN_MILLIS) {
             start = now - TimeUtils.MINUTE_IN_MILLIS;
             end = now;
+        }
+    }
+
+    public record Mapper(long start, long end, int x0, int width) {
+        public int toPixel(long value) {
+            return (int) ((double) width / (end - start) * (value - start) + x0);
+        }
+
+        public long toValue(int pixel) {
+            return (long) (start + (end - start) / (double) width * (pixel - x0));
         }
     }
 

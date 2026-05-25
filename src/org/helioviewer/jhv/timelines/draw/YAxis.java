@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.timelines.draw;
 
-import java.util.function.DoubleToIntFunction;
-
 public final class YAxis {
 
     public static final float BLANK = -Float.MAX_VALUE;
@@ -56,26 +54,20 @@ public final class YAxis {
         return highlighted;
     }
 
+    public Mapper mapper(int y0, int height) {
+        return new Mapper(scale, scale(start), scale(end), y0, height);
+    }
+
     public double pixel2ScaledValue(int y0, int h, int p) {
-        double smin = scale(start);
-        double smax = scale(end);
-        return (smax - smin) * (-p + y0 + h) / h + smin;
+        return mapper(y0, h).pixelToScaled(p);
     }
 
     public int scaledToPixel(int y0, int h, double value) {
-        double smin = scale(start);
-        double smax = scale(end);
-        return (int) (-h * (value - smin) / (smax - smin) + y0 + h);
+        return mapper(y0, h).scaledToPixel(value);
     }
 
     public int dataToPixel(int y0, int h, double value) {
-        return scaledToPixel(y0, h, scale(value));
-    }
-
-    public DoubleToIntFunction dataToPixelMapper(int y0, int h) {
-        double smin = scale(start);
-        double smax = scale(end);
-        return value -> (int) (-h * (scale(value) - smin) / (smax - smin) + y0 + h);
+        return mapper(y0, h).dataToPixel(value);
     }
 
     public String getLabel() {
@@ -169,6 +161,20 @@ public final class YAxis {
 
         String getLabel();
 
+    }
+
+    public record Mapper(YAxisScale scale, double scaledStart, double scaledEnd, int y0, int height) {
+        public double pixelToScaled(int pixel) {
+            return (scaledEnd - scaledStart) * (-pixel + y0 + height) / height + scaledStart;
+        }
+
+        public int scaledToPixel(double value) {
+            return (int) (-height * (value - scaledStart) / (scaledEnd - scaledStart) + y0 + height);
+        }
+
+        public int dataToPixel(double value) {
+            return scaledToPixel(scale.scale(value));
+        }
     }
 
     private static String fixupUnit(String unit) {
