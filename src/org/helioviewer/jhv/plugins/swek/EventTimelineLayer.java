@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -32,6 +33,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
 
     private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
     private EventPlotConfiguration eventUnderMouse;
+    private List<JHVRelatedEvents> visibleEvents = Collections.emptyList();
 
     EventTimelineLayer() {
         registerAndRefresh();
@@ -46,6 +48,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
 
     @Override
     public void fetchData(TimeAxis selectedAxis) {
+        visibleEvents = JHVEventCache.getEvents(selectedAxis.start(), selectedAxis.end());
         JHVEventCache.requestForInterval(selectedAxis.start() - TimeUtils.DAY_IN_MILLIS * 3, selectedAxis.end(), this);
     }
 
@@ -75,6 +78,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     public void cacheUpdated() {
         if (!enabled) return;
         TimeAxis xAxis = DrawController.selectedAxis;
+        visibleEvents = JHVEventCache.getEvents(xAxis.start(), xAxis.end());
         JHVEventCache.requestForInterval(xAxis.start(), xAxis.end(), this);
         if (enabled)
             DrawController.drawRequest();
@@ -86,7 +90,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
             return;
 
         eventUnderMouse = null;
-        List<JHVRelatedEvents> events = JHVEventCache.getEvents(xAxis.start(), xAxis.end());
+        List<JHVRelatedEvents> events = visibleEvents;
         if (events.isEmpty()) {
             if (mousePosition != null) {
                 JHVEventCache.highlight(null);
