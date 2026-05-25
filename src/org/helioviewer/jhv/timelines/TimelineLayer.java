@@ -50,7 +50,7 @@ public interface TimelineLayer {
 
     default void resetAxis() {}
 
-    default boolean highLightChanged(Point p) {
+    default boolean highlightChanged(Point p) {
         return false;
     }
 

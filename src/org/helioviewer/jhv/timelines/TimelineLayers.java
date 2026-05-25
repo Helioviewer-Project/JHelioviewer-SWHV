@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.ObjIntConsumer;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
@@ -35,13 +36,12 @@ public class TimelineLayers extends AbstractTableModel {
         layers.forEach(layer -> layer.fetchData(timeAxis));
     }
 
-    public static boolean highLightChanged(Point p) {
+    public static boolean highlightChanged(Point p) {
+        boolean changed = false;
         for (TimelineLayer tl : layers) {
-            if (tl.highLightChanged(p)) {
-                return true;
-            }
+            changed = tl.highlightChanged(p) || changed;
         }
-        return false;
+        return changed;
     }
 
     public void updateRow(TimelineLayer tl) {
@@ -124,16 +124,6 @@ public class TimelineLayers extends AbstractTableModel {
         return null;
     }
 
-    public static int getNumberOfYAxes() {
-        int ct = 0;
-        for (TimelineLayer tl : layers) {
-            if (tl.showYAxis()) {
-                ct++;
-            }
-        }
-        return ct;
-    }
-
     public static void forEachYAxis(ObjIntConsumer<TimelineLayer> consumer) {
         int axisIndex = -1;
         for (TimelineLayer tl : layers) {
@@ -142,6 +132,24 @@ public class TimelineLayers extends AbstractTableModel {
                 axisIndex++;
             }
         }
+    }
+
+    public static int getNumberOfYAxes() {
+        return count(TimelineLayer::showYAxis);
+    }
+
+    public static void forEachPropagated(ObjIntConsumer<TimelineLayer> consumer) {
+        int index = 0;
+        for (TimelineLayer tl : layers) {
+            if (tl.isPropagated()) {
+                consumer.accept(tl, index);
+                index++;
+            }
+        }
+    }
+
+    public static int getNumberOfPropagationAxes() {
+        return count(TimelineLayer::isPropagated);
     }
 
     public static boolean setYAxisHighlight(@Nullable GraphGeometry.YAxisHit hit) {
@@ -158,24 +166,14 @@ public class TimelineLayers extends AbstractTableModel {
         return changed;
     }
 
-    public static int getNumberOfPropagationAxes() {
+    private static int count(Predicate<TimelineLayer> predicate) {
         int ct = 0;
         for (TimelineLayer tl : layers) {
-            if (tl.isPropagated()) {
+            if (predicate.test(tl)) {
                 ct++;
             }
         }
         return ct;
-    }
-
-    public static void forEachPropagated(ObjIntConsumer<TimelineLayer> consumer) {
-        int index = 0;
-        for (TimelineLayer tl : layers) {
-            if (tl.isPropagated()) {
-                consumer.accept(tl, index);
-                index++;
-            }
-        }
     }
 
 }
