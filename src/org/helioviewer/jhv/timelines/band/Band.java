@@ -199,14 +199,6 @@ public final class Band extends AbstractTimelineLayer {
         g.setColor(graphColor);
         polylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length()));
 
-//      for (GraphPolyline line : graphPolylines) { // dots
-//          int length = line.length();
-//          int[] xPoints = line.xPoints();
-//          int[] yPoints = line.yPoints();
-//          for (int i = 0; i < length; i++)
-//              g.drawLine(xPoints[i], yPoints[i], xPoints[i], yPoints[i]);
-//      }
-
         String[] warnLabels = bandType.getWarnLabels();
         for (int i = 0; i < warnLevels.length; i++) {
             g.drawLine(graphArea.x, warnLevels[i], graphArea.x + graphArea.width, warnLevels[i]);

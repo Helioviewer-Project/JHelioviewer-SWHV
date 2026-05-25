@@ -112,31 +112,29 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         int width = (int) (sx * graphSize.getWidth() + .5);
         int height = (int) (sy * graphSize.getHeight() + .5);
 
-        if (width > 0 && height > 0) {
-            if (width != lastWidth || height != lastHeight) {
-                screenImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
-                ExportMovie.EVEImage = screenImage;
+        if (width != lastWidth || height != lastHeight) {
+            screenImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
+            ExportMovie.EVEImage = screenImage;
 
-                lastWidth = width;
-                lastHeight = height;
-            }
-
-            Graphics2D fullG = screenImage.createGraphics();
-            drawBackground(fullG, screenImage.getWidth(), screenImage.getHeight());
-
-            fullG.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            fullG.setFont(DrawConstants.font);
-            fullG.setTransform(AffineTransform.getScaleInstance(sx, sy));
-
-            Graphics2D plotG = (Graphics2D) fullG.create();
-            plotG.setClip(graphArea);
-            TimeAxis xAxis = DrawController.selectedAxis;
-            TimelineLayers.draw(plotG, graphArea, xAxis, mousePosition);
-            labelPainter.drawStaticLabels(fullG, geometry, xAxis);
-
-            plotG.dispose();
-            fullG.dispose();
+            lastWidth = width;
+            lastHeight = height;
         }
+
+        Graphics2D fullG = screenImage.createGraphics();
+        drawBackground(fullG, screenImage.getWidth(), screenImage.getHeight());
+
+        fullG.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        fullG.setFont(DrawConstants.font);
+        fullG.setTransform(AffineTransform.getScaleInstance(sx, sy));
+
+        Graphics2D plotG = (Graphics2D) fullG.create();
+        plotG.setClip(graphArea);
+        TimeAxis xAxis = DrawController.selectedAxis;
+        TimelineLayers.draw(plotG, graphArea, xAxis, mousePosition);
+        labelPainter.drawStaticLabels(fullG, geometry, xAxis);
+
+        plotG.dispose();
+        fullG.dispose();
     }
 
     private static void drawBackground(Graphics2D g, int width, int height) {

@@ -69,10 +69,7 @@ final class TimelineLabelPainter {
 
     private void drawTimeLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
         drawBaseHorizontalLabels(g, geometry, xAxis);
-
-        TimelineLayers.forEachPropagated((tl, row) -> {
-            drawPropagatedHorizontalLabels(g, geometry, xAxis, row + 1, tl);
-        });
+        TimelineLayers.forEachPropagated((tl, row) -> drawPropagatedHorizontalLabels(g, geometry, xAxis, row + 1, tl));
     }
 
     private void drawYAxisLabels(Graphics2D g, GraphGeometry geometry) {
