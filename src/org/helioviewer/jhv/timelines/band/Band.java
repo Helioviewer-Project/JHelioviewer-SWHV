@@ -296,7 +296,7 @@ public final class Band extends AbstractTimelineLayer {
         long start = propagationModel.getObservationTime(timeAxis.start());
         long end = propagationModel.getObservationTime(timeAxis.end());
         updateData(start, end);
-        updateGraph(); //?
+        updateGraph();
     }
 
     @Override

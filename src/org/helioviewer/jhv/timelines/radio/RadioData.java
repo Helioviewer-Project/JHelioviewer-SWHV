@@ -253,12 +253,12 @@ public final class RadioData extends AbstractTimelineLayer {
             return;
 
         if (canShow(xAxis)) {
-            drawString(g, graphArea, "No data available");
+            drawMessage(g, graphArea, "No data available");
             TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
             YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
             cache.asMap().values().forEach(data -> data.draw(g, graphArea, xMapper, yMapper));
         } else {
-            drawString(g, graphArea, "Reduce the time interval to see the radio spectrograms.");
+            drawMessage(g, graphArea, "Reduce the time interval to see the radio spectrograms.");
         }
     }
 
@@ -272,7 +272,7 @@ public final class RadioData extends AbstractTimelineLayer {
         yAxis.reset(400, 20);
     }
 
-    static void drawString(Graphics2D g, Rectangle ga, String text) {
+    static void drawMessage(Graphics2D g, Rectangle ga, String text) {
         int dx0 = ga.x;
         int dx1 = ga.x + ga.width;
         int dwidth = dx1 - dx0;

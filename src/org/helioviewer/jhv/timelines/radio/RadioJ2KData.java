@@ -167,7 +167,7 @@ class RadioJ2KData implements View.DataHandler {
             return;
         }
         if (!hasData()) {
-            RadioData.drawString(g, ga, "Fetching data");
+            RadioData.drawMessage(g, ga, "Fetching data");
             return;
         }
 
