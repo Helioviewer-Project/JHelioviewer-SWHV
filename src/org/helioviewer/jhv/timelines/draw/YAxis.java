@@ -58,9 +58,9 @@ public final class YAxis {
         return new Mapper(scale, scale(start), scale(end), y0, height);
     }
 
-    public Ticks ticks(Mapper mapper, int topPixel, int bottomPixel) {
-        double scaledStart = mapper.pixelToScaled(bottomPixel);
-        double scaledEnd = mapper.pixelToScaled(topPixel);
+    public Ticks ticks(Mapper mapper) {
+        double scaledStart = mapper.scaledStart();
+        double scaledEnd = mapper.scaledEnd();
         if (scaledStart > scaledEnd) {
             double temp = scaledStart;
             scaledStart = scaledEnd;
