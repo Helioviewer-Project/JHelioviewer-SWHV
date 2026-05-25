@@ -11,11 +11,19 @@ import com.google.common.util.concurrent.FutureCallback;
 public abstract class DecodeCallback implements FutureCallback<ImageBuffer> {
 
     @Override
-    public abstract void onSuccess(ImageBuffer result);
+    public final void onSuccess(ImageBuffer result) {
+        onSuccess(result, true);
+    }
+
+    public abstract void onSuccess(ImageBuffer result, boolean fresh);
 
     @Override
     public void onFailure(@Nonnull Throwable t) {
         Log.error(Throwables.getStackTraceAsString(t));
+    }
+
+    public void onFailure(@Nonnull Throwable t, boolean fresh) {
+        onFailure(t);
     }
 
 }

@@ -74,6 +74,8 @@ public final class URIView extends BaseView {
         DecodeKey key = new DecodeKey(dataUri, filterType);
         ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
+            // Mark running decodes stale before publishing this cached result.
+            executor.cancel();
             sendDataToHandler(imageBuffer, viewpoint);
             return;
         }
@@ -102,10 +104,12 @@ public final class URIView extends BaseView {
         }
 
         @Override
-        public void onSuccess(ImageBuffer result) {
+        public void onSuccess(ImageBuffer result, boolean fresh) {
             if (key.filter() != filterType) return; // filter changed in-flight
 
             ImageBufferCache.put(key, result);
+            // This decode was superseded after it started; do not publish it to the layer.
+            if (!fresh) return;
             sendDataToHandler(result, viewpoint);
         }
 
