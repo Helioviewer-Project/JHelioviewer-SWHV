@@ -98,7 +98,6 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         if (screenImage != null) {
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            g.setFont(DrawConstants.font);
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), null);
             drawMovieLine(g);
             labelPainter.drawMouseValues(g, geometry, DrawController.selectedAxis, mousePosition);
@@ -124,11 +123,11 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         drawBackground(fullG, screenImage.getWidth(), screenImage.getHeight());
 
         fullG.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        fullG.setFont(DrawConstants.font);
         fullG.setTransform(AffineTransform.getScaleInstance(sx, sy));
 
         Graphics2D plotG = (Graphics2D) fullG.create();
         plotG.setClip(graphArea);
+        plotG.setFont(DrawConstants.font);
         TimeAxis xAxis = DrawController.selectedAxis;
         TimelineLayers.draw(plotG, graphArea, xAxis, mousePosition);
         labelPainter.drawStaticLabels(fullG, geometry, xAxis);
