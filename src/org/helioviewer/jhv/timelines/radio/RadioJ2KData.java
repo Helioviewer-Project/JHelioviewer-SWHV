@@ -4,13 +4,16 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBufferByte;
+import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
+import java.awt.image.SampleModel;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.imagedata.IndexedImageFactory;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
@@ -94,16 +97,21 @@ class RadioJ2KData implements View.DataHandler {
 
         region = imageData.getRegion();
         boolean hadData = bufferedImage != null;
-        bufferedImage = IndexedImageFactory.createIndexed(copyBuffer((ByteBuffer) imageBuffer.buffer), w, h, RadioData.getColorModel());
+        bufferedImage = createIndexedImage((ByteBuffer) imageBuffer.buffer, w, h, RadioData.getColorModel());
         imageBuffer.allowExplicitFree();
         if (!hadData)
             RadioData.dataUpdated();
         DrawController.drawRequest();
     }
 
-    private static ByteBuffer copyBuffer(ByteBuffer byteBuffer) {
-        ByteBuffer copy = ByteBuffer.wrap(new byte[byteBuffer.remaining()]);
-        return copy.put(byteBuffer.slice()).flip();
+    private static BufferedImage createIndexedImage(ByteBuffer byteBuffer, int width, int height, IndexColorModel colorModel) {
+        byte[] pixels = new byte[byteBuffer.remaining()];
+        byteBuffer.slice().get(pixels);
+
+        BufferedImage sample = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
+        SampleModel sampleModel = sample.getSampleModel().createCompatibleSampleModel(width, height);
+        DataBufferByte dataBuffer = new DataBufferByte(pixels, pixels.length);
+        return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, dataBuffer, null), false, null);
     }
 
     void requestData(TimeAxis xAxis) {
