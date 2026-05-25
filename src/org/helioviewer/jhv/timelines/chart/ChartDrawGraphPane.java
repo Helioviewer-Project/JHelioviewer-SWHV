@@ -39,7 +39,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     private Point mousePressedPosition;
-    private Point mouseDragPosition;
+    private boolean chartDragged;
 
     private BufferedImage screenImage;
 
@@ -198,7 +198,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         switch (dragMode) {
             case CHART -> {
                 setCursor(UIGlobals.openHandCursor);
-                if (mousePressedPosition != null && mouseDragPosition != null) {
+                if (mousePressedPosition != null && chartDragged) {
                     DrawController.moveX(mousePressedPosition.x - p.x);
                     DrawController.moveAllAxes(p.y - mousePressedPosition.y);
                 }
@@ -208,16 +208,16 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
         dragMode = DragMode.NODRAG;
         mousePressedPosition = null;
-        mouseDragPosition = null;
+        chartDragged = false;
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         Point p = e.getPoint();
-        mouseDragPosition = p;
         if (mousePressedPosition != null) {
             switch (dragMode) {
                 case CHART -> {
+                    chartDragged = true;
                     setCursor(UIGlobals.closedHandCursor);
                     DrawController.moveX(mousePressedPosition.x - p.x);
                     DrawController.moveY(p, p.y - mousePressedPosition.y);
