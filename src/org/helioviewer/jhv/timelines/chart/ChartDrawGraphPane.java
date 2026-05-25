@@ -62,7 +62,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         addMouseWheelListener(this);
         addComponentListener(this);
         DrawController.addDrawListener(this);
-        DrawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
+        DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
     }
 
     @Override
@@ -247,7 +247,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             setCursor(Cursor.getDefaultCursor());
         }
 
-        if (TimelineLayers.highLightChanged(mousePosition)) {
+        if (TimelineLayers.highlightChanged(mousePosition)) {
             drawRequest();
         } else {
             repaint(); // for timeline values
@@ -270,7 +270,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     @Override
     public void componentResized(ComponentEvent e) {
-        DrawController.setGraphInformation(new Rectangle(getWidth(), getHeight()));
+        DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
     }
 
     @Override

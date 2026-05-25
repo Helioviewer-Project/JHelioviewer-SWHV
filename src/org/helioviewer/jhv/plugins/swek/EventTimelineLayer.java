@@ -240,7 +240,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     }
 
     @Override
-    public boolean highLightChanged(Point p) {
+    public boolean highlightChanged(Point p) {
         if (!enabled)
             return false;
         if (eventUnderMouse == null)
