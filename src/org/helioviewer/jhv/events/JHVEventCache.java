@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -24,7 +23,7 @@ public class JHVEventCache {
     private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
     private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
-    private static final List<Pair<Integer, Integer>> assocs = new ArrayList<>();
+    private static final HashMap<Integer, HashSet<Pair<Integer, Integer>>> pendingAssocs = new HashMap<>();
 
     private static JHVRelatedEvents lastHighlighted = null;
 
@@ -79,26 +78,9 @@ public class JHVEventCache {
 
     private static void checkAssociation(JHVEvent event) {
         int uid = event.getUniqueID();
-        JHVRelatedEvents rEvent = relEvents.get(uid);
-        Iterator<Pair<Integer, Integer>> iterator = assocs.iterator();
-        while (iterator.hasNext()) {
-            Pair<Integer, Integer> tocheck = iterator.next();
-            if (tocheck.left() == uid) {
-                JHVRelatedEvents found = relEvents.get(tocheck.right());
-                if (found != null) {
-                    merge(rEvent, found);
-                    rEvent.addAssociation(tocheck);
-                    iterator.remove();
-                }
-            } else if (tocheck.right() == uid) {
-                JHVRelatedEvents found = relEvents.get(tocheck.left());
-                if (found != null) {
-                    merge(rEvent, found);
-                    rEvent.addAssociation(tocheck);
-                    iterator.remove();
-                }
-            }
-        }
+        HashSet<Pair<Integer, Integer>> pending = pendingAssocs.remove(uid);
+        if (pending != null)
+            pending.forEach(JHVEventCache::addAssociation);
     }
 
     private static void createNewRelatedEvent(JHVEvent event) {
@@ -123,8 +105,15 @@ public class JHVEventCache {
                 ll.addAssociation(association);
             }
         } else {
-            assocs.add(association);
+            if (ll == null)
+                addPendingAssociation(association.left(), association);
+            if (rr == null)
+                addPendingAssociation(association.right(), association);
         }
+    }
+
+    private static void addPendingAssociation(Integer id, Pair<Integer, Integer> association) {
+        pendingAssocs.computeIfAbsent(id, k -> new HashSet<>()).add(association);
     }
 
     public static List<JHVRelatedEvents> getEvents(long start, long end) {
