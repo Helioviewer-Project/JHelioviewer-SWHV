@@ -7,8 +7,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 
-import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -66,8 +66,8 @@ final class TimelineLabelPainter {
     }
 
     private void drawTimeLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
-        drawBaseHorizontalLabels(g, geometry, xAxis);
-        TimelineLayers.forEachPropagated((tl, row) -> drawPropagatedHorizontalLabels(g, geometry, xAxis, row + 1, tl));
+        drawHorizontalLabels(g, geometry, xAxis, 0, null);
+        TimelineLayers.forEachPropagated((tl, row) -> drawHorizontalLabels(g, geometry, xAxis, row + 1, tl));
     }
 
     private void drawYAxisLabels(Graphics2D g, GraphGeometry geometry) {
@@ -79,31 +79,7 @@ final class TimelineLabelPainter {
         return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
     }
 
-    private static void drawBaseHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
-        Rectangle graphArea = geometry.area();
-        String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, xAxis.start());
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(tickText, g);
-        int tickTextWidth = (int) tickTextBounds.getWidth();
-        int tickTextHeight = (int) tickTextBounds.getHeight();
-        int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        long tickDifferenceHorizontal = (xAxis.end() - xAxis.start()) / (horizontalTickCount - 1);
-        TimeAxis.Mapper xMapper = geometry.xMapper(xAxis);
-
-        long previousDate = Long.MIN_VALUE;
-        for (int i = 0; i < horizontalTickCount; ++i) {
-            long tickValue = xAxis.start() + i * tickDifferenceHorizontal;
-            int x = xMapper.toPixel(tickValue);
-
-            g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
-            g.drawLine(x, graphArea.y, x, geometry.graphBottom() + 3);
-            g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-
-            drawTimeText(g, geometry, x, formatTickText(tickValue, previousDate), tickTextHeight);
-            previousDate = tickValue;
-        }
-    }
-
-    private static void drawPropagatedHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, int row, TimelineLayer tl) {
+    private static void drawHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, int row, TimelineLayer tl) {
         Rectangle graphArea = geometry.area();
         String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, xAxis.start());
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(tickText, g);
@@ -111,14 +87,26 @@ final class TimelineLabelPainter {
         int tickTextHeight = (int) tickTextBounds.getHeight() + row * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
         long tickDifferenceHorizontal = (xAxis.end() - xAxis.start()) / (horizontalTickCount - 1);
-        TimeAxis.Mapper xMapper = new TimeAxis.Mapper(tl.getObservationTime(xAxis.start()), tl.getObservationTime(xAxis.end()), geometry.area().x, geometry.graphWidth());
+        long start = tl == null ? xAxis.start() : tl.getObservationTime(xAxis.start());
+        long end = tl == null ? xAxis.end() : tl.getObservationTime(xAxis.end());
+        TimeAxis.Mapper xMapper = new TimeAxis.Mapper(start, end, graphArea.x, graphArea.width);
 
         long previousDate = Long.MIN_VALUE;
         for (int i = 0; i < horizontalTickCount; ++i) {
-            long tickValue = tl.getObservationTime(xAxis.start() + i * tickDifferenceHorizontal);
+            long tickValue = xAxis.start() + i * tickDifferenceHorizontal;
+            if (tl != null) {
+                tickValue = tl.getObservationTime(tickValue);
+            }
+            int x = xMapper.toPixel(tickValue);
 
-            g.setColor(tl.getDataColor());
-            drawTimeText(g, geometry, xMapper.toPixel(tickValue), formatTickText(tickValue, previousDate), tickTextHeight);
+            if (tl == null) {
+                g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
+                g.drawLine(x, graphArea.y, x, geometry.graphBottom() + 3);
+                g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
+            } else {
+                g.setColor(tl.getDataColor());
+            }
+            drawTimeText(g, geometry, x, formatTickText(tickValue, previousDate), tickTextHeight);
             previousDate = tickValue;
         }
     }
@@ -135,7 +123,9 @@ final class TimelineLabelPainter {
 
     private static void drawTimeText(Graphics2D g, GraphGeometry geometry, int x, String tickText, int tickTextHeight) {
         int y = geometry.graphBottom() + 2 + tickTextHeight;
-        for (String line : Regex.Return.split(tickText)) {
+        Iterator<String> lines = tickText.lines().iterator();
+        while (lines.hasNext()) {
+            String line = lines.next();
             int lineWidth = (int) g.getFontMetrics().getStringBounds(line, g).getWidth();
             int xl = Math.min(x - lineWidth / 2, geometry.rightEdge() - lineWidth);
             g.drawString(line, xl, y);
@@ -153,7 +143,7 @@ final class TimelineLabelPainter {
         g.setColor(tl.getDataColor());
         YAxis yAxis = tl.getYAxis();
         YAxis.Mapper yMapper = geometry.yMapper(yAxis);
-        YAxis.Ticks ticks = yAxis.ticks(yMapper, geometry.area().y, geometry.graphBottom());
+        YAxis.Ticks ticks = yAxis.ticks(yMapper);
 
         drawHorizontalTickline(g, graphArea, yMapper, ticks.start(), axisX, leftSide, false, highlight);
         int count = 0;
