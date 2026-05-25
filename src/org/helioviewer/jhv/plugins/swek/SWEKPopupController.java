@@ -8,6 +8,7 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.Viewport;
@@ -146,8 +147,20 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         int mouseOverY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        double displayWidth = GLRenderer.getRenderView().cameraWidth(vp.zoom);
+        RenderView renderView = GLRenderer.getRenderView();
+        double displayWidth = renderView.cameraWidth(vp.zoom);
         ProjectionMode mode = Display.mode;
+        Vec3 sphereHitpoint = null;
+        Vec3 planeHitpoint = null;
+        Vec2 mousePosition = null;
+        if (mode == ProjectionMode.Orthographic) {
+            Quat viewpointRotation = viewpoint.toQuat();
+            sphereHitpoint = ViewportProjection.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpointRotation);
+            planeHitpoint = ViewportProjection.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
+        } else {
+            mousePosition = mode.mouseToScreen(camera, renderView, vp, Display.gridType, mouseOverX, mouseOverY);
+        }
+
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
@@ -162,12 +175,9 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                     Quat q = pi.getEarth().toQuat();
                     pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
 
-                    hitpoint = ViewportProjection.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
-                    if (hitpoint != null) {
-                        hitpoint = q.rotateInverseVector(hitpoint);
-                    }
+                    hitpoint = planeHitpoint == null ? null : q.rotateInverseVector(planeHitpoint);
                 } else {
-                    hitpoint = ViewportProjection.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpoint.toQuat());
+                    hitpoint = sphereHitpoint;
                     pt = pi.centralPoint();
                 }
 
@@ -189,14 +199,13 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = mode.projectToScreen(GLRenderer.getRenderView(), vp, Display.gridType, pt);
+                        tf = mode.projectToScreen(renderView, vp, Display.gridType, pt);
                     }
                 }
 
                 if (tf != null) {
-                    Vec2 mousepos = mode.mouseToScreen(camera, GLRenderer.getRenderView(), vp, Display.gridType, mouseOverX, mouseOverY);
-                    double deltaX = Math.abs(tf.x - mousepos.x);
-                    double deltaY = Math.abs(tf.y - mousepos.y);
+                    double deltaX = Math.abs(tf.x - mousePosition.x);
+                    double deltaY = Math.abs(tf.y - mousePosition.y);
                     if (deltaX < 0.02 && deltaY < 0.02) {
                         mouseOverJHVEvent = evtr;
                         break;
