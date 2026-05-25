@@ -66,27 +66,16 @@ final class TimelineLabelPainter {
     }
 
     private void drawTimeLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
-        int row = 0;
-        drawHorizontalLabels(g, geometry, xAxis, row, null);
-        row++;
+        drawHorizontalLabels(g, geometry, xAxis, 0, null);
 
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.isPropagated()) {
-                g.setColor(tl.getDataColor());
-                drawHorizontalLabels(g, geometry, xAxis, row, tl);
-                row++;
-            }
-        }
+        TimelineLayers.forEachPropagated((tl, row) -> {
+            g.setColor(tl.getDataColor());
+            drawHorizontalLabels(g, geometry, xAxis, row + 1, tl);
+        });
     }
 
     private void drawYAxisLabels(Graphics2D g, GraphGeometry geometry) {
-        int axisIndex = -1;
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.showYAxis()) {
-                drawVerticalLabels(g, geometry, tl, axisIndex, tl.getYAxis().isHighlighted());
-                axisIndex++;
-            }
-        }
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> drawVerticalLabels(g, geometry, tl, axisIndex, tl.getYAxis().isHighlighted()));
     }
 
     private static int drawString(Graphics2D g, String text, int x, int y) {

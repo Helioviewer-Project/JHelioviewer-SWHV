@@ -88,21 +88,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     private boolean toggleAxisHighlight(GraphGeometry geometry) {
         YAxisHit hit = mousePosition == null ? null : geometry.yAxisHit(mousePosition);
 
-        boolean toggled = false;
-        int ct = -1;
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.showYAxis()) {
-                if (hit != null && hit.targets(ct)) {
-                    toggled = toggled || !tl.getYAxis().isHighlighted();
-                    tl.getYAxis().setHighlighted(true);
-                } else {
-                    toggled = toggled || tl.getYAxis().isHighlighted();
-                    tl.getYAxis().setHighlighted(false);
-                }
-                ct++;
-            }
-        }
-        return toggled;
+        final boolean[] toggled = {false};
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
+            boolean highlighted = hit != null && hit.targets(axisIndex);
+            toggled[0] = toggled[0] || tl.getYAxis().isHighlighted() != highlighted;
+            tl.getYAxis().setHighlighted(highlighted);
+        });
+        return toggled[0];
     }
 
     @Override
