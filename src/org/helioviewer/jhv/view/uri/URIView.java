@@ -19,9 +19,10 @@ import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.view.BaseView;
-import org.helioviewer.jhv.view.DecodeCallback;
-import org.helioviewer.jhv.view.DecodeExecutor;
+
+import com.google.common.base.Throwables;
 
 public final class URIView extends BaseView {
 
@@ -35,7 +36,7 @@ public final class URIView extends BaseView {
     private final String xml;
     private final Region imageRegion;
 
-    public URIView(DecodeExecutor _executor, DataUri _dataUri) throws Exception {
+    public URIView(LatestWorker<ImageBuffer> _executor, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
 
         reader = dataUri.format() == DataUri.Format.Image.FITS ? new FITSImage() : new GenericImage();
@@ -79,7 +80,7 @@ public final class URIView extends BaseView {
             sendDataToHandler(imageBuffer, viewpoint);
             return;
         }
-        executor.decode(new Decoder(dataUri.file(), reader, filterType), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader, filterType), new Callback(key, viewpoint));
     }
 
     private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
@@ -93,7 +94,7 @@ public final class URIView extends BaseView {
         }
     }
 
-    private class Callback extends DecodeCallback {
+    private class Callback implements LatestWorker.Callback<ImageBuffer> {
 
         private final DecodeKey key;
         private final Position viewpoint;
@@ -111,6 +112,11 @@ public final class URIView extends BaseView {
             // This decode was superseded after it started; do not publish it to the layer.
             if (!fresh) return;
             sendDataToHandler(result, viewpoint);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t, boolean fresh) {
+            Log.error(Throwables.getStackTraceAsString(t));
         }
 
     }

@@ -14,17 +14,17 @@ import org.helioviewer.jhv.imagedata.IndexedImageFactory;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
+import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
 class RadioJ2KData implements View.DataHandler {
 
-    private final DecodeExecutor executor = new DecodeExecutor();
+    private final LatestWorker<ImageBuffer> executor = new LatestWorker<>("Radio-Decoder");
     private final J2KViewCallisto view;
     private boolean disposed;
 

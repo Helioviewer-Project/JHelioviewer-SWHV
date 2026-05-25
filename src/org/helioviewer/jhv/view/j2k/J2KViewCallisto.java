@@ -2,13 +2,14 @@ package org.helioviewer.jhv.view.j2k;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
-import org.helioviewer.jhv.view.DecodeExecutor;
+import org.helioviewer.jhv.threads.LatestWorker;
 
 public class J2KViewCallisto extends J2KView {
 
-    public J2KViewCallisto(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
+    public J2KViewCallisto(LatestWorker<ImageBuffer> _executor, APIRequest _request, DataUri _dataUri) throws Exception {
         super(_executor, _request, _dataUri);
     }
 

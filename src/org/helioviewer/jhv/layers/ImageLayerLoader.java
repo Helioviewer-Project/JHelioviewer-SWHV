@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
@@ -20,8 +21,8 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.threads.Tasks;
-import org.helioviewer.jhv.view.DecodeExecutor;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
@@ -34,7 +35,7 @@ import com.google.common.base.Throwables;
 
 final class ImageLayerLoader {
 
-    private final DecodeExecutor executor = new DecodeExecutor();
+    private final LatestWorker<ImageBuffer> executor = new LatestWorker<>("View-Decoder");
     private final Consumer<View> onViewLoaded;
     private final Runnable onUnload;
 
