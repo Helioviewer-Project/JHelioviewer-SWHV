@@ -66,7 +66,7 @@ class BandCacheMinute implements BandCache {
 
             for (int i = 0; i < values.length; i++) {
                 float value = values[i];
-                if (value != YAxis.BLANK && start <= dates[i] && dates[i] <= end /* ? */) {
+                if (value != YAxis.BLANK && start <= dates[i] && dates[i] <= end) {
                     min = Math.min(value, min);
                     max = Math.max(value, max);
                 }

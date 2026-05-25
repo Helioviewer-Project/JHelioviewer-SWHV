@@ -113,22 +113,6 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         setAvailableInterval();
     }
 
-    private static void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
-        GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
-        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
-            if (hit.targets(axisIndex) || hit.outsideAxes()) {
-                if (move) {
-                    tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
-                }
-                if (zoom) {
-                    tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.axisZoomY(p), geometry.graphHeight());
-                }
-                tl.yaxisChanged();
-            }
-        });
-        drawRequest();
-    }
-
     public static void resetAxis(Point p) {
         GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
         TimelineLayers.forEachYAxis((tl, axisIndex) -> {
@@ -142,11 +126,25 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveY(Point p, double distanceY) {
-        moveAndZoomY(p, distanceY, 0, false, true);
+        GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
+            if (hit.targets(axisIndex) || hit.outsideAxes()) {
+                tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
+                tl.yaxisChanged();
+            }
+        });
+        drawRequest();
     }
 
     private static void zoomY(Point p, int scrollDistance) {
-        moveAndZoomY(p, 0, scrollDistance, true, false);
+        GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
+            if (hit.targets(axisIndex) || hit.outsideAxes()) {
+                tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.axisZoomY(p), geometry.graphHeight());
+                tl.yaxisChanged();
+            }
+        });
+        drawRequest();
     }
 
     public static void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
@@ -167,7 +165,11 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveAllAxes(double distanceY) {
-        TimelineLayers.forEachYAxis((tl, axisIndex) -> tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight()));
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
+            tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
+            tl.yaxisChanged();
+        });
+        drawRequest();
     }
 
     private static void setAvailableInterval() {
