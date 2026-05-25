@@ -96,7 +96,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveX(double pixelDistance) {
-        selectedAxis.move(geometry.area().width, pixelDistance);
+        selectedAxis.move(geometry.graphWidth(), pixelDistance);
         setAvailableInterval();
     }
 
@@ -114,15 +114,14 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     private static void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
-        Rectangle graphArea = geometry.area();
         GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
         TimelineLayers.forEachYAxis((tl, axisIndex) -> {
             if (hit.targets(axisIndex) || hit.outsideAxes()) {
                 if (move) {
-                    tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
+                    tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
                 }
                 if (zoom) {
-                    tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.size().height - p.y - graphArea.y, graphArea.height);
+                    tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.axisZoomY(p), geometry.graphHeight());
                 }
                 tl.yaxisChanged();
             }
@@ -168,7 +167,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveAllAxes(double distanceY) {
-        TimelineLayers.forEachYAxis((tl, axisIndex) -> tl.getYAxis().shiftDownPixels(distanceY, geometry.area().height));
+        TimelineLayers.forEachYAxis((tl, axisIndex) -> tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight()));
     }
 
     private static void setAvailableInterval() {

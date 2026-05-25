@@ -27,6 +27,14 @@ public final class GraphGeometry {
         return area;
     }
 
+    public int graphWidth() {
+        return area.width;
+    }
+
+    public int graphHeight() {
+        return area.height;
+    }
+
     public int rightEdge() {
         return size.width - DrawConstants.GRAPH_RIGHT_SPACE;
     }
@@ -53,6 +61,10 @@ public final class GraphGeometry {
 
     public YAxis.Mapper yMapper(YAxis axis) {
         return axis.mapper(area.y, area.height);
+    }
+
+    public int axisZoomY(Point p) {
+        return size.height - p.y - area.y;
     }
 
     public YAxisHit yAxisHit(Point p) {
