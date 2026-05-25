@@ -239,23 +239,17 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
     }
 
-    private static int value2pixel(int x0, int w, long val, long start, long end) {
-        return (int) ((double) w / (end - start) * (val - start) + x0);
-    }
-
     private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
         String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, xAxis.start());
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(tickText, g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        long start, end;
+        TimeAxis.Mapper xMapper;
         if (tl == null) {
-            start = xAxis.start();
-            end = xAxis.end();
+            xMapper = xAxis.mapper(graphArea.x, graphArea.width);
         } else {
-            start = tl.getObservationTime(xAxis.start());
-            end = tl.getObservationTime(xAxis.end());
+            xMapper = new TimeAxis.Mapper(tl.getObservationTime(xAxis.start()), tl.getObservationTime(xAxis.end()), graphArea.x, graphArea.width);
         }
         long tickDifferenceHorizontal = (xAxis.end() - xAxis.start()) / (horizontalTickCount - 1);
 
@@ -266,7 +260,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 tickValue = tl.getObservationTime(tickValue);
             }
 
-            int x = value2pixel(graphArea.x, graphArea.width, tickValue, start, end);
+            int x = xMapper.toPixel(tickValue);
             if (previousDate == Long.MIN_VALUE) {
                 tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_REVERSE, tickValue);
             } else {
@@ -311,8 +305,9 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
         // Vertical lines
         {
-            double start = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, graphArea.y + graphArea.height);
-            double end = yAxis.pixel2ScaledValue(graphArea.y, graphArea.height, graphArea.y);
+            YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
+            double start = yMapper.pixelToScaled(graphArea.y + graphArea.height);
+            double end = yMapper.pixelToScaled(graphArea.y);
             if (start > end) {
                 double temp = start;
                 start = end;
@@ -327,15 +322,15 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             }
             double tick = startv;
             int ct = 0;
-            drawHorizontalTickline(g, graphArea, yAxis, start, axis_x_offset, leftSide, false, highlight);
+            drawHorizontalTickline(g, graphArea, yMapper, start, axis_x_offset, leftSide, false, highlight);
             while (tick <= endv && ct < 20) {
                 if (tick >= start && tick <= end) {
-                    drawHorizontalTickline(g, graphArea, yAxis, tick, axis_x_offset, leftSide, true, highlight);
+                    drawHorizontalTickline(g, graphArea, yMapper, tick, axis_x_offset, leftSide, true, highlight);
                 }
                 tick += step;
                 ct++;
             }
-            drawHorizontalTickline(g, graphArea, yAxis, end, axis_x_offset, leftSide, false, highlight);
+            drawHorizontalTickline(g, graphArea, yMapper, end, axis_x_offset, leftSide, false, highlight);
         }
 
         // Label and axis
@@ -360,9 +355,9 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
     }
 
-    private static void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt, boolean highlight) {
+    private static void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis.Mapper yMapper, double tick, int axis_x_offset, int leftSide, boolean needTxt, boolean highlight) {
         String tickText = DrawConstants.valueFormatter.format(tick);
-        int y = yAxis.scaledToPixel(graphArea.y, graphArea.height, tick);
+        int y = yMapper.scaledToPixel(tick);
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
         int x_str;
         if (leftSide == -1) {

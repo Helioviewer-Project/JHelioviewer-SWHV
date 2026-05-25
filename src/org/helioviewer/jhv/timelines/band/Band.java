@@ -7,8 +7,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.DoubleToIntFunction;
-import java.util.function.LongToIntFunction;
 import java.util.function.LongUnaryOperator;
 
 import javax.swing.JPanel;
@@ -233,40 +231,40 @@ public final class Band extends AbstractTimelineLayer {
         long end = propagationModel.getObservationTime(timeAxis.end());
 
         LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
-        LongToIntFunction xMapper = timeAxis.value2pixelMapper(graphArea.x, graphArea.width);
-        DoubleToIntFunction yMapper = yAxis.dataToPixelMapper(graphArea.y, graphArea.height);
+        TimeAxis.Mapper xMapper = timeAxis.mapper(graphArea.x, graphArea.width);
+        YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * graphArea.width, start, end);
 
         graphWorker.submit(() -> {
-            List<Polyline> result = new ArrayList<>();
-            for (List<BandCache.DateValue> list : rawData) {
-                if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException();
-                }
-                int size = list.size();
-                if (size == 0) {
-                    continue;
-                }
+                    List<Polyline> result = new ArrayList<>();
+                    for (List<BandCache.DateValue> list : rawData) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            throw new InterruptedException();
+                        }
+                        int size = list.size();
+                        if (size == 0) {
+                            continue;
+                        }
 
-                int[] dates = new int[size];
-                int[] values = new int[size];
-                for (int i = 0; i < size; i++) {
-                    BandCache.DateValue dv = list.get(i);
-                    dates[i] = xMapper.applyAsInt(viewpointTime.applyAsLong(dv.milli));
-                    values[i] = yMapper.applyAsInt(dv.value);
-                }
-                result.add(new Polyline(dates, values));
-            }
-            return result;
-        },
-        (result, fresh) -> {
-            if (!fresh)
-                return;
+                        int[] dates = new int[size];
+                        int[] values = new int[size];
+                        for (int i = 0; i < size; i++) {
+                            BandCache.DateValue dv = list.get(i);
+                            dates[i] = xMapper.toPixel(viewpointTime.applyAsLong(dv.milli));
+                            values[i] = yMapper.dataToPixel(dv.value);
+                        }
+                        result.add(new Polyline(dates, values));
+                    }
+                    return result;
+                },
+                (result, fresh) -> {
+                    if (!fresh)
+                        return;
 
-            polylines.clear();
-            polylines.addAll(result);
-            DrawController.drawRequest();
-        });
+                    polylines.clear();
+                    polylines.addAll(result);
+                    DrawController.drawRequest();
+                });
     }
 
     @Override
