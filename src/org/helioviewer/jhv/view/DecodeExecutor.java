@@ -1,31 +1,34 @@
 package org.helioviewer.jhv.view;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.threads.EDTCallbackExecutor;
-import org.helioviewer.jhv.threads.JHVThread;
-
-import com.google.common.util.concurrent.MoreExecutors;
+import org.helioviewer.jhv.threads.LatestWorker;
 
 public class DecodeExecutor {
 
-    private final ThreadPoolExecutor worker = new ThreadPoolExecutor(
-            1, 1, 10000L, TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue<>(1),
-            new JHVThread.NamedThreadFactory("Decoder"),
-            new ThreadPoolExecutor.DiscardOldestPolicy());
-    private final EDTCallbackExecutor executor = new EDTCallbackExecutor(MoreExecutors.listeningDecorator(worker));
+    private final LatestWorker<ImageBuffer> worker = new LatestWorker<>("Decoder");
 
     public void decode(Callable<ImageBuffer> callable, DecodeCallback callback) {
-        executor.submit(callable, callback);
+        worker.submit(callable, new LatestWorker.Callback<>() {
+            @Override
+            public void onSuccess(ImageBuffer result, boolean fresh) {
+                callback.onSuccess(result, fresh);
+            }
+
+            @Override
+            public void onFailure(Throwable t, boolean fresh) {
+                callback.onFailure(t, fresh);
+            }
+        });
+    }
+
+    public void cancel() {
+        worker.cancel();
     }
 
     public void abolish() {
-        worker.shutdown();
+        worker.abolish();
     }
 
 }

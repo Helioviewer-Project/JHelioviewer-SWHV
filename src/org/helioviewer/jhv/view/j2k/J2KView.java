@@ -273,8 +273,15 @@ public class J2KView extends BaseView {
         if (reader != null && !cacheResult) {
             signalReader(decodeParams, viewpoint);
         }
-        if (useCachedImage(decodeParams, viewpoint))
+
+        DecodeKey key = new DecodeKey(decodeParams, filterType);
+        ImageBuffer imageBuffer = ImageBufferCache.get(key);
+        if (imageBuffer != null) {
+            // Mark running decodes stale before publishing this cached result.
+            executor.cancel();
+            sendDataToHandler(decodeParams, viewpoint, imageBuffer);
             return;
+        }
         submitDecode(decodeParams, viewpoint, cacheResult);
     }
 
@@ -284,16 +291,6 @@ public class J2KView extends BaseView {
                 submitDecode(decodeParams, viewpoint, true);
             }
         });
-    }
-
-    private boolean useCachedImage(J2KParams.Decode decodeParams, Position viewpoint) {
-        DecodeKey key = new DecodeKey(decodeParams, filterType);
-        ImageBuffer imageBuffer = ImageBufferCache.get(key);
-        if (imageBuffer != null) {
-            sendDataToHandler(decodeParams, viewpoint, imageBuffer);
-            return true;
-        }
-        return false;
     }
 
     private void submitDecode(J2KParams.Decode decodeParams, Position viewpoint, boolean cacheResult) {
@@ -319,10 +316,12 @@ public class J2KView extends BaseView {
         }
 
         @Override
-        public void onSuccess(ImageBuffer result) {
+        public void onSuccess(ImageBuffer result, boolean fresh) {
             if (key.filter() != filterType) return; // filter changed in-flight
             if (cacheResult) ImageBufferCache.put(key, result);
 
+            // This decode was superseded after it started; do not publish it to the layer.
+            if (!fresh) return;
             sendDataToHandler(key.params(), viewpoint, result);
         }
 
