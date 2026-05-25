@@ -9,7 +9,6 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -25,6 +24,8 @@ import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
 class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMotionListener, DrawController.Listener {
+
+    private static final Calendar calendar = Calendar.getInstance();
 
     private boolean draggingInterval;
     private Point mousePressed;
@@ -146,14 +147,14 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
     private void drawIntervalGraspPoints(Graphics2D g) {
         g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
-        g.fill(new RoundRectangle2D.Double(leftIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
-        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition - 1, 0, 2, getHeight(), 5, 5));
+        g.fillRect(leftIntervalBorderPosition - 1, 0, 2, getHeight());
+        g.fillRect(rightIntervalBorderPosition - 1, 0, 2, getHeight());
     }
 
     private void drawIntervalHBar(Graphics2D g) {
         g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
-        g.fill(new RoundRectangle2D.Double(DrawConstants.GRAPH_LEFT_SPACE, 0, leftIntervalBorderPosition - DrawConstants.GRAPH_LEFT_SPACE, 2, 5, 5));
-        g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2, 5, 5));
+        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 0, leftIntervalBorderPosition - DrawConstants.GRAPH_LEFT_SPACE, 2);
+        g.fillRect(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2);
     }
 
     private void drawLabels(Graphics2D g, IntervalPixels pixels, TimeAxis selectedInterval) {
@@ -185,7 +186,6 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
     private static List<LabelTick> timeTicks(TimeAxis availableInterval, int maxTicks) {
         List<LabelTick> ticks = new ArrayList<>(maxTicks);
-        Calendar calendar = Calendar.getInstance();
         long timeDiff = availableInterval.end() - availableInterval.start();
         double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
@@ -208,7 +208,6 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private static List<LabelTick> dayTicks(TimeAxis availableInterval, int maxTicks) {
-        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -242,7 +241,6 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private static List<LabelTick> monthTicks(TimeAxis availableInterval, int maxTicks) {
-        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -278,7 +276,6 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     }
 
     private static List<LabelTick> yearTicks(TimeAxis availableInterval, int maxTicks) {
-        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
