@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
@@ -69,16 +70,15 @@ public class JHVEventCache {
         } else {
             createNewRelatedEvent(event);
         }
-        checkAssociation(event);
+        resolvePendingAssociations(id);
     }
 
     public static JHVRelatedEvents getRelatedEvents(int id) {
         return relEvents.get(id);
     }
 
-    private static void checkAssociation(JHVEvent event) {
-        int uid = event.getUniqueID();
-        HashSet<Pair<Integer, Integer>> pending = pendingAssocs.remove(uid);
+    private static void resolvePendingAssociations(Integer id) {
+        HashSet<Pair<Integer, Integer>> pending = pendingAssocs.remove(id);
         if (pending != null)
             pending.forEach(JHVEventCache::addAssociation);
     }
@@ -97,17 +97,17 @@ public class JHVEventCache {
     }
 
     static void addAssociation(Pair<Integer, Integer> association) {
-        JHVRelatedEvents ll = relEvents.get(association.left());
-        JHVRelatedEvents rr = relEvents.get(association.right());
-        if (ll != null && rr != null) {
-            if (ll != rr) {
-                merge(ll, rr);
-                ll.addAssociation(association);
+        JHVRelatedEvents left = relEvents.get(association.left());
+        JHVRelatedEvents right = relEvents.get(association.right());
+        if (left != null && right != null) {
+            if (left != right) {
+                merge(left, right);
+                left.addAssociation(association);
             }
         } else {
-            if (ll == null)
+            if (left == null)
                 addPendingAssociation(association.left(), association);
-            if (rr == null)
+            if (right == null)
                 addPendingAssociation(association.right(), association);
         }
     }
@@ -154,9 +154,16 @@ public class JHVEventCache {
     static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {
         downloadedCache.put(supplier, new RequestCache());
         events.remove(supplier);
-        relEvents.entrySet().removeIf(entry -> entry.getValue().getSupplier() == supplier);
+        relEvents.entrySet().removeIf(entry -> removeEventIfFromSupplier(entry, supplier));
         if (!keepActive) activeEventTypes.remove(supplier);
         fireEventCacheChanged();
+    }
+
+    private static boolean removeEventIfFromSupplier(Map.Entry<Integer, JHVRelatedEvents> entry, SWEKSupplier supplier) {
+        if (entry.getValue().getSupplier() != supplier)
+            return false;
+        pendingAssocs.remove(entry.getKey());
+        return true;
     }
 
     public static List<Interval> getAllRequestIntervals(SWEKSupplier eventType) {
