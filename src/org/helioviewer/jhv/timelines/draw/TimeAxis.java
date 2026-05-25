@@ -23,14 +23,6 @@ public final class TimeAxis {
         return new Mapper(start, end, x0, width);
     }
 
-    public int value2pixel(int x0, int w, long val) {
-        return mapper(x0, w).toPixel(val);
-    }
-
-    public long pixel2value(int x0, int w, int x) {
-        return mapper(x0, w).toValue(x);
-    }
-
     void move(int w, double pixelDistance) {
         long diff = (long) ((end - start) / (double) w * pixelDistance);
         move(diff);

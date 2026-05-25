@@ -211,7 +211,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         if (mousePosition == null || !graphArea.contains(mousePosition)) {
             return;
         }
-        long ts = xAxis.pixel2value(graphArea.x, graphArea.width, mousePosition.x);
+        long ts = xAxis.mapper(graphArea.x, graphArea.width).toValue(mousePosition.x);
         String lbl = '(' + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts);
         int currWidth = 0;
         g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
@@ -398,7 +398,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         ClickableDrawable element = TimelineLayers.getDrawableUnderMouse();
         if (element != null) {
             Rectangle graphArea = DrawController.getGraphArea();
-            element.clicked(e.getLocationOnScreen(), DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, p.x));
+            element.clicked(e.getLocationOnScreen(), DrawController.selectedAxis.mapper(graphArea.x, graphArea.width).toValue(p.x));
         } else {
             DrawController.setMovieFrame(p);
         }

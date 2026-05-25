@@ -96,6 +96,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         }
 
         ArrayList<Long> endDates = new ArrayList<>();
+        TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
         int nrLines = 0;
 
         for (JHVRelatedEvents event : events) {
@@ -113,8 +114,8 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
             int eventPosition = i;
             nrLines = Math.max(nrLines, endDates.size());
 
-            int x0 = xAxis.value2pixel(graphArea.x, graphArea.width, eventStart);
-            int x1 = xAxis.value2pixel(graphArea.x, graphArea.width, eventEnd);
+            int x0 = xMapper.toPixel(eventStart);
+            int x1 = xMapper.toPixel(eventEnd);
             JHVRelatedEvents rEvent = drawEvent(graphArea, event, x0, x1, eventPosition, g, mousePosition);
             if (rEvent != null) {
                 eventUnderMouse = new EventPlotConfiguration(rEvent, x0, x1, eventPosition);
@@ -218,7 +219,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, int mouseX) {
         List<String> txts = new ArrayList<>();
         int width = 1;
-        long ts = DrawController.selectedAxis.pixel2value(graphArea.x, graphArea.width, mouseX);
+        long ts = DrawController.selectedAxis.mapper(graphArea.x, graphArea.width).toValue(mouseX);
         for (JHVEventParameter p : event.getClosestTo(ts).getSimpleVisibleEventParameters()) {
             String name = p.getParameterName();
             if (name != "event_description" && name != "event_title") { // interned

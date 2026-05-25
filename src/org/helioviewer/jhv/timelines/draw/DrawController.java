@@ -103,7 +103,8 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveXAvailableBased(int x0, int x1) {
-        long av_diff = availableAxis.pixel2value(0, graphSize.width, x1) - availableAxis.pixel2value(0, graphSize.width, x0);
+        TimeAxis.Mapper mapper = availableAxis.mapper(0, graphSize.width);
+        long av_diff = mapper.toValue(x1) - mapper.toValue(x0);
         selectedAxis.move(av_diff);
         setAvailableInterval();
     }
@@ -241,7 +242,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static int getMovieLinePosition() {
-        int movieLinePosition = selectedAxis.value2pixel(graphArea.x, graphArea.width, currentTime);
+        int movieLinePosition = selectedAxis.mapper(graphArea.x, graphArea.width).toPixel(currentTime);
         if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
             return -1;
         }
@@ -251,7 +252,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     public static void setMovieFrame(Point point) {
         if (!graphArea.contains(point))
             return;
-        Commands.seekTime(new JHVTime(selectedAxis.pixel2value(graphArea.x, graphArea.width, point.x)));
+        Commands.seekTime(new JHVTime(selectedAxis.mapper(graphArea.x, graphArea.width).toValue(point.x)));
     }
 
     @Override
