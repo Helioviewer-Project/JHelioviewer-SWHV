@@ -29,7 +29,6 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
-import org.helioviewer.jhv.timelines.draw.GraphGeometry.YAxisHit;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 
 @SuppressWarnings("serial")
@@ -84,24 +83,12 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
     }
 
-    private boolean toggleAxisHighlight(GraphGeometry geometry) {
-        YAxisHit hit = mousePosition == null ? null : geometry.yAxisHit(mousePosition);
-
-        final boolean[] toggled = {false};
-        TimelineLayers.forEachYAxis((tl, axisIndex) -> {
-            boolean highlighted = hit != null && hit.targets(axisIndex);
-            toggled[0] = toggled[0] || tl.getYAxis().isHighlighted() != highlighted;
-            tl.getYAxis().setHighlighted(highlighted);
-        });
-        return toggled[0];
-    }
-
     @Override
     protected void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         GraphGeometry geometry = DrawController.getGeometry();
 
-        boolean axisHighlightChanged = toggleAxisHighlight(geometry);
+        boolean axisHighlightChanged = TimelineLayers.setYAxisHighlight(mousePosition == null ? null : geometry.yAxisHit(mousePosition));
         if (redrawGraphArea || axisHighlightChanged) {
             redrawGraphArea = false;
             redrawGraph(geometry);

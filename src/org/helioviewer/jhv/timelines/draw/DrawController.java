@@ -16,7 +16,6 @@ import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayers;
-import org.helioviewer.jhv.timelines.draw.GraphGeometry.YAxisHit;
 
 import org.json.JSONObject;
 
@@ -116,7 +115,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
     private static void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
         Rectangle graphArea = geometry.area();
-        YAxisHit hit = geometry.yAxisHit(p);
+        GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
         TimelineLayers.forEachYAxis((tl, axisIndex) -> {
             if (hit.targets(axisIndex) || hit.outsideAxes()) {
                 if (move) {
@@ -132,7 +131,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void resetAxis(Point p) {
-        YAxisHit hit = geometry.yAxisHit(p);
+        GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
         TimelineLayers.forEachYAxis((tl, axisIndex) -> {
             if (hit.targets(axisIndex)) {
                 tl.resetAxis();
