@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventListener;
-import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -217,16 +216,11 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     }
 
     private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, int mouseX) {
-        List<String> txts = new ArrayList<>();
-        int width = 1;
         long ts = DrawController.selectedAxis.mapper(graphArea.x, graphArea.width).toValue(mouseX);
-        for (JHVEventParameter p : event.getClosestTo(ts).getSimpleVisibleEventParameters()) {
-            String name = p.getParameterName();
-            if (name != "event_description" && name != "event_title") { // interned
-                String str = p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue();
-                txts.add(str);
-                width = Math.max(width, g.getFontMetrics().stringWidth(str));
-            }
+        List<String> txts = SWEKData.visibleParameterLines(event.getClosestTo(ts));
+        int width = 1;
+        for (String text : txts) {
+            width = Math.max(width, g.getFontMetrics().stringWidth(text));
         }
         g.setColor(UIGlobals.TL_TEXT_BACKGROUND_COLOR);
         g.fillRect(mouseX + 5, y, width + 21 + 10, txts.size() * 10 + 11);
