@@ -3,23 +3,25 @@ package org.helioviewer.jhv.view;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
 
-    protected final DecodeExecutor executor;
+    protected final LatestWorker<ImageBuffer> executor;
     protected final DataUri dataUri;
 
     protected ImageFilter.Type filterType = ImageFilter.Type.None;
     protected LUT builtinLUT;
     protected MetaData[] metaData = {BasicMetaData.EMPTY}; // paranoia
 
-    public BaseView(DecodeExecutor _executor, DataUri _dataUri) {
+    public BaseView(LatestWorker<ImageBuffer> _executor, DataUri _dataUri) {
         executor = _executor;
         dataUri = _dataUri;
     }

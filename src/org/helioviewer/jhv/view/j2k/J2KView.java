@@ -27,11 +27,12 @@ import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
-import org.helioviewer.jhv.view.DecodeCallback;
-import org.helioviewer.jhv.view.DecodeExecutor;
+
+import com.google.common.base.Throwables;
 
 import kdu_jni.KduException;
 
@@ -59,7 +60,7 @@ public class J2KView extends BaseView {
 
     protected final J2KReader reader;
 
-    public J2KView(DecodeExecutor _executor, APIRequest _request, DataUri _dataUri) throws Exception {
+    public J2KView(LatestWorker<ImageBuffer> _executor, APIRequest _request, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
         serial = globalSerial.incrementAndGet();
         request = _request;
@@ -297,13 +298,13 @@ public class J2KView extends BaseView {
         DecodeKey key = new DecodeKey(decodeParams, filterType);
         int numComps = source.resolutionSet(decodeParams.frame()).numComps;
         try {
-            executor.decode(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, cacheResult));
+            executor.submit(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, cacheResult));
         } catch (RejectedExecutionException ignore) {
             // Teardown may shut the executor down before a late refresh/resubmit reaches this point.
         }
     }
 
-    private class J2KCallback extends DecodeCallback {
+    private class J2KCallback implements LatestWorker.Callback<ImageBuffer> {
 
         private final DecodeKey key;
         private final Position viewpoint;
@@ -323,6 +324,11 @@ public class J2KView extends BaseView {
             // This decode was superseded after it started; do not publish it to the layer.
             if (!fresh) return;
             sendDataToHandler(key.params(), viewpoint, result);
+        }
+
+        @Override
+        public void onFailure(@Nonnull Throwable t, boolean fresh) {
+            Log.error(Throwables.getStackTraceAsString(t));
         }
 
     }
