@@ -96,11 +96,17 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveX(double pixelDistance) {
+        if (pixelDistance == 0)
+            return;
+
         selectedAxis.move(geometry.graphWidth(), pixelDistance);
         setAvailableInterval();
     }
 
     public static void moveXAvailableBased(int x0, int x1) {
+        if (x0 == x1)
+            return;
+
         TimeAxis.Mapper mapper = availableAxis.mapper(0, geometry.size().width);
         long av_diff = mapper.toValue(x1) - mapper.toValue(x0);
         selectedAxis.move(av_diff);
@@ -108,6 +114,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     private static void zoomX(int x, double factor) {
+        if (factor == 0)
+            return;
+
         Rectangle graphArea = geometry.area();
         selectedAxis.zoom(graphArea.x, graphArea.width, x, factor);
         setAvailableInterval();
@@ -126,6 +135,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveY(Point p, double distanceY) {
+        if (distanceY == 0)
+            return;
+
         GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
         TimelineLayers.forEachYAxis((tl, axisIndex) -> {
             if (hit.targets(axisIndex) || hit.outsideAxes()) {
@@ -137,6 +149,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     private static void zoomY(Point p, int scrollDistance) {
+        if (scrollDistance == 0)
+            return;
+
         GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
         TimelineLayers.forEachYAxis((tl, axisIndex) -> {
             if (hit.targets(axisIndex) || hit.outsideAxes()) {
@@ -165,6 +180,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveAllAxes(double distanceY) {
+        if (distanceY == 0)
+            return;
+
         TimelineLayers.forEachYAxis((tl, axisIndex) -> {
             tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
             tl.yaxisChanged();
@@ -227,8 +245,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
     public static void graphAreaChanged() {
         geometry.layout(Math.max(0, TimelineLayers.getNumberOfPropagationAxes()), TimelineLayers.getNumberOfYAxes());
-        moveX(0); // force recalculation of polylines
-        drawRequest();
+        setAvailableInterval();
     }
 
     @Override
