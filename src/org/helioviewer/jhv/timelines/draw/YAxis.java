@@ -190,12 +190,10 @@ public final class YAxis {
         return unit.replace("^2", "\u00B2").replace("^3", "\u00B3").replace("^-2", "\u207B\u00B2").replace("^-3", "\u207B\u00B3");
     }
 
-    public static class YAxisLogScale implements YAxisScale {
+    public record YAxisLogScale(String label) implements YAxisScale {
 
-        private final String label;
-
-        YAxisLogScale(String _label) {
-            label = "log\u2081\u2080(" + fixupUnit(_label) + ')';
+        public YAxisLogScale {
+            label = "log\u2081\u2080(" + fixupUnit(label) + ')';
         }
 
         @Override
@@ -229,12 +227,10 @@ public final class YAxis {
         }
     }
 
-    public static class YAxisIdentityScale implements YAxisScale {
+    public record YAxisIdentityScale(String label) implements YAxisScale {
 
-        private final String label;
-
-        public YAxisIdentityScale(String _label) {
-            label = fixupUnit(_label);
+        public YAxisIdentityScale {
+            label = fixupUnit(label);
         }
 
         @Override
@@ -269,12 +265,10 @@ public final class YAxis {
 
     }
 
-    public static class YAxisPositiveIdentityScale implements YAxisScale {
+    public record YAxisPositiveIdentityScale(String label) implements YAxisScale {
 
-        private final String label;
-
-        public YAxisPositiveIdentityScale(String _label) {
-            label = fixupUnit(_label);
+        public YAxisPositiveIdentityScale {
+            label = fixupUnit(label);
         }
 
         @Override
