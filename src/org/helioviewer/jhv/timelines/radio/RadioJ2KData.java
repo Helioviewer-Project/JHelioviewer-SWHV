@@ -18,6 +18,7 @@ import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
+import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KViewCallisto;
 import org.helioviewer.jhv.view.j2k.ResolutionSet;
@@ -178,11 +179,13 @@ class RadioJ2KData implements View.DataHandler {
         double freqimStart = startFreq + freqWidth * region.lly / j2kHeight;
         double freqimEnd = startFreq + freqWidth * region.ury / j2kHeight;
 
+        TimeAxis.Mapper xMapper = xAxis.mapper(ga.x, ga.width);
+        YAxis.Mapper yMapper = RadioData.yAxis.mapper(ga.y, ga.height);
         g.drawImage(bufferedImage,
-                xAxis.value2pixel(ga.x, ga.width, imStart),
-                RadioData.yAxis.dataToPixel(ga.y, ga.height, freqimStart),
-                xAxis.value2pixel(ga.x, ga.width, imEnd),
-                RadioData.yAxis.dataToPixel(ga.y, ga.height, freqimEnd),
+                xMapper.toPixel(imStart),
+                yMapper.dataToPixel(freqimStart),
+                xMapper.toPixel(imEnd),
+                yMapper.dataToPixel(freqimEnd),
                 0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null);
     }
 

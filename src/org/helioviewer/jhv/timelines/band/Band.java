@@ -220,10 +220,11 @@ public final class Band extends AbstractTimelineLayer {
         }
 
         Rectangle graphArea = DrawController.getGraphArea();
+        YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
 
         double[] unconvertedWarnLevels = bandType.getWarnLevels();
         for (int i = 0; i < warnLevels.length; i++) {
-            warnLevels[i] = yAxis.dataToPixel(graphArea.y, graphArea.height, unconvertedWarnLevels[i]);
+            warnLevels[i] = yMapper.dataToPixel(unconvertedWarnLevels[i]);
         }
 
         TimeAxis timeAxis = DrawController.selectedAxis;
@@ -232,7 +233,6 @@ public final class Band extends AbstractTimelineLayer {
 
         LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
         TimeAxis.Mapper xMapper = timeAxis.mapper(graphArea.x, graphArea.width);
-        YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * graphArea.width, start, end);
 
         graphWorker.submit(() -> {

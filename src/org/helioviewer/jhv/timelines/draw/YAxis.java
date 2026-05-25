@@ -58,18 +58,6 @@ public final class YAxis {
         return new Mapper(scale, scale(start), scale(end), y0, height);
     }
 
-    public double pixel2ScaledValue(int y0, int h, int p) {
-        return mapper(y0, h).pixelToScaled(p);
-    }
-
-    public int scaledToPixel(int y0, int h, double value) {
-        return mapper(y0, h).scaledToPixel(value);
-    }
-
-    public int dataToPixel(int y0, int h, double value) {
-        return mapper(y0, h).dataToPixel(value);
-    }
-
     public String getLabel() {
         return scale.getLabel();
     }

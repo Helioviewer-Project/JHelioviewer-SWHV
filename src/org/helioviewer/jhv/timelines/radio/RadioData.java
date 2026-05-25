@@ -267,8 +267,9 @@ public final class RadioData extends AbstractTimelineLayer {
     }
 
     static void drawString(Graphics2D g, Rectangle ga, TimeAxis xAxis, String text) {
-        int dx0 = xAxis.value2pixel(ga.x, ga.width, xAxis.start());
-        int dx1 = xAxis.value2pixel(ga.x, ga.width, xAxis.end());
+        TimeAxis.Mapper xMapper = xAxis.mapper(ga.x, ga.width);
+        int dx0 = xMapper.toPixel(xAxis.start());
+        int dx1 = xMapper.toPixel(xAxis.end());
         int dwidth = dx1 - dx0;
         g.setColor(Color.GRAY);
         g.fillRect(dx0, ga.y, dwidth, ga.height);
