@@ -163,37 +163,18 @@ final class TimelineLabelPainter {
         g.setColor(tl.getDataColor());
         YAxis yAxis = tl.getYAxis();
         YAxis.Mapper yMapper = geometry.yMapper(yAxis);
-        YTicks ticks = yTicks(yMapper, geometry);
+        YAxis.Ticks ticks = yAxis.ticks(yMapper, geometry.area().y, geometry.graphBottom());
 
-        drawHorizontalTickline(g, graphArea, yMapper, ticks.start, axisX, leftSide, false, highlight);
+        drawHorizontalTickline(g, graphArea, yMapper, ticks.start(), axisX, leftSide, false, highlight);
         int count = 0;
-        for (double tick = ticks.first; tick <= ticks.last && count < 20; tick += ticks.step, count++) {
-            if (ticks.start <= tick && tick <= ticks.end) {
+        for (double tick = ticks.first(); tick <= ticks.last() && count < 20; tick += ticks.step(), count++) {
+            if (ticks.start() <= tick && tick <= ticks.end()) {
                 drawHorizontalTickline(g, graphArea, yMapper, tick, axisX, leftSide, true, highlight);
             }
         }
-        drawHorizontalTickline(g, graphArea, yMapper, ticks.end, axisX, leftSide, false, highlight);
+        drawHorizontalTickline(g, graphArea, yMapper, ticks.end(), axisX, leftSide, false, highlight);
 
         drawVerticalTitle(g, graphArea, axisX, yAxis.getLabel(), highlight);
-    }
-
-    private static YTicks yTicks(YAxis.Mapper yMapper, GraphGeometry geometry) {
-        double start = yMapper.pixelToScaled(geometry.graphBottom());
-        double end = yMapper.pixelToScaled(geometry.area().y);
-        if (start > end) {
-            double temp = start;
-            start = end;
-            end = temp;
-        }
-
-        int decade = (int) Math.floor(Math.log10(end - start));
-        double step = Math.pow(10, decade);
-        double first = Math.floor(start / step) * step;
-        double last = Math.ceil(end / step) * step;
-        if ((last - first) / step < 5) {
-            step /= 2;
-        }
-        return new YTicks(start, end, first, last, step);
     }
 
     private void drawVerticalTitle(Graphics2D g, Rectangle graphArea, int axisX, String verticalLabel, boolean highlight) {
@@ -237,7 +218,5 @@ final class TimelineLabelPainter {
             }
         }
     }
-
-    private record YTicks(double start, double end, double first, double last, double step) {}
 
 }
