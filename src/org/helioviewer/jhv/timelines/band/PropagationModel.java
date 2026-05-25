@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.util.function.LongUnaryOperator;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -11,6 +13,8 @@ interface PropagationModel {
     long getObservationTime(long ts);
 
     long getViewpointTime(long ts);
+
+    LongUnaryOperator viewpointTimeMapper();
 
     class Delay implements PropagationModel {
 
@@ -35,6 +39,11 @@ interface PropagationModel {
         @Override
         public long getViewpointTime(long ts) {
             return isPropagated ? (long) (ts - delayMilli) : ts;
+        }
+
+        @Override
+        public LongUnaryOperator viewpointTimeMapper() {
+            return isPropagated ? ts -> (long) (ts - delayMilli) : LongUnaryOperator.identity();
         }
 
     }
@@ -63,6 +72,15 @@ interface PropagationModel {
         @Override
         public long getViewpointTime(long ts) {
             return isPropagated ? (long) (ts - radiusMilli * getObservationDistance(ts) + getRSShift() + .5) : ts;
+        }
+
+        @Override
+        public LongUnaryOperator viewpointTimeMapper() {
+            if (!isPropagated) {
+                return LongUnaryOperator.identity();
+            }
+            double rsShift = getRSShift();
+            return ts -> (long) (ts - radiusMilli * getObservationDistance(ts) + rsShift + .5);
         }
 
         private static double getObservationDistance(long ts) {

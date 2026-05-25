@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.timelines.draw;
 
+import java.util.function.DoubleToIntFunction;
+
 public final class YAxis {
 
     public static final float BLANK = -Float.MAX_VALUE;
@@ -60,14 +62,20 @@ public final class YAxis {
         return (smax - smin) * (-p + y0 + h) / h + smin;
     }
 
-    public int scaledvalue2pixel(int y0, int h, double value) {
+    public int scaledToPixel(int y0, int h, double value) {
         double smin = scale(start);
         double smax = scale(end);
         return (int) (-h * (value - smin) / (smax - smin) + y0 + h);
     }
 
-    public int value2pixel(int y0, int h, double value) {
-        return scaledvalue2pixel(y0, h, scale(value));
+    public int dataToPixel(int y0, int h, double value) {
+        return scaledToPixel(y0, h, scale(value));
+    }
+
+    public DoubleToIntFunction dataToPixelMapper(int y0, int h) {
+        double smin = scale(start);
+        double smax = scale(end);
+        return value -> (int) (-h * (scale(value) - smin) / (smax - smin) + y0 + h);
     }
 
     public String getLabel() {

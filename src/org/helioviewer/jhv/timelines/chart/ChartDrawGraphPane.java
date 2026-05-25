@@ -362,7 +362,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     private static void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis yAxis, double tick, int axis_x_offset, int leftSide, boolean needTxt, boolean highlight) {
         String tickText = DrawConstants.valueFormatter.format(tick);
-        int y = yAxis.scaledvalue2pixel(graphArea.y, graphArea.height, tick);
+        int y = yAxis.scaledToPixel(graphArea.y, graphArea.height, tick);
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
         int x_str;
         if (leftSide == -1) {

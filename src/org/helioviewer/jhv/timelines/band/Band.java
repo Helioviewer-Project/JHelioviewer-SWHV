@@ -7,6 +7,9 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.DoubleToIntFunction;
+import java.util.function.LongToIntFunction;
+import java.util.function.LongUnaryOperator;
 
 import javax.swing.JPanel;
 
@@ -15,6 +18,7 @@ import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
@@ -51,6 +55,7 @@ public final class Band extends AbstractTimelineLayer {
     private final YAxis yAxis;
     private final int[] warnLevels;
     private final List<Polyline> polylines = new ArrayList<>();
+    private final LatestWorker<List<Polyline>> graphWorker = new LatestWorker<>("Timeline-Graph");
 
     private RequestCache requestCache;
     private BandCache bandCache;
@@ -140,6 +145,7 @@ public final class Band extends AbstractTimelineLayer {
 
     @Override
     public void remove() {
+        graphWorker.cancel();
         BandDataProvider.stopDownloads(this);
         // clear caches
         requestCache = new RequestCache();
@@ -192,7 +198,7 @@ public final class Band extends AbstractTimelineLayer {
             return;
 
         g.setColor(graphColor);
-        polylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length())); // polylines
+        polylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length()));
 
 //      for (GraphPolyline line : graphPolylines) { // dots
 //          int length = line.length();
@@ -210,34 +216,57 @@ public final class Band extends AbstractTimelineLayer {
     }
 
     private void updateGraph() {
-        if (enabled) {
-            Rectangle graphArea = DrawController.getGraphArea();
+        if (!enabled) {
+            graphWorker.cancel();
+            return;
+        }
 
-            double[] unconvertedWarnLevels = bandType.getWarnLevels();
-            for (int i = 0; i < warnLevels.length; i++) {
-                warnLevels[i] = yAxis.value2pixel(graphArea.y, graphArea.height, unconvertedWarnLevels[i]);
-            }
+        Rectangle graphArea = DrawController.getGraphArea();
 
-            polylines.clear();
+        double[] unconvertedWarnLevels = bandType.getWarnLevels();
+        for (int i = 0; i < warnLevels.length; i++) {
+            warnLevels[i] = yAxis.dataToPixel(graphArea.y, graphArea.height, unconvertedWarnLevels[i]);
+        }
 
-            TimeAxis timeAxis = DrawController.selectedAxis;
-            long start = propagationModel.getObservationTime(timeAxis.start());
-            long end = propagationModel.getObservationTime(timeAxis.end());
-            for (List<BandCache.DateValue> list : bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * graphArea.width, start, end)) {
+        TimeAxis timeAxis = DrawController.selectedAxis;
+        long start = propagationModel.getObservationTime(timeAxis.start());
+        long end = propagationModel.getObservationTime(timeAxis.end());
+
+        LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
+        LongToIntFunction xMapper = timeAxis.value2pixelMapper(graphArea.x, graphArea.width);
+        DoubleToIntFunction yMapper = yAxis.dataToPixelMapper(graphArea.y, graphArea.height);
+        List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * graphArea.width, start, end);
+
+        graphWorker.submit(() -> {
+            List<Polyline> result = new ArrayList<>();
+            for (List<BandCache.DateValue> list : rawData) {
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
                 int size = list.size();
-                if (size == 0)
+                if (size == 0) {
                     continue;
+                }
 
                 int[] dates = new int[size];
                 int[] values = new int[size];
                 for (int i = 0; i < size; i++) {
                     BandCache.DateValue dv = list.get(i);
-                    dates[i] = timeAxis.value2pixel(graphArea.x, graphArea.width, propagationModel.getViewpointTime(dv.milli));
-                    values[i] = yAxis.value2pixel(graphArea.y, graphArea.height, dv.value);
+                    dates[i] = xMapper.applyAsInt(viewpointTime.applyAsLong(dv.milli));
+                    values[i] = yMapper.applyAsInt(dv.value);
                 }
-                polylines.add(new Polyline(dates, values));
+                result.add(new Polyline(dates, values));
             }
-        }
+            return result;
+        },
+        (result, fresh) -> {
+            if (!fresh)
+                return;
+
+            polylines.clear();
+            polylines.addAll(result);
+            DrawController.drawRequest();
+        });
     }
 
     @Override
