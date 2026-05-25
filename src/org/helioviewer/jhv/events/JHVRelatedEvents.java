@@ -2,6 +2,7 @@ package org.helioviewer.jhv.events;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,6 +21,7 @@ public class JHVRelatedEvents {
     private static final ArrayList<JHVEventListener.Highlight> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
+    private final HashMap<Integer, JHVEvent> eventsById = new HashMap<>();
     private final List<Pair<Integer, Integer>> associations = new ArrayList<>();
     private final SWEKSupplier supplier;
     private final Color color;
@@ -30,9 +32,14 @@ public class JHVRelatedEvents {
     JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         supplier = event.getSupplier();
         color = eventColors.getNextColor();
-        events.add(event);
+        addEvent(event);
         interval = new Interval(event.start, event.end);
         addToMap(eventsMap);
+    }
+
+    private void addEvent(JHVEvent event) {
+        events.add(event);
+        eventsById.put(event.getUniqueID(), event);
     }
 
     private void addToMap(Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
@@ -134,8 +141,7 @@ public class JHVRelatedEvents {
 
     @Nullable
     private JHVEvent findEvent(int id) {
-        for (JHVEvent evt : events) if (evt.getUniqueID() == id) return evt;
-        return null;
+        return eventsById.get(id);
     }
 
     void addAssociation(Pair<Integer, Integer> association) {
@@ -145,6 +151,7 @@ public class JHVRelatedEvents {
     void swapEvent(JHVEvent event, Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         removeFromMap(eventsMap);
         events.removeIf(e -> e.getUniqueID() == event.getUniqueID());
+        eventsById.put(event.getUniqueID(), event);
         events.add(event);
         long start = Long.MAX_VALUE, end = Long.MIN_VALUE;
         for (JHVEvent evt : events) {
@@ -159,6 +166,7 @@ public class JHVRelatedEvents {
         removeFromMap(eventsMap);
         found.removeFromMap(eventsMap);
         events.addAll(found.events);
+        eventsById.putAll(found.eventsById);
         associations.addAll(found.associations);
         interval = new Interval(Math.min(interval.start(), found.interval.start()), Math.max(interval.end(), found.interval.end()));
         addToMap(eventsMap);
