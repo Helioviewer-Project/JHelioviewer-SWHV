@@ -34,6 +34,8 @@ import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.draw.GraphGeometry;
+import org.helioviewer.jhv.timelines.draw.GraphGeometry.YAxisHit;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
@@ -90,22 +92,14 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
     }
 
-    private boolean toggleAxisHighlight(Rectangle graphArea) {
-        boolean inLeftYAxis = false;
-        boolean inRightYAxes = false;
-        int rightYAxisNumber = -2;
-        if (mousePosition != null) {
-            boolean yAxisVerticalCondition = mousePosition.y > graphArea.y && mousePosition.y <= graphArea.y + graphArea.height;
-            inRightYAxes = yAxisVerticalCondition && mousePosition.x > graphArea.x + graphArea.width;
-            inLeftYAxis = yAxisVerticalCondition && mousePosition.x < graphArea.x;
-            rightYAxisNumber = (mousePosition.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
-        }
+    private boolean toggleAxisHighlight(GraphGeometry geometry) {
+        YAxisHit hit = mousePosition == null ? null : geometry.yAxisHit(mousePosition);
 
         boolean toggled = false;
         int ct = -1;
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
-                if ((inRightYAxes && rightYAxisNumber == ct) || (inLeftYAxis && ct == -1)) {
+                if (hit != null && hit.targets(ct)) {
                     toggled = toggled || !tl.getYAxis().isHighlighted();
                     tl.getYAxis().setHighlighted(true);
                 } else {
@@ -121,12 +115,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     @Override
     protected void paintComponent(Graphics g1) {
         super.paintComponent(g1);
-        Rectangle graphArea = DrawController.getGraphArea();
+        GraphGeometry geometry = DrawController.getGeometry();
+        Rectangle graphArea = geometry.area();
 
-        boolean axisHighlightChanged = toggleAxisHighlight(graphArea);
+        boolean axisHighlightChanged = toggleAxisHighlight(geometry);
         if (redrawGraphArea || axisHighlightChanged) {
             redrawGraphArea = false;
-            redrawGraph(graphArea);
+            redrawGraph(geometry);
         }
 
         Graphics2D g = (Graphics2D) g1;
@@ -136,12 +131,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             g.setFont(DrawConstants.font);
             g.drawImage(screenImage, 0, 0, getWidth(), getHeight(), null);
             drawMovieLine(g);
-            drawTimelineValues(g, graphArea, DrawController.selectedAxis);
+            drawTimelineValues(g, geometry, DrawController.selectedAxis);
         }
     }
 
-    private void redrawGraph(Rectangle graphArea) {
-        Rectangle graphSize = DrawController.getGraphSize();
+    private void redrawGraph(GraphGeometry geometry) {
+        Rectangle graphArea = geometry.area();
+        Rectangle graphSize = geometry.size();
         double sx = Display.pixelScale[0], sy = Display.pixelScale[1];
         int width = (int) (sx * graphSize.getWidth() + .5);
         int height = (int) (sy * graphSize.getHeight() + .5);
@@ -166,7 +162,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             plotG.setClip(graphArea);
             TimeAxis xAxis = DrawController.selectedAxis;
             TimelineLayers.get().forEach(layer -> layer.draw(plotG, graphArea, xAxis, mousePosition));
-            drawLabels(fullG, graphArea, xAxis);
+            drawLabels(fullG, geometry, xAxis);
 
             plotG.dispose();
             fullG.dispose();
@@ -178,16 +174,17 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         g.fillRect(0, 0, width, height);
     }
 
-    private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
+    private void drawLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
+        Rectangle graphArea = geometry.area();
         Stroke stroke = g.getStroke();
         g.setStroke(thinStroke);
         int ht = 0;
-        drawHorizontalLabels(g, graphArea, xAxis, ht, null);
+        drawHorizontalLabels(g, geometry, xAxis, ht, null);
         ht++;
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.isPropagated()) {
                 g.setColor(tl.getDataColor());
-                drawHorizontalLabels(g, graphArea, xAxis, ht, tl);
+                drawHorizontalLabels(g, geometry, xAxis, ht, tl);
                 ht++;
             }
         }
@@ -195,18 +192,19 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         int ct = -1;
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
-                drawVerticalLabels(g, graphArea, tl, ct, tl.getYAxis().isHighlighted());
+                drawVerticalLabels(g, geometry, tl, ct, tl.getYAxis().isHighlighted());
                 ct++;
             }
         }
         g.setStroke(stroke);
     }
 
-    private void drawTimelineValues(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
+    private void drawTimelineValues(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
+        Rectangle graphArea = geometry.area();
         if (mousePosition == null || !graphArea.contains(mousePosition)) {
             return;
         }
-        long ts = xAxis.mapper(graphArea.x, graphArea.width).toValue(mousePosition.x);
+        long ts = geometry.xMapper(xAxis).toValue(mousePosition.x);
         int x = graphArea.width / 2;
         int y = DrawConstants.GRAPH_TOP_SPACE / 2;
 
@@ -237,16 +235,17 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
     }
 
-    private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
+    private static void drawHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, int ht, TimelineLayer tl) {
+        Rectangle graphArea = geometry.area();
         String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, xAxis.start());
         Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(tickText, g);
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
-        int xend = (int) DrawController.getGraphSize().getWidth() - DrawConstants.GRAPH_RIGHT_SPACE;
+        int xend = geometry.rightEdge();
         TimeAxis.Mapper xMapper;
         if (tl == null) {
-            xMapper = xAxis.mapper(graphArea.x, graphArea.width);
+            xMapper = geometry.xMapper(xAxis);
         } else {
             xMapper = new TimeAxis.Mapper(tl.getObservationTime(xAxis.start()), tl.getObservationTime(xAxis.end()), graphArea.x, graphArea.width);
         }
@@ -292,7 +291,8 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
     }
 
-    private void drawVerticalLabels(Graphics2D g, Rectangle graphArea, TimelineLayer tl, int leftSide, boolean highlight) {
+    private void drawVerticalLabels(Graphics2D g, GraphGeometry geometry, TimelineLayer tl, int leftSide, boolean highlight) {
+        Rectangle graphArea = geometry.area();
         int axis_x_offset = graphArea.x;
         if (leftSide != -1) {
             axis_x_offset += graphArea.width + leftSide * DrawConstants.RIGHT_AXIS_WIDTH;
@@ -300,8 +300,8 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
         g.setColor(tl.getDataColor());
         YAxis yAxis = tl.getYAxis();
-        YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
-        double start = yMapper.pixelToScaled(graphArea.y + graphArea.height);
+        YAxis.Mapper yMapper = geometry.yMapper(yAxis);
+        double start = yMapper.pixelToScaled(geometry.graphBottom());
         double end = yMapper.pixelToScaled(graphArea.y);
         if (start > end) {
             double temp = start;
@@ -375,7 +375,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             return;
         }
         g.setColor(UIGlobals.TL_MOVIE_FRAME_COLOR);
-        g.drawLine(movieLinePosition, 0, movieLinePosition, (int) DrawController.getGraphSize().getHeight());
+        g.drawLine(movieLinePosition, 0, movieLinePosition, DrawController.getGeometry().size().height);
     }
 
     @Override
@@ -388,8 +388,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
         ClickableDrawable element = TimelineLayers.getDrawableUnderMouse();
         if (element != null) {
-            Rectangle graphArea = DrawController.getGraphArea();
-            element.clicked(e.getLocationOnScreen(), DrawController.selectedAxis.mapper(graphArea.x, graphArea.width).toValue(p.x));
+            element.clicked(e.getLocationOnScreen(), DrawController.getGeometry().xMapper(DrawController.selectedAxis).toValue(p.x));
         } else {
             DrawController.setMovieFrame(p);
         }
@@ -477,7 +476,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (TimelineLayers.getDrawableUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        } else if (DrawController.getGraphArea().contains(mousePosition)) {
+        } else if (DrawController.getGeometry().area().contains(mousePosition)) {
             setCursor(UIGlobals.openHandCursor);
         } else {
             setCursor(Cursor.getDefaultCursor());
