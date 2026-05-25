@@ -25,19 +25,21 @@ final class TimelineLabelPainter {
 
     void drawStaticLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
         Stroke stroke = g.getStroke();
-        g.setStroke(thinStroke);
-
-        drawTimeLabels(g, geometry, xAxis);
-        drawYAxisLabels(g, geometry);
-
-        g.setStroke(stroke);
+        try {
+            g.setStroke(thinStroke);
+            g.setFont(DrawConstants.font);
+            drawTimeLabels(g, geometry, xAxis);
+            drawYAxisLabels(g, geometry);
+        } finally {
+            g.setStroke(stroke);
+        }
     }
 
     void drawMouseValues(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, Point mousePosition) {
+        g.setFont(DrawConstants.font);
         Rectangle graphArea = geometry.area();
-        if (mousePosition == null || !graphArea.contains(mousePosition)) {
+        if (mousePosition == null || !graphArea.contains(mousePosition))
             return;
-        }
 
         long ts = geometry.xMapper(xAxis).toValue(mousePosition.x);
         int x = graphArea.width / 2;
@@ -163,9 +165,8 @@ final class TimelineLabelPainter {
         int vHeight = (int) verticalLabelBounds.getHeight();
         int labelCompensation = vWidth / 2;
 
-        Stroke stroke = null;
+        Stroke stroke = g.getStroke();
         if (highlight) {
-            stroke = g.getStroke();
             g.setStroke(boldStroke);
             g.setFont(DrawConstants.fontBold);
         }
