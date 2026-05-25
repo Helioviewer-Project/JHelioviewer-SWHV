@@ -32,14 +32,25 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     private int leftIntervalBorderPosition = -10;
     private int rightIntervalBorderPosition = -10;
 
-    private record IntervalPixels(int width, double ratioX) {
+    private record IntervalPixels(TimeAxis interval, int width, double ratioX) {
 
-        int pixel(TimeAxis interval, long date) {
+        int pixel(long date) {
             return DrawConstants.GRAPH_LEFT_SPACE + (int) ((date - interval.start()) * ratioX);
+        }
+
+        int minutePixel(long date) {
+            long widthMillis = interval.end() - interval.start();
+            double minutes = widthMillis == 0 ? 1 : widthMillis / (double) TimeUtils.MINUTE_IN_MILLIS;
+            long offsetMinutes = Math.round((date - interval.start()) / (double) TimeUtils.MINUTE_IN_MILLIS);
+            return DrawConstants.GRAPH_LEFT_SPACE + (int) ((offsetMinutes / minutes) * width);
         }
 
         int right() {
             return DrawConstants.GRAPH_LEFT_SPACE + width;
+        }
+
+        boolean contains(long date) {
+            return interval.start() <= date && date <= interval.end();
         }
 
     }
@@ -68,12 +79,13 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
         TimeAxis availableAxis = DrawController.availableAxis;
         TimeAxis selectedAxis = DrawController.selectedAxis;
+        IntervalPixels pixels = intervalPixels(availableAxis);
 
-        computeIntervalBorderPositions(availableAxis, selectedAxis);
+        computeIntervalBorderPositions(pixels, selectedAxis);
         drawIntervalBackground(g);
         drawInterval(g);
-        drawMovieInterval(g, availableAxis);
-        drawLabels(g, availableAxis, selectedAxis);
+        drawMovieInterval(g, pixels);
+        drawLabels(g, pixels, selectedAxis);
         drawIntervalGraspPoints(g);
         drawIntervalHBar(g);
     }
@@ -83,15 +95,9 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         g.fillRect(leftIntervalBorderPosition - 1, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() - 3);
     }
 
-    private void computeIntervalBorderPositions(TimeAxis availableInterval, TimeAxis selectedInterval) {
-        long aWidth = availableInterval.end() - availableInterval.start();
-        double diffMin = aWidth == 0 ? 1 : aWidth / (double) TimeUtils.MINUTE_IN_MILLIS;
-        long start = Math.round((selectedInterval.start() - availableInterval.start()) / (double) TimeUtils.MINUTE_IN_MILLIS);
-        long end = Math.round((selectedInterval.end() - availableInterval.start()) / (double) TimeUtils.MINUTE_IN_MILLIS);
-        int availableIntervalWidth = availableIntervalWidth();
-
-        leftIntervalBorderPosition = (int) ((start / diffMin) * availableIntervalWidth) + DrawConstants.GRAPH_LEFT_SPACE;
-        rightIntervalBorderPosition = (int) ((end / diffMin) * availableIntervalWidth) + DrawConstants.GRAPH_LEFT_SPACE;
+    private void computeIntervalBorderPositions(IntervalPixels pixels, TimeAxis selectedInterval) {
+        leftIntervalBorderPosition = pixels.minutePixel(selectedInterval.start());
+        rightIntervalBorderPosition = pixels.minutePixel(selectedInterval.end());
     }
 
     private void drawBackground(Graphics2D g) {
@@ -106,20 +112,18 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         g.fillRect(leftIntervalBorderPosition, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, 1);
     }
 
-    private void drawMovieInterval(Graphics2D g, TimeAxis availableInterval) {
+    private void drawMovieInterval(Graphics2D g, IntervalPixels pixels) {
         long movieStart = Movie.getStartTime();
         long movieEnd = Movie.getEndTime();
 
-        if (movieEnd < availableInterval.start() || movieStart > availableInterval.end()) {
+        if (movieEnd < pixels.interval().start() || movieStart > pixels.interval().end()) {
             return;
         }
 
-        IntervalPixels pixels = intervalPixels(availableInterval);
-
-        long clampedStart = Math.max(movieStart, availableInterval.start());
-        long clampedEnd = Math.min(movieEnd, availableInterval.end());
-        int min = pixels.pixel(availableInterval, clampedStart);
-        int max = pixels.pixel(availableInterval, clampedEnd);
+        long clampedStart = Math.max(movieStart, pixels.interval().start());
+        long clampedEnd = Math.min(movieEnd, pixels.interval().end());
+        int min = pixels.pixel(clampedStart);
+        int max = pixels.pixel(clampedEnd);
 
         int offset = 7;
         g.setColor(UIGlobals.TL_MOVIE_INTERVAL_COLOR);
@@ -156,32 +160,33 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         g.fill(new RoundRectangle2D.Double(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2, 5, 5));
     }
 
-    private void drawLabels(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval) {
+    private void drawLabels(Graphics2D g, IntervalPixels pixels, TimeAxis selectedInterval) {
+        TimeAxis availableInterval = pixels.interval();
         String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, availableInterval.start());
         int tickTextWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        IntervalPixels pixels = intervalPixels(availableInterval);
         int maxTicks = Math.max(2, (pixels.width() - tickTextWidth * 2) / tickTextWidth);
 
         long ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 366 * 3;
-        if (availableInterval.start() <= ts && ts <= availableInterval.end()) {
-            drawLabelsYear(g, availableInterval, selectedInterval, maxTicks, pixels);
+        if (pixels.contains(ts)) {
+            drawLabelsYear(g, selectedInterval, maxTicks, pixels);
             return;
         }
         ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 31 * 3;
-        if (availableInterval.start() <= ts && ts <= availableInterval.end()) {
-            drawLabelsMonth(g, availableInterval, selectedInterval, maxTicks, pixels);
+        if (pixels.contains(ts)) {
+            drawLabelsMonth(g, selectedInterval, maxTicks, pixels);
             return;
         }
         ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 3;
-        if (availableInterval.start() <= ts && ts <= availableInterval.end()) {
-            drawLabelsDay(g, availableInterval, selectedInterval, maxTicks, pixels);
+        if (pixels.contains(ts)) {
+            drawLabelsDay(g, selectedInterval, maxTicks, pixels);
             return;
         }
 
-        drawLabelsTime(g, availableInterval, selectedInterval, maxTicks, pixels);
+        drawLabelsTime(g, selectedInterval, maxTicks, pixels);
     }
 
-    private void drawLabelsTime(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+    private void drawLabelsTime(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+        TimeAxis availableInterval = pixels.interval();
         long timeDiff = availableInterval.end() - availableInterval.start();
         double ratioTime = timeDiff / (double) maxTicks;
         int day = -1;
@@ -189,20 +194,21 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         for (int i = 0; i < maxTicks; ++i) {
             long tickValue = availableInterval.start() + (long) (i * ratioTime);
             calendar.setTimeInMillis(tickValue);
-            int currentday = calendar.get(Calendar.DAY_OF_MONTH);
+            int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
 
             String tickText;
-            if (day == currentday) {
+            if (day == currentDay) {
                 tickText = TimeUtils.format(DrawConstants.HOUR_TIME_FORMAT_NO_SEC, tickValue);
             } else {
                 tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT_NO_SEC, tickValue);
-                day = currentday;
+                day = currentDay;
             }
-            drawLabel(g, availableInterval, selectedInterval, tickText, tickValue, pixels);
+            drawLabel(g, selectedInterval, tickText, tickValue, pixels);
         }
     }
 
-    private void drawLabelsDay(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+    private void drawLabelsDay(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+        TimeAxis availableInterval = pixels.interval();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -229,11 +235,12 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
             long time = calendar.getTimeInMillis();
 
             String tickText = TimeUtils.format(DrawConstants.DAY_MONTH_YEAR_TIME_FORMAT, time);
-            drawLabel(g, availableInterval, selectedInterval, tickText, time, pixels);
+            drawLabel(g, selectedInterval, tickText, time, pixels);
         }
     }
 
-    private void drawLabelsMonth(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+    private void drawLabelsMonth(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+        TimeAxis availableInterval = pixels.interval();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -262,11 +269,12 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
             long time = calendar.getTimeInMillis();
 
             String tickText = TimeUtils.format(DrawConstants.MONTH_YEAR_TIME_FORMAT, time);
-            drawLabel(g, availableInterval, selectedInterval, tickText, time, pixels);
+            drawLabel(g, selectedInterval, tickText, time, pixels);
         }
     }
 
-    private void drawLabelsYear(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+    private void drawLabelsYear(Graphics2D g, TimeAxis selectedInterval, int maxTicks, IntervalPixels pixels) {
+        TimeAxis availableInterval = pixels.interval();
         calendar.setTimeInMillis(availableInterval.start());
 
         int startYear = calendar.get(Calendar.YEAR);
@@ -280,20 +288,20 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         calendar.setTimeInMillis(availableInterval.end());
         int endYear = calendar.get(Calendar.YEAR);
 
-        int hticks = Math.clamp(endYear - startYear + 1, 2, maxTicks);
-        int yearDifference = (endYear - startYear) / (hticks - 1);
-        for (int i = 0; i < hticks; ++i) {
+        int hTicks = Math.clamp(endYear - startYear + 1, 2, maxTicks);
+        int yearDifference = (endYear - startYear) / (hTicks - 1);
+        for (int i = 0; i < hTicks; ++i) {
             calendar.set(startYear + i * yearDifference, Calendar.JANUARY, 1, 0, 0, 0);
             long time = calendar.getTimeInMillis();
 
             String tickText = TimeUtils.format(DrawConstants.YEAR_ONLY_TIME_FORMAT, time);
-            drawLabel(g, availableInterval, selectedInterval, tickText, time, pixels);
+            drawLabel(g, selectedInterval, tickText, time, pixels);
         }
     }
 
-    private void drawLabel(Graphics2D g, TimeAxis availableInterval, TimeAxis selectedInterval, String tickText, long date, IntervalPixels pixels) {
+    private void drawLabel(Graphics2D g, TimeAxis selectedInterval, String tickText, long date, IntervalPixels pixels) {
         int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        int x = pixels.pixel(availableInterval, date);
+        int x = pixels.pixel(date);
         if (selectedInterval.start() <= date && date <= selectedInterval.end()) {
             g.setColor(UIGlobals.TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
@@ -318,7 +326,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         int pixelWidth = availableIntervalWidth();
         long width = availableInterval.end() - availableInterval.start();
         double ratioX = pixelWidth / (double) (width == 0 ? 1 : width);
-        return new IntervalPixels(pixelWidth, ratioX);
+        return new IntervalPixels(availableInterval, pixelWidth, ratioX);
     }
 
     private void moveSelectedInterval(Point newMousePosition) {
