@@ -88,8 +88,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         super.paintComponent(g1);
         GraphGeometry geometry = DrawController.getGeometry();
 
-        boolean axisHighlightChanged = TimelineLayers.setYAxisHighlight(mousePosition == null ? null : geometry.yAxisHit(mousePosition));
-        if (redrawGraphArea || axisHighlightChanged) {
+        if (redrawGraphArea) {
             redrawGraphArea = false;
             redrawGraph(geometry);
         }
@@ -174,6 +173,10 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     public void mouseExited(MouseEvent e) {
         JHVEventCache.highlight(null);
         mousePosition = null;
+        if (TimelineLayers.setYAxisHighlight(null)) {
+            drawRequest();
+            return;
+        }
         repaint();
     }
 
@@ -236,17 +239,21 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     @Override
     public void mouseMoved(MouseEvent e) {
         mousePosition = e.getPoint();
+
+        GraphGeometry geometry = DrawController.getGeometry();
         if (overMovieLine(mousePosition)) {
             setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
         } else if (TimelineLayers.getDrawableUnderMouse() != null) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        } else if (DrawController.getGeometry().area().contains(mousePosition)) {
+        } else if (geometry.area().contains(mousePosition)) {
             setCursor(UIGlobals.openHandCursor);
         } else {
             setCursor(Cursor.getDefaultCursor());
         }
 
-        if (TimelineLayers.highlightChanged(mousePosition)) {
+        boolean axisHighlightChanged = TimelineLayers.setYAxisHighlight(geometry.yAxisHit(mousePosition));
+        boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
+        if (axisHighlightChanged || eventHighlightChanged) {
             drawRequest();
         } else {
             repaint(); // for timeline values
@@ -270,6 +277,8 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     @Override
     public void componentResized(ComponentEvent e) {
         DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
+        if (mousePosition != null)
+            TimelineLayers.setYAxisHighlight(DrawController.getGeometry().yAxisHit(mousePosition));
     }
 
     @Override
