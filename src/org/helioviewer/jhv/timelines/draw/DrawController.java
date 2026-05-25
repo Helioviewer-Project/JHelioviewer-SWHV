@@ -17,6 +17,7 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
+import org.helioviewer.jhv.timelines.draw.GraphGeometry.YAxisHit;
 
 import org.json.JSONObject;
 
@@ -34,8 +35,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     private static final DrawControllerOptions optionsPanel = new DrawControllerOptions();
     private static final ArrayList<Listener> listeners = new ArrayList<>();
 
-    private static Rectangle graphArea = new Rectangle();
-    private static Rectangle graphSize = new Rectangle();
+    private static final GraphGeometry geometry = new GraphGeometry();
     private static long currentTime;
 
     private static boolean locked;
@@ -98,36 +98,35 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void moveX(double pixelDistance) {
-        selectedAxis.move(graphArea.width, pixelDistance);
+        selectedAxis.move(geometry.area().width, pixelDistance);
         setAvailableInterval();
     }
 
     public static void moveXAvailableBased(int x0, int x1) {
-        TimeAxis.Mapper mapper = availableAxis.mapper(0, graphSize.width);
+        TimeAxis.Mapper mapper = availableAxis.mapper(0, geometry.size().width);
         long av_diff = mapper.toValue(x1) - mapper.toValue(x0);
         selectedAxis.move(av_diff);
         setAvailableInterval();
     }
 
     private static void zoomX(int x, double factor) {
+        Rectangle graphArea = geometry.area();
         selectedAxis.zoom(graphArea.x, graphArea.width, x, factor);
         setAvailableInterval();
     }
 
     private static void moveAndZoomY(Point p, double distanceY, int scrollDistance, boolean zoom, boolean move) {
-        boolean yAxisVerticalCondition = (p.y > graphArea.y && p.y <= graphArea.y + graphArea.height);
-        boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
-        boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
-        int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+        Rectangle graphArea = geometry.area();
+        YAxisHit hit = geometry.yAxisHit(p);
         int ct = -1;
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
-                if (isTargetYAxis(ct, rightYAxisNumber, inRightYAxes, inLeftYAxis) || (!inRightYAxes && !inLeftYAxis)) {
+                if (hit.targets(ct) || hit.outsideAxes()) {
                     if (move) {
                         tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
                     }
                     if (zoom) {
-                        tl.getYAxis().zoomSelectedRange(scrollDistance, graphSize.height - p.y - graphArea.y, graphArea.height);
+                        tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.size().height - p.y - graphArea.y, graphArea.height);
                     }
                     tl.yaxisChanged();
                 }
@@ -138,26 +137,19 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void resetAxis(Point p) {
-        boolean yAxisVerticalCondition = p.y > graphArea.y && p.y <= graphArea.y + graphArea.height;
-        boolean inRightYAxes = p.x > graphArea.x + graphArea.width && yAxisVerticalCondition;
-        boolean inLeftYAxis = p.x < graphArea.x && yAxisVerticalCondition;
-        int rightYAxisNumber = (p.x - (graphArea.x + graphArea.width)) / DrawConstants.RIGHT_AXIS_WIDTH;
+        YAxisHit hit = geometry.yAxisHit(p);
         int ct = -1;
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
-                if (isTargetYAxis(ct, rightYAxisNumber, inRightYAxes, inLeftYAxis)) {
+                if (hit.targets(ct)) {
                     tl.resetAxis();
-                } else if (!inRightYAxes && !inLeftYAxis) {
+                } else if (hit.outsideAxes()) {
                     tl.zoomToFitAxis();
                 }
                 ct++;
             }
         }
         drawRequest();
-    }
-
-    private static boolean isTargetYAxis(int axisIndex, int rightYAxisNumber, boolean inRightYAxes, boolean inLeftYAxis) {
-        return (rightYAxisNumber == axisIndex && inRightYAxes) || (axisIndex == -1 && inLeftYAxis);
     }
 
     public static void moveY(Point p, double distanceY) {
@@ -169,8 +161,8 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
-        boolean inGraphArea = p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && p.y > graphArea.y && p.y <= graphArea.y + graphArea.height;
-        boolean inXAxisOrAboveGraph = p.x >= graphArea.x && p.x <= graphArea.x + graphArea.width && (p.y <= graphArea.y || p.y >= graphArea.y + graphArea.height);
+        boolean inGraphArea = geometry.inGraph(p);
+        boolean inXAxisOrAboveGraph = geometry.inXAxisOrAboveGraph(p);
 
         if (inGraphArea || inXAxisOrAboveGraph) {
             double zoomTimeFactor = 10;
@@ -188,7 +180,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     public static void moveAllAxes(double distanceY) {
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
-                tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
+                tl.getYAxis().shiftDownPixels(distanceY, geometry.area().height);
             }
         }
     }
@@ -207,24 +199,12 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void setGraphInformation(Rectangle _graphSize) {
-        graphSize = new Rectangle(_graphSize.x, _graphSize.y, Math.max(1, _graphSize.width), Math.max(1, _graphSize.height));
+        geometry.setSize(_graphSize);
         graphAreaChanged();
     }
 
-    private static void createGraphArea() {
-        int nrPropagatedAxes = Math.max(0, TimelineLayers.getNumberOfPropagationAxes());
-        int height = graphSize.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (nrPropagatedAxes + 1));
-        int nrRightAxes = Math.max(0, TimelineLayers.getNumberOfYAxes() - 1);
-        int width = graphSize.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + nrRightAxes * DrawConstants.RIGHT_AXIS_WIDTH);
-        graphArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, Math.max(1, width), Math.max(1, height));
-    }
-
-    public static Rectangle getGraphArea() {
-        return graphArea;
-    }
-
-    public static Rectangle getGraphSize() {
-        return graphSize;
+    public static GraphGeometry getGeometry() {
+        return geometry;
     }
 
     static void setLocked(boolean _locked) {
@@ -240,17 +220,17 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static int getMovieLinePosition() {
-        int movieLinePosition = selectedAxis.mapper(graphArea.x, graphArea.width).toPixel(currentTime);
-        if (movieLinePosition < graphArea.x || movieLinePosition > (graphArea.x + graphArea.width)) {
+        int movieLinePosition = geometry.xMapper(selectedAxis).toPixel(currentTime);
+        if (movieLinePosition < geometry.area().x || movieLinePosition > geometry.graphRight()) {
             return -1;
         }
         return movieLinePosition;
     }
 
     public static void setMovieFrame(Point point) {
-        if (!graphArea.contains(point))
+        if (!geometry.area().contains(point))
             return;
-        Commands.seekTime(new JHVTime(selectedAxis.mapper(graphArea.x, graphArea.width).toValue(point.x)));
+        Commands.seekTime(new JHVTime(geometry.xMapper(selectedAxis).toValue(point.x)));
     }
 
     @Override
@@ -259,7 +239,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void graphAreaChanged() {
-        createGraphArea();
+        geometry.layout(Math.max(0, TimelineLayers.getNumberOfPropagationAxes()), TimelineLayers.getNumberOfYAxes());
         moveX(0); // force recalculation of polylines
         drawRequest();
     }

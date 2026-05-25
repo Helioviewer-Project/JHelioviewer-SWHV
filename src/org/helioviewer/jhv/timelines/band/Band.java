@@ -21,6 +21,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
@@ -219,8 +220,9 @@ public final class Band extends AbstractTimelineLayer {
             return;
         }
 
-        Rectangle graphArea = DrawController.getGraphArea();
-        YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
+        GraphGeometry geometry = DrawController.getGeometry();
+        Rectangle graphArea = geometry.area();
+        YAxis.Mapper yMapper = geometry.yMapper(yAxis);
 
         double[] unconvertedWarnLevels = bandType.getWarnLevels();
         for (int i = 0; i < warnLevels.length; i++) {
@@ -232,7 +234,7 @@ public final class Band extends AbstractTimelineLayer {
         long end = propagationModel.getObservationTime(timeAxis.end());
 
         LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
-        TimeAxis.Mapper xMapper = timeAxis.mapper(graphArea.x, graphArea.width);
+        TimeAxis.Mapper xMapper = geometry.xMapper(timeAxis);
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * graphArea.width, start, end);
 
         graphWorker.submit(() -> {
