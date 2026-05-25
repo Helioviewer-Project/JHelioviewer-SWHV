@@ -181,7 +181,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         long availableEnd = selectedAxis.end() + diff;
         availableAxis.set(TimeUtils.floorDay(availableStart), TimeUtils.floorDay(availableEnd) + TimeUtils.DAY_IN_MILLIS);
 
-        TimelineLayers.get().forEach(timelineLayer -> timelineLayer.fetchData(selectedAxis));
+        TimelineLayers.fetchData(selectedAxis);
         drawRequest();
     }
 
