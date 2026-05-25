@@ -3,7 +3,6 @@ package org.helioviewer.jhv.plugins.swek;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVEventListener;
-import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKGroup;
@@ -322,14 +320,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private static final int MOUSE_OFFSET_Y = 25;
 
     private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y, long currentTime) {
-        List<String> txts = new ArrayList<>();
-        for (JHVEventParameter p : mouseOverJHVEvent.getClosestTo(currentTime).getSimpleVisibleEventParameters()) {
-            String name = p.getParameterName();
-            if (name != "event_description" && name != "event_title") { // interned
-                txts.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
-            }
-        }
-        GLText.drawTextFloat(vp, txts, x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
+        GLText.drawTextFloat(vp, SWEKData.visibleParameterLines(mouseOverJHVEvent.getClosestTo(currentTime)), x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     private void renderEvents(Viewport vp) {
