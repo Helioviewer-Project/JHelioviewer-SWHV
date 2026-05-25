@@ -162,12 +162,12 @@ class RadioJ2KData implements View.DataHandler {
         return new Rectangle(x0, 0, width, j2kHeight);
     }
 
-    void draw(Graphics2D g, Rectangle ga, TimeAxis xAxis) {
+    void draw(Graphics2D g, Rectangle ga, TimeAxis.Mapper xMapper, YAxis.Mapper yMapper) {
         if (!willDraw) {
             return;
         }
         if (!hasData()) {
-            RadioData.drawString(g, ga, xAxis, "Fetching data");
+            RadioData.drawString(g, ga, "Fetching data");
             return;
         }
 
@@ -179,8 +179,6 @@ class RadioJ2KData implements View.DataHandler {
         double freqimStart = startFreq + freqWidth * region.lly / j2kHeight;
         double freqimEnd = startFreq + freqWidth * region.ury / j2kHeight;
 
-        TimeAxis.Mapper xMapper = xAxis.mapper(ga.x, ga.width);
-        YAxis.Mapper yMapper = RadioData.yAxis.mapper(ga.y, ga.height);
         g.drawImage(bufferedImage,
                 xMapper.toPixel(imStart),
                 yMapper.dataToPixel(freqimStart),
