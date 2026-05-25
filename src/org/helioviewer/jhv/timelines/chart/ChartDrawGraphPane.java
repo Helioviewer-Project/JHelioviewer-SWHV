@@ -164,16 +164,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
             Graphics2D plotG = (Graphics2D) fullG.create();
             plotG.setClip(graphArea);
-            drawData(fullG, plotG, graphArea, DrawController.selectedAxis);
+            TimeAxis xAxis = DrawController.selectedAxis;
+            TimelineLayers.get().forEach(layer -> layer.draw(plotG, graphArea, xAxis, mousePosition));
+            drawLabels(fullG, graphArea, xAxis);
 
             plotG.dispose();
             fullG.dispose();
         }
-    }
-
-    private void drawData(Graphics2D fullG, Graphics2D plotG, Rectangle graphArea, TimeAxis xAxis) {
-        TimelineLayers.get().forEach(layer -> layer.draw(plotG, graphArea, xAxis, mousePosition));
-        drawLabels(fullG, graphArea, xAxis);
     }
 
     private static void drawBackground(Graphics2D g, int width, int height) {
@@ -184,24 +181,22 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     private void drawLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis) {
         Stroke stroke = g.getStroke();
         g.setStroke(thinStroke);
-        {
-            int ht = 0;
-            drawHorizontalLabels(g, graphArea, xAxis, ht, null);
-            ht++;
-            for (TimelineLayer tl : TimelineLayers.get()) {
-                if (tl.isPropagated()) {
-                    g.setColor(tl.getDataColor());
-                    drawHorizontalLabels(g, graphArea, xAxis, ht, tl);
-                    ht++;
-                }
+        int ht = 0;
+        drawHorizontalLabels(g, graphArea, xAxis, ht, null);
+        ht++;
+        for (TimelineLayer tl : TimelineLayers.get()) {
+            if (tl.isPropagated()) {
+                g.setColor(tl.getDataColor());
+                drawHorizontalLabels(g, graphArea, xAxis, ht, tl);
+                ht++;
             }
+        }
 
-            int ct = -1;
-            for (TimelineLayer tl : TimelineLayers.get()) {
-                if (tl.showYAxis()) {
-                    drawVerticalLabels(g, graphArea, tl, ct, tl.getYAxis().isHighlighted());
-                    ct++;
-                }
+        int ct = -1;
+        for (TimelineLayer tl : TimelineLayers.get()) {
+            if (tl.showYAxis()) {
+                drawVerticalLabels(g, graphArea, tl, ct, tl.getYAxis().isHighlighted());
+                ct++;
             }
         }
         g.setStroke(stroke);
@@ -212,31 +207,34 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             return;
         }
         long ts = xAxis.mapper(graphArea.x, graphArea.width).toValue(mousePosition.x);
-        String lbl = '(' + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts);
-        int currWidth = 0;
-        g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-        g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
-        Rectangle2D tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
-        currWidth += (int) tickTextBounds.getWidth();
+        int x = graphArea.width / 2;
+        int y = DrawConstants.GRAPH_TOP_SPACE / 2;
 
-        String value;
+        g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
+        int currWidth = drawString(g, "(" + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts), x, y);
+
         for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.isEnabled() && (value = tl.getStringValue(ts)) != null) {
-                lbl = ", ";
+            if (!tl.isEnabled()) {
+                continue;
+            }
+
+            String value = tl.getStringValue(ts);
+            if (value != null) {
                 g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-                g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
-                tickTextBounds = g.getFontMetrics().getStringBounds(lbl, g);
-                currWidth += (int) tickTextBounds.getWidth();
+                currWidth += drawString(g, ", ", x + currWidth, y);
 
                 g.setColor(tl.getDataColor());
-                g.drawString(value, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
-                tickTextBounds = g.getFontMetrics().getStringBounds(value, g);
-                currWidth += (int) tickTextBounds.getWidth();
+                currWidth += drawString(g, value, x + currWidth, y);
             }
         }
+
         g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-        lbl = ")";
-        g.drawString(lbl, graphArea.width / 2 + currWidth, DrawConstants.GRAPH_TOP_SPACE / 2);
+        drawString(g, ")", x + currWidth, y);
+    }
+
+    private static int drawString(Graphics2D g, String text, int x, int y) {
+        g.drawString(text, x, y);
+        return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
     }
 
     private static void drawHorizontalLabels(Graphics2D g, Rectangle graphArea, TimeAxis xAxis, int ht, TimelineLayer tl) {
@@ -245,6 +243,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         int tickTextWidth = (int) tickTextBounds.getWidth();
         int tickTextHeight = (int) tickTextBounds.getHeight() + ht * DrawConstants.GRAPH_BOTTOM_AXIS_SPACE;
         int horizontalTickCount = Math.max(2, (graphArea.width - tickTextWidth * 2) / tickTextWidth);
+        int xend = (int) DrawController.getGraphSize().getWidth() - DrawConstants.GRAPH_RIGHT_SPACE;
         TimeAxis.Mapper xMapper;
         if (tl == null) {
             xMapper = xAxis.mapper(graphArea.x, graphArea.width);
@@ -282,9 +281,8 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 tickTextBounds = g.getFontMetrics().getStringBounds(line, g);
                 tickTextWidth = (int) tickTextBounds.getWidth();
                 int xl = x - (tickTextWidth / 2);
-                int xend = (int) DrawController.getGraphSize().getWidth() - DrawConstants.GRAPH_RIGHT_SPACE - tickTextWidth;
-                if (xl > xend) {
-                    xl = xend;
+                if (xl > xend - tickTextWidth) {
+                    xl = xend - tickTextWidth;
                 }
                 g.drawString(line, xl, yl);
                 yl += g.getFontMetrics().getHeight() * 2 / 3;
@@ -302,56 +300,49 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
         g.setColor(tl.getDataColor());
         YAxis yAxis = tl.getYAxis();
-
-        // Vertical lines
-        {
-            YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
-            double start = yMapper.pixelToScaled(graphArea.y + graphArea.height);
-            double end = yMapper.pixelToScaled(graphArea.y);
-            if (start > end) {
-                double temp = start;
-                start = end;
-                end = temp;
-            }
-            int decade = (int) Math.floor(Math.log10(end - start));
-            double step = Math.pow(10, decade);
-            double startv = Math.floor(start / step) * step;
-            double endv = Math.ceil(end / step) * step;
-            if ((endv - startv) / step < 5) {
-                step /= 2;
-            }
-            double tick = startv;
-            int ct = 0;
-            drawHorizontalTickline(g, graphArea, yMapper, start, axis_x_offset, leftSide, false, highlight);
-            while (tick <= endv && ct < 20) {
-                if (tick >= start && tick <= end) {
-                    drawHorizontalTickline(g, graphArea, yMapper, tick, axis_x_offset, leftSide, true, highlight);
-                }
-                tick += step;
-                ct++;
-            }
-            drawHorizontalTickline(g, graphArea, yMapper, end, axis_x_offset, leftSide, false, highlight);
+        YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
+        double start = yMapper.pixelToScaled(graphArea.y + graphArea.height);
+        double end = yMapper.pixelToScaled(graphArea.y);
+        if (start > end) {
+            double temp = start;
+            start = end;
+            end = temp;
         }
-
-        // Label and axis
-        {
-            String verticalLabel = yAxis.getLabel();
-            Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
-            int vWidth = (int) verticalLabelBounds.getWidth();
-            int vHeight = (int) verticalLabelBounds.getHeight();
-            int labelCompensation = vWidth / 2;
-            if (highlight) {
-                Stroke s = g.getStroke();
-                g.setStroke(boldStroke);
-                g.setFont(DrawConstants.fontBold);
-                g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
-                g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
-                g.setStroke(s);
-                g.setFont(DrawConstants.font);
-            } else {
-                g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
-                g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
+        int decade = (int) Math.floor(Math.log10(end - start));
+        double step = Math.pow(10, decade);
+        double startv = Math.floor(start / step) * step;
+        double endv = Math.ceil(end / step) * step;
+        if ((endv - startv) / step < 5) {
+            step /= 2;
+        }
+        double tick = startv;
+        int ct = 0;
+        drawHorizontalTickline(g, graphArea, yMapper, start, axis_x_offset, leftSide, false, highlight);
+        while (tick <= endv && ct < 20) {
+            if (tick >= start && tick <= end) {
+                drawHorizontalTickline(g, graphArea, yMapper, tick, axis_x_offset, leftSide, true, highlight);
             }
+            tick += step;
+            ct++;
+        }
+        drawHorizontalTickline(g, graphArea, yMapper, end, axis_x_offset, leftSide, false, highlight);
+
+        String verticalLabel = yAxis.getLabel();
+        Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
+        int vWidth = (int) verticalLabelBounds.getWidth();
+        int vHeight = (int) verticalLabelBounds.getHeight();
+        int labelCompensation = vWidth / 2;
+        if (highlight) {
+            Stroke s = g.getStroke();
+            g.setStroke(boldStroke);
+            g.setFont(DrawConstants.fontBold);
+            g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
+            g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
+            g.setStroke(s);
+            g.setFont(DrawConstants.font);
+        } else {
+            g.drawLine(axis_x_offset, graphArea.y, axis_x_offset, graphArea.y + graphArea.height + 3);
+            g.drawString(verticalLabel, axis_x_offset - labelCompensation, vHeight);
         }
     }
 
@@ -391,7 +382,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
         if (e.getClickCount() == 2) {
-            doubleClicked(p);
+            DrawController.resetAxis(p);
             return;
         }
 
@@ -402,10 +393,6 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         } else {
             DrawController.setMovieFrame(p);
         }
-    }
-
-    private static void doubleClicked(Point p) {
-        DrawController.resetAxis(p);
     }
 
     @Override
@@ -512,14 +499,10 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     @Override
-    public void componentHidden(ComponentEvent e) {
-        // only resize called
-    }
+    public void componentHidden(ComponentEvent e) {}
 
     @Override
-    public void componentMoved(ComponentEvent e) {
-        // only resize called
-    }
+    public void componentMoved(ComponentEvent e) {}
 
     @Override
     public void componentResized(ComponentEvent e) {
@@ -527,9 +510,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     @Override
-    public void componentShown(ComponentEvent e) {
-        // only resize called
-    }
+    public void componentShown(ComponentEvent e) {}
 
     @Override
     public void drawRequest() {
