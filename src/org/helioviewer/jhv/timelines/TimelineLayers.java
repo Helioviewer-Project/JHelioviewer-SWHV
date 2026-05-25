@@ -13,6 +13,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.gui.TimelinePanel;
 
@@ -141,6 +142,20 @@ public class TimelineLayers extends AbstractTableModel {
                 axisIndex++;
             }
         }
+    }
+
+    public static boolean setYAxisHighlight(@Nullable GraphGeometry.YAxisHit hit) {
+        boolean changed = false;
+        int axisIndex = -1;
+        for (TimelineLayer tl : layers) {
+            if (tl.showYAxis()) {
+                boolean highlighted = hit != null && hit.targets(axisIndex);
+                changed = changed || tl.getYAxis().isHighlighted() != highlighted;
+                tl.getYAxis().setHighlighted(highlighted);
+                axisIndex++;
+            }
+        }
+        return changed;
     }
 
     public static int getNumberOfPropagationAxes() {
