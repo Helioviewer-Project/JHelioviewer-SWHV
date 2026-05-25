@@ -122,19 +122,13 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         int ct = -1;
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
-                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                if (isTargetYAxis(ct, rightYAxisNumber, inRightYAxes, inLeftYAxis) || (!inRightYAxes && !inLeftYAxis)) {
                     if (move) {
                         tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
                     }
                     if (zoom) {
                         tl.getYAxis().zoomSelectedRange(scrollDistance, graphSize.height - p.y - graphArea.y, graphArea.height);
                     }
-                    tl.yaxisChanged();
-                } else if ((!inRightYAxes && !inLeftYAxis) && move) {
-                    tl.getYAxis().shiftDownPixels(distanceY, graphArea.height);
-                    tl.yaxisChanged();
-                } else if ((!inRightYAxes && !inLeftYAxis) && zoom) {
-                    tl.getYAxis().zoomSelectedRange(scrollDistance, graphSize.height - p.y - graphArea.y, graphArea.height);
                     tl.yaxisChanged();
                 }
                 ct++;
@@ -151,7 +145,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         int ct = -1;
         for (TimelineLayer tl : TimelineLayers.get()) {
             if (tl.showYAxis()) {
-                if ((rightYAxisNumber == ct && inRightYAxes) || (ct == -1 && inLeftYAxis)) {
+                if (isTargetYAxis(ct, rightYAxisNumber, inRightYAxes, inLeftYAxis)) {
                     tl.resetAxis();
                 } else if (!inRightYAxes && !inLeftYAxis) {
                     tl.zoomToFitAxis();
@@ -160,6 +154,10 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             }
         }
         drawRequest();
+    }
+
+    private static boolean isTargetYAxis(int axisIndex, int rightYAxisNumber, boolean inRightYAxes, boolean inLeftYAxis) {
+        return (rightYAxisNumber == axisIndex && inRightYAxes) || (axisIndex == -1 && inLeftYAxis);
     }
 
     public static void moveY(Point p, double distanceY) {
