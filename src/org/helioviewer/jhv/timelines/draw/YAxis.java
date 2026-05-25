@@ -58,6 +58,25 @@ public final class YAxis {
         return new Mapper(scale, scale(start), scale(end), y0, height);
     }
 
+    public Ticks ticks(Mapper mapper, int topPixel, int bottomPixel) {
+        double scaledStart = mapper.pixelToScaled(bottomPixel);
+        double scaledEnd = mapper.pixelToScaled(topPixel);
+        if (scaledStart > scaledEnd) {
+            double temp = scaledStart;
+            scaledStart = scaledEnd;
+            scaledEnd = temp;
+        }
+
+        int decade = (int) Math.floor(Math.log10(scaledEnd - scaledStart));
+        double step = Math.pow(10, decade);
+        double first = Math.floor(scaledStart / step) * step;
+        double last = Math.ceil(scaledEnd / step) * step;
+        if ((last - first) / step < 5) {
+            step /= 2;
+        }
+        return new Ticks(scaledStart, scaledEnd, first, last, step);
+    }
+
     public String getLabel() {
         return scale.getLabel();
     }
@@ -114,6 +133,8 @@ public final class YAxis {
     private double invScale(double val) {
         return scale.invScale(val);
     }
+
+    public record Ticks(double start, double end, double first, double last, double step) {}
 
     public static YAxisScale generateScale(String scaleString, String label) {
         try {
