@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.timelines;
 
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +13,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
+import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.gui.TimelinePanel;
 
 @SuppressWarnings("serial")
@@ -20,6 +24,23 @@ public class TimelineLayers extends AbstractTableModel {
 
     public static List<TimelineLayer> get() {
         return extLayers;
+    }
+
+    public static void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+        layers.forEach(layer -> layer.draw(g, graphArea, timeAxis, mousePosition));
+    }
+
+    public static void fetchData(TimeAxis timeAxis) {
+        layers.forEach(layer -> layer.fetchData(timeAxis));
+    }
+
+    public static boolean highLightChanged(Point p) {
+        for (TimelineLayer tl : layers) {
+            if (tl.highLightChanged(p)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void updateRow(TimelineLayer tl) {

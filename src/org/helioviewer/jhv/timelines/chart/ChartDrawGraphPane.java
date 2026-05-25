@@ -24,7 +24,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
@@ -145,7 +144,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             Graphics2D plotG = (Graphics2D) fullG.create();
             plotG.setClip(graphArea);
             TimeAxis xAxis = DrawController.selectedAxis;
-            TimelineLayers.get().forEach(layer -> layer.draw(plotG, graphArea, xAxis, mousePosition));
+            TimelineLayers.draw(plotG, graphArea, xAxis, mousePosition);
             labelPainter.drawStaticLabels(fullG, geometry, xAxis);
 
             plotG.dispose();
@@ -250,15 +249,6 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         return movieLinePosition >= 0 && movieLinePosition - 3 <= p.x && p.x <= movieLinePosition + 3;
     }
 
-    private static boolean highlightChanged(Point p) {
-        for (TimelineLayer tl : TimelineLayers.get()) {
-            if (tl.highLightChanged(p)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public void mouseMoved(MouseEvent e) {
         mousePosition = e.getPoint();
@@ -272,7 +262,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             setCursor(Cursor.getDefaultCursor());
         }
 
-        if (highlightChanged(mousePosition)) {
+        if (TimelineLayers.highLightChanged(mousePosition)) {
             drawRequest();
         } else {
             repaint(); // for timeline values
