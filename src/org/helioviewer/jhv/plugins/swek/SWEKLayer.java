@@ -3,6 +3,7 @@ package org.helioviewer.jhv.plugins.swek;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -187,7 +188,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
-        Vec2 previous = null;
         // draw bounds
         float[] oldBoundaryPoint3d = new float[0];
         int plen = points.length / 3;
@@ -199,12 +199,21 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double ynew = alpha * oldBoundaryPoint3d[1] + (1 - alpha) * points[3 * i + 1];
                     double znew = alpha * oldBoundaryPoint3d[2] + (1 - alpha) * points[3 * i + 2];
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
-                    Vec3 pt = new Vec3(xnew / r, ynew / r, znew / r);
-                    previous = mv.emitMapVertex(vp, scale, pt, previous, j == 0, j == DIVPOINTS, POLYGON_RADIUS, color, vexBuf);
+                    vertices.set(j, new Vec3(xnew / r, ynew / r, znew / r));
                 }
+                mv.emitMapLine(vp, scale, vertices, POLYGON_RADIUS, color, vexBuf);
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
         }
+    }
+
+    private final List<Vec3> vertices = fixedSizeVertices(DIVPOINTS + 1);
+
+    private static List<Vec3> fixedSizeVertices(int size) {
+        List<Vec3> vertices = new ArrayList<>(size);
+        for (int i = 0; i < size; i++)
+            vertices.add(Vec3.ZERO);
+        return vertices;
     }
 
     private void drawImage3d(double x, double y, double z, double width, double height) {
