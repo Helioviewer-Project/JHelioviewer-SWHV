@@ -8,6 +8,18 @@ public final class ImageBounds {
 
     private ImageBounds() {}
 
+    public static double radial(MetaData metaData) {
+        Region region = metaData.getPhysicalRegion();
+        Vec2 crval = metaData.getWcsHeader().crval;
+        double x0 = region.llx - crval.x;
+        double x1 = region.urx - crval.x;
+        double y0 = region.lly - crval.y;
+        double y1 = region.ury - crval.y;
+        return Math.max(
+                Math.max(Math.hypot(x0, y0), Math.hypot(x1, y0)),
+                Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
+    }
+
     public static Region hpc(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
         WcsHeader wcsHeader = metaData.getWcsHeader();
