@@ -94,16 +94,12 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private void drawConnectivity(MapView mv, Viewport vp, MapScale scale) {
-        putConnectivity(mv, vp, scale, connectivity.SSW, sswColor, connectivityBuf);
-        putConnectivity(mv, vp, scale, connectivity.FSW, fswColor, connectivityBuf);
-        putConnectivity(mv, vp, scale, connectivity.M, mColor, connectivityBuf);
+        mv.emitMapPoints(vp, scale, connectivity.SSW, SIZE_POINT, ORTHO_RADIUS, sswColor, connectivityBuf);
+        mv.emitMapPoints(vp, scale, connectivity.FSW, SIZE_POINT, ORTHO_RADIUS, fswColor, connectivityBuf);
+        mv.emitMapPoints(vp, scale, connectivity.M, SIZE_POINT, ORTHO_RADIUS, mColor, connectivityBuf);
 
         connectivityCenter.setVertex(connectivityBuf);
         connectivityCenter.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
-    }
-
-    private static void putConnectivity(MapView mv, Viewport vp, MapScale scale, List<Vec3> points, byte[] color, BufVertex vexBuf) {
-        points.forEach(v -> mv.emitMapPoint(vp, scale, v, SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
     }
 
     private void drawHCS(MapView mv, Viewport vp, MapScale scale) {

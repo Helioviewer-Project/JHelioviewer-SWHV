@@ -49,7 +49,7 @@ public class LoadHCS {
                     }
                 }
             }
-            if (!hcsList.isEmpty())
+            if (!hcsList.isEmpty()) // close line
                 hcsList.add(hcsList.getFirst());
             return hcsList;
         }

@@ -33,6 +33,11 @@ final class OrthographicView extends MapView {
     }
 
     @Override
+    public void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
+        vertices.forEach(vertex -> OrthographicMap.emitMapPoint(vertex, size, radius, color, vexBuf));
+    }
+
+    @Override
     public void emitMapPoint(Viewport vp, MapScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
         OrthographicMap.emitMapPoint(vertex, size, radius, color, vexBuf);
     }
