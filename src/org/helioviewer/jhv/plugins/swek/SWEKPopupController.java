@@ -158,7 +158,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             sphereHitpoint = ViewportProjection.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpointRotation);
             planeHitpoint = ViewportProjection.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
         } else {
-            mousePosition = mode.mouseToScreen(camera, renderView, vp, Display.gridType, mouseOverX, mouseOverY);
+            mousePosition = mode.mouseToScreen(camera, renderView, vp, mouseOverX, mouseOverY);
         }
 
         for (JHVRelatedEvents evtr : activeEvents) {

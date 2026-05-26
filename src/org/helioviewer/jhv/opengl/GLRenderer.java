@@ -12,9 +12,11 @@ import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
-import org.helioviewer.jhv.layers.ImageLayerBounds;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
+import org.helioviewer.jhv.wcs.ImageBounds;
 
 public final class GLRenderer {
 
@@ -138,13 +140,13 @@ public final class GLRenderer {
 
     static void renderSceneScale() {
         if (Display.mode == ProjectionMode.Polar) {
-            ProjectionScale.polar.set(0, 360, 0, ImageLayerBounds.getLargestRadialSize());
+            ProjectionScale.polar.set(0, 360, 0, ImageLayers.getLargestRadialSize());
         } else if (Display.mode == ProjectionMode.LogPolar) {
-            ProjectionScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayerBounds.getLargestRadialSize()));
+            ProjectionScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayers.getLargestRadialSize()));
         }
 
         boolean hpcMode = Display.mode == ProjectionMode.HPC;
-        Region hpcBounds = hpcMode ? ImageLayerBounds.getCenteredHpcScaleBounds() : null;
+        Region hpcBounds = hpcMode ? computeHpcSceneScaleBounds() : null;
         Camera camera = Display.getCamera();
         MapContext ctx = Display.mode.createMapContext(camera, renderView, Display.gridType);
         for (Viewport vp : Display.getViewports()) {
@@ -164,6 +166,37 @@ public final class GLRenderer {
             Annotations.render(ctx, vp, scale);
             Layers.renderFloat(ctx, vp, scale);
         }
+    }
+
+    public static Region computeHpcSceneScaleBounds() {
+        Region bounds = getHpcSceneImageBounds();
+        double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
+        double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
+        if (halfWidth <= 0)
+            halfWidth = 5;
+        if (halfHeight <= 0)
+            halfHeight = 5;
+        return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
+    }
+
+    private static Region getHpcSceneImageBounds() {
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+
+            Region bounds = ImageBounds.hpc(layer.getMetaData());
+            minX = Math.min(minX, bounds.llx);
+            maxX = Math.max(maxX, bounds.urx);
+            minY = Math.min(minY, bounds.lly);
+            maxY = Math.max(maxY, bounds.ury);
+        }
+        if (!Double.isFinite(minX) || !Double.isFinite(maxX) || !Double.isFinite(minY) || !Double.isFinite(maxY))
+            return new Region(-5, -5, 10, 10);
+        return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
     }
 
     private static void renderFullFloatScene() {

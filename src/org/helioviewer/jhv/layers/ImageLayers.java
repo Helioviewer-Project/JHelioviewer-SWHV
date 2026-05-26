@@ -20,6 +20,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.SampUtils;
@@ -46,6 +47,26 @@ public final class ImageLayers {
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         });
+    }
+
+    public static double getLargestPhysicalHeight() {
+        double size = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+            size = Math.max(size, layer.getMetaData().getPhysicalRegion().height);
+        }
+        return size;
+    }
+
+    public static double getLargestRadialSize() {
+        double size = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+            size = Math.max(size, ImageBounds.radial(layer.getMetaData()));
+        }
+        return size;
     }
 
     static void displaySynced(Position viewpoint) { // coalesce layers
