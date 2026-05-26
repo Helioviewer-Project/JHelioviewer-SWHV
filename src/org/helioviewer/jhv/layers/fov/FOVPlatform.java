@@ -91,11 +91,11 @@ class FOVPlatform extends DefaultMutableTreeNode {
         instrumentCenters.dispose();
     }
 
-    void render(MapView ctx, Viewport vp, MapScale scale) {
+    void render(MapView mv, Viewport vp, MapScale scale) {
         if (!hasEnabled())
             return;
 
-        JHVTime time = ctx.viewpoint().time;
+        JHVTime time = mv.viewpoint().time;
         Position obsPosition = Spice.getCarrington(observer, time);
         if (obsPosition == null)
             return;
@@ -119,7 +119,7 @@ class FOVPlatform extends DefaultMutableTreeNode {
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).putGeometry(obsPosition.distance, color, renderer, lineBuf, centerBuf));
 
         instrumentCenters.setVertex(centerBuf);
-        instrumentCenters.renderPoints(ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp)));
+        instrumentCenters.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
         instrumentLines.setVertex(lineBuf);
         instrumentLines.renderLine(vp, LINEWIDTH_FOV);
 

@@ -39,7 +39,7 @@ final class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void drawTransformed(MapView ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
+    public void drawTransformed(MapView mv, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -51,8 +51,8 @@ final class AnnotateFOV extends AbstractAnnotateable {
         double dy = 0.5 * (p1.y - p0.y);
 
         fov.setCenter(p0.x + dx, p0.y + dy);
-        fov.putCenter(ctx.isHpc(), color, centerBuf);
-        fov.putRectLine(dx, dy, ctx.isHpc(), color, lineBuf);
+        fov.putCenter(mv.isHpc(), color, centerBuf);
+        fov.putRectLine(dx, dy, mv.isHpc(), color, lineBuf);
     }
 
     @Override

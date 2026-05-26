@@ -58,21 +58,21 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(MapView ctx, Viewport vp, MapScale scale, boolean showLabels) {
-        Camera camera = ctx.camera();
-        double width = ctx.cameraWidth(vp);
-        rebuildIfNeeded(ctx, camera, vp, scale, width);
+    public void render(MapView mv, Viewport vp, MapScale scale, boolean showLabels) {
+        Camera camera = mv.camera();
+        double width = mv.cameraWidth(vp);
+        rebuildIfNeeded(mv, camera, vp, scale, width);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
             drawLabels(camera, vp, width);
     }
 
-    private static FlatGridKey key(MapView ctx, Camera camera, Viewport vp, double width) {
-        return new FlatGridKey(ctx.mode(), ctx.gridType(), vp.aspect, width, camera.getTranslationX(), camera.getTranslationY());
+    private static FlatGridKey key(MapView mv, Camera camera, Viewport vp, double width) {
+        return new FlatGridKey(mv.mode(), mv.gridType(), vp.aspect, width, camera.getTranslationX(), camera.getTranslationY());
     }
 
-    private void rebuildIfNeeded(MapView ctx, Camera camera, Viewport vp, MapScale scale, double width) {
-        FlatGridKey flatGridKey = key(ctx, camera, vp, width);
+    private void rebuildIfNeeded(MapView mv, Camera camera, Viewport vp, MapScale scale, double width) {
+        FlatGridKey flatGridKey = key(mv, camera, vp, width);
 
         double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
         double yCenter = 0.5 - camera.getTranslationY();
@@ -80,13 +80,13 @@ public class FlatGrid {
         AxisSignature xSignature = buildAxisSignature(true,
                 scale.getInterpolatedXValue(Math.clamp(xCenter - halfWidth, 0, 1)),
                 scale.getInterpolatedXValue(Math.clamp(xCenter + halfWidth, 0, 1)), vp.width);
-        AxisSignature ySignature = buildAxisSignature(ctx.isHpc() || ctx.isLatitudinal(),
+        AxisSignature ySignature = buildAxisSignature(mv.isHpc() || mv.isLatitudinal(),
                 scale.getInterpolatedYValue(Math.clamp(yCenter - halfWidth, 0, 1)),
                 scale.getInterpolatedYValue(Math.clamp(yCenter + halfWidth, 0, 1)), vp.height);
         if (!needsRebuild(flatGridKey, xSignature, ySignature))
             return;
 
-        boolean wrap0to360 = ctx.gridType() == GridType.Carrington;
+        boolean wrap0to360 = mv.gridType() == GridType.Carrington;
         xAxis = buildAxis(scale, true, wrap0to360, xSignature);
         yAxis = buildAxis(scale, false, false, ySignature);
         rebuildShape(camera, vp, width);

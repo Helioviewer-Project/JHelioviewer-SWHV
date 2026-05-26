@@ -18,8 +18,8 @@ final class AnnotateLine extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawLine(MapView ctx, double centerX, double centerY, double bw, double bh, byte[] color, BufVertex vexBuf) {
-        boolean flat = ctx.isHpc();
+    private static void drawLine(MapView mv, double centerX, double centerY, double bw, double bh, byte[] color, BufVertex vexBuf) {
+        boolean flat = mv.isHpc();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             double y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
@@ -35,7 +35,7 @@ final class AnnotateLine extends AbstractAnnotateable {
     }
 
     @Override
-    public void drawTransformed(MapView ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
+    public void drawTransformed(MapView mv, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -46,7 +46,7 @@ final class AnnotateLine extends AbstractAnnotateable {
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
 
-        drawLine(ctx, p0.x + dx, p0.y + dy, dx, dy, color, lineBuf);
+        drawLine(mv, p0.x + dx, p0.y + dy, dx, dy, color, lineBuf);
     }
 
     @Override

@@ -105,7 +105,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapView ctx, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
@@ -113,12 +113,12 @@ public final class GridLayer extends AbstractLayer {
             gridNeedsInit = false;
         }
 
-        Position viewpoint = ctx.viewpoint();
+        Position viewpoint = mv.viewpoint();
         float ztext = 0;
-        double pixFactor = ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp));
+        double pixFactor = ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp));
 
         // correct order: grid lines -> Earth indicators -> axis -> grid labels -> radial grid
-        Quat gridQuat = ctx.gridType().toCarrington(viewpoint);
+        Quat gridQuat = mv.gridType().toCarrington(viewpoint);
 
         Transform.pushView();
         Transform.rotateViewInverse(gridQuat);
@@ -158,10 +158,10 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderScale(MapView ctx, Viewport vp, MapScale scale) {
+    public void renderScale(MapView mv, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(ctx, vp, scale, showLabels);
+        flatGrid.render(mv, vp, scale, showLabels);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {

@@ -54,11 +54,11 @@ public final class StarLayer extends AbstractLayer implements ViewpointListener,
     }
 
     @Override
-    public void render(MapView ctx, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
 
-        Position viewpoint = ctx.viewpoint();
+        Position viewpoint = mv.viewpoint();
         BufVertex vexBuf = cache.getIfPresent(viewpoint);
         if (vexBuf == null)
             return;
@@ -70,7 +70,7 @@ public final class StarLayer extends AbstractLayer implements ViewpointListener,
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
-        points.renderPoints(ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp)));
+        points.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
         Transform.popView();
     }
 

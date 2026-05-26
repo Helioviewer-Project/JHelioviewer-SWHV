@@ -100,7 +100,7 @@ public final class GLRenderer {
 
     static void renderScene() {
         Camera camera = Display.getCamera();
-        MapView ctx = Display.mode.createMapView(camera, renderView, Display.gridType);
+        MapView mv = Display.mode.createMapView(camera, renderView, Display.gridType);
         MapScale scale = MapScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -110,9 +110,9 @@ public final class GLRenderer {
             GLSLSolarShader.sphere.use();
             GLSLSolar.quad.render();
 
-            Layers.render(ctx, vp, scale);
-            Annotations.render(ctx, vp, scale);
-            Layers.renderFloat(ctx, vp, scale);
+            Layers.render(mv, vp, scale);
+            Annotations.render(mv, vp, scale);
+            Layers.renderFloat(mv, vp, scale);
         }
     }
 
@@ -130,8 +130,8 @@ public final class GLRenderer {
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
             RenderView miniView = miniCamera.view(renderView.viewpoint(), miniCamera.getCameraWidth(vp.zoom) / vp.zoom);
-            MapView ctx = Display.mode.createMapView(miniCamera, miniView, Display.gridType);
-            Layers.renderMiniview(ctx, vp, scale);
+            MapView mv = Display.mode.createMapView(miniCamera, miniView, Display.gridType);
+            Layers.renderMiniview(mv, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
     }
@@ -146,7 +146,7 @@ public final class GLRenderer {
         boolean hpcMode = Display.mode == MapMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayers.computeHpcScaleBounds() : null;
         Camera camera = Display.getCamera();
-        MapView ctx = Display.mode.createMapView(camera, renderView, Display.gridType);
+        MapView mv = Display.mode.createMapView(camera, renderView, Display.gridType);
         for (Viewport vp : Display.getViewports()) {
             MapScale scale = Display.mode.scale;
             if (hpcMode) {
@@ -160,9 +160,9 @@ public final class GLRenderer {
             Transform.ortho2D(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY());
             GLSLSolarShader.bindScreen(vp, scale);
 
-            Layers.renderScale(ctx, vp, scale);
-            Annotations.render(ctx, vp, scale);
-            Layers.renderFloat(ctx, vp, scale);
+            Layers.renderScale(mv, vp, scale);
+            Annotations.render(mv, vp, scale);
+            Layers.renderFloat(mv, vp, scale);
         }
     }
 

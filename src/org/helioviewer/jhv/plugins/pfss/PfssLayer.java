@@ -48,12 +48,12 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
     }
 
     @Override
-    public void render(MapView ctx, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
 
         PfssLoader.Data data;
-        if ((data = cache.getNearestData(ctx.viewpoint().time.milli)) == null)
+        if ((data = cache.getNearestData(mv.viewpoint().time.milli)) == null)
             return;
         renderData(vp, data);
         lastData = data;
