@@ -7,11 +7,11 @@ import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 
-public final class ViewportProjection {
+public final class ViewportMath {
 
     private static final double PLANE_Z_EPS = 1e-8;
 
-    private ViewportProjection() {}
+    private ViewportMath() {}
 
     private static double computeNormalizedX(Viewport vp, double screenX) {
         return (screenX - vp.x) / vp.width - 0.5;

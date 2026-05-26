@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
@@ -19,13 +19,13 @@ final class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    static void drawCross(MapContext ctx, Viewport vp, ProjectionScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+    static void drawCross(MapView ctx, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
         double delta = 2.5 * Math.PI / 180;
         interpolatedDraw(ctx, vp, scale, longitude + delta, latitude, longitude - delta, latitude, color, vexBuf);
         interpolatedDraw(ctx, vp, scale, longitude, latitude + delta, longitude, latitude - delta, color, vexBuf);
     }
 
-    private static void interpolatedDraw(MapContext ctx, Viewport vp, ProjectionScale scale, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
+    private static void interpolatedDraw(MapView ctx, Viewport vp, MapScale scale, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, longitude1, latitude1, longitude2, latitude2);
@@ -34,7 +34,7 @@ final class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView ctx, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
         if (startPoint == null)
             return;
 

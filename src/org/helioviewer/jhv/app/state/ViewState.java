@@ -8,7 +8,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.annotations.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.ProjectionMode;
+import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
 
@@ -109,7 +109,7 @@ public final class ViewState {
         }
     }
 
-    public record ModeData(ProjectionMode projection, AnnotationMode annotationMode, boolean multiview,
+    public record ModeData(MapMode projection, AnnotationMode annotationMode, boolean multiview,
                            boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {}
 
     public record PlaybackData(Movie.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit,
@@ -125,7 +125,7 @@ public final class ViewState {
     private static final ArrayList<RecordingConfigListener> recordingConfigListeners = new ArrayList<>();
     private static boolean suppressModeNotifications;
 
-    private static ProjectionMode projection = Display.mode;
+    private static MapMode projection = Display.mode;
     private static AnnotationMode annotationMode = AnnotationMode.Cross;
     private static boolean multiview = Display.multiview;
     private static boolean tracking = DisplayController.getTrackingMode();
@@ -167,7 +167,7 @@ public final class ViewState {
 
     public static ModeData readModeJson(JSONObject source) {
         ModeData current = modeData();
-        ProjectionMode projectionValue = current.projection();
+        MapMode projectionValue = current.projection();
         AnnotationMode annotationModeValue = current.annotationMode();
         boolean multiviewValue = current.multiview();
         boolean trackingValue = current.tracking();
@@ -177,7 +177,7 @@ public final class ViewState {
         String projectionName = source.optString("projection", projectionValue.name());
         String annotationModeName = source.optString("annotationMode", annotationModeValue.name());
         try {
-            projectionValue = ProjectionMode.valueOf(projectionName);
+            projectionValue = MapMode.valueOf(projectionName);
         } catch (IllegalArgumentException e) {
             Log.warn("Ignoring invalid projection state value: " + projectionName, e);
         }
@@ -231,7 +231,7 @@ public final class ViewState {
     }
 
     private static void applyModeUpdate(
-            @Nullable ProjectionMode projection,
+            @Nullable MapMode projection,
             @Nullable AnnotationMode annotationMode,
             @Nullable Boolean multiview,
             @Nullable Boolean tracking,
@@ -258,7 +258,7 @@ public final class ViewState {
             @Nullable String showCorona,
             @Nullable String differentialRotation) {
         applyModeUpdate(
-                parseEnum(projection, ProjectionMode.class, "projection"),
+                parseEnum(projection, MapMode.class, "projection"),
                 parseEnum(annotationMode, AnnotationMode.class, "annotation mode"),
                 parseBoolean(multiview, "multiview"),
                 parseBoolean(tracking, "tracking"),
@@ -267,16 +267,16 @@ public final class ViewState {
                 parseBoolean(differentialRotation, "differentialRotation"));
     }
 
-    public static ProjectionMode getProjection() {
+    public static MapMode getProjection() {
         return projection;
     }
 
-    public static void setProjection(ProjectionMode newProjection) {
+    public static void setProjection(MapMode newProjection) {
         if (projection == newProjection)
             return;
 
         projection = newProjection;
-        Display.setProjectionMode(newProjection);
+        Display.setMapMode(newProjection);
         notifyModeListeners();
     }
 

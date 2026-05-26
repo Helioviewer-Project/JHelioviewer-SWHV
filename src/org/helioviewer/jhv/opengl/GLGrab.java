@@ -3,7 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
+import org.helioviewer.jhv.display.MapMode;
 
 public class GLGrab {
 
@@ -42,7 +42,7 @@ public class GLGrab {
 
             capture.bindForRender();
             GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-            if (Display.mode == ProjectionMode.Orthographic) {
+            if (Display.mode == MapMode.Orthographic) {
                 GLRenderer.renderScene();
             } else {
                 GLRenderer.renderSceneScale();

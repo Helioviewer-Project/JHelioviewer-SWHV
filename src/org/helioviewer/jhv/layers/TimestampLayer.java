@@ -5,8 +5,8 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLText;
@@ -42,7 +42,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(MapContext ctx, Viewport vp, ProjectionScale projectionScale) {
+    public void renderFloat(MapView ctx, Viewport vp, MapScale projectionScale) {
         if (!isVisible[vp.idx])
             return;
 
@@ -79,7 +79,7 @@ public class TimestampLayer extends AbstractLayer {
         renderer.endRendering();
     }
 
-    private static String formatFOV(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    private static String formatFOV(MapView ctx, Viewport vp, MapScale scale) {
         if (ctx.isHpc())
             return formatHpcFOV(ctx, vp, scale);
         return formatOrthoFOV(ctx.cameraWidth(vp));
@@ -92,7 +92,7 @@ public class TimestampLayer extends AbstractLayer {
             return String.format("%6.4fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatHpcFOV(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    private static String formatHpcFOV(MapView ctx, Viewport vp, MapScale scale) {
         int centerX = vp.x + vp.width / 2;
         int centerY = vp.yAWT + vp.height / 2;
 

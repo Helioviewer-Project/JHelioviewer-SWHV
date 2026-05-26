@@ -7,9 +7,9 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionMode;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapMode;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -72,7 +72,7 @@ public final class GLRenderer {
 
         Layers.prerender();
 
-        if (Display.mode == ProjectionMode.Orthographic) {
+        if (Display.mode == MapMode.Orthographic) {
             renderScene();
             renderMiniview();
         } else
@@ -100,8 +100,8 @@ public final class GLRenderer {
 
     static void renderScene() {
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.mode.createMapContext(camera, renderView, Display.gridType);
-        ProjectionScale scale = ProjectionScale.ortho;
+        MapView ctx = Display.mode.createMapView(camera, renderView, Display.gridType);
+        MapScale scale = MapScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY(), renderView.viewRotation());
@@ -124,37 +124,37 @@ public final class GLRenderer {
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho2D(vp.aspect, miniCamera.getCameraWidth(vp.zoom), miniCamera.getTranslationX(), miniCamera.getTranslationY());
-            ProjectionScale scale = ProjectionScale.ortho;
+            MapScale scale = MapScale.ortho;
             GLSLSolarShader.bindScreen(vp, scale);
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
             RenderView miniView = miniCamera.view(renderView.viewpoint(), miniCamera.getCameraWidth(vp.zoom) / vp.zoom);
-            MapContext ctx = Display.mode.createMapContext(miniCamera, miniView, Display.gridType);
+            MapView ctx = Display.mode.createMapView(miniCamera, miniView, Display.gridType);
             Layers.renderMiniview(ctx, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
     }
 
     static void renderSceneScale() {
-        if (Display.mode == ProjectionMode.Polar) {
-            ProjectionScale.polar.set(0, 360, 0, ImageLayers.getLargestRadialSize());
-        } else if (Display.mode == ProjectionMode.LogPolar) {
-            ProjectionScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayers.getLargestRadialSize()));
+        if (Display.mode == MapMode.Polar) {
+            MapScale.polar.set(0, 360, 0, ImageLayers.getLargestRadialSize());
+        } else if (Display.mode == MapMode.LogPolar) {
+            MapScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayers.getLargestRadialSize()));
         }
 
-        boolean hpcMode = Display.mode == ProjectionMode.HPC;
+        boolean hpcMode = Display.mode == MapMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayers.computeHpcScaleBounds() : null;
         Camera camera = Display.getCamera();
-        MapContext ctx = Display.mode.createMapContext(camera, renderView, Display.gridType);
+        MapView ctx = Display.mode.createMapView(camera, renderView, Display.gridType);
         for (Viewport vp : Display.getViewports()) {
-            ProjectionScale scale = Display.mode.scale;
+            MapScale scale = Display.mode.scale;
             if (hpcMode) {
                 double halfWidth = 0.5 * hpcBounds.width;
                 double halfHeight = Math.max(0.5 * hpcBounds.height, halfWidth / vp.aspect);
                 halfWidth = halfHeight * vp.aspect;
-                ProjectionScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
-                scale = ProjectionScale.hpc;
+                MapScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
+                scale = MapScale.hpc;
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho2D(vp.aspect, renderView.cameraWidth(vp.zoom), camera.getTranslationX(), camera.getTranslationY());

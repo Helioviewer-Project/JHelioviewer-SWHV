@@ -7,9 +7,9 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionMode;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapMode;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -47,7 +47,7 @@ public class FlatGrid {
     }
 
     // Projection and camera state that invalidates the cached flat grid.
-    private record FlatGridKey(ProjectionMode mode, GridType gridType, double aspect, double cameraWidth,
+    private record FlatGridKey(MapMode mode, GridType gridType, double aspect, double cameraWidth,
                                double translationX, double translationY) {}
 
     public void init() {
@@ -58,7 +58,7 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(MapContext ctx, Viewport vp, ProjectionScale scale, boolean showLabels) {
+    public void render(MapView ctx, Viewport vp, MapScale scale, boolean showLabels) {
         Camera camera = ctx.camera();
         double width = ctx.cameraWidth(vp);
         rebuildIfNeeded(ctx, camera, vp, scale, width);
@@ -67,11 +67,11 @@ public class FlatGrid {
             drawLabels(camera, vp, width);
     }
 
-    private static FlatGridKey key(MapContext ctx, Camera camera, Viewport vp, double width) {
+    private static FlatGridKey key(MapView ctx, Camera camera, Viewport vp, double width) {
         return new FlatGridKey(ctx.mode(), ctx.gridType(), vp.aspect, width, camera.getTranslationX(), camera.getTranslationY());
     }
 
-    private void rebuildIfNeeded(MapContext ctx, Camera camera, Viewport vp, ProjectionScale scale, double width) {
+    private void rebuildIfNeeded(MapView ctx, Camera camera, Viewport vp, MapScale scale, double width) {
         FlatGridKey flatGridKey = key(ctx, camera, vp, width);
 
         double xCenter = 0.5 - camera.getTranslationX() / vp.aspect;
@@ -151,7 +151,7 @@ public class FlatGrid {
         return new AxisSignature(step, first, last);
     }
 
-    private static Axis buildAxis(ProjectionScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
+    private static Axis buildAxis(MapScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
         String[] labels;
         double[] positions;
         boolean[] axisFlags;

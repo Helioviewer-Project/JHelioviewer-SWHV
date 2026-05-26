@@ -11,8 +11,8 @@ import javax.swing.ImageIcon;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -174,7 +174,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawPolygon(MapContext ctx, Viewport vp, ProjectionScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(MapView ctx, Viewport vp, MapScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -250,7 +250,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(MapContext ctx, Viewport vp, ProjectionScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIconScale(MapView ctx, Viewport vp, MapScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -263,7 +263,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, ProjectionScale scale) {
+    private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, MapScale scale) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double principalAngleDegree = params.principalAngleDegree();
@@ -330,7 +330,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         lineThick.renderLine(vp, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(MapContext ctx, List<JHVRelatedEvents> evs, long currentTime) {
+    private void renderIcons(MapView ctx, List<JHVRelatedEvents> evs, long currentTime) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
         for (JHVRelatedEvents evtr : evs) {
@@ -360,7 +360,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void render(MapView ctx, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
         long currentTime = ctx.viewpoint().time.milli;
@@ -386,7 +386,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void renderScale(MapView ctx, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
         long currentTime = ctx.viewpoint().time.milli;

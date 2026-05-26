@@ -7,7 +7,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.time.JHVTime;
 
-final class ViewpointModel {
+final class ViewpointState {
 
     private final HashSet<ViewpointListener> listeners = new HashSet<>();
 
@@ -15,7 +15,7 @@ final class ViewpointModel {
     private Position viewpoint = Sun.StartEarth;
     private UpdateViewpoint updateViewpoint;
 
-    ViewpointModel(UpdateViewpoint _updateViewpoint) {
+    ViewpointState(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
     }
 

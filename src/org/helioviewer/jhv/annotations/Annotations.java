@@ -6,10 +6,10 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -83,7 +83,7 @@ public final class Annotations {
         return true;
     }
 
-    public static void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public static void render(MapView ctx, Viewport vp, MapScale scale) {
         if (pending == null && annotations.isEmpty())
             return;
 
@@ -101,7 +101,7 @@ public final class Annotations {
         annotationsLine.setVertex(annotationsBuf);
         annotationsLine.renderLine(vp, LINEWIDTH);
 
-        double pixFactor = ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp));
+        double pixFactor = ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         Transform.pushView();
         if (ctx.isOrthographic())
@@ -114,7 +114,7 @@ public final class Annotations {
         Transform.popView();
     }
 
-    public static void drawCross(MapContext ctx, Viewport vp, ProjectionScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+    public static void drawCross(MapView ctx, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
         AnnotateCross.drawCross(ctx, vp, scale, longitude, latitude, color, vexBuf);
     }
 

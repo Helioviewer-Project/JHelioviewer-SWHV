@@ -12,7 +12,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -43,7 +43,7 @@ public final class ImageLayers {
         Layers.forEachImageLayer(layer -> {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
-                double pixFactor = ViewportProjection.getImagePixelFactor(camera, Display.getViewport(idx));
+                double pixFactor = ViewportMath.getImagePixelFactor(camera, Display.getViewport(idx));
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         });

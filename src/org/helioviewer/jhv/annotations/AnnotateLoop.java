@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -24,7 +24,7 @@ final class AnnotateLoop extends AbstractAnnotateable {
     }
 
     // Draw the loop as a semicircle whose feet are exactly bp and ep.
-    private void drawLoop(MapContext ctx, Viewport vp, ProjectionScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+    private void drawLoop(MapView ctx, Viewport vp, MapScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
         Vec3 center = new Vec3(0.5 * (bp.x + ep.x), 0.5 * (bp.y + ep.y), 0.5 * (bp.z + ep.z));
         Vec3 u = new Vec3(0.5 * (bp.x - ep.x), 0.5 * (bp.y - ep.y), 0.5 * (bp.z - ep.z));
         double centerLen = center.length();
@@ -50,7 +50,7 @@ final class AnnotateLoop extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView ctx, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

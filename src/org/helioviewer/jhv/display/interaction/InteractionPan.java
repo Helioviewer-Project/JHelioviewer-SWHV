@@ -3,7 +3,7 @@ package org.helioviewer.jhv.display.interaction;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.input.PointerEvent;
 
 final class InteractionPan extends Interaction.Type {
@@ -34,7 +34,7 @@ final class InteractionPan extends Interaction.Type {
         lastX = e.x();
         lastY = e.y();
 
-        double m = 1 / ViewportProjection.getImagePixelFactor(camera, vp);
+        double m = 1 / ViewportMath.getImagePixelFactor(camera, vp);
         camera.setTranslation(camera.getTranslationX() + x * m, camera.getTranslationY() - y * m);
         DisplayController.display();
     }

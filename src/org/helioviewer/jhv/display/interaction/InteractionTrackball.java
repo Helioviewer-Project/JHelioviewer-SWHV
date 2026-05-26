@@ -4,7 +4,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
@@ -36,7 +36,7 @@ final class InteractionTrackball extends Interaction.Type {
 
     @Override
     void mousePressed(PointerEvent e, Viewport vp) {
-        trackballRadius2 = ViewportProjection.selectTrackballRadius2(camera, vp, e.x(), e.y());
+        trackballRadius2 = ViewportMath.selectTrackballRadius2(camera, vp, e.x(), e.y());
         if (constraint == Constraint.AXIS)
             dragAxis = DisplayController.getViewpointUpdate().dragAxis();
         lastMouseX = e.x();
@@ -51,7 +51,7 @@ final class InteractionTrackball extends Interaction.Type {
         if ((e.x() == lastMouseX) && (e.y() == lastMouseY))
             return;
 
-        Quat delta = ViewportProjection.calcTrackballDelta(camera, vp, lastMouseX, lastMouseY, e.x(), e.y(), trackballRadius2);
+        Quat delta = ViewportMath.calcTrackballDelta(camera, vp, lastMouseX, lastMouseY, e.x(), e.y(), trackballRadius2);
         camera.rotateDragRotation(constraint == Constraint.AXIS ? delta.twist(dragAxis) : delta);
         lastMouseX = e.x();
         lastMouseY = e.y();

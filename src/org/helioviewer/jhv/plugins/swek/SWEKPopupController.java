@@ -10,9 +10,9 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.ProjectionMode;
+import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVPositionInformation;
@@ -149,14 +149,14 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         Viewport vp = Display.getActiveViewport();
         RenderView renderView = GLRenderer.getRenderView();
         double displayWidth = renderView.cameraWidth(vp.zoom);
-        ProjectionMode mode = Display.mode;
+        MapMode mode = Display.mode;
         Vec3 sphereHitpoint = null;
         Vec3 planeHitpoint = null;
         Vec2 mousePosition = null;
-        if (mode == ProjectionMode.Orthographic) {
+        if (mode == MapMode.Orthographic) {
             Quat viewpointRotation = viewpoint.toQuat();
-            sphereHitpoint = ViewportProjection.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpointRotation);
-            planeHitpoint = ViewportProjection.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
+            sphereHitpoint = ViewportMath.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpointRotation);
+            planeHitpoint = ViewportMath.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
         } else {
             mousePosition = mode.mouseToScreen(camera, renderView, vp, mouseOverX, mouseOverY);
         }
@@ -167,7 +167,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             if (pi == null)
                 continue;
 
-            if (mode == ProjectionMode.Orthographic) {
+            if (mode == MapMode.Orthographic) {
                 Vec3 hitpoint, pt;
                 if (evt.isCactus()) {
                     double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
@@ -192,7 +192,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 }
             } else {
                 Vec2 tf = null;
-                if ((mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) && evt.isCactus()) {
+                if ((mode == MapMode.Polar || mode == MapMode.LogPolar) && evt.isCactus()) {
                     double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
                     double distSun = computeDistSun(evt, currentTime);
                     tf = new Vec2(mode.scale.getXValueInv(principalAngle) * vp.aspect, mode.scale.getYValueInv(distSun));

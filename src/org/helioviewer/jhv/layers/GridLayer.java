@@ -8,10 +8,10 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
@@ -105,7 +105,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void render(MapView ctx, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
@@ -115,7 +115,7 @@ public final class GridLayer extends AbstractLayer {
 
         Position viewpoint = ctx.viewpoint();
         float ztext = 0;
-        double pixFactor = ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp));
+        double pixFactor = ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp));
 
         // correct order: grid lines -> Earth indicators -> axis -> grid labels -> radial grid
         Quat gridQuat = ctx.gridType().toCarrington(viewpoint);
@@ -158,7 +158,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void renderScale(MapView ctx, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
         flatGrid.render(ctx, vp, scale, showLabels);

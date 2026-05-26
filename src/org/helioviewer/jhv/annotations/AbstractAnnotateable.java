@@ -6,10 +6,10 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -69,7 +69,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     static Vec3 mouseToSky(Camera camera, Viewport vp, int x, int y) {
-        return ViewportProjection.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
+        return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
     }
 
     @Nullable
@@ -84,10 +84,10 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf) {}
+    public void draw(MapView ctx, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {}
 
     @Override
-    public void drawTransformed(MapContext ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {}
+    public void drawTransformed(MapView ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {}
 
     @Override
     public void mousePressed(Camera camera, Viewport vp, int x, int y) {

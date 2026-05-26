@@ -8,11 +8,11 @@ public final class Display {
 
     private Display() {}
 
-    public static ProjectionMode mode = ProjectionMode.Orthographic;
+    public static MapMode mode = MapMode.Orthographic;
     public static boolean multiview = false;
     public static boolean whiteBackground = false;
 
-    public static void setProjectionMode(ProjectionMode _mode) {
+    public static void setMapMode(MapMode _mode) {
         mode = _mode;
         DisplayController.resetCameras();
     }
