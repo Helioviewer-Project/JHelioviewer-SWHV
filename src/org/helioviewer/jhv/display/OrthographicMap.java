@@ -10,12 +10,12 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
-final class OrthographicProjection {
+final class OrthographicMap {
 
-    private OrthographicProjection() {}
+    private OrthographicMap() {}
 
     static Vec3 mouseToSurface(Camera camera, RenderView renderView, Viewport vp, int x, int y) {
-        return ViewportProjection.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, renderView.viewpoint().toQuat());
+        return ViewportMath.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, renderView.viewpoint().toQuat());
     }
 
     static void emitMapVertex(Vec3 vertex, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
@@ -36,7 +36,7 @@ final class OrthographicProjection {
                 ? Quat.ZERO
                 : Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
 
-        Vec3 p = ViewportProjection.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, rotation);
+        Vec3 p = ViewportMath.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, rotation);
         if (p == null)
             return Vec2.NAN;
 

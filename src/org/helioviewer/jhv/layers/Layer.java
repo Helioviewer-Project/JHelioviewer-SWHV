@@ -2,23 +2,23 @@ package org.helioviewer.jhv.layers;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 
 import org.json.JSONObject;
 
 public interface Layer {
 
-    default void render(MapContext ctx, Viewport vp, ProjectionScale scale) {}
+    default void render(MapView ctx, Viewport vp, MapScale scale) {}
 
-    default void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {}
+    default void renderScale(MapView ctx, Viewport vp, MapScale scale) {}
 
-    default void renderFloat(MapContext ctx, Viewport vp, ProjectionScale scale) {}
+    default void renderFloat(MapView ctx, Viewport vp, MapScale scale) {}
 
     default void renderFullFloat(Viewport vp) {}
 
-    default void renderMiniview(MapContext ctx, Viewport vp, ProjectionScale scale) {}
+    default void renderMiniview(MapView ctx, Viewport vp, MapScale scale) {}
 
     default void prerender() {}
 

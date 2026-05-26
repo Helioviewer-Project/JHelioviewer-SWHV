@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.display;
 
-public interface ProjectionScale {
+public interface MapScale {
 
     double getInterpolatedXValue(double v);
 
@@ -18,13 +18,13 @@ public interface ProjectionScale {
 
     void set(double _xStart, double _xStop, double _yStart, double _yStop);
 
-    ProjectionScale ortho = new ProjectionScaleIdentity(0, 0, 0, 0);
-    ProjectionScale hpc = new ProjectionScaleIdentity(-5, 5, -5, 5);
-    ProjectionScale lati = new ProjectionScaleLati(-180, 180, -90, 90);
-    ProjectionScale polar = new ProjectionScaleIdentity(0, 360, 0, 0);
-    ProjectionScale logpolar = new ProjectionScaleLogY(0, 360, 0.05, 1);
+    MapScale ortho = new LinearMapScale(0, 0, 0, 0);
+    MapScale hpc = new LinearMapScale(-5, 5, -5, 5);
+    MapScale lati = new LatitudinalMapScale(-180, 180, -90, 90);
+    MapScale polar = new LinearMapScale(0, 360, 0, 0);
+    MapScale logpolar = new LogMapScale(0, 360, 0.05, 1);
 
-    abstract class ProjectionScaleAbstract implements ProjectionScale {
+    abstract class MapScaleBase implements MapScale {
 
         protected double xStart;
         protected double xStop;
@@ -36,7 +36,7 @@ public interface ProjectionScale {
         protected double invXRange;
         protected double invYRange;
 
-        ProjectionScaleAbstract(double _xStart, double _xStop, double _yStart, double _yStop) {
+        MapScaleBase(double _xStart, double _xStop, double _yStart, double _yStop) {
             set(_xStart, _xStop, _yStart, _yStop);
         }
 
@@ -102,9 +102,9 @@ public interface ProjectionScale {
 
     }
 
-    final class ProjectionScaleLogY extends ProjectionScaleAbstract {
+    final class LogMapScale extends MapScaleBase {
 
-        ProjectionScaleLogY(double _xStart, double _xStop, double _yStart, double _yStop) {
+        LogMapScale(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 
@@ -130,9 +130,9 @@ public interface ProjectionScale {
 
     }
 
-    class ProjectionScaleIdentity extends ProjectionScaleAbstract {
+    class LinearMapScale extends MapScaleBase {
 
-        ProjectionScaleIdentity(double _xStart, double _xStop, double _yStart, double _yStop) {
+        LinearMapScale(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 
@@ -158,9 +158,9 @@ public interface ProjectionScale {
 
     }
 
-    final class ProjectionScaleLati extends ProjectionScaleIdentity {
+    final class LatitudinalMapScale extends LinearMapScale {
 
-        ProjectionScaleLati(double _xStart, double _xStop, double _yStart, double _yStop) {
+        LatitudinalMapScale(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 

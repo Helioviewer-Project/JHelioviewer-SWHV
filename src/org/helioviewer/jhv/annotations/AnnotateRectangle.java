@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalPoint;
 import org.helioviewer.jhv.math.Vec2;
@@ -19,7 +19,7 @@ final class AnnotateRectangle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawRectangle(MapContext ctx, Viewport vp, ProjectionScale scale, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
+    private static void drawRectangle(MapView ctx, Viewport vp, MapScale scale, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
         double startLongitude = start.longitude();
         double startLatitude = start.latitude();
         double endLongitude = end.longitude();
@@ -54,7 +54,7 @@ final class AnnotateRectangle extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView ctx, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

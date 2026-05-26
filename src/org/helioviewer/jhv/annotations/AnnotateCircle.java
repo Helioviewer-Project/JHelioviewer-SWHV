@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -23,7 +23,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawCircle(MapContext ctx, Viewport vp, ProjectionScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+    private void drawCircle(MapView ctx, Viewport vp, MapScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -49,7 +49,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapContext ctx, Viewport vp, ProjectionScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView ctx, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

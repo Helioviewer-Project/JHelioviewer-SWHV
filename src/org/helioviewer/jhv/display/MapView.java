@@ -7,14 +7,14 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
-public abstract class MapContext {
+public abstract class MapView {
 
     private final Camera camera;
     private final RenderView renderView;
-    private final ProjectionMode mode;
+    private final MapMode mode;
     private final GridType gridType;
 
-    protected MapContext(Camera _camera, RenderView _renderView, ProjectionMode _mode, GridType _gridType) {
+    protected MapView(Camera _camera, RenderView _renderView, MapMode _mode, GridType _gridType) {
         camera = _camera;
         renderView = _renderView;
         mode = _mode;
@@ -29,7 +29,7 @@ public abstract class MapContext {
         return renderView.cameraWidth(vp.zoom);
     }
 
-    public ProjectionMode mode() {
+    public MapMode mode() {
         return mode;
     }
 
@@ -46,28 +46,28 @@ public abstract class MapContext {
     }
 
     public boolean isOrthographic() {
-        return mode() == ProjectionMode.Orthographic;
+        return mode() == MapMode.Orthographic;
     }
 
     public boolean isHpc() {
-        return mode() == ProjectionMode.HPC;
+        return mode() == MapMode.HPC;
     }
 
     public boolean isLatitudinal() {
-        return mode() == ProjectionMode.Latitudinal;
+        return mode() == MapMode.Latitudinal;
     }
 
     public boolean isPolar() {
-        return mode() == ProjectionMode.Polar;
+        return mode() == MapMode.Polar;
     }
 
     public boolean isLogPolar() {
-        return mode() == ProjectionMode.LogPolar;
+        return mode() == MapMode.LogPolar;
     }
 
-    public abstract Vec2 projectToScreen(Viewport vp, ProjectionScale scale, Vec3 v);
+    public abstract Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v);
 
-    public abstract Vec2 emitMapVertex(Viewport vp, ProjectionScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf);
+    public abstract Vec2 emitMapVertex(Viewport vp, MapScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf);
 
-    public abstract void emitMapPoint(Viewport vp, ProjectionScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf);
+    public abstract void emitMapPoint(Viewport vp, MapScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf);
 }

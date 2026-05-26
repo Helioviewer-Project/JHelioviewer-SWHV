@@ -2,7 +2,7 @@ package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapContext;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -39,7 +39,7 @@ final class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void drawTransformed(MapContext ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
+    public void drawTransformed(MapView ctx, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

@@ -29,8 +29,8 @@ public final class DisplayController {
         KEEP_TRANSFORM
     }
 
-    private static final ViewpointModel viewpointModel = new ViewpointModel(UpdateViewpoint.observer);
-    private static final ViewpointModel miniViewpointModel = new ViewpointModel(UpdateViewpoint.earthAt1au);
+    private static final ViewpointState viewpointModel = new ViewpointState(UpdateViewpoint.observer);
+    private static final ViewpointState miniViewpointState = new ViewpointState(UpdateViewpoint.earthAt1au);
 
     private static boolean missingHandlerLogged;
     private static Consumer<Position> renderRequestHandler = _ -> missingRenderRequestHandler();
@@ -111,12 +111,12 @@ public final class DisplayController {
     }
 
     static void resetCameras() {
-        resetCamera(Display.getMiniCamera(), miniViewpointModel);
+        resetCamera(Display.getMiniCamera(), miniViewpointState);
         resetCamera(Display.getCamera(), viewpointModel);
         render(1);
     }
 
-    private static void resetCamera(Camera camera, ViewpointModel model) {
+    private static void resetCamera(Camera camera, ViewpointState model) {
         Position viewpoint = model.update(Movie.getTime());
         camera.reset(viewpoint);
         fitCameraToImageLayers(camera, viewpoint);
@@ -129,11 +129,11 @@ public final class DisplayController {
     }
 
     public static void zoomMiniToFit() {
-        fitCameraToImageLayers(Display.getMiniCamera(), miniViewpointModel.getViewpoint());
+        fitCameraToImageLayers(Display.getMiniCamera(), miniViewpointState.getViewpoint());
     }
 
     private static void fitCameraToImageLayers(Camera camera, Position viewpoint) {
-        double size = Display.mode == ProjectionMode.Orthographic ? ImageLayers.getLargestPhysicalHeight() : 1;
+        double size = Display.mode == MapMode.Orthographic ? ImageLayers.getLargestPhysicalHeight() : 1;
         double newFOV = Camera.INITFOV;
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
@@ -172,7 +172,7 @@ public final class DisplayController {
         render(1);
     }
 
-    private static double oneToOneCameraWidth(ImageLayer layer, Viewport vp, ProjectionMode mode) {
+    private static double oneToOneCameraWidth(ImageLayer layer, Viewport vp, MapMode mode) {
         ImageData imageData = layer.getImageData();
         if (imageData == null)
             return 0;
@@ -180,19 +180,19 @@ public final class DisplayController {
         MetaData metaData = imageData.getMetaData();
         double imageHeight = oneToOneImageHeight(metaData, mode);
         double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / metaData.getPhysicalRegion().height;
-        if (mode == ProjectionMode.Orthographic)
+        if (mode == MapMode.Orthographic)
             return cameraWidth;
 
         double viewportHeight = oneToOneViewportHeight(vp, mode);
         return viewportHeight > 0 ? cameraWidth / viewportHeight : 0;
     }
 
-    private static double oneToOneImageHeight(MetaData metaData, ProjectionMode mode) {
-        return mode == ProjectionMode.HPC ? ImageBounds.hpc(metaData).height : metaData.getPhysicalRegion().height;
+    private static double oneToOneImageHeight(MetaData metaData, MapMode mode) {
+        return mode == MapMode.HPC ? ImageBounds.hpc(metaData).height : metaData.getPhysicalRegion().height;
     }
 
-    private static double oneToOneViewportHeight(Viewport vp, ProjectionMode mode) {
-        if (mode == ProjectionMode.HPC) {
+    private static double oneToOneViewportHeight(Viewport vp, MapMode mode) {
+        if (mode == MapMode.HPC) {
             Region bounds = ImageLayers.computeHpcScaleBounds();
             double halfWidth = 0.5 * bounds.width;
             double halfHeight = 0.5 * bounds.height;

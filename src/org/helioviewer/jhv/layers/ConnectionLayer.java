@@ -8,10 +8,10 @@ import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity.Connectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
@@ -72,7 +72,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public ConnectionLayer(JSONObject ignoredJo) {}
 
     @Override
-    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void render(MapView ctx, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
         if (connectivity != null)
@@ -85,29 +85,29 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (!geometryMap.isEmpty()) {
             SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(ctx.viewpoint().time);
             updateTimestamp(g.time());
-            g.render(geometryLine, geometryPoint, vp, ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp)));
+            g.render(geometryLine, geometryPoint, vp, ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp)));
         }
     }
 
     @Override
-    public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void renderScale(MapView ctx, Viewport vp, MapScale scale) {
         render(ctx, vp, scale);
     }
 
-    private void drawConnectivity(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    private void drawConnectivity(MapView ctx, Viewport vp, MapScale scale) {
         putConnectivity(ctx, vp, scale, connectivity.SSW, sswColor, connectivityBuf);
         putConnectivity(ctx, vp, scale, connectivity.FSW, fswColor, connectivityBuf);
         putConnectivity(ctx, vp, scale, connectivity.M, mColor, connectivityBuf);
 
         connectivityCenter.setVertex(connectivityBuf);
-        connectivityCenter.renderPoints(ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp)));
+        connectivityCenter.renderPoints(ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp)));
     }
 
-    private static void putConnectivity(MapContext ctx, Viewport vp, ProjectionScale scale, List<Vec3> points, byte[] color, BufVertex vexBuf) {
+    private static void putConnectivity(MapView ctx, Viewport vp, MapScale scale, List<Vec3> points, byte[] color, BufVertex vexBuf) {
         points.forEach(v -> ctx.emitMapPoint(vp, scale, v, SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
     }
 
-    private void drawHCS(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    private void drawHCS(MapView ctx, Viewport vp, MapScale scale) {
         if (hcs.isEmpty())
             return;
         Vec3 first = hcs.getFirst();
@@ -132,7 +132,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         return SphericalPoint.fromCartesian(x, y, z);
     }
 
-    private void drawFootpointInterpolated(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    private void drawFootpointInterpolated(MapView ctx, Viewport vp, MapScale scale) {
         JHVTime time = ctx.viewpoint().time;
         updateTimestamp(time);
 

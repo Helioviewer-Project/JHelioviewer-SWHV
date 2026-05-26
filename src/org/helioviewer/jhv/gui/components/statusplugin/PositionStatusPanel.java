@@ -9,9 +9,9 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.ProjectionMode;
+import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -39,17 +39,17 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
-        ProjectionMode mode = Display.mode;
+        MapMode mode = Display.mode;
         Vec2 coord = mode.mouseToGrid(camera, GLRenderer.getRenderView(), vp, Display.gridType, x, y);
 
-        if (mode == ProjectionMode.HPC) {
+        if (mode == MapMode.HPC) {
             setText(formatHpc(coord));
-        } else if (mode == ProjectionMode.Latitudinal) {
+        } else if (mode == MapMode.Latitudinal) {
             setText(formatLati(coord));
-        } else if (mode == ProjectionMode.Polar || mode == ProjectionMode.LogPolar) {
+        } else if (mode == MapMode.Polar || mode == MapMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = ViewportProjection.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
+            Vec3 v = ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {

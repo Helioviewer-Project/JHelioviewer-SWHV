@@ -11,8 +11,8 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageData;
@@ -188,12 +188,12 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Override
-    public void renderMiniview(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void renderMiniview(MapView ctx, Viewport vp, MapScale scale) {
         render(ctx, vp, scale);
     }
 
     @Override
-    public void renderScale(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void renderScale(MapView ctx, Viewport vp, MapScale scale) {
         render(ctx, vp, scale);
     }
 
@@ -203,7 +203,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private final float[] latiGrid1 = new float[3];
 
     @Override
-    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void render(MapView ctx, Viewport vp, MapScale scale) {
         if (imageData == null) {
             return;
         }

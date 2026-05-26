@@ -5,11 +5,11 @@ import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.ViewpointListener;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.layers.stars.GaiaClient;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -54,7 +54,7 @@ public final class StarLayer extends AbstractLayer implements ViewpointListener,
     }
 
     @Override
-    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void render(MapView ctx, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
 
@@ -70,7 +70,7 @@ public final class StarLayer extends AbstractLayer implements ViewpointListener,
 
         Transform.pushView();
         Transform.rotateViewInverse(viewpoint.toQuat()); // viewpoint was interpolated for Viewpoint->Location
-        points.renderPoints(ViewportProjection.getPixelFactor(vp, ctx.cameraWidth(vp)));
+        points.renderPoints(ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp)));
         Transform.popView();
     }
 

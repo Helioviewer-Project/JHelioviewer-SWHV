@@ -14,10 +14,10 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapContext;
-import org.helioviewer.jhv.display.ProjectionScale;
+import org.helioviewer.jhv.display.MapView;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportProjection;
+import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -95,7 +95,7 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapContext ctx, Viewport vp, ProjectionScale scale) {
+    public void render(MapView ctx, Viewport vp, MapScale scale) {
         if (vp.idx == 0) // once!
             updateTime(ctx.viewpoint().time);
 
@@ -122,7 +122,7 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
-        double pointFactor = ViewportProjection.getTemperedPointFactor(vp, ctx.cameraWidth(vp));
+        double pointFactor = ViewportMath.getTemperedPointFactor(vp, ctx.cameraWidth(vp));
         Position viewpoint = ctx.viewpoint();
 
         Transform.pushView();
@@ -181,8 +181,8 @@ public class ViewpointLayer extends AbstractLayer {
 
         Viewport vp = Display.getActiveViewport();
         double width = GLRenderer.getRenderView().cameraWidth(vp.zoom);
-        double mousePlaneX = ViewportProjection.computeUpX(vp, width, camera.getTranslationX(), mouseX);
-        double mousePlaneY = ViewportProjection.computeUpY(vp, width, camera.getTranslationY(), mouseY);
+        double mousePlaneX = ViewportMath.computeUpX(vp, width, camera.getTranslationX(), mouseX);
+        double mousePlaneY = ViewportMath.computeUpY(vp, width, camera.getTranslationY(), mouseY);
         Quat dragRotation = camera.getDragRotation();
 
         double halfWidth = width / 2;
