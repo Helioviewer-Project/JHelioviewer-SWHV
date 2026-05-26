@@ -74,38 +74,70 @@ final class ProjectedMap {
     }
 
     static void emitMapLine(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
-        Vec2 previous = null;
-        int last = vertices.size() - 1;
-        for (int i = 0; i <= last; i++)
-            previous = emitMapVertex(kind, viewpoint, scale, rotation, vp, vertices.get(i), previous, i == 0, i == last, color, vexBuf);
-    }
-
-    static void emitMapPoints(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
-        for (int i = 0; i < vertices.size(); i++)
-            emitMapPoint(kind, viewpoint, scale, rotation, vp, vertices.get(i), size, color, vexBuf);
-    }
-
-    private static Vec2 emitMapVertex(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
-        if (kind == Kind.HPC)
-            return emitHpcVertex(viewpoint, scale, vp, vertex, previous, first, last, color, vexBuf);
-
-        Vec2 current = project(kind, viewpoint, scale, rotation, vertex);
-        if (first)
-            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
-        emitWrappedVertex(vp, previous, current, color, vexBuf);
-        if (last)
-            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
-        return current;
-    }
-
-    private static void emitMapPoint(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
+        if (vertices.isEmpty())
+            return;
         if (kind == Kind.HPC) {
-            emitHpcPoint(viewpoint, scale, vp, vertex, size, color, vexBuf);
+            emitHpcLine(viewpoint, scale, vp, vertices, color, vexBuf);
             return;
         }
 
-        Vec2 pt = project(kind, viewpoint, scale, rotation, vertex);
-        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
+        Vec2 current = project(kind, viewpoint, scale, rotation, vertices.getFirst());
+        emitProjectedVertex(vp, current, Colors.Null, vexBuf);
+        vexBuf.repeatVertex(color);
+        for (int i = 1; i < vertices.size(); i++) {
+            Vec2 previous = current;
+            current = project(kind, viewpoint, scale, rotation, vertices.get(i));
+            emitWrappedVertex(vp, previous, current, color, vexBuf);
+        }
+        vexBuf.repeatVertex(Colors.Null);
+    }
+
+    private static void emitHpcLine(Position viewpoint, MapScale scale, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+        // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
+        Vec2 previous = null;
+        int last = vertices.size() - 1;
+        for (int i = 0; i <= last; i++) {
+            Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertices.get(i), scale);
+            if (current == null) {
+                if (previous != null)
+                    vexBuf.repeatVertex(Colors.Null);
+                previous = null;
+                continue;
+            }
+
+            if (i == 0 || previous == null) {
+                emitProjectedVertex(vp, current, Colors.Null, vexBuf);
+                vexBuf.repeatVertex(color);
+            } else {
+                emitProjectedVertex(vp, current, color, vexBuf);
+            }
+            if (i == last)
+                vexBuf.repeatVertex(Colors.Null);
+            previous = current;
+        }
+    }
+
+    static void emitMapPoints(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
+        if (kind == Kind.HPC) {
+            emitHpcPoints(viewpoint, scale, vp, vertices, size, color, vexBuf);
+            return;
+        }
+
+        float pointSize = (float) size;
+        for (Vec3 vertex : vertices) {
+            Vec2 pt = project(kind, viewpoint, scale, rotation, vertex);
+            vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
+        }
+    }
+
+    private static void emitHpcPoints(Position viewpoint, MapScale scale, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
+        // Skip back-side surface points in HPC instead of projecting them through the map.
+        float pointSize = (float) size;
+        for (Vec3 vertex : vertices) {
+            Vec2 pt = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
+            if (pt != null)
+                vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
+        }
     }
 
     static Vec2 mouseToScreen(Camera camera, RenderView renderView, Viewport vp, MapScale scale, int x, int y) {
@@ -151,30 +183,6 @@ final class ProjectedMap {
         return projectHpcViewpointSpace(view, viewpoint.distance, scale);
     }
 
-    private static Vec2 emitHpcVertex(Position viewpoint, MapScale scale, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
-        // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
-        Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
-        if (current == null) {
-            if (previous != null)
-                vexBuf.repeatVertex(Colors.Null);
-            return null;
-        }
-        if (first || previous == null)
-            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
-        emitProjectedVertex(vp, current, color, vexBuf);
-        if (last)
-            emitProjectedVertex(vp, current, Colors.Null, vexBuf);
-        return current;
-    }
-
-    private static void emitHpcPoint(Position viewpoint, MapScale scale, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
-        // Skip back-side surface points in HPC instead of projecting them through the map.
-        Vec2 pt = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
-        if (pt == null)
-            return;
-        vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, (float) size, color);
-    }
-
     private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, byte[] color, BufVertex vexBuf) {
         if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
             emitHorizontalWrap(vp, current, previous, color, vexBuf);
@@ -188,17 +196,17 @@ final class ProjectedMap {
         if (current.x <= 0 && previous.x >= 0) {
             x = (float) (0.5 * vp.aspect);
             vexBuf.putVertex(x, y, 0, 1, color);
-            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+            vexBuf.repeatVertex(Colors.Null);
 
             vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
-            vexBuf.putVertex(-x, y, 0, 1, color);
+            vexBuf.repeatVertex(color);
         } else if (current.x >= 0 && previous.x <= 0) {
             x = (float) (-0.5 * vp.aspect);
             vexBuf.putVertex(x, y, 0, 1, color);
-            vexBuf.putVertex(x, y, 0, 1, Colors.Null);
+            vexBuf.repeatVertex(Colors.Null);
 
             vexBuf.putVertex(-x, y, 0, 1, Colors.Null);
-            vexBuf.putVertex(-x, y, 0, 1, color);
+            vexBuf.repeatVertex(color);
         }
     }
 
