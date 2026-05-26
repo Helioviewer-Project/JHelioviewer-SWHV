@@ -13,17 +13,17 @@ public enum ProjectionMode {
     Orthographic(GLSLSolarShader.ortho, ProjectionScale.ortho) {
         @Override
         public MapContext createMapContext(Camera camera, RenderView renderView, GridType gridType) {
-            return new OrthoMapContext(camera, renderView, gridType);
+            return new OrthographicMapContext(camera, renderView, gridType);
         }
 
         @Override
         public Vec3 mouseToSurface(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
-            return OrthoProjection.mouseToSurface(camera, renderView, vp, x, y);
+            return OrthographicProjection.mouseToSurface(camera, renderView, vp, x, y);
         }
 
         @Override
         public Vec2 mouseToGrid(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
-            return OrthoProjection.mouseToGrid(camera, renderView, vp, gridType, x, y);
+            return OrthographicProjection.mouseToGrid(camera, renderView, vp, gridType, x, y);
         }
 
         @Override
@@ -37,43 +37,43 @@ public enum ProjectionMode {
         }
 
     },
-    HPC(GLSLSolarShader.hpc, ProjectionScale.hpc, NonOrthoProjection.Kind.HPC),
-    Latitudinal(GLSLSolarShader.lati, ProjectionScale.lati, NonOrthoProjection.Kind.LATITUDINAL),
-    LogPolar(GLSLSolarShader.logpolar, ProjectionScale.logpolar, NonOrthoProjection.Kind.POLAR),
-    Polar(GLSLSolarShader.polar, ProjectionScale.polar, NonOrthoProjection.Kind.POLAR);
+    HPC(GLSLSolarShader.hpc, ProjectionScale.hpc, ProjectedMapProjection.Kind.HPC),
+    Latitudinal(GLSLSolarShader.lati, ProjectionScale.lati, ProjectedMapProjection.Kind.LATITUDINAL),
+    LogPolar(GLSLSolarShader.logpolar, ProjectionScale.logpolar, ProjectedMapProjection.Kind.POLAR),
+    Polar(GLSLSolarShader.polar, ProjectionScale.polar, ProjectedMapProjection.Kind.POLAR);
 
     public final GLSLSolarShader shader;
     public final ProjectionScale scale;
-    final NonOrthoProjection.Kind nonOrthoKind;
+    final ProjectedMapProjection.Kind projectedKind;
 
     ProjectionMode(GLSLSolarShader _shader, ProjectionScale _scale) {
         this(_shader, _scale, null);
     }
 
-    ProjectionMode(GLSLSolarShader _shader, ProjectionScale _scale, NonOrthoProjection.Kind _nonOrthoKind) {
+    ProjectionMode(GLSLSolarShader _shader, ProjectionScale _scale, ProjectedMapProjection.Kind _projectedKind) {
         shader = _shader;
         scale = _scale;
-        nonOrthoKind = _nonOrthoKind;
+        projectedKind = _projectedKind;
     }
 
     public MapContext createMapContext(Camera camera, RenderView renderView, GridType gridType) {
-        return new NonOrthoMapContext(camera, renderView, gridType, this);
+        return new ProjectedMapContext(camera, renderView, gridType, this);
     }
 
     public Vec3 mouseToSurface(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToSurface(nonOrthoKind, camera, renderView, vp, scale, gridType, x, y);
+        return ProjectedMapProjection.mouseToSurface(projectedKind, camera, renderView, vp, scale, gridType, x, y);
     }
 
     public Vec2 mouseToGrid(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToGrid(camera, renderView, vp, scale, gridType, x, y);
+        return ProjectedMapProjection.mouseToGrid(camera, renderView, vp, scale, gridType, x, y);
     }
 
     public Vec2 mouseToScreen(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
-        return NonOrthoProjection.mouseToScreen(camera, renderView, vp, scale, gridType, x, y);
+        return ProjectedMapProjection.mouseToScreen(camera, renderView, vp, scale, gridType, x, y);
     }
 
     public Vec2 projectToScreen(RenderView renderView, Viewport vp, GridType gridType, Vec3 v) {
         Position viewpoint = renderView.viewpoint();
-        return NonOrthoProjection.projectToScreen(nonOrthoKind, viewpoint, scale, gridType.mapRotation(viewpoint), vp, v);
+        return ProjectedMapProjection.projectToScreen(projectedKind, viewpoint, scale, gridType.mapRotation(viewpoint), vp, v);
     }
 }
