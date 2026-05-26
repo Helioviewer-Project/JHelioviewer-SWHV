@@ -12,11 +12,11 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.wcs.WcsProjection;
 
-final class NonOrthoProjection {
+final class ProjectedMapProjection {
 
     enum Kind {HPC, LATITUDINAL, POLAR}
 
-    private NonOrthoProjection() {}
+    private ProjectedMapProjection() {}
 
     static Vec2 project(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Vec3 v) {
         return switch (kind) {

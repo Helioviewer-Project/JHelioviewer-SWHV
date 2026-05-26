@@ -6,9 +6,9 @@ import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
-final class OrthoMapContext extends MapContext {
+final class OrthographicMapContext extends MapContext {
 
-    OrthoMapContext(Camera _camera, RenderView _renderView, GridType _gridType) {
+    OrthographicMapContext(Camera _camera, RenderView _renderView, GridType _gridType) {
         super(_camera, _renderView, ProjectionMode.Orthographic, _gridType);
     }
 
@@ -19,12 +19,12 @@ final class OrthoMapContext extends MapContext {
 
     @Override
     public Vec2 emitMapVertex(Viewport vp, ProjectionScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        OrthoProjection.emitMapVertex(vertex, first, last, radius, color, vexBuf);
+        OrthographicProjection.emitMapVertex(vertex, first, last, radius, color, vexBuf);
         return null;
     }
 
     @Override
     public void emitMapPoint(Viewport vp, ProjectionScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        OrthoProjection.emitMapPoint(vertex, size, radius, color, vexBuf);
+        OrthographicProjection.emitMapPoint(vertex, size, radius, color, vexBuf);
     }
 }
