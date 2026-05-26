@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.display;
 
+import java.util.List;
+
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.Vec2;
@@ -21,6 +23,13 @@ final class OrthographicView extends MapView {
     public Vec2 emitMapVertex(Viewport vp, MapScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
         OrthographicMap.emitMapVertex(vertex, first, last, radius, color, vexBuf);
         return null;
+    }
+
+    @Override
+    public void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
+        int last = vertices.size() - 1;
+        for (int i = 0; i <= last; i++)
+            OrthographicMap.emitMapVertex(vertices.get(i), i == 0, i == last, radius, color, vexBuf);
     }
 
     @Override
