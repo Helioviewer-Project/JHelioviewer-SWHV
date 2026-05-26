@@ -13,7 +13,7 @@ public enum MapMode {
     Orthographic(GLSLSolarShader.ortho, MapScale.ortho) {
         @Override
         public MapView createMapView(Camera camera, RenderView renderView, GridType gridType) {
-            return new OrthographicView(camera, renderView, gridType);
+            return MapView.orthographic(camera, renderView, gridType);
         }
 
         @Override
@@ -57,7 +57,7 @@ public enum MapMode {
     }
 
     public MapView createMapView(Camera camera, RenderView renderView, GridType gridType) {
-        return new ProjectedView(camera, renderView, gridType, this);
+        return MapView.projected(camera, renderView, gridType, this);
     }
 
     public Vec3 mouseToSurface(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
