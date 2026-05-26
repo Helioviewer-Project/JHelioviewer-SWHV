@@ -69,6 +69,37 @@ public final class ImageLayers {
         return size;
     }
 
+    public static Region computeHpcScaleBounds() {
+        Region bounds = getHpcImageBounds();
+        double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
+        double halfHeight = Math.max(Math.abs(bounds.lly), Math.abs(bounds.ury));
+        if (halfWidth <= 0)
+            halfWidth = 5;
+        if (halfHeight <= 0)
+            halfHeight = 5;
+        return new Region(-halfWidth, -halfHeight, 2 * halfWidth, 2 * halfHeight);
+    }
+
+    private static Region getHpcImageBounds() {
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+
+            Region bounds = ImageBounds.hpc(layer.getMetaData());
+            minX = Math.min(minX, bounds.llx);
+            maxX = Math.max(maxX, bounds.urx);
+            minY = Math.min(minY, bounds.lly);
+            maxY = Math.max(maxY, bounds.ury);
+        }
+        if (!Double.isFinite(minX) || !Double.isFinite(maxX) || !Double.isFinite(minY) || !Double.isFinite(maxY))
+            return new Region(-5, -5, 10, 10);
+        return new Region(minX, minY, Math.max(Math.nextUp(0.0), maxX - minX), Math.max(Math.nextUp(0.0), maxY - minY));
+    }
+
     static void displaySynced(Position viewpoint) { // coalesce layers
         for (ImageLayer layer : Layers.getImageLayers()) {
             ImageData id;

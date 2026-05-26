@@ -193,7 +193,7 @@ public final class DisplayController {
 
     private static double oneToOneViewportHeight(Viewport vp, ProjectionMode mode) {
         if (mode == ProjectionMode.HPC) {
-            Region bounds = GLRenderer.computeHpcSceneScaleBounds();
+            Region bounds = ImageLayers.computeHpcScaleBounds();
             double halfWidth = 0.5 * bounds.width;
             double halfHeight = 0.5 * bounds.height;
             halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
