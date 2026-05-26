@@ -5,15 +5,18 @@ import java.util.function.Consumer;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.ImageLayerBounds;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
+import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.json.JSONObject;
 
@@ -130,7 +133,7 @@ public final class DisplayController {
     }
 
     private static void fitCameraToImageLayers(Camera camera, Position viewpoint) {
-        double size = ImageLayerBounds.getLargestPhysicalHeight();
+        double size = Display.mode == ProjectionMode.Orthographic ? ImageLayers.getLargestPhysicalHeight() : 1;
         double newFOV = Camera.INITFOV;
         if (size != 0)
             newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
@@ -160,13 +163,43 @@ public final class DisplayController {
 
         Camera camera = Display.getCamera();
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
-        double cameraWidth = ImageProjectionBounds.oneToOneCameraWidth(layer, Display.getActiveViewport(), Display.mode, Display.gridType, viewpoint);
+        double cameraWidth = oneToOneCameraWidth(layer, Display.getActiveViewport(), Display.mode);
         if (cameraWidth > 0) {
             Display.resetViewportZoom();
             double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
             camera.setFOV(fov, viewpoint);
         }
         render(1);
+    }
+
+    private static double oneToOneCameraWidth(ImageLayer layer, Viewport vp, ProjectionMode mode) {
+        ImageData imageData = layer.getImageData();
+        if (imageData == null)
+            return 0;
+
+        MetaData metaData = imageData.getMetaData();
+        double imageHeight = oneToOneImageHeight(metaData, mode);
+        double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / metaData.getPhysicalRegion().height;
+        if (mode == ProjectionMode.Orthographic)
+            return cameraWidth;
+
+        double viewportHeight = oneToOneViewportHeight(vp, mode);
+        return viewportHeight > 0 ? cameraWidth / viewportHeight : 0;
+    }
+
+    private static double oneToOneImageHeight(MetaData metaData, ProjectionMode mode) {
+        return mode == ProjectionMode.HPC ? ImageBounds.hpc(metaData).height : metaData.getPhysicalRegion().height;
+    }
+
+    private static double oneToOneViewportHeight(Viewport vp, ProjectionMode mode) {
+        if (mode == ProjectionMode.HPC) {
+            Region bounds = GLRenderer.computeHpcSceneScaleBounds();
+            double halfWidth = 0.5 * bounds.width;
+            double halfHeight = 0.5 * bounds.height;
+            halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
+            return 2 * halfHeight;
+        }
+        return 1;
     }
 
     public static void resetView() {

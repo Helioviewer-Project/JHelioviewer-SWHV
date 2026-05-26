@@ -27,7 +27,7 @@ public enum ProjectionMode {
         }
 
         @Override
-        public Vec2 mouseToScreen(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
+        public Vec2 mouseToScreen(Camera camera, RenderView renderView, Viewport vp, int x, int y) {
             throw new UnsupportedOperationException("Orthographic mode does not support mouseToScreen()");
         }
 
@@ -68,8 +68,8 @@ public enum ProjectionMode {
         return ProjectedMapProjection.mouseToGrid(camera, renderView, vp, scale, gridType, x, y);
     }
 
-    public Vec2 mouseToScreen(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
-        return ProjectedMapProjection.mouseToScreen(camera, renderView, vp, scale, gridType, x, y);
+    public Vec2 mouseToScreen(Camera camera, RenderView renderView, Viewport vp, int x, int y) {
+        return ProjectedMapProjection.mouseToScreen(camera, renderView, vp, scale, x, y);
     }
 
     public Vec2 projectToScreen(RenderView renderView, Viewport vp, GridType gridType, Vec3 v) {
