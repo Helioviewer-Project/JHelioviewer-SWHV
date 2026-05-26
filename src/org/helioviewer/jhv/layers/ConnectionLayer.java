@@ -8,8 +8,8 @@ import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
@@ -19,7 +19,6 @@ import org.helioviewer.jhv.layers.connect.LoadHCS;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
 import org.helioviewer.jhv.layers.connect.SunJSONTypes;
 import org.helioviewer.jhv.math.SphericalPoint;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -110,12 +109,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private void drawHCS(MapView mv, Viewport vp, MapScale scale) {
         if (hcs.isEmpty())
             return;
-        Vec3 first = hcs.getFirst();
-        Vec2 previous = mv.emitMapVertex(vp, scale, first, null, true, false, ORTHO_RADIUS, hcsColor, hcsBuf);
-        for (int i = 1; i < hcs.size(); i++) {
-            previous = mv.emitMapVertex(vp, scale, hcs.get(i), previous, false, false, ORTHO_RADIUS, hcsColor, hcsBuf);
-        }
-        mv.emitMapVertex(vp, scale, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
+        mv.emitMapLine(vp, scale, hcs, ORTHO_RADIUS, hcsColor, hcsBuf);
 
         hcsLine.setVertex(hcsBuf);
         hcsLine.renderLine(vp, LINEWIDTH);

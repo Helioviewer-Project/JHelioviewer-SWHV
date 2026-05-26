@@ -49,6 +49,8 @@ public class LoadHCS {
                     }
                 }
             }
+            if (!hcsList.isEmpty())
+                hcsList.add(hcsList.getFirst());
             return hcsList;
         }
     }
