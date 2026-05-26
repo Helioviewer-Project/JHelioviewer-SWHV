@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.annotations;
 
+import java.util.List;
+
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
@@ -14,6 +15,7 @@ import org.json.JSONObject;
 final class AnnotateCross extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 2;
+    private static final List<Vec3> crossVertices = fixedSizeVertices(SUBDIVISIONS + 1);
 
     AnnotateCross(JSONObject jo) {
         super(jo);
@@ -26,11 +28,11 @@ final class AnnotateCross extends AbstractAnnotateable {
     }
 
     private static void interpolatedDraw(MapView mv, Viewport vp, MapScale scale, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
-        Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, longitude1, latitude1, longitude2, latitude2);
-            previous = mv.emitMapVertex(vp, scale, pc, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            crossVertices.set(i, pc);
         }
+        mv.emitMapLine(vp, scale, crossVertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override

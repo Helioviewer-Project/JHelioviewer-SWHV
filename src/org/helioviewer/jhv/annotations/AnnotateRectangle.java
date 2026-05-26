@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.annotations;
 
+import java.util.List;
+
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalPoint;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
@@ -15,11 +16,13 @@ final class AnnotateRectangle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 24;
 
+    private final List<Vec3> vertices = fixedSizeVertices(4 * (SUBDIVISIONS + 1));
+
     AnnotateRectangle(JSONObject jo) {
         super(jo);
     }
 
-    private static void drawRectangle(MapView mv, Viewport vp, MapScale scale, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
+    private void drawRectangle(MapView mv, Viewport vp, MapScale scale, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
         double startLongitude = start.longitude();
         double startLatitude = start.latitude();
         double endLongitude = end.longitude();
@@ -30,27 +33,28 @@ final class AnnotateRectangle extends AbstractAnnotateable {
             else if (endLongitude > startLongitude && startLongitude < -Math.PI / 2)
                 startLongitude += 2 * Math.PI;
         }
-        Vec2 previous = null;
 
+        int vertexIndex = 0;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, startLatitude, endLongitude, startLatitude);
-            previous = mv.emitMapVertex(vp, scale, pc, previous, i == 0, false, ANNOTATION_RADIUS, color, vexBuf);
+            vertices.set(vertexIndex++, pc);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, startLatitude, endLongitude, endLatitude);
-            previous = mv.emitMapVertex(vp, scale, pc, previous, false, false, ANNOTATION_RADIUS, color, vexBuf);
+            vertices.set(vertexIndex++, pc);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, endLatitude, startLongitude, endLatitude);
-            previous = mv.emitMapVertex(vp, scale, pc, previous, false, false, ANNOTATION_RADIUS, color, vexBuf);
+            vertices.set(vertexIndex++, pc);
         }
 
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, endLatitude, startLongitude, startLatitude);
-            previous = mv.emitMapVertex(vp, scale, pc, previous, false, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            vertices.set(vertexIndex++, pc);
         }
+        mv.emitMapLine(vp, scale, vertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override

@@ -1,13 +1,14 @@
 package org.helioviewer.jhv.annotations;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
@@ -17,6 +18,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 90;
 
+    private final List<Vec3> vertices = fixedSizeVertices(SUBDIVISIONS + 1);
     private String diameterStr = null;
 
     AnnotateCircle(JSONObject jo) {
@@ -35,17 +37,16 @@ final class AnnotateCircle extends AbstractAnnotateable {
         Vec3 u = Vec3.cross(bp, ep);
         Vec3 v = Vec3.cross(bp, u);
 
-        Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double t = i * 2. * Math.PI / SUBDIVISIONS;
             double cosr = Math.cos(t);
             double sinr = Math.sin(t);
-            Vec3 vex = new Vec3(
+            vertices.set(i, new Vec3(
                     center.x + cosr * u.x + sinr * v.x,
                     center.y + cosr * u.y + sinr * v.y,
-                    center.z + cosr * u.z + sinr * v.z);
-            previous = mv.emitMapVertex(vp, scale, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+                    center.z + cosr * u.z + sinr * v.z));
         }
+        mv.emitMapLine(vp, scale, vertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override

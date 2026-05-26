@@ -1,5 +1,8 @@
 package org.helioviewer.jhv.annotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
@@ -37,6 +40,13 @@ abstract class AbstractAnnotateable implements Annotateable {
             startPoint = fromPointJson(jo, "startPoint");
             endPoint = fromPointJson(jo, "endPoint");
         }
+    }
+
+    static List<Vec3> fixedSizeVertices(int size) {
+        List<Vec3> vertices = new ArrayList<>(size);
+        for (int i = 0; i < size; i++)
+            vertices.add(Vec3.ZERO);
+        return vertices;
     }
 
     private static JSONObject toPointJson(Vec3 p) {
