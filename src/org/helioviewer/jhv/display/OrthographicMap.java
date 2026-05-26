@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.display;
 
+import java.util.List;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -18,7 +20,18 @@ final class OrthographicMap {
         return ViewportMath.unprojectToOutputSphere(camera, vp, renderView.cameraWidth(vp.zoom), x, y, renderView.viewpoint().toQuat());
     }
 
-    static void emitMapVertex(Vec3 vertex, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
+    static void emitMapLine(List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
+        int last = vertices.size() - 1;
+        for (int i = 0; i <= last; i++)
+            emitMapVertex(vertices.get(i), i == 0, i == last, radius, color, vexBuf);
+    }
+
+    static void emitMapPoints(List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
+        for (int i = 0; i < vertices.size(); i++)
+            emitMapPoint(vertices.get(i), size, radius, color, vexBuf);
+    }
+
+    private static void emitMapVertex(Vec3 vertex, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
         if (first)
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
         vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, color);
@@ -26,7 +39,7 @@ final class OrthographicMap {
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
     }
 
-    static void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
+    private static void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
         vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), (float) size, color);
     }
 
