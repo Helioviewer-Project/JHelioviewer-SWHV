@@ -39,6 +39,11 @@ final class ProjectedView extends MapView {
     }
 
     @Override
+    public void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
+        vertices.forEach(vertex -> ProjectedMap.emitMapPoint(kind, viewpoint(), scale, rotation, vp, vertex, size, color, vexBuf));
+    }
+
+    @Override
     public void emitMapPoint(Viewport vp, MapScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
         ProjectedMap.emitMapPoint(kind, viewpoint(), scale, rotation, vp, vertex, size, color, vexBuf);
     }
