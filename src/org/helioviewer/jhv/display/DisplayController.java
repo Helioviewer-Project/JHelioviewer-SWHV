@@ -159,10 +159,10 @@ public final class DisplayController {
             return;
 
         Camera camera = Display.getCamera();
-        double cameraWidth = ImageLayerBounds.getOneToOneCameraWidth(layer);
+        Position viewpoint = GLRenderer.getDisplayedViewpoint();
+        double cameraWidth = ImageProjectionBounds.oneToOneCameraWidth(layer, Display.getActiveViewport(), Display.mode, Display.gridType, viewpoint);
         if (cameraWidth > 0) {
             Display.resetViewportZoom();
-            Position viewpoint = GLRenderer.getDisplayedViewpoint();
             double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
             camera.setFOV(fov, viewpoint);
         }

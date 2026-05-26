@@ -2,13 +2,8 @@ package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.ImageProjectionBounds;
 import org.helioviewer.jhv.display.ProjectionMode;
-import org.helioviewer.jhv.display.ProjectionScale;
-import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.imagedata.ImageData;
-import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
 public final class ImageLayerBounds {
@@ -38,54 +33,6 @@ public final class ImageLayerBounds {
         return size;
     }
 
-    public static double getOneToOneCameraWidth(ImageLayer layer) {
-        ImageData imageData = layer.getImageData();
-        if (imageData == null)
-            return 0;
-
-        Viewport vp = Display.getActiveViewport();
-        MetaData metaData = imageData.getMetaData();
-        double physicalHeight = metaData.getPhysicalRegion().height;
-        Quat mapRotation = Display.gridType.mapRotation(GLRenderer.getDisplayedViewpoint());
-        double imageHeight = oneToOneHeight(Display.mode, mapRotation, metaData);
-        double cameraWidth = vp.height * metaData.getUnitPerPixelY() * imageHeight / physicalHeight;
-        if (Display.mode == ProjectionMode.Orthographic)
-            return cameraWidth;
-
-        double visibleHeight = visibleMapHeight(vp);
-        return visibleHeight > 0 ? cameraWidth / visibleHeight : 0;
-    }
-
-    private static double oneToOneHeight(ProjectionMode mode, Quat mapRotation, MetaData metaData) {
-        if (mode == ProjectionMode.Orthographic)
-            return metaData.getPhysicalRegion().height;
-        return projectedBounds(mode, mapRotation, metaData).height;
-    }
-
-    private static Region projectedBounds(ProjectionMode mode, Quat mapRotation, MetaData metaData) {
-        return switch (mode) {
-            case Orthographic -> metaData.getPhysicalRegion();
-            case HPC -> ImageBounds.hpc(metaData);
-            case Latitudinal -> ImageBounds.latitudinal(metaData, mapRotation);
-            case Polar, LogPolar -> ImageBounds.polar(metaData, mapRotation);
-        };
-    }
-
-    private static double visibleMapHeight(Viewport vp) {
-        if (Display.mode == ProjectionMode.Orthographic)
-            return 1;
-        if (Display.mode == ProjectionMode.HPC) {
-            Region bounds = getCenteredHpcScaleBounds();
-            double halfWidth = 0.5 * bounds.width;
-            double halfHeight = 0.5 * bounds.height;
-            halfHeight = Math.max(halfHeight, halfWidth / vp.aspect);
-            return 2 * halfHeight;
-        }
-
-        ProjectionScale scale = Display.mode.scale;
-        return Math.abs(scale.getInterpolatedYValue(1) - scale.getInterpolatedYValue(0));
-    }
-
     public static Region getCenteredHpcScaleBounds() {
         Region bounds = getLargestHpcBounds();
         double halfWidth = Math.max(Math.abs(bounds.llx), Math.abs(bounds.urx));
@@ -106,7 +53,7 @@ public final class ImageLayerBounds {
             if (!layer.isEnabled())
                 continue;
 
-            Region bounds = ImageBounds.hpc(layer.getMetaData());
+            Region bounds = ImageProjectionBounds.hpc(layer.getMetaData());
             minX = Math.min(minX, bounds.llx);
             maxX = Math.max(maxX, bounds.urx);
             minY = Math.min(minY, bounds.lly);
