@@ -79,8 +79,8 @@ public final class FOVCatalog {
         platforms.forEach(FOVPlatform::dispose);
     }
 
-    public void render(MapView ctx, Viewport vp, MapScale scale) {
-        platforms.forEach(platform -> platform.render(ctx, vp, scale));
+    public void render(MapView mv, Viewport vp, MapScale scale) {
+        platforms.forEach(platform -> platform.render(mv, vp, scale));
     }
 
     public void serialize(JSONObject jo) {

@@ -72,50 +72,50 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public ConnectionLayer(JSONObject ignoredJo) {}
 
     @Override
-    public void render(MapView ctx, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp, MapScale scale) {
         if (!isVisible[vp.idx])
             return;
         if (connectivity != null)
-            drawConnectivity(ctx, vp, scale);
+            drawConnectivity(mv, vp, scale);
         if (hcs != null)
-            drawHCS(ctx, vp, scale);
+            drawHCS(mv, vp, scale);
         if (footpointMap != null)
-            drawFootpointInterpolated(ctx, vp, scale);
+            drawFootpointInterpolated(mv, vp, scale);
 
         if (!geometryMap.isEmpty()) {
-            SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(ctx.viewpoint().time);
+            SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(mv.viewpoint().time);
             updateTimestamp(g.time());
-            g.render(geometryLine, geometryPoint, vp, ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp)));
+            g.render(geometryLine, geometryPoint, vp, ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
         }
     }
 
     @Override
-    public void renderScale(MapView ctx, Viewport vp, MapScale scale) {
-        render(ctx, vp, scale);
+    public void renderScale(MapView mv, Viewport vp, MapScale scale) {
+        render(mv, vp, scale);
     }
 
-    private void drawConnectivity(MapView ctx, Viewport vp, MapScale scale) {
-        putConnectivity(ctx, vp, scale, connectivity.SSW, sswColor, connectivityBuf);
-        putConnectivity(ctx, vp, scale, connectivity.FSW, fswColor, connectivityBuf);
-        putConnectivity(ctx, vp, scale, connectivity.M, mColor, connectivityBuf);
+    private void drawConnectivity(MapView mv, Viewport vp, MapScale scale) {
+        putConnectivity(mv, vp, scale, connectivity.SSW, sswColor, connectivityBuf);
+        putConnectivity(mv, vp, scale, connectivity.FSW, fswColor, connectivityBuf);
+        putConnectivity(mv, vp, scale, connectivity.M, mColor, connectivityBuf);
 
         connectivityCenter.setVertex(connectivityBuf);
-        connectivityCenter.renderPoints(ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp)));
+        connectivityCenter.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
     }
 
-    private static void putConnectivity(MapView ctx, Viewport vp, MapScale scale, List<Vec3> points, byte[] color, BufVertex vexBuf) {
-        points.forEach(v -> ctx.emitMapPoint(vp, scale, v, SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
+    private static void putConnectivity(MapView mv, Viewport vp, MapScale scale, List<Vec3> points, byte[] color, BufVertex vexBuf) {
+        points.forEach(v -> mv.emitMapPoint(vp, scale, v, SIZE_POINT, ORTHO_RADIUS, color, vexBuf));
     }
 
-    private void drawHCS(MapView ctx, Viewport vp, MapScale scale) {
+    private void drawHCS(MapView mv, Viewport vp, MapScale scale) {
         if (hcs.isEmpty())
             return;
         Vec3 first = hcs.getFirst();
-        Vec2 previous = ctx.emitMapVertex(vp, scale, first, null, true, false, ORTHO_RADIUS, hcsColor, hcsBuf);
+        Vec2 previous = mv.emitMapVertex(vp, scale, first, null, true, false, ORTHO_RADIUS, hcsColor, hcsBuf);
         for (int i = 1; i < hcs.size(); i++) {
-            previous = ctx.emitMapVertex(vp, scale, hcs.get(i), previous, false, false, ORTHO_RADIUS, hcsColor, hcsBuf);
+            previous = mv.emitMapVertex(vp, scale, hcs.get(i), previous, false, false, ORTHO_RADIUS, hcsColor, hcsBuf);
         }
-        ctx.emitMapVertex(vp, scale, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
+        mv.emitMapVertex(vp, scale, first, previous, false, true, ORTHO_RADIUS, hcsColor, hcsBuf);
 
         hcsLine.setVertex(hcsBuf);
         hcsLine.renderLine(vp, LINEWIDTH);
@@ -132,12 +132,12 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         return SphericalPoint.fromCartesian(x, y, z);
     }
 
-    private void drawFootpointInterpolated(MapView ctx, Viewport vp, MapScale scale) {
-        JHVTime time = ctx.viewpoint().time;
+    private void drawFootpointInterpolated(MapView mv, Viewport vp, MapScale scale) {
+        JHVTime time = mv.viewpoint().time;
         updateTimestamp(time);
 
         SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.lowerValue(time), footpointMap.higherValue(time));
-        Annotations.drawCross(ctx, vp, scale, point.longitude(), point.latitude(), footpointColor, footpointBuf);
+        Annotations.drawCross(mv, vp, scale, point.longitude(), point.latitude(), footpointColor, footpointBuf);
         footpointLine.setVertex(footpointBuf);
         footpointLine.renderLine(vp, LINEWIDTH);
     }

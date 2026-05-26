@@ -188,13 +188,13 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Override
-    public void renderMiniview(MapView ctx, Viewport vp, MapScale scale) {
-        render(ctx, vp, scale);
+    public void renderMiniview(MapView mv, Viewport vp, MapScale scale) {
+        render(mv, vp, scale);
     }
 
     @Override
-    public void renderScale(MapView ctx, Viewport vp, MapScale scale) {
-        render(ctx, vp, scale);
+    public void renderScale(MapView mv, Viewport vp, MapScale scale) {
+        render(mv, vp, scale);
     }
 
     private final float[] crval0 = new float[2];
@@ -203,19 +203,19 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private final float[] latiGrid1 = new float[3];
 
     @Override
-    public void render(MapView ctx, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp, MapScale scale) {
         if (imageData == null) {
             return;
         }
         if (!isVisible[vp.idx])
             return;
 
-        GLSLSolarShader shader = ctx.mode().shader;
+        GLSLSolarShader shader = mv.mode().shader;
         shader.use();
         glImage.applyFilters();
 
-        Position renderViewpoint = ctx.viewpoint();
-        Quat q = Quat.rotate(ctx.camera().getDragRotation(), renderViewpoint.toQuat());
+        Position renderViewpoint = mv.viewpoint();
+        Quat q = Quat.rotate(mv.camera().getDragRotation(), renderViewpoint.toQuat());
 
         MetaData meta0 = imageData.getMetaData();
         Position metaViewpoint0 = meta0.getViewpoint();
@@ -270,9 +270,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
         Quat displayMap0 = Quat.ZERO;
         Quat displayMap1 = Quat.ZERO;
-        if (ctx.isLatitudinal()) {
-            displayMap0 = displayMap1 = ctx.gridType().mapRotation(renderViewpoint);
-            GridType gridType = ctx.gridType();
+        if (mv.isLatitudinal()) {
+            displayMap0 = displayMap1 = mv.gridType().mapRotation(renderViewpoint);
+            GridType gridType = mv.gridType();
             latiGrid0[0] = (float) latiLongitude(gridType, renderViewpoint, metaViewpoint0);
             latiGrid0[1] = (float) gridType.toLatitude(metaViewpoint0);
             latiGrid0[2] = (float) metaViewpoint0.lat;

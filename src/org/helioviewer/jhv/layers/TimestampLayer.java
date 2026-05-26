@@ -42,12 +42,12 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(MapView ctx, Viewport vp, MapScale projectionScale) {
+    public void renderFloat(MapView mv, Viewport vp, MapScale projectionScale) {
         if (!isVisible[vp.idx])
             return;
 
         String text = "";
-        Position viewpoint = ctx.viewpoint();
+        Position viewpoint = mv.viewpoint();
         if (Display.multiview) {
             ImageLayer im = ImageLayers.getImageLayerInViewport(vp.idx);
             if (im != null) {
@@ -60,7 +60,7 @@ public class TimestampLayer extends AbstractLayer {
         if (extra) {
             text += String.format(" | D\u2609: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
             if (!Display.multiview) {
-                text += " | FOV: " + formatFOV(ctx, vp, projectionScale);
+                text += " | FOV: " + formatFOV(mv, vp, projectionScale);
             }
         }
 
@@ -79,10 +79,10 @@ public class TimestampLayer extends AbstractLayer {
         renderer.endRendering();
     }
 
-    private static String formatFOV(MapView ctx, Viewport vp, MapScale scale) {
-        if (ctx.isHpc())
-            return formatHpcFOV(ctx, vp, scale);
-        return formatOrthoFOV(ctx.cameraWidth(vp));
+    private static String formatFOV(MapView mv, Viewport vp, MapScale scale) {
+        if (mv.isHpc())
+            return formatHpcFOV(mv, vp, scale);
+        return formatOrthoFOV(mv.cameraWidth(vp));
     }
 
     private static String formatOrthoFOV(double r) {
@@ -92,14 +92,14 @@ public class TimestampLayer extends AbstractLayer {
             return String.format("%6.4fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatHpcFOV(MapView ctx, Viewport vp, MapScale scale) {
+    private static String formatHpcFOV(MapView mv, Viewport vp, MapScale scale) {
         int centerX = vp.x + vp.width / 2;
         int centerY = vp.yAWT + vp.height / 2;
 
-        Vec2 left = ctx.mouseToGrid(vp, vp.x, centerY);
-        Vec2 right = ctx.mouseToGrid(vp, vp.x + vp.width - 1, centerY);
-        Vec2 bottom = ctx.mouseToGrid(vp, centerX, vp.yAWT + vp.height - 1);
-        Vec2 top = ctx.mouseToGrid(vp, centerX, vp.yAWT);
+        Vec2 left = mv.mouseToGrid(vp, vp.x, centerY);
+        Vec2 right = mv.mouseToGrid(vp, vp.x + vp.width - 1, centerY);
+        Vec2 bottom = mv.mouseToGrid(vp, centerX, vp.yAWT + vp.height - 1);
+        Vec2 top = mv.mouseToGrid(vp, centerX, vp.yAWT);
 
         double minX = scale.getInterpolatedXValue(0);
         double maxX = scale.getInterpolatedXValue(1);

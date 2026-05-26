@@ -24,7 +24,7 @@ final class AnnotateLoop extends AbstractAnnotateable {
     }
 
     // Draw the loop as a semicircle whose feet are exactly bp and ep.
-    private void drawLoop(MapView ctx, Viewport vp, MapScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+    private void drawLoop(MapView mv, Viewport vp, MapScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
         Vec3 center = new Vec3(0.5 * (bp.x + ep.x), 0.5 * (bp.y + ep.y), 0.5 * (bp.z + ep.z));
         Vec3 u = new Vec3(0.5 * (bp.x - ep.x), 0.5 * (bp.y - ep.y), 0.5 * (bp.z - ep.z));
         double centerLen = center.length();
@@ -45,12 +45,12 @@ final class AnnotateLoop extends AbstractAnnotateable {
                     center.x + cosr * u.x + sinr * center.x,
                     center.y + cosr * u.y + sinr * center.y,
                     center.z + cosr * u.z + sinr * center.z);
-            previous = ctx.emitMapVertex(vp, scale, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            previous = mv.emitMapVertex(vp, scale, vex, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 
     @Override
-    public void draw(MapView ctx, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView mv, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
@@ -59,7 +59,7 @@ final class AnnotateLoop extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawLoop(ctx, vp, scale, p0, p1, color, vexBuf);
+        drawLoop(mv, vp, scale, p0, p1, color, vexBuf);
     }
 
     @Override

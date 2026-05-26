@@ -19,27 +19,27 @@ final class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    static void drawCross(MapView ctx, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+    static void drawCross(MapView mv, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
         double delta = 2.5 * Math.PI / 180;
-        interpolatedDraw(ctx, vp, scale, longitude + delta, latitude, longitude - delta, latitude, color, vexBuf);
-        interpolatedDraw(ctx, vp, scale, longitude, latitude + delta, longitude, latitude - delta, color, vexBuf);
+        interpolatedDraw(mv, vp, scale, longitude + delta, latitude, longitude - delta, latitude, color, vexBuf);
+        interpolatedDraw(mv, vp, scale, longitude, latitude + delta, longitude, latitude - delta, color, vexBuf);
     }
 
-    private static void interpolatedDraw(MapView ctx, Viewport vp, MapScale scale, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
+    private static void interpolatedDraw(MapView mv, Viewport vp, MapScale scale, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
         Vec2 previous = null;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, longitude1, latitude1, longitude2, latitude2);
-            previous = ctx.emitMapVertex(vp, scale, pc, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
+            previous = mv.emitMapVertex(vp, scale, pc, previous, i == 0, i == SUBDIVISIONS, ANNOTATION_RADIUS, color, vexBuf);
         }
     }
 
     @Override
-    public void draw(MapView ctx, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView mv, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
         if (startPoint == null)
             return;
 
         byte[] color = active ? activeColor : baseColor;
-        drawCross(ctx, vp, scale, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), color, vexBuf);
+        drawCross(mv, vp, scale, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), color, vexBuf);
     }
 
     @Override

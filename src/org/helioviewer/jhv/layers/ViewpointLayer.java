@@ -95,16 +95,16 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapView ctx, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp, MapScale scale) {
         if (vp.idx == 0) // once!
-            updateTime(ctx.viewpoint().time);
+            updateTime(mv.viewpoint().time);
 
         if (!isVisible[vp.idx])
             return;
         if (!options.isHeliospheric())
             return;
 
-        long time = ctx.viewpoint().time.milli;
+        long time = mv.viewpoint().time.milli;
         long start = Movie.getStartTime();
         long end = Movie.getEndTime();
 
@@ -122,8 +122,8 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
-        double pointFactor = ViewportMath.getTemperedPointFactor(vp, ctx.cameraWidth(vp));
-        Position viewpoint = ctx.viewpoint();
+        double pointFactor = ViewportMath.getTemperedPointFactor(vp, mv.cameraWidth(vp));
+        Position viewpoint = mv.viewpoint();
 
         Transform.pushView();
         Transform.rotateViewInverse(Quat.createXY(viewpoint.lat, viewpoint.lon + relativeLon));

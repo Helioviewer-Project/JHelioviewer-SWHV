@@ -10,15 +10,15 @@ import org.json.JSONObject;
 
 public interface Layer {
 
-    default void render(MapView ctx, Viewport vp, MapScale scale) {}
+    default void render(MapView mv, Viewport vp, MapScale scale) {}
 
-    default void renderScale(MapView ctx, Viewport vp, MapScale scale) {}
+    default void renderScale(MapView mv, Viewport vp, MapScale scale) {}
 
-    default void renderFloat(MapView ctx, Viewport vp, MapScale scale) {}
+    default void renderFloat(MapView mv, Viewport vp, MapScale scale) {}
 
     default void renderFullFloat(Viewport vp) {}
 
-    default void renderMiniview(MapView ctx, Viewport vp, MapScale scale) {}
+    default void renderMiniview(MapView mv, Viewport vp, MapScale scale) {}
 
     default void prerender() {}
 

@@ -83,7 +83,7 @@ public final class Annotations {
         return true;
     }
 
-    public static void render(MapView ctx, Viewport vp, MapScale scale) {
+    public static void render(MapView mv, Viewport vp, MapScale scale) {
         if (pending == null && annotations.isEmpty())
             return;
 
@@ -91,21 +91,21 @@ public final class Annotations {
 
         annotations.forEach(annotation -> {
             boolean active = annotation == activeAnnotation;
-            annotation.draw(ctx, vp, scale, active, annotationsBuf);
-            annotation.drawTransformed(ctx, active, transformedBuf, centerBuf);
+            annotation.draw(mv, vp, scale, active, annotationsBuf);
+            annotation.drawTransformed(mv, active, transformedBuf, centerBuf);
         });
         if (pending != null) {
-            pending.draw(ctx, vp, scale, false, annotationsBuf);
-            pending.drawTransformed(ctx, false, transformedBuf, centerBuf);
+            pending.draw(mv, vp, scale, false, annotationsBuf);
+            pending.drawTransformed(mv, false, transformedBuf, centerBuf);
         }
         annotationsLine.setVertex(annotationsBuf);
         annotationsLine.renderLine(vp, LINEWIDTH);
 
-        double pixFactor = ViewportMath.getPixelFactor(vp, ctx.cameraWidth(vp));
+        double pixFactor = ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp));
 
         Transform.pushView();
-        if (ctx.isOrthographic())
-            Transform.rotateViewInverse(ctx.viewpoint().toQuat());
+        if (mv.isOrthographic())
+            Transform.rotateViewInverse(mv.viewpoint().toQuat());
         transformedLine.setVertex(transformedBuf);
         transformedLine.renderLine(vp, LINEWIDTH);
         center.setVertex(centerBuf);
@@ -114,8 +114,8 @@ public final class Annotations {
         Transform.popView();
     }
 
-    public static void drawCross(MapView ctx, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
-        AnnotateCross.drawCross(ctx, vp, scale, longitude, latitude, color, vexBuf);
+    public static void drawCross(MapView mv, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+        AnnotateCross.drawCross(mv, vp, scale, longitude, latitude, color, vexBuf);
     }
 
     @Nullable
