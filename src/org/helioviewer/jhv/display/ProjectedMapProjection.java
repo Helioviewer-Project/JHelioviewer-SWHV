@@ -193,11 +193,8 @@ final class ProjectedMapProjection {
     }
 
     private static Vec2 projectPolarVector(Vec3 v, ProjectionScale scale) {
-        double r = Math.sqrt(v.x * v.x + v.y * v.y);
-        double theta = PolarBasis.angle(v);
-        double scaledr = scale.getYValueInv(r);
-        double scaledtheta = scale.getXValueInv(Math.toDegrees(theta));
-        return new Vec2(scaledtheta, scaledr);
+        Vec2 pt = polarPoint(v);
+        return new Vec2(scale.getXValueInv(pt.x), scale.getYValueInv(pt.y));
     }
 
     private static Vec3 unprojectPolarPoint(double angleDeg, double radius) {
@@ -209,17 +206,22 @@ final class ProjectedMapProjection {
     }
 
     private static Vec2 projectLatitudinalVector(Vec3 v, ProjectionScale scale) {
-        // Positive latitude corresponds to positive Y in the non-ortho map basis.
-        double latitude = SphericalCoords.latitude(v);
-        double longitude = SphericalCoords.longitude(v);
-        double scaledphi = scale.getXValueInv(Math.toDegrees(longitude));
-        double scaledtheta = scale.getYValueInv(Math.toDegrees(latitude));
-        return new Vec2(scaledphi, scaledtheta);
+        Vec2 pt = latitudinalPoint(v);
+        return new Vec2(scale.getXValueInv(pt.x), scale.getYValueInv(pt.y));
     }
 
     private static Vec3 unprojectLatitudinalPoint(double longitudeDeg, double latitudeDeg) {
         double longitude = Math.toRadians(longitudeDeg);
         double latitude = Math.toRadians(latitudeDeg);
         return SphericalCoords.unit(longitude, latitude);
+    }
+
+    static Vec2 latitudinalPoint(Vec3 v) {
+        // Positive latitude corresponds to positive Y in the non-ortho map basis.
+        return new Vec2(Math.toDegrees(SphericalCoords.longitude(v)), Math.toDegrees(SphericalCoords.latitude(v)));
+    }
+
+    static Vec2 polarPoint(Vec3 v) {
+        return new Vec2(Math.toDegrees(PolarBasis.angle(v)), Math.sqrt(v.x * v.x + v.y * v.y));
     }
 }

@@ -5,9 +5,7 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayerBounds;
-import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.metadata.MetaData;
@@ -41,8 +39,8 @@ public final class ImageProjectionBounds {
         return switch (mode) {
             case Orthographic -> metaData.getPhysicalRegion();
             case HPC -> hpc(metaData);
-            case Latitudinal -> latitudinal(metaData, mapRotation);
-            case Polar, LogPolar -> polar(metaData, mapRotation);
+            case Latitudinal -> surfaceBounds(metaData, mapRotation, ProjectedMapProjection.Kind.LATITUDINAL);
+            case Polar, LogPolar -> surfaceBounds(metaData, mapRotation, ProjectedMapProjection.Kind.POLAR);
         };
     }
 
@@ -93,15 +91,7 @@ public final class ImageProjectionBounds {
         bounds[3] = Math.max(bounds[3], hpcY);
     }
 
-    public static Region latitudinal(MetaData metaData, Quat mapRotation) {
-        return surfaceBounds(metaData, mapRotation, true);
-    }
-
-    public static Region polar(MetaData metaData, Quat mapRotation) {
-        return surfaceBounds(metaData, mapRotation, false);
-    }
-
-    private static Region surfaceBounds(MetaData metaData, Quat mapRotation, boolean latitudinal) {
+    private static Region surfaceBounds(MetaData metaData, Quat mapRotation, ProjectedMapProjection.Kind kind) {
         WcsHeader wcsHeader = metaData.getWcsHeader();
         Region region = metaData.getPhysicalRegion();
         double x0 = region.llx;
@@ -118,38 +108,38 @@ public final class ImageProjectionBounds {
             double t = i / (double) EDGE_SAMPLES;
             double x = x0 + t * (x1 - x0);
             double y = y0 + t * (y1 - y0);
-            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, latitudinal, x, y0);
-            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, latitudinal, x, y1);
-            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, latitudinal, x0, y);
-            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, latitudinal, x1, y);
+            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, kind, x, y0);
+            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, kind, x, y1);
+            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, kind, x0, y);
+            updateSurfaceBounds(bounds, wcsHeader, viewpoint, mapRotation, kind, x1, y);
         }
 
         if (!Double.isFinite(bounds[0]) || !Double.isFinite(bounds[1]) || !Double.isFinite(bounds[2]) || !Double.isFinite(bounds[3]))
-            return latitudinal ? new Region(-180, -90, 360, 180) : new Region(0, 0, 360, 1);
+            return switch (kind) {
+                case LATITUDINAL -> new Region(-180, -90, 360, 180);
+                case POLAR -> new Region(0, 0, 360, 1);
+                case HPC -> throw new IllegalArgumentException();
+            };
         return regionFromBounds(bounds);
     }
 
-    private static void updateSurfaceBounds(double[] bounds, WcsHeader wcsHeader, Position viewpoint, Quat mapRotation, boolean latitudinal, double x, double y) {
+    private static void updateSurfaceBounds(double[] bounds, WcsHeader wcsHeader, Position viewpoint, Quat mapRotation, ProjectedMapProjection.Kind kind, double x, double y) {
         Vec2 helioprojective = WcsProjection.planeToHelioprojective(wcsHeader, x, y);
         Vec3 world = WcsProjection.helioprojectiveToWorld(viewpoint, helioprojective.x, helioprojective.y);
         if (world == null)
             return;
 
         Vec3 rotated = mapRotation.rotateVector(world);
-        double mapX;
-        double mapY;
-        if (latitudinal) {
-            mapX = Math.toDegrees(SphericalCoords.longitude(rotated));
-            mapY = Math.toDegrees(SphericalCoords.latitude(rotated));
-        } else {
-            mapX = Math.toDegrees(PolarBasis.angle(rotated));
-            mapY = Math.sqrt(rotated.x * rotated.x + rotated.y * rotated.y);
-        }
+        Vec2 pt = switch (kind) {
+            case LATITUDINAL -> ProjectedMapProjection.latitudinalPoint(rotated);
+            case POLAR -> ProjectedMapProjection.polarPoint(rotated);
+            case HPC -> throw new IllegalArgumentException();
+        };
 
-        bounds[0] = Math.min(bounds[0], mapX);
-        bounds[1] = Math.max(bounds[1], mapX);
-        bounds[2] = Math.min(bounds[2], mapY);
-        bounds[3] = Math.max(bounds[3], mapY);
+        bounds[0] = Math.min(bounds[0], pt.x);
+        bounds[1] = Math.max(bounds[1], pt.x);
+        bounds[2] = Math.min(bounds[2], pt.y);
+        bounds[3] = Math.max(bounds[3], pt.y);
     }
 
     private static Region regionFromBounds(double[] bounds) {
