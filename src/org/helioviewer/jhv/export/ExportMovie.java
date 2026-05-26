@@ -11,7 +11,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.Movie;
@@ -149,7 +149,7 @@ public final class ExportMovie implements Movie.Listener {
 
             recording = true;
             notifyStatusChanged();
-            DisplayFrame.render(1);
+            DisplayController.render(1);
         } else {
             VideoFormat format = VideoFormat.H264;
             try {
@@ -201,7 +201,7 @@ public final class ExportMovie implements Movie.Listener {
         if (!isRecording())
             return;
         shallStop = true;
-        DisplayFrame.display(); // force detach
+        DisplayController.display(); // force detach
     }
 
     public static boolean isRecording() {

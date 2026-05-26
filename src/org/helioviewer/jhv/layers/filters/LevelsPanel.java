@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.base.JHVRangeSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -34,7 +34,7 @@ public class LevelsPanel implements FilterDetails {
             int hi = slider.getHighValue();
             layer.getGLImage().setBrightness(lo / 100., (hi - lo) / 100.);
             label.setText(formatPercent(lo, hi));
-            DisplayFrame.display();
+            DisplayController.display();
         });
     }
 

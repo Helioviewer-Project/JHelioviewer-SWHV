@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.layers.ImageLayer;
@@ -31,7 +31,7 @@ public class DifferencePanel implements FilterDetails {
                 item.setSelected(true);
             item.addActionListener(e -> {
                 layer.getGLImage().setDifferenceMode(mode);
-                DisplayFrame.display();
+                DisplayController.display();
             });
             modeGroup.add(item);
             modePanel.add(item);

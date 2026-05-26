@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -485,7 +485,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void newEventsReceived() {
         if (enabled) {
             invalidateActiveEvents();
-            DisplayFrame.display();
+            DisplayController.display();
         }
     }
 
@@ -503,7 +503,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     void setIcons(boolean _icons) {
         icons = _icons;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
 }

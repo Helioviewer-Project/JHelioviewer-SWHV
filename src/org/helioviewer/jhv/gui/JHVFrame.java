@@ -19,7 +19,7 @@ import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.Platform;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.MainContentPanel;
 import org.helioviewer.jhv.gui.components.MenuBar;
 import org.helioviewer.jhv.gui.components.MoviePanel;
@@ -192,7 +192,7 @@ public final class JHVFrame {
         renderHost.attachCanvas(renderCanvas);
         // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
         renderCanvas.requestRender();
-        DisplayFrame.setRenderRequestHandler(renderCanvas::requestRender);
+        DisplayController.setRenderRequestHandler(renderCanvas::requestRender);
     }
 
     private static JFrame createFrame() {

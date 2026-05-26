@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 import javax.swing.JFrame;
 
 import org.helioviewer.jhv.Message;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
@@ -107,7 +107,7 @@ public class JHelioviewer {
         HeadlessEDT.invokeLater(() -> {
             Log.info("Start headless mode");
             AnglePbuffer renderer = new AnglePbuffer();
-            DisplayFrame.setRenderRequestHandler(renderer::requestRender);
+            DisplayController.setRenderRequestHandler(renderer::requestRender);
 
             loadPlugins(false);
 

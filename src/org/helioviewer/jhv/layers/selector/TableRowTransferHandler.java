@@ -17,7 +17,7 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 // Handles DnD row reordering
@@ -113,7 +113,7 @@ class TableRowTransferHandler extends TransferHandler {
         if (act == TransferHandler.MOVE || act == TransferHandler.NONE) {
             grid.setCursor(Cursor.getDefaultCursor());
         }
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
 }

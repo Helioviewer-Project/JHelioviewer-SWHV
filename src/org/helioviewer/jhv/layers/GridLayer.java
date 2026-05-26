@@ -6,7 +6,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -262,7 +262,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setShowAxis(boolean _showAxis) {
         showAxis = _showAxis;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     public boolean isShowLabels() {
@@ -271,7 +271,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setShowLabels(boolean _showLabels) {
         showLabels = _showLabels;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     public boolean isShowRadial() {
@@ -280,7 +280,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setShowRadial(boolean _showRadial) {
         showRadial = _showRadial;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     public double getLonStep() {
@@ -291,7 +291,7 @@ public final class GridLayer extends AbstractLayer {
         lonStep = _lonStep;
         lonLabels = GridLabel.makeLonLabels(Display.gridType, lonStep);
         gridNeedsInit = true;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     public double getLatStep() {
@@ -302,13 +302,13 @@ public final class GridLayer extends AbstractLayer {
         latStep = _latStep;
         latLabels = GridLabel.makeLatLabels(latStep);
         gridNeedsInit = true;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     public void setGridType(GridType gridType) {
         Display.setGridType(gridType);
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
 }

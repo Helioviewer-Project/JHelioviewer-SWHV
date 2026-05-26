@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
@@ -148,7 +148,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         glImage.setLUT(view.getDefaultLUT(), glImage.getInvertLUT());
         setEnabled(true);
 
-        DisplayFrame.zoomMiniToFit();
+        DisplayController.zoomMiniToFit();
         Layers.setActiveImageLayer(this);
 
         if (Display.multiview) {
@@ -160,7 +160,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     private void unsetView() {
         loader.cancelDownload();
 
-        DisplayFrame.zoomMiniToFit();
+        DisplayController.zoomMiniToFit();
         view.setDataHandler(null);
         view.abolish();
 

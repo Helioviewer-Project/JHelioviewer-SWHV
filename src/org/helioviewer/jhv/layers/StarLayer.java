@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
-import org.helioviewer.jhv.display.ViewpointModel;
+import org.helioviewer.jhv.display.ViewpointListener;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.layers.stars.GaiaClient;
@@ -20,7 +20,7 @@ import org.json.JSONObject;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-public final class StarLayer extends AbstractLayer implements ViewpointModel.Listener, GaiaClient.Receiver {
+public final class StarLayer extends AbstractLayer implements ViewpointListener, GaiaClient.Receiver {
 
     private final Cache<Position, BufVertex> cache = Caffeine.newBuilder().softValues().build();
     private final Set<Position> pending = new HashSet<>();
@@ -45,7 +45,7 @@ public final class StarLayer extends AbstractLayer implements ViewpointModel.Lis
     public void setStars(Position viewpoint, BufVertex pointsBuf) {
         pending.remove(viewpoint);
         cache.put(viewpoint, pointsBuf);
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     @Override
@@ -78,9 +78,9 @@ public final class StarLayer extends AbstractLayer implements ViewpointModel.Lis
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
         if (enabled) {
-            DisplayFrame.addViewpointListener(this);
+            DisplayController.addViewpointListener(this);
         } else {
-            DisplayFrame.removeViewpointListener(this);
+            DisplayController.removeViewpointListener(this);
         }
     }
 

@@ -3,7 +3,7 @@ package org.helioviewer.jhv.plugins.pfss;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -138,7 +138,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
 
     void setDetail(int _detail) {
         detail = _detail;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     boolean getFixedColor() {
@@ -147,7 +147,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
 
     void setFixedColor(boolean _fixedColor) {
         fixedColor = _fixedColor;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     double getRadius() {
@@ -156,7 +156,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
 
     void setRadius(double _radius) {
         radius = _radius;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
 }

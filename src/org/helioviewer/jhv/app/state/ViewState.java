@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.annotations.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.ProjectionMode;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Movie;
@@ -128,7 +128,7 @@ public final class ViewState {
     private static ProjectionMode projection = Display.mode;
     private static AnnotationMode annotationMode = AnnotationMode.Cross;
     private static boolean multiview = Display.multiview;
-    private static boolean tracking = DisplayFrame.getTrackingMode();
+    private static boolean tracking = DisplayController.getTrackingMode();
     private static boolean refresh = ImageLayers.getRefreshMode();
     private static boolean showCorona = Display.getShowCorona();
     private static boolean differentialRotation = ImageLayers.getDiffRotationMode();
@@ -315,7 +315,7 @@ public final class ViewState {
             return;
 
         tracking = newTracking;
-        DisplayFrame.setTrackingMode(newTracking);
+        DisplayController.setTrackingMode(newTracking);
         notifyModeListeners();
     }
 
@@ -342,7 +342,7 @@ public final class ViewState {
 
         showCorona = newShowCorona;
         Display.setShowCorona(newShowCorona);
-        DisplayFrame.display();
+        DisplayController.display();
         notifyModeListeners();
     }
 
@@ -356,7 +356,7 @@ public final class ViewState {
 
         differentialRotation = newDifferentialRotation;
         ImageLayers.setDiffRotationMode(newDifferentialRotation);
-        DisplayFrame.display();
+        DisplayController.display();
         notifyModeListeners();
     }
 

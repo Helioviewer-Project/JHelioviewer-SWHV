@@ -14,7 +14,7 @@ public final class Display {
 
     public static void setProjectionMode(ProjectionMode _mode) {
         mode = _mode;
-        DisplayFrame.resetCameras();
+        DisplayController.resetCameras();
     }
 
     public static GridType gridType = GridType.Viewpoint;

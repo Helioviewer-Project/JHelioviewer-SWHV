@@ -11,7 +11,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.ViewportProjection;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
@@ -54,7 +54,7 @@ public final class ImageLayers {
             if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
                 return;
         }
-        DisplayFrame.display(viewpoint);
+        DisplayController.display(viewpoint);
     }
 
     public record WaitUntilLoaded(Collection<ImageLayer> newLayers) implements Callable<Void> {
@@ -89,7 +89,7 @@ public final class ImageLayers {
             }
         }
         Display.reshapeAll();
-        DisplayFrame.render(1);
+        DisplayController.render(1);
     }
 
     @Nullable

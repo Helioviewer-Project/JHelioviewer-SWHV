@@ -13,7 +13,7 @@ import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -131,7 +131,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (spiralSpeed > 0)
             renderSpiral(vp, lati, spiralSpeed);
 
-        List<PositionLoad> positionLoads = PositionLoad.get(DisplayFrame.getViewpointUpdate());
+        List<PositionLoad> positionLoads = PositionLoad.get(DisplayController.getViewpointUpdate());
         if (!positionLoads.isEmpty()) {
             GL.glDisable(GL.DEPTH_TEST);
             renderPlanets(vp, positionLoads, pointFactor, time, start, end);
@@ -156,7 +156,7 @@ public class ViewpointLayer extends AbstractLayer {
     private void clearHoverTextIfNeeded() {
         if (!hoverText.isEmpty()) {
             hoverText.clear();
-            DisplayFrame.display();
+            DisplayController.display();
         }
     }
 
@@ -167,7 +167,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         Camera camera = Display.getCamera();
-        List<PositionLoad> positionLoads = PositionLoad.get(DisplayFrame.getViewpointUpdate());
+        List<PositionLoad> positionLoads = PositionLoad.get(DisplayController.getViewpointUpdate());
         if (positionLoads.isEmpty()) {
             clearHoverTextIfNeeded();
             return;
@@ -217,7 +217,7 @@ public class ViewpointLayer extends AbstractLayer {
         clearHoverTextIfNeeded();
         if (name != null && minDist2 < hoverThreshold2) {
             hoverText.add(name);
-            DisplayFrame.display();
+            DisplayController.display();
         }
     }
 
@@ -233,13 +233,13 @@ public class ViewpointLayer extends AbstractLayer {
         if (enabled) {
             InputController.addListener(hoverListener);
             options.activate();
-            options.applyCurrentViewpoint(DisplayFrame.ViewpointApplyMode.KEEP_TRANSFORM);
+            options.applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
             InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
-                DisplayFrame.setViewpointUpdate(UpdateViewpoint.observer, DisplayFrame.ViewpointApplyMode.KEEP_TRANSFORM);
+                DisplayController.setViewpointUpdate(UpdateViewpoint.observer, DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
         }
     }
 

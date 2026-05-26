@@ -12,9 +12,9 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
 
-public final class DisplayFrame {
+public final class DisplayController {
 
-    private DisplayFrame() {}
+    private DisplayController() {}
 
     public enum ViewpointApplyMode {
         RESET,
@@ -35,11 +35,11 @@ public final class DisplayFrame {
         return viewpointModel.getTrackingMode();
     }
 
-    public static void addViewpointListener(ViewpointModel.Listener listener) {
+    public static void addViewpointListener(ViewpointListener listener) {
         viewpointModel.addListener(listener);
     }
 
-    public static void removeViewpointListener(ViewpointModel.Listener listener) {
+    public static void removeViewpointListener(ViewpointListener listener) {
         viewpointModel.removeListener(listener);
     }
 

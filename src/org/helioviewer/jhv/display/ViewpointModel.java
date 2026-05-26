@@ -7,50 +7,46 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.time.JHVTime;
 
-public final class ViewpointModel {
+final class ViewpointModel {
 
-    public interface Listener {
-        void viewpointChanged(Position v);
-    }
-
-    private final HashSet<Listener> listeners = new HashSet<>();
+    private final HashSet<ViewpointListener> listeners = new HashSet<>();
 
     private boolean tracking;
     private Position viewpoint = Sun.StartEarth;
     private UpdateViewpoint updateViewpoint;
 
-    public ViewpointModel(UpdateViewpoint _updateViewpoint) {
+    ViewpointModel(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
     }
 
-    public void addListener(Listener listener) {
+    void addListener(ViewpointListener listener) {
         listeners.add(listener);
         listener.viewpointChanged(viewpoint);
     }
 
-    public void removeListener(Listener listener) {
+    void removeListener(ViewpointListener listener) {
         listeners.remove(listener);
     }
 
-    public Position update(JHVTime time) {
+    Position update(JHVTime time) {
         viewpoint = updateViewpoint.update(time);
         // listeners.forEach(l -> l.viewpointChanged(viewpoint));
         return viewpoint;
     }
 
-    public Position getViewpoint() {
+    Position getViewpoint() {
         return viewpoint;
     }
 
-    public UpdateViewpoint getUpdateViewpoint() {
+    UpdateViewpoint getUpdateViewpoint() {
         return updateViewpoint;
     }
 
-    public void setUpdateViewpoint(UpdateViewpoint _updateViewpoint) {
+    void setUpdateViewpoint(UpdateViewpoint _updateViewpoint) {
         updateViewpoint = _updateViewpoint;
     }
 
-    public boolean setTrackingMode(boolean _tracking) {
+    boolean setTrackingMode(boolean _tracking) {
         if (tracking == _tracking)
             return false;
 
@@ -58,7 +54,7 @@ public final class ViewpointModel {
         return true;
     }
 
-    public boolean getTrackingMode() {
+    boolean getTrackingMode() {
         return tracking;
     }
 }

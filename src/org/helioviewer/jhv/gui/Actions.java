@@ -18,7 +18,7 @@ import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.dialogs.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialogs.NewVersionDialog;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
@@ -55,7 +55,7 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             Annotations.clear();
-            DisplayFrame.display();
+            DisplayController.display();
         }
     }
 
@@ -385,7 +385,7 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             Annotations.zoom(Display.getCamera());
-            DisplayFrame.render(1);
+            DisplayController.render(1);
         }
     }
 
