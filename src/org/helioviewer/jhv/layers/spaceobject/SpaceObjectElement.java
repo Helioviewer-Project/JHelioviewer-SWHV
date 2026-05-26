@@ -8,7 +8,7 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 
 public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
 
@@ -43,7 +43,7 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
         if (load != null) {
             PositionLoad.remove(uv, load);
             load = null;
-            DisplayFrame.display();
+            DisplayController.display();
         }
     }
 
@@ -70,7 +70,7 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
     public void setStatus(String _status) {
         status = _status;
         model.refresh(this);
-        DisplayFrame.refreshCamera();
+        DisplayController.refreshCamera();
     }
 
     @Override

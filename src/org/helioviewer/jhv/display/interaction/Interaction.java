@@ -4,7 +4,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.input.KeyInputEvent;
 import org.helioviewer.jhv.input.PointerEvent;
@@ -82,7 +82,7 @@ public final class Interaction {
     public void mouseClicked(PointerEvent e) {
         if (e.clickCount() == 2) {
             Display.resetViewportZoom();
-            DisplayFrame.resetCamera();
+            DisplayController.resetCamera();
         }
     }
 

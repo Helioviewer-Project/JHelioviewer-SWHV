@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLImage;
@@ -22,7 +22,7 @@ public class InnerMaskPanel implements FilterDetails {
             double value = slider.getValue() / 100.;
             layer.getGLImage().setInnerMask(value);
             label.setText(formatFloat(value));
-            DisplayFrame.display();
+            DisplayController.display();
         });
     }
 

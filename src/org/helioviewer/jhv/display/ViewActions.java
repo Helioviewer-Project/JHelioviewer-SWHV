@@ -16,17 +16,17 @@ public final class ViewActions {
     public static void zoomFit() {
         Display.resetViewportZoom();
         fitCameraToImageLayers(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
-        DisplayFrame.render(1);
+        DisplayController.render(1);
     }
 
     public static void zoomIn() {
         zoomViewports(-Camera.ZOOM_MULTIPLIER_BUTTON);
-        DisplayFrame.render(1);
+        DisplayController.render(1);
     }
 
     public static void zoomOut() {
         zoomViewports(+Camera.ZOOM_MULTIPLIER_BUTTON);
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     public static void zoomOneToOne() {
@@ -42,17 +42,17 @@ public final class ViewActions {
             double fov = 2. * Math.atan2(0.5 * cameraWidth, viewpoint.distance);
             camera.setFOV(fov, viewpoint);
         }
-        DisplayFrame.render(1);
+        DisplayController.render(1);
     }
 
     public static void resetView() {
         Display.resetViewportZoom();
-        DisplayFrame.resetCamera();
+        DisplayController.resetCamera();
     }
 
     public static void resetViewAxis() {
-        Display.getCamera().resetDragRotationAxis(DisplayFrame.getViewpointUpdate().dragAxis());
-        DisplayFrame.display();
+        Display.getCamera().resetDragRotationAxis(DisplayController.getViewpointUpdate().dragAxis());
+        DisplayController.display();
     }
 
     public static void rotateView90(String axis) {
@@ -69,7 +69,7 @@ public final class ViewActions {
 
     private static void rotateView90(Quat rotation) {
         Display.getCamera().rotateDragRotation(rotation);
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     static void fitCameraToImageLayers(Camera camera, Position viewpoint) {

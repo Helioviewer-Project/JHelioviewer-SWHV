@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.JHVTime;
@@ -153,7 +153,7 @@ class PfssLoader {
     private static void onSuccessData(URI uri, Data result) {
         cache().endDownload();
         cache().markLoaded(uri, result);
-        DisplayFrame.display(); //!
+        DisplayController.display(); //!
     }
 
     private static void onFailureList(String ignoredLogContext, Throwable t) {

@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.DisplayLayout;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.GL;
@@ -86,7 +86,7 @@ public final class MiniviewLayer extends AbstractLayer {
     public void setScale(int _scale) {
         scale = _scale;
         reshapeViewport();
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
 }

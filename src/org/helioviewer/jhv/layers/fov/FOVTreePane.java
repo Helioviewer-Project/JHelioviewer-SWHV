@@ -17,7 +17,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
@@ -101,7 +101,7 @@ public final class FOVTreePane extends JScrollPane {
         JCheckBox checkBox = new JCheckBox(instrument.toString(), instrument.isEnabled());
         checkBox.addActionListener(e -> {
             instrument.setEnabled(checkBox.isSelected());
-            DisplayFrame.display();
+            DisplayController.display();
         });
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);

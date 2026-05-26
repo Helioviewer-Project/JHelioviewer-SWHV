@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.base.lut.LUTComboBox;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.layers.ImageLayer;
 
@@ -28,7 +28,7 @@ public class LUTPanel implements FilterDetails {
 
         ActionListener listener = e -> {
             layer.getGLImage().setLUT(lutCombo.getLUT(), invertButton.isSelected());
-            DisplayFrame.display();
+            DisplayController.display();
         };
         lutCombo.addActionListener(listener);
         invertButton.addActionListener(listener);

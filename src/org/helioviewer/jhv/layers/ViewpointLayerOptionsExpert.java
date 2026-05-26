@@ -6,7 +6,7 @@ import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -103,7 +103,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setRelative(boolean _relative) {
         relative = _relative;
-        DisplayFrame.refreshCamera();
+        DisplayController.refreshCamera();
     }
 
     public int getSpiralSpeedValue() {
@@ -112,7 +112,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setSpiralSpeed(int _spiralSpeed) {
         spiralSpeed = _spiralSpeed;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     public boolean isSpiral() {
@@ -121,7 +121,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setSpiral(boolean _spiral) {
         spiral = _spiral;
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     boolean isDownloading() {

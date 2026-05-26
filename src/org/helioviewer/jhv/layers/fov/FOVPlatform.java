@@ -10,7 +10,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -153,13 +153,13 @@ class FOVPlatform extends DefaultMutableTreeNode {
     void setCenterX(double centerX) {
         this.centerX = centerX;
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterX(control2Center(centerX)));
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     void setCenterY(double centerY) {
         this.centerY = centerY;
         children().asIterator().forEachRemaining(c -> ((FOVInstrument) c).setCenterY(control2Center(centerY)));
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     JSONObject toJson() {

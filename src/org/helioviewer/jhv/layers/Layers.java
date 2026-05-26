@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayFrame;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapContext;
 import org.helioviewer.jhv.display.ProjectionScale;
 import org.helioviewer.jhv.display.Viewport;
@@ -111,7 +111,7 @@ public final class Layers {
 
         int row = layers.indexOf(layer);
         listeners.forEach(listener -> listener.layerAdded(row, layer));
-        DisplayFrame.display(); // e.g., PFSS layer
+        DisplayController.display(); // e.g., PFSS layer
     }
 
     private static void cacheLayer(Layer layer) {
@@ -139,7 +139,7 @@ public final class Layers {
         }
 
         listeners.forEach(listener -> listener.layerRemoved(row, layer));
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     private static void detach(Layer layer) {
@@ -303,7 +303,7 @@ public final class Layers {
 
         setActiveImageLayer(null);
         listeners.forEach(Listener::layersCleared);
-        DisplayFrame.display();
+        DisplayController.display();
     }
 
     private Layers() {}
