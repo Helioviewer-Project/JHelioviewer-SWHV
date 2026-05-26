@@ -20,25 +20,12 @@ final class OrthographicView extends MapView {
     }
 
     @Override
-    public Vec2 emitMapVertex(Viewport vp, MapScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        OrthographicMap.emitMapVertex(vertex, first, last, radius, color, vexBuf);
-        return null;
-    }
-
-    @Override
     public void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
-        int last = vertices.size() - 1;
-        for (int i = 0; i <= last; i++)
-            OrthographicMap.emitMapVertex(vertices.get(i), i == 0, i == last, radius, color, vexBuf);
+        OrthographicMap.emitMapLine(vertices, radius, color, vexBuf);
     }
 
     @Override
     public void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
-        vertices.forEach(vertex -> OrthographicMap.emitMapPoint(vertex, size, radius, color, vexBuf));
-    }
-
-    @Override
-    public void emitMapPoint(Viewport vp, MapScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        OrthographicMap.emitMapPoint(vertex, size, radius, color, vexBuf);
+        OrthographicMap.emitMapPoints(vertices, size, radius, color, vexBuf);
     }
 }

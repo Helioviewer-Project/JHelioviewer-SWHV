@@ -26,25 +26,12 @@ final class ProjectedView extends MapView {
     }
 
     @Override
-    public Vec2 emitMapVertex(Viewport vp, MapScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        return ProjectedMap.emitMapVertex(kind, viewpoint(), scale, rotation, vp, vertex, previous, first, last, color, vexBuf);
-    }
-
-    @Override
     public void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
-        Vec2 previous = null;
-        int last = vertices.size() - 1;
-        for (int i = 0; i <= last; i++)
-            previous = ProjectedMap.emitMapVertex(kind, viewpoint(), scale, rotation, vp, vertices.get(i), previous, i == 0, i == last, color, vexBuf);
+        ProjectedMap.emitMapLine(kind, viewpoint(), scale, rotation, vp, vertices, color, vexBuf);
     }
 
     @Override
     public void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
-        vertices.forEach(vertex -> ProjectedMap.emitMapPoint(kind, viewpoint(), scale, rotation, vp, vertex, size, color, vexBuf));
-    }
-
-    @Override
-    public void emitMapPoint(Viewport vp, MapScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        ProjectedMap.emitMapPoint(kind, viewpoint(), scale, rotation, vp, vertex, size, color, vexBuf);
+        ProjectedMap.emitMapPoints(kind, viewpoint(), scale, rotation, vp, vertices, size, color, vexBuf);
     }
 }

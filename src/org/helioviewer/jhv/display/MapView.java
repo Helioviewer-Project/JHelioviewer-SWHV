@@ -69,11 +69,7 @@ public abstract class MapView {
 
     public abstract Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v);
 
-    public abstract Vec2 emitMapVertex(Viewport vp, MapScale scale, Vec3 vertex, Vec2 previous, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf);
-
     public abstract void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf);
 
     public abstract void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf);
-
-    public abstract void emitMapPoint(Viewport vp, MapScale scale, Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf);
 }

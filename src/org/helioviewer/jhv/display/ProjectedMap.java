@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.display;
 
+import java.util.List;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
@@ -71,7 +73,19 @@ final class ProjectedMap {
         return new Vec2(pt.x * vp.aspect, pt.y);
     }
 
-    static Vec2 emitMapVertex(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
+    static void emitMapLine(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+        Vec2 previous = null;
+        int last = vertices.size() - 1;
+        for (int i = 0; i <= last; i++)
+            previous = emitMapVertex(kind, viewpoint, scale, rotation, vp, vertices.get(i), previous, i == 0, i == last, color, vexBuf);
+    }
+
+    static void emitMapPoints(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
+        for (int i = 0; i < vertices.size(); i++)
+            emitMapPoint(kind, viewpoint, scale, rotation, vp, vertices.get(i), size, color, vexBuf);
+    }
+
+    private static Vec2 emitMapVertex(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 vertex, Vec2 previous, boolean first, boolean last, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC)
             return emitHpcVertex(viewpoint, scale, vp, vertex, previous, first, last, color, vexBuf);
 
@@ -84,7 +98,7 @@ final class ProjectedMap {
         return current;
     }
 
-    static void emitMapPoint(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
+    private static void emitMapPoint(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 vertex, double size, byte[] color, BufVertex vexBuf) {
         if (kind == Kind.HPC) {
             emitHpcPoint(viewpoint, scale, vp, vertex, size, color, vexBuf);
             return;
