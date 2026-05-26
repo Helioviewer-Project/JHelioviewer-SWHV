@@ -26,23 +26,21 @@ final class OrthographicMap {
 
         Vec3 first = vertices.getFirst();
         vexBuf.putVertex((float) (first.x * radius), (float) (first.y * radius), (float) (first.z * radius), 1, Colors.Null);
-        for (Vec3 vertex : vertices) {
+        vexBuf.repeatVertex(color);
+        for (int i = 1; i < vertices.size(); i++) {
+            Vec3 vertex = vertices.get(i);
             float x = (float) (vertex.x * radius);
             float y = (float) (vertex.y * radius);
             float z = (float) (vertex.z * radius);
             vexBuf.putVertex(x, y, z, 1, color);
         }
-        Vec3 last = vertices.getLast();
-        vexBuf.putVertex((float) (last.x * radius), (float) (last.y * radius), (float) (last.z * radius), 1, Colors.Null);
+        vexBuf.repeatVertex(Colors.Null);
     }
 
     static void emitMapPoints(List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
+        float pointSize = (float) size;
         for (Vec3 vertex : vertices)
-            emitMapPoint(vertex, size, radius, color, vexBuf);
-    }
-
-    private static void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
-        vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), (float) size, color);
+            vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), pointSize, color);
     }
 
     static Vec2 mouseToGrid(Camera camera, RenderView renderView, Viewport vp, GridType gridType, int x, int y) {
