@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.wcs;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.math.Vec3;
 
 public final class WcsProjection {
 
@@ -17,6 +19,33 @@ public final class WcsProjection {
         double planeX = (vz * crota.y - vy * crota.z) * 2 + x;
         double planeY = (vx * crota.z - vz * crota.x) * 2 + y;
         return inverseWcsPlaneToHelioprojective(wcsHeader, planeX, planeY);
+    }
+
+    public static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {
+        Vec3 ray = helioprojectiveRay(longitude, latitude);
+
+        double b = viewpoint.distance * ray.z;
+        double c = viewpoint.distance * viewpoint.distance - 1;
+        double discriminant = b * b - c;
+        if (discriminant < 0)
+            return null;
+
+        double root = Math.sqrt(discriminant);
+        double t = -b - root;
+        if (t <= 0)
+            t = -b + root;
+        if (t <= 0)
+            return null;
+
+        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
+        return viewpoint.toQuat().rotateInverseVector(view);
+    }
+
+    private static Vec3 helioprojectiveRay(double longitude, double latitude) {
+        double cosLon = Math.cos(longitude);
+        double cosLat = Math.cos(latitude);
+        double sign = cosLon * cosLat < 0 ? -1 : 1;
+        return new Vec3(sign * Math.sin(longitude) * cosLat, sign * Math.sin(latitude), -sign * cosLon * cosLat);
     }
 
     private static Vec2 inverseWcsPlaneToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {

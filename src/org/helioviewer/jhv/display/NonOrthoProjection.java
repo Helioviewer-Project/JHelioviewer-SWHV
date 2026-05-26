@@ -10,6 +10,7 @@ import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.wcs.WcsProjection;
 
 final class NonOrthoProjection {
 
@@ -62,7 +63,7 @@ final class NonOrthoProjection {
     }
 
     private static Vec3 unprojectHpc(Position viewpoint, double longitudeDeg, double latitudeDeg) {
-        return helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
+        return WcsProjection.helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
     static Vec2 projectToScreen(Kind kind, Position viewpoint, ProjectionScale scale, Quat rotation, Viewport vp, Vec3 v) {
@@ -110,34 +111,6 @@ final class NonOrthoProjection {
         return new Vec2(
                 scale.getInterpolatedXValue(ViewportProjection.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
                 scale.getInterpolatedYValue(ViewportProjection.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
-    }
-
-    static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {
-        Vec3 ray = helioprojectiveRay(longitude, latitude);
-
-        double b = viewpoint.distance * ray.z;
-        double c = viewpoint.distance * viewpoint.distance - 1;
-        double discriminant = b * b - c;
-        if (discriminant < 0)
-            return null;
-
-        double root = Math.sqrt(discriminant);
-        double t = -b - root;
-        if (t <= 0)
-            t = -b + root;
-        if (t <= 0)
-            return null;
-
-        // Return the inverse in world space to match the rotated projectHpc() path above.
-        Vec3 view = new Vec3(t * ray.x, t * ray.y, viewpoint.distance + t * ray.z);
-        return viewpoint.toQuat().rotateInverseVector(view);
-    }
-
-    private static Vec3 helioprojectiveRay(double longitude, double latitude) {
-        double cosLon = Math.cos(longitude);
-        double cosLat = Math.cos(latitude);
-        double sign = cosLon * cosLat < 0 ? -1 : 1;
-        return new Vec3(sign * Math.sin(longitude) * cosLat, sign * Math.sin(latitude), -sign * cosLon * cosLat);
     }
 
     private static Vec3 toHpcViewpointSpace(Position viewpoint, Vec3 v) {
