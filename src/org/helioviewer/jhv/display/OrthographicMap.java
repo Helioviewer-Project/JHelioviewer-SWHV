@@ -21,22 +21,24 @@ final class OrthographicMap {
     }
 
     static void emitMapLine(List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
-        int last = vertices.size() - 1;
-        for (int i = 0; i <= last; i++)
-            emitMapVertex(vertices.get(i), i == 0, i == last, radius, color, vexBuf);
+        if (vertices.isEmpty())
+            return;
+
+        Vec3 first = vertices.getFirst();
+        vexBuf.putVertex((float) (first.x * radius), (float) (first.y * radius), (float) (first.z * radius), 1, Colors.Null);
+        for (Vec3 vertex : vertices) {
+            float x = (float) (vertex.x * radius);
+            float y = (float) (vertex.y * radius);
+            float z = (float) (vertex.z * radius);
+            vexBuf.putVertex(x, y, z, 1, color);
+        }
+        Vec3 last = vertices.getLast();
+        vexBuf.putVertex((float) (last.x * radius), (float) (last.y * radius), (float) (last.z * radius), 1, Colors.Null);
     }
 
     static void emitMapPoints(List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
-        for (int i = 0; i < vertices.size(); i++)
-            emitMapPoint(vertices.get(i), size, radius, color, vexBuf);
-    }
-
-    private static void emitMapVertex(Vec3 vertex, boolean first, boolean last, double radius, byte[] color, BufVertex vexBuf) {
-        if (first)
-            vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
-        vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, color);
-        if (last)
-            vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), 1, Colors.Null);
+        for (Vec3 vertex : vertices)
+            emitMapPoint(vertex, size, radius, color, vexBuf);
     }
 
     private static void emitMapPoint(Vec3 vertex, double size, double radius, byte[] color, BufVertex vexBuf) {
