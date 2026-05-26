@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.display.ViewActions;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
@@ -207,31 +207,31 @@ public final class Commands {
     }
 
     public static void zoomIn() {
-        ViewActions.zoomIn();
+        DisplayController.zoomIn();
     }
 
     public static void zoomOut() {
-        ViewActions.zoomOut();
+        DisplayController.zoomOut();
     }
 
     public static void zoomFit() {
-        ViewActions.zoomFit();
+        DisplayController.zoomFit();
     }
 
     public static void zoomOneToOne() {
-        ViewActions.zoomOneToOne();
+        DisplayController.zoomOneToOne();
     }
 
     public static void resetView() {
-        ViewActions.resetView();
+        DisplayController.resetView();
     }
 
     public static void resetViewAxis() {
-        ViewActions.resetViewAxis();
+        DisplayController.resetViewAxis();
     }
 
     public static void rotateView90(@Nullable String axis) {
-        ViewActions.rotateView90(axis);
+        DisplayController.rotateView90(axis);
     }
 
     public static void notifyLoadStateFinished(@Nullable OperationContext context, boolean success, String message) {
