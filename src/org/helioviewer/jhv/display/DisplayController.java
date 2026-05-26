@@ -52,6 +52,13 @@ public final class DisplayController {
         renderRequestHandler = _renderRequestHandler;
     }
 
+    private static void missingRenderRequestHandler() {
+        if (missingHandlerLogged)
+            return;
+        missingHandlerLogged = true;
+        Log.warn("No render request handler installed");
+    }
+
     public static UpdateViewpoint getViewpointUpdate() {
         return viewpointModel.getUpdateViewpoint();
     }
@@ -91,15 +98,43 @@ public final class DisplayController {
         render(1);
     }
 
+    private static void updateViewpoint(JHVTime time) {
+        Display.getCamera().updateViewpoint(viewpointModel.update(time));
+    }
+
     public static void resetCamera() {
         resetCamera(Display.getCamera(), viewpointModel);
         render(1);
+    }
+
+    static void resetCameras() {
+        resetCamera(Display.getMiniCamera(), miniViewpointModel);
+        resetCamera(Display.getCamera(), viewpointModel);
+        render(1);
+    }
+
+    private static void resetCamera(Camera camera, ViewpointModel model) {
+        Position viewpoint = model.update(Movie.getTime());
+        camera.reset(viewpoint);
+        fitCameraToImageLayers(camera, viewpoint);
     }
 
     public static void zoomFit() {
         Display.resetViewportZoom();
         fitCameraToImageLayers(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
         render(1);
+    }
+
+    public static void zoomMiniToFit() {
+        fitCameraToImageLayers(Display.getMiniCamera(), miniViewpointModel.getViewpoint());
+    }
+
+    private static void fitCameraToImageLayers(Camera camera, Position viewpoint) {
+        double size = ImageLayerBounds.getLargestPhysicalHeight();
+        double newFOV = Camera.INITFOV;
+        if (size != 0)
+            newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
+        camera.setFOV(newFOV, viewpoint);
     }
 
     public static void zoomIn() {
@@ -110,6 +145,12 @@ public final class DisplayController {
     public static void zoomOut() {
         zoomViewports(+Camera.ZOOM_MULTIPLIER_BUTTON);
         display();
+    }
+
+    private static void zoomViewports(double wr) {
+        double factor = Camera.zoomFactor(wr);
+        for (Viewport viewport : Display.getViewports())
+            viewport.zoom *= factor;
     }
 
     public static void zoomOneToOne() {
@@ -126,10 +167,6 @@ public final class DisplayController {
             camera.setFOV(fov, viewpoint);
         }
         render(1);
-    }
-
-    public static void zoomMiniToFit() {
-        fitCameraToImageLayers(Display.getMiniCamera(), miniViewpointModel.getViewpoint());
     }
 
     public static void resetView() {
@@ -154,53 +191,16 @@ public final class DisplayController {
         }
     }
 
+    private static void rotateView90(Quat rotation) {
+        Display.getCamera().rotateDragRotation(rotation);
+        display();
+    }
+
     public static JSONObject cameraToJson() {
         return Display.getCamera().toJson();
     }
 
     public static void cameraFromJson(JSONObject json) {
         Display.getCamera().fromJson(json, viewpointModel.getViewpoint());
-    }
-
-    static void resetCameras() {
-        resetCamera(Display.getMiniCamera(), miniViewpointModel);
-        resetCamera(Display.getCamera(), viewpointModel);
-        render(1);
-    }
-
-    private static void updateViewpoint(JHVTime time) {
-        Display.getCamera().updateViewpoint(viewpointModel.update(time));
-    }
-
-    private static void resetCamera(Camera camera, ViewpointModel model) {
-        Position viewpoint = model.update(Movie.getTime());
-        camera.reset(viewpoint);
-        fitCameraToImageLayers(camera, viewpoint);
-    }
-
-    private static void fitCameraToImageLayers(Camera camera, Position viewpoint) {
-        double size = ImageLayerBounds.getLargestPhysicalHeight();
-        double newFOV = Camera.INITFOV;
-        if (size != 0)
-            newFOV = 2. * Math.atan2(0.5 * size, viewpoint.distance);
-        camera.setFOV(newFOV, viewpoint);
-    }
-
-    private static void zoomViewports(double wr) {
-        double factor = Camera.zoomFactor(wr);
-        for (Viewport viewport : Display.getViewports())
-            viewport.zoom *= factor;
-    }
-
-    private static void rotateView90(Quat rotation) {
-        Display.getCamera().rotateDragRotation(rotation);
-        display();
-    }
-
-    private static void missingRenderRequestHandler() {
-        if (missingHandlerLogged)
-            return;
-        missingHandlerLogged = true;
-        Log.warn("No render request handler installed");
     }
 }
