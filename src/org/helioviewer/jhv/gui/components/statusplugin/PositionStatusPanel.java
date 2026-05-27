@@ -6,10 +6,10 @@ import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.gui.components.StatusPanel;
@@ -30,17 +30,15 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
     private static final String nanPolar = String.format("%7s\u00B0,%7s\u2609", "--", "--");
 
-    private final Camera camera;
-
     public PositionStatusPanel() {
         setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
-        camera = Display.getCamera();
     }
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
-        MapMode mode = Display.mode;
-        Vec2 coord = mode.mouseToGrid(camera, GLRenderer.getRenderView(), vp, Display.gridType, x, y);
+        MapView mv = GLRenderer.getMapView();
+        MapMode mode = mv.mode();
+        Vec2 coord = mv.mouseToGrid(vp, x, y);
 
         if (mode == MapMode.HPC) {
             setText(formatHpc(coord));
@@ -49,7 +47,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         } else if (mode == MapMode.Polar || mode == MapMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
+            Vec3 v = ViewportMath.unprojectToCurrentViewSphereOrPlane(mv.camera(), vp, mv.cameraWidth(vp), x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {
