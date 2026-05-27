@@ -44,22 +44,15 @@ public interface MapScale {
         protected final double invYRange;
 
         MapScaleBase(double _xStart, double _xStop, double _yStart, double _yStop) {
-            double xs = _xStart;
-            double xe = _xStop;
-            if (xs == xe)
-                xe = Math.nextUp(xs);
+            xStart = _xStart;
+            xStop = _xStart == _xStop ? Math.nextUp(_xStart) : _xStop;
 
-            double ys = scaleY(_yStart);
-            double ye = scaleY(_yStop);
-            if (ys == ye)
-                ye = Math.nextUp(ys);
+            yStart = scaleY(_yStart);
+            double scaledYStop = scaleY(_yStop);
+            yStop = yStart == scaledYStop ? Math.nextUp(yStart) : scaledYStop;
 
-            xStart = xs;
-            xStop = xe;
-            yStart = ys;
-            yStop = ye;
-            xRange = xe - xs;
-            yRange = ye - ys;
+            xRange = xStop - xStart;
+            yRange = yStop - yStart;
             invXRange = 1.0 / xRange;
             invYRange = 1.0 / yRange;
         }
