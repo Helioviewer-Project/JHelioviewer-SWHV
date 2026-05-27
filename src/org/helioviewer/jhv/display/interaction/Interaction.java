@@ -32,7 +32,7 @@ public final class Interaction {
     private boolean annotating = false;
 
     public Interaction(Camera _camera) {
-        interactionAnnotate = new InteractionAnnotate(_camera);
+        interactionAnnotate = new InteractionAnnotate();
         interactionAxis = InteractionTrackball.axis(_camera);
         interactionPan = new InteractionPan(_camera);
         interactionRotate = InteractionTrackball.rotate(_camera);

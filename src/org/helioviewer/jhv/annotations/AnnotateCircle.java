@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
@@ -63,8 +62,8 @@ final class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
-        return mouseToSurface(camera, vp, x, y);
+    protected Vec3 computeDragPoint(Viewport vp, int x, int y) {
+        return mouseToSurface(vp, x, y);
     }
 
     @Nullable

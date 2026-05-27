@@ -56,8 +56,8 @@ final class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
-        return mouseToSky(camera, vp, x, y);
+    protected Vec3 computeDragPoint(Viewport vp, int x, int y) {
+        return mouseToSky(vp, x, y);
     }
 
 }

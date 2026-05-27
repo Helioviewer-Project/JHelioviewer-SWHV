@@ -2,7 +2,6 @@ package org.helioviewer.jhv.annotations;
 
 import java.util.List;
 
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
@@ -45,14 +44,14 @@ final class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void mousePressed(Camera camera, Viewport vp, int x, int y) {
-        Vec3 pt = mouseToSurface(camera, vp, x, y);
+    public void mousePressed(Viewport vp, int x, int y) {
+        Vec3 pt = mouseToSurface(vp, x, y);
         if (pt != null)
             startPoint = pt;
     }
 
     @Override
-    public void mouseDragged(Camera camera, Viewport vp, int x, int y) {}
+    public void mouseDragged(Viewport vp, int x, int y) {}
 
     @Override
     public void mouseReleased() {}

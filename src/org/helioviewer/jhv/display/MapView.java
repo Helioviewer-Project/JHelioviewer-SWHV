@@ -56,6 +56,14 @@ public abstract class MapView {
         return mode.mouseToGrid(camera, renderView, vp, gridType, x, y);
     }
 
+    public Vec3 mouseToSurface(Viewport vp, int x, int y) {
+        return mode.mouseToSurface(camera, renderView, vp, gridType, x, y);
+    }
+
+    public Vec3 mouseToSky(Viewport vp, int x, int y) {
+        return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
+    }
+
     public boolean isOrthographic() {
         return mode() == MapMode.Orthographic;
     }
