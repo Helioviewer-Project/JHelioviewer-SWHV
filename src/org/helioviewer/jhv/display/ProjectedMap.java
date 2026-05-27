@@ -5,7 +5,6 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
@@ -36,10 +35,9 @@ final class ProjectedMap {
         };
     }
 
-    static Vec3 mouseToSurface(Kind kind, Camera camera, RenderView renderView, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
-        Position viewpoint = renderView.viewpoint();
+    static Vec3 mouseToSurface(Kind kind, Camera camera, Position viewpoint, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
         Quat rotation = gridType.mapRotation(viewpoint);
-        return unproject(kind, viewpoint, rotation, mouseToGrid(camera, renderView, vp, scale, gridType, x, y));
+        return unproject(kind, viewpoint, rotation, mouseToGrid(camera, width, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
@@ -140,20 +138,19 @@ final class ProjectedMap {
         }
     }
 
-    static Vec2 mouseToScreen(Camera camera, RenderView renderView, Viewport vp, MapScale scale, int x, int y) {
-        Vec2 mouseGrid = mouseToRawGrid(camera, renderView, vp, scale, x, y);
+    static Vec2 mouseToScreen(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+        Vec2 mouseGrid = mouseToRawGrid(camera, width, vp, scale, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
                 scale.getYValueInv(mouseGrid.y));
     }
 
-    static Vec2 mouseToGrid(Camera camera, RenderView renderView, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
-        Vec2 mouseGrid = mouseToRawGrid(camera, renderView, vp, scale, x, y);
+    static Vec2 mouseToGrid(Camera camera, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
+        Vec2 mouseGrid = mouseToRawGrid(camera, width, vp, scale, x, y);
         return new Vec2(scale.getDisplayXValue(mouseGrid.x, gridType), mouseGrid.y);
     }
 
-    private static Vec2 mouseToRawGrid(Camera camera, RenderView renderView, Viewport vp, MapScale scale, int x, int y) {
-        double width = renderView.cameraWidth(vp.zoom);
+    private static Vec2 mouseToRawGrid(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
         return new Vec2(
                 scale.getInterpolatedXValue(ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
                 scale.getInterpolatedYValue(ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
