@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.display;
 
+import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
@@ -9,8 +9,13 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 public enum MapMode {
     Orthographic(GLSLSolarShader.ortho, MapScale.ortho) {
         @Override
-        public MapView createMapView(Camera camera, RenderView renderView, GridType gridType) {
-            return MapView.orthographic(camera, renderView, gridType);
+        public MapView createMapView(Camera camera, Position viewpoint, GridType gridType) {
+            return MapView.orthographic(camera, viewpoint, gridType);
+        }
+
+        @Override
+        public MapView createMapView(Camera camera, Position viewpoint, double width, GridType gridType) {
+            return MapView.orthographic(camera, viewpoint, width, gridType);
         }
     },
     HPC(GLSLSolarShader.hpc, MapScale.hpc, ProjectedMap.Kind.HPC),
@@ -32,7 +37,11 @@ public enum MapMode {
         projectedKind = _projectedKind;
     }
 
-    public MapView createMapView(Camera camera, RenderView renderView, GridType gridType) {
-        return MapView.projected(camera, renderView, gridType, this);
+    public MapView createMapView(Camera camera, Position viewpoint, GridType gridType) {
+        return MapView.projected(camera, viewpoint, gridType, this);
+    }
+
+    public MapView createMapView(Camera camera, Position viewpoint, double width, GridType gridType) {
+        return MapView.projected(camera, viewpoint, width, gridType, this);
     }
 }

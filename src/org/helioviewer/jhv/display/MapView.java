@@ -24,12 +24,20 @@ public abstract class MapView {
         gridType = _gridType;
     }
 
-    static MapView orthographic(Camera camera, RenderView renderView, GridType gridType) {
-        return new OrthographicView(camera, renderView, gridType);
+    static MapView orthographic(Camera camera, Position viewpoint, GridType gridType) {
+        return new OrthographicView(camera, camera.renderView(viewpoint), gridType);
     }
 
-    static MapView projected(Camera camera, RenderView renderView, GridType gridType, MapMode mode) {
-        return new ProjectedView(camera, renderView, gridType, mode);
+    static MapView orthographic(Camera camera, Position viewpoint, double width, GridType gridType) {
+        return new OrthographicView(camera, camera.view(viewpoint, width), gridType);
+    }
+
+    static MapView projected(Camera camera, Position viewpoint, GridType gridType, MapMode mode) {
+        return new ProjectedView(camera, camera.renderView(viewpoint), gridType, mode);
+    }
+
+    static MapView projected(Camera camera, Position viewpoint, double width, GridType gridType, MapMode mode) {
+        return new ProjectedView(camera, camera.view(viewpoint, width), gridType, mode);
     }
 
     public Camera camera() {

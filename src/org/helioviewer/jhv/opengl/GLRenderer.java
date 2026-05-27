@@ -5,7 +5,6 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapMode;
@@ -24,7 +23,7 @@ public final class GLRenderer {
 
     private static MapView initialMapView() {
         Camera camera = Display.getCamera();
-        return Display.mode.createMapView(camera, camera.renderView(Sun.StartEarth), Display.gridType);
+        return Display.mode.createMapView(camera, Sun.StartEarth, Display.gridType);
     }
 
     public static Position getDisplayedViewpoint() {
@@ -68,7 +67,7 @@ public final class GLRenderer {
 
     public static void display(Position viewpoint) {
         Camera camera = Display.getCamera();
-        mapView = Display.mode.createMapView(camera, camera.renderView(viewpoint), Display.gridType);
+        mapView = Display.mode.createMapView(camera, viewpoint, Display.gridType);
 
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
@@ -135,8 +134,7 @@ public final class GLRenderer {
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            RenderView miniView = miniCamera.view(mapView.viewpoint(), miniCamera.getCameraWidth(vp.zoom) / vp.zoom);
-            MapView mv = mapView.mode().createMapView(miniCamera, miniView, mapView.gridType());
+            MapView mv = mapView.mode().createMapView(miniCamera, mapView.viewpoint(), miniCamera.getCameraWidth(vp.zoom) / vp.zoom, mapView.gridType());
             Layers.renderMiniview(mv, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
