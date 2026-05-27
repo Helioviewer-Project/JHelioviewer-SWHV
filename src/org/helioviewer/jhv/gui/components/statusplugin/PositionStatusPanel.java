@@ -8,7 +8,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.components.StatusPanel;
@@ -36,14 +35,13 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
         MapView mv = GLRenderer.getMapView();
-        MapMode mode = mv.mode();
         Vec2 coord = mv.mouseToGrid(vp, x, y);
 
-        if (mode == MapMode.HPC) {
+        if (mv.isHpc()) {
             setText(formatHpc(coord));
-        } else if (mode == MapMode.Latitudinal) {
+        } else if (mv.isLatitudinal()) {
             setText(formatLati(coord));
-        } else if (mode == MapMode.Polar || mode == MapMode.LogPolar) {
+        } else if (mv.isPolar() || mv.isLogPolar()) {
             setText(formatPolar(coord));
         } else {
             Vec3 v = mv.mouseToSky(vp, x, y);
