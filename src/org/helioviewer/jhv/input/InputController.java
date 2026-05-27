@@ -8,7 +8,7 @@ import org.helioviewer.jhv.display.interaction.Interaction;
 
 public final class InputController {
 
-    private static final Interaction interaction = new Interaction(Display.getCamera());
+    private static final Interaction interaction = new Interaction();
 
     public static Interaction.Mode getMode() {
         return interaction.getMode();
