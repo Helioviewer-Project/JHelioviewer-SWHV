@@ -3,7 +3,6 @@ package org.helioviewer.jhv.display;
 import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -75,16 +74,6 @@ public abstract class MapView {
         return viewRotation;
     }
 
-    public abstract Vec2 mouseToGrid(Viewport vp, int x, int y);
-
-    public abstract Vec3 mouseToSurface(Viewport vp, int x, int y);
-
-    public abstract Vec2 mouseToScreen(Viewport vp, int x, int y);
-
-    public Vec3 mouseToSky(Viewport vp, int x, int y) {
-        return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
-    }
-
     public boolean isOrthographic() {
         return mode() == MapMode.Orthographic;
     }
@@ -105,7 +94,17 @@ public abstract class MapView {
         return mode() == MapMode.LogPolar;
     }
 
+    public Vec3 mouseToSky(Viewport vp, int x, int y) {
+        return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
+    }
+
     public abstract Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v);
+
+    public abstract Vec2 mouseToGrid(Viewport vp, int x, int y);
+
+    public abstract Vec3 mouseToSurface(Viewport vp, int x, int y);
+
+    public abstract Vec2 mouseToScreen(Viewport vp, int x, int y);
 
     public abstract void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf);
 

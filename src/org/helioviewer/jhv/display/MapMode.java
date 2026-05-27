@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 // Orthographic mode renders directly in 3D, while non-orthographic modes project

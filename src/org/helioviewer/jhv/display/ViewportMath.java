@@ -3,7 +3,6 @@ package org.helioviewer.jhv.display;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 

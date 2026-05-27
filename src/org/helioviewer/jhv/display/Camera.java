@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.camera;
+package org.helioviewer.jhv.display;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Quat;
@@ -10,10 +10,10 @@ import org.json.JSONObject;
 
 public class Camera {
 
-    public static final double ZOOM_MULTIPLIER_BUTTON = 1;
+    static final double ZOOM_MULTIPLIER_BUTTON = 1;
     private static final double ZOOM_STEP = 0.005;
 
-    public static final double INITFOV = Math.PI / 180.;
+    static final double INITFOV = Math.PI / 180.;
     private static final double MIN_FOV = INITFOV / 360;
     private static final double MAX_FOV = INITFOV * 120;
     private double fov = INITFOV;
@@ -22,7 +22,9 @@ public class Camera {
     private Quat dragRotation = Quat.ZERO;
     private double cameraWidth = 1;
 
-    public void updateViewpoint(Position viewpoint) {
+    Camera() {}
+
+    void updateViewpoint(Position viewpoint) {
         updateWidth(viewpoint);
     }
 
@@ -30,7 +32,7 @@ public class Camera {
         cameraWidth = 2 * viewpoint.distance * Math.tan(0.5 * fov);
     }
 
-    public void reset(Position viewpoint) {
+    void reset(Position viewpoint) {
         translation = Vec2.ZERO;
         dragRotation = Quat.ZERO;
 
@@ -61,7 +63,7 @@ public class Camera {
         dragRotation = Quat.ZERO;
     }
 
-    public void resetDragRotationAxis(Vec3 dragAxis) {
+    void resetDragRotationAxis(Vec3 dragAxis) {
         dragRotation = dragRotation.twist(dragAxis);
     }
 
@@ -78,7 +80,7 @@ public class Camera {
         return Math.exp(ZOOM_STEP * wr); // smoother, direction-symmetric zooming via exponential scaling
     }
 
-    public JSONObject toJson() {
+    JSONObject toJson() {
         JSONObject jo = new JSONObject();
         jo.put("translation", translation.toJson());
         jo.put("dragRotation", dragRotation.toJson());
@@ -86,7 +88,7 @@ public class Camera {
         return jo;
     }
 
-    public void fromJson(JSONObject jo, Position viewpoint) {
+    void fromJson(JSONObject jo, Position viewpoint) {
         JSONArray ja;
         ja = jo.optJSONArray("translation");
         if (ja != null) translation = Vec2.fromJson(ja);

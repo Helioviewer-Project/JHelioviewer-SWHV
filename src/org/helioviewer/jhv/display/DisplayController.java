@@ -6,7 +6,6 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.camera.Camera;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
