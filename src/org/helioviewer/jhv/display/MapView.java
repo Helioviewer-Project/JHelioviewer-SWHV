@@ -62,7 +62,7 @@ public abstract class MapView {
         return viewRotation;
     }
 
-    public Quat dragRotation() {
+    public Quat dragRotation() { // only for ViewpointLayer
         return dragRotation;
     }
 
@@ -90,13 +90,17 @@ public abstract class MapView {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
     }
 
+    public Vec3 mouseToPlane(Viewport vp, int x, int y) { // only for SWEKPopupController
+        return ViewportMath.unprojectToOutputPlane(camera, vp, cameraWidth(vp), x, y, Quat.ZERO);
+    }
+
     public abstract Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v);
 
     public abstract Vec2 mouseToGrid(Viewport vp, int x, int y);
 
     public abstract Vec3 mouseToSurface(Viewport vp, int x, int y);
 
-    public abstract Vec2 mouseToScreen(Viewport vp, int x, int y);
+    public abstract Vec2 mouseToScreen(Viewport vp, int x, int y); // only for SWEKPopupController
 
     public abstract void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf);
 
