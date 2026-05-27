@@ -78,7 +78,7 @@ public final class GLRenderer {
 
         Layers.prerender();
 
-        if (Display.mode == MapMode.Orthographic) {
+        if (mapView.isOrthographic()) {
             renderScene();
             renderMiniview();
         } else
@@ -136,25 +136,26 @@ public final class GLRenderer {
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
             RenderView miniView = miniCamera.view(mapView.viewpoint(), miniCamera.getCameraWidth(vp.zoom) / vp.zoom);
-            MapView mv = Display.mode.createMapView(miniCamera, miniView, Display.gridType);
+            MapView mv = mapView.mode().createMapView(miniCamera, miniView, mapView.gridType());
             Layers.renderMiniview(mv, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
     }
 
     static void renderSceneScale() {
-        if (Display.mode == MapMode.Polar) {
+        MapView mv = mapView;
+        MapMode mode = mv.mode();
+        if (mode == MapMode.Polar) {
             MapScale.polar.set(0, 360, 0, ImageLayers.getLargestRadialSize());
-        } else if (Display.mode == MapMode.LogPolar) {
+        } else if (mode == MapMode.LogPolar) {
             MapScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayers.getLargestRadialSize()));
         }
 
-        boolean hpcMode = Display.mode == MapMode.HPC;
+        boolean hpcMode = mode == MapMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayers.computeHpcScaleBounds() : null;
-        MapView mv = mapView;
         Camera camera = mv.camera();
         for (Viewport vp : Display.getViewports()) {
-            MapScale scale = Display.mode.scale;
+            MapScale scale = mode.scale;
             if (hpcMode) {
                 double halfWidth = 0.5 * hpcBounds.width;
                 double halfHeight = Math.max(0.5 * hpcBounds.height, halfWidth / vp.aspect);
