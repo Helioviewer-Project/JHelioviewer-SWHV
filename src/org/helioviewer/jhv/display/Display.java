@@ -104,6 +104,11 @@ public final class Display {
         int count = Math.min(oldViewports.length, viewports.length);
         for (int i = 0; i < count; i++)
             viewports[i].zoom = oldViewports[i].zoom;
+        if (!separateViewportZoom) {
+            double zoom = oldViewports[0].zoom;
+            for (int i = count; i < viewports.length; i++)
+                viewports[i].zoom = zoom;
+        }
     }
 
     public static boolean separateViewportZoom = false;
