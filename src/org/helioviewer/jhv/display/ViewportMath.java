@@ -20,8 +20,12 @@ public final class ViewportMath {
         return 0.5 - (screenY - vp.yAWT) / vp.height;
     }
 
+    private static double zoomedCameraWidth(Camera camera, Viewport vp) {
+        return camera.baseCameraWidth() * vp.zoom;
+    }
+
     private static double computeUpX(Camera camera, Viewport vp, double screenX) {
-        return computeUpX(vp, camera.getCameraWidth(vp.zoom), camera.getTranslationX(), screenX);
+        return computeUpX(vp, zoomedCameraWidth(camera, vp), camera.getTranslationX(), screenX);
     }
 
     public static double computeUpX(Viewport vp, double width, double tx, double screenX) {
@@ -29,7 +33,7 @@ public final class ViewportMath {
     }
 
     private static double computeUpY(Camera camera, Viewport vp, double screenY) {
-        return computeUpY(vp, camera.getCameraWidth(vp.zoom), camera.getTranslationY(), screenY);
+        return computeUpY(vp, zoomedCameraWidth(camera, vp), camera.getTranslationY(), screenY);
     }
 
     public static double computeUpY(Viewport vp, double width, double ty, double screenY) {
@@ -49,13 +53,13 @@ public final class ViewportMath {
     }
 
     public static double getImagePixelFactor(Camera camera, Viewport vp) {
-        return vp.height / camera.getCameraWidth(vp.zoom);
+        return vp.height / zoomedCameraWidth(camera, vp);
     }
 
     public static double selectTrackballRadius2(Camera camera, Viewport vp, double screenX, double screenY) {
         double radius2 = screenPlaneRadius2(camera, vp, screenX, screenY);
         if (radius2 > 0.5 * Sun.Radius2) {
-            double r = 0.5 * camera.getCameraWidth(vp.zoom);
+            double r = 0.5 * zoomedCameraWidth(camera, vp);
             return r * r;
         }
         return Sun.Radius2;
@@ -68,7 +72,7 @@ public final class ViewportMath {
     }
 
     public static Quat calcTrackballDelta(Camera camera, Viewport vp, double startX, double startY, double endX, double endY, double refRadius2) {
-        double width = camera.getCameraWidth(vp.zoom);
+        double width = zoomedCameraWidth(camera, vp);
         double tx = camera.getTranslationX();
         double ty = camera.getTranslationY();
 
