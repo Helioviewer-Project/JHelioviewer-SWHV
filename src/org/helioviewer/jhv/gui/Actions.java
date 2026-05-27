@@ -384,7 +384,7 @@ public class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Annotations.zoom(Display.getCamera());
+            Annotations.zoom();
             DisplayController.render(1);
         }
     }

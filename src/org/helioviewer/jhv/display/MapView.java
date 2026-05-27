@@ -14,6 +14,7 @@ public abstract class MapView {
     protected final Position viewpoint;
     protected final MapMode mode;
     protected final GridType gridType;
+    private final Quat dragRotation;
     private final Quat viewRotation;
 
     protected MapView(Camera _camera, Position _viewpoint, MapMode _mode, GridType _gridType) {
@@ -21,7 +22,8 @@ public abstract class MapView {
         viewpoint = _viewpoint;
         mode = _mode;
         gridType = _gridType;
-        viewRotation = Quat.rotate(camera.getDragRotation(), viewpoint.toQuat());
+        dragRotation = camera.getDragRotation();
+        viewRotation = Quat.rotate(dragRotation, viewpoint.toQuat());
     }
 
     static MapView orthographic(Camera camera, Position viewpoint, GridType gridType) {
@@ -58,6 +60,10 @@ public abstract class MapView {
 
     public Quat viewRotation() {
         return viewRotation;
+    }
+
+    public Quat dragRotation() {
+        return dragRotation;
     }
 
     public boolean isOrthographic() {
