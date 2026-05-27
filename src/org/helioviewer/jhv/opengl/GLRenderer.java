@@ -6,6 +6,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.MapScale;
@@ -22,8 +23,40 @@ public final class GLRenderer {
     private GLRenderer() {}
 
     private static MapView initialMapView() {
-        Camera camera = Display.getCamera();
-        return Display.mode.createMapView(camera, Sun.StartEarth, Display.gridType);
+        return createMapView(Display.getCamera(), Sun.StartEarth);
+    }
+
+    private static MapView createMapView(Camera camera, Position viewpoint) {
+        MapMode mode = Display.mode;
+        return mode.createMapView(camera, viewpoint, Display.gridType, createScales(mode, Display.getViewports()));
+    }
+
+    private static MapScale[] createScales(MapMode mode, Viewport[] viewports) {
+        return switch (mode) {
+            case Orthographic -> createConstantScales(viewports, MapScale.ortho);
+            case HPC -> createHpcScales(viewports);
+            case Latitudinal -> createConstantScales(viewports, MapScale.lati);
+            case LogPolar -> createConstantScales(viewports, MapScale.logpolar(ImageLayers.getLargestRadialSize()));
+            case Polar -> createConstantScales(viewports, MapScale.polar(ImageLayers.getLargestRadialSize()));
+        };
+    }
+
+    private static MapScale[] createHpcScales(Viewport[] viewports) {
+        Region bounds = ImageLayers.computeHpcScaleBounds();
+        MapScale[] scales = new MapScale[viewports.length];
+        for (Viewport vp : viewports) {
+            double halfWidth = 0.5 * bounds.width;
+            double halfHeight = Math.max(0.5 * bounds.height, halfWidth / vp.aspect);
+            scales[vp.idx] = MapScale.hpc(halfHeight * vp.aspect, halfHeight);
+        }
+        return scales;
+    }
+
+    private static MapScale[] createConstantScales(Viewport[] viewports, MapScale scale) {
+        MapScale[] scales = new MapScale[viewports.length];
+        for (Viewport vp : viewports)
+            scales[vp.idx] = scale;
+        return scales;
     }
 
     public static Position getDisplayedViewpoint() {
@@ -66,9 +99,6 @@ public final class GLRenderer {
     }
 
     public static void display(Position viewpoint) {
-        Camera camera = Display.getCamera();
-        mapView = Display.mode.createMapView(camera, viewpoint, Display.gridType);
-
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
         else
@@ -77,6 +107,7 @@ public final class GLRenderer {
 
         Layers.prerender();
 
+        mapView = createMapView(Display.getCamera(), viewpoint);
         if (mapView.isOrthographic()) {
             renderScene();
             renderMiniview();
@@ -105,8 +136,8 @@ public final class GLRenderer {
 
     static void renderScene() {
         MapView mv = mapView;
-        MapScale scale = MapScale.ortho;
         for (Viewport vp : Display.getViewports()) {
+            MapScale scale = mv.scale(vp);
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY(), mv.viewRotation());
             GLSLSolarShader.bindScreen(vp, scale);
@@ -120,16 +151,26 @@ public final class GLRenderer {
         }
     }
 
+    private static final MapScale[] miniScales = new MapScale[]{MapScale.ortho};
+
+    private static MapView createMiniMapView(Position viewpoint) {
+        return MapMode.Orthographic.createMapView(
+                Display.getMiniCamera(),
+                viewpoint,
+                GridType.Viewpoint,
+                miniScales
+        );
+    }
+
     private static void renderMiniview() {
         MiniviewLayer miniview = Layers.getMiniviewLayer();
         if (miniview != null && miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
-            Camera miniCamera = Display.getMiniCamera();
-            MapView mv = mapView.mode().createMapView(miniCamera, mapView.viewpoint(), mapView.gridType());
+            MapView mv = createMiniMapView(mapView.viewpoint());
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
-            MapScale scale = MapScale.ortho;
+            MapScale scale = mv.scale(vp);
             GLSLSolarShader.bindScreen(vp, scale);
 
             GL.glDisable(GL.DEPTH_TEST);
@@ -141,24 +182,8 @@ public final class GLRenderer {
 
     static void renderSceneScale() {
         MapView mv = mapView;
-        MapMode mode = mv.mode();
-        if (mode == MapMode.Polar) {
-            MapScale.polar.set(0, 360, 0, ImageLayers.getLargestRadialSize());
-        } else if (mode == MapMode.LogPolar) {
-            MapScale.logpolar.set(0, 360, 0.05, Math.max(0.05, ImageLayers.getLargestRadialSize()));
-        }
-
-        boolean hpcMode = mode == MapMode.HPC;
-        Region hpcBounds = hpcMode ? ImageLayers.computeHpcScaleBounds() : null;
         for (Viewport vp : Display.getViewports()) {
-            MapScale scale = mode.scale;
-            if (hpcMode) {
-                double halfWidth = 0.5 * hpcBounds.width;
-                double halfHeight = Math.max(0.5 * hpcBounds.height, halfWidth / vp.aspect);
-                halfWidth = halfHeight * vp.aspect;
-                MapScale.hpc.set(-halfWidth, halfWidth, -halfHeight, halfHeight);
-                scale = MapScale.hpc;
-            }
+            MapScale scale = mv.scale(vp);
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
             GLSLSolarShader.bindScreen(vp, scale);

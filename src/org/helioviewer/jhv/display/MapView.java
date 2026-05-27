@@ -14,24 +14,24 @@ public abstract class MapView {
     protected final Position viewpoint;
     protected final MapMode mode;
     protected final GridType gridType;
+    private final MapScale[] scales;
     private final Quat dragRotation;
     private final Quat viewRotation;
 
-    private MapView(Camera _camera, Position _viewpoint, MapMode _mode, GridType _gridType) {
+    private MapView(Camera _camera, Position _viewpoint, MapMode _mode, GridType _gridType, MapScale[] _scales) {
         camera = _camera;
         viewpoint = _viewpoint;
         mode = _mode;
         gridType = _gridType;
+        scales = _scales;
         dragRotation = camera.getDragRotation();
         viewRotation = Quat.rotate(dragRotation, viewpoint.toQuat());
     }
 
-    static MapView orthographic(Camera camera, Position viewpoint, GridType gridType) {
-        return new OrthographicView(camera, viewpoint, gridType);
-    }
-
-    static MapView projected(Camera camera, Position viewpoint, GridType gridType, MapMode mode) {
-        return new ProjectedView(camera, viewpoint, gridType, mode);
+    static MapView create(Camera camera, Position viewpoint, GridType gridType, MapMode mode, MapScale[] scales) {
+        return mode.kind == MapMode.Kind.ORTHOGRAPHIC
+                ? new OrthographicView(camera, viewpoint, gridType, mode, scales)
+                : new ProjectedView(camera, viewpoint, gridType, mode, scales);
     }
 
     public double cameraWidth(Viewport vp) {
@@ -60,6 +60,10 @@ public abstract class MapView {
 
     public Quat viewRotation() {
         return viewRotation;
+    }
+
+    public MapScale scale(Viewport vp) {
+        return scales[vp.idx];
     }
 
     public Quat dragRotation() { // only for ViewpointLayer
@@ -108,8 +112,8 @@ public abstract class MapView {
 
     private static final class OrthographicView extends MapView {
 
-        OrthographicView(Camera _camera, Position _viewpoint, GridType _gridType) {
-            super(_camera, _viewpoint, MapMode.Orthographic, _gridType);
+        OrthographicView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode, MapScale[] _scales) {
+            super(_camera, _viewpoint, _mode, _gridType, _scales);
         }
 
         @Override
@@ -148,10 +152,19 @@ public abstract class MapView {
         private final ProjectedMap.Kind kind;
         private final Quat rotation;
 
-        ProjectedView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode) {
-            super(_camera, _viewpoint, _mode, _gridType);
-            kind = _mode.projectedKind;
+        ProjectedView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode, MapScale[] _scales) {
+            super(_camera, _viewpoint, _mode, _gridType, _scales);
+            kind = projectedKind(_mode.kind);
             rotation = _gridType.mapRotation(viewpoint);
+        }
+
+        private static ProjectedMap.Kind projectedKind(MapMode.Kind kind) {
+            return switch (kind) {
+                case HPC -> ProjectedMap.Kind.HPC;
+                case LATITUDINAL -> ProjectedMap.Kind.LATITUDINAL;
+                case POLAR -> ProjectedMap.Kind.POLAR;
+                case ORTHOGRAPHIC -> throw new IllegalArgumentException("Orthographic mode has no projected kind");
+            };
         }
 
         @Override
@@ -161,17 +174,17 @@ public abstract class MapView {
 
         @Override
         public Vec2 mouseToGrid(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToGrid(camera, cameraWidth(vp), vp, mode.scale, gridType, x, y);
+            return ProjectedMap.mouseToGrid(camera, cameraWidth(vp), vp, scale(vp), gridType, x, y);
         }
 
         @Override
         public Vec3 mouseToSurface(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToSurface(kind, camera, viewpoint, cameraWidth(vp), vp, mode.scale, gridType, x, y);
+            return ProjectedMap.mouseToSurface(kind, camera, viewpoint, cameraWidth(vp), vp, scale(vp), gridType, x, y);
         }
 
         @Override
         public Vec2 mouseToScreen(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToScreen(camera, cameraWidth(vp), vp, mode.scale, x, y);
+            return ProjectedMap.mouseToScreen(camera, cameraWidth(vp), vp, scale(vp), x, y);
         }
 
         @Override

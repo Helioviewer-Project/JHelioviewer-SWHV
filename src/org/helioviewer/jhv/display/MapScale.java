@@ -16,43 +16,50 @@ public interface MapScale {
 
     double getYstop();
 
-    void set(double _xStart, double _xStop, double _yStart, double _yStop);
-
     MapScale ortho = new LinearMapScale(0, 0, 0, 0);
-    MapScale hpc = new LinearMapScale(-5, 5, -5, 5);
     MapScale lati = new LatitudinalMapScale(-180, 180, -90, 90);
-    MapScale polar = new LinearMapScale(0, 360, 0, 0);
-    MapScale logpolar = new LogMapScale(0, 360, 0.05, 1);
+
+    static MapScale hpc(double halfWidth, double halfHeight) {
+        return new LinearMapScale(-halfWidth, halfWidth, -halfHeight, halfHeight);
+    }
+
+    static MapScale polar(double radialSize) {
+        return new LinearMapScale(0, 360, 0, radialSize);
+    }
+
+    static MapScale logpolar(double radialSize) {
+        return new LogMapScale(0, 360, 0.05, Math.max(0.05, radialSize));
+    }
 
     abstract class MapScaleBase implements MapScale {
 
-        protected double xStart;
-        protected double xStop;
-        protected double yStart;
-        protected double yStop;
+        protected final double xStart;
+        protected final double xStop;
+        protected final double yStart;
+        protected final double yStop;
 
-        protected double xRange;
-        protected double yRange;
-        protected double invXRange;
-        protected double invYRange;
+        protected final double xRange;
+        protected final double yRange;
+        protected final double invXRange;
+        protected final double invYRange;
 
         MapScaleBase(double _xStart, double _xStop, double _yStart, double _yStop) {
-            set(_xStart, _xStop, _yStart, _yStop);
-        }
+            double xs = _xStart;
+            double xe = _xStop;
+            if (xs == xe)
+                xe = Math.nextUp(xs);
 
-        @Override
-        public void set(double _xStart, double _xStop, double _yStart, double _yStop) {
-            xStart = _xStart;
-            xStop = _xStop;
-            if (xStart == xStop)
-                xStop = Math.nextUp(xStart);
-            yStart = scaleY(_yStart);
-            yStop = scaleY(_yStop);
-            if (yStart == yStop)
-                yStop = Math.nextUp(yStart);
+            double ys = scaleY(_yStart);
+            double ye = scaleY(_yStop);
+            if (ys == ye)
+                ye = Math.nextUp(ys);
 
-            xRange = xStop - xStart;
-            yRange = yStop - yStart;
+            xStart = xs;
+            xStop = xe;
+            yStart = ys;
+            yStop = ye;
+            xRange = xe - xs;
+            yRange = ye - ys;
             invXRange = 1.0 / xRange;
             invYRange = 1.0 / yRange;
         }

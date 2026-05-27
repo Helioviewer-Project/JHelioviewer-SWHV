@@ -6,32 +6,25 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
 // through an explicit map basis shared by rendering and mouse unprojection.
 public enum MapMode {
-    Orthographic(GLSLSolarShader.ortho, MapScale.ortho) {
-        @Override
-        public MapView createMapView(Camera camera, Position viewpoint, GridType gridType) {
-            return MapView.orthographic(camera, viewpoint, gridType);
-        }
-    },
-    HPC(GLSLSolarShader.hpc, MapScale.hpc, ProjectedMap.Kind.HPC),
-    Latitudinal(GLSLSolarShader.lati, MapScale.lati, ProjectedMap.Kind.LATITUDINAL),
-    LogPolar(GLSLSolarShader.logpolar, MapScale.logpolar, ProjectedMap.Kind.POLAR),
-    Polar(GLSLSolarShader.polar, MapScale.polar, ProjectedMap.Kind.POLAR);
+    Orthographic(GLSLSolarShader.ortho, Kind.ORTHOGRAPHIC),
+    HPC(GLSLSolarShader.hpc, Kind.HPC),
+    Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
+    LogPolar(GLSLSolarShader.logpolar, Kind.POLAR),
+    Polar(GLSLSolarShader.polar, Kind.POLAR);
+
+    enum Kind {
+        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR
+    }
 
     public final GLSLSolarShader shader;
-    public final MapScale scale;
-    final ProjectedMap.Kind projectedKind;
+    final Kind kind;
 
-    MapMode(GLSLSolarShader _shader, MapScale _scale) {
-        this(_shader, _scale, null);
-    }
-
-    MapMode(GLSLSolarShader _shader, MapScale _scale, ProjectedMap.Kind _projectedKind) {
+    MapMode(GLSLSolarShader _shader, Kind _kind) {
         shader = _shader;
-        scale = _scale;
-        projectedKind = _projectedKind;
+        kind = _kind;
     }
 
-    public MapView createMapView(Camera camera, Position viewpoint, GridType gridType) {
-        return MapView.projected(camera, viewpoint, gridType, this);
+    public MapView createMapView(Camera camera, Position viewpoint, GridType gridType, MapScale[] scales) {
+        return MapView.create(camera, viewpoint, gridType, this, scales);
     }
 }
