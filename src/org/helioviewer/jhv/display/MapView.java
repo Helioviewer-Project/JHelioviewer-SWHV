@@ -17,7 +17,7 @@ public abstract class MapView {
     private final Quat dragRotation;
     private final Quat viewRotation;
 
-    protected MapView(Camera _camera, Position _viewpoint, MapMode _mode, GridType _gridType) {
+    private MapView(Camera _camera, Position _viewpoint, MapMode _mode, GridType _gridType) {
         camera = _camera;
         viewpoint = _viewpoint;
         mode = _mode;
