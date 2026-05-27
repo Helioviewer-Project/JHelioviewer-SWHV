@@ -31,11 +31,12 @@ public final class Interaction {
     private Mode mode = Mode.ROTATE;
     private boolean annotating = false;
 
-    public Interaction(Camera _camera) {
+    public Interaction() {
+        Camera camera = Display.getCamera();
         interactionAnnotate = new InteractionAnnotate();
-        interactionAxis = InteractionTrackball.axis(_camera);
-        interactionPan = new InteractionPan(_camera);
-        interactionRotate = InteractionTrackball.rotate(_camera);
+        interactionAxis = InteractionTrackball.axis(camera);
+        interactionPan = new InteractionPan(camera);
+        interactionRotate = InteractionTrackball.rotate(camera);
         zoom = new Zoom();
     }
 
