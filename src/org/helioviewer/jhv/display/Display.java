@@ -101,13 +101,14 @@ public final class Display {
         Viewport[] oldViewports = viewports;
         activeViewport = 0;
         viewports = DisplayLayout.viewports(glWidth, glHeight, countEnabledLayers());
-        int count = Math.min(oldViewports.length, viewports.length);
-        for (int i = 0; i < count; i++)
-            viewports[i].zoom = oldViewports[i].zoom;
-        if (!separateViewportZoom) {
+        if (separateViewportZoom) {
+            int count = Math.min(oldViewports.length, viewports.length);
+            for (int i = 0; i < count; i++)
+                viewports[i].zoom = oldViewports[i].zoom;
+        } else {
             double zoom = oldViewports[0].zoom;
-            for (int i = count; i < viewports.length; i++)
-                viewports[i].zoom = zoom;
+            for (Viewport viewport : viewports)
+                viewport.zoom = zoom;
         }
     }
 
