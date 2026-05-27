@@ -7,12 +7,10 @@ import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapMode;
+import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVPositionInformation;
@@ -37,13 +35,11 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     private static final int yOffset = 12;
 
     private final SWEKContext swekContext;
-    private final Camera camera;
 
     private Cursor lastCursor;
 
     SWEKPopupController(SWEKContext _swekContext) {
         swekContext = _swekContext;
-        camera = Display.getCamera();
     }
 
     void install() {
@@ -141,77 +137,14 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             return;
         }
 
-        JHVRelatedEvents mouseOverJHVEvent = null;
-
         int mouseOverX = e.x();
         int mouseOverY = e.y();
 
         Viewport vp = Display.getActiveViewport();
         MapView mv = GLRenderer.getMapView();
-        double displayWidth = mv.cameraWidth(vp);
-        MapMode mode = mv.mode();
-        Vec3 sphereHitpoint = null;
-        Vec3 planeHitpoint = null;
-        Vec2 mousePosition = null;
-        if (mode == MapMode.Orthographic) {
-            sphereHitpoint = mv.mouseToSurface(vp, mouseOverX, mouseOverY);
-            planeHitpoint = ViewportMath.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
-        } else {
-            mousePosition = mv.mouseToScreen(vp, mouseOverX, mouseOverY);
-        }
-
-        for (JHVRelatedEvents evtr : activeEvents) {
-            JHVEvent evt = evtr.getClosestTo(currentTime);
-            JHVPositionInformation pi = evt.getPositionInformation();
-            if (pi == null)
-                continue;
-
-            if (mode == MapMode.Orthographic) {
-                Vec3 hitpoint, pt;
-                if (evt.isCactus()) {
-                    double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
-                    double distSun = computeDistSun(evt, currentTime);
-                    Quat q = pi.getEarth().toQuat();
-                    pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
-
-                    hitpoint = planeHitpoint == null ? null : q.rotateInverseVector(planeHitpoint);
-                } else {
-                    hitpoint = sphereHitpoint;
-                    pt = pi.centralPoint();
-                }
-
-                if (pt != null && hitpoint != null) {
-                    double deltaX = Math.abs(hitpoint.x - pt.x);
-                    double deltaY = Math.abs(hitpoint.y - pt.y);
-                    double deltaZ = Math.abs(hitpoint.z - pt.z);
-                    if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08) {
-                        mouseOverJHVEvent = evtr;
-                        break;
-                    }
-                }
-            } else {
-                Vec2 tf = null;
-                if ((mode == MapMode.Polar || mode == MapMode.LogPolar) && evt.isCactus()) {
-                    double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
-                    double distSun = computeDistSun(evt, currentTime);
-                    tf = new Vec2(mode.scale.getXValueInv(principalAngle) * vp.aspect, mode.scale.getYValueInv(distSun));
-                } else {
-                    Vec3 pt = pi.centralPoint();
-                    if (pt != null) {
-                        tf = mv.projectToScreen(vp, mode.scale, pt);
-                    }
-                }
-
-                if (tf != null) {
-                    double deltaX = Math.abs(tf.x - mousePosition.x);
-                    double deltaY = Math.abs(tf.y - mousePosition.y);
-                    if (deltaX < 0.02 && deltaY < 0.02) {
-                        mouseOverJHVEvent = evtr;
-                        break;
-                    }
-                }
-            }
-        }
+        JHVRelatedEvents mouseOverJHVEvent = mv.isOrthographic()
+                ? findOrthographicEvent(activeEvents, currentTime, mv.mouseToSurface(vp, mouseOverX, mouseOverY), mv.mouseToPlane(vp, mouseOverX, mouseOverY))
+                : findProjectedEvent(activeEvents, currentTime, mv, vp, mv.mouseToScreen(vp, mouseOverX, mouseOverY));
 
         swekContext.setMouseOver(mouseOverX, mouseOverY, currentTime, mouseOverJHVEvent);
         Component canvas = component();
@@ -227,4 +160,62 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         }
     }
 
+    private static JHVRelatedEvents findOrthographicEvent(List<JHVRelatedEvents> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
+        for (JHVRelatedEvents evtr : activeEvents) {
+            JHVEvent evt = evtr.getClosestTo(currentTime);
+            JHVPositionInformation pi = evt.getPositionInformation();
+            if (pi == null)
+                continue;
+
+            Vec3 hitpoint, pt;
+            if (evt.isCactus()) {
+                double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
+                double distSun = computeDistSun(evt, currentTime);
+                Quat q = pi.getEarth().toQuat();
+                pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
+                hitpoint = planeHitpoint == null ? null : q.rotateInverseVector(planeHitpoint);
+            } else {
+                hitpoint = sphereHitpoint;
+                pt = pi.centralPoint();
+            }
+
+            if (pt != null && hitpoint != null) {
+                double deltaX = Math.abs(hitpoint.x - pt.x);
+                double deltaY = Math.abs(hitpoint.y - pt.y);
+                double deltaZ = Math.abs(hitpoint.z - pt.z);
+                if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08)
+                    return evtr;
+            }
+        }
+        return null;
+    }
+
+    private static JHVRelatedEvents findProjectedEvent(List<JHVRelatedEvents> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
+        MapScale scale = mv.mode().scale;
+        for (JHVRelatedEvents evtr : activeEvents) {
+            JHVEvent evt = evtr.getClosestTo(currentTime);
+            JHVPositionInformation pi = evt.getPositionInformation();
+            if (pi == null)
+                continue;
+
+            Vec2 tf = null;
+            if ((mv.isPolar() || mv.isLogPolar()) && evt.isCactus()) {
+                double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
+                double distSun = computeDistSun(evt, currentTime);
+                tf = new Vec2(scale.getXValueInv(principalAngle) * vp.aspect, scale.getYValueInv(distSun));
+            } else {
+                Vec3 pt = pi.centralPoint();
+                if (pt != null)
+                    tf = mv.projectToScreen(vp, scale, pt);
+            }
+
+            if (tf != null) {
+                double deltaX = Math.abs(tf.x - mousePosition.x);
+                double deltaY = Math.abs(tf.y - mousePosition.y);
+                if (deltaX < 0.02 && deltaY < 0.02)
+                    return evtr;
+            }
+        }
+        return null;
+    }
 }
