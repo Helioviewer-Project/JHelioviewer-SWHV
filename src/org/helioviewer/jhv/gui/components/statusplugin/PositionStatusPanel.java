@@ -11,7 +11,6 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -47,7 +46,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         } else if (mode == MapMode.Polar || mode == MapMode.LogPolar) {
             setText(formatPolar(coord));
         } else {
-            Vec3 v = ViewportMath.unprojectToCurrentViewSphereOrPlane(mv.camera(), vp, mv.cameraWidth(vp), x, y);
+            Vec3 v = mv.mouseToSky(vp, x, y);
             if (v == null) {
                 setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
             } else {

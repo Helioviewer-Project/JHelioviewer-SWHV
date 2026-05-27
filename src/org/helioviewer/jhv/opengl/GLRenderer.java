@@ -105,11 +105,10 @@ public final class GLRenderer {
 
     static void renderScene() {
         MapView mv = mapView;
-        Camera camera = mv.camera();
         MapScale scale = MapScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho(vp.aspect, mv.cameraWidth(vp), camera.getTranslationX(), camera.getTranslationY(), mv.viewRotation());
+            Transform.ortho(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY(), mv.viewRotation());
             GLSLSolarShader.bindScreen(vp, scale);
 
             GLSLSolarShader.sphere.use();
@@ -151,7 +150,6 @@ public final class GLRenderer {
 
         boolean hpcMode = mode == MapMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayers.computeHpcScaleBounds() : null;
-        Camera camera = mv.camera();
         for (Viewport vp : Display.getViewports()) {
             MapScale scale = mode.scale;
             if (hpcMode) {
@@ -162,7 +160,7 @@ public final class GLRenderer {
                 scale = MapScale.hpc;
             }
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), camera.getTranslationX(), camera.getTranslationY());
+            Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
             GLSLSolarShader.bindScreen(vp, scale);
 
             Layers.renderScale(mv, vp, scale);

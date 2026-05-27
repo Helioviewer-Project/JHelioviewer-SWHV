@@ -27,6 +27,10 @@ public abstract class MapView {
         gridType = _gridType;
     }
 
+    protected final Camera camera() {
+        return camera;
+    }
+
     static MapView orthographic(Camera camera, Position viewpoint, GridType gridType) {
         return new OrthographicView(camera, viewpoint, camera.getCameraWidth(1), gridType);
     }
@@ -43,12 +47,16 @@ public abstract class MapView {
         return new ProjectedView(camera, viewpoint, width, gridType, mode);
     }
 
-    public Camera camera() {
-        return camera;
-    }
-
     public double cameraWidth(Viewport vp) {
         return cameraWidth * vp.zoom;
+    }
+
+    public double cameraTranslationX() {
+        return camera.getTranslationX();
+    }
+
+    public double cameraTranslationY() {
+        return camera.getTranslationY();
     }
 
     public MapMode mode() {
