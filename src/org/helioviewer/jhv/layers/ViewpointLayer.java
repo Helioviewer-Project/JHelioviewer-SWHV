@@ -121,7 +121,7 @@ public class ViewpointLayer extends AbstractLayer {
             }
         }
 
-        double pointFactor = ViewportMath.getTemperedPointFactor(vp, mv.cameraWidth(vp));
+        double pointFactor = temperedPointFactor(vp, mv.cameraWidth(vp));
         Position viewpoint = mv.viewpoint();
 
         Transform.pushView();
@@ -144,6 +144,11 @@ public class ViewpointLayer extends AbstractLayer {
     private static final int MOUSE_OFFSET_Y = 25;
     private final List<String> hoverText = new ArrayList<>();
     private int mouseX, mouseY;
+
+    private static double temperedPointFactor(Viewport vp, double width) {
+        double pixelScale = Display.pixelScale[1];
+        return pixelScale * Math.cbrt(ViewportMath.getPixelFactor(vp, width) / pixelScale);
+    }
 
     @Override
     public void renderFullFloat(Viewport vp) {
@@ -171,14 +176,14 @@ public class ViewpointLayer extends AbstractLayer {
             return;
         }
 
-        long time = GLRenderer.getDisplayedViewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        MapView mv = GLRenderer.getMapView();
+        long time = mv.viewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
         mouseX = e.x();
         mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        MapView mv = GLRenderer.getMapView();
         double width = mv.cameraWidth(vp);
         double mousePlaneX = ViewportMath.computeUpX(vp, width, mv.cameraTranslationX(), mouseX);
         double mousePlaneY = ViewportMath.computeUpY(vp, width, mv.cameraTranslationY(), mouseY);

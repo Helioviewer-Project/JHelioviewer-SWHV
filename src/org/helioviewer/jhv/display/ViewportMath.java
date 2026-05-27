@@ -48,10 +48,6 @@ public final class ViewportMath {
         return Display.pixelScale[1] * getLogicalPixelFactor(vp, width);
     }
 
-    public static double getTemperedPointFactor(Viewport vp, double width) {
-        return Display.pixelScale[1] * Math.cbrt(getLogicalPixelFactor(vp, width));
-    }
-
     public static double getImagePixelFactor(Camera camera, Viewport vp) {
         return vp.height / zoomedCameraWidth(camera, vp);
     }
@@ -115,21 +111,21 @@ public final class ViewportMath {
     }
 
     @Nullable
-    public static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
+    static Vec3 unprojectToOutputSphere(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
         Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
         Vec3 hitPoint = intersectSphere(vp, width, camera.getTranslationX(), camera.getTranslationY(), screenX, screenY);
         return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
-    public static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
+    static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
         Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
         Vec3 hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
         return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
     @Nullable
-    public static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double width, double x, double y) {
+    static Vec3 unprojectToCurrentViewSphereOrPlane(Camera camera, Viewport vp, double width, double x, double y) {
         Quat dragRotation = camera.getDragRotation();
         double tx = camera.getTranslationX();
         double ty = camera.getTranslationY();
