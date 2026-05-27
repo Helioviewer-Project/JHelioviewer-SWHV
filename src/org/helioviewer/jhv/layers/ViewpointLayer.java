@@ -180,7 +180,7 @@ public class ViewpointLayer extends AbstractLayer {
         mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        double width = GLRenderer.getRenderView().cameraWidth(vp.zoom);
+        double width = GLRenderer.getMapView().cameraWidth(vp);
         double mousePlaneX = ViewportMath.computeUpX(vp, width, camera.getTranslationX(), mouseX);
         double mousePlaneY = ViewportMath.computeUpY(vp, width, camera.getTranslationY(), mouseY);
         Quat dragRotation = camera.getDragRotation();

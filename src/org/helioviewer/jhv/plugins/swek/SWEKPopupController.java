@@ -8,9 +8,9 @@ import java.util.List;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapMode;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.events.JHVEvent;
@@ -147,17 +147,17 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         int mouseOverY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        RenderView renderView = GLRenderer.getRenderView();
-        double displayWidth = renderView.cameraWidth(vp.zoom);
-        MapMode mode = Display.mode;
+        MapView mv = GLRenderer.getMapView();
+        double displayWidth = mv.cameraWidth(vp);
+        MapMode mode = mv.mode();
         Vec3 sphereHitpoint = null;
         Vec3 planeHitpoint = null;
         Vec2 mousePosition = null;
         if (mode == MapMode.Orthographic) {
-            sphereHitpoint = mode.mouseToSurface(camera, renderView, vp, Display.gridType, mouseOverX, mouseOverY);
+            sphereHitpoint = mv.mouseToSurface(vp, mouseOverX, mouseOverY);
             planeHitpoint = ViewportMath.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
         } else {
-            mousePosition = mode.mouseToScreen(camera, renderView, vp, mouseOverX, mouseOverY);
+            mousePosition = mv.mouseToScreen(vp, mouseOverX, mouseOverY);
         }
 
         for (JHVRelatedEvents evtr : activeEvents) {
@@ -198,7 +198,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 } else {
                     Vec3 pt = pi.centralPoint();
                     if (pt != null) {
-                        tf = mode.projectToScreen(renderView, vp, Display.gridType, pt);
+                        tf = mv.projectToScreen(vp, mode.scale, pt);
                     }
                 }
 
