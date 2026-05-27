@@ -52,17 +52,15 @@ public abstract class MapView {
         return renderView.viewpoint();
     }
 
-    public Vec2 mouseToGrid(Viewport vp, int x, int y) {
-        return mode.mouseToGrid(camera, renderView, vp, gridType, x, y);
+    protected RenderView renderView() {
+        return renderView;
     }
 
-    public Vec3 mouseToSurface(Viewport vp, int x, int y) {
-        return mode.mouseToSurface(camera, renderView, vp, gridType, x, y);
-    }
+    public abstract Vec2 mouseToGrid(Viewport vp, int x, int y);
 
-    public Vec2 mouseToScreen(Viewport vp, int x, int y) {
-        return mode.mouseToScreen(camera, renderView, vp, x, y);
-    }
+    public abstract Vec3 mouseToSurface(Viewport vp, int x, int y);
+
+    public abstract Vec2 mouseToScreen(Viewport vp, int x, int y);
 
     public Vec3 mouseToSky(Viewport vp, int x, int y) {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
@@ -106,6 +104,21 @@ public abstract class MapView {
         }
 
         @Override
+        public Vec2 mouseToGrid(Viewport vp, int x, int y) {
+            return OrthographicMap.mouseToGrid(camera(), renderView(), vp, gridType(), x, y);
+        }
+
+        @Override
+        public Vec3 mouseToSurface(Viewport vp, int x, int y) {
+            return OrthographicMap.mouseToSurface(camera(), renderView(), vp, x, y);
+        }
+
+        @Override
+        public Vec2 mouseToScreen(Viewport vp, int x, int y) {
+            throw new UnsupportedOperationException("Orthographic mode does not support mouseToScreen()");
+        }
+
+        @Override
         public void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
             OrthographicMap.emitMapLine(vertices, radius, color, vexBuf);
         }
@@ -130,6 +143,21 @@ public abstract class MapView {
         @Override
         public Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v) {
             return ProjectedMap.projectToScreen(kind, viewpoint(), scale, rotation, vp, v);
+        }
+
+        @Override
+        public Vec2 mouseToGrid(Viewport vp, int x, int y) {
+            return ProjectedMap.mouseToGrid(camera(), renderView(), vp, mode().scale, gridType(), x, y);
+        }
+
+        @Override
+        public Vec3 mouseToSurface(Viewport vp, int x, int y) {
+            return ProjectedMap.mouseToSurface(kind, camera(), renderView(), vp, mode().scale, gridType(), x, y);
+        }
+
+        @Override
+        public Vec2 mouseToScreen(Viewport vp, int x, int y) {
+            return ProjectedMap.mouseToScreen(camera(), renderView(), vp, mode().scale, x, y);
         }
 
         @Override
