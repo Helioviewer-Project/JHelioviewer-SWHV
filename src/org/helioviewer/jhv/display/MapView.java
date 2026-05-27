@@ -60,6 +60,10 @@ public abstract class MapView {
         return mode.mouseToSurface(camera, renderView, vp, gridType, x, y);
     }
 
+    public Vec2 mouseToScreen(Viewport vp, int x, int y) {
+        return mode.mouseToScreen(camera, renderView, vp, x, y);
+    }
+
     public Vec3 mouseToSky(Viewport vp, int x, int y) {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
     }

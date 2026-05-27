@@ -27,10 +27,6 @@ public final class GLRenderer {
         return renderView.viewpoint();
     }
 
-    public static RenderView getRenderView() {
-        return renderView;
-    }
-
     public static MapView getMapView() {
         return mapView;
     }
