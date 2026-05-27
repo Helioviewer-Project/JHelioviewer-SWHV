@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.camera.RenderView;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -13,31 +12,35 @@ import org.helioviewer.jhv.opengl.BufVertex;
 public abstract class MapView {
 
     private final Camera camera;
-    private final RenderView renderView;
+    private final Position viewpoint;
+    private final double cameraWidth;
+    private final Quat viewRotation;
     private final MapMode mode;
     private final GridType gridType;
 
-    protected MapView(Camera _camera, RenderView _renderView, MapMode _mode, GridType _gridType) {
+    protected MapView(Camera _camera, Position _viewpoint, double _cameraWidth, MapMode _mode, GridType _gridType) {
         camera = _camera;
-        renderView = _renderView;
+        viewpoint = _viewpoint;
+        cameraWidth = _cameraWidth;
+        viewRotation = Quat.rotate(_camera.getDragRotation(), _viewpoint.toQuat());
         mode = _mode;
         gridType = _gridType;
     }
 
     static MapView orthographic(Camera camera, Position viewpoint, GridType gridType) {
-        return new OrthographicView(camera, camera.renderView(viewpoint), gridType);
+        return new OrthographicView(camera, viewpoint, camera.getCameraWidth(1), gridType);
     }
 
     static MapView orthographic(Camera camera, Position viewpoint, double width, GridType gridType) {
-        return new OrthographicView(camera, camera.view(viewpoint, width), gridType);
+        return new OrthographicView(camera, viewpoint, width, gridType);
     }
 
     static MapView projected(Camera camera, Position viewpoint, GridType gridType, MapMode mode) {
-        return new ProjectedView(camera, camera.renderView(viewpoint), gridType, mode);
+        return new ProjectedView(camera, viewpoint, camera.getCameraWidth(1), gridType, mode);
     }
 
     static MapView projected(Camera camera, Position viewpoint, double width, GridType gridType, MapMode mode) {
-        return new ProjectedView(camera, camera.view(viewpoint, width), gridType, mode);
+        return new ProjectedView(camera, viewpoint, width, gridType, mode);
     }
 
     public Camera camera() {
@@ -45,7 +48,7 @@ public abstract class MapView {
     }
 
     public double cameraWidth(Viewport vp) {
-        return renderView.cameraWidth(vp.zoom);
+        return cameraWidth * vp.zoom;
     }
 
     public MapMode mode() {
@@ -57,11 +60,11 @@ public abstract class MapView {
     }
 
     public Position viewpoint() {
-        return renderView.viewpoint();
+        return viewpoint;
     }
 
     public Quat viewRotation() {
-        return renderView.viewRotation();
+        return viewRotation;
     }
 
     public abstract Vec2 mouseToGrid(Viewport vp, int x, int y);
@@ -102,8 +105,8 @@ public abstract class MapView {
 
     private static final class OrthographicView extends MapView {
 
-        OrthographicView(Camera _camera, RenderView _renderView, GridType _gridType) {
-            super(_camera, _renderView, MapMode.Orthographic, _gridType);
+        OrthographicView(Camera _camera, Position _viewpoint, double _cameraWidth, GridType _gridType) {
+            super(_camera, _viewpoint, _cameraWidth, MapMode.Orthographic, _gridType);
         }
 
         @Override
@@ -142,8 +145,8 @@ public abstract class MapView {
         private final ProjectedMap.Kind kind;
         private final Quat rotation;
 
-        ProjectedView(Camera _camera, RenderView _renderView, GridType _gridType, MapMode _mode) {
-            super(_camera, _renderView, _mode, _gridType);
+        ProjectedView(Camera _camera, Position _viewpoint, double _cameraWidth, GridType _gridType, MapMode _mode) {
+            super(_camera, _viewpoint, _cameraWidth, _mode, _gridType);
             kind = _mode.projectedKind;
             rotation = _gridType.mapRotation(viewpoint());
         }
