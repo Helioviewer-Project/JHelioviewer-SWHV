@@ -7,12 +7,9 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.camera.Camera;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -73,13 +70,13 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    static Vec3 mouseToSurface(Camera camera, Viewport vp, int x, int y) {
-        return Display.mode.mouseToSurface(camera, GLRenderer.getRenderView(), vp, Display.gridType, x, y);
+    static Vec3 mouseToSurface(Viewport vp, int x, int y) {
+        return GLRenderer.getMapView().mouseToSurface(vp, x, y);
     }
 
     @Nullable
-    static Vec3 mouseToSky(Camera camera, Viewport vp, int x, int y) {
-        return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, GLRenderer.getRenderView().cameraWidth(vp.zoom), x, y);
+    static Vec3 mouseToSky(Viewport vp, int x, int y) {
+        return GLRenderer.getMapView().mouseToSky(vp, x, y);
     }
 
     @Nullable
@@ -89,7 +86,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Nullable
-    protected Vec3 computeDragPoint(Camera camera, Viewport vp, int x, int y) {
+    protected Vec3 computeDragPoint(Viewport vp, int x, int y) {
         return null;
     }
 
@@ -100,21 +97,21 @@ abstract class AbstractAnnotateable implements Annotateable {
     public void drawTransformed(MapView mv, boolean active, BufVertex lineBuf, BufVertex centerBuf) {}
 
     @Override
-    public void mousePressed(Camera camera, Viewport vp, int x, int y) {
+    public void mousePressed(Viewport vp, int x, int y) {
         if (!isDraggable())
             return;
 
-        Vec3 pt = computeDragPoint(camera, vp, x, y);
+        Vec3 pt = computeDragPoint(vp, x, y);
         if (pt != null)
             dragStartPoint = pt;
     }
 
     @Override
-    public void mouseDragged(Camera camera, Viewport vp, int x, int y) {
+    public void mouseDragged(Viewport vp, int x, int y) {
         if (!isDraggable())
             return;
 
-        Vec3 pt = computeDragPoint(camera, vp, x, y);
+        Vec3 pt = computeDragPoint(vp, x, y);
         if (pt != null)
             dragEndPoint = pt;
     }
