@@ -19,6 +19,7 @@ import org.helioviewer.jhv.layers.MiniviewLayer;
 public final class GLRenderer {
 
     private static RenderView renderView = Display.getCamera().renderView(Sun.StartEarth);
+    private static MapView mapView = Display.mode.createMapView(Display.getCamera(), renderView, Display.gridType);
 
     private GLRenderer() {}
 
@@ -28,6 +29,10 @@ public final class GLRenderer {
 
     public static RenderView getRenderView() {
         return renderView;
+    }
+
+    public static MapView getMapView() {
+        return mapView;
     }
 
     public static void init() {
@@ -62,7 +67,9 @@ public final class GLRenderer {
     }
 
     public static void display(Position viewpoint) {
-        renderView = Display.getCamera().renderView(viewpoint);
+        Camera camera = Display.getCamera();
+        renderView = camera.renderView(viewpoint);
+        mapView = Display.mode.createMapView(camera, renderView, Display.gridType);
 
         if (Display.whiteBackground)
             GL.glClearColor(1, 1, 1, 0);
@@ -99,8 +106,8 @@ public final class GLRenderer {
     }
 
     static void renderScene() {
-        Camera camera = Display.getCamera();
-        MapView mv = Display.mode.createMapView(camera, renderView, Display.gridType);
+        MapView mv = mapView;
+        Camera camera = mv.camera();
         MapScale scale = MapScale.ortho;
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
@@ -145,8 +152,8 @@ public final class GLRenderer {
 
         boolean hpcMode = Display.mode == MapMode.HPC;
         Region hpcBounds = hpcMode ? ImageLayers.computeHpcScaleBounds() : null;
-        Camera camera = Display.getCamera();
-        MapView mv = Display.mode.createMapView(camera, renderView, Display.gridType);
+        MapView mv = mapView;
+        Camera camera = mv.camera();
         for (Viewport vp : Display.getViewports()) {
             MapScale scale = Display.mode.scale;
             if (hpcMode) {
