@@ -51,7 +51,7 @@ public class Camera {
         translation = new Vec2(x, y);
     }
 
-    public Quat getDragRotation() {
+    Quat getDragRotation() {
         return dragRotation;
     }
 
@@ -59,7 +59,7 @@ public class Camera {
         dragRotation = Quat.rotate(dragRotation, _dragRotation);
     }
 
-    public void resetDragRotation() {
+    void resetDragRotation() {
         dragRotation = Quat.ZERO;
     }
 
@@ -67,7 +67,7 @@ public class Camera {
         dragRotation = dragRotation.twist(dragAxis);
     }
 
-    public void setFOV(double _fov, Position viewpoint) {
+    void setFOV(double _fov, Position viewpoint) {
         fov = Math.clamp(_fov, MIN_FOV, MAX_FOV);
         updateWidth(viewpoint);
     }

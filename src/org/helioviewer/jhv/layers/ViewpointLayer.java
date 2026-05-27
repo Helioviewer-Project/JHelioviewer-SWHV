@@ -11,7 +11,6 @@ import org.helioviewer.jhv.astronomy.PositionResponse;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
@@ -166,7 +165,6 @@ public class ViewpointLayer extends AbstractLayer {
             return;
         }
 
-        Camera camera = Display.getCamera();
         List<PositionLoad> positionLoads = PositionLoad.get(DisplayController.getViewpointUpdate());
         if (positionLoads.isEmpty()) {
             clearHoverTextIfNeeded();
@@ -180,10 +178,11 @@ public class ViewpointLayer extends AbstractLayer {
         mouseY = e.y();
 
         Viewport vp = Display.getActiveViewport();
-        double width = GLRenderer.getMapView().cameraWidth(vp);
-        double mousePlaneX = ViewportMath.computeUpX(vp, width, camera.getTranslationX(), mouseX);
-        double mousePlaneY = ViewportMath.computeUpY(vp, width, camera.getTranslationY(), mouseY);
-        Quat dragRotation = camera.getDragRotation();
+        MapView mv = GLRenderer.getMapView();
+        double width = mv.cameraWidth(vp);
+        double mousePlaneX = ViewportMath.computeUpX(vp, width, mv.cameraTranslationX(), mouseX);
+        double mousePlaneY = ViewportMath.computeUpY(vp, width, mv.cameraTranslationY(), mouseY);
+        Quat dragRotation = mv.dragRotation();
 
         double halfWidth = width / 2;
         double hoverThreshold2 = (0.01 * halfWidth) * (0.01 * halfWidth);

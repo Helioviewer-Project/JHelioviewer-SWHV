@@ -131,6 +131,14 @@ public final class DisplayController {
         fitCameraToImageLayers(Display.getMiniCamera(), miniViewpointState.getViewpoint());
     }
 
+    public static void zoomToFovAnnotation(double centerX, double centerY, double halfSize) {
+        Camera camera = Display.getCamera();
+        Position viewpoint = GLRenderer.getDisplayedViewpoint();
+        camera.setTranslation(-centerX, -centerY);
+        camera.resetDragRotation();
+        camera.setFOV(2 * Math.atan2(halfSize, viewpoint.distance), viewpoint);
+    }
+
     private static void fitCameraToImageLayers(Camera camera, Position viewpoint) {
         double size = Display.mode == MapMode.Orthographic ? ImageLayers.getLargestPhysicalHeight() : 1;
         double newFOV = Camera.INITFOV;

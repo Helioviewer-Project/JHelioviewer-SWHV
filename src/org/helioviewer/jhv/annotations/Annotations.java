@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
@@ -126,10 +125,10 @@ public final class Annotations {
             return pending.getData();
     }
 
-    public static void zoom(Camera camera) {
+    public static void zoom() {
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
         if (activeAnnotation instanceof AnnotateFOV annotationFOV)
-            annotationFOV.zoom(camera, Display.getActiveViewport());
+            annotationFOV.zoom(Display.getActiveViewport());
     }
 
     public static void clear() {
