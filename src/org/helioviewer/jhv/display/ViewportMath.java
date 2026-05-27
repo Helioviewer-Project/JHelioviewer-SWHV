@@ -40,12 +40,8 @@ public final class ViewportMath {
         return computeNormalizedY(vp, screenY) * width - ty;
     }
 
-    private static double getLogicalPixelFactor(Viewport vp, double width) {
-        return (vp.height / Display.pixelScale[1]) / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
-    }
-
     public static double getPixelFactor(Viewport vp, double width) {
-        return Display.pixelScale[1] * getLogicalPixelFactor(vp, width);
+        return vp.height / (width < 1 ? Math.cbrt(width) : width); // slow down zoomin of drawings
     }
 
     public static double getImagePixelFactor(Camera camera, Viewport vp) {
