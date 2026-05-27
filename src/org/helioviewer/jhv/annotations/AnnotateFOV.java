@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.annotations;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.camera.Camera;
+import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec3;
