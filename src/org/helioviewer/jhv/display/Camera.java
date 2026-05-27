@@ -72,8 +72,8 @@ public class Camera {
         updateWidth(viewpoint);
     }
 
-    public double getCameraWidth(double zoom) {
-        return cameraWidth * zoom;
+    double baseCameraWidth() {
+        return cameraWidth;
     }
 
     public static double zoomFactor(double wr) {

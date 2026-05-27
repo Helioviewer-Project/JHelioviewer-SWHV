@@ -11,11 +11,6 @@ public enum MapMode {
         public MapView createMapView(Camera camera, Position viewpoint, GridType gridType) {
             return MapView.orthographic(camera, viewpoint, gridType);
         }
-
-        @Override
-        public MapView createMapView(Camera camera, Position viewpoint, double width, GridType gridType) {
-            return MapView.orthographic(camera, viewpoint, width, gridType);
-        }
     },
     HPC(GLSLSolarShader.hpc, MapScale.hpc, ProjectedMap.Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, MapScale.lati, ProjectedMap.Kind.LATITUDINAL),
@@ -38,9 +33,5 @@ public enum MapMode {
 
     public MapView createMapView(Camera camera, Position viewpoint, GridType gridType) {
         return MapView.projected(camera, viewpoint, gridType, this);
-    }
-
-    public MapView createMapView(Camera camera, Position viewpoint, double width, GridType gridType) {
-        return MapView.projected(camera, viewpoint, width, gridType, this);
     }
 }

@@ -125,15 +125,15 @@ public final class GLRenderer {
         if (miniview != null && miniview.isEnabled()) {
             Viewport vp = miniview.getViewport();
             Camera miniCamera = Display.getMiniCamera();
+            MapView mv = mapView.mode().createMapView(miniCamera, mapView.viewpoint(), mapView.gridType());
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho2D(vp.aspect, miniCamera.getCameraWidth(vp.zoom), miniCamera.getTranslationX(), miniCamera.getTranslationY());
+            Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
             MapScale scale = MapScale.ortho;
             GLSLSolarShader.bindScreen(vp, scale);
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            MapView mv = mapView.mode().createMapView(miniCamera, mapView.viewpoint(), miniCamera.getCameraWidth(vp.zoom) / vp.zoom, mapView.gridType());
             Layers.renderMiniview(mv, vp, scale);
             GL.glEnable(GL.DEPTH_TEST);
         }
