@@ -191,7 +191,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     }
 
     private static JHVRelatedEvents findProjectedEvent(List<JHVRelatedEvents> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
-        MapScale scale = mv.mode().scale;
+        MapScale scale = mv.scale(vp);
         for (JHVRelatedEvents evtr : activeEvents) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             JHVPositionInformation pi = evt.getPositionInformation();
