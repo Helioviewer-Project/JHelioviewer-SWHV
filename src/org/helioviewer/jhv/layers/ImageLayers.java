@@ -9,10 +9,8 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -38,12 +36,10 @@ public final class ImageLayers {
     }
 
     public static void decode(float factor, Position viewpoint) {
-        Camera camera = Display.getCamera();
-
         Layers.forEachImageLayer(layer -> {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
-                double pixFactor = ViewportMath.getImagePixelFactor(camera, Display.getViewport(idx));
+                double pixFactor = DisplayController.getImagePixelFactor(Display.getViewport(idx));
                 layer.getView().decode(viewpoint, pixFactor, factor);
             }
         });

@@ -8,7 +8,7 @@ import org.helioviewer.jhv.math.Vec3;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Camera {
+public final class Camera {
 
     static final double ZOOM_MULTIPLIER_BUTTON = 1;
     private static final double ZOOM_STEP = 0.005;

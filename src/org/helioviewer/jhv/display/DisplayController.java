@@ -42,6 +42,10 @@ public final class DisplayController {
             display(viewpoint);
     }
 
+    public static double getImagePixelFactor(Viewport vp) {
+        return ViewportMath.getImagePixelFactor(Display.getCamera(), vp);
+    }
+
     public static void display() {
         display(viewpointModel.getViewpoint());
     }
