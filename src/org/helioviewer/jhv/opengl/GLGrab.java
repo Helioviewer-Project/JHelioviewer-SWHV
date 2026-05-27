@@ -3,7 +3,6 @@ package org.helioviewer.jhv.opengl;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapMode;
 
 public class GLGrab {
 
@@ -42,7 +41,7 @@ public class GLGrab {
 
             capture.bindForRender();
             GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-            if (Display.mode == MapMode.Orthographic) {
+            if (GLRenderer.getMapView().isOrthographic()) {
                 GLRenderer.renderScene();
             } else {
                 GLRenderer.renderSceneScale();
