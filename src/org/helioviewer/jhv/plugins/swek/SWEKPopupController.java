@@ -154,8 +154,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
         Vec3 planeHitpoint = null;
         Vec2 mousePosition = null;
         if (mode == MapMode.Orthographic) {
-            Quat viewpointRotation = viewpoint.toQuat();
-            sphereHitpoint = ViewportMath.unprojectToOutputSphere(camera, vp, displayWidth, mouseOverX, mouseOverY, viewpointRotation);
+            sphereHitpoint = mode.mouseToSurface(camera, renderView, vp, Display.gridType, mouseOverX, mouseOverY);
             planeHitpoint = ViewportMath.unprojectToOutputPlane(camera, vp, displayWidth, mouseOverX, mouseOverY, Quat.ZERO);
         } else {
             mousePosition = mode.mouseToScreen(camera, renderView, vp, mouseOverX, mouseOverY);
