@@ -214,9 +214,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         shader.use();
         glImage.applyFilters();
 
-        Position renderViewpoint = mv.viewpoint();
-        Quat q = Quat.rotate(mv.camera().getDragRotation(), renderViewpoint.toQuat());
-
         MetaData meta0 = imageData.getMetaData();
         Position metaViewpoint0 = meta0.getViewpoint();
         ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
@@ -225,6 +222,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         WcsHeader wcs0 = meta0.getWcsHeader();
         WcsHeader wcs1 = meta1.getWcsHeader();
 
+        Quat q = mv.viewRotation();
         Quat cameraDiff0 = Quat.rotateWithConjugate(q, metaViewpoint0.toQuat());
         Quat cameraDiff1 = Quat.rotateWithConjugate(q, metaViewpoint1.toQuat());
 
@@ -256,6 +254,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
 
         float deltaT0 = 0, deltaT1 = 0;
+        Position renderViewpoint = mv.viewpoint();
         if (ImageLayers.getDiffRotationMode()) {
             deltaT0 = (float) ((renderViewpoint.time.milli - metaViewpoint0.time.milli) * 1e-9);
             deltaT1 = (float) ((renderViewpoint.time.milli - metaViewpoint1.time.milli) * 1e-9);
@@ -271,8 +270,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         Quat displayMap0 = Quat.ZERO;
         Quat displayMap1 = Quat.ZERO;
         if (mv.isLatitudinal()) {
-            displayMap0 = displayMap1 = mv.gridType().mapRotation(renderViewpoint);
             GridType gridType = mv.gridType();
+            displayMap0 = displayMap1 = gridType.mapRotation(renderViewpoint);
             latiGrid0[0] = (float) latiLongitude(gridType, renderViewpoint, metaViewpoint0);
             latiGrid0[1] = (float) gridType.toLatitude(metaViewpoint0);
             latiGrid0[2] = (float) metaViewpoint0.lat;
