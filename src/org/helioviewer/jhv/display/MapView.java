@@ -52,6 +52,10 @@ public abstract class MapView {
         return renderView.viewpoint();
     }
 
+    public Quat viewRotation() {
+        return renderView.viewRotation();
+    }
+
     protected RenderView renderView() {
         return renderView;
     }
