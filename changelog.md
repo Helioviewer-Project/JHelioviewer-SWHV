@@ -1,13 +1,34 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 5.1.0 (pending)
+## JHelioviewer 5.5.0 (pending)
 
+### Display and rendering
 - Add `ARC` WCS projection support
-- Load user color lookup tables from `$HOME/JHelioviewer-SWHV/Settings/user-luts.txt`
 - Add option to zoom multiview panels separately
+- Improve multiview layouts, flat-grid density, and grid label sizing
+- Improve map projection, annotation, SWEK, and connection rendering performance
+
+### Image loading and data
+- Load user color lookup tables from `$HOME/JHelioviewer-SWHV/Settings/user-luts.txt`
+- Harden FITS metadata handling, WCS parsing, LUT restoration, BLANK/BZERO/BSCALE handling, and clipping range behavior
+- Improve JPIP/J2K robustness, including socket buffering, premature EOF handling, dropped decode callbacks, and resource cleanup
+- Improve image-layer loading ownership and asynchronous decode handling
+
+### Application control and integration
 - Set IAS as default image data server, remove the automatic setting, and restore the preference in Settings
 - Allow server-like headless operation, including full software rendering (see `extra/samp`)
+- Expand SAMP support for image load completion and FITS view settings
+- Improve startup, crash reporting, uncaught exception routing, and ANGLE diagnostics
+
+### Timeline, events, and UI
+- Improve timeline rendering performance with off-EDT polyline building, cached SWEK events, and reduced repaint churn
+- Improve SWEK event association, related-event lookup, timeline cache, and popup ownership
+- Reduce Swing coupling in layer options and layer selector updates
+
+### Technical
+- Expand GLSL/WCS validation coverage, including SwiftShader and Electron-backed shader checks
+- Rework and tighten display/viewpoint/camera internals around `MapView`
 - Various bug fixes, cleanups, and major internal refactoring
 
 ## JHelioviewer 5.0 (2026-05-08)
