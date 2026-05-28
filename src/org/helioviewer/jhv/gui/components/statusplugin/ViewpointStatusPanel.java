@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.gui.components.statusplugin;
 
+import java.text.DecimalFormat;
+
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
@@ -11,6 +13,9 @@ import org.helioviewer.jhv.time.JHVTime;
 
 @SuppressWarnings("serial")
 public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin implements Interfaces.LazyComponent {
+
+    private final DecimalFormat carringtonFormat = new DecimalFormat("0.00");
+    private final DecimalFormat distanceFormat = new DecimalFormat("0.000");
 
     private double distance;
     private JHVTime time = Sun.StartEarth.time;
@@ -28,7 +33,7 @@ public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin impleme
 
         distance = viewpoint.distance;
         time = viewpoint.time;
-        setText(String.format("CR: %.2f D\u2609: %7.3fau |", Carrington.time2CR(time), distance * Sun.MeanEarthDistanceInv));
+        setText("CR: " + carringtonFormat.format(Carrington.time2CR(time)) + " D\u2609: " + distanceFormat.format(distance * Sun.MeanEarthDistanceInv) + "au |");
     }
 
 }
