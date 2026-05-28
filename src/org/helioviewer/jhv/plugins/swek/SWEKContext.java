@@ -6,21 +6,10 @@ import org.helioviewer.jhv.events.JHVRelatedEvents;
 
 final class SWEKContext {
 
-    private boolean enabled;
     private JHVRelatedEvents mouseOverJHVEvent;
     private int mouseOverX;
     private int mouseOverY;
     private long mouseOverTime;
-
-    boolean isEnabled() {
-        return enabled;
-    }
-
-    void setEnabled(boolean _enabled) {
-        enabled = _enabled;
-        if (!enabled)
-            clearHover();
-    }
 
     @Nullable
     JHVRelatedEvents mouseOverJHVEvent() {

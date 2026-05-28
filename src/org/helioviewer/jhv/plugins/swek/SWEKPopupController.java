@@ -34,12 +34,12 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     private static final int xOffset = 12;
     private static final int yOffset = 12;
 
-    private final SWEKContext swekContext;
+    private final SWEKContext swekContext = new SWEKContext();
 
     private Cursor lastCursor;
 
-    SWEKPopupController(SWEKContext _swekContext) {
-        swekContext = _swekContext;
+    SWEKContext context() {
+        return swekContext;
     }
 
     void install() {
@@ -93,7 +93,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     @Override
     public void mouseClicked(PointerEvent e) {
         JHVRelatedEvents mouseOverJHVEvent = swekContext.mouseOverJHVEvent();
-        if (swekContext.isEnabled() && mouseOverJHVEvent != null) {
+        if (mouseOverJHVEvent != null) {
             Component canvas = component();
             SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(swekContext.mouseOverTime()));
             hekPopUp.pack();
@@ -124,11 +124,6 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
 
     @Override
     public void mouseMoved(PointerEvent e) {
-        if (!swekContext.isEnabled()) {
-            resetHover();
-            return;
-        }
-
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
         long currentTime = viewpoint.time.milli;
         List<JHVRelatedEvents> activeEvents = JHVEventCache.getEvents(currentTime, currentTime);
