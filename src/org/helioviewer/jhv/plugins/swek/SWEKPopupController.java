@@ -35,20 +35,51 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     private static final int yOffset = 12;
 
     private final SWEKContext swekContext = new SWEKContext();
+    private SWEKLayer layer;
+    private boolean guiInstalled;
+    private boolean mouseTracking;
 
     private Cursor lastCursor;
 
-    SWEKContext context() {
-        return swekContext;
+    void setLayer(SWEKLayer _layer) {
+        if (layer == _layer) {
+            updateMouseTracking();
+            return;
+        }
+
+        resetHover();
+        if (layer != null)
+            layer.setContext(null);
+
+        layer = _layer;
+
+        if (layer != null)
+            layer.setContext(swekContext);
+        updateMouseTracking();
     }
 
     void install() {
-        InputController.addListener(this);
+        guiInstalled = true;
+        updateMouseTracking();
     }
 
     void uninstall() {
-        InputController.removeListener(this);
-        resetHover();
+        guiInstalled = false;
+        updateMouseTracking();
+    }
+
+    private void updateMouseTracking() {
+        boolean shouldTrackMouse = guiInstalled && layer != null && layer.isEnabled();
+        if (shouldTrackMouse == mouseTracking)
+            return;
+
+        mouseTracking = shouldTrackMouse;
+        if (mouseTracking) {
+            InputController.addListener(this);
+        } else {
+            InputController.removeListener(this);
+            resetHover();
+        }
     }
 
     private static Component component() {

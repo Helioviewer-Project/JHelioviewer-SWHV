@@ -10,17 +10,20 @@ import org.json.JSONObject;
 
 public class SWEKPlugin extends Plugin {
 
-    private static final SWEKLayer layer = new SWEKLayer(null);
+    private static SWEKPlugin instance;
+    private static SWEKLayer layer;
     private EventTimelineLayer etl;
     private SWEKTreePane swekPanel;
     private SWEKPopupController popupController;
 
     public SWEKPlugin() {
         super("Space Weather Event Knowledgebase", "Visualize space weather relevant events");
+        instance = this;
     }
 
     @Override
     public void install() {
+        layer = new SWEKLayer(null);
         layer.setEnabled(true);
         Layers.add(layer);
     }
@@ -28,6 +31,7 @@ public class SWEKPlugin extends Plugin {
     @Override
     public void uninstall() {
         Layers.remove(layer);
+        layer = null;
     }
 
     @Override
@@ -35,7 +39,7 @@ public class SWEKPlugin extends Plugin {
         etl = new EventTimelineLayer();
         swekPanel = new SWEKTreePane(SWEKConfig.load());
         popupController = new SWEKPopupController();
-        layer.setContext(popupController.context());
+        bindLayer();
 
         JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         JHVFrame.getLeftContentPane().revalidate();
@@ -49,6 +53,7 @@ public class SWEKPlugin extends Plugin {
     public void uninstallGUI() {
         Timelines.getLayers().remove(etl);
         popupController.uninstall();
+        popupController.setLayer(null);
         LayerOptions.unregister(SWEKLayer.class);
 
         JHVFrame.getLeftContentPane().remove(swekPanel);
@@ -66,6 +71,21 @@ public class SWEKPlugin extends Plugin {
     @Override
     public void loadState(JSONObject jo) {
         // functionality to be restored later
+    }
+
+    static void restoreLayer(SWEKLayer _layer) {
+        layer = _layer;
+        instance.bindLayer();
+    }
+
+    static void layerStateChanged(SWEKLayer _layer) {
+        if (layer == _layer)
+            instance.bindLayer();
+    }
+
+    private void bindLayer() {
+        if (popupController != null)
+            popupController.setLayer(layer);
     }
 
 }
