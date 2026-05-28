@@ -34,7 +34,8 @@ public class SWEKPlugin extends Plugin {
     public void installGUI() {
         etl = new EventTimelineLayer();
         swekPanel = new SWEKTreePane(SWEKConfig.load());
-        popupController = new SWEKPopupController(layer.getContext());
+        popupController = new SWEKPopupController();
+        layer.setContext(popupController.context());
 
         JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
         JHVFrame.getLeftContentPane().revalidate();

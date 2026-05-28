@@ -57,7 +57,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
     private static final float[][] texCoord = {{0, 1}, {1, 1}, {0, 0}, {1, 0}};
 
-    private final SWEKContext swekContext = new SWEKContext();
+    private SWEKContext swekContext;
     private boolean icons = true;
 
     private final GLSLLine lineEvent = new GLSLLine(true);
@@ -78,8 +78,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             icons = jo.optBoolean("icons", icons);
     }
 
-    SWEKContext getContext() {
-        return swekContext;
+    void setContext(SWEKContext _swekContext) {
+        swekContext = _swekContext;
     }
 
     @Override
@@ -424,7 +424,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void renderFullFloat(Viewport vp) {
         if (!enabled)
             return;
-        if (swekContext.mouseOverJHVEvent() != null) {
+        if (swekContext != null && swekContext.mouseOverJHVEvent() != null) {
             drawText(vp, swekContext.mouseOverJHVEvent(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
         }
     }
@@ -443,7 +443,6 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     @Override
     public void setEnabled(boolean _enabled) {
         super.setEnabled(_enabled);
-        swekContext.setEnabled(enabled);
 
         if (enabled) {
             JHVEventCache.registerHandler(this);
