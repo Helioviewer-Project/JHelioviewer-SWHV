@@ -36,9 +36,7 @@ public final class DisplayController {
 
     public static void render(float decodeFactor) {
         Position viewpoint = viewpointModel.getViewpoint();
-        if (ImageLayers.areEnabled())
-            ImageLayers.decode(decodeFactor, viewpoint);
-        else
+        if (!ImageLayers.decode(decodeFactor, viewpoint)) // just display() if none enabled
             display(viewpoint);
     }
 

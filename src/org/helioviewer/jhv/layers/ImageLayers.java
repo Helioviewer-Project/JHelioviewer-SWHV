@@ -27,22 +27,17 @@ public final class ImageLayers {
 
     private ImageLayers() {}
 
-    public static boolean areEnabled() {
+    public static boolean decode(float factor, Position viewpoint) {
+        boolean decoded = false;
         for (ImageLayer layer : Layers.getImageLayers()) {
-            if (layer.isEnabled())
-                return true;
-        }
-        return false;
-    }
-
-    public static void decode(float factor, Position viewpoint) {
-        Layers.forEachImageLayer(layer -> {
             int idx = layer.isVisibleIdx();
             if (idx != -1) {
                 double pixFactor = DisplayController.getImagePixelFactor(Display.getViewport(idx));
                 layer.getView().decode(viewpoint, pixFactor, factor);
+                decoded = true;
             }
-        });
+        }
+        return decoded;
     }
 
     public static double getLargestPhysicalHeight() {
