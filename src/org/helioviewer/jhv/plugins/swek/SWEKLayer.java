@@ -12,8 +12,8 @@ import javax.swing.ImageIcon;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
@@ -74,8 +74,10 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private List<JHVRelatedEvents> cachedActiveEvents = List.of();
 
     public SWEKLayer(JSONObject jo) {
-        if (jo != null)
+        if (jo != null) {
             icons = jo.optBoolean("icons", icons);
+            SWEKPlugin.restoreLayer(this);
+        }
     }
 
     void setContext(SWEKContext _swekContext) {
@@ -454,6 +456,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             Movie.removeTimeRangeListener(this);
             JHVEventCache.unregisterHandler(this);
         }
+        SWEKPlugin.layerStateChanged(this);
     }
 
     @Override
