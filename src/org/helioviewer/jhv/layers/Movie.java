@@ -142,7 +142,7 @@ public class Movie {
             if (next == null)
                 pause();
             else
-                setTime(next);
+                syncTime(next);
         }
     }
 
