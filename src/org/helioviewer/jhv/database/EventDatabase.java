@@ -106,8 +106,24 @@ public class EventDatabase {
         try (Statement statement = connection.createStatement()) {
             statement.setQueryTimeout(30);
             statement.executeUpdate(createtbl.toString());
+            createEventTableIndexes(statement, eventType);
         }
         connection.commit();
+    }
+
+    private static void createEventTableIndexes(Statement statement, SWEKSupplier eventType) throws Exception {
+        String tableName = eventType.getDatabaseName();
+        HashSet<String> relationFields = new HashSet<>();
+        SWEKGroup group = eventType.getGroup();
+        for (SWEK.RelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
+            if (re.group() == group)
+                re.relatedOnList().forEach(swon -> relationFields.add(swon.parameterFrom().name().toLowerCase()));
+            if (re.relatedWith() == group)
+                re.relatedOnList().forEach(swon -> relationFields.add(swon.parameterWith().name().toLowerCase()));
+        }
+
+        for (String field : relationFields)
+            statement.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName + '_' + field + " ON " + tableName + " (" + field + ")");
     }
 
     private static int getIdFromUID(String uid) throws Exception {
