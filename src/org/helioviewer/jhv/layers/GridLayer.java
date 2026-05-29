@@ -181,11 +181,11 @@ public final class GridLayer extends AbstractLayer {
         float fuzz = 0.75f;
 
         GL.glDisable(GL.CULL_FACE);
+        renderer.begin3DRendering();
         for (float rsize : labelPos) {
-            renderer.begin3DRendering();
             labels.forEach(label -> renderer.draw(label.txt, rsize * label.x, rsize * label.y, z, fuzz * rsize * textScaleFactor));
-            renderer.end3DRendering();
         }
+        renderer.end3DRendering();
         GL.glEnable(GL.CULL_FACE);
     }
 
