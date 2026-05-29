@@ -59,15 +59,7 @@ public final class FastRiceProvider implements ICompressorProvider {
         return null;
     }
 
-    private static final class Control implements ICompressorControl {
-
-        private final Class<?> baseType;
-        private final boolean quantized;
-
-        private Control(Class<?> _baseType, boolean _quantized) {
-            baseType = _baseType;
-            quantized = _quantized;
-        }
+    private record Control(Class<?> baseType, boolean quantized) implements ICompressorControl {
 
         @Override
         public boolean compress(Buffer in, ByteBuffer out, ICompressOption option) {
@@ -107,7 +99,7 @@ public final class FastRiceProvider implements ICompressorProvider {
         Decoder decoder = new Decoder(in, option, FS_BITS_FOR_BYTE, FS_MAX_FOR_BYTE);
         int last = decoder.firstByte();
         int length = out.limit();
-        for (int i = 0; i < length;) {
+        for (int i = 0; i < length; ) {
             int fs = decoder.readFs();
             int end = decoder.blockEnd(i, length);
             if (fs < 0) {
@@ -145,7 +137,7 @@ public final class FastRiceProvider implements ICompressorProvider {
     }
 
     private static void decodeShort(Decoder decoder, int last, short[] out, int offset, int length) {
-        for (int i = 0; i < length;) {
+        for (int i = 0; i < length; ) {
             int fs = decoder.readFs();
             int end = decoder.blockEnd(i, length);
             if (fs < 0) {
@@ -167,7 +159,7 @@ public final class FastRiceProvider implements ICompressorProvider {
     }
 
     private static void decodeShort(Decoder decoder, int last, ShortBuffer out, int length) {
-        for (int i = 0; i < length;) {
+        for (int i = 0; i < length; ) {
             int fs = decoder.readFs();
             int end = decoder.blockEnd(i, length);
             if (fs < 0) {
@@ -192,7 +184,7 @@ public final class FastRiceProvider implements ICompressorProvider {
         Decoder decoder = new Decoder(in, option, FS_BITS_FOR_INT, FS_MAX_FOR_INT);
         int last = decoder.firstInt();
         int length = out.limit();
-        for (int i = 0; i < length;) {
+        for (int i = 0; i < length; ) {
             int fs = decoder.readFs();
             int end = decoder.blockEnd(i, length);
             if (fs < 0) {
@@ -219,7 +211,7 @@ public final class FastRiceProvider implements ICompressorProvider {
         int last = decoder.firstInt();
         int length = out.limit();
         Quantizer quantizer = new Quantizer(quantize);
-        for (int i = 0; i < length;) {
+        for (int i = 0; i < length; ) {
             int fs = decoder.readFs();
             int end = decoder.blockEnd(i, length);
             if (fs < 0) {
@@ -249,7 +241,7 @@ public final class FastRiceProvider implements ICompressorProvider {
         int last = decoder.firstInt();
         int length = out.limit();
         Quantizer quantizer = new Quantizer(quantize);
-        for (int i = 0; i < length;) {
+        for (int i = 0; i < length; ) {
             int fs = decoder.readFs();
             int end = decoder.blockEnd(i, length);
             if (fs < 0) {
@@ -390,13 +382,9 @@ public final class FastRiceProvider implements ICompressorProvider {
             int position = inPosition;
             long bitBuffer = bits;
             int bitCount = nbits;
-            int block = blockSize;
-            int fsWidth = fsBits;
-            int directBits = bBits;
-            int maxFs = fsMax;
 
-            for (int i = 0; i < length;) {
-                bitCount -= fsWidth;
+            for (int i = 0; i < length; ) {
+                bitCount -= fsBits;
                 while (bitCount < 0) {
                     bitBuffer = bitBuffer << BITS_PER_BYTE | input[position++] & BYTE_MASK;
                     bitCount += BITS_PER_BYTE;
@@ -405,14 +393,14 @@ public final class FastRiceProvider implements ICompressorProvider {
                 int fs = (int) ((bitBuffer >>> bitCount) - 1L);
                 bitBuffer &= (1L << bitCount) - 1L;
 
-                int end = Math.min(i + block, length);
+                int end = Math.min(i + blockSize, length);
                 if (fs < 0) {
                     for (; i < end; i++) {
                         out[offset + i] = (short) last;
                     }
-                } else if (fs == maxFs) {
+                } else if (fs == fsMax) {
                     for (; i < end; i++) {
-                        int k = directBits - bitCount;
+                        int k = bBits - bitCount;
                         long diff = bitBuffer << k;
                         for (k -= BITS_PER_BYTE; k >= 0; k -= BITS_PER_BYTE) {
                             bitBuffer = input[position++] & BYTE_MASK;
@@ -478,7 +466,6 @@ public final class FastRiceProvider implements ICompressorProvider {
 
     private static final class Quantizer {
 
-        private final QuantizeOption option;
         private final boolean dither;
         private final boolean checkZero;
         private final boolean checkNull;
@@ -490,8 +477,7 @@ public final class FastRiceProvider implements ICompressorProvider {
         private int iseed;
         private int nextRandom;
 
-        private Quantizer(QuantizeOption _option) {
-            option = _option;
+        private Quantizer(QuantizeOption option) {
             dither = option.isDither() || option.isDither2();
             checkZero = option.isCheckZero() || option.isDither2();
             checkNull = option.isCheckNull();
