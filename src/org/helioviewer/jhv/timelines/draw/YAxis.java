@@ -187,13 +187,13 @@ public final class YAxis {
     }
 
     private static String fixupUnit(String unit) {
-        return unit.replace("^2", "\u00B2").replace("^3", "\u00B3").replace("^-2", "\u207B\u00B2").replace("^-3", "\u207B\u00B3");
+        return unit.replace("^2", "²").replace("^3", "³").replace("^-2", "⁻²").replace("^-3", "⁻³");
     }
 
     public record YAxisLogScale(String label) implements YAxisScale {
 
         public YAxisLogScale {
-            label = "log\u2081\u2080(" + fixupUnit(label) + ')';
+            label = "log₁₀(" + fixupUnit(label) + ')';
         }
 
         @Override

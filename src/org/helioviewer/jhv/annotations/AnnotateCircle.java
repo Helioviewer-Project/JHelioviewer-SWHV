@@ -8,6 +8,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.FastFormat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
@@ -33,7 +34,10 @@ final class AnnotateCircle extends AbstractAnnotateable {
         double d = 2 * r;
         if (d != diameter) {
             diameter = d;
-            diameterStr = d < 0.2 * Sun.Radius ? String.format("Dann: %7.2fMm", d * (Sun.RadiusMeter / 1e6)) : String.format("Dann: %7.2fR\u2609", d);
+            if (d < 0.2 * Sun.Radius)
+                diameterStr = "Dann: " + FastFormat.fixed2(d * (Sun.RadiusMeter / 1e6), 7, false) + "Mm";
+            else
+                diameterStr = "Dann: " + FastFormat.fixed2(d, 7, false) + "R☉";
         }
 
         Vec3 center = new Vec3(bp.x * cosf, bp.y * cosf, bp.z * cosf);

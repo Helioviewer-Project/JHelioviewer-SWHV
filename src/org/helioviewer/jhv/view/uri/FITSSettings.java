@@ -32,9 +32,9 @@ public final class FITSSettings {
 
     public static final class SettingsDialog extends JDialog implements Interfaces.ShowableDialog, FITSViewState.Listener {
 
-        private final JRadioButton gammaButton = new JRadioButton("\u03B3");
-        private final JRadioButton betaButton = new JRadioButton("\u03B2");
-        private final JRadioButton alphaButton = new JRadioButton("\u03B1");
+        private final JRadioButton gammaButton = new JRadioButton("γ");
+        private final JRadioButton betaButton = new JRadioButton("β");
+        private final JRadioButton alphaButton = new JRadioButton("α");
         private final JHVSlider gammaSlider;
         private final JLabel gammaLabel = new JLabel("", JLabel.RIGHT);
         private final JHVSlider betaSlider;
@@ -87,9 +87,9 @@ public final class FITSSettings {
             setResizable(false);
             FITSViewState.addListener(this);
 
-            gammaButton.setToolTipText("<html><body>pixel<sup>1/\u03B3</sup>");
-            betaButton.setToolTipText("<html><body>asinh(pixel / 2<sup>\u03B2</sup>)");
-            alphaButton.setToolTipText("<html><body>log1p(10<sup>\u03B1</sup>\u22C5pixel) / log1p(10<sup>\u03B1</sup>)");
+            gammaButton.setToolTipText("<html><body>pixel<sup>1/γ</sup>");
+            betaButton.setToolTipText("<html><body>asinh(pixel / 2<sup>β</sup>)");
+            alphaButton.setToolTipText("<html><body>log1p(10<sup>α</sup>⋅pixel) / log1p(10<sup>α</sup>)");
 
             ButtonGroup scalingGroup = new ButtonGroup();
             scalingGroup.add(gammaButton);

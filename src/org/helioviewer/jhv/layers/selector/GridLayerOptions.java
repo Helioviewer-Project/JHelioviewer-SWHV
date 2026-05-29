@@ -93,7 +93,7 @@ final class GridLayerOptions extends JPanel {
         JHVSpinner spinner = new JHVSpinner(initialValue, GridLayer.GRID_STEP_MIN, GridLayer.GRID_STEP_MAX, GridLayer.GRID_STEP);
         spinner.addChangeListener(e -> valueSetter.accept((Double) spinner.getValue()));
         JFormattedTextField textField = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-        textField.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "\u00B0", GridLayer.GRID_STEP_MIN, GridLayer.GRID_STEP_MAX));
+        textField.setFormatterFactory(new TerminatedFormatterFactory("%.1f", "°", GridLayer.GRID_STEP_MIN, GridLayer.GRID_STEP_MAX));
         return spinner;
     }
 

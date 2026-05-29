@@ -78,12 +78,12 @@ public final class FOVTreePane extends JScrollPane {
 
         JPanel spinnerXPanel = new JPanel(new BorderLayout());
         spinnerXPanel.setOpaque(false);
-        spinnerXPanel.add(new JLabel("    \u03B4x ", JLabel.RIGHT), BorderLayout.LINE_START);
+        spinnerXPanel.add(new JLabel("    δx ", JLabel.RIGHT), BorderLayout.LINE_START);
         spinnerXPanel.add(spinnerX, BorderLayout.LINE_END);
 
         JPanel spinnerYPanel = new JPanel(new BorderLayout());
         spinnerYPanel.setOpaque(false);
-        spinnerYPanel.add(new JLabel("    \u03B4y ", JLabel.RIGHT), BorderLayout.LINE_START);
+        spinnerYPanel.add(new JLabel("    δy ", JLabel.RIGHT), BorderLayout.LINE_START);
         spinnerYPanel.add(spinnerY, BorderLayout.LINE_END);
 
         JPanel panel = new JPanel(new GridLayout(1, 3, 0, 0));
@@ -114,7 +114,7 @@ public final class FOVTreePane extends JScrollPane {
     private static JHVSpinner createSpinner(double value) {
         JHVSpinner spinner = new JHVSpinner(value, FOVPlatform.MIN_CENTER_ARCMIN, FOVPlatform.MAX_CENTER_ARCMIN, 0.1);
         JFormattedTextField field = ((JHVSpinner.DefaultEditor) spinner.getEditor()).getTextField();
-        field.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "\u2032", FOVPlatform.MIN_CENTER_ARCMIN, FOVPlatform.MAX_CENTER_ARCMIN));
+        field.setFormatterFactory(new TerminatedFormatterFactory("%.2f", "′", FOVPlatform.MIN_CENTER_ARCMIN, FOVPlatform.MAX_CENTER_ARCMIN));
         return spinner;
     }
 
