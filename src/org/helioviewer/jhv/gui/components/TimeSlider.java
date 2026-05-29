@@ -3,8 +3,11 @@ package org.helioviewer.jhv.gui.components;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -13,13 +16,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.app.Commands;
@@ -47,7 +51,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     private static final int MENU_SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(); // Cmd on macOS, Ctrl elsewhere
 
     private final TimeSliderUI sliderUI;
-    private final JLabel frameNumberLabel;
+    private final FrameNumberPanel frameNumberPanel;
     private boolean dirty;
     private boolean wasPlaying;
     private boolean allowSetFrame = true;
@@ -85,11 +89,11 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "playPause");
         getActionMap().put("playPause", Actions.PLAY_PAUSE);
 
-        frameNumberLabel = new JLabel((getValue() + 1) + "/" + (getMaximum() + 1), JLabel.RIGHT);
+        frameNumberPanel = new FrameNumberPanel(getValue(), getMaximum());
     }
 
-    JLabel getFrameNumberPanel() {
-        return frameNumberLabel;
+    JComponent getFrameNumberPanel() {
+        return frameNumberPanel;
     }
 
     void setAllowFrame(boolean _allowSetFrame) {
@@ -99,6 +103,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void setMaximum(int maximum) {
         super.setMaximum(maximum);
+        if (frameNumberPanel != null)
+            frameNumberPanel.setFrame(getValue(), maximum);
         repaint();
     }
 
@@ -127,7 +133,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     public void lazyRepaint() {
         if (dirty) {
             super.repaint();
-            frameNumberLabel.setText((getValue() + 1) + "/" + (getMaximum() + 1));
+            frameNumberPanel.setFrame(getValue(), getMaximum());
             dirty = false;
         }
     }
@@ -271,6 +277,69 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
             setMaximum(maximum);
             repaint();
         }
+    }
+
+    private static final class FrameNumberPanel extends JComponent {
+
+        private final Map<?, ?> desktopHints;
+        private int frame = -1;
+        private int maximum = -1;
+        private String text = "";
+
+        FrameNumberPanel(int _value, int _maximum) {
+            Object hints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+            desktopHints = hints instanceof Map<?, ?> map ? map : null;
+            setFont(UIGlobals.uiFontMonoSmall);
+            setForeground(UIGlobals.foreColor);
+            setFrame(_value, _maximum);
+        }
+
+        void setFrame(int _value, int _maximum) {
+            if (frame == _value && maximum == _maximum)
+                return;
+
+            boolean maximumChanged = maximum != _maximum;
+            frame = _value;
+            maximum = _maximum;
+            text = (frame + 1) + "/" + (maximum + 1);
+            repaint();
+            if (maximumChanged)
+                revalidate();
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            Insets insets = getInsets();
+            FontMetrics fm = getFontMetrics(getFont());
+            String maximumText = (maximum + 1) + "/" + (maximum + 1);
+            return new Dimension(
+                    insets.left + fm.stringWidth(maximumText) + insets.right,
+                    insets.top + fm.getHeight() + insets.bottom);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g1) {
+            if (text.isEmpty())
+                return;
+
+            Graphics2D g = (Graphics2D) g1.create();
+            try {
+                if (desktopHints != null)
+                    g.addRenderingHints(desktopHints);
+
+                g.setColor(getForeground());
+                g.setFont(getFont());
+
+                FontMetrics fm = g.getFontMetrics();
+                Insets insets = getInsets();
+                int x = getWidth() - insets.right - fm.stringWidth(text);
+                int y = insets.top + (getHeight() - insets.top - insets.bottom - fm.getHeight()) / 2 + fm.getAscent();
+                BasicGraphicsUtils.drawString(this, g, text, x, y);
+            } finally {
+                g.dispose();
+            }
+        }
+
     }
 
     // Extension of BasicSliderUI overriding some drawing functions.

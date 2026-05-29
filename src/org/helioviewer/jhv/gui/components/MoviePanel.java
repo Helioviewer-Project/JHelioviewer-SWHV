@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -124,7 +125,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         secondLine.add(buttonPanel, BorderLayout.LINE_START);
 
         // Current frame number
-        JLabel frameNumberPanel = timeSlider.getFrameNumberPanel();
+        JComponent frameNumberPanel = timeSlider.getFrameNumberPanel();
         frameNumberPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         secondLine.add(frameNumberPanel, BorderLayout.LINE_END);
 
