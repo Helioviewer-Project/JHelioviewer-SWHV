@@ -6,6 +6,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -69,6 +70,11 @@ public final class LayersPanel extends JPanel {
 
         @Override
         public void tableChanged(TableModelEvent e) {
+            if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == TIME_COL) {
+                dirtyTimeColumn = true;
+                return;
+            }
+
             super.tableChanged(e);
             if (e.getType() == TableModelEvent.INSERT) {
                 int row = e.getLastRow();
@@ -90,13 +96,27 @@ public final class LayersPanel extends JPanel {
         }
 
         private boolean dirty = false;
+        private boolean dirtyTimeColumn = false;
 
         @Override
         public void lazyRepaint() {
             if (dirty) {
                 super.repaint();
-                dirty = false;
+            } else if (dirtyTimeColumn) {
+                repaintTimeColumn();
             }
+            dirty = false;
+            dirtyTimeColumn = false;
+        }
+
+        private void repaintTimeColumn() {
+            Rectangle visible = getVisibleRect();
+            Rectangle cell = getCellRect(0, TIME_COL, true);
+
+            int x0 = Math.max(cell.x, visible.x);
+            int x1 = Math.min(cell.x + cell.width, visible.x + visible.width);
+            if (x0 < x1)
+                super.repaint(x0, visible.y, x1 - x0, visible.height);
         }
 
     }
