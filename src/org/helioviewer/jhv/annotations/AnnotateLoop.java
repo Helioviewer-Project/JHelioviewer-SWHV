@@ -18,6 +18,7 @@ final class AnnotateLoop extends AbstractAnnotateable {
     private static final int SUBDIVISIONS = 45;
 
     private final List<Vec3> vertices = fixedSizeVertices(SUBDIVISIONS + 1);
+    private double cachedHeight = Double.NaN;
     private String heightStr = null;
 
     AnnotateLoop(JSONObject jo) {
@@ -34,7 +35,10 @@ final class AnnotateLoop extends AbstractAnnotateable {
 
         double radiusLen = u.length();
         double height = centerLen + radiusLen - Sun.Radius;
-        heightStr = height < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", height * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2609", height);
+        if (height != cachedHeight) {
+            cachedHeight = height;
+            heightStr = height < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", height * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2609", height);
+        }
 
         double centerScale = radiusLen / centerLen;
         for (int i = 0; i <= SUBDIVISIONS; i++) {
