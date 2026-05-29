@@ -8,6 +8,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.FastFormat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 
@@ -37,7 +38,10 @@ final class AnnotateLoop extends AbstractAnnotateable {
         double height = centerLen + radiusLen - Sun.Radius;
         if (height != cachedHeight) {
             cachedHeight = height;
-            heightStr = height < 0.2 * Sun.Radius ? String.format("Hann: %7.2fMm", height * (Sun.RadiusMeter / 1e6)) : String.format("Hann: %7.2fR\u2609", height);
+            if (height < 0.2 * Sun.Radius)
+                heightStr = "Hann: " + FastFormat.fixed2(height * (Sun.RadiusMeter / 1e6), 7, false) + "Mm";
+            else
+                heightStr = "Hann: " + FastFormat.fixed2(height, 7, false) + "R☉";
         }
 
         double centerScale = radiusLen / centerLen;

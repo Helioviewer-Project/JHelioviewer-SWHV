@@ -24,7 +24,7 @@ public class SliderFilterPanel {
 
     public static class DeltaCROTA extends AbstractSliderFilterPanel {
         public DeltaCROTA(ImageLayer layer) {
-            super("\u03B4CROTA",
+            super("δCROTA",
                     GLImage.MIN_DCROTA * 10, GLImage.MAX_DCROTA * 10, (int) (layer.getGLImage().getDeltaCROTA() * 10),
                     value -> formatDegree(value / 10.0),
                     value -> layer.getGLImage().setDeltaCROTA(value / 10.0));
@@ -33,7 +33,7 @@ public class SliderFilterPanel {
 
     public static class DeltaCRVAL1 extends AbstractSliderFilterPanel {
         public DeltaCRVAL1(ImageLayer layer) {
-            super("\u03B4CRVAL1",
+            super("δCRVAL1",
                     GLImage.MIN_DCRVAL, GLImage.MAX_DCRVAL, layer.getGLImage().getDeltaCRVAL1(),
                     SliderFilterPanel::formatArcsec,
                     layer.getGLImage()::setDeltaCRVAL1);
@@ -42,7 +42,7 @@ public class SliderFilterPanel {
 
     public static class DeltaCRVAL2 extends AbstractSliderFilterPanel {
         public DeltaCRVAL2(ImageLayer layer) {
-            super("\u03B4CRVAL2",
+            super("δCRVAL2",
                     GLImage.MIN_DCRVAL, GLImage.MAX_DCRVAL, layer.getGLImage().getDeltaCRVAL2(),
                     SliderFilterPanel::formatArcsec,
                     layer.getGLImage()::setDeltaCRVAL2);
@@ -68,11 +68,11 @@ public class SliderFilterPanel {
     }
 
     private static String formatDegree(double value) {
-        return "<html><p align='right'>" + String.format("%.1f", value) + "\u00B0</p>";
+        return "<html><p align='right'>" + String.format("%.1f", value) + "°</p>";
     }
 
     private static String formatArcsec(int value) {
-        return "<html><p align='right'>" + value + "\u2033</p>";
+        return "<html><p align='right'>" + value + "″</p>";
     }
 
     private static abstract class AbstractSliderFilterPanel implements FilterDetails {

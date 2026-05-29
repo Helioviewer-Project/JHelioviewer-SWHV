@@ -62,7 +62,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private final ButtonText RESETCAMERA = new ButtonText(Buttons.resetCamera, "Reset View", "Reset view to default");
     private final ButtonText RESETCAMERAAXIS = new ButtonText(Buttons.resetCameraAxis, "Reset Axis", "Reset view axis");
     private final ButtonText ROTATE = new ButtonText(Buttons.rotate, "Rotate", "Rotate");
-    private final ButtonText ROTATE90 = new ButtonText(Buttons.rotate90, "Rotate View 90\u00B0", "Rotate view 90\u00B0");
+    private final ButtonText ROTATE90 = new ButtonText(Buttons.rotate90, "Rotate View 90°", "Rotate view 90°");
     private final ButtonText SAMP = new ButtonText(Buttons.samp, "SAMP", "Send SAMP message");
     private final ButtonText TRACK = new ButtonText(Buttons.track, "Track", "Track solar rotation");
     private final ButtonText ZOOMFIT = new ButtonText(Buttons.zoomFit, "Zoom-Fit", "Zoom to fit");

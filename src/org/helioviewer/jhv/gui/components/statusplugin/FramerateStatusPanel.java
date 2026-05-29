@@ -4,6 +4,7 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
+import org.helioviewer.jhv.math.FastFormat;
 
 @SuppressWarnings("serial")
 public final class FramerateStatusPanel extends StatusPanel.StatusPlugin implements Interfaces.LazyComponent {
@@ -20,7 +21,7 @@ public final class FramerateStatusPanel extends StatusPanel.StatusPlugin impleme
         int f = JHVFrame.getFramerate();
         if (f != fps) {
             fps = f;
-            setText(String.format("FPS: %2d", fps));
+            setText("FPS: " + FastFormat.integer(fps, 2, false));
         }
     }
 

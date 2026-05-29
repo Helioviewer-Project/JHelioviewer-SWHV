@@ -27,7 +27,7 @@ public class InnerMaskPanel implements FilterDetails {
     }
 
     private static String formatFloat(double value) {
-        return "<html><p align='right'>" + String.format("%.2f", value) + "R\u2609</p>";
+        return "<html><p align='right'>" + String.format("%.2f", value) + "R☉</p>";
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.helioviewer.jhv.gui.components.StatusPanel;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
 import org.helioviewer.jhv.input.PointerEvent;
+import org.helioviewer.jhv.math.FastFormat;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -23,10 +24,13 @@ import org.helioviewer.jhv.swing.TransferAccess;
 @SuppressWarnings("serial")
 public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements InputPointerListener, InputPointerMotionListener {
 
-    private static final String nanOrtho = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
-    private static final String nanHpc = String.format("%7s,%7s", "--", "--");
-    private static final String nanLati = String.format("%7s\u00B0,%7s\u00B0", "--", "--");
-    private static final String nanPolar = String.format("%7s\u00B0,%7s\u2609", "--", "--");
+    private static final int FIELD_WIDTH = 7;
+    private static final String MISSING = FastFormat.text("--", FIELD_WIDTH);
+    private static final String NAN_DEGREES = MISSING + "°," + MISSING + "°";
+    private static final String NAN_HPC = MISSING + "," + MISSING;
+    private static final String NAN_POLAR = MISSING + "°," + MISSING + "☉";
+
+    private final StringBuilder textBuffer = new StringBuilder(128);
 
     public PositionStatusPanel() {
         setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
@@ -69,7 +73,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                     double gamma = Math.PI - alpha - beta;
                     double h = (viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
 
-                    annStr = String.format("Hann: %7.2fMm", h * (Sun.RadiusMeter / 1e6));
+                    annStr = "Hann: " + FastFormat.fixed2(h * (Sun.RadiusMeter / 1e6), FIELD_WIDTH, false) + "Mm";
                 } */
 
                 double zeta = viewpoint.distance - v.z;
@@ -82,38 +86,83 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         }
     }
 
-    private static String formatXY(double p) {
+    private static StringBuilder appendXY(StringBuilder sb, double p) {
         if (Math.abs(p) < 1) // accomodate SOLO
-            return String.format("%+7d\u2033", (int) Math.round(3600 * p));
+            FastFormat.appendInteger(sb, Math.round(3600 * p), FIELD_WIDTH, true).append('″');
         else
-            return String.format("%+7.2f\u00B0", p);
+            appendDegrees(sb, p);
+        return sb;
     }
 
-    private static String formatR(double r) {
+    private static StringBuilder appendR(StringBuilder sb, double r) {
         if (r < 32 * Sun.Radius)
-            return String.format("%7.2fR\u2609", r);
+            FastFormat.appendFixed2(sb, r, FIELD_WIDTH, false).append("R☉");
         else
-            return String.format("%7.2fau", r * Sun.MeanEarthDistanceInv);
+            FastFormat.appendFixed2(sb, r * Sun.MeanEarthDistanceInv, FIELD_WIDTH, false).append("au");
+        return sb;
     }
 
-    private static String formatLati(@Nonnull Vec2 coord) {
-        String coordStr = coord == Vec2.NAN ? nanLati : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03C6,\u03B8):(%s)", coordStr);
+    private static StringBuilder appendDegrees(StringBuilder sb, double value) {
+        return FastFormat.appendFixed2(sb, value, FIELD_WIDTH, true).append('°');
     }
 
-    private static String formatHpc(@Nonnull Vec2 coord) {
-        String coordStr = coord == Vec2.NAN ? nanHpc : String.format("%s,%s", formatXY(coord.x), formatXY(coord.y));
-        return String.format("(Tx,Ty):(%s)", coordStr);
+    private static void appendDegreePair(StringBuilder sb, Vec2 coord) {
+        appendDegrees(sb, coord.x).append(',');
+        appendDegrees(sb, coord.y);
     }
 
-    private static String formatPolar(@Nonnull Vec2 coord) {
-        String coordStr = coord == Vec2.NAN ? nanPolar : String.format("%+7.2f\u00B0,%s", coord.x, formatR(coord.y));
-        return String.format("(\u03B8,\u03c1):(%s)", coordStr);
+    private String formatLati(@Nonnull Vec2 coord) {
+        StringBuilder sb = resetBuffer();
+        sb.append("(φ,θ):(");
+        if (coord == Vec2.NAN)
+            sb.append(NAN_DEGREES);
+        else
+            appendDegreePair(sb, coord);
+        return sb.append(')').toString();
     }
 
-    private static String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py) {
-        String coordStr = coord == Vec2.NAN ? nanOrtho : String.format("%+7.2f\u00B0,%+7.2f\u00B0", coord.x, coord.y);
-        return String.format("(\u03c1,\u03c8):(%s,%+7.2f\u00B0) | (\u03C6,\u03B8):(%s) | (x,y):(%s,%s)", formatR(r), pa, coordStr, formatXY(px), formatXY(py));
+    private String formatHpc(@Nonnull Vec2 coord) {
+        StringBuilder sb = resetBuffer();
+        sb.append("(Tx,Ty):(");
+        if (coord == Vec2.NAN) {
+            sb.append(NAN_HPC);
+        } else {
+            appendXY(sb, coord.x).append(',');
+            appendXY(sb, coord.y);
+        }
+        return sb.append(')').toString();
+    }
+
+    private String formatPolar(@Nonnull Vec2 coord) {
+        StringBuilder sb = resetBuffer();
+        sb.append("(θ,ρ):(");
+        if (coord == Vec2.NAN) {
+            sb.append(NAN_POLAR);
+        } else {
+            appendDegrees(sb, coord.x).append(',');
+            appendR(sb, coord.y);
+        }
+        return sb.append(')').toString();
+    }
+
+    private String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py) {
+        StringBuilder sb = resetBuffer();
+        sb.append("(ρ,ψ):(");
+        appendR(sb, r).append(',');
+        appendDegrees(sb, pa).append(") | (φ,θ):(");
+        if (coord == Vec2.NAN)
+            sb.append(NAN_DEGREES);
+        else
+            appendDegreePair(sb, coord);
+        sb.append(") | (x,y):(");
+        appendXY(sb, px).append(',');
+        appendXY(sb, py);
+        return sb.append(')').toString();
+    }
+
+    private StringBuilder resetBuffer() {
+        textBuffer.setLength(0);
+        return textBuffer;
     }
 
     @Override

@@ -30,7 +30,7 @@ public class SectorPanel implements FilterDetails {
     }
 
     private static String formatDegree(int low, int high) {
-        return "<html><p align='right'>" + low + "\u00B0</p><p align='right'>" + high + "\u00B0</p>";
+        return "<html><p align='right'>" + low + "°</p><p align='right'>" + high + "°</p>";
     }
 
     @Override

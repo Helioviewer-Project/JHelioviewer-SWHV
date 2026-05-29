@@ -6,6 +6,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.StatusPanel;
+import org.helioviewer.jhv.math.FastFormat;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 
@@ -28,7 +29,8 @@ public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin impleme
 
         distance = viewpoint.distance;
         time = viewpoint.time;
-        setText(String.format("CR: %.2f D\u2609: %7.3fau |", Carrington.time2CR(time), distance * Sun.MeanEarthDistanceInv));
+        setText("CR: " + FastFormat.fixed2(Carrington.time2CR(time), 0, false) +
+                " D☉: " + FastFormat.fixed3(distance * Sun.MeanEarthDistanceInv, 7, false) + "au |");
     }
 
 }
