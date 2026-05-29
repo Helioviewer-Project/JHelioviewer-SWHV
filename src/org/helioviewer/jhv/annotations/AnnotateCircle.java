@@ -18,6 +18,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
     private static final int SUBDIVISIONS = 90;
 
     private final List<Vec3> vertices = fixedSizeVertices(SUBDIVISIONS + 1);
+    private double diameter = Double.NaN;
     private String diameterStr = null;
 
     AnnotateCircle(JSONObject jo) {
@@ -30,7 +31,10 @@ final class AnnotateCircle extends AbstractAnnotateable {
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
 
         double d = 2 * r;
-        diameterStr = d < 0.2 * Sun.Radius ? String.format("Dann: %7.2fMm", d * (Sun.RadiusMeter / 1e6)) : String.format("Dann: %7.2fR\u2609", d);
+        if (d != diameter) {
+            diameter = d;
+            diameterStr = d < 0.2 * Sun.Radius ? String.format("Dann: %7.2fMm", d * (Sun.RadiusMeter / 1e6)) : String.format("Dann: %7.2fR\u2609", d);
+        }
 
         Vec3 center = new Vec3(bp.x * cosf, bp.y * cosf, bp.z * cosf);
         Vec3 u = Vec3.cross(bp, ep);
