@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
@@ -22,6 +23,7 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
@@ -38,6 +40,7 @@ final class SWEKTreePane extends JPanel {
     private final DefaultTreeModel treeModel;
     private final JTree tree;
     private final IdentityHashMap<SWEKGroup, Component> groupComponents = new IdentityHashMap<>();
+    private final IdentityHashMap<SWEKGroup, TreePath> groupPaths = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKSupplier, Component> supplierComponents = new IdentityHashMap<>();
     private final Timer loadingTimer;
 
@@ -69,12 +72,18 @@ final class SWEKTreePane extends JPanel {
             Object child = children.nextElement();
             if (child instanceof SWEKGroup group && group.isDownloading()) {
                 anyBusy = true;
-                treeModel.nodeChanged(group);
+                repaintGroup(group);
             }
         }
 
         if (!anyBusy)
             loadingTimer.stop();
+    }
+
+    private void repaintGroup(SWEKGroup group) {
+        Rectangle bounds = tree.getPathBounds(groupPaths.computeIfAbsent(group, g -> new TreePath(g.getPath())));
+        if (bounds != null)
+            tree.repaint(bounds);
     }
 
     private Component componentFor(Object value) {
