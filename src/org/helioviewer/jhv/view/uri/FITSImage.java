@@ -162,118 +162,158 @@ public final class FITSImage implements URIImageReader {
         return new SampleBuffer(samples, sampleLen);
     }
 
-    private interface PixelScaler {
-        double map(float d);
+    private interface NormalizedMapping {
+        double map(double x);
     }
 
-    private record PixelMapping(PixelScaler scaler, double scale) {}
+    private static final int SCALE_LOOKUP_SIZE = 1 << 16;
+    private static final int RAW_SHORT_LOOKUP_SIZE = 1 << Short.SIZE;
+    private static final short HALF_FLOAT_ZERO = Float.floatToFloat16(0f);
+    private static final short HALF_FLOAT_ONE = Float.floatToFloat16(1f);
 
-    private static PixelMapping pixelMapping(FITSViewState.Data state, float range) {
+    private record NormalizedLookup(short[] values) {
+        private short mapIndex(double index) {
+            if (!(index > 0)) {
+                return HALF_FLOAT_ZERO;
+            }
+            if (index >= SCALE_LOOKUP_SIZE) {
+                return HALF_FLOAT_ONE;
+            }
+            return values[(int) index];
+        }
+    }
+
+    private static NormalizedLookup normalizedLookup(NormalizedMapping mapping) {
+        short[] values = new short[SCALE_LOOKUP_SIZE];
+
+        for (int i = 0; i < values.length; i++) {
+            double x = (i + .5) / SCALE_LOOKUP_SIZE;
+            values[i] = mapNormalizedToHalfFloat(x, mapping);
+        }
+        return new NormalizedLookup(values);
+    }
+
+    private static NormalizedMapping normalizedMapping(FITSViewState.Data state, float range) {
         return switch (state.scalingMode()) {
             case Gamma -> {
                 double gamma = state.gamma();
-                yield new PixelMapping(d -> Math.pow(d, gamma), 1. / Math.pow(range, gamma));
+                yield x -> Math.pow(x, gamma);
             }
             case Beta -> {
-                double beta = state.beta();
-                yield new PixelMapping(d -> MathUtils.asinh(d * beta), 1. / MathUtils.asinh(range * beta));
+                double k = range * state.beta();
+                double scale = 1. / MathUtils.asinh(k);
+                yield x -> scale * MathUtils.asinh(x * k);
             }
             case Alpha -> {
                 double alpha = state.alpha();
-                yield new PixelMapping(d -> Math.log1p(d / range * alpha), 1. / Math.log1p(alpha));
+                double scale = 1. / Math.log1p(alpha);
+                yield x -> scale * Math.log1p(x * alpha);
             }
         };
     }
 
-    private static short scalePixelToHalfFloat(float v, float min, float max, PixelScaler scaler, double scale) {
-        if (v == BAD_PIXEL) {
-            return 0;
+    private static short mapNormalizedToHalfFloat(double x, NormalizedMapping mapping) {
+        if (!(x > 0)) {
+            return HALF_FLOAT_ZERO;
         }
-
-        v = Math.clamp(v, min, max); // sampling may have missed extremes
-        double mapped = scaler.map(v - min);
-        return Float.floatToFloat16((float) Math.clamp(scale * mapped, 0, 1));
+        if (x >= 1) {
+            return HALF_FLOAT_ONE;
+        }
+        return Float.floatToFloat16((float) Math.clamp(mapping.map(x), 0, 1));
     }
 
-    private static short[] halfFloatLookup(boolean hasBlank, long blank, double bzero, double bscale, float min, float max, PixelMapping mapping) {
-        PixelScaler scaler = mapping.scaler();
-        double scale = mapping.scale();
-        short[] lookup = new short[1 << 16];
+    private static short[] rawShortToHalfFloat(boolean hasBlank, long blank, double bzero, double bscale, float min, double toUnit,
+                                               NormalizedMapping mapping) {
+        short[] values = new short[RAW_SHORT_LOOKUP_SIZE];
 
-        for (int i = 0; i < lookup.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             short raw = (short) i;
             float v = (hasBlank && raw == (short) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-            lookup[i] = scalePixelToHalfFloat(v, min, max, scaler, scale);
+            // sampling may have missed extremes
+            values[i] = mapNormalizedToHalfFloat((v - min) * toUnit, mapping);
         }
-        return lookup;
+        return values;
     }
 
     private static void convertPixels(Object pixels, ShortBuffer outData, boolean hasBlank, long blank, double bzero, double bscale,
                                       int width, int height, float min, float max, FITSViewState.Data state) throws Exception {
-        PixelMapping mapping = pixelMapping(state, max - min);
-        PixelScaler scaler = mapping.scaler();
-        double scale = mapping.scale();
+        float range = max - min;
+        double toUnit = 1. / range;
+        double toIndex = SCALE_LOOKUP_SIZE / (double) range;
+        NormalizedMapping mapping = normalizedMapping(state, range);
 
         switch (pixels) {
             case short[] inData -> {
-                short[] lookup = halfFloatLookup(hasBlank, blank, bzero, bscale, min, max, mapping);
+                short[] values = rawShortToHalfFloat(hasBlank, blank, bzero, bscale, min, toUnit, mapping);
                 ParallelRange.run(height, (from, to) -> {
                     for (int j = from; j < to; j++) {
                         int inLine = width * j;
                         int outLine = width * (height - 1 - j);
 
                         for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            outData.put(outIdx, lookup[inData[inLine + i] & 0xFFFF]);
+                            outData.put(outIdx, values[inData[inLine + i] & 0xFFFF]);
                         }
                     }
                 });
             }
-            case int[] inData -> ParallelRange.run(height, (from, to) -> {
-                for (int j = from; j < to; j++) {
-                    int inLine = width * j;
-                    int outLine = width * (height - 1 - j);
+            case int[] inData -> {
+                NormalizedLookup lookup = normalizedLookup(mapping);
+                ParallelRange.run(height, (from, to) -> {
+                    for (int j = from; j < to; j++) {
+                        int inLine = width * j;
+                        int outLine = width * (height - 1 - j);
 
-                    for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                        int raw = inData[inLine + i];
-                        float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                            int raw = inData[inLine + i];
+                            float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
+                        }
                     }
-                }
-            });
-            case long[] inData -> ParallelRange.run(height, (from, to) -> {
-                for (int j = from; j < to; j++) {
-                    int inLine = width * j;
-                    int outLine = width * (height - 1 - j);
+                });
+            }
+            case long[] inData -> {
+                NormalizedLookup lookup = normalizedLookup(mapping);
+                ParallelRange.run(height, (from, to) -> {
+                    for (int j = from; j < to; j++) {
+                        int inLine = width * j;
+                        int outLine = width * (height - 1 - j);
 
-                    for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                        long raw = inData[inLine + i];
-                        float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
-                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                            long raw = inData[inLine + i];
+                            float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
+                        }
                     }
-                }
-            });
-            case float[] inData -> ParallelRange.run(height, (from, to) -> {
-                for (int j = from; j < to; j++) {
-                    int inLine = width * j;
-                    int outLine = width * (height - 1 - j);
+                });
+            }
+            case float[] inData -> {
+                NormalizedLookup lookup = normalizedLookup(mapping);
+                ParallelRange.run(height, (from, to) -> {
+                    for (int j = from; j < to; j++) {
+                        int inLine = width * j;
+                        int outLine = width * (height - 1 - j);
 
-                    for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                        float v = floatPixel(inData[inLine + i], bzero, bscale);
-                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                            float v = floatPixel(inData[inLine + i], bzero, bscale);
+                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
+                        }
                     }
-                }
-            });
-            case double[] inData -> ParallelRange.run(height, (from, to) -> {
-                for (int j = from; j < to; j++) {
-                    int inLine = width * j;
-                    int outLine = width * (height - 1 - j);
+                });
+            }
+            case double[] inData -> {
+                NormalizedLookup lookup = normalizedLookup(mapping);
+                ParallelRange.run(height, (from, to) -> {
+                    for (int j = from; j < to; j++) {
+                        int inLine = width * j;
+                        int outLine = width * (height - 1 - j);
 
-                    for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                        float v = floatPixel(inData[inLine + i], bzero, bscale);
-                        outData.put(outIdx, scalePixelToHalfFloat(v, min, max, scaler, scale));
+                        for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
+                            float v = floatPixel(inData[inLine + i], bzero, bscale);
+                            outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
+                        }
                     }
-                }
-            });
+                });
+            }
             default -> throw new Exception("Unknown pixel type: " + pixels.getClass().getSimpleName());
         }
     }
