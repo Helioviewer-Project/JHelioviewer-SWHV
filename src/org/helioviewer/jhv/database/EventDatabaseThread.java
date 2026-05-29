@@ -15,7 +15,7 @@ import org.helioviewer.jhv.Log;
 
 final class EventDatabaseThread {
 
-    private static final int CURRENT_VERSION_SCHEMA = 10;
+    private static final int CURRENT_VERSION_SCHEMA = 11;
     private static Connection connection;
 
     private EventDatabaseThread() {
