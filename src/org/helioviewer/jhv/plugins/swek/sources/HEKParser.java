@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventParameter;
 import org.helioviewer.jhv.events.JHVPositionInformation;
@@ -191,18 +192,15 @@ class HEKParser {
      */
     @Nullable
     private static HgsPoint parseCoordinates(String value) {
-        Double longitudeDeg = null;
-        Double latitudeDeg = null;
+        String[] parts = Regex.MultiSpace.split(value.trim(), 3);
+        if (parts.length < 2)
+            return null;
 
-        try (Scanner s = new Scanner(value)) {
-            s.useDelimiter(" ");
-            if (s.hasNextDouble())
-                longitudeDeg = s.nextDouble();
-            if (s.hasNextDouble())
-                latitudeDeg = s.nextDouble();
+        try {
+            return new HgsPoint(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
+        } catch (NumberFormatException e) {
+            return null;
         }
-
-        return longitudeDeg != null && latitudeDeg != null ? new HgsPoint(longitudeDeg, latitudeDeg) : null;
     }
 
     @Nullable
