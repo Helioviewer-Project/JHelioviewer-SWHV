@@ -31,9 +31,9 @@ public class GLSLLine extends VAO implements GLSLVertexReceiver {
 
         Buffer buffer;
         buffer = vexBuf.toVertexBuffer();
-        vbo[0].setBufferData(buffer.limit(), buffer.capacity(), buffer);
+        vbo[0].setBufferData(buffer.capacity(), buffer);
         buffer = vexBuf.toColorBuffer();
-        vbo[1].setBufferData(buffer.limit(), buffer.capacity(), buffer);
+        vbo[1].setBufferData(buffer.capacity(), buffer);
 
         if (count < 4) {
             Log.warn("GLSLLine requires at least two visible vertices padded by transparent sentinels; count=" + count + ", emitter=" + getEmitter());

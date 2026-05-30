@@ -36,7 +36,7 @@ class GLBO {
         GL.glBindBuffer(target, bufferID);
     }
 
-    void setBufferData(int limit, int capacity, Buffer buffer) {
+    void setBufferData(int capacity, Buffer buffer) {
         GL.glBindBuffer(target, bufferID);
         GL.glBufferData(target, capacity, usage); // orphan, https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
         switch (buffer) {
@@ -52,7 +52,7 @@ class GLBO {
         if (limit == lastFloatCount && floatDataMatches(buffer, limit))
             return;
 
-        setBufferData(limit, capacity, buffer);
+        setBufferData(capacity, buffer);
 
         if (lastFloatData == null || lastFloatData.length < limit)
             lastFloatData = new float[limit];
