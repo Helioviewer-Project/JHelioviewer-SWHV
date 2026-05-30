@@ -20,7 +20,7 @@ public class GLSLTexture extends VAO1 {
             return;
 
         Buffer buffer = buf.toBuffer();
-        vbo.setBufferData(4 * buffer.limit(), 4 * buffer.capacity(), buffer);
+        vbo.setBufferData(4 * buffer.capacity(), buffer);
         buf.clear();
     }
 

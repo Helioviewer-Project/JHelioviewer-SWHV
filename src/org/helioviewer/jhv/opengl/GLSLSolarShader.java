@@ -146,7 +146,8 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put((float) scale.getInterpolatedXValue(0)).put((float) scale.getInterpolatedXValue(1));
         screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
 
-        screenBO.setBufferData(screenBuf.flip().limit(), SCREEN_SIZE, screenBuf); // always changes
+        screenBuf.flip();
+        screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes
     }
 
     static void bindDisplay(float[] color,

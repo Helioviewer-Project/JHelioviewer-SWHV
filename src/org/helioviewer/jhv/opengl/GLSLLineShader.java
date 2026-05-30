@@ -37,7 +37,8 @@ class GLSLLineShader extends GLSLShader {
         screenBuf.put(mvp);
         mvp.flip();
         screenBuf.put(vp.glslArray).put((float) (0.5 * _thickness)); // +3 floats padding
-        screenBO.setBufferData(screenBuf.flip().limit(), SCREEN_SIZE, screenBuf); // always changes
+        screenBuf.flip();
+        screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes
     }
 
 }

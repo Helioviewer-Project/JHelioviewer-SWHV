@@ -22,9 +22,9 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
 
         Buffer buffer;
         buffer = vexBuf.toVertexBuffer();
-        vbo[0].setBufferData(buffer.limit(), buffer.capacity(), buffer);
+        vbo[0].setBufferData(buffer.capacity(), buffer);
         buffer = vexBuf.toColorBuffer();
-        vbo[1].setBufferData(buffer.limit(), buffer.capacity(), buffer);
+        vbo[1].setBufferData(buffer.capacity(), buffer);
     }
 
     public void renderPoints(double factor) {
