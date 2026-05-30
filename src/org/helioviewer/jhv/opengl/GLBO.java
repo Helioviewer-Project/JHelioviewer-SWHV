@@ -15,7 +15,6 @@ class GLBO {
 
     private int bufferID;
     private float[] lastFloatData;
-    private int lastFloatCount = -1;
 
     GLBO(int _target, int _usage) {
         target = _target;
@@ -29,7 +28,6 @@ class GLBO {
         GL.glDeleteBuffer(bufferID);
         bufferID = -1;
         lastFloatData = null;
-        lastFloatCount = -1;
     }
 
     void bind() {
@@ -48,22 +46,20 @@ class GLBO {
         }
     }
 
-    void setBufferDataIfChanged(int limit, int capacity, FloatBuffer buffer) {
-        if (limit == lastFloatCount && floatDataMatches(buffer, limit))
+    void setBufferDataIfChanged(int capacity, FloatBuffer buffer) {
+        int count = buffer.remaining();
+        if (lastFloatData != null && lastFloatData.length == count && floatDataMatches(buffer, count))
             return;
 
         setBufferData(capacity, buffer);
 
-        if (lastFloatData == null || lastFloatData.length < limit)
-            lastFloatData = new float[limit];
+        if (lastFloatData == null || lastFloatData.length != count)
+            lastFloatData = new float[count];
         buffer.get(0, lastFloatData);
-        lastFloatCount = limit;
     }
 
-    private boolean floatDataMatches(FloatBuffer buffer, int limit) {
-        if (lastFloatData == null)
-            return false;
-        for (int i = 0; i < limit; i++) {
+    private boolean floatDataMatches(FloatBuffer buffer, int count) {
+        for (int i = 0; i < count; i++) {
             if (Float.floatToRawIntBits(lastFloatData[i]) != Float.floatToRawIntBits(buffer.get(i)))
                 return false;
         }
