@@ -103,7 +103,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (!options.isHeliospheric())
             return;
 
-        long time = mv.viewpoint().time.milli;
+        long time = Movie.getTime().milli;
         long start = Movie.getStartTime();
         long end = Movie.getEndTime();
 
@@ -177,7 +177,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         MapView mv = GLRenderer.getMapView();
-        long time = mv.viewpoint().time.milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
         mouseX = e.x();
