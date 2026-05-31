@@ -10,6 +10,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
+import org.helioviewer.jhv.opengl.DirectBufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.opengl.GLSLShape;
 import org.helioviewer.jhv.time.JHVTime;
@@ -22,8 +23,8 @@ public class SunJSONTypes {
     public static class GeometryCollection {
 
         private final JHVTime time;
-        private final HashMap<Double, BufVertex> linesMap = new HashMap<>();
-        private final BufVertex pointsBuf;
+        private final HashMap<Double, DirectBufVertex> linesMap = new HashMap<>();
+        private final DirectBufVertex pointsBuf;
 
         GeometryCollection(JHVTime _time, List<GeometryBuffer> bufList) {
             time = _time;
@@ -38,8 +39,8 @@ public class SunJSONTypes {
                     pointsList.add(buf.vexBuf);
                 }
             }
-            Multimaps.asMap(linesWidths).forEach((w, l) -> linesMap.put(w, BufVertex.join(l)));
-            pointsBuf = pointsList.isEmpty() ? null : BufVertex.join(pointsList);
+            Multimaps.asMap(linesWidths).forEach((w, l) -> linesMap.put(w, new DirectBufVertex(BufVertex.join(l))));
+            pointsBuf = pointsList.isEmpty() ? null : new DirectBufVertex(BufVertex.join(pointsList));
         }
 
         public JHVTime time() {
