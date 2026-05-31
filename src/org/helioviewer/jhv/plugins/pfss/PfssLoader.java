@@ -24,7 +24,17 @@ import okio.BufferedSource;
 
 class PfssLoader {
 
-    record Data(JHVTime dateObs, float[] lineX, float[] lineY, float[] lineZ, float[] lineS, int points) {}
+    record Data(JHVTime dateObs, float[] lineX, float[] lineY, float[] lineZ, float[] lineS, int points) {
+        @Override
+        public boolean equals(Object obj) {
+            return obj == this;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
+        }
+    }
 
     static void submitList(long start, long end) {
         submit("pfss-list", new ListLoader(start, end), result -> onSuccessList(start), PfssLoader::onFailureList);
