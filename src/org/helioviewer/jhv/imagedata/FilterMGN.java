@@ -54,7 +54,7 @@ class FilterMGN implements ImageFilter.Algorithm {
             return n;
         }
 
-        private void gaussianConv(float[] dst, float[] src, int N, int stride, int offset, float[] scratch) {
+        private void gaussianConv3(float[] dst, float[] src, int N, int stride, int offset, float[] scratch) {
             int pad = radii[0] + 1;
             float accum = 0;
 
@@ -77,10 +77,10 @@ class FilterMGN implements ImageFilter.Algorithm {
             // Compute stacked box filters
             int dstPos = offset;
             for (int n = 0; n < N; ++n) {
-                accum = weights[0] * (scratch[pad + n + radii[0]] - scratch[pad + n - radii[0] - 1]);
-                for (int k = 1; k < K; ++k)
-                    accum += weights[k] * (scratch[pad + n + radii[k]] - scratch[pad + n - radii[k] - 1]);
-                dst[dstPos] = accum;
+                int center = pad + n;
+                dst[dstPos] = weights[0] * (scratch[center + radii[0]] - scratch[center - radii[0] - 1]) +
+                        weights[1] * (scratch[center + radii[1]] - scratch[center - radii[1] - 1]) +
+                        weights[2] * (scratch[center + radii[2]] - scratch[center - radii[2] - 1]);
                 dstPos += stride;
             }
         }
@@ -90,12 +90,12 @@ class FilterMGN implements ImageFilter.Algorithm {
             ParallelRange.run(height, (from, to) -> {
                 float[] scratch = new float[width + 2 * pad];
                 for (int y = from; y < to; y++)
-                    gaussianConv(dst, src, width, 1, width * y, scratch);
+                    gaussianConv3(dst, src, width, 1, width * y, scratch);
             });
             ParallelRange.run(width, (from, to) -> {
                 float[] scratch = new float[height + 2 * pad];
                 for (int x = from; x < to; x++)
-                    gaussianConv(dst, dst, height, width, x, scratch);
+                    gaussianConv3(dst, dst, height, width, x, scratch);
             });
         }
 
