@@ -60,7 +60,7 @@ public final class URIView extends BaseView {
 
             imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
             metaData[0] = m;
-            ImageBufferCache.put(new DecodeKey(dataUri, ImageFilter.Type.None), buffer);
+            ImageBufferCache.put(decodeKey(ImageFilter.Type.None), buffer);
 
             LUT lut = image.lut();
             if (lut != null)
@@ -72,7 +72,7 @@ public final class URIView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
-        DecodeKey key = new DecodeKey(dataUri, filterType);
+        DecodeKey key = decodeKey(filterType);
         ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
             // Mark running decodes stale before publishing this cached result.
@@ -81,6 +81,17 @@ public final class URIView extends BaseView {
             return;
         }
         executor.submit(new Decoder(dataUri.file(), reader, filterType), new Callback(key, viewpoint));
+    }
+
+    private ImageFilter.Type decodeKeyFilter;
+    private DecodeKey decodeKey;
+
+    private DecodeKey decodeKey(ImageFilter.Type filter) {
+        if (decodeKey == null || decodeKeyFilter != filter) {
+            decodeKeyFilter = filter;
+            decodeKey = new DecodeKey(dataUri, filter);
+        }
+        return decodeKey;
     }
 
     private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
