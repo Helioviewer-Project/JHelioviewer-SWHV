@@ -38,8 +38,6 @@ import kdu_jni.KduException;
 
 public class J2KView extends BaseView {
 
-    private record DecodeKey(J2KParams.Decode params, ImageFilter.Type filter) {}
-
     private static final AtomicInteger globalSerial = new AtomicInteger();
 
     private static final Cleaner reaper = Cleaner.create();
@@ -130,7 +128,7 @@ public class J2KView extends BaseView {
     }
 
     private static void clearCache(int aSerial) {
-        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey dk && dk.params().serial() == aSerial);
+        ImageBufferCache.invalidateIf(key -> key instanceof J2KDecodeKey dk && dk.serial() == aSerial);
     }
 
     private record J2KAbolisher(int aSerial, J2KReader aReader, J2KSource aSource) implements Runnable {
@@ -251,13 +249,13 @@ public class J2KView extends BaseView {
             res = source.resolutionSet(frame).getNextLevel(reqHeight, reqHeight);
         }
 
-        return new J2KParams.Decode(serial, frame, res.subImage(), res.level(), factor);
+        return new J2KParams.Decode(frame, res.subImage(), res.level(), factor);
     }
 
     private int currentLevel = 10000;
 
     protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
-        int level = decodeParams.level();
+        int level = decodeParams.level;
         boolean priority = !Movie.isPlaying();
 
         if (priority || level < currentLevel) {
@@ -269,13 +267,13 @@ public class J2KView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         J2KParams.Decode decodeParams = getDecodeParams(targetFrame, pixFactor, factor);
-        AtomicBoolean status = source.getFrameStatus(decodeParams.frame(), decodeParams.level()); // before signalling to reader
+        AtomicBoolean status = source.getFrameStatus(decodeParams.frame, decodeParams.level); // before signalling to reader
         boolean cacheResult = status != null && status.get();
         if (reader != null && !cacheResult) {
             signalReader(decodeParams, viewpoint);
         }
 
-        DecodeKey key = new DecodeKey(decodeParams, filterType);
+        J2KDecodeKey key = new J2KDecodeKey(serial, decodeParams, filterType);
         ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
             // Mark running decodes stale before publishing this cached result.
@@ -288,15 +286,15 @@ public class J2KView extends BaseView {
 
     void refreshDecodeFromReader(J2KParams.Decode decodeParams, Position viewpoint) {
         EventQueue.invokeLater(() -> {
-            if (decodeParams.frame() == targetFrame) {
+            if (decodeParams.frame == targetFrame) {
                 submitDecode(decodeParams, viewpoint, true);
             }
         });
     }
 
     private void submitDecode(J2KParams.Decode decodeParams, Position viewpoint, boolean cacheResult) {
-        DecodeKey key = new DecodeKey(decodeParams, filterType);
-        int numComps = source.resolutionSet(decodeParams.frame()).numComps;
+        J2KDecodeKey key = new J2KDecodeKey(serial, decodeParams, filterType);
+        int numComps = source.resolutionSet(decodeParams.frame).numComps;
         try {
             executor.submit(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, cacheResult));
         } catch (RejectedExecutionException ignore) {
@@ -306,11 +304,11 @@ public class J2KView extends BaseView {
 
     private class J2KCallback implements LatestWorker.Callback<ImageBuffer> {
 
-        private final DecodeKey key;
+        private final J2KDecodeKey key;
         private final Position viewpoint;
         private final boolean cacheResult;
 
-        J2KCallback(DecodeKey _key, Position _viewpoint, boolean _cacheResult) {
+        J2KCallback(J2KDecodeKey _key, Position _viewpoint, boolean _cacheResult) {
             key = _key;
             viewpoint = _viewpoint;
             cacheResult = _cacheResult;
@@ -335,10 +333,10 @@ public class J2KView extends BaseView {
 
     private void sendDataToHandler(J2KParams.Decode decodeParams, Position viewpoint, ImageBuffer imageBuffer) {
         imageBuffer.protectFromExplicitFree();
-        int frame = decodeParams.frame();
+        int frame = decodeParams.frame;
         MetaData m = metaData[frame];
-        J2KParams.SubImage roi = decodeParams.subImage();
-        ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level());
+        J2KParams.SubImage roi = decodeParams.subImage;
+        ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level);
         Region r = m.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
 
         ImageData data = new ImageData(imageBuffer, m, r, viewpoint);

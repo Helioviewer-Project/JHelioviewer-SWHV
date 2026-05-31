@@ -121,9 +121,10 @@ class J2KReader implements Runnable {
 
             J2KView view = params.view();
             J2KSource.Remote source = params.source();
+            J2KParams.Decode decodeParams = params.decodeParams();
 
-            int frame = params.decodeParams().frame();
-            int level = params.decodeParams().level();
+            int frame = decodeParams.frame;
+            int level = decodeParams.level;
             ResolutionSet.Level resLevel = source.resolutionSet(frame).getLevel(level);
             int width = resLevel.width();
             int height = resLevel.height();

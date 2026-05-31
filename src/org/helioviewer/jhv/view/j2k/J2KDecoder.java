@@ -62,12 +62,12 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             }
             Jpx_source source = src.jpxSource();
 
-            J2KParams.SubImage subImage = params.subImage();
-            int frame = params.frame();
+            J2KParams.SubImage subImage = params.subImage;
+            int frame = params.frame;
             // Measurements for compositor on 4k AIA tiles were up to about 10x faster than
             // kdu_region_decompressor/region output (~23ms vs ~200ms). Compositor stays on
             // Kakadu's optimized 32-bit path; region uses general channel-buffer conversion.
-            compositor = createCompositor(source, params.factor() < 1 ? qualityLow : qualityHigh);
+            compositor = createCompositor(source, params.factor < 1 ? qualityLow : qualityHigh);
             DecodeScratch scratch = localScratch.get();
 
             Kdu_dims empty = scratch.empty;
@@ -79,7 +79,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
                 compositor.Add_ilayer(frame, empty, empty);
             }
 
-            compositor.Set_scale(false, false, false, 1f / (1 << params.level()), params.factor());
+            compositor.Set_scale(false, false, false, 1f / (1 << params.level), params.factor);
 
             Kdu_dims requestedRegion = scratch.requestedRegion;
             requestedRegion.From_u32(subImage.x(), subImage.y(), subImage.w(), subImage.h());
