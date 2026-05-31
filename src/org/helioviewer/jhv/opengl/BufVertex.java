@@ -94,6 +94,14 @@ public class BufVertex {
         return count;
     }
 
+    int vertexByteLength() {
+        return lengthVertx;
+    }
+
+    int colorByteLength() {
+        return lengthColor;
+    }
+
     public void clear() {
         lengthVertx = 0;
         lengthColor = 0;

@@ -17,14 +17,20 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
     @Override
     public void setVertexRepeatable(BufVertex vexBuf) {
         count = vexBuf.getCount();
+        setVertexRepeatable(vexBuf.toVertexBuffer(), vexBuf.toColorBuffer());
+    }
+
+    @Override
+    public void setVertexRepeatable(DirectBufVertex vexBuf) {
+        count = vexBuf.count();
+        setVertexRepeatable(vexBuf.vertexBuffer(), vexBuf.colorBuffer());
+    }
+
+    private void setVertexRepeatable(Buffer vertexBuffer, Buffer colorBuffer) {
         if (count == 0)
             return;
-
-        Buffer buffer;
-        buffer = vexBuf.toVertexBuffer();
-        vbo[0].setBufferData(buffer.capacity(), buffer);
-        buffer = vexBuf.toColorBuffer();
-        vbo[1].setBufferData(buffer.capacity(), buffer);
+        vbo[0].setBufferData(vertexBuffer.capacity(), vertexBuffer);
+        vbo[1].setBufferData(colorBuffer.capacity(), colorBuffer);
     }
 
     public void renderPoints(double factor) {
