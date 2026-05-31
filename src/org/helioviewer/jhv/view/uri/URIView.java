@@ -26,10 +26,8 @@ import com.google.common.base.Throwables;
 
 public final class URIView extends BaseView {
 
-    private record DecodeKey(DataUri uri, ImageFilter.Type filter) {}
-
     static void clearURICache() {
-        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey);
+        ImageBufferCache.invalidateIf(key -> key instanceof URIDecodeKey);
     }
 
     private final URIImageReader reader;
@@ -72,7 +70,7 @@ public final class URIView extends BaseView {
 
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
-        DecodeKey key = decodeKey(filterType);
+        URIDecodeKey key = decodeKey(filterType);
         ImageBuffer imageBuffer = ImageBufferCache.get(key);
         if (imageBuffer != null) {
             // Mark running decodes stale before publishing this cached result.
@@ -84,12 +82,12 @@ public final class URIView extends BaseView {
     }
 
     private ImageFilter.Type decodeKeyFilter;
-    private DecodeKey decodeKey;
+    private URIDecodeKey decodeKey;
 
-    private DecodeKey decodeKey(ImageFilter.Type filter) {
+    private URIDecodeKey decodeKey(ImageFilter.Type filter) {
         if (decodeKey == null || decodeKeyFilter != filter) {
             decodeKeyFilter = filter;
-            decodeKey = new DecodeKey(dataUri, filter);
+            decodeKey = new URIDecodeKey(dataUri, filter);
         }
         return decodeKey;
     }
@@ -107,10 +105,10 @@ public final class URIView extends BaseView {
 
     private class Callback implements LatestWorker.Callback<ImageBuffer> {
 
-        private final DecodeKey key;
+        private final URIDecodeKey key;
         private final Position viewpoint;
 
-        Callback(DecodeKey _key, Position _viewpoint) {
+        Callback(URIDecodeKey _key, Position _viewpoint) {
             key = _key;
             viewpoint = _viewpoint;
         }
@@ -151,7 +149,7 @@ public final class URIView extends BaseView {
 
     @Override
     public void abolish() {
-        ImageBufferCache.invalidateIf(key -> key instanceof DecodeKey k && k.uri().equals(dataUri));
+        ImageBufferCache.invalidateIf(key -> key instanceof URIDecodeKey k && k.uri() == dataUri);
     }
 
     @Override
