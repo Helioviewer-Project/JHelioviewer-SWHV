@@ -25,7 +25,7 @@ public class J2KViewCallisto extends J2KView {
     protected J2KParams.Decode getDecodeParams(int frame, double pixFactor, float factor) {
         ResolutionSet.Level res = getResolutionLevel(frame, 0);
         J2KParams.SubImage subImage = new J2KParams.SubImage(region.x(), region.y(), region.width(), region.height(), res.width(), res.height());
-        return new J2KParams.Decode(serial, frame, subImage, res.level(), factor);
+        return new J2KParams.Decode(frame, subImage, res.level(), factor);
     }
 
     @Override
