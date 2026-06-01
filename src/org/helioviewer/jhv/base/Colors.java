@@ -27,16 +27,65 @@ public class Colors {
     }
 
     public static final byte[] Null = {0, 0, 0, 0};
-    public static final byte[] Red = bytes(Color.RED);
-    public static final byte[] Green = bytes(Color.GREEN);
-    public static final byte[] ReducedGreen = {(byte) 100, (byte) 175, (byte) 100, (byte) 255};
-    public static final byte[] Blue = bytes(Color.BLUE);
-    public static final byte[] Yellow = bytes(Color.YELLOW);
-    public static final byte[] White = bytes(Color.WHITE);
-    public static final byte[] Black = bytes(Color.BLACK);
-    public static final byte[] Gray = bytes(Color.GRAY);
-    public static final byte[] DarkGray = bytes(Color.DARK_GRAY);
-    public static final byte[] LightGray = bytes(Color.LIGHT_GRAY);
+
+    public enum NamedColor {
+        Red("Red", Color.RED),
+        Green("Green", Color.GREEN),
+        ReducedGreen("Reduced Green", new Color(100, 175, 100)),
+        Blue("Blue", Color.BLUE),
+        Yellow("Yellow", Color.YELLOW),
+        Cyan("Cyan", Color.CYAN),
+        Magenta("Magenta", Color.MAGENTA),
+        White("White", Color.WHITE),
+        Black("Black", Color.BLACK),
+        Gray("Gray", Color.GRAY),
+        DarkGray("Dark Gray", Color.DARK_GRAY),
+        LightGray("Light Gray", Color.LIGHT_GRAY);
+
+        private final String label;
+        private final Color awtColor;
+        private final byte[] bytes;
+
+        NamedColor(String _label, Color _awtColor) {
+            label = _label;
+            awtColor = _awtColor;
+            bytes = Colors.bytes(_awtColor);
+        }
+
+        public Color awtColor() {
+            return awtColor;
+        }
+
+        public byte[] bytes() {
+            return bytes;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+
+        public static NamedColor parse(String name) {
+            try {
+                return valueOf(name);
+            } catch (RuntimeException e) {
+                return Blue;
+            }
+        }
+    }
+
+    public static final byte[] Red = NamedColor.Red.bytes();
+    public static final byte[] Green = NamedColor.Green.bytes();
+    public static final byte[] ReducedGreen = NamedColor.ReducedGreen.bytes();
+    public static final byte[] Blue = NamedColor.Blue.bytes();
+    public static final byte[] Yellow = NamedColor.Yellow.bytes();
+    public static final byte[] Cyan = NamedColor.Cyan.bytes();
+    public static final byte[] Magenta = NamedColor.Magenta.bytes();
+    public static final byte[] White = NamedColor.White.bytes();
+    public static final byte[] Black = NamedColor.Black.bytes();
+    public static final byte[] Gray = NamedColor.Gray.bytes();
+    public static final byte[] DarkGray = NamedColor.DarkGray.bytes();
+    public static final byte[] LightGray = NamedColor.LightGray.bytes();
 
     public static final float[] WhiteFloat = {1, 1, 1, 1};
     public static final float[] LightGrayFloat = {.75f, .75f, .75f, 1};
