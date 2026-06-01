@@ -39,7 +39,7 @@ final class AnnotateFOV extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        byte[] color = dragged ? dragColor : (active ? activeColor : baseColor);
+        byte[] color = color(dragged, active);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = 0.5 * (p1.x - p0.x);

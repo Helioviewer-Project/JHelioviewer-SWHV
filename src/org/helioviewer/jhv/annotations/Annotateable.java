@@ -28,6 +28,10 @@ public interface Annotateable {
 
     boolean isDraggable();
 
+    double thickness();
+
+    byte[] baseColor();
+
     JSONObject toJson();
 
 }

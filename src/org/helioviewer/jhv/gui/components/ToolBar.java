@@ -1,7 +1,11 @@
 package org.helioviewer.jhv.gui.components;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EnumMap;
@@ -12,18 +16,24 @@ import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
+import javax.swing.JToggleButton;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.annotations.AnnotationMode;
+import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.app.state.ViewState;
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.interaction.Interaction;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.components.base.HoldRepeat;
+import org.helioviewer.jhv.gui.components.base.JHVSlider;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.io.samp.SampClient;
 //import org.helioviewer.jhv.timelines.band.HapiReader;
@@ -246,6 +256,9 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             annotationItems.put(mode, item);
         }
         annotationButton.addSeparator();
+        addAnnotationColorItems(annotationButton);
+        annotationButton.add(createAnnotationThicknessPanel());
+        annotationButton.addSeparator();
         annotationButton.add(new Actions.ClearAnnotations());
         annotationButton.addSeparator();
         annotationButton.add(new Actions.ZoomFOVAnnotation());
@@ -289,6 +302,68 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private void addButton(AbstractButton b) {
         b.setFocusPainted(false);
         add(b);
+    }
+
+    private static void addAnnotationColorItems(JideSplitButton annotationButton) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 8, 3, 8));
+        ButtonGroup colorGroup = new ButtonGroup();
+        for (Colors.NamedColor color : Annotations.BASE_COLORS) {
+            JToggleButton button = new JToggleButton(new ColorIcon(color.awtColor()));
+            button.setSelected(color == Annotations.getBaseColor());
+            button.setToolTipText(color.toString());
+            button.setFocusPainted(false);
+            button.setPreferredSize(new Dimension(22, 22));
+            button.addActionListener(e -> Annotations.setBaseColor(color));
+            colorGroup.add(button);
+            panel.add(button);
+        }
+        annotationButton.add(panel);
+    }
+
+    private static JPanel createAnnotationThicknessPanel() {
+        int thickness = Annotations.getThicknessValue();
+        JHVSlider slider = new JHVSlider(Annotations.MIN_THICKNESS, Annotations.MAX_THICKNESS, Annotations.DEFAULT_THICKNESS);
+        slider.setValue(thickness);
+        slider.setMajorTickSpacing(1);
+        slider.setSnapToTicks(true);
+        slider.setToolTipText("Annotation thickness");
+        slider.setPreferredSize(new Dimension(110, slider.getPreferredSize().height));
+        slider.addChangeListener(e -> Annotations.setThicknessValue(slider.getValue()));
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+        panel.add(slider, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private static final class ColorIcon implements Icon {
+
+        private static final int SIZE = 12;
+
+        private final Color color;
+
+        private ColorIcon(Color _color) {
+            color = _color;
+        }
+
+        @Override
+        public int getIconWidth() {
+            return SIZE;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return SIZE;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            g.setColor(color);
+            g.fillRect(x, y, SIZE, SIZE);
+            g.setColor(Color.DARK_GRAY);
+            g.drawRect(x, y, SIZE - 1, SIZE - 1);
+        }
     }
 
     private void setDisplayMode(DisplayMode mode) {
