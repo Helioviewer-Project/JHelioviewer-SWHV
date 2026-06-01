@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
@@ -22,7 +22,6 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     static final byte[] activeColor = Colors.Red;
     static final byte[] dragColor = Colors.Green;
-    static final byte[] baseColor = Colors.Blue;
 
     protected static final double ANNOTATION_RADIUS = Sun.Radius * 1.01;
 
@@ -32,7 +31,12 @@ abstract class AbstractAnnotateable implements Annotateable {
     Vec3 dragStartPoint;
     Vec3 dragEndPoint;
 
+    private final double thickness;
+    private final Colors.NamedColor baseColor;
+
     AbstractAnnotateable(JSONObject jo) {
+        thickness = jo == null ? Annotations.getThickness() : jo.optDouble("thickness", Annotations.getDefaultThickness());
+        baseColor = jo == null ? Annotations.getBaseColor() : Colors.NamedColor.parse(jo.optString("color", Colors.NamedColor.Blue.name()));
         if (jo != null) {
             startPoint = fromPointJson(jo, "startPoint");
             endPoint = fromPointJson(jo, "endPoint");
@@ -140,8 +144,22 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
+    public double thickness() {
+        return thickness;
+    }
+
+    @Override
+    public byte[] baseColor() {
+        return baseColor.bytes();
+    }
+
+    byte[] color(boolean dragged, boolean active) {
+        return dragged ? dragColor : (active ? activeColor : baseColor());
+    }
+
+    @Override
     public JSONObject toJson() {
-        JSONObject jo = new JSONObject().put("type", getTypeName());
+        JSONObject jo = new JSONObject().put("type", getTypeName()).put("thickness", thickness).put("color", baseColor.name());
         if (startPoint != null)
             jo.put("startPoint", toPointJson(startPoint));
         if (endPoint != null)

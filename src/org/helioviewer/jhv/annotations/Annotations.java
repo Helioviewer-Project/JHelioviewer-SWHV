@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.opengl.BufVertex;
@@ -20,6 +21,16 @@ import org.json.JSONObject;
 public final class Annotations {
 
     private static final double LINEWIDTH = GLSLLine.LINEWIDTH_BASIC;
+    public static final int MIN_THICKNESS = 1;
+    public static final int MAX_THICKNESS = 8;
+    public static final int DEFAULT_THICKNESS = 1;
+    public static final Colors.NamedColor[] BASE_COLORS = {
+            Colors.NamedColor.Blue,
+            Colors.NamedColor.Yellow,
+            Colors.NamedColor.Cyan,
+            Colors.NamedColor.Magenta,
+            Colors.NamedColor.White
+    };
 
     private static final ArrayList<Annotateable> annotations = new ArrayList<>();
     private static final GLSLLine annotationsLine = new GLSLLine(true);
@@ -31,11 +42,37 @@ public final class Annotations {
 
     private static Annotateable pending;
     private static int activeIndex = -1;
+    private static double thickness = DEFAULT_THICKNESS * LINEWIDTH;
+    private static Colors.NamedColor baseColor = Colors.NamedColor.Blue;
 
     private Annotations() {}
 
     public static void start(Annotateable annotateable) {
         pending = annotateable;
+    }
+
+    public static int getThicknessValue() {
+        return (int) Math.round(thickness / LINEWIDTH);
+    }
+
+    static double getThickness() {
+        return thickness;
+    }
+
+    static double getDefaultThickness() {
+        return DEFAULT_THICKNESS * LINEWIDTH;
+    }
+
+    public static void setThicknessValue(int value) {
+        thickness = Math.clamp(value, MIN_THICKNESS, MAX_THICKNESS) * LINEWIDTH;
+    }
+
+    public static Colors.NamedColor getBaseColor() {
+        return baseColor;
+    }
+
+    public static void setBaseColor(Colors.NamedColor color) {
+        baseColor = color;
     }
 
     @Nullable
@@ -88,29 +125,33 @@ public final class Annotations {
 
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
 
-        annotations.forEach(annotation -> {
-            boolean active = annotation == activeAnnotation;
-            annotation.draw(mv, vp, scale, active, annotationsBuf);
-            annotation.drawTransformed(mv, active, transformedBuf, centerBuf);
-        });
-        if (pending != null) {
-            pending.draw(mv, vp, scale, false, annotationsBuf);
-            pending.drawTransformed(mv, false, transformedBuf, centerBuf);
-        }
-        annotationsLine.setVertex(annotationsBuf);
-        annotationsLine.renderLine(vp, LINEWIDTH);
+        annotations.forEach(annotation -> renderAnnotation(mv, vp, scale, annotation, annotation == activeAnnotation));
+        if (pending != null)
+            renderAnnotation(mv, vp, scale, pending, false);
 
         double pixFactor = ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp));
 
         Transform.pushView();
         if (mv.isOrthographic())
             Transform.rotateViewInverse(mv.viewpoint().toQuat());
+        annotations.forEach(annotation -> renderTransformedAnnotation(mv, vp, pixFactor, annotation, annotation == activeAnnotation));
+        if (pending != null)
+            renderTransformedAnnotation(mv, vp, pixFactor, pending, false);
+        Transform.popView();
+    }
+
+    private static void renderAnnotation(MapView mv, Viewport vp, MapScale scale, Annotateable annotation, boolean active) {
+        annotation.draw(mv, vp, scale, active, annotationsBuf);
+        annotationsLine.setVertex(annotationsBuf);
+        annotationsLine.renderLine(vp, annotation.thickness());
+    }
+
+    private static void renderTransformedAnnotation(MapView mv, Viewport vp, double pixFactor, Annotateable annotation, boolean active) {
+        annotation.drawTransformed(mv, active, transformedBuf, centerBuf);
         transformedLine.setVertex(transformedBuf);
-        transformedLine.renderLine(vp, LINEWIDTH);
+        transformedLine.renderLine(vp, annotation.thickness());
         center.setVertex(centerBuf);
         center.renderPoints(pixFactor);
-
-        Transform.popView();
     }
 
     public static void drawCross(MapView mv, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
