@@ -1,7 +1,9 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 5.5.0 (pending)
+## JHelioviewer 5.5.1 (pending)
+
+## JHelioviewer 5.5.0 (2026-06-01)
 
 ### Display and rendering
 - Add `ARC` WCS projection support
