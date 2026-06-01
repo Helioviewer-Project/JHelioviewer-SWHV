@@ -14,7 +14,6 @@ class FOVInstrument extends DefaultMutableTreeNode {
     enum FOVType {RECTANGULAR, CIRCULAR}
 
     private static final double TEXT_SCALE = 0.075;
-    private final FOVShape fov = new FOVShape();
 
     private final String name;
     private final FOVType type;
@@ -48,21 +47,21 @@ class FOVInstrument extends DefaultMutableTreeNode {
         if (!enabled)
             return;
 
-        fov.setCenter(centerX * distance, centerY * distance);
-        fov.setLineWidth(lineWidth);
-        fov.putCenter(false, color, centerBuf);
+        double fovCenterX = centerX * distance;
+        double fovCenterY = centerY * distance;
+        FOVShape.putCenter(fovCenterX, fovCenterY, false, lineWidth, color, centerBuf);
 
         if (inner > 0)
-            fov.putCircLine(inner * distance, false, color, lineBuf);
+            FOVShape.putCircLine(fovCenterX, fovCenterY, inner * distance, false, lineWidth, color, lineBuf);
         if (type == FOVType.RECTANGULAR) {
-            fov.putRectLine(wide * distance, high * distance, false, color, lineBuf);
+            FOVShape.putRectLine(fovCenterX, fovCenterY, wide * distance, high * distance, false, lineWidth, color, lineBuf);
             float x = (float) ((centerX - wide) * distance);
             float y = (float) ((centerY - high) * distance);
             double labelSize = high * distance;
             float scaleFactor = (float) (TEXT_SCALE / renderer.getFontSize() * labelSize);
             renderer.draw(name, x, y, 0, scaleFactor); // using SurfacePut
         } else {
-            fov.putCircLine(wide * distance, false, color, lineBuf);
+            FOVShape.putCircLine(fovCenterX, fovCenterY, wide * distance, false, lineWidth, color, lineBuf);
             double halfSide = wide / Math.sqrt(2);
             float x = (float) ((centerX - halfSide) * distance);
             float y = (float) ((centerY - halfSide) * distance);
