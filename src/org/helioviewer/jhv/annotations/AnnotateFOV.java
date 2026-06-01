@@ -11,8 +11,6 @@ import org.json.JSONObject;
 
 final class AnnotateFOV extends AbstractAnnotateable {
 
-    private final FOVShape fov = new FOVShape();
-
     AnnotateFOV(JSONObject jo) {
         super(jo);
     }
@@ -44,11 +42,11 @@ final class AnnotateFOV extends AbstractAnnotateable {
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
+        double centerX = p0.x + dx;
+        double centerY = p0.y + dy;
 
-        fov.setCenter(p0.x + dx, p0.y + dy);
-        fov.setLineWidth(thickness());
-        fov.putCenter(mv.isHpc(), color, centerBuf);
-        fov.putRectLine(dx, dy, mv.isHpc(), color, lineBuf);
+        FOVShape.putCenter(centerX, centerY, mv.isHpc(), thickness(), color, centerBuf);
+        FOVShape.putRectLine(centerX, centerY, dx, dy, mv.isHpc(), thickness(), color, lineBuf);
     }
 
     @Override
