@@ -34,13 +34,6 @@ float stripCoverage(vec2 p, vec2 start, vec2 tangent, float lengthPixels) {
     return edgeCoverage(abs(cross2(tangent, delta)));
 }
 
-bool insideDirectedStrip(vec2 p, vec2 start, vec2 tangent, float direction) {
-    vec2 delta = p - start;
-    float along = direction * dot(delta, tangent);
-    float across = abs(cross2(tangent, delta));
-    return along >= 0.0 && across <= halfWidthPixels + aaPixels;
-}
-
 void main(void) {
     if (fragColor.a == 0.)
         discard;
@@ -59,9 +52,16 @@ void main(void) {
         float prevLength = length(prevDelta);
         vec2 prevTangent = prevLength > 0.0 ? prevDelta / prevLength : segmentTangent;
 
+        vec2 joinDelta = p - currPixel;
+        float prevAlong = -dot(joinDelta, prevTangent);
+        float prevAcross = abs(cross2(prevTangent, joinDelta));
+        bool inPrevStrip = prevAlong >= 0.0 && prevAcross <= halfWidthPixels + aaPixels;
+
+        float currentAlong = dot(joinDelta, segmentTangent);
+        float currentAcross = abs(cross2(segmentTangent, joinDelta));
+        bool inCurrentStrip = currentAlong >= 0.0 && currentAcross <= halfWidthPixels + aaPixels;
+
         bool shallowJoin = dot(prevTangent, segmentTangent) > 0.5;
-        bool inPrevStrip = insideDirectedStrip(p, currPixel, prevTangent, -1.0);
-        bool inCurrentStrip = insideDirectedStrip(p, currPixel, segmentTangent, 1.0);
 
         if (shallowJoin && inPrevStrip)
             coverage = 0.0;
