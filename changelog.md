@@ -12,6 +12,7 @@
 ### Image loading and data
 - Load user color lookup tables from `$HOME/JHelioviewer-SWHV/Settings/user-luts.txt`
 - Harden FITS metadata handling, WCS parsing, LUT restoration, BLANK/BZERO/BSCALE handling, and clipping range behavior
+- Speed up FITS loading with faster Rice decompression and normalized pixel-conversion lookup tables
 - Improve JPIP/J2K robustness, including socket buffering, premature EOF handling, dropped decode callbacks, and resource cleanup
 - Improve image-layer loading ownership and asynchronous decode handling
 
@@ -23,13 +24,13 @@
 
 ### Timeline, events, and UI
 - Improve timeline rendering performance with off-EDT polyline building, cached SWEK events, and reduced repaint churn
-- Improve SWEK event association, related-event lookup, timeline cache, and popup ownership
+- Improve SWEK event insertion and association, related-event lookup, timeline cache, and popup ownership
 - Reduce Swing coupling in layer options and layer selector updates
 
 ### Technical
 - Expand GLSL/WCS validation coverage, including SwiftShader and Electron-backed shader checks
-- Rework and tighten display/viewpoint/camera internals around `MapView`
-- Various bug fixes, cleanups, and major internal refactoring
+- Rework and tighten display/viewpoint/camera internals
+- Various profile-driven optimizations, bug fixes, cleanups, and major internal refactoring
 
 ## JHelioviewer 5.0 (2026-05-08)
 
