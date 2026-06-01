@@ -3,6 +3,8 @@
 
 ## JHelioviewer 5.5.1 (pending)
 
+- Add options to choose colors and line thickness for annotations
+
 ## JHelioviewer 5.5.0 (2026-06-01)
 
 ### Display and rendering

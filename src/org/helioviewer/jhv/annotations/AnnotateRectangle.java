@@ -15,7 +15,7 @@ final class AnnotateRectangle extends AbstractAnnotateable {
 
     private static final int SUBDIVISIONS = 24;
 
-    private final List<Vec3> vertices = fixedSizeVertices(4 * (SUBDIVISIONS + 1));
+    private final List<Vec3> vertices = fixedSizeVertices(4 * SUBDIVISIONS + 1);
 
     AnnotateRectangle(JSONObject jo) {
         super(jo);
@@ -39,17 +39,17 @@ final class AnnotateRectangle extends AbstractAnnotateable {
             vertices.set(vertexIndex++, pc);
         }
 
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
+        for (int i = 1; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, startLatitude, endLongitude, endLatitude);
             vertices.set(vertexIndex++, pc);
         }
 
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
+        for (int i = 1; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, endLongitude, endLatitude, startLongitude, endLatitude);
             vertices.set(vertexIndex++, pc);
         }
 
-        for (int i = 0; i <= SUBDIVISIONS; i++) {
+        for (int i = 1; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, endLatitude, startLongitude, startLatitude);
             vertices.set(vertexIndex++, pc);
         }
