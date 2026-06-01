@@ -17,12 +17,12 @@ final class AnnotateLine extends AbstractAnnotateable {
         super(jo);
     }
 
-    private static void drawLine(MapView mv, double centerX, double centerY, double bw, double bh, byte[] color, BufVertex vexBuf) {
+    private static void drawLine(MapView mv, double centerX, double centerY, double bw, double bh, double thickness, byte[] color, BufVertex vexBuf) {
         boolean flat = mv.isHpc();
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             double x = -bw + 2 * bw / SUBDIVISIONS * i + centerX;
             double y = -bh + 2 * bh / SUBDIVISIONS * i + centerY;
-            double z = FOVShape.computeZ(x, y, flat);
+            double z = FOVShape.computeZ(x, y, flat, thickness);
             if (i == 0) { // first
                 vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
@@ -45,7 +45,7 @@ final class AnnotateLine extends AbstractAnnotateable {
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
 
-        drawLine(mv, p0.x + dx, p0.y + dy, dx, dy, color, lineBuf);
+        drawLine(mv, p0.x + dx, p0.y + dy, dx, dy, thickness(), color, lineBuf);
     }
 
     @Override

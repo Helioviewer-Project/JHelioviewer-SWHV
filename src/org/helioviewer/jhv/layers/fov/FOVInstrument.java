@@ -44,11 +44,12 @@ class FOVInstrument extends DefaultMutableTreeNode {
         centerY = _centerY;
     }
 
-    void putGeometry(double distance, byte[] color, SdfTextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
+    void putGeometry(double distance, double lineWidth, byte[] color, SdfTextRenderer renderer, BufVertex lineBuf, BufVertex centerBuf) {
         if (!enabled)
             return;
 
         fov.setCenter(centerX * distance, centerY * distance);
+        fov.setLineWidth(lineWidth);
         fov.putCenter(false, color, centerBuf);
 
         if (inner > 0)
