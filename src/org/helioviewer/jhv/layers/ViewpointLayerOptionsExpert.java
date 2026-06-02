@@ -113,6 +113,9 @@ public final class ViewpointLayerOptionsExpert {
     }
 
     public void setRelative(boolean _relative) {
+        if (relative == _relative)
+            return;
+
         relative = _relative;
         fireChanged();
     }

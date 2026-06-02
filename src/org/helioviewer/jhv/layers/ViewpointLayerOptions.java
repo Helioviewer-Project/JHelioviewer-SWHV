@@ -89,21 +89,23 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     }
 
     void applyCurrentViewpoint(DisplayController.ViewpointApplyMode mode) {
-        DisplayController.setViewpointUpdate(getUpdateViewpoint(), mode);
+        DisplayController.setViewpointUpdate(createViewpointUpdate(), mode);
     }
 
-    private UpdateViewpoint getUpdateViewpoint() {
+    private UpdateViewpoint createViewpointUpdate() {
+        long start = Movie.getStartTime();
+        long end = Movie.getEndTime();
         return switch (cameraMode) {
             case ObserverAt1au -> UpdateViewpoint.observerAt1au;
-            case Location -> new UpdateViewpoint.Location(locationOptions.getHighlightedLoad(), Movie.getStartTime(), Movie.getEndTime());
-            case Heliosphere -> new UpdateViewpoint.Equatorial(equatorialOptions.getHighlightedLoad(), equatorialOptions.isRelative(), Movie.getStartTime(), Movie.getEndTime());
+            case Location -> new UpdateViewpoint.Location(locationOptions.getHighlightedLoad(), start, end);
+            case Heliosphere -> new UpdateViewpoint.Equatorial(equatorialOptions.getHighlightedLoad(), equatorialOptions.isRelative(), start, end);
         };
     }
 
     private void optionStateChanged(CameraMode mode) {
         if (cameraMode == mode) {
             applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
-            DisplayController.refreshCamera();
+            DisplayController.render(1);
         }
     }
 

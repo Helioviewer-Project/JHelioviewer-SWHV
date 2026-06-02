@@ -99,23 +99,11 @@ public interface UpdateViewpoint {
                 }
             }
 
-            double relLon = getRelativeLongitude(itime.milli);
+            double relLon = relativeLongitude(itime.milli);
             return new Position(itime, distance, Sun.getEarth(itime).lon + hciLon - relLon + Math.PI / 2, Math.PI / 2);
         }
 
-        public double getRelativeLongitude(long time, long _start, long _end) {
-            if (!relative || controlLoad == null)
-                return 0;
-
-            PositionResponse response = controlLoad.getResponse();
-            if (response != null) {
-                response.interpolateLatitudinal(time, _start, _end, lati);
-                return lati[1];
-            }
-            return 0;
-        }
-
-        private double getRelativeLongitude(long time) {
+        private double relativeLongitude(long time) {
             if (!relative || controlLoad == null)
                 return 0;
 
