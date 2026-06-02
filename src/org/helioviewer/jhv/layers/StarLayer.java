@@ -6,7 +6,6 @@ import java.util.Set;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.ViewpointListener;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
@@ -54,7 +53,7 @@ public final class StarLayer extends AbstractLayer implements ViewpointListener,
     }
 
     @Override
-    public void render(MapView mv, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
 

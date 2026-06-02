@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
@@ -154,24 +153,24 @@ public final class Layers {
         reapImageBuffers();
     }
 
-    public static void render(MapView mv, Viewport vp, MapScale scale) {
-        layers.forEach(layer -> layer.render(mv, vp, scale));
+    public static void render(MapView mv, Viewport vp) {
+        layers.forEach(layer -> layer.render(mv, vp));
     }
 
-    public static void renderScale(MapView mv, Viewport vp, MapScale scale) {
-        layers.forEach(layer -> layer.renderScale(mv, vp, scale));
+    public static void renderScale(MapView mv, Viewport vp) {
+        layers.forEach(layer -> layer.renderScale(mv, vp));
     }
 
-    public static void renderFloat(MapView mv, Viewport vp, MapScale scale) {
-        layers.forEach(layer -> layer.renderFloat(mv, vp, scale));
+    public static void renderFloat(MapView mv, Viewport vp) {
+        layers.forEach(layer -> layer.renderFloat(mv, vp));
     }
 
     public static void renderFullFloat(Viewport vp) {
         layers.forEach(layer -> layer.renderFullFloat(vp));
     }
 
-    public static void renderMiniview(MapView mv, Viewport vp, MapScale scale) {
-        layers.forEach(layer -> layer.renderMiniview(mv, vp, scale));
+    public static void renderMiniview(MapView mv, Viewport vp) {
+        layers.forEach(layer -> layer.renderMiniview(mv, vp));
     }
 
     private static void initLayers() {

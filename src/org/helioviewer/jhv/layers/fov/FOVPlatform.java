@@ -12,7 +12,6 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.math.Quat;
@@ -91,7 +90,7 @@ class FOVPlatform extends DefaultMutableTreeNode {
         instrumentCenters.dispose();
     }
 
-    void render(MapView mv, Viewport vp, MapScale scale) {
+    void render(MapView mv, Viewport vp) {
         if (!hasEnabled())
             return;
 

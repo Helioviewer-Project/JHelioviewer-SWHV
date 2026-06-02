@@ -8,7 +8,6 @@ import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
@@ -71,7 +70,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     public ConnectionLayer(JSONObject ignoredJo) {}
 
     @Override
-    public void render(MapView mv, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         if (connectivity != null)
@@ -89,8 +88,8 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     @Override
-    public void renderScale(MapView mv, Viewport vp, MapScale scale) {
-        render(mv, vp, scale);
+    public void renderScale(MapView mv, Viewport vp) {
+        render(mv, vp);
     }
 
     private void drawConnectivity(MapView mv, Viewport vp) {

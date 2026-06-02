@@ -57,9 +57,9 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(MapView mv, Viewport vp, MapScale scale, boolean showLabels) {
+    public void render(MapView mv, Viewport vp, boolean showLabels) {
         double width = mv.cameraWidth(vp);
-        rebuildIfNeeded(mv, vp, scale, width);
+        rebuildIfNeeded(mv, vp, width);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
             drawLabels(mv, vp, width);
@@ -69,9 +69,10 @@ public class FlatGrid {
         return new FlatGridKey(mv.mode(), mv.gridType(), vp.aspect, width, mv.cameraTranslationX(), mv.cameraTranslationY());
     }
 
-    private void rebuildIfNeeded(MapView mv, Viewport vp, MapScale scale, double width) {
+    private void rebuildIfNeeded(MapView mv, Viewport vp, double width) {
         FlatGridKey flatGridKey = key(mv, vp, width);
 
+        MapScale scale = mv.scale(vp);
         double xCenter = 0.5 - mv.cameraTranslationX() / vp.aspect;
         double yCenter = 0.5 - mv.cameraTranslationY();
         double halfWidth = 0.5 * width;

@@ -14,7 +14,6 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.input.InputController;
@@ -94,7 +93,7 @@ public class ViewpointLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapView mv, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp) {
         if (vp.idx == 0) // once!
             updateTime(mv.viewpoint().time);
 

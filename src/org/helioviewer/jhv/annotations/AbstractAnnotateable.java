@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
@@ -95,7 +94,7 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {}
+    public void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf) {}
 
     @Override
     public void drawTransformed(MapView mv, boolean active, BufVertex lineBuf, BufVertex centerBuf) {}

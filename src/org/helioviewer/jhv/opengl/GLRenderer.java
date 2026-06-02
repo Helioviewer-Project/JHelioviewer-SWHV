@@ -145,9 +145,9 @@ public final class GLRenderer {
             GLSLSolarShader.sphere.use();
             GLSLSolar.quad.render();
 
-            Layers.render(mv, vp, scale);
-            Annotations.render(mv, vp, scale);
-            Layers.renderFloat(mv, vp, scale);
+            Layers.render(mv, vp);
+            Annotations.render(mv, vp);
+            Layers.renderFloat(mv, vp);
         }
     }
 
@@ -175,7 +175,7 @@ public final class GLRenderer {
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
-            Layers.renderMiniview(mv, vp, scale);
+            Layers.renderMiniview(mv, vp);
             GL.glEnable(GL.DEPTH_TEST);
         }
     }
@@ -188,9 +188,9 @@ public final class GLRenderer {
             Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
             GLSLSolarShader.bindScreen(vp, scale);
 
-            Layers.renderScale(mv, vp, scale);
-            Annotations.render(mv, vp, scale);
-            Layers.renderFloat(mv, vp, scale);
+            Layers.renderScale(mv, vp);
+            Annotations.render(mv, vp);
+            Layers.renderFloat(mv, vp);
         }
     }
 

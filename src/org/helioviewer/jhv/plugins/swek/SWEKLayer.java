@@ -261,7 +261,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(MapView mv, Viewport vp, MapScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIconScale(MapView mv, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -371,7 +371,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void render(MapView mv, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
@@ -397,7 +397,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     @Override
-    public void renderScale(MapView mv, Viewport vp, MapScale scale) {
+    public void renderScale(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
@@ -405,6 +405,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (evs.isEmpty())
             return;
 
+        MapScale scale = mv.scale(vp);
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus() && (mv.isPolar() || mv.isLogPolar())) {
@@ -412,7 +413,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             } else {
                 drawPolygon(mv, vp, evtr, evt);
                 if (icons) {
-                    drawIconScale(mv, vp, scale, evtr, evt);
+                    drawIconScale(mv, vp, evtr, evt);
                 }
             }
         }
