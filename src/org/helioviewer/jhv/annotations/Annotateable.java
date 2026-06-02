@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public interface Annotateable {
 
     @Nullable
-    Object getData();
+    String getData();
 
     void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf);
 

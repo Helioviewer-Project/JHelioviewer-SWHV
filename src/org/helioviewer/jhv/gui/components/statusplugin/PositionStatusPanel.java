@@ -55,25 +55,9 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
                 Position viewpoint = GLRenderer.getDisplayedViewpoint();
 
-                Object annData = Annotations.getAnnotationData();
-                if (annData instanceof String str) {
-                    annStr = str;
-                } /* else if (r > 1 && annData instanceof Vec3 annv) {
-                    Vec3 v_m = new Vec3(v.x / r, v.y / r, 0);
-                    Vec3 vva = viewpoint.toQuat().rotateVector(annv);
-                    Vec3 v_a = v.x < 0 ?
-                            Vec3.cross(Vec3.cross(vva, Vec3.YAxis), Vec3.cross(Vec3.ZAxis, v_m)) :
-                            Vec3.cross(Vec3.cross(Vec3.ZAxis, v_m), Vec3.cross(vva, Vec3.YAxis));
-                    v_a.normalize();
-                    //System.out.println(">>> " + vva + " " + v_a);
-
-                    double alpha = Math.atan2(r, viewpoint.distance);
-                    double beta = Math.acos(Vec3.dot(v_a, Vec3.ZAxis));
-                    double gamma = Math.PI - alpha - beta;
-                    double h = (viewpoint.distance * Math.sin(alpha) / Math.sin(gamma) - 1);
-
-                    annStr = "Hann: " + FastFormat.fixed2(h * (Sun.RadiusMeter / 1e6), FIELD_WIDTH, false) + "Mm";
-                } */
+                String annData = Annotations.getAnnotationData();
+                if (annData != null)
+                    annStr = annData;
 
                 double zeta = viewpoint.distance - v.z;
                 double px = (180 / Math.PI) * Math.atan2(v.x, zeta);

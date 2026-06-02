@@ -158,7 +158,7 @@ public final class Annotations {
     }
 
     @Nullable
-    public static Object getAnnotationData() {
+    public static String getAnnotationData() {
         if (pending == null)
             return activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex).getData() : null;
         else

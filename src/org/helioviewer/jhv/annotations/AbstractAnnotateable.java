@@ -84,7 +84,7 @@ abstract class AbstractAnnotateable implements Annotateable {
 
     @Nullable
     @Override
-    public Object getData() {
+    public String getData() {
         return null;
     }
 

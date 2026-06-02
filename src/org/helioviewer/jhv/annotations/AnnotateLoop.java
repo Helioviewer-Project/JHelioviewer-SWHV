@@ -76,7 +76,7 @@ final class AnnotateLoop extends AbstractAnnotateable {
 
     @Nullable
     @Override
-    public Object getData() {
+    public String getData() {
         return heightStr;
     }
 
