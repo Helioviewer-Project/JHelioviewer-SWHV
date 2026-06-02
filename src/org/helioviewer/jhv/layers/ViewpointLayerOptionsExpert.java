@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -9,6 +10,7 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
+import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -157,11 +159,19 @@ public final class ViewpointLayerOptionsExpert {
 
     @Nullable
     PositionLoad getHighlightedLoad() {
-        return container.getHighlightedLoad();
+        SpaceObjectElement element = container.getHighlightedElement();
+        return element == null ? null : element.getLoad();
     }
 
     List<PositionLoad> getSelectedLoads() {
-        return container.getSelectedLoads();
+        ArrayList<PositionLoad> loads = new ArrayList<>();
+        for (SpaceObjectElement element : container.getSelectedElements()) {
+            PositionLoad load = element.getLoad();
+            if (load != null)
+                loads.add(load);
+        }
+        loads.removeIf(load -> load.future().isCancelled() || (load.future().isDone() && load.getResponse() == null));
+        return loads;
     }
 
     int getSpiralSpeed() {
