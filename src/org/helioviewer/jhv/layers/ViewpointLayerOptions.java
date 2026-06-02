@@ -98,7 +98,9 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
         return switch (cameraMode) {
             case ObserverAt1au -> UpdateViewpoint.observerAt1au;
             case Location -> new UpdateViewpoint.Location(locationOptions.getHighlightedLoad(), start, end);
-            case Heliosphere -> new UpdateViewpoint.Equatorial(equatorialOptions.getHighlightedLoad(), equatorialOptions.isRelative(), start, end);
+            case Heliosphere ->
+                    new UpdateViewpoint.Equatorial(equatorialOptions.getHighlightedLoad(), equatorialOptions.getFrame(), equatorialOptions.isRelative(),
+                            start, end);
         };
     }
 
