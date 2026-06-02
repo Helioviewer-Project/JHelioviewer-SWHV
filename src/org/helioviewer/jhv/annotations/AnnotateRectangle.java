@@ -21,7 +21,7 @@ final class AnnotateRectangle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawRectangle(MapView mv, Viewport vp, MapScale scale, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
+    private void drawRectangle(MapView mv, Viewport vp, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
         double startLongitude = start.longitude();
         double startLatitude = start.latitude();
         double endLongitude = end.longitude();
@@ -53,7 +53,7 @@ final class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, endLatitude, startLongitude, startLatitude);
             vertices.set(vertexIndex++, pc);
         }
-        mv.emitMapLine(vp, scale, vertices, ANNOTATION_RADIUS, color, vexBuf);
+        mv.emitMapLine(vp, vertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override
@@ -68,7 +68,7 @@ final class AnnotateRectangle extends AbstractAnnotateable {
 
         SphericalPoint spherical0 = SphericalPoint.fromCartesian(p0);
         SphericalPoint spherical1 = SphericalPoint.fromCartesian(p1);
-        drawRectangle(mv, vp, scale, spherical0, spherical1, color, vexBuf);
+        drawRectangle(mv, vp, spherical0, spherical1, color, vexBuf);
     }
 
     @Override
