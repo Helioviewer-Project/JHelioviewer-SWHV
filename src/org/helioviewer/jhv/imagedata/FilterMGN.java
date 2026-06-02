@@ -24,12 +24,9 @@ class FilterMGN implements ImageFilter.Algorithm {
         private final float[] weights = new float[SII_MAX_K];
         // Box radii
         private final int[] radii = new int[SII_MAX_K];
-        // Number of boxes
-        private final int K;
 
-        GaussFilter(float sigma, int _K) {
-            K = _K;
-
+        // Specialized for K=3
+        GaussFilter(float sigma, int K) {
             int i = K - SII_MIN_K;
             float sum = 0;
 
