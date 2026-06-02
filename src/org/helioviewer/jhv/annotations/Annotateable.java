@@ -3,7 +3,6 @@ package org.helioviewer.jhv.annotations;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.opengl.BufVertex;
 
@@ -14,7 +13,7 @@ public interface Annotateable {
     @Nullable
     Object getData();
 
-    void draw(MapView mv, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf);
+    void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf);
 
     void drawTransformed(MapView mv, boolean active, BufVertex lineBuf, BufVertex centerBuf);
 

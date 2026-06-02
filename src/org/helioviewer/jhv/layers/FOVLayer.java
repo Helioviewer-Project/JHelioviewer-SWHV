@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers;
 
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.fov.FOVCatalog;
 
@@ -21,10 +20,10 @@ public class FOVLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapView mv, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        catalog.render(mv, vp, scale);
+        catalog.render(mv, vp);
     }
 
     @Override

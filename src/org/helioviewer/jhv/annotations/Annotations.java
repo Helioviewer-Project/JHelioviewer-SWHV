@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
@@ -119,15 +118,15 @@ public final class Annotations {
         return true;
     }
 
-    public static void render(MapView mv, Viewport vp, MapScale scale) {
+    public static void render(MapView mv, Viewport vp) {
         if (pending == null && annotations.isEmpty())
             return;
 
         Annotateable activeAnnotation = activeIndex >= 0 && activeIndex < annotations.size() ? annotations.get(activeIndex) : null;
 
-        annotations.forEach(annotation -> renderAnnotation(mv, vp, scale, annotation, annotation == activeAnnotation));
+        annotations.forEach(annotation -> renderAnnotation(mv, vp, annotation, annotation == activeAnnotation));
         if (pending != null)
-            renderAnnotation(mv, vp, scale, pending, false);
+            renderAnnotation(mv, vp, pending, false);
 
         double pixFactor = ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp));
 
@@ -140,8 +139,8 @@ public final class Annotations {
         Transform.popView();
     }
 
-    private static void renderAnnotation(MapView mv, Viewport vp, MapScale scale, Annotateable annotation, boolean active) {
-        annotation.draw(mv, vp, scale, active, annotationsBuf);
+    private static void renderAnnotation(MapView mv, Viewport vp, Annotateable annotation, boolean active) {
+        annotation.draw(mv, vp, active, annotationsBuf);
         annotationsLine.setVertex(annotationsBuf);
         annotationsLine.renderLine(vp, annotation.thickness());
     }

@@ -5,8 +5,8 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.opengl.GLText;
@@ -42,7 +42,7 @@ public class TimestampLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderFloat(MapView mv, Viewport vp, MapScale projectionScale) {
+    public void renderFloat(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
 
@@ -60,7 +60,7 @@ public class TimestampLayer extends AbstractLayer {
         if (extra) {
             text += String.format(" | D☉: %7.4fau", viewpoint.distance * Sun.MeanEarthDistanceInv);
             if (!Display.multiview) {
-                text += " | FOV: " + formatFOV(mv, vp, projectionScale);
+                text += " | FOV: " + formatFOV(mv, vp);
             }
         }
 
@@ -79,9 +79,9 @@ public class TimestampLayer extends AbstractLayer {
         renderer.endRendering();
     }
 
-    private static String formatFOV(MapView mv, Viewport vp, MapScale scale) {
+    private static String formatFOV(MapView mv, Viewport vp) {
         if (mv.isHpc())
-            return formatHpcFOV(mv, vp, scale);
+            return formatHpcFOV(mv, vp);
         return formatOrthoFOV(mv.cameraWidth(vp));
     }
 
@@ -92,7 +92,7 @@ public class TimestampLayer extends AbstractLayer {
             return String.format("%6.4fau", r * Sun.MeanEarthDistanceInv);
     }
 
-    private static String formatHpcFOV(MapView mv, Viewport vp, MapScale scale) {
+    private static String formatHpcFOV(MapView mv, Viewport vp) {
         int centerX = vp.x + vp.width / 2;
         int centerY = vp.yAWT + vp.height / 2;
 
@@ -101,6 +101,7 @@ public class TimestampLayer extends AbstractLayer {
         Vec2 bottom = mv.mouseToGrid(vp, centerX, vp.yAWT + vp.height - 1);
         Vec2 top = mv.mouseToGrid(vp, centerX, vp.yAWT);
 
+        MapScale scale = mv.scale(vp);
         double minX = scale.getInterpolatedXValue(0);
         double maxX = scale.getInterpolatedXValue(1);
         double minY = scale.getInterpolatedYValue(0);

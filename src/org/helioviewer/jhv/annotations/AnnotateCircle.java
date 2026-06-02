@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.FastFormat;
@@ -57,7 +56,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;

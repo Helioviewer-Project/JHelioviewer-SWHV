@@ -2,7 +2,6 @@ package org.helioviewer.jhv.annotations;
 
 import java.util.List;
 
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.SphericalCoords;
@@ -35,7 +34,7 @@ final class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, MapScale scale, boolean active, BufVertex vexBuf) {
+    public void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf) {
         if (startPoint == null)
             return;
 

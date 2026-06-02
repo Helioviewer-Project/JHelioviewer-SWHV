@@ -9,7 +9,6 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
@@ -105,7 +104,7 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void render(MapView mv, Viewport vp, MapScale scale) {
+    public void render(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
@@ -158,10 +157,10 @@ public final class GridLayer extends AbstractLayer {
     }
 
     @Override
-    public void renderScale(MapView mv, Viewport vp, MapScale scale) {
+    public void renderScale(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(mv, vp, scale, showLabels);
+        flatGrid.render(mv, vp, showLabels);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
