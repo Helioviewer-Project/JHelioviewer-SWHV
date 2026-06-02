@@ -2,42 +2,28 @@ package org.helioviewer.jhv.layers.spaceobject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntConsumer;
 
 import javax.annotation.Nullable;
-
-import org.json.JSONArray;
 
 public final class SpaceObjectContainer {
 
     private final boolean exclusive;
-    private final SpaceObjectModel model;
+    private final List<SpaceObjectElement> elements;
+    private Runnable changeListener = () -> {};
 
     private SpaceObjectElement highlighted;
 
-    public SpaceObjectContainer(SpaceObjectModel _model, boolean _exclusive) {
+    public SpaceObjectContainer(List<SpaceObjectElement> _elements, boolean _exclusive) {
         exclusive = _exclusive;
-        model = _model;
-    }
-
-    public int size() {
-        return model.size();
-    }
-
-    public SpaceObjectElement elementAt(int row) {
-        return model.elementAt(row);
-    }
-
-    public void addRefreshListener(IntConsumer listener) {
-        model.addRefreshListener(listener);
+        elements = _elements;
     }
 
     public boolean isExclusive() {
         return exclusive;
     }
 
-    public int getHighlightedIndex() {
-        return highlighted == null ? -1 : model.indexOf(highlighted);
+    public List<SpaceObjectElement> getElements() {
+        return elements;
     }
 
     public void setHighlightedElement(SpaceObjectElement element) {
@@ -50,9 +36,12 @@ public final class SpaceObjectContainer {
     }
 
     public List<SpaceObjectElement> getSelectedElements() {
-        ArrayList<SpaceObjectElement> elements = new ArrayList<>();
-        model.forEachSelected(elements::add);
-        return elements;
+        ArrayList<SpaceObjectElement> selected = new ArrayList<>();
+        for (SpaceObjectElement element : elements) {
+            if (element.isSelected())
+                selected.add(element);
+        }
+        return selected;
     }
 
     public void selectElement(SpaceObjectElement element) {
@@ -60,7 +49,10 @@ public final class SpaceObjectContainer {
         if (exclusive) {
             if (element.isSelected()) // avoid reload on re-clicking same
                 return;
-            model.forEachSelected(SpaceObjectElement::deselect);
+            for (SpaceObjectElement selected : elements) {
+                if (selected.isSelected())
+                    selected.deselect();
+            }
             element.select();
         } else {
             if (element.isSelected())
@@ -68,12 +60,20 @@ public final class SpaceObjectContainer {
             else
                 element.select();
         }
+        fireChanged();
     }
 
-    public JSONArray toJson() {
-        JSONArray ja = new JSONArray();
-        model.forEachSelected(ja::put);
-        return ja;
+    public void setChangeListener(Runnable listener) {
+        changeListener = listener;
+    }
+
+    public void setStatus(SpaceObjectElement element, String status) {
+        element.setStatus(status);
+        fireChanged();
+    }
+
+    private void fireChanged() {
+        changeListener.run();
     }
 
 }

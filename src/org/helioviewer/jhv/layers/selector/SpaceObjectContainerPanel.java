@@ -5,13 +5,16 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.base.TableValue;
@@ -33,7 +36,24 @@ final class SpaceObjectContainerPanel extends JScrollPane {
 
     SpaceObjectContainerPanel(ViewpointLayerOptionsExpert options) {
         SpaceObjectContainer container = options.getContainer();
-        grid = new JTable(new SpaceObjectTableModel(container));
+        AbstractTableModel tableModel = new AbstractTableModel() {
+            @Override
+            public int getRowCount() {
+                return container.getElements().size();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return STATUS_COL + 1;
+            }
+
+            @Override
+            public Object getValueAt(int row, int column) {
+                return container.getElements().get(row);
+            }
+        };
+        grid = new JTable(tableModel);
+        container.setChangeListener(tableModel::fireTableDataChanged);
         grid.setTableHeader(null);
         grid.setShowHorizontalLines(true);
         grid.setRowSelectionAllowed(true);
@@ -41,16 +61,13 @@ final class SpaceObjectContainerPanel extends JScrollPane {
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
 
-        if (container.isExclusive())
-            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedExclusiveRenderer());
-        else
-            grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedRenderer());
+        grid.getColumnModel().getColumn(SELECTED_COL).setCellRenderer(new SelectedRenderer(container.isExclusive()));
         grid.getColumnModel().getColumn(SELECTED_COL).setPreferredWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(SELECTED_COL).setMaxWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(OBJECT_COL).setCellRenderer(new ObjectRenderer());
         grid.getColumnModel().getColumn(STATUS_COL).setCellRenderer(new StatusRenderer());
 
-        int row = container.getHighlightedIndex();
+        int row = container.getElements().indexOf(container.getHighlightedElement());
         if (row != -1)
             grid.getSelectionModel().setSelectionInterval(row, row);
 
@@ -90,41 +107,34 @@ final class SpaceObjectContainerPanel extends JScrollPane {
     }
 
     private static class ObjectRenderer extends DefaultTableCellRenderer {
+
+        ObjectRenderer() {
+            setToolTipText("Select for spiral");
+        }
+
         @Override
         public void setValue(Object value) {
             if (value instanceof SpaceObjectElement element) {
                 setText(element.toString());
-                setToolTipText("Select for spiral");
             }
         }
     }
 
-    private static class SelectedRenderer extends DefaultTableCellRenderer {
+    private static class SelectedRenderer implements TableCellRenderer {
 
-        private final JCheckBox checkBox = new JCheckBox();
+        private final AbstractButton button;
 
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof SpaceObjectElement element) {
-                checkBox.setSelected(element.isSelected());
-            }
-            checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            return checkBox;
+        SelectedRenderer(boolean exclusive) {
+            button = exclusive ? new JRadioButton() : new JCheckBox();
         }
 
-    }
-
-    private static class SelectedExclusiveRenderer extends DefaultTableCellRenderer {
-
-        private final JRadioButton radio = new JRadioButton();
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (value instanceof SpaceObjectElement element) {
-                radio.setSelected(element.isSelected());
+                button.setSelected(element.isSelected());
             }
-            radio.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            return radio;
+            button.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            return button;
         }
 
     }

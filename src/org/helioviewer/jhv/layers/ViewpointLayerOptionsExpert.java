@@ -13,7 +13,6 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
-import org.helioviewer.jhv.layers.spaceobject.SpaceObjectModel;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -64,7 +63,7 @@ public final class ViewpointLayerOptionsExpert {
         ArrayList<SpaceObjectElement> elements = new ArrayList<>();
         SpaceObject.getTargets(observer).forEach(target -> elements.add(new SpaceObjectElement(target.toString())));
 
-        container = new SpaceObjectContainer(new SpaceObjectModel(elements), exclusive);
+        container = new SpaceObjectContainer(elements, exclusive);
         selectTargets(ja);
     }
 
@@ -196,7 +195,10 @@ public final class ViewpointLayerOptionsExpert {
             jo.put("startTime", new JHVTime(startTime));
             jo.put("endTime", new JHVTime(endTime));
         }
-        jo.put("objects", container.toJson());
+        JSONArray objects = new JSONArray();
+        for (SpaceObjectElement element : container.getSelectedElements())
+            objects.put(element);
+        jo.put("objects", objects);
         return jo;
     }
 
@@ -229,8 +231,7 @@ public final class ViewpointLayerOptionsExpert {
         int len = selectedTargets.length();
         for (int i = 0; i < len; i++) {
             String target = selectedTargets.optString(i, "Earth");
-            for (int row = 0; row < container.size(); row++) {
-                SpaceObjectElement element = container.elementAt(row);
+            for (SpaceObjectElement element : container.getElements()) {
                 if (element.toString().equals(target)) {
                     selectElement(element);
                     break;
@@ -252,7 +253,7 @@ public final class ViewpointLayerOptionsExpert {
             return;
 
         loads.put(element, PositionLoad.submit(status -> {
-            element.setStatus(status);
+            container.setStatus(element, status);
             DisplayController.refreshCamera();
         }, observer, target, frame, startTime, endTime));
     }
@@ -263,7 +264,7 @@ public final class ViewpointLayerOptionsExpert {
             return;
 
         load.cancel();
-        element.setStatus(null);
+        container.setStatus(element, null);
         DisplayController.display();
     }
 
