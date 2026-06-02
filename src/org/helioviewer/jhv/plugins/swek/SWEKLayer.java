@@ -177,7 +177,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawPolygon(MapView mv, Viewport vp, MapScale scale, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(MapView mv, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -203,7 +203,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
                     double r = Math.sqrt(xnew * xnew + ynew * ynew + znew * znew);
                     vertices.set(j, new Vec3(xnew / r, ynew / r, znew / r));
                 }
-                mv.emitMapLine(vp, scale, vertices, POLYGON_RADIUS, color, vexBuf);
+                mv.emitMapLine(vp, vertices, POLYGON_RADIUS, color, vexBuf);
             }
             oldBoundaryPoint3d = new float[]{points[3 * i], points[3 * i + 1], points[3 * i + 2]};
         }
@@ -268,7 +268,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            Vec2 tf = mv.projectToScreen(vp, scale, pt);
+            Vec2 tf = mv.projectToScreen(vp, pt);
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x, tf.y, sz, sz);
         }
@@ -384,7 +384,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             if (evt.isCactus()) {
                 drawCactusArc(evtr, evt, currentTime);
             } else {
-                drawPolygon(mv, vp, scale, evtr, evt);
+                drawPolygon(mv, vp, evtr, evt);
                 if (icons) {
                     drawIcon(evtr, evt);
                 }
@@ -410,7 +410,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             if (evt.isCactus() && (mv.isPolar() || mv.isLogPolar())) {
                 drawCactusArcScale(vp, evtr, evt, currentTime, scale);
             } else {
-                drawPolygon(mv, vp, scale, evtr, evt);
+                drawPolygon(mv, vp, evtr, evt);
                 if (icons) {
                     drawIconScale(mv, vp, scale, evtr, evt);
                 }

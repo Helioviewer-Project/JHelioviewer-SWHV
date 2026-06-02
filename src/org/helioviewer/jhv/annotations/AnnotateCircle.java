@@ -26,7 +26,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
         super(jo);
     }
 
-    private void drawCircle(MapView mv, Viewport vp, MapScale scale, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+    private void drawCircle(MapView mv, Viewport vp, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
         double cosf = Vec3.dot(bp, ep);
         double r = Math.sqrt(1 - cosf * cosf);
         // P = center + r cos(A) (bp x ep) + r sin(A) ep
@@ -53,7 +53,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
                     center.y + cosr * u.y + sinr * v.y,
                     center.z + cosr * u.z + sinr * v.z));
         }
-        mv.emitMapLine(vp, scale, vertices, ANNOTATION_RADIUS, color, vexBuf);
+        mv.emitMapLine(vp, vertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override
@@ -66,7 +66,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawCircle(mv, vp, scale, p0, p1, color, vexBuf);
+        drawCircle(mv, vp, p0, p1, color, vexBuf);
     }
 
     @Override

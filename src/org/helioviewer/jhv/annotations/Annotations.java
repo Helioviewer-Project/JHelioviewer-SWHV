@@ -154,8 +154,8 @@ public final class Annotations {
         center.renderPoints(pixFactor);
     }
 
-    public static void drawCross(MapView mv, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
-        AnnotateCross.drawCross(mv, vp, scale, longitude, latitude, color, vexBuf);
+    public static void drawCross(MapView mv, Viewport vp, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+        AnnotateCross.drawCross(mv, vp, longitude, latitude, color, vexBuf);
     }
 
     @Nullable

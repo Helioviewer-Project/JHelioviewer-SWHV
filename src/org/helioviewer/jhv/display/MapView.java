@@ -98,7 +98,7 @@ public abstract class MapView {
         return ViewportMath.unprojectToOutputPlane(camera, vp, cameraWidth(vp), x, y, Quat.ZERO);
     }
 
-    public abstract Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v);
+    public abstract Vec2 projectToScreen(Viewport vp, Vec3 v);
 
     public abstract Vec2 mouseToGrid(Viewport vp, int x, int y);
 
@@ -106,9 +106,9 @@ public abstract class MapView {
 
     public abstract Vec2 mouseToScreen(Viewport vp, int x, int y); // only for SWEKPopupController
 
-    public abstract void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf);
+    public abstract void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf);
 
-    public abstract void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf);
+    public abstract void emitMapPoints(Viewport vp, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf);
 
     private static final class OrthographicView extends MapView {
 
@@ -117,7 +117,7 @@ public abstract class MapView {
         }
 
         @Override
-        public Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v) {
+        public Vec2 projectToScreen(Viewport vp, Vec3 v) {
             throw new UnsupportedOperationException("Orthographic mode does not support projectToScreen()");
         }
 
@@ -137,12 +137,12 @@ public abstract class MapView {
         }
 
         @Override
-        public void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
+        public void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
             OrthographicMap.emitMapLine(vertices, radius, color, vexBuf);
         }
 
         @Override
-        public void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
+        public void emitMapPoints(Viewport vp, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
             OrthographicMap.emitMapPoints(vertices, size, radius, color, vexBuf);
         }
     }
@@ -168,8 +168,8 @@ public abstract class MapView {
         }
 
         @Override
-        public Vec2 projectToScreen(Viewport vp, MapScale scale, Vec3 v) {
-            return ProjectedMap.projectToScreen(kind, viewpoint, scale, rotation, vp, v);
+        public Vec2 projectToScreen(Viewport vp, Vec3 v) {
+            return ProjectedMap.projectToScreen(kind, viewpoint, scale(vp), rotation, vp, v);
         }
 
         @Override
@@ -188,13 +188,13 @@ public abstract class MapView {
         }
 
         @Override
-        public void emitMapLine(Viewport vp, MapScale scale, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
-            ProjectedMap.emitMapLine(kind, viewpoint, scale, rotation, vp, vertices, color, vexBuf);
+        public void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
+            ProjectedMap.emitMapLine(kind, viewpoint, scale(vp), rotation, vp, vertices, color, vexBuf);
         }
 
         @Override
-        public void emitMapPoints(Viewport vp, MapScale scale, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
-            ProjectedMap.emitMapPoints(kind, viewpoint, scale, rotation, vp, vertices, size, color, vexBuf);
+        public void emitMapPoints(Viewport vp, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
+            ProjectedMap.emitMapPoints(kind, viewpoint, scale(vp), rotation, vp, vertices, size, color, vexBuf);
         }
     }
 }

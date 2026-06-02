@@ -232,7 +232,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
             } else {
                 Vec3 pt = pi.centralPoint();
                 if (pt != null)
-                    tf = mv.projectToScreen(vp, scale, pt);
+                    tf = mv.projectToScreen(vp, pt);
             }
 
             if (tf != null) {

@@ -20,18 +20,18 @@ final class AnnotateCross extends AbstractAnnotateable {
         super(jo);
     }
 
-    static void drawCross(MapView mv, Viewport vp, MapScale scale, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
+    static void drawCross(MapView mv, Viewport vp, double longitude, double latitude, byte[] color, BufVertex vexBuf) {
         double delta = 2.5 * Math.PI / 180;
-        interpolatedDraw(mv, vp, scale, longitude + delta, latitude, longitude - delta, latitude, color, vexBuf);
-        interpolatedDraw(mv, vp, scale, longitude, latitude + delta, longitude, latitude - delta, color, vexBuf);
+        interpolatedDraw(mv, vp, longitude + delta, latitude, longitude - delta, latitude, color, vexBuf);
+        interpolatedDraw(mv, vp, longitude, latitude + delta, longitude, latitude - delta, color, vexBuf);
     }
 
-    private static void interpolatedDraw(MapView mv, Viewport vp, MapScale scale, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
+    private static void interpolatedDraw(MapView mv, Viewport vp, double longitude1, double latitude1, double longitude2, double latitude2, byte[] color, BufVertex vexBuf) {
         for (int i = 0; i <= SUBDIVISIONS; i++) {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, longitude1, latitude1, longitude2, latitude2);
             crossVertices.set(i, pc);
         }
-        mv.emitMapLine(vp, scale, crossVertices, ANNOTATION_RADIUS, color, vexBuf);
+        mv.emitMapLine(vp, crossVertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override
@@ -40,7 +40,7 @@ final class AnnotateCross extends AbstractAnnotateable {
             return;
 
         byte[] color = color(false, active);
-        drawCross(mv, vp, scale, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), color, vexBuf);
+        drawCross(mv, vp, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), color, vexBuf);
     }
 
     @Override

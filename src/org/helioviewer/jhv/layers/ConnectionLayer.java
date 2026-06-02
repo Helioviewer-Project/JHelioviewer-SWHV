@@ -75,11 +75,11 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         if (!isVisible[vp.idx])
             return;
         if (connectivity != null)
-            drawConnectivity(mv, vp, scale);
+            drawConnectivity(mv, vp);
         if (hcs != null)
-            drawHCS(mv, vp, scale);
+            drawHCS(mv, vp);
         if (footpointMap != null)
-            drawFootpointInterpolated(mv, vp, scale);
+            drawFootpointInterpolated(mv, vp);
 
         if (!geometryMap.isEmpty()) {
             SunJSONTypes.GeometryCollection g = geometryMap.nearestValue(mv.viewpoint().time);
@@ -93,19 +93,19 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         render(mv, vp, scale);
     }
 
-    private void drawConnectivity(MapView mv, Viewport vp, MapScale scale) {
-        mv.emitMapPoints(vp, scale, connectivity.SSW, SIZE_POINT, ORTHO_RADIUS, sswColor, connectivityBuf);
-        mv.emitMapPoints(vp, scale, connectivity.FSW, SIZE_POINT, ORTHO_RADIUS, fswColor, connectivityBuf);
-        mv.emitMapPoints(vp, scale, connectivity.M, SIZE_POINT, ORTHO_RADIUS, mColor, connectivityBuf);
+    private void drawConnectivity(MapView mv, Viewport vp) {
+        mv.emitMapPoints(vp, connectivity.SSW, SIZE_POINT, ORTHO_RADIUS, sswColor, connectivityBuf);
+        mv.emitMapPoints(vp, connectivity.FSW, SIZE_POINT, ORTHO_RADIUS, fswColor, connectivityBuf);
+        mv.emitMapPoints(vp, connectivity.M, SIZE_POINT, ORTHO_RADIUS, mColor, connectivityBuf);
 
         connectivityCenter.setVertex(connectivityBuf);
         connectivityCenter.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
     }
 
-    private void drawHCS(MapView mv, Viewport vp, MapScale scale) {
+    private void drawHCS(MapView mv, Viewport vp) {
         if (hcs.isEmpty())
             return;
-        mv.emitMapLine(vp, scale, hcs, ORTHO_RADIUS, hcsColor, hcsBuf);
+        mv.emitMapLine(vp, hcs, ORTHO_RADIUS, hcsColor, hcsBuf);
 
         hcsLine.setVertex(hcsBuf);
         hcsLine.renderLine(vp, LINEWIDTH);
@@ -122,12 +122,12 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
         return SphericalPoint.fromCartesian(x, y, z);
     }
 
-    private void drawFootpointInterpolated(MapView mv, Viewport vp, MapScale scale) {
+    private void drawFootpointInterpolated(MapView mv, Viewport vp) {
         JHVTime time = mv.viewpoint().time;
         updateTimestamp(time);
 
         SphericalPoint point = interpolateToSpherical(time.milli, footpointMap.lowerValue(time), footpointMap.higherValue(time));
-        Annotations.drawCross(mv, vp, scale, point.longitude(), point.latitude(), footpointColor, footpointBuf);
+        Annotations.drawCross(mv, vp, point.longitude(), point.latitude(), footpointColor, footpointBuf);
         footpointLine.setVertex(footpointBuf);
         footpointLine.renderLine(vp, LINEWIDTH);
     }
