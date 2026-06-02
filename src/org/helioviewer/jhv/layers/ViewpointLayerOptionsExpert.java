@@ -28,8 +28,6 @@ public final class ViewpointLayerOptionsExpert {
     private final boolean exclusive;
     private final SpaceObject observer;
     private final SpaceObjectContainer container;
-    private final Map<SpaceObject, SpaceObjectElement> targetElements = new HashMap<>();
-    private final Map<SpaceObjectElement, SpaceObject> elementTargets = new HashMap<>();
     private final Map<SpaceObjectElement, PositionLoad> loads = new HashMap<>();
     private Runnable changeListener = () -> {};
 
@@ -63,17 +61,11 @@ public final class ViewpointLayerOptionsExpert {
         if (ja == null)
             ja = new JSONArray(new String[]{"Earth"});
 
-        JSONArray selectedTargets = ja;
         ArrayList<SpaceObjectElement> elements = new ArrayList<>();
-        SpaceObject.getTargets(observer).forEach(target -> {
-            SpaceObjectElement element = new SpaceObjectElement(target.toString());
-            elements.add(element);
-            targetElements.put(target, element);
-            elementTargets.put(element, target);
-        });
+        SpaceObject.getTargets(observer).forEach(target -> elements.add(new SpaceObjectElement(target.toString())));
 
         container = new SpaceObjectContainer(new SpaceObjectModel(elements), exclusive);
-        selectTargets(selectedTargets);
+        selectTargets(ja);
     }
 
     void setChangeListener(Runnable listener) {
@@ -112,20 +104,17 @@ public final class ViewpointLayerOptionsExpert {
         List<SpaceObjectElement> selected = container.getSelectedElements();
         boolean wasSelected = element.isSelected();
         container.selectElement(element);
-        if (exclusive) {
-            for (SpaceObjectElement selectedElement : selected) {
-                if (selectedElement != element)
-                    unload(selectedElement);
-            }
-            if (!wasSelected)
-                load(element);
-        } else if (wasSelected) {
+
+        if (wasSelected) {
+            if (exclusive)
+                return;
             unload(element);
         } else {
+            if (exclusive)
+                selected.forEach(this::unload);
             load(element);
         }
-        if (!exclusive || !wasSelected)
-            fireChanged();
+        fireChanged();
     }
 
     public void setHighlightedElement(SpaceObjectElement element) {
@@ -239,9 +228,14 @@ public final class ViewpointLayerOptionsExpert {
     private void selectTargets(JSONArray selectedTargets) {
         int len = selectedTargets.length();
         for (int i = 0; i < len; i++) {
-            SpaceObjectElement element = targetElements.get(SpaceObject.get(selectedTargets.optString(i, "Earth")));
-            if (element != null)
-                selectElement(element);
+            String target = selectedTargets.optString(i, "Earth");
+            for (int row = 0; row < container.size(); row++) {
+                SpaceObjectElement element = container.elementAt(row);
+                if (element.toString().equals(target)) {
+                    selectElement(element);
+                    break;
+                }
+            }
         }
     }
 
@@ -253,7 +247,7 @@ public final class ViewpointLayerOptionsExpert {
     private void load(SpaceObjectElement element) {
         unload(element);
 
-        SpaceObject target = elementTargets.get(element);
+        SpaceObject target = SpaceObject.get(element.toString());
         if (target == null)
             return;
 
