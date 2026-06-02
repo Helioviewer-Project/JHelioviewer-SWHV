@@ -75,7 +75,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
 
     @Nullable
     @Override
-    public Object getData() {
+    public String getData() {
         return diameterStr;
     }
 
