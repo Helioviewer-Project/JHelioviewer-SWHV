@@ -5,7 +5,6 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.annotations.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;
@@ -79,7 +78,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 double zeta = viewpoint.distance - v.z;
                 double px = (180 / Math.PI) * Math.atan2(v.x, zeta);
                 double py = (180 / Math.PI) * Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
-                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (DisplayController.getViewpointUpdate() == UpdateViewpoint.equatorial ? 0 : 90)); // w.r.t. axis
+                double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (DisplayController.getViewpointUpdate().dragAxis() == Vec3.ZAxis ? 0 : 90)); // w.r.t. axis
                 String ortho = formatOrtho(coord, r, pa, px, py);
                 setText(annStr.isEmpty() ? ortho : annStr + " | " + ortho);
             }

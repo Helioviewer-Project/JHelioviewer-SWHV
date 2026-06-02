@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Frame;
@@ -14,16 +16,14 @@ import org.json.JSONObject;
 public final class ViewpointLayerOptions implements TimeListener.Range {
 
     public enum CameraMode {
-        ObserverAt1au("Observer at 1au", UpdateViewpoint.observerAt1au),
-        Location("Location", UpdateViewpoint.location),
-        Heliosphere("Heliosphere", UpdateViewpoint.equatorial);
+        ObserverAt1au("Observer at 1au"),
+        Location("Location"),
+        Heliosphere("Heliosphere");
 
         final String label;
-        final UpdateViewpoint update;
 
-        CameraMode(String _label, UpdateViewpoint _update) {
+        CameraMode(String _label) {
             label = _label;
-            update = _update;
         }
 
         @Override
@@ -44,8 +44,10 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
             joLocation = jo.optJSONObject("location");
             joEquatorial = jo.optJSONObject("equatorial");
         }
-        locationOptions = new ViewpointLayerOptionsExpert(joLocation, UpdateViewpoint.location, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
-        equatorialOptions = new ViewpointLayerOptionsExpert(joEquatorial, UpdateViewpoint.equatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
+        locationOptions = new ViewpointLayerOptionsExpert(joLocation, SpaceObject.SUN, Frame.SOLO_IAU_SUN_2009, true);
+        equatorialOptions = new ViewpointLayerOptionsExpert(joEquatorial, SpaceObject.SUN, Frame.SOLO_HCI, false);
+        locationOptions.setChangeListener(() -> optionStateChanged(CameraMode.Location));
+        equatorialOptions.setChangeListener(() -> optionStateChanged(CameraMode.Heliosphere));
 
         cameraMode = CameraMode.Location;
         if (jo != null) {
@@ -87,7 +89,22 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     }
 
     void applyCurrentViewpoint(DisplayController.ViewpointApplyMode mode) {
-        DisplayController.setViewpointUpdate(cameraMode.update, mode);
+        DisplayController.setViewpointUpdate(getUpdateViewpoint(), mode);
+    }
+
+    private UpdateViewpoint getUpdateViewpoint() {
+        return switch (cameraMode) {
+            case ObserverAt1au -> UpdateViewpoint.observerAt1au;
+            case Location -> new UpdateViewpoint.Location(locationOptions.getHighlightedLoad(), Movie.getStartTime(), Movie.getEndTime());
+            case Heliosphere -> new UpdateViewpoint.Equatorial(equatorialOptions.getHighlightedLoad(), equatorialOptions.isRelative(), Movie.getStartTime(), Movie.getEndTime());
+        };
+    }
+
+    private void optionStateChanged(CameraMode mode) {
+        if (cameraMode == mode) {
+            applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
+            DisplayController.refreshCamera();
+        }
     }
 
     void activate() {
@@ -102,6 +119,7 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     public void timeRangeChanged(long start, long end) {
         locationOptions.setTimespan(start, end);
         equatorialOptions.setTimespan(start, end);
+        optionStateChanged(cameraMode);
     }
 
     boolean isHeliospheric() {
@@ -111,6 +129,10 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     @Nullable
     PositionLoad getHighlightedLoad() {
         return isHeliospheric() ? equatorialOptions.getHighlightedLoad() : null;
+    }
+
+    List<PositionLoad> getVisibleLoads() {
+        return isHeliospheric() ? equatorialOptions.getSelectedLoads() : List.of();
     }
 
     int getSpiralSpeed() {

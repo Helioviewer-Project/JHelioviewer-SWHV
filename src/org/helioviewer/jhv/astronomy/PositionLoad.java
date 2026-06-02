@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
 import java.net.URI;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -15,9 +14,6 @@ import org.helioviewer.jhv.threads.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;
-
-//import com.google.common.base.Stopwatch;
-import com.google.common.collect.ArrayListMultimap;
 
 public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject target, boolean isHCI,
                            Future<PositionResponse> future) {
@@ -83,22 +79,12 @@ public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject tar
         return null;
     }
 
-    private static final ArrayListMultimap<UpdateViewpoint, PositionLoad> loads = ArrayListMultimap.create();
-
-    private static void pruneFailedLoads(UpdateViewpoint uv) {
-        loads.get(uv).removeIf(load -> load.future.isCancelled() || (load.future.isDone() && load.getResponse() == null));
-    }
-
-    public static PositionLoad submit(UpdateViewpoint uv, StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
-        pruneFailedLoads(uv);
+    public static PositionLoad submit(StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         receiver.setStatus("Loading...");
 
         Future<PositionResponse> future = Tasks.submit(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
                 result -> onSuccess(receiver), (logContext, t) -> onFailure(receiver, t));
-        PositionLoad load = new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, future);
-        loads.put(uv, load);
-
-        return load;
+        return new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, future);
     }
 
     private static void onSuccess(StatusReceiver receiver) {
@@ -110,19 +96,8 @@ public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject tar
             receiver.setStatus(t.getMessage());
     }
 
-    public static List<PositionLoad> get(UpdateViewpoint uv) {
-        return loads.get(uv);
-    }
-
-    public static void remove(UpdateViewpoint uv, PositionLoad load) {
-        loads.remove(uv, load);
+    public static void remove(PositionLoad load) {
         if (load.future.cancel(true)) load.receiver.setStatus(null);
-    }
-
-    public static void removeAll(UpdateViewpoint uv) {
-        for (PositionLoad load : loads.removeAll(uv)) {
-            if (load.future.cancel(true)) load.receiver.setStatus(null);
-        }
     }
 
 }

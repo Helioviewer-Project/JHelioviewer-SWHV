@@ -1,11 +1,12 @@
 package org.helioviewer.jhv.layers;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.time.JHVTime;
@@ -21,6 +22,7 @@ public final class ViewpointLayerOptionsExpert {
 
     private final boolean exclusive;
     private final SpaceObjectContainer container;
+    private Runnable changeListener = () -> {};
 
     private boolean syncInterval = true;
     private long startTime = Movie.getStartTime();
@@ -31,7 +33,7 @@ public final class ViewpointLayerOptionsExpert {
 
     private Frame frame;
 
-    ViewpointLayerOptionsExpert(JSONObject jo, UpdateViewpoint uv, SpaceObject observer, Frame _frame, boolean _exclusive) {
+    ViewpointLayerOptionsExpert(JSONObject jo, SpaceObject observer, Frame _frame, boolean _exclusive) {
         exclusive = _exclusive;
         frame = _frame;
 
@@ -51,7 +53,16 @@ public final class ViewpointLayerOptionsExpert {
         if (ja == null)
             ja = new JSONArray(new String[]{"Earth"});
 
-        container = new SpaceObjectContainer(ja, exclusive, uv, observer, frame, startTime, endTime);
+        container = new SpaceObjectContainer(ja, exclusive, observer, frame, startTime, endTime);
+        container.setChangeListener(this::fireChanged);
+    }
+
+    void setChangeListener(Runnable listener) {
+        changeListener = listener;
+    }
+
+    private void fireChanged() {
+        changeListener.run();
     }
 
     public void setTimespan(long start, long end) {
@@ -103,7 +114,7 @@ public final class ViewpointLayerOptionsExpert {
 
     public void setRelative(boolean _relative) {
         relative = _relative;
-        DisplayController.refreshCamera();
+        fireChanged();
     }
 
     public int getSpiralSpeedValue() {
@@ -144,6 +155,10 @@ public final class ViewpointLayerOptionsExpert {
     @Nullable
     PositionLoad getHighlightedLoad() {
         return container.getHighlightedLoad();
+    }
+
+    List<PositionLoad> getSelectedLoads() {
+        return container.getSelectedLoads();
     }
 
     int getSpiralSpeed() {

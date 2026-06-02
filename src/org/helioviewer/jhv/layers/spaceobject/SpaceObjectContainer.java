@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.layers.spaceobject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.IntConsumer;
 
 import javax.annotation.Nullable;
@@ -7,33 +9,29 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 
 import org.json.JSONArray;
 
 public final class SpaceObjectContainer {
 
     private final boolean exclusive;
-    private final UpdateViewpoint uv;
     private final SpaceObject observer;
     private final SpaceObjectModel model;
+    private Runnable changeListener = () -> {};
 
     private SpaceObjectElement highlighted;
     private Frame frame;
     private long startTime;
     private long endTime;
 
-    public SpaceObjectContainer(JSONArray ja, boolean _exclusive, UpdateViewpoint _uv, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
+    public SpaceObjectContainer(JSONArray ja, boolean _exclusive, SpaceObject _observer, Frame _frame, long _startTime, long _endTime) {
         exclusive = _exclusive;
-        uv = _uv;
         observer = _observer;
         frame = _frame;
         startTime = _startTime;
         endTime = _endTime;
 
         model = new SpaceObjectModel(observer);
-
-        PositionLoad.removeAll(uv);
 
         int len = ja.length();
         for (int i = 0; i < len; i++)
@@ -52,6 +50,10 @@ public final class SpaceObjectContainer {
         model.addRefreshListener(listener);
     }
 
+    public void setChangeListener(Runnable listener) {
+        changeListener = listener;
+    }
+
     public boolean isExclusive() {
         return exclusive;
     }
@@ -62,6 +64,7 @@ public final class SpaceObjectContainer {
 
     public void setHighlightedElement(SpaceObjectElement element) {
         highlighted = element;
+        changeListener.run();
     }
 
     private void selectTarget(SpaceObject target) {
@@ -76,7 +79,18 @@ public final class SpaceObjectContainer {
 
     @Nullable
     public PositionLoad getHighlightedLoad() {
-        return highlighted == null ? null : highlighted.getLoad(uv);
+        return highlighted == null ? null : highlighted.getLoad();
+    }
+
+    public List<PositionLoad> getSelectedLoads() {
+        ArrayList<PositionLoad> loads = new ArrayList<>();
+        model.forEachSelected(element -> {
+            PositionLoad load = element.getLoad();
+            if (load != null)
+                loads.add(load);
+        });
+        loads.removeIf(load -> load.future().isCancelled() || (load.future().isDone() && load.getResponse() == null));
+        return loads;
     }
 
     public void setFrame(Frame _frame) {
@@ -84,7 +98,8 @@ public final class SpaceObjectContainer {
             return;
 
         frame = _frame;
-        model.forEachSelected(element -> element.load(uv, observer, frame, startTime, endTime));
+        model.forEachSelected(element -> element.load(observer, frame, startTime, endTime));
+        changeListener.run();
     }
 
     public void setTime(long _startTime, long _endTime) {
@@ -93,7 +108,8 @@ public final class SpaceObjectContainer {
 
         startTime = _startTime;
         endTime = _endTime;
-        model.forEachSelected(element -> element.load(uv, observer, frame, startTime, endTime));
+        model.forEachSelected(element -> element.load(observer, frame, startTime, endTime));
+        changeListener.run();
     }
 
     public void selectElement(SpaceObjectElement element) {
@@ -101,14 +117,15 @@ public final class SpaceObjectContainer {
         if (exclusive) {
             if (element.isSelected()) // avoid reload on re-clicking same
                 return;
-            model.forEachSelected(e -> e.unload(uv));
-            element.load(uv, observer, frame, startTime, endTime);
+            model.forEachSelected(SpaceObjectElement::unload);
+            element.load(observer, frame, startTime, endTime);
         } else {
             if (element.isSelected())
-                element.unload(uv);
+                element.unload();
             else
-                element.load(uv, observer, frame, startTime, endTime);
+                element.load(observer, frame, startTime, endTime);
         }
+        changeListener.run();
     }
 
     public boolean isDownloading() {

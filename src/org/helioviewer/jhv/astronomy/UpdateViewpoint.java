@@ -1,10 +1,7 @@
 package org.helioviewer.jhv.astronomy;
 
-import java.util.List;
-
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
@@ -19,8 +16,6 @@ public interface UpdateViewpoint {
     UpdateViewpoint observer = new Observer();
     UpdateViewpoint observerAt1au = new ObserverAt1au();
     UpdateViewpoint earthAt1au = new EarthAt1au();
-    UpdateViewpoint equatorial = new Equatorial();
-    UpdateViewpoint location = new Location();
 
     class Observer implements UpdateViewpoint {
         @Override
@@ -47,8 +42,43 @@ public interface UpdateViewpoint {
         }
     }
 
-    class Equatorial implements UpdateViewpoint {
+    final class Location implements UpdateViewpoint {
+        private final PositionLoad positionLoad;
+        private final long start;
+        private final long end;
+
+        public Location(PositionLoad _positionLoad, long _start, long _end) {
+            positionLoad = _positionLoad;
+            start = _start;
+            end = _end;
+        }
+
+        @Override
+        public Position update(JHVTime time) {
+            if (positionLoad != null) {
+                PositionResponse response = positionLoad.getResponse();
+                if (response != null)
+                    return response.interpolateCarrington(time.milli, start, end);
+            }
+            return Sun.getEarth(time);
+        }
+    }
+
+    final class Equatorial implements UpdateViewpoint {
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(Math.toRadians(0.5));
+
+        private final PositionLoad controlLoad;
+        private final boolean relative;
+        private final long start;
+        private final long end;
+        private final double[] lati = new double[3];
+
+        public Equatorial(PositionLoad _controlLoad, boolean _relative, long _start, long _end) {
+            controlLoad = _controlLoad;
+            relative = _relative;
+            start = _start;
+            end = _end;
+        }
 
         @Override
         public Vec3 dragAxis() {
@@ -58,36 +88,43 @@ public interface UpdateViewpoint {
         @Override
         public Position update(JHVTime time) {
             double hciLon = 0;
-            long start = Movie.getStartTime(), end = Movie.getEndTime();
             JHVTime itime = time;
 
-            List<PositionLoad> loadList = PositionLoad.get(this);
-            if (!loadList.isEmpty()) {
-                PositionLoad load = loadList.getFirst();
-                PositionResponse response = load.getResponse();
+            if (controlLoad != null) {
+                PositionResponse response = controlLoad.getResponse();
                 if (response != null) {
                     itime = new JHVTime(response.interpolateTime(time.milli, start, end));
-                    if (load.isHCI())
+                    if (controlLoad.isHCI())
                         hciLon = Sun.getEarthHCI(itime).lon;
                 }
             }
 
-            double relLon = Layers.getViewpointLayer().getRelativeLongitude(itime.milli, start, end);
+            double relLon = getRelativeLongitude(itime.milli);
             return new Position(itime, distance, Sun.getEarth(itime).lon + hciLon - relLon + Math.PI / 2, Math.PI / 2);
         }
-    }
 
-    class Location implements UpdateViewpoint {
-        @Override
-        public Position update(JHVTime time) {
-            List<PositionLoad> loadList = PositionLoad.get(this);
-            if (!loadList.isEmpty()) {
-                PositionResponse response = loadList.getFirst().getResponse();
-                if (response != null) {
-                    return response.interpolateCarrington(time.milli, Movie.getStartTime(), Movie.getEndTime());
-                }
+        public double getRelativeLongitude(long time, long _start, long _end) {
+            if (!relative || controlLoad == null)
+                return 0;
+
+            PositionResponse response = controlLoad.getResponse();
+            if (response != null) {
+                response.interpolateLatitudinal(time, _start, _end, lati);
+                return lati[1];
             }
-            return Sun.getEarth(time);
+            return 0;
+        }
+
+        private double getRelativeLongitude(long time) {
+            if (!relative || controlLoad == null)
+                return 0;
+
+            PositionResponse response = controlLoad.getResponse();
+            if (response != null) {
+                response.interpolateLatitudinal(time, start, end, lati);
+                return lati[1];
+            }
+            return 0;
         }
     }
 
