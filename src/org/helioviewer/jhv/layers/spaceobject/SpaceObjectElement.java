@@ -1,13 +1,10 @@
 package org.helioviewer.jhv.layers.spaceobject;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Frame;
 import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
 
 public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
@@ -24,24 +21,24 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
         model = _model;
     }
 
-    void load(UpdateViewpoint uv, SpaceObject observer, Frame frame, long startTime, long endTime) {
+    void load(SpaceObject observer, Frame frame, long startTime, long endTime) {
         selected = true;
         status = null;
         model.refresh(this);
 
         if (load != null) {
-            PositionLoad.remove(uv, load);
+            PositionLoad.remove(load);
         }
-        load = PositionLoad.submit(uv, this, observer, target, frame, startTime, endTime);
+        load = PositionLoad.submit(this, observer, target, frame, startTime, endTime);
     }
 
-    void unload(UpdateViewpoint uv) {
+    void unload() {
         selected = false;
         status = null;
         model.refresh(this);
 
         if (load != null) {
-            PositionLoad.remove(uv, load);
+            PositionLoad.remove(load);
             load = null;
             DisplayController.display();
         }
@@ -56,10 +53,8 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
     }
 
     @Nullable
-    PositionLoad getLoad(UpdateViewpoint uv) {
-        List<PositionLoad> loads = PositionLoad.get(uv);
-        int idx = loads.indexOf(load);
-        return idx < 0 ? null : loads.get(idx);
+    PositionLoad getLoad() {
+        return load;
     }
 
     public String getStatus() {
