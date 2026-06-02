@@ -54,6 +54,10 @@ public final class SpaceObjectContainer {
         changeListener = listener;
     }
 
+    private void fireChanged() {
+        changeListener.run();
+    }
+
     public boolean isExclusive() {
         return exclusive;
     }
@@ -64,7 +68,7 @@ public final class SpaceObjectContainer {
 
     public void setHighlightedElement(SpaceObjectElement element) {
         highlighted = element;
-        changeListener.run();
+        fireChanged();
     }
 
     private void selectTarget(SpaceObject target) {
@@ -99,7 +103,7 @@ public final class SpaceObjectContainer {
 
         frame = _frame;
         model.forEachSelected(element -> element.load(observer, frame, startTime, endTime));
-        changeListener.run();
+        fireChanged();
     }
 
     public void setTime(long _startTime, long _endTime) {
@@ -109,7 +113,7 @@ public final class SpaceObjectContainer {
         startTime = _startTime;
         endTime = _endTime;
         model.forEachSelected(element -> element.load(observer, frame, startTime, endTime));
-        changeListener.run();
+        fireChanged();
     }
 
     public void selectElement(SpaceObjectElement element) {
@@ -125,7 +129,7 @@ public final class SpaceObjectContainer {
             else
                 element.load(observer, frame, startTime, endTime);
         }
-        changeListener.run();
+        fireChanged();
     }
 
     public boolean isDownloading() {
