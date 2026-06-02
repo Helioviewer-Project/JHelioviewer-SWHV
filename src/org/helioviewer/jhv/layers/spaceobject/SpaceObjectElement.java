@@ -1,60 +1,41 @@
 package org.helioviewer.jhv.layers.spaceobject;
 
-import javax.annotation.Nullable;
+public final class SpaceObjectElement {
 
-import org.helioviewer.jhv.astronomy.Frame;
-import org.helioviewer.jhv.astronomy.PositionLoad;
-import org.helioviewer.jhv.astronomy.SpaceObject;
-import org.helioviewer.jhv.display.DisplayController;
-
-public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
-
-    private final SpaceObject target;
-    private final SpaceObjectModel model;
+    private final String name;
+    private SpaceObjectModel model;
 
     private boolean selected;
     private String status;
-    private PositionLoad load;
 
-    SpaceObjectElement(SpaceObject _target, SpaceObjectModel _model) {
-        target = _target;
+    public SpaceObjectElement(String _name) {
+        name = _name;
+    }
+
+    void setModel(SpaceObjectModel _model) {
         model = _model;
     }
 
-    void load(SpaceObject observer, Frame frame, long startTime, long endTime) {
+    void select() {
         selected = true;
         status = null;
         model.refresh(this);
-
-        if (load != null) {
-            PositionLoad.remove(load);
-        }
-        load = PositionLoad.submit(this, observer, target, frame, startTime, endTime);
     }
 
-    void unload() {
+    void deselect() {
         selected = false;
         status = null;
         model.refresh(this);
-
-        if (load != null) {
-            PositionLoad.remove(load);
-            load = null;
-            DisplayController.display();
-        }
     }
 
-    boolean isDownloading() {
-        return load != null && load.isDownloading();
+    public void setStatus(String _status) {
+        status = _status;
+        if (model != null)
+            model.refresh(this);
     }
 
     public boolean isSelected() {
         return selected;
-    }
-
-    @Nullable
-    public PositionLoad getLoad() {
-        return load;
     }
 
     public String getStatus() {
@@ -62,15 +43,8 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
     }
 
     @Override
-    public void setStatus(String _status) {
-        status = _status;
-        model.refresh(this);
-        DisplayController.refreshCamera();
-    }
-
-    @Override
     public String toString() {
-        return target.toString();
+        return name;
     }
 
 }
