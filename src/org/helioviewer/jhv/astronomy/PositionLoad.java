@@ -15,11 +15,20 @@ import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;
 
-public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject target, boolean isHCI,
-                           Future<PositionResponse> future) {
+public final class PositionLoad {
+
+    private final StatusReceiver receiver;
+    private final SpaceObject target;
+    private final Future<PositionResponse> future;
 
     public interface StatusReceiver {
         void setStatus(String status);
+    }
+
+    private PositionLoad(StatusReceiver _receiver, SpaceObject _target, Future<PositionResponse> _future) {
+        receiver = _receiver;
+        target = _target;
+        future = _future;
     }
 
     private record LoadPosition(SpaceObject observer, SpaceObject target, Frame frame, long start,
@@ -70,6 +79,14 @@ public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject tar
         return !future.isDone();
     }
 
+    public boolean hasFailed() {
+        return future.isCancelled() || (future.isDone() && getResponse() == null);
+    }
+
+    public SpaceObject target() {
+        return target;
+    }
+
     @Nullable
     public PositionResponse getResponse() {
         try {
@@ -84,7 +101,7 @@ public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject tar
 
         Future<PositionResponse> future = Tasks.submit(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
                 result -> onSuccess(receiver), (logContext, t) -> onFailure(receiver, t));
-        return new PositionLoad(receiver, target, frame == Frame.SOLO_HCI, future);
+        return new PositionLoad(receiver, target, future);
     }
 
     private static void onSuccess(StatusReceiver receiver) {
@@ -96,8 +113,9 @@ public record PositionLoad(PositionLoad.StatusReceiver receiver, SpaceObject tar
             receiver.setStatus(t.getMessage());
     }
 
-    public static void remove(PositionLoad load) {
-        if (load.future.cancel(true)) load.receiver.setStatus(null);
+    public void cancel() {
+        if (future.cancel(true))
+            receiver.setStatus(null);
     }
 
 }

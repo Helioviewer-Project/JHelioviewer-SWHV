@@ -68,13 +68,15 @@ public interface UpdateViewpoint {
         private static final double distance = 2 * Sun.MeanEarthDistance / Math.tan(Math.toRadians(0.5));
 
         private final PositionLoad controlLoad;
+        private final Frame frame;
         private final boolean relative;
         private final long start;
         private final long end;
         private final double[] lati = new double[3];
 
-        public Equatorial(PositionLoad _controlLoad, boolean _relative, long _start, long _end) {
+        public Equatorial(PositionLoad _controlLoad, Frame _frame, boolean _relative, long _start, long _end) {
             controlLoad = _controlLoad;
+            frame = _frame;
             relative = _relative;
             start = _start;
             end = _end;
@@ -94,7 +96,7 @@ public interface UpdateViewpoint {
                 PositionResponse response = controlLoad.getResponse();
                 if (response != null) {
                     itime = new JHVTime(response.interpolateTime(time.milli, start, end));
-                    if (controlLoad.isHCI())
+                    if (frame == Frame.SOLO_HCI)
                         hciLon = Sun.getEarthHCI(itime).lon;
                 }
             }

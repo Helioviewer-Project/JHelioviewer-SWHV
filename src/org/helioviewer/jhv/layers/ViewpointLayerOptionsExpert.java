@@ -213,7 +213,7 @@ public final class ViewpointLayerOptionsExpert {
             if (load != null)
                 loads.add(load);
         }
-        loads.removeIf(load -> load.future().isCancelled() || (load.future().isDone() && load.getResponse() == null));
+        loads.removeIf(PositionLoad::hasFailed);
         return loads;
     }
 
@@ -262,7 +262,7 @@ public final class ViewpointLayerOptionsExpert {
         if (load == null)
             return;
 
-        PositionLoad.remove(load);
+        load.cancel();
         element.setStatus(null);
         DisplayController.display();
     }
