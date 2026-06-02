@@ -7,7 +7,6 @@ import java.util.function.IntConsumer;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Frame;
-import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 
 import org.json.JSONArray;
@@ -82,19 +81,14 @@ public final class SpaceObjectContainer {
     }
 
     @Nullable
-    public PositionLoad getHighlightedLoad() {
-        return highlighted == null ? null : highlighted.getLoad();
+    public SpaceObjectElement getHighlightedElement() {
+        return highlighted;
     }
 
-    public List<PositionLoad> getSelectedLoads() {
-        ArrayList<PositionLoad> loads = new ArrayList<>();
-        model.forEachSelected(element -> {
-            PositionLoad load = element.getLoad();
-            if (load != null)
-                loads.add(load);
-        });
-        loads.removeIf(load -> load.future().isCancelled() || (load.future().isDone() && load.getResponse() == null));
-        return loads;
+    public List<SpaceObjectElement> getSelectedElements() {
+        ArrayList<SpaceObjectElement> elements = new ArrayList<>();
+        model.forEachSelected(elements::add);
+        return elements;
     }
 
     public void setFrame(Frame _frame) {

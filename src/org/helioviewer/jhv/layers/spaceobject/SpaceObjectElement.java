@@ -53,7 +53,7 @@ public final class SpaceObjectElement implements PositionLoad.StatusReceiver {
     }
 
     @Nullable
-    PositionLoad getLoad() {
+    public PositionLoad getLoad() {
         return load;
     }
 
