@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.base.TableValue;
+import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
 
@@ -30,7 +31,8 @@ final class SpaceObjectContainerPanel extends JScrollPane {
 
     private final JTable grid;
 
-    SpaceObjectContainerPanel(SpaceObjectContainer container) {
+    SpaceObjectContainerPanel(ViewpointLayerOptionsExpert options) {
+        SpaceObjectContainer container = options.getContainer();
         grid = new JTable(new SpaceObjectTableModel(container));
         grid.setTableHeader(null);
         grid.setShowHorizontalLines(true);
@@ -62,9 +64,9 @@ final class SpaceObjectContainerPanel extends JScrollPane {
                     return;
 
                 if (v.col == SELECTED_COL)
-                    container.selectElement(element);
+                    options.selectElement(element);
                 else
-                    container.setHighlightedElement(element);
+                    options.setHighlightedElement(element);
                 DisplayController.refreshCamera();
             }
         });

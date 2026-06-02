@@ -6,25 +6,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import java.util.function.Predicate;
 
-import org.helioviewer.jhv.astronomy.SpaceObject;
-
-final class SpaceObjectModel {
+public final class SpaceObjectModel {
 
     private final List<SpaceObjectElement> elements = new ArrayList<>();
     private final List<IntConsumer> refreshListeners = new ArrayList<>();
-    private final Map<SpaceObject, Integer> targetRows = new HashMap<>();
     private final Map<SpaceObjectElement, Integer> elementRows = new HashMap<>();
 
-    SpaceObjectModel(SpaceObject observer) {
-        SpaceObject.getTargets(observer).forEach(target -> {
-            SpaceObjectElement element = new SpaceObjectElement(target, this);
+    public SpaceObjectModel(List<SpaceObjectElement> _elements) {
+        for (SpaceObjectElement element : _elements) {
             int row = elements.size();
             elements.add(element);
-            targetRows.put(target, row);
             elementRows.put(element, row);
-        });
+            element.setModel(this);
+        }
     }
 
     void forEachSelected(Consumer<SpaceObjectElement> action) {
@@ -32,18 +27,6 @@ final class SpaceObjectModel {
             if (element.isSelected())
                 action.accept(element);
         }
-    }
-
-    boolean anySelected(Predicate<SpaceObjectElement> predicate) {
-        for (SpaceObjectElement element : elements) {
-            if (element.isSelected() && predicate.test(element))
-                return true;
-        }
-        return false;
-    }
-
-    public int indexOf(SpaceObject object) {
-        return targetRows.getOrDefault(object, -1);
     }
 
     public int indexOf(SpaceObjectElement element) {
