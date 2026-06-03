@@ -17,6 +17,9 @@ import org.json.JSONObject;
 
 public final class PositionLoad {
 
+    private static final int MAX_POINTS = 50000;
+    private static final UriTemplate template = new UriTemplate("https://swhv.oma.be/position");
+
     private final StatusReceiver receiver;
     private final SpaceObject target;
     private final Future<PositionResponse> future;
@@ -33,10 +36,6 @@ public final class PositionLoad {
 
     private record LoadPosition(SpaceObject observer, SpaceObject target, Frame frame, long start,
                                 long end) implements Callable<PositionResponse> {
-
-        private static final int MAX_POINTS = 50000;
-        private static final UriTemplate template = new UriTemplate("https://swhv.oma.be/position");
-
         @Override
         public PositionResponse call() throws Exception {
             if (start > end)
@@ -117,5 +116,4 @@ public final class PositionLoad {
         if (future.cancel(true))
             receiver.setStatus(null);
     }
-
 }

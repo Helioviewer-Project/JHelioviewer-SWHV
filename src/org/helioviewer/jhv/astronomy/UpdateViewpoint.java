@@ -46,6 +46,7 @@ public interface UpdateViewpoint {
         private final PositionLoad positionLoad;
         private final long start;
         private final long end;
+        private final PositionResponse.Interpolated interpolated = new PositionResponse.Interpolated();
 
         public Location(PositionLoad _positionLoad, long _start, long _end) {
             positionLoad = _positionLoad;
@@ -58,7 +59,7 @@ public interface UpdateViewpoint {
             if (positionLoad != null) {
                 PositionResponse response = positionLoad.getResponse();
                 if (response != null)
-                    return response.interpolateCarrington(time.milli, start, end);
+                    return response.interpolateCarrington(time.milli, start, end, interpolated);
             }
             return Sun.getEarth(time);
         }
@@ -73,6 +74,7 @@ public interface UpdateViewpoint {
         private final long start;
         private final long end;
         private final double[] lati = new double[3];
+        private final PositionResponse.Interpolated interpolated = new PositionResponse.Interpolated();
 
         public Equatorial(PositionLoad _controlLoad, Frame _frame, boolean _relative, long _start, long _end) {
             controlLoad = _controlLoad;
@@ -111,7 +113,7 @@ public interface UpdateViewpoint {
 
             PositionResponse response = controlLoad.getResponse();
             if (response != null) {
-                response.interpolateLatitudinal(time, start, end, lati);
+                response.interpolateLatitudinal(time, start, end, lati, interpolated);
                 return lati[1];
             }
             return 0;
