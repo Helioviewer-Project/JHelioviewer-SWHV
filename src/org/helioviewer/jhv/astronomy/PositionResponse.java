@@ -10,6 +10,17 @@ import org.json.JSONObject;
 
 public class PositionResponse {
 
+    public static final class Interpolated {
+        public long time;
+        public double x;
+        public double y;
+        public double z;
+
+        public double distance() {
+            return Math.sqrt(x * x + y * y + z * z);
+        }
+    }
+
     private final Position.Cartesian[] position;
     private final long positionStart;
     private final long positionEnd;
@@ -61,9 +72,16 @@ public class PositionResponse {
         }
     }
 
-    private Position.Cartesian getInterpolatedPosition(long time) {
+    private void interpolate(long t, long start, long end, Interpolated out) {
+        long time = interpolateTime(t, start, end);
+        out.time = time;
+
         if (positionStart == positionEnd) {
-            return position[0];
+            Position.Cartesian p = position[0];
+            out.x = p.x();
+            out.y = p.y();
+            out.z = p.z();
+            return;
         }
 
         int maxIndex = position.length - 1;
@@ -75,50 +93,40 @@ public class PositionResponse {
         long tend = position[inext].milli();
 
         double alpha = tend == tstart ? 1. : Math.clamp((time - tstart) / (double) (tend - tstart), 0, 1);
-        double x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
-        double y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
-        double z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
 
-        return new Position.Cartesian(time, x, y, z);
+        out.x = (1. - alpha) * position[i].x() + alpha * position[inext].x();
+        out.y = (1. - alpha) * position[i].y() + alpha * position[inext].y();
+        out.z = (1. - alpha) * position[i].z() + alpha * position[inext].z();
     }
 
-    public double interpolateRectangular(long t, long start, long end, float[] xyz) {
-        long time = interpolateTime(t, start, end);
-        Position.Cartesian p = getInterpolatedPosition(time);
-        double x = p.x(), y = p.y(), z = p.z();
+    public double interpolateRectangular(long t, long start, long end, float[] xyz, Interpolated out) {
+        interpolate(t, start, end, out);
 
-        xyz[0] = (float) x;
-        xyz[1] = (float) y;
-        xyz[2] = (float) z;
-
-        return Math.sqrt(x * x + y * y + z * z);
+        xyz[0] = (float) out.x;
+        xyz[1] = (float) out.y;
+        xyz[2] = (float) out.z;
+        return out.distance();
     }
 
-    public double interpolateRectangular(long t, long start, long end, double[] xyz) {
-        long time = interpolateTime(t, start, end);
-        Position.Cartesian p = getInterpolatedPosition(time);
-        double x = p.x(), y = p.y(), z = p.z();
+    public double interpolateRectangular(long t, long start, long end, double[] xyz, Interpolated out) {
+        interpolate(t, start, end, out);
 
-        xyz[0] = x;
-        xyz[1] = y;
-        xyz[2] = z;
-
-        return Math.sqrt(x * x + y * y + z * z);
+        xyz[0] = out.x;
+        xyz[1] = out.y;
+        xyz[2] = out.z;
+        return out.distance();
     }
 
-    public void interpolateLatitudinal(long t, long start, long end, double[] lati) {
-        long time = interpolateTime(t, start, end);
-        Position.Cartesian p = getInterpolatedPosition(time);
-        double x = p.x(), y = p.y(), z = p.z();
-
+    public void interpolateLatitudinal(long t, long start, long end, double[] lati, Interpolated out) {
+        interpolate(t, start, end, out);
         double dist, hgln, hglt;
-        dist = Math.sqrt(x * x + y * y + z * z);
+        dist = out.distance();
         if (dist == 0) {
             hgln = 0;
             hglt = 0;
         } else {
-            hgln = Math.atan2(y, x);
-            double sinLat = Math.clamp(z / dist, -1., 1.);
+            hgln = Math.atan2(out.y, out.x);
+            double sinLat = Math.clamp(out.z / dist, -1., 1.);
             hglt = Math.asin(sinLat);
         }
         lati[0] = dist;
@@ -126,24 +134,21 @@ public class PositionResponse {
         lati[2] = hglt;
     }
 
-    Position interpolateCarrington(long t, long start, long end) {
-        long time = interpolateTime(t, start, end);
-        Position.Cartesian p = getInterpolatedPosition(time);
-        double x = p.x(), y = p.y(), z = p.z();
-
+    Position interpolateCarrington(long t, long start, long end, Interpolated out) {
+        interpolate(t, start, end, out);
         double dist, hgln, hglt;
-        dist = Math.sqrt(x * x + y * y + z * z);
+        dist = out.distance();
         if (dist == 0) {
             hgln = 0;
             hglt = 0;
         } else {
-            hgln = Math.atan2(y, x);
+            hgln = Math.atan2(out.y, out.x);
             if (hgln < 0)
                 hgln += 2 * Math.PI;
-            double sinLat = Math.clamp(z / dist, -1., 1.);
+            double sinLat = Math.clamp(out.z / dist, -1., 1.);
             hglt = Math.asin(sinLat);
         }
-        return new Position(new JHVTime(time), dist, -hgln, hglt).setLocation(location);
+        return new Position(new JHVTime(out.time), dist, -hgln, hglt).setLocation(location);
     }
 
 }

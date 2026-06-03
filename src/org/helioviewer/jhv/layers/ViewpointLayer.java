@@ -56,6 +56,9 @@ public class ViewpointLayer extends AbstractLayer {
     private final double[] lati = new double[3];
     private final double[] hoverPoint = new double[3];
     private final double[] rotatedHoverPoint = new double[3];
+    private final PositionResponse.Interpolated latiInterpolated = new PositionResponse.Interpolated();
+    private final PositionResponse.Interpolated hoverInterpolated = new PositionResponse.Interpolated();
+    private final PositionResponse.Interpolated orbitInterpolated = new PositionResponse.Interpolated();
 
     private final ViewpointLayerOptions options;
     private final HoverListener hoverListener = new HoverListener();
@@ -85,7 +88,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (control != null && options.isRelative()) {
             PositionResponse response = control.getResponse();
             if (response != null) {
-                response.interpolateLatitudinal(time, start, end, lati);
+                response.interpolateLatitudinal(time, start, end, lati, latiInterpolated);
                 relativeLon = lati[1];
             }
         }
@@ -114,7 +117,7 @@ public class ViewpointLayer extends AbstractLayer {
         if (control != null) {
             PositionResponse response = control.getResponse();
             if (response != null) {
-                response.interpolateLatitudinal(time, start, end, lati);
+                response.interpolateLatitudinal(time, start, end, lati, latiInterpolated);
                 spiralSpeed = options.getSpiralSpeed(); // only if we have control point
                 relativeLon = options.isRelative() ? lati[1] : 0;
             }
@@ -200,7 +203,7 @@ public class ViewpointLayer extends AbstractLayer {
             if (response == null)
                 continue;
 
-            response.interpolateRectangular(time, start, end, hoverPoint); // should be shared with the one in renderPlanets
+            response.interpolateRectangular(time, start, end, hoverPoint, hoverInterpolated); // should be shared with the one in renderPlanets
             if (relativeLon != 0) {
                 double x = hoverPoint[0];
                 double y = hoverPoint[1];
@@ -314,7 +317,7 @@ public class ViewpointLayer extends AbstractLayer {
             byte[] color = positionLoad.target().getColor();
             long t = start;
 
-            double dist = response.interpolateRectangular(t, start, end, xyzw);
+            double dist = response.interpolateRectangular(t, start, end, xyzw, orbitInterpolated);
             orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], Colors.Null);
             orbitBuf.repeatVertex(color);
 
@@ -323,7 +326,7 @@ public class ViewpointLayer extends AbstractLayer {
                 t += delta;
                 if (t > time)
                     t = time;
-                dist = response.interpolateRectangular(t, start, end, xyzw);
+                dist = response.interpolateRectangular(t, start, end, xyzw, orbitInterpolated);
                 orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], color);
                 delta = getStep(dist);
             }
