@@ -3,12 +3,12 @@
 precision highp float;
 
 in vec4 fragColor;
-in vec2 prevPixel;
-in vec2 currPixel;
-in vec2 nextPixel;
-in float hasPrev;
-in float hasFollow;
-in float halfWidthPixels;
+flat in vec2 prevPixel;
+flat in vec2 currPixel;
+flat in vec2 nextPixel;
+flat in float hasPrev;
+flat in float hasFollow;
+flat in float halfWidthPixels;
 out vec4 outColor;
 
 const float aaPixels = 1.5;

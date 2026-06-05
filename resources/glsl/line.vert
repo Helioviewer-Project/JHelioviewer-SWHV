@@ -9,12 +9,12 @@ layout(location = 5) in vec4 NextColor;
 layout(location = 6) in vec4 FollowVertex;
 layout(location = 7) in vec4 FollowColor;
 out vec4 fragColor;
-out vec2 prevPixel;
-out vec2 currPixel;
-out vec2 nextPixel;
-out float hasPrev;
-out float hasFollow;
-out float halfWidthPixels;
+flat out vec2 prevPixel;
+flat out vec2 currPixel;
+flat out vec2 nextPixel;
+flat out float hasPrev;
+flat out float hasFollow;
+flat out float halfWidthPixels;
 
 struct Screen {
     mat4 mvp;
