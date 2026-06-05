@@ -45,6 +45,7 @@ void main(void) {
         discard;
 
     vec2 segmentTangent = segmentDelta / segmentLength;
+    float coverageRadius = halfWidthPixels + 0.5 * aaPixels;
     float coverage = stripCoverage(p, currPixel, segmentTangent, segmentLength);
 
     if (hasPrev > 0.5) {
@@ -55,11 +56,11 @@ void main(void) {
         vec2 joinDelta = p - currPixel;
         float prevAlong = -dot(joinDelta, prevTangent);
         float prevAcross = abs(cross2(prevTangent, joinDelta));
-        bool inPrevStrip = prevAlong >= 0.0 && prevAcross <= halfWidthPixels + aaPixels;
+        bool inPrevStrip = prevAlong >= 0.0 && prevAcross <= coverageRadius;
 
         float currentAlong = dot(joinDelta, segmentTangent);
         float currentAcross = abs(cross2(segmentTangent, joinDelta));
-        bool inCurrentStrip = currentAlong >= 0.0 && currentAcross <= halfWidthPixels + aaPixels;
+        bool inCurrentStrip = currentAlong >= 0.0 && currentAcross <= coverageRadius;
 
         bool shallowJoin = dot(prevTangent, segmentTangent) > 0.5;
 
