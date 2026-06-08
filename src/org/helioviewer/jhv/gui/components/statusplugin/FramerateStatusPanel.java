@@ -21,7 +21,7 @@ public final class FramerateStatusPanel extends StatusPanel.StatusPlugin impleme
         int f = JHVFrame.getFramerate();
         if (f != fps) {
             fps = f;
-            setText("FPS: " + FastFormat.integer(fps, 2, false));
+            setText(FastFormat.appendInteger(new StringBuilder("FPS: "), fps, 2, false).toString());
         }
     }
 

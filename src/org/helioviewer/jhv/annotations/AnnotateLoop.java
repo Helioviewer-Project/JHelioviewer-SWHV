@@ -37,10 +37,15 @@ final class AnnotateLoop extends AbstractAnnotateable {
         double height = centerLen + radiusLen - Sun.Radius;
         if (height != cachedHeight) {
             cachedHeight = height;
-            if (height < 0.2 * Sun.Radius)
-                heightStr = "Hann: " + FastFormat.fixed2(height * (Sun.RadiusMeter / 1e6), 7, false) + "Mm";
-            else
-                heightStr = "Hann: " + FastFormat.fixed2(height, 7, false) + "R☉";
+            if (height < 0.2 * Sun.Radius) {
+                heightStr = FastFormat.appendFixed2(new StringBuilder("Hann: "), height * (Sun.RadiusMeter / 1e6), 7, false)
+                        .append("Mm")
+                        .toString();
+            } else {
+                heightStr = FastFormat.appendFixed2(new StringBuilder("Hann: "), height, 7, false)
+                        .append("R☉")
+                        .toString();
+            }
         }
 
         double centerScale = radiusLen / centerLen;

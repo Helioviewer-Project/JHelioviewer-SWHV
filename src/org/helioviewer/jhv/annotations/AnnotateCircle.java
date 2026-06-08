@@ -33,10 +33,15 @@ final class AnnotateCircle extends AbstractAnnotateable {
         double d = 2 * r;
         if (d != diameter) {
             diameter = d;
-            if (d < 0.2 * Sun.Radius)
-                diameterStr = "Dann: " + FastFormat.fixed2(d * (Sun.RadiusMeter / 1e6), 7, false) + "Mm";
-            else
-                diameterStr = "Dann: " + FastFormat.fixed2(d, 7, false) + "R☉";
+            if (d < 0.2 * Sun.Radius) {
+                diameterStr = FastFormat.appendFixed2(new StringBuilder("Dann: "), d * (Sun.RadiusMeter / 1e6), 7, false)
+                        .append("Mm")
+                        .toString();
+            } else {
+                diameterStr = FastFormat.appendFixed2(new StringBuilder("Dann: "), d, 7, false)
+                        .append("R☉")
+                        .toString();
+            }
         }
 
         Vec3 center = new Vec3(bp.x * cosf, bp.y * cosf, bp.z * cosf);
