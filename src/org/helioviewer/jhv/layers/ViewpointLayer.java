@@ -36,17 +36,15 @@ public class ViewpointLayer extends AbstractLayer {
 
     private static final double LINEWIDTH_ORBIT = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_SPIRAL = 2 * GLSLLine.LINEWIDTH_BASIC;
-    private static final float SIZE_PLANET = 5;
-
     private static final double SPIRAL_RADIUS = 3 * Sun.MeanEarthDistance;
     private static final int SPIRAL_DIVISIONS = 64;
     private static final int SPIRAL_ARMS = 9;
 
     private final GLSLLine orbits = new GLSLLine(true);
-    private final BufVertex orbitBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
     private final GLSLShape planets = new GLSLShape(true);
-    private final BufVertex planetBuf = new BufVertex(8 * GLSLShape.stride);
-    private final ViewpointOrbitTrail.Cache orbitTrails = new ViewpointOrbitTrail.Cache();
+    private final ViewpointOrbitWorker orbitWorker = new ViewpointOrbitWorker(this::orbitsReady);
+    private ViewpointOrbitWorker.Parameters uploadedParameters;
+    private ViewpointOrbitWorker.Prepared readyOrbits;
 
     private final GLSLLine spiral = new GLSLLine(true);
     private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2) * GLSLLine.stride);
@@ -240,6 +238,7 @@ public class ViewpointLayer extends AbstractLayer {
             options.applyCurrentViewpoint(DisplayController.ViewpointApplyMode.KEEP_TRANSFORM);
         } else {
             hoverText.clear();
+            clearOrbitWorker();
             InputController.removeListener(hoverListener);
             options.deactivate();
             if (wasEnabled && Layers.getViewpointLayer() == this)
@@ -286,6 +285,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     @Override
     public void dispose() {
+        clearOrbitWorker();
         orbits.dispose();
         planets.dispose();
         spiral.dispose();
@@ -300,32 +300,55 @@ public class ViewpointLayer extends AbstractLayer {
         return options;
     }
 
-    private final float[] currentPoint = {0, 0, 0, 1};
-
     private void renderPlanets(Viewport vp, List<PositionLoad> positionLoads, double pointFactor, long time, long start, long end) {
-        orbitTrails.prune(positionLoads);
+        ViewpointOrbitWorker.Parameters parameters = createOrbitParameters(positionLoads, time, start, end);
+        if (parameters.entries().isEmpty()) {
+            clearOrbitWorker();
+            return;
+        }
 
+        uploadReadyOrbits(parameters);
+
+        if (!parameters.equals(uploadedParameters))
+            orbitWorker.submit(parameters);
+
+        if (parameters.compatibleWith(uploadedParameters)) {
+            orbits.renderLine(vp, LINEWIDTH_ORBIT);
+            planets.renderPoints(pointFactor);
+        }
+    }
+
+    private static ViewpointOrbitWorker.Parameters createOrbitParameters(List<PositionLoad> positionLoads, long time, long start, long end) {
+        ArrayList<ViewpointOrbitWorker.Entry> entries = new ArrayList<>(positionLoads.size());
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
-            if (response == null)
-                continue;
-
-            byte[] color = positionLoad.target().getColor();
-            ViewpointOrbitTrail trail = orbitTrails.get(positionLoad, response, start, end);
-            trail.putVertices(orbitBuf, currentPoint, color, time);
-            planetBuf.putVertex(currentPoint[0], currentPoint[1], currentPoint[2], SIZE_PLANET, color);
+            if (response != null)
+                entries.add(new ViewpointOrbitWorker.Entry(positionLoad, response, positionLoad.target().getColor()));
         }
+        return new ViewpointOrbitWorker.Parameters(entries, time, start, end);
+    }
 
-        // Avoid GLSLLine warning: must have at least 2 vertices + 2 sentinels to draw.
-        if (orbitBuf.getCount() >= 4) {
-            orbits.setVertex(orbitBuf);
-            orbits.renderLine(vp, LINEWIDTH_ORBIT);
-        } else {
-            orbitBuf.clear();
+    private void uploadReadyOrbits(ViewpointOrbitWorker.Parameters parameters) {
+        if (readyOrbits == null)
+            return;
+
+        if (parameters.compatibleWith(readyOrbits.parameters())) {
+            orbits.setVertexRepeatable(readyOrbits.orbitVertices());
+            planets.setVertexRepeatable(readyOrbits.planetVertices());
+            uploadedParameters = readyOrbits.parameters();
         }
+        readyOrbits = null;
+    }
 
-        planets.setVertex(planetBuf);
-        planets.renderPoints(pointFactor);
+    private void orbitsReady(ViewpointOrbitWorker.Prepared prepared) {
+        readyOrbits = prepared;
+        DisplayController.display();
+    }
+
+    private void clearOrbitWorker() {
+        readyOrbits = null;
+        uploadedParameters = null;
+        orbitWorker.cancel();
     }
 
     private void spiralPutVertex(double rad, double lon, double lat, byte[] color) {
@@ -370,5 +393,4 @@ public class ViewpointLayer extends AbstractLayer {
         spiral.setVertex(spiralBuf);
         spiral.renderLine(vp, LINEWIDTH_SPIRAL);
     }
-
 }
