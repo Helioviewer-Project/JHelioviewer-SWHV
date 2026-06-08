@@ -23,6 +23,10 @@ final class ViewpointOrbitTrail {
             trails.keySet().removeIf(positionLoad -> !positionLoads.contains(positionLoad));
         }
 
+        void clear() {
+            trails.clear();
+        }
+
         ViewpointOrbitTrail get(PositionLoad positionLoad, PositionResponse response, long start, long end) {
             ViewpointOrbitTrail trail = trails.get(positionLoad);
             if (trail == null || !trail.matches(response, start, end)) {
@@ -125,5 +129,4 @@ final class ViewpointOrbitTrail {
     private static long getStep(double dist) { // decrease interpolation step proportionally with distance, stop at 3au
         return (long) (DELTA_ORBIT * Math.min(dist, DELTA_CUTOFF));
     }
-
 }
