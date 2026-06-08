@@ -29,8 +29,14 @@ public final class ViewpointStatusPanel extends StatusPanel.StatusPlugin impleme
 
         distance = viewpoint.distance;
         time = viewpoint.time;
-        setText("CR: " + FastFormat.fixed2(Carrington.time2CR(time), 0, false) +
-                " D☉: " + FastFormat.fixed3(distance * Sun.MeanEarthDistanceInv, 7, false) + "au |");
+
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("CR: ");
+        FastFormat.appendFixed2(sb, Carrington.time2CR(time), 0, false);
+        sb.append(" D☉: ");
+        FastFormat.appendFixed3(sb, distance * Sun.MeanEarthDistanceInv, 7, false);
+        sb.append("au |");
+        setText(sb.toString());
     }
 
 }
