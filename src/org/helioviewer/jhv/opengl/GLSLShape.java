@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 public class GLSLShape extends VAO implements GLSLVertexReceiver {
 
@@ -26,7 +26,7 @@ public class GLSLShape extends VAO implements GLSLVertexReceiver {
         setVertexRepeatable(vexBuf.vertexBuffer(), vexBuf.colorBuffer());
     }
 
-    private void setVertexRepeatable(Buffer vertexBuffer, Buffer colorBuffer) {
+    private void setVertexRepeatable(ByteBuffer vertexBuffer, ByteBuffer colorBuffer) {
         if (count == 0)
             return;
         vbo[0].setBufferData(vertexBuffer.capacity(), vertexBuffer);
