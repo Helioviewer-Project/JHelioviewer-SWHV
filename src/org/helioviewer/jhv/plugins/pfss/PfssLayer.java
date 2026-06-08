@@ -15,7 +15,7 @@ import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
 
-public class PfssLayer extends AbstractLayer implements TimeListener.Range, PfssLineWorker.Listener { // has to be public for state
+public class PfssLayer extends AbstractLayer implements TimeListener.Range { // has to be public for state
 
     private static final double LINEWIDTH = 2 * GLSLLine.LINEWIDTH_BASIC;
 
@@ -43,7 +43,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range, Pfss
         jo.put("radius", radius);
     }
 
-    private final PfssLineWorker lineWorker = new PfssLineWorker();
+    private final PfssLineWorker lineWorker = new PfssLineWorker(this::lineReady);
     private PfssLineWorker.Parameters uploadedParameters;
     private PfssLineWorker.Line readyLine;
 
@@ -57,15 +57,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range, Pfss
             return;
 
         PfssLineWorker.Parameters parameters = new PfssLineWorker.Parameters(data, detail, fixedColor, radius, Display.whiteBackground);
-        if (readyLine != null) {
-            if (readyLine.parameters().equals(parameters)) {
-                glslLine.setVertexRepeatable(readyLine.vertices());
-                uploadedParameters = readyLine.parameters();
-                pfssTime = uploadedParameters.data().dateObs();
-                Layers.fireTimeUpdated(this);
-            }
-            readyLine = null;
-        }
+        uploadReadyLine(parameters);
 
         if (!parameters.equals(uploadedParameters))
             lineWorker.submit(parameters);
@@ -74,10 +66,22 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range, Pfss
             glslLine.renderLine(vp, LINEWIDTH);
     }
 
-    @Override
-    public void lineReady(PfssLineWorker.Line line) {
+    private void lineReady(PfssLineWorker.Line line) {
         readyLine = line;
         DisplayController.display();
+    }
+
+    private void uploadReadyLine(PfssLineWorker.Parameters parameters) {
+        if (readyLine == null)
+            return;
+
+        if (readyLine.parameters().equals(parameters)) {
+            glslLine.setVertexRepeatable(readyLine.vertices());
+            uploadedParameters = readyLine.parameters();
+            pfssTime = uploadedParameters.data().dateObs();
+            Layers.fireTimeUpdated(this);
+        }
+        readyLine = null;
     }
 
     @Override
@@ -105,10 +109,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range, Pfss
             Movie.addTimeRangeListener(this);
         } else {
             Movie.removeTimeRangeListener(this);
-            lineWorker.cancel();
-            uploadedParameters = null;
-            readyLine = null;
-            pfssTime = null;
+            clearLineWorker();
         }
     }
 
@@ -119,17 +120,20 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range, Pfss
 
     @Override
     public void init() {
-        lineWorker.setListener(this);
         glslLine.init();
     }
 
     @Override
     public void dispose() {
-        lineWorker.cancel();
-        lineWorker.setListener(null);
-        uploadedParameters = null;
-        readyLine = null;
+        clearLineWorker();
         glslLine.dispose();
+    }
+
+    private void clearLineWorker() {
+        readyLine = null;
+        uploadedParameters = null;
+        pfssTime = null;
+        lineWorker.cancel();
     }
 
     @Override

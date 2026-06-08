@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.pfss;
 
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
@@ -11,24 +12,20 @@ import org.helioviewer.jhv.threads.LatestWorker;
 
 final class PfssLineWorker {
 
-    interface Listener {
-        void lineReady(Line line);
-    }
-
     private final LatestWorker<Line> worker = new LatestWorker<>("PFSS-Line");
     private final Callback callback = new Callback();
-    private Listener listener;
+    private final Consumer<Line> onReady;
     private Parameters submittedParameters;
 
-    void setListener(Listener _listener) {
-        listener = _listener;
+    PfssLineWorker(@Nonnull Consumer<Line> _onReady) {
+        onReady = _onReady;
     }
 
     void submit(Parameters parameters) {
         if (parameters.equals(submittedParameters))
             return;
         submittedParameters = parameters;
-        worker.submit(new Decoder(parameters), callback);
+        worker.submit(new Builder(parameters), callback);
     }
 
     void cancel() {
@@ -36,7 +33,7 @@ final class PfssLineWorker {
         submittedParameters = null;
     }
 
-    private record Decoder(Parameters parameters) implements Callable<Line> {
+    private record Builder(Parameters parameters) implements Callable<Line> {
         @Nonnull
         @Override
         public Line call() {
@@ -52,8 +49,7 @@ final class PfssLineWorker {
             if (!fresh)
                 return;
             submittedParameters = null;
-            if (listener != null)
-                listener.lineReady(result);
+            onReady.accept(result);
         }
 
         @Override
