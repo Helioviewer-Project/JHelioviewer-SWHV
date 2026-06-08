@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -108,11 +107,11 @@ public class BufVertex {
         count = 0;
     }
 
-    public Buffer toVertexBuffer() {
+    public ByteBuffer toVertexBuffer() {
         return vertxBuffer.limit(lengthVertx);
     }
 
-    public Buffer toColorBuffer() {
+    public ByteBuffer toColorBuffer() {
         return colorBuffer.limit(lengthColor);
     }
 

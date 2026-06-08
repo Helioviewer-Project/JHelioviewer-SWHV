@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.opengl;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
@@ -17,9 +16,9 @@ public final class DirectBufVertex {
         count = buf.getCount();
     }
 
-    private static ByteBuffer copy(Buffer buffer, int size) {
+    private static ByteBuffer copy(ByteBuffer buffer, int size) {
         ByteBuffer ret = BufferUtils.newByteBuffer(size);
-        ret.put(((ByteBuffer) buffer).duplicate());
+        ret.put(buffer.duplicate());
         return ret.flip();
     }
 
