@@ -40,7 +40,6 @@ final class ViewpointOrbitWorker {
 
     void cancel() {
         worker.cancel();
-        orbitTrails.clear();
         submittedParameters = null;
     }
 

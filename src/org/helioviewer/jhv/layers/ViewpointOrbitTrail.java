@@ -23,10 +23,6 @@ final class ViewpointOrbitTrail {
             trails.keySet().removeIf(positionLoad -> !positionLoads.contains(positionLoad));
         }
 
-        void clear() {
-            trails.clear();
-        }
-
         ViewpointOrbitTrail get(PositionLoad positionLoad, PositionResponse response, long start, long end) {
             ViewpointOrbitTrail trail = trails.get(positionLoad);
             if (trail == null || !trail.matches(response, start, end)) {
