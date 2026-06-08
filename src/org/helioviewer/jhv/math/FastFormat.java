@@ -4,28 +4,16 @@ public final class FastFormat {
 
     private FastFormat() {}
 
-    public static String fixed2(double value, int width, boolean alwaysSign) {
-        return appendFixed2(new StringBuilder(Math.max(width, 16)), value, width, alwaysSign).toString();
-    }
-
-    public static String fixed3(double value, int width, boolean alwaysSign) {
-        return appendFixed3(new StringBuilder(Math.max(width, 16)), value, width, alwaysSign).toString();
-    }
-
-    public static String integer(long value, int width, boolean alwaysSign) {
-        return appendInteger(new StringBuilder(Math.max(width, 16)), value, width, alwaysSign).toString();
-    }
-
     public static String text(String value, int width) {
         return appendText(new StringBuilder(Math.max(width, 16)), value, width).toString();
     }
 
     public static StringBuilder appendFixed2(StringBuilder out, double value, int width, boolean alwaysSign) {
-        return appendFixed(out, value, width, alwaysSign, 100, 10);
+        return appendFixed(out, value, width, alwaysSign, 100);
     }
 
     public static StringBuilder appendFixed3(StringBuilder out, double value, int width, boolean alwaysSign) {
-        return appendFixed(out, value, width, alwaysSign, 1000, 100);
+        return appendFixed(out, value, width, alwaysSign, 1000);
     }
 
     public static StringBuilder appendInteger(StringBuilder out, long value, int width, boolean alwaysSign) {
@@ -34,16 +22,38 @@ public final class FastFormat {
 
         boolean negative = value < 0;
         long absValue = negative ? -value : value;
-        int len = digitCount(absValue);
-        if (negative || alwaysSign)
-            len++;
 
-        appendSpaces(out, width - len);
-        if (negative)
-            out.append('-');
-        else if (alwaysSign)
-            out.append('+');
-        appendUnsigned(out, absValue);
+        char[] buf = new char[32];
+        int charPos = 32;
+
+        long temp = absValue;
+        while (temp >= 10) {
+            long q = temp / 10;
+            int r = (int) (temp - q * 10);
+            buf[--charPos] = (char) ('0' + r);
+            temp = q;
+        }
+        buf[--charPos] = (char) ('0' + temp);
+
+        if (negative) {
+            buf[--charPos] = '-';
+        } else if (alwaysSign) {
+            buf[--charPos] = '+';
+        }
+
+        int len = 32 - charPos;
+        if (width <= 32) {
+            int spaces = width - len;
+            while (spaces > 0) {
+                buf[--charPos] = ' ';
+                spaces--;
+            }
+            out.append(buf, charPos, 32 - charPos);
+        } else {
+            int spaces = width - len;
+            out.repeat(" ", spaces);
+            out.append(buf, charPos, len);
+        }
         return out;
     }
 
@@ -51,7 +61,7 @@ public final class FastFormat {
         return appendPadded(out, value, width);
     }
 
-    private static StringBuilder appendFixed(StringBuilder out, double value, int width, boolean alwaysSign, int scale, int firstFractionDivisor) {
+    private static StringBuilder appendFixed(StringBuilder out, double value, int width, boolean alwaysSign, int scale) {
         if (!Double.isFinite(value))
             return appendPadded(out, (alwaysSign && value > 0 ? "+" : "") + value, width);
 
@@ -64,59 +74,59 @@ public final class FastFormat {
         long scaled = (long) Math.floor(scaledValue + 0.5 + Math.ulp(scaledValue));
         long whole = scaled / scale;
         long fraction = scaled - whole * scale;
-        int precision = scale == 100 ? 2 : 3;
-        int len = digitCount(whole) + 1 + precision;
-        if (negative || alwaysSign)
-            len++;
 
-        appendSpaces(out, width - len);
-        if (negative)
-            out.append('-');
-        else if (alwaysSign)
-            out.append('+');
-        appendUnsigned(out, whole);
-        out.append('.');
-        appendFraction(out, fraction, firstFractionDivisor);
+        char[] buf = new char[32];
+        int charPos = 32;
+
+        int frac = (int) fraction;
+        if (scale == 100) {
+            buf[--charPos] = (char) ('0' + (frac % 10));
+            buf[--charPos] = (char) ('0' + (frac / 10));
+        } else {
+            buf[--charPos] = (char) ('0' + (frac % 10));
+            buf[--charPos] = (char) ('0' + ((frac % 100) / 10));
+            buf[--charPos] = (char) ('0' + (frac / 100));
+        }
+
+        buf[--charPos] = '.';
+
+        long tempWhole = whole;
+        while (tempWhole >= 10) {
+            long q = tempWhole / 10;
+            int r = (int) (tempWhole - q * 10);
+            buf[--charPos] = (char) ('0' + r);
+            tempWhole = q;
+        }
+        buf[--charPos] = (char) ('0' + tempWhole);
+
+        if (negative) {
+            buf[--charPos] = '-';
+        } else if (alwaysSign) {
+            buf[--charPos] = '+';
+        }
+
+        int len = 32 - charPos;
+        if (width <= 32) {
+            int spaces = width - len;
+            while (spaces > 0) {
+                buf[--charPos] = ' ';
+                spaces--;
+            }
+            out.append(buf, charPos, 32 - charPos);
+        } else {
+            int spaces = width - len;
+            out.repeat(" ", spaces);
+            out.append(buf, charPos, len);
+        }
         return out;
     }
 
     private static StringBuilder appendPadded(StringBuilder out, String value, int width) {
-        appendSpaces(out, width - value.length());
+        int spaces = width - value.length();
+        if (spaces > 0) {
+            out.repeat(" ", spaces);
+        }
         return out.append(value);
-    }
-
-    private static void appendSpaces(StringBuilder out, int count) {
-        out.repeat(" ", Math.max(0, count));
-    }
-
-    private static void appendUnsigned(StringBuilder out, long value) {
-        long divisor = 1;
-        while (divisor <= Long.MAX_VALUE / 10 && value / divisor >= 10)
-            divisor *= 10;
-        while (divisor != 0) {
-            long digit = value / divisor;
-            out.append((char) ('0' + (int) digit));
-            value -= digit * divisor;
-            divisor /= 10;
-        }
-    }
-
-    private static void appendFraction(StringBuilder out, long value, int divisor) {
-        while (divisor != 0) {
-            long digit = value / divisor;
-            out.append((char) ('0' + (int) digit));
-            value -= digit * divisor;
-            divisor /= 10;
-        }
-    }
-
-    private static int digitCount(long value) {
-        int digits = 1;
-        while (value >= 10) {
-            value /= 10;
-            digits++;
-        }
-        return digits;
     }
 
 }
