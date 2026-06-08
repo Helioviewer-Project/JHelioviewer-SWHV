@@ -32,21 +32,17 @@ const float dir[2] = float[2](1.0, -1.0);
 // only reserves enough screen-space geometry around the current segment.
 const float aaPixels = 1.5;
 
-vec2 projectPixel(vec4 vertex, vec2 viewportOrigin, vec2 ndcToPixel) {
-    vec4 projected = screen.mvp * vertex;
-    return viewportOrigin + (projected.xy / projected.w + 1.0) * ndcToPixel;
-}
-
 void main(void) {
     vec2 viewportOrigin = screen.viewport.xy;
     vec2 viewportSize = screen.viewport.zw;
     vec2 ndcToPixel = 0.5 * viewportSize;
     vec2 pixelToNdc = 1.0 / ndcToPixel;
 
+    vec4 prev = screen.mvp * PrevVertex;
     vec4 curr = screen.mvp * CurrVertex;
     vec4 next = screen.mvp * NextVertex;
 
-    prevPixel = projectPixel(PrevVertex, viewportOrigin, ndcToPixel);
+    prevPixel = viewportOrigin + (prev.xy / prev.w + 1.0) * ndcToPixel;
     currPixel = viewportOrigin + (curr.xy / curr.w + 1.0) * ndcToPixel;
     nextPixel = viewportOrigin + (next.xy / next.w + 1.0) * ndcToPixel;
 

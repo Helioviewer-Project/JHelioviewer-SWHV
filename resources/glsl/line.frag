@@ -35,7 +35,7 @@ float stripCoverage(vec2 p, vec2 start, vec2 tangent, float lengthPixels) {
 }
 
 void main(void) {
-    if (fragColor.a == 0.)
+    if (fragColor.a <= 0.0)
         discard;
 
     vec2 p = gl_FragCoord.xy;
