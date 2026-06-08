@@ -34,8 +34,6 @@ import org.json.JSONObject;
 
 public class ViewpointLayer extends AbstractLayer {
 
-    private static final double DELTA_ORBIT = 2 * 60 * 1000 * Sun.MeanEarthDistanceInv;
-    private static final double DELTA_CUTOFF = 3 * Sun.MeanEarthDistance;
     private static final double LINEWIDTH_ORBIT = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final double LINEWIDTH_SPIRAL = 2 * GLSLLine.LINEWIDTH_BASIC;
     private static final float SIZE_PLANET = 5;
@@ -48,6 +46,7 @@ public class ViewpointLayer extends AbstractLayer {
     private final BufVertex orbitBuf = new BufVertex(3276 * GLSLLine.stride); // pre-allocate 64k
     private final GLSLShape planets = new GLSLShape(true);
     private final BufVertex planetBuf = new BufVertex(8 * GLSLShape.stride);
+    private final ViewpointOrbitTrail.Cache orbitTrails = new ViewpointOrbitTrail.Cache();
 
     private final GLSLLine spiral = new GLSLLine(true);
     private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2) * GLSLLine.stride);
@@ -58,7 +57,6 @@ public class ViewpointLayer extends AbstractLayer {
     private final double[] rotatedHoverPoint = new double[3];
     private final PositionResponse.Interpolated latiInterpolated = new PositionResponse.Interpolated();
     private final PositionResponse.Interpolated hoverInterpolated = new PositionResponse.Interpolated();
-    private final PositionResponse.Interpolated orbitInterpolated = new PositionResponse.Interpolated();
 
     private final ViewpointLayerOptions options;
     private final HoverListener hoverListener = new HoverListener();
@@ -302,36 +300,20 @@ public class ViewpointLayer extends AbstractLayer {
         return options;
     }
 
-    private static long getStep(double dist) { // decrease interpolation step proportionally with distance, stop at 3au
-        return (long) (DELTA_ORBIT * Math.min(dist, DELTA_CUTOFF));
-    }
-
-    private final float[] xyzw = {0, 0, 0, 1};
+    private final float[] currentPoint = {0, 0, 0, 1};
 
     private void renderPlanets(Viewport vp, List<PositionLoad> positionLoads, double pointFactor, long time, long start, long end) {
+        orbitTrails.prune(positionLoads);
+
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
             if (response == null)
                 continue;
 
             byte[] color = positionLoad.target().getColor();
-            long t = start;
-
-            double dist = response.interpolateRectangular(t, start, end, xyzw, orbitInterpolated);
-            orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], Colors.Null);
-            orbitBuf.repeatVertex(color);
-
-            long delta = getStep(dist);
-            while (t < time) {
-                t += delta;
-                if (t > time)
-                    t = time;
-                dist = response.interpolateRectangular(t, start, end, xyzw, orbitInterpolated);
-                orbitBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], xyzw[3], color);
-                delta = getStep(dist);
-            }
-            orbitBuf.repeatVertex(Colors.Null);
-            planetBuf.putVertex(xyzw[0], xyzw[1], xyzw[2], SIZE_PLANET, color);
+            ViewpointOrbitTrail trail = orbitTrails.get(positionLoad, response, start, end);
+            trail.putVertices(orbitBuf, currentPoint, color, time);
+            planetBuf.putVertex(currentPoint[0], currentPoint[1], currentPoint[2], SIZE_PLANET, color);
         }
 
         // Avoid GLSLLine warning: must have at least 2 vertices + 2 sentinels to draw.
