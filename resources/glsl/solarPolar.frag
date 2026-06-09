@@ -6,8 +6,8 @@ vec2 samplePolarTexcoord(const vec2 crval, const vec4 crota, const vec4 rect, co
     // Effective polar map convention is 0 at north and increasing anti-clockwise.
     // This basis must stay consistent with the Java-side non-ortho projection after
     // the subsequent rotate_plane_inverse(..., vec2(pos.x, -pos.y) - crval) step.
-    float theta = -(scrpos.x * TWOPI + HALFPI);
-    vec2 polarXY = vec2(cos(theta), sin(theta)) * radialCoordinate;
+    float angle = scrpos.x * TWOPI;
+    vec2 polarXY = vec2(-sin(angle), -cos(angle)) * radialCoordinate;
 
     if (display.cutOff.z >= 0.) {
         // Convert the polar north-up basis to the display-plane x/y basis used by cutOff.
