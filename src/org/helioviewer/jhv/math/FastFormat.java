@@ -3,46 +3,32 @@ package org.helioviewer.jhv.math;
 public final class FastFormat {
 
     private static final ThreadLocal<char[]> BUFFER = ThreadLocal.withInitial(() -> new char[32]);
-    private static final ThreadLocal<StringBuilder> SB = ThreadLocal.withInitial(() -> new StringBuilder(32));
 
     private static final char[] DIGITS = {
-        '0', '0', '0', '1', '0', '2', '0', '3', '0', '4', '0', '5', '0', '6', '0', '7', '0', '8', '0', '9',
-        '1', '0', '1', '1', '1', '2', '1', '3', '1', '4', '1', '5', '1', '6', '1', '7', '1', '8', '1', '9',
-        '2', '0', '2', '1', '2', '2', '2', '3', '2', '4', '2', '5', '2', '6', '2', '7', '2', '8', '2', '9',
-        '3', '0', '3', '1', '3', '2', '3', '3', '3', '4', '3', '5', '3', '6', '3', '7', '3', '8', '3', '9',
-        '4', '0', '4', '1', '4', '2', '4', '3', '4', '4', '4', '5', '4', '6', '4', '7', '4', '8', '4', '9',
-        '5', '0', '5', '1', '5', '2', '5', '3', '5', '4', '5', '5', '5', '6', '5', '7', '5', '8', '5', '9',
-        '6', '0', '6', '1', '6', '2', '6', '3', '6', '4', '6', '5', '6', '6', '6', '7', '6', '8', '6', '9',
-        '7', '0', '7', '1', '7', '2', '7', '3', '7', '4', '7', '5', '7', '6', '7', '7', '7', '8', '7', '9',
-        '8', '0', '8', '1', '8', '2', '8', '3', '8', '4', '8', '5', '8', '6', '8', '7', '8', '8', '8', '9',
-        '9', '0', '9', '1', '9', '2', '9', '3', '9', '4', '9', '5', '9', '6', '9', '7', '9', '8', '9', '9'
+            '0', '0', '0', '1', '0', '2', '0', '3', '0', '4', '0', '5', '0', '6', '0', '7', '0', '8', '0', '9',
+            '1', '0', '1', '1', '1', '2', '1', '3', '1', '4', '1', '5', '1', '6', '1', '7', '1', '8', '1', '9',
+            '2', '0', '2', '1', '2', '2', '2', '3', '2', '4', '2', '5', '2', '6', '2', '7', '2', '8', '2', '9',
+            '3', '0', '3', '1', '3', '2', '3', '3', '3', '4', '3', '5', '3', '6', '3', '7', '3', '8', '3', '9',
+            '4', '0', '4', '1', '4', '2', '4', '3', '4', '4', '4', '5', '4', '6', '4', '7', '4', '8', '4', '9',
+            '5', '0', '5', '1', '5', '2', '5', '3', '5', '4', '5', '5', '5', '6', '5', '7', '5', '8', '5', '9',
+            '6', '0', '6', '1', '6', '2', '6', '3', '6', '4', '6', '5', '6', '6', '6', '7', '6', '8', '6', '9',
+            '7', '0', '7', '1', '7', '2', '7', '3', '7', '4', '7', '5', '7', '6', '7', '7', '7', '8', '7', '9',
+            '8', '0', '8', '1', '8', '2', '8', '3', '8', '4', '8', '5', '8', '6', '8', '7', '8', '8', '8', '9',
+            '9', '0', '9', '1', '9', '2', '9', '3', '9', '4', '9', '5', '9', '6', '9', '7', '9', '8', '9', '9'
     };
 
     private FastFormat() {}
-
-    public static String text(String value, int width) {
-        if (width <= value.length()) {
-            return value;
-        }
-        StringBuilder sb = SB.get();
-        sb.setLength(0);
-        return appendText(sb, value, width).toString();
-    }
 
     public static StringBuilder appendFixed2(StringBuilder out, double value, int width, boolean alwaysSign) {
         return appendFixed(out, value, width, alwaysSign, 100);
     }
 
     public static String rounded1(double value) {
-        StringBuilder sb = SB.get();
-        sb.setLength(0);
-        return appendRounded(sb, value, 10).toString();
+        return appendRounded(new StringBuilder(8), value, 10).toString();
     }
 
     public static String rounded2(double value) {
-        StringBuilder sb = SB.get();
-        sb.setLength(0);
-        return appendRounded(sb, value, 100).toString();
+        return appendRounded(new StringBuilder(8), value, 100).toString();
     }
 
     public static StringBuilder appendFixed3(StringBuilder out, double value, int width, boolean alwaysSign) {
@@ -116,10 +102,6 @@ public final class FastFormat {
         return out;
     }
 
-    public static StringBuilder appendText(StringBuilder out, String value, int width) {
-        return appendPadded(out, value, width);
-    }
-
     private static StringBuilder appendRounded(StringBuilder out, double value, int scale) {
         if (!Double.isFinite(value))
             return out.append(value);
@@ -158,7 +140,7 @@ public final class FastFormat {
                 out.append((char) ('0' + d2));
             }
         } else {
-            while (fraction != 0 && fraction % 10 == 0) {
+            while (fraction % 10 == 0) {
                 fraction /= 10;
                 scale /= 10;
             }
@@ -271,5 +253,4 @@ public final class FastFormat {
         }
         return out.append(value);
     }
-
 }
