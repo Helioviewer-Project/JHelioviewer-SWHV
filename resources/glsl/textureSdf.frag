@@ -9,10 +9,13 @@ uniform vec4 color;
 uniform sampler2D image;
 uniform vec2 unitRange;
 
+const vec2 MIN_TEXCOORD_DERIVATIVE = vec2(1e-5);
+
 void main(void) {
     float signedDistance = texture(image, texCoord).r - 0.5;
 
-    vec2 screenTexSize = 1.0 / fwidth(texCoord);
+    vec2 texCoordDerivative = max(fwidth(texCoord), MIN_TEXCOORD_DERIVATIVE);
+    vec2 screenTexSize = 1.0 / texCoordDerivative;
     float screenPxRange = max(0.5 * dot(unitRange, screenTexSize), 1.0);
     float coverage = clamp(screenPxRange * signedDistance + 0.5, 0.0, 1.0);
     if (coverage <= 0.0)
