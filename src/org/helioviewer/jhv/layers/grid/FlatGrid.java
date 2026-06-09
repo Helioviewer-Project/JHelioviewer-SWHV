@@ -1,14 +1,12 @@
 package org.helioviewer.jhv.layers.grid;
 
-import java.text.DecimalFormat;
-
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.FastFormat;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLShape;
@@ -20,7 +18,6 @@ public class FlatGrid {
 
     //private static final float TEXT_SCALE = GridLabel.textScale; // scalable text
     private static final int TEXT_SIZE = 12;
-    private static final DecimalFormat FORMATTER = MathUtils.numberFormatter("0", 2);
     private static final double THICKNESS_PIXELS = 1.5;
     private static final double[] ANGULAR_STEPS = {0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 45, 90, 180};
     private static final double[] LINEAR_STEP_FACTORS = {1, 2, 5, 10};
@@ -74,11 +71,11 @@ public class FlatGrid {
             if (xAxis.positions()[i] == 0)
                 continue;
             double x = RasterLine.snapVertical(vp, width, mv.cameraTranslationX(), xAxis.positions()[i]);
-            renderer.draw(FORMATTER.format(xAxis.labelValues()[i]), (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
+            renderer.draw(FastFormat.rounded2(xAxis.labelValues()[i]), (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
         }
         for (int i = 0; i < yAxis.labelValues().length; i++) {
             double y = RasterLine.snapHorizontal(vp, width, mv.cameraTranslationY(), yAxis.positions()[i]);
-            renderer.draw(FORMATTER.format(yAxis.labelValues()[i]), 0, (float) y + labelOffset, 0, textScaleFactor);
+            renderer.draw(FastFormat.rounded2(yAxis.labelValues()[i]), 0, (float) y + labelOffset, 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }

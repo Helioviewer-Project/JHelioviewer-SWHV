@@ -1,12 +1,11 @@
 package org.helioviewer.jhv.layers.grid;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.math.FastFormat;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -15,8 +14,6 @@ public class GridLabel {
 
     // height of text in solar radii
     public static final float textScale = (float) (0.06 * Sun.Radius);
-
-    private static final DecimalFormat formatter1 = MathUtils.numberFormatter("0", 1);
 
     public final String txt;
     public final float x;
@@ -57,7 +54,7 @@ public class GridLabel {
 
         List<GridLabel> labels = new ArrayList<>();
         for (double phi = 0; phi < 360; phi += radialStep) {
-            String txt = formatter1.format(phi);
+            String txt = FastFormat.rounded1(phi);
             double angle = -phi * Math.PI / 180. + delta;
             float x = (float) (Math.sin(angle) * size - horizontalAdjustment);
             float y = (float) (Math.cos(angle) * size - verticalAdjustment);
@@ -74,7 +71,7 @@ public class GridLabel {
 
         List<GridLabel> labels = new ArrayList<>();
         for (double phi = 0; phi <= 90; phi += latStep) {
-            String txt = formatter1.format(phi);
+            String txt = FastFormat.rounded1(phi);
             double angle = (90 - phi) * Math.PI / 180.;
             float x = (float) (Math.sin(angle) * size);
             float y = (float) (Math.cos(angle) * size - verticalAdjustment);
@@ -86,7 +83,7 @@ public class GridLabel {
             }
         }
         for (double phi = -latStep; phi >= -90; phi -= latStep) {
-            String txt = formatter1.format(phi);
+            String txt = FastFormat.rounded1(phi);
             double angle = (90 - phi) * Math.PI / 180.;
             float x = (float) (Math.sin(angle) * size);
             float y = (float) (Math.cos(angle) * size - verticalAdjustment);
@@ -105,7 +102,7 @@ public class GridLabel {
 
         List<TransformedGridLabel> labels = new ArrayList<>();
         for (double theta = 0; theta <= 180.; theta += lonStep) {
-            String txt = formatter1.format(theta);
+            String txt = FastFormat.rounded1(theta);
             double angle = (90 - theta) * Math.PI / 180.;
             float x = (float) (Math.cos(angle) * size);
             float y = (float) (Math.sin(angle) * size);
@@ -116,7 +113,7 @@ public class GridLabel {
             labels.add(makeTransformedLabel(txt, x, y, m));
         }
         for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
-            String txt = gridType == GridType.Carrington ? formatter1.format(theta + 360) : formatter1.format(theta);
+            String txt = FastFormat.rounded1(gridType == GridType.Carrington ? theta + 360 : theta);
             double angle = (90 - theta) * Math.PI / 180.;
             float x = (float) (Math.cos(angle) * size);
             float y = (float) (Math.sin(angle) * size);
