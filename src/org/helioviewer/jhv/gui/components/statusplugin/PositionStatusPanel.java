@@ -24,7 +24,7 @@ import org.helioviewer.jhv.swing.TransferAccess;
 public final class PositionStatusPanel extends StatusPanel.StatusPlugin implements InputPointerListener, InputPointerMotionListener {
 
     private static final int FIELD_WIDTH = 7;
-    private static final String MISSING = FastFormat.text("--", FIELD_WIDTH);
+    private static final String MISSING = String.format("%" + FIELD_WIDTH + "s", "--");
     private static final String NAN_DEGREES = MISSING + "°," + MISSING + "°";
     private static final String NAN_HPC = MISSING + "," + MISSING;
     private static final String NAN_POLAR = MISSING + "°," + MISSING + "☉";
