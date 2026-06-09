@@ -46,9 +46,11 @@ public class FlatGrid {
         private static final Axis EMPTY = new Axis(null, new String[0], new boolean[0], new double[0]);
     }
 
-    // Projection and camera state that invalidates the cached flat grid.
-    private record FlatGridKey(MapMode mode, GridType gridType, double aspect, double cameraWidth,
+    // Projection, scale, and camera state that invalidates the cached flat grid.
+    private record FlatGridKey(MapMode mode, GridType gridType, ScaleSignature scale, double aspect, double cameraWidth,
                                double translationX, double translationY) {}
+
+    private record ScaleSignature(double x0, double x1, double y0, double y1) {}
 
     public void init() {
         shape.init();
@@ -66,14 +68,21 @@ public class FlatGrid {
             drawLabels(mv, vp, width);
     }
 
-    private static FlatGridKey key(MapView mv, Viewport vp, double width) {
-        return new FlatGridKey(mv.mode(), mv.gridType(), vp.aspect, width, mv.cameraTranslationX(), mv.cameraTranslationY());
+    private static FlatGridKey key(MapView mv, MapScale scale, Viewport vp, double width) {
+        return new FlatGridKey(mv.mode(), mv.gridType(), scaleSignature(scale), vp.aspect, width, mv.cameraTranslationX(), mv.cameraTranslationY());
+    }
+
+    private static ScaleSignature scaleSignature(MapScale scale) {
+        return new ScaleSignature(
+                scale.getInterpolatedXValue(0),
+                scale.getInterpolatedXValue(1),
+                scale.getInterpolatedYValue(0),
+                scale.getInterpolatedYValue(1));
     }
 
     private void rebuildIfNeeded(MapView mv, Viewport vp, double width) {
-        FlatGridKey flatGridKey = key(mv, vp, width);
-
         MapScale scale = mv.scale(vp);
+        FlatGridKey flatGridKey = key(mv, scale, vp, width);
         double xCenter = 0.5 - mv.cameraTranslationX() / vp.aspect;
         double yCenter = 0.5 - mv.cameraTranslationY();
         double halfWidth = 0.5 * width;
