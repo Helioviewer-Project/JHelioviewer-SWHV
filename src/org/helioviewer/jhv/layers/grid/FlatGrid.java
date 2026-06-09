@@ -1,13 +1,11 @@
 package org.helioviewer.jhv.layers.grid;
 
 import java.text.DecimalFormat;
-import java.util.Objects;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
-import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.MathUtils;
@@ -33,24 +31,7 @@ public class FlatGrid {
 
     private final GLSLShape shape = new GLSLShape(false);
 
-    private FlatGridKey previousKey;
-
-    private Axis xAxis = Axis.EMPTY;
-    private Axis yAxis = Axis.EMPTY;
-
-    // Step and inclusive bounds of one flat axis.
-    private record AxisSignature(double step, double first, double last) {}
-
-    // Built axis labels, zero-axis flags, and positions.
-    private record Axis(AxisSignature signature, String[] labels, boolean[] axisFlags, double[] positions) {
-        private static final Axis EMPTY = new Axis(null, new String[0], new boolean[0], new double[0]);
-    }
-
-    // Projection, scale, and camera state that invalidates the cached flat grid.
-    private record FlatGridKey(MapMode mode, GridType gridType, ScaleSignature scale, double aspect, double cameraWidth,
-                               double translationX, double translationY) {}
-
-    private record ScaleSignature(double x0, double x1, double y0, double y1) {}
+    private record Axis(double[] labelValues, double[] positions) {}
 
     public void init() {
         shape.init();
@@ -62,54 +43,25 @@ public class FlatGrid {
 
     public void render(MapView mv, Viewport vp, boolean showLabels) {
         double width = mv.cameraWidth(vp);
-        rebuildIfNeeded(mv, vp, width);
-        shape.renderShape(GL.TRIANGLES);
-        if (showLabels)
-            drawLabels(mv, vp, width);
-    }
-
-    private static FlatGridKey key(MapView mv, MapScale scale, Viewport vp, double width) {
-        return new FlatGridKey(mv.mode(), mv.gridType(), scaleSignature(scale), vp.aspect, width, mv.cameraTranslationX(), mv.cameraTranslationY());
-    }
-
-    private static ScaleSignature scaleSignature(MapScale scale) {
-        return new ScaleSignature(
-                scale.getInterpolatedXValue(0),
-                scale.getInterpolatedXValue(1),
-                scale.getInterpolatedYValue(0),
-                scale.getInterpolatedYValue(1));
-    }
-
-    private void rebuildIfNeeded(MapView mv, Viewport vp, double width) {
         MapScale scale = mv.scale(vp);
-        FlatGridKey flatGridKey = key(mv, scale, vp, width);
         double xCenter = 0.5 - mv.cameraTranslationX() / vp.aspect;
         double yCenter = 0.5 - mv.cameraTranslationY();
         double halfWidth = 0.5 * width;
-        AxisSignature xSignature = buildAxisSignature(true,
-                scale.getInterpolatedXValue(Math.clamp(xCenter - halfWidth, 0, 1)),
-                scale.getInterpolatedXValue(Math.clamp(xCenter + halfWidth, 0, 1)), vp.width);
-        AxisSignature ySignature = buildAxisSignature(mv.isHpc() || mv.isLatitudinal(),
-                scale.getInterpolatedYValue(Math.clamp(yCenter - halfWidth, 0, 1)),
-                scale.getInterpolatedYValue(Math.clamp(yCenter + halfWidth, 0, 1)), vp.height);
-        if (!needsRebuild(flatGridKey, xSignature, ySignature))
-            return;
-
-        boolean wrap0to360 = mv.gridType() == GridType.Carrington;
-        xAxis = buildAxis(scale, true, wrap0to360, xSignature);
-        yAxis = buildAxis(scale, false, false, ySignature);
-        rebuildShape(mv, vp, width);
-
-        previousKey = flatGridKey;
+        double x0 = scale.getInterpolatedXValue(Math.clamp(xCenter - halfWidth, 0, 1));
+        double x1 = scale.getInterpolatedXValue(Math.clamp(xCenter + halfWidth, 0, 1));
+        double y0 = scale.getInterpolatedYValue(Math.clamp(yCenter - halfWidth, 0, 1));
+        double y1 = scale.getInterpolatedYValue(Math.clamp(yCenter + halfWidth, 0, 1));
+        Axis xAxis = buildAxis(scale, true, true, mv.gridType() == GridType.Carrington,
+                x0, x1, vp.width);
+        Axis yAxis = buildAxis(scale, false, mv.isHpc() || mv.isLatitudinal(), false,
+                y0, y1, vp.height);
+        updateShape(xAxis, yAxis, mv, vp, width);
+        shape.renderShape(GL.TRIANGLES);
+        if (showLabels)
+            drawLabels(xAxis, yAxis, mv, vp, width);
     }
 
-    private boolean needsRebuild(FlatGridKey flatGridKey, AxisSignature xSignature, AxisSignature ySignature) {
-        return !Objects.equals(previousKey, flatGridKey) ||
-                !Objects.equals(xAxis.signature(), xSignature) ||
-                !Objects.equals(yAxis.signature(), ySignature);
-    }
-
-    private void drawLabels(MapView mv, Viewport vp, double width) {
+    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width) {
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
         double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
@@ -118,76 +70,56 @@ public class FlatGrid {
 
         renderer.setColor(Colors.WhiteFloat);
         renderer.begin3DRendering();
-        for (int i = 0; i < xAxis.labels().length; i++) {
-            if (xAxis.axisFlags()[i])
+        for (int i = 0; i < xAxis.labelValues().length; i++) {
+            if (xAxis.positions()[i] == 0)
                 continue;
             double x = RasterLine.snapVertical(vp, width, mv.cameraTranslationX(), xAxis.positions()[i]);
-            renderer.draw(xAxis.labels()[i], (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
+            renderer.draw(FORMATTER.format(xAxis.labelValues()[i]), (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
         }
-        for (int i = 0; i < yAxis.labels().length; i++) {
+        for (int i = 0; i < yAxis.labelValues().length; i++) {
             double y = RasterLine.snapHorizontal(vp, width, mv.cameraTranslationY(), yAxis.positions()[i]);
-            renderer.draw(yAxis.labels()[i], 0, (float) y + labelOffset, 0, textScaleFactor);
+            renderer.draw(FORMATTER.format(yAxis.labelValues()[i]), 0, (float) y + labelOffset, 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }
 
-    private void rebuildShape(MapView mv, Viewport vp, double width) {
+    private void updateShape(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width) {
         int noPoints = RasterLine.vertexCount(xAxis.positions().length + yAxis.positions().length);
         BufVertex vexBuf = new BufVertex(noPoints * GLSLShape.stride);
 
         for (int i = 0; i < xAxis.positions().length; i++) {
-            byte[] color = xAxis.axisFlags()[i] ? AXIS_COLOR : GRID_COLOR;
+            byte[] color = xAxis.positions()[i] == 0 ? AXIS_COLOR : GRID_COLOR;
             RasterLine.putVertical(vp, width, mv.cameraTranslationX(), vp.aspect * xAxis.positions()[i], -0.5, 0.5, THICKNESS_PIXELS, color, vexBuf);
         }
         for (int i = 0; i < yAxis.positions().length; i++) {
-            byte[] color = yAxis.axisFlags()[i] ? AXIS_COLOR : GRID_COLOR;
+            byte[] color = yAxis.positions()[i] == 0 ? AXIS_COLOR : GRID_COLOR;
             RasterLine.putHorizontal(vp, width, mv.cameraTranslationY(), -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], THICKNESS_PIXELS, color, vexBuf);
         }
         shape.setVertex(vexBuf);
     }
 
-    private static AxisSignature buildAxisSignature(boolean angular, double start, double stop, int pixels) {
+    private static Axis buildAxis(MapScale scale, boolean xAxis, boolean angularStep, boolean wrap0to360, double start, double stop, int pixels) {
         double range = Math.abs(stop - start);
-        if (!Double.isFinite(range) || range <= Math.ulp(1.0))
-            return new AxisSignature(0, start, start);
-
-        double targetDivisions = Math.max(1, pixels / TARGET_GRID_PIXELS);
-        double step = angular ? chooseAngularStep(range, targetDivisions) : chooseLinearStep(range, targetDivisions);
-        double lo = Math.min(start, stop);
-        double hi = Math.max(start, stop);
-        double first = Math.ceil(lo / step) * step;
-        double last = Math.floor(hi / step) * step;
-        return new AxisSignature(step, first, last);
-    }
-
-    private static Axis buildAxis(MapScale scale, boolean horizontal, boolean wrap0to360, AxisSignature signature) {
-        String[] labels;
-        double[] positions;
-        boolean[] axisFlags;
-        if (signature.step() == 0) {
-            double value = signature.first();
-            labels = new String[]{FORMATTER.format(wrap0to360 ? wrapCarrington(value) : value)};
-            double position = horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value);
-            boolean axis = Math.abs(position) < AXIS_EPSILON;
-            positions = new double[]{axis ? 0 : position};
-            axisFlags = new boolean[]{axis};
-        } else {
-            double step = signature.step();
-            double first = signature.first();
-            int count = (int) Math.max(0, Math.floor((signature.last() - first) / step) + 1);
-            labels = new String[count];
-            positions = new double[count];
-            axisFlags = new boolean[count];
-            for (int i = 0; i < count; i++) {
-                double value = first + i * step;
-                labels[i] = FORMATTER.format(wrap0to360 ? wrapCarrington(value) : value);
-                double position = horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value);
-                boolean axis = Math.abs(position) < AXIS_EPSILON;
-                positions[i] = axis ? 0 : position;
-                axisFlags[i] = axis;
-            }
+        double first = start;
+        double step = 0;
+        int count = 1;
+        if (Double.isFinite(range) && range > Math.ulp(1.0)) {
+            double targetDivisions = Math.max(1, pixels / TARGET_GRID_PIXELS);
+            step = angularStep ? chooseAngularStep(range, targetDivisions) : chooseLinearStep(range, targetDivisions);
+            first = Math.ceil(Math.min(start, stop) / step) * step;
+            double last = Math.floor(Math.max(start, stop) / step) * step;
+            count = (int) Math.max(0, Math.floor((last - first) / step) + 1);
         }
-        return new Axis(signature, labels, axisFlags, positions);
+
+        double[] labelValues = new double[count];
+        double[] positions = new double[count];
+        for (int i = 0; i < count; i++) {
+            double value = first + i * step;
+            labelValues[i] = wrap0to360 ? wrapCarrington(value) : value;
+            double position = xAxis ? scale.getXValueInv(value) : scale.getYValueInv(value);
+            positions[i] = Math.abs(position) < AXIS_EPSILON ? 0 : position;
+        }
+        return new Axis(labelValues, positions);
     }
 
     private static double chooseAngularStep(double range, double targetDivisions) {
@@ -200,8 +132,6 @@ public class FlatGrid {
     }
 
     private static double chooseLinearStep(double range, double targetDivisions) {
-        if (!Double.isFinite(range) || range <= Math.ulp(1.0))
-            return 1;
         double target = range / targetDivisions;
         double base = Math.pow(10, Math.floor(Math.log10(target)));
         for (double factor : LINEAR_STEP_FACTORS) {
