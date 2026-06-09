@@ -29,6 +29,7 @@ public class FlatGrid {
     private static final double TARGET_GRID_PIXELS = 12 * TEXT_SIZE;
     private static final byte[] GRID_COLOR = Colors.Red;
     private static final byte[] AXIS_COLOR = Colors.Green;
+    private static final double AXIS_EPSILON = 1e-9;
 
     private final GLSLShape shape = new GLSLShape(false);
 
@@ -157,8 +158,10 @@ public class FlatGrid {
         if (signature.step() == 0) {
             double value = signature.first();
             labels = new String[]{FORMATTER.format(wrap0to360 ? wrapCarrington(value) : value)};
-            positions = new double[]{horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value)};
-            axisFlags = new boolean[]{Math.abs(positions[0]) < 1e-9};
+            double position = horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value);
+            boolean axis = Math.abs(position) < AXIS_EPSILON;
+            positions = new double[]{axis ? 0 : position};
+            axisFlags = new boolean[]{axis};
         } else {
             double step = signature.step();
             double first = signature.first();
@@ -169,8 +172,10 @@ public class FlatGrid {
             for (int i = 0; i < count; i++) {
                 double value = first + i * step;
                 labels[i] = FORMATTER.format(wrap0to360 ? wrapCarrington(value) : value);
-                positions[i] = horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value);
-                axisFlags[i] = Math.abs(positions[i]) < 1e-9;
+                double position = horizontal ? scale.getXValueInv(value) : scale.getYValueInv(value);
+                boolean axis = Math.abs(position) < AXIS_EPSILON;
+                positions[i] = axis ? 0 : position;
+                axisFlags[i] = axis;
             }
         }
         return new Axis(signature, labels, axisFlags, positions);
