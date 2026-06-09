@@ -14,7 +14,7 @@ final class Zoom {
     private static final double SPEED_LIMIT = 25;
     private static final double ACCELERATION_LIMIT = 2;
     private static final double VELOCITY_SMOOTHING = 0.80;
-    private static final long GESTURE_TIMEOUT_MS = 200;
+    private static final long GESTURE_TIMEOUT_MS = 1000;
 
     private double velocity = 0;
     private double lastWheelDelta = 0;
