@@ -36,6 +36,12 @@ public class JSONUtils {
         }
     }
 
+    public static JSONArray getArray(URI uri) throws IOException, JSONException {
+        try (NetClient nc = NetClient.of(uri)) {
+            return new JSONArray(new JSONTokener(new BufferedReader(nc.getReader(), BUFSIZ)));
+        }
+    }
+
     public static JSONObject getUncached(URI uri) throws IOException, JSONException {
         try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.NETWORK)) {
             return get(nc.getReader());
