@@ -50,9 +50,6 @@ public class AspiicsDialog extends StandardDialog {
     private static final String JP2_DATA_URL = "https://p3sc.oma.be/datarepfiles/L3_jpeg2000/%s/%06d/%s";
     private static final Dimension RESULT_SIZE = new Dimension(500, 350);
 
-    private static final DataSet FITS = new DataSet(FITS_URL);
-    private static final DataSet JP2 = new DataSet(JP2_URL);
-
     private final JComboBox<Orbit> orbitCombo = new JComboBox<>();
     private final JRadioButton fitsButton = new JRadioButton("FITS", true);
     private final JRadioButton jp2Button = new JRadioButton("JP2");
@@ -90,11 +87,11 @@ public class AspiicsDialog extends StandardDialog {
             if (selected.isEmpty())
                 return;
 
-            Commands.loadImage(selected.stream().map(this::toUri).toList());
+            Commands.loadImage(selected.stream().map(Product::uri).toList());
             setVisible(false);
         });
 
-        AbstractAction close = new AbstractAction() {
+        AbstractAction close = new AbstractAction("Close") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -103,7 +100,6 @@ public class AspiicsDialog extends StandardDialog {
         setDefaultCancelAction(close);
 
         JButton closeButton = new JButton(close);
-        closeButton.setText("Close");
 
         ButtonPanel panel = new ButtonPanel();
         panel.add(addButton, ButtonPanel.AFFIRMATIVE_BUTTON);
@@ -236,12 +232,11 @@ public class AspiicsDialog extends StandardDialog {
             return;
 
         searching = true;
-        foundLabel.setText("Searching...");
         clearProducts();
-        updateButtonState();
-        DataSet dataSet = selectedDataSet();
-        String url = String.format(dataSet.queryUrl(), orbit.orbitId());
-        Task.submit("ASPIICS search", new SearchProducts(url, dataSet), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
+        foundLabel.setText("Searching...");
+        boolean jp2 = jp2Button.isSelected();
+        String url = String.format(jp2 ? JP2_URL : FITS_URL, orbit.orbitId());
+        Task.submit("ASPIICS search", new SearchProducts(url, jp2), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
     }
 
     private void onSearchSuccess(List<Product> result) {
@@ -253,16 +248,20 @@ public class AspiicsDialog extends StandardDialog {
     private void onSearchFailure() {
         searching = false;
         clearProducts();
-        updateButtonState();
     }
 
     private void updateButtonState() {
-        orbitCombo.setEnabled(!loadingOrbits && !searching);
-        fitsButton.setEnabled(!loadingOrbits && !searching);
-        jp2Button.setEnabled(!loadingOrbits && !searching);
-        setEnabled(productButtons, !loadingOrbits && !searching);
-        searchButton.setEnabled(!loadingOrbits && !searching && orbitCombo.getSelectedItem() != null);
-        addButton.setEnabled(!loadingOrbits && !searching && listPane.getSelectedIndex() >= 0);
+        boolean enabled = !busy();
+        orbitCombo.setEnabled(enabled);
+        fitsButton.setEnabled(enabled);
+        jp2Button.setEnabled(enabled);
+        setEnabled(productButtons, enabled);
+        searchButton.setEnabled(enabled && orbitCombo.getSelectedItem() != null);
+        addButton.setEnabled(enabled && listPane.getSelectedIndex() >= 0);
+    }
+
+    private boolean busy() {
+        return loadingOrbits || searching;
     }
 
     private void updateProductList() {
@@ -290,16 +289,6 @@ public class AspiicsDialog extends StandardDialog {
         return productButtons[0].getText();
     }
 
-    private URI toUri(Product product) {
-        if (product.dataSet() == FITS)
-            return URI.create(String.format(FITS_DATA_URL, product.version(), product.name()));
-        return URI.create(String.format(JP2_DATA_URL, product.version(), product.orbitId(), product.name()));
-    }
-
-    private DataSet selectedDataSet() {
-        return fitsButton.isSelected() ? FITS : JP2;
-    }
-
     private static void addToGroup(JRadioButton... buttons) {
         ButtonGroup group = new ButtonGroup();
         for (JRadioButton button : buttons)
@@ -313,9 +302,13 @@ public class AspiicsDialog extends StandardDialog {
 
     private record Orbit(int orbitId, String start, String end) {}
 
-    private record Product(String version, String name, int orbitId, String type, DataSet dataSet) {}
-
-    private record DataSet(String queryUrl) {}
+    private record Product(String version, String name, int orbitId, String type, boolean jp2) {
+        private URI uri() {
+            return jp2
+                    ? URI.create(String.format(JP2_DATA_URL, version, orbitId, name))
+                    : URI.create(String.format(FITS_DATA_URL, version, name));
+        }
+    }
 
     private record LoadOrbits() implements Callable<List<Orbit>> {
         @Override
@@ -332,7 +325,7 @@ public class AspiicsDialog extends StandardDialog {
         }
     }
 
-    private record SearchProducts(String url, DataSet dataSet) implements Callable<List<Product>> {
+    private record SearchProducts(String url, boolean jp2) implements Callable<List<Product>> {
         @Override
         public List<Product> call() throws Exception {
             JSONArray array = JSONUtils.getArray(new URI(url));
@@ -343,7 +336,7 @@ public class AspiicsDialog extends StandardDialog {
                     String name = item.optString("name");
                     String type = productType(name);
                     if (type != null)
-                        products.add(new Product(item.optString("version"), name, item.optInt("orbit_id"), type, dataSet));
+                        products.add(new Product(item.optString("version"), name, item.optInt("orbit_id"), type, jp2));
                 }
             }
             return products;
