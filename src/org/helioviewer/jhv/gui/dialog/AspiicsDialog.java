@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -155,17 +156,6 @@ public class AspiicsDialog extends StandardDialog {
         JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         foundPanel.add(foundLabel);
 
-        listPane.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Product product) {
-                    label.setText(product.name());
-                    label.setToolTipText(product.version() + " orbit " + product.orbitId());
-                }
-                return label;
-            }
-        });
         SearchableUtils.installSearchable(listPane);
         listPane.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting())
@@ -183,7 +173,7 @@ public class AspiicsDialog extends StandardDialog {
         orbitCombo.addActionListener(e -> clearProducts());
 
         JPanel content = new JPanel();
-        content.setLayout(new javax.swing.BoxLayout(content, javax.swing.BoxLayout.PAGE_AXIS));
+        content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         content.add(queryPanel);
         content.add(foundPanel);
         content.add(scrollPane);
@@ -232,11 +222,9 @@ public class AspiicsDialog extends StandardDialog {
             return;
 
         searching = true;
-        clearProducts();
-        foundLabel.setText("Searching...");
+        clearProducts("Searching...");
         boolean jp2 = jp2Button.isSelected();
-        String url = String.format(jp2 ? JP2_URL : FITS_URL, orbit.orbitId());
-        Task.submit("ASPIICS search", new SearchProducts(url, jp2), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
+        Task.submit("ASPIICS search", new SearchProducts(orbit.orbitId(), jp2), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
     }
 
     private void onSearchSuccess(List<Product> result) {
@@ -275,9 +263,13 @@ public class AspiicsDialog extends StandardDialog {
     }
 
     private void clearProducts() {
+        clearProducts("0 found");
+    }
+
+    private void clearProducts(String status) {
         products = List.of();
         listPane.setListData(new Product[0]);
-        foundLabel.setText("0 found");
+        foundLabel.setText(status);
         updateButtonState();
     }
 
@@ -308,6 +300,11 @@ public class AspiicsDialog extends StandardDialog {
                     ? URI.create(String.format(JP2_DATA_URL, version, orbitId, name))
                     : URI.create(String.format(FITS_DATA_URL, version, name));
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     private record LoadOrbits() implements Callable<List<Orbit>> {
@@ -325,9 +322,10 @@ public class AspiicsDialog extends StandardDialog {
         }
     }
 
-    private record SearchProducts(String url, boolean jp2) implements Callable<List<Product>> {
+    private record SearchProducts(int orbitId, boolean jp2) implements Callable<List<Product>> {
         @Override
         public List<Product> call() throws Exception {
+            String url = String.format(jp2 ? JP2_URL : FITS_URL, orbitId);
             JSONArray array = JSONUtils.getArray(new URI(url));
             List<Product> products = new ArrayList<>(array.length());
             for (int i = 0; i < array.length(); i++) {
