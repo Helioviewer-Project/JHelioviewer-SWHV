@@ -45,10 +45,9 @@ import com.jidesoft.swing.SearchableUtils;
 public class AspiicsDialog extends StandardDialog {
 
     private static final String ORBITS_URL = "https://p3sc.oma.be/api/l3_orbit_time_ranges";
-    private static final String FITS_URL = "https://p3sc.oma.be/api/L3?select=version,name,orbit_id&orbit_id=eq.%d&active=is.true";
-    private static final String JP2_URL = "https://p3sc.oma.be/api/L3_jpeg2000?select=version,name,orbit_id&orbit_id=eq.%d&active=is.true";
-    private static final String FITS_DATA_URL = "https://p3sc.oma.be/datarepfiles/L3/%s/%s";
-    private static final String JP2_DATA_URL = "https://p3sc.oma.be/datarepfiles/L3_jpeg2000/%s/%06d/%s";
+    private static final String FITS_URL = "https://p3sc.oma.be/api/L3?select=datalocation&orbit_id=eq.%d&active=is.true";
+    private static final String JP2_URL = "https://p3sc.oma.be/api/L3_jpeg2000?select=datalocation&orbit_id=eq.%d&active=is.true";
+    private static final String DATA_URL = "https://p3sc.oma.be/datarepfiles/";
     private static final Dimension RESULT_SIZE = new Dimension(500, 350);
 
     private final JComboBox<Orbit> orbitCombo = new JComboBox<>();
@@ -63,9 +62,9 @@ public class AspiicsDialog extends StandardDialog {
     };
     private final JButton searchButton = new JButton("Search");
     private final JButton addButton = new JButton("Add");
-    private final JList<Product> listPane = new JList<>();
+    private final JList<String> listPane = new JList<>();
     private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
-    private List<Product> products = List.of();
+    private List<String> products = List.of();
     private boolean loadingOrbits;
     private boolean searching;
 
@@ -84,11 +83,8 @@ public class AspiicsDialog extends StandardDialog {
     @Override
     public ButtonPanel createButtonPanel() {
         addButton.addActionListener(e -> {
-            List<Product> selected = listPane.getSelectedValuesList();
-            if (selected.isEmpty())
-                return;
-
-            Commands.loadImage(selected.stream().map(Product::uri).toList());
+            List<String> selected = listPane.getSelectedValuesList();
+            Commands.loadImage(selected.stream().map(AspiicsDialog::uri).toList());
             setVisible(false);
         });
 
@@ -116,10 +112,8 @@ public class AspiicsDialog extends StandardDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Orbit(int orbitId, String start, String end)) {
-                    label.setText(Integer.toString(orbitId));
+                if (value instanceof Orbit(int ignored, String start, String end))
                     label.setToolTipText(start + " - " + end);
-                }
                 return label;
             }
         });
@@ -153,14 +147,23 @@ public class AspiicsDialog extends StandardDialog {
         queryPanel.add(productPanel, gc);
         gc.gridwidth = 1;
 
-        JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        foundPanel.add(foundLabel);
-
+        listPane.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof String datalocation)
+                    label.setText(fileName(datalocation));
+                return label;
+            }
+        });
         SearchableUtils.installSearchable(listPane);
         listPane.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting())
                 updateButtonState();
         });
+
+        JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
+        foundPanel.add(foundLabel);
 
         JScrollPane scrollPane = new JScrollPane(listPane);
         scrollPane.setPreferredSize(RESULT_SIZE);
@@ -227,7 +230,7 @@ public class AspiicsDialog extends StandardDialog {
         Task.submit("ASPIICS search", new SearchProducts(orbit.orbitId(), jp2), this::onSearchSuccess, (logContext, t) -> onSearchFailure());
     }
 
-    private void onSearchSuccess(List<Product> result) {
+    private void onSearchSuccess(List<String> result) {
         searching = false;
         products = result;
         updateProductList();
@@ -239,7 +242,7 @@ public class AspiicsDialog extends StandardDialog {
     }
 
     private void updateButtonState() {
-        boolean enabled = !busy();
+        boolean enabled = !loadingOrbits && !searching;
         orbitCombo.setEnabled(enabled);
         fitsButton.setEnabled(enabled);
         jp2Button.setEnabled(enabled);
@@ -248,15 +251,11 @@ public class AspiicsDialog extends StandardDialog {
         addButton.setEnabled(enabled && listPane.getSelectedIndex() >= 0);
     }
 
-    private boolean busy() {
-        return loadingOrbits || searching;
-    }
-
     private void updateProductList() {
         String type = selectedProductType();
-        Product[] filtered = products.stream()
-                .filter(product -> product.type().equals(type))
-                .toArray(Product[]::new);
+        String[] filtered = products.stream()
+                .filter(datalocation -> type.equals(productType(datalocation)))
+                .toArray(String[]::new);
         listPane.setListData(filtered);
         foundLabel.setText(filtered.length + " found");
         updateButtonState();
@@ -268,7 +267,7 @@ public class AspiicsDialog extends StandardDialog {
 
     private void clearProducts(String status) {
         products = List.of();
-        listPane.setListData(new Product[0]);
+        listPane.setListData(new String[0]);
         foundLabel.setText(status);
         updateButtonState();
     }
@@ -292,18 +291,26 @@ public class AspiicsDialog extends StandardDialog {
             button.setEnabled(enabled);
     }
 
-    private record Orbit(int orbitId, String start, String end) {}
+    private static String productType(String datalocation) {
+        String name = fileName(datalocation);
+        int start = "aspiics_".length();
+        int end = name.indexOf("_l3_", start);
+        return end > start ? name.substring(start, end) : null;
+    }
 
-    private record Product(String version, String name, int orbitId, String type, boolean jp2) {
-        private URI uri() {
-            return jp2
-                    ? URI.create(String.format(JP2_DATA_URL, version, orbitId, name))
-                    : URI.create(String.format(FITS_DATA_URL, version, name));
-        }
+    private static URI uri(String datalocation) {
+        return URI.create(DATA_URL + datalocation);
+    }
 
+    private static String fileName(String datalocation) {
+        int slash = datalocation.lastIndexOf('/');
+        return slash >= 0 ? datalocation.substring(slash + 1) : datalocation;
+    }
+
+    private record Orbit(int orbitId, String start, String end) {
         @Override
         public String toString() {
-            return name;
+            return Integer.toString(orbitId);
         }
     }
 
@@ -322,29 +329,23 @@ public class AspiicsDialog extends StandardDialog {
         }
     }
 
-    private record SearchProducts(int orbitId, boolean jp2) implements Callable<List<Product>> {
+    private record SearchProducts(int orbitId, boolean jp2) implements Callable<List<String>> {
         @Override
-        public List<Product> call() throws Exception {
+        public List<String> call() throws Exception {
             String url = String.format(jp2 ? JP2_URL : FITS_URL, orbitId);
             JSONArray array = JSONUtils.getArray(new URI(url));
-            List<Product> products = new ArrayList<>(array.length());
+            List<String> products = new ArrayList<>(array.length());
             for (int i = 0; i < array.length(); i++) {
                 JSONObject item = array.optJSONObject(i);
                 if (item != null) {
-                    String name = item.optString("name");
-                    String type = productType(name);
-                    if (type != null)
-                        products.add(new Product(item.optString("version"), name, item.optInt("orbit_id"), type, jp2));
+                    String datalocation = item.optString("datalocation");
+                    if (productType(datalocation) != null)
+                        products.add(datalocation);
                 }
             }
             return products;
         }
 
-        private static String productType(String name) {
-            int start = "aspiics_".length();
-            int end = name.indexOf("_l3_", start);
-            return end > start ? name.substring(start, end) : null;
-        }
     }
 
 }
