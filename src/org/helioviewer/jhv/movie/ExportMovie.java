@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.export;
+package org.helioviewer.jhv.movie;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public final class ExportMovie implements Movie.Listener {
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("JHV-EncodeMovie"));
     private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
 
-    private static MovieExporter exporter;
+    private static ExportWriter exporter;
     private static GLGrab grabber;
 
     private static ViewState.RecordingMode mode;
@@ -144,7 +144,7 @@ public final class ExportMovie implements Movie.Listener {
         grabber = new GLGrab(canvasWidth, canvasHeight);
 
         if (mode == ViewState.RecordingMode.SHOT) {
-            exporter = new MovieExporter(VideoFormat.PNG, canvasWidth, exportHeight, fps);
+            exporter = new ExportWriter(VideoFormat.PNG, canvasWidth, exportHeight, fps);
             shallStop = true;
 
             recording = true;
@@ -155,7 +155,7 @@ public final class ExportMovie implements Movie.Listener {
             try {
                 format = VideoFormat.valueOf(Settings.getProperty("video.format"));
             } catch (Exception ignore) {}
-            exporter = new MovieExporter(format, canvasWidth, exportHeight, fps);
+            exporter = new ExportWriter(format, canvasWidth, exportHeight, fps);
 
             recording = true;
             notifyStatusChanged();
@@ -223,12 +223,12 @@ public final class ExportMovie implements Movie.Listener {
         statusListeners.forEach(StatusListener::recordingStatusChanged);
     }
 
-    private record FrameConsumer(MovieExporter movieExporter, BufferedImage mainImage, BufferedImage eveImage,
+    private record FrameConsumer(ExportWriter exportWriter, BufferedImage mainImage, BufferedImage eveImage,
                                  int movieLinePosition) implements Runnable {
         @Override
         public void run() {
             try {
-                movieExporter.encode(mainImage, eveImage, movieLinePosition);
+                exportWriter.encode(mainImage, eveImage, movieLinePosition);
             } catch (Exception e) {
                 Log.error(e);
             } finally {
@@ -238,11 +238,11 @@ public final class ExportMovie implements Movie.Listener {
         }
     }
 
-    private record CloseWriter(MovieExporter movieExporter) implements Runnable {
+    private record CloseWriter(ExportWriter exportWriter) implements Runnable {
         @Override
         public void run() {
             try {
-                String output = movieExporter.close();
+                String output = exportWriter.close();
                 recordingFinished(true, "Recording finished.", output);
             } catch (Exception e) {
                 Log.error(e);

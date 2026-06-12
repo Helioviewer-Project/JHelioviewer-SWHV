@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.export;
+package org.helioviewer.jhv.movie;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,7 +20,7 @@ import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
-class MovieExporter {
+class ExportWriter {
 
     private static final long FFMPEG_TIMEOUT_MINUTES = 30;
     private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
@@ -33,7 +33,7 @@ class MovieExporter {
 
     private File tempFile;
 
-    MovieExporter(VideoFormat _format, int _w, int _h, int _fps) {
+    ExportWriter(VideoFormat _format, int _w, int _h, int _fps) {
         prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         format = _format;
         w = _w;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.export;
+package org.helioviewer.jhv.movie;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv;
 
-import org.helioviewer.jhv.export.ExportMovie;
+import org.helioviewer.jhv.movie.ExportMovie;
 
 public class ExitHooks {
 

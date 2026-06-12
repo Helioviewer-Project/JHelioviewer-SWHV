@@ -7,14 +7,14 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
+import org.helioviewer.jhv.movie.ExportMovie;
 
 public final class GLRenderer {
 
