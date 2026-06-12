@@ -11,9 +11,9 @@ import org.helioviewer.jhv.Message;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-public final class Tasks {
+public final class Task {
 
-    private Tasks() {}
+    private Task() {}
 
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                        @Nonnull FailureHandler onFailure) {

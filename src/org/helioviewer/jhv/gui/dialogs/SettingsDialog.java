@@ -43,7 +43,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -55,7 +55,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
     private final JLabel cacheSizeLabel = new JLabel(cacheSizeText("--.-"), JLabel.RIGHT);
 
     private void updateCacheSize() {
-        Tasks.submit("cache-size",
+        Task.submit("cache-size",
                 JPIPCacheManager::getSize,
                 size -> cacheSizeLabel.setText(cacheSizeText(String.format("%.1f", size / (1024 * 1024 * 1024.)))),
                 Log::error);
@@ -238,7 +238,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
         JButton clearCache = new JButton("Clear Cache");
         clearCache.addActionListener(e -> {
             clearCache.setEnabled(false);
-            Tasks.submit("clear-cache", () -> {
+            Task.submit("clear-cache", () -> {
                 JPIPCacheManager.clear();
                 return null;
             }, _ -> {

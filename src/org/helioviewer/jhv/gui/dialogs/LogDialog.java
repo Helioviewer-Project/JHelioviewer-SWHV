@@ -18,13 +18,13 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 public class LogDialog implements Interfaces.ShowableDialog {
 
     @Override
     public void showDialog() {
-        Tasks.submit("log", Log::get, LogDialog::showDialog, Log::error);
+        Task.submit("log", Log::get, LogDialog::showDialog, Log::error);
     }
 
     private static void showDialog(String log) {

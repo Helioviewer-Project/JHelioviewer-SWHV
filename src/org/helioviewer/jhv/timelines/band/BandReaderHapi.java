@@ -20,7 +20,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.io.UriTemplate;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -46,15 +46,15 @@ public class BandReaderHapi {
     private static Catalog theCatalog; //!
 
     public static void requestCatalog() {
-        Tasks.submit(ROBserver, new LoadHapiCatalog(ROBserver), BandReaderHapi::onSuccessCatalog, BandReaderHapi::onFailure);
+        Task.submit(ROBserver, new LoadHapiCatalog(ROBserver), BandReaderHapi::onSuccessCatalog, BandReaderHapi::onFailure);
     }
 
     static Future<Band.Data> requestData(String url, long start, long end) {
-        return Tasks.submit(url, new LoadHapiStream(theCatalog, url, start, end), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
+        return Task.submit(url, new LoadHapiStream(theCatalog, url, start, end), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
     }
 
     public static void loadUri(URI uri) {
-        Tasks.submit(uri.toString(), new LoadHapiUri(uri), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
+        Task.submit(uri.toString(), new LoadHapiUri(uri), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
     }
 
     private record LoadHapiCatalog(String server) implements Callable<Catalog> {

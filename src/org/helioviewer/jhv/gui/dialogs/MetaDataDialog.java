@@ -28,7 +28,7 @@ import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.FitsMetaData;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.w3c.dom.Document;
@@ -135,7 +135,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
                 "Observation Date: " + m.getViewpoint().time);
 
         int request = ++metadataRequest;
-        Tasks.submit("metadata", () -> parseMetadata(layer, m), parsed -> applyMetadata(request, parsed), Log::error);
+        Task.submit("metadata", () -> parseMetadata(layer, m), parsed -> applyMetadata(request, parsed), Log::error);
     }
 
     private void applyMetadata(int request, ParsedMetadata parsed) {
@@ -179,7 +179,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         if (xml == null || filename == null)
             return;
 
-        Tasks.submit("metadata-export", () -> {
+        Task.submit("metadata-export", () -> {
             Path path = Path.of(JHVDirectory.EXPORTS.getPath(), filename);
             try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                 writer.write(xml, 0, xml.length());

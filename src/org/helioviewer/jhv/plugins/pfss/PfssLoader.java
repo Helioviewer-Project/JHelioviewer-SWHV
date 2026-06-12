@@ -12,7 +12,7 @@ import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -44,9 +44,9 @@ class PfssLoader {
         submit(uri.toString(), new DataLoader(time, uri), result -> onSuccessData(uri, result), (logContext, t) -> onFailureData(uri, t));
     }
 
-    private static <T> void submit(String logContext, Callable<T> task, Consumer<T> onSuccess, Tasks.FailureHandler onFailure) {
+    private static <T> void submit(String logContext, Callable<T> task, Consumer<T> onSuccess, Task.FailureHandler onFailure) {
         cache().beginDownload();
-        Tasks.submit(logContext, task, onSuccess, onFailure);
+        Task.submit(logContext, task, onSuccess, onFailure);
     }
 
     private record ListLoader(long start, long end) implements Callable<Void> {

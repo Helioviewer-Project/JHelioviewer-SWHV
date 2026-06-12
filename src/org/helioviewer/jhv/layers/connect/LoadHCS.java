@@ -12,7 +12,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 public class LoadHCS {
 
@@ -21,7 +21,7 @@ public class LoadHCS {
     }
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        Tasks.submit(uri.toString(), new HCS(uri), receiver::setHCS, "Error getting the data");
+        Task.submit(uri.toString(), new HCS(uri), receiver::setHCS, "Error getting the data");
     }
 
     private record HCS(URI uri) implements Callable<List<Vec3>> {

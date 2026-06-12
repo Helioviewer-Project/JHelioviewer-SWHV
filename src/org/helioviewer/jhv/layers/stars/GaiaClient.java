@@ -18,7 +18,7 @@ import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.jastronomy.jsofa.JSOFA;
@@ -41,7 +41,7 @@ public final class GaiaClient {
     private GaiaClient() {}
 
     public static void submitSearch(Receiver receiver, Position viewpoint) {
-        Tasks.submit("gaia", new Query(viewpoint), result -> onSuccess(receiver, viewpoint, result), (logContext, t) -> onFailure(receiver, viewpoint, t));
+        Task.submit("gaia", new Query(viewpoint), result -> onSuccess(receiver, viewpoint, result), (logContext, t) -> onFailure(receiver, viewpoint, t));
     }
 
     public interface Receiver {

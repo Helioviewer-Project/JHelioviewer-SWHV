@@ -12,7 +12,7 @@ import org.helioviewer.jhv.Message;
 //import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 //import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
@@ -26,13 +26,13 @@ public class LoadSunJSON {
     public static void submit(@Nonnull List<URI> uriList) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            Tasks.submit("sunjson", new LoadSunJSONURI(uriList), receiver::setGeometry, LoadSunJSON::onFailure);
+            Task.submit("sunjson", new LoadSunJSONURI(uriList), receiver::setGeometry, LoadSunJSON::onFailure);
     }
 
     public static void submit(@Nonnull String json) {
         Receiver receiver = Layers.getConnectionLayer();
         if (receiver != null) // ConnectionLayer() can be null in current releases
-            Tasks.submit("sunjson", new LoadSunJSONString(json), receiver::setGeometry, LoadSunJSON::onFailure);
+            Task.submit("sunjson", new LoadSunJSONString(json), receiver::setGeometry, LoadSunJSON::onFailure);
     }
 
     private record LoadSunJSONURI(List<URI> uriList) implements Callable<List<SunJSONTypes.GeometryCollection>> {

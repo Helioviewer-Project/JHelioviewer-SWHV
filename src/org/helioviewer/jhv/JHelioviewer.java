@@ -22,7 +22,7 @@ import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 public class JHelioviewer {
 
@@ -99,7 +99,7 @@ public class JHelioviewer {
             frame.setVisible(true);
             UITimer.start();
 
-            Tasks.submit("init", new Init(true), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
+            Task.submit("init", new Init(true), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
         });
     }
 
@@ -111,7 +111,7 @@ public class JHelioviewer {
 
             loadPlugins(false);
 
-            Tasks.submit("init", new Init(false), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
+            Task.submit("init", new Init(false), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
         });
     }
 
