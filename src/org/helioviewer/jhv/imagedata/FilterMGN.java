@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.imagedata;
 
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.thread.ParallelRange;
 
 class FilterMGN implements ImageFilter.Algorithm {
 

@@ -3,6 +3,7 @@ package org.helioviewer.jhv.imagedata;
 import java.util.Arrays;
 
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.thread.ParallelRange;
 
 class FilterWOW implements ImageFilter.Algorithm {
 

@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.imagedata;
 
+import org.helioviewer.jhv.thread.ParallelRange;
+
 //import com.google.common.base.Stopwatch;
 
 public class ImageFilter {
