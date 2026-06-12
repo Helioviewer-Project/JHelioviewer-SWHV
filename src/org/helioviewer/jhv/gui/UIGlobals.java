@@ -23,7 +23,7 @@ import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
 import org.helioviewer.jhv.io.FileUtils;
 
-public class UIGlobals {
+public final class UIGlobals {
 
     public static void setLaf() {
         try {
@@ -189,4 +189,5 @@ public class UIGlobals {
     public static Color TL_MOVIE_FRAME_COLOR;
     public static Color TL_MOVIE_INTERVAL_COLOR;
 
+    private UIGlobals() {}
 }

@@ -5,8 +5,6 @@ import org.helioviewer.jhv.layers.Layers;
 
 public final class Display {
 
-    private Display() {}
-
     public static MapMode mode = MapMode.Orthographic;
     public static boolean multiview = false;
     public static boolean whiteBackground = false;
@@ -129,4 +127,6 @@ public final class Display {
     public static boolean getShowCorona() {
         return showCorona;
     }
+
+    private Display() {}
 }

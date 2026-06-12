@@ -12,8 +12,6 @@ import org.helioviewer.jhv.base.Regex;
 
 public final class TransferLoad {
 
-    private TransferLoad() {}
-
     public static void transferFileList(List<?> objects) {
         List<URI> imageUris = new ArrayList<>(objects.size());
         List<URI> jsonUris = new ArrayList<>(objects.size());
@@ -75,4 +73,5 @@ public final class TransferLoad {
         });
     }
 
+    private TransferLoad() {}
 }

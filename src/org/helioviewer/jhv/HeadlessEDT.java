@@ -6,8 +6,6 @@ import java.util.concurrent.CountDownLatch;
 
 final class HeadlessEDT {
 
-    private HeadlessEDT() {}
-
     static void invokeLater(Runnable startup) throws InterruptedException {
         CountDownLatch keepAlive = new CountDownLatch(1);
         EventQueue.invokeLater(() -> {
@@ -33,4 +31,5 @@ final class HeadlessEDT {
         }
     }
 
+    private HeadlessEDT() {}
 }

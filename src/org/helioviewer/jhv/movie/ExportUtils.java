@@ -11,8 +11,6 @@ import org.helioviewer.jhv.image.nio.NativeImageFactory;
 
 class ExportUtils {
 
-    private ExportUtils() {}
-
     static BufferedImage scaleImage(BufferedImage img, int newW, int newH, int movieLinePosition) {
         BufferedImage simg = NativeImageFactory.createRGBImage(newW, newH);
 
@@ -31,4 +29,5 @@ class ExportUtils {
         return simg;
     }
 
+    private ExportUtils() {}
 }

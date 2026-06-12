@@ -7,7 +7,7 @@ import javax.swing.Timer;
 import org.helioviewer.jhv.gui.components.MoviePanel;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 
-public class UITimer {
+public final class UITimer {
 
     private static final ArrayList<Interfaces.LazyComponent> lazyComponents = new ArrayList<>();
 
@@ -38,4 +38,5 @@ public class UITimer {
         lazyComponents.forEach(Interfaces.LazyComponent::lazyRepaint);
     }
 
+    private UITimer() {}
 }

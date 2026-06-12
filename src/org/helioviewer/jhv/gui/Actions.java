@@ -32,7 +32,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
 @SuppressWarnings({"serial", "this-escape"})
-public class Actions {
+public final class Actions {
 
     public static final AbstractAction PLAY_PAUSE = new PlayPauseAction();
     public static final AbstractAction PREVIOUS_FRAME = new PreviousFrameAction();
@@ -420,4 +420,5 @@ public class Actions {
         }
     }
 
+    private Actions() {}
 }

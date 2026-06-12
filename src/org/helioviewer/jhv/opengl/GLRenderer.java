@@ -20,8 +20,6 @@ public final class GLRenderer {
 
     private static MapView mapView = initialMapView();
 
-    private GLRenderer() {}
-
     private static MapView initialMapView() {
         return createMapView(Display.getCamera(), Sun.StartEarth);
     }
@@ -200,4 +198,5 @@ public final class GLRenderer {
         Layers.renderFullFloat(vp);
     }
 
+    private GLRenderer() {}
 }

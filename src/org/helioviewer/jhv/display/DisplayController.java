@@ -21,8 +21,6 @@ import org.json.JSONObject;
 
 public final class DisplayController {
 
-    private DisplayController() {}
-
     public enum ViewpointApplyMode {
         RESET,
         KEEP_TRANSFORM
@@ -245,4 +243,6 @@ public final class DisplayController {
     public static void cameraFromJson(JSONObject json) {
         Display.getCamera().fromJson(json, viewpointModel.getViewpoint());
     }
+
+    private DisplayController() {}
 }

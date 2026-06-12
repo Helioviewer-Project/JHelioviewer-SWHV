@@ -2,8 +2,6 @@ package org.helioviewer.jhv.math;
 
 public final class PolarBasis {
 
-    private PolarBasis() {}
-
     public static double x(double radius, double angleRadians) {
         return -radius * Math.sin(angleRadians);
     }
@@ -23,4 +21,6 @@ public final class PolarBasis {
     public static Vec3 vec3(double radius, double angleRadians) {
         return new Vec3(x(radius, angleRadians), y(radius, angleRadians), 0);
     }
+
+    private PolarBasis() {}
 }

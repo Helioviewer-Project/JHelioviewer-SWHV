@@ -16,8 +16,6 @@ public final class GLText {
 
     private static SdfTextRenderer renderer;
 
-    private GLText() {}
-
     public static SdfTextRenderer renderer() {
         if (renderer == null)
             renderer = new SdfTextRenderer();
@@ -68,4 +66,5 @@ public final class GLText {
         renderer.endRendering();
     }
 
+    private GLText() {}
 }

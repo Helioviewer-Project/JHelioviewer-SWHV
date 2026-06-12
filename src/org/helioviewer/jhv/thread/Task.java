@@ -13,8 +13,6 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public final class Task {
 
-    private Task() {}
-
     public static <T> Future<T> submit(@Nonnull Callable<T> task, @Nonnull FutureCallback<T> callback) {
         return EDTCallbackExecutor.pool.submit(task, callback);
     }
@@ -51,4 +49,5 @@ public final class Task {
         Message.err(errorMessage, t.getMessage());
     }
 
+    private Task() {}
 }

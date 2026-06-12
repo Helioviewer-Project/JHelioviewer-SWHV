@@ -41,8 +41,6 @@ import org.helioviewer.jhv.thread.Task;
 
 public final class JHVFrame {
 
-    private JHVFrame() {}
-
     @SuppressWarnings("serial")
     private static final class FixedWidthPanel extends JPanel {
         private int fixedWidth = -1;
@@ -309,4 +307,5 @@ public final class JHVFrame {
         return menuBar;
     }
 
+    private JHVFrame() {}
 }

@@ -16,8 +16,6 @@ import org.json.JSONObject;
 
 public final class ViewState {
 
-    private ViewState() {}
-
     public interface ModeListener {
         void modeStateChanged();
     }
@@ -599,4 +597,6 @@ public final class ViewState {
     private static void notifyRecordingConfigListeners() {
         recordingConfigListeners.forEach(RecordingConfigListener::recordingConfigChanged);
     }
+
+    private ViewState() {}
 }

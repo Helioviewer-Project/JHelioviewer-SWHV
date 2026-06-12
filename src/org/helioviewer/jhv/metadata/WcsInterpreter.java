@@ -45,8 +45,6 @@ final class WcsInterpreter {
             double pc21,
             double pc22) {}
 
-    private WcsInterpreter() {}
-
     static Result read(MetaDataContainer m) {
         String ctype1 = m.getString("CTYPE1").orElse("");
         String ctype2 = m.getString("CTYPE2").orElse("");
@@ -157,4 +155,6 @@ final class WcsInterpreter {
                 .or(() -> m.getDouble("CROTA2").map(Math::toRadians))
                 .orElse(0.);
     }
+
+    private WcsInterpreter() {}
 }

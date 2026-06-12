@@ -9,8 +9,6 @@ public final class WcsProjection {
 
     private static final int ZPN_BISECTION_STEPS = 50;
 
-    private WcsProjection() {}
-
     public static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double x, double y) {
         Quat crota = wcsHeader.crota;
         double vx = crota.w * x - crota.z * y;
@@ -185,4 +183,6 @@ public final class WcsProjection {
             derivative = derivative * eta + i * pv2[i];
         return derivative;
     }
+
+    private WcsProjection() {}
 }

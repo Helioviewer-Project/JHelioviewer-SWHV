@@ -48,8 +48,6 @@ public final class XMLUtils {
         return builder.parse(new InputSource(new StringReader(xml)));
     }
 
-    private XMLUtils() {}
-
 /*
     private static void indent(int level) {
         for (int i = 0; i < level; i++)
@@ -91,4 +89,6 @@ public final class XMLUtils {
         System.out.println("</" + node.getNodeName() + ">");
     }
 */
+
+    private XMLUtils() {}
 }

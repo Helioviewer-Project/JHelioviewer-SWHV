@@ -13,8 +13,6 @@ final class AngleJAWT {
         T apply(long platformInfo);
     }
 
-    private AngleJAWT() {}
-
     static <T> T withPlatformInfo(Canvas canvas, PlatformInfoAccess<T> access) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             JAWT awt = JAWT.calloc(stack);
@@ -54,4 +52,6 @@ final class AngleJAWT {
             }
         }
     }
+
+    private AngleJAWT() {}
 }

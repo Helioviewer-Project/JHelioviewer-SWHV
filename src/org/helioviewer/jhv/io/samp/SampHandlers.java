@@ -15,8 +15,6 @@ final class SampHandlers {
 
     private static final Map<String, String> harmless = Collections.singletonMap("x-samp.mostly-harmless", "1");
 
-    private SampHandlers() {}
-
     @FunctionalInterface
     interface CheckedHandler {
         void accept(String senderId, String senderName, Message msg) throws Exception;
@@ -43,4 +41,5 @@ final class SampHandlers {
         return value == null ? null : value.toString();
     }
 
+    private SampHandlers() {}
 }

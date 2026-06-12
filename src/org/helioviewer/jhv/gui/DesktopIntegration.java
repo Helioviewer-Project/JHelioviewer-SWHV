@@ -24,8 +24,6 @@ public final class DesktopIntegration {
             openURL(e.getURL().toString());
     };
 
-    private DesktopIntegration() {}
-
     public static void openURL(String url) {
         try {
             if (url == null)
@@ -56,4 +54,5 @@ public final class DesktopIntegration {
         Desktop.getDesktop().setAboutHandler(handler);
     }
 
+    private DesktopIntegration() {}
 }

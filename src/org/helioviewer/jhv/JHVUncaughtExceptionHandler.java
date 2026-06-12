@@ -21,8 +21,6 @@ import org.helioviewer.jhv.gui.components.base.HTMLPane;
 
 class JHVUncaughtExceptionHandler {
 
-    private JHVUncaughtExceptionHandler() {}
-
     // This method should be called once when the application starts
     public static void setupHandlerForThread(boolean headless) {
         Thread.setDefaultUncaughtExceptionHandler(headless ? new Headless() : new GUI());
@@ -107,4 +105,5 @@ class JHVUncaughtExceptionHandler {
         }
     }
 
+    private JHVUncaughtExceptionHandler() {}
 }
