@@ -10,7 +10,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.thread.JHVThread;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;
@@ -98,7 +98,7 @@ public final class PositionLoad {
     public static PositionLoad submit(StatusReceiver receiver, SpaceObject observer, SpaceObject target, Frame frame, long start, long end) {
         receiver.setStatus("Loading...");
 
-        Future<PositionResponse> future = Tasks.submit(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
+        Future<PositionResponse> future = Task.submit(target.getSpiceName(), new LoadPosition(observer, target, frame, start, end),
                 result -> onSuccess(receiver), (logContext, t) -> onFailure(receiver, t));
         return new PositionLoad(receiver, target, future);
     }

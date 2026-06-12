@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.everit.json.schema.Schema;
@@ -19,7 +19,7 @@ import org.json.JSONObject;
 class LoadSources {
 
     static void submit(@Nonnull String server) {
-        Tasks.submit(server, new SourcesLoad(server), DataSources::setupSources, LoadSources::onFailure);
+        Task.submit(server, new SourcesLoad(server), DataSources::setupSources, LoadSources::onFailure);
     }
 
     private record SourcesLoad(String server) implements Callable<DataSourcesParser> {

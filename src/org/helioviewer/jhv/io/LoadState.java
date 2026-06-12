@@ -10,18 +10,18 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 import org.json.JSONObject;
 
 class LoadState {
 
     static void submit(@Nullable Commands.OperationContext context, @Nonnull URI uri) {
-        Tasks.submit(uri.toString(), new LoadStateURI(uri), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
+        Task.submit(uri.toString(), new LoadStateURI(uri), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
     }
 
     static void submit(@Nullable Commands.OperationContext context, @Nonnull String json) {
-        Tasks.submit("state", new LoadStateString(json), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
+        Task.submit("state", new LoadStateString(json), result -> onSuccess(context, result), (logContext, t) -> onFailure(context, logContext, t));
     }
 
     private static void onSuccess(@Nullable Commands.OperationContext context, JSONObject state) {

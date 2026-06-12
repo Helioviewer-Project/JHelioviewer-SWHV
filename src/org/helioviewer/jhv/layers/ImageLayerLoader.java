@@ -22,7 +22,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.thread.JHVThread;
 import org.helioviewer.jhv.thread.LatestWorker;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.view.ManyView;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.J2KView;
@@ -51,7 +51,7 @@ final class ImageLayerLoader {
     void load(APIRequest req) {
         cancelLoad();
         int gen = ++loadGeneration;
-        loadFuture = Tasks.submit("request", () -> {
+        loadFuture = Task.submit("request", () -> {
                     URI uri = requestAPI(req.toJpipRequest());
                     return uri == null ? null : createView(req, uri);
                 },
@@ -62,7 +62,7 @@ final class ImageLayerLoader {
     void load(List<URI> uriList) {
         cancelLoad();
         int gen = ++loadGeneration;
-        loadFuture = Tasks.submit(uriList.toString(), () -> loadUri(uriList),
+        loadFuture = Task.submit(uriList.toString(), () -> loadUri(uriList),
                 result -> onSuccess(result, gen),
                 (logContext, t) -> onFailure(t, gen));
     }

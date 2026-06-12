@@ -12,7 +12,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -26,7 +26,7 @@ public class LoadFootpoint {
     private static final DateTimeFormatter euroTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public static void submit(@Nonnull URI uri, Receiver receiver) {
-        Tasks.submit(uri.toString(), new Footpoint(uri), receiver::setPositionMap, "Error getting the data");
+        Task.submit(uri.toString(), new Footpoint(uri), receiver::setPositionMap, "Error getting the data");
     }
 
     private record Footpoint(URI uri) implements Callable<TimeMap<Position.Cartesian>> {

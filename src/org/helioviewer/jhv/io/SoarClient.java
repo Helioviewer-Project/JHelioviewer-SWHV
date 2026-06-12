@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONArray;
@@ -35,7 +35,7 @@ public final class SoarClient {
     }
 
     private static void doDataSearch(@Nonnull ReceiverItems receiver, String adql) {
-        Tasks.submit("soar", new QueryItems(adql), receiver::setSoarResponseItems, "Error getting the data");
+        Task.submit("soar", new QueryItems(adql), receiver::setSoarResponseItems, "Error getting the data");
     }
 
     public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull List<String> descriptors, @Nonnull String level, long start, long end) {
@@ -47,7 +47,7 @@ public final class SoarClient {
     }
 
     public static void submitGetSoops(@Nonnull ReceiverSoops receiver) {
-        Tasks.submit("soar", new QuerySoops(querySoops), receiver::setSoarResponseSoops,
+        Task.submit("soar", new QuerySoops(querySoops), receiver::setSoarResponseSoops,
                 "An error occurred querying the server");
     }
 
@@ -71,7 +71,7 @@ public final class SoarClient {
     }
 
     static void submitTable(@Nonnull URI uri) {
-        Tasks.submit(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
+        Task.submit(uri.toString(), new QueryTable(uri), SoarClient::submitLoad, "An error occurred querying the server");
     }
 
     private static String adqlSearchTime(List<String> descriptors, String level, long start, long end) {

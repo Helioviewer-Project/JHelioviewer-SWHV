@@ -10,7 +10,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.EDTQueue;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandDataProvider;
 import org.helioviewer.jhv.timelines.band.BandReaderCdf;
@@ -21,15 +21,15 @@ import org.json.JSONObject;
 class LoadRequest {
 
     static void submit(@Nonnull URI uri) {
-        Tasks.submit(uri.toString(), new LoadRequestURI(uri), Tasks::doNothing, "Error getting the data");
+        Task.submit(uri.toString(), new LoadRequestURI(uri), Task::doNothing, "Error getting the data");
     }
 
     static void submit(@Nonnull String json) {
-        Tasks.submit("request", new LoadRequestString(json), Tasks::doNothing, "Error getting the data");
+        Task.submit("request", new LoadRequestString(json), Task::doNothing, "Error getting the data");
     }
 
     static void submitCDF(@Nonnull List<URI> uriList) {
-        Tasks.submit("cdf", new LoadRequestCDF(uriList), LoadRequest::onSuccessCDF, LoadRequest::onFailureCDF);
+        Task.submit("cdf", new LoadRequestCDF(uriList), LoadRequest::onSuccessCDF, LoadRequest::onFailureCDF);
         Timelines.dc.setStatus("Loading...");
     }
 

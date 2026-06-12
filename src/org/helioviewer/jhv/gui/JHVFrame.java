@@ -39,7 +39,7 @@ import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.swing.AwtInputAdapter;
 import org.helioviewer.jhv.swing.TransferAccess;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 public final class JHVFrame {
 
@@ -168,7 +168,7 @@ public final class JHVFrame {
     }
 
     private static void startAngleWarmup() {
-        Tasks.submit("angle-warmup", () -> {
+        Task.submit("angle-warmup", () -> {
             if (Platform.isMacOS())
                 MacAngleBridge.prewarm();
             AngleRenderer.prewarm();

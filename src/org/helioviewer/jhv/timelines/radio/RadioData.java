@@ -27,7 +27,7 @@ import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.thread.JHVThread;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -117,7 +117,7 @@ public final class RadioData extends AbstractTimelineLayer {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
             if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
                 downloadStarted(date);
-                Tasks.submit(Long.toString(date), new RadioJPXDownload(date), result -> onSuccessRadioJPX(date, result), (logContext, t) -> onFailureRadioJPX(date, t));
+                Task.submit(Long.toString(date), new RadioJPXDownload(date), result -> onSuccessRadioJPX(date, result), (logContext, t) -> onFailureRadioJPX(date, t));
             }
         }
     }

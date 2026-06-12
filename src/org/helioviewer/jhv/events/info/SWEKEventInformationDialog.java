@@ -21,7 +21,7 @@ import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 // Popup displaying information about a HEK event.
 // This panel is a JDialog so it can appear above the heavyweight render surface.
@@ -78,7 +78,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
 
         add(allTablePanel, allTablePanelConstraint);
 
-        Tasks.submit("event-info", new DatabaseCallable(event), this::onSuccessDatabase, SWEKEventInformationDialog::onFailureDatabase);
+        Task.submit("event-info", new DatabaseCallable(event), this::onSuccessDatabase, SWEKEventInformationDialog::onFailureDatabase);
     }
 
     private record DatabaseCallable(JHVEvent qEvent) implements Callable<List<JHVEvent>> {

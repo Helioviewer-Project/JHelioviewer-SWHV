@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.timelines.Timelines;
 
 import org.json.JSONArray;
@@ -43,7 +43,7 @@ public class BandDataProvider {
     }
 
     public static void loadBand(JSONObject jo) {
-        Tasks.submit("band", new BandLoad(jo), BandDataProvider::acceptData, BandDataProvider::onFailure);
+        Task.submit("band", new BandLoad(jo), BandDataProvider::acceptData, BandDataProvider::onFailure);
     }
 
     static void acceptData(Band.Data line) {

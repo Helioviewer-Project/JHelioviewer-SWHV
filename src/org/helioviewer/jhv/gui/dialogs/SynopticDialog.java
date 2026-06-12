@@ -32,7 +32,7 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONArray;
@@ -157,7 +157,7 @@ public class SynopticDialog extends StandardDialog {
             selectedLabel.setText("0 selected");
             listPane.setListData(new URI[0]);
             updateButtonState();
-            Tasks.submit(server, new SearchSynoptic(server, hmiButton.isSelected() ? hmiQuery : aiaQuery, buildQuery()), this::onSearchSuccess,
+            Task.submit(server, new SearchSynoptic(server, hmiButton.isSelected() ? hmiQuery : aiaQuery, buildQuery()), this::onSearchSuccess,
                     (logContext, t) -> onSearchFailure(t));
         });
         gc.gridx = 0;

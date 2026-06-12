@@ -15,7 +15,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.JHVThread;
-import org.helioviewer.jhv.thread.Tasks;
+import org.helioviewer.jhv.thread.Task;
 
 import okio.Buffer;
 import okio.BufferedSink;
@@ -35,7 +35,7 @@ public class DownloadLayer {
     @Nullable
     public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName, @Nonnull Progress progress) {
         Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), baseName);
-        return Tasks.submit(baseName,
+        return Task.submit(baseName,
                 new LayerDownload(req, progress, dstPath),
                 result -> onSuccess(layer, progress, result),
                 (logContext, t) -> onFailure(progress, t));
