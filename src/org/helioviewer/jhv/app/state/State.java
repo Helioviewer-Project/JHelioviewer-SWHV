@@ -24,8 +24,8 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
-import org.helioviewer.jhv.thread.EDTCallbackExecutor;
 import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -204,7 +204,7 @@ public final class State {
         Annotations.fromJson(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
-        EDTCallbackExecutor.pool.submit(
+        Task.submit(
                 new ImageLayers.WaitUntilLoaded(newLayers.keySet()),
                 new Callback(context, newLayers, masterLayer, time, modeData));
     }
