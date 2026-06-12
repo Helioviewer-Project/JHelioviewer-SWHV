@@ -39,8 +39,6 @@ import com.google.common.util.concurrent.FutureCallback;
 
 public final class State {
 
-    private State() {}
-
     public static void save(String dir, String file) {
         JSONObject json = toJson();
 
@@ -263,4 +261,5 @@ public final class State {
         }
     }
 
+    private State() {}
 }

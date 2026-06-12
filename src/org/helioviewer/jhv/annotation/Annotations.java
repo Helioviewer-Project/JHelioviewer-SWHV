@@ -44,8 +44,6 @@ public final class Annotations {
     private static double thickness = DEFAULT_THICKNESS * LINEWIDTH;
     private static Colors.NamedColor baseColor = Colors.NamedColor.Blue;
 
-    private Annotations() {}
-
     public static void start(Annotateable annotateable) {
         pending = annotateable;
     }
@@ -221,4 +219,5 @@ public final class Annotations {
         center.dispose();
     }
 
+    private Annotations() {}
 }

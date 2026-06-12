@@ -38,8 +38,6 @@ public final class GaiaClient {
         Log.setLoggerLevel("uk.ac.starlink", Level.WARNING); // shut-up info logs
     }
 
-    private GaiaClient() {}
-
     public static void submitSearch(Receiver receiver, Position viewpoint) {
         Task.submit("gaia", new Query(viewpoint), result -> onSuccess(receiver, viewpoint, result), (logContext, t) -> onFailure(receiver, viewpoint, t));
     }
@@ -296,4 +294,5 @@ public final class GaiaClient {
         Message.err("Error getting the data", t.getMessage());
     }
 
+    private GaiaClient() {}
 }

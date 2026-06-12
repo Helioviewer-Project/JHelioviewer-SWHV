@@ -8,8 +8,6 @@ import org.json.JSONObject;
 
 final class ViewHandlers {
 
-    private ViewHandlers() {}
-
     static void register(SampClient client) {
         client.addMessageHandler(SampHandlers.create("jhv.view.set", (senderId, sender, msg) -> {
             String projection = SampHandlers.optionalString(msg, "projection");
@@ -30,4 +28,6 @@ final class ViewHandlers {
             }
         }));
     }
+
+    private ViewHandlers() {}
 }

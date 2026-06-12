@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-public class Interfaces {
+public final class Interfaces {
 
     public interface LazyComponent {
         void lazyRepaint();
@@ -38,4 +38,5 @@ public class Interfaces {
         void setStatus(String status);
     }
 
+    private Interfaces() {}
 }

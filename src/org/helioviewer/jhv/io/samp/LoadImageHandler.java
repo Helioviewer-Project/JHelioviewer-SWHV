@@ -19,8 +19,6 @@ import org.json.JSONObject;
 
 final class LoadImageHandler {
 
-    private LoadImageHandler() {}
-
     static AbstractMessageHandler create() {
         return SampHandlers.create("jhv.load.image", (senderId, sender, msg) -> {
             Commands.OperationContext context = SampClient.operationContext(senderId, msg, "jhv.load.image", "jhv.load.image.completed");
@@ -73,4 +71,5 @@ final class LoadImageHandler {
         return t.getMessage() == null || t.getMessage().isBlank() ? "Image load failed." : t.getMessage();
     }
 
+    private LoadImageHandler() {}
 }

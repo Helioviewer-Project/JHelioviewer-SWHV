@@ -9,8 +9,6 @@ public class FOVShape {
     private static final float SIZE_POINT = 0.02f;
     private static final double epsilon = 0.006;
 
-    private FOVShape() {}
-
     public static void putCenter(double centerX, double centerY, boolean flat, double lineWidth, byte[] color, BufVertex vexBuf) {
         double centerZ = computeZ(centerX, centerY, flat, lineWidth);
         vexBuf.putVertex((float) centerX, (float) centerY, (float) centerZ, SIZE_POINT, color);
@@ -79,4 +77,5 @@ public class FOVShape {
         }
     }
 
+    private FOVShape() {}
 }

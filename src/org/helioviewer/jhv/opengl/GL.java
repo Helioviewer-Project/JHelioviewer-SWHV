@@ -81,8 +81,6 @@ public final class GL {
     public static final int VERSION = GLES30.GL_VERSION;
     public static final int VERTEX_SHADER = GLES30.GL_VERTEX_SHADER;
 
-    private GL() {}
-
     public static String formatVersionString(String version) {
         return version != null && version.startsWith("OpenGL ") ? version : "OpenGL " + version;
     }
@@ -403,4 +401,6 @@ public final class GL {
     public static void glViewport(int x, int y, int width, int height) {
         GLES30.glViewport(x, y, width, height);
     }
+
+    private GL() {}
 }

@@ -17,8 +17,6 @@ import org.json.JSONObject;
 
 public final class SoarClient {
 
-    private SoarClient() {}
-
     private static final String querySoops = "SELECT DISTINCT soop_name FROM soop ORDER BY soop_name";
     private static final UriTemplate queryTemplate = new UriTemplate("https://soar.esac.esa.int/soar-sl-tap/tap/sync",
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
@@ -154,4 +152,5 @@ public final class SoarClient {
         }
     }
 
+    private SoarClient() {}
 }

@@ -5,8 +5,6 @@ import java.awt.Canvas;
 import org.lwjgl.system.jawt.JAWTX11DrawingSurfaceInfo;
 
 public final class X11AngleBridge {
-    private X11AngleBridge() {}
-
     public static long drawable(Canvas canvas) {
         Long drawable = AngleJAWT.withPlatformInfo(canvas, platformInfo -> {
             if (platformInfo == 0L)
@@ -19,4 +17,6 @@ public final class X11AngleBridge {
         });
         return drawable == null ? 0L : drawable;
     }
+
+    private X11AngleBridge() {}
 }

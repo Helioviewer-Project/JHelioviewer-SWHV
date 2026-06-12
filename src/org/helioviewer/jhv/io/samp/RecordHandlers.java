@@ -8,8 +8,6 @@ import org.astrogrid.samp.Message;
 
 final class RecordHandlers {
 
-    private RecordHandlers() {}
-
     static void register(SampClient client) {
         client.addMessageHandler(SampHandlers.create("jhv.record.set", (senderId, sender, msg) -> {
             String mode = SampHandlers.optionalString(msg, "mode");
@@ -32,4 +30,6 @@ final class RecordHandlers {
                 SampHandlers.optionalString(msg, "speedUnit"));
         EventQueue.invokeLater(() -> Commands.recordStart(context, input));
     }
+
+    private RecordHandlers() {}
 }

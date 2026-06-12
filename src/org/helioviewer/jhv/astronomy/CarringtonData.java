@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.astronomy;
 
 final class CarringtonData {
-    private CarringtonData() {}
-
     static final long[] CR_START = {
             /* 1557 */ 1753091000L, /* 1970-01-21T06:58:11 */
             /* 1558 */ 4115389920L, /* 1970-02-17T15:09:49 */
@@ -1076,4 +1074,6 @@ final class CarringtonData {
             /* 2626 */ 2520926659480L, /* 2049-11-19T09:24:19 */
             /* 2627 */ 2523286891400L, /* 2049-12-16T17:01:31 */
     };
+
+    private CarringtonData() {}
 }

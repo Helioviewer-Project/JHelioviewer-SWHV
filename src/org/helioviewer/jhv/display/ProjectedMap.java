@@ -16,8 +16,6 @@ final class ProjectedMap {
 
     enum Kind {HPC, LATITUDINAL, POLAR}
 
-    private ProjectedMap() {}
-
     static Vec2 project(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
         return switch (kind) {
             case HPC -> projectHpc(viewpoint, v, scale);
@@ -240,4 +238,6 @@ final class ProjectedMap {
         double latitude = Math.toRadians(latitudeDeg);
         return SphericalCoords.unit(longitude, latitude);
     }
+
+    private ProjectedMap() {}
 }

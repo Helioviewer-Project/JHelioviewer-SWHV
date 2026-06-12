@@ -4,8 +4,6 @@ import org.helioviewer.jhv.display.Viewport;
 
 public class RasterLine {
 
-    private RasterLine() {}
-
     // Example:
     // BufVertex vexBuf = new BufVertex(RasterLine.vertexCount(2) * GLSLShape.stride);
     // RasterLine.putVertical(vp, width, tx, targetX, y0, y1, 1.5, Colors.Green, vexBuf);
@@ -51,4 +49,6 @@ public class RasterLine {
     private static double halfThickness(Viewport vp, double width, double thicknessPixels) {
         return 0.5 * thicknessPixels * width / vp.height;
     }
+
+    private RasterLine() {}
 }

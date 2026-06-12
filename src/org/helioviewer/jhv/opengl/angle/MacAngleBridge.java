@@ -33,8 +33,6 @@ public final class MacAngleBridge {
     private static final MethodHandle DEVICE_INFO = downcall("jhv_metal_device_info",
             FunctionDescriptor.of(ValueLayout.ADDRESS));
 
-    private MacAngleBridge() {}
-
     public static void prewarm() {
         // Force class initialization and native symbol resolution before the first canvas attach.
         Log.info("Metal device: " + deviceInfo());
@@ -104,4 +102,6 @@ public final class MacAngleBridge {
         MemorySegment function = LOOKUP.find(symbol).orElseThrow(() -> new UnsatisfiedLinkError(symbol));
         return LINKER.downcallHandle(function, descriptor);
     }
+
+    private MacAngleBridge() {}
 }

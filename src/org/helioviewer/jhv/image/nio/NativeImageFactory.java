@@ -9,8 +9,6 @@ public class NativeImageFactory {
 
     private static final AbstractOwnedDataBuffer.BackendKind BACKEND_KIND = AbstractOwnedDataBuffer.BackendKind.NATIVE;
 
-    private NativeImageFactory() {}
-
     public static BufferedImage copyImage(BufferedImage bi) {
         BufferedImage ret = createCompatible(bi.getWidth(), bi.getHeight(), bi.getType());
         try {
@@ -56,4 +54,5 @@ public class NativeImageFactory {
         AbstractOwnedDataBuffer.free(bi, BACKEND_KIND);
     }
 
+    private NativeImageFactory() {}
 }

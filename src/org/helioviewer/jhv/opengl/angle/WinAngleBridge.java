@@ -5,8 +5,6 @@ import java.awt.Canvas;
 import org.lwjgl.system.jawt.JAWTWin32DrawingSurfaceInfo;
 
 public final class WinAngleBridge {
-    private WinAngleBridge() {}
-
     public static long hwnd(Canvas canvas) {
         Long hwnd = AngleJAWT.withPlatformInfo(canvas, platformInfo -> {
             if (platformInfo == 0L)
@@ -15,4 +13,6 @@ public final class WinAngleBridge {
         });
         return hwnd == null ? 0L : hwnd;
     }
+
+    private WinAngleBridge() {}
 }

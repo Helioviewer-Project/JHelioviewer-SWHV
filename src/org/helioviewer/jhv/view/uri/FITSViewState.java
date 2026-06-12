@@ -134,8 +134,6 @@ public final class FITSViewState {
     private static double alpha = Math.pow(10, 3);
     private static final ArrayList<Listener> listeners = new ArrayList<>();
 
-    private FITSViewState() {}
-
     private static void refresh() {
         URIView.clearURICache();
         DisplayController.render(1);
@@ -298,4 +296,5 @@ public final class FITSViewState {
         }
     }
 
+    private FITSViewState() {}
 }

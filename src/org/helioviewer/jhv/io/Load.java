@@ -13,8 +13,6 @@ import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
 public final class Load {
 
-    private Load() {}
-
     public static void cdf(@Nonnull List<URI> uris) {
         if (!uris.isEmpty())
             LoadRequest.submitCDF(uris);
@@ -137,4 +135,6 @@ public final class Load {
             default -> throw new IllegalArgumentException(operation + " accepts URI or String");
         }
     }
+
+    private Load() {}
 }

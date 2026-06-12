@@ -13,8 +13,6 @@ import org.helioviewer.jhv.Log;
 
 public final class JHVThread {
 
-    private JHVThread() {}
-
     public static boolean isInterrupted(Throwable t) {
         return t instanceof CancellationException ||
                 t instanceof ClosedByInterruptException ||
@@ -57,4 +55,5 @@ public final class JHVThread {
         }
     }
 
+    private JHVThread() {}
 }

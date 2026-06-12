@@ -12,8 +12,6 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 final class OrthographicMap {
 
-    private OrthographicMap() {}
-
     static Vec3 mouseToSurface(Camera camera, Position viewpoint, double width, Viewport vp, int x, int y) {
         return ViewportMath.unprojectToOutputSphere(camera, vp, width, x, y, viewpoint.toQuat());
     }
@@ -55,4 +53,6 @@ final class OrthographicMap {
         phi = gridType == GridType.Carrington && phi < 0 ? phi + 360 : phi;
         return new Vec2(phi, theta);
     }
+
+    private OrthographicMap() {}
 }

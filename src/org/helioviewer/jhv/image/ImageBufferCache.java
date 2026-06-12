@@ -23,8 +23,6 @@ public final class ImageBufferCache {
             .removalListener((Object key, ImageBuffer value, RemovalCause cause) -> retire(value))
             .build();
 
-    private ImageBufferCache() {}
-
     @Nullable
     public static ImageBuffer get(Object key) {
         return cache.getIfPresent(key);
@@ -55,4 +53,6 @@ public final class ImageBufferCache {
             }
         }
     }
+
+    private ImageBufferCache() {}
 }

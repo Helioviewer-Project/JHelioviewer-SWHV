@@ -84,5 +84,4 @@ public final class LayerOptions implements Layers.Listener {
     public void timeUpdated(Layer layer) {}
 
     private LayerOptions() {}
-
 }

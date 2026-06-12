@@ -26,8 +26,6 @@ import org.astrogrid.samp.SampUtils;
 
 public final class ImageLayers {
 
-    private ImageLayers() {}
-
     public static boolean decode(float factor, Position viewpoint) {
         boolean decoded = false;
         for (ImageLayer layer : Layers.getImageLayers()) {
@@ -271,4 +269,5 @@ public final class ImageLayers {
         }
     }
 
+    private ImageLayers() {}
 }

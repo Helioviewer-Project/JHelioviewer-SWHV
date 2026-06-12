@@ -17,8 +17,6 @@ public final class FastFormat {
             '9', '0', '9', '1', '9', '2', '9', '3', '9', '4', '9', '5', '9', '6', '9', '7', '9', '8', '9', '9'
     };
 
-    private FastFormat() {}
-
     public static StringBuilder appendFixed2(StringBuilder out, double value, int width, boolean alwaysSign) {
         return appendFixed(out, value, width, alwaysSign, 100);
     }
@@ -253,4 +251,6 @@ public final class FastFormat {
         }
         return out.append(value);
     }
+
+    private FastFormat() {}
 }

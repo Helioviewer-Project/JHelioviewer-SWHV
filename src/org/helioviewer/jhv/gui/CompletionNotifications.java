@@ -11,8 +11,6 @@ import org.helioviewer.jhv.gui.dialogs.TextDialog;
 
 public final class CompletionNotifications {
 
-    private CompletionNotifications() {}
-
     public static Commands.OperationContext recordingContext() {
         return new Commands.OperationContext(CompletionNotifications.class, null, null, "record",
                 (context, success, message, output) -> {
@@ -40,4 +38,5 @@ public final class CompletionNotifications {
         show(recording + ready);
     }
 
+    private CompletionNotifications() {}
 }

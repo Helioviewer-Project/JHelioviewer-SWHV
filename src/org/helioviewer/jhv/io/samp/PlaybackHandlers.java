@@ -11,8 +11,6 @@ import org.astrogrid.samp.client.AbstractMessageHandler;
 
 final class PlaybackHandlers {
 
-    private PlaybackHandlers() {}
-
     static void register(SampClient client) {
         client.addMessageHandler(playbackSetHandler());
         client.addMessageHandler(commandHandler("jhv.playback.play", Commands::play));
@@ -65,4 +63,6 @@ final class PlaybackHandlers {
     private static AbstractMessageHandler commandHandler(String type, Runnable command) {
         return SampHandlers.create(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
     }
+
+    private PlaybackHandlers() {}
 }

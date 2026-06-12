@@ -3,7 +3,7 @@ package org.helioviewer.jhv.gui;
 import java.awt.Component;
 import java.awt.Container;
 
-public class ComponentUtils {
+public final class ComponentUtils {
 
     public static void setVisible(Component container, boolean visible) {
         if (container instanceof Container cont) {
@@ -21,4 +21,5 @@ public class ComponentUtils {
         com.jidesoft.swing.JideSwingUtilities.setEnabledRecursively(c, enable);
     }
 
+    private ComponentUtils() {}
 }

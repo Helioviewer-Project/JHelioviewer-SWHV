@@ -10,8 +10,6 @@ public final class ViewportMath {
 
     private static final double PLANE_Z_EPS = 1e-8;
 
-    private ViewportMath() {}
-
     private static double computeNormalizedX(Viewport vp, double screenX) {
         return (screenX - vp.x) / vp.width - 0.5;
     }
@@ -145,4 +143,5 @@ public final class ViewportMath {
         return dragRotation.rotateInverseVector(new Vec3(upX, upY, zvalue));
     }
 
+    private ViewportMath() {}
 }

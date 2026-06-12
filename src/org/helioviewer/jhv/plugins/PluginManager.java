@@ -11,8 +11,6 @@ public final class PluginManager {
     private static final List<Plugin> plugins = new ArrayList<>();
     private static boolean guiEnabled;
 
-    private PluginManager() {}
-
     public static void setGUIEnabled(boolean _guiEnabled) {
         guiEnabled = _guiEnabled;
     }
@@ -59,4 +57,5 @@ public final class PluginManager {
         }
     }
 
+    private PluginManager() {}
 }

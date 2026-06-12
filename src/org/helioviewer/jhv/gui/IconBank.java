@@ -6,7 +6,7 @@ import java.awt.Transparency;
 import javax.annotation.Nonnull;
 import javax.swing.ImageIcon;
 
-public class IconBank {
+public final class IconBank {
 
     private static final ImageIcon blank = new ImageIcon(GraphicsEnvironment.getLocalGraphicsEnvironment().
             getDefaultScreenDevice().getDefaultConfiguration().
@@ -33,4 +33,5 @@ public class IconBank {
         return blank;
     }
 
+    private IconBank() {}
 }

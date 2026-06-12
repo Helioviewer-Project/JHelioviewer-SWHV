@@ -18,8 +18,6 @@ final class CompatibleImageUtils {
         DataBuffer create(int type, int size, int numBanks) throws IOException;
     }
 
-    private CompatibleImageUtils() {}
-
     static BufferedImage createCompatibleImage(int width, int height, int type, DataBufferFactory dataBufferFactory) {
         try {
             return createCompatibleImageOrThrow(width, height, type, dataBufferFactory);
@@ -90,4 +88,6 @@ final class CompatibleImageUtils {
         DataBuffer buffer = dataBufferFactory.create(DataBuffer.TYPE_BYTE, 3 * width * height, 1);
         return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, buffer, null), false, null);
     }
+
+    private CompatibleImageUtils() {}
 }

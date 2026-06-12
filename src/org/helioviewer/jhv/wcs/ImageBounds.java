@@ -6,8 +6,6 @@ import org.helioviewer.jhv.metadata.MetaData;
 
 public final class ImageBounds {
 
-    private ImageBounds() {}
-
     public static double radial(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
         Vec2 crval = metaData.getWcsHeader().crval;
@@ -59,4 +57,6 @@ public final class ImageBounds {
                 Math.max(Math.nextUp(0.0), bounds[1] - bounds[0]),
                 Math.max(Math.nextUp(0.0), bounds[3] - bounds[2]));
     }
+
+    private ImageBounds() {}
 }

@@ -20,8 +20,6 @@ import org.json.JSONObject;
 
 public final class Commands {
 
-    private Commands() {}
-
     public record PlaybackInput(
             @Nullable String advanceMode,
             @Nullable String speed,
@@ -245,4 +243,5 @@ public final class Commands {
             context.complete(success, message, output);
     }
 
+    private Commands() {}
 }

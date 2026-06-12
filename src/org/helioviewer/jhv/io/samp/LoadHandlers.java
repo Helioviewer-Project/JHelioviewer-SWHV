@@ -15,8 +15,6 @@ import org.astrogrid.samp.client.AbstractMessageHandler;
 
 final class LoadHandlers {
 
-    private LoadHandlers() {}
-
     static void register(SampClient client) {
         client.addMessageHandler(singleURIHandler("image.load.fits", Commands::loadImage));
         // load VOTable only from SOAR
@@ -120,4 +118,6 @@ final class LoadHandlers {
             return null;
         return toURI(url.toString());
     }
+
+    private LoadHandlers() {}
 }

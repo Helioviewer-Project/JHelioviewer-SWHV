@@ -28,8 +28,6 @@ public final class Transform {
     private static int projDepth;
     private static int viewDepth;
 
-    private Transform() {}
-
     public static void pushProjection() {
         proj.pushMatrix();
         projDepth++;
@@ -105,4 +103,5 @@ public final class Transform {
         return inv;
     }
 
+    private Transform() {}
 }

@@ -8,8 +8,6 @@ import javax.swing.Timer;
 
 public final class HoldRepeat {
 
-    private HoldRepeat() {}
-
     public static void install(AbstractButton button, int repeatMs) {
         Timer timer = new Timer(repeatMs, e -> {
             if (button.isEnabled())
@@ -40,4 +38,5 @@ public final class HoldRepeat {
         });
     }
 
+    private HoldRepeat() {}
 }

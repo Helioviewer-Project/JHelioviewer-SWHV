@@ -19,8 +19,6 @@ final class AngleLibraries {
     private static final String SWIFTSHADER_ICD_ENV = "VK_ICD_FILENAMES";
     private static boolean swiftShaderLoaded;
 
-    private AngleLibraries() {}
-
     static void configureLwjglAngleLibraries() {
         Configuration.EGL_LIBRARY_NAME.set(libraryPath(eglLibrary()).toString());
         Configuration.OPENGLES_LIBRARY_NAME.set(libraryPath(openGlesLibrary()).toString());
@@ -93,4 +91,5 @@ final class AngleLibraries {
         throw new IllegalStateException("Unsupported ANGLE platform");
     }
 
+    private AngleLibraries() {}
 }
