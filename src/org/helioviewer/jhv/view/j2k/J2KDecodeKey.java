@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.j2k;
 
-import org.helioviewer.jhv.imagedata.ImageFilter;
+import org.helioviewer.jhv.image.ImageFilter;
 
 final class J2KDecodeKey {
 

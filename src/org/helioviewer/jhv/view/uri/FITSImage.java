@@ -8,8 +8,8 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 
 import org.helioviewer.jhv.base.ArrayUtils;
-import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageFilter;
+import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.thread.ParallelRange;
 import org.helioviewer.jhv.math.MathUtils;
 

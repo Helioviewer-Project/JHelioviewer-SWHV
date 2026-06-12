@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.imagedata.nio;
+package org.helioviewer.jhv.image.nio;
 
 import java.awt.image.DataBuffer;
 import java.io.IOException;

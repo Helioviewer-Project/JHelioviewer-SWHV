@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.uri;
 
-import org.helioviewer.jhv.imagedata.ImageFilter;
+import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
 
 final class URIDecodeKey {
