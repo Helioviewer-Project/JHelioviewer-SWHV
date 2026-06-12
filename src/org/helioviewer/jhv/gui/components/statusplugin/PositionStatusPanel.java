@@ -2,7 +2,7 @@ package org.helioviewer.jhv.gui.components.statusplugin;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;

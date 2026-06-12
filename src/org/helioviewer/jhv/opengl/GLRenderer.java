@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Region;

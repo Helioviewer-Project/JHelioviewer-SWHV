@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.annotations.AnnotationMode;
+import org.helioviewer.jhv.annotation.AnnotationMode;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;

@@ -25,8 +25,8 @@ import javax.swing.JToggleButton;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.annotations.AnnotationMode;
-import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.annotation.AnnotationMode;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.MapMode;
