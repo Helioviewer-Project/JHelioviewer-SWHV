@@ -27,7 +27,7 @@ import org.helioviewer.jhv.gui.dialogs.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.time.TimeUtils;

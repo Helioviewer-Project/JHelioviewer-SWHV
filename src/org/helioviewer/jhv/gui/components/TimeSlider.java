@@ -34,7 +34,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.view.View;
 
 // Extension of JSlider displaying the caching status on the track.

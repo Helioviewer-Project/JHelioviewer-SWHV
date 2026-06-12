@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.swing.JideToggleButton;

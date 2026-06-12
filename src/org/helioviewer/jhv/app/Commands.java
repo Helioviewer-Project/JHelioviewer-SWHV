@@ -11,7 +11,7 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.view.uri.FITSViewState;

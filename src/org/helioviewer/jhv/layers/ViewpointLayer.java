@@ -21,6 +21,7 @@ import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;

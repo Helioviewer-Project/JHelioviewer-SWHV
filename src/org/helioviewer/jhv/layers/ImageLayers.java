@@ -14,6 +14,7 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.thread.EDTQueue;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;

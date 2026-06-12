@@ -23,7 +23,7 @@ import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.AbstractLayer;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;

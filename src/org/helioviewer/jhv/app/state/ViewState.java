@@ -10,7 +10,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 
 import org.json.JSONObject;
 

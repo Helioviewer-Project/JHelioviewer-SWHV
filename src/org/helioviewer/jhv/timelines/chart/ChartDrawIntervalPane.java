@@ -16,7 +16,7 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;

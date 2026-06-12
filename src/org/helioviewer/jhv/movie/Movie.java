@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.layers;
+package org.helioviewer.jhv.movie;
 
 import java.util.ArrayList;
 import java.util.function.Function;
@@ -8,7 +8,8 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.movie.ExportMovie;
+import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
@@ -122,7 +123,7 @@ public class Movie {
         return layer.getEndTime();
     }
 
-    static void timeRangeChanged() {
+    public static void timeRangeChanged() {
         movieStart = getMovieStart();
         movieEnd = getMovieEnd();
         timeRangeListeners.forEach(listener -> listener.timeRangeChanged(movieStart, movieEnd));
