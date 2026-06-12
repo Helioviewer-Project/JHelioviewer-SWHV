@@ -15,8 +15,8 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
-import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
+import org.helioviewer.jhv.image.nio.MappedImageFactory;
+import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 

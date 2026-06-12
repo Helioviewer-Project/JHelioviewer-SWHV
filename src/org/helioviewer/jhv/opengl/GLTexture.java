@@ -6,7 +6,7 @@ import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.image.ImageBuffer;
 
 public class GLTexture {
 

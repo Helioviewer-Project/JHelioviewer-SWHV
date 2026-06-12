@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Region;
-import org.helioviewer.jhv.imagedata.ImageBuffer;
+import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;

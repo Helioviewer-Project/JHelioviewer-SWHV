@@ -5,8 +5,8 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.Callable;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageFilter;
+import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.ImageFilter;
 
 import org.lwjgl.system.MemoryUtil;
 

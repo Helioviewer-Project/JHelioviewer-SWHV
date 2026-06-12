@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.gui.UIGlobals;
-import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
+import org.helioviewer.jhv.image.nio.NativeImageFactory;
 
 class ExportUtils {
 

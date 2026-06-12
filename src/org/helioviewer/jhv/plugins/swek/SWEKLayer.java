@@ -21,7 +21,7 @@ import org.helioviewer.jhv.events.JHVEventListener;
 import org.helioviewer.jhv.events.JHVPositionInformation;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
+import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.math.MathUtils;

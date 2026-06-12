@@ -2,7 +2,7 @@ package org.helioviewer.jhv.view;
 
 import java.util.ArrayList;
 
-import org.helioviewer.jhv.imagedata.ImageFilter;
+import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.NullMetaData;
 import org.helioviewer.jhv.time.JHVTime;
