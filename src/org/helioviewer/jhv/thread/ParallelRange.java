@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.imagedata;
+package org.helioviewer.jhv.thread;
 
 import java.util.stream.IntStream;
 
