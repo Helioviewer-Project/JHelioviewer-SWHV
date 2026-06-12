@@ -26,14 +26,14 @@ class ExportWriter {
     private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
 
     private final String prefix;
-    private final VideoFormat format;
+    private final ExportFormat format;
     private final int w;
     private final int h;
     private final int fps;
 
     private File tempFile;
 
-    ExportWriter(VideoFormat _format, int _w, int _h, int _fps) {
+    ExportWriter(ExportFormat _format, int _w, int _h, int _fps) {
         prefix = JHVDirectory.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
         format = _format;
         w = _w;
@@ -117,7 +117,7 @@ class ExportWriter {
                 "-hide_banner",
                 "-f", "rawvideo",
                 "-pix_fmt", "rgb24",
-                "-r", format == VideoFormat.PNG ? "1" : String.valueOf(fps),
+                "-r", format == ExportFormat.PNG ? "1" : String.valueOf(fps),
                 "-s", w + "x" + h,
                 "-i", tempFile.getPath()
         );
@@ -125,7 +125,7 @@ class ExportWriter {
         List<String> command = new ArrayList<>(ffmpeg);
         command.addAll(input);
         command.addAll(format.settings);
-        command.addAll(format == VideoFormat.PNG ? formatImage : formatVideo);
+        command.addAll(format == ExportFormat.PNG ? formatImage : formatVideo);
         command.add("-y");
         command.add(outPath);
         return command;
