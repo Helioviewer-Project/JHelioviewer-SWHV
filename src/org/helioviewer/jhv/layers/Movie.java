@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.export.ExportMovie;
-import org.helioviewer.jhv.threads.EDTTimer;
+import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;

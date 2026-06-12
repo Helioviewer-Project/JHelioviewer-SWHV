@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.io.TransferLoad;
-import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.thread.JHVThread;
 
 public final class TransferAccess {
 

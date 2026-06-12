@@ -22,7 +22,7 @@ import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.plugins.pfss.PfssPlugin;
 import org.helioviewer.jhv.plugins.swek.SWEKPlugin;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.Tasks;
 
 public class JHelioviewer {
 

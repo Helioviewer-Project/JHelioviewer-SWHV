@@ -5,7 +5,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
-import org.helioviewer.jhv.threads.LatestWorker;
+import org.helioviewer.jhv.thread.LatestWorker;
 
 public class J2KViewCallisto extends J2KView {
 

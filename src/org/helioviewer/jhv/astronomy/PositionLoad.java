@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
-import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.Tasks;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;

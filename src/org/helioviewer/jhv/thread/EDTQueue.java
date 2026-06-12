@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.threads;
+package org.helioviewer.jhv.thread;
 
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;

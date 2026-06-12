@@ -18,7 +18,7 @@ import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLShape;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.Tasks;
 import org.helioviewer.jhv.time.JHVTime;
 
 import org.jastronomy.jsofa.JSOFA;

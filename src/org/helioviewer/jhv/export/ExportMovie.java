@@ -16,7 +16,7 @@ import org.helioviewer.jhv.imagedata.nio.MappedImageFactory;
 import org.helioviewer.jhv.imagedata.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLGrab;
-import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.thread.JHVThread;
 
 public final class ExportMovie implements Movie.Listener {
 

@@ -14,8 +14,8 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.Tasks;
 
 import okio.Buffer;
 import okio.BufferedSink;

@@ -28,8 +28,8 @@ import org.helioviewer.jhv.events.SWEK;
 import org.helioviewer.jhv.events.SWEKGroup;
 import org.helioviewer.jhv.events.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.threads.JHVThread;
-import org.helioviewer.jhv.threads.SingleExecutor;
+import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.SingleExecutor;
 
 public class EventDatabase {
 

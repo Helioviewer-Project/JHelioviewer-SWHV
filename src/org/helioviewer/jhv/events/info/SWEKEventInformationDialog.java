@@ -21,7 +21,7 @@ import org.helioviewer.jhv.events.JHVEvent;
 import org.helioviewer.jhv.events.JHVEventCache;
 import org.helioviewer.jhv.events.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.Tasks;
 
 // Popup displaying information about a HEK event.
 // This panel is a JDialog so it can appear above the heavyweight render surface.

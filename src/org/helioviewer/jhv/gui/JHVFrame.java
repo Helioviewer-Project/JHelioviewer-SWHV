@@ -39,7 +39,7 @@ import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.swing.AwtInputAdapter;
 import org.helioviewer.jhv.swing.TransferAccess;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.Tasks;
 
 public final class JHVFrame {
 
