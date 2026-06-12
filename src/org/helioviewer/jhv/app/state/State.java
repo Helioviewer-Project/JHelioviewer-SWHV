@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.ImageLayer;

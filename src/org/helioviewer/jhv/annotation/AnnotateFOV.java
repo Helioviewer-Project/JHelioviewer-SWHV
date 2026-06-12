@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.annotations;
+package org.helioviewer.jhv.annotation;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapView;

@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.DisplayController;

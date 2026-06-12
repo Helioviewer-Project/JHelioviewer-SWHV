@@ -14,7 +14,7 @@ import javax.swing.KeyStroke;
 
 import org.helioviewer.jhv.ExitHooks;
 import org.helioviewer.jhv.Settings;
-import org.helioviewer.jhv.annotations.Annotations;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.display.Display;
