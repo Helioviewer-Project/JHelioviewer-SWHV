@@ -21,7 +21,7 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.events.JHVEventCache;
+import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.timelines.TimelineLayers;

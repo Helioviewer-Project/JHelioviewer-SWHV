@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events;
+package org.helioviewer.jhv.event;
 
 public class JHVEventListener {
 

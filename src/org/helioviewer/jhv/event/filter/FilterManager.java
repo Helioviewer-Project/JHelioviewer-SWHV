@@ -1,12 +1,12 @@
-package org.helioviewer.jhv.events.filter;
+package org.helioviewer.jhv.event.filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.helioviewer.jhv.events.SWEK;
-import org.helioviewer.jhv.events.SWEKSupplier;
+import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKSupplier;
 
 public class FilterManager {
 

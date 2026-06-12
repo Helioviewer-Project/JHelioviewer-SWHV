@@ -3,8 +3,8 @@ package org.helioviewer.jhv.plugins.swek;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.events.JHVEvent;
-import org.helioviewer.jhv.events.JHVEventParameter;
+import org.helioviewer.jhv.event.JHVEvent;
+import org.helioviewer.jhv.event.JHVEventParameter;
 
 class SWEKData {
 

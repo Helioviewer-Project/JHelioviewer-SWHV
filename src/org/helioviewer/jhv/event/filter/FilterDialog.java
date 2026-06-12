@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.filter;
+package org.helioviewer.jhv.event.filter;
 
 import java.awt.GridLayout;
 import java.awt.event.FocusEvent;
@@ -11,8 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKSupplier;
+import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKSupplier;
 
 @SuppressWarnings("serial")
 public final class FilterDialog extends JDialog implements FocusListener, WindowFocusListener {

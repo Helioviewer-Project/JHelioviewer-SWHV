@@ -1,8 +1,8 @@
-package org.helioviewer.jhv.events.info;
+package org.helioviewer.jhv.event.info;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.helioviewer.jhv.events.JHVEventParameter;
+import org.helioviewer.jhv.event.JHVEventParameter;
 
 @SuppressWarnings("serial")
 class ParameterTableModel extends AbstractTableModel {

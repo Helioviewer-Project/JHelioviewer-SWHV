@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events;
+package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.events.filter.FilterManager;
+import org.helioviewer.jhv.event.filter.FilterManager;
 import org.helioviewer.jhv.thread.JHVThread;
 
 import com.google.common.collect.ArrayListMultimap;

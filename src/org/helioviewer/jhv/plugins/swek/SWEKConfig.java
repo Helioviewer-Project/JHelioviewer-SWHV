@@ -14,9 +14,9 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.events.SWEK;
-import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKSupplier;
+import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;

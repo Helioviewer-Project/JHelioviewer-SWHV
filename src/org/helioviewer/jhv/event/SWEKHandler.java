@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events;
+package org.helioviewer.jhv.event;
 
 import java.net.URI;
 import java.util.List;

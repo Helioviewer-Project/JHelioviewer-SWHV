@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events;
+package org.helioviewer.jhv.event;
 
 import java.util.ArrayList;
 import java.util.List;

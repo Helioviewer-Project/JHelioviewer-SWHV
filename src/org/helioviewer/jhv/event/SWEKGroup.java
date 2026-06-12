@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events;
+package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
 import java.util.HashMap;

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.events.JHVEventListener;
+import org.helioviewer.jhv.event.JHVEventListener;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.components.MoviePanel;

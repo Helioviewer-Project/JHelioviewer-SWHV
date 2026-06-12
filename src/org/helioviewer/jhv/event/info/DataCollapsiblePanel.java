@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.info;
+package org.helioviewer.jhv.event.info;
 
 import java.awt.event.ActionEvent;
 

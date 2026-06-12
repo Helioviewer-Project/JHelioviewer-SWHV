@@ -1,13 +1,13 @@
-package org.helioviewer.jhv.events.filter;
+package org.helioviewer.jhv.event.filter;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.events.SWEK;
-import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKSupplier;
+import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 
 class FilterPanelFactory {

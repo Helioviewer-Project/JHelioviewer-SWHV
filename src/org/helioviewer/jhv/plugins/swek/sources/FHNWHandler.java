@@ -8,11 +8,11 @@ import java.util.List;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.events.JHVEvent;
-import org.helioviewer.jhv.events.SWEK;
-import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKHandler;
-import org.helioviewer.jhv.events.SWEKSupplier;
+import org.helioviewer.jhv.event.JHVEvent;
+import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKHandler;
+import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.time.TimeUtils;

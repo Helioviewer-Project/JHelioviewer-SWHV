@@ -25,9 +25,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.helioviewer.jhv.events.SWEKGroup;
-import org.helioviewer.jhv.events.SWEKSupplier;
-import org.helioviewer.jhv.events.filter.FilterDialog;
+import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKSupplier;
+import org.helioviewer.jhv.event.filter.FilterDialog;
 import org.helioviewer.jhv.gui.components.base.BusyIndicator;
 
 import com.jidesoft.swing.JideButton;
