@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.DirectBufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
-import org.helioviewer.jhv.threads.LatestWorker;
+import org.helioviewer.jhv.thread.LatestWorker;
 
 final class PfssLineWorker {
 

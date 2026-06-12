@@ -13,7 +13,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.thread.JHVThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;

@@ -43,7 +43,7 @@ import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.Tasks;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import com.jidesoft.dialog.ButtonPanel;

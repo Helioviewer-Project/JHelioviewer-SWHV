@@ -13,7 +13,7 @@ import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Message;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.swing.DesktopIntegration;
-import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.thread.JHVThread;
 
 import com.jidesoft.dialog.ButtonPanel;
 

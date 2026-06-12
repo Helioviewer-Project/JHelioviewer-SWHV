@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.threads;
+package org.helioviewer.jhv.thread;
 
 import javax.swing.Timer;
 

@@ -18,7 +18,7 @@ import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
-import org.helioviewer.jhv.threads.LatestWorker;
+import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
 

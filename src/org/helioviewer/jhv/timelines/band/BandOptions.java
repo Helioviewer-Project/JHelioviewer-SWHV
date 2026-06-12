@@ -18,7 +18,7 @@ import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.Buttons;
 import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
-import org.helioviewer.jhv.threads.JHVThread;
+import org.helioviewer.jhv.thread.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;

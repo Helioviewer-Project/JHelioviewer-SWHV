@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.threads;
+package org.helioviewer.jhv.thread;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;

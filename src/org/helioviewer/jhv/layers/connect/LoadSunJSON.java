@@ -12,7 +12,7 @@ import org.helioviewer.jhv.Message;
 //import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.threads.Tasks;
+import org.helioviewer.jhv.thread.Tasks;
 
 //import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
