@@ -7,9 +7,9 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.metadata.DetectorMask;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.view.View;
 
 import org.json.JSONObject;
 
@@ -58,38 +58,38 @@ public class GLImage {
     private boolean lastInverted = false;
     private boolean lutChanged = true;
     private DetectorMask uploadedMask = DetectorMask.NONE;
-    private ImageData uploadedImageData;
+    private View.ImageData uploadedImageData;
 
-    public void streamImage(ImageData imageData, ImageData prevImageData, ImageData baseImageData) {
+    public void streamImage(View.ImageData imageData, View.ImageData prevImageData, View.ImageData baseImageData) {
         if (uploadedImageData != imageData) {
             tex.bind();
-            tex.copyImageBuffer(imageData.getImageBuffer(), GL.LINEAR);
+            tex.copyImageBuffer(imageData.imageBuffer(), GL.LINEAR);
             uploadedImageData = imageData;
         }
 
-        ImageData prevFrame = diffMode == DifferenceMode.Base ? baseImageData : prevImageData;
+        View.ImageData prevFrame = diffMode == DifferenceMode.Base ? baseImageData : prevImageData;
         if (diffMode != DifferenceMode.None && prevFrame != null) {
             diffTex.bind();
-            diffTex.copyImageBuffer(prevFrame.getImageBuffer(), GL.LINEAR);
+            diffTex.copyImageBuffer(prevFrame.imageBuffer(), GL.LINEAR);
         }
     }
 
     public void collectImageBuffers(Set<ImageBuffer> retained) {
         if (uploadedImageData != null)
-            retained.add(uploadedImageData.getImageBuffer());
+            retained.add(uploadedImageData.imageBuffer());
     }
 
     private final float[] color = new float[4];
 
     public void applyFilters() {
-        MetaData metaData = uploadedImageData.getMetaData();
+        MetaData metaData = uploadedImageData.metaData();
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
         color[0] = (float) (opacity * red); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         color[1] = (float) (opacity * green);
         color[2] = (float) (opacity * blue);
         color[3] = (float) (opacity * blend);
         GLSLSolarShader.bindDisplay(color,
-                1f / uploadedImageData.getImageBuffer().width, 1f / uploadedImageData.getImageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
+                1f / uploadedImageData.imageBuffer().width, 1f / uploadedImageData.imageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
                 metaData.getSector0(), metaData.getSector1(), (float) enhanced,
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 (float) brightOffset, (float) (brightScale * metaData.getResponseFactor()),

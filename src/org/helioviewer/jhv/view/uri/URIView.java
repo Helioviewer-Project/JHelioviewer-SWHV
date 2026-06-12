@@ -12,7 +12,6 @@ import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
@@ -21,6 +20,7 @@ import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.View;
 
 import com.google.common.base.Throwables;
 
@@ -132,7 +132,7 @@ public final class URIView extends BaseView {
 
     private void sendDataToHandler(ImageBuffer imageBuffer, Position viewpoint) {
         imageBuffer.protectFromExplicitFree();
-        ImageData data = new ImageData(imageBuffer, metaData[0], imageRegion, viewpoint);
+        View.ImageData data = new View.ImageData(imageBuffer, metaData[0], imageRegion, viewpoint);
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);

@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
@@ -86,8 +85,8 @@ class RadioJ2KData implements View.DataHandler {
     }
 
     @Override
-    public void handleData(ImageData imageData) {
-        ImageBuffer imageBuffer = imageData.getImageBuffer();
+    public void handleData(View.ImageData imageData) {
+        ImageBuffer imageBuffer = imageData.imageBuffer();
         int w = imageBuffer.width;
         int h = imageBuffer.height;
         if (w < 1 || h < 1) {
@@ -95,7 +94,7 @@ class RadioJ2KData implements View.DataHandler {
             return;
         }
 
-        region = imageData.getRegion();
+        region = imageData.region();
         boolean hadData = bufferedImage != null;
         bufferedImage = createIndexedImage((ByteBuffer) imageBuffer.buffer, w, h, RadioData.getColorModel());
         imageBuffer.allowExplicitFree();

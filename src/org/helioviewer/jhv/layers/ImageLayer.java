@@ -14,7 +14,6 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadLayer;
@@ -213,10 +212,10 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         shader.use();
         glImage.applyFilters();
 
-        MetaData meta0 = imageData.getMetaData();
+        MetaData meta0 = imageData.metaData();
         Position metaViewpoint0 = meta0.getViewpoint();
-        ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
-        MetaData meta1 = imageDataDiff.getMetaData();
+        View.ImageData imageDataDiff = glImage.getDifferenceMode() == DifferenceMode.Base ? baseImageData : prevImageData;
+        MetaData meta1 = imageDataDiff.metaData();
         Position metaViewpoint1 = meta1.getViewpoint();
         WcsHeader wcs0 = meta0.getWcsHeader();
         WcsHeader wcs1 = meta1.getWcsHeader();
@@ -260,8 +259,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
 
         GLSLSolarShader.bindWCS(
-                cameraDiff0, imageData.getRegion(), crota0, crval0, (float) wcs0.zpnUpperEta, deltaT0,
-                cameraDiff1, imageDataDiff.getRegion(), crota1, crval1, (float) wcs1.zpnUpperEta, deltaT1);
+                cameraDiff0, imageData.region(), crota0, crval0, (float) wcs0.zpnUpperEta, deltaT0,
+                cameraDiff1, imageDataDiff.region(), crota1, crval1, (float) wcs1.zpnUpperEta, deltaT1);
         shader.bindPV(wcs0.pv2, wcs1.pv2);
 
         Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();
@@ -295,13 +294,13 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     @Override
     public String getName() {
-        return imageData == null ? "Loading..." : imageData.getMetaData().getDisplayName();
+        return imageData == null ? "Loading..." : imageData.metaData().getDisplayName();
     }
 
     @Nullable
     @Override
     public String getTimeString() {
-        return imageData == null ? null : imageData.getMetaData().getViewpoint().time.toString();
+        return imageData == null ? null : imageData.metaData().getViewpoint().time.toString();
     }
 
     @Override
@@ -314,19 +313,19 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         glImage.dispose();
     }
 
-    private ImageData imageData;
-    private ImageData prevImageData;
-    private ImageData baseImageData;
+    private View.ImageData imageData;
+    private View.ImageData prevImageData;
+    private View.ImageData baseImageData;
 
-    private void setImageData(@Nonnull ImageData newImageData) {
-        long newMilli = newImageData.getMetaData().getViewpoint().time.milli;
+    private void setImageData(@Nonnull View.ImageData newImageData) {
+        long newMilli = newImageData.metaData().getViewpoint().time.milli;
         if (baseImageData == null || newMilli == view.getFirstTime().milli) {
             baseImageData = newImageData;
         }
 
         if (imageData == null || baseImageData == newImageData) { // first or loop playback
             prevImageData = newImageData;
-        } else if (newMilli != imageData.getMetaData().getViewpoint().time.milli) { // new frame
+        } else if (newMilli != imageData.metaData().getViewpoint().time.milli) { // new frame
             prevImageData = imageData;
         }
 
@@ -334,34 +333,34 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     }
 
     @Nullable
-    public ImageData getImageData() {
+    public View.ImageData getImageData() {
         return imageData;
     }
 
     void collectImageBuffers(Set<ImageBuffer> retained) {
         if (imageData != null)
-            retained.add(imageData.getImageBuffer());
+            retained.add(imageData.imageBuffer());
         if (prevImageData != null)
-            retained.add(prevImageData.getImageBuffer());
+            retained.add(prevImageData.imageBuffer());
         if (baseImageData != null)
-            retained.add(baseImageData.getImageBuffer());
+            retained.add(baseImageData.imageBuffer());
         if (glImage != null)
             glImage.collectImageBuffers(retained);
     }
 
     @Nonnull
     public MetaData getMetaData() { //!
-        return imageData == null ? view.getMetaData(view.getFirstTime()) : imageData.getMetaData();
+        return imageData == null ? view.getMetaData(view.getFirstTime()) : imageData.metaData();
     }
 
     @Override
-    public void handleData(ImageData newImageData) {
+    public void handleData(View.ImageData newImageData) {
         if (removed)
             return;
-        newImageData.getImageBuffer().allowExplicitFree();
+        newImageData.imageBuffer().allowExplicitFree();
         setImageData(newImageData);
         Layers.fireTimeUpdated(this);
-        ImageLayers.displaySynced(imageData.getViewpoint());
+        ImageLayers.displaySynced(imageData.viewpoint());
     }
 
     @Override

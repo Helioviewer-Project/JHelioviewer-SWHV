@@ -16,7 +16,6 @@ import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageBufferCache;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
@@ -30,6 +29,7 @@ import org.helioviewer.jhv.threads.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
+import org.helioviewer.jhv.view.View;
 
 import com.google.common.base.Throwables;
 
@@ -338,7 +338,7 @@ public class J2KView extends BaseView {
         ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level);
         Region r = m.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
 
-        ImageData data = new ImageData(imageBuffer, m, r, viewpoint);
+        View.ImageData data = new View.ImageData(imageBuffer, m, r, viewpoint);
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);

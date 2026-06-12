@@ -11,13 +11,13 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.imagedata.ImageData;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.threads.EDTQueue;
 import org.helioviewer.jhv.threads.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;
+import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.astrogrid.samp.Message;
@@ -93,8 +93,8 @@ public final class ImageLayers {
 
     static void displaySynced(Position viewpoint) { // coalesce layers
         for (ImageLayer layer : Layers.getImageLayers()) {
-            ImageData id;
-            if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.getViewpoint() /* deliberate on reference */)
+            View.ImageData id;
+            if (layer.isEnabled() && (id = layer.getImageData()) != null && viewpoint != id.viewpoint() /* deliberate on reference */)
                 return;
         }
         DisplayController.display(viewpoint);
@@ -172,9 +172,9 @@ public final class ImageLayers {
             if ((req = activeLayer.getView().getAPIRequest()) != null) {
                 str.append("&cadence=").append(req.cadence()).append("&cadenceUnits=s");
             }
-            ImageData id;
+            View.ImageData id;
             if ((id = activeLayer.getImageData()) != null) {
-                Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
+                Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
                 str.append(String.format("&xCen=%.1f", region.llx + region.width / 2.));
                 str.append(String.format("&yCen=%.1f", -(region.lly + region.height / 2.)));
                 str.append(String.format("&width=%.1f", region.width));
@@ -192,7 +192,7 @@ public final class ImageLayers {
     }
 
     public static void getSAMPMessage(Message msg) {
-        ImageData id;
+        View.ImageData id;
         ImageLayer activeLayer = Layers.getActiveImageLayer();
         if (activeLayer == null || activeLayer.getView().getAPIRequest() == null || (id = activeLayer.getImageData()) == null)
             return;
@@ -204,7 +204,7 @@ public final class ImageLayers {
         msg.addParam("cadence", SampUtils.encodeLong(req.cadence() * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
-        Region region = Region.scale(id.getRegion(), 1 / id.getMetaData().getUnitPerArcsec());
+        Region region = Region.scale(id.region(), 1 / id.metaData().getUnitPerArcsec());
         msg.addParam("cutout.x0", SampUtils.encodeFloat(region.llx + region.width / 2.));
         msg.addParam("cutout.y0", SampUtils.encodeFloat(-(region.lly + region.height / 2.)));
         msg.addParam("cutout.w", SampUtils.encodeFloat(region.width));
@@ -215,7 +215,7 @@ public final class ImageLayers {
             if (!layer.isEnabled() || (id = layer.getImageData()) == null)
                 continue;
 
-            if (id.getMetaData() instanceof FitsMetaData fm) {
+            if (id.metaData() instanceof FitsMetaData fm) {
                 HashMap<String, String> layerMsg = new HashMap<>();
                 layerMsg.put("observatory", fm.getObservatory());
                 layerMsg.put("instrument", fm.getInstrument());

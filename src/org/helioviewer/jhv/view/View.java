@@ -6,14 +6,21 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.imagedata.ImageData;
+import org.helioviewer.jhv.imagedata.ImageBuffer;
 import org.helioviewer.jhv.imagedata.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.time.JHVTime;
 
 public interface View {
+
+    record ImageData(
+            @Nonnull ImageBuffer imageBuffer,
+            @Nonnull MetaData metaData,
+            @Nonnull Region region,
+            @Nonnull Position viewpoint) {}
 
     interface DataHandler {
         void handleData(ImageData imageData);
