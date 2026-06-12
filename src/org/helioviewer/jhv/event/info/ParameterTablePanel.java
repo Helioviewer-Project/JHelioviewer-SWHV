@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.info;
+package org.helioviewer.jhv.event.info;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -15,7 +15,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.events.JHVEventParameter;
+import org.helioviewer.jhv.event.JHVEventParameter;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
 import org.helioviewer.jhv.swing.DesktopIntegration;
 

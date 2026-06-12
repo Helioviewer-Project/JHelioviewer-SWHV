@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.filter;
+package org.helioviewer.jhv.event.filter;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,8 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.GOESLevel;
-import org.helioviewer.jhv.events.SWEK;
-import org.helioviewer.jhv.events.SWEKSupplier;
+import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
 
 @SuppressWarnings("serial")

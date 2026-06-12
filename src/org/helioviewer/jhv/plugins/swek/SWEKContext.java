@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.swek;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.events.JHVRelatedEvents;
+import org.helioviewer.jhv.event.JHVRelatedEvents;
 
 final class SWEKContext {
 

@@ -12,10 +12,10 @@ import javax.annotation.Nullable;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.events.JHVEventCache;
-import org.helioviewer.jhv.events.JHVEventListener;
-import org.helioviewer.jhv.events.JHVRelatedEvents;
-import org.helioviewer.jhv.events.info.SWEKEventInformationDialog;
+import org.helioviewer.jhv.event.JHVEventCache;
+import org.helioviewer.jhv.event.JHVEventListener;
+import org.helioviewer.jhv.event.JHVRelatedEvents;
+import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;

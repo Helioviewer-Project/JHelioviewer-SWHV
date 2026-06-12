@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.events.info;
+package org.helioviewer.jhv.event.info;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,9 +17,9 @@ import javax.swing.WindowConstants;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.events.JHVEvent;
-import org.helioviewer.jhv.events.JHVEventCache;
-import org.helioviewer.jhv.events.JHVRelatedEvents;
+import org.helioviewer.jhv.event.JHVEvent;
+import org.helioviewer.jhv.event.JHVEventCache;
+import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.thread.Task;
 
