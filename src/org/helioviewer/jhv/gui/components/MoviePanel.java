@@ -36,8 +36,8 @@ import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
 import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.movie.ExportMovie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 

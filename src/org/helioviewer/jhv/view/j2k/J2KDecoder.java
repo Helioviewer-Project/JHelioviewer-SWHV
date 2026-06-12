@@ -1,14 +1,17 @@
 package org.helioviewer.jhv.view.j2k;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 
 import org.lwjgl.system.MemoryUtil;
+
+//import com.google.common.base.Stopwatch;
+//import com.google.common.math.StatsAccumulator;
 
 import kdu_jni.Jpx_source;
 import kdu_jni.KduException;
@@ -20,9 +23,6 @@ import kdu_jni.Kdu_ilayer_ref;
 import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
-
-//import com.google.common.math.StatsAccumulator;
-//import com.google.common.base.Stopwatch;
 
 record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFilter.Type filterType)
         implements Callable<ImageBuffer> {

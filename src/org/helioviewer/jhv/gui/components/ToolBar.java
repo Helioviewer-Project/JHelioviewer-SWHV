@@ -13,15 +13,15 @@ import java.util.EnumMap;
 //import java.util.Map;
 
 import javax.swing.AbstractButton;
-import javax.swing.Box;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JToolBar;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 
 import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.Settings;

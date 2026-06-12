@@ -15,9 +15,9 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
-import org.helioviewer.jhv.layers.fov.FOVTreePane;
 import org.helioviewer.jhv.layers.TimestampLayer;
 import org.helioviewer.jhv.layers.ViewpointLayer;
+import org.helioviewer.jhv.layers.fov.FOVTreePane;
 
 public final class LayerOptions implements Layers.Listener {
 

@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.display.interaction;
 
-import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.annotation.Annotateable;
+import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.Viewport;

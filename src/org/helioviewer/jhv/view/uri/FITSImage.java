@@ -10,8 +10,11 @@ import java.util.Arrays;
 import org.helioviewer.jhv.base.ArrayUtils;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.thread.ParallelRange;
 import org.helioviewer.jhv.math.MathUtils;
+import org.helioviewer.jhv.thread.ParallelRange;
+
+import com.google.common.escape.Escaper;
+import com.google.common.xml.XmlEscapers;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
@@ -21,9 +24,6 @@ import nom.tam.fits.ImageHDU;
 import nom.tam.fits.header.Standard;
 import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
-
-import com.google.common.escape.Escaper;
-import com.google.common.xml.XmlEscapers;
 
 // essentially static; local or network cache
 public final class FITSImage implements URIImageReader {
