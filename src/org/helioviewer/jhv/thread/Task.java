@@ -15,9 +15,13 @@ public final class Task {
 
     private Task() {}
 
+    public static <T> Future<T> submit(@Nonnull Callable<T> task, @Nonnull FutureCallback<T> callback) {
+        return EDTCallbackExecutor.pool.submit(task, callback);
+    }
+
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                        @Nonnull FailureHandler onFailure) {
-        return EDTCallbackExecutor.pool.submit(task, new FutureCallback<>() {
+        return submit(task, new FutureCallback<>() {
             @Override
             public void onSuccess(T result) {
                 onSuccess.accept(result);
