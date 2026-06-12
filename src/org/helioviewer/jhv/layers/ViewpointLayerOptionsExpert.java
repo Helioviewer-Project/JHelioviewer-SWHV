@@ -13,6 +13,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 

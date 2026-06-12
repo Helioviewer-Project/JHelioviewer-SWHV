@@ -9,6 +9,7 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;

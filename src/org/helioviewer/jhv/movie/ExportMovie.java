@@ -14,7 +14,6 @@ import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.image.nio.MappedImageFactory;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
-import org.helioviewer.jhv.layers.Movie;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.thread.JHVThread;
 

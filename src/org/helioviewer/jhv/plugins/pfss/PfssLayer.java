@@ -8,7 +8,7 @@ import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.opengl.GLSLLine;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;

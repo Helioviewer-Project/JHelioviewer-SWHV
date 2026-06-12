@@ -17,6 +17,7 @@ import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;

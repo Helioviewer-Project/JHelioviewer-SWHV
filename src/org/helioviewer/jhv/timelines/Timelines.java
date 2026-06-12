@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.timelines.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.gui.TimelineDialog;

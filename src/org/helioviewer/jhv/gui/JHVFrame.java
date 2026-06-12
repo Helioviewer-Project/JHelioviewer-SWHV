@@ -32,7 +32,7 @@ import org.helioviewer.jhv.gui.components.statusplugin.ViewpointStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.Movie;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
 import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
