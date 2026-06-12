@@ -9,8 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.components.base.JHVSpinner;
-import org.helioviewer.jhv.swing.DesktopIntegration;
 
 @SuppressWarnings("serial")
 class PfssLayerOptions extends JPanel {

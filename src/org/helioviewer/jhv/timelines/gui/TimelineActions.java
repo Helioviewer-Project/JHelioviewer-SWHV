@@ -11,9 +11,9 @@ import javax.swing.KeyStroke;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.Actions;
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
-import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.timelines.Timelines;
 
 @SuppressWarnings("serial")

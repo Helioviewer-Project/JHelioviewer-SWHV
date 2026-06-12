@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.swing;
+package org.helioviewer.jhv.gui;
 
 import java.awt.Desktop;
 import java.awt.Toolkit;

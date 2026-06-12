@@ -14,6 +14,7 @@ import javax.swing.event.HyperlinkListener;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
@@ -21,7 +22,6 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.opengl.GL;
-import org.helioviewer.jhv.swing.DesktopIntegration;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;

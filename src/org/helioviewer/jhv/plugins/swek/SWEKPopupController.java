@@ -16,6 +16,7 @@ import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.event.JHVPositionInformation;
 import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
+import org.helioviewer.jhv.gui.AwtInputAdapter;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
@@ -26,7 +27,6 @@ import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.GLRenderer;
-import org.helioviewer.jhv.swing.AwtInputAdapter;
 
 class SWEKPopupController implements InputPointerListener, InputPointerMotionListener {
 
