@@ -18,8 +18,8 @@ import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.lut.LUT;
 //import org.helioviewer.jhv.base.XMLUtils;
+import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
