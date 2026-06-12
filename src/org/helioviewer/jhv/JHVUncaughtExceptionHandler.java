@@ -15,9 +15,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
+import org.helioviewer.jhv.gui.DesktopIntegration;
+import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
-import org.helioviewer.jhv.swing.DesktopIntegration;
-import org.helioviewer.jhv.swing.TransferAccess;
 
 class JHVUncaughtExceptionHandler {
 

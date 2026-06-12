@@ -13,11 +13,11 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
-import org.helioviewer.jhv.swing.DesktopIntegration;
-import org.helioviewer.jhv.swing.TransferAccess;
 import org.helioviewer.jhv.thread.Task;
 
 public class LogDialog implements Interfaces.ShowableDialog {

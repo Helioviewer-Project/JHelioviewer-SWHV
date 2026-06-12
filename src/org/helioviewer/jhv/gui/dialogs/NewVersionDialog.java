@@ -11,8 +11,8 @@ import javax.swing.JOptionPane;
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.thread.JHVThread;
 
 import com.jidesoft.dialog.ButtonPanel;

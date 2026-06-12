@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.swing;
+package org.helioviewer.jhv.gui;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -11,8 +11,6 @@ import org.helioviewer.jhv.io.TransferLoad;
 import org.helioviewer.jhv.thread.JHVThread;
 
 public final class TransferAccess {
-
-    private TransferAccess() {}
 
     public static boolean canImport(Transferable transferable) {
         return transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
@@ -54,4 +52,5 @@ public final class TransferAccess {
         }
     }
 
+    private TransferAccess() {}
 }

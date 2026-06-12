@@ -11,10 +11,10 @@ import org.helioviewer.jhv.Platform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.Actions;
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.dialogs.AboutDialog;
 import org.helioviewer.jhv.gui.dialogs.LogDialog;
 import org.helioviewer.jhv.gui.dialogs.SettingsDialog;
-import org.helioviewer.jhv.swing.DesktopIntegration;
 import org.helioviewer.jhv.view.uri.FITSSettings;
 
 // Menu bar of the main window
