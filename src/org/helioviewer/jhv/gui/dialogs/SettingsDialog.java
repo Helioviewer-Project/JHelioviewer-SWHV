@@ -40,7 +40,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.DataSources;
-import org.helioviewer.jhv.movie.VideoFormat;
+import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.thread.Task;
@@ -206,13 +206,13 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
 
         c.gridx = 1;
         c.gridy = 7;
-        JComboBox<VideoFormat> comboVideo = new JComboBox<>(VideoFormat.values());
-        VideoFormat videoFormat = VideoFormat.H264;
+        JComboBox<ExportFormat> comboVideo = new JComboBox<>(ExportFormat.values());
+        ExportFormat videoFormat = ExportFormat.H264;
         try {
-            videoFormat = VideoFormat.valueOf(Settings.getProperty("video.format"));
+            videoFormat = ExportFormat.valueOf(Settings.getProperty("video.format"));
         } catch (Exception ignore) {}
         comboVideo.setSelectedItem(videoFormat);
-        comboVideo.addActionListener(e -> Settings.setProperty("video.format", ((VideoFormat) Objects.requireNonNull(comboVideo.getSelectedItem())).name()));
+        comboVideo.addActionListener(e -> Settings.setProperty("video.format", ((ExportFormat) Objects.requireNonNull(comboVideo.getSelectedItem())).name()));
         settings.add(comboVideo, c);
 
         c.gridx = 0;

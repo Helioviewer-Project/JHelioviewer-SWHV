@@ -2,7 +2,7 @@ package org.helioviewer.jhv.movie;
 
 import java.util.List;
 
-public enum VideoFormat {
+public enum ExportFormat {
     H264("H.264", ".mp4", List.of("-c:v", "libx264", "-profile:v", "high", "-level", "4.2", "-crf", "23", "-preset", "fast",
             "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709:fullrange=on")),
     H264HQ("H.264 better", ".mp4", List.of("-c:v", "libx264", "-profile:v", "high", "-level", "4.2", "-crf", "17", "-preset", "medium",
@@ -17,7 +17,7 @@ public enum VideoFormat {
     final String extension;
     final List<String> settings;
 
-    VideoFormat(String _name, String _extension, List<String> _settings) {
+    ExportFormat(String _name, String _extension, List<String> _settings) {
         name = _name;
         extension = _extension;
         settings = _settings;

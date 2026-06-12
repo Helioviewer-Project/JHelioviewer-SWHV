@@ -143,16 +143,16 @@ public final class ExportMovie implements Movie.Listener {
         grabber = new GLGrab(canvasWidth, canvasHeight);
 
         if (mode == ViewState.RecordingMode.SHOT) {
-            exporter = new ExportWriter(VideoFormat.PNG, canvasWidth, exportHeight, fps);
+            exporter = new ExportWriter(ExportFormat.PNG, canvasWidth, exportHeight, fps);
             shallStop = true;
 
             recording = true;
             notifyStatusChanged();
             DisplayController.render(1);
         } else {
-            VideoFormat format = VideoFormat.H264;
+            ExportFormat format = ExportFormat.H264;
             try {
-                format = VideoFormat.valueOf(Settings.getProperty("video.format"));
+                format = ExportFormat.valueOf(Settings.getProperty("video.format"));
             } catch (Exception ignore) {}
             exporter = new ExportWriter(format, canvasWidth, exportHeight, fps);
 
