@@ -25,7 +25,6 @@ import javax.swing.event.PopupMenuListener;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
-import org.helioviewer.jhv.export.ExportMovie;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
@@ -38,6 +37,7 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.Movie;
+import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
