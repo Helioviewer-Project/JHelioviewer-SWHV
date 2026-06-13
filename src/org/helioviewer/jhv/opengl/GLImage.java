@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 import java.util.Set;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.metadata.DetectorMask;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.view.View;

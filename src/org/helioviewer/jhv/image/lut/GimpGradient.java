@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.lut;
+package org.helioviewer.jhv.image.lut;
 
 import java.awt.Color;
 import java.io.BufferedReader;

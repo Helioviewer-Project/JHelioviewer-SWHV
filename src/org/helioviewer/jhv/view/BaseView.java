@@ -2,9 +2,9 @@ package org.helioviewer.jhv.view;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;

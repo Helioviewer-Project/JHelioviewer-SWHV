@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.lut.LUT;
+import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.view.View;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
