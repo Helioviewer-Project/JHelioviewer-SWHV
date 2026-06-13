@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.List;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
+import org.helioviewer.jhv.time.Interval;
 
 import org.json.JSONException;
 import org.json.JSONObject;

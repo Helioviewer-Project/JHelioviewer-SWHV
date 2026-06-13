@@ -10,8 +10,8 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.interval.RequestCache;
+import org.helioviewer.jhv.time.Interval;
+import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 
 public class JHVEventCache {

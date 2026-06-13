@@ -21,8 +21,6 @@ import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKGroup;
@@ -30,6 +28,8 @@ import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.thread.JHVThread;
 import org.helioviewer.jhv.thread.SingleExecutor;
+import org.helioviewer.jhv.time.Interval;
+import org.helioviewer.jhv.time.RequestCache;
 
 public class EventDatabase {
 

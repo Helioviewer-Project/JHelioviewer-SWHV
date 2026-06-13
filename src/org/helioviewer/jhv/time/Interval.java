@@ -1,11 +1,9 @@
-package org.helioviewer.jhv.base.interval;
+package org.helioviewer.jhv.time;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import org.helioviewer.jhv.time.TimeUtils;
 
 public record Interval(long start, long end) implements Comparable<Interval> {
 
