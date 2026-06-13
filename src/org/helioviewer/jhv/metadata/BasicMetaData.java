@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.metadata;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 public class BasicMetaData extends CommonMetaData {
