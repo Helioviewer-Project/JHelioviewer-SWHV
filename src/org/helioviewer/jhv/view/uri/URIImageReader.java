@@ -4,9 +4,9 @@ import java.io.File;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.base.lut.LUT;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.lut.LUT;
 
 interface URIImageReader {
 

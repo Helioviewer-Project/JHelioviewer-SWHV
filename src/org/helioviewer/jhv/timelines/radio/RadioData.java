@@ -18,10 +18,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.base.lut.LUTComboBox;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.image.lut.LUT;
+import org.helioviewer.jhv.image.lut.LUTComboBox;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;

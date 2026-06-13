@@ -7,10 +7,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.base.lut.LUT;
-import org.helioviewer.jhv.base.lut.LUTComboBox;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.image.lut.LUT;
+import org.helioviewer.jhv.image.lut.LUTComboBox;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.swing.JideToggleButton;

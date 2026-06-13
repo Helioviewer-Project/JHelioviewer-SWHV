@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.lut;
+package org.helioviewer.jhv.image.lut;
 
 import java.io.BufferedReader;
 import java.io.File;
