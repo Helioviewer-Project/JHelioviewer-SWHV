@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.annotation.Annotations;
@@ -34,8 +33,6 @@ import org.helioviewer.jhv.timelines.Timelines;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.google.common.util.concurrent.FutureCallback;
 
 public final class State {
 
@@ -202,14 +199,15 @@ public final class State {
         Annotations.fromJson(data.optJSONObject("annotations"));
 
         JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Player.getTime().milli));
+        Callback callback = new Callback(context, newLayers, masterLayer, time, modeData);
         Task.submit(
                 new ImageLayers.WaitUntilLoaded(newLayers.keySet()),
-                new Callback(context, newLayers, masterLayer, time, modeData));
+                callback::onSuccess,
+                callback::onFailure);
     }
 
     private record Callback(@Nullable Commands.OperationContext context, Map<ImageLayer, Boolean> newLayers,
-                            @Nullable ImageLayer masterLayer, JHVTime time,
-                            ViewState.ModeData modeData) implements FutureCallback<Void> {
+                            @Nullable ImageLayer masterLayer, JHVTime time, ViewState.ModeData modeData) {
 
         private void applyRestoredPlaybackState() {
             ViewState.applyMode(modeData); // this applies projection again
@@ -217,8 +215,7 @@ public final class State {
             DisplayController.refreshCamera();
         }
 
-        @Override
-        public void onSuccess(Void result) {
+        void onSuccess(Void result) {
             newLayers.keySet().forEach(ImageLayer::unload); // prune failed layers
             for (ImageLayer layer : Layers.getImageLayers()) {
                 Boolean enabled = newLayers.get(layer);
@@ -231,8 +228,7 @@ public final class State {
             Commands.notifyLoadStateFinished(context, true, "State loaded.");
         }
 
-        @Override
-        public void onFailure(@Nonnull Throwable t) {
+        void onFailure(Throwable t) {
             Log.error(t);
             String message = t.getMessage() == null || t.getMessage().isBlank() ? "State load failed." : t.getMessage();
             Commands.notifyLoadStateFinished(context, false, message);

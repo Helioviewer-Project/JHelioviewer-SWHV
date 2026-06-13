@@ -9,27 +9,16 @@ import javax.annotation.Nonnull;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 
-import com.google.common.util.concurrent.FutureCallback;
-
 public final class Task {
 
-    public static <T> Future<T> submit(@Nonnull Callable<T> task, @Nonnull FutureCallback<T> callback) {
-        return EDTCallbackExecutor.pool.submit(task, callback);
+    public static <T> Future<T> submit(@Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
+                                       @Nonnull Consumer<Throwable> onFailure) {
+        return EDTCallbackExecutor.pool.submit(task, onSuccess, onFailure);
     }
 
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                        @Nonnull FailureHandler onFailure) {
-        return submit(task, new FutureCallback<>() {
-            @Override
-            public void onSuccess(T result) {
-                onSuccess.accept(result);
-            }
-
-            @Override
-            public void onFailure(@Nonnull Throwable t) {
-                onFailure.onFailure(logContext, t);
-            }
-        });
+        return EDTCallbackExecutor.pool.submit(task, onSuccess, t -> onFailure.onFailure(logContext, t));
     }
 
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
