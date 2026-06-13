@@ -3,10 +3,10 @@ package org.helioviewer.jhv.opengl;
 import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 public class GLSLSolarShader extends GLSLShader {

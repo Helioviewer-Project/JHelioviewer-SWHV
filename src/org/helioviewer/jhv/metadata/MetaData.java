@@ -3,7 +3,6 @@ package org.helioviewer.jhv.metadata;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 public interface MetaData {

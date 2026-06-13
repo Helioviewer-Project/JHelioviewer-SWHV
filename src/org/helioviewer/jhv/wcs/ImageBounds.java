@@ -1,8 +1,8 @@
 package org.helioviewer.jhv.wcs;
 
-import org.helioviewer.jhv.base.Region;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.Region;
 
 public final class ImageBounds {
 
