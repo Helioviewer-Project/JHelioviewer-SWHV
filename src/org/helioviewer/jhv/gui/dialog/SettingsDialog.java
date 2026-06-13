@@ -38,7 +38,7 @@ import org.helioviewer.jhv.DisplaySettings;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.movie.ExportFormat;
 import org.helioviewer.jhv.plugins.Plugin;
@@ -68,7 +68,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
     private DefaultsSelectionPanel defaultsPanel;
 
     public SettingsDialog() {
-        super(JHVFrame.getFrame(), "Settings", true);
+        super(MainFrame.get(), "Settings", true);
         setResizable(false);
     }
 
@@ -112,7 +112,7 @@ public final class SettingsDialog extends StandardDialog implements Interfaces.S
     public void showDialog() {
         updateCacheSize();
         pack();
-        setLocationRelativeTo(JHVFrame.getFrame());
+        setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 

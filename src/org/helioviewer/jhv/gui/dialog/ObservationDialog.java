@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.CadencePanel;
 import org.helioviewer.jhv.gui.component.ImageSelectorPanel;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
@@ -46,7 +46,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
     private static ObservationDialog instance;
 
     public static ObservationDialog getInstance() {
-        return instance == null ? instance = new ObservationDialog(JHVFrame.getFrame()) : instance;
+        return instance == null ? instance = new ObservationDialog(MainFrame.get()) : instance;
     }
 
     private ObservationDialog(JFrame mainFrame) {
@@ -115,7 +115,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
         }
 
         pack();
-        setLocationRelativeTo(JHVFrame.getFrame());
+        setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 

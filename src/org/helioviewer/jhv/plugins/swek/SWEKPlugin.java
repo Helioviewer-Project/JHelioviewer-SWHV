@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins.swek;
 
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayerOptions;
 import org.helioviewer.jhv.plugins.Plugin;
@@ -41,8 +41,8 @@ public class SWEKPlugin extends Plugin {
         popupController = new SWEKPopupController();
         bindLayer();
 
-        JHVFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
-        JHVFrame.getLeftContentPane().revalidate();
+        MainFrame.getLeftContentPane().add("Space Weather Event Knowledgebase", swekPanel, true);
+        MainFrame.getLeftContentPane().revalidate();
 
         LayerOptions.register(SWEKLayer.class, layer -> new SWEKLayerOptionsPanel((SWEKLayer) layer));
         popupController.install();
@@ -56,8 +56,8 @@ public class SWEKPlugin extends Plugin {
         popupController.setLayer(null);
         LayerOptions.unregister(SWEKLayer.class);
 
-        JHVFrame.getLeftContentPane().remove(swekPanel);
-        JHVFrame.getLeftContentPane().revalidate();
+        MainFrame.getLeftContentPane().remove(swekPanel);
+        MainFrame.getLeftContentPane().revalidate();
         swekPanel = null;
         popupController = null;
         etl = null;

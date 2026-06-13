@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.layers.ConnectionLayer;
 import org.helioviewer.jhv.layers.connect.LoadConnectivity;
 import org.helioviewer.jhv.layers.connect.LoadFootpoint;
@@ -50,7 +50,7 @@ final class ConnectionLayerOptions extends JPanel {
     }
 
     private void load(ConnectionLayer layer, BiConsumer<URI, ConnectionLayer> consumer) {
-        FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
+        FileDialog fileDialog = new FileDialog(MainFrame.get(), "Choose a file", FileDialog.LOAD);
         fileDialog.setMultipleMode(false);
         fileDialog.setVisible(true);
 

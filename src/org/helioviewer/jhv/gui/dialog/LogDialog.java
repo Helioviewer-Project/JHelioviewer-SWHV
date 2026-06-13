@@ -15,7 +15,7 @@ import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.thread.Task;
@@ -53,7 +53,7 @@ public class LogDialog implements Interfaces.ShowableDialog {
         optionPane.setMessage(new Object[]{report, copyToClipboard, new JSeparator(), scrollPane});
         optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
         optionPane.setOptions(new String[]{"Close"});
-        optionPane.createDialog(JHVFrame.getFrame(), "JHelioviewer Log").setVisible(true);
+        optionPane.createDialog(MainFrame.get(), "JHelioviewer Log").setVisible(true);
     }
 
 }

@@ -49,7 +49,7 @@ final class MessageHandler implements Message.Handler {
             optionPane.setMessage(new Object[]{report, scrollPane});
             optionPane.setMessageType(type);
             optionPane.setOptions(new String[]{"Close"});
-            optionPane.createDialog(JHVFrame.getFrame(), title).setVisible(true);
+            optionPane.createDialog(MainFrame.get(), title).setVisible(true);
         });
     }
 

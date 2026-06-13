@@ -122,7 +122,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
+            FileDialog fileDialog = new FileDialog(MainFrame.get(), "Choose a file", FileDialog.LOAD);
             // does not work on Windows
             fileDialog.setFilenameFilter(ExtensionFileFilter.Image);
             fileDialog.setMultipleMode(true);
@@ -282,7 +282,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Save as...", FileDialog.SAVE);
+            FileDialog fileDialog = new FileDialog(MainFrame.get(), "Save as...", FileDialog.SAVE);
             // does not work on Windows
             fileDialog.setFilenameFilter(ExtensionFileFilter.JHV);
             fileDialog.setMultipleMode(false);
@@ -345,9 +345,9 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int state = JHVFrame.getFrame().getExtendedState();
+            int state = MainFrame.get().getExtendedState();
             state ^= JFrame.ICONIFIED;
-            JHVFrame.getFrame().setExtendedState(state);
+            MainFrame.get().setExtendedState(state);
         }
     }
 
@@ -358,9 +358,9 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int state = JHVFrame.getFrame().getExtendedState();
+            int state = MainFrame.get().getExtendedState();
             state ^= JFrame.MAXIMIZED_BOTH;
-            JHVFrame.getFrame().setExtendedState(state);
+            MainFrame.get().setExtendedState(state);
         }
     }
 

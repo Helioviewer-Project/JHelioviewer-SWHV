@@ -26,7 +26,7 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.SoarClient;
 
@@ -67,7 +67,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
     private static SoarDialog instance;
 
     public static SoarDialog getInstance() {
-        return instance == null ? instance = new SoarDialog(JHVFrame.getFrame()) : instance;
+        return instance == null ? instance = new SoarDialog(MainFrame.get()) : instance;
     }
 
     private SoarDialog(JFrame mainFrame) {
@@ -223,7 +223,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
 
     public void showDialog() {
         pack();
-        setLocationRelativeTo(JHVFrame.getFrame());
+        setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 

@@ -17,7 +17,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
@@ -95,12 +95,12 @@ public class JHelioviewer {
         EventQueue.invokeLater(() -> {
             Log.info("Start main window");
             UIGlobals.setLaf();
-            JFrame frame = JHVFrame.prepare();
+            JFrame frame = MainFrame.prepare();
 
             loadPlugins(true);
 
             frame.pack();
-            JHVFrame.stabilizeLeftPaneWidth();
+            MainFrame.stabilizeLeftPaneWidth();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             UITimer.start();

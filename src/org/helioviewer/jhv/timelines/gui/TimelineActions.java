@@ -12,7 +12,7 @@ import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.timelines.Timelines;
 
@@ -40,7 +40,7 @@ public class TimelineActions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            FileDialog fileDialog = new FileDialog(JHVFrame.getFrame(), "Choose a file", FileDialog.LOAD);
+            FileDialog fileDialog = new FileDialog(MainFrame.get(), "Choose a file", FileDialog.LOAD);
             // does not work on Windows
             fileDialog.setFilenameFilter(ExtensionFileFilter.Timeline);
             fileDialog.setMultipleMode(true);

@@ -29,7 +29,7 @@ import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.dialog.ObservationDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -221,7 +221,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         addLayerPanel.add(syncButton, BorderLayout.LINE_END);
         add(addLayerPanel);
 
-        add(JHVFrame.getLayersPanel());
+        add(MainFrame.getLayersPanel());
 
         Player.addStatusListener(this);
         ExportMovie.addStatusListener(this);
