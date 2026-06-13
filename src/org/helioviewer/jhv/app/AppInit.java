@@ -27,7 +27,7 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import nom.tam.fits.FitsFactory;
 
-public final class JHVInit {
+public final class AppInit {
 
     public static void init(boolean webProfilePopup) throws Exception {
         SampClient.init(webProfilePopup);
@@ -126,5 +126,5 @@ public final class JHVInit {
         Spice.loadKernels(userKernels);
     }
 
-    private JHVInit() {}
+    private AppInit() {}
 }
