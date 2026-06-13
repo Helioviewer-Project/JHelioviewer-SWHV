@@ -23,8 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.app.Message;
+import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
@@ -40,7 +40,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
     private static final double MAX_SIZE = 2;
     private static final Dimension resultSize = new Dimension(500, 350);
     private static final String[] Level = {/* "LL01", "LL02", "LL03",*/ "L1", "L2", "L3"};
-    private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(JHVGlobals.alphanumComparator).
+    private static final ImmutableSortedMap<String, List<String>> Dataset = new ImmutableSortedMap.Builder<String, List<String>>(NaturalSort.comparator).
             put("EUI FSI 174", List.of("eui-fsi174-image", "eui-fsi174-image-occulter", "eui-fsi174-image-short")).
             put("EUI FSI 304", List.of("eui-fsi304-image", "eui-fsi304-image-occulter", "eui-fsi304-image-short")).
             put("EUI HRI 174", List.of("eui-hrieuv174-image", "eui-hrieuvnon-image")).

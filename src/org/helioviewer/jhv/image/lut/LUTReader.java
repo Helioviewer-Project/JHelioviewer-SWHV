@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.FileUtils;
 
@@ -65,7 +65,7 @@ final class LUTReader {
             -11509590, -11444567, -11314008, -11183449, -11053146, -10988123, -10857564, -10727005, -10596446});
 
     static Map<String, LUT> read(String resourcePath) {
-        TreeMap<String, LUT> luts = new TreeMap<>(JHVGlobals.alphanumComparator);
+        TreeMap<String, LUT> luts = new TreeMap<>(NaturalSort.comparator);
         luts.put(gray.name(), gray);
         luts.put(spectral.name(), spectral);
 
