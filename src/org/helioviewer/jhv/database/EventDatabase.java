@@ -25,14 +25,14 @@ import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.SingleExecutor;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 
 public class EventDatabase {
 
-    private static final SingleExecutor executor = new SingleExecutor(new JHVThread.NamedThreadFactory("EventDatabase"));
+    private static final SingleExecutor executor = new SingleExecutor(new AppThread.NamedThreadFactory("EventDatabase"));
 
     public record Event2Db(byte[] compressedJson, long start, long end, long archiv, String uid,
                            List<JHVDatabaseParam> paramList) {}

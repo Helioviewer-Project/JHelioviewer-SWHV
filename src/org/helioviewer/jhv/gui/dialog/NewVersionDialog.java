@@ -14,7 +14,7 @@ import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.io.NetClient;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 
 import com.jidesoft.dialog.ButtonPanel;
 
@@ -28,7 +28,7 @@ public class NewVersionDialog extends TextDialog {
     }
 
     public static void check() {
-        JHVThread.create(() -> {
+        AppThread.create(() -> {
             try (NetClient nc = NetClient.of(new URI(AppInfo.downloadURL + "VERSION")); BufferedSource source = nc.getSource()) {
                 String version = source.readUtf8Line();
                 if (version == null || version.isEmpty())

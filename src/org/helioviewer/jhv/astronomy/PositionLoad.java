@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.UriTemplate;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -108,7 +108,7 @@ public final class PositionLoad {
     }
 
     private static void onFailure(StatusReceiver receiver, Throwable t) {
-        if (!JHVThread.isInterrupted(t))
+        if (!AppThread.isInterrupted(t))
             receiver.setStatus(t.getMessage());
     }
 

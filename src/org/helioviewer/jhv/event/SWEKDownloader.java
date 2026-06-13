@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.filter.FilterManager;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.time.Interval;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -22,12 +22,12 @@ class SWEKDownloader implements FilterManager.Listener {
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
     private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
             new PriorityBlockingQueue<>(2048, new ComparePriority()),
-            new JHVThread.NamedThreadFactory("SWEK Download"),
+            new AppThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy()) {
         @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
-            JHVThread.afterExecute(r, t);
+            AppThread.afterExecute(r, t);
         }
     };
 

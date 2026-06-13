@@ -32,7 +32,7 @@ public final class LatestWorker<T> {
         worker = new ThreadPoolExecutor(
                 1, 1, 10000L, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(1),
-                new JHVThread.NamedThreadFactory(name),
+                new AppThread.NamedThreadFactory(name),
                 new ThreadPoolExecutor.DiscardOldestPolicy());
         worker.allowCoreThreadTimeOut(true);
         executor = new EDTCallbackExecutor(MoreExecutors.listeningDecorator(worker));

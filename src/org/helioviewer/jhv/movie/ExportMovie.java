@@ -15,7 +15,7 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.image.nio.MappedImageFactory;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLGrab;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 
 public final class ExportMovie implements Player.Listener {
 
@@ -24,7 +24,7 @@ public final class ExportMovie implements Player.Listener {
     }
 
     private static final ExportMovie instance = new ExportMovie();
-    private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new JHVThread.NamedThreadFactory("JHV-EncodeMovie"));
+    private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new AppThread.NamedThreadFactory("JHV-EncodeMovie"));
     private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
 
     private static ExportWriter exporter;

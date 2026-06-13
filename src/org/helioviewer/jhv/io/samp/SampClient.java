@@ -13,7 +13,7 @@ import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
@@ -41,7 +41,7 @@ public final class SampClient extends HubConnector {
     private static SampClient instance; // keep instance built at startup
 
     public static void init(boolean webProfilePopup) {
-        JHVThread.create(() -> {
+        AppThread.create(() -> {
             if (Boolean.parseBoolean(Settings.getProperty("startup.sampHub"))) {
                 try {
                     if (Hub.getRunningHubs().length == 0) {

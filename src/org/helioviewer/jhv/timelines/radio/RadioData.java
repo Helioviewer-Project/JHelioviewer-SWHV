@@ -26,7 +26,7 @@ import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.NetFileCache;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
@@ -153,7 +153,7 @@ public final class RadioData extends AbstractTimelineLayer {
 
     private void onFailureRadioJPX(long date, @Nonnull Throwable t) {
         doneRadioJPX(date);
-        if (JHVThread.isInterrupted(t)) {
+        if (AppThread.isInterrupted(t)) {
             Log.warn(t);
             return;
         }

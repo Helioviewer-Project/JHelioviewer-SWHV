@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 
 import okio.Buffer;
@@ -85,7 +85,7 @@ public class DownloadLayer {
 
     private static void onFailure(Progress progress, Throwable t) {
         progress.done();
-        if (JHVThread.isInterrupted(t)) {
+        if (AppThread.isInterrupted(t)) {
             Log.warn(t);
             return;
         }
