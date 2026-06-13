@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.plugins;
 
-import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Settings;
 
 import org.json.JSONObject;
 

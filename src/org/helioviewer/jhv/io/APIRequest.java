@@ -2,7 +2,7 @@ package org.helioviewer.jhv.io;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;

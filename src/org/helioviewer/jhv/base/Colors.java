@@ -2,7 +2,7 @@ package org.helioviewer.jhv.base;
 
 import java.awt.Color;
 
-import org.helioviewer.jhv.DisplaySettings;
+import org.helioviewer.jhv.app.DisplaySettings;
 
 public class Colors {
 

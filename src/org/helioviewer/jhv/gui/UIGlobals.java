@@ -17,7 +17,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 //import javax.swing.plaf.FontUIResource;
 
-import org.helioviewer.jhv.DisplaySettings;
+import org.helioviewer.jhv.app.DisplaySettings;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.gui.IconBank.JHVIcon;
