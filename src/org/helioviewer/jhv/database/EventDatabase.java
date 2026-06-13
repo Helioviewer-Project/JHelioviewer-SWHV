@@ -35,7 +35,7 @@ public class EventDatabase {
     private static final SingleExecutor executor = new SingleExecutor(new AppThread.NamedThreadFactory("EventDatabase"));
 
     public record Event2Db(byte[] compressedJson, long start, long end, long archiv, String uid,
-                           List<JHVDatabaseParam> paramList) {}
+                           List<DatabaseField> paramList) {}
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
@@ -289,8 +289,8 @@ public class EventDatabase {
                     {
                         StringBuilder fieldString = new StringBuilder();
                         StringBuilder varString = new StringBuilder();
-                        for (JHVDatabaseParam p : event2db.paramList) {
-                            fieldString.append(',').append(p.getParamName());
+                        for (DatabaseField p : event2db.paramList) {
+                            fieldString.append(',').append(p.name());
                             varString.append(",?");
                         }
                         String full_statement = "INSERT INTO " + type.getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ')';
@@ -298,14 +298,8 @@ public class EventDatabase {
                         pstatement.setInt(1, generatedKey);
 
                         int index = 2;
-                        for (JHVDatabaseParam p : event2db.paramList) {
-                            if (p.isInt()) {
-                                pstatement.setInt(index, p.getIntValue());
-                            } else if (p.isString()) {
-                                pstatement.setString(index, p.getStringValue());
-                            } else if (p.isDouble()) {
-                                pstatement.setDouble(index, p.getDoubleValue());
-                            }
+                        for (DatabaseField p : event2db.paramList) {
+                            p.bind(pstatement, index);
                             index++;
                         }
                         pstatement.executeUpdate();
