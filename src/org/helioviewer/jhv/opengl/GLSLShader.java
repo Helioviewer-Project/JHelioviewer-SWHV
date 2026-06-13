@@ -51,7 +51,7 @@ abstract class GLSLShader {
             initUniforms(progID);
         } catch (Exception e) {
             _dispose();
-            throw new JHVGLException("Cannot load shader", e);
+            throw new GLException("Cannot load shader", e);
         }
     }
 
@@ -100,9 +100,9 @@ abstract class GLSLShader {
                 if (infoLogLength > 0) {
                     String log = GL.glGetShaderInfoLog(id, infoLogLength);
                     Log.error(log);
-                    throw new JHVGLException("Cannot compile shader: " + log);
+                    throw new GLException("Cannot compile shader: " + log);
                 } else
-                    throw new JHVGLException("Cannot compile shader: unknown reason");
+                    throw new GLException("Cannot compile shader: unknown reason");
             }
             return id;
         } catch (Exception e) {
@@ -125,9 +125,9 @@ abstract class GLSLShader {
                 if (infoLogLength > 0) {
                     String log = GL.glGetProgramInfoLog(id, infoLogLength);
                     Log.error(log);
-                    throw new JHVGLException("Cannot link shader: " + log);
+                    throw new GLException("Cannot link shader: " + log);
                 } else
-                    throw new JHVGLException("Cannot link shader: unknown reason");
+                    throw new GLException("Cannot link shader: unknown reason");
             }
 
             GL.glDetachShader(id, vertexID);

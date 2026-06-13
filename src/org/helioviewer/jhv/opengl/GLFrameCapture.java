@@ -165,7 +165,7 @@ final class GLFrameCapture {
     private static void checkFramebufferComplete(String label) {
         int status = GL.glCheckFramebufferStatus(GL.FRAMEBUFFER);
         if (status != GL.FRAMEBUFFER_COMPLETE)
-            throw new JHVGLException("GLFrameCapture " + label + " framebuffer incomplete: 0x" + Integer.toHexString(status));
+            throw new GLException("GLFrameCapture " + label + " framebuffer incomplete: 0x" + Integer.toHexString(status));
     }
 
     private static int attachDepthRenderbuffer(int width, int height, int samples, int renderbuffer) {

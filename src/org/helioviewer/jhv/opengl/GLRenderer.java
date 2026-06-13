@@ -129,7 +129,7 @@ public final class GLRenderer {
         GLSLShapeShader.dispose();
         GLSLTextureShader.dispose();
 
-        JHVGLException.checkErrors("GLRenderer.dispose()");
+        GLException.checkErrors("GLRenderer.dispose()");
     }
 
     static void renderScene() {
