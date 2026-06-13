@@ -8,6 +8,11 @@ import javax.annotation.Nullable;
 import org.apache.commons.validator.routines.UrlValidator;
 
 public class JHVEvent {
+
+    public record Link(int leftId, int rightId) {}
+
+    public record LinkRef(String leftUid, String rightUid) {}
+
     public final long start;
     public final long end;
     private final int id;

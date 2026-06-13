@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.event.GOESLevel;
@@ -118,12 +117,12 @@ public class HEKHandler extends SWEKHandler {
     protected boolean parseAssociations(JSONObject eventJSON) {
         JSONArray associations = eventJSON.getJSONArray("association");
         int len = associations.length();
-        Pair<?, ?>[] assocs = new Pair<?, ?>[len];
+        JHVEvent.LinkRef[] links = new JHVEvent.LinkRef[len];
         for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            assocs[i] = new Pair<>(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
+            links[i] = new JHVEvent.LinkRef(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
         }
-        return EventDatabase.dump_association2db((Pair<String, String>[]) assocs) != -1;
+        return EventDatabase.dump_association2db(links) != -1;
     }
 
     @Override

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -24,7 +23,7 @@ public class JHVEventCache {
     private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
     private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
-    private static final HashMap<Integer, HashSet<Pair<Integer, Integer>>> pendingAssocs = new HashMap<>();
+    private static final HashMap<Integer, HashSet<JHVEvent.Link>> pendingAssocs = new HashMap<>();
 
     private static JHVRelatedEvents lastHighlighted = null;
 
@@ -78,7 +77,7 @@ public class JHVEventCache {
     }
 
     private static void resolvePendingAssociations(Integer id) {
-        HashSet<Pair<Integer, Integer>> pending = pendingAssocs.remove(id);
+        HashSet<JHVEvent.Link> pending = pendingAssocs.remove(id);
         if (pending != null)
             pending.forEach(JHVEventCache::addAssociation);
     }
@@ -96,24 +95,24 @@ public class JHVEventCache {
         }
     }
 
-    static void addAssociation(Pair<Integer, Integer> association) {
-        JHVRelatedEvents left = relEvents.get(association.left());
-        JHVRelatedEvents right = relEvents.get(association.right());
+    static void addAssociation(JHVEvent.Link link) {
+        JHVRelatedEvents left = relEvents.get(link.leftId());
+        JHVRelatedEvents right = relEvents.get(link.rightId());
         if (left != null && right != null) {
             if (left != right) {
                 merge(left, right);
-                left.addAssociation(association);
+                left.addAssociation(link);
             }
         } else {
             if (left == null)
-                addPendingAssociation(association.left(), association);
+                addPendingAssociation(link.leftId(), link);
             if (right == null)
-                addPendingAssociation(association.right(), association);
+                addPendingAssociation(link.rightId(), link);
         }
     }
 
-    private static void addPendingAssociation(Integer id, Pair<Integer, Integer> association) {
-        pendingAssocs.computeIfAbsent(id, k -> new HashSet<>()).add(association);
+    private static void addPendingAssociation(int id, JHVEvent.Link link) {
+        pendingAssocs.computeIfAbsent(id, k -> new HashSet<>()).add(link);
     }
 
     public static List<JHVRelatedEvents> getEvents(long start, long end) {
