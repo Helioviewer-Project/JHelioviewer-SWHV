@@ -10,8 +10,8 @@ import java.sql.Statement;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.io.Directories;
 
 final class EventDatabaseThread {
 
@@ -49,7 +49,7 @@ final class EventDatabaseThread {
         if (connection != null)
             return connection;
 
-        Path path = Path.of(JHVDirectory.CACHE.getPath(), "events.db");
+        Path path = Path.of(Directories.CACHE.getPath(), "events.db");
         boolean fexist = Files.exists(path);
         connection = DriverManager.getConnection("jdbc:sqlite:" + path);
 

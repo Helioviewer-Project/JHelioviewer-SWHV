@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 
 import org.json.JSONArray;
@@ -59,7 +58,7 @@ public class DataSources {
 
     public static void initSources() {
         ImmutableMap.Builder<String, Map<String, String>> builder = new ImmutableMap.Builder<>();
-        Path userSources = Path.of(JHVDirectory.SETTINGS.getPath(), "sources.json");
+        Path userSources = Path.of(Directories.SETTINGS.getPath(), "sources.json");
         if (Files.exists(userSources)) { // user servers
             try (BufferedReader reader = Files.newBufferedReader(userSources)) {
                 loadUserServers(JSONUtils.get(reader), builder);

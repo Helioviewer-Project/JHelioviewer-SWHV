@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.FileUtils;
 
 import org.ehcache.Cache;
@@ -54,8 +54,8 @@ public class JPIPCacheManager {
     private static final int HEADER_BYTES = 8;
     private static final Duration EXPIRY = Duration.ofDays(7);
     private static final long MAX_STREAM_CACHE_SIZE = 8L * 1024 * 1024 * 1024;
-    private static final Path levelCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPLevel-5");
-    private static final Path streamCacheDir = Path.of(JHVDirectory.CACHE.getPath(), "JPIPStream-5");
+    private static final Path levelCacheDir = Path.of(Directories.CACHE.getPath(), "JPIPLevel-5");
+    private static final Path streamCacheDir = Path.of(Directories.CACHE.getPath(), "JPIPStream-5");
 
     private static final Object cacheLock = new Object();
 
@@ -297,7 +297,7 @@ public class JPIPCacheManager {
     private static void deleteDirs(String... dirs) {
         for (String dir : dirs) { // delete old versions
             try {
-                FileUtils.deleteDir(Path.of(JHVDirectory.CACHE.getPath(), dir));
+                FileUtils.deleteDir(Path.of(Directories.CACHE.getPath(), dir));
             } catch (Exception ignore) {}
         }
     }

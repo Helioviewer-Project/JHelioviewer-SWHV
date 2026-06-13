@@ -6,13 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.Directories;
 
 @SuppressWarnings("serial")
 public class Settings {
 
-    private static final Path userPath = Path.of(JHVDirectory.SETTINGS.getPath(), "user.properties");
+    private static final Path userPath = Path.of(Directories.SETTINGS.getPath(), "user.properties");
     private static final Properties defaults = new Properties() {
         {
             setProperty("startup.sampHub", "true");
@@ -35,9 +35,9 @@ public class Settings {
         }
 
         if (getProperty("path.local") == null)
-            setProperty("path.local", JHVDirectory.DOWNLOADS.getPath());
+            setProperty("path.local", Directories.DOWNLOADS.getPath());
         if (getProperty("path.state") == null)
-            setProperty("path.state", JHVDirectory.STATES.getPath());
+            setProperty("path.state", Directories.STATES.getPath());
         String server = getProperty("dataSources.defaultServer");
         if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
             setProperty("dataSources.defaultServer", "IAS");

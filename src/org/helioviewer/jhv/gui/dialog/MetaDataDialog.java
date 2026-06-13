@@ -18,13 +18,13 @@ import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.component.WrappedTable;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.XMLUtils;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.FitsMetaData;
@@ -180,7 +180,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
             return;
 
         Task.submit("metadata-export", () -> {
-            Path path = Path.of(JHVDirectory.EXPORTS.getPath(), filename);
+            Path path = Path.of(Directories.EXPORTS.getPath(), filename);
             try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                 writer.write(xml, 0, xml.length());
             }

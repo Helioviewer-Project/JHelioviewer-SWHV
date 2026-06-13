@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.AppThread;
 
@@ -77,7 +76,7 @@ public class FileUtils {
     public static List<URI> unZip(URI uri) throws IOException {
         List<URI> uriList = new ArrayList<>();
         String uriPath = uri.getPath();
-        Path targetDir = tempDir(JHVDirectory.fileCacheDir, uriPath.substring(Math.max(0, uriPath.lastIndexOf('/') + 1)) + ".x").toPath();
+        Path targetDir = tempDir(Directories.fileCacheDir, uriPath.substring(Math.max(0, uriPath.lastIndexOf('/') + 1)) + ".x").toPath();
 
         try (FileSystem zipfs = FileSystems.newFileSystem(URI.create("jar:" + uri), Collections.emptyMap())) {
             for (Path root : zipfs.getRootDirectories()) {

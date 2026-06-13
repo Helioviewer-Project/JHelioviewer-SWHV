@@ -12,12 +12,12 @@ import javax.swing.JColorChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -70,7 +70,7 @@ class BandOptions extends JPanel {
         JideButton downloadButton = new JideButton(Buttons.download);
         downloadButton.setToolTipText("Download selected layer");
         downloadButton.addActionListener(e -> {
-            Path path = Path.of(JHVDirectory.DOWNLOADS.getPath(),
+            Path path = Path.of(Directories.DOWNLOADS.getPath(),
                     band.getBandType().getName().replace(' ', '_') + "__" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".json");
             JSONObject jo = band.toJson();
 
