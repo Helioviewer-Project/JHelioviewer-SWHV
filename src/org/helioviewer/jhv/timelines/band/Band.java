@@ -13,10 +13,10 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.GOESLevel;
-import org.helioviewer.jhv.base.interval.Interval;
-import org.helioviewer.jhv.base.interval.RequestCache;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.thread.LatestWorker;
+import org.helioviewer.jhv.time.Interval;
+import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;

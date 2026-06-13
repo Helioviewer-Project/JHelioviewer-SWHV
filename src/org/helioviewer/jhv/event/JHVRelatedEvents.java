@@ -11,8 +11,8 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.time.Interval;
 
 public class JHVRelatedEvents {
 

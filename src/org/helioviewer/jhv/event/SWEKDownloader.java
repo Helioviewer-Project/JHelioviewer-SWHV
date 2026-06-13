@@ -9,10 +9,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.base.Pair;
-import org.helioviewer.jhv.base.interval.Interval;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.filter.FilterManager;
 import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.time.Interval;
 
 import com.google.common.collect.ArrayListMultimap;
 

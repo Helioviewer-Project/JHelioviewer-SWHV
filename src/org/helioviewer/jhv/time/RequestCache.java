@@ -1,4 +1,4 @@
-package org.helioviewer.jhv.base.interval;
+package org.helioviewer.jhv.time;
 
 import java.util.ArrayList;
 import java.util.List;
