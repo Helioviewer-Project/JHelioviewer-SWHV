@@ -17,7 +17,7 @@ import javax.swing.table.TableRowSorter;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.event.JHVEventParameter;
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.components.base.WrappedTable;
+import org.helioviewer.jhv.gui.component.WrappedTable;
 
 @SuppressWarnings("serial")
 class ParameterTablePanel extends JPanel {

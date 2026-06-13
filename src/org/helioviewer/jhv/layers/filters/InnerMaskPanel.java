@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.JLabel;
 
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
+import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLImage;
 

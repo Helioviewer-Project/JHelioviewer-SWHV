@@ -1,0 +1,125 @@
+package org.helioviewer.jhv.gui.dialog;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.io.InputStream;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.gui.DesktopIntegration;
+import org.helioviewer.jhv.gui.IconBank;
+import org.helioviewer.jhv.gui.Interfaces;
+import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.gui.component.HTMLPane;
+import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.opengl.GL;
+
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
+
+@SuppressWarnings("serial")
+public final class AboutDialog extends StandardDialog implements Interfaces.ShowableDialog, HyperlinkListener {
+
+    public AboutDialog() {
+        super(JHVFrame.getFrame(), "About JHelioviewer", true);
+        setResizable(false);
+    }
+
+    @Override
+    public ButtonPanel createButtonPanel() {
+        return new CloseButtonPanel(this);
+    }
+
+    @Override
+    public JComponent createContentPanel() {
+        String text = "<center>This software was built using several components including:</center><ul>" +
+                "<li><a href=\"https://kakadusoftware.com\">Kakadu</a> JPEG2000 Toolkit, © 2015, <a href='/licenses/Kakadu.txt'>licensed</a> from NewSouth Innovations Ltd.</li>" +
+                "<li><a href=\"https://www.lwjgl.org\">LWJGL</a> Java 3D graphics libraries and <a href=\"https://chromium.googlesource.com/angle/angle\">ANGLE</a> cross-platform GLES translation layer.</li>" +
+                "<li><a href=\"https://github.com/JOML-CI/JOML\">JOML</a>, a Java math library for GL rendering calculations.</li>" +
+                "<li><a href=\"https://naif.jpl.nasa.gov/naif/\">SPICE</a>, the observation geometry system for space science missions.</li>" +
+                "<li><a href=\"https://ffmpeg.org\">FFmpeg</a>, the leading multimedia framework.</li>" +
+                "<li><a href=\"https://github.com/square/okio\">Okio</a> and <a href=\"https://github.com/square/okhttp\">OkHttp</a> libraries by Square, Inc.</li>" +
+                "<li><a href=\"https://github.com/google/guava\">Guava</a>, Google core libraries for Java.</li>" +
+                "<li><a href=\"https://github.com/ben-manes/caffeine\">Caffeine</a> and <a href=\"https://www.ehcache.org\">Ehcache</a> caching libraries.</li>" +
+                "<li><a href=\"https://www.ocpsoft.org/prettytime/nlp\">PrettyTime NLP</a>, a human time parsing library.</li>" +
+                "<li><a href=\"https://github.com/jidesoft/jide-oss\">JIDE Common Layer</a>, © 2002-2017, JIDE Software, Inc.</li>" +
+                "<li><a href=\"https://github.com/JFormDesigner/FlatLaf\">FlatLaf</a>, a modern cross-platform Look and Feel for Java Swing.</li>" +
+                "<li>JSAMP, JCDF and STIL packages by <a href=\"https://www.star.bristol.ac.uk/~mbt/\">Mark Taylor</a>.</li>" +
+                "<li><a href=\"https://nom-tam-fits.github.io/nom-tam-fits\">FITS</a> in Java public domain library.</li>" +
+                "<li><a href=\"https://tika.apache.org\">Apache Tika</a>, a content analysis toolkit.</li>" +
+                "<li><a href=\"https://github.com/xerial/sqlite-jdbc\">Xerial</a> SQLite JDBC driver.</li>" +
+                "<li><a href=\"https://www.ej-technologies.com/products/install4j/overview.html\">install4j</a>, the multi-platform installer builder.</li>";
+
+        HTMLPane pane = new HTMLPane();
+        pane.setText(text);
+        pane.addHyperlinkListener(this);
+        pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        return new JScrollPane(pane);
+    }
+
+    @Override
+    public JComponent createBannerPanel() {
+        int delta = 3;
+        int fontSize = UIGlobals.uiFont.getSize();
+        String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" +
+                "<a href='https://www.jhelioviewer.org'>" + JHVGlobals.programName + "</a></span><br/>" +
+                "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
+                "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GL.version + "</span><br/><br/>" +
+                "© 2026 <a href='https://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
+                "Part of the ESA/NASA Helioviewer Project<br/>" +
+                "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
+                "JHelioviewer is released under the<br/>" +
+                "<a href='/licenses/JHelioviewer.txt'>Mozilla Public License Version 2.0</a><br/>" +
+                "and its use is governed by the<br/>" +
+                "<a href='/licenses/EULA.txt'>End-User License Agreement</a><br/><br/>" +
+                "Contact: <a href='mailto:Daniel.Mueller@esa.int'>Daniel.Mueller@esa.int</a>";
+
+        HTMLPane pane = new HTMLPane();
+        pane.setText(text);
+        pane.addHyperlinkListener(this);
+        pane.setOpaque(false);
+
+        JLabel logo = new JLabel(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL));
+        logo.setMaximumSize(new Dimension(64, 64));
+
+        JPanel banner = new JPanel(new BorderLayout());
+        banner.add(logo, BorderLayout.LINE_START);
+        banner.add(pane, BorderLayout.LINE_END);
+        banner.setBorder(BorderFactory.createEmptyBorder(5, 35, 5, 35));
+        return banner;
+    }
+
+    @Override
+    public void showDialog() {
+        pack();
+        setLocationRelativeTo(JHVFrame.getFrame());
+        setVisible(true);
+    }
+
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            if (e.getURL() == null) {
+                String res = e.getDescription();
+                String name = res.substring(Math.max(0, res.lastIndexOf('/') + 1));
+                try (InputStream is = FileUtils.getResource(res)) {
+                    new TextDialog("License - " + name.substring(0, name.indexOf('.')), FileUtils.streamToString(is), true).showDialog();
+                } catch (Exception ex) {
+                    Log.error(ex);
+                }
+            } else {
+                DesktopIntegration.openURL(e.getURL().toString());
+            }
+        }
+    }
+
+}

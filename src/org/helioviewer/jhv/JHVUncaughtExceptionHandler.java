@@ -17,7 +17,7 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.TransferAccess;
-import org.helioviewer.jhv.gui.components.base.HTMLPane;
+import org.helioviewer.jhv.gui.component.HTMLPane;
 
 class JHVUncaughtExceptionHandler {
 

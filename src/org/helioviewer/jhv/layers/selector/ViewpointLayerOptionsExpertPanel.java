@@ -13,8 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.astronomy.Frame;
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
-import org.helioviewer.jhv.gui.components.timeselector.TimeSelectorPanel;
+import org.helioviewer.jhv.gui.component.JHVSlider;
+import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
 
 @SuppressWarnings("serial")

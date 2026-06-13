@@ -10,7 +10,7 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.event.JHVEventListener;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.components.MoviePanel;
+import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
