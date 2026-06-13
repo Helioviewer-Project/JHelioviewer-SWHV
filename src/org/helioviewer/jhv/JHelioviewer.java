@@ -52,11 +52,11 @@ public class JHelioviewer {
         // Set the platform
         Platform.init();
         // Create persistent directories, including Logs.
-        JHVGlobals.createPersistentDirs();
+        JHVDirectory.createPersistentDirs();
         // Init log
         Log.init();
         // Create transient cache directories after logging is available. On Windows this may need an ASCII-safe path.
-        JHVGlobals.createCacheDirs();
+        JHVDirectory.createCacheDirs();
         // Information log message
         Log.info("JHelioviewer started with command-line options: " + String.join(" ", args));
 

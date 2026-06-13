@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.image.nio.MappedImageFactory;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.io.FileUtils;
@@ -23,7 +22,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 class ExportWriter {
 
     private static final long FFMPEG_TIMEOUT_MINUTES = 30;
-    private static final List<String> ffmpeg = List.of(new File(JHVGlobals.libCacheDir, "ffmpeg").getAbsolutePath());
+    private static final List<String> ffmpeg = List.of(new File(JHVDirectory.libCacheDir, "ffmpeg").getAbsolutePath());
 
     private final String prefix;
     private final ExportFormat format;
@@ -43,7 +42,7 @@ class ExportWriter {
 
     void encode(BufferedImage mainImage, BufferedImage eveImage, int movieLinePosition) throws Exception {
         if (tempFile == null) {
-            tempFile = File.createTempFile("dump", null, JHVGlobals.exportCacheDir);
+            tempFile = File.createTempFile("dump", null, JHVDirectory.exportCacheDir);
             tempFile.deleteOnExit();
         }
 
@@ -133,9 +132,9 @@ class ExportWriter {
 
     private void runFFmpeg(List<String> command) throws Exception {
         ProcessBuilder builder = new ProcessBuilder()
-                .directory(JHVGlobals.exportCacheDir)
-                .redirectError(File.createTempFile("fferr", null, JHVGlobals.exportCacheDir))
-                .redirectOutput(File.createTempFile("ffout", null, JHVGlobals.exportCacheDir))
+                .directory(JHVDirectory.exportCacheDir)
+                .redirectError(File.createTempFile("fferr", null, JHVDirectory.exportCacheDir))
+                .redirectOutput(File.createTempFile("ffout", null, JHVDirectory.exportCacheDir))
                 .command(command);
 
         Process process = builder.start();
