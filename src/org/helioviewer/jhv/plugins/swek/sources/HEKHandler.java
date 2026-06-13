@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.database.DatabaseField;
 import org.helioviewer.jhv.database.EventDatabase;
-import org.helioviewer.jhv.database.JHVDatabaseParam;
 import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
@@ -85,19 +85,19 @@ public class HEKHandler extends SWEKHandler {
                 long archiv = TimeUtils.parse(result.getString("kb_archivdate"));
                 String uid = result.getString("kb_archivid");
 
-                ArrayList<JHVDatabaseParam> paramList = new ArrayList<>();
+                ArrayList<DatabaseField> paramList = new ArrayList<>();
                 for (Map.Entry<String, String> fieldEntry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
                     String dbType = fieldEntry.getValue();
                     String fieldName = fieldEntry.getKey();
                     String lfieldName = fieldName.toLowerCase();
                     if (!result.isNull(lfieldName)) {
                         switch (dbType) {
-                            case JHVDatabaseParam.DBINTTYPE ->
-                                    paramList.add(new JHVDatabaseParam(result.getInt(lfieldName), fieldName));
-                            case JHVDatabaseParam.DBSTRINGTYPE ->
-                                    paramList.add(new JHVDatabaseParam(result.getString(lfieldName), fieldName));
-                            case JHVDatabaseParam.DBDOUBLETYPE ->
-                                    paramList.add(new JHVDatabaseParam(result.getDouble(lfieldName), fieldName));
+                            case DatabaseField.INTEGER ->
+                                    paramList.add(new DatabaseField(fieldName, result.getInt(lfieldName)));
+                            case DatabaseField.TEXT ->
+                                    paramList.add(new DatabaseField(fieldName, result.getString(lfieldName)));
+                            case DatabaseField.REAL ->
+                                    paramList.add(new DatabaseField(fieldName, result.getDouble(lfieldName)));
                         }
                     }
                 }
