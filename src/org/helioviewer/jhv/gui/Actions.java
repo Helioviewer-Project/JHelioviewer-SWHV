@@ -27,7 +27,7 @@ import org.helioviewer.jhv.gui.dialogs.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 
@@ -245,7 +245,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Movie.isPlaying())
+            if (Player.isPlaying())
                 Commands.pause();
             Commands.previousFrame();
         }
@@ -258,7 +258,7 @@ public final class Actions {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (Movie.isPlaying())
+            if (Player.isPlaying())
                 Commands.pause();
             Commands.nextFrame();
         }

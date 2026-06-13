@@ -17,7 +17,7 @@ import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -50,9 +50,9 @@ public final class Layers {
         nullImageLayer.setView(NullView.create(start, end, TimeUtils.defaultCadence(start, end)));
         // Replacing the placeholder NullView also needs a full Movie resync when it is active.
         if (activeLayer == nullImageLayer)
-            Movie.setMaster(activeLayer);
+            Player.setMaster(activeLayer);
         else
-            Movie.timeRangeChanged();
+            Player.timeRangeChanged();
     }
 
     public static ImageLayer getActiveImageLayer() {
@@ -61,7 +61,7 @@ public final class Layers {
 
     public static void setActiveImageLayer(ImageLayer layer) {
         activeLayer = layer == null ? nullImageLayer : layer;
-        Movie.setMaster(activeLayer);
+        Player.setMaster(activeLayer);
     }
 
     private static int imageLayersCount;

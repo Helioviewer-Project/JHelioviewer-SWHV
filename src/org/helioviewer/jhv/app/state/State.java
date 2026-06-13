@@ -21,7 +21,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
 import org.helioviewer.jhv.thread.JHVThread;
@@ -54,7 +54,7 @@ public final class State {
 
     private static JSONObject toJson() {
         JSONObject main = new JSONObject();
-        main.put("time", Movie.getTime());
+        main.put("time", Player.getTime());
         ViewState.writeModeJson(main);
         main.put("annotations", Annotations.toJson());
 
@@ -201,7 +201,7 @@ public final class State {
         Layers.restore(restoredLayers);
         Annotations.fromJson(data.optJSONObject("annotations"));
 
-        JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Movie.getTime().milli));
+        JHVTime time = new JHVTime(TimeUtils.optParse(data.optString("time"), Player.getTime().milli));
         Task.submit(
                 new ImageLayers.WaitUntilLoaded(newLayers.keySet()),
                 new Callback(context, newLayers, masterLayer, time, modeData));

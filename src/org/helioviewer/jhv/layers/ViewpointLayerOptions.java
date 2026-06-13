@@ -9,7 +9,7 @@ import org.helioviewer.jhv.astronomy.PositionLoad;
 import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
@@ -94,8 +94,8 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     }
 
     private UpdateViewpoint createViewpointUpdate() {
-        long start = Movie.getStartTime();
-        long end = Movie.getEndTime();
+        long start = Player.getStartTime();
+        long end = Player.getEndTime();
         return switch (cameraMode) {
             case ObserverAt1au -> UpdateViewpoint.observerAt1au;
             case Location -> new UpdateViewpoint.Location(locationOptions.getHighlightedLoad(), start, end);
@@ -113,11 +113,11 @@ public final class ViewpointLayerOptions implements TimeListener.Range {
     }
 
     void activate() {
-        Movie.addTimeRangeListener(this);
+        Player.addTimeRangeListener(this);
     }
 
     void deactivate() {
-        Movie.removeTimeRangeListener(this);
+        Player.removeTimeRangeListener(this);
     }
 
     @Override

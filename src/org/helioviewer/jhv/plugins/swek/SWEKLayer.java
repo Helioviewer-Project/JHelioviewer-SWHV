@@ -28,7 +28,7 @@ import org.helioviewer.jhv.math.PolarBasis;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.BufCoord;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
@@ -355,8 +355,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     private List<JHVRelatedEvents> activeEvents(long time) {
-        long start = Movie.getStartTime();
-        long end = Movie.getEndTime();
+        long start = Player.getStartTime();
+        long end = Player.getEndTime();
         if (time != cachedEventsTime || start != cachedEventsStart || end != cachedEventsEnd) {
             cachedEventsTime = time;
             cachedEventsStart = start;
@@ -449,12 +449,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         if (enabled) {
             JHVEventCache.registerHandler(this);
-            Movie.addTimeRangeListener(this);
-            requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
+            Player.addTimeRangeListener(this);
+            requestEvents(true, Player.getStartTime(), Player.getEndTime());
         } else {
             invalidateActiveEvents();
             JHVEventCache.highlight(null);
-            Movie.removeTimeRangeListener(this);
+            Player.removeTimeRangeListener(this);
             JHVEventCache.unregisterHandler(this);
         }
         SWEKPlugin.layerStateChanged(this);
@@ -476,8 +476,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         iconCacheId.clear();
     }
 
-    private long startTime = Movie.getStartTime();
-    private long endTime = Movie.getEndTime();
+    private long startTime = Player.getStartTime();
+    private long endTime = Player.getEndTime();
 
     private void requestEvents(boolean force, long start, long end) {
         if (force || start < startTime || end > endTime) {
@@ -506,7 +506,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (!enabled)
             return;
         invalidateActiveEvents();
-        requestEvents(true, Movie.getStartTime(), Movie.getEndTime());
+        requestEvents(true, Player.getStartTime(), Player.getEndTime());
     }
 
     boolean isIcons() {

@@ -12,7 +12,7 @@ import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.Load;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.movie.ExportMovie;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.view.uri.FITSViewState;
 
@@ -84,31 +84,31 @@ public final class Commands {
     }
 
     public static void play() {
-        Movie.play();
+        Player.play();
     }
 
     public static void pause() {
-        Movie.pause();
+        Player.pause();
     }
 
     public static void togglePlayback() {
-        Movie.toggle();
+        Player.toggle();
     }
 
     public static void seekFrame(int frame) {
-        Movie.setFrame(frame);
+        Player.setFrame(frame);
     }
 
     public static void seekTime(JHVTime time) {
-        Movie.setTime(time);
+        Player.setTime(time);
     }
 
     public static void nextFrame() {
-        Movie.nextFrame();
+        Player.nextFrame();
     }
 
     public static void previousFrame() {
-        Movie.previousFrame();
+        Player.previousFrame();
     }
 
     public static void setRecordingRaw(@Nullable String mode, @Nullable String size) {

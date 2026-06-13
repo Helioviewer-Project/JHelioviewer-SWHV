@@ -16,7 +16,7 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
-public class Movie {
+public class Player {
 
     public enum AdvanceMode {
         Loop, Stop, Swing, SwingDown
@@ -162,7 +162,7 @@ public class Movie {
         }
     }
 
-    private static final EDTTimer movieTimer = new EDTTimer(1000 / FPS_RELATIVE_DEFAULT, Movie::relativeTimeAdvance);
+    private static final EDTTimer movieTimer = new EDTTimer(1000 / FPS_RELATIVE_DEFAULT, Player::relativeTimeAdvance);
 
     public static boolean isPlaying() {
         return movieTimer.isRunning();
@@ -309,13 +309,13 @@ public class Movie {
     }
 
     public static void setDesiredRelativeSpeed(int fps) {
-        movieTimer.setTask(Movie::relativeTimeAdvance);
+        movieTimer.setTask(Player::relativeTimeAdvance);
         movieTimer.setDelay(1000 / fps);
         deltaT = 0;
     }
 
     public static void setDesiredAbsoluteSpeed(int sec) {
-        movieTimer.setTask(Movie::absoluteTimeAdvance);
+        movieTimer.setTask(Player::absoluteTimeAdvance);
         movieTimer.setDelay(1000 / FPS_ABSOLUTE);
         deltaT = 1000 / FPS_ABSOLUTE * sec;
     }

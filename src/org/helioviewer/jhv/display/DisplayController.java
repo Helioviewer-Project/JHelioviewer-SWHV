@@ -11,7 +11,7 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLRenderer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.view.View;
@@ -81,7 +81,7 @@ public final class DisplayController {
         viewpointModel.setUpdateViewpoint(updateViewpoint);
         switch (mode) {
             case RESET -> resetCamera();
-            case KEEP_TRANSFORM -> updateViewpoint(Movie.getTime());
+            case KEEP_TRANSFORM -> updateViewpoint(Player.getTime());
         }
     }
 
@@ -96,7 +96,7 @@ public final class DisplayController {
     }
 
     public static void refreshCamera() {
-        updateViewpoint(Movie.getTime());
+        updateViewpoint(Player.getTime());
         render(1);
     }
 
@@ -116,7 +116,7 @@ public final class DisplayController {
     }
 
     private static void resetCamera(Camera camera, ViewpointState model) {
-        Position viewpoint = model.update(Movie.getTime());
+        Position viewpoint = model.update(Player.getTime());
         camera.reset(viewpoint);
         fitCameraToImageLayers(camera, viewpoint);
     }

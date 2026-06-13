@@ -21,7 +21,7 @@ import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
 import org.helioviewer.jhv.input.PointerEvent;
 import org.helioviewer.jhv.math.Quat;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;
@@ -102,9 +102,9 @@ public class ViewpointLayer extends AbstractLayer {
         if (!options.isHeliospheric())
             return;
 
-        long time = Movie.getTime().milli;
-        long start = Movie.getStartTime();
-        long end = Movie.getEndTime();
+        long time = Player.getTime().milli;
+        long start = Player.getStartTime();
+        long end = Player.getEndTime();
 
         PositionLoad control = options.getHighlightedLoad();
         double relativeLon = 0;
@@ -176,7 +176,7 @@ public class ViewpointLayer extends AbstractLayer {
         }
 
         MapView mv = GLRenderer.getMapView();
-        long time = Movie.getTime().milli, start = Movie.getStartTime(), end = Movie.getEndTime();
+        long time = Player.getTime().milli, start = Player.getStartTime(), end = Player.getEndTime();
         double relativeLon = getRelativeLongitude(time, start, end);
 
         mouseX = e.x();

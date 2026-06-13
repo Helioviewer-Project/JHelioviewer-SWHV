@@ -10,7 +10,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.layers.ImageLayers;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 
 import org.json.JSONObject;
 
@@ -110,7 +110,7 @@ public final class ViewState {
     public record ModeData(MapMode projection, AnnotationMode annotationMode, boolean multiview,
                            boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {}
 
-    public record PlaybackData(Movie.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit,
+    public record PlaybackData(Player.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit,
                                int firstFrame, int lastFrame) {}
 
     public record RecordingData(RecordingMode mode, RecordingSize size) {}
@@ -132,8 +132,8 @@ public final class ViewState {
     private static boolean differentialRotation = ImageLayers.getDiffRotationMode();
     public static final int PLAYBACK_SPEED_MIN = 1;
     public static final int PLAYBACK_SPEED_MAX = 120;
-    private static Movie.AdvanceMode playbackAdvanceMode = Movie.AdvanceMode.Loop;
-    private static int playbackSpeed = Movie.FPS_RELATIVE_DEFAULT;
+    private static Player.AdvanceMode playbackAdvanceMode = Player.AdvanceMode.Loop;
+    private static int playbackSpeed = Player.FPS_RELATIVE_DEFAULT;
     private static PlaybackSpeedUnit playbackSpeedUnit = PlaybackSpeedUnit.FRAMES_PER_SECOND;
     private static int playbackFirstFrame;
     private static int playbackLastFrame;
@@ -358,12 +358,12 @@ public final class ViewState {
         notifyModeListeners();
     }
 
-    public static void setPlaybackAdvanceMode(Movie.AdvanceMode newPlaybackAdvanceMode) {
+    public static void setPlaybackAdvanceMode(Player.AdvanceMode newPlaybackAdvanceMode) {
         if (playbackAdvanceMode == newPlaybackAdvanceMode)
             return;
 
         playbackAdvanceMode = newPlaybackAdvanceMode;
-        Movie.setAdvanceMode(newPlaybackAdvanceMode);
+        Player.setAdvanceMode(newPlaybackAdvanceMode);
         notifyPlaybackConfigListeners();
     }
 
@@ -377,14 +377,14 @@ public final class ViewState {
         playbackSpeed = speed;
         playbackSpeedUnit = newPlaybackSpeedUnit;
         if (playbackSpeedUnit.isRelative())
-            Movie.setDesiredRelativeSpeed(playbackSpeed);
+            Player.setDesiredRelativeSpeed(playbackSpeed);
         else
-            Movie.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
+            Player.setDesiredAbsoluteSpeed(playbackSpeed * playbackSpeedUnit.secPerSecond());
         notifyPlaybackConfigListeners();
     }
 
     private static void applyPlaybackUpdate(
-            @Nullable Movie.AdvanceMode advanceMode,
+            @Nullable Player.AdvanceMode advanceMode,
             @Nullable Integer speed,
             @Nullable PlaybackSpeedUnit speedUnit,
             @Nullable Integer firstFrame,
@@ -448,7 +448,7 @@ public final class ViewState {
     private static void applyPlaybackRangeState(int firstFrame, int lastFrame) {
         playbackFirstFrame = firstFrame;
         playbackLastFrame = lastFrame;
-        Movie.setPlaybackRange(firstFrame, lastFrame);
+        Player.setPlaybackRange(firstFrame, lastFrame);
     }
 
     private static @Nullable Integer parseInteger(@Nullable String value, String name) {
@@ -496,9 +496,9 @@ public final class ViewState {
         }
     }
 
-    private static @Nullable Movie.AdvanceMode parseAdvanceMode(@Nullable String value) {
-        Movie.AdvanceMode mode = parseEnum(value, Movie.AdvanceMode.class, "playback advance mode");
-        if (mode == Movie.AdvanceMode.SwingDown) {
+    private static @Nullable Player.AdvanceMode parseAdvanceMode(@Nullable String value) {
+        Player.AdvanceMode mode = parseEnum(value, Player.AdvanceMode.class, "playback advance mode");
+        if (mode == Player.AdvanceMode.SwingDown) {
             Log.warn("Ignoring internal playback advance mode value: " + value);
             return null;
         }

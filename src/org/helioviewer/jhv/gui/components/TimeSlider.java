@@ -34,14 +34,14 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.view.View;
 
 // Extension of JSlider displaying the caching status on the track.
 // This element provides its own look and feel. Therefore, it is independent
 // of the global look and feel.
 @SuppressWarnings("serial")
-public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Movie.Listener, Movie.StatusListener, ViewState.PlaybackRangeListener {
+public final class TimeSlider extends JSlider implements Interfaces.LazyComponent, MouseListener, MouseMotionListener, MouseWheelListener, Player.Listener, Player.StatusListener, ViewState.PlaybackRangeListener {
 
     private enum DragMode {
         Frame, Range, RangeStart, RangeEnd
@@ -77,8 +77,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
-        Movie.addFrameListener(this);
-        Movie.addStatusListener(this);
+        Player.addFrameListener(this);
+        Player.addStatusListener(this);
         UITimer.register(this);
         ViewState.addPlaybackRangeListener(this);
 
@@ -192,7 +192,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void mousePressed(MouseEvent e) {
-        wasPlaying = Movie.isPlaying();
+        wasPlaying = Player.isPlaying();
         if (wasPlaying)
             Commands.pause();
         dragMode = dragModeFor(e);
@@ -272,7 +272,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
     @Override
     public void movieStatusChanged() {
-        int maximum = Movie.isAvailable() ? Movie.getMaximumFrameNumber() : 0;
+        int maximum = Player.isAvailable() ? Player.getMaximumFrameNumber() : 0;
         if (getMaximum() != maximum) {
             setMaximum(maximum);
             repaint();

@@ -37,7 +37,7 @@ import org.helioviewer.jhv.gui.dialogs.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.ExportMovie;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
@@ -46,7 +46,7 @@ import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, Movie.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
+public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, Player.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
@@ -65,7 +65,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private final JideButton advancedButton;
     private final JHVSpinner speedSpinner;
     private final JComboBox<ViewState.PlaybackSpeedUnit> speedUnitComboBox;
-    private final JComboBox<Movie.AdvanceMode> advanceModeComboBox;
+    private final JComboBox<Player.AdvanceMode> advanceModeComboBox;
     private final JRadioButton loopButton;
     private final JRadioButton shotButton;
     private final JRadioButton freeButton;
@@ -144,8 +144,8 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         // Animation mode
         modePanel.add(new JLabel(" and ", JLabel.RIGHT));
 
-        advanceModeComboBox = new JComboBox<>(new Movie.AdvanceMode[]{Movie.AdvanceMode.Loop, Movie.AdvanceMode.Stop, Movie.AdvanceMode.Swing});
-        advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((Movie.AdvanceMode) advanceModeComboBox.getSelectedItem()));
+        advanceModeComboBox = new JComboBox<>(new Player.AdvanceMode[]{Player.AdvanceMode.Loop, Player.AdvanceMode.Stop, Player.AdvanceMode.Swing});
+        advanceModeComboBox.addActionListener(e -> ViewState.setPlaybackAdvanceMode((Player.AdvanceMode) advanceModeComboBox.getSelectedItem()));
         modePanel.add(advanceModeComboBox);
 
         // Record
@@ -225,7 +225,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         add(JHVFrame.getLayersPanel());
 
-        Movie.addStatusListener(this);
+        Player.addStatusListener(this);
         ExportMovie.addStatusListener(this);
         ViewState.addPlaybackConfigListener(this);
         ViewState.addRecordingConfigListener(this);
@@ -338,7 +338,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     @Override
     public void movieStatusChanged() {
-        boolean playing = Movie.isPlaying();
+        boolean playing = Player.isPlaying();
 
         if (playing) {
             playButton.setText(Buttons.pause);

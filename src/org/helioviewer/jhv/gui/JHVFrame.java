@@ -33,7 +33,7 @@ import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
@@ -156,7 +156,7 @@ public final class JHVFrame {
         mainFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
         mainFrame.getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
-        Movie.setMaster(Layers.getActiveImageLayer()); //! for nullImageLayer
+        Player.setMaster(Layers.getActiveImageLayer()); //! for nullImageLayer
 
         // Prewarm ANGLE off the EDT, then return here via attachAndRender() to attach the real render canvas.
         startAngleWarmup();
