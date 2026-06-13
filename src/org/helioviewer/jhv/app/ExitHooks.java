@@ -1,4 +1,4 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.app;
 
 import org.helioviewer.jhv.movie.ExportMovie;
 

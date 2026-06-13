@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.astronomy.SpiceMath;

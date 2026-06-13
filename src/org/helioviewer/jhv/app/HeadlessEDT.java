@@ -1,12 +1,12 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.app;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.util.concurrent.CountDownLatch;
 
-final class HeadlessEDT {
+public final class HeadlessEDT {
 
-    static void invokeLater(Runnable startup) throws InterruptedException {
+    public static void invokeLater(Runnable startup) throws InterruptedException {
         CountDownLatch keepAlive = new CountDownLatch(1);
         EventQueue.invokeLater(() -> {
             startup.run();

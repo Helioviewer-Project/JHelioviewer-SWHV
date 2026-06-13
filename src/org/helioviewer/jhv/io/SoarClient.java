@@ -7,8 +7,8 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 

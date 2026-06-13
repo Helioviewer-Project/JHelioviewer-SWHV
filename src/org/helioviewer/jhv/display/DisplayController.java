@@ -2,7 +2,7 @@ package org.helioviewer.jhv.display;
 
 import java.util.function.Consumer;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.UpdateViewpoint;
 import org.helioviewer.jhv.layers.ImageLayer;

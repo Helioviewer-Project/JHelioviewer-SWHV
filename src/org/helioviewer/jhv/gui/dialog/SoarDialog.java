@@ -24,7 +24,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;

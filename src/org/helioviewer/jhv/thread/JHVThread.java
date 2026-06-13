@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 
 public final class JHVThread {
 

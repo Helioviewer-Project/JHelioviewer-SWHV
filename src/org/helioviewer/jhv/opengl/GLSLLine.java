@@ -2,7 +2,7 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.Viewport;
 
 public class GLSLLine extends VAO implements GLSLVertexReceiver {

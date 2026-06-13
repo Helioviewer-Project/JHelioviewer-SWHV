@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.io.FileUtils;
 
 import org.apache.tika.Tika;

@@ -1,4 +1,4 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.app;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +12,7 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -23,7 +24,7 @@ public class Log {
 
     private static final String filename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".log";
 
-    static void init() throws Exception {
+    public static void init() throws Exception {
         FileUtils.deleteFromDir(Path.of(JHVDirectory.LOGS.getPath()), 7 * TimeUtils.DAY_IN_MILLIS, false);
 
         LogFormatter logFormatter = new LogFormatter();

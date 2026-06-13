@@ -16,9 +16,9 @@ import javax.swing.JScrollPane;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Message;
-import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Message;
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.MainContentPanel;
 import org.helioviewer.jhv.gui.component.MenuBar;

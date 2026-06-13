@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.image.lut.LUT;

@@ -10,7 +10,7 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.nio.ByteBuffer;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;

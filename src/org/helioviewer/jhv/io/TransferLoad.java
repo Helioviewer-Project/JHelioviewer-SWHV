@@ -6,8 +6,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.base.Regex;
 
 public final class TransferLoad {

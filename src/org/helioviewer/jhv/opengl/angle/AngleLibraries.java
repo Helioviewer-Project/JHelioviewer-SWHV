@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.FileUtils;
 
 import org.lwjgl.system.Configuration;

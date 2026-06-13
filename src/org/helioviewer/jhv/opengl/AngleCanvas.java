@@ -19,7 +19,7 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
-import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.FileUtils;
 

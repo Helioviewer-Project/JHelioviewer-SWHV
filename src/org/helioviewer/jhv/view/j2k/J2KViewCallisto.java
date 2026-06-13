@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.view.j2k;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;

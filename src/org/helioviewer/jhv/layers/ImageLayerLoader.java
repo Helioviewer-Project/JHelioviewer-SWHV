@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;

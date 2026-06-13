@@ -2,8 +2,8 @@ package org.helioviewer.jhv.opengl.angle;
 
 import java.nio.IntBuffer;
 
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLRenderer;

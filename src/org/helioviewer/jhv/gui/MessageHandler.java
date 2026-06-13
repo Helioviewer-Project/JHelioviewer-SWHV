@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 
 final class MessageHandler implements Message.Handler {

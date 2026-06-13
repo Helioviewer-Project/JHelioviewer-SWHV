@@ -1,4 +1,4 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.app;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -15,11 +15,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 
-class JHVUncaughtExceptionHandler {
+public final class JHVUncaughtExceptionHandler {
 
     // This method should be called once when the application starts
     public static void setupHandlerForThread(boolean headless) {

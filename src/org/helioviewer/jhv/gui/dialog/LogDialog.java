@@ -12,7 +12,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
