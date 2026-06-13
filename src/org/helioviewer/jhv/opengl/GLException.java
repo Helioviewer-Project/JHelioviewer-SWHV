@@ -3,13 +3,13 @@ package org.helioviewer.jhv.opengl;
 import org.helioviewer.jhv.app.Log;
 
 @SuppressWarnings("serial")
-final class JHVGLException extends RuntimeException {
+final class GLException extends RuntimeException {
 
-    JHVGLException(String message) {
+    GLException(String message) {
         super(message);
     }
 
-    JHVGLException(String message, Throwable cause) {
+    GLException(String message, Throwable cause) {
         super(message, cause);
     }
 
