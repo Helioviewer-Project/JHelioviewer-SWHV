@@ -22,7 +22,7 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.component.WrappedTable;
 import org.helioviewer.jhv.io.XMLUtils;
@@ -55,7 +55,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     private int metadataRequest;
 
     public MetaDataDialog() {
-        super(JHVFrame.getFrame(), "Image Information");
+        super(MainFrame.get(), "Image Information");
 
         fitsTable.setModel(fitsModel);
         fitsTable.setRowSorter(new TableRowSorter<>(fitsModel));
@@ -111,7 +111,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     public void showDialog() {
         fitsTable.updateRowHeights();
         pack();
-        setLocationRelativeTo(JHVFrame.getFrame());
+        setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 

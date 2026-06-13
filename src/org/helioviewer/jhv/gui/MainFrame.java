@@ -39,7 +39,7 @@ import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
 
-public final class JHVFrame {
+public final class MainFrame {
 
     @SuppressWarnings("serial")
     private static final class FixedWidthPanel extends JPanel {
@@ -169,9 +169,9 @@ public final class JHVFrame {
                 MacAngleBridge.prewarm();
             AngleRenderer.prewarm();
             return null;
-        }, ignored -> EventQueue.invokeLater(JHVFrame::attachAndRender), (context, error) -> {
+        }, ignored -> EventQueue.invokeLater(MainFrame::attachAndRender), (context, error) -> {
             Log.warn("ANGLE warmup failed", error);
-            EventQueue.invokeLater(JHVFrame::attachAndRender);
+            EventQueue.invokeLater(MainFrame::attachAndRender);
         });
     }
 
@@ -254,7 +254,7 @@ public final class JHVFrame {
         return fallback;
     }
 
-    public static JFrame getFrame() {
+    public static JFrame get() {
         return mainFrame;
     }
 
@@ -307,5 +307,5 @@ public final class JHVFrame {
         return menuBar;
     }
 
-    private JHVFrame() {}
+    private MainFrame() {}
 }

@@ -17,7 +17,7 @@ import org.helioviewer.jhv.event.JHVPositionInformation;
 import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.AwtInputAdapter;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.input.InputPointerListener;
 import org.helioviewer.jhv.input.InputPointerMotionListener;
@@ -83,7 +83,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
     }
 
     private static Component component() {
-        return JHVFrame.getRenderComponent();
+        return MainFrame.getRenderComponent();
     }
 
     private Point calcWindowPosition(Component component, Point p, int hekWidth, int hekHeight) {

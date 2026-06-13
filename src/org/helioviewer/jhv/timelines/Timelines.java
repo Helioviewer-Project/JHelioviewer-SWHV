@@ -7,7 +7,7 @@ import javax.swing.JComponent;
 
 import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.timelines.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -36,9 +36,9 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
 
     public void installTimelines() {
         pluginPanes.add(plotOne);
-        JHVFrame.getLeftContentPane().add("Timeline Layers", timelinePanel, true);
-        JHVFrame.getLeftContentPane().revalidate();
-        JHVFrame.getMainContentPanel().addPlugin(this);
+        MainFrame.getLeftContentPane().add("Timeline Layers", timelinePanel, true);
+        MainFrame.getLeftContentPane().revalidate();
+        MainFrame.getMainContentPanel().addPlugin(this);
 
         Player.addTimeListener(dc);
         JHVRelatedEvents.addHighlightListener(dc);
@@ -48,9 +48,9 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
         JHVRelatedEvents.removeHighlightListener(dc);
         Player.removeTimeListener(dc);
 
-        JHVFrame.getMainContentPanel().removePlugin(this);
-        JHVFrame.getLeftContentPane().remove(timelinePanel);
-        JHVFrame.getLeftContentPane().revalidate();
+        MainFrame.getMainContentPanel().removePlugin(this);
+        MainFrame.getLeftContentPane().remove(timelinePanel);
+        MainFrame.getLeftContentPane().revalidate();
         pluginPanes.remove(plotOne);
     }
 

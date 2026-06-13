@@ -29,7 +29,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.thread.Task;
@@ -68,7 +68,7 @@ public class SynopticDialog extends StandardDialog {
     private static SynopticDialog instance;
 
     public static SynopticDialog getInstance() {
-        return instance == null ? instance = new SynopticDialog(JHVFrame.getFrame()) : instance;
+        return instance == null ? instance = new SynopticDialog(MainFrame.get()) : instance;
     }
 
     private SynopticDialog(JFrame mainFrame) {
@@ -220,7 +220,7 @@ public class SynopticDialog extends StandardDialog {
 
     public void showDialog() {
         pack();
-        setLocationRelativeTo(JHVFrame.getFrame());
+        setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 

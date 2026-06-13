@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.gui.status;
 
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.component.StatusPanel;
 import org.helioviewer.jhv.math.FastFormat;
@@ -18,7 +18,7 @@ public final class FramerateStatusPanel extends StatusPanel.StatusPlugin impleme
 
     @Override
     public void lazyRepaint() {
-        int f = JHVFrame.getFramerate();
+        int f = MainFrame.getFramerate();
         if (f != fps) {
             fps = f;
             setText(FastFormat.appendInteger(new StringBuilder("FPS: "), fps, 2, false).toString());

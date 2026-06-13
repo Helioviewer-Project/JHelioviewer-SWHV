@@ -20,7 +20,7 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.event.JHVRelatedEvents;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.thread.Task;
 
 // Popup displaying information about a HEK event.
@@ -42,7 +42,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
     private final DataCollapsiblePanelModel model;
 
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
-        super(JHVFrame.getFrame(), revent.getSupplier().getGroup().getName());
+        super(MainFrame.get(), revent.getSupplier().getGroup().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 

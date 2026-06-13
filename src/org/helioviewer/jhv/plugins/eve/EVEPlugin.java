@@ -2,7 +2,7 @@ package org.helioviewer.jhv.plugins.eve;
 
 import javax.swing.JMenuItem;
 
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
@@ -32,16 +32,16 @@ public class EVEPlugin extends Plugin {
         tl.installTimelines();
         newItem = new JMenuItem(new TimelineActions.NewLayer());
         openItem = new JMenuItem(new TimelineActions.OpenLocalFile());
-        JHVFrame.getMenuBar().getMenu(0).add(newItem, 3);
-        JHVFrame.getMenuBar().getMenu(0).add(openItem, 5);
+        MainFrame.getMenuBar().getMenu(0).add(newItem, 3);
+        MainFrame.getMenuBar().getMenu(0).add(openItem, 5);
 
         BandReaderHapi.requestCatalog();
     }
 
     @Override
     public void uninstallGUI() {
-        JHVFrame.getMenuBar().getMenu(0).remove(openItem);
-        JHVFrame.getMenuBar().getMenu(0).remove(newItem);
+        MainFrame.getMenuBar().getMenu(0).remove(openItem);
+        MainFrame.getMenuBar().getMenu(0).remove(newItem);
         openItem = null;
         newItem = null;
         tl.uninstallTimelines();

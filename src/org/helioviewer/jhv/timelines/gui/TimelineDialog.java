@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.band.BandType;
@@ -45,7 +45,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     };
 
     public TimelineDialog() {
-        super(JHVFrame.getFrame(), "New Layer", true);
+        super(MainFrame.get(), "New Layer", true);
         setResizable(false);
     }
 
@@ -109,7 +109,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     @Override
     public void showDialog() {
         pack();
-        setLocationRelativeTo(JHVFrame.getFrame());
+        setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 

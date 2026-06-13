@@ -21,7 +21,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 
@@ -74,13 +74,13 @@ public final class FITSSettings {
         }
 
         public SettingsDialog() {
-            super(JHVFrame.getFrame(), "FITS Settings", false);
+            super(MainFrame.get(), "FITS Settings", false);
             FITSViewState.Data initialState = FITSViewState.data();
             gammaSlider = createSlider(FITSViewState.GAMMA, initialState.gammaIndex());
             betaSlider = createSlider(FITSViewState.BETA, initialState.betaIndex());
             alphaSlider = createSlider(FITSViewState.ALPHA, initialState.alphaIndex());
             contrastSlider = createSlider(FITSViewState.Z_CONTRAST, initialState.zContrastIndex());
-            setLocationRelativeTo(JHVFrame.getFrame());
+            setLocationRelativeTo(MainFrame.get());
             setType(Window.Type.UTILITY);
             setResizable(false);
             FITSViewState.addListener(this);

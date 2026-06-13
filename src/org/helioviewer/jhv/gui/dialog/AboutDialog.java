@@ -17,7 +17,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.IconBank;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.gui.JHVFrame;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.io.FileUtils;
@@ -30,7 +30,7 @@ import com.jidesoft.dialog.StandardDialog;
 public final class AboutDialog extends StandardDialog implements Interfaces.ShowableDialog, HyperlinkListener {
 
     public AboutDialog() {
-        super(JHVFrame.getFrame(), "About JHelioviewer", true);
+        super(MainFrame.get(), "About JHelioviewer", true);
         setResizable(false);
     }
 
@@ -101,7 +101,7 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
     @Override
     public void showDialog() {
         pack();
-        setLocationRelativeTo(JHVFrame.getFrame());
+        setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
 
