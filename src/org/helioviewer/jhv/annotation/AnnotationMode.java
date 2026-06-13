@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.annotation;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 
 import org.json.JSONObject;
 

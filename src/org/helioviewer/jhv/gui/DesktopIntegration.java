@@ -11,7 +11,7 @@ import java.net.URI;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 
 public final class DesktopIntegration {
 

@@ -6,7 +6,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.util.List;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.io.TransferLoad;
 import org.helioviewer.jhv.thread.JHVThread;
 

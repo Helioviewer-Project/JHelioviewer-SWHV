@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import org.helioviewer.jhv.Platform;
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.time.TimeUtils;
 
 // Class manages a calendar view which shows all days of a month.

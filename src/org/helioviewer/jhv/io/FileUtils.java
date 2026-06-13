@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.JHVThread;
 
 import okio.BufferedSource;

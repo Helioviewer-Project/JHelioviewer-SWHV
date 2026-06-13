@@ -35,8 +35,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.DisplaySettings;
-import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.io.DataSources;

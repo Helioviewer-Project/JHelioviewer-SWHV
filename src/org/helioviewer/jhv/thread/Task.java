@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Message;
 
 import com.google.common.util.concurrent.FutureCallback;
 

@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.opengl;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 
 @SuppressWarnings("serial")
 final class JHVGLException extends RuntimeException {

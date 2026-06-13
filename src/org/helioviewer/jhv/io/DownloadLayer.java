@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.JHVThread;
 import org.helioviewer.jhv.thread.Task;

@@ -8,7 +8,7 @@ import java.util.logging.Level;
 //import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 
 import okhttp3.Authenticator;
 import okhttp3.Cache;

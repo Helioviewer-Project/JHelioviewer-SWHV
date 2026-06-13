@@ -1,9 +1,9 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.app;
 
 public class Platform {
 
     // Reads the builtin Java properties to determine the platform and set simplified properties used by JHV
-    static void init() {
+    public static void init() {
         String os = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
         if (os == null || arch == null)

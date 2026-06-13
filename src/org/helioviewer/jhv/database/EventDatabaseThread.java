@@ -11,7 +11,7 @@ import java.sql.Statement;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 
 final class EventDatabaseThread {
 

@@ -9,7 +9,12 @@ import java.util.concurrent.Callable;
 
 import javax.swing.JFrame;
 
-import org.helioviewer.jhv.Message;
+import org.helioviewer.jhv.app.HeadlessEDT;
+import org.helioviewer.jhv.app.JHVInit;
+import org.helioviewer.jhv.app.JHVUncaughtExceptionHandler;
+import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Message;
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.UIGlobals;

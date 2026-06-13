@@ -1,4 +1,4 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.app;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.samp.SampClient;
@@ -26,9 +28,9 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 
 import nom.tam.fits.FitsFactory;
 
-class JHVInit {
+public final class JHVInit {
 
-    static void init(boolean webProfilePopup) throws Exception {
+    public static void init(boolean webProfilePopup) throws Exception {
         SampClient.init(webProfilePopup);
         ExitHooks.attach();
 
@@ -77,7 +79,7 @@ class JHVInit {
         }
     }
 
-    static void loadSpice() throws Exception {
+    public static void loadSpice() throws Exception {
         loadLib("JNISpice", Platform.getResourceDir());
 
         List<String> kernels = List.of(
@@ -125,4 +127,5 @@ class JHVInit {
         Spice.loadKernels(userKernels);
     }
 
+    private JHVInit() {}
 }

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.Log;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;

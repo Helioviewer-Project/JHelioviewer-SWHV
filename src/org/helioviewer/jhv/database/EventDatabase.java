@@ -19,7 +19,7 @@ import java.util.zip.GZIPInputStream;
 import javax.annotation.Nullable;
 import javax.swing.tree.TreeNode;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKGroup;

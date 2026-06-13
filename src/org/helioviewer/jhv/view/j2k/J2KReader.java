@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.helioviewer.jhv.Log;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
