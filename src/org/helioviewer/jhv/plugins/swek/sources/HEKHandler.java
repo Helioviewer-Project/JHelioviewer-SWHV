@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.database.JHVDatabaseParam;
+import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKGroup;

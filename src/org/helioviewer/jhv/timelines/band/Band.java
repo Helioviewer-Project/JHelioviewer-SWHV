@@ -12,8 +12,8 @@ import java.util.function.LongUnaryOperator;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.base.GOESLevel;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
