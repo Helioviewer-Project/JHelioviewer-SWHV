@@ -2,7 +2,6 @@ package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -15,13 +14,12 @@ import org.helioviewer.jhv.time.Interval;
 
 import com.google.common.collect.ArrayListMultimap;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 class SWEKDownloader implements FilterManager.Listener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
     private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
-            new PriorityBlockingQueue<>(2048, new ComparePriority()),
+            new PriorityBlockingQueue<>(2048),
             new AppThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy()) {
         @Override
@@ -31,7 +29,8 @@ class SWEKDownloader implements FilterManager.Listener {
         }
     };
 
-    private record Worker(SWEKSupplier supplier, List<SWEK.Param> params, long start, long end) implements Runnable {
+    private record Worker(SWEKSupplier supplier, List<SWEK.Param> params,
+                          long start, long end) implements Runnable, Comparable<Worker> {
         @Override
         public void run() {
             boolean success = supplier.getSource().handler().remote2db(supplier, start, end, params);
@@ -54,6 +53,10 @@ class SWEKDownloader implements FilterManager.Listener {
         void stopWorker() { // TBD
         }
 
+        @Override
+        public int compareTo(Worker other) {
+            return Long.compare(other.end, end);
+        }
     }
 
     private static final SWEKDownloader instance = new SWEKDownloader();
@@ -128,12 +131,4 @@ class SWEKDownloader implements FilterManager.Listener {
             }
         }
     }
-
-    private static class ComparePriority<T extends Worker> implements Comparator<T> {
-        @Override
-        public int compare(T l1, T l2) {
-            return Long.compare(l2.end(), l1.end());
-        }
-    }
-
 }
