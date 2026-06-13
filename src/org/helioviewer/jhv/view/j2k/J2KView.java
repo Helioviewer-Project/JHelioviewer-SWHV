@@ -23,7 +23,7 @@ import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.movie.ExportMovie;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.JHVThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
@@ -255,7 +255,7 @@ public class J2KView extends BaseView {
 
     protected void signalReader(J2KParams.Decode decodeParams, Position viewpoint) {
         int level = decodeParams.level;
-        boolean priority = !Movie.isPlaying();
+        boolean priority = !Player.isPlaying();
 
         if (priority || level < currentLevel) {
             reader.signal(new J2KParams.Read(this, (J2KSource.Remote) source, decodeParams, viewpoint, priority));

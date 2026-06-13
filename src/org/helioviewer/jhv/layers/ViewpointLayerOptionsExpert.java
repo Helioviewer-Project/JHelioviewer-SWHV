@@ -13,7 +13,7 @@ import org.helioviewer.jhv.astronomy.SpaceObject;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -32,8 +32,8 @@ public final class ViewpointLayerOptionsExpert {
     private Runnable changeListener = () -> {};
 
     private boolean syncInterval = true;
-    private long startTime = Movie.getStartTime();
-    private long endTime = Movie.getEndTime();
+    private long startTime = Player.getStartTime();
+    private long endTime = Player.getEndTime();
     private int spiralSpeed = 500;
     private boolean spiral = false;
     private boolean relative = false;
@@ -129,7 +129,7 @@ public final class ViewpointLayerOptionsExpert {
     public void setSyncInterval(boolean _syncInterval) {
         syncInterval = _syncInterval;
         if (syncInterval)
-            setTimespan(Movie.getStartTime(), Movie.getEndTime());
+            setTimespan(Player.getStartTime(), Player.getEndTime());
     }
 
     public long getStartTime() {

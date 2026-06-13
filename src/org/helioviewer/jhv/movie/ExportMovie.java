@@ -17,7 +17,7 @@ import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.thread.JHVThread;
 
-public final class ExportMovie implements Movie.Listener {
+public final class ExportMovie implements Player.Listener {
 
     public interface StatusListener {
         void recordingStatusChanged();
@@ -77,7 +77,7 @@ public final class ExportMovie implements Movie.Listener {
                 MappedImageFactory.free(screen);
             }
         }
-        Movie.grabDone();
+        Player.grabDone();
 
         if (shallStop) {
             grabber.dispose();
@@ -100,13 +100,13 @@ public final class ExportMovie implements Movie.Listener {
                 ViewState.applyRecordStartUpdate(input.mode(), input.size(), input.advanceMode(), input.speed(), input.speedUnit());
 
             ViewState.PlaybackData playbackData = ViewState.playbackData();
-            int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Movie.FPS_ABSOLUTE;
+            int fps = playbackData.speedUnit().isRelative() ? playbackData.speed() : Player.FPS_ABSOLUTE;
             startRecording(ViewState.recordingData(), fps);
         } catch (Exception e) {
             Log.error(e);
             recording = false;
             shallStop = false;
-            Movie.removeFrameListener(instance);
+            Player.removeFrameListener(instance);
             if (grabber != null) {
                 grabber.dispose();
                 grabber = null;
@@ -160,7 +160,7 @@ public final class ExportMovie implements Movie.Listener {
             notifyStatusChanged();
 
             if (mode == ViewState.RecordingMode.LOOP) {
-                Movie.addFrameListener(instance);
+                Player.addFrameListener(instance);
                 Commands.seekFrame(0);
                 Commands.play();
             }
@@ -171,7 +171,7 @@ public final class ExportMovie implements Movie.Listener {
         recording = false;
         notifyStatusChanged();
         if (mode == ViewState.RecordingMode.LOOP) {
-            Movie.removeFrameListener(instance);
+            Player.removeFrameListener(instance);
         }
 
         try {

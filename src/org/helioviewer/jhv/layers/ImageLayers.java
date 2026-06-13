@@ -14,7 +14,7 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.movie.Movie;
+import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.EDTQueue;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -181,10 +181,10 @@ public final class ImageLayers {
             }
         }
 
-        long start = Movie.getStartTime();
+        long start = Player.getStartTime();
         str.append("&startDate=").append(TimeUtils.formatDate(start));
         str.append("&startTime=").append(TimeUtils.formatTime(start));
-        long end = Movie.getEndTime();
+        long end = Player.getEndTime();
         str.append("&stopDate=").append(TimeUtils.formatDate(end));
         str.append("&stopTime=").append(TimeUtils.formatTime(end));
         return str.toString();
@@ -197,9 +197,9 @@ public final class ImageLayers {
             return;
 
         APIRequest req = activeLayer.getView().getAPIRequest();
-        msg.addParam("timestamp", Movie.getTime().toString());
-        msg.addParam("start", TimeUtils.format(Movie.getStartTime()));
-        msg.addParam("end", TimeUtils.format(Movie.getEndTime()));
+        msg.addParam("timestamp", Player.getTime().toString());
+        msg.addParam("start", TimeUtils.format(Player.getStartTime()));
+        msg.addParam("end", TimeUtils.format(Player.getEndTime()));
         msg.addParam("cadence", SampUtils.encodeLong(req.cadence() * 1000L));
         msg.addParam("cutout.set", SampUtils.encodeBoolean(true));
 
