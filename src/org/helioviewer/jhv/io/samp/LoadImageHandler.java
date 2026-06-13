@@ -10,8 +10,8 @@ import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.EDTQueue;
-import org.helioviewer.jhv.thread.JHVThread;
 
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.AbstractMessageHandler;
@@ -55,7 +55,7 @@ final class LoadImageHandler {
                 context.complete(false, "No image files found.", null);
                 return;
             }
-            JHVThread.create(() -> {
+            AppThread.create(() -> {
                 try {
                     new ImageLayers.WaitUntilLoaded(List.of(layer)).call();
                     boolean success = EDTQueue.invokeAndWait(() -> Layers.getImageLayers().contains(layer) && layer.isViewLoadFinished());

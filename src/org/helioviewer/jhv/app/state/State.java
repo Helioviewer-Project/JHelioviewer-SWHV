@@ -24,7 +24,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.plugins.PluginManager;
 import org.helioviewer.jhv.plugins.eve.EVEPlugin;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -42,7 +42,7 @@ public final class State {
     public static void save(String dir, String file) {
         JSONObject json = toJson();
 
-        JHVThread.create(() -> {
+        AppThread.create(() -> {
             Path path = Path.of(dir, file);
             try (BufferedWriter writer = Files.newBufferedWriter(path)) {
                 json.write(writer);

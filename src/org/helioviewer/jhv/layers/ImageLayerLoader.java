@@ -20,7 +20,7 @@ import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetFileCache;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.view.ManyView;
@@ -119,7 +119,7 @@ final class ImageLayerLoader {
         if (gen != loadGeneration) {
             return;
         }
-        if (JHVThread.isInterrupted(t)) {
+        if (AppThread.isInterrupted(t)) {
             Log.warn(t);
             return;
         }

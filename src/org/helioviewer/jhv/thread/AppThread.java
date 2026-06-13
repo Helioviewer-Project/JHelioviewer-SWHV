@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.app.Log;
 
-public final class JHVThread {
+public final class AppThread {
 
     public static boolean isInterrupted(Throwable t) {
         return t instanceof CancellationException ||
@@ -55,5 +55,5 @@ public final class JHVThread {
         }
     }
 
-    private JHVThread() {}
+    private AppThread() {}
 }

@@ -20,7 +20,7 @@ record EDTCallbackExecutor(ListeningExecutorService delegate) {
     private static final Executor eventQueue = EventQueue::invokeLater;
 
     private static ExecutorService createCachedPool() {
-        ExecutorService service = Executors.newCachedThreadPool(new JHVThread.NamedThreadFactory("Worker"));
+        ExecutorService service = Executors.newCachedThreadPool(new AppThread.NamedThreadFactory("Worker"));
         Runnable shutdownHook =
                 new Runnable() {
                     private final WeakReference<ExecutorService> executorServiceRef = new WeakReference<>(service);

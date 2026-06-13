@@ -27,7 +27,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 
 import okio.BufferedSource;
 import okio.Okio;
@@ -179,7 +179,7 @@ public class FileUtils {
     }
 
     public static void resolveURIListOffEDT(List<URI> uris, String threadName, Consumer<List<URI>> callback) {
-        JHVThread.create(() -> {
+        AppThread.create(() -> {
             List<URI> resolved = new ArrayList<>();
             for (URI uri : uris) {
                 try {

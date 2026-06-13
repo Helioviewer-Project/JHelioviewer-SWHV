@@ -24,7 +24,7 @@ import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.thread.JHVThread;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeMap;
@@ -134,7 +134,7 @@ public class J2KView extends BaseView {
         @Override
         public void run() {
             // reader abolish may take too long in stressed conditions
-            JHVThread.create(() -> {
+            AppThread.create(() -> {
                 try {
                     if (aReader != null) {
                         aReader.stop();
