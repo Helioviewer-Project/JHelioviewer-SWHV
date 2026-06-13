@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.FileUtils;
 
@@ -53,7 +53,7 @@ final class AngleLibraries {
 
         String resourcePath = Platform.getResourceDir() + fileName;
         try (InputStream in = FileUtils.getResource(resourcePath)) {
-            Path extractedPath = Path.of(JHVGlobals.libCacheDir, fileName);
+            Path extractedPath = Path.of(JHVDirectory.libCacheDir, fileName);
             Files.copy(in, extractedPath, StandardCopyOption.REPLACE_EXISTING);
             return extractedPath;
         } catch (IOException e) {

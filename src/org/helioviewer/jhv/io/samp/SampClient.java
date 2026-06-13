@@ -8,7 +8,6 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Commands;

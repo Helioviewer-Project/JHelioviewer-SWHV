@@ -17,7 +17,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.helioviewer.jhv.JHVDirectory;
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.astronomy.Spice;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.samp.SampClient;
@@ -57,7 +56,7 @@ public final class JHVInit {
     private static void loadLib(String name, String resourceDir) throws Exception {
         String libraryName = System.mapLibraryName(name);
         try (InputStream in = FileUtils.getResource(resourceDir + libraryName)) {
-            Path libraryPath = Path.of(JHVGlobals.libCacheDir, libraryName);
+            Path libraryPath = Path.of(JHVDirectory.libCacheDir, libraryName);
             Files.copy(in, libraryPath, StandardCopyOption.REPLACE_EXISTING);
             System.load(libraryPath.toString());
         }
@@ -69,7 +68,7 @@ public final class JHVInit {
         }
         loadLib("kdu_jni", resourceDir);
 
-        Path ffmpegPath = Path.of(JHVGlobals.libCacheDir, "ffmpeg");
+        Path ffmpegPath = Path.of(JHVDirectory.libCacheDir, "ffmpeg");
         try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {
             Files.copy(in, ffmpegPath, StandardCopyOption.REPLACE_EXISTING);
         }
@@ -96,7 +95,7 @@ public final class JHVInit {
 
         List<String> builtinKernels = kernels.parallelStream().map(k -> { // order does not matter
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
-                Path kp = Path.of(JHVGlobals.dataCacheDir, k);
+                Path kp = Path.of(JHVDirectory.dataCacheDir, k);
                 Files.copy(in, kp, StandardCopyOption.REPLACE_EXISTING);
                 return kp.toString();
             } catch (Exception e) {

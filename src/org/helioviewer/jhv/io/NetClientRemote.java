@@ -7,7 +7,7 @@ import java.util.logging.Level;
 
 //import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 
@@ -43,7 +43,7 @@ class NetClientRemote implements NetClient {
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
-            .cache(new Cache(JHVGlobals.clientCacheDir, cacheSize))
+            .cache(new Cache(JHVDirectory.clientCacheDir, cacheSize))
             .dispatcher(dispatcher)
             .proxyAuthenticator(Authenticator.JAVA_NET_AUTHENTICATOR)
             //.addInterceptor(logging)

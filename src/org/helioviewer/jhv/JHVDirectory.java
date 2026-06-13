@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.io.FileUtils;
 
 // An enum containing all the directories mapped in a system independent way. If
 // a new directory is required, just add it here, and it will be created at startup.
@@ -30,7 +31,7 @@ public enum JHVDirectory {
             return HOME.getPath() + "States" + File.separator;
         }
     },
-    // The exports directory (movies, screenshots, meta data)
+    // The exports directory (movies, screenshots, metadata)
     EXPORTS {
         @Override
         public String getPath() {
@@ -73,6 +74,43 @@ public enum JHVDirectory {
     public File getFile() {
         return new File(getPath());
     }
+
+    static void createPersistentDirs() {
+        for (JHVDirectory dir : JHVDirectory.values()) {
+            if (dir == JHVDirectory.CACHE || dir == JHVDirectory.DOWNLOADS)
+                continue;
+
+            File f = dir.getFile();
+            if (!f.isDirectory() && !f.mkdirs())
+                throw new IllegalStateException("Failed to create directory: " + f);
+        }
+    }
+
+    static void createCacheDirs() {
+        File cacheDir = JHVDirectory.CACHE.getFile();
+        try {
+            if (!cacheDir.isDirectory() && !cacheDir.mkdirs())
+                throw new IllegalStateException("Failed to create directory: " + cacheDir);
+
+            File downloadsDir = JHVDirectory.DOWNLOADS.getFile();
+            if (!downloadsDir.isDirectory() && !downloadsDir.mkdirs())
+                throw new IllegalStateException("Failed to create directory: " + downloadsDir);
+
+            libCacheDir = FileUtils.tempDir(cacheDir, "lib").getAbsolutePath();
+            dataCacheDir = FileUtils.tempDir(cacheDir, "data").getAbsolutePath();
+            fileCacheDir = FileUtils.tempDir(cacheDir, "file");
+            clientCacheDir = FileUtils.tempDir(cacheDir, "client");
+            exportCacheDir = FileUtils.tempDir(cacheDir, "export");
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to initialize cache directory: " + cacheDir, e);
+        }
+    }
+
+    public static String libCacheDir;
+    public static String dataCacheDir;
+    public static File fileCacheDir;
+    public static File clientCacheDir;
+    public static File exportCacheDir;
 
     private static String transientRoot() {
         if (!Platform.isWindows())

@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 
 final class BufferBacking {
@@ -45,7 +45,7 @@ final class BufferBacking {
         int componentSize = DataBuffer.getDataTypeSize(type) / 8;
         long length = ((long) size) * componentSize * numBanks;
 
-        Path tempPath = Files.createTempFile(JHVGlobals.exportCacheDir.toPath(), "mbuf", null);
+        Path tempPath = Files.createTempFile(JHVDirectory.exportCacheDir.toPath(), "mbuf", null);
         Arena arena = Arena.ofShared();
         try (FileChannel channel = FileChannel.open(tempPath, StandardOpenOption.READ, StandardOpenOption.WRITE)) {
             channel.truncate(length);

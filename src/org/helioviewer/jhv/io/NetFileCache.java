@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.JHVDirectory;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -28,7 +28,7 @@ public class NetFileCache {
                     return new DataUri(uri, uri, file);
                 }
 
-                Path path = Files.createTempFile(JHVGlobals.fileCacheDir.toPath(), "jhv", null);
+                Path path = Files.createTempFile(JHVDirectory.fileCacheDir.toPath(), "jhv", null);
                 try (NetClient nc = NetClient.of(uri, false, NetClient.NetCache.BYPASS); BufferedSink sink = Okio.buffer(Okio.sink(path))) {
                     sink.writeAll(nc.getSource());
                 }
