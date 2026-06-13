@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.gui.DesktopIntegration;
@@ -28,12 +29,12 @@ public class NewVersionDialog extends TextDialog {
 
     public static void check() {
         JHVThread.create(() -> {
-            try (NetClient nc = NetClient.of(new URI(JHVGlobals.downloadURL + "VERSION")); BufferedSource source = nc.getSource()) {
+            try (NetClient nc = NetClient.of(new URI(AppInfo.downloadURL + "VERSION")); BufferedSource source = nc.getSource()) {
                 String version = source.readUtf8Line();
                 if (version == null || version.isEmpty())
                     throw new Exception("Update Checker: Empty version string");
 
-                String runningVersion = JHVGlobals.version + '.' + JHVGlobals.revision;
+                String runningVersion = AppInfo.version + '.' + AppInfo.revision;
                 if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
                     Log.info("Found newer version " + version);
                     EventQueue.invokeLater(() -> new NewVersionDialog(updateAvailableMessage(version, runningVersion)).showDialog());
@@ -54,7 +55,7 @@ public class NewVersionDialog extends TextDialog {
         AbstractAction download = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DesktopIntegration.openURL(JHVGlobals.downloadURL);
+                DesktopIntegration.openURL(AppInfo.downloadURL);
                 setVisible(false);
             }
         };

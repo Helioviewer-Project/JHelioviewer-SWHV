@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 
 import javax.swing.JFrame;
 
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.HeadlessEDT;
 import org.helioviewer.jhv.app.JHVInit;
 import org.helioviewer.jhv.app.JHVUncaughtExceptionHandler;
@@ -60,7 +61,7 @@ public class JHelioviewer {
         Log.info("JHelioviewer started with command-line options: " + String.join(" ", args));
 
         // Read the version and revision from the JAR metafile
-        JHVGlobals.getVersion();
+        AppInfo.loadVersion();
 
         DataSources.initSources(); // sources must be initialized before settings
         Settings.load();

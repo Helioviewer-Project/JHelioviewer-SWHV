@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.TransferHandler;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Platform;
@@ -192,7 +192,7 @@ public final class JHVFrame {
     }
 
     private static JFrame createFrame() {
-        JFrame frame = new JFrame(JHVGlobals.programName);
+        JFrame frame = new JFrame(AppInfo.programName);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.setTransferHandler(new TransferHandler() {
             @Override
