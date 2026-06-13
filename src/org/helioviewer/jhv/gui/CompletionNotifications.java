@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.gui.dialog.TextDialog;
 
 public final class CompletionNotifications {
 

@@ -19,8 +19,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.components.base.JHVSpinner;
-import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.gui.component.JHVSpinner;
+import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 
 @SuppressWarnings("serial")
 public final class FOVTreePane extends JScrollPane {

@@ -17,7 +17,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.components.base.TableValue;
+import org.helioviewer.jhv.gui.component.TableValue;
 import org.helioviewer.jhv.layers.ViewpointLayerOptionsExpert;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectContainer;
 import org.helioviewer.jhv.layers.spaceobject.SpaceObjectElement;

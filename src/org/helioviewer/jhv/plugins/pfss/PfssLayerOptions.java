@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.components.base.JHVSpinner;
+import org.helioviewer.jhv.gui.component.JHVSpinner;
 
 @SuppressWarnings("serial")
 class PfssLayerOptions extends JPanel {

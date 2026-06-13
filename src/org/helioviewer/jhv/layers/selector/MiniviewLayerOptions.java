@@ -6,7 +6,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
+import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 
 @SuppressWarnings("serial")

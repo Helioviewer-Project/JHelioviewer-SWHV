@@ -8,7 +8,7 @@ import java.util.List;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
-import org.helioviewer.jhv.gui.components.base.JHVSpinner;
+import org.helioviewer.jhv.gui.component.JHVSpinner;
 
 class FilterPanelFactory {
 

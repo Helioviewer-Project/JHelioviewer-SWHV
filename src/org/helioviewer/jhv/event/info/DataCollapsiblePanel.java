@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.gui.components.CollapsiblePane;
+import org.helioviewer.jhv.gui.component.CollapsiblePane;
 
 @SuppressWarnings("serial")
 class DataCollapsiblePanel extends CollapsiblePane {

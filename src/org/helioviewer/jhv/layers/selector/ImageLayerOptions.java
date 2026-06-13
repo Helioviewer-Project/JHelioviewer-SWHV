@@ -11,9 +11,9 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import org.helioviewer.jhv.gui.CompletionNotifications;
-import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.CircularProgressUI;
-import org.helioviewer.jhv.gui.dialogs.MetaDataDialog;
+import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.CircularProgressUI;
+import org.helioviewer.jhv.gui.dialog.MetaDataDialog;
 import org.helioviewer.jhv.io.DownloadLayer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;

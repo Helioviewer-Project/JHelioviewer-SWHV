@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import javax.swing.Timer;
 
-import org.helioviewer.jhv.gui.components.MoviePanel;
-import org.helioviewer.jhv.gui.components.base.BusyIndicator;
+import org.helioviewer.jhv.gui.component.BusyIndicator;
+import org.helioviewer.jhv.gui.component.MoviePanel;
 
 public final class UITimer {
 

@@ -11,8 +11,8 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.dialogs.TextDialog;
+import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.dialog.TextDialog;
 import org.helioviewer.jhv.layers.ViewpointLayer;
 import org.helioviewer.jhv.layers.ViewpointLayerOptions;
 import org.helioviewer.jhv.layers.ViewpointLayerOptions.CameraMode;

@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
+import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.layers.ImageLayer;
 

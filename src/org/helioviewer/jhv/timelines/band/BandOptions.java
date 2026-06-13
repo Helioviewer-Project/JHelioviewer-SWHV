@@ -16,8 +16,8 @@ import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 import org.helioviewer.jhv.thread.JHVThread;
 import org.helioviewer.jhv.time.TimeUtils;
 

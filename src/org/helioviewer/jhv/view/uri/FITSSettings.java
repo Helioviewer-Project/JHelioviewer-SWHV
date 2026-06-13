@@ -22,8 +22,8 @@ import javax.swing.JSlider;
 
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
-import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.gui.component.JHVSlider;
+import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 
 @SuppressWarnings("serial")
 public final class FITSSettings {

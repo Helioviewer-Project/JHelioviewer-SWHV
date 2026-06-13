@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.JLabel;
 
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.components.base.JHVRangeSlider;
+import org.helioviewer.jhv.gui.component.JHVRangeSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
 
 public class LevelsPanel implements FilterDetails {

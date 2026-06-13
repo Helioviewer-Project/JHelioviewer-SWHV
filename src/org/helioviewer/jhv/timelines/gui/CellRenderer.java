@@ -11,8 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.helioviewer.jhv.gui.components.Buttons;
-import org.helioviewer.jhv.gui.components.base.BusyIndicator;
+import org.helioviewer.jhv.gui.component.BusyIndicator;
+import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 @SuppressWarnings("serial")

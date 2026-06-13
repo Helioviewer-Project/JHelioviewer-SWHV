@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.helioviewer.jhv.gui.components.base.JHVSlider;
+import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.layers.TimestampLayer;
 
 @SuppressWarnings("serial")

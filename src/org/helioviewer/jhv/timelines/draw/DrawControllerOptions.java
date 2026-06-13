@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.astronomy.Carrington;
-import org.helioviewer.jhv.gui.components.Buttons;
+import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 

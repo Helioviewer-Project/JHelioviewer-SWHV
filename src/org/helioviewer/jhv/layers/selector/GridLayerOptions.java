@@ -15,8 +15,8 @@ import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
-import org.helioviewer.jhv.gui.components.base.JHVSpinner;
-import org.helioviewer.jhv.gui.components.base.TerminatedFormatterFactory;
+import org.helioviewer.jhv.gui.component.JHVSpinner;
+import org.helioviewer.jhv.gui.component.TerminatedFormatterFactory;
 import org.helioviewer.jhv.layers.GridLayer;
 
 @SuppressWarnings("serial")
