@@ -19,7 +19,7 @@ import javax.swing.JSpinner;
  * {@link #installMouseWheelSupport(JSpinner)} to add the support
  * and {@link #uninstallMouseWheelSupport(JComponent)} to remove the support.
  */
-public class WheelSupport {
+final class WheelSupport {
 
     private static final String CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER = "mouseWheelListener";
     private static final String SPINNER_ACTION_NAME_INCREMENT = "increment";
@@ -50,7 +50,7 @@ public class WheelSupport {
         spinner.putClientProperty(CLIENT_PROPERTY_MOUSE_WHEEL_LISTENER, l);
     }
 
-    public static void installMouseWheelSupport(JSlider slider) {
+    static void installMouseWheelSupport(JSlider slider) {
         MouseWheelListener l = e -> {
             if (!slider.isEnabled()) {
                 return;
@@ -80,4 +80,5 @@ public class WheelSupport {
         }
     }
 
+    private WheelSupport() {}
 }

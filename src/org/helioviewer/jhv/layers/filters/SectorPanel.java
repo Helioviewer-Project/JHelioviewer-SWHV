@@ -8,13 +8,13 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.JHVRangeSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
 
-public class SectorPanel implements FilterDetails {
+class SectorPanel implements FilterDetails {
 
     private final JHVRangeSlider slider;
     private final JLabel label;
     private final JLabel title = new JLabel("Sector", JLabel.RIGHT);
 
-    public SectorPanel(ImageLayer layer) {
+    SectorPanel(ImageLayer layer) {
         int left = 0; // (int) (layer.getGLImage().getSector0() + .5);
         int right = 0; // (int) (layer.getGLImage().getSector1() + .5);
         slider = new JHVRangeSlider(-180, 180, left, right);

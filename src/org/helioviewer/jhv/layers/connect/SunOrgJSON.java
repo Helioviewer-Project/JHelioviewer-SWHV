@@ -15,7 +15,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class SunOrgJSON {
+class SunOrgJSON {
 
     static SunJSONTypes.GeometryCollection process(JSONObject jo) {
         JHVTime time = TimeUtils.J2000;

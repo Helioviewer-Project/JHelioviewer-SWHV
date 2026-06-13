@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
 import javax.swing.Timer;
 
-public final class HoldRepeat {
+final class HoldRepeat {
 
     public static void install(AbstractButton button, int repeatMs) {
         Timer timer = new Timer(repeatMs, e -> {

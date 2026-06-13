@@ -11,7 +11,7 @@ import org.helioviewer.jhv.time.JHVTime;
 
 import com.alibaba.fastjson2.JSON;
 
-public class SunFastJSON {
+class SunFastJSON {
 
     static SunJSONTypes.GeometryCollection process(String string) {
         return parseInput(JSON.parseObject(string, JObject.class));
