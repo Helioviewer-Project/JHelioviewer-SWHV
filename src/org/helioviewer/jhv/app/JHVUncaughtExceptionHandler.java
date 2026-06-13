@@ -15,7 +15,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.component.HTMLPane;
@@ -42,7 +41,7 @@ public final class JHVUncaughtExceptionHandler {
             e.printStackTrace(new PrintWriter(stackTrace));
 
             String msg = "";
-            msg += "Uncaught Exception in " + JHVGlobals.userAgent;
+            msg += "Uncaught Exception in " + AppInfo.userAgent;
             msg += "\nThread: " + t;
             msg += "\nMessage: " + e.getMessage();
             msg += "\nStacktrace:\n";
@@ -66,8 +65,8 @@ public final class JHVUncaughtExceptionHandler {
             report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
             report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
             report.setText("Fatal error detected." +
-                    "<p>Please email this report at <a href='mailto:" + JHVGlobals.emailAddress + "'>" + JHVGlobals.emailAddress + "</a> " +
-                    "or use it to open an issue at <a href='" + JHVGlobals.bugURL + "'>" + JHVGlobals.bugURL + "</a>.<br/>");
+                    "<p>Please email this report at <a href='mailto:" + AppInfo.emailAddress + "'>" + AppInfo.emailAddress + "</a> " +
+                    "or use it to open an issue at <a href='" + AppInfo.bugURL + "'>" + AppInfo.bugURL + "</a>.<br/>");
 
             JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the error report to the clipboard.");
             copyToClipboard.addMouseListener(new MouseAdapter() {

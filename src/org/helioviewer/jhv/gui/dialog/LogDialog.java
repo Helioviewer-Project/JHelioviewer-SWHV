@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
@@ -32,7 +32,7 @@ public class LogDialog implements Interfaces.ShowableDialog {
         report.setOpaque(false);
         report.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
         report.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
-        report.setText("If you encounter a problem, please attach this log to the problem description and open an issue at <a href='" + JHVGlobals.bugURL + "'>" + JHVGlobals.bugURL + "</a>.<br/>");
+        report.setText("If you encounter a problem, please attach this log to the problem description and open an issue at <a href='" + AppInfo.bugURL + "'>" + AppInfo.bugURL + "</a>.<br/>");
 
         JLabel copyToClipboard = new JLabel("<html><a href=''>Click here to copy the log to the clipboard.");
         copyToClipboard.addMouseListener(new MouseAdapter() {

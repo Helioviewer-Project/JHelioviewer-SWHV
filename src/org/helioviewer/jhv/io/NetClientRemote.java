@@ -8,6 +8,7 @@ import java.util.logging.Level;
 //import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 
 import okhttp3.Authenticator;
@@ -61,7 +62,7 @@ class NetClientRemote implements NetClient {
         if (url == null)
             throw new IOException("Could not parse " + uri);
 
-        Request.Builder builder = new Request.Builder().header("User-Agent", JHVGlobals.userAgent).url(url);
+        Request.Builder builder = new Request.Builder().header("User-Agent", AppInfo.userAgent).url(url);
         if (cache == NetCache.NETWORK)
             builder.cacheControl(CacheControl.FORCE_NETWORK);
         else if (cache == NetCache.BYPASS)

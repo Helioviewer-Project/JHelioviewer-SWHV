@@ -16,7 +16,7 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.ProxySettings;
 
@@ -64,7 +64,7 @@ public class HTTPSocket {
             InputStream openInputStream = new BufferedInputStream(openSocket.getInputStream());
 
             HashMap<String, String> hdr = new HashMap<>();
-            hdr.put("User-Agent", JHVGlobals.userAgent);
+            hdr.put("User-Agent", AppInfo.userAgent);
             hdr.put("Connection", "keep-alive");
             hdr.put("Accept-Encoding", "gzip");
             hdr.put("Cache-Control", "no-cache");

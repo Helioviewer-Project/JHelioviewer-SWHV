@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -69,10 +70,10 @@ public final class SampClient extends HubConnector {
 
         Map<String, String> meta = new HashMap<>();
         meta.put("samp.name", "JHelioviewer");
-        meta.put("samp.description.text", JHVGlobals.userAgent);
+        meta.put("samp.description.text", AppInfo.userAgent);
         meta.put("samp.icon.url", "https://swhv.oma.be/user_manual/hvImage_160x160.png");
-        meta.put("samp.documentation.url", JHVGlobals.documentationURL);
-        meta.put("author.mail", JHVGlobals.emailAddress);
+        meta.put("samp.documentation.url", AppInfo.documentationURL);
+        meta.put("author.mail", AppInfo.emailAddress);
         meta.put("author.name", "ESA JHelioviewer Team");
         declareMetadata(Metadata.asMetadata(meta));
 

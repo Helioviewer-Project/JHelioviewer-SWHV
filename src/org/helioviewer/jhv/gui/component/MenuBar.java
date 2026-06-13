@@ -6,7 +6,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
@@ -111,13 +111,13 @@ public final class MenuBar extends JMenuBar {
             helpMenu.add(aboutAction);
         }
 
-        helpMenu.add(new Actions.OpenURLinBrowser("Open User Manual", JHVGlobals.documentationURL));
+        helpMenu.add(new Actions.OpenURLinBrowser("Open User Manual", AppInfo.documentationURL));
         helpMenu.add(new Actions.OpenURLinBrowser("Open Website", "https://www.jhelioviewer.org"));
         helpMenu.add(new Actions.OpenURLinBrowser("Open Change Log", "https://github.com/Helioviewer-Project/JHelioviewer-SWHV/blob/master/changelog.md"));
         helpMenu.add(new Actions.CheckForUpdates());
         helpMenu.addSeparator();
         helpMenu.add(new Actions.ShowDialog("Show Log...", new LogDialog()));
-        helpMenu.add(new Actions.OpenURLinBrowser("Report Bug/Request Feature", JHVGlobals.bugURL));
+        helpMenu.add(new Actions.OpenURLinBrowser("Report Bug/Request Feature", AppInfo.bugURL));
 
         add(helpMenu);
     }

@@ -12,7 +12,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.IconBank;
@@ -71,9 +71,9 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
         int delta = 3;
         int fontSize = UIGlobals.uiFont.getSize();
         String text = "<center><b><span style='font-size:" + (fontSize + delta) + "pt'>" +
-                "<a href='https://www.jhelioviewer.org'>" + JHVGlobals.programName + "</a></span><br/>" +
-                "Version " + JHVGlobals.version + '.' + JHVGlobals.revision + "</b><br/>" +
-                "<span style='font-size:" + (fontSize - delta) + "pt'>" + JHVGlobals.versionDetail + "<br/>" + GL.version + "</span><br/><br/>" +
+                "<a href='https://www.jhelioviewer.org'>" + AppInfo.programName + "</a></span><br/>" +
+                "Version " + AppInfo.version + '.' + AppInfo.revision + "</b><br/>" +
+                "<span style='font-size:" + (fontSize - delta) + "pt'>" + AppInfo.versionDetail + "<br/>" + GL.version + "</span><br/><br/>" +
                 "© 2026 <a href='https://www.jhelioviewer.org/about.html'>ESA JHelioviewer Team</a><br/>" +
                 "Part of the ESA/NASA Helioviewer Project<br/>" +
                 "Enhanced at ROB/SIDC (ESA Contract No. 4000107325/12/NL/AK)<br/><br/>" +
