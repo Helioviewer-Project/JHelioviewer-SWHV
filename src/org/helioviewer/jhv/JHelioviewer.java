@@ -10,8 +10,8 @@ import java.util.concurrent.Callable;
 import javax.swing.JFrame;
 
 import org.helioviewer.jhv.app.AppInfo;
+import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.HeadlessEDT;
-import org.helioviewer.jhv.app.JHVInit;
 import org.helioviewer.jhv.app.JHVUncaughtExceptionHandler;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
@@ -77,7 +77,7 @@ public class JHelioviewer {
 
         ProxySettings.init();
         try {
-            JHVInit.loadSpice();
+            AppInit.loadSpice();
         } catch (Exception e) {
             Log.error("Failed to setup SPICE", e);
             Message.fatalErr("Failed to setup SPICE:\n" + e.getMessage());
@@ -136,7 +136,7 @@ public class JHelioviewer {
     private record Init(boolean webProfilePopup) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
-            JHVInit.init(webProfilePopup);
+            AppInit.init(webProfilePopup);
             return null;
         }
     }
