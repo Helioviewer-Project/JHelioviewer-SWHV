@@ -7,6 +7,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.filter.FilterManager;
 import org.helioviewer.jhv.thread.AppThread;
@@ -18,21 +19,25 @@ class SWEKDownloader implements FilterManager.Listener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
-    private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
+    private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(
+            NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
             new PriorityBlockingQueue<>(2048),
             new AppThread.NamedThreadFactory("SWEK Download"),
-            new ThreadPoolExecutor.DiscardPolicy()) {
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            AppThread.afterExecute(r, t);
-        }
-    };
+            new ThreadPoolExecutor.DiscardPolicy());
 
     private record Worker(SWEKSupplier supplier, List<SWEK.Param> params,
                           long start, long end) implements Runnable, Comparable<Worker> {
         @Override
         public void run() {
+            try {
+                download();
+            } catch (Throwable t) {
+                if (!AppThread.isInterrupted(t))
+                    Log.error(t);
+            }
+        }
+
+        private void download() {
             boolean success = supplier.getSource().handler().remote2db(supplier, start, end, params);
             if (success) {
                 List<JHVEvent.Link> assocList = EventDatabase.associations2Program(start, end, supplier);
