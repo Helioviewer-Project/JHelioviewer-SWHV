@@ -5,7 +5,7 @@ import java.io.File;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 

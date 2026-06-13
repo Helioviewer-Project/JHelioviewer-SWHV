@@ -1,7 +1,7 @@
 package org.helioviewer.jhv.display.interaction;
 
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.annotation.Annotations;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.display.Camera;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;

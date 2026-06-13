@@ -12,10 +12,10 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.ExitHooks;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;

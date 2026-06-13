@@ -8,10 +8,10 @@ import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.thread.AppThread;
 

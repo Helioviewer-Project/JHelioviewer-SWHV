@@ -19,7 +19,7 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.helioviewer.jhv.Settings;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.Interfaces;
 
 @SuppressWarnings("serial")

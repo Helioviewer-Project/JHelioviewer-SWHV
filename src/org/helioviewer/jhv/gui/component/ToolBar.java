@@ -23,10 +23,10 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
-import org.helioviewer.jhv.Settings;
 import org.helioviewer.jhv.annotation.AnnotationMode;
 import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.MapMode;
