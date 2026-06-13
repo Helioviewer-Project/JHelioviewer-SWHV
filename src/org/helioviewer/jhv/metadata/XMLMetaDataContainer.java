@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
-import org.helioviewer.jhv.base.XMLUtils;
+import org.helioviewer.jhv.io.XMLUtils;
 
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;

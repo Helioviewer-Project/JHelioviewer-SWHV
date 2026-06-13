@@ -20,12 +20,12 @@ import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.XMLUtils;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.JHVFrame;
 import org.helioviewer.jhv.gui.components.base.HTMLPane;
 import org.helioviewer.jhv.gui.components.base.WrappedTable;
+import org.helioviewer.jhv.io.XMLUtils;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.thread.Task;
