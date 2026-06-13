@@ -23,6 +23,7 @@ import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.io.CommandLine;
 import org.helioviewer.jhv.io.DataSources;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.ProxySettings;
 import org.helioviewer.jhv.opengl.AnglePbuffer;
 import org.helioviewer.jhv.plugins.PluginManager;
@@ -53,11 +54,11 @@ public class JHelioviewer {
         // Set the platform
         Platform.init();
         // Create persistent directories, including Logs.
-        JHVDirectory.createPersistentDirs();
+        Directories.createPersistentDirs();
         // Init log
         Log.init();
         // Create transient cache directories after logging is available. On Windows this may need an ASCII-safe path.
-        JHVDirectory.createCacheDirs();
+        Directories.createCacheDirs();
         // Information log message
         Log.info("JHelioviewer started with command-line options: " + String.join(" ", args));
 

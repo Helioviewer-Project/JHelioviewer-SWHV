@@ -1,14 +1,13 @@
-package org.helioviewer.jhv;
+package org.helioviewer.jhv.io;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import org.helioviewer.jhv.app.Platform;
-import org.helioviewer.jhv.io.FileUtils;
 
 // An enum containing all the directories mapped in a system independent way. If
 // a new directory is required, just add it here, and it will be created at startup.
-public enum JHVDirectory {
+public enum Directories {
     // The home directory
     HOME {
         private final String path = System.getProperty("user.home");
@@ -75,9 +74,9 @@ public enum JHVDirectory {
         return new File(getPath());
     }
 
-    static void createPersistentDirs() {
-        for (JHVDirectory dir : JHVDirectory.values()) {
-            if (dir == JHVDirectory.CACHE || dir == JHVDirectory.DOWNLOADS)
+    public static void createPersistentDirs() {
+        for (Directories dir : Directories.values()) {
+            if (dir == Directories.CACHE || dir == Directories.DOWNLOADS)
                 continue;
 
             File f = dir.getFile();
@@ -86,13 +85,13 @@ public enum JHVDirectory {
         }
     }
 
-    static void createCacheDirs() {
-        File cacheDir = JHVDirectory.CACHE.getFile();
+    public static void createCacheDirs() {
+        File cacheDir = Directories.CACHE.getFile();
         try {
             if (!cacheDir.isDirectory() && !cacheDir.mkdirs())
                 throw new IllegalStateException("Failed to create directory: " + cacheDir);
 
-            File downloadsDir = JHVDirectory.DOWNLOADS.getFile();
+            File downloadsDir = Directories.DOWNLOADS.getFile();
             if (!downloadsDir.isDirectory() && !downloadsDir.mkdirs())
                 throw new IllegalStateException("Failed to create directory: " + downloadsDir);
 

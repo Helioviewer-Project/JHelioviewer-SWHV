@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.astronomy.Spice;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.samp.SampClient;
 import org.helioviewer.jhv.metadata.AIAResponse;
@@ -56,7 +56,7 @@ public final class AppInit {
     private static void loadLib(String name, String resourceDir) throws Exception {
         String libraryName = System.mapLibraryName(name);
         try (InputStream in = FileUtils.getResource(resourceDir + libraryName)) {
-            Path libraryPath = Path.of(JHVDirectory.libCacheDir, libraryName);
+            Path libraryPath = Path.of(Directories.libCacheDir, libraryName);
             Files.copy(in, libraryPath, StandardCopyOption.REPLACE_EXISTING);
             System.load(libraryPath.toString());
         }
@@ -68,7 +68,7 @@ public final class AppInit {
         }
         loadLib("kdu_jni", resourceDir);
 
-        Path ffmpegPath = Path.of(JHVDirectory.libCacheDir, "ffmpeg");
+        Path ffmpegPath = Path.of(Directories.libCacheDir, "ffmpeg");
         try (InputStream in = FileUtils.getResource(resourceDir + "ffmpeg")) {
             Files.copy(in, ffmpegPath, StandardCopyOption.REPLACE_EXISTING);
         }
@@ -95,7 +95,7 @@ public final class AppInit {
 
         List<String> builtinKernels = kernels.parallelStream().map(k -> { // order does not matter
             try (InputStream in = FileUtils.getResource("/kernels/" + k)) {
-                Path kp = Path.of(JHVDirectory.dataCacheDir, k);
+                Path kp = Path.of(Directories.dataCacheDir, k);
                 Files.copy(in, kp, StandardCopyOption.REPLACE_EXISTING);
                 return kp.toString();
             } catch (Exception e) {
@@ -105,7 +105,7 @@ public final class AppInit {
         }).filter(Objects::nonNull).toList();
         Spice.loadKernels(builtinKernels);
 
-        Path userKernelsPath = Path.of(JHVDirectory.KERNELS.getPath());
+        Path userKernelsPath = Path.of(Directories.KERNELS.getPath());
         List<String> userKernels = new ArrayList<>();
         Files.walkFileTree(userKernelsPath, Set.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<>() {
             @Override

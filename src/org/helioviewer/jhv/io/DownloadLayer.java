@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.AppThread;
@@ -34,7 +33,7 @@ public class DownloadLayer {
 
     @Nullable
     public static Future<Path> submit(@Nonnull APIRequest req, @Nonnull ImageLayer layer, @Nonnull String baseName, @Nonnull Progress progress) {
-        Path dstPath = Path.of(JHVDirectory.DOWNLOADS.getPath(), baseName);
+        Path dstPath = Path.of(Directories.DOWNLOADS.getPath(), baseName);
         return Task.submit(baseName,
                 new LayerDownload(req, progress, dstPath),
                 result -> onSuccess(layer, progress, result),

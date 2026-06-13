@@ -5,9 +5,9 @@ import java.io.File;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.gui.dialog.TextDialog;
+import org.helioviewer.jhv.io.Directories;
 
 public final class CompletionNotifications {
 
@@ -33,7 +33,7 @@ public final class CompletionNotifications {
     }
 
     private static void showRecordingFinished(@Nullable String output) {
-        String ready = " is ready in " + urify(JHVDirectory.EXPORTS.getPath()) + '.';
+        String ready = " is ready in " + urify(Directories.EXPORTS.getPath()) + '.';
         String recording = output == null || output.contains("%") ? "Recording" : "Recording " + urify(output);
         show(recording + ready);
     }

@@ -16,9 +16,9 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.JHVDirectory;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 
@@ -149,7 +149,7 @@ public record LUT(String name, ByteBuffer rgba) {
             }
         }
 
-        LUTReader.read(new File(JHVDirectory.SETTINGS.getPath(), "user-luts.txt"), loadedLuts);
+        LUTReader.read(new File(Directories.SETTINGS.getPath(), "user-luts.txt"), loadedLuts);
         return loadedLuts;
     }
 

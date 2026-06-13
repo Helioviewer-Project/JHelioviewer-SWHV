@@ -12,7 +12,7 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.helioviewer.jhv.JHVDirectory;
+import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -22,10 +22,10 @@ public class Log {
     private static final Logger root = Logger.getLogger("");
     private static final HashMap<String, Logger> configuredLoggers = new HashMap<>();
 
-    private static final String filename = JHVDirectory.LOGS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".log";
+    private static final String filename = Directories.LOGS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".log";
 
     public static void init() throws Exception {
-        FileUtils.deleteFromDir(Path.of(JHVDirectory.LOGS.getPath()), 7 * TimeUtils.DAY_IN_MILLIS, false);
+        FileUtils.deleteFromDir(Path.of(Directories.LOGS.getPath()), 7 * TimeUtils.DAY_IN_MILLIS, false);
 
         LogFormatter logFormatter = new LogFormatter();
         FileHandler fileHandler = new FileHandler(filename, 1024 * 1024, 1);
