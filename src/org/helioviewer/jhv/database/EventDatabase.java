@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.Log;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKGroup;
@@ -154,15 +153,15 @@ public class EventDatabase {
         pstatement.executeUpdate();
     }
 
-    private static void dump_associationint2db(List<Pair<Integer, Integer>> assocs) throws Exception {
-        int len = assocs.size();
+    private static void dump_associationint2db(List<JHVEvent.Link> links) throws Exception {
+        int len = links.size();
         int i = 0;
         int errorcode = 0;
         PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
         while (i < len && errorcode == 0) {
-            Pair<Integer, Integer> assoc = assocs.get(i);
-            int id0 = assoc.left();
-            int id1 = assoc.right();
+            JHVEvent.Link link = links.get(i);
+            int id0 = link.leftId();
+            int id1 = link.rightId();
 
             if (id0 != -1 && id1 != -1 && id0 != id1) {
                 /* Avoid circular insertions by pre-ordering events */
@@ -183,28 +182,28 @@ public class EventDatabase {
         pstatement.getConnection().commit();
     }
 
-    public static int dump_association2db(Pair<String, String>[] assocs) {
+    public static int dump_association2db(JHVEvent.LinkRef[] links) {
         try {
-            return executor.invokeAndWait(new DumpAssociation2Db(assocs));
+            return executor.invokeAndWait(new DumpAssociation2Db(links));
         } catch (Exception e) {
             Log.error(e);
         }
         return -1;
     }
 
-    private record DumpAssociation2Db(Pair<String, String>[] assocs) implements Callable<Integer> {
+    private record DumpAssociation2Db(JHVEvent.LinkRef[] links) implements Callable<Integer> {
         @Override
         public Integer call() throws Exception {
-            int len = assocs.length;
+            int len = links.length;
             int i = 0;
             int errorcode = 0;
 
             PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
 
             while (i < len && errorcode == 0) {
-                Pair<String, String> assoc = assocs[i];
-                int id0 = getIdFromUID(assoc.left());
-                int id1 = getIdFromUID(assoc.right());
+                JHVEvent.LinkRef link = links[i];
+                int id0 = getIdFromUID(link.leftUid());
+                int id1 = getIdFromUID(link.rightUid());
                 if (id0 != -1 && id1 != -1) {
                     pstatement.setInt(1, id0);
                     pstatement.setInt(2, id1);
@@ -318,17 +317,17 @@ public class EventDatabase {
             }
             insertFullEvent.getConnection().commit();
 
-            ArrayList<Pair<Integer, Integer>> assocs = new ArrayList<>();
+            ArrayList<JHVEvent.Link> links = new ArrayList<>();
             for (int id : inserted_ids) {
                 if (id == -1) {
                     Log.error("Failed to dump to database");
-                    assocs.add(new Pair<>(1, 1));
+                    links.add(new JHVEvent.Link(1, 1));
                 } else {
                     List<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
-                    rels.forEach(rel -> assocs.add(new Pair<>(id, rel.getUniqueID())));
+                    rels.forEach(rel -> links.add(new JHVEvent.Link(id, rel.getUniqueID())));
                 }
             }
-            dump_associationint2db(assocs);
+            dump_associationint2db(links);
             return null;
         }
     }
@@ -556,7 +555,7 @@ public class EventDatabase {
         }
     }
 
-    public static List<Pair<Integer, Integer>> associations2Program(long start, long end, SWEKSupplier type) {
+    public static List<JHVEvent.Link> associations2Program(long start, long end, SWEKSupplier type) {
         try {
             return executor.invokeAndWait(new Associations2Program(start, end, type));
         } catch (Exception e) {
@@ -566,10 +565,10 @@ public class EventDatabase {
     }
 
     private record Associations2Program(long start, long end, SWEKSupplier type)
-            implements Callable<List<Pair<Integer, Integer>>> {
+            implements Callable<List<JHVEvent.Link>> {
         @Override
-        public List<Pair<Integer, Integer>> call() throws Exception {
-            List<Pair<Integer, Integer>> assocList = new ArrayList<>();
+        public List<JHVEvent.Link> call() throws Exception {
+            List<JHVEvent.Link> assocList = new ArrayList<>();
             int typeId = getEventTypeId(type);
             if (typeId != -1) {
                 PreparedStatement pstatement = getPreparedStatement(SELECT_ASSOCIATIONS);
@@ -579,7 +578,7 @@ public class EventDatabase {
 
                 try (ResultSet rs = pstatement.executeQuery()) {
                     while (rs.next()) {
-                        assocList.add(new Pair<>(rs.getInt(1), rs.getInt(2)));
+                        assocList.add(new JHVEvent.Link(rs.getInt(1), rs.getInt(2)));
                     }
                 }
             }

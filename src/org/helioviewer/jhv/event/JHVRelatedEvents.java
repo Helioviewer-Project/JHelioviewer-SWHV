@@ -10,7 +10,6 @@ import java.util.TreeMap;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.time.Interval;
 
@@ -21,7 +20,7 @@ public class JHVRelatedEvents {
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
     private final HashMap<Integer, JHVEvent> eventsById = new HashMap<>();
-    private final List<Pair<Integer, Integer>> associations = new ArrayList<>();
+    private final List<JHVEvent.Link> associations = new ArrayList<>();
     private final SWEKSupplier supplier;
     private final Color color;
 
@@ -124,10 +123,10 @@ public class JHVRelatedEvents {
 
     private List<JHVEvent> getAssociatedEvents(int id, boolean next) {
         List<JHVEvent> result = new ArrayList<>();
-        for (Pair<Integer, Integer> assoc : associations) {
-            Integer source = next ? assoc.left() : assoc.right();
+        for (JHVEvent.Link link : associations) {
+            int source = next ? link.leftId() : link.rightId();
             if (source == id) {
-                Integer target = next ? assoc.right() : assoc.left();
+                int target = next ? link.rightId() : link.leftId();
                 JHVEvent found = eventsById.get(target);
                 if (found != null)
                     result.add(found);
@@ -136,8 +135,8 @@ public class JHVRelatedEvents {
         return result;
     }
 
-    void addAssociation(Pair<Integer, Integer> association) {
-        associations.add(association);
+    void addAssociation(JHVEvent.Link link) {
+        associations.add(link);
     }
 
     void swapEvent(JHVEvent event, Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {

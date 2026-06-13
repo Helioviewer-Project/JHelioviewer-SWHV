@@ -8,7 +8,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.helioviewer.jhv.base.Pair;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.filter.FilterManager;
 import org.helioviewer.jhv.thread.JHVThread;
@@ -37,7 +36,7 @@ class SWEKDownloader implements FilterManager.Listener {
         public void run() {
             boolean success = supplier.getSource().handler().remote2db(supplier, start, end, params);
             if (success) {
-                List<Pair<Integer, Integer>> assocList = EventDatabase.associations2Program(start, end, supplier);
+                List<JHVEvent.Link> assocList = EventDatabase.associations2Program(start, end, supplier);
                 List<JHVEvent> eventList = EventDatabase.events2Program(start, end, supplier, params);
                 EventQueue.invokeLater(() -> {
                     assocList.forEach(JHVEventCache::addAssociation);
