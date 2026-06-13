@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.app.Log;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 
 public final class LatestWorker<T> {
@@ -40,17 +39,7 @@ public final class LatestWorker<T> {
 
     public void submit(Callable<T> task, Callback<T> callback) {
         int request = ++generation;
-        executor.submit(task, new FutureCallback<>() {
-            @Override
-            public void onSuccess(T result) {
-                callback.onSuccess(result, request == generation);
-            }
-
-            @Override
-            public void onFailure(@Nonnull Throwable t) {
-                callback.onFailure(t, request == generation);
-            }
-        });
+        executor.submit(task, result -> callback.onSuccess(result, request == generation), t -> callback.onFailure(t, request == generation));
     }
 
     public void cancel() {

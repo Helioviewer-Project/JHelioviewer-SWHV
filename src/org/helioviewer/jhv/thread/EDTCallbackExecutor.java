@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -36,9 +37,19 @@ record EDTCallbackExecutor(ListeningExecutorService delegate) {
         return service;
     }
 
-    <T> ListenableFuture<T> submit(Callable<T> callable, FutureCallback<T> callback) {
+    <T> ListenableFuture<T> submit(Callable<T> callable, Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
         ListenableFuture<T> futureTask = delegate.submit(callable);
-        Futures.addCallback(futureTask, callback, eventQueue);
+        Futures.addCallback(futureTask, new FutureCallback<>() {
+            @Override
+            public void onSuccess(T result) {
+                onSuccess.accept(result);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                onFailure.accept(t);
+            }
+        }, eventQueue);
         return futureTask;
     }
 }
