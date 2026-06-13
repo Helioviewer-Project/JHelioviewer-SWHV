@@ -5,7 +5,7 @@ import java.util.TreeSet;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import org.json.JSONObject;
@@ -43,7 +43,7 @@ public class DataSourcesParser {
     }
 
     private void parse(DefaultMutableTreeNode parentNode, JSONObject root, String str) {
-        TreeSet<String> sorted = new TreeSet<>(JHVGlobals.alphanumComparator);
+        TreeSet<String> sorted = new TreeSet<>(NaturalSort.comparator);
         sorted.addAll(root.keySet());
 
         for (String key : sorted) {

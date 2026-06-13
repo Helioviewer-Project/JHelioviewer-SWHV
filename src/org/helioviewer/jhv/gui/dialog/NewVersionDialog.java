@@ -8,10 +8,10 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
-import org.helioviewer.jhv.JHVGlobals;
 import org.helioviewer.jhv.app.AppInfo;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
+import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.thread.JHVThread;
@@ -35,7 +35,7 @@ public class NewVersionDialog extends TextDialog {
                     throw new Exception("Update Checker: Empty version string");
 
                 String runningVersion = AppInfo.version + '.' + AppInfo.revision;
-                if (JHVGlobals.alphanumComparator.compare(version, runningVersion) > 0) {
+                if (NaturalSort.comparator.compare(version, runningVersion) > 0) {
                     Log.info("Found newer version " + version);
                     EventQueue.invokeLater(() -> new NewVersionDialog(updateAvailableMessage(version, runningVersion)).showDialog());
                 } else {
