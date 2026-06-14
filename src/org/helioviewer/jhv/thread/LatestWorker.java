@@ -10,8 +10,6 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.app.Log;
 
-import com.google.common.util.concurrent.MoreExecutors;
-
 public final class LatestWorker<T> {
 
     public interface Callback<T> {
@@ -34,7 +32,7 @@ public final class LatestWorker<T> {
                 new AppThread.NamedThreadFactory(name),
                 new ThreadPoolExecutor.DiscardOldestPolicy());
         worker.allowCoreThreadTimeOut(true);
-        executor = new EDTCallbackExecutor(MoreExecutors.listeningDecorator(worker));
+        executor = new EDTCallbackExecutor(worker);
     }
 
     public void submit(Callable<T> task, Callback<T> callback) {
