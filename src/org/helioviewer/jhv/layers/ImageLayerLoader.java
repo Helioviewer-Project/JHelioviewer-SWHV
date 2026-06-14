@@ -31,7 +31,6 @@ import org.helioviewer.jhv.view.uri.URIView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
 final class ImageLayerLoader {
 
     private final LatestWorker<ImageBuffer> executor = new LatestWorker<>("View-Decoder");
