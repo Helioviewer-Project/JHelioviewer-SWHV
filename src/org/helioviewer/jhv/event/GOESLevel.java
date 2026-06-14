@@ -29,20 +29,14 @@ public class GOESLevel {
             try {
                 double val = Double.parseDouble(s.substring(1));
                 char v = s.charAt(0);
-                switch (v) {
-                    case 'A':
-                        return 1e-8 * val;
-                    case 'B':
-                        return 1e-7 * val;
-                    case 'C':
-                        return 1e-6 * val;
-                    case 'M':
-                        return 1e-5 * val;
-                    case 'X':
-                        return 1e-4 * val;
-                    default:
-                        break;
-                }
+                return switch (v) {
+                    case 'A' -> 1e-8 * val;
+                    case 'B' -> 1e-7 * val;
+                    case 'C' -> 1e-6 * val;
+                    case 'M' -> 1e-5 * val;
+                    case 'X' -> 1e-4 * val;
+                    default -> 1.0;
+                };
             } catch (Exception ignore) {}
         }
         return 1; // for log
