@@ -20,7 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-@SuppressWarnings("unchecked")
 public class ComesepHandler extends SWEKHandler {
 
     private static final String BASE_URL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
@@ -120,5 +119,4 @@ public class ComesepHandler extends SWEKHandler {
             }
         }
     }
-
 }
