@@ -24,31 +24,31 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-@SuppressWarnings("unchecked")
 public class HEKHandler extends SWEKHandler {
 
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
 
     private enum HEKEventEnum {
-        ACTIVE_REGION("ActiveRegion", "Active Region", "AR"),
-        CORONAL_DIMMING("CoronalDimming", "Coronal Dimming", "CD"),
-        CORONAL_HOLE("CoronalHole", "Coronal Hole", "CH"),
-        CORONAL_MASS_EJECTION("CME", "Coronal Mass Ejection", "CE"),
-        CORONAL_WAVE("CoronalWave", "Coronal Wave", "CW"),
-        EMERGING_FLUX("EmergingFlux", "Emerging Flux", "EF"),
-        ERUPTION("Eruption", "Eruption", "ER"),
-        FILAMENT("Filament", "Filament", "FI"),
-        FILAMENT_ERUPTION("FilamentEruption", "Filament Eruption", "FE"),
-        FLARE("Flare", "Flare", "FL"),
-        SUNSPOT("Sunspot", "Sunspot", "SS"),
-        UNKNOWN("Unknown", "Unknown", "UK");
+        ACTIVE_REGION("Active Region", "AR"),
+        CORONAL_DIMMING("Coronal Dimming", "CD"),
+        CORONAL_HOLE("Coronal Hole", "CH"),
+        CORONAL_MASS_EJECTION("Coronal Mass Ejection", "CE"),
+        CORONAL_WAVE("Coronal Wave", "CW"),
+        EMERGING_FLUX("Emerging Flux", "EF"),
+        ERUPTION("Eruption", "ER"),
+        FILAMENT("Filament", "FI"),
+        FILAMENT_ERUPTION("Filament Eruption", "FE"),
+        FLARE("Flare", "FL"),
+        FLARE_TRIGGER("Flare Trigger", "FL"),
+        SUNSPOT("Sunspot", "SS"),
+        UNKNOWN("Unknown", "UK");
 
         // The abbreviation of the HEKEvent
         private final String eventAbbreviation;
         // The name of the SWEK Event
         private final String swekEventName;
 
-        HEKEventEnum(String _hekEventName, String _swekEventName, String _eventAbbreviation) {
+        HEKEventEnum(String _swekEventName, String _eventAbbreviation) {
             eventAbbreviation = _eventAbbreviation;
             swekEventName = _swekEventName;
         }
@@ -161,5 +161,4 @@ public class HEKHandler extends SWEKHandler {
 
         return currentEvent;
     }
-
 }
