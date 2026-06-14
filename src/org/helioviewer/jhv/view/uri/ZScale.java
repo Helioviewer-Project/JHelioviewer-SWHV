@@ -28,9 +28,9 @@ final class ZScale {
 
     // flattenData -- Compute and subtract the fitted line from the data array,
     // returned the flattened data in FLAT.
-    private static void zFlattenData(float[] sampleData, float[] flat, float[] x, int npix, float z0, float dz) {
+    private static void zFlattenData(float[] sampleData, float[] flat, float xscale, int npix, float z0, float dz) {
         for (int i = 0; i < npix; i++)
-            flat[i] = sampleData[i] - (x[i] * dz + z0);
+            flat[i] = sampleData[i] - ((i * xscale - 1) * dz + z0);
     }
 
     // computeSigma -- Compute the root mean square deviation from the
@@ -79,7 +79,7 @@ final class ZScale {
     // produces a more stringent rejection criteria which takes advantage of the
     // fact that bad pixels tend to be clumped.  The number of pixels left in the
     // fit is returned as the function value.
-    private static int zRejectPixels(float[] sampleData, float[] flat, float[] normx, short[] badpix, int npix,
+    private static int zRejectPixels(float[] sampleData, float[] flat, float xscale, short[] badpix, int npix,
                                      double[] sumxsqr, double[] sumxz, double[] sumx, double[] sumz, float threshold, int ngrow) {
         int ngoodpix = npix;
         float lcut = -threshold;
@@ -100,7 +100,7 @@ final class ZScale {
                     for (int j = Math.max(0, i - ngrow); j < Math.min(npix, i + ngrow); j++) {
                         if (badpix[j] != BAD_PIXEL) {
                             if (j <= i) {
-                                double x = normx[j];
+                                double x = j * xscale - 1;
                                 double z = sampleData[j];
                                 sumxsqr[0] = sumxsqr[0] - (x * x);
                                 sumxz[0] = sumxz[0] - z * x;
@@ -136,17 +136,9 @@ final class ZScale {
         } else
             xscale = (float) (2.0 / (npix - 1));
 
-        // Allocate a buffer for data minus fitted curve, another for the
-        // normalized X values, and another to flag rejected pixels.
+        // Allocate a buffer for data minus fitted curve, and another to flag rejected pixels.
         float[] flat = new float[npix];
-        float[] normx = new float[npix];
         short[] badpix = new short[npix];
-
-        // Compute normalized X vector.  The data X values [1:npix] are
-        // normalized to the range [-1:1].  This diagonalizes the lsq matrix
-        // and reduces its condition number.
-        for (int i = 0; i < npix; i++)
-            normx[i] = i * xscale - 1;
 
         // Fit a line with no pixel rejection.  Accumulate the elements of the
         // matrix and data vector.  The matrix M is diagonal with
@@ -158,7 +150,7 @@ final class ZScale {
         double[] sumz = {0};
 
         for (int j = 0; j < npix; j++) {
-            float x = normx[j];
+            float x = j * xscale - 1;
             float z = sampleData[j];
             sumxsqr[0] = sumxsqr[0] + (x * x);
             sumxz[0] = sumxz[0] + z * x;
@@ -184,7 +176,7 @@ final class ZScale {
             last_ngoodpix = ngoodpix;
 
             // Subtract the fitted line from the data array
-            zFlattenData(sampleData, flat, normx, npix, z0, dz);
+            zFlattenData(sampleData, flat, xscale, npix, z0, dz);
 
             // Compute the k-sigma rejection threshold.  In principle this
             // could be more efficiently computed using the matrix sums
@@ -196,7 +188,7 @@ final class ZScale {
             float threshold = sigma[0] * krej;
 
             // Detect and reject pixels further than ksigma from the fitted line.
-            ngoodpix = zRejectPixels(sampleData, flat, normx, badpix, npix, sumxsqr, sumxz, sumx, sumz, threshold, ngrow);
+            ngoodpix = zRejectPixels(sampleData, flat, xscale, badpix, npix, sumxsqr, sumxz, sumx, sumz, threshold, ngrow);
 
             // Solve for the coefficients of the fitted line.  Note that after
             // pixel rejection the sum of the X values need no longer be zero.
@@ -217,6 +209,8 @@ final class ZScale {
         return ngoodpix;
     }
 
+    record ZScaleRange(float low, float high) {}
+
     // ZSCALE -- Compute the optimal Z1, Z2 (range of greyscale values to be
     // displayed) of an image.  For efficiency a statistical subsample of an image
     // is used.  The pixel sample evenly subsamples the image in x and y.  The
@@ -234,14 +228,13 @@ final class ZScale {
     // of the fitted line is divided by the user-supplied contrast factor and the
     // final Z1 and Z2 are computed, taking the origin of the fitted line at the
     // median value.
-    static void zscale(float[] sample, int npix, float[] zLow, float[] zHigh, float[] zMax, int zContrast) {
+    static ZScaleRange zscale(float[] sample, int npix, int zContrast) {
         int center_pixel = Math.max(1, (npix + 1) / 2);
 
         // Sort the sample, compute the minimum, maximum, and median pixel values
         // Arrays.sort(sample, 0, npix); -- already sorted
         float zmin = sample[0];
         float zmax = sample[Math.max(npix, 1) - 1];
-        zMax[0] = zmax;
 
         // The median value is the average of the two central values if there
         // are an even number of pixels in the sample.
@@ -264,16 +257,16 @@ final class ZScale {
 
         int ngoodpix = zFitLine(sample, npix, zstart, zslope, ZSKREJ, ngrow, ZSMAX_ITERATIONS);
         if (ngoodpix < minpix) {
-            zLow[0] = zmin;
-            zHigh[0] = zmax;
+            return new ZScaleRange(zmin, zmax);
         } else {
             /* if (zContrast > 0) {
                 zslope[0] = zslope[0] / zContrast;
             } */
             zslope[0] = zslope[0] * zContrast;
 
-            zLow[0] = Math.max(zmin, median - (center_pixel - 1) * zslope[0]);
-            zHigh[0] = Math.min(zmax, median + (npix - center_pixel) * zslope[0]);
+            float low = Math.max(zmin, median - (center_pixel - 1) * zslope[0]);
+            float high = Math.min(zmax, median + (npix - center_pixel) * zslope[0]);
+            return new ZScaleRange(low, high);
         }
     }
 
