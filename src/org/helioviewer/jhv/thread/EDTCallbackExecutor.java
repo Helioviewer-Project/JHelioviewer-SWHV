@@ -3,22 +3,17 @@ package org.helioviewer.jhv.thread;
 import java.awt.EventQueue;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
+record EDTCallbackExecutor(ExecutorService delegate) {
 
-record EDTCallbackExecutor(ListeningExecutorService delegate) {
-
-    static final EDTCallbackExecutor pool = new EDTCallbackExecutor(MoreExecutors.listeningDecorator(createCachedPool()));
-
-    private static final Executor eventQueue = EventQueue::invokeLater;
+    static final EDTCallbackExecutor pool = new EDTCallbackExecutor(createCachedPool());
 
     private static ExecutorService createCachedPool() {
         ExecutorService service = Executors.newCachedThreadPool(new AppThread.NamedThreadFactory("Worker"));
@@ -37,19 +32,24 @@ record EDTCallbackExecutor(ListeningExecutorService delegate) {
         return service;
     }
 
-    <T> ListenableFuture<T> submit(Callable<T> callable, Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
-        ListenableFuture<T> futureTask = delegate.submit(callable);
-        Futures.addCallback(futureTask, new FutureCallback<>() {
+    <T> Future<T> submit(Callable<T> callable, Consumer<T> onSuccess, Consumer<Throwable> onFailure) {
+        FutureTask<T> futureTask = new FutureTask<>(callable) {
             @Override
-            public void onSuccess(T result) {
-                onSuccess.accept(result);
+            protected void done() {
+                try {
+                    T result = get();
+                    EventQueue.invokeLater(() -> onSuccess.accept(result));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException e) {
+                    Throwable cause = e.getCause();
+                    EventQueue.invokeLater(() -> onFailure.accept(cause));
+                } catch (CancellationException e) {
+                    EventQueue.invokeLater(() -> onFailure.accept(e));
+                }
             }
-
-            @Override
-            public void onFailure(Throwable t) {
-                onFailure.accept(t);
-            }
-        }, eventQueue);
+        };
+        delegate.execute(futureTask);
         return futureTask;
     }
 }
