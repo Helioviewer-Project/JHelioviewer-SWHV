@@ -242,6 +242,7 @@ public final class FITSImage implements URIImageReader {
         double toIndex = SCALE_LOOKUP_SIZE / (double) range;
         NormalizedMapping mapping = normalizedMapping(state, range);
 
+        final boolean identity = bzero == 0.0 && bscale == 1.0; // hope HotSpot can generate a fast path
         switch (pixels) {
             case short[] inData -> {
                 short[] values = rawShortToHalfFloat(hasBlank, blank, bzero, bscale, min, toUnit, mapping);
@@ -265,7 +266,7 @@ public final class FITSImage implements URIImageReader {
 
                         for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                             int raw = inData[inLine + i];
-                            float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                            float v = (hasBlank && raw == (int) blank) ? BAD_PIXEL : identity ? (float) raw : (float) (bzero + raw * bscale);
                             outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
                         }
                     }
@@ -280,7 +281,7 @@ public final class FITSImage implements URIImageReader {
 
                         for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
                             long raw = inData[inLine + i];
-                            float v = (hasBlank && raw == blank) ? BAD_PIXEL : (float) (bzero + raw * bscale);
+                            float v = (hasBlank && raw == blank) ? BAD_PIXEL : identity ? (float) raw : (float) (bzero + raw * bscale);
                             outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
                         }
                     }
@@ -294,7 +295,8 @@ public final class FITSImage implements URIImageReader {
                         int outLine = width * (height - 1 - j);
 
                         for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            float v = floatPixel(inData[inLine + i], bzero, bscale);
+                            float raw = inData[inLine + i];
+                            float v = Float.isNaN(raw) ? BAD_PIXEL : Float.isInfinite(raw) ? Float.MAX_VALUE : identity ? raw : (float) (bzero + raw * bscale);
                             outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
                         }
                     }
@@ -308,7 +310,8 @@ public final class FITSImage implements URIImageReader {
                         int outLine = width * (height - 1 - j);
 
                         for (int i = 0, outIdx = outLine; i < width; i++, outIdx++) {
-                            float v = floatPixel(inData[inLine + i], bzero, bscale);
+                            double raw = inData[inLine + i];
+                            float v = Double.isNaN(raw) ? BAD_PIXEL : Double.isInfinite(raw) ? Float.MAX_VALUE : identity ? (float) raw : (float) (bzero + raw * bscale);
                             outData.put(outIdx, lookup.mapIndex((v - min) * toIndex));
                         }
                     }
