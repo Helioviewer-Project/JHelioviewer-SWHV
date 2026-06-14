@@ -324,7 +324,7 @@ public class ViewpointLayer extends AbstractLayer {
         for (PositionLoad positionLoad : positionLoads) {
             PositionResponse response = positionLoad.getResponse();
             if (response != null)
-                entries.add(new ViewpointOrbitWorker.Entry(positionLoad, response, positionLoad.target().getColor()));
+                entries.add(new ViewpointOrbitWorker.Entry(positionLoad, response, positionLoad.target().getTrajectoryColor(Display.whiteBackground)));
         }
         return new ViewpointOrbitWorker.Parameters(entries, time, start, end);
     }

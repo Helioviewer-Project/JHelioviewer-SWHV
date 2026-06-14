@@ -22,7 +22,6 @@ import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
 
-
 public final class URIView extends BaseView {
 
     static void clearURICache() {
