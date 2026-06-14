@@ -1,13 +1,12 @@
 package org.helioviewer.jhv.time;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeMap;
 
 @SuppressWarnings("serial")
 public class TimeMap<V> extends TreeMap<JHVTime, V> {
 
-    private HashSet<JHVTime> timeSet;
     private JHVTime[] timeArray;
     private int maxIdx;
 
@@ -16,7 +15,6 @@ public class TimeMap<V> extends TreeMap<JHVTime, V> {
             throw new RuntimeException("Attempt to call buildIndex() on empty TimeMap");
 
         Set<JHVTime> keySet = navigableKeySet();
-        timeSet = new HashSet<>(keySet);
         timeArray = keySet.toArray(JHVTime[]::new);
         maxIdx = timeArray.length - 1;
     }
@@ -57,17 +55,19 @@ public class TimeMap<V> extends TreeMap<JHVTime, V> {
     }
 
     public JHVTime nearestKey(JHVTime time) {
-        if (timeSet.contains(time)) // common case
-            return time;
+        int idx = Arrays.binarySearch(timeArray, time);
+        if (idx >= 0)
+            return timeArray[idx];
 
-        JHVTime c = ceilingKey(time);
-        JHVTime f = floorKey(time);
+        int ip = -idx - 1;
+        if (ip == 0)
+            return timeArray[0];
+        if (ip > maxIdx)
+            return timeArray[maxIdx];
 
-        if (f != null && c != null)
-            return time.milli - f.milli < c.milli - time.milli ? f : c;
-        if (f == null && c != null)
-            return c;
-        return f;
+        JHVTime f = timeArray[ip - 1];
+        JHVTime c = timeArray[ip];
+        return time.milli - f.milli < c.milli - time.milli ? f : c;
     }
 
     public V nearestValue(JHVTime time) {
