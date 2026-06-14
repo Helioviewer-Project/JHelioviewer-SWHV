@@ -41,7 +41,6 @@ import org.json.JSONObject;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.google.common.base.Throwables;
 
 public final class RadioData extends AbstractTimelineLayer {
 
@@ -157,7 +156,7 @@ public final class RadioData extends AbstractTimelineLayer {
             Log.warn(t);
             return;
         }
-        Log.error(Throwables.getStackTraceAsString(t));
+        Log.errorStack(t);
     }
 
     private static void doneRadioJPX(long date) {

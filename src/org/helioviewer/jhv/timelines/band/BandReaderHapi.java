@@ -28,7 +28,6 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.common.base.Throwables;
 
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
@@ -89,7 +88,7 @@ public class BandReaderHapi {
     }
 
     private static void onFailure(String ignoredLogContext, Throwable t) {
-        Log.error(Throwables.getStackTraceAsString(t));
+        Log.errorStack(t);
     }
 
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {}

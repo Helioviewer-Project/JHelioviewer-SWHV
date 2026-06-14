@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.app;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -65,6 +67,14 @@ public class Log {
         return msg == null ? caller : caller + " - " + msg;
     }
 
+    private static String stackTrace(Throwable thrown) {
+        StringWriter sw = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(sw)) {
+            thrown.printStackTrace(pw);
+        }
+        return sw.toString();
+    }
+
     public static String get() {
         try {
             Path path = Path.of(filename);
@@ -99,6 +109,10 @@ public class Log {
 
     public static void error(Throwable thrown) {
         root.log(Level.SEVERE, getCaller(null), thrown);
+    }
+
+    public static void errorStack(Throwable thrown) {
+        root.log(Level.SEVERE, getCaller(stackTrace(thrown)));
     }
 
     public static void error(String msg, Throwable thrown) {
