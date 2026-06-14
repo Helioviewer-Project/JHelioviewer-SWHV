@@ -51,21 +51,22 @@ final class ZScale {
 
         // Compute mean and sigma
         switch (ngoodpix) {
-            case 0:
+            case 0 -> {
                 mean[0] = ZSINDEF;
                 sigma[0] = ZSINDEF;
-                break;
-            case 1:
+            }
+            case 1 -> {
                 mean[0] = (float) sum;
                 sigma[0] = ZSINDEF;
-                break;
-            default:
+            }
+            default -> {
                 mean[0] = (float) (sum / ngoodpix);
                 double temp = sumsq / (ngoodpix - 1) - (sum * sum) / (ngoodpix * (ngoodpix - 1));
                 if (temp < 0)       // possible with roundoff error
                     sigma[0] = 0;
                 else
                     sigma[0] = (float) Math.sqrt(temp);
+            }
         }
     }
 
