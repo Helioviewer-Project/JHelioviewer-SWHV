@@ -397,12 +397,9 @@ public final class FITSImage implements URIImageReader {
                     max = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMax);
                 } else {
                     Arrays.sort(sampleData.values(), 0, sampleLen);
-                    float[] zLow = {0};
-                    float[] zHigh = {0};
-                    float[] zMax = {0};
-                    ZScale.zscale(sampleData.values(), sampleLen, zLow, zHigh, zMax, state.zContrast());
-                    min = zLow[0];
-                    max = zHigh[0];
+                    ZScale.ZScaleRange range = ZScale.zscale(sampleData.values(), sampleLen, state.zContrast());
+                    min = range.low();
+                    max = range.high();
                 }
             }
         }
