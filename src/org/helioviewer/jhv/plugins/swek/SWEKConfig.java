@@ -100,7 +100,15 @@ class SWEKConfig {
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
             JSONObject supplier = suppliersArray.getJSONObject(i);
-            group.add(new SWEKSupplier(supplier.getString("supplier_name"), supplier.getString("supplier_display_name"), sources.get(supplier.getString("source")), supplier.getString("db")));
+
+            String supplierName = supplier.getString("supplier_name");
+            String sourceName = supplier.getString("source");
+            SWEK.Source source = sources.get(sourceName);
+            if (source == null) {
+                Log.warn("Skipping SWEK supplier " + supplierName + " because source is disabled: " + sourceName);
+                continue;
+            }
+            group.add(new SWEKSupplier(supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db")));
         }
         return group;
     }
