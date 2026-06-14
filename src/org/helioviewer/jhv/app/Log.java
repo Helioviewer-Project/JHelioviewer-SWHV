@@ -23,6 +23,7 @@ public class Log {
     private static final HashMap<String, Logger> configuredLoggers = new HashMap<>();
 
     private static final String filename = Directories.LOGS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis()) + ".log";
+    private static final StackWalker WALKER = StackWalker.getInstance();
 
     public static void init() throws Exception {
         FileUtils.deleteFromDir(Path.of(Directories.LOGS.getPath()), 7 * TimeUtils.DAY_IN_MILLIS, false);
@@ -59,7 +60,7 @@ public class Log {
     }
 
     private static String getCaller(String msg) {
-        Optional<StackWalker.StackFrame> frame = StackWalker.getInstance().walk(s -> s.skip(2).findFirst());
+        Optional<StackWalker.StackFrame> frame = WALKER.walk(s -> s.skip(2).findFirst());
         String caller = frame.map(stackFrame -> stackFrame.getClassName() + '.' + stackFrame.getMethodName()).orElse("|unknown|");
         return msg == null ? caller : caller + " - " + msg;
     }
