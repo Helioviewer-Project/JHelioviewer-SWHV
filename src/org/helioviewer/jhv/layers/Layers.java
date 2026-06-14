@@ -235,10 +235,16 @@ public final class Layers {
             action.accept((ImageLayer) layers.get(i));
     }
 
+    private static final ThreadLocal<Set<ImageBuffer>> retainedSet = ThreadLocal.withInitial(() -> Collections.newSetFromMap(new IdentityHashMap<>()));
+
     private static void reapImageBuffers() {
-        Set<ImageBuffer> retained = Collections.newSetFromMap(new IdentityHashMap<>());
-        forEachImageLayer(layer -> layer.collectImageBuffers(retained));
+        Set<ImageBuffer> retained = retainedSet.get();
+        retained.clear();
+        for (int i = 0; i < imageLayersCount; i++) {
+            ((ImageLayer) layers.get(i)).collectImageBuffers(retained);
+        }
         ImageBufferCache.reap(retained);
+        retained.clear();
     }
 
     public static void setImageLayersNearestFrame(JHVTime dateTime) {
