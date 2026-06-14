@@ -45,6 +45,8 @@ public final class ImageBufferCache {
     public static void reap(Set<ImageBuffer> retained) {
         cache.cleanUp();
         synchronized (retired) {
+            if (retired.isEmpty())
+                return;
             Iterator<WeakReference<ImageBuffer>> iterator = retired.iterator();
             while (iterator.hasNext()) {
                 ImageBuffer imageBuffer = iterator.next().get();
