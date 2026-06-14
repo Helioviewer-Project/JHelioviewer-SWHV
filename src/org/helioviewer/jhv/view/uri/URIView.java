@@ -22,7 +22,6 @@ import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
 
-import com.google.common.base.Throwables;
 
 public final class URIView extends BaseView {
 
@@ -125,7 +124,7 @@ public final class URIView extends BaseView {
 
         @Override
         public void onFailure(@Nonnull Throwable t, boolean fresh) {
-            Log.error(Throwables.getStackTraceAsString(t));
+            Log.errorStack(t);
         }
 
     }

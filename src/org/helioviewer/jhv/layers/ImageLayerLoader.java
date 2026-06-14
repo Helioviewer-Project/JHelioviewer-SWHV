@@ -31,7 +31,6 @@ import org.helioviewer.jhv.view.uri.URIView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.common.base.Throwables;
 
 final class ImageLayerLoader {
 
@@ -125,7 +124,7 @@ final class ImageLayerLoader {
         }
         onUnload.run();
 
-        Log.error(Throwables.getStackTraceAsString(t));
+        Log.errorStack(t);
         Message.err("Error getting the data", t.getMessage());
     }
 

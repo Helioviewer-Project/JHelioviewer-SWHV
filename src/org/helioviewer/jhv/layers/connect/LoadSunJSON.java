@@ -15,7 +15,6 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.thread.Task;
 
 //import com.google.common.base.Stopwatch;
-import com.google.common.base.Throwables;
 
 public class LoadSunJSON {
 
@@ -61,7 +60,7 @@ public class LoadSunJSON {
     }
 
     private static void onFailure(String ignoredLogContext, Throwable t) {
-        Log.error(Throwables.getStackTraceAsString(t));
+        Log.errorStack(t);
         Message.err("Error getting the data", t.getMessage());
     }
 

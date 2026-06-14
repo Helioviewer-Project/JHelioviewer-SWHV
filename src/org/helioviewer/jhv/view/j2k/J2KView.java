@@ -31,7 +31,6 @@ import org.helioviewer.jhv.time.TimeMap;
 import org.helioviewer.jhv.view.BaseView;
 import org.helioviewer.jhv.view.View;
 
-import com.google.common.base.Throwables;
 
 import kdu_jni.KduException;
 
@@ -325,7 +324,7 @@ public class J2KView extends BaseView {
 
         @Override
         public void onFailure(@Nonnull Throwable t, boolean fresh) {
-            Log.error(Throwables.getStackTraceAsString(t));
+            Log.errorStack(t);
         }
 
     }
