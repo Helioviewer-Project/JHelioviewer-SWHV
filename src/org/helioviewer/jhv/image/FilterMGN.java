@@ -125,7 +125,7 @@ class FilterMGN implements ImageFilter.Algorithm {
                 int rowBase = y * width;
                 int rowEnd = rowBase + width;
                 for (int i = rowBase; i < rowEnd; i++) {
-                    accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] * MathUtils.invSqrt(conv2[i]);
+                    accum[i] += conv2[i] == 0 ? 0 : weight * conv[i] / (float) Math.sqrt(conv2[i]);
                 }
             }
         });
