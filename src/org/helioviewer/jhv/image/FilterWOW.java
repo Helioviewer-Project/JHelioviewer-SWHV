@@ -116,7 +116,7 @@ class FilterWOW implements ImageFilter.Algorithm {
                 int rowBase = y * width;
                 int rowEnd = rowBase + width;
                 for (int idx = rowBase; idx < rowEnd; idx++) {
-                    output[idx] += MathUtils.invSqrt(variance[idx]) * detail[idx];
+                    output[idx] += detail[idx] / (float) Math.sqrt(variance[idx]);
                 }
             }
         });
