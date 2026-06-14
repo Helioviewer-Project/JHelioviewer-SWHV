@@ -30,17 +30,6 @@ public final class FastRiceProvider implements ICompressorProvider {
     private static final int ZERO_VALUE = Integer.MIN_VALUE + 2;
     private static final Logger LOG = Logger.getLogger(FastRiceProvider.class.getName());
 
-    // @formatter:off
-    private static final int[] NONZERO_COUNT = {0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-            5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-            6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-            7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8,
-            8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-            8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-            8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-            8, 8, 8, 8, 8, 8, 8, 8, 8};
-    // @formatter:on
-
     public FastRiceProvider() {}
 
     @Override
@@ -359,7 +348,7 @@ public final class FastRiceProvider implements ICompressorProvider {
                 nbits += BITS_PER_BYTE;
                 bits = getByte();
             }
-            int nzero = nbits - NONZERO_COUNT[(int) (bits & BYTE_MASK)];
+            int nzero = nbits - (32 - Integer.numberOfLeadingZeros((int) (bits & BYTE_MASK)));
             nbits -= nzero + 1;
             bits ^= 1L << nbits;
             nbits -= fs;
@@ -423,7 +412,7 @@ public final class FastRiceProvider implements ICompressorProvider {
                             bitCount += BITS_PER_BYTE;
                             bitBuffer = input[position++] & BYTE_MASK;
                         }
-                        int nzero = bitCount - NONZERO_COUNT[(int) (bitBuffer & BYTE_MASK)];
+                        int nzero = bitCount - (32 - Integer.numberOfLeadingZeros((int) (bitBuffer & BYTE_MASK)));
                         bitCount -= nzero + 1;
                         bitBuffer ^= 1L << bitCount;
 
