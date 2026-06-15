@@ -75,6 +75,9 @@ public final class LayerOptions implements Layers.Listener {
     }
 
     @Override
+    public void nameUpdated(Layer layer) {}
+
+    @Override
     public void layerUpdated(Layer layer) {
         if (panels.get(layer) instanceof ImageLayerOptions panel)
             panel.refresh(layer);

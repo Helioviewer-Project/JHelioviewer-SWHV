@@ -33,6 +33,8 @@ public final class Layers {
 
         void layersCleared();
 
+        void nameUpdated(Layer layer);
+
         void layerUpdated(Layer layer);
 
         void timeUpdated(Layer layer);
@@ -209,6 +211,10 @@ public final class Layers {
 
     public static void fireTimeUpdated(Layer layer) {
         listeners.forEach(listener -> listener.timeUpdated(layer));
+    }
+
+    public static void fireNameUpdated(Layer layer) {
+        listeners.forEach(listener -> listener.nameUpdated(layer));
     }
 
     public static void fireLayerUpdated(Layer layer) {

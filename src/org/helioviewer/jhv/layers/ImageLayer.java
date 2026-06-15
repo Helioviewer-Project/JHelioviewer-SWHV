@@ -359,12 +359,14 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (removed)
             return;
         String oldName = getName();
+
         newImageData.imageBuffer().allowExplicitFree();
         setImageData(newImageData);
-        if (Objects.equals(oldName, getName()))
-            Layers.fireTimeUpdated(this);
-        else
-            Layers.fireLayerUpdated(this);
+
+        if (!Objects.equals(oldName, getName()))
+            Layers.fireNameUpdated(this);
+        Layers.fireTimeUpdated(this);
+
         ImageLayers.displaySynced(imageData.viewpoint());
     }
 
