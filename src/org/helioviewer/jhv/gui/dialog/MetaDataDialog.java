@@ -15,7 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.app.Log;
@@ -116,7 +116,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     }
 
     public void setMetaData(ImageLayer layer) {
-        fitsModel.setRowCount(0);
+        fitsModel.setRows(List.of());
         hvArea.setText("");
         hvArea.setPreferredSize(new Dimension(600, 100));
         exportXml = null;
@@ -142,8 +142,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         if (request != metadataRequest)
             return;
 
-        for (NodeValue value : parsed.fits)
-            fitsModel.addRow(new String[]{value.name, value.text, value.comment});
+        fitsModel.setRows(parsed.fits);
         hvArea.setText(parsed.helioviewer);
 
         exportXml = parsed.exportXml;
@@ -188,15 +187,41 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
         }, CompletionNotifications::fileReady, (logContext, t) -> Log.error("Failed to write metadata", t));
     }
 
-    private static class FitsModel extends DefaultTableModel {
+    private static class FitsModel extends AbstractTableModel {
 
-        FitsModel() {
-            super(new String[0][0], new String[]{"Keyword", "Value", "Comment"});
+        private static final String[] COLUMNS = {"Keyword", "Value", "Comment"};
+
+        private List<NodeValue> rows = List.of();
+
+        void setRows(List<NodeValue> _rows) {
+            rows = _rows;
+            fireTableDataChanged();
         }
 
         @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
+        public int getRowCount() {
+            return rows.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return COLUMNS.length;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return COLUMNS[column];
+        }
+
+        @Override
+        public Object getValueAt(int row, int column) {
+            NodeValue value = rows.get(row);
+            return switch (column) {
+                case 0 -> value.name;
+                case 1 -> value.text;
+                case 2 -> value.comment;
+                default -> "";
+            };
         }
 
         @Override
