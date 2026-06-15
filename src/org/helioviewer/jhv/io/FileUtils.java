@@ -28,9 +28,6 @@ import java.util.zip.GZIPInputStream;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.AppThread;
 
-import okio.BufferedSource;
-import okio.Okio;
-
 public class FileUtils {
 
     public static InputStream getResource(String path) throws IOException {
@@ -54,9 +51,9 @@ public class FileUtils {
             return pb;
     }
 
-    public static String streamToString(InputStream is) throws IOException {
-        try (BufferedSource buffer = Okio.buffer(Okio.source(is))) {
-            return buffer.readString(StandardCharsets.UTF_8);
+    public static String getResourceString(String path) throws IOException {
+        try (InputStream is = getResource(path)) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
