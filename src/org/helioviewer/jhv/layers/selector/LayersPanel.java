@@ -92,20 +92,28 @@ public final class LayersPanel extends JPanel {
 
         @Override
         public void repaint(int x, int y, int width, int height) {
-            dirty = true;
+            if (dirtyRect == null)
+                dirtyRect = new Rectangle(x, y, width, height);
+            else
+                dirtyRect.add(new Rectangle(x, y, width, height));
         }
 
         private boolean dirty = false;
+        @Nullable
+        private Rectangle dirtyRect;
         private boolean dirtyTimeColumn = false;
 
         @Override
         public void lazyRepaint() {
             if (dirty) {
                 super.repaint();
+            } else if (dirtyRect != null) {
+                super.repaint(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height);
             } else if (dirtyTimeColumn) {
                 repaintTimeColumn();
             }
             dirty = false;
+            dirtyRect = null;
             dirtyTimeColumn = false;
         }
 

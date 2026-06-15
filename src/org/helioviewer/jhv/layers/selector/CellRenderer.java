@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers.selector;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Rectangle;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -47,7 +48,8 @@ class CellRenderer {
             // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof Layer layer) {
                 if (layer.isDownloading()) {
-                    table.repaint(); // lazy
+                    Rectangle rect = table.getCellRect(row, column, false);
+                    table.repaint(rect.x, rect.y, rect.width, rect.height); // lazy
 
                     over.setForeground(label.getForeground());
                     over.setBackground(label.getBackground());
