@@ -16,6 +16,7 @@ public class WrappedTable extends JTable {
 
     @Override
     public void columnMarginChanged(ChangeEvent e) {
+        super.columnMarginChanged(e);
         if (updateTimer == null) {
             updateTimer = new Timer(50, _ -> updateRowHeights());
             updateTimer.setRepeats(false);
@@ -47,7 +48,7 @@ public class WrappedTable extends JTable {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setText(String.format("<html><div width=%d>%s</div>", table.getColumnModel().getColumn(column).getWidth(), value));
+            label.setText("<html><div width=" + table.getColumnModel().getColumn(column).getWidth() + ">" + value + "</div>");
             return label;
         }
     }
