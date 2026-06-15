@@ -2,6 +2,7 @@ package org.helioviewer.jhv.layers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -357,9 +358,13 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     public void handleData(View.ImageData newImageData) {
         if (removed)
             return;
+        String oldName = getName();
         newImageData.imageBuffer().allowExplicitFree();
         setImageData(newImageData);
-        Layers.fireTimeUpdated(this);
+        if (Objects.equals(oldName, getName()))
+            Layers.fireTimeUpdated(this);
+        else
+            Layers.fireLayerUpdated(this);
         ImageLayers.displaySynced(imageData.viewpoint());
     }
 
