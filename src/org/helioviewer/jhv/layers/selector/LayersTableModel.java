@@ -8,6 +8,7 @@ import org.helioviewer.jhv.layers.Layers;
 @SuppressWarnings("serial")
 final class LayersTableModel extends AbstractTableModel implements Layers.Listener, Reorderable {
 
+    static final int NAME_COL = 1;
     static final int TIME_COL = 2;
     static final int NUMBER_COLUMNS = 5;
 
@@ -49,6 +50,13 @@ final class LayersTableModel extends AbstractTableModel implements Layers.Listen
     @Override
     public void layersCleared() {
         fireTableDataChanged();
+    }
+
+    @Override
+    public void nameUpdated(Layer layer) {
+        int row = Layers.getLayers().indexOf(layer);
+        if (row >= 0)
+            fireTableCellUpdated(row, NAME_COL);
     }
 
     @Override
