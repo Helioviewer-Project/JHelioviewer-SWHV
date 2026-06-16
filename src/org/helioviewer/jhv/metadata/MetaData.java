@@ -42,6 +42,9 @@ public interface MetaData {
     @Nonnull
     Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);
 
+    @Nonnull
+    Region roiToSunRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);
+
     boolean getCalculateDepth();
 
     @Nonnull
