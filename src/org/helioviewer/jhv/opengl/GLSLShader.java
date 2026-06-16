@@ -39,11 +39,11 @@ abstract class GLSLShader {
 
     protected final void _init(boolean common) {
         try {
-            vertexID = attachShader(GL.VERTEX_SHADER, FileUtils.getResourceString(vertex));
+            vertexID = attachShader(GL.VERTEX_SHADER, FileUtils.readResourceString(vertex));
 
-            String fragmentText = FileUtils.getResourceString(fragment);
+            String fragmentText = FileUtils.readResourceString(fragment);
             if (common)
-                fragmentText = FileUtils.getResourceString(COMMON_FRAGMENT) + fragmentText;
+                fragmentText = FileUtils.readResourceString(COMMON_FRAGMENT) + fragmentText;
             fragmentID = attachShader(GL.FRAGMENT_SHADER, fragmentText);
 
             progID = initializeProgram();

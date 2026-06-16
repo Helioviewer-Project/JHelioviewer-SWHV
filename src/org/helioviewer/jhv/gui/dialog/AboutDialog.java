@@ -111,7 +111,7 @@ public final class AboutDialog extends StandardDialog implements Interfaces.Show
                 String res = e.getDescription();
                 String name = res.substring(Math.max(0, res.lastIndexOf('/') + 1));
                 try {
-                    new TextDialog("License - " + name.substring(0, name.indexOf('.')), FileUtils.getResourceString(res), true).showDialog();
+                    new TextDialog("License - " + name.substring(0, name.indexOf('.')), FileUtils.readResourceString(res), true).showDialog();
                 } catch (Exception ex) {
                     Log.error(ex);
                 }

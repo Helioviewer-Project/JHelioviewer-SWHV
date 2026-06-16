@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
@@ -20,15 +19,13 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.AppThread;
 
-public class FileUtils {
+public final class FileUtils {
 
     public static InputStream getResource(String path) throws IOException {
         InputStream is = FileUtils.class.getResourceAsStream(path);
@@ -37,37 +34,22 @@ public class FileUtils {
         return is;
     }
 
-    public static InputStream decompressStream(InputStream input) throws IOException {
-        PushbackInputStream pb = new PushbackInputStream(input, 2); // pushbackstream for looking ahead
-        byte[] signature = new byte[2];
-        int len = pb.read(signature); // read the signature
-        if (len <= 0) { // end of stream
-            return pb;
-        }
-        pb.unread(signature, 0, len); // push back the signature to the stream
-        if (len >= 2 && signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b) // check if matches standard gzip magic number
-            return new GZIPInputStream(pb);
-        else
-            return pb;
-    }
-
-    public static String getResourceString(String path) throws IOException {
+    public static String readResourceString(String path) throws IOException {
         try (InputStream is = getResource(path)) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
     public static long diskUsage(Path path) throws IOException {
-        AtomicLong size = new AtomicLong(0);
-
+        long[] size = {0};
         Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                size.addAndGet(attrs.size());
+                size[0] += attrs.size();
                 return FileVisitResult.CONTINUE;
             }
         });
-        return size.get();
+        return size[0];
     }
 
     public static List<URI> unZip(URI uri) throws IOException {
@@ -131,7 +113,6 @@ public class FileUtils {
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
             return deleteDir ? delete(dir) : FileVisitResult.CONTINUE;
         }
-
     }
 
     private static final DeleteFileVisitor nukeVisitor = new DeleteFileVisitor(-1, true);
@@ -168,10 +149,6 @@ public class FileUtils {
         if (!Files.isDirectory(path))
             return List.of(uri);
         return listDir(path);
-    }
-
-    public static void resolveURIListOffEDT(URI uri, String threadName, Consumer<List<URI>> callback) {
-        resolveURIListOffEDT(List.of(uri), threadName, callback);
     }
 
     public static void resolveURIListOffEDT(List<URI> uris, String threadName, Consumer<List<URI>> callback) {
@@ -212,4 +189,5 @@ public class FileUtils {
         return tempDir;
     }
 
+    private FileUtils() {}
 }

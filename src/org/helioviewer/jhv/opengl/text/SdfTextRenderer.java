@@ -233,7 +233,7 @@ public final class SdfTextRenderer {
     }
 
     private void validateCharset() throws IOException {
-        String charset = FileUtils.getResourceString(ATLAS_CHARSET).trim();
+        String charset = FileUtils.readResourceString(ATLAS_CHARSET).trim();
         if (charset.length() >= 2 && charset.charAt(0) == '"' && charset.charAt(charset.length() - 1) == '"')
             charset = charset.substring(1, charset.length() - 1);
 
