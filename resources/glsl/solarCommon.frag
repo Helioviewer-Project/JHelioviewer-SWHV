@@ -72,6 +72,8 @@ struct Display {
     vec2 brightness;
     vec2 radii;
     vec2 slit;
+    float upsilonLow;
+    float upsilonHigh;
 };
 
 layout(std140) uniform DisplayBlock {
@@ -151,6 +153,13 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
             blurredValue = blurredValue * BOOST + 0.5;
         }
         value = mix(value, blurredValue, sharpenMix);
+    }
+
+    if (display.upsilonLow != 1. || display.upsilonHigh != 1.) {
+        // Two-sided gamma about the median (Gilly & DeForest Eq. 2): upsilonLow and
+        // upsilonHigh independently set the curvature below and above I = 0.5
+        value = clamp(value, 0., 1.);
+        value = value < .5 ? .5 * pow(2. * value, display.upsilonLow) : 1. - .5 * pow(2. - 2. * value, display.upsilonHigh);
     }
 
     value += dither(texcoord);

@@ -21,6 +21,8 @@ class CommonMetaData implements MetaData {
     protected double unitPerPixelX = 1;
     protected double unitPerPixelY = 1;
     protected double unitPerArcsec = DEFAULT_UNIT_PER_ARCSEC;
+    protected double sunShiftX = 0;
+    protected double sunShiftY = 0;
     protected float responseFactor = 1;
 
     protected Position viewpoint = Sun.StartEarth;
@@ -121,6 +123,16 @@ class CommonMetaData implements MetaData {
     public Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
         return new Region(roiX * factorX * unitPerPixelX + region.llx, roiY * factorY * unitPerPixelY + region.lly,
                 roiWidth * factorX * unitPerPixelX, roiHeight * factorY * unitPerPixelY);
+    }
+
+    @Nonnull
+    @Override
+    public Region roiToSunRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
+        Region r = roiToRegion(roiX, roiY, roiWidth, roiHeight, factorX, factorY);
+        if (sunShiftX == 0 && sunShiftY == 0)
+            return r;
+        // Move the origin from the WCS reference point to the Sun center
+        return new Region(r.llx - sunShiftX, r.lly + sunShiftY, r.width, r.height);
     }
 
     @Override
