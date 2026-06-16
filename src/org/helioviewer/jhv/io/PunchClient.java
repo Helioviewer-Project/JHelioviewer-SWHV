@@ -1,0 +1,164 @@
+package org.helioviewer.jhv.io;
+
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+
+import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.time.TimeUtils;
+
+// Lists and loads native FITS files from the PUNCH archive at the Solar Data
+// Analysis Center (public, no auth). The archive is a plain directory tree:
+// {BASE}/{level}/{product}/{YYYY}/{MM}/{DD}/PUNCH_L{lvl}_{code}_{YYYYMMDDhhmmss}_v{ver}.fits
+public final class PunchClient {
+
+    private static final String BASE_URL = "https://umbra.nascom.nasa.gov/punch";
+    private static final Pattern FILE_PATTERN = Pattern.compile("PUNCH_L[0-9A-Z]_[A-Z0-9]{3}_(\\d{14})_v[0-9A-Za-z]+\\.fits");
+    private static final Pattern DIR_PATTERN = Pattern.compile("href=\"([A-Z0-9]{2,4})/\"");
+    private static final Pattern NUM_DIR_PATTERN = Pattern.compile("href=\"(\\d{2,4})/\"");
+    private static final DateTimeFormatter FILE_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+    public record DataItem(String file, URI uri, long milli) {
+        @Override
+        public String toString() {
+            return TimeUtils.format(milli) + "  " + file;
+        }
+    }
+
+    public interface ReceiverItems {
+        void setPunchResponseItems(List<DataItem> list);
+    }
+
+    public interface ReceiverProducts {
+        void setPunchResponseProducts(List<String> list);
+    }
+
+    public interface ReceiverCoverage {
+        // Latest day with data, in UTC epoch ms; 0 if the archive has nothing for this product
+        void setPunchResponseCoverage(long latestDayMilli);
+    }
+
+    public static void submitSearchTime(@Nonnull ReceiverItems receiver, @Nonnull String level, @Nonnull String product, long start, long end, long cadence) {
+        Task.submit("punch", new QueryItems(level, product, start, end, cadence), receiver::setPunchResponseItems, "Error listing the PUNCH archive");
+    }
+
+    public static void submitGetProducts(@Nonnull ReceiverProducts receiver, @Nonnull String level) {
+        Task.submit("punch", new QueryProducts(level), receiver::setPunchResponseProducts, "Error listing the PUNCH archive");
+    }
+
+    public static void submitGetCoverage(@Nonnull ReceiverCoverage receiver, @Nonnull String level, @Nonnull String product) {
+        Task.submit("punch", new QueryCoverage(level, product), receiver::setPunchResponseCoverage, "Error listing the PUNCH archive");
+    }
+
+    public static void submitLoad(@Nonnull List<DataItem> items) {
+        Commands.loadImage(items.stream().map(DataItem::uri).toList());
+    }
+
+    private static String readIndex(String url) throws Exception {
+        try (NetClient nc = NetClient.of(new URI(url), true, NetClient.NetCache.NETWORK)) {
+            boolean ok = nc.isSuccessful();
+            String body = ok ? nc.getSource().readUtf8() : null;
+            Log.info("PUNCH " + url + " -> " + (ok ? body.length() + " bytes" : "not ok"));
+            return body;
+        }
+    }
+
+    private record QueryProducts(String level) implements Callable<List<String>> {
+        @Override
+        public List<String> call() throws Exception {
+            String html = readIndex(BASE_URL + '/' + level + '/');
+            List<String> products = new ArrayList<>();
+            if (html != null) {
+                Matcher m = DIR_PATTERN.matcher(html);
+                while (m.find())
+                    products.add(m.group(1));
+            }
+            return products;
+        }
+    }
+
+    private record QueryCoverage(String level, String product) implements Callable<Long> {
+        @Override
+        public Long call() throws Exception {
+            // Walk year -> month -> day, picking the lexicographically largest at each level
+            String latestYear = latestNumeric(BASE_URL + '/' + level + '/' + product + '/');
+            if (latestYear == null)
+                return 0L;
+            String latestMonth = latestNumeric(BASE_URL + '/' + level + '/' + product + '/' + latestYear + '/');
+            if (latestMonth == null)
+                return 0L;
+            String latestDay = latestNumeric(BASE_URL + '/' + level + '/' + product + '/' + latestYear + '/' + latestMonth + '/');
+            if (latestDay == null)
+                return 0L;
+            return LocalDateTime.of(Integer.parseInt(latestYear), Integer.parseInt(latestMonth), Integer.parseInt(latestDay), 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli();
+        }
+
+        private static String latestNumeric(String url) throws Exception {
+            String html = readIndex(url);
+            if (html == null)
+                return null;
+            String latest = null;
+            Matcher m = NUM_DIR_PATTERN.matcher(html);
+            while (m.find()) {
+                String s = m.group(1);
+                if (latest == null || s.compareTo(latest) > 0)
+                    latest = s;
+            }
+            return latest;
+        }
+    }
+
+    private record QueryItems(String level, String product, long start, long end, long cadence) implements Callable<List<DataItem>> {
+        @Override
+        public List<DataItem> call() throws Exception {
+            // Newer versions of the same timestamp overwrite older ones (index is name-sorted)
+            TreeMap<Long, DataItem> found = new TreeMap<>();
+            for (long day = Math.floorDiv(start, TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS; day <= end; day += TimeUtils.DAY_IN_MILLIS)
+                listDay(found, day);
+
+            // lastKept is seeded just below the first possible in-range item so that any
+            // item with milli >= start passes the cadence check on the first iteration.
+            // Using Long.MIN_VALUE here would overflow the (item.milli - lastKept) check.
+            List<DataItem> result = new ArrayList<>(found.size());
+            long lastKept = start - Math.max(1, cadence) - 1;
+            for (DataItem item : found.values()) {
+                if (item.milli >= start && item.milli <= end && item.milli - lastKept >= cadence) {
+                    result.add(item);
+                    lastKept = item.milli;
+                }
+            }
+            return result;
+        }
+
+        private void listDay(TreeMap<Long, DataItem> found, long day) throws Exception {
+            LocalDateTime date = LocalDateTime.ofEpochSecond(day / 1000, 0, ZoneOffset.UTC);
+            String dirUrl = String.format("%s/%s/%s/%04d/%02d/%02d/", BASE_URL, level, product, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+            String html = readIndex(dirUrl);
+            if (html == null)
+                return;
+
+            int matched = 0;
+            Matcher m = FILE_PATTERN.matcher(html);
+            while (m.find()) {
+                String file = m.group();
+                long milli = LocalDateTime.parse(m.group(1), FILE_TIME).toInstant(ZoneOffset.UTC).toEpochMilli();
+                found.put(milli, new DataItem(file, URI.create(dirUrl + file), milli));
+                matched++;
+            }
+            Log.info("PUNCH parsed " + matched + " files from " + dirUrl);
+        }
+    }
+
+    private PunchClient() {}
+}
