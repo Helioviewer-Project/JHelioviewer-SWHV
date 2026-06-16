@@ -211,7 +211,7 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         GLSLSolarShader shader = mv.mode().shader;
         shader.use();
-        glImage.applyFilters();
+        glImage.applyFilters(view.getFilter() == ImageFilter.Type.RHEF);
 
         MetaData meta0 = imageData.metaData();
         Position metaViewpoint0 = meta0.getViewpoint();
