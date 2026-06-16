@@ -22,6 +22,7 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
+import org.helioviewer.jhv.metadata.Region;
 //import org.helioviewer.jhv.io.XMLUtils;
 
 // essentially static; local or network cache
@@ -69,15 +70,15 @@ final class GenericImage implements URIImageReader {
             */
             BufferedImage image = reader.read(0);
             LUT lut = readLUT(image);
-            ImageBuffer imageBuffer = readBuffered(image, ImageFilter.Type.None);
+            ImageBuffer imageBuffer = readBuffered(image, ImageFilter.Type.None, null);
 
             return new URIImageReader.Image(xml, imageBuffer, lut);
         });
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType) throws Exception {
-        return withReader(file, reader -> readBuffered(reader.read(0), filterType));
+    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable Region region) throws Exception {
+        return withReader(file, reader -> readBuffered(reader.read(0), filterType, region));
     }
 
     @Nullable
@@ -98,18 +99,18 @@ final class GenericImage implements URIImageReader {
         }
     }
 
-    private static ImageBuffer readBuffered(BufferedImage image, ImageFilter.Type filterType) {
+    private static ImageBuffer readBuffered(BufferedImage image, ImageFilter.Type filterType, @Nullable Region region) {
         int w = image.getWidth();
         int h = image.getHeight();
 
         switch (image.getType()) {
             case BufferedImage.TYPE_BYTE_GRAY, BufferedImage.TYPE_BYTE_INDEXED -> {
                 return ImageBuffer.fromBytes(w, h, ImageBuffer.Format.Gray8,
-                        ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filterType);
+                        ((DataBufferByte) image.getRaster().getDataBuffer()).getData(), filterType, region);
             }
             case BufferedImage.TYPE_USHORT_GRAY -> {
                 return ImageBuffer.fromShorts(w, h, ImageBuffer.Format.Gray16F,
-                        halfFloat(((DataBufferUShort) image.getRaster().getDataBuffer()).getData()), filterType);
+                        halfFloat(((DataBufferUShort) image.getRaster().getDataBuffer()).getData()), filterType, region);
             }
             default -> {
                 BufferedImage conv = NativeImageFactory.createRGBAPremultipliedImage(w, h);

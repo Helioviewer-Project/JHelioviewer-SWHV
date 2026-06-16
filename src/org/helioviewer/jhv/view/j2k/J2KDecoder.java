@@ -4,9 +4,12 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.metadata.Region;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -24,7 +27,7 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFilter.Type filterType)
+record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFilter.Type filterType, @Nullable Region region)
         implements Callable<ImageBuffer> {
 
     // Maximum of samples to process per rendering iteration
@@ -101,7 +104,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             boolean gray = numComps < 3;
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
             ImageBuffer.Format format = gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filterType);
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filterType, region);
             ByteBuffer outByteBuffer = outBuffer.byteBuffer();
 
             Kdu_dims newRegion = scratch.newRegion;
