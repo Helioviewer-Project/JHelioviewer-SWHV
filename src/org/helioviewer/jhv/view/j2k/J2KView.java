@@ -293,10 +293,17 @@ public class J2KView extends BaseView {
         J2KDecodeKey key = new J2KDecodeKey(serial, decodeParams, filterType);
         int numComps = source.resolutionSet(decodeParams.frame).numComps;
         try {
-            executor.submit(new J2KDecoder(source, decodeParams, numComps, filterType), new J2KCallback(key, viewpoint, cacheResult));
+            executor.submit(new J2KDecoder(source, decodeParams, numComps, filterType, filterRegion(decodeParams)), new J2KCallback(key, viewpoint, cacheResult));
         } catch (RejectedExecutionException ignore) {
             // Teardown may shut the executor down before a late refresh/resubmit reaches this point.
         }
+    }
+
+    private Region filterRegion(J2KParams.Decode decodeParams) {
+        int frame = decodeParams.frame;
+        J2KParams.SubImage roi = decodeParams.subImage;
+        ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level);
+        return metaData[frame].roiToSunRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
     }
 
     private class J2KCallback implements LatestWorker.Callback<ImageBuffer> {

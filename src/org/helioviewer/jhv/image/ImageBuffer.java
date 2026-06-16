@@ -5,6 +5,10 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
+import javax.annotation.Nullable;
+
+import org.helioviewer.jhv.metadata.Region;
+
 import org.lwjgl.system.MemoryUtil;
 
 public final class ImageBuffer {
@@ -30,25 +34,25 @@ public final class ImageBuffer {
     private volatile boolean explicitFreeProtected;
 
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data) {
-        return fromBytes(width, height, format, data, ImageFilter.Type.None);
+        return fromBytes(width, height, format, data, ImageFilter.Type.None, null);
     }
 
-    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter.Type filterType) {
+    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter.Type filterType, @Nullable Region region) {
         if (format == Format.Gray16F)
             throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
-        byte[] filtered = format == Format.RGBA32 ? data : ImageFilter.filter(data, width, height, filterType);
+        byte[] filtered = format == Format.RGBA32 ? data : ImageFilter.filter(data, width, height, filterType, region);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
-    public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter.Type filterType) {
+    public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter.Type filterType, @Nullable Region region) {
         if (format != Format.Gray16F)
             throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
-        short[] filtered = ImageFilter.filterHalfFloat(data, width, height, filterType);
+        short[] filtered = ImageFilter.filterHalfFloat(data, width, height, filterType, region);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
-    public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter.Type filterType) {
-        return new WriteBuffer(width, height, format, filterType);
+    public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter.Type filterType, @Nullable Region region) {
+        return new WriteBuffer(width, height, format, filterType, region);
     }
 
     private ImageBuffer(int _width, int _height, Format _format, ByteBuffer _buffer) {
@@ -91,16 +95,18 @@ public final class ImageBuffer {
         private final int height;
         private final Format format;
         private final ImageFilter.Type filterType;
+        private final Region region;
         private final ImageBuffer directBuffer;
         private final byte[] byteArray;
         private final short[] shortArray;
         private final Buffer writeBuffer;
 
-        private WriteBuffer(int _width, int _height, Format _format, ImageFilter.Type _filterType) {
+        private WriteBuffer(int _width, int _height, Format _format, ImageFilter.Type _filterType, @Nullable Region _region) {
             width = _width;
             height = _height;
             format = _format;
             filterType = _filterType;
+            region = _region;
 
             if (usesDirectBuffer(format, filterType)) {
                 directBuffer = allocate(width, height, format);
@@ -132,8 +138,8 @@ public final class ImageBuffer {
             if (directBuffer != null)
                 return directBuffer;
             return shortArray != null
-                    ? fromShorts(width, height, format, shortArray, filterType)
-                    : fromBytes(width, height, format, byteArray, filterType);
+                    ? fromShorts(width, height, format, shortArray, filterType, region)
+                    : fromBytes(width, height, format, byteArray, filterType, region);
         }
 
         private static boolean usesDirectBuffer(Format format, ImageFilter.Type filterType) {
