@@ -4,6 +4,8 @@
 ## JHelioviewer 5.5.1 (pending)
 
 - Add options to choose colors and line thickness for annotations
+- Offload orbital trails and PFSS coordinates calculations from the rendering thread
+- Various bug fixes, cleanups, and internal refactoring
 
 ## JHelioviewer 5.5.0 (2026-06-01)
 
