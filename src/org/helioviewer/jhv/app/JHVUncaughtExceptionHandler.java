@@ -50,12 +50,12 @@ public final class JHVUncaughtExceptionHandler {
             return msg;
         }
 
-        protected abstract void handle(String msg);
+        abstract void handle(String msg);
     }
 
     private static final class GUI extends Base {
         @Override
-        protected void handle(String msg) {
+        void handle(String msg) {
             EventQueue.invokeLater(() -> showErrorDialog(msg));
         }
 
@@ -99,7 +99,7 @@ public final class JHVUncaughtExceptionHandler {
 
     private static final class Headless extends Base {
         @Override
-        protected void handle(String msg) {
+        void handle(String msg) {
             System.err.println(msg);
             System.exit(1);
         }

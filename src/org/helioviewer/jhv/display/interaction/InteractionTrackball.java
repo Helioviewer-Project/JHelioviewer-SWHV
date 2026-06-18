@@ -21,7 +21,7 @@ final class InteractionTrackball extends Interaction.Type {
     private int lastMouseY;
     private boolean dragStartSet; // avoid freak mouseDragged before mousePressed
 
-    InteractionTrackball(Camera _camera, Constraint _constraint) {
+    private InteractionTrackball(Camera _camera, Constraint _constraint) {
         camera = _camera;
         constraint = _constraint;
     }
