@@ -25,7 +25,7 @@ public abstract class SWEKHandler {
             boolean success = true;
             boolean overmax = true;
             while (overmax && success) {
-                JSONObject eventJSON = JSONUtils.get(createURI(supplier.getGroup(), start, end, params, page));
+                JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, params, page));
                 overmax = eventJSON.optBoolean("overmax", false);
                 success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
                 page++;
@@ -41,7 +41,7 @@ public abstract class SWEKHandler {
 
     protected abstract boolean parseAssociations(JSONObject eventJSON);
 
-    protected abstract URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception;
+    protected abstract URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception;
 
     public abstract JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException;
 

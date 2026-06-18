@@ -14,7 +14,6 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -27,6 +26,7 @@ import org.json.JSONObject;
 public class HEKHandler extends SWEKHandler {
 
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
+    private static final String STRING_EQUALS = URLEncoder.encode("==", StandardCharsets.UTF_8);
 
     private enum HEKEventEnum {
         ACTIVE_REGION("Active Region", "AR"),
@@ -126,13 +126,13 @@ public class HEKHandler extends SWEKHandler {
     }
 
     @Override
-    protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
+    protected URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
-        baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(group.getName()));
+        baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(supplier.getGroup().getName()));
         baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
         baseURL.append("&param0=event_starttime&op0=").append(SWEK.Operand.SMALLER_OR_EQUAL.encodedRepresentation);
         baseURL.append("&value0=").append(TimeUtils.format(end));
-        appendParams(baseURL, params);
+        appendSupplierFilter(baseURL, supplier);
         baseURL.append("&event_starttime=").append(TimeUtils.format(start));
         long max = Math.max(System.currentTimeMillis(), end);
         baseURL.append("&event_endtime=").append(TimeUtils.format(max));
@@ -140,17 +140,11 @@ public class HEKHandler extends SWEKHandler {
         return new URI(baseURL.toString());
     }
 
-    private static void appendParams(StringBuilder baseURL, List<SWEK.Param> params) {
-        int paramCount = 1;
-        for (SWEK.Param p : params) {
-            if ("provider".equalsIgnoreCase(p.name())) {
-                String encodedValue = URLEncoder.encode(p.value(), StandardCharsets.UTF_8);
-                baseURL.append("&param").append(paramCount).append('=').append("frm_name").
-                        append("&op").append(paramCount).append('=').append(p.operand().encodedRepresentation).
-                        append("&value").append(paramCount).append('=').append(encodedValue);
-                paramCount++;
-            }
-        }
+    private static void appendSupplierFilter(StringBuilder baseURL, SWEKSupplier supplier) {
+        String encodedValue = URLEncoder.encode(supplier.getSupplierName(), StandardCharsets.UTF_8);
+        baseURL.append("&param1=frm_name").
+                append("&op1=").append(STRING_EQUALS).
+                append("&value1=").append(encodedValue);
     }
 
     @Override

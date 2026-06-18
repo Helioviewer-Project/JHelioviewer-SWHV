@@ -10,7 +10,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -72,19 +71,8 @@ public class ComesepHandler extends SWEKHandler {
     }
 
     @Override
-    protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
-        return new URI(BASE_URL + "model=" + model(params) + "&startdate=" + TimeUtils.format(start) + "&enddate=" + TimeUtils.format(end));
-    }
-
-    private static String model(List<SWEK.Param> params) {
-        String model = "";
-        for (SWEK.Param p : params) {
-            if (p.name().equals("provider")) {
-                model = p.value();
-                break;
-            }
-        }
-        return model;
+    protected URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
+        return new URI(BASE_URL + "model=" + supplier.getSupplierName() + "&startdate=" + TimeUtils.format(start) + "&enddate=" + TimeUtils.format(end));
     }
 
     @Override
