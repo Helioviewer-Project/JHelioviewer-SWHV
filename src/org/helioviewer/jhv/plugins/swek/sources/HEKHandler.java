@@ -62,7 +62,6 @@ public class HEKHandler extends SWEKHandler {
             }
             return UNKNOWN.eventAbbreviation;
         }
-
     }
 
     @Override
@@ -131,8 +130,7 @@ public class HEKHandler extends SWEKHandler {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
         baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(supplier.getGroup().getName()));
         baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
-        baseURL.append("&param0=event_starttime&op0=").append(SMALLER_OR_EQUAL);
-        baseURL.append("&value0=").append(TimeUtils.format(end));
+        baseURL.append("&param0=event_starttime&op0=").append(SMALLER_OR_EQUAL).append("&value0=").append(TimeUtils.format(end));
         appendSupplierFilter(baseURL, supplier);
         baseURL.append("&event_starttime=").append(TimeUtils.format(start));
         long max = Math.max(System.currentTimeMillis(), end);
@@ -143,9 +141,7 @@ public class HEKHandler extends SWEKHandler {
 
     private static void appendSupplierFilter(StringBuilder baseURL, SWEKSupplier supplier) {
         String encodedValue = URLEncoder.encode(supplier.getSupplierName(), StandardCharsets.UTF_8);
-        baseURL.append("&param1=frm_name").
-                append("&op1=").append(STRING_EQUALS).
-                append("&value1=").append(encodedValue);
+        baseURL.append("&param1=frm_name").append("&op1=").append(STRING_EQUALS).append("&value1=").append(encodedValue);
     }
 
     @Override
@@ -153,7 +149,6 @@ public class HEKHandler extends SWEKHandler {
         JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
         HEKParser.parseResult(json, currentEvent, full);
         currentEvent.finishParams();
-
         return currentEvent;
     }
 }
