@@ -60,8 +60,7 @@ class SWEKConfig {
     private static SWEK.Source parseSource(JSONObject obj) {
         String name = obj.getString("name");
         return switch (name) {
-            case "COMESEP" ->
-                    new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
+            //case "COMESEP" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
             //case "FHNW" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler());
             case "HEK" ->
                     new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler());
@@ -85,9 +84,7 @@ class SWEKConfig {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
             try {
-                SWEKGroup group = parseGroup(eventJSONArray.getJSONObject(i), dtm);
-                root.add(group);
-                groups.put(group.getName(), group);
+                addGroup(eventJSONArray.getJSONObject(i), dtm, root);
             } catch (Exception e) { // allow continuing when a source is disabled
                 Log.error(e);
             }
@@ -95,7 +92,7 @@ class SWEKConfig {
         return dtm;
     }
 
-    private static SWEKGroup parseGroup(JSONObject obj, DefaultTreeModel dtm) {
+    private static void addGroup(JSONObject obj, DefaultTreeModel dtm, DefaultMutableTreeNode root) {
         SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIconKey(obj), dtm);
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
@@ -104,13 +101,16 @@ class SWEKConfig {
             String supplierName = supplier.getString("supplier_name");
             String sourceName = supplier.getString("source");
             SWEK.Source source = sources.get(sourceName);
-            if (source == null) {
-                Log.warn("Skipping SWEK supplier " + supplierName + " because source is disabled: " + sourceName);
+            if (source == null)
                 continue;
-            }
+
             group.add(new SWEKSupplier(supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db")));
         }
-        return group;
+        if (group.getChildCount() == 0)
+            return;
+
+        root.add(group);
+        groups.put(group.getName(), group);
     }
 
     private static String parseEventIconKey(JSONObject obj) {
