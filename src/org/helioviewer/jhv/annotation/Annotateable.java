@@ -13,9 +13,9 @@ public interface Annotateable {
     @Nullable
     String getData();
 
-    void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf);
+    void draw(MapView mv, Viewport vp, BufVertex vexBuf);
 
-    void drawTransformed(MapView mv, boolean active, BufVertex lineBuf, BufVertex centerBuf);
+    void drawTransformed(MapView mv, double lineThickness, BufVertex lineBuf, BufVertex centerBuf);
 
     void mousePressed(Viewport vp, int x, int y);
 

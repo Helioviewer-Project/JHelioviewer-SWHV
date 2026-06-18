@@ -61,7 +61,7 @@ final class AnnotateCircle extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf) {
+    public void draw(MapView mv, Viewport vp, BufVertex vexBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
