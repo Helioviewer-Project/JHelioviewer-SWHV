@@ -182,7 +182,7 @@ public class EventDatabase {
         pstatement.getConnection().commit();
     }
 
-    public static int dump_association2db(JHVEvent.LinkRef[] links) {
+    public static int dump_association2db(List<JHVEvent.LinkRef> links) {
         try {
             return executor.invokeAndWait(new DumpAssociation2Db(links));
         } catch (Exception e) {
@@ -191,17 +191,14 @@ public class EventDatabase {
         return -1;
     }
 
-    private record DumpAssociation2Db(JHVEvent.LinkRef[] links) implements Callable<Integer> {
+    private record DumpAssociation2Db(List<JHVEvent.LinkRef> links) implements Callable<Integer> {
         @Override
         public Integer call() throws Exception {
-            int len = links.length;
-            int i = 0;
             int errorcode = 0;
 
             PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
 
-            while (i < len && errorcode == 0) {
-                JHVEvent.LinkRef link = links[i];
+            for (JHVEvent.LinkRef link : links) {
                 int id0 = getIdFromUID(link.leftUid());
                 int id1 = getIdFromUID(link.rightUid());
                 if (id0 != -1 && id1 != -1) {
@@ -211,8 +208,8 @@ public class EventDatabase {
                 } else {
                     errorcode = -1;
                     Log.error("Could not add association to database");
+                    break;
                 }
-                i++;
             }
             pstatement.getConnection().commit();
             return errorcode;
