@@ -21,6 +21,11 @@ public class SWEK {
 
     public record Param(String name, String value, Operand operand) {}
 
+    public record RemoteParameter(String name, Object value) {}
+
+    public record RemoteEvent(byte[] compressedJson, long start, long end, long archiv, String uid,
+                              List<RemoteParameter> paramList) {}
+
     public record Parameter(String name, String displayName, ParameterFilter filter, boolean visible) {}
 
     // Holds the related parameters of related events
