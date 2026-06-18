@@ -10,7 +10,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -92,7 +91,7 @@ public class FHNWHandler extends SWEKHandler {
     }
 
     @Override
-    protected URI createURI(SWEKGroup group, long start, long end, List<SWEK.Param> params, int page) throws Exception {
+    protected URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
         String adql = "SELECT TOP 10 * FROM rhessi_flares.epn_core WHERE" +
                 " start_time >= '" + "2002-01-01T00:00:00" + //TimeUtils.format(start) +
                 "' AND end_time <= '" + TimeUtils.format(end) + "' ORDER BY start_time";

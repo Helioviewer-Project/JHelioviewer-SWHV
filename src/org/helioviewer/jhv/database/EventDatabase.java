@@ -521,9 +521,7 @@ public class EventDatabase {
                 String join = "LEFT JOIN " + type.getDatabaseName() + " AS tp ON tp.event_id=e.id";
                 StringBuilder and = new StringBuilder();
                 for (SWEK.Param p : params) {
-                    if (!"provider".equals(p.name())) {
-                        and.append("AND tp.").append(p.name()).append(p.operand().representation).append(p.value()).append(' ');
-                    }
+                    and.append("AND tp.").append(p.name()).append(p.operand().representation).append(p.value()).append(' ');
                 }
                 String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join + " WHERE e.start BETWEEN ? AND ? and e.type_id=? " + and + " order by e.start, e.end ";
                 PreparedStatement pstatement = getPreparedStatement(sqlt);
