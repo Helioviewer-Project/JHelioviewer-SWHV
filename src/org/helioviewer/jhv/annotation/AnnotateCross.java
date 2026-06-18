@@ -34,7 +34,7 @@ final class AnnotateCross extends AbstractAnnotateable {
     }
 
     @Override
-    public void draw(MapView mv, Viewport vp, boolean active, BufVertex vexBuf) {
+    public void draw(MapView mv, Viewport vp, BufVertex vexBuf) {
         if (startPoint == null)
             return;
 

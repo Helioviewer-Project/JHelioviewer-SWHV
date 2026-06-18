@@ -138,15 +138,17 @@ public final class Annotations {
     }
 
     private static void renderAnnotation(MapView mv, Viewport vp, Annotateable annotation, boolean active) {
-        annotation.draw(mv, vp, active, annotationsBuf);
+        double lineThickness = annotation.thickness(active);
+        annotation.draw(mv, vp, annotationsBuf);
         annotationsLine.setVertex(annotationsBuf);
-        annotationsLine.renderLine(vp, annotation.thickness(active));
+        annotationsLine.renderLine(vp, lineThickness);
     }
 
     private static void renderTransformedAnnotation(MapView mv, Viewport vp, double pixFactor, Annotateable annotation, boolean active) {
-        annotation.drawTransformed(mv, active, transformedBuf, centerBuf);
+        double lineThickness = annotation.thickness(active);
+        annotation.drawTransformed(mv, lineThickness, transformedBuf, centerBuf);
         transformedLine.setVertex(transformedBuf);
-        transformedLine.renderLine(vp, annotation.thickness(active));
+        transformedLine.renderLine(vp, lineThickness);
         center.setVertex(centerBuf);
         center.renderPoints(pixFactor);
     }

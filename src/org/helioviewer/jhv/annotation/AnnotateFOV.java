@@ -32,12 +32,11 @@ final class AnnotateFOV extends AbstractAnnotateable {
     }
 
     @Override
-    public void drawTransformed(MapView mv, boolean active, BufVertex lineBuf, BufVertex centerBuf) {
+    public void drawTransformed(MapView mv, double lineThickness, BufVertex lineBuf, BufVertex centerBuf) {
         boolean dragged = beingDragged();
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        double lineThickness = thickness(active);
         byte[] color = color(dragged);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
