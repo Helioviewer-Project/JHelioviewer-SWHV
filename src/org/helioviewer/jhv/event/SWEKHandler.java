@@ -3,7 +3,6 @@ package org.helioviewer.jhv.event;
 import java.net.URI;
 import java.util.List;
 
-import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.io.JSONUtils;
 
 import org.json.JSONException;
@@ -11,27 +10,11 @@ import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    record RemotePage(List<SWEK.RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
+    record RemotePage(boolean overmax, List<SWEK.RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
 
-    interface PageConsumer {
-        void accept(RemotePage page);
-    }
-
-    boolean fetch(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, PageConsumer consumer) {
-        try {
-            int page = 0;
-            boolean overmax = true;
-            while (overmax) {
-                JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, params, page));
-                overmax = eventJSON.optBoolean("overmax", false);
-                consumer.accept(new RemotePage(parseEvents(eventJSON, supplier), parseAssociations(eventJSON)));
-                page++;
-            }
-            return true;
-        } catch (Exception e) {
-            Log.error("Error loading SWEK", e);
-        }
-        return false;
+    RemotePage fetchPage(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
+        JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, params, page));
+        return new RemotePage(eventJSON.optBoolean("overmax", false), parseEvents(eventJSON, supplier), parseAssociations(eventJSON));
     }
 
     protected abstract List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;

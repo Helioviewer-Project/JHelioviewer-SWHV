@@ -38,37 +38,47 @@ class SWEKDownloader implements FilterManager.Listener {
         }
 
         private void download() {
-            boolean success = loadRemote();
-            if (success) {
-                List<JHVEvent.Link> assocList = EventDatabase.associations2Program(start, end, supplier);
-                List<JHVEvent> eventList = EventDatabase.events2Program(start, end, supplier, params);
-                EventQueue.invokeLater(() -> {
-                    assocList.forEach(JHVEventCache::addAssociation);
-                    eventList.forEach(JHVEventCache::addEvent);
-                    JHVEventCache.fireEventCacheChanged();
-
-                    workerFinished(supplier, this);
-                });
-                EventDatabase.addDaterange2db(start, end, supplier);
-            } else {
+            if (!loadRemote()) {
                 EventQueue.invokeLater(() -> workerFailed(supplier, this));
+                return;
             }
+
+            List<JHVEvent.Link> associations = EventDatabase.associations2Program(start, end, supplier);
+            List<JHVEvent> events = EventDatabase.events2Program(start, end, supplier, params);
+            EventQueue.invokeLater(() -> publish(associations, events));
+            EventDatabase.addDaterange2db(start, end, supplier);
+        }
+
+        private void publish(List<JHVEvent.Link> associations, List<JHVEvent> events) {
+            associations.forEach(JHVEventCache::addAssociation);
+            events.forEach(JHVEventCache::addEvent);
+            JHVEventCache.fireEventCacheChanged();
+            workerFinished(supplier, this);
         }
 
         private boolean loadRemote() {
             if (isDownloaded())
                 return true;
 
-            List<JHVEvent.LinkRef> associations = new ArrayList<>();
-            SWEKHandler.PageConsumer storePage = page -> {
-                EventDatabase.storeEvents(page.events(), supplier);
-                associations.addAll(page.associations());
-            };
-
-            boolean loaded = supplier.getSource().handler().fetch(supplier, start, end, params, storePage);
-            if (!loaded)
+            try {
+                return fetchAndStoreRemote();
+            } catch (Exception e) {
+                Log.error("Error loading SWEK", e);
                 return false;
+            }
+        }
 
+        private boolean fetchAndStoreRemote() throws Exception {
+            List<JHVEvent.LinkRef> associations = new ArrayList<>();
+            int page = 0;
+            boolean overmax = true;
+            while (overmax) {
+                SWEKHandler.RemotePage remotePage = supplier.getSource().handler().fetchPage(supplier, start, end, params, page);
+                EventDatabase.storeEvents(remotePage.events(), supplier);
+                associations.addAll(remotePage.associations());
+                overmax = remotePage.overmax();
+                page++;
+            }
             return EventDatabase.storeAssociations(associations) != -1;
         }
 
@@ -150,9 +160,10 @@ class SWEKDownloader implements FilterManager.Listener {
     static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
         List<SWEK.Param> params = defineParameters(supplier);
         SWEKGroup group = supplier.getGroup();
+        long latestStart = System.currentTimeMillis() + SIXHOURS;
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
-                if (intt.start() < System.currentTimeMillis() + SIXHOURS) {
+                if (intt.start() < latestStart) {
                     Worker worker = new Worker(supplier, params, intt.start(), intt.end());
                     downloadPool.execute(worker);
                     workerMap.put(supplier, worker);
