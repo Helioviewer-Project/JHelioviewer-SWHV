@@ -51,7 +51,7 @@ class SWEKDownloader implements FilterManager.Listener {
                 });
                 EventDatabase.addDaterange2db(start, end, supplier);
             } else {
-                EventQueue.invokeLater(() -> workerForcedToStop(supplier, this));
+                EventQueue.invokeLater(() -> workerFailed(supplier, this));
             }
         }
 
@@ -60,15 +60,16 @@ class SWEKDownloader implements FilterManager.Listener {
                 return true;
 
             List<JHVEvent.LinkRef> associations = new ArrayList<>();
-            if (!supplier.getSource().handler().fetch(supplier, start, end, params, page -> storePage(page, associations)))
+            SWEKHandler.PageConsumer storePage = page -> {
+                EventDatabase.storeEvents(page.events(), supplier);
+                associations.addAll(page.associations());
+            };
+
+            boolean loaded = supplier.getSource().handler().fetch(supplier, start, end, params, storePage);
+            if (!loaded)
                 return false;
 
             return EventDatabase.storeAssociations(associations) != -1;
-        }
-
-        private void storePage(SWEKHandler.RemotePage page, List<JHVEvent.LinkRef> associations) {
-            EventDatabase.storeEvents(page.events(), supplier);
-            associations.addAll(page.associations());
         }
 
         private boolean isDownloaded() {
@@ -115,7 +116,7 @@ class SWEKDownloader implements FilterManager.Listener {
         updateGroupBusy(supplier.getGroup());
     }
 
-    private static void workerForcedToStop(SWEKSupplier supplier, Worker worker) {
+    private static void workerFailed(SWEKSupplier supplier, Worker worker) {
         JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
         workerFinished(supplier, worker);
     }
