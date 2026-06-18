@@ -8,13 +8,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.time.Interval;
 
 public class JHVRelatedEvents {
 
     private static final Colors.Data eventColors = new Colors.Data();
-    private static final ArrayList<JHVEventListener.Highlight> listeners = new ArrayList<>();
 
     private final ArrayList<JHVEvent> events = new ArrayList<>();
     private final HashMap<Integer, JHVEvent> eventsById = new HashMap<>();
@@ -61,24 +59,11 @@ public class JHVRelatedEvents {
         return supplier.getGroup();
     }
 
-    void highlight(boolean isHighlighted) {
-        if (isHighlighted != highlighted) {
-            highlighted = isHighlighted;
-            fireHighlightChanged();
-        }
-    }
-
-    public static void addHighlightListener(JHVEventListener.Highlight listener) {
-        if (!listeners.contains(listener)) listeners.add(listener);
-    }
-
-    public static void removeHighlightListener(JHVEventListener.Highlight listener) {
-        listeners.remove(listener);
-    }
-
-    private static void fireHighlightChanged() {
-        listeners.forEach(JHVEventListener.Highlight::highlightChanged);
-        DisplayController.display();
+    boolean highlight(boolean isHighlighted) {
+        if (isHighlighted == highlighted)
+            return false;
+        highlighted = isHighlighted;
+        return true;
     }
 
     public JHVEvent getClosestTo(long timestamp) {

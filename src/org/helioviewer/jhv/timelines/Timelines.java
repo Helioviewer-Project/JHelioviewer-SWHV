@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import org.helioviewer.jhv.event.JHVRelatedEvents;
+import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.movie.Player;
@@ -41,11 +41,11 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
         MainFrame.getMainContentPanel().addPlugin(this);
 
         Player.addTimeListener(dc);
-        JHVRelatedEvents.addHighlightListener(dc);
+        JHVEventCache.addHighlightListener(dc);
     }
 
     public void uninstallTimelines() {
-        JHVRelatedEvents.removeHighlightListener(dc);
+        JHVEventCache.removeHighlightListener(dc);
         Player.removeTimeListener(dc);
 
         MainFrame.getMainContentPanel().removePlugin(this);

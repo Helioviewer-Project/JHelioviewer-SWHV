@@ -10,6 +10,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -20,6 +21,7 @@ public class JHVEventCache {
     private static final long MAX_EVENT_DURATION = TimeUtils.DAY_IN_MILLIS * 14;
 
     private static final Set<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
+    private static final Set<JHVEventListener.Highlight> highlightListeners = new HashSet<>();
     private static final Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> events = new HashMap<>();
     private static final Map<Integer, JHVRelatedEvents> relatedEventsById = new HashMap<>();
     private static final Set<SWEKSupplier> activeEventTypes = new HashSet<>();
@@ -57,9 +59,27 @@ public class JHVEventCache {
 
     public static void highlight(JHVRelatedEvents event) {
         if (event == lastHighlighted) return;
-        if (event != null) event.highlight(true);
-        if (lastHighlighted != null) lastHighlighted.highlight(false);
+        boolean changed = false;
+        if (event != null)
+            changed = event.highlight(true);
+        if (lastHighlighted != null)
+            changed = lastHighlighted.highlight(false) || changed;
         lastHighlighted = event;
+        if (changed)
+            fireHighlightChanged();
+    }
+
+    public static void addHighlightListener(JHVEventListener.Highlight listener) {
+        highlightListeners.add(listener);
+    }
+
+    public static void removeHighlightListener(JHVEventListener.Highlight listener) {
+        highlightListeners.remove(listener);
+    }
+
+    private static void fireHighlightChanged() {
+        highlightListeners.forEach(JHVEventListener.Highlight::highlightChanged);
+        DisplayController.display();
     }
 
     public static void addEvent(JHVEvent event) {
