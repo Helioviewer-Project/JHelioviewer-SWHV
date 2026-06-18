@@ -26,6 +26,7 @@ import org.json.JSONObject;
 public class HEKHandler extends SWEKHandler {
 
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
+    private static final String SMALLER_OR_EQUAL = URLEncoder.encode("<=", StandardCharsets.UTF_8);
     private static final String STRING_EQUALS = URLEncoder.encode("==", StandardCharsets.UTF_8);
 
     private enum HEKEventEnum {
@@ -130,7 +131,7 @@ public class HEKHandler extends SWEKHandler {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
         baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(supplier.getGroup().getName()));
         baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
-        baseURL.append("&param0=event_starttime&op0=").append(SWEK.Operand.SMALLER_OR_EQUAL.encodedRepresentation);
+        baseURL.append("&param0=event_starttime&op0=").append(SMALLER_OR_EQUAL);
         baseURL.append("&value0=").append(TimeUtils.format(end));
         appendSupplierFilter(baseURL, supplier);
         baseURL.append("&event_starttime=").append(TimeUtils.format(start));
