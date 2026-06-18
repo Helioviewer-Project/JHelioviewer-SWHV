@@ -65,64 +65,58 @@ public class HEKHandler extends SWEKHandler {
     }
 
     @Override
-    protected boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier) {
-        try {
-            JSONArray results = eventJSON.getJSONArray("result");
-            int len = results.length();
-            List<EventDatabase.Event2Db> event2dbList = new ArrayList<>(len);
-            for (int i = 0; i < len; i++) {
-                JSONObject result = results.getJSONObject(i);
-                if (result.has("fl_goescls"))
-                    result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
+    protected List<EventDatabase.Event2Db> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+        JSONArray results = eventJSON.getJSONArray("result");
+        int len = results.length();
+        List<EventDatabase.Event2Db> event2dbList = new ArrayList<>(len);
+        for (int i = 0; i < len; i++) {
+            JSONObject result = results.getJSONObject(i);
+            if (result.has("fl_goescls"))
+                result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
 
-                long start = TimeUtils.parse(result.getString("event_starttime"));
-                long end = TimeUtils.parse(result.getString("event_endtime"));
-                if (end < start) {
-                    Log.warn("Event end before start: " + result);
-                    continue;
-                }
+            long start = TimeUtils.parse(result.getString("event_starttime"));
+            long end = TimeUtils.parse(result.getString("event_endtime"));
+            if (end < start) {
+                Log.warn("Event end before start: " + result);
+                continue;
+            }
 
-                long archiv = TimeUtils.parse(result.getString("kb_archivdate"));
-                String uid = result.getString("kb_archivid");
+            long archiv = TimeUtils.parse(result.getString("kb_archivdate"));
+            String uid = result.getString("kb_archivid");
 
-                ArrayList<DatabaseField> paramList = new ArrayList<>();
-                for (Map.Entry<String, String> fieldEntry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
-                    String dbType = fieldEntry.getValue();
-                    String fieldName = fieldEntry.getKey();
-                    String lfieldName = fieldName.toLowerCase();
-                    if (!result.isNull(lfieldName)) {
-                        switch (dbType) {
-                            case DatabaseField.INTEGER ->
-                                    paramList.add(new DatabaseField(fieldName, result.getInt(lfieldName)));
-                            case DatabaseField.TEXT ->
-                                    paramList.add(new DatabaseField(fieldName, result.getString(lfieldName)));
-                            case DatabaseField.REAL ->
-                                    paramList.add(new DatabaseField(fieldName, result.getDouble(lfieldName)));
-                        }
+            ArrayList<DatabaseField> paramList = new ArrayList<>();
+            for (Map.Entry<String, String> fieldEntry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
+                String dbType = fieldEntry.getValue();
+                String fieldName = fieldEntry.getKey();
+                String lfieldName = fieldName.toLowerCase();
+                if (!result.isNull(lfieldName)) {
+                    switch (dbType) {
+                        case DatabaseField.INTEGER ->
+                                paramList.add(new DatabaseField(fieldName, result.getInt(lfieldName)));
+                        case DatabaseField.TEXT ->
+                                paramList.add(new DatabaseField(fieldName, result.getString(lfieldName)));
+                        case DatabaseField.REAL ->
+                                paramList.add(new DatabaseField(fieldName, result.getDouble(lfieldName)));
                     }
                 }
-                try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                    event2dbList.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, paramList));
-                }
             }
-            EventDatabase.dump_event2db(event2dbList, supplier);
-        } catch (Exception e) {
-            Log.error(e);
-            return false;
+            try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
+                event2dbList.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, paramList));
+            }
         }
-        return true;
+        return event2dbList;
     }
 
     @Override
-    protected boolean parseAssociations(JSONObject eventJSON) {
+    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON) {
         JSONArray associations = eventJSON.getJSONArray("association");
         int len = associations.length();
-        JHVEvent.LinkRef[] links = new JHVEvent.LinkRef[len];
+        List<JHVEvent.LinkRef> links = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            links[i] = new JHVEvent.LinkRef(asobj.getString("first_ivorn"), asobj.getString("second_ivorn"));
+            links.add(new JHVEvent.LinkRef(asobj.getString("first_ivorn"), asobj.getString("second_ivorn")));
         }
-        return EventDatabase.dump_association2db(links) != -1;
+        return links;
     }
 
     @Override
