@@ -5,7 +5,8 @@ import java.util.List;
 public class SWEK {
 
     public enum Operand {
-        EQUALS("="), NOT_EQUAL("!="), BIGGER(">"), SMALLER("<"), BIGGER_OR_EQUAL(">="), SMALLER_OR_EQUAL("<="), LIKE("like");
+        BIGGER_OR_EQUAL(">="),
+        SMALLER_OR_EQUAL("<=");
 
         public final String representation;
 
