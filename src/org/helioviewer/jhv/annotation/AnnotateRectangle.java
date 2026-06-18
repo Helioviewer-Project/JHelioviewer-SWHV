@@ -61,7 +61,7 @@ final class AnnotateRectangle extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        byte[] color = color(dragged, active);
+        byte[] color = color(dragged);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 

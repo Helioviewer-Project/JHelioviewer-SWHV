@@ -27,7 +27,7 @@ public interface Annotateable {
 
     boolean isDraggable();
 
-    double thickness();
+    double thickness(boolean active);
 
     byte[] baseColor();
 
