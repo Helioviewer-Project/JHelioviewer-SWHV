@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.TreeMap;
 
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -19,7 +18,7 @@ public class JHVEventCache {
     private static final long MAX_EVENT_DURATION = TimeUtils.DAY_IN_MILLIS * 14;
 
     private static final HashSet<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
-    private static final HashMap<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> events = new HashMap<>();
+    private static final HashMap<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> events = new HashMap<>();
     private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
     private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
     private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
@@ -119,7 +118,7 @@ public class JHVEventCache {
         if (activeEventTypes.isEmpty()) return Collections.emptyList();
         List<JHVRelatedEvents> result = new ArrayList<>();
         for (SWEKSupplier evt : activeEventTypes) {
-            TreeMap<Long, List<JHVRelatedEvents>> supplierMap = events.get(evt);
+            NavigableMap<Long, List<JHVRelatedEvents>> supplierMap = events.get(evt);
             if (supplierMap != null) {
                 // Find all events that can overlap the requested range.
                 NavigableMap<Long, List<JHVRelatedEvents>> relevantRange =

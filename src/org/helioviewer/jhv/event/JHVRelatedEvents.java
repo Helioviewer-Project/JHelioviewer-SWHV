@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
@@ -27,7 +28,7 @@ public class JHVRelatedEvents {
     private Interval interval;
     private boolean highlighted;
 
-    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
+    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         supplier = event.getSupplier();
         color = eventColors.getNextColor();
         addEvent(event);
@@ -40,14 +41,14 @@ public class JHVRelatedEvents {
         eventsById.put(event.getUniqueID(), event);
     }
 
-    private void addToMap(Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
+    private void addToMap(Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         eventsMap.computeIfAbsent(supplier, k -> new TreeMap<>())
                 .computeIfAbsent(interval.start(), k -> new ArrayList<>())
                 .add(this);
     }
 
-    private void removeFromMap(Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
-        TreeMap<Long, List<JHVRelatedEvents>> supplierMap = eventsMap.get(supplier);
+    private void removeFromMap(Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
+        NavigableMap<Long, List<JHVRelatedEvents>> supplierMap = eventsMap.get(supplier);
         if (supplierMap != null) {
             List<JHVRelatedEvents> list = supplierMap.get(interval.start());
             if (list != null) {
@@ -139,7 +140,7 @@ public class JHVRelatedEvents {
         associations.add(link);
     }
 
-    void swapEvent(JHVEvent event, Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
+    void swapEvent(JHVEvent event, Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         removeFromMap(eventsMap);
         events.removeIf(e -> e.getUniqueID() == event.getUniqueID());
         eventsById.put(event.getUniqueID(), event);
@@ -153,7 +154,7 @@ public class JHVRelatedEvents {
         addToMap(eventsMap);
     }
 
-    void merge(JHVRelatedEvents found, Map<SWEKSupplier, TreeMap<Long, List<JHVRelatedEvents>>> eventsMap) {
+    void merge(JHVRelatedEvents found, Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
         removeFromMap(eventsMap);
         found.removeFromMap(eventsMap);
         events.addAll(found.events);
