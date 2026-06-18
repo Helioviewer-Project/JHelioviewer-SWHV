@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 
 import javax.annotation.Nonnull;
 
@@ -28,34 +25,11 @@ public class JHVRelatedEvents {
     private Interval interval;
     private boolean highlighted;
 
-    JHVRelatedEvents(JHVEvent event, Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
+    JHVRelatedEvents(JHVEvent event) {
         supplier = event.getSupplier();
         color = eventColors.getNextColor();
         addEvent(event);
         interval = new Interval(event.start, event.end);
-        addToMap(eventsMap);
-    }
-
-    private void addEvent(JHVEvent event) {
-        events.add(event);
-        eventsById.put(event.getUniqueID(), event);
-    }
-
-    private void addToMap(Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
-        eventsMap.computeIfAbsent(supplier, k -> new TreeMap<>())
-                .computeIfAbsent(interval.start(), k -> new ArrayList<>())
-                .add(this);
-    }
-
-    private void removeFromMap(Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
-        NavigableMap<Long, List<JHVRelatedEvents>> supplierMap = eventsMap.get(supplier);
-        if (supplierMap != null) {
-            List<JHVRelatedEvents> list = supplierMap.get(interval.start());
-            if (list != null) {
-                list.remove(this);
-                if (list.isEmpty()) supplierMap.remove(interval.start());
-            }
-        }
     }
 
     public List<JHVEvent> getEvents() {
@@ -140,8 +114,12 @@ public class JHVRelatedEvents {
         associations.add(link);
     }
 
-    void swapEvent(JHVEvent event, Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
-        removeFromMap(eventsMap);
+    private void addEvent(JHVEvent event) {
+        events.add(event);
+        eventsById.put(event.getUniqueID(), event);
+    }
+
+    void swapEvent(JHVEvent event) {
         events.removeIf(e -> e.getUniqueID() == event.getUniqueID());
         eventsById.put(event.getUniqueID(), event);
         events.add(event);
@@ -151,17 +129,13 @@ public class JHVRelatedEvents {
             end = Math.max(end, evt.end);
         }
         interval = new Interval(start, end);
-        addToMap(eventsMap);
     }
 
-    void merge(JHVRelatedEvents found, Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> eventsMap) {
-        removeFromMap(eventsMap);
-        found.removeFromMap(eventsMap);
+    void merge(JHVRelatedEvents found) {
         events.addAll(found.events);
         eventsById.putAll(found.eventsById);
         associations.addAll(found.associations);
         interval = new Interval(Math.min(interval.start(), found.interval.start()), Math.max(interval.end(), found.interval.end()));
-        addToMap(eventsMap);
     }
 
 }

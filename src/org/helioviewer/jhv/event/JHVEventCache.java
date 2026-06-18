@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -17,12 +19,12 @@ public class JHVEventCache {
     private static final double FACTOR = 0.2;
     private static final long MAX_EVENT_DURATION = TimeUtils.DAY_IN_MILLIS * 14;
 
-    private static final HashSet<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
-    private static final HashMap<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> events = new HashMap<>();
-    private static final HashMap<Integer, JHVRelatedEvents> relEvents = new HashMap<>();
-    private static final HashSet<SWEKSupplier> activeEventTypes = new HashSet<>();
-    private static final HashMap<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
-    private static final HashMap<Integer, HashSet<JHVEvent.Link>> pendingAssocs = new HashMap<>();
+    private static final Set<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
+    private static final Map<SWEKSupplier, NavigableMap<Long, List<JHVRelatedEvents>>> events = new HashMap<>();
+    private static final Map<Integer, JHVRelatedEvents> relatedEventsById = new HashMap<>();
+    private static final Set<SWEKSupplier> activeEventTypes = new HashSet<>();
+    private static final Map<SWEKSupplier, RequestCache> downloadedCache = new HashMap<>();
+    private static final Map<Integer, Set<JHVEvent.Link>> pendingAssocs = new HashMap<>();
 
     private static JHVRelatedEvents lastHighlighted = null;
 
@@ -62,9 +64,11 @@ public class JHVEventCache {
 
     public static void addEvent(JHVEvent event) {
         Integer id = event.getUniqueID();
-        JHVRelatedEvents relatedEvents = relEvents.get(id);
+        JHVRelatedEvents relatedEvents = relatedEventsById.get(id);
         if (relatedEvents != null) {
-            relatedEvents.swapEvent(event, events);
+            removeFromIndex(relatedEvents);
+            relatedEvents.swapEvent(event);
+            addToIndex(relatedEvents);
         } else {
             createNewRelatedEvent(event);
         }
@@ -72,31 +76,55 @@ public class JHVEventCache {
     }
 
     public static JHVRelatedEvents getRelatedEvents(int id) {
-        return relEvents.get(id);
+        return relatedEventsById.get(id);
     }
 
     private static void resolvePendingAssociations(Integer id) {
-        HashSet<JHVEvent.Link> pending = pendingAssocs.remove(id);
+        Set<JHVEvent.Link> pending = pendingAssocs.remove(id);
         if (pending != null)
             pending.forEach(JHVEventCache::addAssociation);
     }
 
     private static void createNewRelatedEvent(JHVEvent event) {
-        JHVRelatedEvents revent = new JHVRelatedEvents(event, events);
-        relEvents.put(event.getUniqueID(), revent);
+        JHVRelatedEvents revent = new JHVRelatedEvents(event);
+        addToIndex(revent);
+        relatedEventsById.put(event.getUniqueID(), revent);
     }
 
     private static void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
         if (current == found) return;
-        current.merge(found, events);
+        removeFromIndex(current);
+        removeFromIndex(found);
+        current.merge(found);
+        addToIndex(current);
         for (JHVEvent foundev : found.getEvents()) {
-            relEvents.put(foundev.getUniqueID(), current);
+            relatedEventsById.put(foundev.getUniqueID(), current);
         }
     }
 
+    private static void addToIndex(JHVRelatedEvents event) {
+        events.computeIfAbsent(event.getSupplier(), _ -> new TreeMap<>())
+                .computeIfAbsent(event.getStart(), _ -> new ArrayList<>())
+                .add(event);
+    }
+
+    private static void removeFromIndex(JHVRelatedEvents event) {
+        NavigableMap<Long, List<JHVRelatedEvents>> supplierEvents = events.get(event.getSupplier());
+        if (supplierEvents == null)
+            return;
+
+        List<JHVRelatedEvents> list = supplierEvents.get(event.getStart());
+        if (list == null)
+            return;
+
+        list.remove(event);
+        if (list.isEmpty())
+            supplierEvents.remove(event.getStart());
+    }
+
     static void addAssociation(JHVEvent.Link link) {
-        JHVRelatedEvents left = relEvents.get(link.leftId());
-        JHVRelatedEvents right = relEvents.get(link.rightId());
+        JHVRelatedEvents left = relatedEventsById.get(link.leftId());
+        JHVRelatedEvents right = relatedEventsById.get(link.rightId());
         if (left != null && right != null) {
             if (left != right) {
                 merge(left, right);
@@ -152,7 +180,7 @@ public class JHVEventCache {
     static void removeSupplier(SWEKSupplier supplier, boolean keepActive) {
         downloadedCache.put(supplier, new RequestCache());
         events.remove(supplier);
-        relEvents.entrySet().removeIf(entry -> removeEventIfFromSupplier(entry, supplier));
+        relatedEventsById.entrySet().removeIf(entry -> removeEventIfFromSupplier(entry, supplier));
         if (!keepActive) activeEventTypes.remove(supplier);
         fireEventCacheChanged();
     }
