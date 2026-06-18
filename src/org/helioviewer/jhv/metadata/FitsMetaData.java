@@ -186,7 +186,7 @@ public final class FitsMetaData extends CommonMetaData {
             measurement = m.getString("BTYPE").orElse("");
             displayName = instrument + ' ' + measurement; // TBD
         } else if (instrument.equals("SPICE")) {
-            measurement = m.getString("EXTNAME").orElse("");
+            measurement = m.getString("CMPNAM").orElse("");
             displayName = instrument + ' ' + measurement;
         } else if (detector.equals("demregpy")) {
             displayName = "DEM " + instrument;
