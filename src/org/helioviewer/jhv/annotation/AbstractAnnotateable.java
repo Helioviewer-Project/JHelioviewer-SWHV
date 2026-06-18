@@ -146,13 +146,8 @@ abstract class AbstractAnnotateable implements Annotateable {
         return active ? ACTIVE_THICKNESS_FACTOR * thickness : thickness;
     }
 
-    @Override
-    public byte[] baseColor() {
-        return baseColor.bytes();
-    }
-
     byte[] color(boolean dragged) {
-        return dragged ? dragColor : baseColor();
+        return dragged ? dragColor : baseColor.bytes();
     }
 
     @Override
@@ -169,5 +164,4 @@ abstract class AbstractAnnotateable implements Annotateable {
         String className = getClass().getSimpleName();
         return className.startsWith("Annotate") ? className.substring("Annotate".length()) : className;
     }
-
 }

@@ -29,8 +29,6 @@ public interface Annotateable {
 
     double thickness(boolean active);
 
-    byte[] baseColor();
-
     JSONObject toJson();
 
 }
