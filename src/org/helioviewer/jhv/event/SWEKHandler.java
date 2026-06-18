@@ -6,40 +6,38 @@ import java.util.List;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.time.Interval;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    public boolean remote2db(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params) {
-        for (Interval interval : EventDatabase.db2daterange(supplier)) {
-            if (interval.start() <= start && interval.end() >= end) {
-                return true;
-            }
-        }
+    record RemotePage(List<EventDatabase.Event2Db> events, List<JHVEvent.LinkRef> associations) {}
 
+    interface PageConsumer {
+        void accept(RemotePage page);
+    }
+
+    boolean fetch(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, PageConsumer consumer) {
         try {
             int page = 0;
-            boolean success = true;
             boolean overmax = true;
-            while (overmax && success) {
+            while (overmax) {
                 JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, params, page));
                 overmax = eventJSON.optBoolean("overmax", false);
-                success = parseRemote(eventJSON, supplier) && parseAssociations(eventJSON);
+                consumer.accept(new RemotePage(parseEvents(eventJSON, supplier), parseAssociations(eventJSON)));
                 page++;
             }
-            return success;
+            return true;
         } catch (Exception e) {
             Log.error("Error loading SWEK", e);
         }
         return false;
     }
 
-    protected abstract boolean parseRemote(JSONObject eventJSON, SWEKSupplier supplier);
+    protected abstract List<EventDatabase.Event2Db> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;
 
-    protected abstract boolean parseAssociations(JSONObject eventJSON);
+    protected abstract List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON) throws Exception;
 
     protected abstract URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception;
 

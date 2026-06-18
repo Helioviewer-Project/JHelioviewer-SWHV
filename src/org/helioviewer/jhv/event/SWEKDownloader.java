@@ -38,7 +38,7 @@ class SWEKDownloader implements FilterManager.Listener {
         }
 
         private void download() {
-            boolean success = supplier.getSource().handler().remote2db(supplier, start, end, params);
+            boolean success = loadRemote();
             if (success) {
                 List<JHVEvent.Link> assocList = EventDatabase.associations2Program(start, end, supplier);
                 List<JHVEvent> eventList = EventDatabase.events2Program(start, end, supplier, params);
@@ -53,6 +53,32 @@ class SWEKDownloader implements FilterManager.Listener {
             } else {
                 EventQueue.invokeLater(() -> workerForcedToStop(supplier, this));
             }
+        }
+
+        private boolean loadRemote() {
+            if (isDownloaded())
+                return true;
+
+            List<JHVEvent.LinkRef> associations = new ArrayList<>();
+            if (!supplier.getSource().handler().fetch(supplier, start, end, params, page -> storePage(page, associations)))
+                return false;
+
+            JHVEvent.LinkRef[] links = associations.toArray(JHVEvent.LinkRef[]::new);
+            return EventDatabase.dump_association2db(links) != -1;
+        }
+
+        private void storePage(SWEKHandler.RemotePage page, List<JHVEvent.LinkRef> associations) {
+            EventDatabase.dump_event2db(page.events(), supplier);
+            associations.addAll(page.associations());
+        }
+
+        private boolean isDownloaded() {
+            for (Interval interval : EventDatabase.db2daterange(supplier)) {
+                if (interval.start() <= start && interval.end() >= end) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         void stopWorker() { // TBD
