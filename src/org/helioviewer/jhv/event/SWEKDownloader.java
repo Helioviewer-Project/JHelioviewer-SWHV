@@ -63,11 +63,11 @@ class SWEKDownloader implements FilterManager.Listener {
             if (!supplier.getSource().handler().fetch(supplier, start, end, params, page -> storePage(page, associations)))
                 return false;
 
-            return EventDatabase.dump_association2db(associations) != -1;
+            return EventDatabase.storeAssociations(associations) != -1;
         }
 
         private void storePage(SWEKHandler.RemotePage page, List<JHVEvent.LinkRef> associations) {
-            EventDatabase.dump_event2db(page.events(), supplier);
+            EventDatabase.storeEvents(page.events(), supplier);
             associations.addAll(page.associations());
         }
 

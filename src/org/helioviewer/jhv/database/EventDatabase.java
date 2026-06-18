@@ -151,13 +151,9 @@ public class EventDatabase {
         pstatement.executeUpdate();
     }
 
-    private static void dump_associationint2db(List<JHVEvent.Link> links) throws Exception {
-        int len = links.size();
-        int i = 0;
-        int errorcode = 0;
+    private static void storeAssociationIds(List<JHVEvent.Link> links) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
-        while (i < len && errorcode == 0) {
-            JHVEvent.Link link = links.get(i);
+        for (JHVEvent.Link link : links) {
             int id0 = link.leftId();
             int id1 = link.rightId();
 
@@ -172,24 +168,23 @@ public class EventDatabase {
                 }
                 pstatement.executeUpdate();
             } else if (id0 != id1) {
-                errorcode = -1;
                 Log.error("Could not add association to database");
+                break;
             }
-            i++;
         }
         pstatement.getConnection().commit();
     }
 
-    public static int dump_association2db(List<JHVEvent.LinkRef> links) {
+    public static int storeAssociations(List<JHVEvent.LinkRef> links) {
         try {
-            return executor.invokeAndWait(new DumpAssociation2Db(links));
+            return executor.invokeAndWait(new StoreAssociations(links));
         } catch (Exception e) {
             Log.error(e);
         }
         return -1;
     }
 
-    private record DumpAssociation2Db(List<JHVEvent.LinkRef> links) implements Callable<Integer> {
+    private record StoreAssociations(List<JHVEvent.LinkRef> links) implements Callable<Integer> {
         @Override
         public Integer call() throws Exception {
             int errorcode = 0;
@@ -242,15 +237,15 @@ public class EventDatabase {
         }
     }
 
-    public static void dump_event2db(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) {
+    public static void storeEvents(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) {
         try {
-            executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
+            executor.invokeAndWait(new StoreEvents(event2db_list, type));
         } catch (Exception e) {
             Log.error(e);
         }
     }
 
-    private record DumpEvent2Db(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) implements Callable<Void> {
+    private record StoreEvents(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             int[] inserted_ids = get_id_init_list(event2db_list.size());
@@ -318,14 +313,13 @@ public class EventDatabase {
             ArrayList<JHVEvent.Link> links = new ArrayList<>();
             for (int id : inserted_ids) {
                 if (id == -1) {
-                    Log.error("Failed to dump to database");
-                    links.add(new JHVEvent.Link(1, 1));
-                } else {
-                    List<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
-                    rels.forEach(rel -> links.add(new JHVEvent.Link(id, rel.getUniqueID())));
+                    Log.error("Failed to store event");
+                    continue;
                 }
+                List<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
+                rels.forEach(rel -> links.add(new JHVEvent.Link(id, rel.getUniqueID())));
             }
-            dump_associationint2db(links);
+            storeAssociationIds(links);
             return null;
         }
     }
