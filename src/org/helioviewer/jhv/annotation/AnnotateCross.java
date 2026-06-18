@@ -38,7 +38,7 @@ final class AnnotateCross extends AbstractAnnotateable {
         if (startPoint == null)
             return;
 
-        byte[] color = color(false, active);
+        byte[] color = color(false);
         drawCross(mv, vp, SphericalCoords.longitude(startPoint), SphericalCoords.latitude(startPoint), color, vexBuf);
     }
 

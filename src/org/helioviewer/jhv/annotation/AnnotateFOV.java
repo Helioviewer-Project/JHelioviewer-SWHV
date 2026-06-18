@@ -37,7 +37,8 @@ final class AnnotateFOV extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        byte[] color = color(dragged, active);
+        double lineThickness = thickness(active);
+        byte[] color = color(dragged);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = 0.5 * (p1.x - p0.x);
@@ -45,8 +46,8 @@ final class AnnotateFOV extends AbstractAnnotateable {
         double centerX = p0.x + dx;
         double centerY = p0.y + dy;
 
-        FOVShape.putCenter(centerX, centerY, mv.isHpc(), thickness(), color, centerBuf);
-        FOVShape.putRectLine(centerX, centerY, dx, dy, mv.isHpc(), thickness(), color, lineBuf);
+        FOVShape.putCenter(centerX, centerY, mv.isHpc(), lineThickness, color, centerBuf);
+        FOVShape.putRectLine(centerX, centerY, dx, dy, mv.isHpc(), lineThickness, color, lineBuf);
     }
 
     @Override

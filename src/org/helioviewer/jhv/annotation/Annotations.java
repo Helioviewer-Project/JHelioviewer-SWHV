@@ -140,13 +140,13 @@ public final class Annotations {
     private static void renderAnnotation(MapView mv, Viewport vp, Annotateable annotation, boolean active) {
         annotation.draw(mv, vp, active, annotationsBuf);
         annotationsLine.setVertex(annotationsBuf);
-        annotationsLine.renderLine(vp, annotation.thickness());
+        annotationsLine.renderLine(vp, annotation.thickness(active));
     }
 
     private static void renderTransformedAnnotation(MapView mv, Viewport vp, double pixFactor, Annotateable annotation, boolean active) {
         annotation.drawTransformed(mv, active, transformedBuf, centerBuf);
         transformedLine.setVertex(transformedBuf);
-        transformedLine.renderLine(vp, annotation.thickness());
+        transformedLine.renderLine(vp, annotation.thickness(active));
         center.setVertex(centerBuf);
         center.renderPoints(pixFactor);
     }

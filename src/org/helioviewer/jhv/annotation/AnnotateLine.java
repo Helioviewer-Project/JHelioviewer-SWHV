@@ -39,13 +39,14 @@ final class AnnotateLine extends AbstractAnnotateable {
         if ((startPoint == null || endPoint == null) && !dragged)
             return;
 
-        byte[] color = color(dragged, active);
+        double lineThickness = thickness(active);
+        byte[] color = color(dragged);
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
         double dx = 0.5 * (p1.x - p0.x);
         double dy = 0.5 * (p1.y - p0.y);
 
-        drawLine(mv, p0.x + dx, p0.y + dy, dx, dy, thickness(), color, lineBuf);
+        drawLine(mv, p0.x + dx, p0.y + dy, dx, dy, lineThickness, color, lineBuf);
     }
 
     @Override

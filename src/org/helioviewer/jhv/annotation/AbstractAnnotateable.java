@@ -19,9 +19,8 @@ import org.json.JSONObject;
 
 abstract class AbstractAnnotateable implements Annotateable {
 
-    static final byte[] activeColor = Colors.Red;
     static final byte[] dragColor = Colors.Green;
-
+    private static final double ACTIVE_THICKNESS_FACTOR = 1.5;
     protected static final double ANNOTATION_RADIUS = Sun.Radius * 1.01;
 
     Vec3 startPoint;
@@ -143,8 +142,8 @@ abstract class AbstractAnnotateable implements Annotateable {
     }
 
     @Override
-    public double thickness() {
-        return thickness;
+    public double thickness(boolean active) {
+        return active ? ACTIVE_THICKNESS_FACTOR * thickness : thickness;
     }
 
     @Override
@@ -152,8 +151,8 @@ abstract class AbstractAnnotateable implements Annotateable {
         return baseColor.bytes();
     }
 
-    byte[] color(boolean dragged, boolean active) {
-        return dragged ? dragColor : (active ? activeColor : baseColor());
+    byte[] color(boolean dragged) {
+        return dragged ? dragColor : baseColor();
     }
 
     @Override
