@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKHandler;
@@ -24,10 +23,10 @@ public class ComesepHandler extends SWEKHandler {
     private static final String BASE_URL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
-    protected List<EventDatabase.Event2Db> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray results = eventJSON.getJSONArray("results");
         int len = results.length();
-        List<EventDatabase.Event2Db> event2dbList = new ArrayList<>(len);
+        List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             JSONObject result = results.getJSONObject(i);
 
@@ -46,7 +45,7 @@ public class ComesepHandler extends SWEKHandler {
             long archiv = start;
             String uid = result.getString("alertid");
             try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                event2dbList.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, new ArrayList<>()));
+                event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, List.of()));
             }
         }
         return event2dbList;

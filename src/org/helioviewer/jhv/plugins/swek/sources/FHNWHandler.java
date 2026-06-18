@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKHandler;
@@ -26,13 +25,13 @@ public class FHNWHandler extends SWEKHandler {
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
 
     @Override
-    protected List<EventDatabase.Event2Db> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray params = eventJSON.getJSONArray("columns");
         int plen = params.length();
         JSONArray events = eventJSON.getJSONArray("data");
         int len = events.length();
 
-        List<EventDatabase.Event2Db> event2dbList = new ArrayList<>(len);
+        List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
         for (int j = 0; j < len; j++) {
             JSONArray event = events.getJSONArray(j);
             int elen = event.length();
@@ -53,7 +52,7 @@ public class FHNWHandler extends SWEKHandler {
                 long archiv = start;
                 String uid = result.getString("granule_uid");
                 try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                    event2dbList.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, new ArrayList<>()));
+                    event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, List.of()));
                 }
             } else
                 Log.warn("Inconsistent event parameter list length");

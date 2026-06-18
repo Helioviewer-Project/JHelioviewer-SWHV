@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.io.JSONUtils;
 
 import org.json.JSONException;
@@ -12,7 +11,7 @@ import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    record RemotePage(List<EventDatabase.Event2Db> events, List<JHVEvent.LinkRef> associations) {}
+    record RemotePage(List<SWEK.RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
 
     interface PageConsumer {
         void accept(RemotePage page);
@@ -35,7 +34,7 @@ public abstract class SWEKHandler {
         return false;
     }
 
-    protected abstract List<EventDatabase.Event2Db> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;
+    protected abstract List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;
 
     protected abstract List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON) throws Exception;
 

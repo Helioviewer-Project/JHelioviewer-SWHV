@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,9 +34,6 @@ import org.helioviewer.jhv.time.RequestCache;
 public class EventDatabase {
 
     private static final SingleExecutor executor = new SingleExecutor(new AppThread.NamedThreadFactory("EventDatabase"));
-
-    public record Event2Db(byte[] compressedJson, long start, long end, long archiv, String uid,
-                           List<DatabaseField> paramList) {}
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
@@ -235,7 +233,16 @@ public class EventDatabase {
         return inserted_ids;
     }
 
-    public static void dump_event2db(List<Event2Db> event2db_list, SWEKSupplier type) {
+    private static void bindRemoteParameter(PreparedStatement statement, int index, SWEK.RemoteParameter parameter) throws SQLException {
+        switch (parameter.value()) {
+            case Integer i -> statement.setInt(index, i);
+            case String s -> statement.setString(index, s);
+            case Double d -> statement.setDouble(index, d);
+            default -> throw new IllegalArgumentException("Unsupported remote parameter value: " + parameter.value());
+        }
+    }
+
+    public static void dump_event2db(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) {
         try {
             executor.invokeAndWait(new DumpEvent2Db(event2db_list, type));
         } catch (Exception e) {
@@ -243,7 +250,7 @@ public class EventDatabase {
         }
     }
 
-    private record DumpEvent2Db(List<Event2Db> event2db_list, SWEKSupplier type) implements Callable<Void> {
+    private record DumpEvent2Db(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             int[] inserted_ids = get_id_init_list(event2db_list.size());
@@ -255,18 +262,18 @@ public class EventDatabase {
             PreparedStatement updateEvent = getPreparedStatement(UPDATE_EVENT);
 
             for (int i = 0; i < llen; i++) {
-                Event2Db event2db = event2db_list.get(i);
+                SWEK.RemoteEvent event2db = event2db_list.get(i);
                 int generatedKey = -1;
                 if (typeId != -1) {
-                    generatedKey = getEventId(event2db.uid);
+                    generatedKey = getEventId(event2db.uid());
 
                     if (generatedKey == -1) {
                         insertFullEvent.setInt(1, typeId);
-                        insertFullEvent.setString(2, event2db.uid);
-                        insertFullEvent.setLong(3, event2db.start);
-                        insertFullEvent.setLong(4, event2db.end);
-                        insertFullEvent.setLong(5, event2db.archiv);
-                        insertFullEvent.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                        insertFullEvent.setString(2, event2db.uid());
+                        insertFullEvent.setLong(3, event2db.start());
+                        insertFullEvent.setLong(4, event2db.end());
+                        insertFullEvent.setLong(5, event2db.archiv());
+                        insertFullEvent.setBinaryStream(6, new ByteArrayInputStream(event2db.compressedJson()), event2db.compressedJson().length);
                         insertFullEvent.executeUpdate();
 
                         try (ResultSet rs = selectLastInsert.executeQuery()) {
@@ -276,17 +283,17 @@ public class EventDatabase {
                         }
                     } else {
                         updateEvent.setInt(1, typeId);
-                        updateEvent.setString(2, event2db.uid);
-                        updateEvent.setLong(3, event2db.start);
-                        updateEvent.setLong(4, event2db.end);
-                        updateEvent.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson), event2db.compressedJson.length);
+                        updateEvent.setString(2, event2db.uid());
+                        updateEvent.setLong(3, event2db.start());
+                        updateEvent.setLong(4, event2db.end());
+                        updateEvent.setBinaryStream(5, new ByteArrayInputStream(event2db.compressedJson()), event2db.compressedJson().length);
                         updateEvent.setInt(6, generatedKey);
                         updateEvent.executeUpdate();
                     }
                     {
                         StringBuilder fieldString = new StringBuilder();
                         StringBuilder varString = new StringBuilder();
-                        for (DatabaseField p : event2db.paramList) {
+                        for (SWEK.RemoteParameter p : event2db.paramList()) {
                             fieldString.append(',').append(p.name());
                             varString.append(",?");
                         }
@@ -295,8 +302,8 @@ public class EventDatabase {
                         pstatement.setInt(1, generatedKey);
 
                         int index = 2;
-                        for (DatabaseField p : event2db.paramList) {
-                            p.bind(pstatement, index);
+                        for (SWEK.RemoteParameter p : event2db.paramList()) {
+                            bindRemoteParameter(pstatement, index, p);
                             index++;
                         }
                         pstatement.executeUpdate();

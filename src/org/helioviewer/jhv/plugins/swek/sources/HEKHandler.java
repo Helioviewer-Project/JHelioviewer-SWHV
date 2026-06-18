@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.database.DatabaseField;
-import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
@@ -65,10 +63,10 @@ public class HEKHandler extends SWEKHandler {
     }
 
     @Override
-    protected List<EventDatabase.Event2Db> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray results = eventJSON.getJSONArray("result");
         int len = results.length();
-        List<EventDatabase.Event2Db> event2dbList = new ArrayList<>(len);
+        List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             JSONObject result = results.getJSONObject(i);
             if (result.has("fl_goescls"))
@@ -84,24 +82,21 @@ public class HEKHandler extends SWEKHandler {
             long archiv = TimeUtils.parse(result.getString("kb_archivdate"));
             String uid = result.getString("kb_archivid");
 
-            ArrayList<DatabaseField> paramList = new ArrayList<>();
+            ArrayList<SWEK.RemoteParameter> paramList = new ArrayList<>();
             for (Map.Entry<String, String> fieldEntry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
                 String dbType = fieldEntry.getValue();
                 String fieldName = fieldEntry.getKey();
                 String lfieldName = fieldName.toLowerCase();
                 if (!result.isNull(lfieldName)) {
                     switch (dbType) {
-                        case DatabaseField.INTEGER ->
-                                paramList.add(new DatabaseField(fieldName, result.getInt(lfieldName)));
-                        case DatabaseField.TEXT ->
-                                paramList.add(new DatabaseField(fieldName, result.getString(lfieldName)));
-                        case DatabaseField.REAL ->
-                                paramList.add(new DatabaseField(fieldName, result.getDouble(lfieldName)));
+                        case "INTEGER" -> paramList.add(new SWEK.RemoteParameter(fieldName, result.getInt(lfieldName)));
+                        case "TEXT" -> paramList.add(new SWEK.RemoteParameter(fieldName, result.getString(lfieldName)));
+                        case "REAL" -> paramList.add(new SWEK.RemoteParameter(fieldName, result.getDouble(lfieldName)));
                     }
                 }
             }
             try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                event2dbList.add(new EventDatabase.Event2Db(baos.toByteArray(), start, end, archiv, uid, paramList));
+                event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, paramList));
             }
         }
         return event2dbList;
