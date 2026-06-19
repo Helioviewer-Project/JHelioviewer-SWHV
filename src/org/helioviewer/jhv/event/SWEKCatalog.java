@@ -6,9 +6,6 @@ import java.util.List;
 
 public final class SWEKCatalog {
 
-    private static final HashMap<String, SWEK.Source> sources = new HashMap<>();
-    private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
-    private static final ArrayList<SWEKGroup> groupList = new ArrayList<>();
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
     private static final HashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new HashMap<>();
     private static List<SWEK.RelatedEvents> relatedEvents = List.of();
@@ -22,33 +19,9 @@ public final class SWEKCatalog {
     }
 
     public static void clear() {
-        sources.clear();
-        groups.clear();
-        groupList.clear();
         suppliers.clear();
         suppliersByGroup.clear();
         relatedEvents = List.of();
-    }
-
-    public static void addSource(SWEK.Source source) {
-        sources.put(source.name(), source);
-    }
-
-    public static SWEK.Source getSource(String name) {
-        return sources.get(name);
-    }
-
-    public static void addGroup(SWEKGroup group) {
-        groups.put(group.getName(), group);
-        groupList.add(group);
-    }
-
-    public static SWEKGroup getGroup(String name) {
-        return groups.get(name);
-    }
-
-    public static List<SWEKGroup> getGroups() {
-        return groupList;
     }
 
     public static SWEKSupplier getSupplier(String key) {
