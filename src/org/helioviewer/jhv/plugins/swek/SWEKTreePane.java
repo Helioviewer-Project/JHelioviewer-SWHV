@@ -28,6 +28,7 @@ import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.event.SWEKCatalog;
+import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.filter.FilterDialog;
@@ -64,6 +65,7 @@ final class SWEKTreePane extends JPanel {
             tree.expandRow(i);
 
         loadingTimer = new Timer(500, e -> repaintBusyGroups());
+        SWEKDownloader.setGroupChangedCallback(this::groupBusyChanged);
 
         setBorder(BorderFactory.createEmptyBorder());
         add(tree, BorderLayout.CENTER);
@@ -74,7 +76,6 @@ final class SWEKTreePane extends JPanel {
         DefaultTreeModel model = new DefaultTreeModel(root);
         for (SWEKGroup group : groups) {
             DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group);
-            group.setOnDownloadingChanged(() -> model.nodeChanged(groupNode));
             for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(group)) {
                 groupNode.add(new DefaultMutableTreeNode(supplier));
             }
@@ -83,13 +84,24 @@ final class SWEKTreePane extends JPanel {
         return model;
     }
 
+    private void groupBusyChanged(SWEKGroup group) {
+        Enumeration<?> children = ((DefaultMutableTreeNode) treeModel.getRoot()).children();
+        while (children.hasMoreElements()) {
+            Object child = children.nextElement();
+            if (child instanceof DefaultMutableTreeNode groupNode && groupNode.getUserObject() == group) {
+                treeModel.nodeChanged(groupNode);
+                return;
+            }
+        }
+    }
+
     private void repaintBusyGroups() {
         boolean anyBusy = false;
         Enumeration<?> children = ((DefaultMutableTreeNode) treeModel.getRoot()).children();
         while (children.hasMoreElements()) {
             Object child = children.nextElement();
             if (child instanceof DefaultMutableTreeNode groupNode && groupNode.getUserObject() instanceof SWEKGroup group) {
-                if (group.isDownloading()) {
+                if (SWEKDownloader.isGroupBusy(group)) {
                     anyBusy = true;
                     repaintGroup(groupNode);
                 }
@@ -109,11 +121,12 @@ final class SWEKTreePane extends JPanel {
     private Component componentFor(Object value) {
         Component component = null;
         if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKGroup group) {
-            if (group.isDownloading() && !loadingTimer.isRunning())
+            boolean busy = SWEKDownloader.isGroupBusy(group);
+            if (busy && !loadingTimer.isRunning())
                 loadingTimer.start();
             component = groupComponents.computeIfAbsent(group, SWEKTreePane::createGroupComponent);
             if (component instanceof JPanel panel && panel.getComponentCount() > 1)
-                panel.getComponent(1).setVisible(group.isDownloading());
+                panel.getComponent(1).setVisible(busy);
         } else if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKSupplier supplier) {
             component = supplierComponents.computeIfAbsent(supplier, SWEKTreePane::createSupplierComponent);
             if (component instanceof JPanel panel && panel.getComponent(0) instanceof JCheckBox checkBox)
@@ -133,7 +146,7 @@ final class SWEKTreePane extends JPanel {
 
         BusyIndicator busyIndicator = new BusyIndicator();
         busyIndicator.setOpaque(false);
-        busyIndicator.setVisible(group.isDownloading());
+        busyIndicator.setVisible(SWEKDownloader.isGroupBusy(group));
         busyIndicator.setPreferredSize(new Dimension(size, size));
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -183,6 +196,7 @@ final class SWEKTreePane extends JPanel {
 
     @Override
     public void removeNotify() {
+        SWEKDownloader.clearGroupChangedCallback();
         loadingTimer.stop();
         super.removeNotify();
     }

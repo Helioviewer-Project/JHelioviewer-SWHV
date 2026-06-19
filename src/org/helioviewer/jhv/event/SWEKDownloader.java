@@ -3,6 +3,7 @@ package org.helioviewer.jhv.event;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -15,10 +16,11 @@ import org.helioviewer.jhv.time.Interval;
 
 import com.google.common.collect.ArrayListMultimap;
 
-class SWEKDownloader implements FilterManager.Listener {
+public class SWEKDownloader implements FilterManager.Listener {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
+    private static Consumer<SWEKGroup> groupChanged = _ -> {};
     private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(
             NUMBER_THREADS, NUMBER_THREADS, 10000L, TimeUnit.MILLISECONDS,
             new PriorityBlockingQueue<>(2048),
@@ -107,14 +109,24 @@ class SWEKDownloader implements FilterManager.Listener {
         FilterManager.addListener(this);
     }
 
-    private static void updateGroupBusy(SWEKGroup group) {
+    public static void setGroupChangedCallback(Consumer<SWEKGroup> callback) {
+        groupChanged = callback;
+    }
+
+    public static void clearGroupChangedCallback() {
+        groupChanged = _ -> {};
+    }
+
+    public static boolean isGroupBusy(SWEKGroup group) {
         for (SWEKSupplier supplier : workerMap.keySet()) {
-            if (supplier.group() == group && !workerMap.get(supplier).isEmpty()) {
-                group.startedDownload();
-                return;
-            }
+            if (supplier.group() == group && !workerMap.get(supplier).isEmpty())
+                return true;
         }
-        group.stoppedDownload();
+        return false;
+    }
+
+    private static void updateGroupBusy(SWEKGroup group) {
+        EventQueue.invokeLater(() -> groupChanged.accept(group));
     }
 
     static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
