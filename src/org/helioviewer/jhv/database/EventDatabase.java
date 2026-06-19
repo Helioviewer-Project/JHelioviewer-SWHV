@@ -77,7 +77,7 @@ public class EventDatabase {
     private static int _getEventTypeId(SWEKSupplier event) throws Exception {
         int typeId = -1;
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_TYPE);
-        pstatement.setString(1, event.getGroup().getName());
+        pstatement.setString(1, event.group().getName());
         pstatement.setString(2, SWEKCatalog.key(event));
 
         try (ResultSet rs = pstatement.executeQuery()) {
@@ -90,12 +90,12 @@ public class EventDatabase {
 
     private static void insertEventTypeIfNotExist(SWEKSupplier eventType) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_EVENT_TYPE);
-        pstatement.setString(1, eventType.getGroup().getName());
+        pstatement.setString(1, eventType.group().getName());
         pstatement.setString(2, SWEKCatalog.key(eventType));
         pstatement.executeUpdate();
 
-        StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.getDatabaseName()).append(" (");
-        eventType.getGroup().getAllDatabaseFields().forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
+        StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.dbName()).append(" (");
+        eventType.group().getAllDatabaseFields().forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
         createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE )");
 
         Connection connection = pstatement.getConnection();
@@ -108,9 +108,9 @@ public class EventDatabase {
     }
 
     private static void createEventTableIndexes(Statement statement, SWEKSupplier eventType) throws Exception {
-        String tableName = eventType.getDatabaseName();
+        String tableName = eventType.dbName();
         HashSet<String> relationFields = new HashSet<>();
-        SWEKGroup group = eventType.getGroup();
+        SWEKGroup group = eventType.group();
         for (SWEK.RelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
             if (re.group() == group)
                 re.relatedOnList().forEach(swon -> relationFields.add(swon.parameterFrom().name().toLowerCase()));
@@ -291,7 +291,7 @@ public class EventDatabase {
                             fieldString.append(',').append(p.name());
                             varString.append(",?");
                         }
-                        String full_statement = "INSERT INTO " + type.getDatabaseName() + "(event_id" + fieldString + ") VALUES(?" + varString + ')';
+                        String full_statement = "INSERT INTO " + type.dbName() + "(event_id" + fieldString + ") VALUES(?" + varString + ')';
                         PreparedStatement pstatement = getPreparedStatement(full_statement);
                         pstatement.setInt(1, generatedKey);
 
@@ -325,7 +325,7 @@ public class EventDatabase {
 
     private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) throws Exception {
         try (InputStream bais = new ByteArrayInputStream(jsonEvent.json); InputStream is = new GZIPInputStream(bais)) {
-            return jsonEvent.type.getSource().handler().parseEventJSON(JSONUtils.get(is), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
+            return jsonEvent.type.source().handler().parseEventJSON(JSONUtils.get(is), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
         }
     }
 
@@ -348,7 +348,7 @@ public class EventDatabase {
 
     // Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
     private static List<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws Exception {
-        SWEKGroup group = jhvEventType.getGroup();
+        SWEKGroup group = jhvEventType.group();
         List<JHVEvent> nEvents = new ArrayList<>();
         List<JsonEvent> jsonEvents = new ArrayList<>();
 
@@ -513,7 +513,7 @@ public class EventDatabase {
             List<JHVEvent> eventList = new ArrayList<>();
             int typeId = getEventTypeId(type);
             if (typeId != -1) {
-                String join = "LEFT JOIN " + type.getDatabaseName() + " AS tp ON tp.event_id=e.id";
+                String join = "LEFT JOIN " + type.dbName() + " AS tp ON tp.event_id=e.id";
                 StringBuilder and = new StringBuilder();
                 for (SWEK.Param p : params) {
                     and.append("AND tp.").append(p.name()).append(p.operand().representation).append(p.value()).append(' ');
@@ -587,8 +587,8 @@ public class EventDatabase {
         int type_right_id = getEventTypeId(type_right);
 
         if (type_left_id != -1 && type_right_id != -1) {
-            String table_left_name = type_left.getDatabaseName();
-            String table_right_name = type_right.getDatabaseName();
+            String table_left_name = type_left.dbName();
+            String table_right_name = type_right.dbName();
 
             String sqlt = "SELECT tl.event_id, tr.event_id FROM " + table_left_name + " AS tl," + table_right_name + " AS tr" + " WHERE tl." + param_left + "=tr." + param_right + " AND tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?)";
             PreparedStatement pstatement = getPreparedStatement(sqlt);

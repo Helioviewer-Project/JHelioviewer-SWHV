@@ -42,7 +42,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
     private final DataCollapsiblePanelModel model;
 
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
-        super(MainFrame.get(), revent.getSupplier().getGroup().getName());
+        super(MainFrame.get(), revent.getSupplier().group().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
