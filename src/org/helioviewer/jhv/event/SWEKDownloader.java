@@ -16,7 +16,7 @@ import org.helioviewer.jhv.time.Interval;
 
 import com.google.common.collect.ArrayListMultimap;
 
-public class SWEKDownloader implements FilterManager.Listener {
+public class SWEKDownloader {
 
     private static final int NUMBER_THREADS = 8;
     private static final long SIXHOURS = 1000 * 60 * 60 * 6;
@@ -136,11 +136,10 @@ public class SWEKDownloader implements FilterManager.Listener {
         }
     }
 
-    private static final SWEKDownloader instance = new SWEKDownloader();
     private static final ArrayListMultimap<SWEKSupplier, Worker> workerMap = ArrayListMultimap.create();
 
-    private SWEKDownloader() {
-        FilterManager.addListener(this);
+    static {
+        FilterManager.addListener(SWEKDownloader::filtersChanged);
     }
 
     public static void setGroupChangedCallback(Consumer<SWEKGroup> callback) {
@@ -183,8 +182,7 @@ public class SWEKDownloader implements FilterManager.Listener {
         updateGroupBusy(worker.supplier.group());
     }
 
-    @Override
-    public void filtersChanged(SWEKSupplier supplier) {
+    private static void filtersChanged(SWEKSupplier supplier) {
         stopDownloadSupplier(supplier, true);
         if (JHVEventCache.isSupplierActive(supplier)) {
             startDownloadSupplier(supplier, JHVEventCache.getAllRequestIntervals(supplier));
