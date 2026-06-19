@@ -30,7 +30,6 @@ public final class SWEKGroup {
 
     public void addSupplier(SWEKSupplier supplier) {
         suppliers.add(supplier);
-        supplier.setGroup(this);
     }
 
     public List<SWEKSupplier> getSuppliers() {

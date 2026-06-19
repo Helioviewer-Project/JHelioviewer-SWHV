@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.FileUtils;
@@ -100,8 +101,9 @@ class SWEKConfig {
             if (source == null)
                 continue;
 
-            SWEKSupplier supplierObj = new SWEKSupplier(supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db"));
+            SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db"));
             group.addSupplier(supplierObj);
+            SWEKCatalog.add(supplierObj);
         }
         if (group.getSuppliers().isEmpty())
             return;

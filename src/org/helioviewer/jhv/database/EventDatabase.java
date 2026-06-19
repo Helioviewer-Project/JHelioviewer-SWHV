@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -77,7 +78,7 @@ public class EventDatabase {
         int typeId = -1;
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_TYPE);
         pstatement.setString(1, event.getGroup().getName());
-        pstatement.setString(2, event.getKey());
+        pstatement.setString(2, SWEKCatalog.key(event));
 
         try (ResultSet rs = pstatement.executeQuery()) {
             if (rs.next()) {
@@ -90,7 +91,7 @@ public class EventDatabase {
     private static void insertEventTypeIfNotExist(SWEKSupplier eventType) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_EVENT_TYPE);
         pstatement.setString(1, eventType.getGroup().getName());
-        pstatement.setString(2, eventType.getKey());
+        pstatement.setString(2, SWEKCatalog.key(eventType));
         pstatement.executeUpdate();
 
         StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.getDatabaseName()).append(" (");
@@ -617,7 +618,7 @@ public class EventDatabase {
                     long start = rs.getLong(2);
                     long end = rs.getLong(3);
                     byte[] json = rs.getBytes(4);
-                    ret.add(new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end));
+                    ret.add(new JsonEvent(json, SWEKCatalog.getSupplier(rs.getString(5)), id, start, end));
                 }
             }
             return ret;
@@ -647,7 +648,7 @@ public class EventDatabase {
                     long start = rs.getLong(2);
                     long end = rs.getLong(3);
                     byte[] json = rs.getBytes(4);
-                    je = new JsonEvent(json, SWEKSupplier.getSupplier(rs.getString(5)), id, start, end);
+                    je = new JsonEvent(json, SWEKCatalog.getSupplier(rs.getString(5)), id, start, end);
                 }
             }
             return je;
