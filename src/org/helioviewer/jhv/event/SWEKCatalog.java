@@ -3,6 +3,7 @@ package org.helioviewer.jhv.event;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class SWEKCatalog {
 
@@ -38,6 +39,17 @@ public final class SWEKCatalog {
 
     public static List<SWEK.RelatedEvents> getRelatedEvents() {
         return relatedEvents;
+    }
+
+    static void addRelationDatabaseFields(SWEKGroup group, Map<String, String> fields) {
+        for (SWEK.RelatedEvents re : relatedEvents) {
+            if (re.group() == group) {
+                re.relatedOnList().forEach(swon -> fields.put(swon.parameterFrom().name().intern(), swon.dbType()));
+            }
+            if (re.relatedWith() == group) {
+                re.relatedOnList().forEach(swon -> fields.put(swon.parameterWith().name().intern(), swon.dbType()));
+            }
+        }
     }
 
     public static String key(SWEKSupplier supplier) {
