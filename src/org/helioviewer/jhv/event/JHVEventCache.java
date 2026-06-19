@@ -51,10 +51,18 @@ public class JHVEventCache {
         downloadedCache.get(eventType).removeRequestedInterval(start, end);
     }
 
-    static void supplierActivated(SWEKSupplier supplier) {
-        activeEventTypes.add(supplier);
-        downloadedCache.computeIfAbsent(supplier, k -> new RequestCache());
-        fireEventCacheChanged();
+    public static boolean isSupplierActive(SWEKSupplier supplier) {
+        return activeEventTypes.contains(supplier);
+    }
+
+    public static void setSupplierActive(SWEKSupplier supplier, boolean active) {
+        if (active) {
+            activeEventTypes.add(supplier);
+            downloadedCache.computeIfAbsent(supplier, k -> new RequestCache());
+            fireEventCacheChanged();
+        } else {
+            SWEKDownloader.stopDownloadSupplier(supplier, false);
+        }
     }
 
     public static void highlight(JHVRelatedEvents event) {

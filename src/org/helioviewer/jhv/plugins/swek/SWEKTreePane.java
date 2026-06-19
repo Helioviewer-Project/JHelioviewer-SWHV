@@ -26,6 +26,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.filter.FilterDialog;
@@ -115,7 +116,7 @@ final class SWEKTreePane extends JPanel {
         } else if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKSupplier supplier) {
             component = supplierComponents.computeIfAbsent(supplier, SWEKTreePane::createSupplierComponent);
             if (component instanceof JPanel panel && panel.getComponent(0) instanceof JCheckBox checkBox)
-                checkBox.setSelected(supplier.isActive());
+                checkBox.setSelected(JHVEventCache.isSupplierActive(supplier));
         }
 
         if (component != null)
@@ -146,8 +147,8 @@ final class SWEKTreePane extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
-        JCheckBox checkBox = new JCheckBox(supplier.getName(), supplier.isActive());
-        checkBox.addActionListener(e -> supplier.activate(checkBox.isSelected()));
+        JCheckBox checkBox = new JCheckBox(supplier.getName(), JHVEventCache.isSupplierActive(supplier));
+        checkBox.addActionListener(e -> JHVEventCache.setSupplierActive(supplier, checkBox.isSelected()));
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);
         panel.add(checkBox, BorderLayout.LINE_START);

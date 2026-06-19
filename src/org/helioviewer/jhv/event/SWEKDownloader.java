@@ -117,7 +117,7 @@ class SWEKDownloader implements FilterManager.Listener {
         group.stoppedDownload();
     }
 
-    private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
+    static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         workerMap.get(supplier).forEach(worker -> {
             worker.stopWorker();
             JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
@@ -136,17 +136,10 @@ class SWEKDownloader implements FilterManager.Listener {
         updateGroupBusy(supplier.getGroup());
     }
 
-    static void activateSupplier(SWEKSupplier supplier, boolean active) {
-        if (active)
-            JHVEventCache.supplierActivated(supplier);
-        else
-            stopDownloadSupplier(supplier, false);
-    }
-
     @Override
     public void filtersChanged(SWEKSupplier supplier) {
         stopDownloadSupplier(supplier, true);
-        if (supplier.isActive()) {
+        if (JHVEventCache.isSupplierActive(supplier)) {
             startDownloadSupplier(supplier, JHVEventCache.getAllRequestIntervals(supplier));
         }
     }
