@@ -8,6 +8,7 @@ public final class SWEKCatalog {
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
     private static final HashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new HashMap<>();
+    private static List<SWEK.RelatedEvents> relatedEvents = List.of();
 
     private SWEKCatalog() {
     }
@@ -17,12 +18,26 @@ public final class SWEKCatalog {
         suppliersByGroup.computeIfAbsent(supplier.group(), _ -> new ArrayList<>()).add(supplier);
     }
 
+    public static void clear() {
+        suppliers.clear();
+        suppliersByGroup.clear();
+        relatedEvents = List.of();
+    }
+
     public static SWEKSupplier getSupplier(String key) {
         return suppliers.get(key);
     }
 
     public static List<SWEKSupplier> getSuppliers(SWEKGroup group) {
         return suppliersByGroup.getOrDefault(group, List.of());
+    }
+
+    public static void setRelatedEvents(List<SWEK.RelatedEvents> events) {
+        relatedEvents = events;
+    }
+
+    public static List<SWEK.RelatedEvents> getRelatedEvents() {
+        return relatedEvents;
     }
 
     public static String key(SWEKSupplier supplier) {

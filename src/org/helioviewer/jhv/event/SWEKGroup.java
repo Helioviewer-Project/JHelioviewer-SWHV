@@ -7,8 +7,6 @@ import java.util.Map;
 
 public final class SWEKGroup {
 
-    private static List<SWEK.RelatedEvents> relatedEvents;
-
     private final String name;
     private final List<SWEK.Parameter> parameterList;
     private final String iconKey;
@@ -41,7 +39,7 @@ public final class SWEKGroup {
                 fields.put(p.name().intern(), pf.dbType());
             }
         }
-        for (SWEK.RelatedEvents re : relatedEvents) {
+        for (SWEK.RelatedEvents re : SWEKCatalog.getRelatedEvents()) {
             if (re.group() == this) {
                 re.relatedOnList().forEach(swon -> fields.put(swon.parameterFrom().name().intern(), swon.dbType()));
             }
@@ -50,14 +48,6 @@ public final class SWEKGroup {
             }
         }
         databaseFields = fields;
-    }
-
-    public static void setSWEKRelatedEvents(List<SWEK.RelatedEvents> _relatedEvents) {
-        relatedEvents = _relatedEvents;
-    }
-
-    public static List<SWEK.RelatedEvents> getSWEKRelatedEvents() {
-        return relatedEvents;
     }
 
     public String getName() {

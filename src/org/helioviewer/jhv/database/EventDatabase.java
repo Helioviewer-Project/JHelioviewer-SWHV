@@ -111,7 +111,7 @@ public class EventDatabase {
         String tableName = eventType.dbName();
         HashSet<String> relationFields = new HashSet<>();
         SWEKGroup group = eventType.group();
-        for (SWEK.RelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
+        for (SWEK.RelatedEvents re : SWEKCatalog.getRelatedEvents()) {
             if (re.group() == group)
                 re.relatedOnList().forEach(swon -> relationFields.add(swon.parameterFrom().name().toLowerCase()));
             if (re.relatedWith() == group)
@@ -352,7 +352,7 @@ public class EventDatabase {
         List<JHVEvent> nEvents = new ArrayList<>();
         List<JsonEvent> jsonEvents = new ArrayList<>();
 
-        for (SWEK.RelatedEvents re : SWEKGroup.getSWEKRelatedEvents()) {
+        for (SWEK.RelatedEvents re : SWEKCatalog.getRelatedEvents()) {
             if (re.group() == group) {
                 for (SWEK.RelatedOn swon : re.relatedOnList()) {
                     String f = swon.parameterFrom().name().toLowerCase();

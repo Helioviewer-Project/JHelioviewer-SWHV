@@ -31,13 +31,16 @@ class SWEKConfig {
     private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
 
     static List<SWEKGroup> load() {
+        sources.clear();
+        groups.clear();
+        SWEKCatalog.clear();
         try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
             JSONObject jo = JSONUtils.get(in);
             EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
             parseSources(jo);
 
             List<SWEKGroup> groupList = parseGroups(jo);
-            SWEKGroup.setSWEKRelatedEvents(parseRelatedEvents(jo));
+            SWEKCatalog.setRelatedEvents(parseRelatedEvents(jo));
             return groupList;
         } catch (Exception e) {
             Log.error(e);
