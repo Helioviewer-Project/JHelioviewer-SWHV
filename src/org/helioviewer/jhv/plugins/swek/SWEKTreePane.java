@@ -27,6 +27,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.helioviewer.jhv.event.JHVEventCache;
+import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.filter.FilterDialog;
@@ -74,7 +75,7 @@ final class SWEKTreePane extends JPanel {
         for (SWEKGroup group : groups) {
             DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group);
             group.setOnDownloadingChanged(() -> model.nodeChanged(groupNode));
-            for (SWEKSupplier supplier : group.getSuppliers()) {
+            for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(group)) {
                 groupNode.add(new DefaultMutableTreeNode(supplier));
             }
             root.add(groupNode);

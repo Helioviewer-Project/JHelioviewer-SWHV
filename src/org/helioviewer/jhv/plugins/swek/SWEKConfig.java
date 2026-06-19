@@ -102,10 +102,9 @@ class SWEKConfig {
                 continue;
 
             SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db"));
-            group.addSupplier(supplierObj);
             SWEKCatalog.add(supplierObj);
         }
-        if (group.getSuppliers().isEmpty())
+        if (SWEKCatalog.getSuppliers(group).isEmpty())
             return;
 
         groupList.add(group);

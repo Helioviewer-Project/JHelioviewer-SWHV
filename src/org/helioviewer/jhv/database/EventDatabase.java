@@ -359,7 +359,7 @@ public class EventDatabase {
                     String w = swon.parameterWith().name().toLowerCase();
 
                     SWEKGroup reType = re.relatedWith();
-                    for (SWEKSupplier supplier : reType.getSuppliers()) {
+                    for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {
                         if (similartype == (supplier == jhvEventType)) {
                             jsonEvents.addAll(is_dbthread
                                     ? rel2prog(id, jhvEventType, supplier, f, w)
@@ -375,7 +375,7 @@ public class EventDatabase {
                     String w = swon.parameterWith().name().toLowerCase();
 
                     SWEKGroup reType = re.group();
-                    for (SWEKSupplier supplier : reType.getSuppliers()) {
+                    for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {
                         if (similartype == (supplier == jhvEventType)) {
                             jsonEvents.addAll(is_dbthread
                                     ? rel2prog(id, supplier, jhvEventType, f, w)
