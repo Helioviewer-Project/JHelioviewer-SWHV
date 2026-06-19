@@ -41,15 +41,17 @@ public final class SWEKCatalog {
         return relatedEvents;
     }
 
-    static void addRelationDatabaseFields(SWEKGroup group, Map<String, String> fields) {
+    public static Map<String, String> getRelationDatabaseFields(SWEKGroup group) {
+        HashMap<String, String> fields = new HashMap<>();
         for (SWEK.RelatedEvents re : relatedEvents) {
             if (re.group() == group) {
-                re.relatedOnList().forEach(swon -> fields.put(swon.parameterFrom().name().intern(), swon.dbType()));
+                re.relatedOnList().forEach(swon -> fields.put(swon.parameterFrom().intern(), swon.dbType()));
             }
             if (re.relatedWith() == group) {
-                re.relatedOnList().forEach(swon -> fields.put(swon.parameterWith().name().intern(), swon.dbType()));
+                re.relatedOnList().forEach(swon -> fields.put(swon.parameterWith().intern(), swon.dbType()));
             }
         }
+        return fields;
     }
 
     public static String key(SWEKSupplier supplier) {

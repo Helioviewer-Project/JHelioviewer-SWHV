@@ -109,16 +109,7 @@ public class EventDatabase {
 
     private static void createEventTableIndexes(Statement statement, SWEKSupplier eventType) throws Exception {
         String tableName = eventType.dbName();
-        HashSet<String> relationFields = new HashSet<>();
-        SWEKGroup group = eventType.group();
-        for (SWEK.RelatedEvents re : SWEKCatalog.getRelatedEvents()) {
-            if (re.group() == group)
-                re.relatedOnList().forEach(swon -> relationFields.add(swon.parameterFrom().name().toLowerCase()));
-            if (re.relatedWith() == group)
-                re.relatedOnList().forEach(swon -> relationFields.add(swon.parameterWith().name().toLowerCase()));
-        }
-
-        for (String field : relationFields)
+        for (String field : SWEKCatalog.getRelationDatabaseFields(eventType.group()).keySet())
             statement.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName + '_' + field + " ON " + tableName + " (" + field + ")");
     }
 
@@ -355,8 +346,8 @@ public class EventDatabase {
         for (SWEK.RelatedEvents re : SWEKCatalog.getRelatedEvents()) {
             if (re.group() == group) {
                 for (SWEK.RelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom().name().toLowerCase();
-                    String w = swon.parameterWith().name().toLowerCase();
+                    String f = swon.parameterFrom().toLowerCase();
+                    String w = swon.parameterWith().toLowerCase();
 
                     SWEKGroup reType = re.relatedWith();
                     for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {
@@ -371,8 +362,8 @@ public class EventDatabase {
 
             if (re.relatedWith() == group) {
                 for (SWEK.RelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom().name().toLowerCase();
-                    String w = swon.parameterWith().name().toLowerCase();
+                    String f = swon.parameterFrom().toLowerCase();
+                    String w = swon.parameterWith().toLowerCase();
 
                     SWEKGroup reType = re.group();
                     for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {

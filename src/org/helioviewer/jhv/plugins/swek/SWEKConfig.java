@@ -165,7 +165,7 @@ class SWEKConfig {
             JSONObject relatedOn = relatedOnArray.getJSONObject(i);
             String parameterFrom = relatedOn.getString("parameter_from");
             String parameterWith = relatedOn.getString("parameter_with");
-            relatedOnList.add(new SWEK.RelatedOn(new SWEK.Parameter(parameterFrom, parameterFrom, null, false), new SWEK.Parameter(parameterWith, parameterWith, null, false), relatedOn.getString("dbtype")));
+            relatedOnList.add(new SWEK.RelatedOn(parameterFrom, parameterWith, relatedOn.getString("dbtype")));
         }
         return relatedOnList;
     }
