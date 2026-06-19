@@ -33,9 +33,9 @@ class SWEKConfig {
             EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
             parseSources(jo);
 
-            List<SWEKGroup> groupList = parseGroups(jo);
+            parseGroups(jo);
             SWEKCatalog.setRelatedEvents(parseRelatedEvents(jo));
-            return groupList;
+            return SWEKCatalog.getGroups();
         } catch (Exception e) {
             Log.error(e);
             return List.of();
@@ -72,20 +72,18 @@ class SWEKConfig {
         return parameterList;
     }
 
-    private static List<SWEKGroup> parseGroups(JSONObject obj) {
-        List<SWEKGroup> groupList = new ArrayList<>();
+    private static void parseGroups(JSONObject obj) {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
             try {
-                addGroup(eventJSONArray.getJSONObject(i), groupList);
+                addGroup(eventJSONArray.getJSONObject(i));
             } catch (Exception e) { // allow continuing when a source is disabled
                 Log.error(e);
             }
         }
-        return groupList;
     }
 
-    private static void addGroup(JSONObject obj, List<SWEKGroup> groupList) {
+    private static void addGroup(JSONObject obj) {
         SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIconKey(obj));
 
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
@@ -104,7 +102,6 @@ class SWEKConfig {
         if (SWEKCatalog.getSuppliers(group).isEmpty())
             return;
 
-        groupList.add(group);
         SWEKCatalog.addGroup(group);
     }
 
