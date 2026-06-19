@@ -3,6 +3,10 @@ package org.helioviewer.jhv.event;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +31,9 @@ public class SWEKDownloader implements FilterManager.Listener {
             new AppThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    private static final class Worker implements Runnable, Comparable<Worker> {
+    private record LoadedEvents(List<JHVEvent.Link> associations, List<JHVEvent> events) {}
+
+    private static final class Download implements Callable<LoadedEvents> {
         private final SWEKSupplier supplier;
         private final List<SWEK.Param> params;
         private final long start;
@@ -35,7 +41,7 @@ public class SWEKDownloader implements FilterManager.Listener {
 
         private volatile boolean cancelled;
 
-        Worker(SWEKSupplier _supplier, List<SWEK.Param> _params, long _start, long _end) {
+        Download(SWEKSupplier _supplier, List<SWEK.Param> _params, long _start, long _end) {
             supplier = _supplier;
             params = _params;
             start = _start;
@@ -43,57 +49,21 @@ public class SWEKDownloader implements FilterManager.Listener {
         }
 
         @Override
-        public void run() {
+        public LoadedEvents call() {
             try {
-                download();
-            } catch (Throwable t) {
-                if (!AppThread.isInterrupted(t))
-                    Log.error(t);
-            }
-        }
-
-        private void download() {
-            if (cancelled)
-                return;
-
-            if (!loadRemote()) {
-                if (!cancelled)
-                    EventQueue.invokeLater(() -> workerFailed(this));
-                return;
-            }
-
-            List<JHVEvent.Link> associations = EventDatabase.associations2Program(start, end, supplier);
-            List<JHVEvent> events = EventDatabase.events2Program(start, end, supplier, params);
-            if (cancelled)
-                return;
-
-            EventQueue.invokeLater(() -> {
-                if (!cancelled)
-                    publish(associations, events);
-            });
-            if (cancelled)
-                return;
-
-            EventDatabase.addDaterange2db(start, end, supplier);
-        }
-
-        private void publish(List<JHVEvent.Link> associations, List<JHVEvent> events) {
-            associations.forEach(JHVEventCache::addAssociation);
-            events.forEach(JHVEventCache::addEvent);
-            JHVEventCache.fireEventCacheChanged();
-            workerFinished(this);
-        }
-
-        private boolean loadRemote() {
-            if (isDownloaded())
-                return true;
-
-            try {
-                return fetchAndStoreRemote();
+                if (!isDownloaded() && !fetchAndStoreRemote())
+                    return null;
             } catch (Exception e) {
-                Log.error("Error loading SWEK", e);
-                return false;
+                if (!AppThread.isInterrupted(e))
+                    Log.error("Error loading SWEK", e);
+                return null;
             }
+            if (cancelled)
+                return null;
+
+            return new LoadedEvents(
+                    EventDatabase.associations2Program(start, end, supplier),
+                    EventDatabase.events2Program(start, end, supplier, params));
         }
 
         private boolean fetchAndStoreRemote() throws Exception {
@@ -124,15 +94,67 @@ public class SWEKDownloader implements FilterManager.Listener {
             }
             return false;
         }
+    }
+
+    private static final class Worker extends FutureTask<LoadedEvents> implements Comparable<Worker> {
+        private final Download download;
+
+        Worker(SWEKSupplier _supplier, List<SWEK.Param> _params, long _start, long _end) {
+            this(new Download(_supplier, _params, _start, _end));
+        }
+
+        private Worker(Download _download) {
+            super(_download);
+            download = _download;
+        }
+
+        @Override
+        protected void done() {
+            if (download.cancelled)
+                return;
+
+            EventQueue.invokeLater(() -> {
+                if (download.cancelled)
+                    return;
+                try {
+                    LoadedEvents events = get();
+                    if (events != null)
+                        onSuccess(events);
+                    else
+                        onFailure(null);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException e) {
+                    onFailure(e.getCause());
+                } catch (CancellationException ignored) {
+                    // Cancelled workers are removed by stopDownloadSupplier.
+                }
+            });
+        }
+
+        private void onSuccess(LoadedEvents events) {
+            events.associations().forEach(JHVEventCache::addAssociation);
+            events.events().forEach(JHVEventCache::addEvent);
+            JHVEventCache.fireEventCacheChanged();
+            EventDatabase.addDaterange2db(download.start, download.end, download.supplier);
+            workerFinished(this);
+        }
+
+        private void onFailure(Throwable t) {
+            if (t != null && !AppThread.isInterrupted(t))
+                Log.error(t);
+            workerFailed(this);
+        }
 
         void stopWorker() {
-            cancelled = true;
+            download.cancelled = true;
+            cancel(false);
             downloadPool.remove(this);
         }
 
         @Override
         public int compareTo(Worker other) {
-            return Long.compare(other.end, end);
+            return Long.compare(other.download.end, download.end);
         }
     }
 
@@ -166,7 +188,7 @@ public class SWEKDownloader implements FilterManager.Listener {
     static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         for (Worker worker : workerMap.get(supplier)) {
             worker.stopWorker();
-            JHVEventCache.intervalNotDownloaded(supplier, worker.start, worker.end);
+            JHVEventCache.intervalNotDownloaded(supplier, worker.download.start, worker.download.end);
         }
         workerMap.removeAll(supplier);
         JHVEventCache.removeSupplier(supplier, keepActive);
@@ -174,13 +196,13 @@ public class SWEKDownloader implements FilterManager.Listener {
     }
 
     private static void workerFailed(Worker worker) {
-        JHVEventCache.intervalNotDownloaded(worker.supplier, worker.start, worker.end);
+        JHVEventCache.intervalNotDownloaded(worker.download.supplier, worker.download.start, worker.download.end);
         workerFinished(worker);
     }
 
     private static void workerFinished(Worker worker) {
-        workerMap.remove(worker.supplier, worker);
-        updateGroupBusy(worker.supplier.group());
+        workerMap.remove(worker.download.supplier, worker);
+        updateGroupBusy(worker.download.supplier.group());
     }
 
     @Override
