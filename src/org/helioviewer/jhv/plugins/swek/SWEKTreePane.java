@@ -148,7 +148,7 @@ final class SWEKTreePane extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
-        JCheckBox checkBox = new JCheckBox(supplier.name(), JHVEventCache.isSupplierActive(supplier));
+        JCheckBox checkBox = new JCheckBox(supplier.displayName(), JHVEventCache.isSupplierActive(supplier));
         checkBox.addActionListener(e -> JHVEventCache.setSupplierActive(supplier, checkBox.isSelected()));
         checkBox.setFocusPainted(false);
         checkBox.setOpaque(false);

@@ -1,13 +1,13 @@
 package org.helioviewer.jhv.event;
 
-public record SWEKSupplier(SWEKGroup group, String supplierName, String name, SWEK.Source source, String dbName) {
+public record SWEKSupplier(SWEKGroup group, String supplierName, String displayName, SWEK.Source source, String dbName) {
 
     public SWEKSupplier {
-        name = name.intern();
+        displayName = displayName.intern();
     }
 
     public boolean isCactus() {
-        return name == "CACTus" && "HEK".equals(source.name());
+        return displayName == "CACTus" && "HEK".equals(source.name());
     }
 
     @Override
