@@ -5,7 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -27,12 +26,7 @@ import org.json.JSONObject;
 
 class SWEKConfig {
 
-    private static final HashMap<String, SWEK.Source> sources = new HashMap<>();
-    private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
-
     static List<SWEKGroup> load() {
-        sources.clear();
-        groups.clear();
         SWEKCatalog.clear();
         try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
             JSONObject jo = JSONUtils.get(in);
@@ -53,7 +47,7 @@ class SWEKConfig {
         for (int i = 0; i < sourcesArray.length(); i++) {
             SWEK.Source source = parseSource(sourcesArray.getJSONObject(i));
             if (source != null)
-                sources.put(source.name(), source);
+                SWEKCatalog.addSource(source);
         }
     }
 
@@ -100,7 +94,7 @@ class SWEKConfig {
 
             String supplierName = supplier.getString("supplier_name");
             String sourceName = supplier.getString("source");
-            SWEK.Source source = sources.get(sourceName);
+            SWEK.Source source = SWEKCatalog.getSource(sourceName);
             if (source == null)
                 continue;
 
@@ -111,7 +105,7 @@ class SWEKConfig {
             return;
 
         groupList.add(group);
-        groups.put(group.getName(), group);
+        SWEKCatalog.addGroup(group);
     }
 
     private static String parseEventIconKey(JSONObject obj) {
@@ -138,8 +132,8 @@ class SWEKConfig {
         List<SWEK.RelatedEvents> relatedEventsList = new ArrayList<>(relatedEventsArray.length());
         for (int i = 0; i < relatedEventsArray.length(); i++) {
             JSONObject relatedEvent = relatedEventsArray.getJSONObject(i);
-            SWEKGroup group = groups.get(relatedEvent.getString("event_name"));
-            SWEKGroup relatedWith = groups.get(relatedEvent.getString("related_with"));
+            SWEKGroup group = SWEKCatalog.getGroup(relatedEvent.getString("event_name"));
+            SWEKGroup relatedWith = SWEKCatalog.getGroup(relatedEvent.getString("related_with"));
             if (group != null && relatedWith != null)
                 relatedEventsList.add(new SWEK.RelatedEvents(group, relatedWith, parseRelatedOnList(relatedEvent)));
         }
