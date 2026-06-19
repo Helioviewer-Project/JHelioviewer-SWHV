@@ -92,7 +92,7 @@ public class FHNWHandler extends SWEKHandler {
     }
 
     @Override
-    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON) {
+    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) {
         return List.of();
     }
 

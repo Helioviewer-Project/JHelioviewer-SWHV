@@ -5,8 +5,10 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.GOESLevel;
@@ -69,6 +71,9 @@ public class HEKHandler extends SWEKHandler {
         List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             JSONObject result = results.getJSONObject(i);
+            if (!isSupplierEvent(result, supplier))
+                continue;
+
             if (result.has("fl_goescls"))
                 result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
 
@@ -103,15 +108,35 @@ public class HEKHandler extends SWEKHandler {
     }
 
     @Override
-    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON) {
+    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) {
+        Set<String> acceptedUids = getSupplierUids(eventJSON, supplier);
         JSONArray associations = eventJSON.getJSONArray("association");
         int len = associations.length();
         List<JHVEvent.LinkRef> links = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             JSONObject asobj = associations.getJSONObject(i);
-            links.add(new JHVEvent.LinkRef(asobj.getString("first_ivorn"), asobj.getString("second_ivorn")));
+            String first = asobj.getString("first_ivorn");
+            String second = asobj.getString("second_ivorn");
+            if (acceptedUids.contains(first) || acceptedUids.contains(second))
+                links.add(new JHVEvent.LinkRef(first, second));
         }
         return links;
+    }
+
+    private static Set<String> getSupplierUids(JSONObject eventJSON, SWEKSupplier supplier) {
+        JSONArray results = eventJSON.getJSONArray("result");
+        int len = results.length();
+        Set<String> uids = new HashSet<>();
+        for (int i = 0; i < len; i++) {
+            JSONObject result = results.getJSONObject(i);
+            if (isSupplierEvent(result, supplier))
+                uids.add(result.getString("kb_archivid"));
+        }
+        return uids;
+    }
+
+    private static boolean isSupplierEvent(JSONObject result, SWEKSupplier supplier) {
+        return supplier.supplierName().equals(result.optString("frm_name"));
     }
 
     @Override
