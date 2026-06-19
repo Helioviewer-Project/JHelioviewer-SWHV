@@ -9,7 +9,6 @@ public final class SWEKSupplier {
     private final SWEK.Source source;
     private final SWEKGroup group;
     private final boolean isCactus;
-    private boolean active;
 
     public SWEKSupplier(SWEKGroup _group, String _supplierName, String _name, SWEK.Source _source, String _db) {
         group = _group;
@@ -43,15 +42,6 @@ public final class SWEKSupplier {
 
     public boolean isCactus() {
         return isCactus;
-    }
-
-    public void activate(boolean b) {
-        active = b;
-        SWEKDownloader.activateSupplier(this, b);
-    }
-
-    public boolean isActive() {
-        return active;
     }
 
 }
