@@ -88,7 +88,7 @@ public class JHVEvent {
     }
 
     public void addParameter(String key, String value, boolean full) {
-        SWEK.Parameter p = parameterFromList(key, supplier.group().getParameterList());
+        SWEK.Parameter p = parameterFromList(key, supplier.getParameterList());
         if (p == null) p = parameterFromList(key, supplier.source().generalParameters());
 
         boolean visible = (p != null) && p.visible();

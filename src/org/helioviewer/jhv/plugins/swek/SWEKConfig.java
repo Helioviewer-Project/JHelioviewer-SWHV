@@ -78,6 +78,18 @@ class SWEKConfig {
         return parameterList;
     }
 
+    private static List<SWEK.Parameter> parseSupplierParameters(JSONObject supplier, List<SWEK.Parameter> defaultParameters) {
+        if (supplier.has("parameter_list"))
+            return parseParameters(supplier.getJSONArray("parameter_list"));
+
+        if (!supplier.has("extra_parameters"))
+            return defaultParameters;
+
+        List<SWEK.Parameter> parameters = new ArrayList<>(defaultParameters);
+        parameters.addAll(parseParameters(supplier.getJSONArray("extra_parameters")));
+        return parameters;
+    }
+
     private static void parseGroups(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
@@ -90,7 +102,8 @@ class SWEKConfig {
     }
 
     private static void addGroup(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {
-        SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIconKey(obj));
+        List<SWEK.Parameter> defaultParameters = parseParameters(obj.getJSONArray("parameter_list"));
+        SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseEventIconKey(obj));
 
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
@@ -102,7 +115,8 @@ class SWEKConfig {
             if (source == null)
                 continue;
 
-            SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db"));
+            List<SWEK.Parameter> parameters = parseSupplierParameters(supplier, defaultParameters);
+            SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db"), parameters);
             SWEKCatalog.add(supplierObj);
         }
         if (SWEKCatalog.getSuppliers(group).isEmpty())

@@ -163,9 +163,8 @@ final class SWEKTreePane extends JPanel {
         checkBox.setOpaque(false);
         panel.add(checkBox, BorderLayout.LINE_START);
 
-        SWEKGroup group = supplier.group();
-        if (group.containsFilter()) {
-            FilterDialog filterDialog = new FilterDialog(group, supplier);
+        if (supplier.containsFilter()) {
+            FilterDialog filterDialog = new FilterDialog(supplier);
             JideButton filterButton = new JideButton("Filter");
             filterButton.addMouseListener(new MouseAdapter() {
                 @Override

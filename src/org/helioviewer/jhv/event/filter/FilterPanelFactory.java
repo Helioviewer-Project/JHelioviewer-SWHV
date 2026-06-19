@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.helioviewer.jhv.event.SWEK;
-import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.gui.component.JHVSpinner;
 
@@ -52,9 +51,9 @@ class FilterPanelFactory {
         return spinner;
     }
 
-    static List<FilterPanel> createFilterPanel(SWEKGroup group, SWEKSupplier supplier, FilterDialog filterDialog, boolean enabled) {
+    static List<FilterPanel> createFilterPanel(SWEKSupplier supplier, FilterDialog filterDialog, boolean enabled) {
         List<FilterPanel> panels = new ArrayList<>();
-        for (SWEK.Parameter p : group.getParameterList()) {
+        for (SWEK.Parameter p : supplier.getParameterList()) {
             SWEK.ParameterFilter filter = p.filter();
             if (filter != null) {
                 String filterType = filter.type().toLowerCase();

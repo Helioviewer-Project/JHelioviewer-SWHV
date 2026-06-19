@@ -42,7 +42,7 @@ class HEKParser {
         String waveValue = null;
 
         // First iterate over parameters in the config file
-        List<SWEK.Parameter> plist = currentEvent.getSupplier().group().getParameterList();
+        List<SWEK.Parameter> plist = currentEvent.getSupplier().getParameterList();
         Iterator<SWEK.Parameter> paramIterator = plist.iterator();
         HashSet<String> insertedKeys = new HashSet<>();
 
