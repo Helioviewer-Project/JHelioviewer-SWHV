@@ -3,10 +3,10 @@ package org.helioviewer.jhv.event;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -27,8 +27,21 @@ public class SWEKDownloader implements FilterManager.Listener {
             new AppThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    private record Worker(SWEKSupplier supplier, List<SWEK.Param> params,
-                          long start, long end) implements Runnable, Comparable<Worker> {
+    private static final class Worker implements Runnable, Comparable<Worker> {
+        private final SWEKSupplier supplier;
+        private final List<SWEK.Param> params;
+        private final long start;
+        private final long end;
+
+        private volatile boolean cancelled;
+
+        Worker(SWEKSupplier _supplier, List<SWEK.Param> _params, long _start, long _end) {
+            supplier = _supplier;
+            params = _params;
+            start = _start;
+            end = _end;
+        }
+
         @Override
         public void run() {
             try {
@@ -40,14 +53,27 @@ public class SWEKDownloader implements FilterManager.Listener {
         }
 
         private void download() {
+            if (cancelled)
+                return;
+
             if (!loadRemote()) {
-                EventQueue.invokeLater(() -> workerFailed(supplier, this));
+                if (!cancelled)
+                    EventQueue.invokeLater(() -> workerFailed(this));
                 return;
             }
 
             List<JHVEvent.Link> associations = EventDatabase.associations2Program(start, end, supplier);
             List<JHVEvent> events = EventDatabase.events2Program(start, end, supplier, params);
-            EventQueue.invokeLater(() -> publish(associations, events));
+            if (cancelled)
+                return;
+
+            EventQueue.invokeLater(() -> {
+                if (!cancelled)
+                    publish(associations, events);
+            });
+            if (cancelled)
+                return;
+
             EventDatabase.addDaterange2db(start, end, supplier);
         }
 
@@ -55,7 +81,7 @@ public class SWEKDownloader implements FilterManager.Listener {
             associations.forEach(JHVEventCache::addAssociation);
             events.forEach(JHVEventCache::addEvent);
             JHVEventCache.fireEventCacheChanged();
-            workerFinished(supplier, this);
+            workerFinished(this);
         }
 
         private boolean loadRemote() {
@@ -75,12 +101,18 @@ public class SWEKDownloader implements FilterManager.Listener {
             int page = 0;
             boolean overmax = true;
             while (overmax) {
+                if (cancelled)
+                    return false;
+
                 SWEKHandler.RemotePage remotePage = supplier.source().handler().fetchPage(supplier, start, end, params, page);
                 EventDatabase.storeEvents(remotePage.events(), supplier);
                 associations.addAll(remotePage.associations());
                 overmax = remotePage.overmax();
                 page++;
             }
+            if (cancelled)
+                return false;
+
             return EventDatabase.storeAssociations(associations) != -1;
         }
 
@@ -93,7 +125,9 @@ public class SWEKDownloader implements FilterManager.Listener {
             return false;
         }
 
-        void stopWorker() { // TBD
+        void stopWorker() {
+            cancelled = true;
+            downloadPool.remove(this);
         }
 
         @Override
@@ -130,22 +164,23 @@ public class SWEKDownloader implements FilterManager.Listener {
     }
 
     static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
-        workerMap.get(supplier).forEach(worker -> {
+        for (Worker worker : workerMap.get(supplier)) {
             worker.stopWorker();
-            JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
-        });
+            JHVEventCache.intervalNotDownloaded(supplier, worker.start, worker.end);
+        }
+        workerMap.removeAll(supplier);
         JHVEventCache.removeSupplier(supplier, keepActive);
         updateGroupBusy(supplier.group());
     }
 
-    private static void workerFailed(SWEKSupplier supplier, Worker worker) {
-        JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
-        workerFinished(supplier, worker);
+    private static void workerFailed(Worker worker) {
+        JHVEventCache.intervalNotDownloaded(worker.supplier, worker.start, worker.end);
+        workerFinished(worker);
     }
 
-    private static void workerFinished(SWEKSupplier supplier, Worker worker) {
-        workerMap.remove(supplier, worker);
-        updateGroupBusy(supplier.group());
+    private static void workerFinished(Worker worker) {
+        workerMap.remove(worker.supplier, worker);
+        updateGroupBusy(worker.supplier.group());
     }
 
     @Override
