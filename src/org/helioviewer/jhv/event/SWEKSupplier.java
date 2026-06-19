@@ -2,10 +2,7 @@ package org.helioviewer.jhv.event;
 
 import java.util.HashMap;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
-@SuppressWarnings("serial")
-public final class SWEKSupplier extends DefaultMutableTreeNode {
+public final class SWEKSupplier {
 
     private final String supplierName;
     private final String name;
@@ -15,6 +12,8 @@ public final class SWEKSupplier extends DefaultMutableTreeNode {
     private final SWEK.Source source;
     private final boolean isCactus;
     private boolean active;
+
+    private SWEKGroup group;
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
 
@@ -46,8 +45,12 @@ public final class SWEKSupplier extends DefaultMutableTreeNode {
         return name;
     }
 
+    public void setGroup(SWEKGroup _group) {
+        group = _group;
+    }
+
     public SWEKGroup getGroup() {
-        return (SWEKGroup) getParent();
+        return group;
     }
 
     public SWEK.Source getSource() {

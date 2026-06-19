@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
@@ -19,7 +17,7 @@ import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.FileUtils;
 import org.helioviewer.jhv.io.JSONUtils;
-import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;
+//import org.helioviewer.jhv.plugins.swek.sources.ComesepHandler;
 //import org.helioviewer.jhv.plugins.swek.sources.FHNWHandler;
 import org.helioviewer.jhv.plugins.swek.sources.HEKHandler;
 
@@ -31,19 +29,18 @@ class SWEKConfig {
     private static final HashMap<String, SWEK.Source> sources = new HashMap<>();
     private static final HashMap<String, SWEKGroup> groups = new HashMap<>();
 
-    static DefaultTreeModel load() {
-        SWEKIconBank.init();
+    static List<SWEKGroup> load() {
         try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
             JSONObject jo = JSONUtils.get(in);
             EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
             parseSources(jo);
 
-            DefaultTreeModel dtm = parseGroups(jo);
+            List<SWEKGroup> groupList = parseGroups(jo);
             SWEKGroup.setSWEKRelatedEvents(parseRelatedEvents(jo));
-            return dtm;
+            return groupList;
         } catch (Exception e) {
             Log.error(e);
-            return new DefaultTreeModel(new DefaultMutableTreeNode(""));
+            return List.of();
         }
     }
 
@@ -59,13 +56,13 @@ class SWEKConfig {
     @Nullable
     private static SWEK.Source parseSource(JSONObject obj) {
         String name = obj.getString("name");
-        return switch (name) {
-            //case "COMESEP" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
-            //case "FHNW" -> new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler());
-            case "HEK" ->
-                    new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler());
-            default -> null;
-        };
+        //if ("COMESEP".equals(name))
+        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
+        //if ("FHNW".equals(name))
+        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler());
+        if ("HEK".equals(name))
+            return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler());
+        return null;
     }
 
     private static List<SWEK.Parameter> parseParameters(JSONArray parameterArray) {
@@ -77,23 +74,22 @@ class SWEKConfig {
         return parameterList;
     }
 
-    private static DefaultTreeModel parseGroups(JSONObject obj) {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
-        DefaultTreeModel dtm = new DefaultTreeModel(root);
-
+    private static List<SWEKGroup> parseGroups(JSONObject obj) {
+        List<SWEKGroup> groupList = new ArrayList<>();
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
             try {
-                addGroup(eventJSONArray.getJSONObject(i), dtm, root);
+                addGroup(eventJSONArray.getJSONObject(i), groupList);
             } catch (Exception e) { // allow continuing when a source is disabled
                 Log.error(e);
             }
         }
-        return dtm;
+        return groupList;
     }
 
-    private static void addGroup(JSONObject obj, DefaultTreeModel dtm, DefaultMutableTreeNode root) {
-        SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIconKey(obj), dtm);
+    private static void addGroup(JSONObject obj, List<SWEKGroup> groupList) {
+        SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIconKey(obj));
+
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
         for (int i = 0; i < suppliersArray.length(); i++) {
             JSONObject supplier = suppliersArray.getJSONObject(i);
@@ -104,12 +100,13 @@ class SWEKConfig {
             if (source == null)
                 continue;
 
-            group.add(new SWEKSupplier(supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db")));
+            SWEKSupplier supplierObj = new SWEKSupplier(supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db"));
+            group.addSupplier(supplierObj);
         }
-        if (group.getChildCount() == 0)
+        if (group.getSuppliers().isEmpty())
             return;
 
-        root.add(group);
+        groupList.add(group);
         groups.put(group.getName(), group);
     }
 
@@ -137,7 +134,10 @@ class SWEKConfig {
         List<SWEK.RelatedEvents> relatedEventsList = new ArrayList<>(relatedEventsArray.length());
         for (int i = 0; i < relatedEventsArray.length(); i++) {
             JSONObject relatedEvent = relatedEventsArray.getJSONObject(i);
-            relatedEventsList.add(new SWEK.RelatedEvents(groups.get(relatedEvent.getString("event_name")), groups.get(relatedEvent.getString("related_with")), parseRelatedOnList(relatedEvent)));
+            SWEKGroup group = groups.get(relatedEvent.getString("event_name"));
+            SWEKGroup relatedWith = groups.get(relatedEvent.getString("related_with"));
+            if (group != null && relatedWith != null)
+                relatedEventsList.add(new SWEK.RelatedEvents(group, relatedWith, parseRelatedOnList(relatedEvent)));
         }
         return relatedEventsList;
     }

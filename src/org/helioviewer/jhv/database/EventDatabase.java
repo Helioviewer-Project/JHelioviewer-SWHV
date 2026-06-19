@@ -10,7 +10,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.concurrent.Callable;
 import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nullable;
-import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.JHVEvent;
@@ -360,8 +358,7 @@ public class EventDatabase {
                     String w = swon.parameterWith().name().toLowerCase();
 
                     SWEKGroup reType = re.relatedWith();
-                    for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
-                        SWEKSupplier supplier = (SWEKSupplier) e.nextElement();
+                    for (SWEKSupplier supplier : reType.getSuppliers()) {
                         if (similartype == (supplier == jhvEventType)) {
                             jsonEvents.addAll(is_dbthread
                                     ? rel2prog(id, jhvEventType, supplier, f, w)
@@ -377,8 +374,7 @@ public class EventDatabase {
                     String w = swon.parameterWith().name().toLowerCase();
 
                     SWEKGroup reType = re.group();
-                    for (Enumeration<TreeNode> e = reType.children(); e.hasMoreElements(); ) {
-                        SWEKSupplier supplier = (SWEKSupplier) e.nextElement();
+                    for (SWEKSupplier supplier : reType.getSuppliers()) {
                         if (similartype == (supplier == jhvEventType)) {
                             jsonEvents.addAll(is_dbthread
                                     ? rel2prog(id, supplier, jhvEventType, f, w)
