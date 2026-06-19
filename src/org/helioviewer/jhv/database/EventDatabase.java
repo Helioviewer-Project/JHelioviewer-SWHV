@@ -346,8 +346,8 @@ public class EventDatabase {
         for (SWEK.RelatedEvents re : SWEKCatalog.getRelatedEvents()) {
             if (re.group() == group) {
                 for (SWEK.RelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom().toLowerCase();
-                    String w = swon.parameterWith().toLowerCase();
+                    String f = swon.parameterFrom();
+                    String w = swon.parameterWith();
 
                     SWEKGroup reType = re.relatedWith();
                     for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {
@@ -362,8 +362,8 @@ public class EventDatabase {
 
             if (re.relatedWith() == group) {
                 for (SWEK.RelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom().toLowerCase();
-                    String w = swon.parameterWith().toLowerCase();
+                    String f = swon.parameterFrom();
+                    String w = swon.parameterWith();
 
                     SWEKGroup reType = re.group();
                     for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {

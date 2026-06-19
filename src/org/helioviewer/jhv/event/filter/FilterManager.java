@@ -23,7 +23,7 @@ public class FilterManager {
     }
 
     static void addFilter(SWEKSupplier supplier, SWEK.Parameter parameter, SWEK.Param filter) {
-        Map<SWEK.Parameter, List<SWEK.Param>> filteredParameter = getFilter(supplier);
+        Map<SWEK.Parameter, List<SWEK.Param>> filteredParameter = filters.computeIfAbsent(supplier, _ -> new HashMap<>());
         filteredParameter.computeIfAbsent(parameter, k -> new ArrayList<>()).add(filter);
     }
 
@@ -35,12 +35,7 @@ public class FilterManager {
         listeners.forEach(listener -> listener.filtersChanged(supplier));
     }
 
-    public static Map<SWEK.Parameter, List<SWEK.Param>> getFilter(SWEKSupplier supplier) {
-        return filters.computeIfAbsent(supplier, k -> new HashMap<>());
+    public static Map<SWEK.Parameter, List<SWEK.Param>> getFilters(SWEKSupplier supplier) {
+        return filters.getOrDefault(supplier, Map.of());
     }
-/*
-    public static boolean isFiltered(SWEKSupplier supplier, SWEKParameter parameter) {
-        return filters.containsKey(supplier) && filters.get(supplier).containsKey(parameter);
-    }
-*/
 }
