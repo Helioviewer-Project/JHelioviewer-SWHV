@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.event;
 
-import java.awt.EventQueue;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +11,6 @@ public final class SWEKGroup {
     private final String iconKey;
 
     private final boolean containsParameterFilter;
-    private boolean downloading;
-    private Runnable onDownloadingChanged;
 
     private HashMap<String, String> databaseFields;
 
@@ -73,31 +70,6 @@ public final class SWEKGroup {
 
     public String getIconKey() {
         return iconKey;
-    }
-
-    public void setOnDownloadingChanged(Runnable callback) {
-        onDownloadingChanged = callback;
-    }
-
-    private void setDownloading(boolean _downloading) {
-        if (downloading == _downloading)
-            return;
-        downloading = _downloading;
-        if (onDownloadingChanged != null) {
-            onDownloadingChanged.run();
-        }
-    }
-
-    public boolean isDownloading() {
-        return downloading;
-    }
-
-    void startedDownload() {
-        EventQueue.invokeLater(() -> setDownloading(true));
-    }
-
-    void stoppedDownload() {
-        EventQueue.invokeLater(() -> setDownloading(false));
     }
 
 }
