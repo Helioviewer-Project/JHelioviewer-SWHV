@@ -52,7 +52,7 @@ public class ComesepHandler extends SWEKHandler {
     }
 
     @Override
-    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON) {
+    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) {
         JSONArray associations = eventJSON.getJSONArray("associations");
         int len = associations.length();
         List<JHVEvent.LinkRef> links = new ArrayList<>(len);
