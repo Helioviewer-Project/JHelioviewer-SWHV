@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ public final class SWEKGroup {
     private boolean downloading;
     private Runnable onDownloadingChanged;
 
-    private final List<SWEKSupplier> suppliers = new ArrayList<>();
     private HashMap<String, String> databaseFields;
 
     public SWEKGroup(String _name, List<SWEK.Parameter> _parameterList, String _iconKey) {
@@ -26,14 +24,6 @@ public final class SWEKGroup {
         parameterList = _parameterList;
         iconKey = _iconKey;
         containsParameterFilter = checkFilters(parameterList);
-    }
-
-    public void addSupplier(SWEKSupplier supplier) {
-        suppliers.add(supplier);
-    }
-
-    public List<SWEKSupplier> getSuppliers() {
-        return suppliers;
     }
 
     public Map<String, String> getAllDatabaseFields() {
