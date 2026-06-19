@@ -306,11 +306,6 @@
                 },
                 {
                     "source"                    : "HEK",
-                    "parameter_name"            : "OBS_Observatory",
-                    "parameter_display_name"    : "Observatory"
-                },
-                {
-                    "source"                    : "HEK",
                     "parameter_name"            : "Event_EndTime",
                     "parameter_display_name"    : "Event End Time"
                 },
