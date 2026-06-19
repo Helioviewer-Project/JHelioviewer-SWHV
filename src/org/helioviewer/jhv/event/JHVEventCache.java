@@ -48,7 +48,9 @@ public class JHVEventCache {
     }
 
     static void intervalNotDownloaded(SWEKSupplier eventType, long start, long end) {
-        downloadedCache.get(eventType).removeRequestedInterval(start, end);
+        RequestCache cache = downloadedCache.get(eventType);
+        if (cache != null)
+            cache.removeRequestedInterval(start, end);
     }
 
     public static boolean isSupplierActive(SWEKSupplier supplier) {
