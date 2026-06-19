@@ -1,34 +1,40 @@
 package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-
-@SuppressWarnings("serial")
-public final class SWEKGroup extends DefaultMutableTreeNode {
+public final class SWEKGroup {
 
     private static List<SWEK.RelatedEvents> relatedEvents;
 
     private final String name;
     private final List<SWEK.Parameter> parameterList;
     private final String iconKey;
-    private final DefaultTreeModel treeModel;
 
     private final boolean containsParameterFilter;
     private boolean downloading;
+    private Runnable onDownloadingChanged;
 
+    private final List<SWEKSupplier> suppliers = new ArrayList<>();
     private HashMap<String, String> databaseFields;
 
-    public SWEKGroup(String _name, List<SWEK.Parameter> _parameterList, String _iconKey, DefaultTreeModel _treeModel) {
+    public SWEKGroup(String _name, List<SWEK.Parameter> _parameterList, String _iconKey) {
         name = _name.intern();
         parameterList = _parameterList;
         iconKey = _iconKey;
-        treeModel = _treeModel;
         containsParameterFilter = checkFilters(parameterList);
+    }
+
+    public void addSupplier(SWEKSupplier supplier) {
+        suppliers.add(supplier);
+        supplier.setGroup(this);
+    }
+
+    public List<SWEKSupplier> getSuppliers() {
+        return suppliers;
     }
 
     public Map<String, String> getAllDatabaseFields() {
@@ -90,11 +96,17 @@ public final class SWEKGroup extends DefaultMutableTreeNode {
         return iconKey;
     }
 
+    public void setOnDownloadingChanged(Runnable callback) {
+        onDownloadingChanged = callback;
+    }
+
     private void setDownloading(boolean _downloading) {
         if (downloading == _downloading)
             return;
         downloading = _downloading;
-        treeModel.nodeChanged(this); // notify to repaint
+        if (onDownloadingChanged != null) {
+            onDownloadingChanged.run();
+        }
     }
 
     public boolean isDownloading() {

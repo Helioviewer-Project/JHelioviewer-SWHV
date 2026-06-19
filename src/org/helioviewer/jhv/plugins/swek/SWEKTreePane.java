@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.IdentityHashMap;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
@@ -40,13 +41,14 @@ final class SWEKTreePane extends JPanel {
     private final DefaultTreeModel treeModel;
     private final JTree tree;
     private final IdentityHashMap<SWEKGroup, Component> groupComponents = new IdentityHashMap<>();
-    private final IdentityHashMap<SWEKGroup, TreePath> groupPaths = new IdentityHashMap<>();
+    private final IdentityHashMap<DefaultMutableTreeNode, TreePath> groupPaths = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKSupplier, Component> supplierComponents = new IdentityHashMap<>();
     private final Timer loadingTimer;
 
-    SWEKTreePane(DefaultTreeModel _treeModel) {
+    SWEKTreePane(List<SWEKGroup> groups) {
         super(new BorderLayout());
-        treeModel = _treeModel;
+        SWEKIconBank.init();
+        treeModel = createTreeModel(groups);
 
         tree = new JTree(treeModel);
         tree.setRootVisible(false);
@@ -65,14 +67,30 @@ final class SWEKTreePane extends JPanel {
         add(tree, BorderLayout.CENTER);
     }
 
+    private static DefaultTreeModel createTreeModel(List<SWEKGroup> groups) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+        DefaultTreeModel model = new DefaultTreeModel(root);
+        for (SWEKGroup group : groups) {
+            DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group);
+            group.setOnDownloadingChanged(() -> model.nodeChanged(groupNode));
+            for (SWEKSupplier supplier : group.getSuppliers()) {
+                groupNode.add(new DefaultMutableTreeNode(supplier));
+            }
+            root.add(groupNode);
+        }
+        return model;
+    }
+
     private void repaintBusyGroups() {
         boolean anyBusy = false;
         Enumeration<?> children = ((DefaultMutableTreeNode) treeModel.getRoot()).children();
         while (children.hasMoreElements()) {
             Object child = children.nextElement();
-            if (child instanceof SWEKGroup group && group.isDownloading()) {
-                anyBusy = true;
-                repaintGroup(group);
+            if (child instanceof DefaultMutableTreeNode groupNode && groupNode.getUserObject() instanceof SWEKGroup group) {
+                if (group.isDownloading()) {
+                    anyBusy = true;
+                    repaintGroup(groupNode);
+                }
             }
         }
 
@@ -80,21 +98,21 @@ final class SWEKTreePane extends JPanel {
             loadingTimer.stop();
     }
 
-    private void repaintGroup(SWEKGroup group) {
-        Rectangle bounds = tree.getPathBounds(groupPaths.computeIfAbsent(group, g -> new TreePath(g.getPath())));
+    private void repaintGroup(DefaultMutableTreeNode groupNode) {
+        Rectangle bounds = tree.getPathBounds(groupPaths.computeIfAbsent(groupNode, g -> new TreePath(g.getPath())));
         if (bounds != null)
             tree.repaint(bounds);
     }
 
     private Component componentFor(Object value) {
         Component component = null;
-        if (value instanceof SWEKGroup group) {
+        if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKGroup group) {
             if (group.isDownloading() && !loadingTimer.isRunning())
                 loadingTimer.start();
             component = groupComponents.computeIfAbsent(group, SWEKTreePane::createGroupComponent);
             if (component instanceof JPanel panel && panel.getComponentCount() > 1)
                 panel.getComponent(1).setVisible(group.isDownloading());
-        } else if (value instanceof SWEKSupplier supplier) {
+        } else if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SWEKSupplier supplier) {
             component = supplierComponents.computeIfAbsent(supplier, SWEKTreePane::createSupplierComponent);
             if (component instanceof JPanel panel && panel.getComponent(0) instanceof JCheckBox checkBox)
                 checkBox.setSelected(supplier.isActive());
