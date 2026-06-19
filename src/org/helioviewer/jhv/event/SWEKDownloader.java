@@ -73,7 +73,7 @@ class SWEKDownloader implements FilterManager.Listener {
             int page = 0;
             boolean overmax = true;
             while (overmax) {
-                SWEKHandler.RemotePage remotePage = supplier.getSource().handler().fetchPage(supplier, start, end, params, page);
+                SWEKHandler.RemotePage remotePage = supplier.source().handler().fetchPage(supplier, start, end, params, page);
                 EventDatabase.storeEvents(remotePage.events(), supplier);
                 associations.addAll(remotePage.associations());
                 overmax = remotePage.overmax();
@@ -109,7 +109,7 @@ class SWEKDownloader implements FilterManager.Listener {
 
     private static void updateGroupBusy(SWEKGroup group) {
         for (SWEKSupplier supplier : workerMap.keySet()) {
-            if (supplier.getGroup() == group && !workerMap.get(supplier).isEmpty()) {
+            if (supplier.group() == group && !workerMap.get(supplier).isEmpty()) {
                 group.startedDownload();
                 return;
             }
@@ -123,7 +123,7 @@ class SWEKDownloader implements FilterManager.Listener {
             JHVEventCache.intervalNotDownloaded(supplier, worker.start(), worker.end());
         });
         JHVEventCache.removeSupplier(supplier, keepActive);
-        updateGroupBusy(supplier.getGroup());
+        updateGroupBusy(supplier.group());
     }
 
     private static void workerFailed(SWEKSupplier supplier, Worker worker) {
@@ -133,7 +133,7 @@ class SWEKDownloader implements FilterManager.Listener {
 
     private static void workerFinished(SWEKSupplier supplier, Worker worker) {
         workerMap.remove(supplier, worker);
-        updateGroupBusy(supplier.getGroup());
+        updateGroupBusy(supplier.group());
     }
 
     @Override
@@ -152,7 +152,7 @@ class SWEKDownloader implements FilterManager.Listener {
 
     static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
         List<SWEK.Param> params = defineParameters(supplier);
-        SWEKGroup group = supplier.getGroup();
+        SWEKGroup group = supplier.group();
         long latestStart = System.currentTimeMillis() + SIXHOURS;
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {

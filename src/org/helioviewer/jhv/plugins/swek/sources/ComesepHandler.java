@@ -65,7 +65,7 @@ public class ComesepHandler extends SWEKHandler {
 
     @Override
     protected URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
-        return new URI(BASE_URL + "model=" + supplier.getSupplierName() + "&startdate=" + TimeUtils.format(start) + "&enddate=" + TimeUtils.format(end));
+        return new URI(BASE_URL + "model=" + supplier.supplierName() + "&startdate=" + TimeUtils.format(start) + "&enddate=" + TimeUtils.format(end));
     }
 
     @Override

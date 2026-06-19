@@ -83,7 +83,7 @@ public class HEKHandler extends SWEKHandler {
             String uid = result.getString("kb_archivid");
 
             ArrayList<SWEK.RemoteParameter> paramList = new ArrayList<>();
-            for (Map.Entry<String, String> fieldEntry : supplier.getGroup().getAllDatabaseFields().entrySet()) {
+            for (Map.Entry<String, String> fieldEntry : supplier.group().getAllDatabaseFields().entrySet()) {
                 String dbType = fieldEntry.getValue();
                 String fieldName = fieldEntry.getKey();
                 String lfieldName = fieldName.toLowerCase();
@@ -117,7 +117,7 @@ public class HEKHandler extends SWEKHandler {
     @Override
     protected URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
-        baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(supplier.getGroup().getName()));
+        baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(supplier.group().getName()));
         baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
         baseURL.append("&param0=event_starttime&op0=").append(SMALLER_OR_EQUAL).append("&value0=").append(TimeUtils.format(end));
         appendSupplierFilter(baseURL, supplier);
@@ -129,7 +129,7 @@ public class HEKHandler extends SWEKHandler {
     }
 
     private static void appendSupplierFilter(StringBuilder baseURL, SWEKSupplier supplier) {
-        String encodedValue = URLEncoder.encode(supplier.getSupplierName(), StandardCharsets.UTF_8);
+        String encodedValue = URLEncoder.encode(supplier.supplierName(), StandardCharsets.UTF_8);
         baseURL.append("&param1=frm_name").append("&op1=").append(STRING_EQUALS).append("&value1=").append(encodedValue);
     }
 

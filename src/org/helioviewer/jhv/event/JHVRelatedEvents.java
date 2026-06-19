@@ -56,7 +56,7 @@ public class JHVRelatedEvents {
 
     @Nonnull
     public SWEKGroup getGroup() {
-        return supplier.getGroup();
+        return supplier.group();
     }
 
     boolean highlight(boolean isHighlighted) {

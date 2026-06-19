@@ -18,7 +18,7 @@ public final class SWEKCatalog {
     }
 
     public static String key(SWEKSupplier supplier) {
-        return supplier.getSupplierName() + supplier.getSource().name() + supplier.getDatabaseName();
+        return supplier.supplierName() + supplier.source().name() + supplier.dbName();
     }
 
 }
