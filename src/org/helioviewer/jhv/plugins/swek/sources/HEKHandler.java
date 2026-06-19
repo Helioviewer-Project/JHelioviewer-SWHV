@@ -39,8 +39,7 @@ public class HEKHandler extends SWEKHandler {
             if (!isSupplierEvent(result, supplier))
                 continue;
 
-            if (!result.isNull("fl_goescls"))
-                result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
+            addGoesValue(result);
 
             long start = TimeUtils.parse(result.getString("event_starttime"));
             long end = TimeUtils.parse(result.getString("event_endtime"));
@@ -53,7 +52,7 @@ public class HEKHandler extends SWEKHandler {
             String uid = result.getString("kb_archivid");
 
             ArrayList<SWEK.RemoteParameter> paramList = new ArrayList<>();
-            for (Map.Entry<String, String> fieldEntry : supplier.group().getAllDatabaseFields().entrySet()) {
+            for (Map.Entry<String, String> fieldEntry : supplier.getAllDatabaseFields().entrySet()) {
                 String dbType = fieldEntry.getValue();
                 String fieldName = fieldEntry.getKey();
                 String lfieldName = fieldName.toLowerCase();
@@ -107,6 +106,12 @@ public class HEKHandler extends SWEKHandler {
         return supplier.supplierName().equals(result.optString("frm_name"));
     }
 
+    private static void addGoesValue(JSONObject result) {
+        String goesClass = result.optString("fl_goescls").trim();
+        if (!goesClass.isEmpty())
+            result.put("jhv_goesflux", GOESLevel.getFloatValue(goesClass));
+    }
+
     @Override
     protected URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
@@ -133,7 +138,7 @@ public class HEKHandler extends SWEKHandler {
             case "Eruption" -> "ER";
             case "Filament" -> "FI";
             case "Filament Eruption" -> "FE";
-            case "Flare", "Flare Trigger" -> "FL";
+            case "Flare" -> "FL";
             case "Sunspot" -> "SS";
             default -> "UK";
         };

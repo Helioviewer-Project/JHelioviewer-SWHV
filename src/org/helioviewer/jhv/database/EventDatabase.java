@@ -95,7 +95,7 @@ public class EventDatabase {
         pstatement.executeUpdate();
 
         StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.dbName()).append(" (");
-        eventType.group().getAllDatabaseFields().forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
+        eventType.getAllDatabaseFields().forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
         createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE )");
 
         Connection connection = pstatement.getConnection();
