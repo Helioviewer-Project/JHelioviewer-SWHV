@@ -29,41 +29,6 @@ public class HEKHandler extends SWEKHandler {
     private static final String SMALLER_OR_EQUAL = URLEncoder.encode("<=", StandardCharsets.UTF_8);
     private static final String STRING_EQUALS = URLEncoder.encode("==", StandardCharsets.UTF_8);
 
-    private enum HEKEventEnum {
-        ACTIVE_REGION("Active Region", "AR"),
-        CORONAL_DIMMING("Coronal Dimming", "CD"),
-        CORONAL_HOLE("Coronal Hole", "CH"),
-        CORONAL_MASS_EJECTION("Coronal Mass Ejection", "CE"),
-        CORONAL_WAVE("Coronal Wave", "CW"),
-        EMERGING_FLUX("Emerging Flux", "EF"),
-        ERUPTION("Eruption", "ER"),
-        FILAMENT("Filament", "FI"),
-        FILAMENT_ERUPTION("Filament Eruption", "FE"),
-        FLARE("Flare", "FL"),
-        FLARE_TRIGGER("Flare Trigger", "FL"),
-        SUNSPOT("Sunspot", "SS"),
-        UNKNOWN("Unknown", "UK");
-
-        // The abbreviation of the HEKEvent
-        private final String eventAbbreviation;
-        // The name of the SWEK Event
-        private final String swekEventName;
-
-        HEKEventEnum(String _swekEventName, String _eventAbbreviation) {
-            eventAbbreviation = _eventAbbreviation;
-            swekEventName = _swekEventName;
-        }
-
-        static String getHEKEventAbbreviation(String eventType) {
-            for (HEKEventEnum event : values()) {
-                if (event.swekEventName.equals(eventType)) {
-                    return event.eventAbbreviation;
-                }
-            }
-            return UNKNOWN.eventAbbreviation;
-        }
-    }
-
     @Override
     protected List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray results = eventJSON.getJSONArray("result");
@@ -74,7 +39,7 @@ public class HEKHandler extends SWEKHandler {
             if (!isSupplierEvent(result, supplier))
                 continue;
 
-            if (result.has("fl_goescls"))
+            if (!result.isNull("fl_goescls"))
                 result.put("fl_val", GOESLevel.getFloatValue(result.getString("fl_goescls")));
 
             long start = TimeUtils.parse(result.getString("event_starttime"));
@@ -109,8 +74,11 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) {
+        JSONArray associations = eventJSON.optJSONArray("association");
+        if (associations == null)
+            return List.of();
+
         Set<String> acceptedUids = getSupplierUids(eventJSON, supplier);
-        JSONArray associations = eventJSON.getJSONArray("association");
         int len = associations.length();
         List<JHVEvent.LinkRef> links = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
@@ -142,10 +110,11 @@ public class HEKHandler extends SWEKHandler {
     @Override
     protected URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
-        baseURL.append("&event_type=").append(HEKEventEnum.getHEKEventAbbreviation(supplier.group().getName()));
+        baseURL.append("&event_type=").append(getEventAbbreviation(supplier.group().getName()));
         baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
         baseURL.append("&param0=event_starttime&op0=").append(SMALLER_OR_EQUAL).append("&value0=").append(TimeUtils.format(end));
-        appendSupplierFilter(baseURL, supplier);
+        String encodedSupplier = URLEncoder.encode(supplier.supplierName(), StandardCharsets.UTF_8);
+        baseURL.append("&param1=frm_name&op1=").append(STRING_EQUALS).append("&value1=").append(encodedSupplier);
         baseURL.append("&event_starttime=").append(TimeUtils.format(start));
         long max = Math.max(System.currentTimeMillis(), end);
         baseURL.append("&event_endtime=").append(TimeUtils.format(max));
@@ -153,9 +122,21 @@ public class HEKHandler extends SWEKHandler {
         return new URI(baseURL.toString());
     }
 
-    private static void appendSupplierFilter(StringBuilder baseURL, SWEKSupplier supplier) {
-        String encodedValue = URLEncoder.encode(supplier.supplierName(), StandardCharsets.UTF_8);
-        baseURL.append("&param1=frm_name").append("&op1=").append(STRING_EQUALS).append("&value1=").append(encodedValue);
+    private static String getEventAbbreviation(String eventType) {
+        return switch (eventType) {
+            case "Active Region" -> "AR";
+            case "Coronal Dimming" -> "CD";
+            case "Coronal Hole" -> "CH";
+            case "Coronal Mass Ejection" -> "CE";
+            case "Coronal Wave" -> "CW";
+            case "Emerging Flux" -> "EF";
+            case "Eruption" -> "ER";
+            case "Filament" -> "FI";
+            case "Filament Eruption" -> "FE";
+            case "Flare", "Flare Trigger" -> "FL";
+            case "Sunspot" -> "SS";
+            default -> "UK";
+        };
     }
 
     @Override
