@@ -158,7 +158,7 @@ public class SWEKDownloader implements FilterManager.Listener {
 
     private static List<SWEK.Param> defineParameters(SWEKSupplier supplier) {
         List<SWEK.Param> params = new ArrayList<>();
-        FilterManager.getFilter(supplier).values().forEach(params::addAll);
+        FilterManager.getFilters(supplier).values().forEach(params::addAll);
         return params;
     }
 
