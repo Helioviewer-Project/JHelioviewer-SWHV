@@ -28,8 +28,7 @@ public class SWEK {
 
     public record Parameter(String name, String displayName, ParameterFilter filter, boolean visible) {}
 
-    // Holds the related parameters of related events
-    public record RelatedOn(Parameter parameterFrom, Parameter parameterWith, String dbType) {}
+    public record RelatedOn(String parameterFrom, String parameterWith, String dbType) {}
 
     public record RelatedEvents(SWEKGroup group, SWEKGroup relatedWith, List<RelatedOn> relatedOnList) {}
 

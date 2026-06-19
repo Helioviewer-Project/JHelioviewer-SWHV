@@ -43,7 +43,7 @@ public final class SWEKSupplier {
                 fields.put(p.name().intern(), pf.dbType());
             }
         }
-        SWEKCatalog.addRelationDatabaseFields(group, fields);
+        fields.putAll(SWEKCatalog.getRelationDatabaseFields(group));
         databaseFields = fields;
     }
 
