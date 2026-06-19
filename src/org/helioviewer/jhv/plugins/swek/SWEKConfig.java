@@ -5,7 +5,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -31,24 +33,28 @@ class SWEKConfig {
         try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
             JSONObject jo = JSONUtils.get(in);
             EventDatabase.config_hash = Arrays.hashCode(jo.toString().toCharArray());
-            parseSources(jo);
+            Map<String, SWEK.Source> sources = parseSources(jo);
+            HashMap<String, SWEKGroup> groupsByName = new HashMap<>();
+            List<SWEKGroup> groups = new ArrayList<>();
 
-            parseGroups(jo);
-            SWEKCatalog.setRelatedEvents(parseRelatedEvents(jo));
-            return SWEKCatalog.getGroups();
+            parseGroups(jo, sources, groupsByName, groups);
+            SWEKCatalog.setRelatedEvents(parseRelatedEvents(jo, groupsByName));
+            return groups;
         } catch (Exception e) {
             Log.error(e);
             return List.of();
         }
     }
 
-    private static void parseSources(JSONObject obj) {
+    private static Map<String, SWEK.Source> parseSources(JSONObject obj) {
+        HashMap<String, SWEK.Source> sources = new HashMap<>();
         JSONArray sourcesArray = obj.getJSONArray("sources");
         for (int i = 0; i < sourcesArray.length(); i++) {
             SWEK.Source source = parseSource(sourcesArray.getJSONObject(i));
             if (source != null)
-                SWEKCatalog.addSource(source);
+                sources.put(source.name(), source);
         }
+        return sources;
     }
 
     @Nullable
@@ -72,18 +78,18 @@ class SWEKConfig {
         return parameterList;
     }
 
-    private static void parseGroups(JSONObject obj) {
+    private static void parseGroups(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
         for (int i = 0; i < eventJSONArray.length(); i++) {
             try {
-                addGroup(eventJSONArray.getJSONObject(i));
+                addGroup(eventJSONArray.getJSONObject(i), sources, groupsByName, groups);
             } catch (Exception e) { // allow continuing when a source is disabled
                 Log.error(e);
             }
         }
     }
 
-    private static void addGroup(JSONObject obj) {
+    private static void addGroup(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {
         SWEKGroup group = new SWEKGroup(obj.getString("event_name"), parseParameters(obj.getJSONArray("parameter_list")), parseEventIconKey(obj));
 
         JSONArray suppliersArray = obj.getJSONArray("suppliers");
@@ -92,7 +98,7 @@ class SWEKConfig {
 
             String supplierName = supplier.getString("supplier_name");
             String sourceName = supplier.getString("source");
-            SWEK.Source source = SWEKCatalog.getSource(sourceName);
+            SWEK.Source source = sources.get(sourceName);
             if (source == null)
                 continue;
 
@@ -102,7 +108,8 @@ class SWEKConfig {
         if (SWEKCatalog.getSuppliers(group).isEmpty())
             return;
 
-        SWEKCatalog.addGroup(group);
+        groupsByName.put(group.getName(), group);
+        groups.add(group);
     }
 
     private static String parseEventIconKey(JSONObject obj) {
@@ -124,13 +131,13 @@ class SWEKConfig {
         return new SWEK.ParameterFilter(filter.getString("filter_type"), filter.getDouble("min"), filter.getDouble("max"), filter.getDouble("start_value"), filter.getDouble("step_size"), filter.getString("units"), filter.getString("dbtype"));
     }
 
-    private static List<SWEK.RelatedEvents> parseRelatedEvents(JSONObject obj) {
+    private static List<SWEK.RelatedEvents> parseRelatedEvents(JSONObject obj, Map<String, SWEKGroup> groupsByName) {
         JSONArray relatedEventsArray = obj.getJSONArray("related_events");
         List<SWEK.RelatedEvents> relatedEventsList = new ArrayList<>(relatedEventsArray.length());
         for (int i = 0; i < relatedEventsArray.length(); i++) {
             JSONObject relatedEvent = relatedEventsArray.getJSONObject(i);
-            SWEKGroup group = SWEKCatalog.getGroup(relatedEvent.getString("event_name"));
-            SWEKGroup relatedWith = SWEKCatalog.getGroup(relatedEvent.getString("related_with"));
+            SWEKGroup group = groupsByName.get(relatedEvent.getString("event_name"));
+            SWEKGroup relatedWith = groupsByName.get(relatedEvent.getString("related_with"));
             if (group != null && relatedWith != null)
                 relatedEventsList.add(new SWEK.RelatedEvents(group, relatedWith, parseRelatedOnList(relatedEvent)));
         }
