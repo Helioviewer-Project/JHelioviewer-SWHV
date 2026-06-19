@@ -44,7 +44,7 @@ final class SWEKTreePane extends JPanel {
     private final DefaultTreeModel treeModel;
     private final JTree tree;
     private final IdentityHashMap<SWEKGroup, Component> groupComponents = new IdentityHashMap<>();
-    private final IdentityHashMap<DefaultMutableTreeNode, TreePath> groupPaths = new IdentityHashMap<>();
+    private final IdentityHashMap<SWEKGroup, DefaultMutableTreeNode> groupNodes = new IdentityHashMap<>();
     private final IdentityHashMap<SWEKSupplier, Component> supplierComponents = new IdentityHashMap<>();
     private final Timer loadingTimer;
 
@@ -71,11 +71,12 @@ final class SWEKTreePane extends JPanel {
         add(tree, BorderLayout.CENTER);
     }
 
-    private static DefaultTreeModel createTreeModel(List<SWEKGroup> groups) {
+    private DefaultTreeModel createTreeModel(List<SWEKGroup> groups) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
         DefaultTreeModel model = new DefaultTreeModel(root);
         for (SWEKGroup group : groups) {
             DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group);
+            groupNodes.put(group, groupNode);
             for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(group)) {
                 groupNode.add(new DefaultMutableTreeNode(supplier));
             }
@@ -85,14 +86,9 @@ final class SWEKTreePane extends JPanel {
     }
 
     private void groupBusyChanged(SWEKGroup group) {
-        Enumeration<?> children = ((DefaultMutableTreeNode) treeModel.getRoot()).children();
-        while (children.hasMoreElements()) {
-            Object child = children.nextElement();
-            if (child instanceof DefaultMutableTreeNode groupNode && groupNode.getUserObject() == group) {
-                treeModel.nodeChanged(groupNode);
-                return;
-            }
-        }
+        DefaultMutableTreeNode groupNode = groupNodes.get(group);
+        if (groupNode != null)
+            treeModel.nodeChanged(groupNode);
     }
 
     private void repaintBusyGroups() {
@@ -113,7 +109,7 @@ final class SWEKTreePane extends JPanel {
     }
 
     private void repaintGroup(DefaultMutableTreeNode groupNode) {
-        Rectangle bounds = tree.getPathBounds(groupPaths.computeIfAbsent(groupNode, g -> new TreePath(g.getPath())));
+        Rectangle bounds = tree.getPathBounds(new TreePath(groupNode.getPath()));
         if (bounds != null)
             tree.repaint(bounds);
     }
