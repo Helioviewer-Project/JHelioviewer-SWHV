@@ -1,10 +1,32 @@
 
 # Revision history for JHelioviewer
 
-## JHelioviewer 5.5.1 (pending)
+## JHelioviewer 5.6.0 (pending)
 
-- Add options to choose colors and line thickness for annotations
-- Offload orbital trails and PFSS coordinates calculations from the rendering thread
+### Display and rendering
+- Add options to choose colors and line thickness for annotations (fixes #156)
+- Draw the active annotation thicker instead of forcing it to red
+- Improve thick-line joins, rectangle corners, annotation loops, and FOV outline rendering
+- Improve flat-grid stability and grid label formatting
+- Adjust trajectory colors for white canvas (fixes #260)
+
+### Timeline, events, and UI
+- Map HEK Flare Trigger events to Flare events (fixes #105)
+- Fix CACTus event loading from HEK (fixes #190)
+- Filter HEK events by supplier and improve SWEK event loading, paging, storage, and cancellation
+- Move SWEK event indexing, highlight dispatch, and supplier configuration into clearer event-cache/catalog code
+- Disable COMESEP event source
+- Improve layer-table update/repaint behavior when layer names or metadata change
+
+### Performance and data
+- Offload viewpoint orbit trail and PFSS coordinate preparation from the rendering thread
+- Cache viewpoint orbit trail samples
+- Reduce allocations in status panels, grid labels, FITS scaling, time maps, and interpolation paths
+- Update bundled libraries, SPICE kernels, and supporting build tools
+
+### Technical
+- Reorganize core packages and simplify application, GUI, event, image, movie, thread, and metadata internals
+- Clean up viewpoint position loading, map-scale ownership, FOV shape emission, and SWEK APIs
 - Various bug fixes, cleanups, and internal refactoring
 
 ## JHelioviewer 5.5.0 (2026-06-01)
