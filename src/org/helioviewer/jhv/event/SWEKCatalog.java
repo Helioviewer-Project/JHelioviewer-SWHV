@@ -9,6 +9,8 @@ public final class SWEKCatalog {
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
     private static final HashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new HashMap<>();
+    private static final HashMap<SWEKSupplier, Map<String, String>> databaseFieldsBySupplier = new HashMap<>();
+    private static final HashMap<SWEKGroup, Map<String, String>> relationDatabaseFieldsByGroup = new HashMap<>();
     private static List<SWEK.RelatedEvents> relatedEvents = List.of();
 
     private SWEKCatalog() {
@@ -22,6 +24,8 @@ public final class SWEKCatalog {
     public static void clear() {
         suppliers.clear();
         suppliersByGroup.clear();
+        databaseFieldsBySupplier.clear();
+        relationDatabaseFieldsByGroup.clear();
         relatedEvents = List.of();
     }
 
@@ -35,6 +39,7 @@ public final class SWEKCatalog {
 
     public static void setRelatedEvents(List<SWEK.RelatedEvents> events) {
         relatedEvents = events;
+        updateDatabaseFields();
     }
 
     public static List<SWEK.RelatedEvents> getRelatedEvents() {
@@ -42,6 +47,24 @@ public final class SWEKCatalog {
     }
 
     public static Map<String, String> relationDatabaseFields(SWEKGroup group) {
+        return relationDatabaseFieldsByGroup.getOrDefault(group, Map.of());
+    }
+
+    public static Map<String, String> databaseFields(SWEKSupplier supplier) {
+        return databaseFieldsBySupplier.getOrDefault(supplier, Map.of());
+    }
+
+    private static void updateDatabaseFields() {
+        relationDatabaseFieldsByGroup.clear();
+        databaseFieldsBySupplier.clear();
+
+        for (SWEKSupplier supplier : suppliers.values()) {
+            relationDatabaseFieldsByGroup.computeIfAbsent(supplier.group(), SWEKCatalog::createRelationDatabaseFields);
+            databaseFieldsBySupplier.put(supplier, createDatabaseFields(supplier));
+        }
+    }
+
+    private static Map<String, String> createRelationDatabaseFields(SWEKGroup group) {
         HashMap<String, String> fields = new HashMap<>();
         for (SWEK.RelatedEvents re : relatedEvents) {
             if (re.group() == group) {
@@ -51,10 +74,10 @@ public final class SWEKCatalog {
                 re.relatedOnList().forEach(swon -> fields.put(swon.parameterWith().intern(), swon.dbType()));
             }
         }
-        return fields;
+        return Map.copyOf(fields);
     }
 
-    public static Map<String, String> databaseFields(SWEKSupplier supplier) {
+    private static Map<String, String> createDatabaseFields(SWEKSupplier supplier) {
         HashMap<String, String> fields = new HashMap<>();
         for (SWEK.Parameter p : supplier.getParameterList()) {
             SWEK.ParameterFilter pf = p.filter();
@@ -62,7 +85,7 @@ public final class SWEKCatalog {
                 fields.put(p.name().intern(), pf.dbType());
         }
         fields.putAll(relationDatabaseFields(supplier.group()));
-        return fields;
+        return Map.copyOf(fields);
     }
 
     public static String key(SWEKSupplier supplier) {
