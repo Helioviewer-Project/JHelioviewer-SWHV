@@ -156,6 +156,8 @@
   "color":"PUNCH"},
  {"instrument":"NFI-0",
   "color":"PUNCH"},
+ {"instrument":"WFI+NFI Mosaic",
+  "color":"PUNCH"},
 
 ]
 
