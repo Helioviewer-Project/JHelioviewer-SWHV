@@ -23,6 +23,7 @@ import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.thread.AppThread;
@@ -218,7 +219,7 @@ public class EventDatabase {
         return inserted_ids;
     }
 
-    private static void bindRemoteParameter(PreparedStatement statement, int index, SWEK.RemoteParameter parameter) throws SQLException {
+    private static void bindRemoteParameter(PreparedStatement statement, int index, SWEKHandler.RemoteParameter parameter) throws SQLException {
         switch (parameter.value()) {
             case Integer i -> statement.setInt(index, i);
             case String s -> statement.setString(index, s);
@@ -227,7 +228,7 @@ public class EventDatabase {
         }
     }
 
-    public static void storeEvents(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) {
+    public static void storeEvents(List<SWEKHandler.RemoteEvent> event2db_list, SWEKSupplier type) {
         try {
             executor.invokeAndWait(new StoreEvents(event2db_list, type));
         } catch (Exception e) {
@@ -235,7 +236,8 @@ public class EventDatabase {
         }
     }
 
-    private record StoreEvents(List<SWEK.RemoteEvent> event2db_list, SWEKSupplier type) implements Callable<Void> {
+    private record StoreEvents(List<SWEKHandler.RemoteEvent> event2db_list,
+                               SWEKSupplier type) implements Callable<Void> {
         @Override
         public Void call() throws Exception {
             int[] inserted_ids = get_id_init_list(event2db_list.size());
@@ -247,7 +249,7 @@ public class EventDatabase {
             PreparedStatement updateEvent = getPreparedStatement(UPDATE_EVENT);
 
             for (int i = 0; i < llen; i++) {
-                SWEK.RemoteEvent event2db = event2db_list.get(i);
+                SWEKHandler.RemoteEvent event2db = event2db_list.get(i);
                 int generatedKey = -1;
                 if (typeId != -1) {
                     generatedKey = getEventId(event2db.uid());
@@ -278,7 +280,7 @@ public class EventDatabase {
                     {
                         StringBuilder fieldString = new StringBuilder();
                         StringBuilder varString = new StringBuilder();
-                        for (SWEK.RemoteParameter p : event2db.paramList()) {
+                        for (SWEKHandler.RemoteParameter p : event2db.paramList()) {
                             fieldString.append(',').append(p.name());
                             varString.append(",?");
                         }
@@ -287,7 +289,7 @@ public class EventDatabase {
                         pstatement.setInt(1, generatedKey);
 
                         int index = 2;
-                        for (SWEK.RemoteParameter p : event2db.paramList()) {
+                        for (SWEKHandler.RemoteParameter p : event2db.paramList()) {
                             bindRemoteParameter(pstatement, index, p);
                             index++;
                         }
