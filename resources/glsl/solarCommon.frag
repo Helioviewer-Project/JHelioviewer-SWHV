@@ -55,6 +55,8 @@ struct Screen {
     float xStop;
     float yStart;
     float yStop;
+    float yParam;         // free radial-scale parameter (PowerDisk exponent inverse)
+    float diskFlatRadius; // rim radius in R_sun for flat-in-disk layers; <= 0 discards
 };
 
 layout(std140) uniform ScreenBlock {
@@ -179,6 +181,14 @@ vec2 getScrPos(void) {
     vec2 scrpos = vec2(screen.iaspect * up1.x, up1.y) + .5;
     clamp_coord(scrpos);
     return scrpos;
+}
+
+// Isotropic world-plane offset from the disk center, for the disk projections:
+// getScrPos without the map-square clamp and aspect scaling.
+vec2 getDiskPos(void) {
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
+    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    return up1.xy;
 }
 
 vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {

@@ -11,6 +11,7 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
+import org.helioviewer.jhv.layers.grid.DiskGrid;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
@@ -44,7 +45,7 @@ public final class GridLayer extends AbstractLayer {
     private static final double LINEWIDTH_AXES = 2 * LINEWIDTH;
     // private static final double PLANETEXT_Z = 0.01;
 
-    private double lonStep = 15;
+    private double lonStep = 30;
     private double latStep = 20;
     private boolean gridNeedsInit = true;
 
@@ -60,6 +61,7 @@ public final class GridLayer extends AbstractLayer {
     private final GLSLLine radialCircleLineFar = new GLSLLine(false);
     private final GLSLLine radialThickLineFar = new GLSLLine(false);
     private final FlatGrid flatGrid = new FlatGrid();
+    private final DiskGrid diskGrid = new DiskGrid();
     private final GLSLLine gridLine = new GLSLLine(false);
 
     private List<GridLabel> latLabels;
@@ -160,7 +162,10 @@ public final class GridLayer extends AbstractLayer {
     public void renderScale(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(mv, vp, showLabels);
+        if (mv.isDisk())
+            diskGrid.render(mv, vp, showLabels, lonStep);
+        else
+            flatGrid.render(mv, vp, showLabels);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
@@ -230,6 +235,7 @@ public final class GridLayer extends AbstractLayer {
         GridMath.initRadialCircles(radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
         flatGrid.init();
+        diskGrid.init();
     }
 
     @Override
@@ -243,6 +249,7 @@ public final class GridLayer extends AbstractLayer {
         radialCircleLineFar.dispose();
         radialThickLineFar.dispose();
         flatGrid.dispose();
+        diskGrid.dispose();
     }
 
     @Override

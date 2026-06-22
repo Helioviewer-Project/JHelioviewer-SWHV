@@ -10,14 +10,19 @@ public enum MapMode {
     HPC(GLSLSolarShader.hpc, Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
     LogPolar(GLSLSolarShader.logpolar, Kind.POLAR),
-    Polar(GLSLSolarShader.polar, Kind.POLAR);
+    Polar(GLSLSolarShader.polar, Kind.POLAR),
+    PowerDisk(GLSLSolarShader.diskPower, Kind.DISK);
 
     enum Kind {
-        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR
+        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR, DISK
     }
 
     public final GLSLSolarShader shader;
     final Kind kind;
+
+    public boolean isDisk() {
+        return kind == Kind.DISK;
+    }
 
     MapMode(GLSLSolarShader _shader, Kind _kind) {
         shader = _shader;

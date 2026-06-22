@@ -61,6 +61,8 @@ public class ImageFilterPanel implements FilterDetails {
         enhanceButton.setAlwaysDropdown(true);
         enhanceButton.add(enhancePanel);
 
+        // Disk imagers render flat automatically in a disk projection (see ImageLayer.render
+        // and ImageLayers.isDiskImager); no manual toggle needed.
         buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
     }
 

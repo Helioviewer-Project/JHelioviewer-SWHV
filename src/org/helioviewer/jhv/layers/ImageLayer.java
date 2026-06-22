@@ -209,7 +209,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (!isVisible[vp.idx])
             return;
 
-        GLSLSolarShader shader = mv.mode().shader;
+        // Disk imagers always render flat in a disk projection (the radial warp polar-resamples
+        // and smears the disk center); decided live so it holds regardless of layer load order.
+        GLSLSolarShader shader = mv.isDisk() && ImageLayers.isDiskImager(imageData.metaData()) ? GLSLSolarShader.diskFlat : mv.mode().shader;
         shader.use();
         glImage.applyFilters();
 

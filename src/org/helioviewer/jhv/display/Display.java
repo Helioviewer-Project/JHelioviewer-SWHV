@@ -20,6 +20,33 @@ public final class Display {
         gridType = _gridType;
     }
 
+    private static double diskPower = 0.0; // default to logarithmic (mid-scale, most dramatic)
+    // Radial range shown by the disk projection, in R_sun. rMax == 0 means
+    // "follow the loaded layers".
+    private static double diskRMin = 0;
+    private static double diskRMax = 0;
+
+    public static double getDiskPower() {
+        return diskPower;
+    }
+
+    public static void setDiskPower(double p) {
+        diskPower = Math.clamp(p, -1, 1); // -1 = inverse, 0 = logarithmic, 1 = linear
+    }
+
+    public static double getDiskRMin() {
+        return diskRMin;
+    }
+
+    public static double getDiskRMax() {
+        return diskRMax;
+    }
+
+    public static void setDiskRange(double rMin, double rMax) {
+        diskRMin = Math.clamp(rMin, 0, 64);
+        diskRMax = Math.clamp(rMax, 0, 64);
+    }
+
     static int glWidth = 1;
     static int glHeight = 1;
     public static final double[] pixelScale = {1, 1};

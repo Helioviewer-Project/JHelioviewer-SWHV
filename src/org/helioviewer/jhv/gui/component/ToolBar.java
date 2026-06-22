@@ -17,6 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -29,8 +30,13 @@ import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.interaction.Interaction;
+import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Layer;
+import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.io.samp.SampClient;
@@ -126,6 +132,37 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         } catch (Exception ignore) {}
         setDisplayMode(displayMode);
         ViewState.addModeListener(this);
+
+        // Keep the disk radial-range slider's maximum equal to the loaded layers' extent.
+        Layers.addListener(new Layers.Listener() {
+            @Override
+            public void layerAdded(int index, Layer layer) {
+                updateDiskRangeMax();
+            }
+
+            @Override
+            public void layerRemoved(int index, Layer layer) {
+                updateDiskRangeMax();
+            }
+
+            @Override
+            public void layersCleared() {
+                updateDiskRangeMax();
+            }
+
+            @Override
+            public void layerUpdated(Layer layer) {
+                updateDiskRangeMax();
+            }
+
+            @Override
+            public void nameUpdated(Layer layer) {
+            }
+
+            @Override
+            public void timeUpdated(Layer layer) {
+            }
+        });
     }
 
     private JideToggleButton coronaButton;
@@ -133,6 +170,8 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private JideToggleButton multiviewButton;
     private final EnumMap<AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(AnnotationMode.class);
     private final EnumMap<MapMode, JRadioButtonMenuItem> projectionItems = new EnumMap<>(MapMode.class);
+    private JHVSlider powerDiskSlider; // PowerDisk radial exponent; only meaningful for that mode
+    private JHVRangeSlider diskRangeSlider; // disk view radial range (R_sun); both disk modes; max tracks loaded layers
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
@@ -240,6 +279,11 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             projectionButton.add(item);
             projectionItems.put(el, item);
         }
+        projectionButton.addSeparator();
+        projectionButton.add(createPowerDiskPanel());
+        projectionButton.add(createDiskRangePanel());
+        powerDiskSlider.setEnabled(ViewState.getProjection() == MapMode.PowerDisk);
+        diskRangeSlider.setEnabled(ViewState.getProjection().isDisk());
         addButton(projectionButton);
 
         JideSplitButton annotationButton = toolSplitButton(ANNOTATION);
@@ -317,6 +361,78 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             panel.add(button);
         }
         annotationButton.add(panel);
+    }
+
+    // PowerDisk radial exponent p (display radius ~ r^p): slider 0.01..2, default 1.0 (linear).
+    // power() is read live every render, so the value takes effect through the scale rebuild.
+    private JPanel createPowerDiskPanel() {
+        powerDiskSlider = new JHVSlider(-1000, 1000, (int) Math.round(Display.getDiskPower() * 1000));
+        powerDiskSlider.setToolTipText("PowerDisk radial exponent p, applied to the corona (r > 1 R☉): p = -1 inverse, p = 0 logarithmic, p = 1 linear");
+        powerDiskSlider.setPreferredSize(new Dimension(110, powerDiskSlider.getPreferredSize().height));
+        JLabel value = new JLabel(String.format("p %.3f", Display.getDiskPower()), JLabel.RIGHT);
+        powerDiskSlider.addChangeListener(e -> {
+            Display.setDiskPower(powerDiskSlider.getValue() / 1000.);
+            value.setText(String.format("p %.3f", Display.getDiskPower()));
+            DisplayController.display();
+        });
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+        panel.add(value, BorderLayout.LINE_START);
+        panel.add(powerDiskSlider, BorderLayout.CENTER);
+        return panel;
+    }
+
+    // Disk view radial range (R_sun) shown by both disk projections. Low handle = inner
+    // radius, high handle = outer radius. The slider maximum is the radial extent of the
+    // loaded layers and tracks it as layers are added/removed (see updateDiskRangeMax), so
+    // the high handle at the maximum means "fit to the loaded layers".
+    private JPanel createDiskRangePanel() {
+        int max = diskRangeMaxTicks();
+        boolean fit = Display.getDiskRMax() <= 0;
+        int lo = Math.min((int) Math.round(Display.getDiskRMin() * 10), max);
+        int hi = fit ? max : Math.min((int) Math.round(Display.getDiskRMax() * 10), max);
+        diskRangeSlider = new JHVRangeSlider(0, max, lo, hi);
+        diskRangeSlider.setToolTipText("Disk radial range shown in R☉ (outer at the maximum fits the loaded layers)");
+        diskRangeSlider.setPreferredSize(new Dimension(110, diskRangeSlider.getPreferredSize().height));
+
+        JLabel value = new JLabel(diskRangeLabel(lo, hi, max), JLabel.RIGHT);
+        diskRangeSlider.addChangeListener(e -> {
+            int l = diskRangeSlider.getLowValue();
+            int h = diskRangeSlider.getHighValue();
+            Display.setDiskRange(l / 10., h >= diskRangeSlider.getMaximum() ? 0 : h / 10.); // max = fit
+            value.setText(diskRangeLabel(l, h, diskRangeSlider.getMaximum()));
+            DisplayController.display();
+        });
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+        panel.add(value, BorderLayout.LINE_START);
+        panel.add(diskRangeSlider, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private static int diskRangeMaxTicks() {
+        return Math.clamp((int) Math.ceil(ImageLayers.getLargestDiskRadius() * 10), 10, 5120);
+    }
+
+    // Grow/shrink the range slider to the loaded layers' extent; an outer handle that was
+    // sitting at "fit" (the old maximum) keeps fitting at the new extent.
+    private void updateDiskRangeMax() {
+        if (diskRangeSlider == null)
+            return;
+        int oldMax = diskRangeSlider.getMaximum();
+        int newMax = diskRangeMaxTicks();
+        if (newMax == oldMax)
+            return;
+        boolean fit = diskRangeSlider.getHighValue() >= oldMax;
+        diskRangeSlider.setMaximum(newMax);
+        if (fit)
+            diskRangeSlider.setHighValue(newMax);
+    }
+
+    private static String diskRangeLabel(int lo, int hi, int max) {
+        String top = hi >= max ? "fit" : String.format("%.1f", hi / 10.);
+        return String.format("r %.1f–%s", lo / 10., top);
     }
 
     private static JPanel createAnnotationThicknessPanel() {
@@ -417,6 +533,10 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         JRadioButtonMenuItem activeProjection = projectionItems.get(ViewState.getProjection());
         if (activeProjection != null)
             activeProjection.setSelected(true);
+        if (powerDiskSlider != null)
+            powerDiskSlider.setEnabled(ViewState.getProjection() == MapMode.PowerDisk);
+        if (diskRangeSlider != null)
+            diskRangeSlider.setEnabled(ViewState.getProjection().isDisk());
         JRadioButtonMenuItem activeAnnotationMode = annotationItems.get(ViewState.getAnnotationMode());
         if (activeAnnotationMode != null)
             activeAnnotationMode.setSelected(true);
