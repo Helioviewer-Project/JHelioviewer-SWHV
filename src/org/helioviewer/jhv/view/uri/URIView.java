@@ -31,6 +31,7 @@ public final class URIView extends BaseView {
     private final URIImageReader reader;
     private final String xml;
     private final Region imageRegion;
+    private volatile float[] fixedRange; // optional shared [min, max] display range for FITS frames
 
     public URIView(LatestWorker<ImageBuffer> _executor, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
@@ -76,7 +77,14 @@ public final class URIView extends BaseView {
             sendDataToHandler(imageBuffer, viewpoint);
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader, filterType), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader, filterType, fixedRange), new Callback(key, viewpoint));
+    }
+
+    @Override
+    public void setRange(double min, double max) {
+        fixedRange = new float[]{(float) min, (float) max};
+        // drop cached decodes for this file so they re-decode with the new range (caller re-renders)
+        ImageBufferCache.invalidateIf(k -> k instanceof URIDecodeKey key && key.uri() == dataUri);
     }
 
     private ImageFilter.Type decodeKeyFilter;
@@ -90,11 +98,11 @@ public final class URIView extends BaseView {
         return decodeKey;
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type, float[] clip) implements Callable<ImageBuffer> {
         @Nonnull
         @Override
         public ImageBuffer call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file, type);
+            ImageBuffer imageBuffer = reader.readImageBuffer(file, type, clip);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
             return imageBuffer;
