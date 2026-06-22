@@ -77,7 +77,7 @@ public final class URIView extends BaseView {
             sendDataToHandler(image, viewpoint);
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader, createFilter(filterType), imageRegion), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader, createFilter(filterType), imageRegion, fixedRange), new Callback(key, viewpoint));
     }
 
     private ImageFilter createFilter(ImageFilter.Type type) {
@@ -95,11 +95,22 @@ public final class URIView extends BaseView {
         return decodeKey;
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion) implements Callable<DecodedImage> {
+    // Optional shared [min, max] display range for this layer's FITS frames. When set, every frame
+    // normalizes to it instead of per-frame auto, so a multi-frame layer does not strobe.
+    private volatile float[] fixedRange;
+
+    @Override
+    public void setRange(double min, double max) {
+        fixedRange = new float[]{(float) min, (float) max};
+        // drop cached decodes for this file so they re-decode with the new range (caller re-renders)
+        ImageBufferCache.invalidateIf(k -> k instanceof URIDecodeKey key && key.uri() == dataUri);
+    }
+
+    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion, float[] clip) implements Callable<DecodedImage> {
         @Nonnull
         @Override
         public DecodedImage call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file, filter);
+            ImageBuffer imageBuffer = reader.readImageBuffer(file, filter, clip);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
             return new DecodedImage(imageBuffer, imageRegion);

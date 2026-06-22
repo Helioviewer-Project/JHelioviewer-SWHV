@@ -131,7 +131,19 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
             return;
 
         replaceView(_view);
+        if (fixedRange != null) // re-apply a pending shared display range to the freshly loaded view
+            _view.setRange(fixedRange[0], fixedRange[1]);
         activateView();
+    }
+
+    private double[] fixedRange; // optional shared FITS display range applied to all the layer's frames
+
+    // Pin all of this layer's frames to a fixed [min, max] display range (FITS only), so a
+    // multi-frame layer (e.g. a PUNCH movie) does not strobe as each frame auto-normalizes.
+    public void setFixedRange(double min, double max) {
+        fixedRange = new double[]{min, max};
+        view.setRange(min, max); // applies now if the real view is already in place
+        DisplayController.display();
     }
 
     private void replaceView(View newView) {

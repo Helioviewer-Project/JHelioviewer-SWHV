@@ -36,20 +36,20 @@ public final class FITSImage implements URIImageReader {
     public URIImageReader.Image readImage(File file) throws Exception {
         try (Fits f = new Fits(file)) {
             BasicHDU<?> hdu = findHDU(f);
-            return new URIImageReader.Image(getHeaderAsXML(imageHeader(hdu)), readHDU(hdu, ImageFilter.NONE), null);
+            return new URIImageReader.Image(getHeaderAsXML(imageHeader(hdu)), readHDU(hdu, ImageFilter.NONE, null), null);
         }
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter filter) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter filter, @Nullable float[] clip) throws Exception {
         try (Fits f = new Fits(file)) {
-            return readHDU(findHDU(f), filter);
+            return readHDU(findHDU(f), filter, clip);
         }
     }
 
     public ImageBuffer readImageBuffer(InputStream input) throws Exception {
         try (Fits f = new Fits(input)) {
-            return readHDU(findHDU(f), ImageFilter.NONE);
+            return readHDU(findHDU(f), ImageFilter.NONE, null);
         }
     }
 
@@ -333,10 +333,10 @@ public final class FITSImage implements URIImageReader {
         return axes;
     }
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter filter) throws Exception {
+    private static ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter filter, @Nullable float[] clip) throws Exception {
         Header header = imageHeader(hdu);
         int[] axes = imageAxes(header);
-        return readPixels(header, axes, readFlatPixels(hdu, axes), filter);
+        return readPixels(header, axes, readFlatPixels(hdu, axes), filter, clip);
     }
 
     @SuppressWarnings("deprecation")
@@ -357,7 +357,7 @@ public final class FITSImage implements URIImageReader {
         return buffer.array();
     }
 
-    private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter filter) throws Exception {
+    private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter filter, @Nullable float[] clip) throws Exception {
         int height = axes[0];
         int width = axes[1];
 
@@ -378,30 +378,39 @@ public final class FITSImage implements URIImageReader {
             throw new Exception("Invalid FITS BZERO/BSCALE");
         FITSViewState.Data state = FITSViewState.data();
 
-        float min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
-        float max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
-        if (min == Float.MAX_VALUE || max == Float.MAX_VALUE) {
-            if (state.clippingMode() == FITSViewState.ClippingMode.Range) {
-                min = (float) state.clippingMin();
-                max = (float) state.clippingMax();
-            } else {
-                SampleBuffer sampleData = sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height);
-                int sampleLen = sampleData.length();
-                if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                    return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).finish();
-
-                if (state.clippingMode().percentile() > 0) {
-                    double percentile = state.clippingMode().percentile();
-                    int kMin = Math.clamp((int) (percentile * sampleLen), 0, sampleLen - 1);
-                    int kMax = Math.clamp((int) ((1 - percentile) * sampleLen), 0, sampleLen - 1);
-                    float[] values = sampleData.values();
-                    min = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMin);
-                    max = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMax);
+        float min;
+        float max;
+        if (clip != null) {
+            // Per-layer fixed display range — shared across a multi-frame layer's frames (e.g.
+            // a PUNCH movie) so they normalize identically instead of strobing per-frame.
+            min = clip[0];
+            max = clip[1];
+        } else {
+            min = header.getFloatValue("HV_DMIN", Float.MAX_VALUE);
+            max = header.getFloatValue("HV_DMAX", Float.MAX_VALUE);
+            if (min == Float.MAX_VALUE || max == Float.MAX_VALUE) {
+                if (state.clippingMode() == FITSViewState.ClippingMode.Range) {
+                    min = (float) state.clippingMin();
+                    max = (float) state.clippingMax();
                 } else {
-                    Arrays.sort(sampleData.values(), 0, sampleLen);
-                    ZScale.ZScaleRange range = ZScale.zscale(sampleData.values(), sampleLen, state.zContrast());
-                    min = range.low();
-                    max = range.high();
+                    SampleBuffer sampleData = sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height);
+                    int sampleLen = sampleData.length();
+                    if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
+                        return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).finish();
+
+                    if (state.clippingMode().percentile() > 0) {
+                        double percentile = state.clippingMode().percentile();
+                        int kMin = Math.clamp((int) (percentile * sampleLen), 0, sampleLen - 1);
+                        int kMax = Math.clamp((int) ((1 - percentile) * sampleLen), 0, sampleLen - 1);
+                        float[] values = sampleData.values();
+                        min = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMin);
+                        max = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMax);
+                    } else {
+                        Arrays.sort(sampleData.values(), 0, sampleLen);
+                        ZScale.ZScaleRange range = ZScale.zscale(sampleData.values(), sampleLen, state.zContrast());
+                        min = range.low();
+                        max = range.high();
+                    }
                 }
             }
         }

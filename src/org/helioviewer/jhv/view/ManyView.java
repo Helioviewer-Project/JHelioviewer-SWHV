@@ -68,6 +68,11 @@ public class ManyView implements View {
     }
 
     @Override
+    public void setRange(double min, double max) {
+        frameMap.values().forEach(frameInfo -> frameInfo.view.setRange(min, max));
+    }
+
+    @Override
     public ImageFilter.Type getFilter() {
         return frameMap.indexedValue(0).view.getFilter();
     }

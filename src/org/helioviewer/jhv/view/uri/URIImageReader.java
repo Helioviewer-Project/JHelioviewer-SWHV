@@ -14,6 +14,8 @@ interface URIImageReader {
 
     Image readImage(File file) throws Exception;
 
-    ImageBuffer readImageBuffer(File file, ImageFilter filter) throws Exception;
+    // clip: optional fixed [min, max] display range; when non-null the FITS reader normalizes to
+    // it instead of per-frame auto, so a multi-frame layer's frames don't strobe. Non-FITS ignore.
+    ImageBuffer readImageBuffer(File file, ImageFilter filter, @Nullable float[] clip) throws Exception;
 
 }

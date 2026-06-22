@@ -76,8 +76,8 @@ final class GenericImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter filter) throws Exception {
-        return withReader(file, reader -> readBuffered(reader.read(0), filter));
+    public ImageBuffer readImageBuffer(File file, ImageFilter filter, @Nullable float[] clip) throws Exception {
+        return withReader(file, reader -> readBuffered(reader.read(0), filter)); // clip: N/A for 8-bit images
     }
 
     @Nullable
