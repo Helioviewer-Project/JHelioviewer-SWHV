@@ -31,7 +31,7 @@ public class FHNWHandler extends SWEKHandler {
         JSONArray events = eventJSON.getJSONArray("data");
         int len = events.length();
 
-        List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
+        List<SWEKHandler.RemoteEvent> event2dbList = new ArrayList<>(len);
         for (int j = 0; j < len; j++) {
             JSONArray event = events.getJSONArray(j);
             int elen = event.length();
@@ -52,7 +52,7 @@ public class FHNWHandler extends SWEKHandler {
                 long archiv = start;
                 String uid = result.getString("granule_uid");
                 try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                    event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, List.of()));
+                    event2dbList.add(new SWEKHandler.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, List.of()));
                 }
             } else
                 Log.warn("Inconsistent event parameter list length");

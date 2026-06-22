@@ -26,7 +26,7 @@ public class ComesepHandler extends SWEKHandler {
     protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray results = eventJSON.getJSONArray("results");
         int len = results.length();
-        List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
+        List<SWEKHandler.RemoteEvent> event2dbList = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             JSONObject result = results.getJSONObject(i);
 
@@ -45,7 +45,7 @@ public class ComesepHandler extends SWEKHandler {
             long archiv = start;
             String uid = result.getString("alertid");
             try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, List.of()));
+                event2dbList.add(new SWEKHandler.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, List.of()));
             }
         }
         return new RemotePage(eventJSON.optBoolean("overmax", false), event2dbList, parseAssociations(eventJSON));

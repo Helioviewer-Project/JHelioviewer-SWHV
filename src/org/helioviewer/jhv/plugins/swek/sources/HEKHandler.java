@@ -33,7 +33,7 @@ public class HEKHandler extends SWEKHandler {
     protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray results = eventJSON.getJSONArray("result");
         int len = results.length();
-        List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
+        List<SWEKHandler.RemoteEvent> event2dbList = new ArrayList<>(len);
         Set<String> acceptedUids = new HashSet<>();
         for (int i = 0; i < len; i++) {
             JSONObject result = results.getJSONObject(i);
@@ -53,21 +53,24 @@ public class HEKHandler extends SWEKHandler {
             String uid = result.getString("kb_archivid");
             acceptedUids.add(uid);
 
-            ArrayList<SWEK.RemoteParameter> paramList = new ArrayList<>();
+            ArrayList<SWEKHandler.RemoteParameter> paramList = new ArrayList<>();
             for (Map.Entry<String, String> fieldEntry : supplier.getAllDatabaseFields().entrySet()) {
                 String dbType = fieldEntry.getValue();
                 String fieldName = fieldEntry.getKey();
                 String lfieldName = fieldName.toLowerCase();
                 if (!result.isNull(lfieldName)) {
                     switch (dbType) {
-                        case "INTEGER" -> paramList.add(new SWEK.RemoteParameter(fieldName, result.getInt(lfieldName)));
-                        case "TEXT" -> paramList.add(new SWEK.RemoteParameter(fieldName, result.getString(lfieldName)));
-                        case "REAL" -> paramList.add(new SWEK.RemoteParameter(fieldName, result.getDouble(lfieldName)));
+                        case "INTEGER" ->
+                                paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getInt(lfieldName)));
+                        case "TEXT" ->
+                                paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getString(lfieldName)));
+                        case "REAL" ->
+                                paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getDouble(lfieldName)));
                     }
                 }
             }
             try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-                event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, paramList));
+                event2dbList.add(new SWEKHandler.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, paramList));
             }
         }
         return new RemotePage(eventJSON.optBoolean("overmax", false), event2dbList, parseAssociations(eventJSON, acceptedUids));

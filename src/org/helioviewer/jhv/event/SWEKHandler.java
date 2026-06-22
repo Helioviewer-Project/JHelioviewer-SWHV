@@ -10,7 +10,12 @@ import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    public record RemotePage(boolean overmax, List<SWEK.RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
+    public record RemoteParameter(String name, Object value) {}
+
+    public record RemoteEvent(byte[] compressedJson, long start, long end, long archiv, String uid,
+                              List<RemoteParameter> paramList) {}
+
+    public record RemotePage(boolean overmax, List<RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
 
     RemotePage fetchPage(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
         JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, params, page));
