@@ -14,6 +14,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -54,7 +55,7 @@ public class HEKHandler extends SWEKHandler {
             acceptedUids.add(uid);
 
             ArrayList<SWEKHandler.RemoteParameter> paramList = new ArrayList<>();
-            for (Map.Entry<String, String> fieldEntry : supplier.getAllDatabaseFields().entrySet()) {
+            for (Map.Entry<String, String> fieldEntry : SWEKCatalog.databaseFields(supplier).entrySet()) {
                 String dbType = fieldEntry.getValue();
                 String fieldName = fieldEntry.getKey();
                 String lfieldName = fieldName.toLowerCase();

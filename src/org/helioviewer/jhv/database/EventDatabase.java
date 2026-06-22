@@ -96,7 +96,7 @@ public class EventDatabase {
         pstatement.executeUpdate();
 
         StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.dbName()).append(" (");
-        eventType.getAllDatabaseFields().forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
+        SWEKCatalog.databaseFields(eventType).forEach((key, value) -> createtbl.append(key).append(' ').append(value).append(" DEFAULT NULL,"));
         createtbl.append("event_id INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(event_id) REFERENCES events(id), UNIQUE(event_id) ON CONFLICT REPLACE )");
 
         Connection connection = pstatement.getConnection();
@@ -110,7 +110,7 @@ public class EventDatabase {
 
     private static void createEventTableIndexes(Statement statement, SWEKSupplier eventType) throws Exception {
         String tableName = eventType.dbName();
-        for (String field : SWEKCatalog.getRelationDatabaseFields(eventType.group()).keySet())
+        for (String field : SWEKCatalog.relationDatabaseFields(eventType.group()).keySet())
             statement.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName + '_' + field + " ON " + tableName + " (" + field + ")");
     }
 
