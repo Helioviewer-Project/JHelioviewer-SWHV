@@ -22,7 +22,6 @@ public final class DiskGrid {
     private static final int MAX_RINGS = 16;
     private static final double MIN_RING_SPACING = 0.04; // fraction of the disk radius
     private static final double[] RING_FACTORS = {1, 2, 5};
-    private static final byte[] gridColor = Colors.Red;
 
     private final GLSLLine line = new GLSLLine(false);
 
@@ -36,13 +35,13 @@ public final class DiskGrid {
 
     // spokeStep is the angular spacing of the radial spokes in degrees (the grid layer's
     // longitude step; the latitude/coordinate-system controls do not map to a radial grid).
-    public void render(MapView mv, Viewport vp, boolean showLabels, double spokeStep) {
+    public void render(MapView mv, Viewport vp, boolean showLabels, double spokeStep, byte[] color, double lineScale, double labelAlpha) {
         MapScale scale = mv.scale(vp);
         double[] rings = chooseRings(scale);
-        updateLine(scale, rings, spokeStep);
-        line.renderLine(vp, GridMath.LINEWIDTH);
+        updateLine(scale, rings, spokeStep, color);
+        line.renderLine(vp, GridMath.LINEWIDTH * lineScale);
         if (showLabels)
-            drawLabels(mv, vp, scale, rings);
+            drawLabels(mv, vp, scale, rings, labelAlpha);
     }
 
     // Ring radii at 1-2-5 decade steps within the radial range, decimated for legibility
@@ -73,7 +72,7 @@ public final class DiskGrid {
         return (float) (.5 * (scale.getYValueInv(r) + .5));
     }
 
-    private void updateLine(MapScale scale, double[] rings, double spokeStep) {
+    private void updateLine(MapScale scale, double[] rings, double spokeStep, byte[] color) {
         int spokes = (int) Math.round(360 / spokeStep);
         int noPoints = rings.length * (SUBDIVISIONS + 3) + 4 * spokes;
         BufVertex vexBuf = new BufVertex(noPoints * GLSLLine.stride);
@@ -86,7 +85,7 @@ public final class DiskGrid {
                 float y = (float) (rho * Math.sin(a));
                 if (j == 0)
                     vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-                vexBuf.putVertex(x, y, 0, 1, gridColor);
+                vexBuf.putVertex(x, y, 0, 1, color);
                 if (j == SUBDIVISIONS)
                     vexBuf.putVertex(x, y, 0, 1, Colors.Null);
             }
@@ -97,14 +96,14 @@ public final class DiskGrid {
             float x = (float) (.5 * -Math.sin(a));
             float y = (float) (.5 * Math.cos(a));
             vexBuf.putVertex(0, 0, 0, 1, Colors.Null);
-            vexBuf.repeatVertex(gridColor);
-            vexBuf.putVertex(x, y, 0, 1, gridColor);
+            vexBuf.repeatVertex(color);
+            vexBuf.putVertex(x, y, 0, 1, color);
             vexBuf.repeatVertex(Colors.Null);
         }
         line.setVertex(vexBuf);
     }
 
-    private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings) {
+    private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings, double labelAlpha) {
         SdfTextRenderer renderer = GLText.renderer();
         // Scale to the camera width (not min(width, 1)) so the labels keep a constant on-screen
         // size at any zoom; the disk view normally spans several R_sun, where the cap shrank them.
@@ -113,7 +112,9 @@ public final class DiskGrid {
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
 
-        renderer.setColor(Colors.WhiteFloat);
+        // White labels at the label opacity (premultiplied)
+        float a = (float) labelAlpha;
+        renderer.setColor(new float[]{a, a, a, a});
         renderer.begin3DRendering();
         for (double r : rings) {
             renderer.draw(FastFormat.rounded2(r), labelOffset, ringRho(scale, r) + labelOffset, 0, textScaleFactor);
