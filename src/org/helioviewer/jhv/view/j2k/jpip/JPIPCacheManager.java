@@ -51,11 +51,10 @@ public class JPIPCacheManager {
 
     private static final int MAGIC = 0x4A504950; // JPIP
     private static final int VERSION = 1;
-    private static final int HEADER_BYTES = 8;
     private static final Duration EXPIRY = Duration.ofDays(7);
     private static final long MAX_STREAM_CACHE_SIZE = 8L * 1024 * 1024 * 1024;
-    private static final Path levelCacheDir = Path.of(Directories.CACHE.getPath(), "JPIPLevel-5");
-    private static final Path streamCacheDir = Path.of(Directories.CACHE.getPath(), "JPIPStream-5");
+    private static final Path levelCacheDir = Path.of(Directories.CACHE.getPath(), "JPIPLevel-6");
+    private static final Path streamCacheDir = Path.of(Directories.CACHE.getPath(), "JPIPStream-6");
 
     private static final Object cacheLock = new Object();
 
@@ -83,7 +82,7 @@ public class JPIPCacheManager {
                                 .withExpiry(expiryPolicy))
                         .build(true);
 
-                deleteDirs("JPIPLevel-3", "JPIPStream-3", "JPIPLevel-4", "JPIPStream-4"); // delete old formats
+                deleteDirs("JPIPLevel-3", "JPIPStream-3", "JPIPLevel-4", "JPIPStream-4", "JPIPLevel-5", "JPIPStream-5"); // delete old formats
                 Files.createDirectories(streamCacheDir);
                 deleteTempStreams();
                 deleteStaleStreams();
@@ -143,37 +142,30 @@ public class JPIPCacheManager {
     }
 
     @Nonnull
-    public static Writer writer(@Nullable String key, int level) {
+    public static Writer writer(@Nullable String key, int level, @Nonnull JPIPCache cache, int frame) {
         if (key == null)
             return NOOP_WRITER;
 
-        Path tempFile = null;
-        try {
-            synchronized (cacheLock) {
-                if (!enabled)
-                    return NOOP_WRITER;
+        synchronized (cacheLock) {
+            if (!enabled)
+                return NOOP_WRITER;
 
-                Files.createDirectories(streamCacheDir);
-                Path file = streamPath(key);
-                tempFile = streamCacheDir.resolve(file.getFileName() + "." + UUID.randomUUID() + ".tmp");
-                boolean append = Files.exists(file);
-                if (append)
-                    Files.copy(file, tempFile);
-
-                DataOutputStream out = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(tempFile,
-                        append ? StandardOpenOption.APPEND : StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)));
-                if (!append) {
-                    out.writeInt(MAGIC);
-                    out.writeInt(VERSION);
-                }
-                return new Writer(key, level, tempFile, out, append && Files.size(file) > HEADER_BYTES, generation);
-            }
-        } catch (Exception e) {
-            disableAfterFailure(e);
-            if (tempFile != null)
-                deleteFile(tempFile);
-            return NOOP_WRITER;
+            return new Writer(key, level, cache, frame, generation);
         }
+    }
+
+    private static boolean writeCachedDatabins(Path tempFile, JPIPCache cache, int frame) throws KduException, IOException {
+        boolean hasRecords = false;
+        Files.createDirectories(streamCacheDir);
+        try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(tempFile, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)))) {
+            out.writeInt(MAGIC);
+            out.writeInt(VERSION);
+            for (JPIPSegment seg : cache.scan(frame)) {
+                write(out, seg);
+                hasRecords = true;
+            }
+        }
+        return hasRecords;
     }
 
     private static void read(Path file, JPIPCache cache, int frame) throws IOException, KduException {
@@ -201,6 +193,20 @@ public class JPIPCacheManager {
                 cache.put(frame, seg);
             }
         }
+    }
+
+    private static void write(DataOutputStream out, int klassID, long binID, int offset, byte[] data, int length, boolean isFinal) throws IOException {
+        out.writeInt(klassID);
+        out.writeLong(binID);
+        out.writeInt(offset);
+        out.writeInt(length);
+        out.writeBoolean(isFinal);
+        if (length > 0)
+            out.write(data, 0, length);
+    }
+
+    private static void write(DataOutputStream out, JPIPSegment seg) throws IOException {
+        write(out, seg.klassID, seg.binID, seg.offset, seg.data, seg.length, seg.isFinal);
     }
 
     private static Path streamPath(String key) {
@@ -351,29 +357,31 @@ public class JPIPCacheManager {
 
     public static final class Writer implements AutoCloseable {
 
+        @Nullable
         private final String key;
         private final int level;
-        private final Path tempFile;
+        @Nullable
+        private final JPIPCache cache;
+        private final int frame;
         private final long generation;
 
-        private DataOutputStream out;
         private boolean active;
-        private boolean hasRecords;
+        private boolean hasResponseRecords;
 
         private Writer() {
-            key = "";
+            key = null;
             level = 0;
-            tempFile = null;
+            cache = null;
+            frame = 0;
             generation = 0;
         }
 
-        private Writer(String _key, int _level, Path _tempFile, DataOutputStream _out, boolean _hasRecords, long _generation) {
+        private Writer(String _key, int _level, JPIPCache _cache, int _frame, long _generation) {
             key = _key;
             level = _level;
-            tempFile = _tempFile;
+            cache = _cache;
+            frame = _frame;
             generation = _generation;
-            out = _out;
-            hasRecords = _hasRecords;
             active = true;
         }
 
@@ -381,19 +389,7 @@ public class JPIPCacheManager {
             if (!active || seg.klassID == Constants.KDU.META_DATABIN)
                 return;
 
-            try {
-                out.writeInt(seg.klassID);
-                out.writeLong(seg.binID);
-                out.writeInt(seg.offset);
-                out.writeInt(seg.length);
-                out.writeBoolean(seg.isFinal);
-                if (seg.length > 0)
-                    out.write(seg.data, 0, seg.length);
-                hasRecords = true;
-            } catch (Exception e) {
-                disableAfterFailure(e);
-                close();
-            }
+            hasResponseRecords = true;
         }
 
         public void commit() {
@@ -401,10 +397,18 @@ public class JPIPCacheManager {
                 return;
 
             active = false;
-            if (!closeOutput())
+            if (!hasResponseRecords || key == null || cache == null)
                 return;
 
-            if (!hasRecords) {
+            Path file = streamPath(key);
+            Path tempFile = streamCacheDir.resolve(file.getFileName() + "." + UUID.randomUUID() + ".tmp");
+            try {
+                if (!writeCachedDatabins(tempFile, cache, frame)) {
+                    deleteFile(tempFile);
+                    return;
+                }
+            } catch (Exception e) {
+                disableAfterFailure(e);
                 deleteFile(tempFile);
                 return;
             }
@@ -418,24 +422,6 @@ public class JPIPCacheManager {
                 return;
 
             active = false;
-            closeOutput();
-            if (tempFile != null)
-                deleteFile(tempFile);
-        }
-
-        private boolean closeOutput() {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    Log.error(e);
-                    deleteFile(tempFile);
-                    return false;
-                } finally {
-                    out = null;
-                }
-            }
-            return true;
         }
     }
 

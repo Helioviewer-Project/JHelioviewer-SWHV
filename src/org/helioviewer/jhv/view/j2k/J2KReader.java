@@ -97,7 +97,7 @@ class J2KReader implements Runnable {
             if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
                 return true;
 
-            try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level)) {
+            try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level, cache, frame)) {
                 JPIPResponse res = socket.request(query, frame, cache, writer);
                 boolean complete = res.isResponseComplete();
                 if (complete)
@@ -177,7 +177,7 @@ class J2KReader implements Runnable {
                         stepQueries[currentStep] = null;
 
                         source.setFrameComplete(currentStep, level);
-                        if (singleFrame)
+                        if (currentStep == frame)
                             view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
                     } else {
                         source.setFramePartial(currentStep);
