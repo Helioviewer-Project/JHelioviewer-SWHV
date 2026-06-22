@@ -10,16 +10,14 @@ import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    record RemotePage(boolean overmax, List<SWEK.RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
+    public record RemotePage(boolean overmax, List<SWEK.RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
 
     RemotePage fetchPage(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception {
         JSONObject eventJSON = JSONUtils.get(createURI(supplier, start, end, params, page));
-        return new RemotePage(eventJSON.optBoolean("overmax", false), parseEvents(eventJSON, supplier), parseAssociations(eventJSON, supplier));
+        return parseRemotePage(eventJSON, supplier);
     }
 
-    protected abstract List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;
-
-    protected abstract List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;
+    protected abstract RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception;
 
     protected abstract URI createURI(SWEKSupplier supplier, long start, long end, List<SWEK.Param> params, int page) throws Exception;
 
