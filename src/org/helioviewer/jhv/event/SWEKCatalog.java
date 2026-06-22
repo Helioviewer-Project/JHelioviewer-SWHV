@@ -41,7 +41,7 @@ public final class SWEKCatalog {
         return relatedEvents;
     }
 
-    public static Map<String, String> getRelationDatabaseFields(SWEKGroup group) {
+    public static Map<String, String> relationDatabaseFields(SWEKGroup group) {
         HashMap<String, String> fields = new HashMap<>();
         for (SWEK.RelatedEvents re : relatedEvents) {
             if (re.group() == group) {
@@ -54,8 +54,18 @@ public final class SWEKCatalog {
         return fields;
     }
 
+    public static Map<String, String> databaseFields(SWEKSupplier supplier) {
+        HashMap<String, String> fields = new HashMap<>();
+        for (SWEK.Parameter p : supplier.getParameterList()) {
+            SWEK.ParameterFilter pf = p.filter();
+            if (pf != null)
+                fields.put(p.name().intern(), pf.dbType());
+        }
+        fields.putAll(relationDatabaseFields(supplier.group()));
+        return fields;
+    }
+
     public static String key(SWEKSupplier supplier) {
         return supplier.supplierName() + supplier.source().name() + supplier.dbName();
     }
-
 }

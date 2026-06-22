@@ -1,8 +1,6 @@
 package org.helioviewer.jhv.event;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class SWEKSupplier {
 
@@ -15,8 +13,6 @@ public final class SWEKSupplier {
     private final List<SWEK.Parameter> parameterList;
     private final boolean containsParameterFilter;
 
-    private HashMap<String, String> databaseFields;
-
     public SWEKSupplier(SWEKGroup _group, String _supplierName, String _displayName, SWEK.Source _source, String _dbName, List<SWEK.Parameter> _parameterList) {
         group = _group;
         supplierName = _supplierName;
@@ -26,25 +22,6 @@ public final class SWEKSupplier {
         isCactus = displayName == "CACTus" && "HEK".equals(source.name());
         parameterList = _parameterList;
         containsParameterFilter = checkFilters(parameterList);
-    }
-
-    public Map<String, String> getAllDatabaseFields() {
-        if (databaseFields == null) {
-            createAllDatabaseFields();
-        }
-        return databaseFields;
-    }
-
-    private void createAllDatabaseFields() {
-        HashMap<String, String> fields = new HashMap<>();
-        for (SWEK.Parameter p : parameterList) {
-            SWEK.ParameterFilter pf = p.filter();
-            if (pf != null) {
-                fields.put(p.name().intern(), pf.dbType());
-            }
-        }
-        fields.putAll(SWEKCatalog.getRelationDatabaseFields(group));
-        databaseFields = fields;
     }
 
     public List<SWEK.Parameter> getParameterList() {
