@@ -23,7 +23,7 @@ public class ComesepHandler extends SWEKHandler {
     private static final String BASE_URL = "http://swhv.oma.be/comesep/comeseprequestapi/getComesep.php?";
 
     @Override
-    protected List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray results = eventJSON.getJSONArray("results");
         int len = results.length();
         List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
@@ -48,11 +48,10 @@ public class ComesepHandler extends SWEKHandler {
                 event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, List.of()));
             }
         }
-        return event2dbList;
+        return new RemotePage(eventJSON.optBoolean("overmax", false), event2dbList, parseAssociations(eventJSON));
     }
 
-    @Override
-    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) {
+    private static List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON) {
         JSONArray associations = eventJSON.getJSONArray("associations");
         int len = associations.length();
         List<JHVEvent.LinkRef> links = new ArrayList<>(len);

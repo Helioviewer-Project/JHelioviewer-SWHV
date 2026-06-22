@@ -25,7 +25,7 @@ public class FHNWHandler extends SWEKHandler {
             UriTemplate.vars().set("REQUEST", "doQuery").set("LANG", "ADQL").set("FORMAT", "json"));
 
     @Override
-    protected List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray params = eventJSON.getJSONArray("columns");
         int plen = params.length();
         JSONArray events = eventJSON.getJSONArray("data");
@@ -58,7 +58,7 @@ public class FHNWHandler extends SWEKHandler {
                 Log.warn("Inconsistent event parameter list length");
         }
 
-        return event2dbList;
+        return new RemotePage(eventJSON.optBoolean("overmax", false), event2dbList, List.of());
     }
 
     @Override
@@ -89,11 +89,6 @@ public class FHNWHandler extends SWEKHandler {
                 " start_time >= '" + "2002-01-01T00:00:00" + //TimeUtils.format(start) +
                 "' AND end_time <= '" + TimeUtils.format(end) + "' ORDER BY start_time";
         return new URI(queryTemplate.expand(UriTemplate.vars().set("QUERY", adql)));
-    }
-
-    @Override
-    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) {
-        return List.of();
     }
 
 }

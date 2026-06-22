@@ -30,10 +30,11 @@ public class HEKHandler extends SWEKHandler {
     private static final String STRING_EQUALS = URLEncoder.encode("==", StandardCharsets.UTF_8);
 
     @Override
-    protected List<SWEK.RemoteEvent> parseEvents(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+    protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
         JSONArray results = eventJSON.getJSONArray("result");
         int len = results.length();
         List<SWEK.RemoteEvent> event2dbList = new ArrayList<>(len);
+        Set<String> acceptedUids = new HashSet<>();
         for (int i = 0; i < len; i++) {
             JSONObject result = results.getJSONObject(i);
             if (!isSupplierEvent(result, supplier))
@@ -50,6 +51,7 @@ public class HEKHandler extends SWEKHandler {
 
             long archiv = TimeUtils.parse(result.getString("kb_archivdate"));
             String uid = result.getString("kb_archivid");
+            acceptedUids.add(uid);
 
             ArrayList<SWEK.RemoteParameter> paramList = new ArrayList<>();
             for (Map.Entry<String, String> fieldEntry : supplier.getAllDatabaseFields().entrySet()) {
@@ -68,16 +70,14 @@ public class HEKHandler extends SWEKHandler {
                 event2dbList.add(new SWEK.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, paramList));
             }
         }
-        return event2dbList;
+        return new RemotePage(eventJSON.optBoolean("overmax", false), event2dbList, parseAssociations(eventJSON, acceptedUids));
     }
 
-    @Override
-    protected List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, SWEKSupplier supplier) {
+    private static List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, Set<String> acceptedUids) {
         JSONArray associations = eventJSON.optJSONArray("association");
         if (associations == null)
             return List.of();
 
-        Set<String> acceptedUids = getSupplierUids(eventJSON, supplier);
         int len = associations.length();
         List<JHVEvent.LinkRef> links = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
@@ -88,18 +88,6 @@ public class HEKHandler extends SWEKHandler {
                 links.add(new JHVEvent.LinkRef(first, second));
         }
         return links;
-    }
-
-    private static Set<String> getSupplierUids(JSONObject eventJSON, SWEKSupplier supplier) {
-        JSONArray results = eventJSON.getJSONArray("result");
-        int len = results.length();
-        Set<String> uids = new HashSet<>();
-        for (int i = 0; i < len; i++) {
-            JSONObject result = results.getJSONObject(i);
-            if (isSupplierEvent(result, supplier))
-                uids.add(result.getString("kb_archivid"));
-        }
-        return uids;
     }
 
     private static boolean isSupplierEvent(JSONObject result, SWEKSupplier supplier) {
