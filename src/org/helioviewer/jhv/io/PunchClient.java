@@ -5,8 +5,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +20,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -61,8 +67,60 @@ public final class PunchClient {
         Task.submit("punch", new QueryCoverage(level, product), receiver::setPunchResponseCoverage, "Error listing the PUNCH archive");
     }
 
-    public static void submitLoad(@Nonnull List<DataItem> items) {
-        Commands.loadImage(items.stream().map(DataItem::uri).toList());
+    public static void submitLoad(@Nonnull List<DataItem> items, @Nonnull String level, @Nonnull String product, long start, long end, long cadence) {
+        List<URI> uris = items.stream().map(DataItem::uri).toList();
+        Commands.loadImage(uris).thenAccept(layer -> {
+            if (layer != null)
+                rememberQuery(layer, level, product, start, end, cadence, uris);
+        });
+    }
+
+    // ---- per-layer query state, for the "check missing frames" refresh action -----
+
+    public record RefreshResult(int existingCount, int newCount, ImageLayer newLayer) {}
+
+    public interface RefreshReceiver {
+        void onRefreshComplete(RefreshResult result);
+    }
+
+    private record QueryState(String level, String product, long start, long end, long cadence, Set<URI> loadedUris) {}
+
+    // Weak so we do not pin layers that the user has removed
+    private static final Map<ImageLayer, QueryState> layerQueries = Collections.synchronizedMap(new WeakHashMap<>());
+
+    static void rememberQuery(ImageLayer layer, String level, String product, long start, long end, long cadence, List<URI> uris) {
+        layerQueries.put(layer, new QueryState(level, product, start, end, cadence, new HashSet<>(uris)));
+    }
+
+    public static boolean hasRememberedQuery(ImageLayer layer) {
+        return layerQueries.containsKey(layer);
+    }
+
+    // Re-runs the original query, diffs against the URIs we already loaded for this layer,
+    // and loads any new ones as a fresh layer (so the user can compare or replace)
+    public static void submitRefresh(@Nonnull ImageLayer layer, @Nonnull RefreshReceiver receiver) {
+        QueryState q = layerQueries.get(layer);
+        if (q == null) {
+            receiver.onRefreshComplete(new RefreshResult(0, 0, null));
+            return;
+        }
+        Task.submit("punch-refresh", new QueryItems(q.level, q.product, q.start, q.end, q.cadence), items -> {
+            List<URI> newUris = new ArrayList<>();
+            for (DataItem it : items)
+                if (!q.loadedUris.contains(it.uri))
+                    newUris.add(it.uri);
+            if (newUris.isEmpty()) {
+                receiver.onRefreshComplete(new RefreshResult(q.loadedUris.size(), 0, null));
+                return;
+            }
+            Commands.loadImage(newUris).thenAccept(newLayer -> {
+                // Track the union on the original layer so a second refresh diffs correctly
+                q.loadedUris.addAll(newUris);
+                if (newLayer != null)
+                    rememberQuery(newLayer, q.level, q.product, q.start, q.end, q.cadence, newUris);
+                receiver.onRefreshComplete(new RefreshResult(q.loadedUris.size() - newUris.size(), newUris.size(), newLayer));
+            });
+        }, "Error refreshing PUNCH layer");
     }
 
     private static String readIndex(String url) throws Exception {

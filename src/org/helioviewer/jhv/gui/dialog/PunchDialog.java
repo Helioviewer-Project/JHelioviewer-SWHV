@@ -135,8 +135,11 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
                 if (choice != JOptionPane.OK_OPTION)
                     return;
             }
-            PunchClient.submitLoad(items);
-            setVisible(false);
+            if (levelCombo.getSelectedItem() instanceof String level && productCombo.getSelectedItem() instanceof String product &&
+                    cadenceCombo.getSelectedItem() instanceof Cadence cadence) {
+                PunchClient.submitLoad(items, level, product, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime(), cadence.milli);
+                setVisible(false);
+            }
         });
         return loadButton;
     }

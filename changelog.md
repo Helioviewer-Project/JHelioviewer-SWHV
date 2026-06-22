@@ -19,6 +19,7 @@
   screen space to structures near the Sun while keeping the solar disk linear. (by @GillySpace27)
 - Remove the redundant Polar and LogPolar projections, subsumed by RectWarp
 - Add grid line color, opacity and width controls to the grid layer (by @GillySpace27)
+- Add a per-layer refresh button to check the PUNCH archive for new frames (by @GillySpace27)
 
 ### Timeline, events, and UI
 - Map HEK Flare Trigger events to Flare events (fixes #105)
