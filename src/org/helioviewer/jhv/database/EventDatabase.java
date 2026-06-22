@@ -308,7 +308,7 @@ public class EventDatabase {
                     Log.error("Failed to store event");
                     continue;
                 }
-                List<JHVEvent> rels = _getOtherRelations(id, type, true, false, true);
+                List<JHVEvent> rels = parseJSON(collectRelationEvents(id, type, true, true), false);
                 rels.forEach(rel -> links.add(new JHVEvent.Link(id, rel.getUniqueID())));
             }
             storeAssociationIds(links);
@@ -322,83 +322,83 @@ public class EventDatabase {
         }
     }
 
-    private static List<JHVEvent> createUniqueList(List<JHVEvent> events) {
+    private static List<JHVEvent> parseJSON(List<JsonEvent> jsonEvents, boolean full) {
         HashSet<Integer> ids = new HashSet<>();
-        List<JHVEvent> uniqueEvents = new ArrayList<>();
-        for (JHVEvent ev : events) {
-            int id = ev.getUniqueID();
-            if (!ids.contains(id)) {
-                ids.add(id);
-                uniqueEvents.add(ev);
+        List<JHVEvent> events = new ArrayList<>();
+        for (int i = 0; i < jsonEvents.size(); i++) {
+            JsonEvent jsonEvent = jsonEvents.get(i);
+            jsonEvents.set(i, null);
+            if (!ids.add(jsonEvent.id))
+                continue;
+
+            try {
+                events.add(parseJSON(jsonEvent, full));
+            } catch (Exception e) {
+                Log.error(e);
             }
         }
-        return uniqueEvents;
+        return events;
     }
 
     public static List<JHVEvent> getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full) throws Exception {
-        return _getOtherRelations(id, jhvEventType, similartype, full, false);
+        return parseJSON(executor.invokeAndWait(new CollectRelationEvents(id, jhvEventType, similartype)), full);
     }
 
-    // Given an event id and its type, return all related events. If similartype is true, return only related events having the same type.
-    private static List<JHVEvent> _getOtherRelations(int id, SWEKSupplier jhvEventType, boolean similartype, boolean full, boolean is_dbthread) throws Exception {
+    private record CollectRelationEvents(int id, SWEKSupplier type, boolean similarType) implements Callable<List<JsonEvent>> {
+        @Override
+        public List<JsonEvent> call() throws Exception {
+            List<JsonEvent> jsonEvents = collectRelationEvents(id, type, similarType, false);
+            try {
+                JsonEvent ev = event2Program(id);
+                if (ev != null)
+                    jsonEvents.add(ev);
+            } catch (Exception e) {
+                Log.error(e);
+            }
+            return jsonEvents;
+        }
+    }
+
+    private static List<JsonEvent> collectRelationEvents(int id, SWEKSupplier jhvEventType, boolean similartype,
+                                                        boolean failOnError) throws Exception {
         SWEKGroup group = jhvEventType.group();
-        List<JHVEvent> nEvents = new ArrayList<>();
         List<JsonEvent> jsonEvents = new ArrayList<>();
 
         for (SWEK.RelatedEvents re : SWEKCatalog.getRelatedEvents()) {
             if (re.group() == group) {
                 for (SWEK.RelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom();
-                    String w = swon.parameterWith();
-
-                    SWEKGroup reType = re.relatedWith();
-                    for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {
-                        if (similartype == (supplier == jhvEventType)) {
-                            jsonEvents.addAll(is_dbthread
-                                    ? rel2prog(id, jhvEventType, supplier, f, w)
-                                    : relations2Program(id, jhvEventType, supplier, f, w));
-                        }
-                    }
+                    addRelationEvents(jsonEvents, id, jhvEventType, similartype, re.relatedWith(),
+                            swon.parameterFrom(), swon.parameterWith(), true, failOnError);
                 }
             }
 
             if (re.relatedWith() == group) {
                 for (SWEK.RelatedOn swon : re.relatedOnList()) {
-                    String f = swon.parameterFrom();
-                    String w = swon.parameterWith();
-
-                    SWEKGroup reType = re.group();
-                    for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(reType)) {
-                        if (similartype == (supplier == jhvEventType)) {
-                            jsonEvents.addAll(is_dbthread
-                                    ? rel2prog(id, supplier, jhvEventType, f, w)
-                                    : relations2Program(id, supplier, jhvEventType, f, w));
-                        }
-                    }
+                    addRelationEvents(jsonEvents, id, jhvEventType, similartype, re.group(),
+                            swon.parameterFrom(), swon.parameterWith(), false, failOnError);
                 }
             }
+        }
 
-            for (JsonEvent jsonEvent : jsonEvents) {
+        return jsonEvents;
+    }
+
+    private static void addRelationEvents(List<JsonEvent> jsonEvents, int id, SWEKSupplier eventType, boolean similarType,
+                                          SWEKGroup otherGroup, String leftParameter, String rightParameter,
+                                          boolean eventTypeIsLeft, boolean failOnError) throws Exception {
+        for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(otherGroup)) {
+            if (similarType == (supplier == eventType)) {
+                SWEKSupplier leftType = eventTypeIsLeft ? eventType : supplier;
+                SWEKSupplier rightType = eventTypeIsLeft ? supplier : eventType;
                 try {
-                    nEvents.add(parseJSON(jsonEvent, full));
+                    jsonEvents.addAll(queryRelationEvents(id, leftType, rightType, leftParameter, rightParameter));
                 } catch (Exception e) {
+                    if (failOnError)
+                        throw e;
                     Log.error(e);
                 }
             }
-            jsonEvents.clear();
         }
-
-        JsonEvent ev;
-        if (!is_dbthread && (ev = event2Program(id)) != null) {
-            jsonEvents.add(ev);
-            try {
-                nEvents.add(parseJSON(ev, full));
-            } catch (Exception e) {
-                Log.error(e);
-            }
-        }
-
-        return createUniqueList(nEvents);
     }
 
     public static void addDaterange2db(long start, long end, SWEKSupplier type) {
@@ -566,16 +566,7 @@ public class EventDatabase {
         }
     }
 
-    private static List<JsonEvent> relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) {
-        try {
-            return executor.invokeAndWait(new Relations2Program(event_id, type_left, type_right, param_left, param_right));
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return Collections.emptyList();
-    }
-
-    private static List<JsonEvent> rel2prog(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) throws Exception {
+    private static List<JsonEvent> queryRelationEvents(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left, String param_right) throws Exception {
         int type_left_id = getEventTypeId(type_left);
         int type_right_id = getEventTypeId(type_right);
 
@@ -619,41 +610,19 @@ public class EventDatabase {
         return Collections.emptyList();
     }
 
-    private record Relations2Program(int event_id, SWEKSupplier type_left, SWEKSupplier type_right, String param_left,
-                                     String param_right) implements Callable<List<JsonEvent>> {
-        @Override
-        public List<JsonEvent> call() throws Exception {
-            return rel2prog(event_id, type_left, type_right, param_left, param_right);
-        }
-    }
-
-    private record Event2Program(int event_id) implements Callable<JsonEvent> {
-        @Nullable
-        @Override
-        public JsonEvent call() throws Exception {
-            PreparedStatement ps = getPreparedStatement(SELECT_EVENT_BY_ID);
-            ps.setLong(1, event_id);
-
-            JsonEvent je = null;
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int id = rs.getInt(1);
-                    long start = rs.getLong(2);
-                    long end = rs.getLong(3);
-                    byte[] json = rs.getBytes(4);
-                    je = new JsonEvent(json, SWEKCatalog.getSupplier(rs.getString(5)), id, start, end);
-                }
-            }
-            return je;
-        }
-    }
-
     @Nullable
-    private static JsonEvent event2Program(int event_id) {
-        try {
-            return executor.invokeAndWait(new Event2Program(event_id));
-        } catch (Exception e) {
-            Log.error(e);
+    private static JsonEvent event2Program(int event_id) throws Exception {
+        PreparedStatement ps = getPreparedStatement(SELECT_EVENT_BY_ID);
+        ps.setLong(1, event_id);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                int id = rs.getInt(1);
+                long start = rs.getLong(2);
+                long end = rs.getLong(3);
+                byte[] json = rs.getBytes(4);
+                return new JsonEvent(json, SWEKCatalog.getSupplier(rs.getString(5)), id, start, end);
+            }
         }
         return null;
     }
