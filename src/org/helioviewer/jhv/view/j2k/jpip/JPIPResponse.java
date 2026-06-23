@@ -134,14 +134,13 @@ public class JPIPResponse {
         return seg;
     }
 
-    void readSegments(InputStream in, int frame, JPIPCache cache, JPIPCacheManager.Writer writer) throws KduException, IOException {
+    void readSegments(InputStream in, JPIPCache cache, int frame) throws KduException, IOException {
         JPIPSegment seg;
         while ((seg = readSegment(in)) != null) {
             if (seg.isEOR) {
                 status = seg.binID;
             } else if (seg.isFinal || seg.length > 0) { // avoid pointless segments
                 cache.put(frame, seg);
-                writer.write(seg);
             }
         }
     }

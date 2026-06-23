@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.Nullable;
 
 import kdu_jni.KduException;
 import kdu_jni.Kdu_cache;
@@ -15,11 +14,7 @@ public class JPIPCache extends Kdu_cache {
         return complete[0];
     }
 
-    void put(int frame, JPIPSegment seg) throws KduException {
-        Add_to_databin(seg.klassID, frame, seg.binID, seg.data, seg.offset, seg.length, seg.isFinal, true, false);
-    }
-
-    List<JPIPSegment> scan(int frame) throws KduException {
+    private JPIPStream scan(int frame) throws KduException {
         int flags = Kdu_global.KDU_CACHE_SCAN_START | Kdu_global.KDU_CACHE_SCAN_FIX_CODESTREAM;
         int[] klassID = new int[1];
         long[] codestreamID = {frame};
@@ -27,25 +22,45 @@ public class JPIPCache extends Kdu_cache {
         int[] binLen = new int[1];
         boolean[] complete = new boolean[1];
 
-        List<JPIPSegment> segments = new ArrayList<>();
-        while (Scan_databins(flags, klassID, codestreamID, binID, binLen, complete)) {
-            flags &= ~Kdu_global.KDU_CACHE_SCAN_START;
+        JPIPStream stream = new JPIPStream();
+        while (Scan_databins(flags, klassID, codestreamID, binID, binLen, complete, null, 0)) {
             if (klassID[0] == Constants.KDU.META_DATABIN)
                 continue;
 
+            flags &= ~Kdu_global.KDU_CACHE_SCAN_START;
             byte[] data = new byte[binLen[0]];
-            if (!Scan_databins(flags | Kdu_global.KDU_CACHE_SCAN_NO_ADVANCE, klassID, codestreamID, binID, binLen, complete, data, data.length))
+            if (!Scan_databins(flags | Kdu_global.KDU_CACHE_SCAN_NO_ADVANCE, klassID, codestreamID, binID, binLen, complete, data, binLen[0]))
                 break;
 
             JPIPSegment seg = new JPIPSegment();
             seg.binID = binID[0];
             seg.klassID = klassID[0];
+            seg.codestreamID = codestreamID[0];
             seg.length = binLen[0];
             seg.data = data;
             seg.isFinal = complete[0];
-            segments.add(seg);
+            stream.segments.add(seg);
         }
-        return segments;
+        return stream;
+    }
+
+    void put(int frame, JPIPSegment seg) throws KduException {
+        Add_to_databin(seg.klassID, frame, seg.binID, seg.data, seg.offset, seg.length, seg.isFinal, true, false);
+    }
+
+    public void put(int frame, JPIPStream stream) throws KduException {
+        for (JPIPSegment seg : stream.segments)
+            put(frame, seg);
+    }
+
+    @Nullable
+    public JPIPStream get(int frame) {
+        try {
+            return scan(frame);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

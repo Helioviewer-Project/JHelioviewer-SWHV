@@ -10,6 +10,7 @@ import org.helioviewer.jhv.view.j2k.jpip.JPIPCache;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPCacheManager;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPResponse;
 import org.helioviewer.jhv.view.j2k.jpip.JPIPSocket;
+import org.helioviewer.jhv.view.j2k.jpip.JPIPStream;
 
 import kdu_jni.KduException;
 
@@ -94,16 +95,18 @@ class J2KReader implements Runnable {
     private boolean readStep(J2KSource.Remote source, String query, String key, int level, int frame) throws KduException, IOException {
         try (J2KSource.Use ignored = source.use()) {
             JPIPCache cache = source.cache();
-            if (key != null && JPIPCacheManager.restore(key, level, cache, frame))
-                return true;
-
-            try (JPIPCacheManager.Writer writer = JPIPCacheManager.writer(key, level, cache, frame)) {
-                JPIPResponse res = socket.request(query, frame, cache, writer);
-                boolean complete = res.isResponseComplete();
-                if (complete)
-                    writer.commit();
-                return complete;
+            JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
+            if (stream == null) {
+                JPIPResponse res = socket.request(query, cache, frame);
+                if (res.isResponseComplete()) {
+                    if (key != null && (stream = cache.get(frame)) != null)
+                        JPIPCacheManager.put(key, level, stream);
+                    return true;
+                }
+                return false;
             }
+            cache.put(frame, stream);
+            return true;
         }
     }
 
@@ -177,7 +180,7 @@ class J2KReader implements Runnable {
                         stepQueries[currentStep] = null;
 
                         source.setFrameComplete(currentStep, level);
-                        if (currentStep == frame)
+                        if (singleFrame)
                             view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
                     } else {
                         source.setFramePartial(currentStep);

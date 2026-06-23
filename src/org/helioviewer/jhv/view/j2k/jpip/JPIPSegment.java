@@ -1,10 +1,16 @@
 package org.helioviewer.jhv.view.j2k.jpip;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 // The class JPIPSegment is used to construct objects to store
 // segments of JPIP data. These segments can be data-bin segments as well as EOR
 // messages. In this last case, the EOR code is stored in the 'id'
 // field and the EOR message body is stored in the 'data' field.
-class JPIPSegment {
+class JPIPSegment implements Serializable {
+
+    @Serial
+    static final long serialVersionUID = 42L;
 
     // The data-bin in-class identifier
     long binID;
