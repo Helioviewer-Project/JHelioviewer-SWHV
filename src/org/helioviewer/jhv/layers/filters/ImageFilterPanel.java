@@ -3,13 +3,19 @@ package org.helioviewer.jhv.layers.filters;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.JHVSlider;
 import org.helioviewer.jhv.image.ImageFilter;
@@ -61,8 +67,40 @@ public class ImageFilterPanel implements FilterDetails {
         enhanceButton.setAlwaysDropdown(true);
         enhanceButton.add(enhancePanel);
 
-        // Disk imagers render flat automatically in a disk projection (see ImageLayer.render
-        // and ImageLayers.isDiskImager); no manual toggle needed.
+        // Disk imagers render flat by default in a disk projection (see ImageLayer.render and
+        // ImageLayers.isDiskImager). This toggle overrides that and applies the radial warp anyway.
+        // The icon itself shows the state: concentric rings = warp applied, single circle = held flat.
+        JToggleButton radialButton = new JToggleButton(layer.getDiskScaling() ? Buttons.radialScale : Buttons.radialScaleOff, layer.getDiskScaling());
+        radialButton.setMargin(new Insets(0, 4, 0, 4));
+        radialButton.setToolTipText("Disk radial scaling for this disk imager — circle = radial warp applied, rectangle = held flat (the default). Turn on to make an off-disk-masked disk imager a virtual coronagraph");
+        radialButton.addActionListener(e -> {
+            boolean on = radialButton.isSelected();
+            radialButton.setText(on ? Buttons.radialScale : Buttons.radialScaleOff);
+            layer.setDiskScaling(on);
+            DisplayController.display();
+        });
+        // Only meaningful for a disk imager in the PowerDisk projection; grey out otherwise. Track
+        // projection changes only while the button is on screen, so the listener is not leaked.
+        Runnable updateRadialEnabled = () -> radialButton.setEnabled(layer.isDiskImager() && ViewState.getProjection() == MapMode.PowerDisk);
+        updateRadialEnabled.run();
+        ViewState.ModeListener radialModeListener = updateRadialEnabled::run;
+        radialButton.addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent e) {
+                ViewState.addModeListener(radialModeListener);
+                updateRadialEnabled.run();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent e) {
+                ViewState.removeModeListener(radialModeListener);
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent e) {
+            }
+        });
+        buttonPanel.add(radialButton, BorderLayout.LINE_START);
         buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
     }
 
