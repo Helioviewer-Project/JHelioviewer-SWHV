@@ -36,7 +36,7 @@ public final class JPIPSocket extends HTTPSocket {
         try {
             jpipPath = uri.getPath();
 
-            JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), 0, cache, JPIPCacheManager.NOOP_WRITER); // deliberately short
+            JPIPResponse res = request(createQuery(512, "cnew", "http", "type", "jpp-stream", "tid", "0"), cache, 0); // deliberately short
             String cnew = res.getCNew();
             if (cnew == null)
                 throw new IOException("The header 'JPIP-cnew' was not sent by the server");
@@ -94,17 +94,16 @@ public final class JPIPSocket extends HTTPSocket {
     }
 
     public void init(JPIPCache cache) throws KduException, IOException {
-        JPIPCacheManager.Writer writer = JPIPCacheManager.NOOP_WRITER;
         JPIPResponse res;
         String req = createQuery(META_REQUEST_LEN, "stream", "0", "metareq", "[*]!!");
         do {
-            res = request(req, 0, cache, writer);
+            res = request(req, cache, 0);
         } while (!res.isResponseComplete());
 
         // prime first image
         req = createLayerQuery(0, "64,64");
         do {
-            res = request(req, 0, cache, writer);
+            res = request(req, cache, 0);
         } while (!res.isResponseComplete() && !cache.isDataBinCompleted(mainHeaderKlass, 0, 0));
     }
 
@@ -115,7 +114,7 @@ public final class JPIPSocket extends HTTPSocket {
         write("GET " + jpipPath + '?' + queryStr + httpHeader);
     }
 
-    public JPIPResponse request(String queryStr, int frame, JPIPCache cache, JPIPCacheManager.Writer writer) throws KduException, IOException {
+    public JPIPResponse request(String queryStr, JPIPCache cache, int frame) throws KduException, IOException {
         writeRequest(queryStr);
 
         Map<String, String> header = readHeader();
@@ -124,7 +123,7 @@ public final class JPIPSocket extends HTTPSocket {
 
         JPIPResponse jpipRes = new JPIPResponse(header.get("JPIP-cnew"));
         try (InputStream in = getInputStream(header)) {
-            jpipRes.readSegments(in, frame, cache, writer);
+            jpipRes.readSegments(in, cache, frame);
         }
 
         if ("close".equals(header.get("Connection"))) {
