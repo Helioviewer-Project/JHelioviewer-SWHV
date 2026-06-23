@@ -389,8 +389,8 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private JPanel createDiskRangePanel() {
         int max = diskRangeMaxTicks();
         boolean fit = Display.getDiskRMax() <= 0;
-        int lo = Math.min((int) Math.round(Display.getDiskRMin() * 10), max);
-        int hi = fit ? max : Math.min((int) Math.round(Display.getDiskRMax() * 10), max);
+        int lo = Math.min((int) Math.round(Display.getDiskRMin() * 100), max);
+        int hi = fit ? max : Math.min((int) Math.round(Display.getDiskRMax() * 100), max);
         diskRangeSlider = new JHVRangeSlider(0, max, lo, hi);
         diskRangeSlider.setToolTipText("Disk radial range shown in R☉ (outer at the maximum fits the loaded layers)");
         diskRangeSlider.setPreferredSize(new Dimension(110, diskRangeSlider.getPreferredSize().height));
@@ -399,7 +399,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         diskRangeSlider.addChangeListener(e -> {
             int l = diskRangeSlider.getLowValue();
             int h = diskRangeSlider.getHighValue();
-            Display.setDiskRange(l / 10., h >= diskRangeSlider.getMaximum() ? 0 : h / 10.); // max = fit
+            Display.setDiskRange(l / 100., h >= diskRangeSlider.getMaximum() ? 0 : h / 100.); // max = fit
             value.setText(diskRangeLabel(l, h, diskRangeSlider.getMaximum()));
             DisplayController.display();
         });
@@ -412,7 +412,9 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     }
 
     private static int diskRangeMaxTicks() {
-        return Math.clamp((int) Math.ceil(ImageLayers.getLargestDiskRadius() * 10), 10, 5120);
+        // 0.01 R☉ per tick (100 ticks/R☉) so the sub-1-R☉ range stays finely settable; max tracks
+        // the loaded layers' extent, clamped to [1, 64] R☉ (matches Display.setDiskRange).
+        return Math.clamp((int) Math.ceil(ImageLayers.getLargestDiskRadius() * 100), 100, 6400);
     }
 
     // Grow/shrink the range slider to the loaded layers' extent; an outer handle that was
@@ -431,8 +433,8 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     }
 
     private static String diskRangeLabel(int lo, int hi, int max) {
-        String top = hi >= max ? "fit" : String.format("%.1f", hi / 10.);
-        return String.format("r %.1f–%s", lo / 10., top);
+        String top = hi >= max ? "fit" : String.format("%.2f", hi / 100.);
+        return String.format("r %.2f–%s", lo / 100., top);
     }
 
     private static JPanel createAnnotationThicknessPanel() {
