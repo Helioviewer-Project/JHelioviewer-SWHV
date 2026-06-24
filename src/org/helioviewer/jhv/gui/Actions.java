@@ -22,6 +22,7 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.dialog.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialog.NewVersionDialog;
 import org.helioviewer.jhv.gui.dialog.ObservationDialog;
+import org.helioviewer.jhv.gui.dialog.PunchDialog;
 import org.helioviewer.jhv.gui.dialog.SoarDialog;
 import org.helioviewer.jhv.gui.dialog.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
@@ -112,6 +113,17 @@ public final class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             SynopticDialog.getInstance().showDialog();
+        }
+    }
+
+    public static class NewPunchLayer extends AbstractAction {
+        public NewPunchLayer() {
+            super("New PUNCH Layer...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            PunchDialog.getInstance().showDialog();
         }
     }
 
