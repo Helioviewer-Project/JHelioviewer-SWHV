@@ -40,7 +40,6 @@ import org.json.JSONObject;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
-import com.jidesoft.swing.SearchableUtils;
 
 @SuppressWarnings("serial")
 public class SynopticDialog extends StandardDialog {
@@ -190,7 +189,7 @@ public class SynopticDialog extends StandardDialog {
                 return label;
             }
         });
-        SearchableUtils.installSearchable(listPane);
+        com.jidesoft.swing.SearchableUtils.installSearchable(listPane);
         JScrollPane scrollPane = new JScrollPane(listPane);
         scrollPane.setPreferredSize(resultSize);
 
