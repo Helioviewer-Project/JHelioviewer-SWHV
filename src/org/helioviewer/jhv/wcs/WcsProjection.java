@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.wcs;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
@@ -17,6 +19,15 @@ public final class WcsProjection {
         double planeX = (vz * crota.y - vy * crota.z) * 2 + x;
         double planeY = (vx * crota.z - vz * crota.x) * 2 + y;
         return inverseWcsPlaneToHelioprojective(wcsHeader, planeX, planeY);
+    }
+
+    @Nullable
+    public static Vec2 helioprojectiveToPlane(WcsHeader wcsHeader, double longitude, double latitude) {
+        Vec2 plane = helioprojectiveToWcsPlane(wcsHeader, longitude, latitude);
+        if (plane == null)
+            return null;
+        Vec3 rotated = wcsHeader.crota.rotateInverseVector(new Vec3(plane.x, plane.y, 0));
+        return new Vec2(rotated.x, rotated.y);
     }
 
     public static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {
@@ -54,6 +65,84 @@ public final class WcsProjection {
         if (wcsHeader.projection == WcsHeader.Projection.ZPN)
             return inverseZpnToHelioprojective(wcsHeader, planeX, planeY);
         return inverseTanToHelioprojective(wcsHeader, planeX, planeY);
+    }
+
+    @Nullable
+    private static Vec2 helioprojectiveToWcsPlane(WcsHeader wcsHeader, double longitude, double latitude) {
+        double dphi = longitude - wcsHeader.phi0;
+        double sinLat = Math.sin(latitude);
+        double cosLat = Math.cos(latitude);
+        double sinDphi = Math.sin(dphi);
+        double cosDphi = Math.cos(dphi);
+        double nativeX = cosLat * sinDphi;
+        double nativeY = sinLat * wcsHeader.cosTheta0 - cosLat * wcsHeader.sinTheta0 * cosDphi;
+        double cosNativeDistance = sinLat * wcsHeader.sinTheta0 + cosLat * wcsHeader.cosTheta0 * cosDphi;
+        return nativeToWcsPlane(wcsHeader, nativeX, nativeY, cosNativeDistance);
+    }
+
+    @Nullable
+    private static Vec2 nativeToWcsPlane(WcsHeader wcsHeader, double nativeX, double nativeY, double cosNativeDistance) {
+        if (wcsHeader.projection == WcsHeader.Projection.ARC)
+            return nativeToArc(wcsHeader, nativeX, nativeY, cosNativeDistance);
+        if (wcsHeader.projection == WcsHeader.Projection.AZP)
+            return nativeToAzp(wcsHeader, nativeX, nativeY, cosNativeDistance);
+        if (wcsHeader.projection == WcsHeader.Projection.ZPN)
+            return nativeToZpn(wcsHeader, nativeX, nativeY, cosNativeDistance);
+        return nativeToTan(wcsHeader, nativeX, nativeY, cosNativeDistance);
+    }
+
+    @Nullable
+    private static Vec2 nativeToTan(WcsHeader wcsHeader, double nativeX, double nativeY, double cosNativeDistance) {
+        if (cosNativeDistance <= 0)
+            return null;
+        return new Vec2(
+                wcsHeader.unitsPerRad * nativeX / cosNativeDistance,
+                wcsHeader.unitsPerRad * nativeY / cosNativeDistance);
+    }
+
+    private static Vec2 nativeToArc(WcsHeader wcsHeader, double nativeX, double nativeY, double cosNativeDistance) {
+        double nativeRadius = Math.hypot(nativeX, nativeY);
+        if (nativeRadius == 0)
+            return new Vec2(0, 0);
+
+        double nativeDistance = Math.atan2(nativeRadius, cosNativeDistance);
+        double radial = wcsHeader.unitsPerRad * nativeDistance;
+        return new Vec2(radial * nativeX / nativeRadius, radial * nativeY / nativeRadius);
+    }
+
+    @Nullable
+    private static Vec2 nativeToAzp(WcsHeader wcsHeader, double nativeX, double nativeY, double cosNativeDistance) {
+        double nativeRadius = Math.hypot(nativeX, nativeY);
+        if (nativeRadius == 0)
+            return new Vec2(0, 0);
+
+        double mu = wcsHeader.azpMu;
+        if (wcsHeader.azpSinGamma == 0 && mu > 1 && mu * cosNativeDistance + 1 <= 0)
+            return null;
+
+        double denom = wcsHeader.azpCosGamma * (wcsHeader.azpMu + cosNativeDistance) - nativeY * wcsHeader.azpSinGamma;
+        if (denom <= 0)
+            return null;
+
+        double scale = wcsHeader.unitsPerRad * wcsHeader.azpMuPlus1 / denom;
+        return new Vec2(wcsHeader.azpCosGamma * nativeX * scale, nativeY * scale);
+    }
+
+    @Nullable
+    private static Vec2 nativeToZpn(WcsHeader wcsHeader, double nativeX, double nativeY, double cosNativeDistance) {
+        double nativeRadius = Math.hypot(nativeX, nativeY);
+        if (nativeRadius == 0)
+            return new Vec2(0, 0);
+
+        double nativeDistance = Math.atan2(nativeRadius, cosNativeDistance);
+        if (nativeDistance > wcsHeader.zpnUpperEta)
+            return null;
+
+        double radial = wcsHeader.unitsPerRad * zpnRadial(wcsHeader.pv2, nativeDistance);
+        if (radial < 0)
+            return null;
+
+        return new Vec2(radial * nativeX / nativeRadius, radial * nativeY / nativeRadius);
     }
 
     private static Vec2 inverseTanToHelioprojective(WcsHeader wcsHeader, double planeX, double planeY) {
