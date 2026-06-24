@@ -3,7 +3,6 @@ package org.helioviewer.jhv.layers.grid;
 import java.util.Arrays;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
@@ -17,7 +16,6 @@ import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 // isotropic disk world coordinates (center at the origin, rim at radius 0.5)
 public final class DiskGrid {
 
-    private static final int TEXT_SIZE = 22;
     private static final int SUBDIVISIONS = 180;
     private static final int MAX_RINGS = 16;
     private static final double MIN_RING_SPACING = 0.04; // fraction of the disk radius
@@ -35,13 +33,13 @@ public final class DiskGrid {
 
     // spokeStep is the angular spacing of the radial spokes in degrees (the grid layer's
     // longitude step; the latitude/coordinate-system controls do not map to a radial grid).
-    public void render(MapView mv, Viewport vp, boolean showLabels, double spokeStep, byte[] color, double lineScale, double labelAlpha) {
+    public void render(MapView mv, Viewport vp, boolean showLabels, double spokeStep, byte[] color, double lineScale, double labelAlpha, double labelSize, double labelAngle) {
         MapScale scale = mv.scale(vp);
         double[] rings = chooseRings(scale);
         updateLine(scale, rings, spokeStep, color);
         line.renderLine(vp, GridMath.LINEWIDTH * lineScale);
         if (showLabels)
-            drawLabels(mv, vp, scale, rings, labelAlpha);
+            drawLabels(mv, vp, scale, rings, labelAlpha, labelSize, labelAngle);
     }
 
     // Ring radii at 1-2-5 decade steps within the radial range, decimated for legibility
@@ -103,21 +101,31 @@ public final class DiskGrid {
         line.setVertex(vexBuf);
     }
 
-    private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings, double labelAlpha) {
+    private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings, double labelAlpha, double labelSize, double labelAngle) {
         SdfTextRenderer renderer = GLText.renderer();
-        // Scale to the camera width (not min(width, 1)) so the labels keep a constant on-screen
-        // size at any zoom; the disk view normally spans several R_sun, where the cap shrank them.
+        // Size the labels as a fraction of the camera FOV (world units), not a fixed pixel count:
+        // this keeps a constant on-screen size at any zoom AND makes the size invariant to the
+        // render resolution, so exporting a movie at a higher resolution keeps the same relative
+        // label size (the old pixel-based form scaled by the screen's stale pixelScale / vp.height).
+        // labelSize reads as ~pixels per 1000 px of frame width.
         double width = mv.cameraWidth(vp);
-        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * width / vp.height;
+        double worldTextHeight = labelSize * width / 1000.;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
+
+        // Place the label column along a spoke at labelAngle (clockwise from straight up); the text
+        // stays upright. labelAngle = 0 reproduces the original vertical column up the +y axis.
+        double th = Math.toRadians(labelAngle);
+        double sin = Math.sin(th);
+        double cos = Math.cos(th);
 
         // White labels at the label opacity (premultiplied)
         float a = (float) labelAlpha;
         renderer.setColor(new float[]{a, a, a, a});
         renderer.begin3DRendering();
         for (double r : rings) {
-            renderer.draw(FastFormat.rounded2(r), labelOffset, ringRho(scale, r) + labelOffset, 0, textScaleFactor);
+            double rho = ringRho(scale, r);
+            renderer.draw(FastFormat.rounded2(r), (float) (sin * rho + labelOffset), (float) (cos * rho + labelOffset), 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }

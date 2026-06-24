@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers.grid;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
@@ -37,7 +36,7 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(MapView mv, Viewport vp, boolean showLabels, byte[] color, double lineScale, double labelAlpha) {
+    public void render(MapView mv, Viewport vp, boolean showLabels, byte[] color, double lineScale, double labelAlpha, double labelSize) {
         double width = mv.cameraWidth(vp);
         MapScale scale = mv.scale(vp);
         double xCenter = 0.5 - mv.cameraTranslationX() / vp.aspect;
@@ -54,13 +53,16 @@ public class FlatGrid {
         updateShape(xAxis, yAxis, mv, vp, width, color, lineScale);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(xAxis, yAxis, mv, vp, width, labelAlpha);
+            drawLabels(xAxis, yAxis, mv, vp, width, labelAlpha, labelSize);
     }
 
-    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, double labelAlpha) {
+    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, double labelAlpha, double labelSize) {
         SdfTextRenderer renderer = GLText.renderer();
-        //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
-        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
+        // Size as a fraction of the (capped) camera FOV, not a pixel count, so the labels are
+        // invariant to the render resolution (export at a higher resolution keeps the same relative
+        // size). labelSize is the grid layer's label-size slider; the min(width, 1) cap keeps the
+        // labels from growing without bound when zoomed out.
+        double worldTextHeight = labelSize * Math.min(width, 1) / 1000.;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
 
