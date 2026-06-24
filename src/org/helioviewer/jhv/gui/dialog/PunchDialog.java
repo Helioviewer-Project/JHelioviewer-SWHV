@@ -24,10 +24,7 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
-import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.PunchClient;
-import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -67,12 +64,12 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
 
     private static final Cadence[] Cadences = {
             new Cadence("native cadence", 0),
-            new Cadence("every 10 minutes", 10 * 60_000L),
-            new Cadence("every 30 minutes", 30 * 60_000L),
-            new Cadence("every hour", 3600_000L),
-            new Cadence("every 3 hours", 3 * 3600_000L),
-            new Cadence("every 6 hours", 6 * 3600_000L),
-            new Cadence("every day", 24 * 3600_000L)};
+            new Cadence("every 10 minutes", 10 * TimeUtils.MINUTE_IN_MILLIS),
+            new Cadence("every 30 minutes", 30 * TimeUtils.MINUTE_IN_MILLIS),
+            new Cadence("every hour", 60 * TimeUtils.MINUTE_IN_MILLIS),
+            new Cadence("every 3 hours", 3 * 60 * TimeUtils.MINUTE_IN_MILLIS),
+            new Cadence("every 6 hours", 6 * 60 * TimeUtils.MINUTE_IN_MILLIS),
+            new Cadence("every day", TimeUtils.DAY_IN_MILLIS)};
 
     private final JComboBox<String> levelCombo = new JComboBox<>(Level);
     private final JComboBox<String> productCombo = new JComboBox<>();
@@ -242,20 +239,9 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         if (!productsDownloaded && levelCombo.getSelectedItem() instanceof String level)
             PunchClient.submitGetProducts(this, level);
 
-        // Inherit the main-window time range so the user does not retype it: prefer the
-        // active image layer's request range (what the main New Layer dialog shows), and
-        // fall back to the movie span. If nothing is loaded, the time selector defaults to
-        // "now", which is past the public archive's coverage for PUNCH; the coverage probe
-        // below fixes that by setting the range to the archive's latest day.
         long start = Player.getStartTime();
         long end = Player.getEndTime();
-        ImageLayer active = Layers.getActiveImageLayer();
-        APIRequest req;
-        if (active != null && (req = active.getView().getAPIRequest()) != null) {
-            start = req.startTime();
-            end = req.endTime();
-        }
-        if (start > TimeUtils.START.milli && end > start) {
+        if (timeSelectorPanel.getStartTime() != start || timeSelectorPanel.getEndTime() != end) {
             timeSelectorPanel.setTime(start, end);
             rangeUserChanged = true; // honor the range even if coverage comes back later
         }
@@ -301,7 +287,7 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
             coverageLabel.setText("Archive: no data for this product");
             return;
         }
-        coverageLabel.setText("Archive: latest day available is " + TimeUtils.format(latestDayMilli).substring(0, 10));
+        coverageLabel.setText("Archive: latest day available is " + TimeUtils.formatDate(latestDayMilli));
         if (!rangeUserChanged) {
             // Default to the latest archived day (00:00 -> 24:00 UTC). The user can edit
             // and the next probe will not overwrite their choice.
