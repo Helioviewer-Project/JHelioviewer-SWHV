@@ -37,8 +37,8 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public class PunchDialog extends StandardDialog implements PunchClient.ReceiverItems, PunchClient.ReceiverProducts, PunchClient.ReceiverCoverage {
 
-    // Generous cap with a confirmation prompt past CONFIRM_FILES; downloads happen
-    // serially under Commands.loadImage, so the layer is usable as frames stream in
+    // Generous cap with a confirmation prompt past CONFIRM_FILES; multi-URI image
+    // loads can resolve files concurrently, so very large selections need a hard limit
     private static final int MAX_FILES = 5000;
     private static final int CONFIRM_FILES = 200;
     private static final Dimension resultSize = new Dimension(500, 350);
@@ -81,9 +81,11 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
     private final JList<PunchClient.DataItem> listPane = new JList<>();
     private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
     private final JLabel coverageLabel = new JLabel(" ", JLabel.LEFT);
+    private final JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
 
     private boolean productsDownloaded;
     private boolean rangeUserChanged; // true once the user has explicitly set a range
+    private boolean updatingProducts;
 
     private static PunchDialog instance;
 
@@ -131,7 +133,7 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
             }
             if (items.size() > CONFIRM_FILES) {
                 int choice = JOptionPane.showConfirmDialog(this,
-                        String.format("This will download %d native-resolution FITS files (typically a few MB each).%nThey are fetched one after the other so the layer is usable as frames stream in.%nProceed?", items.size()),
+                        String.format("This will download %d native-resolution FITS files (typically a few MB each).%nSeveral files may be fetched in parallel.%nProceed?", items.size()),
                         "Large PUNCH download", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (choice != JOptionPane.OK_OPTION)
                     return;
@@ -153,18 +155,32 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         dataSelector.add(searchButton);
 
         levelCombo.addActionListener(e -> {
-            if (levelCombo.getSelectedItem() instanceof String level)
+            if (levelCombo.getSelectedItem() instanceof String level) {
+                clearResults();
+                coverageLabel.setText("Checking products...");
+                updatingProducts = true;
+                try {
+                    productCombo.setModel(new DefaultComboBoxModel<>());
+                } finally {
+                    updatingProducts = false;
+                }
+                productsDownloaded = false;
                 PunchClient.submitGetProducts(this, level);
+            }
         });
         productCombo.addActionListener(e -> {
-            if (productCombo.getSelectedItem() instanceof String product)
+            if (!updatingProducts && productCombo.getSelectedItem() instanceof String product) {
+                clearResults();
                 productCombo.setToolTipText(ProductInfo.getOrDefault(product, "PUNCH data product"));
+                coverageLabel.setText("Checking archive coverage...");
+                if (levelCombo.getSelectedItem() instanceof String level)
+                    PunchClient.submitGetCoverage(this, level, product);
+            }
         });
 
         JPanel foundPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
         foundPanel.add(foundLabel);
         JPanel selectedPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 5, 0));
-        JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
         selectedPanel.add(selectedLabel);
 
         listPane.addListSelectionListener(e -> {
@@ -177,7 +193,10 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
 
         // Any explicit edit to the time fields counts as "user-set", so we stop
         // overwriting on the next coverage probe
-        timeSelectorPanel.addListener((start, end) -> rangeUserChanged = true);
+        timeSelectorPanel.addListener((start, end) -> {
+            rangeUserChanged = true;
+            clearResults();
+        });
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
@@ -199,11 +218,18 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         searchButton.addActionListener(e -> {
             if (levelCombo.getSelectedItem() instanceof String level && productCombo.getSelectedItem() instanceof String product &&
                     cadenceCombo.getSelectedItem() instanceof Cadence cadence) {
+                clearResults();
                 PunchClient.submitSearchTime(this, level, product, timeSelectorPanel.getStartTime(), timeSelectorPanel.getEndTime(), cadence.milli);
                 foundLabel.setText("Searching...");
             }
         });
         return searchButton;
+    }
+
+    private void clearResults() {
+        listPane.setListData(new PunchClient.DataItem[0]);
+        foundLabel.setText("0 found");
+        selectedLabel.setText("0 selected");
     }
 
     @Nullable
@@ -233,10 +259,6 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
             timeSelectorPanel.setTime(start, end);
             rangeUserChanged = true; // honor the range even if coverage comes back later
         }
-        coverageLabel.setText("Checking archive coverage...");
-        if (levelCombo.getSelectedItem() instanceof String level && productCombo.getSelectedItem() instanceof String product)
-            PunchClient.submitGetCoverage(this, level, product);
-
         pack();
         setLocationRelativeTo(MainFrame.get());
         setVisible(true);
@@ -252,15 +274,25 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
 
     @Override
     public void setPunchResponseProducts(List<String> list) {
-        productCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
-        productsDownloaded = true; // mark loaded only after successful callback
-        if (list.contains("CAM"))
-            productCombo.setSelectedItem("CAM");
-        else if (!list.isEmpty())
-            productCombo.setSelectedIndex(0);
-        // Now that we know the product, kick off the coverage probe
-        if (levelCombo.getSelectedItem() instanceof String level && productCombo.getSelectedItem() instanceof String product)
-            PunchClient.submitGetCoverage(this, level, product);
+        updatingProducts = true;
+        try {
+            productCombo.setModel(new DefaultComboBoxModel<>(list.toArray(String[]::new)));
+            productsDownloaded = true; // mark loaded only after successful callback
+            if (list.contains("CAM"))
+                productCombo.setSelectedItem("CAM");
+            else if (!list.isEmpty())
+                productCombo.setSelectedIndex(0);
+        } finally {
+            updatingProducts = false;
+        }
+        if (productCombo.getSelectedItem() instanceof String product) {
+            productCombo.setToolTipText(ProductInfo.getOrDefault(product, "PUNCH data product"));
+            coverageLabel.setText("Checking archive coverage...");
+            if (levelCombo.getSelectedItem() instanceof String level)
+                PunchClient.submitGetCoverage(this, level, product);
+        } else {
+            coverageLabel.setText("Archive: no products for this level");
+        }
     }
 
     @Override
