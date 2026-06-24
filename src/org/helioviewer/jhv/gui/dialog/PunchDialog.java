@@ -23,9 +23,9 @@ import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.PunchClient;
-import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -77,7 +77,7 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final JList<PunchClient.DataItem> listPane = new JList<>();
     private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
-    private final JLabel coverageLabel = new JLabel(" ", JLabel.LEFT);
+    private final HTMLPane coverageLabel = new HTMLPane();
     private final JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
 
     private boolean productsDownloaded;
@@ -239,12 +239,6 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         if (!productsDownloaded && levelCombo.getSelectedItem() instanceof String level)
             PunchClient.submitGetProducts(this, level);
 
-        long start = Player.getStartTime();
-        long end = Player.getEndTime();
-        if (timeSelectorPanel.getStartTime() != start || timeSelectorPanel.getEndTime() != end) {
-            timeSelectorPanel.setTime(start, end);
-            rangeUserChanged = true; // honor the range even if coverage comes back later
-        }
         pack();
         setLocationRelativeTo(MainFrame.get());
         setVisible(true);
