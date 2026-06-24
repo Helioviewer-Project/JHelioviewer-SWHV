@@ -24,7 +24,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 public final class PunchClient {
 
     private static final String BASE_URL = "https://umbra.nascom.nasa.gov/punch";
-    private static final Pattern FILE_PATTERN = Pattern.compile("PUNCH_L[0-9A-Z]_[A-Z0-9]{3}_(\\d{14})_v[0-9A-Za-z]+\\.fits");
+    private static final Pattern FILE_PATTERN = Pattern.compile("href=\"(PUNCH_L[0-9A-Z]_[A-Z0-9]{3}_(\\d{14})_v[0-9A-Za-z]+\\.fits)\"");
     private static final Pattern DIR_PATTERN = Pattern.compile("href=\"([A-Z0-9]{2,4})/\"");
     private static final Pattern NUM_DIR_PATTERN = Pattern.compile("href=\"(\\d{2,4})/\"");
     private static final DateTimeFormatter FILE_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -69,7 +69,10 @@ public final class PunchClient {
         try (NetClient nc = NetClient.of(new URI(url), true, NetClient.NetCache.NETWORK)) {
             boolean ok = nc.isSuccessful();
             String body = ok ? nc.getSource().readUtf8() : null;
-            Log.info("PUNCH " + url + " -> " + (ok ? body.length() + " bytes" : "not ok"));
+            // Log.info("PUNCH " + url + " -> " + (ok ? body.length() + " bytes" : "not ok"));
+            if (!ok)
+                Log.info("PUNCH " + url + " -> not ok");
+
             return body;
         }
     }
@@ -119,7 +122,8 @@ public final class PunchClient {
         }
     }
 
-    private record QueryItems(String level, String product, long start, long end, long cadence) implements Callable<List<DataItem>> {
+    private record QueryItems(String level, String product, long start, long end,
+                              long cadence) implements Callable<List<DataItem>> {
         @Override
         public List<DataItem> call() throws Exception {
             // Newer versions of the same timestamp overwrite older ones (index is name-sorted)
@@ -151,8 +155,8 @@ public final class PunchClient {
             int matched = 0;
             Matcher m = FILE_PATTERN.matcher(html);
             while (m.find()) {
-                String file = m.group();
-                long milli = LocalDateTime.parse(m.group(1), FILE_TIME).toInstant(ZoneOffset.UTC).toEpochMilli();
+                String file = m.group(1);
+                long milli = LocalDateTime.parse(m.group(2), FILE_TIME).toInstant(ZoneOffset.UTC).toEpochMilli();
                 found.put(milli, new DataItem(file, URI.create(dirUrl + file), milli));
                 matched++;
             }
