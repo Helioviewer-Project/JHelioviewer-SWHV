@@ -37,6 +37,7 @@ final class GridLayerOptions extends JPanel {
     // no meaning there (Longitude maps to the spoke spacing, so it stays enabled), so they are
     // greyed out while a disk projection is active.
     private final JComponent[] nonDiskControls;
+    private final JComponent[] diskOnlyControls;
     private final ViewState.ModeListener modeListener = this::applyProjectionEnablement;
 
     GridLayerOptions(GridLayer layer) {
@@ -124,7 +125,28 @@ final class GridLayerOptions extends JPanel {
         c0.anchor = GridBagConstraints.LINE_START;
         add(createOpacitySlider("Grid label opacity", layer.getLabelAlpha(), layer::setLabelAlpha), c0);
 
+        c0.gridy = 5;
+
+        c0.gridx = 0;
+        c0.anchor = GridBagConstraints.LINE_END;
+        add(new JLabel("Label size ", JLabel.RIGHT), c0);
+        c0.gridx = 1;
+        c0.anchor = GridBagConstraints.LINE_START;
+        JHVSlider labelSizeSlider = createLabelSizeSlider(layer);
+        add(labelSizeSlider, c0);
+
+        c0.gridx = 2;
+        c0.anchor = GridBagConstraints.LINE_END;
+        add(new JLabel("Label angle ", JLabel.RIGHT), c0);
+        c0.gridx = 3;
+        c0.anchor = GridBagConstraints.LINE_START;
+        JHVSlider labelAngleSlider = createLabelAngleSlider(layer);
+        add(labelAngleSlider, c0);
+
         nonDiskControls = new JComponent[]{axisToggle, radialToggle, gridTypeBox, latSpinner};
+        // The radius-label spoke angle only makes sense for the disk grid, so enable it only in a
+        // disk projection. Label size stays available alongside label opacity (always enabled).
+        diskOnlyControls = new JComponent[]{labelAngleSlider};
         applyProjectionEnablement();
         // Track the projection only while the panel is on screen, so the listener is not leaked
         addAncestorListener(new AncestorListener() {
@@ -146,9 +168,11 @@ final class GridLayerOptions extends JPanel {
     }
 
     private void applyProjectionEnablement() {
-        boolean enabled = !ViewState.getProjection().isDisk();
+        boolean disk = ViewState.getProjection().isDisk();
         for (JComponent control : nonDiskControls)
-            control.setEnabled(enabled);
+            control.setEnabled(!disk);
+        for (JComponent control : diskOnlyControls)
+            control.setEnabled(disk);
     }
 
     private JButton createColorButton(GridLayer layer) {
@@ -199,6 +223,22 @@ final class GridLayerOptions extends JPanel {
         JHVSlider slider = new JHVSlider(min, max, (int) Math.round(layer.getGridLineScale() * 10));
         slider.setToolTipText("Grid line width");
         slider.addChangeListener(e -> layer.setGridLineScale(slider.getValue() / 10.));
+        return slider;
+    }
+
+    private static JHVSlider createLabelSizeSlider(GridLayer layer) {
+        int min = (int) GridLayer.GRID_LABEL_SIZE_MIN;
+        int max = (int) GridLayer.GRID_LABEL_SIZE_MAX;
+        JHVSlider slider = new JHVSlider(min, max, (int) Math.round(layer.getGridLabelSize()));
+        slider.setToolTipText("Disk grid label font size");
+        slider.addChangeListener(e -> layer.setGridLabelSize(slider.getValue()));
+        return slider;
+    }
+
+    private static JHVSlider createLabelAngleSlider(GridLayer layer) {
+        JHVSlider slider = new JHVSlider(0, 360, (int) Math.round(layer.getGridLabelAngle()));
+        slider.setToolTipText("Disk grid radius-label spoke angle (° clockwise from vertical)");
+        slider.addChangeListener(e -> layer.setGridLabelAngle(slider.getValue()));
         return slider;
     }
 

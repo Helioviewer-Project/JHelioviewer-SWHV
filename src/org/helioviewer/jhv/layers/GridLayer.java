@@ -39,6 +39,9 @@ public final class GridLayer extends AbstractLayer {
     public static final double GRID_STEP = 0.1;
     public static final double GRID_LINE_SCALE_MIN = 0.5;
     public static final double GRID_LINE_SCALE_MAX = 5;
+    public static final double GRID_LABEL_SIZE_MIN = 8;
+    public static final double GRID_LABEL_SIZE_MAX = 48;
+    public static final double GRID_LABEL_SIZE_REF = 22; // size at which each grid's labels keep their original size
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
@@ -63,6 +66,10 @@ public final class GridLayer extends AbstractLayer {
     private double gridAlpha = 1;
     private double labelAlpha = 1;
     private double gridLineScale = 1;
+    // Disk-grid radius-label styling: font size (px at the reference scale) and the azimuth of the
+    // label spoke, in degrees clockwise from straight up (0 = a vertical column up the +y axis).
+    private double gridLabelSize = GRID_LABEL_SIZE_REF;
+    private double gridLabelAngle = 0;
 
     private byte[] gridColorBytes() {
         return Colors.bytes(gridColor, gridAlpha);
@@ -101,6 +108,8 @@ public final class GridLayer extends AbstractLayer {
         jo.put("alpha", gridAlpha);
         jo.put("labelAlpha", labelAlpha);
         jo.put("lineScale", gridLineScale);
+        jo.put("labelSize", gridLabelSize);
+        jo.put("labelAngle", gridLabelAngle);
     }
 
     private void deserialize(JSONObject jo) {
@@ -114,6 +123,8 @@ public final class GridLayer extends AbstractLayer {
         gridAlpha = Math.clamp(jo.optDouble("alpha", gridAlpha), 0, 1);
         labelAlpha = Math.clamp(jo.optDouble("labelAlpha", labelAlpha), 0, 1);
         gridLineScale = Math.clamp(jo.optDouble("lineScale", gridLineScale), GRID_LINE_SCALE_MIN, GRID_LINE_SCALE_MAX);
+        gridLabelSize = Math.clamp(jo.optDouble("labelSize", gridLabelSize), GRID_LABEL_SIZE_MIN, GRID_LABEL_SIZE_MAX);
+        gridLabelAngle = jo.optDouble("labelAngle", gridLabelAngle);
 
         String strGridType = jo.optString("type", Display.gridType.toString());
         try {
@@ -191,9 +202,9 @@ public final class GridLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
         if (mv.isDisk())
-            diskGrid.render(mv, vp, showLabels, lonStep, gridColorBytes(), gridLineScale, labelAlpha);
+            diskGrid.render(mv, vp, showLabels, lonStep, gridColorBytes(), gridLineScale, labelAlpha, gridLabelSize, gridLabelAngle);
         else
-            flatGrid.render(mv, vp, showLabels, gridColorBytes(), gridLineScale, labelAlpha);
+            flatGrid.render(mv, vp, showLabels, gridColorBytes(), gridLineScale, labelAlpha, gridLabelSize);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
@@ -206,10 +217,10 @@ public final class GridLayer extends AbstractLayer {
         Transform.popView();
     }
 
-    private static void drawRadialGridText(List<GridLabel> labels, float z, float[] labelPos, float[] color) {
+    private void drawRadialGridText(List<GridLabel> labels, float z, float[] labelPos, float[] color) {
         SdfTextRenderer renderer = GLText.renderer();
         renderer.setColor(color);
-        float textScaleFactor = textScale / renderer.getFontSize();
+        float textScaleFactor = (float) (textScale * gridLabelSize / GRID_LABEL_SIZE_REF) / renderer.getFontSize();
         float fuzz = 0.75f;
 
         GL.glDisable(GL.CULL_FACE);
@@ -224,8 +235,9 @@ public final class GridLayer extends AbstractLayer {
     private void drawGridText(float z) {
         SdfTextRenderer renderer = GLText.renderer();
         renderer.setColor(gridLabelColor(Colors.WhiteFloat));
-        // the scale factor has to be divided by the current font size
-        float textScaleFactor = textScale / renderer.getFontSize();
+        // the scale factor has to be divided by the current font size; the label-size slider scales
+        // it relative to the default (textScale is a fixed world size, so this stays resolution-invariant)
+        float textScaleFactor = (float) (textScale * gridLabelSize / GRID_LABEL_SIZE_REF) / renderer.getFontSize();
 
         renderer.begin3DRendering();
 
@@ -380,6 +392,24 @@ public final class GridLayer extends AbstractLayer {
 
     public void setGridLineScale(double _gridLineScale) {
         gridLineScale = Math.clamp(_gridLineScale, GRID_LINE_SCALE_MIN, GRID_LINE_SCALE_MAX);
+        DisplayController.display();
+    }
+
+    public double getGridLabelSize() {
+        return gridLabelSize;
+    }
+
+    public void setGridLabelSize(double _gridLabelSize) {
+        gridLabelSize = Math.clamp(_gridLabelSize, GRID_LABEL_SIZE_MIN, GRID_LABEL_SIZE_MAX);
+        DisplayController.display();
+    }
+
+    public double getGridLabelAngle() {
+        return gridLabelAngle;
+    }
+
+    public void setGridLabelAngle(double _gridLabelAngle) {
+        gridLabelAngle = _gridLabelAngle;
         DisplayController.display();
     }
 
