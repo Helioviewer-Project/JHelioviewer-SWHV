@@ -373,7 +373,7 @@ values are clamped to the supported ranges.
 
 Accepted keys:
 
-- `clippingMode`: `Auto`, `ZScale`, `Range`
+- `clippingMode`: `Percentile001`, `Percentile05`, `ZScale`, `Range`
 - `zContrast`: integer, clamped to `4` through `400`
 - `clippingMin`: number, clamped to `-1e20` through `1e20`
 - `clippingMax`: number, clamped to `-1e20` through `1e20`
