@@ -19,6 +19,7 @@ import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.State;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.gui.dialog.AspiicsDialog;
 import org.helioviewer.jhv.gui.dialog.LoadStateDialog;
 import org.helioviewer.jhv.gui.dialog.NewVersionDialog;
 import org.helioviewer.jhv.gui.dialog.ObservationDialog;
@@ -124,6 +125,17 @@ public final class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             PunchDialog.getInstance().showDialog();
+        }
+    }
+
+    public static class NewAspiicsLayer extends AbstractAction {
+        public NewAspiicsLayer() {
+            super("New ASPIICS Layer...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            AspiicsDialog.getInstance().showDialog();
         }
     }
 

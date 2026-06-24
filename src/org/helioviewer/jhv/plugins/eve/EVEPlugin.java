@@ -32,8 +32,8 @@ public class EVEPlugin extends Plugin {
         tl.installTimelines();
         newItem = new JMenuItem(new TimelineActions.NewLayer());
         openItem = new JMenuItem(new TimelineActions.OpenLocalFile());
-        MainFrame.getMenuBar().getMenu(0).add(newItem, 4);
-        MainFrame.getMenuBar().getMenu(0).add(openItem, 5);
+        MainFrame.getMenuBar().getMenu(0).add(newItem, 5);
+        MainFrame.getMenuBar().getMenu(0).add(openItem, 6);
 
         BandReaderHapi.requestCatalog();
     }
