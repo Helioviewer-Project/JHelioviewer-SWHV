@@ -104,7 +104,7 @@ public final class PunchClient {
             String latestDay = latestNumeric(BASE_URL + '/' + level + '/' + product + '/' + latestYear + '/' + latestMonth + '/');
             if (latestDay == null)
                 return 0L;
-            return LocalDateTime.of(Integer.parseInt(latestYear), Integer.parseInt(latestMonth), Integer.parseInt(latestDay), 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli();
+            return TimeUtils.parseDate(latestYear + "-" + latestMonth + "-" + latestDay);
         }
 
         private static String latestNumeric(String url) throws Exception {
@@ -128,7 +128,7 @@ public final class PunchClient {
         public List<DataItem> call() throws Exception {
             // Newer versions of the same timestamp overwrite older ones (index is name-sorted)
             TreeMap<Long, DataItem> found = new TreeMap<>();
-            for (long day = Math.floorDiv(start, TimeUtils.DAY_IN_MILLIS) * TimeUtils.DAY_IN_MILLIS; day <= end; day += TimeUtils.DAY_IN_MILLIS)
+            for (long day = TimeUtils.floorDay(start); day <= end; day += TimeUtils.DAY_IN_MILLIS)
                 listDay(found, day);
 
             // lastKept is seeded just below the first possible in-range item so that any
@@ -156,7 +156,7 @@ public final class PunchClient {
             Matcher m = FILE_PATTERN.matcher(html);
             while (m.find()) {
                 String file = m.group(1);
-                long milli = LocalDateTime.parse(m.group(2), FILE_TIME).toInstant(ZoneOffset.UTC).toEpochMilli();
+                long milli = TimeUtils.parse(FILE_TIME, m.group(2));
                 found.put(milli, new DataItem(file, URI.create(dirUrl + file), milli));
                 matched++;
             }
