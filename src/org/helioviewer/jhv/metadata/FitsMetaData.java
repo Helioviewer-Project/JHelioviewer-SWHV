@@ -10,9 +10,9 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
-import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.WcsHeader;
+import org.helioviewer.jhv.wcs.WcsProjection;
 
 public final class FitsMetaData extends CommonMetaData {
 
@@ -299,9 +299,11 @@ public final class FitsMetaData extends CommonMetaData {
 
             // Sun center in region coordinates, for radius-aware image filters
             if (!isSurfaceMap && (crval.x != 0 || crval.y != 0)) {
-                Vec3 sun = crota.rotateInverseVector(new Vec3(-crval.x, -crval.y, 0));
-                sunShiftX = sun.x;
-                sunShiftY = sun.y;
+                Vec2 sun = WcsProjection.helioprojectiveToPlane(new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota), 0, 0);
+                if (sun != null) {
+                    sunShiftX = sun.x;
+                    sunShiftY = sun.y;
+                }
             }
         }
     }
