@@ -94,9 +94,9 @@ public final class Actions {
         }
     }
 
-    public static class NewSoarLayer extends AbstractKeyAction {
+    public static class NewSoarLayer extends AbstractAction {
         public NewSoarLayer() {
-            super("New SOAR Layer...", KeyStroke.getKeyStroke(KeyEvent.VK_N, DesktopIntegration.menuShortcutMask | InputEvent.SHIFT_DOWN_MASK));
+            super("New SOAR Layer...");
         }
 
         @Override
