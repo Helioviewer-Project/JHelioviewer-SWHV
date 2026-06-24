@@ -112,6 +112,9 @@ public final class WcsProjection {
         double x = planeX * wcsHeader.radPerUnit;
         double y = planeY * wcsHeader.radPerUnit;
         double radial = Math.sqrt(x * x + y * y);
+        if (radial == 0)
+            return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
+
         double nativeDistance = inverseZpnPrimaryBranch(wcsHeader, radial);
         if (nativeDistance == 0)
             return new Vec2(wcsHeader.phi0, wcsHeader.theta0);
