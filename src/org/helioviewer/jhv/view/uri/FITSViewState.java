@@ -13,7 +13,27 @@ public final class FITSViewState {
     }
 
     enum ClippingMode {
-        Auto, ZScale, Range
+        Percentile001("Percentile 0.001%", 0.00001),
+        Percentile05("Percentile 0.5%", 0.005),
+        ZScale("ZScale", 0),
+        Range("Range", 0);
+
+        private final String label;
+        private final double percentile;
+
+        ClippingMode(String _label, double _percentile) {
+            label = _label;
+            percentile = _percentile;
+        }
+
+        double percentile() {
+            return percentile;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 
     enum ScalingMode {
@@ -126,7 +146,7 @@ public final class FITSViewState {
     private static int zContrast = 4;
     private static double clippingMin = -500;
     private static double clippingMax = 500;
-    private static ClippingMode clippingMode = ClippingMode.Auto;
+    private static ClippingMode clippingMode = ClippingMode.Percentile001;
 
     private static ScalingMode scalingMode = ScalingMode.Gamma;
     private static double gamma = 1. / 2.2;

@@ -321,9 +321,6 @@ public final class FITSImage implements URIImageReader {
         }
     }
 
-    private static final double MIN_MULT = 0.00001; // 0.0005
-    private static final double MAX_MULT = 0.99999; // 0.9995
-
     private static int[] imageAxes(Header header) throws Exception {
         int nAxis = header.getIntValue("NAXIS", 0);
         if (nAxis != 2)
@@ -386,15 +383,15 @@ public final class FITSImage implements URIImageReader {
                 min = (float) state.clippingMin();
                 max = (float) state.clippingMax();
             } else {
-                boolean autoMode = state.clippingMode() == FITSViewState.ClippingMode.Auto;
                 SampleBuffer sampleData = sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
                     return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filterType).finish();
 
-                if (autoMode) {
-                    int kMin = Math.clamp((int) (MIN_MULT * sampleLen), 0, sampleLen - 1);
-                    int kMax = Math.clamp((int) (MAX_MULT * sampleLen), 0, sampleLen - 1);
+                if (state.clippingMode().percentile() > 0) {
+                    double percentile = state.clippingMode().percentile();
+                    int kMin = Math.clamp((int) (percentile * sampleLen), 0, sampleLen - 1);
+                    int kMax = Math.clamp((int) ((1 - percentile) * sampleLen), 0, sampleLen - 1);
                     float[] values = sampleData.values();
                     min = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMin);
                     max = ArrayUtils.selectKth(values, 0, sampleLen - 1, kMax);
