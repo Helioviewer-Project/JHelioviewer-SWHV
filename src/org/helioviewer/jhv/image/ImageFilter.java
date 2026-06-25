@@ -25,12 +25,7 @@ public class ImageFilter {
     }
 
     interface Algorithm {
-        float[] filter(float[] data, int width, int height);
-
-        // Radius-aware filters override this; the Sun-center region locates the annuli
-        default float[] filter(float[] data, int width, int height, @Nullable Region region) {
-            return filter(data, width, height);
-        }
+        float[] filter(float[] data, int width, int height, @Nullable Region region);
     }
 
     private static final float BDIV = 1 / 255f;
