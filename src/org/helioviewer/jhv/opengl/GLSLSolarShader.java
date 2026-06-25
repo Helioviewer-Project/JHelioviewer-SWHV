@@ -158,13 +158,15 @@ public class GLSLSolarShader extends GLSLShader {
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
                             float bOffset, float bScale,
                             float innerRadius, float outerRadius,
-                            float slitLeft, float slitRight) {
+                            float slitLeft, float slitRight,
+                            float upsilonLow, float upsilonHigh) {
         displayBuf.put(color);
         displayBuf.put(shWidth).put(shHeight).put(shWeight).put(isDiff);
         displayBuf.put(sector0).put(sector1).put(/*sector0 + 2 * Math.PI == sector1*/ sector0 == sector1 ? 0 : 1).put(enhanced);
         displayBuf.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
         displayBuf.put(bOffset).put(bScale);
         displayBuf.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
+        displayBuf.put(upsilonLow).put(upsilonHigh);
 
         displayBuf.flip();
         displayBO.setBufferDataIfChanged(DISPLAY_SIZE, displayBuf);

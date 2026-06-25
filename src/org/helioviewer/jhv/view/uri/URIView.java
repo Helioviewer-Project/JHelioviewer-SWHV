@@ -31,6 +31,7 @@ public final class URIView extends BaseView {
     private final URIImageReader reader;
     private final String xml;
     private final Region imageRegion;
+    private final Region filterRegion;
 
     public URIView(LatestWorker<ImageBuffer> _executor, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
@@ -55,6 +56,7 @@ public final class URIView extends BaseView {
             xml = readXml;
 
             imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
+            filterRegion = m.roiToSunRegion(0, 0, buffer.width, buffer.height, 1, 1);
             metaData[0] = m;
             ImageBufferCache.put(decodeKey(ImageFilter.Type.None), buffer);
 
@@ -76,7 +78,7 @@ public final class URIView extends BaseView {
             sendDataToHandler(imageBuffer, viewpoint);
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader, filterType), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader, filterType, filterRegion), new Callback(key, viewpoint));
     }
 
     private ImageFilter.Type decodeKeyFilter;
@@ -90,11 +92,11 @@ public final class URIView extends BaseView {
         return decodeKey;
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type) implements Callable<ImageBuffer> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type, Region region) implements Callable<ImageBuffer> {
         @Nonnull
         @Override
         public ImageBuffer call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file, type);
+            ImageBuffer imageBuffer = reader.readImageBuffer(file, type, region);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
             return imageBuffer;
