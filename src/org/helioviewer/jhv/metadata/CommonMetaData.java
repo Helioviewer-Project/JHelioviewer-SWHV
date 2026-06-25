@@ -132,7 +132,7 @@ class CommonMetaData implements MetaData {
         if (sunShiftX == 0 && sunShiftY == 0)
             return r;
         // Move the origin from the WCS reference point to the Sun center
-        return new Region(r.llx - sunShiftX, r.lly + sunShiftY, r.width, r.height);
+        return new Region(r.llx - sunShiftX, r.lly - sunShiftY, r.width, r.height);
     }
 
     @Override
