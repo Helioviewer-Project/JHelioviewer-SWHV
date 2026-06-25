@@ -299,12 +299,12 @@ public final class FitsMetaData extends CommonMetaData {
 
         wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
 
-        // Sun center in region coordinates, for radius-aware image filters
+        // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
         if (!wcsProjection.isSurfaceMap() && (crval.x != 0 || crval.y != 0)) {
             Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
             if (sun != null) {
                 sunShiftX = sun.x;
-                sunShiftY = sun.y;
+                sunShiftY = -sun.y;
             }
         }
     }
