@@ -90,6 +90,10 @@ public abstract class MapView {
         return mode == MapMode.LogPolar;
     }
 
+    public boolean isDisk() {
+        return mode.kind == MapMode.Kind.DISK;
+    }
+
     public Vec3 mouseToSky(Viewport vp, int x, int y) {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
     }
@@ -163,6 +167,7 @@ public abstract class MapView {
                 case HPC -> ProjectedMap.Kind.HPC;
                 case LATITUDINAL -> ProjectedMap.Kind.LATITUDINAL;
                 case POLAR -> ProjectedMap.Kind.POLAR;
+                case DISK -> ProjectedMap.Kind.DISK;
                 case ORTHOGRAPHIC -> throw new IllegalArgumentException("Orthographic mode has no projected kind");
             };
         }
@@ -174,7 +179,7 @@ public abstract class MapView {
 
         @Override
         public Vec2 mouseToGrid(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToGrid(camera, cameraWidth(vp), vp, scale(vp), gridType, x, y);
+            return ProjectedMap.mouseToGrid(kind, camera, cameraWidth(vp), vp, scale(vp), gridType, x, y);
         }
 
         @Override
@@ -184,7 +189,7 @@ public abstract class MapView {
 
         @Override
         public Vec2 mouseToScreen(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToScreen(camera, cameraWidth(vp), vp, scale(vp), x, y);
+            return ProjectedMap.mouseToScreen(kind, camera, cameraWidth(vp), vp, scale(vp), x, y);
         }
 
         @Override

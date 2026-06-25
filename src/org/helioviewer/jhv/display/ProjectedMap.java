@@ -14,13 +14,14 @@ import org.helioviewer.jhv.wcs.WcsProjection;
 
 final class ProjectedMap {
 
-    enum Kind {HPC, LATITUDINAL, POLAR}
+    enum Kind {HPC, LATITUDINAL, POLAR, DISK}
 
     static Vec2 project(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
         return switch (kind) {
             case HPC -> projectHpc(viewpoint, v, scale);
             case LATITUDINAL -> projectLatitudinal(rotation, scale, v);
             case POLAR -> projectPolar(rotation, scale, v);
+            case DISK -> projectDisk(rotation, scale, v);
         };
     }
 
@@ -28,13 +29,13 @@ final class ProjectedMap {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
             case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
-            case POLAR -> unprojectPolar(rotation, pt.x, pt.y);
+            case POLAR, DISK -> unprojectPolar(rotation, pt.x, pt.y);
         };
     }
 
     static Vec3 mouseToSurface(Kind kind, Camera camera, Position viewpoint, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
         Quat rotation = gridType.mapRotation(viewpoint);
-        return unproject(kind, viewpoint, rotation, mouseToGrid(camera, width, vp, scale, gridType, x, y));
+        return unproject(kind, viewpoint, rotation, mouseToGrid(kind, camera, width, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
@@ -54,6 +55,18 @@ final class ProjectedMap {
         return rotation.rotateInverseVector(unprojectPolarPoint(angleDeg, radius));
     }
 
+    private static Vec2 projectDisk(Quat rotation, MapScale scale, Vec3 v0) {
+        // The disk shows the image plane with the radius remapped: a point at radius r
+        // lands at fraction t of the disk radius 0.5, along its image-plane direction.
+        Vec3 v = rotation.rotateVector(v0);
+        double r = Math.hypot(v.x, v.y);
+        if (r == 0)
+            return new Vec2(0, 0);
+        double t = Math.max(0, scale.getYValueInv(r) + .5);
+        double f = .5 * t / r;
+        return new Vec2(f * v.x, f * v.y);
+    }
+
     private static Vec2 projectHpc(Position viewpoint, Vec3 v, MapScale scale) {
         // External solar points arrive in world space; HPC projection is defined in viewpoint space.
         return projectHpcViewpointSpace(toHpcViewpointSpace(viewpoint, v), viewpoint.distance, scale);
@@ -65,7 +78,8 @@ final class ProjectedMap {
 
     static Vec2 projectToScreen(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 v) {
         Vec2 pt = project(kind, viewpoint, scale, rotation, v);
-        return new Vec2(pt.x * vp.aspect, pt.y);
+        // Disk coordinates are isotropic, not stretched to the map rectangle
+        return kind == Kind.DISK ? pt : new Vec2(pt.x * vp.aspect, pt.y);
     }
 
     static void emitMapLine(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
@@ -73,6 +87,10 @@ final class ProjectedMap {
             return;
         if (kind == Kind.HPC) {
             emitHpcLine(viewpoint, scale, vp, vertices, color, vexBuf);
+            return;
+        }
+        if (kind == Kind.DISK) {
+            emitDiskLine(viewpoint, scale, rotation, vertices, color, vexBuf);
             return;
         }
 
@@ -83,6 +101,18 @@ final class ProjectedMap {
             Vec2 previous = current;
             current = project(kind, viewpoint, scale, rotation, vertices.get(i));
             emitWrappedVertex(vp, previous, current, color, vexBuf);
+        }
+        vexBuf.repeatVertex(Colors.Null);
+    }
+
+    private static void emitDiskLine(Position viewpoint, MapScale scale, Quat rotation, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+        // The disk has no angular seam, so no horizontal wrap
+        Vec2 current = project(Kind.DISK, viewpoint, scale, rotation, vertices.getFirst());
+        vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(color);
+        for (int i = 1; i < vertices.size(); i++) {
+            current = project(Kind.DISK, viewpoint, scale, rotation, vertices.get(i));
+            vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, color);
         }
         vexBuf.repeatVertex(Colors.Null);
     }
@@ -119,6 +149,13 @@ final class ProjectedMap {
         }
 
         float pointSize = (float) size;
+        if (kind == Kind.DISK) {
+            for (Vec3 vertex : vertices) {
+                Vec2 pt = project(kind, viewpoint, scale, rotation, vertex);
+                vexBuf.putVertex((float) pt.x, (float) pt.y, 0, pointSize, color);
+            }
+            return;
+        }
         for (Vec3 vertex : vertices) {
             Vec2 pt = project(kind, viewpoint, scale, rotation, vertex);
             vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
@@ -135,16 +172,30 @@ final class ProjectedMap {
         }
     }
 
-    static Vec2 mouseToScreen(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+    static Vec2 mouseToScreen(Kind kind, Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+        if (kind == Kind.DISK) {
+            return new Vec2(
+                    ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x),
+                    ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y));
+        }
         Vec2 mouseGrid = mouseToRawGrid(camera, width, vp, scale, x, y);
         return new Vec2(
                 scale.getXValueInv(mouseGrid.x) * vp.aspect,
                 scale.getYValueInv(mouseGrid.y));
     }
 
-    static Vec2 mouseToGrid(Camera camera, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
+    static Vec2 mouseToGrid(Kind kind, Camera camera, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
+        if (kind == Kind.DISK)
+            return mouseToDiskGrid(camera, width, vp, scale, x, y);
         Vec2 mouseGrid = mouseToRawGrid(camera, width, vp, scale, x, y);
         return new Vec2(scale.getDisplayXValue(mouseGrid.x, gridType), mouseGrid.y);
+    }
+
+    private static Vec2 mouseToDiskGrid(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+        double upX = ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x);
+        double upY = ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y);
+        double t = 2 * Math.hypot(upX, upY);
+        return new Vec2(Math.toDegrees(PolarBasis.angle(upX, upY)), scale.getInterpolatedYValue(t));
     }
 
     private static Vec2 mouseToRawGrid(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {

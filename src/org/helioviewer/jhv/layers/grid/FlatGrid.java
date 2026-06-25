@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers.grid;
 
 import org.helioviewer.jhv.base.Colors;
-import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
@@ -18,11 +17,10 @@ public class FlatGrid {
 
     //private static final float TEXT_SCALE = GridLabel.textScale; // scalable text
     private static final int TEXT_SIZE = 12;
-    private static final double THICKNESS_PIXELS = 1.5;
+    private static final double BASE_THICKNESS_PIXELS = 1.5;
     private static final double[] ANGULAR_STEPS = {0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 45, 90, 180};
     private static final double[] LINEAR_STEP_FACTORS = {1, 2, 5, 10};
     private static final double TARGET_GRID_PIXELS = 12 * TEXT_SIZE;
-    private static final byte[] GRID_COLOR = Colors.Red;
     private static final byte[] AXIS_COLOR = Colors.Green;
     private static final double AXIS_EPSILON = 1e-9;
 
@@ -38,7 +36,7 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(MapView mv, Viewport vp, boolean showLabels) {
+    public void render(MapView mv, Viewport vp, boolean showLabels, byte[] color, double lineScale, double labelAlpha, double labelSize) {
         double width = mv.cameraWidth(vp);
         MapScale scale = mv.scale(vp);
         double xCenter = 0.5 - mv.cameraTranslationX() / vp.aspect;
@@ -52,20 +50,25 @@ public class FlatGrid {
                 x0, x1, vp.width);
         Axis yAxis = buildAxis(scale, false, mv.isHpc() || mv.isLatitudinal(), false,
                 y0, y1, vp.height);
-        updateShape(xAxis, yAxis, mv, vp, width);
+        updateShape(xAxis, yAxis, mv, vp, width, color, lineScale);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(xAxis, yAxis, mv, vp, width);
+            drawLabels(xAxis, yAxis, mv, vp, width, labelAlpha, labelSize);
     }
 
-    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width) {
+    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, double labelAlpha, double labelSize) {
         SdfTextRenderer renderer = GLText.renderer();
-        //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
-        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
+        // Size as a fraction of the (capped) camera FOV, not a pixel count, so the labels are
+        // invariant to the render resolution (export at a higher resolution keeps the same relative
+        // size). labelSize is the grid layer's label-size slider; the min(width, 1) cap keeps the
+        // labels from growing without bound when zoomed out.
+        double worldTextHeight = labelSize * Math.min(width, 1) / 1000.;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
 
-        renderer.setColor(Colors.WhiteFloat);
+        // White labels at the label opacity (premultiplied)
+        float a = (float) labelAlpha;
+        renderer.setColor(new float[]{a, a, a, a});
         renderer.begin3DRendering();
         for (int i = 0; i < xAxis.labelValues().length; i++) {
             if (xAxis.positions()[i] == 0)
@@ -80,17 +83,18 @@ public class FlatGrid {
         renderer.end3DRendering();
     }
 
-    private void updateShape(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width) {
+    private void updateShape(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, byte[] gridColor, double lineScale) {
         int noPoints = RasterLine.vertexCount(xAxis.positions().length + yAxis.positions().length);
         BufVertex vexBuf = new BufVertex(noPoints * GLSLShape.stride);
 
+        double thickness = BASE_THICKNESS_PIXELS * lineScale;
         for (int i = 0; i < xAxis.positions().length; i++) {
-            byte[] color = xAxis.positions()[i] == 0 ? AXIS_COLOR : GRID_COLOR;
-            RasterLine.putVertical(vp, width, mv.cameraTranslationX(), vp.aspect * xAxis.positions()[i], -0.5, 0.5, THICKNESS_PIXELS, color, vexBuf);
+            byte[] color = xAxis.positions()[i] == 0 ? AXIS_COLOR : gridColor;
+            RasterLine.putVertical(vp, width, mv.cameraTranslationX(), vp.aspect * xAxis.positions()[i], -0.5, 0.5, thickness, color, vexBuf);
         }
         for (int i = 0; i < yAxis.positions().length; i++) {
-            byte[] color = yAxis.positions()[i] == 0 ? AXIS_COLOR : GRID_COLOR;
-            RasterLine.putHorizontal(vp, width, mv.cameraTranslationY(), -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], THICKNESS_PIXELS, color, vexBuf);
+            byte[] color = yAxis.positions()[i] == 0 ? AXIS_COLOR : gridColor;
+            RasterLine.putHorizontal(vp, width, mv.cameraTranslationY(), -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], thickness, color, vexBuf);
         }
         shape.setVertex(vexBuf);
     }

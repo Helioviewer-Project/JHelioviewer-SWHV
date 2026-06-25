@@ -9,6 +9,7 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.metadata.DetectorMask;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.wcs.ImageBounds;
 import org.helioviewer.jhv.view.View;
 
 import org.json.JSONObject;
@@ -38,7 +39,10 @@ public class GLImage {
     private int deltaCRVAL1 = 0;
     private int deltaCRVAL2 = 0;
 
+    // Radial mask as fractions of the layer's inscribed radius: the band [innerMask, outerMask]
+    // is shown. innerMask = 0 and outerMask = 1 mask nothing; them meeting masks everything.
     private double innerMask = 0;
+    private double outerMask = 1;
     private double slitLeft = 0;
     private double slitRight = 1;
     // private double sector0 = -Math.PI;
@@ -83,6 +87,10 @@ public class GLImage {
 
     public void applyFilters() {
         MetaData metaData = uploadedImageData.metaData();
+        // Radial mask scale: the layer's inscribed (nearest-edge) radius. getOuterRadius() can
+        // be Float.MAX_VALUE (unbounded FOV, e.g. AIA); the corner distance overshoots the
+        // circular FOV, so inscribed is the meaningful full-extent reference.
+        double maskRef = ImageBounds.inscribed(metaData);
         // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
         color[0] = (float) (opacity * red); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         color[1] = (float) (opacity * green);
@@ -93,7 +101,8 @@ public class GLImage {
                 metaData.getSector0(), metaData.getSector1(), (float) enhanced,
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 (float) brightOffset, (float) (brightScale * metaData.getResponseFactor()),
-                Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1,
+                Math.max(metaData.getInnerRadius(), (float) (innerMask * maskRef)),
+                Display.getShowCorona() ? (outerMask < 1 ? (float) (outerMask * maskRef) : metaData.getOuterRadius()) : 1,
                 (float) slitLeft, (float) slitRight);
 
         applyLUT();
@@ -169,7 +178,15 @@ public class GLImage {
     }
 
     public void setInnerMask(double mask) {
-        innerMask = Math.clamp(mask, 0, MAX_INNER);
+        innerMask = Math.clamp(mask, 0, 1);
+    }
+
+    public void setOuterMask(double mask) {
+        outerMask = Math.clamp(mask, 0, 1);
+    }
+
+    public double getOuterMask() {
+        return outerMask;
     }
 
     public void setSlit(double left, double right) {
@@ -310,6 +327,7 @@ public class GLImage {
         setSlit(jo.optDouble("slitLeft", slitLeft), jo.optDouble("slitRight", slitRight));
         // setSector(jo.optDouble("sector0", sector0), jo.optDouble("sector1", sector1));
         setInnerMask(jo.optDouble("innerMask", innerMask));
+        setOuterMask(jo.optDouble("outerMask", outerMask));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         setEnhanced(jo.optDouble("enhanced", enhanced));
         String strDiffMode = jo.optString("differenceMode", diffMode.toString());
@@ -335,6 +353,7 @@ public class GLImage {
         // jo.put("sector0", getSector0());
         // jo.put("sector1", getSector1());
         jo.put("innerMask", innerMask);
+        jo.put("outerMask", outerMask);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
         jo.put("enhanced", enhanced);

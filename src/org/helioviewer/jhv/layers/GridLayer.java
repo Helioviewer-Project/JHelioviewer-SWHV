@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers;
 
+import java.awt.Color;
 import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -11,6 +12,7 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.display.ViewportMath;
+import org.helioviewer.jhv.layers.grid.DiskGrid;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
@@ -35,6 +37,11 @@ public final class GridLayer extends AbstractLayer {
     public static final double GRID_STEP_MIN = 5;
     public static final double GRID_STEP_MAX = 90;
     public static final double GRID_STEP = 0.1;
+    public static final double GRID_LINE_SCALE_MIN = 0.5;
+    public static final double GRID_LINE_SCALE_MAX = 5;
+    public static final double GRID_LABEL_SIZE_MIN = 8;
+    public static final double GRID_LABEL_SIZE_MAX = 48;
+    public static final double GRID_LABEL_SIZE_REF = 22; // size at which each grid's labels keep their original size
 
     // height of text in solar radii
     private static final float textScale = GridLabel.textScale;
@@ -44,13 +51,34 @@ public final class GridLayer extends AbstractLayer {
     private static final double LINEWIDTH_AXES = 2 * LINEWIDTH;
     // private static final double PLANETEXT_Z = 0.01;
 
-    private double lonStep = 15;
+    private double lonStep = 30;
     private double latStep = 20;
     private boolean gridNeedsInit = true;
 
     private boolean showAxis = true;
     private boolean showLabels = true;
     private boolean showRadial = false;
+
+    // User-styleable grid line color, line opacity, label opacity and width (applied to the
+    // lat/lon graticule, the flat map grid, and the disk rings/spokes; the axis/Earth/radial
+    // overlays keep their colors). Line and label opacity are independent.
+    private Color gridColor = Color.RED;
+    private double gridAlpha = 1;
+    private double labelAlpha = 1;
+    private double gridLineScale = 1;
+    // Disk-grid radius-label styling: font size (px at the reference scale) and the azimuth of the
+    // label spoke, in degrees clockwise from straight up (0 = a vertical column up the +y axis).
+    private double gridLabelSize = GRID_LABEL_SIZE_REF;
+    private double gridLabelAngle = 0;
+
+    private byte[] gridColorBytes() {
+        return Colors.bytes(gridColor, gridAlpha);
+    }
+
+    // A label color faded to the label opacity (premultiplied; base is an opaque premultiplied color)
+    private float[] gridLabelColor(float[] base) {
+        return new float[]{(float) (base[0] * labelAlpha), (float) (base[1] * labelAlpha), (float) (base[2] * labelAlpha), (float) (base[3] * labelAlpha)};
+    }
 
     private final GLSLShape earthPoint = new GLSLShape(false);
     private final GLSLLine axesLine = new GLSLLine(false);
@@ -60,6 +88,7 @@ public final class GridLayer extends AbstractLayer {
     private final GLSLLine radialCircleLineFar = new GLSLLine(false);
     private final GLSLLine radialThickLineFar = new GLSLLine(false);
     private final FlatGrid flatGrid = new FlatGrid();
+    private final DiskGrid diskGrid = new DiskGrid();
     private final GLSLLine gridLine = new GLSLLine(false);
 
     private List<GridLabel> latLabels;
@@ -75,6 +104,12 @@ public final class GridLayer extends AbstractLayer {
         jo.put("showLabels", showLabels);
         jo.put("showRadial", showRadial);
         jo.put("type", Display.gridType);
+        jo.put("color", gridColor.getRGB());
+        jo.put("alpha", gridAlpha);
+        jo.put("labelAlpha", labelAlpha);
+        jo.put("lineScale", gridLineScale);
+        jo.put("labelSize", gridLabelSize);
+        jo.put("labelAngle", gridLabelAngle);
     }
 
     private void deserialize(JSONObject jo) {
@@ -84,6 +119,12 @@ public final class GridLayer extends AbstractLayer {
         showAxis = jo.optBoolean("showAxis", showAxis);
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
+        gridColor = new Color(jo.optInt("color", gridColor.getRGB()));
+        gridAlpha = Math.clamp(jo.optDouble("alpha", gridAlpha), 0, 1);
+        labelAlpha = Math.clamp(jo.optDouble("labelAlpha", labelAlpha), 0, 1);
+        gridLineScale = Math.clamp(jo.optDouble("lineScale", gridLineScale), GRID_LINE_SCALE_MIN, GRID_LINE_SCALE_MAX);
+        gridLabelSize = Math.clamp(jo.optDouble("labelSize", gridLabelSize), GRID_LABEL_SIZE_MIN, GRID_LABEL_SIZE_MAX);
+        gridLabelAngle = jo.optDouble("labelAngle", gridLabelAngle);
 
         String strGridType = jo.optString("type", Display.gridType.toString());
         try {
@@ -108,7 +149,7 @@ public final class GridLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
-            GridMath.initGrid(gridLine, lonStep, latStep);
+            GridMath.initGrid(gridLine, lonStep, latStep, gridColorBytes());
             gridNeedsInit = false;
         }
 
@@ -121,7 +162,7 @@ public final class GridLayer extends AbstractLayer {
 
         Transform.pushView();
         Transform.rotateViewInverse(gridQuat);
-        gridLine.renderLine(vp, LINEWIDTH);
+        gridLine.renderLine(vp, LINEWIDTH * gridLineScale);
         Transform.popView();
 
         drawEarthCircles(vp, pixFactor, Sun.getEarth(viewpoint.time));
@@ -144,12 +185,12 @@ public final class GridLayer extends AbstractLayer {
                     radialCircleLineFar.renderLine(vp, LINEWIDTH);
                     radialThickLineFar.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabelsFar, ztext, R_LABEL_POS_FAR);
+                        drawRadialGridText(radialLabelsFar, ztext, R_LABEL_POS_FAR, gridLabelColor(Colors.MiddleGrayFloat));
                 } else {
                     radialCircleLine.renderLine(vp, LINEWIDTH);
                     radialThickLine.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabels, ztext, R_LABEL_POS);
+                        drawRadialGridText(radialLabels, ztext, R_LABEL_POS, gridLabelColor(Colors.MiddleGrayFloat));
                 }
             }
             Transform.popView();
@@ -160,7 +201,10 @@ public final class GridLayer extends AbstractLayer {
     public void renderScale(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(mv, vp, showLabels);
+        if (mv.isDisk())
+            diskGrid.render(mv, vp, showLabels, lonStep, gridColorBytes(), gridLineScale, labelAlpha, gridLabelSize, gridLabelAngle);
+        else
+            flatGrid.render(mv, vp, showLabels, gridColorBytes(), gridLineScale, labelAlpha, gridLabelSize);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
@@ -173,10 +217,10 @@ public final class GridLayer extends AbstractLayer {
         Transform.popView();
     }
 
-    private static void drawRadialGridText(List<GridLabel> labels, float z, float[] labelPos) {
+    private void drawRadialGridText(List<GridLabel> labels, float z, float[] labelPos, float[] color) {
         SdfTextRenderer renderer = GLText.renderer();
-        renderer.setColor(Colors.MiddleGrayFloat);
-        float textScaleFactor = textScale / renderer.getFontSize();
+        renderer.setColor(color);
+        float textScaleFactor = (float) (textScale * gridLabelSize / GRID_LABEL_SIZE_REF) / renderer.getFontSize();
         float fuzz = 0.75f;
 
         GL.glDisable(GL.CULL_FACE);
@@ -190,9 +234,10 @@ public final class GridLayer extends AbstractLayer {
 
     private void drawGridText(float z) {
         SdfTextRenderer renderer = GLText.renderer();
-        renderer.setColor(Colors.WhiteFloat);
-        // the scale factor has to be divided by the current font size
-        float textScaleFactor = textScale / renderer.getFontSize();
+        renderer.setColor(gridLabelColor(Colors.WhiteFloat));
+        // the scale factor has to be divided by the current font size; the label-size slider scales
+        // it relative to the default (textScale is a fixed world size, so this stays resolution-invariant)
+        float textScaleFactor = (float) (textScale * gridLabelSize / GRID_LABEL_SIZE_REF) / renderer.getFontSize();
 
         renderer.begin3DRendering();
 
@@ -211,7 +256,7 @@ public final class GridLayer extends AbstractLayer {
     @Override
     public void init() {
         gridLine.init();
-        GridMath.initGrid(gridLine, lonStep, latStep);
+        GridMath.initGrid(gridLine, lonStep, latStep, gridColorBytes());
         gridNeedsInit = false;
 
         axesLine.init();
@@ -230,6 +275,7 @@ public final class GridLayer extends AbstractLayer {
         GridMath.initRadialCircles(radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
         flatGrid.init();
+        diskGrid.init();
     }
 
     @Override
@@ -243,6 +289,7 @@ public final class GridLayer extends AbstractLayer {
         radialCircleLineFar.dispose();
         radialThickLineFar.dispose();
         flatGrid.dispose();
+        diskGrid.dispose();
     }
 
     @Override
@@ -307,6 +354,62 @@ public final class GridLayer extends AbstractLayer {
     public void setGridType(GridType gridType) {
         Display.setGridType(gridType);
         lonLabels = GridLabel.makeLonLabels(gridType, lonStep);
+        DisplayController.display();
+    }
+
+    public Color getGridColor() {
+        return gridColor;
+    }
+
+    public void setGridColor(Color _gridColor) {
+        gridColor = _gridColor;
+        gridNeedsInit = true; // the cached 3D grid buffer bakes in the color
+        DisplayController.display();
+    }
+
+    public double getGridAlpha() {
+        return gridAlpha;
+    }
+
+    public void setGridAlpha(double _gridAlpha) {
+        gridAlpha = Math.clamp(_gridAlpha, 0, 1);
+        gridNeedsInit = true;
+        DisplayController.display();
+    }
+
+    public double getLabelAlpha() {
+        return labelAlpha;
+    }
+
+    public void setLabelAlpha(double _labelAlpha) {
+        labelAlpha = Math.clamp(_labelAlpha, 0, 1);
+        DisplayController.display();
+    }
+
+    public double getGridLineScale() {
+        return gridLineScale;
+    }
+
+    public void setGridLineScale(double _gridLineScale) {
+        gridLineScale = Math.clamp(_gridLineScale, GRID_LINE_SCALE_MIN, GRID_LINE_SCALE_MAX);
+        DisplayController.display();
+    }
+
+    public double getGridLabelSize() {
+        return gridLabelSize;
+    }
+
+    public void setGridLabelSize(double _gridLabelSize) {
+        gridLabelSize = Math.clamp(_gridLabelSize, GRID_LABEL_SIZE_MIN, GRID_LABEL_SIZE_MAX);
+        DisplayController.display();
+    }
+
+    public double getGridLabelAngle() {
+        return gridLabelAngle;
+    }
+
+    public void setGridLabelAngle(double _gridLabelAngle) {
+        gridLabelAngle = _gridLabelAngle;
         DisplayController.display();
     }
 

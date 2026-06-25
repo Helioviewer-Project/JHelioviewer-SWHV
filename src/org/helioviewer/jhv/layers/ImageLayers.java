@@ -39,6 +39,20 @@ public final class ImageLayers {
         return decoded;
     }
 
+    // R_sun; a disk imager's nearest-edge FOV reaches at most about this far
+    private static final double DISK_IMAGER_MAX_RADIUS = 2;
+
+    // A disk imager shows the solar disk; it is rendered flat (no radial warp) in a disk
+    // projection, while coronagraphs keep the warp (see ImageLayer.render). JP2/Helioviewer
+    // sources carry no occulter metadata (innerRadius/cutoff/mask are FITS-only), so we can't
+    // rely on innerRadius alone — a JP2 coronagraph like LASCO reports innerRadius 0, identical
+    // to AIA. Distinguish by field of view: a disk imager's FOV is dominated by the disk
+    // (nearest edge within ~2 R_sun), while a coronagraph's extends far past the occulted limb.
+    // FITS coronagraphs (e.g. PUNCH) also report innerRadius >= 1.
+    public static boolean isDiskImager(@Nullable MetaData m) {
+        return m != null && m.getInnerRadius() < 1 && ImageBounds.inscribed(m) < DISK_IMAGER_MAX_RADIUS;
+    }
+
     public static double getLargestPhysicalHeight() {
         double size = 0;
         for (ImageLayer layer : Layers.getImageLayers()) {
@@ -55,6 +69,18 @@ public final class ImageLayers {
             if (!layer.isEnabled())
                 continue;
             size = Math.max(size, ImageBounds.radial(layer.getMetaData()));
+        }
+        return size;
+    }
+
+    // Inscribed (nearest-edge) radius of the widest layer; the meaningful outer radius for
+    // the disk view (beyond it the FOV has only corner data), used to size the range slider.
+    public static double getLargestDiskRadius() {
+        double size = 0;
+        for (ImageLayer layer : Layers.getImageLayers()) {
+            if (!layer.isEnabled())
+                continue;
+            size = Math.max(size, ImageBounds.inscribed(layer.getMetaData()));
         }
         return size;
     }

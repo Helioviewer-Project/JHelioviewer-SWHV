@@ -50,6 +50,8 @@ public class Buttons {
 
     public static final String invert = button(MaterialDesign.INVERT_COLORS);
     public static final String corona = button(MaterialDesign.WHITE_BALANCE_SUNNY);
+    public static final String radialScale = button(MaterialDesign.VECTOR_CIRCLE_VARIANT); // disk warp on (circle/radial)
+    public static final String radialScaleOff = button(MaterialDesign.CROP_LANDSCAPE); // disk held flat (rectangle)
 
     public static final String calendar = button(MaterialDesign.CALENDAR);
     public static final String skipBack = button(MaterialDesign.SKIP_BACKWARD);
