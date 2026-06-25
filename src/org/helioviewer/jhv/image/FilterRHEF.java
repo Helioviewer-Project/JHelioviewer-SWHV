@@ -16,11 +16,6 @@ class FilterRHEF implements ImageFilter.Algorithm {
     private static final int MIN_BIN_COUNT = 5;
 
     @Override
-    public float[] filter(float[] data, int width, int height) {
-        return filter(data, width, height, null);
-    }
-
-    @Override
     public float[] filter(float[] data, int width, int height, @Nullable Region region) {
         if (width < 1 || height < 1)
             return data;
