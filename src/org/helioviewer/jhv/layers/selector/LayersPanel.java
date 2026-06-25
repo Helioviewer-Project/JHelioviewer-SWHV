@@ -43,11 +43,12 @@ public final class LayersPanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
 
-    private static final int ENABLED_COL = 0;
-    private static final int TITLE_COL = 1;
-    private static final int TIME_COL = LayersTableModel.TIME_COL;
-    private static final int DOWNLOAD_COL = 3;
-    private static final int REMOVE_COL = 4;
+    static final int ENABLED_COL = 0;
+    static final int NAME_COL = 1;
+    static final int TIME_COL = 2;
+    static final int DOWNLOAD_COL = 3;
+    static final int REMOVE_COL = 4;
+    static final int NUMBER_COLUMNS = 5;
 
     private static final int NUMBEROFVISIBLEROWS = 9;
 
@@ -158,7 +159,7 @@ public final class LayersPanel extends JPanel {
         grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
 
-        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new CellRenderer.Name());
+        grid.getColumnModel().getColumn(NAME_COL).setCellRenderer(new CellRenderer.Name());
 
         grid.getColumnModel().getColumn(TIME_COL).setCellRenderer(new CellRenderer.Time());
         int timeWidth = SwingUtilities.computeStringWidth(grid.getFontMetrics(CellRenderer.Time.font), "2000-01-01T12:00:00.000");
@@ -178,7 +179,7 @@ public final class LayersPanel extends JPanel {
         });
 
         model.addTableModelListener(e -> {
-            if (e.getType() != TableModelEvent.UPDATE || e.getColumn() == TIME_COL)
+            if (e.getType() != TableModelEvent.UPDATE || e.getColumn() == NAME_COL || e.getColumn() == TIME_COL)
                 return;
 
             int row = grid.getSelectedRow();
@@ -193,7 +194,7 @@ public final class LayersPanel extends JPanel {
                 if (v == null || !(v.value instanceof Layer layer))
                     return;
 
-                if ((v.col == TITLE_COL || v.col == TIME_COL) && layer instanceof ImageLayer il && e.getClickCount() == 2) {
+                if ((v.col == NAME_COL || v.col == TIME_COL) && layer instanceof ImageLayer il && e.getClickCount() == 2) {
                     ObservationDialog.getInstance().showDialog(false, il);
                     return;
                 }
@@ -202,7 +203,7 @@ public final class LayersPanel extends JPanel {
                     layer.setEnabled(!layer.isEnabled());
                     model.updateCell(v.row, v.col);
                     DisplayController.render(1);
-                } else if (v.col == TITLE_COL && layer instanceof ImageLayer il) {
+                } else if (v.col == NAME_COL && layer instanceof ImageLayer il) {
                     Layers.setActiveImageLayer(il);
                     grid.repaint(); // multiple rows involved
                 } else if (v.col == REMOVE_COL && layer.isDeletable()) {
