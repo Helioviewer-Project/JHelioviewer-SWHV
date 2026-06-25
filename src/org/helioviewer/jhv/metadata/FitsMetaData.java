@@ -38,7 +38,6 @@ public final class FitsMetaData extends CommonMetaData {
 
         viewpoint = retrievePosition(m, retrieveTime(m));
         retrievePixelParameters(m);
-        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
 
         retrieveOcculterRadii(m);
         retrieveOcculterLinearCutOff(m);
@@ -296,14 +295,16 @@ public final class FitsMetaData extends CommonMetaData {
 
             if (!CROTABlockSet.contains(instrument))
                 crota = Quat.createAxisZ(wcs.crotaRad());
+        }
 
-            // Sun center in region coordinates, for radius-aware image filters
-            if (!isSurfaceMap && (crval.x != 0 || crval.y != 0)) {
-                Vec2 sun = WcsProjection.helioprojectiveToPlane(new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota), 0, 0);
-                if (sun != null) {
-                    sunShiftX = sun.x;
-                    sunShiftY = sun.y;
-                }
+        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
+
+        // Sun center in region coordinates, for radius-aware image filters
+        if (!wcsProjection.isSurfaceMap() && (crval.x != 0 || crval.y != 0)) {
+            Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
+            if (sun != null) {
+                sunShiftX = sun.x;
+                sunShiftY = sun.y;
             }
         }
     }
