@@ -37,9 +37,10 @@ public interface MapScale {
     }
 
     static MapScale diskPower(double radialSize) {
-        double rMax = Display.getDiskRMax();
-        // No 0.1 floor needed: the disk scale is linear inside the limb, so r -> 0 is fine
-        return new PowerMapScale(0, 360, Display.getDiskRMin(), Math.max(rMax > 0 ? rMax : radialSize, 1));
+        // Inner bound pinned to 0 so the sub-limb mapping is linear through the origin
+        // (a disk imager and the grid stay locked at every radius); the outer extent fits
+        // the loaded layers. Radial compression is the p slider; masking is the per-layer mask.
+        return new PowerMapScale(0, 360, 0, Math.max(radialSize, 1));
     }
 
     abstract class MapScaleBase implements MapScale {

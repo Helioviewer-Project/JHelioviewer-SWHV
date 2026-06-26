@@ -10,6 +10,11 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 public abstract class MapView {
 
+    // The disk projection works in a normalized radial space (rim at w-radius 0.5), so it fits
+    // the viewport at camera width ~1 regardless of the orthographic R_sun FOV. A small margin
+    // keeps the outer rim off the very edge.
+    static final double DISK_FIT_WIDTH = 1.1;
+
     protected final Camera camera;
     protected final Position viewpoint;
     protected final MapMode mode;
@@ -170,6 +175,14 @@ public abstract class MapView {
                 case DISK -> ProjectedMap.Kind.DISK;
                 case ORTHOGRAPHIC -> throw new IllegalArgumentException("Orthographic mode has no projected kind");
             };
+        }
+
+        // The disk must not inherit Ortho's R_sun camera width (it would collapse to a dot when
+        // switched in from a zoomed-out view); fit it to the viewport and let the wheel zoom
+        // (vp.zoom) scale it from there. Render and mouse mapping both read this, so they stay in sync.
+        @Override
+        public double cameraWidth(Viewport vp) {
+            return kind == ProjectedMap.Kind.DISK ? DISK_FIT_WIDTH * vp.zoom : super.cameraWidth(vp);
         }
 
         @Override

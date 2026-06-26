@@ -56,7 +56,6 @@ struct Screen {
     float yStart;
     float yStop;
     float yParam;         // free radial-scale parameter (PowerDisk exponent inverse)
-    float diskFlatRadius; // rim radius in R_sun for flat-in-disk layers; <= 0 discards
 };
 
 layout(std140) uniform ScreenBlock {

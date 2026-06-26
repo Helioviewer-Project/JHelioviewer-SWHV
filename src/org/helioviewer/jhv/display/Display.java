@@ -21,10 +21,6 @@ public final class Display {
     }
 
     private static double diskPower = 0.0; // default to logarithmic (mid-scale, most dramatic)
-    // Radial range shown by the disk projection, in R_sun. rMax == 0 means
-    // "follow the loaded layers".
-    private static double diskRMin = 0;
-    private static double diskRMax = 0;
 
     public static double getDiskPower() {
         return diskPower;
@@ -32,19 +28,6 @@ public final class Display {
 
     public static void setDiskPower(double p) {
         diskPower = Math.clamp(p, -1, 1); // -1 = inverse, 0 = logarithmic, 1 = linear
-    }
-
-    public static double getDiskRMin() {
-        return diskRMin;
-    }
-
-    public static double getDiskRMax() {
-        return diskRMax;
-    }
-
-    public static void setDiskRange(double rMin, double rMax) {
-        diskRMin = Math.clamp(rMin, 0, 64);
-        diskRMax = Math.clamp(rMax, 0, 64);
     }
 
     static int glWidth = 1;

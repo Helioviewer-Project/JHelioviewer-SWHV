@@ -18,7 +18,6 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag", true);
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag", true);
     public static final GLSLSolarShader diskPower = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarDiskPower.frag", true);
-    public static final GLSLSolarShader diskFlat = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarDiskFlat.frag", true);
 
     private final boolean hasCommon;
 
@@ -41,7 +40,9 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int PROJECTION_SIZE = projectionBuf.capacity() * 4;
 
     private static GLBO screenBO;
-    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4 + 4);
+    // mat4 (16) + vec4 viewport (4) + 6 scalars (iaspect, xStart, xStop, yStart, yStop, yParam),
+    // padded to the std140 16-byte block boundary
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 6 + 2);
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO displayBO;
@@ -61,7 +62,6 @@ public class GLSLSolarShader extends GLSLShader {
         polar._init(polar.hasCommon);
         logpolar._init(logpolar.hasCommon);
         diskPower._init(diskPower.hasCommon);
-        diskFlat._init(diskFlat.hasCommon);
     }
 
     private static void setupCommonBlocks(int programID) {
@@ -95,7 +95,6 @@ public class GLSLSolarShader extends GLSLShader {
         polar._dispose();
         logpolar._dispose();
         diskPower._dispose();
-        diskFlat._dispose();
         wcsBO.delete();
         projectionBO.delete();
         screenBO.delete();
@@ -152,11 +151,7 @@ public class GLSLSolarShader extends GLSLShader {
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
         screenBuf.put((float) scale.getInterpolatedXValue(0)).put((float) scale.getInterpolatedXValue(1));
-        // Flat-in-disk layers are scaled so the solar limb (r = 1) lands exactly where
-        // the radial warp puts it: rim radius = 1 / t(1). Non-positive when the limb
-        // is outside the radial range; the flat shader discards in that case.
-        double t1 = scale.getYValueInv(1) + .5;
-        screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop()).put((float) scale.getYParam()).put(t1 > 1e-4 ? (float) (1 / t1) : 0);
+        screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop()).put((float) scale.getYParam());
 
         screenBuf.flip();
         screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes

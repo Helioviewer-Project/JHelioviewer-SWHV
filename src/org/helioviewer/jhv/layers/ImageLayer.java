@@ -34,9 +34,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final GLImage glImage;
     private final ImageLayerLoader loader;
-    // Override the auto-flat default: when true, a disk imager follows the disk radial warp instead
-    // of rendering flat (e.g. to use an off-disk-masked disk imager as a virtual coronagraph).
-    private boolean diskScaling;
 
     private boolean removed;
     protected View view;
@@ -212,10 +209,10 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (!isVisible[vp.idx])
             return;
 
-        // Disk imagers render flat in a disk projection by default (the radial warp polar-resamples
-        // and smears the disk center); decided live so it holds regardless of layer load order. The
-        // per-layer diskScaling override opts a disk imager back into the warp (virtual coronagraph).
-        GLSLSolarShader shader = mv.isDisk() && !diskScaling && ImageLayers.isDiskImager(imageData.metaData()) ? GLSLSolarShader.diskFlat : mv.mode().shader;
+        // The disk radial warp is now anchored linear-through-origin below the limb, so it
+        // renders a disk imager's on-disk pixels crisply (no polar smear) while keeping the
+        // off-limb locked to the grid — every layer uses its projection's shader directly.
+        GLSLSolarShader shader = mv.mode().shader;
         shader.use();
         glImage.applyFilters();
 
@@ -389,20 +386,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
     @Nonnull
     public GLImage getGLImage() {
         return glImage;
-    }
-
-    // Whether this layer's data is a disk imager (occulter-free, ~<2 R☉ FOV), for which the disk
-    // projection flattens by default; the diskScaling override only applies to such layers.
-    public boolean isDiskImager() {
-        return imageData != null && ImageLayers.isDiskImager(imageData.metaData());
-    }
-
-    public boolean getDiskScaling() {
-        return diskScaling;
-    }
-
-    public void setDiskScaling(boolean _diskScaling) {
-        diskScaling = _diskScaling;
     }
 
     @Nonnull
