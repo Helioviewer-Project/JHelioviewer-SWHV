@@ -177,12 +177,13 @@ public abstract class MapView {
             };
         }
 
-        // The disk must not inherit Ortho's R_sun camera width (it would collapse to a dot when
-        // switched in from a zoomed-out view); fit it to the viewport and let the wheel zoom
-        // (vp.zoom) scale it from there. Render and mouse mapping both read this, so they stay in sync.
+        // The radial projections (disk + rectangular unwraps) must not inherit Ortho's R_sun camera
+        // width (they would collapse when switched in from a zoomed-out view); fit them to the viewport
+        // and let the wheel zoom (vp.zoom) scale from there. Render and mouse mapping both read this.
         @Override
         public double cameraWidth(Viewport vp) {
-            return kind == ProjectedMap.Kind.DISK ? DISK_FIT_WIDTH * vp.zoom : super.cameraWidth(vp);
+            return (kind == ProjectedMap.Kind.DISK || kind == ProjectedMap.Kind.POLAR)
+                    ? DISK_FIT_WIDTH * vp.zoom : super.cameraWidth(vp);
         }
 
         @Override
