@@ -11,7 +11,7 @@ public enum MapMode {
     Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
     LogPolar(GLSLSolarShader.logpolar, Kind.POLAR),
     Polar(GLSLSolarShader.polar, Kind.POLAR),
-    PowerDisk(GLSLSolarShader.diskPower, Kind.DISK);
+    RadialWarp(GLSLSolarShader.diskPower, Kind.DISK);
 
     enum Kind {
         ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR, DISK

@@ -36,7 +36,7 @@ public final class GLRenderer {
             case Latitudinal -> createConstantScales(viewports, MapScale.lati);
             case LogPolar -> createConstantScales(viewports, MapScale.logpolar(ImageLayers.getLargestRadialSize()));
             case Polar -> createConstantScales(viewports, MapScale.polar(ImageLayers.getLargestRadialSize()));
-            case PowerDisk -> createConstantScales(viewports, MapScale.diskPower(ImageLayers.getLargestRadialSize()));
+            case RadialWarp -> createConstantScales(viewports, MapScale.diskPower(ImageLayers.getLargestRadialSize()));
         };
     }
 

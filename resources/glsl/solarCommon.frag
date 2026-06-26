@@ -55,7 +55,7 @@ struct Screen {
     float xStop;
     float yStart;
     float yStop;
-    float yParam;         // free radial-scale parameter (PowerDisk exponent inverse)
+    float yParam;         // free radial-scale parameter (RadialWarp exponent inverse)
 };
 
 layout(std140) uniform ScreenBlock {

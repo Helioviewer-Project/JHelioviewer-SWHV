@@ -137,7 +137,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private JideToggleButton multiviewButton;
     private final EnumMap<AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(AnnotationMode.class);
     private final EnumMap<MapMode, JRadioButtonMenuItem> projectionItems = new EnumMap<>(MapMode.class);
-    private JHVSlider powerDiskSlider; // PowerDisk radial exponent; only meaningful for that mode
+    private JHVSlider radialWarpSlider; // RadialWarp radial exponent; only meaningful for that mode
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
@@ -246,8 +246,8 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             projectionItems.put(el, item);
         }
         projectionButton.addSeparator();
-        projectionButton.add(createPowerDiskPanel());
-        powerDiskSlider.setEnabled(ViewState.getProjection() == MapMode.PowerDisk);
+        projectionButton.add(createRadialWarpPanel());
+        radialWarpSlider.setEnabled(ViewState.getProjection() == MapMode.RadialWarp);
         addButton(projectionButton);
 
         JideSplitButton annotationButton = toolSplitButton(ANNOTATION);
@@ -327,22 +327,22 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         annotationButton.add(panel);
     }
 
-    // PowerDisk radial exponent p (display radius ~ r^p): slider 0.01..2, default 1.0 (linear).
+    // RadialWarp radial exponent p (display radius ~ r^p): slider 0.01..2, default 1.0 (linear).
     // power() is read live every render, so the value takes effect through the scale rebuild.
-    private JPanel createPowerDiskPanel() {
-        powerDiskSlider = new JHVSlider(-1000, 1000, (int) Math.round(Display.getDiskPower() * 1000));
-        powerDiskSlider.setToolTipText("PowerDisk radial exponent p, applied to the corona (r > 1 R☉): p = -1 inverse, p = 0 logarithmic, p = 1 linear");
-        powerDiskSlider.setPreferredSize(new Dimension(110, powerDiskSlider.getPreferredSize().height));
+    private JPanel createRadialWarpPanel() {
+        radialWarpSlider = new JHVSlider(-1000, 1000, (int) Math.round(Display.getDiskPower() * 1000));
+        radialWarpSlider.setToolTipText("RadialWarp radial exponent p, applied to the corona (r > 1 R☉): p = -1 inverse, p = 0 logarithmic, p = 1 linear");
+        radialWarpSlider.setPreferredSize(new Dimension(110, radialWarpSlider.getPreferredSize().height));
         JLabel value = new JLabel(String.format("p %.3f", Display.getDiskPower()), JLabel.RIGHT);
-        powerDiskSlider.addChangeListener(e -> {
-            Display.setDiskPower(powerDiskSlider.getValue() / 1000.);
+        radialWarpSlider.addChangeListener(e -> {
+            Display.setDiskPower(radialWarpSlider.getValue() / 1000.);
             value.setText(String.format("p %.3f", Display.getDiskPower()));
             DisplayController.display();
         });
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
         panel.add(value, BorderLayout.LINE_START);
-        panel.add(powerDiskSlider, BorderLayout.CENTER);
+        panel.add(radialWarpSlider, BorderLayout.CENTER);
         return panel;
     }
 
@@ -444,8 +444,8 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         JRadioButtonMenuItem activeProjection = projectionItems.get(ViewState.getProjection());
         if (activeProjection != null)
             activeProjection.setSelected(true);
-        if (powerDiskSlider != null)
-            powerDiskSlider.setEnabled(ViewState.getProjection() == MapMode.PowerDisk);
+        if (radialWarpSlider != null)
+            radialWarpSlider.setEnabled(ViewState.getProjection() == MapMode.RadialWarp);
         JRadioButtonMenuItem activeAnnotationMode = annotationItems.get(ViewState.getAnnotationMode());
         if (activeAnnotationMode != null)
             activeAnnotationMode.setSelected(true);
