@@ -17,6 +17,8 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag", true);
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag", true);
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag", true);
+    public static final GLSLSolarShader diskPower = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarDiskPower.frag", true);
+    public static final GLSLSolarShader rectWarp = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarRectWarp.frag", true);
 
     private final boolean hasCommon;
 
@@ -39,7 +41,9 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int PROJECTION_SIZE = projectionBuf.capacity() * 4;
 
     private static GLBO screenBO;
-    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4 + 4);
+    // mat4 (16) + vec4 viewport (4) + 6 scalars (iaspect, xStart, xStop, yStart, yStop, yParam),
+    // padded to the std140 16-byte block boundary
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 6 + 2);
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO displayBO;
@@ -58,6 +62,8 @@ public class GLSLSolarShader extends GLSLShader {
         lati._init(lati.hasCommon);
         polar._init(polar.hasCommon);
         logpolar._init(logpolar.hasCommon);
+        diskPower._init(diskPower.hasCommon);
+        rectWarp._init(rectWarp.hasCommon);
     }
 
     private static void setupCommonBlocks(int programID) {
@@ -90,6 +96,8 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose();
         polar._dispose();
         logpolar._dispose();
+        diskPower._dispose();
+        rectWarp._dispose();
         wcsBO.delete();
         projectionBO.delete();
         screenBO.delete();
@@ -146,7 +154,7 @@ public class GLSLSolarShader extends GLSLShader {
         inv.flip();
         screenBuf.put(vp.glslArray).put((float) (1 / vp.aspect));
         screenBuf.put((float) scale.getInterpolatedXValue(0)).put((float) scale.getInterpolatedXValue(1));
-        screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop());
+        screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop()).put((float) scale.getYParam());
 
         screenBuf.flip();
         screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes

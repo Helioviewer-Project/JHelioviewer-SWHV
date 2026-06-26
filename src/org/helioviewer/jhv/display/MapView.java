@@ -10,6 +10,11 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 public abstract class MapView {
 
+    // The disk projection works in a normalized radial space (rim at w-radius 0.5), so it fits
+    // the viewport at camera width ~1 regardless of the orthographic R_sun FOV. A small margin
+    // keeps the outer rim off the very edge.
+    static final double DISK_FIT_WIDTH = 1.1;
+
     protected final Camera camera;
     protected final Position viewpoint;
     protected final MapMode mode;
@@ -90,6 +95,10 @@ public abstract class MapView {
         return mode == MapMode.LogPolar;
     }
 
+    public boolean isDisk() {
+        return mode.kind == MapMode.Kind.DISK;
+    }
+
     public Vec3 mouseToSky(Viewport vp, int x, int y) {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
     }
@@ -163,8 +172,18 @@ public abstract class MapView {
                 case HPC -> ProjectedMap.Kind.HPC;
                 case LATITUDINAL -> ProjectedMap.Kind.LATITUDINAL;
                 case POLAR -> ProjectedMap.Kind.POLAR;
+                case DISK -> ProjectedMap.Kind.DISK;
                 case ORTHOGRAPHIC -> throw new IllegalArgumentException("Orthographic mode has no projected kind");
             };
+        }
+
+        // The radial projections (disk + rectangular unwraps) must not inherit Ortho's R_sun camera
+        // width (they would collapse when switched in from a zoomed-out view); fit them to the viewport
+        // and let the wheel zoom (vp.zoom) scale from there. Render and mouse mapping both read this.
+        @Override
+        public double cameraWidth(Viewport vp) {
+            return (kind == ProjectedMap.Kind.DISK || kind == ProjectedMap.Kind.POLAR)
+                    ? DISK_FIT_WIDTH * vp.zoom : super.cameraWidth(vp);
         }
 
         @Override
@@ -174,7 +193,7 @@ public abstract class MapView {
 
         @Override
         public Vec2 mouseToGrid(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToGrid(camera, cameraWidth(vp), vp, scale(vp), gridType, x, y);
+            return ProjectedMap.mouseToGrid(kind, camera, cameraWidth(vp), vp, scale(vp), gridType, x, y);
         }
 
         @Override
@@ -184,7 +203,7 @@ public abstract class MapView {
 
         @Override
         public Vec2 mouseToScreen(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToScreen(camera, cameraWidth(vp), vp, scale(vp), x, y);
+            return ProjectedMap.mouseToScreen(kind, camera, cameraWidth(vp), vp, scale(vp), x, y);
         }
 
         @Override
