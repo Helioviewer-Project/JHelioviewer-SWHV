@@ -18,6 +18,7 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag", true);
     public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag", true);
     public static final GLSLSolarShader diskPower = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarDiskPower.frag", true);
+    public static final GLSLSolarShader rectWarp = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarRectWarp.frag", true);
 
     private final boolean hasCommon;
 
@@ -62,6 +63,7 @@ public class GLSLSolarShader extends GLSLShader {
         polar._init(polar.hasCommon);
         logpolar._init(logpolar.hasCommon);
         diskPower._init(diskPower.hasCommon);
+        rectWarp._init(rectWarp.hasCommon);
     }
 
     private static void setupCommonBlocks(int programID) {
@@ -95,6 +97,7 @@ public class GLSLSolarShader extends GLSLShader {
         polar._dispose();
         logpolar._dispose();
         diskPower._dispose();
+        rectWarp._dispose();
         wcsBO.delete();
         projectionBO.delete();
         screenBO.delete();
