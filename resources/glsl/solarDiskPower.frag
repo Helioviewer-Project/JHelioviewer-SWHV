@@ -4,7 +4,7 @@ vec2 sampleDiskTexcoord(const vec2 crval, const vec4 crota, const vec4 rect, con
         discard;
 
     // The disk shows the image plane with the radius remapped; same polar map
-    // convention as solarPolar.frag, 0 at north and increasing anti-clockwise.
+    // convention as solarRectWarp.frag, 0 at north and increasing anti-clockwise.
     // This basis must stay consistent with the Java-side non-ortho projection after
     // the subsequent rotate_plane_inverse(..., vec2(pos.x, -pos.y) - crval) step.
     vec2 polarXY = (2. * radialCoordinate / t) * vec2(w.x, -w.y);
