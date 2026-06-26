@@ -273,27 +273,10 @@ public final class ViewState {
         if (projection == newProjection)
             return;
 
-        MapMode oldProjection = projection;
         projection = newProjection;
-        Display.setMapMode(newProjection);
-        // Remember the Ortho wheel zoom on the way out so a round trip returns to it exactly; the
-        // disk projection fits on entry (it lives in a normalized radial space, so it must not
-        // inherit Ortho's R_sun zoom) rather than carrying over or anchoring to a moving target.
-        if (oldProjection == MapMode.Orthographic) {
-            var vps = Display.getViewports();
-            if (vps.length > 0)
-                savedOrthoZoom = vps[0].zoom;
-        }
-        if (newProjection == MapMode.Orthographic)
-            for (var vp : Display.getViewports())
-                vp.zoom = savedOrthoZoom;
-        else if (newProjection.isDisk())
-            for (var vp : Display.getViewports())
-                vp.zoom = 1;
+        Display.setMapMode(newProjection); // resets wheel zoom + re-fits the camera (all modes fit on entry)
         notifyModeListeners();
     }
-
-    private static double savedOrthoZoom = 1; // Ortho wheel zoom, preserved across a projection round trip
 
     public static AnnotationMode getAnnotationMode() {
         return annotationMode;

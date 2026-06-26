@@ -11,7 +11,8 @@ public final class Display {
 
     public static void setMapMode(MapMode _mode) {
         mode = _mode;
-        DisplayController.resetCameras();
+        resetViewportZoom();              // every projection fits on entry (no inherited wheel zoom)
+        DisplayController.resetCameras();  // re-fits the FOV to the mode + resets pan/rotation
     }
 
     public static GridType gridType = GridType.Viewpoint;
