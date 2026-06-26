@@ -87,12 +87,10 @@ public abstract class MapView {
         return mode == MapMode.Latitudinal;
     }
 
+    // Any rectangular angle x radius unwrap (currently RectWarp). Kept as isPolar() so existing
+    // call sites that handle the polar layout (status readout, CACTus event rendering) still work.
     public boolean isPolar() {
-        return mode == MapMode.Polar;
-    }
-
-    public boolean isLogPolar() {
-        return mode == MapMode.LogPolar;
+        return mode.kind == MapMode.Kind.POLAR;
     }
 
     public boolean isDisk() {

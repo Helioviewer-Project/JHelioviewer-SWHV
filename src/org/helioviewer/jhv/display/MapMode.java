@@ -9,8 +9,6 @@ public enum MapMode {
     Orthographic(GLSLSolarShader.ortho, Kind.ORTHOGRAPHIC),
     HPC(GLSLSolarShader.hpc, Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
-    LogPolar(GLSLSolarShader.logpolar, Kind.POLAR),
-    Polar(GLSLSolarShader.polar, Kind.POLAR),
     RadialWarp(GLSLSolarShader.diskPower, Kind.DISK),
     RectWarp(GLSLSolarShader.rectWarp, Kind.POLAR);
 

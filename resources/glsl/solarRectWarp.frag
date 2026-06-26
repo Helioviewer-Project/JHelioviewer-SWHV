@@ -1,5 +1,5 @@
 
-// Rectangular (angle x radius) unwrap like solarPolar.frag, but the radial axis follows the
+// Rectangular (angle x radius) unwrap, but the radial axis follows the
 // PowerDisk/RadialWarp Box-Cox transform driven by screen.yParam (p): linear inside the limb,
 // power-law outside, so one p slider spans inverse / linear / logarithmic for this layout too.
 
@@ -7,7 +7,7 @@ vec2 sampleRectWarpTexcoord(const vec2 crval, const vec4 crota, const vec4 rect,
     if (radialCoordinate > display.radii.y || radialCoordinate < display.radii.x)
         discard;
 
-    // Same polar map convention as solarPolar.frag: 0 at north, increasing anti-clockwise.
+    // Polar map convention: 0 at north, increasing anti-clockwise.
     float angle = scrpos.x * TWOPI;
     vec2 polarXY = vec2(-sin(angle), -cos(angle)) * radialCoordinate;
 

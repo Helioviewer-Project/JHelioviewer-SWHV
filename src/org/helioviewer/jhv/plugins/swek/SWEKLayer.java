@@ -408,7 +408,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         MapScale scale = mv.scale(vp);
         for (JHVRelatedEvents evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
-            if (evt.isCactus() && (mv.isPolar() || mv.isLogPolar())) {
+            if (evt.isCactus() && mv.isPolar()) {
                 drawCactusArcScale(vp, evtr, evt, currentTime, scale);
             } else {
                 drawPolygon(mv, vp, evtr, evt);
