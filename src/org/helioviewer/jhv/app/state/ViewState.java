@@ -274,7 +274,7 @@ public final class ViewState {
             return;
 
         projection = newProjection;
-        Display.setMapMode(newProjection);
+        Display.setMapMode(newProjection); // resets wheel zoom + re-fits the camera (all modes fit on entry)
         notifyModeListeners();
     }
 

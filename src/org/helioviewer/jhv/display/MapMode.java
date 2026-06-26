@@ -9,15 +9,31 @@ public enum MapMode {
     Orthographic(GLSLSolarShader.ortho, Kind.ORTHOGRAPHIC),
     HPC(GLSLSolarShader.hpc, Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
-    LogPolar(GLSLSolarShader.logpolar, Kind.POLAR),
-    Polar(GLSLSolarShader.polar, Kind.POLAR);
+    RadialWarp(GLSLSolarShader.diskPower, Kind.DISK),
+    RectWarp(GLSLSolarShader.rectWarp, Kind.POLAR);
 
     enum Kind {
-        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR
+        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR, DISK
     }
 
     public final GLSLSolarShader shader;
     final Kind kind;
+
+    public boolean isDisk() {
+        return kind == Kind.DISK;
+    }
+
+    // The radial / normalized-fit projections (disk and rectangular unwraps): they live in a
+    // normalized radial space and fit the viewport at camera width ~1, independent of the
+    // orthographic R_sun FOV.
+    public boolean usesFitWidth() {
+        return kind == Kind.DISK || kind == Kind.POLAR;
+    }
+
+    // The projections whose radial axis follows the Box-Cox p exponent (the shared p slider).
+    public boolean usesRadialExponent() {
+        return this == RadialWarp || this == RectWarp;
+    }
 
     MapMode(GLSLSolarShader _shader, Kind _kind) {
         shader = _shader;
