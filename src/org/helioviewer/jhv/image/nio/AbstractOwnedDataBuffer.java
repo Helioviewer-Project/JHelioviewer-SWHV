@@ -78,12 +78,10 @@ abstract class AbstractOwnedDataBuffer extends DataBuffer {
 
     static DataBuffer createOrThrow(int type, int size, int numBanks, BackendKind backendKind, BackingFactory backingFactory) throws IOException {
         return switch (type) {
-            case DataBuffer.TYPE_BYTE ->
-                    new OwnedByteDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_BYTE, size, numBanks), backendKind);
+            case DataBuffer.TYPE_BYTE -> new OwnedByteDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_BYTE, size, numBanks), backendKind);
             case DataBuffer.TYPE_USHORT ->
                     new OwnedUShortDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_USHORT, size, numBanks), backendKind);
-            case DataBuffer.TYPE_INT ->
-                    new OwnedIntDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_INT, size, numBanks), backendKind);
+            case DataBuffer.TYPE_INT -> new OwnedIntDataBuffer(size, numBanks, backingFactory.create(DataBuffer.TYPE_INT, size, numBanks), backendKind);
             default -> throw new IllegalArgumentException("Unsupported data type: " + type);
         };
     }

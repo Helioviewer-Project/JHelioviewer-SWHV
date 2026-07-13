@@ -359,8 +359,7 @@ public class EventDatabase {
         }
     }
 
-    private static List<JsonEvent> collectRelationEvents(int id, SWEKSupplier jhvEventType, boolean similartype,
-                                                        boolean failOnError) throws Exception {
+    private static List<JsonEvent> collectRelationEvents(int id, SWEKSupplier jhvEventType, boolean similartype, boolean failOnError) throws Exception {
         SWEKGroup group = jhvEventType.group();
         List<JsonEvent> jsonEvents = new ArrayList<>();
 

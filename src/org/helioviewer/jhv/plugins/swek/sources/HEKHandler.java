@@ -61,12 +61,9 @@ public class HEKHandler extends SWEKHandler {
                 String lfieldName = fieldName.toLowerCase();
                 if (!result.isNull(lfieldName)) {
                     switch (dbType) {
-                        case "INTEGER" ->
-                                paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getInt(lfieldName)));
-                        case "TEXT" ->
-                                paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getString(lfieldName)));
-                        case "REAL" ->
-                                paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getDouble(lfieldName)));
+                        case "INTEGER" -> paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getInt(lfieldName)));
+                        case "TEXT" -> paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getString(lfieldName)));
+                        case "REAL" -> paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getDouble(lfieldName)));
                     }
                 }
             }

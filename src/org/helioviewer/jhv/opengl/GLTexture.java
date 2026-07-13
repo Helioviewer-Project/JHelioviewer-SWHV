@@ -53,14 +53,12 @@ public class GLTexture {
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 0);
         switch (buffer) {
-            case null ->
-                    GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
+            case null -> GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
             case ByteBuffer byteBuffer ->
                     GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, BufferUtils.directByteBuffer(byteBuffer));
             case ShortBuffer shortBuffer ->
                     GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, BufferUtils.directShortBuffer(shortBuffer));
-            default ->
-                    throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
+            default -> throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
         }
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, filter);
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, filter);
