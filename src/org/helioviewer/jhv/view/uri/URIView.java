@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.image.FilterRegion;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
@@ -31,7 +32,7 @@ public final class URIView extends BaseView {
     private final URIImageReader reader;
     private final String xml;
     private final Region imageRegion;
-    private final Region filterRegion;
+    private final FilterRegion filterRegion;
 
     public URIView(LatestWorker<ImageBuffer> _executor, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
@@ -56,7 +57,7 @@ public final class URIView extends BaseView {
             xml = readXml;
 
             imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
-            filterRegion = m.roiToSunRegion(0, 0, buffer.width, buffer.height, 1, 1);
+            filterRegion = new FilterRegion(m, 0, 0, 1, 1);
             metaData[0] = m;
             ImageBufferCache.put(decodeKey(ImageFilter.Type.None), buffer);
 
@@ -92,7 +93,7 @@ public final class URIView extends BaseView {
         return decodeKey;
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type, Region region) implements Callable<ImageBuffer> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type, FilterRegion region) implements Callable<ImageBuffer> {
         @Nonnull
         @Override
         public ImageBuffer call() throws Exception {

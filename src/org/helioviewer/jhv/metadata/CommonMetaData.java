@@ -127,12 +127,8 @@ class CommonMetaData implements MetaData {
 
     @Nonnull
     @Override
-    public Region roiToSunRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY) {
-        Region r = roiToRegion(roiX, roiY, roiWidth, roiHeight, factorX, factorY);
-        if (sunShiftX == 0 && sunShiftY == 0)
-            return r;
-        // Move the origin from the WCS reference point to the Sun center
-        return new Region(r.llx - sunShiftX, r.lly - sunShiftY, r.width, r.height);
+    public Vec2 getSunShift() {
+        return new Vec2(sunShiftX, sunShiftY);
     }
 
     @Override

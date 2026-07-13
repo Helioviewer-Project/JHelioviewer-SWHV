@@ -3,6 +3,7 @@ package org.helioviewer.jhv.metadata;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 public interface MetaData {
@@ -43,7 +44,7 @@ public interface MetaData {
     Region roiToRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);
 
     @Nonnull
-    Region roiToSunRegion(int roiX, int roiY, int roiWidth, int roiHeight, double factorX, double factorY);
+    Vec2 getSunShift();
 
     boolean getCalculateDepth();
 
