@@ -18,7 +18,7 @@ import com.jidesoft.swing.JideSplitButton;
 
 public class ImageFilterPanel implements FilterDetails {
 
-    private final JComboBox<ImageFilter.Type> filterCombo = new JComboBox<>(ImageFilter.Type.values());
+    private final JPanel filterPanel = new JPanel(new BorderLayout());
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
     private final JLabel title = new JLabel("Filter ", JLabel.RIGHT);
 
@@ -30,10 +30,15 @@ public class ImageFilterPanel implements FilterDetails {
         return String.format("%.2f", value);
     }
 
-    public ImageFilterPanel(ImageLayer layer) {
-        filterCombo.setSelectedItem(layer.getView().getFilter());
-        filterCombo.setToolTipText(layer.getView().getFilter().description);
+    private static JPanel createUpsilonRow(String title, JHVSlider slider, JLabel label) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JLabel(title), BorderLayout.LINE_START);
+        panel.add(slider, BorderLayout.CENTER);
+        panel.add(label, BorderLayout.LINE_END);
+        return panel;
+    }
 
+    private static JPanel createEnhancePanel(ImageLayer layer) {
         JHVSlider slider = new JHVSlider(0, 30, (int) (layer.getGLImage().getEnhanced() * 10));
         JLabel label = new JLabel(formatLabel(slider.getValue() / 10.), JLabel.RIGHT);
         label.setToolTipText("<html><body>pixel⋅R<sup>v");
@@ -46,7 +51,15 @@ public class ImageFilterPanel implements FilterDetails {
         JPanel enhancePanel = new JPanel(new BorderLayout());
         enhancePanel.add(slider, BorderLayout.LINE_START);
         enhancePanel.add(label, BorderLayout.LINE_END);
+        return enhancePanel;
+    }
 
+    public ImageFilterPanel(ImageLayer layer) {
+        JComboBox<ImageFilter.Type> filterCombo = new JComboBox<>(ImageFilter.Type.values());
+        filterCombo.setSelectedItem(layer.getView().getFilter());
+        filterCombo.setToolTipText(layer.getView().getFilter().description);
+
+        JPanel enhancePanel = createEnhancePanel(layer);
         JideSplitButton enhanceButton = new JideSplitButton(Buttons.corona);
         enhanceButton.setToolTipText("Enhance radially the off-disk corona");
         enhanceButton.setAlwaysDropdown(true);
@@ -68,36 +81,28 @@ public class ImageFilterPanel implements FilterDetails {
             upsilonHighLabel.setText(formatUpsilon(value));
             DisplayController.display();
         });
-        JPanel upsilonLowRow = new JPanel(new BorderLayout());
-        upsilonLowRow.add(new JLabel("ΥL "), BorderLayout.LINE_START);
-        upsilonLowRow.add(upsilonLowSlider, BorderLayout.CENTER);
-        upsilonLowRow.add(upsilonLowLabel, BorderLayout.LINE_END);
-        JPanel upsilonHighRow = new JPanel(new BorderLayout());
-        upsilonHighRow.add(new JLabel("ΥH "), BorderLayout.LINE_START);
-        upsilonHighRow.add(upsilonHighSlider, BorderLayout.CENTER);
-        upsilonHighRow.add(upsilonHighLabel, BorderLayout.LINE_END);
         JPanel upsilonPanel = new JPanel(new GridLayout(2, 1));
-        upsilonPanel.add(upsilonLowRow);
-        upsilonPanel.add(upsilonHighRow);
+        upsilonPanel.add(createUpsilonRow("ΥL ", upsilonLowSlider, upsilonLowLabel));
+        upsilonPanel.add(createUpsilonRow("ΥH ", upsilonHighSlider, upsilonHighLabel));
 
         JideSplitButton upsilonButton = new JideSplitButton("Υ");
         upsilonButton.setToolTipText("Soften shadows (ΥL, below median) and highlights (ΥH, above median) of RHEF output independently");
         upsilonButton.setAlwaysDropdown(true);
         upsilonButton.add(upsilonPanel);
 
-        // The Υ midtone control only affects RHEF, so enable it only when RHEF is selected.
-        upsilonButton.setEnabled(layer.getView().getFilter() == ImageFilter.Type.RHEF);
+        upsilonButton.setVisible(layer.getView().getFilter() == ImageFilter.Type.RHEF);
         filterCombo.addActionListener(e -> {
             if (filterCombo.getSelectedItem() instanceof ImageFilter.Type type && type != layer.getView().getFilter()) {
                 filterCombo.setToolTipText(type.description);
-                upsilonButton.setEnabled(type == ImageFilter.Type.RHEF);
+                upsilonButton.setVisible(type == ImageFilter.Type.RHEF);
                 layer.getView().clearCache();
                 layer.getView().setFilter(type);
                 DisplayController.render(1);
             }
         });
 
-        buttonPanel.add(upsilonButton, BorderLayout.LINE_START);
+        filterPanel.add(filterCombo, BorderLayout.CENTER);
+        filterPanel.add(upsilonButton, BorderLayout.LINE_END);
         buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
     }
 
@@ -108,7 +113,7 @@ public class ImageFilterPanel implements FilterDetails {
 
     @Override
     public Component getSecond() {
-        return filterCombo;
+        return filterPanel;
     }
 
     @Override
