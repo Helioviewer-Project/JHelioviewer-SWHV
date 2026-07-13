@@ -1,8 +1,5 @@
 package org.helioviewer.jhv.image;
 
-import javax.annotation.Nullable;
-
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.thread.ParallelRange;
 
 class FilterMGN implements ImageFilter.Algorithm {
@@ -134,7 +131,7 @@ class FilterMGN implements ImageFilter.Algorithm {
     }
 
     @Override
-    public float[] filter(float[] data, int width, int height, @Nullable Region region) {
+    public float[] filter(float[] data, int width, int height) {
         if (width < 1 || height < 1)
             return data;
 

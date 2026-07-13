@@ -5,10 +5,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.image.FilterRegion;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -104,7 +104,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             boolean gray = numComps < 3;
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
             ImageBuffer.Format format = gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
-            Region region = metaData.roiToSunRegion(actualX, actualY, actualWidth, actualHeight, factorX, factorY);
+            FilterRegion region = new FilterRegion(metaData, actualX, actualY, factorX, factorY);
             ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filterType, region);
             ByteBuffer outByteBuffer = outBuffer.byteBuffer();
 
