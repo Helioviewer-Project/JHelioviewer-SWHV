@@ -56,10 +56,7 @@ public class ImageFilter {
 
     private static final float BDIV = 1 / 255f;
 
-    static byte[] filter(byte[] array, int width, int height, ImageFilter filter) {
-        if (filter.isNone())
-            return array;
-
+    short[] apply(byte[] array, int width, int height) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -72,27 +69,10 @@ public class ImageFilter {
                 }
             }
         });
-
-        float[] image = filter.algorithm.filter(data, width, height);
-
-        byte[] out = new byte[length];
-        ParallelRange.run(height, (from, to) -> {
-            for (int y = from; y < to; y++) {
-                int rowBase = y * width;
-                int rowEnd = rowBase + width;
-                for (int idx = rowBase; idx < rowEnd; idx++) {
-                    out[idx] = (byte) Math.clamp(image[idx] * 255 + .5f, 0, 255);
-                }
-            }
-        });
-
-        return out;
+        return apply(data, width, height);
     }
 
-    static short[] filterHalfFloat(short[] array, int width, int height, ImageFilter filter) {
-        if (filter.isNone())
-            return array;
-
+    short[] apply(short[] array, int width, int height) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -105,8 +85,12 @@ public class ImageFilter {
                 }
             }
         });
+        return apply(data, width, height);
+    }
 
-        float[] image = filter.algorithm.filter(data, width, height);
+    private short[] apply(float[] data, int width, int height) {
+        float[] image = algorithm.filter(data, width, height);
+        int length = width * height;
 
         short[] out = new short[length];
         ParallelRange.run(height, (from, to) -> {
@@ -118,7 +102,6 @@ public class ImageFilter {
                 }
             }
         });
-
         return out;
     }
 
