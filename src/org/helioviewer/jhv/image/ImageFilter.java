@@ -35,12 +35,12 @@ public class ImageFilter {
         algorithm = _algorithm;
     }
 
-    public static ImageFilter of(Type type) {
+    private static ImageFilter of(Type type) {
         return switch (type) {
             case None -> NONE;
             case MGN -> MGN;
             case WOW -> WOW;
-            case RHEF -> new ImageFilter(new FilterRHEF(null));
+            case RHEF -> throw new IllegalArgumentException("RHEF requires image geometry");
         };
     }
 
