@@ -2,21 +2,25 @@ package org.helioviewer.jhv.image;
 
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.thread.ParallelRange;
 
 // Radial Histogram Equalizing Filter (Gilly & DeForest 2024): rank-equalizes pixel
 // values within ~1-pixel-wide annuli centered on the Sun, flattening the radial
 // brightness gradient while preserving the relative structure at each height.
-class FilterRHEF implements ImageFilter.RegionAlgorithm {
+class FilterRHEF implements ImageFilter.Algorithm {
 
     // Annuli with fewer valid pixels are passed through unfiltered
     private static final int MIN_BIN_COUNT = 5;
 
+    private final SunCenteredRegion sunCenteredRegion;
+
+    FilterRHEF(SunCenteredRegion _sunCenteredRegion) {
+        sunCenteredRegion = _sunCenteredRegion;
+    }
+
     @Override
-    public float[] filter(float[] data, int width, int height, @Nullable SunCenteredRegion sunCenteredRegion) {
+    public float[] filter(float[] data, int width, int height) {
         if (width < 1 || height < 1)
             return data;
 

@@ -8,7 +8,6 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.metadata.Region;
 
@@ -107,8 +106,8 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
             ImageBuffer.Format format = gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
             Region imageRegion = metaData.roiToRegion(actualX, actualY, actualWidth, actualHeight, factorX, factorY);
-            SunCenteredRegion sunCenteredRegion = SunCenteredRegion.fromImageRegion(imageRegion, metaData.getSunShift());
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filterType, sunCenteredRegion);
+            ImageFilter filter = ImageFilter.of(filterType, imageRegion, metaData);
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filter);
             ByteBuffer outByteBuffer = outBuffer.byteBuffer();
 
             Kdu_dims newRegion = scratch.newRegion;

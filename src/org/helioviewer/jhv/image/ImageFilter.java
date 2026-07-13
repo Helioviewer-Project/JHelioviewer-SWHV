@@ -1,25 +1,27 @@
 package org.helioviewer.jhv.image;
 
-import javax.annotation.Nullable;
-
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.thread.ParallelRange;
 
 //import com.google.common.base.Stopwatch;
 
 public class ImageFilter {
 
+    public static final ImageFilter NONE = new ImageFilter(null);
+    private static final ImageFilter MGN = new ImageFilter(new FilterMGN());
+    private static final ImageFilter WOW = new ImageFilter(new FilterWOW());
+
     public enum Type {
-        None("No filter", null),
-        MGN("Multi-scale Gaussian normalization", new FilterMGN()),
-        WOW("Wavelet-optimized whitening", new FilterWOW()),
-        RHEF("Radial histogram equalizing filter", new FilterRHEF());
+        None("No filter"),
+        MGN("Multi-scale Gaussian normalization"),
+        WOW("Wavelet-optimized whitening"),
+        RHEF("Radial histogram equalizing filter");
 
         public final String description;
-        final Algorithm algorithm;
 
-        Type(String _description, Algorithm _algorithm) {
+        Type(String _description) {
             description = _description;
-            algorithm = _algorithm;
         }
     }
 
@@ -27,18 +29,37 @@ public class ImageFilter {
         float[] filter(float[] data, int width, int height);
     }
 
-    interface RegionAlgorithm extends Algorithm {
-        @Override
-        default float[] filter(float[] data, int width, int height) {
-            return filter(data, width, height, null);
-        }
+    private final Algorithm algorithm;
 
-        float[] filter(float[] data, int width, int height, @Nullable SunCenteredRegion region);
+    private ImageFilter(Algorithm _algorithm) {
+        algorithm = _algorithm;
+    }
+
+    public static ImageFilter of(Type type) {
+        return switch (type) {
+            case None -> NONE;
+            case MGN -> MGN;
+            case WOW -> WOW;
+            case RHEF -> new ImageFilter(new FilterRHEF(null));
+        };
+    }
+
+    public static ImageFilter of(Type type, Region imageRegion, MetaData metaData) {
+        return type == Type.RHEF
+                ? new ImageFilter(new FilterRHEF(SunCenteredRegion.fromImageRegion(imageRegion, metaData.getSunShift())))
+                : of(type);
+    }
+
+    boolean isNone() {
+        return algorithm == null;
     }
 
     private static final float BDIV = 1 / 255f;
 
-    private static byte[] filter(byte[] array, int width, int height, Algorithm algorithm, @Nullable SunCenteredRegion region) {
+    static byte[] filter(byte[] array, int width, int height, ImageFilter filter) {
+        if (filter.isNone())
+            return array;
+
         int length = width * height;
 
         float[] data = new float[length];
@@ -52,7 +73,7 @@ public class ImageFilter {
             }
         });
 
-        float[] image = filter(data, width, height, algorithm, region);
+        float[] image = filter.algorithm.filter(data, width, height);
 
         byte[] out = new byte[length];
         ParallelRange.run(height, (from, to) -> {
@@ -68,7 +89,10 @@ public class ImageFilter {
         return out;
     }
 
-    private static short[] filterHalfFloat(short[] array, int width, int height, Algorithm algorithm, @Nullable SunCenteredRegion region) {
+    static short[] filterHalfFloat(short[] array, int width, int height, ImageFilter filter) {
+        if (filter.isNone())
+            return array;
+
         int length = width * height;
 
         float[] data = new float[length];
@@ -82,7 +106,7 @@ public class ImageFilter {
             }
         });
 
-        float[] image = filter(data, width, height, algorithm, region);
+        float[] image = filter.algorithm.filter(data, width, height);
 
         short[] out = new short[length];
         ParallelRange.run(height, (from, to) -> {
@@ -96,20 +120,6 @@ public class ImageFilter {
         });
 
         return out;
-    }
-
-    private static float[] filter(float[] data, int width, int height, Algorithm algorithm, @Nullable SunCenteredRegion region) {
-        return algorithm instanceof RegionAlgorithm regionAlgorithm
-                ? regionAlgorithm.filter(data, width, height, region)
-                : algorithm.filter(data, width, height);
-    }
-
-    static byte[] filter(byte[] data, int width, int height, Type type, @Nullable SunCenteredRegion region) {
-        return type == Type.None ? data : filter(data, width, height, type.algorithm, region);
-    }
-
-    static short[] filterHalfFloat(short[] data, int width, int height, Type type, @Nullable SunCenteredRegion region) {
-        return type == Type.None ? data : filterHalfFloat(data, width, height, type.algorithm, region);
     }
 
 }

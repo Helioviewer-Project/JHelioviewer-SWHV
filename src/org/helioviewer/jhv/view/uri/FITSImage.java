@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.base.ArrayUtils;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.thread.ParallelRange;
 
@@ -37,20 +36,20 @@ public final class FITSImage implements URIImageReader {
     public URIImageReader.Image readImage(File file) throws Exception {
         try (Fits f = new Fits(file)) {
             BasicHDU<?> hdu = findHDU(f);
-            return new URIImageReader.Image(getHeaderAsXML(imageHeader(hdu)), readHDU(hdu, ImageFilter.Type.None, null), null);
+            return new URIImageReader.Image(getHeaderAsXML(imageHeader(hdu)), readHDU(hdu, ImageFilter.NONE), null);
         }
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter filter) throws Exception {
         try (Fits f = new Fits(file)) {
-            return readHDU(findHDU(f), filterType, region);
+            return readHDU(findHDU(f), filter);
         }
     }
 
     public ImageBuffer readImageBuffer(InputStream input) throws Exception {
         try (Fits f = new Fits(input)) {
-            return readHDU(findHDU(f), ImageFilter.Type.None, null);
+            return readHDU(findHDU(f), ImageFilter.NONE);
         }
     }
 
@@ -334,10 +333,10 @@ public final class FITSImage implements URIImageReader {
         return axes;
     }
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception {
+    private static ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter filter) throws Exception {
         Header header = imageHeader(hdu);
         int[] axes = imageAxes(header);
-        return readPixels(header, axes, readFlatPixels(hdu, axes), filterType, region);
+        return readPixels(header, axes, readFlatPixels(hdu, axes), filter);
     }
 
     @SuppressWarnings("deprecation")
@@ -358,12 +357,12 @@ public final class FITSImage implements URIImageReader {
         return buffer.array();
     }
 
-    private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception {
+    private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter filter) throws Exception {
         int height = axes[0];
         int width = axes[1];
 
         if (pixels instanceof byte[] inData) {
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filterType, region);
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter);
             ByteBuffer outData = outBuffer.byteBuffer();
             for (int j = 0; j < height; j++) {
                 outData.put(width * (height - 1 - j), inData, width * j, width);
@@ -389,7 +388,7 @@ public final class FITSImage implements URIImageReader {
                 SampleBuffer sampleData = sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                    return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filterType, region).finish();
+                    return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).finish();
 
                 if (state.clippingMode().percentile() > 0) {
                     double percentile = state.clippingMode().percentile();
@@ -411,7 +410,7 @@ public final class FITSImage implements URIImageReader {
         }
         // System.out.println(">>> " + min + ' ' + max);
 
-        ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16F, filterType, region);
+        ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray16F, filter);
         convertPixels(pixels, outBuffer.shortBuffer(), hasBlank, blank, bzero, bscale, width, height, min, max, state);
         return outBuffer.finish();
     }
