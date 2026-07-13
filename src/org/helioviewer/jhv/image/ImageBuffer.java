@@ -5,8 +5,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
-import javax.annotation.Nullable;
-
 import org.lwjgl.system.MemoryUtil;
 
 public final class ImageBuffer {
@@ -32,25 +30,25 @@ public final class ImageBuffer {
     private volatile boolean explicitFreeProtected;
 
     public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data) {
-        return fromBytes(width, height, format, data, ImageFilter.Type.None, null);
+        return fromBytes(width, height, format, data, ImageFilter.NONE);
     }
 
-    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) {
+    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter filter) {
         if (format == Format.Gray16F)
             throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
-        byte[] filtered = format == Format.RGBA32 ? data : ImageFilter.filter(data, width, height, filterType, region);
+        byte[] filtered = format == Format.RGBA32 ? data : ImageFilter.filter(data, width, height, filter);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
-    public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) {
+    public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter filter) {
         if (format != Format.Gray16F)
             throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
-        short[] filtered = ImageFilter.filterHalfFloat(data, width, height, filterType, region);
+        short[] filtered = ImageFilter.filterHalfFloat(data, width, height, filter);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
-    public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) {
-        return new WriteBuffer(width, height, format, filterType, region);
+    public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter filter) {
+        return new WriteBuffer(width, height, format, filter);
     }
 
     private ImageBuffer(int _width, int _height, Format _format, ByteBuffer _buffer) {
@@ -92,21 +90,19 @@ public final class ImageBuffer {
         private final int width;
         private final int height;
         private final Format format;
-        private final ImageFilter.Type filterType;
-        private final SunCenteredRegion region;
+        private final ImageFilter filter;
         private final ImageBuffer directBuffer;
         private final byte[] byteArray;
         private final short[] shortArray;
         private final Buffer writeBuffer;
 
-        private WriteBuffer(int _width, int _height, Format _format, ImageFilter.Type _filterType, @Nullable SunCenteredRegion _region) {
+        private WriteBuffer(int _width, int _height, Format _format, ImageFilter _filter) {
             width = _width;
             height = _height;
             format = _format;
-            filterType = _filterType;
-            region = _region;
+            filter = _filter;
 
-            if (usesDirectBuffer(format, filterType)) {
+            if (usesDirectBuffer(format, filter)) {
                 directBuffer = allocate(width, height, format);
                 byteArray = null;
                 shortArray = null;
@@ -136,12 +132,12 @@ public final class ImageBuffer {
             if (directBuffer != null)
                 return directBuffer;
             return shortArray != null
-                    ? fromShorts(width, height, format, shortArray, filterType, region)
-                    : fromBytes(width, height, format, byteArray, filterType, region);
+                    ? fromShorts(width, height, format, shortArray, filter)
+                    : fromBytes(width, height, format, byteArray, filter);
         }
 
-        private static boolean usesDirectBuffer(Format format, ImageFilter.Type filterType) {
-            return filterType == ImageFilter.Type.None || format == Format.RGBA32;
+        private static boolean usesDirectBuffer(Format format, ImageFilter filter) {
+            return filter.isNone() || format == Format.RGBA32;
         }
     }
 

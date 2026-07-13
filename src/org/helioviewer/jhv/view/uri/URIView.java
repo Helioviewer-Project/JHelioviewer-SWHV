@@ -12,7 +12,6 @@ import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
-import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
@@ -33,7 +32,6 @@ public final class URIView extends BaseView {
     private final URIImageReader reader;
     private final String xml;
     private final Region imageRegion;
-    private final SunCenteredRegion sunCenteredRegion;
 
     public URIView(LatestWorker<DecodedImage> _executor, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
@@ -58,7 +56,6 @@ public final class URIView extends BaseView {
             xml = readXml;
 
             imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
-            sunCenteredRegion = SunCenteredRegion.fromImageRegion(imageRegion, m.getSunShift());
             metaData[0] = m;
             ImageBufferCache.put(decodeKey(ImageFilter.Type.None), new DecodedImage(buffer, imageRegion));
 
@@ -80,7 +77,11 @@ public final class URIView extends BaseView {
             sendDataToHandler(image, viewpoint);
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader, filterType, sunCenteredRegion, imageRegion), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader, createFilter(filterType), imageRegion), new Callback(key, viewpoint));
+    }
+
+    private ImageFilter createFilter(ImageFilter.Type type) {
+        return ImageFilter.of(type, imageRegion, metaData[0]);
     }
 
     private ImageFilter.Type decodeKeyFilter;
@@ -94,11 +95,11 @@ public final class URIView extends BaseView {
         return decodeKey;
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type, SunCenteredRegion sunCenteredRegion, Region imageRegion) implements Callable<DecodedImage> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter filter, Region imageRegion) implements Callable<DecodedImage> {
         @Nonnull
         @Override
         public DecodedImage call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file, type, sunCenteredRegion);
+            ImageBuffer imageBuffer = reader.readImageBuffer(file, filter);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
             return new DecodedImage(imageBuffer, imageRegion);
