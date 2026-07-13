@@ -35,21 +35,21 @@ public final class ImageBuffer {
         return fromBytes(width, height, format, data, ImageFilter.Type.None, null);
     }
 
-    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter.Type filterType, @Nullable FilterRegion region) {
+    public static ImageBuffer fromBytes(int width, int height, Format format, byte[] data, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) {
         if (format == Format.Gray16F)
             throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
         byte[] filtered = format == Format.RGBA32 ? data : ImageFilter.filter(data, width, height, filterType, region);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
-    public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter.Type filterType, @Nullable FilterRegion region) {
+    public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) {
         if (format != Format.Gray16F)
             throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
         short[] filtered = ImageFilter.filterHalfFloat(data, width, height, filterType, region);
         return new ImageBuffer(width, height, format, allocateFrom(filtered));
     }
 
-    public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter.Type filterType, @Nullable FilterRegion region) {
+    public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) {
         return new WriteBuffer(width, height, format, filterType, region);
     }
 
@@ -93,13 +93,13 @@ public final class ImageBuffer {
         private final int height;
         private final Format format;
         private final ImageFilter.Type filterType;
-        private final FilterRegion region;
+        private final SunCenteredRegion region;
         private final ImageBuffer directBuffer;
         private final byte[] byteArray;
         private final short[] shortArray;
         private final Buffer writeBuffer;
 
-        private WriteBuffer(int _width, int _height, Format _format, ImageFilter.Type _filterType, @Nullable FilterRegion _region) {
+        private WriteBuffer(int _width, int _height, Format _format, ImageFilter.Type _filterType, @Nullable SunCenteredRegion _region) {
             width = _width;
             height = _height;
             format = _format;

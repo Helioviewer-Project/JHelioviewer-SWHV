@@ -33,12 +33,12 @@ public class ImageFilter {
             return filter(data, width, height, null);
         }
 
-        float[] filter(float[] data, int width, int height, @Nullable FilterRegion region);
+        float[] filter(float[] data, int width, int height, @Nullable SunCenteredRegion region);
     }
 
     private static final float BDIV = 1 / 255f;
 
-    private static byte[] filter(byte[] array, int width, int height, Algorithm algorithm, @Nullable FilterRegion region) {
+    private static byte[] filter(byte[] array, int width, int height, Algorithm algorithm, @Nullable SunCenteredRegion region) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -68,7 +68,7 @@ public class ImageFilter {
         return out;
     }
 
-    private static short[] filterHalfFloat(short[] array, int width, int height, Algorithm algorithm, @Nullable FilterRegion region) {
+    private static short[] filterHalfFloat(short[] array, int width, int height, Algorithm algorithm, @Nullable SunCenteredRegion region) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -98,17 +98,17 @@ public class ImageFilter {
         return out;
     }
 
-    private static float[] filter(float[] data, int width, int height, Algorithm algorithm, @Nullable FilterRegion region) {
+    private static float[] filter(float[] data, int width, int height, Algorithm algorithm, @Nullable SunCenteredRegion region) {
         return algorithm instanceof RegionAlgorithm regionAlgorithm
                 ? regionAlgorithm.filter(data, width, height, region)
                 : algorithm.filter(data, width, height);
     }
 
-    static byte[] filter(byte[] data, int width, int height, Type type, @Nullable FilterRegion region) {
+    static byte[] filter(byte[] data, int width, int height, Type type, @Nullable SunCenteredRegion region) {
         return type == Type.None ? data : filter(data, width, height, type.algorithm, region);
     }
 
-    static short[] filterHalfFloat(short[] data, int width, int height, Type type, @Nullable FilterRegion region) {
+    static short[] filterHalfFloat(short[] data, int width, int height, Type type, @Nullable SunCenteredRegion region) {
         return type == Type.None ? data : filterHalfFloat(data, width, height, type.algorithm, region);
     }
 

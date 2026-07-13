@@ -5,10 +5,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.image.FilterRegion;
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.metadata.Region;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -28,7 +30,7 @@ import kdu_jni.Kdu_thread_env;
 
 record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFilter.Type filterType,
                   MetaData metaData, double factorX, double factorY)
-        implements Callable<ImageBuffer> {
+        implements Callable<DecodedImage> {
 
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
@@ -50,7 +52,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
     }
 
     @Override
-    public ImageBuffer call() throws Exception {
+    public DecodedImage call() throws Exception {
         boolean sourceInUse = false;
         boolean sourceOpened = false;
         boolean recreateThreadEnv = false;
@@ -104,8 +106,9 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             boolean gray = numComps < 3;
             // Assume Kakadu's 4-byte compositor output already matches our RGBA byte upload layout.
             ImageBuffer.Format format = gray ? ImageBuffer.Format.Gray8 : ImageBuffer.Format.RGBA32;
-            FilterRegion region = new FilterRegion(metaData, actualX, actualY, factorX, factorY);
-            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filterType, region);
+            Region imageRegion = metaData.roiToRegion(actualX, actualY, actualWidth, actualHeight, factorX, factorY);
+            SunCenteredRegion sunCenteredRegion = SunCenteredRegion.fromImageRegion(imageRegion, metaData.getSunShift());
+            ImageBuffer.WriteBuffer outBuffer = ImageBuffer.createWriteBuffer(actualWidth, actualHeight, format, filterType, sunCenteredRegion);
             ByteBuffer outByteBuffer = outBuffer.byteBuffer();
 
             Kdu_dims newRegion = scratch.newRegion;
@@ -139,7 +142,7 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
         if (view.getMaximumFrameNumber() > 0 && acc.count() == view.getMaximumFrameNumber() + 1)
             System.out.println(">>> mean: " + acc.mean() + " stddev: " + acc.sampleStandardDeviation());
 */
-            return outBuffer.finish();
+            return new DecodedImage(outBuffer.finish(), imageRegion);
         } catch (KduException e) {
             recreateThreadEnv = true;
             throw e;

@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
-import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.io.DataUri.Format.Image;
@@ -33,7 +33,7 @@ import org.json.JSONObject;
 
 final class ImageLayerLoader {
 
-    private final LatestWorker<ImageBuffer> executor = new LatestWorker<>("View-Decoder");
+    private final LatestWorker<DecodedImage> executor = new LatestWorker<>("View-Decoder");
     private final Consumer<View> onViewLoaded;
     private final Runnable onUnload;
 

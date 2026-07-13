@@ -2,6 +2,7 @@ package org.helioviewer.jhv.view;
 
 import javax.annotation.Nullable;
 
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.image.lut.LUT;
@@ -14,14 +15,14 @@ import org.helioviewer.jhv.time.JHVTime;
 
 public class BaseView implements View {
 
-    protected final LatestWorker<ImageBuffer> executor;
+    protected final LatestWorker<DecodedImage> executor;
     protected final DataUri dataUri;
 
     protected ImageFilter.Type filterType = ImageFilter.Type.None;
     protected LUT builtinLUT;
     protected MetaData[] metaData = {BasicMetaData.EMPTY}; // paranoia
 
-    public BaseView(LatestWorker<ImageBuffer> _executor, DataUri _dataUri) {
+    public BaseView(LatestWorker<DecodedImage> _executor, DataUri _dataUri) {
         executor = _executor;
         dataUri = _dataUri;
     }

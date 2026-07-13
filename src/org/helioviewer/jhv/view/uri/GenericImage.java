@@ -18,9 +18,9 @@ import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.image.FilterRegion;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 //import org.helioviewer.jhv.io.XMLUtils;
@@ -77,7 +77,7 @@ final class GenericImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable FilterRegion region) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception {
         return withReader(file, reader -> readBuffered(reader.read(0), filterType, region));
     }
 
@@ -99,7 +99,7 @@ final class GenericImage implements URIImageReader {
         }
     }
 
-    private static ImageBuffer readBuffered(BufferedImage image, ImageFilter.Type filterType, @Nullable FilterRegion region) {
+    private static ImageBuffer readBuffered(BufferedImage image, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) {
         int w = image.getWidth();
         int h = image.getHeight();
 

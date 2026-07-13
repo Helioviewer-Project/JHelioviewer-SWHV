@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.image.ImageBuffer;
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.APIRequest;
@@ -20,7 +20,6 @@ import org.helioviewer.jhv.io.DataUri.Format.Image;
 import org.helioviewer.jhv.metadata.BasicMetaData;
 import org.helioviewer.jhv.metadata.FitsMetaData;
 import org.helioviewer.jhv.metadata.MetaData;
-import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.metadata.XMLMetaDataContainer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
@@ -55,7 +54,7 @@ public class J2KView extends BaseView {
 
     protected final J2KReader reader;
 
-    public J2KView(LatestWorker<ImageBuffer> _executor, APIRequest _request, DataUri _dataUri) throws Exception {
+    public J2KView(LatestWorker<DecodedImage> _executor, APIRequest _request, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
         serial = globalSerial.incrementAndGet();
         request = _request;
@@ -271,11 +270,11 @@ public class J2KView extends BaseView {
         }
 
         J2KDecodeKey key = new J2KDecodeKey(serial, decodeParams, filterType);
-        ImageBuffer imageBuffer = ImageBufferCache.get(key);
-        if (imageBuffer != null) {
+        DecodedImage image = ImageBufferCache.get(key);
+        if (image != null) {
             // Mark running decodes stale before publishing this cached result.
             executor.cancel();
-            sendDataToHandler(decodeParams, viewpoint, imageBuffer);
+            sendDataToHandler(decodeParams.frame, viewpoint, image);
             return;
         }
         submitDecode(decodeParams, viewpoint, cacheResult);
@@ -303,7 +302,7 @@ public class J2KView extends BaseView {
         }
     }
 
-    private class J2KCallback implements LatestWorker.Callback<ImageBuffer> {
+    private class J2KCallback implements LatestWorker.Callback<DecodedImage> {
 
         private final J2KDecodeKey key;
         private final Position viewpoint;
@@ -316,13 +315,13 @@ public class J2KView extends BaseView {
         }
 
         @Override
-        public void onSuccess(ImageBuffer result, boolean fresh) {
+        public void onSuccess(DecodedImage result, boolean fresh) {
             if (key.filter() != filterType) return; // filter changed in-flight
             if (cacheResult) ImageBufferCache.put(key, result);
 
             // This decode was superseded after it started; do not publish it to the layer.
             if (!fresh) return;
-            sendDataToHandler(key.params(), viewpoint, result);
+            sendDataToHandler(key.params().frame, viewpoint, result);
         }
 
         @Override
@@ -332,20 +331,16 @@ public class J2KView extends BaseView {
 
     }
 
-    private void sendDataToHandler(J2KParams.Decode decodeParams, Position viewpoint, ImageBuffer imageBuffer) {
-        imageBuffer.protectFromExplicitFree();
-        int frame = decodeParams.frame;
+    private void sendDataToHandler(int frame, Position viewpoint, DecodedImage image) {
+        image.imageBuffer().protectFromExplicitFree();
         MetaData m = metaData[frame];
-        J2KParams.SubImage roi = decodeParams.subImage;
-        ResolutionSet.Level resolution = getResolutionLevel(frame, decodeParams.level);
-        Region r = m.roiToRegion(roi.x(), roi.y(), roi.w(), roi.h(), resolution.factorX(), resolution.factorY());
 
-        View.ImageData data = new View.ImageData(imageBuffer, m, r, viewpoint);
+        View.ImageData data = new View.ImageData(image.imageBuffer(), m, image.region(), viewpoint);
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);
             else
-                imageBuffer.allowExplicitFree();
+                image.imageBuffer().allowExplicitFree();
         });
     }
 

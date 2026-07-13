@@ -17,19 +17,19 @@ public final class ImageBufferCache {
     private static final long MAX_CACHE_BYTES = 8L * 1024 * 1024 * 1024;
     private static final ArrayList<WeakReference<ImageBuffer>> retired = new ArrayList<>();
 
-    private static final Cache<Object, ImageBuffer> cache = Caffeine.newBuilder()
+    private static final Cache<Object, DecodedImage> cache = Caffeine.newBuilder()
             .maximumWeight(MAX_CACHE_BYTES)
-            .weigher((Object key, ImageBuffer value) -> value.byteSize())
-            .removalListener((Object key, ImageBuffer value, RemovalCause cause) -> retire(value))
+            .weigher((Object key, DecodedImage value) -> value.imageBuffer().byteSize())
+            .removalListener((Object key, DecodedImage value, RemovalCause cause) -> retire(value.imageBuffer()))
             .build();
 
     @Nullable
-    public static ImageBuffer get(Object key) {
+    public static DecodedImage get(Object key) {
         return cache.getIfPresent(key);
     }
 
-    public static void put(Object key, ImageBuffer imageBuffer) {
-        cache.put(key, imageBuffer);
+    public static void put(Object key, DecodedImage image) {
+        cache.put(key, image);
     }
 
     public static void invalidateIf(Predicate<Object> predicate) {

@@ -4,9 +4,9 @@ import java.io.File;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.image.FilterRegion;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.image.lut.LUT;
 
 interface URIImageReader {
@@ -15,6 +15,6 @@ interface URIImageReader {
 
     Image readImage(File file) throws Exception;
 
-    ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable FilterRegion region) throws Exception;
+    ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception;
 
 }
