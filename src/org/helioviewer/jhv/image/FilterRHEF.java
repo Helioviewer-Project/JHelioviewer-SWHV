@@ -77,6 +77,7 @@ class FilterRHEF implements ImageFilter.Algorithm {
 
         float[] out = data.clone();
         ParallelRange.run(numBins, (from, to) -> {
+            long[] packed = new long[0];
             for (int b = from; b < to; b++) {
                 int lo = offset[b];
                 int hi = offset[b + 1];
@@ -85,7 +86,10 @@ class FilterRHEF implements ImageFilter.Algorithm {
 
                 // Pack value bits with the pixel index; non-negative float bits sort numerically.
                 // Zero pixels (detector padding, occulters) are excluded and stay zero.
-                long[] packed = new long[hi - lo];
+                int binSize = hi - lo;
+                if (packed.length < binSize) {
+                    packed = new long[binSize];
+                }
                 int n = 0;
                 for (int j = lo; j < hi; j++) {
                     int idx = order[j];
