@@ -8,10 +8,11 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.image.FilterRegion;
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageBufferCache;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.DataUri;
 import org.helioviewer.jhv.metadata.BasicMetaData;
@@ -32,9 +33,9 @@ public final class URIView extends BaseView {
     private final URIImageReader reader;
     private final String xml;
     private final Region imageRegion;
-    private final FilterRegion filterRegion;
+    private final SunCenteredRegion sunCenteredRegion;
 
-    public URIView(LatestWorker<ImageBuffer> _executor, DataUri _dataUri) throws Exception {
+    public URIView(LatestWorker<DecodedImage> _executor, DataUri _dataUri) throws Exception {
         super(_executor, _dataUri);
 
         reader = dataUri.format() == DataUri.Format.Image.FITS ? new FITSImage() : new GenericImage();
@@ -57,9 +58,9 @@ public final class URIView extends BaseView {
             xml = readXml;
 
             imageRegion = m.roiToRegion(0, 0, buffer.width, buffer.height, 1, 1);
-            filterRegion = new FilterRegion(m, 0, 0, 1, 1);
+            sunCenteredRegion = SunCenteredRegion.fromImageRegion(imageRegion, m.getSunShift());
             metaData[0] = m;
-            ImageBufferCache.put(decodeKey(ImageFilter.Type.None), buffer);
+            ImageBufferCache.put(decodeKey(ImageFilter.Type.None), new DecodedImage(buffer, imageRegion));
 
             LUT lut = image.lut();
             if (lut != null)
@@ -72,14 +73,14 @@ public final class URIView extends BaseView {
     @Override
     public void decode(Position viewpoint, double pixFactor, float factor) {
         URIDecodeKey key = decodeKey(filterType);
-        ImageBuffer imageBuffer = ImageBufferCache.get(key);
-        if (imageBuffer != null) {
+        DecodedImage image = ImageBufferCache.get(key);
+        if (image != null) {
             // Mark running decodes stale before publishing this cached result.
             executor.cancel();
-            sendDataToHandler(imageBuffer, viewpoint);
+            sendDataToHandler(image, viewpoint);
             return;
         }
-        executor.submit(new Decoder(dataUri.file(), reader, filterType, filterRegion), new Callback(key, viewpoint));
+        executor.submit(new Decoder(dataUri.file(), reader, filterType, sunCenteredRegion, imageRegion), new Callback(key, viewpoint));
     }
 
     private ImageFilter.Type decodeKeyFilter;
@@ -93,18 +94,18 @@ public final class URIView extends BaseView {
         return decodeKey;
     }
 
-    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type, FilterRegion region) implements Callable<ImageBuffer> {
+    private record Decoder(File file, URIImageReader reader, ImageFilter.Type type, SunCenteredRegion sunCenteredRegion, Region imageRegion) implements Callable<DecodedImage> {
         @Nonnull
         @Override
-        public ImageBuffer call() throws Exception {
-            ImageBuffer imageBuffer = reader.readImageBuffer(file, type, region);
+        public DecodedImage call() throws Exception {
+            ImageBuffer imageBuffer = reader.readImageBuffer(file, type, sunCenteredRegion);
             if (imageBuffer == null) // e.g. FITS
                 throw new Exception("Could not read: " + file);
-            return imageBuffer;
+            return new DecodedImage(imageBuffer, imageRegion);
         }
     }
 
-    private class Callback implements LatestWorker.Callback<ImageBuffer> {
+    private class Callback implements LatestWorker.Callback<DecodedImage> {
 
         private final URIDecodeKey key;
         private final Position viewpoint;
@@ -115,7 +116,7 @@ public final class URIView extends BaseView {
         }
 
         @Override
-        public void onSuccess(ImageBuffer result, boolean fresh) {
+        public void onSuccess(DecodedImage result, boolean fresh) {
             if (key.filter() != filterType) return; // filter changed in-flight
 
             ImageBufferCache.put(key, result);
@@ -131,14 +132,14 @@ public final class URIView extends BaseView {
 
     }
 
-    private void sendDataToHandler(ImageBuffer imageBuffer, Position viewpoint) {
-        imageBuffer.protectFromExplicitFree();
-        View.ImageData data = new View.ImageData(imageBuffer, metaData[0], imageRegion, viewpoint);
+    private void sendDataToHandler(DecodedImage image, Position viewpoint) {
+        image.imageBuffer().protectFromExplicitFree();
+        View.ImageData data = new View.ImageData(image.imageBuffer(), metaData[0], image.region(), viewpoint);
         EventQueue.invokeLater(() -> {
             if (dataHandler != null)
                 dataHandler.handleData(data);
             else
-                imageBuffer.allowExplicitFree();
+                image.imageBuffer().allowExplicitFree();
         });
     }
 

@@ -10,9 +10,9 @@ import java.util.Arrays;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.base.ArrayUtils;
-import org.helioviewer.jhv.image.FilterRegion;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
+import org.helioviewer.jhv.image.SunCenteredRegion;
 import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.thread.ParallelRange;
 
@@ -42,7 +42,7 @@ public final class FITSImage implements URIImageReader {
     }
 
     @Override
-    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable FilterRegion region) throws Exception {
+    public ImageBuffer readImageBuffer(File file, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception {
         try (Fits f = new Fits(file)) {
             return readHDU(findHDU(f), filterType, region);
         }
@@ -334,7 +334,7 @@ public final class FITSImage implements URIImageReader {
         return axes;
     }
 
-    private static ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter.Type filterType, @Nullable FilterRegion region) throws Exception {
+    private static ImageBuffer readHDU(BasicHDU<?> hdu, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception {
         Header header = imageHeader(hdu);
         int[] axes = imageAxes(header);
         return readPixels(header, axes, readFlatPixels(hdu, axes), filterType, region);
@@ -358,7 +358,7 @@ public final class FITSImage implements URIImageReader {
         return buffer.array();
     }
 
-    private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter.Type filterType, @Nullable FilterRegion region) throws Exception {
+    private static ImageBuffer readPixels(Header header, int[] axes, Object pixels, ImageFilter.Type filterType, @Nullable SunCenteredRegion region) throws Exception {
         int height = axes[0];
         int width = axes[1];
 

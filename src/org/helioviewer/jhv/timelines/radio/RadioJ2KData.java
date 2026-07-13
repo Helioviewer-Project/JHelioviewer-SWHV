@@ -11,6 +11,7 @@ import java.awt.image.SampleModel;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.image.DecodedImage;
 import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataUri;
@@ -27,7 +28,7 @@ import org.helioviewer.jhv.view.j2k.ResolutionSet;
 
 class RadioJ2KData implements View.DataHandler {
 
-    private final LatestWorker<ImageBuffer> executor = new LatestWorker<>("Radio-Decoder");
+    private final LatestWorker<DecodedImage> executor = new LatestWorker<>("Radio-Decoder");
     private final J2KViewCallisto view;
     private boolean disposed;
 

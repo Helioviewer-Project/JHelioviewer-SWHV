@@ -16,13 +16,13 @@ class FilterRHEF implements ImageFilter.RegionAlgorithm {
     private static final int MIN_BIN_COUNT = 5;
 
     @Override
-    public float[] filter(float[] data, int width, int height, @Nullable FilterRegion filterRegion) {
+    public float[] filter(float[] data, int width, int height, @Nullable SunCenteredRegion sunCenteredRegion) {
         if (width < 1 || height < 1)
             return data;
 
         // Buffer geometry in physical units; the region origin sits at the Sun center.
         // Without a region, assume the Sun at the image center with pixel units.
-        Region region = filterRegion == null ? null : filterRegion.sunCentered(width, height);
+        Region region = sunCenteredRegion == null ? null : sunCenteredRegion.region();
         double pixX, pixY, llx, lly;
         if (region == null || !(region.width > 0) || !(region.height > 0)) {
             pixX = 1;
