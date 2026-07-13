@@ -43,7 +43,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO displayBO;
-    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 4 + 4);
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 2 + 2 + 2 + 1 + 1);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init() {

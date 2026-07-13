@@ -27,10 +27,8 @@ import kdu_jni.Kdu_quality_limiter;
 import kdu_jni.Kdu_region_compositor;
 import kdu_jni.Kdu_thread_env;
 
-record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFilter.Type filterType,
-                  MetaData metaData, double factorX, double factorY)
-        implements Callable<DecodedImage> {
-
+record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFilter.Type filterType, MetaData metaData,
+                  double factorX, double factorY) implements Callable<DecodedImage> {
     // Maximum of samples to process per rendering iteration
     private static final int MAX_RENDER_SAMPLES = 256 * 1024;
     private static final int[] firstComponent = {0};
