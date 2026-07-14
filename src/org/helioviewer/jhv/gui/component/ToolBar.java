@@ -330,16 +330,19 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         warpLambdaSlider = new JHVSlider(-1000, 1000, (int) Math.round(Display.getWarpLambda() * 1000));
         warpLambdaSlider.setToolTipText("Box-Cox lambda for warp projections");
         warpLambdaSlider.setPreferredSize(new Dimension(110, warpLambdaSlider.getPreferredSize().height));
-        JLabel value = new JLabel(String.format("lambda %.3f", Display.getWarpLambda()), JLabel.RIGHT);
+        JLabel label = new JLabel("lambda");
+        JLabel value = new JLabel(String.format("%.3f", Display.getWarpLambda()), JLabel.RIGHT);
+        value.setPreferredSize(new JLabel("-0.000").getPreferredSize());
         warpLambdaSlider.addChangeListener(e -> {
             Display.setWarpLambda(warpLambdaSlider.getValue() / 1000.);
-            value.setText(String.format("lambda %.3f", Display.getWarpLambda()));
+            value.setText(String.format("%.3f", Display.getWarpLambda()));
             DisplayController.display();
         });
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
-        panel.add(value, BorderLayout.LINE_START);
+        panel.add(label, BorderLayout.LINE_START);
         panel.add(warpLambdaSlider, BorderLayout.CENTER);
+        panel.add(value, BorderLayout.LINE_END);
         return panel;
     }
 
