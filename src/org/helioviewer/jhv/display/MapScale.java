@@ -27,14 +27,6 @@ public interface MapScale {
         return new LinearMapScale(-halfWidth, halfWidth, -halfHeight, halfHeight);
     }
 
-    static MapScale polar(double radialSize) {
-        return new LinearMapScale(0, 360, 0, radialSize);
-    }
-
-    static MapScale logpolar(double radialSize) {
-        return new LogMapScale(0, 360, 0.05, Math.max(0.05, radialSize));
-    }
-
     static MapScale boxCoxRadial(double radialSize) {
         return new BoxCoxRadialScale(0, 360, 0, Math.max(radialSize, 1));
     }
@@ -107,34 +99,6 @@ public interface MapScale {
         protected abstract double scaleY(double val);
 
         protected abstract double invScaleY(double val);
-
-    }
-
-    final class LogMapScale extends MapScaleBase {
-
-        LogMapScale(double _xStart, double _xStop, double _yStart, double _yStop) {
-            super(_xStart, _xStop, _yStart, _yStop);
-        }
-
-        @Override
-        public double scaleX(double val) {
-            return val;
-        }
-
-        @Override
-        public double invScaleX(double val) {
-            return val;
-        }
-
-        @Override
-        public double scaleY(double val) {
-            return Math.log(val);
-        }
-
-        @Override
-        public double invScaleY(double val) {
-            return Math.exp(val);
-        }
 
     }
 

@@ -14,13 +14,12 @@ import org.helioviewer.jhv.wcs.WcsProjection;
 
 final class ProjectedMap {
 
-    enum Kind {HPC, LATITUDINAL, POLAR, RADIAL_WARP, RECT_WARP}
+    enum Kind {HPC, LATITUDINAL, RADIAL_WARP, RECT_WARP}
 
     static Vec2 project(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
         return switch (kind) {
             case HPC -> projectHpc(viewpoint, v, scale);
             case LATITUDINAL -> projectLatitudinal(rotation, scale, v);
-            case POLAR -> projectPolar(rotation, scale, v);
             case RADIAL_WARP -> projectRadialWarp(viewpoint, scale, v);
             case RECT_WARP -> projectRectWarp(viewpoint, scale, v);
         };
@@ -30,7 +29,6 @@ final class ProjectedMap {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
             case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
-            case POLAR -> unprojectPolar(rotation, pt.x, pt.y);
             case RADIAL_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
             case RECT_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
         };
@@ -48,14 +46,6 @@ final class ProjectedMap {
 
     private static Vec3 unprojectLatitudinal(Quat rotation, double longitudeDeg, double latitudeDeg) {
         return rotation.rotateInverseVector(unprojectLatitudinalPoint(longitudeDeg, latitudeDeg));
-    }
-
-    private static Vec2 projectPolar(Quat rotation, MapScale scale, Vec3 v) {
-        return projectPolarVector(rotation.rotateVector(v), scale);
-    }
-
-    private static Vec3 unprojectPolar(Quat rotation, double angleDeg, double radius) {
-        return rotation.rotateInverseVector(unprojectPolarPoint(angleDeg, radius));
     }
 
     private static Vec3 unprojectRadialWarp(Position viewpoint, double angleDeg, double radius) {
@@ -279,22 +269,6 @@ final class ProjectedMap {
 
     private static void emitProjectedVertex(Viewport vp, Vec2 projected, byte[] color, BufVertex vexBuf) {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
-    }
-
-    private static Vec2 projectPolarVector(Vec3 v, MapScale scale) {
-        double r = Math.sqrt(v.x * v.x + v.y * v.y);
-        double theta = PolarBasis.angle(v);
-        double scaledr = scale.getYValueInv(r);
-        double scaledtheta = scale.getXValueInv(Math.toDegrees(theta));
-        return new Vec2(scaledtheta, scaledr);
-    }
-
-    private static Vec3 unprojectPolarPoint(double angleDeg, double radius) {
-        double theta = Math.toRadians(angleDeg);
-        double x = PolarBasis.x(radius, theta);
-        double y = PolarBasis.y(radius, theta);
-        double z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
-        return new Vec3(x, y, z);
     }
 
     private static Vec2 projectLatitudinalVector(Vec3 v, MapScale scale) {

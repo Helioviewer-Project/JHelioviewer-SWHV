@@ -44,8 +44,8 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
             setText(formatHpc(coord));
         } else if (mv.isLatitudinal()) {
             setText(formatLati(coord));
-        } else if (mv.isPolar() || mv.isLogPolar() || mv.isRadialWarp() || mv.isRectWarp()) {
-            setText(formatPolar(coord));
+        } else if (mv.isRadialWarp() || mv.isRectWarp()) {
+            setText(formatAngleRadius(coord));
         } else {
             Vec3 v = mv.mouseToSky(vp, x, y);
             if (v == null) {
@@ -116,7 +116,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         return sb.append(')').toString();
     }
 
-    private String formatPolar(@Nonnull Vec2 coord) {
+    private String formatAngleRadius(@Nonnull Vec2 coord) {
         StringBuilder sb = resetBuffer();
         sb.append("(θ,ρ):(");
         if (coord == Vec2.NAN) {
