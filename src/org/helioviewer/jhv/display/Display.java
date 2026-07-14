@@ -20,14 +20,14 @@ public final class Display {
         gridType = _gridType;
     }
 
-    private static double radialWarpPower = 0.0;
+    private static double warpLambda = 0.0;
 
-    public static double getRadialWarpPower() {
-        return radialWarpPower;
+    public static double getWarpLambda() {
+        return warpLambda;
     }
 
-    public static void setRadialWarpPower(double power) {
-        radialWarpPower = Math.clamp(power, -1, 1);
+    public static void setWarpLambda(double lambda) {
+        warpLambda = Math.clamp(lambda, -1, 1);
     }
 
     static int glWidth = 1;

@@ -11,7 +11,7 @@ void main(void) {
     clamp_coord(vec2(angle / TWOPI, t));
 
     float scaled = screen.yStart + t * (screen.yStop - screen.yStart);
-    float lambda = screen.yParam;
+    float lambda = screen.lambda;
     float radialCoordinate = scaled <= 1. ? scaled
             : (lambda == 0. ? exp(scaled - 1.) : pow(1. + lambda * (scaled - 1.), 1. / lambda));
     vec2 hpcXY = (radialCoordinate / length(w)) * w;

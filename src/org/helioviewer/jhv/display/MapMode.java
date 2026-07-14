@@ -24,6 +24,10 @@ public enum MapMode {
         return kind == Kind.RADIAL_WARP;
     }
 
+    public boolean usesWarpLambda() {
+        return this == RadialWarp;
+    }
+
     MapMode(GLSLSolarShader _shader, Kind _kind) {
         shader = _shader;
         kind = _kind;

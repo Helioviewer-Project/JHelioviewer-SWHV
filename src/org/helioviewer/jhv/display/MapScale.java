@@ -16,7 +16,7 @@ public interface MapScale {
 
     double getYstop();
 
-    default double getYParam() {
+    default double getLambda() {
         return 1;
     }
 
@@ -146,7 +146,7 @@ public interface MapScale {
         }
 
         @Override
-        public double getYParam() {
+        public double getLambda() {
             return lambda();
         }
 
@@ -179,7 +179,7 @@ public interface MapScale {
         }
 
         private static double lambda() {
-            return Display.getRadialWarpPower();
+            return Display.getWarpLambda();
         }
 
     }

@@ -55,7 +55,7 @@ struct Screen {
     float xStop;
     float yStart;
     float yStop;
-    float yParam;
+    float lambda;
 };
 
 layout(std140) uniform ScreenBlock {
