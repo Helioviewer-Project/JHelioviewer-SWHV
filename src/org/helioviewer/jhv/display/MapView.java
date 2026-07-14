@@ -172,7 +172,7 @@ public abstract class MapView {
 
         @Override
         public double cameraWidth(Viewport vp) {
-            return mode.usesNormalizedFitWidth() ? NORMALIZED_FIT_WIDTH * vp.zoom : super.cameraWidth(vp);
+            return mode.usesNormalizedFitWidth() ? mode.normalizedFitWidth() * vp.zoom : super.cameraWidth(vp);
         }
 
         @Override
