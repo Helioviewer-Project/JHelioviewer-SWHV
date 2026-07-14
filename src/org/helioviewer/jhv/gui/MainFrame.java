@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Taskbar;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
@@ -237,6 +238,7 @@ public final class MainFrame {
         frame.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
 
         frame.setIconImage(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_SMALL).getImage());
+        setAppIcon();
 
         return frame;
     }
@@ -308,4 +310,20 @@ public final class MainFrame {
     }
 
     private MainFrame() {}
+
+    // The window icon above does not reach the macOS Dock or the Windows taskbar: without this the
+    // running app is represented by the generic Java icon. The usual remedy, -Xdock:icon, only
+    // applies when the app happens to be launched through a script that passes it, so set the icon
+    // from inside the app, where it always holds.
+    private static void setAppIcon() {
+        try {
+            if (!Taskbar.isTaskbarSupported())
+                return;
+            Taskbar taskbar = Taskbar.getTaskbar();
+            if (taskbar.isSupported(Taskbar.Feature.ICON_IMAGE))
+                taskbar.setIconImage(IconBank.getIcon(IconBank.JHVIcon.HVLOGO_APP).getImage());
+        } catch (Exception e) { // the icon is cosmetic and must never stop startup
+            Log.warn("Could not set the application icon", e);
+        }
+    }
 }
