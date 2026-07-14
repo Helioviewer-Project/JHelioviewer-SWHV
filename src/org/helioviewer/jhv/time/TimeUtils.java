@@ -40,6 +40,25 @@ public class TimeUtils {
         return (int) Math.max(MIN_DEF_CADENCE, (end - start) / MAX_FRAMES / 1000);
     }
 
+    // A duration rendered to 3 significant figures in its largest sensible unit, e.g. "2.03 d".
+    public static String formatDurationSig(long millis) {
+        double sec = Math.max(0, millis) / 1000.;
+        if (sec >= 86400)
+            return sig3(sec / 86400) + " d";
+        if (sec >= 3600)
+            return sig3(sec / 3600) + " h";
+        if (sec >= 60)
+            return sig3(sec / 60) + " min";
+        return sig3(sec) + " s";
+    }
+
+    private static String sig3(double v) {
+        if (v <= 0)
+            return "0";
+        int decimals = Math.max(0, 2 - (int) Math.floor(Math.log10(v)));
+        return String.format("%." + decimals + "f", v);
+    }
+
     public static long floorSec(long milli) {
         return (milli / 1000L) * 1000L;
     }

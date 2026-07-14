@@ -10,6 +10,7 @@ enum MaterialDesign {
     CHART_GANTT("mdi-chart-gantt", '\uf66c'),
     CHECK("mdi-check", '\uf12c'),
     CHEVRON_DOWN("mdi-chevron-down", '\uf140'),
+    CHEVRON_LEFT("mdi-chevron-left", '\uf141'),
     CHEVRON_RIGHT("mdi-chevron-right", '\uf142'),
     CLOSE("mdi-close", '\uf156'),
     CROP_LANDSCAPE("mdi-crop-landscape", '\uf1a0'),

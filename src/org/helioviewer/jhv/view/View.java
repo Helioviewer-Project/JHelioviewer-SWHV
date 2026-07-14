@@ -81,6 +81,20 @@ public interface View {
         return complete;
     }
 
+    // Number of frames fully loaded/cached (what the timeline draws as "complete").
+    default int getCompleteFrameCount() {
+        int max = getMaximumFrameNumber();
+        if (isComplete())
+            return max + 1;
+        int n = 0;
+        for (int i = 0; i <= max; i++) {
+            AtomicBoolean status = getFrameCompletion(i);
+            if (status != null && status.get())
+                n++;
+        }
+        return n;
+    }
+
     JHVTime getFrameTime(int frame);
 
     JHVTime getFirstTime();

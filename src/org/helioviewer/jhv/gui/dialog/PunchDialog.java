@@ -24,7 +24,9 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
+import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.PunchClient;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -79,6 +81,7 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
     private final JLabel foundLabel = new JLabel("0 found", JLabel.RIGHT);
     private final HTMLPane coverageLabel = new HTMLPane();
     private final JLabel selectedLabel = new JLabel("0 selected", JLabel.RIGHT);
+    private final JLabel cadenceWarning = new JLabel(" ", JLabel.LEFT);
 
     private boolean productsDownloaded;
     private boolean rangeUserChanged; // true once the user has explicitly set a range
@@ -199,6 +202,9 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         content.add(timeSelectorPanel);
         content.add(dataSelector);
+        JPanel warningPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
+        warningPanel.add(cadenceWarning);
+        content.add(warningPanel);
         JPanel coveragePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
         coveragePanel.add(coverageLabel);
         content.add(coveragePanel);
@@ -235,9 +241,60 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         return null;
     }
 
+    private Cadence requestCadence; // entry inserted to mirror the Layers-section time step
+
+    // Seed the cadence combo from the Layers-section request cadence so "New PUNCH Layer" honors
+    // the same time step as the main New Layer control. Cadence is a MINIMUM inter-frame spacing:
+    // asking for a step finer than the product's native cadence just keeps every available frame.
+    private void applyRequestCadence() {
+        int reqSec = MainFrame.getLayersSectionPanel().getCadence();
+        long reqMilli = reqSec == APIRequest.CADENCE_ALL ? 0 : reqSec * 1000L;
+
+        if (requestCadence != null) { // drop any stale inserted entry from a previous open
+            cadenceCombo.removeItem(requestCadence);
+            requestCadence = null;
+        }
+        for (int i = 0; i < cadenceCombo.getItemCount(); i++) {
+            if (cadenceCombo.getItemAt(i).milli == reqMilli) {
+                cadenceCombo.setSelectedIndex(i);
+                return;
+            }
+        }
+        requestCadence = new Cadence(cadenceLabel(reqMilli), reqMilli);
+        cadenceCombo.insertItemAt(requestCadence, 0);
+        cadenceCombo.setSelectedItem(requestCadence);
+    }
+
+    private static String cadenceLabel(long milli) {
+        if (milli <= 0)
+            return "native cadence";
+        long sec = milli / 1000;
+        if (sec % 86400 == 0)
+            return "every " + sec / 86400 + " day" + (sec / 86400 == 1 ? "" : "s");
+        if (sec % 3600 == 0)
+            return "every " + sec / 3600 + " hour" + (sec / 3600 == 1 ? "" : "s");
+        if (sec % 60 == 0)
+            return "every " + sec / 60 + " minute" + (sec / 60 == 1 ? "" : "s");
+        return "every " + sec + " s";
+    }
+
     public void showDialog() {
         if (!productsDownloaded && levelCombo.getSelectedItem() instanceof String level)
             PunchClient.submitGetProducts(this, level);
+
+        // Preset the main window's time range so it does not have to be retyped. If nothing sets a
+        // usable range, the time selector defaults to "now", which is past the public archive's
+        // coverage for PUNCH; the coverage probe below then falls back to the archive's latest day.
+        long start = MoviePanel.getInstance().getStartTime();
+        long end = MoviePanel.getInstance().getEndTime();
+        if (start > TimeUtils.START.milli && end > start) {
+            timeSelectorPanel.setTime(start, end);
+            rangeUserChanged = true; // honor the range even if coverage comes back later
+        }
+        applyRequestCadence(); // inherit the Layers-section "time step" so it is actually respected
+        coverageLabel.setText("Checking archive coverage...");
+        if (levelCombo.getSelectedItem() instanceof String level && productCombo.getSelectedItem() instanceof String product)
+            PunchClient.submitGetCoverage(this, level, product);
 
         pack();
         setLocationRelativeTo(MainFrame.get());
@@ -250,6 +307,45 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
         foundLabel.setText(list.isEmpty()
                 ? "0 found — archive may not cover this period; see umbra.nascom.nasa.gov/punch"
                 : list.size() + " found");
+        checkNativeCadence(list);
+    }
+
+    // If the requested step is finer than what this product actually provides, the min-spacing
+    // filter would keep every frame anyway. Fall back to "get all" and warn with the true fastest
+    // cadence so the user knows that value is what's really used.
+    private void checkNativeCadence(List<PunchClient.DataItem> list) {
+        cadenceWarning.setText(" ");
+        if (list.size() < 2 || !(cadenceCombo.getSelectedItem() instanceof Cadence sel) || sel.milli <= 0)
+            return;
+
+        long nativeMilli = Long.MAX_VALUE;
+        long prev = list.get(0).milli();
+        for (int i = 1; i < list.size(); i++) {
+            long m = list.get(i).milli();
+            nativeMilli = Math.min(nativeMilli, Math.abs(m - prev));
+            prev = m;
+        }
+        if (nativeMilli > sel.milli) {
+            cadenceWarning.setText("⚠ fastest cadence for this product is ~" + humanSpacing(nativeMilli) + "; using all available frames");
+            selectNativeCadence(); // default to "get all frames"
+        }
+    }
+
+    private void selectNativeCadence() {
+        for (int i = 0; i < cadenceCombo.getItemCount(); i++)
+            if (cadenceCombo.getItemAt(i).milli == 0) {
+                cadenceCombo.setSelectedIndex(i);
+                return;
+            }
+    }
+
+    private static String humanSpacing(long milli) {
+        long sec = Math.round(milli / 1000.0);
+        if (sec >= 3600)
+            return String.format("%.1f h", sec / 3600.0);
+        if (sec >= 60)
+            return Math.round(sec / 60.0) + " min";
+        return sec + " s";
     }
 
     @Override

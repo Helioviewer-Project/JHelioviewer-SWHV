@@ -16,6 +16,7 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.CadencePanel;
 import org.helioviewer.jhv.gui.component.ImageSelectorPanel;
+import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSourcesTree;
@@ -39,7 +40,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
     private final JButton availabilityBtn = new JButton("Available data");
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final CadencePanel cadencePanel = new CadencePanel();
+    private final CadencePanel cadencePanel = new CadencePanel(timeSelectorPanel);
     private final ImageSelectorPanel imageSelectorPanel;
     private ImageLayer layer;
 
@@ -104,6 +105,9 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
             imageSelectorPanel.setupLayer(req);
             timeSelectorPanel.setTime(req.startTime(), req.endTime());
             cadencePanel.setCadence(req.cadence());
+        } else {
+            // Preset the main window's time range so it does not have to be retyped.
+            timeSelectorPanel.setTime(MoviePanel.getInstance().getStartTime(), MoviePanel.getInstance().getEndTime());
         }
 
         if (newLayer) {
