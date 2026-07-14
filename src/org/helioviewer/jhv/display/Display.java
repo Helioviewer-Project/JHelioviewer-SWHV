@@ -20,6 +20,16 @@ public final class Display {
         gridType = _gridType;
     }
 
+    private static double radialWarpPower = 0.0;
+
+    public static double getRadialWarpPower() {
+        return radialWarpPower;
+    }
+
+    public static void setRadialWarpPower(double power) {
+        radialWarpPower = Math.clamp(power, -1, 1);
+    }
+
     static int glWidth = 1;
     static int glHeight = 1;
     public static final double[] pixelScale = {1, 1};

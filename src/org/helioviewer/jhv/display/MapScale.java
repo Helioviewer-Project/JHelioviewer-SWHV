@@ -16,6 +16,10 @@ public interface MapScale {
 
     double getYstop();
 
+    default double getYParam() {
+        return 1;
+    }
+
     MapScale ortho = new LinearMapScale(0, 0, 0, 0);
     MapScale lati = new LatitudinalMapScale(-180, 180, -90, 90);
 
@@ -29,6 +33,10 @@ public interface MapScale {
 
     static MapScale logpolar(double radialSize) {
         return new LogMapScale(0, 360, 0.05, Math.max(0.05, radialSize));
+    }
+
+    static MapScale radialWarp(double radialSize) {
+        return new RadialWarpScale(0, 360, 0, Math.max(radialSize, 1));
     }
 
     abstract class MapScaleBase implements MapScale {
@@ -126,6 +134,52 @@ public interface MapScale {
         @Override
         public double invScaleY(double val) {
             return Math.exp(val);
+        }
+
+    }
+
+    // Box-Cox radial scale outside radius 1.
+    final class RadialWarpScale extends MapScaleBase {
+
+        RadialWarpScale(double _xStart, double _xStop, double _yStart, double _yStop) {
+            super(_xStart, _xStop, _yStart, _yStop);
+        }
+
+        @Override
+        public double getYParam() {
+            return lambda();
+        }
+
+        @Override
+        public double scaleX(double val) {
+            return val;
+        }
+
+        @Override
+        public double invScaleX(double val) {
+            return val;
+        }
+
+        @Override
+        public double scaleY(double val) {
+            if (val <= 1)
+                return val;
+
+            double lambda = lambda();
+            return lambda == 0 ? 1 + Math.log(val) : 1 + (Math.pow(val, lambda) - 1) / lambda;
+        }
+
+        @Override
+        public double invScaleY(double val) {
+            if (val <= 1)
+                return val;
+
+            double lambda = lambda();
+            return lambda == 0 ? Math.exp(val - 1) : Math.pow(1 + lambda * (val - 1), 1 / lambda);
+        }
+
+        private static double lambda() {
+            return Display.getRadialWarpPower();
         }
 
     }
