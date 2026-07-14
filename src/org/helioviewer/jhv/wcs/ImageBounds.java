@@ -8,14 +8,34 @@ public final class ImageBounds {
 
     public static double radial(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
-        Vec2 crval = metaData.getWcsHeader().crval;
-        double x0 = region.llx - crval.x;
-        double x1 = region.urx - crval.x;
-        double y0 = region.lly - crval.y;
-        double y1 = region.ury - crval.y;
+        Vec2 sun = sunCenter(metaData);
+        double x0 = region.llx - sun.x;
+        double x1 = region.urx - sun.x;
+        double y0 = region.lly - sun.y;
+        double y1 = region.ury - sun.y;
         return Math.max(
                 Math.max(Math.hypot(x0, y0), Math.hypot(x1, y0)),
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
+    }
+
+    public static double inscribed(MetaData metaData) {
+        Region region = metaData.getPhysicalRegion();
+        Vec2 sun = sunCenter(metaData);
+        double right = region.urx - sun.x;
+        double left = sun.x - region.llx;
+        double top = region.ury - sun.y;
+        double bottom = sun.y - region.lly;
+        return Math.max(0, Math.min(Math.min(right, left), Math.min(top, bottom)));
+    }
+
+    private static Vec2 sunCenter(MetaData metaData) {
+        WcsHeader wcsHeader = metaData.getWcsHeader();
+        if (!wcsHeader.projection.isSurfaceMap()) {
+            Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
+            if (sun != null && Double.isFinite(sun.x) && Double.isFinite(sun.y))
+                return sun;
+        }
+        return wcsHeader.crval;
     }
 
     public static Region hpc(MetaData metaData) {
