@@ -14,7 +14,7 @@ import org.helioviewer.jhv.wcs.WcsProjection;
 
 final class ProjectedMap {
 
-    enum Kind {HPC, LATITUDINAL, POLAR, RADIAL_WARP}
+    enum Kind {HPC, LATITUDINAL, POLAR, RADIAL_WARP, RECT_WARP}
 
     static Vec2 project(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
         return switch (kind) {
@@ -22,6 +22,7 @@ final class ProjectedMap {
             case LATITUDINAL -> projectLatitudinal(rotation, scale, v);
             case POLAR -> projectPolar(rotation, scale, v);
             case RADIAL_WARP -> projectRadialWarp(viewpoint, scale, v);
+            case RECT_WARP -> projectRectWarp(viewpoint, scale, v);
         };
     }
 
@@ -31,6 +32,7 @@ final class ProjectedMap {
             case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
             case POLAR -> unprojectPolar(rotation, pt.x, pt.y);
             case RADIAL_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
+            case RECT_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
         };
     }
 
@@ -67,16 +69,26 @@ final class ProjectedMap {
     }
 
     private static Vec2 projectRadialWarp(Position viewpoint, MapScale scale, Vec3 v0) {
-        Vec3 v = toHpcViewpointSpace(viewpoint, v0);
-        double fovScale = viewpoint.distance / (viewpoint.distance - v.z);
-        double x = fovScale * v.x;
-        double y = fovScale * v.y;
-        double r = Math.hypot(x, y);
+        Vec2 hpcXY = projectToHpcPlane(viewpoint, v0);
+        double r = Math.hypot(hpcXY.x, hpcXY.y);
         if (r == 0)
             return new Vec2(0, 0);
         double t = Math.max(0, scale.getYValueInv(r) + .5);
         double f = .5 * t / r;
-        return new Vec2(f * x, f * y);
+        return new Vec2(f * hpcXY.x, f * hpcXY.y);
+    }
+
+    private static Vec2 projectRectWarp(Position viewpoint, MapScale scale, Vec3 v0) {
+        Vec2 hpcXY = projectToHpcPlane(viewpoint, v0);
+        double r = Math.hypot(hpcXY.x, hpcXY.y);
+        double theta = PolarBasis.angle(hpcXY.x, hpcXY.y);
+        return new Vec2(scale.getXValueInv(Math.toDegrees(theta)), scale.getYValueInv(r));
+    }
+
+    private static Vec2 projectToHpcPlane(Position viewpoint, Vec3 v0) {
+        Vec3 v = toHpcViewpointSpace(viewpoint, v0);
+        double fovScale = viewpoint.distance / (viewpoint.distance - v.z);
+        return new Vec2(fovScale * v.x, fovScale * v.y);
     }
 
     private static Vec2 projectHpc(Position viewpoint, Vec3 v, MapScale scale) {

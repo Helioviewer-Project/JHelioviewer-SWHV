@@ -35,8 +35,8 @@ public interface MapScale {
         return new LogMapScale(0, 360, 0.05, Math.max(0.05, radialSize));
     }
 
-    static MapScale radialWarp(double radialSize) {
-        return new RadialWarpScale(0, 360, 0, Math.max(radialSize, 1));
+    static MapScale boxCoxRadial(double radialSize) {
+        return new BoxCoxRadialScale(0, 360, 0, Math.max(radialSize, 1));
     }
 
     abstract class MapScaleBase implements MapScale {
@@ -139,9 +139,9 @@ public interface MapScale {
     }
 
     // Box-Cox radial scale outside radius 1.
-    final class RadialWarpScale extends MapScaleBase {
+    final class BoxCoxRadialScale extends MapScaleBase {
 
-        RadialWarpScale(double _xStart, double _xStop, double _yStart, double _yStop) {
+        BoxCoxRadialScale(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
         }
 

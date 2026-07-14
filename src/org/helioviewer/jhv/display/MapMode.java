@@ -11,21 +11,22 @@ public enum MapMode {
     Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
     LogPolar(GLSLSolarShader.logpolar, Kind.POLAR),
     Polar(GLSLSolarShader.polar, Kind.POLAR),
-    RadialWarp(GLSLSolarShader.radialWarp, Kind.RADIAL_WARP);
+    RadialWarp(GLSLSolarShader.radialWarp, Kind.RADIAL_WARP),
+    RectWarp(GLSLSolarShader.rectWarp, Kind.RECT_WARP);
 
     enum Kind {
-        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR, RADIAL_WARP
+        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR, RADIAL_WARP, RECT_WARP
     }
 
     public final GLSLSolarShader shader;
     final Kind kind;
 
     public boolean usesNormalizedFitWidth() {
-        return kind == Kind.RADIAL_WARP;
+        return kind == Kind.RADIAL_WARP || kind == Kind.RECT_WARP;
     }
 
     public boolean usesWarpLambda() {
-        return this == RadialWarp;
+        return this == RadialWarp || this == RectWarp;
     }
 
     MapMode(GLSLSolarShader _shader, Kind _kind) {
