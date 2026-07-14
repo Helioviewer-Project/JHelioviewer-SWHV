@@ -7,10 +7,15 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
@@ -25,6 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -49,6 +55,27 @@ public class AspiicsDialog extends StandardDialog {
     private static final String JP2_URL = "https://p3sc.oma.be/api/L3_jpeg2000?select=datalocation&orbit_id=eq.%d&active=is.true";
     private static final String DATA_URL = "https://p3sc.oma.be/datarepfiles/";
     private static final Dimension RESULT_SIZE = new Dimension(500, 350);
+    // An L3 FITS frame is a 2048x2048 float image, about 17 MB, and the P3SC archive is not fast;
+    // a whole orbit is easily several GB, so warn before a large download.
+    private static final int CONFIRM_FILES = 50;
+    private static final double FITS_MB = 16.8;
+    private static final Pattern TIME_PATTERN = Pattern.compile("(\\d{8}T\\d{6})");
+    private static final DateTimeFormatter FILE_TIME = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+
+    private record Cadence(String label, long milli) {
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    private static final Cadence[] CADENCES = {
+            new Cadence("all frames", 0),
+            new Cadence("every minute", 60_000L),
+            new Cadence("every 5 minutes", 5 * 60_000L),
+            new Cadence("every 10 minutes", 10 * 60_000L),
+            new Cadence("every 30 minutes", 30 * 60_000L),
+            new Cadence("every hour", 3600_000L)};
 
     private final JComboBox<Orbit> orbitCombo = new JComboBox<>();
     private final JRadioButton fitsButton = new JRadioButton("FITS", true);
@@ -60,6 +87,7 @@ public class AspiicsDialog extends StandardDialog {
             new JRadioButton("pb"),
             new JRadioButton("pa")
     };
+    private final JComboBox<Cadence> cadenceCombo = new JComboBox<>(CADENCES);
     private final JButton searchButton = new JButton("Search");
     private final JButton addButton = new JButton("Add");
     private final JList<String> listPane = new JList<>();
@@ -84,6 +112,8 @@ public class AspiicsDialog extends StandardDialog {
     public ButtonPanel createButtonPanel() {
         addButton.addActionListener(e -> {
             List<String> selected = listPane.getSelectedValuesList();
+            if (selected.isEmpty() || !confirmDownload(selected.size()))
+                return;
             Commands.loadImage(selected.stream().map(AspiicsDialog::uri).toList());
             setVisible(false);
         });
@@ -147,6 +177,13 @@ public class AspiicsDialog extends StandardDialog {
         queryPanel.add(productPanel, gc);
         gc.gridwidth = 1;
 
+        gc.gridx = 0;
+        gc.gridy = 2;
+        queryPanel.add(new JLabel("Cadence"), gc);
+        gc.gridx = 1;
+        cadenceCombo.setToolTipText("Thin the frames to at most one per interval; the archive is slow and the frames are large");
+        queryPanel.add(cadenceCombo, gc);
+
         listPane.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -174,6 +211,7 @@ public class AspiicsDialog extends StandardDialog {
         for (JRadioButton button : productButtons)
             button.addActionListener(e -> updateProductList());
         orbitCombo.addActionListener(e -> clearProducts());
+        cadenceCombo.addActionListener(e -> updateProductList());
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
@@ -247,18 +285,60 @@ public class AspiicsDialog extends StandardDialog {
         fitsButton.setEnabled(enabled);
         jp2Button.setEnabled(enabled);
         setEnabled(productButtons, enabled);
+        cadenceCombo.setEnabled(enabled);
         searchButton.setEnabled(enabled && orbitCombo.getSelectedItem() != null);
         addButton.setEnabled(enabled && listPane.getSelectedIndex() >= 0);
     }
 
     private void updateProductList() {
         String type = selectedProductType();
-        String[] filtered = products.stream()
+        List<String> matching = products.stream()
                 .filter(datalocation -> type.equals(productType(datalocation)))
-                .toArray(String[]::new);
-        listPane.setListData(filtered);
-        foundLabel.setText(filtered.length + " found");
+                .sorted(Comparator.comparingLong(AspiicsDialog::timeOf))
+                .toList();
+        List<String> shown = thin(matching, selectedCadence());
+        listPane.setListData(shown.toArray(String[]::new));
+        foundLabel.setText(shown.size() < matching.size()
+                ? shown.size() + " found (thinned from " + matching.size() + ')'
+                : shown.size() + " found");
         updateButtonState();
+    }
+
+    // Keep at most one frame per cadence interval. ASPIICS runs at a high native cadence, and the
+    // frames are large, so loading every one of them is rarely what you want for a movie.
+    private static List<String> thin(List<String> sorted, long cadence) {
+        if (cadence <= 0)
+            return sorted;
+        List<String> out = new ArrayList<>();
+        long last = Long.MIN_VALUE;
+        for (String datalocation : sorted) {
+            long t = timeOf(datalocation);
+            if (t < 0 || last == Long.MIN_VALUE || t - last >= cadence) {
+                out.add(datalocation);
+                if (t >= 0)
+                    last = t;
+            }
+        }
+        return out;
+    }
+
+    private long selectedCadence() {
+        return cadenceCombo.getSelectedItem() instanceof Cadence cadence ? cadence.milli() : 0;
+    }
+
+    private boolean confirmDownload(int count) {
+        if (count <= CONFIRM_FILES)
+            return true;
+        String size = jp2Button.isSelected() ? "" : String.format(" (roughly %.1f GB)", count * FITS_MB / 1024);
+        return JOptionPane.showConfirmDialog(this,
+                String.format("This will download %d frames%s.%nThe P3SC archive is not fast; a sparser cadence will cut this down.%nProceed?", count, size),
+                "Large ASPIICS download", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
+    }
+
+    // Observation time from the file name: aspiics_<product>_l3_<YYYYMMDDThhmmss>_...
+    private static long timeOf(String datalocation) {
+        Matcher m = TIME_PATTERN.matcher(fileName(datalocation));
+        return m.find() ? LocalDateTime.parse(m.group(1), FILE_TIME).toInstant(ZoneOffset.UTC).toEpochMilli() : -1;
     }
 
     private void clearProducts() {
