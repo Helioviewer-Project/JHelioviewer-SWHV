@@ -16,8 +16,6 @@ public class GridMath {
     private static final byte[] axisNorthColor = Colors.Red;
     private static final byte[] axisSouthColor = Colors.Blue;
     private static final byte[] earthLineColor = Colors.Yellow;
-    private static final byte[] color1 = Colors.Red;
-    private static final byte[] color2 = Colors.Green;
 
     private static final float earthPointSize = 0.02f;
 
@@ -112,7 +110,7 @@ public class GridMath {
         radialThickLine.setVertex(thickBuf);
     }
 
-    public static void initGrid(GLSLLine gridLine, double lonstepDegrees, double latstepDegrees) {
+    public static void initGrid(GLSLLine gridLine, double lonstepDegrees, double latstepDegrees, byte[] color) {
         int no_lon_steps = ((int) Math.ceil(360 / lonstepDegrees)) / 2 + 1;
         int no_lat_steps = ((int) Math.ceil(180 / latstepDegrees)) / 2;
         int HALFDIVISIONS = SUBDIVISIONS / 2;
@@ -131,7 +129,7 @@ public class GridMath {
                     if (i == 0) {
                         vexBuf.putVertex(rotv, Colors.Null);
                     }
-                    vexBuf.putVertex(rotv, i % 2 == 0 ? color1 : color2);
+                    vexBuf.putVertex(rotv, color);
                     if (i == HALFDIVISIONS) {
                         vexBuf.putVertex(rotv, Colors.Null);
                     }
@@ -153,7 +151,7 @@ public class GridMath {
                     if (i == 0) {
                         vexBuf.putVertex(v, Colors.Null);
                     }
-                    vexBuf.putVertex(v, i % 2 == 0 ? color1 : color2);
+                    vexBuf.putVertex(v, color);
                     if (i == HALFDIVISIONS) {
                         vexBuf.putVertex(v, Colors.Null);
                     }

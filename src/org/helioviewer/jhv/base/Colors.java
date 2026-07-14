@@ -26,6 +26,10 @@ public class Colors {
         return new float[]{(float) (c.getRed() * alpha / 255), (float) (c.getGreen() * alpha / 255), (float) (c.getBlue() * alpha / 255), (float) alpha};
     }
 
+    public static float[] fade(float[] color, double alpha) {
+        return new float[]{(float) (color[0] * alpha), (float) (color[1] * alpha), (float) (color[2] * alpha), (float) (color[3] * alpha)};
+    }
+
     public static final byte[] Null = {0, 0, 0, 0};
 
     public enum NamedColor {
@@ -66,10 +70,14 @@ public class Colors {
         }
 
         public static NamedColor parse(String name) {
+            return parse(name, Blue);
+        }
+
+        public static NamedColor parse(String name, NamedColor fallback) {
             try {
                 return valueOf(name);
             } catch (RuntimeException e) {
-                return Blue;
+                return fallback;
             }
         }
     }
