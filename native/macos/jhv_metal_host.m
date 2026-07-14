@@ -38,6 +38,21 @@ static CAMetalLayer *jhv_create_metal_layer(id<MTLDevice> device, CGFloat conten
     metalLayer.framebufferOnly = NO;
     metalLayer.opaque = YES;
     metalLayer.contentsScale = contentsScale;
+    // Without this the layer defaults to kCAGravityResize: when the layer is resized, Core Animation
+    // stretches the *previous* frame to the new bounds until fresh content is drawn, so a programmatic
+    // layout change (collapsing a panel) briefly shows a distorted frame even though the drawable and
+    // the viewport both end up correct.
+    //
+    // Without this the layer defaults to kCAGravityResize, which stretches the previous frame to the
+    // new bounds until fresh content is drawn -- a visibly distorted frame on any programmatic resize.
+    //
+    // No anchor makes a stale frame correct: the right placement depends on which edge moved. Centre
+    // is the deliberate choice, because it keeps the sidebar collapse -- the frequent one -- clean,
+    // the Sun being drawn about the canvas centre. It leaves a brief vertical shift when the timelines
+    // panel is collapsed, which is a once-a-session action. The only fix without this trade is an
+    // atomic native resize-and-render, and every route to that dispatches synchronously to the main
+    // thread, which deadlocks against AppKit.
+    metalLayer.contentsGravity = kCAGravityCenter;
     jhv_set_metal_layer_frame(metalLayer, frame);
     return metalLayer;
 }
