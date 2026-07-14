@@ -11,6 +11,7 @@
 - Adjust trajectory colors for white canvas (fixes #260)
 - Add a `New PUNCH Layer` source that loads FITS frames from the PUNCH archive at `umbra.nascom.nasa.gov/punch`
 - Add `RHEF` radial histogram equalizing filter with an Upsilon midtone control
+- Add a `RadialWarp` Sun-centered radial disk projection with a tunable radial exponent (p = -1 inverse, 0 logarithmic, 1 linear; only the corona beyond 1 R☉ is warped), a radial ring/spoke grid, and an automatic flat-in-disk layout for disk imagers
 
 ### Timeline, events, and UI
 - Map HEK Flare Trigger events to Flare events (fixes #105)
