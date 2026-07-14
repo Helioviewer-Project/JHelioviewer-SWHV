@@ -8,11 +8,15 @@ import java.util.function.DoubleConsumer;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
+import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.gui.component.JHVSpinner;
@@ -21,6 +25,12 @@ import org.helioviewer.jhv.layers.GridLayer;
 
 @SuppressWarnings("serial")
 final class GridLayerOptions extends JPanel {
+
+    // The disk projection draws a radial ring/spoke grid; these lat/lon-graticule controls have
+    // no meaning there (Longitude maps to the spoke spacing, so it stays enabled), so they are
+    // greyed out while a disk projection is active.
+    private final JComponent[] nonDiskControls;
+    private final ViewState.ModeListener modeListener = this::applyProjectionEnablement;
 
     GridLayerOptions(GridLayer layer) {
         setLayout(new GridBagLayout());
@@ -34,7 +44,8 @@ final class GridLayerOptions extends JPanel {
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.LINE_END;
-        add(createToggle("Solar axis", layer.isShowAxis(), layer::setShowAxis), c0);
+        JCheckBox axisToggle = createToggle("Solar axis", layer.isShowAxis(), layer::setShowAxis);
+        add(axisToggle, c0);
 
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.LINE_END;
@@ -44,14 +55,16 @@ final class GridLayerOptions extends JPanel {
 
         c0.gridx = 1;
         c0.anchor = GridBagConstraints.LINE_END;
-        add(createToggle("Radial grid", layer.isShowRadial(), layer::setShowRadial), c0);
+        JCheckBox radialToggle = createToggle("Radial grid", layer.isShowRadial(), layer::setShowRadial);
+        add(radialToggle, c0);
 
         c0.gridx = 2;
         c0.anchor = GridBagConstraints.LINE_END;
         add(new JLabel("Grid type ", JLabel.RIGHT), c0);
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.LINE_START;
-        add(createGridTypeBox(layer), c0);
+        JComboBox<GridType> gridTypeBox = createGridTypeBox(layer);
+        add(gridTypeBox, c0);
 
         c0.gridy = 2;
 
@@ -69,7 +82,34 @@ final class GridLayerOptions extends JPanel {
 
         c0.gridx = 3;
         c0.anchor = GridBagConstraints.LINE_START;
-        add(createGridResolutionSpinner(layer.getLatStep(), layer::setLatStep), c0);
+        JHVSpinner latSpinner = createGridResolutionSpinner(layer.getLatStep(), layer::setLatStep);
+        add(latSpinner, c0);
+
+        nonDiskControls = new JComponent[]{axisToggle, radialToggle, gridTypeBox, latSpinner};
+        applyProjectionEnablement();
+        // Track the projection only while the panel is on screen, so the listener is not leaked
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                ViewState.addModeListener(modeListener);
+                applyProjectionEnablement();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                ViewState.removeModeListener(modeListener);
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+            }
+        });
+    }
+
+    private void applyProjectionEnablement() {
+        boolean enabled = !ViewState.getProjection().isDisk();
+        for (JComponent control : nonDiskControls)
+            control.setEnabled(enabled);
     }
 
     private JCheckBox createToggle(String text, boolean initialValue, Consumer<Boolean> onChange) {
