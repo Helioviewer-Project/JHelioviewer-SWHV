@@ -107,7 +107,7 @@ public final class ViewState {
         }
     }
 
-    public record ModeData(MapMode projection, AnnotationMode annotationMode, boolean multiview,
+    public record ModeData(MapMode projection, double warpLambda, AnnotationMode annotationMode, boolean multiview,
                            boolean tracking, boolean refresh, boolean showCorona, boolean differentialRotation) {}
 
     public record PlaybackData(Player.AdvanceMode advanceMode, int speed, PlaybackSpeedUnit speedUnit,
@@ -130,6 +130,7 @@ public final class ViewState {
     private static boolean refresh = ImageLayers.getRefreshMode();
     private static boolean showCorona = Display.getShowCorona();
     private static boolean differentialRotation = ImageLayers.getDiffRotationMode();
+    private static double warpLambda = Display.getWarpLambda();
     public static final int PLAYBACK_SPEED_MIN = 1;
     public static final int PLAYBACK_SPEED_MAX = 120;
     private static Player.AdvanceMode playbackAdvanceMode = Player.AdvanceMode.Loop;
@@ -141,7 +142,7 @@ public final class ViewState {
     private static RecordingSize recordingSize = RecordingSize.ORIGINAL;
 
     public static ModeData modeData() {
-        return new ModeData(projection, getAnnotationMode(), multiview, tracking, refresh, showCorona, differentialRotation);
+        return new ModeData(projection, warpLambda, getAnnotationMode(), multiview, tracking, refresh, showCorona, differentialRotation);
     }
 
     public static PlaybackData playbackData() {
@@ -156,6 +157,7 @@ public final class ViewState {
         ModeData data = modeData();
         target.put("multiview", data.multiview());
         target.put("projection", data.projection());
+        target.put("warpLambda", data.warpLambda());
         target.put("annotationMode", data.annotationMode());
         target.put("tracking", data.tracking());
         target.put("refresh", data.refresh());
@@ -166,6 +168,7 @@ public final class ViewState {
     public static ModeData readModeJson(JSONObject source) {
         ModeData current = modeData();
         MapMode projectionValue = current.projection();
+        double warpLambdaValue = current.warpLambda();
         AnnotationMode annotationModeValue = current.annotationMode();
         boolean multiviewValue = current.multiview();
         boolean trackingValue = current.tracking();
@@ -185,6 +188,7 @@ public final class ViewState {
             Log.warn("Ignoring invalid annotation mode state value: " + annotationModeName, e);
         }
         multiviewValue = readBoolean(source, "multiview", multiviewValue);
+        warpLambdaValue = Math.clamp(source.optDouble("warpLambda", warpLambdaValue), -1, 1);
         trackingValue = readBoolean(source, "tracking", trackingValue);
         refreshValue = readBoolean(source, "refresh", refreshValue);
         showCoronaValue = readBoolean(source, "showCorona", showCoronaValue);
@@ -192,6 +196,7 @@ public final class ViewState {
 
         return new ModeData(
                 projectionValue,
+                warpLambdaValue,
                 annotationModeValue,
                 multiviewValue,
                 trackingValue,
@@ -202,6 +207,7 @@ public final class ViewState {
 
     public static void applyMode(ModeData data) {
         boolean changed = projection != data.projection()
+                || warpLambda != data.warpLambda()
                 || annotationMode != data.annotationMode()
                 || multiview != data.multiview()
                 || tracking != data.tracking()
@@ -215,6 +221,7 @@ public final class ViewState {
         suppressModeNotifications = true;
         try {
             setProjection(data.projection());
+            setWarpLambda(data.warpLambda());
             setAnnotationMode(data.annotationMode());
             setMultiview(data.multiview());
             setTracking(data.tracking());
@@ -239,6 +246,7 @@ public final class ViewState {
         ModeData current = modeData();
         applyMode(new ModeData(
                 projection == null ? current.projection() : projection,
+                current.warpLambda(),
                 annotationMode == null ? current.annotationMode() : annotationMode,
                 multiview == null ? current.multiview() : multiview,
                 tracking == null ? current.tracking() : tracking,
@@ -275,6 +283,21 @@ public final class ViewState {
 
         projection = newProjection;
         Display.setMapMode(newProjection);
+        notifyModeListeners();
+    }
+
+    public static double getWarpLambda() {
+        return warpLambda;
+    }
+
+    public static void setWarpLambda(double newWarpLambda) {
+        newWarpLambda = Math.clamp(newWarpLambda, -1, 1);
+        if (warpLambda == newWarpLambda)
+            return;
+
+        warpLambda = newWarpLambda;
+        Display.setWarpLambda(newWarpLambda);
+        DisplayController.display();
         notifyModeListeners();
     }
 

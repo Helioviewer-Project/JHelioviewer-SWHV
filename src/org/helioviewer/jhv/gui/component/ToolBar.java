@@ -31,7 +31,6 @@ import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.interaction.Interaction;
 import org.helioviewer.jhv.gui.Actions;
@@ -137,6 +136,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private final EnumMap<AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(AnnotationMode.class);
     private final EnumMap<MapMode, JRadioButtonMenuItem> projectionItems = new EnumMap<>(MapMode.class);
     private JHVSlider warpLambdaSlider;
+    private JLabel warpLambdaValue;
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
@@ -327,22 +327,21 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     }
 
     private JPanel createWarpLambdaPanel() {
-        warpLambdaSlider = new JHVSlider(-1000, 1000, (int) Math.round(Display.getWarpLambda() * 1000));
+        warpLambdaSlider = new JHVSlider(-1000, 1000, (int) Math.round(ViewState.getWarpLambda() * 1000));
         warpLambdaSlider.setToolTipText("Box-Cox lambda for warp projections");
         warpLambdaSlider.setPreferredSize(new Dimension(110, warpLambdaSlider.getPreferredSize().height));
         JLabel label = new JLabel("lambda");
-        JLabel value = new JLabel(String.format("%.3f", Display.getWarpLambda()), JLabel.RIGHT);
-        value.setPreferredSize(new JLabel("-0.000").getPreferredSize());
+        warpLambdaValue = new JLabel(String.format("%.3f", ViewState.getWarpLambda()), JLabel.RIGHT);
+        warpLambdaValue.setPreferredSize(new JLabel("-0.000").getPreferredSize());
         warpLambdaSlider.addChangeListener(e -> {
-            Display.setWarpLambda(warpLambdaSlider.getValue() / 1000.);
-            value.setText(String.format("%.3f", Display.getWarpLambda()));
-            DisplayController.display();
+            ViewState.setWarpLambda(warpLambdaSlider.getValue() / 1000.);
+            warpLambdaValue.setText(String.format("%.3f", ViewState.getWarpLambda()));
         });
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
         panel.add(label, BorderLayout.LINE_START);
         panel.add(warpLambdaSlider, BorderLayout.CENTER);
-        panel.add(value, BorderLayout.LINE_END);
+        panel.add(warpLambdaValue, BorderLayout.LINE_END);
         return panel;
     }
 
@@ -444,8 +443,12 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         JRadioButtonMenuItem activeProjection = projectionItems.get(ViewState.getProjection());
         if (activeProjection != null)
             activeProjection.setSelected(true);
-        if (warpLambdaSlider != null)
+        if (warpLambdaSlider != null) {
             warpLambdaSlider.setEnabled(ViewState.getProjection().usesWarpLambda());
+            warpLambdaSlider.setValue((int) Math.round(ViewState.getWarpLambda() * 1000));
+        }
+        if (warpLambdaValue != null)
+            warpLambdaValue.setText(String.format("%.3f", ViewState.getWarpLambda()));
         JRadioButtonMenuItem activeAnnotationMode = annotationItems.get(ViewState.getAnnotationMode());
         if (activeAnnotationMode != null)
             activeAnnotationMode.setSelected(true);
