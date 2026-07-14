@@ -11,8 +11,12 @@ public final class PolarBasis {
     }
 
     public static double angle(Vec3 v) {
+        return angle(v.x, v.y);
+    }
+
+    public static double angle(double x, double y) {
         // Polar basis: 0 at north, increasing anti-clockwise.
-        double theta = Math.atan2(-v.x, v.y);
+        double theta = Math.atan2(-x, y);
         if (theta < 0)
             theta += 2 * Math.PI;
         return theta;
