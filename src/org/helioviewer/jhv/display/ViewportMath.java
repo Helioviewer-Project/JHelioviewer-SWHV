@@ -19,7 +19,10 @@ public final class ViewportMath {
     }
 
     private static double zoomedCameraWidth(Camera camera, Viewport vp) {
-        return camera.baseCameraWidth() * vp.zoom;
+        // Mirror MapView.cameraWidth: the disk projection renders at a normalized fit width, not the
+        // orthographic R_sun FOV, so pan/zoom/LOD sensitivity must use the same width or it desyncs.
+        double base = Display.mode.isDisk() ? MapView.DISK_FIT_WIDTH : camera.baseCameraWidth();
+        return base * vp.zoom;
     }
 
     private static double computeUpX(Camera camera, Viewport vp, double screenX) {

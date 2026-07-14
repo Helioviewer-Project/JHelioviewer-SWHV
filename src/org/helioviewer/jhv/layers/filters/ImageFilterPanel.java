@@ -103,6 +103,8 @@ public class ImageFilterPanel implements FilterDetails {
 
         filterPanel.add(filterCombo, BorderLayout.CENTER);
         filterPanel.add(upsilonButton, BorderLayout.LINE_END);
+        // Disk imagers render flat automatically in a disk projection (see ImageLayer.render
+        // and ImageLayers.isDiskImager); no manual toggle needed.
         buttonPanel.add(enhanceButton, BorderLayout.LINE_END);
     }
 

@@ -20,6 +20,16 @@ public final class Display {
         gridType = _gridType;
     }
 
+    private static double diskPower = 0.0; // default to logarithmic (mid-scale, most dramatic)
+
+    public static double getDiskPower() {
+        return diskPower;
+    }
+
+    public static void setDiskPower(double p) {
+        diskPower = Math.clamp(p, -1, 1); // -1 = inverse, 0 = logarithmic, 1 = linear
+    }
+
     static int glWidth = 1;
     static int glHeight = 1;
     public static final double[] pixelScale = {1, 1};

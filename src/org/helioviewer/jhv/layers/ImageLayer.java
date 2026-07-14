@@ -209,6 +209,9 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         if (!isVisible[vp.idx])
             return;
 
+        // The disk radial warp is now anchored linear-through-origin below the limb, so it
+        // renders a disk imager's on-disk pixels crisply (no polar smear) while keeping the
+        // off-limb locked to the grid — every layer uses its projection's shader directly.
         GLSLSolarShader shader = mv.mode().shader;
         shader.use();
         glImage.applyFilters(view.getFilter() == ImageFilter.Type.RHEF);
