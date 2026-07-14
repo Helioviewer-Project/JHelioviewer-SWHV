@@ -14,6 +14,7 @@ import org.helioviewer.jhv.display.ViewportMath;
 import org.helioviewer.jhv.layers.grid.FlatGrid;
 import org.helioviewer.jhv.layers.grid.GridLabel;
 import org.helioviewer.jhv.layers.grid.GridMath;
+import org.helioviewer.jhv.layers.grid.RadialWarpGrid;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.GL;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -68,6 +69,7 @@ public final class GridLayer extends AbstractLayer {
     private final GLSLLine radialCircleLineFar = new GLSLLine(false);
     private final GLSLLine radialThickLineFar = new GLSLLine(false);
     private final FlatGrid flatGrid = new FlatGrid();
+    private final RadialWarpGrid radialWarpGrid = new RadialWarpGrid();
     private final GLSLLine gridLine = new GLSLLine(false);
 
     private List<GridLabel> latLabels;
@@ -177,7 +179,10 @@ public final class GridLayer extends AbstractLayer {
     public void renderScale(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(mv, vp, showLabels, gridColorBytes, gridLineScale, Colors.fade(Colors.WhiteFloat, labelAlpha));
+        if (mv.isRadialWarp())
+            radialWarpGrid.render(mv, vp, showLabels, lonStep, gridColorBytes, gridLineScale, Colors.fade(Colors.WhiteFloat, labelAlpha));
+        else
+            flatGrid.render(mv, vp, showLabels, gridColorBytes, gridLineScale, Colors.fade(Colors.WhiteFloat, labelAlpha));
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
@@ -247,6 +252,7 @@ public final class GridLayer extends AbstractLayer {
         GridMath.initRadialCircles(radialCircleLineFar, radialThickLineFar, RADIAL_UNIT_FAR, RADIAL_STEP_FAR);
 
         flatGrid.init();
+        radialWarpGrid.init();
     }
 
     @Override
@@ -260,6 +266,7 @@ public final class GridLayer extends AbstractLayer {
         radialCircleLineFar.dispose();
         radialThickLineFar.dispose();
         flatGrid.dispose();
+        radialWarpGrid.dispose();
     }
 
     @Override
