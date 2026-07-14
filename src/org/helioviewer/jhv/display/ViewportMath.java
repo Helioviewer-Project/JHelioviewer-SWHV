@@ -19,7 +19,7 @@ public final class ViewportMath {
     }
 
     private static double zoomedCameraWidth(Camera camera, Viewport vp) {
-        double base = Display.mode.usesNormalizedFitWidth() ? MapView.NORMALIZED_FIT_WIDTH : camera.baseCameraWidth();
+        double base = Display.mode.usesNormalizedFitWidth() ? Display.mode.normalizedFitWidth() : camera.baseCameraWidth();
         return base * vp.zoom;
     }
 

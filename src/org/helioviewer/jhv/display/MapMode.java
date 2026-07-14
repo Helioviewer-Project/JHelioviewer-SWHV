@@ -23,6 +23,10 @@ public enum MapMode {
         return kind == Kind.RADIAL_WARP || kind == Kind.RECT_WARP;
     }
 
+    public double normalizedFitWidth() {
+        return this == RectWarp ? 1.0 : MapView.NORMALIZED_FIT_WIDTH;
+    }
+
     public boolean usesWarpLambda() {
         return this == RadialWarp || this == RectWarp;
     }
