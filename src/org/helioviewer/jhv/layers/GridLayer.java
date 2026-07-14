@@ -56,6 +56,7 @@ public final class GridLayer extends AbstractLayer {
 
     private Colors.NamedColor gridColor = Colors.NamedColor.Red;
     private double gridAlpha = 1;
+    private byte[] gridColorBytes = gridColor.bytes();
     private double labelAlpha = 1;
     private double gridLineScale = 1;
 
@@ -97,6 +98,7 @@ public final class GridLayer extends AbstractLayer {
         showRadial = jo.optBoolean("showRadial", showRadial);
         gridColor = Colors.NamedColor.parse(jo.optString("color", gridColor.name()), gridColor);
         gridAlpha = Math.clamp(jo.optDouble("alpha", gridAlpha), 0, 1);
+        updateGridColorBytes();
         labelAlpha = Math.clamp(jo.optDouble("labelAlpha", labelAlpha), 0, 1);
         gridLineScale = Math.clamp(jo.optDouble("lineScale", gridLineScale), GRID_LINE_SCALE_MIN, GRID_LINE_SCALE_MAX);
 
@@ -123,7 +125,7 @@ public final class GridLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
         if (gridNeedsInit) {
-            GridMath.initGrid(gridLine, lonStep, latStep, gridColorBytes());
+            GridMath.initGrid(gridLine, lonStep, latStep, gridColorBytes);
             gridNeedsInit = false;
         }
 
@@ -175,7 +177,7 @@ public final class GridLayer extends AbstractLayer {
     public void renderScale(MapView mv, Viewport vp) {
         if (!isVisible[vp.idx])
             return;
-        flatGrid.render(mv, vp, showLabels, gridColorBytes(), gridLineScale, Colors.fade(Colors.WhiteFloat, labelAlpha));
+        flatGrid.render(mv, vp, showLabels, gridColorBytes, gridLineScale, Colors.fade(Colors.WhiteFloat, labelAlpha));
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
@@ -226,7 +228,7 @@ public final class GridLayer extends AbstractLayer {
     @Override
     public void init() {
         gridLine.init();
-        GridMath.initGrid(gridLine, lonStep, latStep, gridColorBytes());
+        GridMath.initGrid(gridLine, lonStep, latStep, gridColorBytes);
         gridNeedsInit = false;
 
         axesLine.init();
@@ -331,6 +333,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setGridColor(Colors.NamedColor _gridColor) {
         gridColor = _gridColor;
+        updateGridColorBytes();
         gridNeedsInit = true;
         DisplayController.display();
     }
@@ -341,6 +344,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setGridAlpha(double _gridAlpha) {
         gridAlpha = Math.clamp(_gridAlpha, 0, 1);
+        updateGridColorBytes();
         gridNeedsInit = true;
         DisplayController.display();
     }
@@ -363,8 +367,8 @@ public final class GridLayer extends AbstractLayer {
         DisplayController.display();
     }
 
-    private byte[] gridColorBytes() {
-        return Colors.bytes(gridColor.awtColor(), gridAlpha);
+    private void updateGridColorBytes() {
+        gridColorBytes = gridAlpha == 1 ? gridColor.bytes() : Colors.bytes(gridColor.awtColor(), gridAlpha);
     }
 
 }

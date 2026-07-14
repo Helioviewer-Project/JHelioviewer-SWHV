@@ -27,6 +27,8 @@ public class Colors {
     }
 
     public static float[] fade(float[] color, double alpha) {
+        if (alpha == 1)
+            return color;
         return new float[]{(float) (color[0] * alpha), (float) (color[1] * alpha), (float) (color[2] * alpha), (float) (color[3] * alpha)};
     }
 
