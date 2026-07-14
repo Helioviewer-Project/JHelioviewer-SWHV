@@ -102,11 +102,15 @@ public interface MapScale {
 
     }
 
-    // Box-Cox radial scale outside radius 1.
+    // Box-Cox radial scale outside radius 1, anchored so the limb has the
+    // same normalized position as the linear scale for every lambda.
     final class BoxCoxRadialScale extends MapScaleBase {
+
+        private final double radialSize;
 
         BoxCoxRadialScale(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
+            radialSize = _yStop;
         }
 
         @Override
@@ -140,6 +144,39 @@ public interface MapScale {
 
             double lambda = lambda();
             return lambda == 0 ? Math.exp(val - 1) : Math.pow(1 + lambda * (val - 1), 1 / lambda);
+        }
+
+        @Override
+        public double getInterpolatedYValue(double v) {
+            double limb = limb();
+            if (radialSize <= 1 || v <= limb)
+                return v / limb;
+
+            double scaled = 1 + (v - limb) * (scaleY(radialSize) - 1) / (1 - limb);
+            return invScaleY(scaled);
+        }
+
+        @Override
+        public double getYValueInv(double v) {
+            double limb = limb();
+            double t = radialSize <= 1 || v <= 1
+                    ? v * limb
+                    : limb + (scaleY(v) - 1) * (1 - limb) / (scaleY(radialSize) - 1);
+            return t - 0.5;
+        }
+
+        @Override
+        public double getYstart() {
+            return 0;
+        }
+
+        @Override
+        public double getYstop() {
+            return radialSize;
+        }
+
+        private double limb() {
+            return 1 / radialSize;
         }
 
         private static double lambda() {

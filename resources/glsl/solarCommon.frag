@@ -197,6 +197,20 @@ vec2 getDiskPos(void) {
     return up1.xy;
 }
 
+// Match MapScale.BoxCoxRadialScale: keep R=1 at the linear-scale position and
+// apply Box-Cox only from the limb to the loaded outer radius.
+float radialCoordinateFromNormalizedRadius(float t) {
+    float radialSize = screen.yStop;
+    float limb = 1. / radialSize;
+    if (radialSize <= 1. || t <= limb)
+        return t / limb;
+
+    float lambda = screen.lambda;
+    float scaledOuter = lambda == 0. ? 1. + log(radialSize) : 1. + (pow(radialSize, lambda) - 1.) / lambda;
+    float scaled = 1. + (t - limb) * (scaledOuter - 1.) / (1. - limb);
+    return lambda == 0. ? exp(scaled - 1.) : pow(1. + lambda * (scaled - 1.), 1. / lambda);
+}
+
 vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
 }

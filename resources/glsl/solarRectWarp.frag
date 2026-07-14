@@ -3,10 +3,7 @@ void main(void) {
     vec2 scrpos = getScrPos();
 
     float angle = scrpos.x * TWOPI;
-    float scaled = screen.yStart + scrpos.y * (screen.yStop - screen.yStart);
-    float lambda = screen.lambda;
-    float radialCoordinate = scaled <= 1. ? scaled
-            : (lambda == 0. ? exp(scaled - 1.) : pow(1. + lambda * (scaled - 1.), 1. / lambda));
+    float radialCoordinate = radialCoordinateFromNormalizedRadius(scrpos.y);
     vec2 hpcXY = radialCoordinate * vec2(-sin(angle), cos(angle));
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
     float enhancementFactor;
