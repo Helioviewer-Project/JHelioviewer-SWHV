@@ -17,6 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -29,8 +30,11 @@ import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapMode;
 import org.helioviewer.jhv.display.interaction.Interaction;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.io.samp.SampClient;
@@ -133,6 +137,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private JideToggleButton multiviewButton;
     private final EnumMap<AnnotationMode, JRadioButtonMenuItem> annotationItems = new EnumMap<>(AnnotationMode.class);
     private final EnumMap<MapMode, JRadioButtonMenuItem> projectionItems = new EnumMap<>(MapMode.class);
+    private JHVSlider radialWarpSlider; // RadialWarp radial exponent; only meaningful for that mode
     private JideToggleButton refreshButton;
     private JideToggleButton trackingButton;
 
@@ -240,6 +245,9 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             projectionButton.add(item);
             projectionItems.put(el, item);
         }
+        projectionButton.addSeparator();
+        projectionButton.add(createRadialWarpPanel());
+        radialWarpSlider.setEnabled(ViewState.getProjection() == MapMode.RadialWarp);
         addButton(projectionButton);
 
         JideSplitButton annotationButton = toolSplitButton(ANNOTATION);
@@ -317,6 +325,25 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             panel.add(button);
         }
         annotationButton.add(panel);
+    }
+
+    // RadialWarp radial exponent p (display radius ~ r^p): slider 0.01..2, default 1.0 (linear).
+    // power() is read live every render, so the value takes effect through the scale rebuild.
+    private JPanel createRadialWarpPanel() {
+        radialWarpSlider = new JHVSlider(-1000, 1000, (int) Math.round(Display.getDiskPower() * 1000));
+        radialWarpSlider.setToolTipText("RadialWarp radial exponent p, applied to the corona (r > 1 R☉): p = -1 inverse, p = 0 logarithmic, p = 1 linear");
+        radialWarpSlider.setPreferredSize(new Dimension(110, radialWarpSlider.getPreferredSize().height));
+        JLabel value = new JLabel(String.format("p %.3f", Display.getDiskPower()), JLabel.RIGHT);
+        radialWarpSlider.addChangeListener(e -> {
+            Display.setDiskPower(radialWarpSlider.getValue() / 1000.);
+            value.setText(String.format("p %.3f", Display.getDiskPower()));
+            DisplayController.display();
+        });
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+        panel.add(value, BorderLayout.LINE_START);
+        panel.add(radialWarpSlider, BorderLayout.CENTER);
+        return panel;
     }
 
     private static JPanel createAnnotationThicknessPanel() {
@@ -417,6 +444,8 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         JRadioButtonMenuItem activeProjection = projectionItems.get(ViewState.getProjection());
         if (activeProjection != null)
             activeProjection.setSelected(true);
+        if (radialWarpSlider != null)
+            radialWarpSlider.setEnabled(ViewState.getProjection() == MapMode.RadialWarp);
         JRadioButtonMenuItem activeAnnotationMode = annotationItems.get(ViewState.getAnnotationMode());
         if (activeAnnotationMode != null)
             activeAnnotationMode.setSelected(true);
