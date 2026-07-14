@@ -11,6 +11,11 @@ public final class Display {
 
     public static void setMapMode(MapMode _mode) {
         mode = _mode;
+        // Fit on entry: drop any wheel zoom inherited from the previous projection, then let
+        // resetCameras() re-fit the FOV to the new mode. Without the first step the incoming
+        // projection is scaled by a zoom factor that was meaningful only in the outgoing one,
+        // so switching (e.g. from a zoomed Orthographic) lands at an arbitrary scale.
+        resetViewportZoom();
         DisplayController.resetCameras();
     }
 
