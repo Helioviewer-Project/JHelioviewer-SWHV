@@ -9,13 +9,11 @@ public enum MapMode {
     Orthographic(GLSLSolarShader.ortho, Kind.ORTHOGRAPHIC),
     HPC(GLSLSolarShader.hpc, Kind.HPC),
     Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
-    LogPolar(GLSLSolarShader.logpolar, Kind.POLAR),
-    Polar(GLSLSolarShader.polar, Kind.POLAR),
     RadialWarp(GLSLSolarShader.radialWarp, Kind.RADIAL_WARP),
     RectWarp(GLSLSolarShader.rectWarp, Kind.RECT_WARP);
 
     enum Kind {
-        ORTHOGRAPHIC, HPC, LATITUDINAL, POLAR, RADIAL_WARP, RECT_WARP
+        ORTHOGRAPHIC, HPC, LATITUDINAL, RADIAL_WARP, RECT_WARP
     }
 
     public final GLSLSolarShader shader;

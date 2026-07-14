@@ -84,14 +84,6 @@ public abstract class MapView {
         return mode == MapMode.Latitudinal;
     }
 
-    public boolean isPolar() {
-        return mode == MapMode.Polar;
-    }
-
-    public boolean isLogPolar() {
-        return mode == MapMode.LogPolar;
-    }
-
     public boolean isRadialWarp() {
         return mode.kind == MapMode.Kind.RADIAL_WARP;
     }
@@ -172,7 +164,6 @@ public abstract class MapView {
             return switch (kind) {
                 case HPC -> ProjectedMap.Kind.HPC;
                 case LATITUDINAL -> ProjectedMap.Kind.LATITUDINAL;
-                case POLAR -> ProjectedMap.Kind.POLAR;
                 case RADIAL_WARP -> ProjectedMap.Kind.RADIAL_WARP;
                 case RECT_WARP -> ProjectedMap.Kind.RECT_WARP;
                 case ORTHOGRAPHIC -> throw new IllegalArgumentException("Orthographic mode has no projected kind");

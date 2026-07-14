@@ -225,7 +225,7 @@ class SWEKPopupController implements InputPointerListener, InputPointerMotionLis
                 continue;
 
             Vec2 tf = null;
-            if ((mv.isPolar() || mv.isLogPolar() || mv.isRectWarp()) && evt.isCactus()) {
+            if (mv.isRectWarp() && evt.isCactus()) {
                 double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
                 double distSun = computeDistSun(evt, currentTime);
                 tf = new Vec2(scale.getXValueInv(principalAngle) * vp.aspect, scale.getYValueInv(distSun));

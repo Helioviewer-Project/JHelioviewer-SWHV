@@ -15,8 +15,6 @@ public class GLSLSolarShader extends GLSLShader {
     public static final GLSLSolarShader ortho = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarOrtho.frag", true);
     public static final GLSLSolarShader hpc = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarHpc.frag", true);
     public static final GLSLSolarShader lati = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLati.frag", true);
-    public static final GLSLSolarShader polar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarPolar.frag", true);
-    public static final GLSLSolarShader logpolar = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarLogPolar.frag", true);
     public static final GLSLSolarShader radialWarp = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarRadialWarp.frag", true);
     public static final GLSLSolarShader rectWarp = new GLSLSolarShader("/glsl/solar.vert", "/glsl/solarRectWarp.frag", true);
 
@@ -58,8 +56,6 @@ public class GLSLSolarShader extends GLSLShader {
         ortho._init(ortho.hasCommon);
         hpc._init(hpc.hasCommon);
         lati._init(lati.hasCommon);
-        polar._init(polar.hasCommon);
-        logpolar._init(logpolar.hasCommon);
         radialWarp._init(radialWarp.hasCommon);
         rectWarp._init(rectWarp.hasCommon);
     }
@@ -92,8 +88,6 @@ public class GLSLSolarShader extends GLSLShader {
         ortho._dispose();
         hpc._dispose();
         lati._dispose();
-        polar._dispose();
-        logpolar._dispose();
         radialWarp._dispose();
         rectWarp._dispose();
         wcsBO.delete();
