@@ -5,6 +5,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.math.FastFormat;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GLSLLine;
@@ -14,7 +15,7 @@ import org.helioviewer.jhv.opengl.text.SdfTextRenderer;
 // Radius rings and angular spokes in RadialWarp's circular output coordinates.
 public final class RadialWarpGrid {
 
-    private static final int TEXT_SIZE = 22;
+    private static final int TEXT_SIZE = 12;
     private static final int SUBDIVISIONS = 180;
     private static final int MAX_RINGS = 16;
     private static final double MIN_RING_SPACING = 0.04;
@@ -31,13 +32,13 @@ public final class RadialWarpGrid {
         line.dispose();
     }
 
-    public void render(MapView mv, Viewport vp, boolean showLabels, double spokeStep, byte[] color, double lineScale, float[] labelColor) {
+    public void render(MapView mv, Viewport vp, boolean showLabels, double spokeStep, byte[] color, double lineScale, float[] labelColor, double labelSize, double labelAngle) {
         MapScale scale = mv.scale(vp);
         int ringCount = chooseRings(scale);
         updateLine(scale, ringCount, spokeStep, color);
         line.renderLine(vp, GridMath.LINEWIDTH * lineScale);
         if (showLabels)
-            drawLabels(mv, vp, scale, rings, ringCount, labelColor);
+            drawLabels(mv, vp, scale, rings, ringCount, labelColor, labelSize, labelAngle);
     }
 
     private int chooseRings(MapScale scale) {
@@ -98,18 +99,22 @@ public final class RadialWarpGrid {
         line.setVertex(vexBuf);
     }
 
-    private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings, int ringCount, float[] color) {
+    private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings, int ringCount, float[] color, double labelSize, double labelAngle) {
         SdfTextRenderer renderer = GLText.renderer();
         double width = mv.cameraWidth(vp);
-        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * width / vp.height;
+        double worldTextHeight = TEXT_SIZE * labelSize / GridLayer.GRID_LABEL_SIZE_REF * Display.pixelScale[1] * width / vp.height;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
+        double angle = Math.toRadians(labelAngle);
+        double sin = Math.sin(angle);
+        double cos = Math.cos(angle);
 
         renderer.setColor(color);
         renderer.begin3DRendering();
         for (int i = 0; i < ringCount; i++) {
             double r = rings[i];
-            renderer.draw(FastFormat.rounded2(r), labelOffset, ringRho(scale, r) + labelOffset, 0, textScaleFactor);
+            double rho = ringRho(scale, r);
+            renderer.draw(FastFormat.rounded2(r), (float) (sin * rho + labelOffset), (float) (cos * rho + labelOffset), 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }

@@ -89,6 +89,8 @@ final class GridLayerOptions extends JPanel {
         addAdjustmentRow(adjustmentsPanel, "Line width ", createLineWidthSlider(layer), 1);
         addAdjustmentRow(adjustmentsPanel, "Line opacity ", createOpacitySlider(layer.getGridAlpha(), layer::setGridAlpha), 2);
         addAdjustmentRow(adjustmentsPanel, "Label opacity ", createOpacitySlider(layer.getLabelAlpha(), layer::setLabelAlpha), 3);
+        addAdjustmentRow(adjustmentsPanel, "Label size ", createLabelSizeSlider(layer), 4);
+        addAdjustmentRow(adjustmentsPanel, "Ring label angle ", createLabelAngleSlider(layer), 5);
 
         JideToggleButton adjButton = new JideToggleButton(Buttons.adjustmentsRight);
         adjButton.addActionListener(e -> {
@@ -151,6 +153,18 @@ final class GridLayerOptions extends JPanel {
         int max = (int) Math.round(GridLayer.GRID_LINE_SCALE_MAX * 10);
         JHVSlider slider = new JHVSlider(min, max, (int) Math.round(layer.getGridLineScale() * 10));
         slider.addChangeListener(e -> layer.setGridLineScale(slider.getValue() / 10.));
+        return slider;
+    }
+
+    private static JHVSlider createLabelSizeSlider(GridLayer layer) {
+        JHVSlider slider = new JHVSlider((int) GridLayer.GRID_LABEL_SIZE_MIN, (int) GridLayer.GRID_LABEL_SIZE_MAX, (int) Math.round(layer.getGridLabelSize()));
+        slider.addChangeListener(e -> layer.setGridLabelSize(slider.getValue()));
+        return slider;
+    }
+
+    private static JHVSlider createLabelAngleSlider(GridLayer layer) {
+        JHVSlider slider = new JHVSlider(0, 360, (int) Math.round(layer.getGridLabelAngle()));
+        slider.addChangeListener(e -> layer.setGridLabelAngle(slider.getValue()));
         return slider;
     }
 

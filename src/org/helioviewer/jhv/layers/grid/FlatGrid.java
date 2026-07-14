@@ -6,6 +6,7 @@ import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.layers.GridLayer;
 import org.helioviewer.jhv.math.FastFormat;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.opengl.GL;
@@ -37,7 +38,7 @@ public class FlatGrid {
         shape.dispose();
     }
 
-    public void render(MapView mv, Viewport vp, boolean showLabels, byte[] gridColor, double lineScale, float[] labelColor) {
+    public void render(MapView mv, Viewport vp, boolean showLabels, byte[] gridColor, double lineScale, float[] labelColor, double labelSize) {
         double width = mv.cameraWidth(vp);
         MapScale scale = mv.scale(vp);
         double xCenter = 0.5 - mv.cameraTranslationX() / vp.aspect;
@@ -54,13 +55,13 @@ public class FlatGrid {
         updateShape(xAxis, yAxis, mv, vp, width, gridColor, lineScale);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(xAxis, yAxis, mv, vp, width, labelColor);
+            drawLabels(xAxis, yAxis, mv, vp, width, labelColor, labelSize);
     }
 
-    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, float[] labelColor) {
+    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, float[] labelColor, double labelSize) {
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
-        double worldTextHeight = TEXT_SIZE * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
+        double worldTextHeight = TEXT_SIZE * labelSize / GridLayer.GRID_LABEL_SIZE_REF * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
 
