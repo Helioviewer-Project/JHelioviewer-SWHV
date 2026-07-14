@@ -96,6 +96,10 @@ public abstract class MapView {
         return mode.kind == MapMode.Kind.RADIAL_WARP;
     }
 
+    public boolean isRectWarp() {
+        return mode.kind == MapMode.Kind.RECT_WARP;
+    }
+
     public Vec3 mouseToSky(Viewport vp, int x, int y) {
         return ViewportMath.unprojectToCurrentViewSphereOrPlane(camera, vp, cameraWidth(vp), x, y);
     }
@@ -170,6 +174,7 @@ public abstract class MapView {
                 case LATITUDINAL -> ProjectedMap.Kind.LATITUDINAL;
                 case POLAR -> ProjectedMap.Kind.POLAR;
                 case RADIAL_WARP -> ProjectedMap.Kind.RADIAL_WARP;
+                case RECT_WARP -> ProjectedMap.Kind.RECT_WARP;
                 case ORTHOGRAPHIC -> throw new IllegalArgumentException("Orthographic mode has no projected kind");
             };
         }
