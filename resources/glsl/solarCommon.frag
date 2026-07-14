@@ -191,6 +191,12 @@ vec2 getScrPos(void) {
     return scrpos;
 }
 
+vec2 getDiskPos(void) {
+    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
+    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    return up1.xy;
+}
+
 vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(cross(vec, quat.xyz) + quat.w * vec, quat.xyz);
 }
@@ -421,4 +427,86 @@ vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
     texcoord.x = fract(texcoord.x);
     clamp_coord(texcoord);
     return texcoord;
+}
+
+vec2 screenToHelioprojective(const vec2 scrpos) {
+    return vec2(
+        radians(screen.xStart + scrpos.x * (screen.xStop - screen.xStart)),
+        radians(screen.yStart + scrpos.y * (screen.yStop - screen.yStart)));
+}
+
+bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDistance, out vec3 world) {
+    vec3 ray = helioprojectiveToObserverRay(helioprojective);
+    float b = observerDistance * ray.z;
+    float c = observerDistance * observerDistance - 1.;
+    vec3 observer = observerPosition(observerDistance);
+    float discriminant = b * b - c;
+    if (discriminant < 0.) {
+        world = vec3(0.);
+        return false;
+    }
+
+    float root = sqrt(discriminant);
+    float tNear = -b - root;
+    float tFar = -b + root;
+    float t = tNear > 0. ? tNear : tFar;
+    if (t <= 0.) {
+        world = vec3(0.);
+        return false;
+    }
+
+    world = observer + t * ray;
+    return true;
+}
+
+vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDistance) {
+    return helioprojectiveToHpcPlanePoint(helioprojective, observerDistance).xy;
+}
+
+vec2 hpcXYToHelioprojective(const vec2 hpcXY, const float observerDistance) {
+    return worldToHelioprojective(vec3(hpcXY, 0.), observerDistance);
+}
+
+float hpcEnhancementFactor(const vec2 hpcXY) {
+    return max(1., length(hpcXY));
+}
+
+void clipHpcGeometry(const vec2 hpcXY) {
+    if (display.sector.z != 0.) {
+        float theta = atan(hpcXY.y, hpcXY.x);
+        if (theta < display.sector.x || theta > display.sector.y)
+            discard;
+    }
+
+    float radial2 = dot(hpcXY, hpcXY);
+    float minRadius2 = display.radii.x * display.radii.x;
+    float maxRadius2 = display.radii.y * display.radii.y;
+    if (radial2 > maxRadius2 || radial2 < minRadius2)
+        discard;
+
+    if (display.cutOff.z >= 0.) {
+        float flatDist = abs(dot(hpcXY, display.cutOff.xy));
+        vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
+        float flatDistAlt = abs(dot(hpcXY, cutOffAlt));
+        if (flatDist > display.cutOff.z || flatDistAlt > display.cutOff.z)
+            discard;
+    }
+}
+
+vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 helioprojective, const vec2 hpcXY, const float dt, const float[6] PV, out float enhancementFactor) {
+    enhancementFactor = 1.;
+    float observerDistance = projection.observerDistance;
+
+    vec3 world;
+    if (helioprojectiveToWorld(helioprojective, observerDistance, world)) {
+        if (dt != 0.) {
+            vec3 rotatedWorld = differential(dt, world);
+            helioprojective = worldToHelioprojective(rotatedWorld, observerDistance);
+        }
+    } else {
+        enhancementFactor = hpcEnhancementFactor(hpcXY);
+    }
+
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
+    return wcsPlaneToTexcoord(plane, wcs);
 }
