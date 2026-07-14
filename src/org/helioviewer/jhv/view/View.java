@@ -38,6 +38,9 @@ public interface View {
 
     default void clearCache() {}
 
+    // Set a shared fixed [min, max] display range across this view's frames (FITS only); no-op otherwise
+    default void setRange(double min, double max) {}
+
     void setFilter(ImageFilter.Type t);
 
     ImageFilter.Type getFilter();

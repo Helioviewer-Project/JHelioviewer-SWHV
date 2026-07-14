@@ -130,7 +130,7 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
             }
             if (items.size() > CONFIRM_FILES) {
                 int choice = JOptionPane.showConfirmDialog(this,
-                        String.format("This will download %d native-resolution FITS files (typically a few MB each).%nSeveral files may be fetched in parallel.%nProceed?", items.size()),
+                        String.format("This will download %d native-resolution FITS files (typically a few MB each).%nThey are fetched as the layer plays, several in parallel, and a shared display range is computed in the background so the movie does not strobe.%nProceed?", items.size()),
                         "Large PUNCH download", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (choice != JOptionPane.OK_OPTION)
                     return;

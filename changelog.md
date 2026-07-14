@@ -11,6 +11,7 @@
 - Adjust trajectory colors for white canvas (fixes #260)
 - Add a `New PUNCH Layer` source that loads FITS frames from the PUNCH archive at `umbra.nascom.nasa.gov/punch`
 - Add `RHEF` radial histogram equalizing filter with an Upsilon midtone control
+- Pin a multi-frame FITS layer to one shared display range so a PUNCH movie does not strobe as each frame auto-normalizes
 
 ### Timeline, events, and UI
 - Map HEK Flare Trigger events to Flare events (fixes #105)
