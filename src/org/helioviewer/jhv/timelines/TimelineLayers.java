@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
+import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
@@ -79,6 +80,9 @@ public class TimelineLayers extends AbstractTableModel {
         if (layers.contains(tl)) // avoid band duplication via file load
             return;
         layers.add(tl);
+
+        if (tl instanceof Band band)
+            band.setOnColorChanged(() -> updateCell(layers.indexOf(band), TimelinePanel.LINECOLOR_COL));
 
         int row = layers.size() - 1;
         fireTableRowsInserted(row, row);

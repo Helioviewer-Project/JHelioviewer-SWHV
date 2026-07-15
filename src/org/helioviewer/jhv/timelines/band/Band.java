@@ -65,6 +65,7 @@ public final class Band extends AbstractTimelineLayer {
     private Color graphColor = bandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
     private boolean multicolor = true;
+    private Runnable onColorChanged;
 
     private Band(BandType _bandType) {
         bandType = _bandType;
@@ -169,6 +170,7 @@ public final class Band extends AbstractTimelineLayer {
     void setDataColor(Color c) {
         graphColor = c;
         DrawController.drawRequest();
+        notifyColorChanged();
     }
 
     public boolean isMulticolor() {
@@ -178,6 +180,16 @@ public final class Band extends AbstractTimelineLayer {
     public void setMulticolor(boolean _multicolor) {
         multicolor = _multicolor;
         updateGraph();
+        notifyColorChanged();
+    }
+
+    public void setOnColorChanged(Runnable callback) {
+        onColorChanged = callback;
+    }
+
+    private void notifyColorChanged() {
+        if (onColorChanged != null)
+            onColorChanged.run();
     }
 
     @Override
