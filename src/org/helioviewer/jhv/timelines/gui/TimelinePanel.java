@@ -2,15 +2,22 @@ package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -25,6 +32,9 @@ import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.TableValue;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
+import org.helioviewer.jhv.timelines.band.Band;
+import org.helioviewer.jhv.timelines.band.BandReaderHapi;
+import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import com.jidesoft.swing.JideButton;
@@ -33,6 +43,7 @@ import com.jidesoft.swing.JideButton;
 public final class TimelinePanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
+    private static final String NONE_ITEM = "None";
 
     private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
@@ -44,7 +55,10 @@ public final class TimelinePanel extends JPanel {
     private static final int NUMBEROFVISIBLEROWS = 6;
 
     private final TimelineTable grid;
+    private final TimelineLayers layers;
     private final JPanel optionsPanelWrapper;
+    private final JComboBox<String> predefinedCombo;
+    private boolean suppressComboAction;
 
     private static class TimelineTable extends JTable implements Interfaces.LazyComponent {
 
@@ -106,6 +120,7 @@ public final class TimelinePanel extends JPanel {
     }
 
     public TimelinePanel(TimelineLayers model) {
+        layers = model;
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -124,8 +139,26 @@ public final class TimelinePanel extends JPanel {
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> new TimelineActions.NewLayer().actionPerformed(new ActionEvent(addLayerButton, 0, "")));
 
+        predefinedCombo = new JComboBox<>();
+        predefinedCombo.setToolTipText("Predefined plot");
+        predefinedCombo.addActionListener(e -> {
+            if (suppressComboAction)
+                return;
+            Object selected = predefinedCombo.getSelectedItem();
+            if (selected instanceof String groupName && !NONE_ITEM.equals(groupName))
+                loadPredefinedGroup(groupName);
+        });
+
+        refreshPredefinedCombo();
+        BandReaderHapi.setOnCatalogLoaded(this::refreshPredefinedCombo);
+
+        JPanel leftButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
+        leftButtonPanel.add(addLayerButton);
+        leftButtonPanel.add(new JLabel("Predefined:"));
+        leftButtonPanel.add(predefinedCombo);
+
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
-        addLayerButtonWrapper.add(addLayerButton, BorderLayout.LINE_START);
+        addLayerButtonWrapper.add(leftButtonPanel, BorderLayout.LINE_START);
         addLayerButtonWrapper.add(DrawController.getOptionsPanel(), BorderLayout.LINE_END);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
@@ -172,12 +205,12 @@ public final class TimelinePanel extends JPanel {
 
                 if (v.col == ENABLED_COL) {
                     timeline.setEnabled(!timeline.isEnabled());
-                    model.updateCell(v.row, v.col);
+                    layers.updateCell(v.row, v.col);
                     if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
                 } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
-                    model.remove(timeline);
+                    layers.remove(timeline);
                     selectExistingRow(v.row);
                 }
             }
@@ -222,6 +255,31 @@ public final class TimelinePanel extends JPanel {
         }
         revalidate();
         repaint();
+    }
+
+    private void loadPredefinedGroup(String groupName) {
+        LinkedHashMap<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
+        List<BandType> bandTypes = groups.get(groupName);
+        if (bandTypes == null)
+            return;
+
+        List<TimelineLayer> existing = new ArrayList<>(TimelineLayers.get());
+        for (TimelineLayer layer : existing)
+            layers.remove(layer);
+
+        for (BandType bandType : bandTypes)
+            layers.add(Band.createFromType(bandType));
+    }
+
+    private void refreshPredefinedCombo() {
+        suppressComboAction = true;
+        LinkedHashMap<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
+        List<String> items = new ArrayList<>();
+        items.add(NONE_ITEM);
+        items.addAll(groups.keySet());
+        predefinedCombo.setModel(new DefaultComboBoxModel<>(items.toArray(String[]::new)));
+        predefinedCombo.setSelectedIndex(0);
+        suppressComboAction = false;
     }
 
 }
