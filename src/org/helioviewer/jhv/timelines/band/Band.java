@@ -309,10 +309,10 @@ public final class Band extends AbstractTimelineLayer {
                                 Color barColor = useMulticolor ? bandType.getLevelColor(floatValues[i]) : null;
                                 if (barColor == null)
                                     barColor = graphColor;
-                                int right = dates[i];
-                                int left = xMapper.toPixel(viewpointTime.applyAsLong(list.get(i).milli) - barWidthMillis);
-                                int barWidth = right - left;
-                                int gap = Math.max(1, barWidth / 40);
+      int right = dates[i];
+                                 int left = xMapper.toPixel(viewpointTime.applyAsLong(list.get(i).milli) - barWidthMillis);
+                                 int barWidth = Math.max(1, right - left);
+                                 int gap = barWidth / 40;
                                 int top = Math.min(yPixels[i], baselineY);
                                 int bottom = Math.max(yPixels[i], baselineY);
                                 result.add(new Bar(left + gap, top, right, bottom, barColor));
