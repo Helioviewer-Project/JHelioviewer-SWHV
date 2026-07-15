@@ -21,6 +21,8 @@ import org.helioviewer.jhv.timelines.gui.TimelinePanel;
 @SuppressWarnings("serial")
 public class TimelineLayers extends AbstractTableModel {
 
+    public static final int NUMBEROFCOLUMNS = 6;
+
     private static final ArrayList<TimelineLayer> layers = new ArrayList<>();
     private static final List<TimelineLayer> extLayers = Collections.unmodifiableList(layers);
 
@@ -124,7 +126,7 @@ public class TimelineLayers extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return TimelinePanel.NUMBEROFCOLUMNS;
+        return NUMBEROFCOLUMNS;
     }
 
     @Override
