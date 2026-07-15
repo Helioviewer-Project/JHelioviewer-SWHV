@@ -120,7 +120,8 @@ public class BandReaderHapi {
     private record BandReader(BandType type, HapiTableReader tableReader) {}
 
     private record Parameter(String name, String units, String scale, JSONArray range, String predefinedGroup, int predefinedOrder,
-                             String plotType, long barWidth, JSONArray levels) {}
+                             String plotType, long barWidth, JSONArray levels,
+                             JSONArray warningLevels) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -230,6 +231,7 @@ public class BandReaderHapi {
             if (p.levels != null) {
                 jobt.put("levels", p.levels);
             }
+            jobt.put("warninglevels", p.warningLevels);
 
             HapiParam[] typeParams = new HapiParam[]{params[0], params[i]};
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
@@ -254,6 +256,7 @@ public class BandReaderHapi {
         String plotType = null;
         long barWidth = 0;
         JSONArray levels = null;
+        JSONArray warningLevels = null;
         JSONObject jhvparams = jo.optJSONObject("jhvparams");
         if (jhvparams != null) {
             scale = jhvparams.optString("scale", null);
@@ -269,9 +272,10 @@ public class BandReaderHapi {
             plotType = jhvparams.optString("plottype", null);
             barWidth = jhvparams.optLong("barWidth", 0);
             levels = jhvparams.optJSONArray("levels");
+            warningLevels = jhvparams.optJSONArray("warninglevels");
         }
 
-        return new Parameter(name, units, scale, range, predefinedGroup, predefinedOrder, plotType, barWidth, levels);
+        return new Parameter(name, units, scale, range, predefinedGroup, predefinedOrder, plotType, barWidth, levels, warningLevels);
     }
 
     private static Band.Data getHapiStream(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {

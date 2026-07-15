@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -55,7 +54,7 @@ public final class Band extends AbstractTimelineLayer {
     private final BandOptions optionsPanel = new BandOptions(this);
 
     private final YAxis yAxis;
-    private final int[] warnLevels;
+    private int[] warnPixels;
     private final List<Polyline> polylines = new ArrayList<>();
     private final List<Bar> bars = new ArrayList<>();
     private final LatestWorker<List<Object>> graphWorker = new LatestWorker<>("Timeline-Graph");
@@ -70,7 +69,7 @@ public final class Band extends AbstractTimelineLayer {
     private Band(BandType _bandType) {
         bandType = _bandType;
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
-        warnLevels = new int[bandType.getWarnLevels().length];
+        warnPixels = new int[bandType.getWarningLevels().length];
         // those should be cleared
         requestCache = new RequestCache();
         bandCache = createBandCache(bandType.getBandCacheType());
@@ -243,10 +242,11 @@ public final class Band extends AbstractTimelineLayer {
             polylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length()));
         }
 
-        String[] warnLabels = bandType.getWarnLabels();
-        for (int i = 0; i < warnLevels.length; i++) {
-            g.drawLine(graphArea.x, warnLevels[i], graphArea.x + graphArea.width, warnLevels[i]);
-            g.drawString(warnLabels[i], graphArea.x, warnLevels[i] - 2);
+        BandType.WarningLevel[] wls = bandType.getWarningLevels();
+        for (int i = 0; i < warnPixels.length; i++) {
+            g.setColor(wls[i].color());
+            g.drawLine(graphArea.x, warnPixels[i], graphArea.x + graphArea.width, warnPixels[i]);
+            g.drawString(wls[i].label(), graphArea.x, warnPixels[i] - 2);
         }
     }
 
@@ -261,9 +261,9 @@ public final class Band extends AbstractTimelineLayer {
         Rectangle drawArea = TimelineLayers.getDrawArea(this, graphArea);
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, drawArea);
 
-        double[] unconvertedWarnLevels = bandType.getWarnLevels();
-        for (int i = 0; i < warnLevels.length; i++) {
-            warnLevels[i] = yMapper.dataToPixel(unconvertedWarnLevels[i]);
+        BandType.WarningLevel[] wls = bandType.getWarningLevels();
+        for (int i = 0; i < warnPixels.length; i++) {
+            warnPixels[i] = yMapper.dataToPixel(wls[i].value());
         }
 
         TimeAxis timeAxis = DrawController.selectedAxis;
@@ -340,11 +340,8 @@ public final class Band extends AbstractTimelineLayer {
         float val = bandCache.getValue(propagationModel.getObservationTime(ts));
         if (val == YAxis.BLANK) {
             return "--";
-        } else if (bandType.isXRSB()) {
-            return GOESLevel.getStringValue(val);
-        } else {
-            return DrawConstants.valueFormatter.format(yAxis.scale(val));
         }
+        return DrawConstants.valueFormatter.format(yAxis.scale(val));
     }
 
     @Override
