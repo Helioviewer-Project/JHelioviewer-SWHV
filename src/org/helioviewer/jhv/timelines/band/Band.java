@@ -276,10 +276,9 @@ public final class Band extends AbstractTimelineLayer {
 
         LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
         TimeAxis.Mapper xMapper = geometry.xMapper(timeAxis);
-        List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width, start, end);
-
         final boolean isBar = "bar".equals(bandType.getPlotType());
         final long barWidthMillis = isBar ? bandType.getBarWidth() * 1000 : 0;
+        List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width, start - barWidthMillis, end + barWidthMillis);
         final int baselineY = yMapper.dataToPixel(0);
         final boolean useMulticolor = multicolor;
 
