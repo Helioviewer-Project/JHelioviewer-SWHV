@@ -98,13 +98,28 @@ public class BandReaderHapi {
         if (theCatalog == null)
             return groups;
         for (BandType type : theCatalog.types) {
-            String group = type.getPredefinedGroup();
-            if (group != null)
-                groups.computeIfAbsent(group, k -> new ArrayList<>()).add(type);
+            BandType.PredefinedEntry[] entries = type.getPredefinedEntries();
+            if (entries != null) {
+                for (BandType.PredefinedEntry entry : entries) {
+                    if (entry.name() != null)
+                        groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
+                }
+            }
         }
-        for (List<BandType> list : groups.values())
-            list.sort((a, b) -> Integer.compare(a.getPredefinedOrder(), b.getPredefinedOrder()));
+        for (var e : groups.entrySet())
+            e.getValue().sort((a, b) -> Integer.compare(orderFor(a, e.getKey()), orderFor(b, e.getKey())));
         return groups;
+    }
+
+    private static int orderFor(BandType type, String groupName) {
+        BandType.PredefinedEntry[] entries = type.getPredefinedEntries();
+        if (entries != null) {
+            for (BandType.PredefinedEntry entry : entries) {
+                if (groupName.equals(entry.name()))
+                    return entry.order();
+            }
+        }
+        return 0;
     }
 
     private static void onFailure(String ignoredLogContext, Throwable t) {
@@ -119,9 +134,9 @@ public class BandReaderHapi {
 
     private record BandReader(BandType type, HapiTableReader tableReader) {}
 
-    private record Parameter(String name, String units, String scale, JSONArray range, String predefinedGroup, int predefinedOrder,
-                             String plotType, long barWidth, JSONArray levels,
-                             JSONArray warningLevels) {}
+  private record Parameter(String name, String units, String scale, JSONArray range, JSONArray predefined,
+                              String plotType, long barWidth, JSONArray levels,
+                              JSONArray warningLevels) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -220,9 +235,8 @@ public class BandReaderHapi {
                     put("range", p.range).
                     put("scale", p.scale).
                     put("label", title == null ? p.name : title + ' ' + p.name);
-            if (p.predefinedGroup != null) {
-                jobt.put("predefinedGroup", p.predefinedGroup)
-                    .put("predefinedOrder", p.predefinedOrder);
+            if (p.predefined != null) {
+                jobt.put("predefined", p.predefined);
             }
             if (p.plotType != null) {
                 jobt.put("plottype", p.plotType)
@@ -251,8 +265,7 @@ public class BandReaderHapi {
 
         String scale = null;
         JSONArray range = null;
-        String predefinedGroup = null;
-        int predefinedOrder = 0;
+        JSONArray predefined = null;
         String plotType = null;
         long barWidth = 0;
         JSONArray levels = null;
@@ -261,21 +274,14 @@ public class BandReaderHapi {
         if (jhvparams != null) {
             scale = jhvparams.optString("scale", null);
             range = jhvparams.optJSONArray("range");
-            JSONArray predefined = jhvparams.optJSONArray("predefined");
-            if (predefined != null && predefined.length() > 0) {
-                JSONObject first = predefined.optJSONObject(0);
-                if (first != null) {
-                    predefinedGroup = first.optString("name", null);
-                    predefinedOrder = first.optInt("order", 0);
-                }
-            }
+            predefined = jhvparams.optJSONArray("predefined");
             plotType = jhvparams.optString("plottype", null);
             barWidth = jhvparams.optLong("barWidth", 0);
             levels = jhvparams.optJSONArray("levels");
             warningLevels = jhvparams.optJSONArray("warninglevels");
         }
 
-        return new Parameter(name, units, scale, range, predefinedGroup, predefinedOrder, plotType, barWidth, levels, warningLevels);
+        return new Parameter(name, units, scale, range, predefined, plotType, barWidth, levels, warningLevels);
     }
 
     private static Band.Data getHapiStream(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
