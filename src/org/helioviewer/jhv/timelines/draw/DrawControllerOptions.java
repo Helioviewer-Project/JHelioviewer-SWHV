@@ -19,6 +19,7 @@ class DrawControllerOptions extends JPanel {
 
     private final JComboBox<ZoomItem> zoomCombo;
     private final JideToggleButton lockButton;
+    private final JideToggleButton stackedButton;
     private final JLabel statusLabel;
 
     private enum ZOOM {
@@ -55,10 +56,21 @@ class DrawControllerOptions extends JPanel {
             lockButton.setText(lockButton.isSelected() ? Buttons.lock : Buttons.unlock);
         });
 
+        stackedButton = new JideToggleButton(Buttons.overlaid);
+        stackedButton.setToolTipText("Stack layers vertically");
+        stackedButton.addActionListener(e -> {
+            DrawController.setStacked(stackedButton.isSelected());
+            stackedButton.setText(stackedButton.isSelected() ? Buttons.stacked : Buttons.overlaid);
+        });
+
         statusLabel = new JLabel("", JLabel.RIGHT);
 
+        JPanel togglePanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        togglePanel.add(lockButton);
+        togglePanel.add(stackedButton);
+
         add(statusLabel, BorderLayout.LINE_START);
-        add(lockButton, BorderLayout.CENTER);
+        add(togglePanel, BorderLayout.CENTER);
         add(zoomCombo, BorderLayout.LINE_END);
     }
 
@@ -105,6 +117,11 @@ class DrawControllerOptions extends JPanel {
     void setLocked(boolean locked) {
         if (lockButton.isSelected() != locked)
             lockButton.doClick();
+    }
+
+    void setStacked(boolean stacked) {
+        if (stackedButton.isSelected() != stacked)
+            stackedButton.doClick();
     }
 
     void setStatus(String status) {
