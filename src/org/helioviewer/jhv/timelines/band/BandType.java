@@ -8,21 +8,18 @@ import org.json.JSONObject;
 
 public class BandType {
 
-    private static final String[] xWarnLabels = {"B", "C", "M", "X"};
-    private static final double[] xWarnValues = {1e-7, 1e-6, 1e-5, 1e-4};
-
     private final String name;
     private final String baseUrl;
     private final String label;
     private final String unitLabel;
-    private final String[] warnLabels;
-    private final double[] warnLevels;
+    private final WarningLevel[] warningLevels;
     private final double min;
     private final double max;
     private final String scale;
     private final String bandCacheType;
-    private final boolean isXRSB;
     private record Level(double min, double max, Color color) {}
+
+    record WarningLevel(String label, double value, Color color) {}
 
     private final String predefinedGroup;
     private final int predefinedOrder;
@@ -62,14 +59,7 @@ public class BandType {
         barWidth = jo.optLong("barWidth", 0);
         levels = parseLevels(jo.optJSONArray("levels"));
 
-        isXRSB = label.contains("XRAY long");
-        if (isXRSB) {
-            warnLabels = xWarnLabels;
-            warnLevels = xWarnValues;
-        } else {
-            warnLabels = new String[0];
-            warnLevels = new double[0];
-        }
+        warningLevels = parseWarningLevels(jo.optJSONArray("warninglevels"));
     }
 
     void serialize(JSONObject jo) {
@@ -92,12 +82,8 @@ public class BandType {
         return unitLabel;
     }
 
-    String[] getWarnLabels() {
-        return warnLabels;
-    }
-
-    double[] getWarnLevels() {
-        return warnLevels;
+    WarningLevel[] getWarningLevels() {
+        return warningLevels;
     }
 
     double getMin() {
@@ -110,10 +96,6 @@ public class BandType {
 
     String getBaseUrl() {
         return baseUrl;
-    }
-
-    boolean isXRSB() {
-        return isXRSB;
     }
 
     String getPredefinedGroup() {
@@ -173,6 +155,13 @@ public class BandType {
     }
 
     private static Color namedColor(String name) {
+        if (name.startsWith("#")) {
+            try {
+                return Color.decode(name);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
         return switch (name.toLowerCase()) {
             case "red" -> Color.RED;
             case "green" -> Color.GREEN;
@@ -187,6 +176,24 @@ public class BandType {
             case "pink" -> Color.PINK;
             default -> null;
         };
+    }
+
+    private static WarningLevel[] parseWarningLevels(JSONArray ja) {
+        if (ja == null || ja.length() == 0)
+            return new WarningLevel[0];
+        ArrayList<WarningLevel> list = new ArrayList<>();
+        for (int i = 0; i < ja.length(); i++) {
+            JSONObject jo = ja.optJSONObject(i);
+            if (jo == null)
+                continue;
+            String label = jo.optString("label", null);
+            double value = jo.optDouble("value", 0);
+            String colorName = jo.optString("color", "white");
+            Color color = namedColor(colorName);
+            if (label != null && color != null)
+                list.add(new WarningLevel(label, value, color));
+        }
+        return list.toArray(WarningLevel[]::new);
     }
 
     @Override
