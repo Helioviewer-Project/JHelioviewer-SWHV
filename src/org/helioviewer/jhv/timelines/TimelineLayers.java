@@ -29,7 +29,26 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public static void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
-        layers.forEach(layer -> layer.draw(g, graphArea, timeAxis, mousePosition));
+        GraphGeometry geometry = DrawController.getGeometry();
+        boolean stackedMode = geometry.isStacked();
+        int yAxisIndex = 0;
+
+        for (TimelineLayer layer : layers) {
+            if (!layer.isEnabled())
+                continue;
+
+            Rectangle area;
+            if (stackedMode && layer.showYAxis()) {
+                area = geometry.getLayerArea(yAxisIndex);
+                yAxisIndex++;
+            } else {
+                area = graphArea;
+            }
+
+            g.setClip(area);
+            layer.draw(g, area, timeAxis, mousePosition);
+        }
+        g.setClip(graphArea);
     }
 
     public static void fetchData(TimeAxis timeAxis) {
@@ -136,6 +155,46 @@ public class TimelineLayers extends AbstractTableModel {
 
     public static int getNumberOfYAxes() {
         return count(TimelineLayer::showYAxis);
+    }
+
+    public static List<TimelineLayer> getVisibleYAxisLayers() {
+        List<TimelineLayer> result = new ArrayList<>();
+        for (TimelineLayer tl : layers) {
+            if (tl.showYAxis() && tl.isEnabled()) {
+                result.add(tl);
+            }
+        }
+        return result;
+    }
+
+    @Nullable
+    public static TimelineLayer getVisibleYAxisLayerAt(int index) {
+        List<TimelineLayer> visible = getVisibleYAxisLayers();
+        if (index >= 0 && index < visible.size()) {
+            return visible.get(index);
+        }
+        return null;
+    }
+
+    public static Rectangle getDrawArea(TimelineLayer layer, Rectangle graphArea) {
+        GraphGeometry geometry = DrawController.getGeometry();
+        if (!geometry.isStacked()) {
+            return graphArea;
+        }
+        if (!layer.showYAxis()) {
+            return graphArea;
+        }
+        int index = 0;
+        for (TimelineLayer tl : layers) {
+            if (!tl.isEnabled() || !tl.showYAxis()) {
+                continue;
+            }
+            if (tl == layer) {
+                return geometry.getLayerArea(index);
+            }
+            index++;
+        }
+        return graphArea;
     }
 
     public static void forEachPropagated(ObjIntConsumer<TimelineLayer> consumer) {

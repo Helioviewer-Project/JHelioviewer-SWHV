@@ -173,7 +173,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     public void mouseExited(MouseEvent e) {
         JHVEventCache.highlight(null);
         mousePosition = null;
-        if (TimelineLayers.setYAxisHighlight(null)) {
+        if (!DrawController.getGeometry().isStacked() && TimelineLayers.setYAxisHighlight(null)) {
             drawRequest();
             return;
         }
@@ -251,12 +251,22 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             setCursor(Cursor.getDefaultCursor());
         }
 
-        boolean axisHighlightChanged = TimelineLayers.setYAxisHighlight(geometry.yAxisHit(mousePosition));
-        boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
-        if (axisHighlightChanged || eventHighlightChanged) {
-            drawRequest();
+        if (geometry.isStacked()) {
+            geometry.layerIndexAtPoint(mousePosition);
+            boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
+            if (eventHighlightChanged) {
+                drawRequest();
+            } else {
+                repaint();
+            }
         } else {
-            repaint(); // for timeline values
+            boolean axisHighlightChanged = TimelineLayers.setYAxisHighlight(geometry.yAxisHit(mousePosition));
+            boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
+            if (axisHighlightChanged || eventHighlightChanged) {
+                drawRequest();
+            } else {
+                repaint();
+            }
         }
     }
 
@@ -277,7 +287,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     @Override
     public void componentResized(ComponentEvent e) {
         DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
-        if (mousePosition != null)
+        if (mousePosition != null && !DrawController.getGeometry().isStacked())
             TimelineLayers.setYAxisHighlight(DrawController.getGeometry().yAxisHit(mousePosition));
     }
 

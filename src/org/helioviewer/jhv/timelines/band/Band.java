@@ -19,6 +19,7 @@ import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
@@ -214,7 +215,8 @@ public final class Band extends AbstractTimelineLayer {
 
         GraphGeometry geometry = DrawController.getGeometry();
         Rectangle graphArea = geometry.area();
-        YAxis.Mapper yMapper = geometry.yMapper(yAxis);
+        Rectangle drawArea = TimelineLayers.getDrawArea(this, graphArea);
+        YAxis.Mapper yMapper = geometry.yMapper(yAxis, drawArea);
 
         double[] unconvertedWarnLevels = bandType.getWarnLevels();
         for (int i = 0; i < warnLevels.length; i++) {
@@ -227,7 +229,7 @@ public final class Band extends AbstractTimelineLayer {
 
         LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
         TimeAxis.Mapper xMapper = geometry.xMapper(timeAxis);
-        List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * graphArea.width, start, end);
+        List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width, start, end);
 
         graphWorker.submit(() -> {
                     List<Polyline> result = new ArrayList<>();
