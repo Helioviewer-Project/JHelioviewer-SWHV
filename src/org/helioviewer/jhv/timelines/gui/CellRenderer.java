@@ -38,11 +38,16 @@ class CellRenderer {
     static final class LineColor extends DefaultTableCellRenderer {
 
         private Color c;
+        private boolean multicolor;
 
         @Override
         public void setValue(Object value) {
-            if (value instanceof TimelineLayer layer) {
+            if (value instanceof Band band) {
+                c = band.getDataColor();
+                multicolor = band.isMulticolor();
+            } else if (value instanceof TimelineLayer layer) {
                 c = layer.getDataColor();
+                multicolor = false;
             }
         }
 
@@ -50,24 +55,19 @@ class CellRenderer {
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
             if (c != null) {
-                g.setColor(c);
-                g.fillRect(4, getHeight() / 2 - 1, getWidth() - 4, 2);
+                int w = getWidth() - 4;
+                int h = 2;
+                int y = getHeight() / 2 - 1;
+                if (multicolor) {
+                    g.setColor(Color.RED);
+                    g.fillRect(4, y, w / 2, h);
+                    g.setColor(Color.GREEN);
+                    g.fillRect(4 + w / 2, y, w - w / 2, h);
+                } else {
+                    g.setColor(c);
+                    g.fillRect(4, y, w, h);
+                }
             }
-        }
-
-    }
-
-    static final class Levels extends DefaultTableCellRenderer {
-
-        private final JCheckBox checkBox = new JCheckBox();
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof Band band) {
-                checkBox.setSelected(band.isMulticolor());
-            }
-            checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            return checkBox;
         }
 
     }
