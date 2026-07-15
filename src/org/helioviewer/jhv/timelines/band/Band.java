@@ -66,6 +66,8 @@ public final class Band extends AbstractTimelineLayer {
     private boolean multicolor = true;
     private Runnable onColorChanged;
 
+    public boolean drawWarnings = true;
+
     private Band(BandType _bandType) {
         bandType = _bandType;
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
@@ -242,11 +244,13 @@ public final class Band extends AbstractTimelineLayer {
             polylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length()));
         }
 
-        BandType.WarningLevel[] wls = bandType.getWarningLevels();
-        for (int i = 0; i < warnPixels.length; i++) {
-            g.setColor(wls[i].color());
-            g.drawLine(graphArea.x, warnPixels[i], graphArea.x + graphArea.width, warnPixels[i]);
-            g.drawString(wls[i].label(), graphArea.x, warnPixels[i] - 2);
+        if (drawWarnings) {
+            BandType.WarningLevel[] wls = bandType.getWarningLevels();
+            for (int i = 0; i < warnPixels.length; i++) {
+                g.setColor(wls[i].color());
+                g.drawLine(graphArea.x, warnPixels[i], graphArea.x + graphArea.width, warnPixels[i]);
+                g.drawString(wls[i].label(), graphArea.x, warnPixels[i] - 2);
+            }
         }
     }
 
