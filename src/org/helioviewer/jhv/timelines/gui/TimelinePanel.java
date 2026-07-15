@@ -52,9 +52,8 @@ public final class TimelinePanel extends JPanel {
     private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
     public static final int LOADING_COL = 2;
-    private static final int LINECOLOR_COL = 3;
-    private static final int LEVELS_COL = 4;
-    private static final int REMOVE_COL = 5;
+    public static final int LINECOLOR_COL = 3;
+    private static final int REMOVE_COL = 4;
 
     private static final int NUMBEROFVISIBLEROWS = 6;
 
@@ -73,7 +72,7 @@ public final class TimelinePanel extends JPanel {
 
         @Override
         public void changeSelection(int row, int col, boolean toggle, boolean extend) {
-            if (col != ENABLED_COL && col != REMOVE_COL && col != LEVELS_COL)
+            if (col != ENABLED_COL && col != REMOVE_COL && col != LINECOLOR_COL)
                 super.changeSelection(row, col, toggle, extend);
             // otherwise prevent changing selection
         }
@@ -209,11 +208,6 @@ public final class TimelinePanel extends JPanel {
         grid.getColumnModel().getColumn(LINECOLOR_COL).setMinWidth(20);
         grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(LEVELS_COL).setCellRenderer(new CellRenderer.Levels());
-        grid.getColumnModel().getColumn(LEVELS_COL).setPreferredWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(LEVELS_COL).setMinWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(LEVELS_COL).setMaxWidth(ICON_WIDTH + 8);
-
         grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new CellRenderer.Remove());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMinWidth(ICON_WIDTH + 2);
@@ -237,7 +231,7 @@ public final class TimelinePanel extends JPanel {
                     if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
-                } else if (v.col == LEVELS_COL && timeline instanceof Band band) {
+                } else if (v.col == LINECOLOR_COL && timeline instanceof Band band) {
                     band.setMulticolor(!band.isMulticolor());
                     layers.updateCell(v.row, v.col);
                 } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
