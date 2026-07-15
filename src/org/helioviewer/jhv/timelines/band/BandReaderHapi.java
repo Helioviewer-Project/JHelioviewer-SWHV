@@ -42,6 +42,11 @@ public class BandReaderHapi {
     private static final String ROBserver = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
 
     private static Catalog theCatalog; //!
+    private static Runnable onCatalogLoaded;
+
+    public static void setOnCatalogLoaded(@Nullable Runnable callback) {
+        onCatalogLoaded = callback;
+    }
 
     public static void requestCatalog() {
         Task.submit(ROBserver, new LoadHapiCatalog(ROBserver), BandReaderHapi::onSuccessCatalog, BandReaderHapi::onFailure);
@@ -84,6 +89,22 @@ public class BandReaderHapi {
     private static void onSuccessCatalog(@Nonnull Catalog catalog) {
         theCatalog = catalog;
         Timelines.td.setupDatasets(groupName, theCatalog.types);
+        if (onCatalogLoaded != null)
+            onCatalogLoaded.run();
+    }
+
+    public static LinkedHashMap<String, List<BandType>> getPredefinedGroups() {
+        LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
+        if (theCatalog == null)
+            return groups;
+        for (BandType type : theCatalog.types) {
+            String group = type.getPredefinedGroup();
+            if (group != null)
+                groups.computeIfAbsent(group, k -> new ArrayList<>()).add(type);
+        }
+        for (List<BandType> list : groups.values())
+            list.sort((a, b) -> Integer.compare(a.getPredefinedOrder(), b.getPredefinedOrder()));
+        return groups;
     }
 
     private static void onFailure(String ignoredLogContext, Throwable t) {
@@ -98,7 +119,7 @@ public class BandReaderHapi {
 
     private record BandReader(BandType type, HapiTableReader tableReader) {}
 
-    private record Parameter(String name, String units, String scale, JSONArray range) {}
+    private record Parameter(String name, String units, String scale, JSONArray range, String predefinedGroup, int predefinedOrder) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -197,6 +218,10 @@ public class BandReaderHapi {
                     put("range", p.range).
                     put("scale", p.scale).
                     put("label", title == null ? p.name : title + ' ' + p.name);
+            if (p.predefinedGroup != null) {
+                jobt.put("predefinedGroup", p.predefinedGroup)
+                    .put("predefinedOrder", p.predefinedOrder);
+            }
 
             HapiParam[] typeParams = new HapiParam[]{params[0], params[i]};
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
@@ -216,13 +241,23 @@ public class BandReaderHapi {
 
         String scale = null;
         JSONArray range = null;
+        String predefinedGroup = null;
+        int predefinedOrder = 0;
         JSONObject jhvparams = jo.optJSONObject("jhvparams");
         if (jhvparams != null) {
             scale = jhvparams.optString("scale", null);
             range = jhvparams.optJSONArray("range");
+            JSONArray predefined = jhvparams.optJSONArray("predefined");
+            if (predefined != null && predefined.length() > 0) {
+                JSONObject first = predefined.optJSONObject(0);
+                if (first != null) {
+                    predefinedGroup = first.optString("name", null);
+                    predefinedOrder = first.optInt("order", 0);
+                }
+            }
         }
 
-        return new Parameter(name, units, scale, range);
+        return new Parameter(name, units, scale, range, predefinedGroup, predefinedOrder);
     }
 
     private static Band.Data getHapiStream(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {

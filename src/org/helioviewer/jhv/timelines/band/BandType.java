@@ -19,6 +19,8 @@ public class BandType {
     private final String scale;
     private final String bandCacheType;
     private final boolean isXRSB;
+    private final String predefinedGroup;
+    private final int predefinedOrder;
 
     private final JSONObject json;
 
@@ -45,6 +47,8 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
         bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
+        predefinedGroup = jo.optString("predefinedGroup", null);
+        predefinedOrder = jo.optInt("predefinedOrder", 0);
 
         isXRSB = label.contains("XRAY long");
         if (isXRSB) {
@@ -98,6 +102,14 @@ public class BandType {
 
     boolean isXRSB() {
         return isXRSB;
+    }
+
+    String getPredefinedGroup() {
+        return predefinedGroup;
+    }
+
+    int getPredefinedOrder() {
+        return predefinedOrder;
     }
 
     @Override
