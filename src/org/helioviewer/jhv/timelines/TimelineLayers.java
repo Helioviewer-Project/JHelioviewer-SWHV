@@ -35,6 +35,7 @@ public class TimelineLayers extends AbstractTableModel {
         GraphGeometry geometry = DrawController.getGeometry();
         boolean stackedMode = geometry.isStacked();
         int yAxisIndex = 0;
+        boolean firstBand = true;
 
         for (TimelineLayer layer : layers) {
             if (!layer.isEnabled())
@@ -49,6 +50,10 @@ public class TimelineLayers extends AbstractTableModel {
             }
 
             g.setClip(area);
+            if (layer instanceof Band band) {
+                band.drawWarnings = stackedMode || firstBand;
+                firstBand = false;
+            }
             layer.draw(g, area, timeAxis, mousePosition);
         }
         g.setClip(graphArea);
