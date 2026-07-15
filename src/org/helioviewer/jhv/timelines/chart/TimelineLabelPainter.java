@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
@@ -121,7 +122,7 @@ final class TimelineLabelPainter {
         drawStackedHorizontalTickline(g, stripArea, yMapper, ticks.end(), axisX, false);
 
         g.drawLine(axisX, stripArea.y, axisX, stripArea.y + stripArea.height);
-        g.drawString(yAxis.getLabel(), axisX + 2, stripArea.y + stripArea.height - 4);
+        drawRotatedLabel(g, yAxis.getLabel(), axisX, stripArea);
     }
 
     private static void drawStackedHorizontalTickline(Graphics g, Rectangle stripArea, YAxis.Mapper yMapper, double tick, int axisX, boolean needTxt) {
@@ -143,6 +144,24 @@ final class TimelineLabelPainter {
     private static int drawString(Graphics2D g, String text, int x, int y) {
         g.drawString(text, x, y);
         return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
+    }
+
+    private static void drawRotatedLabel(Graphics2D g, String label, int axisX, Rectangle stripArea) {
+        Rectangle2D bounds = g.getFontMetrics().getStringBounds(label, g);
+        double textWidth = bounds.getWidth();
+        double textHeight = bounds.getHeight();
+
+        double cx = axisX / 4.0;
+        double cy = stripArea.y + stripArea.height / 2.0;
+
+        AffineTransform oldTransform = g.getTransform();
+        try {
+            g.translate(cx, cy);
+            g.rotate(-Math.PI / 2);
+            g.drawString(label, (float) (-textWidth / 2), (float) (textHeight / 3));
+        } finally {
+            g.setTransform(oldTransform);
+        }
     }
 
     private static void drawHorizontalLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, int row, TimelineLayer tl) {
