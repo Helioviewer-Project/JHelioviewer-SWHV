@@ -1,6 +1,8 @@
 package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -16,8 +18,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -43,15 +47,15 @@ import com.jidesoft.swing.JideButton;
 public final class TimelinePanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
-    private static final String NONE_ITEM = "None";
+    private static final String NONE_ITEM = "Predefined";
 
     private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
     public static final int LOADING_COL = 2;
     private static final int LINECOLOR_COL = 3;
-    private static final int REMOVE_COL = 4;
+    private static final int LEVELS_COL = 4;
+    private static final int REMOVE_COL = 5;
 
-    public static final int NUMBEROFCOLUMNS = 5;
     private static final int NUMBEROFVISIBLEROWS = 6;
 
     private final TimelineTable grid;
@@ -69,7 +73,7 @@ public final class TimelinePanel extends JPanel {
 
         @Override
         public void changeSelection(int row, int col, boolean toggle, boolean extend) {
-            if (col != ENABLED_COL && col != REMOVE_COL)
+            if (col != ENABLED_COL && col != REMOVE_COL && col != LEVELS_COL)
                 super.changeSelection(row, col, toggle, extend);
             // otherwise prevent changing selection
         }
@@ -141,6 +145,18 @@ public final class TimelinePanel extends JPanel {
 
         predefinedCombo = new JComboBox<>();
         predefinedCombo.setToolTipText("Predefined plot");
+        predefinedCombo.setMaximumSize(new Dimension(100, predefinedCombo.getPreferredSize().height));
+        predefinedCombo.setPreferredSize(new Dimension(80, predefinedCombo.getPreferredSize().height));
+        predefinedCombo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (index == 0 && NONE_ITEM.equals(value)) {
+                    label.setForeground(Color.GRAY);
+                }
+                return label;
+            }
+        });
         predefinedCombo.addActionListener(e -> {
             if (suppressComboAction)
                 return;
@@ -154,12 +170,14 @@ public final class TimelinePanel extends JPanel {
 
         JPanel leftButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
         leftButtonPanel.add(addLayerButton);
-        leftButtonPanel.add(new JLabel("Predefined:"));
-        leftButtonPanel.add(predefinedCombo);
+
+        JPanel rightButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
+        rightButtonPanel.add(predefinedCombo);
+        rightButtonPanel.add(DrawController.getOptionsPanel());
 
         JPanel addLayerButtonWrapper = new JPanel(new BorderLayout());
         addLayerButtonWrapper.add(leftButtonPanel, BorderLayout.LINE_START);
-        addLayerButtonWrapper.add(DrawController.getOptionsPanel(), BorderLayout.LINE_END);
+        addLayerButtonWrapper.add(rightButtonPanel, BorderLayout.LINE_END);
 
         JPanel jspContainer = new JPanel(new BorderLayout());
         jspContainer.add(addLayerButtonWrapper, BorderLayout.CENTER);
@@ -172,23 +190,33 @@ public final class TimelinePanel extends JPanel {
         grid.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         grid.setColumnSelectionAllowed(false);
         grid.setIntercellSpacing(new Dimension(0, 0));
+        grid.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new CellRenderer.Enabled());
         grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(ENABLED_COL).setMinWidth(ICON_WIDTH + 8);
         grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
 
         grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new CellRenderer.Name());
 
         grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new CellRenderer.Loading());
         grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(LOADING_COL).setMinWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new CellRenderer.LineColor());
         grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
+        grid.getColumnModel().getColumn(LINECOLOR_COL).setMinWidth(20);
         grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
+
+        grid.getColumnModel().getColumn(LEVELS_COL).setCellRenderer(new CellRenderer.Levels());
+        grid.getColumnModel().getColumn(LEVELS_COL).setPreferredWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(LEVELS_COL).setMinWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(LEVELS_COL).setMaxWidth(ICON_WIDTH + 8);
 
         grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new CellRenderer.Remove());
         grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(REMOVE_COL).setMinWidth(ICON_WIDTH + 2);
         grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getSelectionModel().addListSelectionListener(e -> {
@@ -209,6 +237,9 @@ public final class TimelinePanel extends JPanel {
                     if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
+                } else if (v.col == LEVELS_COL && timeline instanceof Band band) {
+                    band.setMulticolor(!band.isMulticolor());
+                    layers.updateCell(v.row, v.col);
                 } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
                     layers.remove(timeline);
                     selectExistingRow(v.row);

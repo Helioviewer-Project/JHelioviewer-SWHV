@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.timelines.draw;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Objects;
 
 import javax.swing.JComboBox;
@@ -44,6 +45,8 @@ class DrawControllerOptions extends JPanel {
                 new ZoomItem(ZOOM.Hour, 1)
         };
         zoomCombo = new JComboBox<>(items);
+        zoomCombo.setMaximumSize(new Dimension(130, zoomCombo.getPreferredSize().height));
+        zoomCombo.setPreferredSize(new Dimension(110, zoomCombo.getPreferredSize().height));
         zoomCombo.addActionListener(e -> {
             ZoomItem item = (ZoomItem) Objects.requireNonNull(zoomCombo.getSelectedItem());
             zoomTo(item.zoom, item.number);
@@ -66,12 +69,12 @@ class DrawControllerOptions extends JPanel {
         statusLabel = new JLabel("", JLabel.RIGHT);
 
         JPanel togglePanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
-        togglePanel.add(lockButton);
         togglePanel.add(stackedButton);
+        togglePanel.add(zoomCombo);
+        togglePanel.add(lockButton);
 
         add(statusLabel, BorderLayout.LINE_START);
         add(togglePanel, BorderLayout.CENTER);
-        add(zoomCombo, BorderLayout.LINE_END);
     }
 
     private record ZoomItem(ZOOM zoom, long number) {
@@ -79,7 +82,7 @@ class DrawControllerOptions extends JPanel {
         public String toString() {
             String plural = number > 1 ? "s" : "";
             return switch (zoom) {
-                case CUSTOM -> "Custom interval";
+                case CUSTOM -> "Custom";
                 case All -> "Maximum interval";
                 case Year -> number + " year" + plural;
                 case Month -> number + " month" + plural;
