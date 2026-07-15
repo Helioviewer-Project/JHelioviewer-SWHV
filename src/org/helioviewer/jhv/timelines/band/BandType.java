@@ -21,8 +21,9 @@ public class BandType {
 
     record WarningLevel(String label, double value, Color color) {}
 
-    private final String predefinedGroup;
-    private final int predefinedOrder;
+    record PredefinedEntry(String name, int order) {}
+
+    private final PredefinedEntry[] predefinedEntries;
     private final String plotType;
     private final long barWidth;
     private final Level[] levels;
@@ -52,8 +53,17 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
         bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
-        predefinedGroup = jo.optString("predefinedGroup", null);
-        predefinedOrder = jo.optInt("predefinedOrder", 0);
+        JSONArray predefinedArray = jo.optJSONArray("predefined");
+        if (predefinedArray != null && predefinedArray.length() > 0) {
+            predefinedEntries = new PredefinedEntry[predefinedArray.length()];
+            for (int i = 0; i < predefinedArray.length(); i++) {
+                JSONObject pe = predefinedArray.optJSONObject(i);
+                if (pe != null)
+                    predefinedEntries[i] = new PredefinedEntry(pe.optString("name", null), pe.optInt("order", 0));
+            }
+        } else {
+            predefinedEntries = null;
+        }
 
         plotType = jo.optString("plottype", null);
         barWidth = jo.optLong("barWidth", 0);
@@ -98,12 +108,8 @@ public class BandType {
         return baseUrl;
     }
 
-    String getPredefinedGroup() {
-        return predefinedGroup;
-    }
-
-    int getPredefinedOrder() {
-        return predefinedOrder;
+    PredefinedEntry[] getPredefinedEntries() {
+        return predefinedEntries;
     }
 
     String getPlotType() {
