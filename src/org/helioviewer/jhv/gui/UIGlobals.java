@@ -98,7 +98,7 @@ public final class UIGlobals {
                 TL_INTERVAL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.darker();
                 TL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.brighter();
 
-                TL_TICK_LINE_COLOR = foreColor;
+                TL_TICK_LINE_COLOR = foreColor.darker().darker();
                 TL_LABEL_TEXT_COLOR = foreColor;
                 TL_TEXT_COLOR = foreColor;
                 TL_TEXT_BACKGROUND_COLOR = backColor;
@@ -112,7 +112,7 @@ public final class UIGlobals {
                 TL_INTERVAL_BORDER_COLOR = TL_SELECTED_INTERVAL_BACKGROUND_COLOR.darker();
                 TL_BORDER_COLOR = new Color(182, 190, 206);
 
-                TL_TICK_LINE_COLOR = Color.LIGHT_GRAY;
+                TL_TICK_LINE_COLOR = Color.DARK_GRAY;
                 TL_LABEL_TEXT_COLOR = Color.BLACK;
                 TL_TEXT_COLOR = Color.WHITE;
                 TL_TEXT_BACKGROUND_COLOR = Color.GRAY;
