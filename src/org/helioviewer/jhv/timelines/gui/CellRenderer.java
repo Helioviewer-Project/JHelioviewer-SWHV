@@ -14,6 +14,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.gui.component.BusyIndicator;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.timelines.TimelineLayer;
+import org.helioviewer.jhv.timelines.band.Band;
 
 @SuppressWarnings("serial")
 class CellRenderer {
@@ -52,6 +53,21 @@ class CellRenderer {
                 g.setColor(c);
                 g.fillRect(4, getHeight() / 2 - 1, getWidth() - 4, 2);
             }
+        }
+
+    }
+
+    static final class Levels extends DefaultTableCellRenderer {
+
+        private final JCheckBox checkBox = new JCheckBox();
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (value instanceof Band band) {
+                checkBox.setSelected(band.isMulticolor());
+            }
+            checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            return checkBox;
         }
 
     }
