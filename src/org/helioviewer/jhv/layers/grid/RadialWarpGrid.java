@@ -102,7 +102,7 @@ public final class RadialWarpGrid {
     private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings, int ringCount, float[] color, double labelSize, double labelAngle) {
         SdfTextRenderer renderer = GLText.renderer();
         double width = mv.cameraWidth(vp);
-        double worldTextHeight = TEXT_SIZE * labelSize / GridLayer.GRID_LABEL_SIZE_REF * Display.pixelScale[1] * width / vp.height;
+        double worldTextHeight = TEXT_SIZE * labelSize / GridLayer.GRID_LABEL_SIZE_REF * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
         float textScaleFactor = (float) (worldTextHeight / renderer.getFontSize());
         float labelOffset = (float) (0.1 * worldTextHeight);
         double angle = Math.toRadians(labelAngle);
