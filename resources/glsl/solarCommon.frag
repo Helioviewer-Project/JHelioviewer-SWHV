@@ -20,6 +20,7 @@ const float WCS_PROJECTION_CAR = 4.;
 const float WCS_PROJECTION_CEA = 5.;
 
 out vec4 outColor;
+in vec2 normalizedScreenpos;
 
 struct WCS {
     vec4 cameraDiff; // not strictly WCS
@@ -184,7 +185,6 @@ void clamp_value(const float value, const float low, const float high) {
 }
 
 vec2 getScrPos(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 scrpos = vec2(screen.iaspect * up1.x, up1.y) + .5;
     clamp_coord(scrpos);
@@ -192,7 +192,6 @@ vec2 getScrPos(void) {
 }
 
 vec2 getDiskPos(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     return up1.xy;
 }

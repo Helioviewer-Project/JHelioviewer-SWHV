@@ -71,7 +71,6 @@ vec3 rotateOnDiskPoint(const WCS wcs, const vec3 hitPoint) {
 }
 
 void main(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
     vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
     vec2 upXY = up1.xy;
     bool diffMode = display.isDiff != NODIFFERENCE;
