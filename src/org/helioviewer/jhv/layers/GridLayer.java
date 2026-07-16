@@ -64,7 +64,7 @@ public final class GridLayer extends AbstractLayer {
     private double labelAlpha = 1;
     private double gridLineScale = 1;
     private double gridLabelSize = GRID_LABEL_SIZE_REF;
-    private double gridLabelAngle = 0;
+    private double gridLabelAngle = 120;
 
     private final GLSLShape earthPoint = new GLSLShape(false);
     private final GLSLLine axesLine = new GLSLLine(false);
