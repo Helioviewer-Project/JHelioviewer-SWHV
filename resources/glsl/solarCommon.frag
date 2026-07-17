@@ -50,7 +50,6 @@ layout(std140) uniform ProjectionBlock {
 
 struct Screen {
     mat4 inverseMVP;
-    vec4 viewport;
     float iaspect;
     float xStart;
     float xStop;
