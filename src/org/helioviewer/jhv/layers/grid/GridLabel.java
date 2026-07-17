@@ -113,7 +113,7 @@ public class GridLabel {
             labels.add(makeTransformedLabel(txt, x, y, m));
         }
         for (double theta = -lonStep; theta > -180.; theta -= lonStep) {
-            String txt = FastFormat.rounded1(gridType == GridType.Carrington ? theta + 360 : theta);
+            String txt = FastFormat.rounded1(gridType.displayLongitude(theta));
             double angle = (90 - theta) * Math.PI / 180.;
             float x = (float) (Math.cos(angle) * size);
             float y = (float) (Math.sin(angle) * size);

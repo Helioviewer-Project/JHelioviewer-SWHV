@@ -7,6 +7,7 @@ import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.gui.TransferAccess;
@@ -32,24 +33,24 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
     private final StringBuilder textBuffer = new StringBuilder(128);
 
     public PositionStatusPanel() {
-        setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
+        setText(formatOrtho(Vec2.NAN, GridType.Viewpoint, 0, 0, 0, 0));
     }
 
     private void update(int x, int y) {
         Viewport vp = Display.getActiveViewport();
         MapView mv = GLRenderer.getMapView();
-        Vec2 coord = mv.mouseToGrid(vp, x, y);
+        Vec2 coord = mv.mouseToMap(vp, x, y);
 
         if (mv.isHpc()) {
             setText(formatHpc(coord));
         } else if (mv.isLatitudinal()) {
-            setText(formatLati(coord));
+            setText(formatLati(coord, mv.gridType()));
         } else if (mv.isRadialWarp() || mv.isRectWarp()) {
             setText(formatAngleRadius(coord));
         } else {
             Vec3 v = mv.mouseToSky(vp, x, y);
             if (v == null) {
-                setText(formatOrtho(Vec2.NAN, 0, 0, 0, 0));
+                setText(formatOrtho(Vec2.NAN, mv.gridType(), 0, 0, 0, 0));
             } else {
                 String annStr = "";
                 double r = Math.sqrt(v.x * v.x + v.y * v.y);
@@ -63,7 +64,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
                 double px = (180 / Math.PI) * Math.atan2(v.x, zeta);
                 double py = (180 / Math.PI) * Math.atan2(v.y, Math.sqrt(v.x * v.x + zeta * zeta));
                 double pa = MathUtils.mapTo0To360((180 / Math.PI) * Math.atan2(v.y, v.x) - (DisplayController.getViewpointUpdate().dragAxis() == Vec3.ZAxis ? 0 : 90)); // w.r.t. axis
-                String ortho = formatOrtho(coord, r, pa, px, py);
+                String ortho = formatOrtho(coord, mv.gridType(), r, pa, px, py);
                 setText(annStr.isEmpty() ? ortho : annStr + " | " + ortho);
             }
         }
@@ -89,18 +90,18 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         return FastFormat.appendFixed2(sb, value, FIELD_WIDTH, true).append('°');
     }
 
-    private static void appendDegreePair(StringBuilder sb, Vec2 coord) {
-        appendDegrees(sb, coord.x).append(',');
+    private static void appendDegreePair(StringBuilder sb, Vec2 coord, GridType gridType) {
+        appendDegrees(sb, gridType.displayLongitude(coord.x)).append(',');
         appendDegrees(sb, coord.y);
     }
 
-    private String formatLati(@Nonnull Vec2 coord) {
+    private String formatLati(@Nonnull Vec2 coord, GridType gridType) {
         StringBuilder sb = resetBuffer();
         sb.append("(φ,θ):(");
         if (coord == Vec2.NAN)
             sb.append(NAN_DEGREES);
         else
-            appendDegreePair(sb, coord);
+            appendDegreePair(sb, coord, gridType);
         return sb.append(')').toString();
     }
 
@@ -128,7 +129,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         return sb.append(')').toString();
     }
 
-    private String formatOrtho(@Nonnull Vec2 coord, double r, double pa, double px, double py) {
+    private String formatOrtho(@Nonnull Vec2 coord, GridType gridType, double r, double pa, double px, double py) {
         StringBuilder sb = resetBuffer();
         sb.append("(ρ,ψ):(");
         appendR(sb, r).append(',');
@@ -136,7 +137,7 @@ public final class PositionStatusPanel extends StatusPanel.StatusPlugin implemen
         if (coord == Vec2.NAN)
             sb.append(NAN_DEGREES);
         else
-            appendDegreePair(sb, coord);
+            appendDegreePair(sb, coord, gridType);
         sb.append(") | (x,y):(");
         appendXY(sb, px).append(',');
         appendXY(sb, py);

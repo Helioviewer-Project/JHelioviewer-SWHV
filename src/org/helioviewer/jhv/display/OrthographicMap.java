@@ -39,7 +39,7 @@ final class OrthographicMap {
             vexBuf.putVertex((float) (vertex.x * radius), (float) (vertex.y * radius), (float) (vertex.z * radius), pointSize, color);
     }
 
-    static Vec2 mouseToGrid(Camera camera, Position viewpoint, double width, Viewport vp, GridType gridType, int x, int y) {
+    static Vec2 mouseToMap(Camera camera, Position viewpoint, double width, Viewport vp, GridType gridType, int x, int y) {
         Quat rotation = gridType == GridType.Viewpoint
                 ? Quat.ZERO
                 : Quat.rotateWithConjugate(viewpoint.toQuat(), gridType.toCarrington(viewpoint));
@@ -50,7 +50,6 @@ final class OrthographicMap {
 
         double theta = Math.toDegrees(SphericalCoords.latitude(p));
         double phi = Math.toDegrees(SphericalCoords.longitude(p));
-        phi = gridType == GridType.Carrington && phi < 0 ? phi + 360 : phi;
         return new Vec2(phi, theta);
     }
 

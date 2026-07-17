@@ -48,10 +48,9 @@ public class FlatGrid {
         double x1 = scale.toMapX(Math.clamp(xCenter + halfWidth, 0, 1));
         double y0 = scale.toMapY(Math.clamp(yCenter - halfWidth, 0, 1));
         double y1 = scale.toMapY(Math.clamp(yCenter + halfWidth, 0, 1));
-        boolean wrapLongitude = mv.isLatitudinal() && mv.gridType() == GridType.Carrington;
-        Axis xAxis = buildAxis(scale, true, true, wrapLongitude,
+        Axis xAxis = buildAxis(scale, true, true, mv.isLatitudinal(), mv.gridType(),
                 x0, x1, vp.width);
-        Axis yAxis = buildAxis(scale, false, mv.isHpc() || mv.isLatitudinal(), false,
+        Axis yAxis = buildAxis(scale, false, mv.isHpc() || mv.isLatitudinal(), false, mv.gridType(),
                 y0, y1, vp.height);
         updateShape(xAxis, yAxis, mv, vp, width, gridColor, lineScale);
         shape.renderShape(GL.TRIANGLES);
@@ -97,7 +96,7 @@ public class FlatGrid {
         shape.setVertex(vexBuf);
     }
 
-    private static Axis buildAxis(MapScale scale, boolean xAxis, boolean angularStep, boolean wrap0to360, double start, double stop, int pixels) {
+    private static Axis buildAxis(MapScale scale, boolean xAxis, boolean angularStep, boolean longitudeAxis, GridType gridType, double start, double stop, int pixels) {
         double range = Math.abs(stop - start);
         double first = start;
         double step = 0;
@@ -114,7 +113,7 @@ public class FlatGrid {
         double[] positions = new double[count];
         for (int i = 0; i < count; i++) {
             double value = first + i * step;
-            labelValues[i] = wrap0to360 ? wrapCarrington(value) : value;
+            labelValues[i] = longitudeAxis ? gridType.displayLongitude(value) : value;
             double position = (xAxis ? scale.toUnitX(value) : scale.toUnitY(value)) - 0.5;
             positions[i] = Math.abs(position) < AXIS_EPSILON ? 0 : position;
         }
@@ -141,8 +140,4 @@ public class FlatGrid {
         return 10 * base;
     }
 
-    private static double wrapCarrington(double value) {
-        double wrapped = value % 360;
-        return wrapped < 0 ? wrapped + 360 : wrapped;
-    }
 }

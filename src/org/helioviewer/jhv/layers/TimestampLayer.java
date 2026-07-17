@@ -96,10 +96,10 @@ public class TimestampLayer extends AbstractLayer {
         int centerX = vp.x + vp.width / 2;
         int centerY = vp.yAWT + vp.height / 2;
 
-        Vec2 left = mv.mouseToGrid(vp, vp.x, centerY);
-        Vec2 right = mv.mouseToGrid(vp, vp.x + vp.width - 1, centerY);
-        Vec2 bottom = mv.mouseToGrid(vp, centerX, vp.yAWT + vp.height - 1);
-        Vec2 top = mv.mouseToGrid(vp, centerX, vp.yAWT);
+        Vec2 left = mv.mouseToMap(vp, vp.x, centerY);
+        Vec2 right = mv.mouseToMap(vp, vp.x + vp.width - 1, centerY);
+        Vec2 bottom = mv.mouseToMap(vp, centerX, vp.yAWT + vp.height - 1);
+        Vec2 top = mv.mouseToMap(vp, centerX, vp.yAWT);
 
         MapScale scale = mv.scale(vp);
         double minX = scale.toMapX(0);

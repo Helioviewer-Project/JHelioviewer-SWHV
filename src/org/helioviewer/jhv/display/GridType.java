@@ -29,4 +29,8 @@ public enum GridType {
         return Quat.createXY(this == Viewpoint ? viewpoint.lat : 0, toLongitude(viewpoint));
     }
 
+    public double displayLongitude(double longitude) {
+        return this == Carrington && longitude < 0 ? longitude + 360 : longitude;
+    }
+
 }

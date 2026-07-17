@@ -16,7 +16,7 @@ final class ProjectedMap {
 
     enum Kind {HPC, LATITUDINAL, RADIAL_WARP, RECT_WARP}
 
-    static Vec2 project(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
+    private static Vec2 project(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
         return switch (kind) {
             case HPC -> projectHpc(viewpoint, v, scale);
             case LATITUDINAL -> projectLatitudinal(rotation, scale, v);
@@ -29,14 +29,8 @@ final class ProjectedMap {
         return switch (kind) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
             case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
-            case RADIAL_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
-            case RECT_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
+            case RADIAL_WARP, RECT_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
         };
-    }
-
-    static Vec3 mouseToSurface(Kind kind, Camera camera, Position viewpoint, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
-        Quat rotation = gridType.mapRotation(viewpoint);
-        return unproject(kind, viewpoint, rotation, mouseToGrid(kind, camera, width, vp, scale, gridType, x, y));
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
@@ -184,36 +178,19 @@ final class ProjectedMap {
         }
     }
 
-    static Vec2 mouseToScreen(Kind kind, Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
-        if (kind == Kind.RADIAL_WARP) {
-            return new Vec2(
-                    ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x),
-                    ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y));
-        }
-        Vec2 mouseGrid = mouseToRawGrid(camera, width, vp, scale, x, y);
-        return new Vec2(
-                (scale.toUnitX(mouseGrid.x) - 0.5) * vp.aspect,
-                scale.toUnitY(mouseGrid.y) - 0.5);
-    }
-
-    static Vec2 mouseToGrid(Kind kind, Camera camera, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
+    static Vec2 mouseToMap(Kind kind, Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
         if (kind == Kind.RADIAL_WARP)
-            return mouseToRadialWarpGrid(camera, width, vp, scale, x, y);
-        Vec2 mouseGrid = mouseToRawGrid(camera, width, vp, scale, x, y);
-        return new Vec2(scale.getDisplayXValue(mouseGrid.x, gridType), mouseGrid.y);
+            return mouseToRadialWarpMap(camera, width, vp, scale, x, y);
+        return new Vec2(
+                scale.toMapX(ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
+                scale.toMapY(ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
-    private static Vec2 mouseToRadialWarpGrid(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+    private static Vec2 mouseToRadialWarpMap(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
         double upX = ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x);
         double upY = ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y);
         double t = 2 * Math.hypot(upX, upY);
         return new Vec2(Math.toDegrees(PolarBasis.angle(upX, upY)), scale.toMapY(t));
-    }
-
-    private static Vec2 mouseToRawGrid(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
-        return new Vec2(
-                scale.toMapX(ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
-                scale.toMapY(ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
     private static Vec3 toHpcViewpointSpace(Position viewpoint, Vec3 v) {
