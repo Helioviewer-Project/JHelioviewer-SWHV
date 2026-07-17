@@ -175,16 +175,19 @@ void clamp_value(const float value, const float low, const float high) {
         discard;
 }
 
-vec2 getScrPos(void) {
-    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    vec2 scrpos = vec2(screen.iaspect * up1.x, up1.y) + .5;
-    clamp_coord(scrpos);
-    return scrpos;
+// Convert normalized screen coordinates to the view-aligned plane in scene units.
+// The projection is orthographic, so xy is independent of clip-space z and needs no perspective divide.
+vec2 getViewPosition(void) {
+    return (screen.inverseMVP * vec4(normalizedScreenpos, -1., 1.)).xy;
 }
 
-vec2 getDiskPos(void) {
-    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    return up1.xy;
+// Map the centered view plane to the [0, 1] map domain: remove the viewport's
+// horizontal aspect scaling, move the origin to the lower-left, and discard outside it.
+vec2 getNormalizedMapPos(void) {
+    vec2 pos = getViewPosition();
+    pos = vec2(screen.iaspect * pos.x, pos.y) + .5;
+    clamp_coord(pos);
+    return pos;
 }
 
 // Match MapScale.BoxCoxRadialScale: keep R=1 at the linear-scale position and
@@ -433,10 +436,10 @@ vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
     return texcoord;
 }
 
-vec2 screenToHelioprojective(const vec2 scrpos) {
+vec2 normalizedMapToHelioprojective(const vec2 mapPos) {
     return vec2(
-        radians(screen.xStart + scrpos.x * (screen.xStop - screen.xStart)),
-        radians(screen.yStart + scrpos.y * (screen.yStop - screen.yStart)));
+        radians(screen.xStart + mapPos.x * (screen.xStop - screen.xStart)),
+        radians(screen.yStart + mapPos.y * (screen.yStop - screen.yStart)));
 }
 
 bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDistance, out vec3 world) {

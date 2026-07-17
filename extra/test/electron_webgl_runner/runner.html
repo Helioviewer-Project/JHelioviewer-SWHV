@@ -143,21 +143,18 @@ function projectionBlock(job) {
 }
 
 function screenBlock(job) {
-  const block = new Float32Array(28);
+  const block = new Float32Array(24);
   const inverseScale = job.mode === "ortho" ? 1 : 0.5;
   block[0] = inverseScale;    // inverseMVP[0][0]
   block[5] = inverseScale;    // inverseMVP[1][1]
   block[10] = 1;              // inverseMVP[2][2]
   block[15] = 1;              // inverseMVP[3][3]
-  block[16] = 0;              // viewport.x
-  block[17] = 0;              // viewport.y
-  block[18] = job.width;      // viewport.width
-  block[19] = job.height;     // viewport.height
-  block[20] = 1;              // iaspect
-  block[21] = job.boundsDeg[0];
-  block[22] = job.boundsDeg[1];
-  block[23] = job.boundsDeg[2];
-  block[24] = job.boundsDeg[3];
+  block[16] = 1;              // iaspect
+  block[17] = job.boundsDeg[0];
+  block[18] = job.boundsDeg[1];
+  block[19] = job.boundsDeg[2];
+  block[20] = job.boundsDeg[3];
+  block[21] = job.warpLambda ?? 1;
   return block;
 }
 
@@ -206,8 +203,8 @@ ${stripMain(hpcSource)}
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    vec2 scrpos = getScrPos();
-    vec2 helioprojective = screenToHelioprojective(scrpos);
+    vec2 mapPos = getNormalizedMapPos();
+    vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
     vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, projection[0].observerDistance);
 
     float enhancementFactor;
@@ -229,8 +226,8 @@ function hpcDiffSelfcheckDiagnostic(commonSource, hpcSource) {
 ${stripMain(hpcSource)}
 
 void main(void) {
-    vec2 scrpos = getScrPos();
-    vec2 helioprojective = screenToHelioprojective(scrpos);
+    vec2 mapPos = getNormalizedMapPos();
+    vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
 
     float observerDistance = projection[0].observerDistance;
     vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, observerDistance);
@@ -272,14 +269,12 @@ ${stripMain(orthoSource)}
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
-    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    vec2 upXY = up1.xy;
-    float radius2 = dot(upXY, upXY);
+    vec2 viewPosition = getViewPosition();
+    float radius2 = dot(viewPosition, viewPosition);
     if (radius2 > 1.)
         discard;
 
-    vec3 hitPoint = vec3(upXY, sqrt(1. - radius2));
+    vec3 hitPoint = vec3(viewPosition, sqrt(1. - radius2));
     vec3 world = rotateOnDiskPoint(wcs[0], hitPoint);
     clipOrthoGeometry(world);
     vec2 texCoord = sampleOrthoTexcoord(world, wcs[0], projection[0], uPv);
@@ -293,13 +288,11 @@ function orthoDiffSelfcheckDiagnostic(commonSource, orthoSource) {
 ${stripMain(orthoSource)}
 
 void main(void) {
-    vec2 normalizedScreenpos = 2. * (gl_FragCoord.xy - screen.viewport.xy) / screen.viewport.zw - 1.;
-    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    vec2 upXY = up1.xy;
+    vec2 viewPosition = getViewPosition();
     bool surfaceMapMode = isSurfaceMap(projection[0]);
     bool diffSurfaceMapMode = isSurfaceMap(projection[1]);
 
-    float radius2 = dot(upXY, upXY);
+    float radius2 = dot(viewPosition, viewPosition);
     bool onDisk = radius2 <= 1.;
     if (surfaceMapMode && !onDisk)
         discard;
@@ -309,7 +302,7 @@ void main(void) {
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
 
     if (onDisk) {
-        hitPoint = vec3(upXY, sqrt(1. - radius2));
+        hitPoint = vec3(viewPosition, sqrt(1. - radius2));
         if (surfaceMapMode)
             rotatedHitPoint = rotate_vector_inverse(projection[0].sourceViewQuat, hitPoint);
         else
@@ -317,7 +310,7 @@ void main(void) {
     }
 
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) {
-        hitPoint = vec3(up1.xy, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
+        hitPoint = vec3(viewPosition, intersectPlane(wcs[0].cameraDiff, viewPosition, onDisk));
         rotatedHitPoint = rotate_vector_inverse(wcs[0].cameraDiff, hitPoint);
         if (onDisk && hitPoint.z < 0.)
             discard;
@@ -332,7 +325,7 @@ void main(void) {
     vec3 diffRotatedHitPoint = vec3(0.);
 
     if (onDisk) {
-        diffHitPoint = vec3(upXY, sqrt(1. - radius2));
+        diffHitPoint = vec3(viewPosition, sqrt(1. - radius2));
         if (diffSurfaceMapMode)
             diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, diffHitPoint);
         else
@@ -340,7 +333,7 @@ void main(void) {
     }
 
     if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
-        diffHitPoint = vec3(up1.xy, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
+        diffHitPoint = vec3(viewPosition, intersectPlane(wcs[1].cameraDiff, viewPosition, onDisk));
         diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, diffHitPoint);
         if (onDisk && diffHitPoint.z < 0.)
             discard;
@@ -363,12 +356,12 @@ ${stripMain(latiSource)}
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    vec2 scrpos = getScrPos();
+    vec2 mapPos = getNormalizedMapPos();
     vec2 texCoord = projection[0].projectionCode == WCS_PROJECTION_CAR
-            ? sampleLatiCarTexcoord(scrpos, wcs[0], projection[0])
+            ? sampleLatiCarTexcoord(mapPos, wcs[0], projection[0])
             : projection[0].projectionCode == WCS_PROJECTION_CEA
-            ? sampleLatiCeaTexcoord(scrpos, wcs[0], projection[0], pv0)
-            : sampleLatiZenithalTexcoord(scrpos, wcs[0], uLatiGrid);
+            ? sampleLatiCeaTexcoord(mapPos, wcs[0], projection[0], pv0)
+            : sampleLatiZenithalTexcoord(mapPos, wcs[0], uLatiGrid);
     diagnosticOutput(texCoord, 1.);
 }
 `;
@@ -376,10 +369,10 @@ void main(void) {
 
 function latiTexcoordExpression(index, pv, grid) {
   return `projection[${index}].projectionCode == WCS_PROJECTION_CAR
-            ? sampleLatiCarTexcoord(scrpos, wcs[${index}], projection[${index}])
+            ? sampleLatiCarTexcoord(mapPos, wcs[${index}], projection[${index}])
             : projection[${index}].projectionCode == WCS_PROJECTION_CEA
-            ? sampleLatiCeaTexcoord(scrpos, wcs[${index}], projection[${index}], ${pv})
-            : sampleLatiZenithalTexcoord(scrpos, wcs[${index}], ${grid})`;
+            ? sampleLatiCeaTexcoord(mapPos, wcs[${index}], projection[${index}], ${pv})
+            : sampleLatiZenithalTexcoord(mapPos, wcs[${index}], ${grid})`;
 }
 
 function latiDiffSelfcheckDiagnostic(commonSource, latiSource, mode) {
@@ -397,7 +390,7 @@ void main(void) {
     if (display.radii.x > 1.)
         discard;
 
-    vec2 scrpos = getScrPos();
+    vec2 mapPos = getNormalizedMapPos();
     vec2 texCoord = ${texcoordExpression};
     vec2 diffTexCoord = ${diffExpression};
     outColor = vec4(texCoord, diffTexCoord);
@@ -405,30 +398,50 @@ void main(void) {
 `;
 }
 
-function polarDiagnostic(commonSource, polarSource, functionName, radialExpression) {
+function warpGeometry(mode) {
+  if (mode === "radial_warp")
+    return `vec2 w = getViewPosition();
+    float t = 2. * length(w);
+    if (t > 1. || t == 0.)
+        discard;
+    float radialCoordinate = radialCoordinateFromNormalizedRadius(t);
+    vec2 hpcXY = (radialCoordinate / length(w)) * w;`;
+  if (mode === "rect_warp")
+    return `vec2 mapPos = getNormalizedMapPos();
+    float angle = mapPos.x * TWOPI;
+    float radialCoordinate = radialCoordinateFromNormalizedRadius(mapPos.y);
+    vec2 hpcXY = radialCoordinate * vec2(-sin(angle), cos(angle));`;
+  throw new Error(`Unsupported warp mode: ${mode}`);
+}
+
+function warpDiagnostic(commonSource, mode) {
   return `${commonSource}
-${stripMain(polarSource)}
 
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    vec2 scrpos = getScrPos();
-    float radialCoordinate = ${radialExpression};
-    vec2 texCoord = ${functionName}(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
+    ${warpGeometry(mode)}
+    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
+    clipHpcGeometry(hpcXY);
+    float enhancementFactor;
+    vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, wcs[0].deltaT, uPv, enhancementFactor);
     diagnosticOutput(texCoord, radialCoordinate);
 }
 `;
 }
 
-function polarDiffSelfcheckDiagnostic(commonSource, polarSource, functionName, radialExpression) {
+function warpDiffSelfcheckDiagnostic(commonSource, mode) {
   return `${commonSource}
-${stripMain(polarSource)}
 
 void main(void) {
-    vec2 scrpos = getScrPos();
-    float radialCoordinate = ${radialExpression};
-    vec2 texCoord = ${functionName}(wcs[0].crval, wcs[0].crota, wcs[0].rect, scrpos, radialCoordinate);
-    vec2 diffTexCoord = ${functionName}(wcs[1].crval, wcs[1].crota, wcs[1].rect, scrpos, radialCoordinate);
+    ${warpGeometry(mode)}
+    clipHpcGeometry(hpcXY);
+    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
+    float enhancementFactor;
+    vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, wcs[0].deltaT, pv0, enhancementFactor);
+    vec2 diffHelioprojective = hpcXYToHelioprojective(hpcXY, projection[1].observerDistance);
+    float diffEnhancementFactor;
+    vec2 diffTexCoord = sampleHpcTexcoord(wcs[1], projection[1], diffHelioprojective, hpcXY, wcs[1].deltaT, pv1, diffEnhancementFactor);
     outColor = vec4(texCoord, diffTexCoord);
 }
 `;
@@ -441,10 +454,10 @@ function productionFragment(job, commonSource) {
     return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarOrtho.frag"), "utf8")}`;
   if (job.mode === "lati_zenithal")
     return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8")}`;
-  if (job.mode === "polar")
-    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8")}`;
-  if (job.mode === "logpolar")
-    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLogPolar.frag"), "utf8")}`;
+  if (job.mode === "radial_warp")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarRadialWarp.frag"), "utf8")}`;
+  if (job.mode === "rect_warp")
+    return `${commonSource}\n${fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarRectWarp.frag"), "utf8")}`;
   throw new Error(`Unsupported mode: ${job.mode}`);
 }
 
@@ -541,7 +554,7 @@ function floatToHalf(value) {
 }
 
 function diagnosticFragment(job, commonSource) {
-  if (job.colorSmoke)
+  if (job.colorSmoke || job.colorDiffSmoke)
     return productionFragment(job, commonSource);
   if (job.mode === "hpc") {
     const hpcSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarHpc.frag"), "utf8");
@@ -555,18 +568,8 @@ function diagnosticFragment(job, commonSource) {
     return job.diffSelfcheck
         ? latiDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"), job.latiDiffSelfcheckMode || "normal")
         : latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"));
-  if (job.mode === "polar") {
-    const polarSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarPolar.frag"), "utf8");
-    return job.diffSelfcheck
-        ? polarDiffSelfcheckDiagnostic(commonSource, polarSource, "samplePolarTexcoord", "screen.yStart + scrpos.y * (screen.yStop - screen.yStart)")
-        : polarDiagnostic(commonSource, polarSource, "samplePolarTexcoord", "screen.yStart + scrpos.y * (screen.yStop - screen.yStart)");
-  }
-  if (job.mode === "logpolar") {
-    const logPolarSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLogPolar.frag"), "utf8");
-    return job.diffSelfcheck
-        ? polarDiffSelfcheckDiagnostic(commonSource, logPolarSource, "sampleLogPolarTexcoord", "exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart))")
-        : polarDiagnostic(commonSource, logPolarSource, "sampleLogPolarTexcoord", "exp(screen.yStart + scrpos.y * (screen.yStop - screen.yStart))");
-  }
+  if (job.mode === "radial_warp" || job.mode === "rect_warp")
+    return job.diffSelfcheck ? warpDiffSelfcheckDiagnostic(commonSource, job.mode) : warpDiagnostic(commonSource, job.mode);
   throw new Error(`Unsupported mode: ${job.mode}`);
 }
 
@@ -609,7 +612,7 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   setUniformInt(gl, program, "lut", 2);
   setUniformInt(gl, program, "mask", 3);
   let sourceTexture = null;
-  if (job.sampleTexture || job.colorSmoke) {
+  if (job.sampleTexture || job.colorSmoke || job.colorDiffSmoke) {
     sourceTexture = bindSyntheticSourceTexture(gl, job, errors);
     errors.sourceTexture = gl.getError();
   } else {

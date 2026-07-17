@@ -1,9 +1,9 @@
 void main(void) {
     vec4 color;
-    vec2 scrpos = getScrPos();
+    vec2 mapPos = getNormalizedMapPos();
 
-    float angle = scrpos.x * TWOPI;
-    float radialCoordinate = radialCoordinateFromNormalizedRadius(scrpos.y);
+    float angle = mapPos.x * TWOPI;
+    float radialCoordinate = radialCoordinateFromNormalizedRadius(mapPos.y);
     vec2 hpcXY = radialCoordinate * vec2(-sin(angle), cos(angle));
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
     float enhancementFactor;

@@ -1,6 +1,6 @@
 void main(void) {
     vec4 color;
-    vec2 w = getDiskPos();
+    vec2 w = getViewPosition();
     float t = 2. * length(w);
     if (t > 1. || t == 0.)
         discard;

@@ -54,13 +54,13 @@ void clipOrthoGeometry(const vec3 samplePoint) {
     }
 }
 
-float intersectPlane(const vec4 quat, const vec4 vecin, const bool discardBackFacing) {
+float intersectPlane(const vec4 quat, const vec2 viewPosition, const bool discardBackFacing) {
     vec3 altnormal = rotate_vector(quat, zAxis);
     if (discardBackFacing && altnormal.z <= 0.)
         discard;
     if (abs(altnormal.z) < PLANE_Z_EPS)
         discard;
-    return -dot(altnormal.xy, vecin.xy) / altnormal.z;
+    return -dot(altnormal.xy, viewPosition) / altnormal.z;
 }
 
 vec3 rotateOnDiskPoint(const WCS wcs, const vec3 hitPoint) {
@@ -71,13 +71,12 @@ vec3 rotateOnDiskPoint(const WCS wcs, const vec3 hitPoint) {
 }
 
 void main(void) {
-    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
-    vec2 upXY = up1.xy;
+    vec2 viewPosition = getViewPosition();
     bool diffMode = display.isDiff != NODIFFERENCE;
     bool surfaceMapMode = isSurfaceMap(projection[0]);
     bool diffSurfaceMapMode = isSurfaceMap(projection[1]);
 
-    float radius2 = dot(upXY, upXY);
+    float radius2 = dot(viewPosition, viewPosition);
     bool onDisk = radius2 <= 1.;
     // CAR/CEA have no off-limb representation; wrap only the visible solar sphere.
     if (surfaceMapMode && !onDisk)
@@ -89,7 +88,7 @@ void main(void) {
     vec3 hitPoint = vec3(0.), rotatedHitPoint = vec3(0.);
 
     if (onDisk) {
-        hitPoint = vec3(upXY, sqrt(1. - radius2));
+        hitPoint = vec3(viewPosition, sqrt(1. - radius2));
         if (surfaceMapMode) {
             // CAR/CEA stay attached to the visible sphere under drag/view rotation.
             rotatedHitPoint = rotate_vector_inverse(projection[0].sourceViewQuat, hitPoint);
@@ -107,7 +106,7 @@ void main(void) {
     bool didFallback = false;
     // Observer-image projections keep the existing off-limb / back-side fallback.
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) { // off-limb or back
-        hitPoint = vec3(up1.xy, intersectPlane(wcs[0].cameraDiff, up1, onDisk));
+        hitPoint = vec3(viewPosition, intersectPlane(wcs[0].cameraDiff, viewPosition, onDisk));
         rotatedHitPoint = rotate_vector_inverse(wcs[0].cameraDiff, hitPoint);
         if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
             discard;
@@ -128,7 +127,7 @@ void main(void) {
         vec3 diffRotatedHitPoint = vec3(0.);
 
         if (onDisk) {
-            diffHitPoint = vec3(upXY, sqrt(1. - radius2));
+            diffHitPoint = vec3(viewPosition, sqrt(1. - radius2));
             if (diffSurfaceMapMode) {
                 diffRotatedHitPoint = rotate_vector_inverse(projection[1].sourceViewQuat, diffHitPoint);
             } else {
@@ -137,7 +136,7 @@ void main(void) {
         }
 
         if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
-            diffHitPoint = vec3(up1.xy, intersectPlane(wcs[1].cameraDiff, up1, onDisk));
+            diffHitPoint = vec3(viewPosition, intersectPlane(wcs[1].cameraDiff, viewPosition, onDisk));
             diffRotatedHitPoint = rotate_vector_inverse(wcs[1].cameraDiff, diffHitPoint);
             if (onDisk && diffHitPoint.z < 0.) // differential: off-limb behind sphere
                 discard;

@@ -12,9 +12,9 @@ layout(std140) uniform ScreenBlock {
 const vec4 black = vec4(0, 0, 0, 1);
 
 void main(void) {
-    vec4 up1 = screen.inverseMVP * vec4(normalizedScreenpos.x, normalizedScreenpos.y, -1., 1.);
+    vec2 viewPosition = (screen.inverseMVP * vec4(normalizedScreenpos, -1., 1.)).xy;
 
-    if (dot(up1.xy, up1.xy) > 1.)
+    if (dot(viewPosition, viewPosition) > 1.)
         discard;
     outColor = black;
 }

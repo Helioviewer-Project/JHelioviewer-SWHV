@@ -16,7 +16,7 @@ import numpy as np
 from validate_jhv_wcs_against_astropy import (
     LATI_ZENITHAL_BOUNDS_DEG,
     LATI_SURFACE_BOUNDS_DEG,
-    LOGPOLAR_MIN_RADIUS,
+    clipHpcGeometry,
     displayLatitudinalWorld,
     hpc_bounds_degrees,
     is_surface_map_projection,
@@ -26,9 +26,10 @@ from validate_jhv_wcs_against_astropy import (
     renderHpcTexcoords,
     renderLatitudinalTexcoords,
     renderOrthographicTexcoords,
-    renderPolarTexcoords,
+    sampleHpcTexcoord,
     sample_texture_linear,
     texcoord_to_pixel_center,
+    worldToHelioprojective,
     wcsRect,
     zpn_primary_branch_upper_eta,
 )
@@ -41,7 +42,7 @@ DEFAULT_ELECTRON = Path(os.environ.get(
     "JHV_ELECTRON",
     str(Path.home() / "electron-v42.1.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
 ))
-ALL_MODES = ("hpc", "ortho", "lati_zenithal", "polar", "logpolar")
+ALL_MODES = ("hpc", "ortho", "lati_zenithal", "radial_warp", "rect_warp")
 HPC_PROJECTION_CASES = (
     ("arc_punch", "PUNCH_L3_CAM_20260425001600_v0k.fits", 1, 0.3),
     ("azp_hi1", "20250622_000831_s4h1A.fts", None, 0.2),
@@ -155,6 +156,7 @@ def common_job(
         "height": render_size,
         "outputPath": str(output_path),
         "boundsDeg": list(bounds),
+        "warpLambda": 1.0,
         "rect": list(wcsRect(meta)),
         "crota": crota_quat(meta.crota_rad),
         "crval": [meta.crval_internal_x, meta.crval_internal_y],
@@ -403,14 +405,28 @@ def cpu_texcoord_for_mode(
             grid=(0.0, 0.0, 0.0),
         )
         return texcoord
-    if mode == "polar":
-        texcoord, _ = renderPolarTexcoords((sx, sy), sy, meta, image_data)
-        return texcoord
-    if mode == "logpolar":
-        radial = math.exp(math.log(LOGPOLAR_MIN_RADIUS) + sy * (math.log(1.0) - math.log(LOGPOLAR_MIN_RADIUS)))
-        texcoord, _ = renderPolarTexcoords((sx, sy), radial, meta, image_data, logpolar=True)
+    if mode == "radial_warp" or mode == "rect_warp":
+        hpc_xy = warp_hpc_xy(mode, sx, sy)
+        if not is_finite_texcoord(hpc_xy) or not clipHpcGeometry(hpc_xy):
+            return (math.nan, math.nan)
+        helioprojective = worldToHelioprojective((hpc_xy[0], hpc_xy[1], 0.0), meta.observer_distance)
+        texcoord, _ = sampleHpcTexcoord(helioprojective, hpc_xy, meta, image_data)
         return texcoord
     raise ValueError(f"Unsupported Electron WebGL mode: {mode}")
+
+
+def warp_hpc_xy(mode: str, sx: float, sy: float) -> tuple[float, float]:
+    if mode == "radial_warp":
+        x = sx - 0.5
+        y = sy - 0.5
+        t = 2.0 * math.hypot(x, y)
+        if t > 1.0 or t == 0.0:
+            return (math.nan, math.nan)
+        return (2.0 * x, 2.0 * y)
+    if mode == "rect_warp":
+        angle = sx * 2.0 * math.pi
+        return (-sy * math.sin(angle), sy * math.cos(angle))
+    raise ValueError(f"Unsupported warp mode: {mode}")
 
 
 def expected_plane_internal_for_mode(
@@ -442,25 +458,14 @@ def expected_plane_internal_for_mode(
             return (math.nan, math.nan)
         return (spherical[1] - meta.crval_internal_x, spherical[2] - meta.crval_internal_y)
 
-    if mode == "polar" or mode == "logpolar":
-        radial = math.exp(math.log(LOGPOLAR_MIN_RADIUS) + sy * (math.log(1.0) - math.log(LOGPOLAR_MIN_RADIUS))) if mode == "logpolar" else sy
-        if radial > 1.0 or radial < 0.0:
-            return (math.nan, math.nan)
-        theta = -(sx * 2.0 * math.pi + 0.5 * math.pi)
-        x = math.cos(theta) * radial
-        y = math.sin(theta) * radial
-        return (x - meta.crval_internal_x, -y - meta.crval_internal_y)
-
     return (math.nan, math.nan)
 
 
 def bounds_for_mode(mode: str) -> tuple[float, float, float, float]:
     if mode == "lati_zenithal":
         return LATI_ZENITHAL_BOUNDS_DEG
-    if mode == "polar":
-        return (0.0, 1.0, 0.0, 1.0)
-    if mode == "logpolar":
-        return (0.0, 1.0, math.log(LOGPOLAR_MIN_RADIUS), math.log(1.0))
+    if mode == "radial_warp" or mode == "rect_warp":
+        return (0.0, 360.0, 0.0, 1.0)
     return (0.0, 1.0, 0.0, 1.0)
 
 
@@ -1716,7 +1721,7 @@ def main() -> int:
     parser.add_argument("--backend", choices=("default", "swiftshader"), default="default")
     parser.add_argument(
         "--mode",
-        choices=("hpc", "ortho", "lati_zenithal", "polar", "logpolar"),
+        choices=ALL_MODES,
         default="hpc",
     )
     args = parser.parse_args()
