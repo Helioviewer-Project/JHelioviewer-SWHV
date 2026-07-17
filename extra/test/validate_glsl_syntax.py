@@ -19,8 +19,8 @@ COMMON_SOLAR_FRAGMENTS = (
     "solarOrtho.frag",
     "solarHpc.frag",
     "solarLati.frag",
-    "solarPolar.frag",
-    "solarLogPolar.frag",
+    "solarRadialWarp.frag",
+    "solarRectWarp.frag",
 )
 
 

@@ -1,7 +1,7 @@
 void main(void) {
     vec4 color;
-    vec2 scrpos = getScrPos();
-    vec2 helioprojective = screenToHelioprojective(scrpos);
+    vec2 mapPos = getNormalizedMapPos();
+    vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
     bool diffMode = display.isDiff != NODIFFERENCE;
     float observerDistance = projection[0].observerDistance;
     vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, observerDistance);
