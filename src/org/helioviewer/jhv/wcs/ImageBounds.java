@@ -18,16 +18,6 @@ public final class ImageBounds {
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
     }
 
-    public static double inscribed(MetaData metaData) {
-        Region region = metaData.getPhysicalRegion();
-        Vec2 sun = sunCenter(metaData);
-        double right = region.urx - sun.x;
-        double left = sun.x - region.llx;
-        double top = region.ury - sun.y;
-        double bottom = sun.y - region.lly;
-        return Math.max(0, Math.min(Math.min(right, left), Math.min(top, bottom)));
-    }
-
     private static Vec2 sunCenter(MetaData metaData) {
         WcsHeader wcsHeader = metaData.getWcsHeader();
         if (!wcsHeader.projection.isSurfaceMap()) {

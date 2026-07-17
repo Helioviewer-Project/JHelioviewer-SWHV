@@ -34,8 +34,7 @@ public final class GLRenderer {
             case Orthographic -> createConstantScales(viewports, MapScale.ortho);
             case HPC -> createHpcScales(viewports);
             case Latitudinal -> createConstantScales(viewports, MapScale.lati);
-            case RadialWarp -> createConstantScales(viewports, MapScale.boxCoxRadial(ImageLayers.getLargestRadialSize()));
-            case RectWarp -> createConstantScales(viewports, MapScale.boxCoxRadial(ImageLayers.getLargestRadialSize()));
+            case RadialWarp, RectWarp -> createConstantScales(viewports, MapScale.boxCoxRadial(ImageLayers.getLargestRadialSize()));
         };
     }
 

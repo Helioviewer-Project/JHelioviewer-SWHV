@@ -102,7 +102,7 @@ public abstract class MapView {
 
     public abstract Vec2 projectToScreen(Viewport vp, Vec3 v);
 
-    public abstract Vec2 mouseToGrid(Viewport vp, int x, int y);
+    public abstract Vec2 mouseToMap(Viewport vp, int x, int y);
 
     public abstract Vec3 mouseToSurface(Viewport vp, int x, int y);
 
@@ -124,8 +124,8 @@ public abstract class MapView {
         }
 
         @Override
-        public Vec2 mouseToGrid(Viewport vp, int x, int y) {
-            return OrthographicMap.mouseToGrid(camera, viewpoint, cameraWidth(vp), vp, gridType, x, y);
+        public Vec2 mouseToMap(Viewport vp, int x, int y) {
+            return OrthographicMap.mouseToMap(camera, viewpoint, cameraWidth(vp), vp, gridType, x, y);
         }
 
         @Override
@@ -181,18 +181,21 @@ public abstract class MapView {
         }
 
         @Override
-        public Vec2 mouseToGrid(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToGrid(kind, camera, cameraWidth(vp), vp, scale(vp), gridType, x, y);
+        public Vec2 mouseToMap(Viewport vp, int x, int y) {
+            return ProjectedMap.mouseToMap(kind, camera, cameraWidth(vp), vp, scale(vp), x, y);
         }
 
         @Override
         public Vec3 mouseToSurface(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToSurface(kind, camera, viewpoint, cameraWidth(vp), vp, scale(vp), gridType, x, y);
+            return ProjectedMap.unproject(kind, viewpoint, rotation, mouseToMap(vp, x, y));
         }
 
         @Override
         public Vec2 mouseToScreen(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToScreen(kind, camera, cameraWidth(vp), vp, scale(vp), x, y);
+            double width = cameraWidth(vp);
+            return new Vec2(
+                    ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x),
+                    ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y));
         }
 
         @Override
