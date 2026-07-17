@@ -35,12 +35,12 @@ public interface MapScale {
         private final double invXRange;
         private final double invYRange;
 
-        LinearMapScale(double xStart, double xStop, double yStart, double yStop) {
-            this.xStart = xStart;
-            double effectiveXStop = xStart == xStop ? Math.nextUp(xStart) : xStop;
+        LinearMapScale(double _xStart, double _xStop, double _yStart, double _yStop) {
+            xStart = _xStart;
+            double effectiveXStop = _xStart == _xStop ? Math.nextUp(_xStart) : _xStop;
 
-            this.yStart = yStart;
-            double effectiveYStop = yStart == yStop ? Math.nextUp(yStart) : yStop;
+            yStart = _yStart;
+            double effectiveYStop = _yStart == _yStop ? Math.nextUp(_yStart) : _yStop;
 
             xRange = effectiveXStop - xStart;
             yRange = effectiveYStop - yStart;
@@ -77,10 +77,10 @@ public interface MapScale {
         private final double radialSize;
         private final double limb;
 
-        BoxCoxRadialScale(double radialSize) {
-            super(0, 360, 0, radialSize);
-            this.radialSize = radialSize;
-            limb = 1 / radialSize;
+        BoxCoxRadialScale(double _radialSize) {
+            super(0, 360, 0, _radialSize);
+            radialSize = _radialSize;
+            limb = 1 / _radialSize;
         }
 
         @Override
