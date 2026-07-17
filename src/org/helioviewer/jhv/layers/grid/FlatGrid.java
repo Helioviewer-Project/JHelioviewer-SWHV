@@ -48,7 +48,8 @@ public class FlatGrid {
         double x1 = scale.toMapX(Math.clamp(xCenter + halfWidth, 0, 1));
         double y0 = scale.toMapY(Math.clamp(yCenter - halfWidth, 0, 1));
         double y1 = scale.toMapY(Math.clamp(yCenter + halfWidth, 0, 1));
-        Axis xAxis = buildAxis(scale, true, true, mv.gridType() == GridType.Carrington,
+        boolean wrapLongitude = mv.isLatitudinal() && mv.gridType() == GridType.Carrington;
+        Axis xAxis = buildAxis(scale, true, true, wrapLongitude,
                 x0, x1, vp.width);
         Axis yAxis = buildAxis(scale, false, mv.isHpc() || mv.isLatitudinal(), false,
                 y0, y1, vp.height);
