@@ -9,8 +9,16 @@
 - Improve thick-line joins, rectangle corners, annotation loops, and FOV outline rendering
 - Improve flat-grid stability and grid label formatting
 - Adjust trajectory colors for white canvas (fixes #260)
-- Add a `New PUNCH Layer` source that loads FITS frames from the PUNCH archive at `umbra.nascom.nasa.gov/punch`
-- Add `RHEF` radial histogram equalizing filter with an Upsilon midtone control
+- Add a `New PUNCH Layer` source that loads FITS frames from the PUNCH archive at `umbra.nascom.nasa.gov/punch` (by @GillySpace27)
+- Add `RHEF` radial histogram equalizing filter with an Upsilon midtone control (by @GillySpace27)
+- Add `RadialWarp` and `RectWarp` views for exploring wide-field solar images.
+  `RadialWarp` keeps the view circular, while `RectWarp` unwraps it into angle
+  versus distance from the Sun. The λ slider controls how distances beyond the
+  solar limb are displayed: λ = 1 is linear, λ = 0 is logarithmic, and λ = −1
+  gives the strongest compression of the outer corona. Lower values give more
+  screen space to structures near the Sun while keeping the solar disk linear. (by @GillySpace27)
+- Remove the redundant Polar and LogPolar projections, subsumed by RectWarp
+- Add grid line color, opacity and width controls to the grid layer (by @GillySpace27)
 
 ### Timeline, events, and UI
 - Map HEK Flare Trigger events to Flare events (fixes #105)

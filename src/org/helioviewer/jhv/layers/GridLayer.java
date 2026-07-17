@@ -58,7 +58,7 @@ public final class GridLayer extends AbstractLayer {
     private boolean showLabels = true;
     private boolean showRadial = false;
 
-    private Colors.NamedColor gridColor = Colors.NamedColor.DarkGray;
+    private Colors.NamedColor gridColor = Colors.NamedColor.ReducedGreen;
     private double gridAlpha = 1;
     private byte[] gridColorBytes = gridColor.bytes();
     private double labelAlpha = 1;
