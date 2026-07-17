@@ -97,7 +97,7 @@ final class ProjectedMap {
             return;
         }
         if (mode == MapMode.RadialWarp) {
-            emitRadialWarpLine(viewpoint, scale, rotation, vertices, color, vexBuf);
+            emitRadialWarpLine(viewpoint, scale, vertices, color, vexBuf);
             return;
         }
 
@@ -112,12 +112,12 @@ final class ProjectedMap {
         vexBuf.repeatVertex(Colors.Null);
     }
 
-    private static void emitRadialWarpLine(Position viewpoint, MapScale scale, Quat rotation, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
-        Vec2 current = project(MapMode.RadialWarp, viewpoint, scale, rotation, vertices.getFirst());
+    private static void emitRadialWarpLine(Position viewpoint, MapScale scale, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+        Vec2 current = projectRadialWarp(viewpoint, scale, vertices.getFirst());
         vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
         for (int i = 1; i < vertices.size(); i++) {
-            current = project(MapMode.RadialWarp, viewpoint, scale, rotation, vertices.get(i));
+            current = projectRadialWarp(viewpoint, scale, vertices.get(i));
             vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, color);
         }
         vexBuf.repeatVertex(Colors.Null);
@@ -157,7 +157,7 @@ final class ProjectedMap {
         float pointSize = (float) size;
         if (mode == MapMode.RadialWarp) {
             for (Vec3 vertex : vertices) {
-                Vec2 pt = project(mode, viewpoint, scale, rotation, vertex);
+                Vec2 pt = projectRadialWarp(viewpoint, scale, vertex);
                 vexBuf.putVertex((float) pt.x, (float) pt.y, 0, pointSize, color);
             }
             return;
