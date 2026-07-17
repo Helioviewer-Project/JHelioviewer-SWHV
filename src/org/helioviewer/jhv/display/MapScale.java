@@ -2,19 +2,15 @@ package org.helioviewer.jhv.display;
 
 public interface MapScale {
 
-    double getInterpolatedXValue(double v);
+    double toMapX(double unitX);
 
-    double getInterpolatedYValue(double v);
+    double toMapY(double unitY);
 
     double getDisplayXValue(double v, GridType gridType);
 
-    double getXValueInv(double v);
+    double toUnitX(double mapX);
 
-    double getYValueInv(double v);
-
-    double getYstart();
-
-    double getYstop();
+    double toUnitY(double mapY);
 
     default double getLambda() {
         return 1;
@@ -34,9 +30,7 @@ public interface MapScale {
     abstract class MapScaleBase implements MapScale {
 
         protected final double xStart;
-        protected final double xStop;
         protected final double yStart;
-        protected final double yStop;
 
         protected final double xRange;
         protected final double yRange;
@@ -45,11 +39,10 @@ public interface MapScale {
 
         MapScaleBase(double _xStart, double _xStop, double _yStart, double _yStop) {
             xStart = _xStart;
-            xStop = _xStart == _xStop ? Math.nextUp(_xStart) : _xStop;
+            double xStop = _xStart == _xStop ? Math.nextUp(_xStart) : _xStop;
 
-            yStart = scaleY(_yStart);
-            double scaledYStop = scaleY(_yStop);
-            yStop = yStart == scaledYStop ? Math.nextUp(yStart) : scaledYStop;
+            yStart = _yStart;
+            double yStop = _yStart == _yStop ? Math.nextUp(_yStart) : _yStop;
 
             xRange = xStop - xStart;
             yRange = yStop - yStart;
@@ -63,42 +56,24 @@ public interface MapScale {
         }
 
         @Override
-        public double getInterpolatedXValue(double v) {
-            return invScaleX(xStart + v * xRange);
+        public double toMapX(double unitX) {
+            return xStart + unitX * xRange;
         }
 
         @Override
-        public double getInterpolatedYValue(double v) {
-            return invScaleY(yStart + v * yRange);
+        public double toMapY(double unitY) {
+            return yStart + unitY * yRange;
         }
 
         @Override
-        public double getXValueInv(double v) {
-            return (scaleX(v) - xStart) * invXRange - 0.5;
+        public double toUnitX(double mapX) {
+            return (mapX - xStart) * invXRange;
         }
 
         @Override
-        public double getYValueInv(double v) {
-            return (scaleY(v) - yStart) * invYRange - 0.5;
+        public double toUnitY(double mapY) {
+            return (mapY - yStart) * invYRange;
         }
-
-        @Override
-        public double getYstart() {
-            return yStart;
-        }
-
-        @Override
-        public double getYstop() {
-            return yStop;
-        }
-
-        protected abstract double scaleX(double val);
-
-        protected abstract double invScaleX(double val);
-
-        protected abstract double scaleY(double val);
-
-        protected abstract double invScaleY(double val);
 
     }
 
@@ -118,18 +93,7 @@ public interface MapScale {
             return lambda();
         }
 
-        @Override
-        public double scaleX(double val) {
-            return val;
-        }
-
-        @Override
-        public double invScaleX(double val) {
-            return val;
-        }
-
-        @Override
-        public double scaleY(double val) {
+        private static double scaleY(double val) {
             if (val <= 1)
                 return val;
 
@@ -137,8 +101,7 @@ public interface MapScale {
             return lambda == 0 ? 1 + Math.log(val) : 1 + (Math.pow(val, lambda) - 1) / lambda;
         }
 
-        @Override
-        public double invScaleY(double val) {
+        private static double invScaleY(double val) {
             if (val <= 1)
                 return val;
 
@@ -147,32 +110,21 @@ public interface MapScale {
         }
 
         @Override
-        public double getInterpolatedYValue(double v) {
+        public double toMapY(double unitY) {
             double limb = limb();
-            if (radialSize <= 1 || v <= limb)
-                return v / limb;
+            if (radialSize <= 1 || unitY <= limb)
+                return unitY / limb;
 
-            double scaled = 1 + (v - limb) * (scaleY(radialSize) - 1) / (1 - limb);
+            double scaled = 1 + (unitY - limb) * (scaleY(radialSize) - 1) / (1 - limb);
             return invScaleY(scaled);
         }
 
         @Override
-        public double getYValueInv(double v) {
+        public double toUnitY(double mapY) {
             double limb = limb();
-            double t = radialSize <= 1 || v <= 1
-                    ? v * limb
-                    : limb + (scaleY(v) - 1) * (1 - limb) / (scaleY(radialSize) - 1);
-            return t - 0.5;
-        }
-
-        @Override
-        public double getYstart() {
-            return 0;
-        }
-
-        @Override
-        public double getYstop() {
-            return radialSize;
+            return radialSize <= 1 || mapY <= 1
+                    ? mapY * limb
+                    : limb + (scaleY(mapY) - 1) * (1 - limb) / (scaleY(radialSize) - 1);
         }
 
         private double limb() {
@@ -189,26 +141,6 @@ public interface MapScale {
 
         LinearMapScale(double _xStart, double _xStop, double _yStart, double _yStop) {
             super(_xStart, _xStop, _yStart, _yStop);
-        }
-
-        @Override
-        public double scaleX(double val) {
-            return val;
-        }
-
-        @Override
-        public double invScaleX(double val) {
-            return val;
-        }
-
-        @Override
-        public double scaleY(double val) {
-            return val;
-        }
-
-        @Override
-        public double invScaleY(double val) {
-            return val;
         }
 
     }
