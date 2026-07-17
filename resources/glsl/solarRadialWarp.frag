@@ -10,7 +10,7 @@ void main(void) {
         angle += TWOPI;
     clamp_coord(vec2(angle / TWOPI, t));
 
-    float radialCoordinate = radialCoordinateFromNormalizedRadius(t);
+    float radialCoordinate = unwarpRadius(t);
     vec2 hpcXY = (radialCoordinate / length(w)) * w;
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
     float enhancementFactor;

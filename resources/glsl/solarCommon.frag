@@ -190,18 +190,22 @@ vec2 getNormalizedMapPos(void) {
     return pos;
 }
 
-// Match MapScale.BoxCoxRadialScale: keep R=1 at the linear-scale position and
-// apply Box-Cox only from the limb to the loaded outer radius.
-float radialCoordinateFromNormalizedRadius(float t) {
-    float radialSize = screen.yStop;
-    float limb = 1. / radialSize;
-    if (radialSize <= 1. || t <= limb)
-        return t / limb;
+// Convert a normalized warp radius back to radial distance in solar radii.
+// The disk is linear; only distances beyond the limb use Box-Cox scaling.
+float unwarpRadius(float normalizedRadius) {
+    float outerRadius = screen.yStop;
+    float limbPosition = 1. / outerRadius;
+    if (outerRadius <= 1. || normalizedRadius <= limbPosition)
+        return normalizedRadius / limbPosition;
 
     float lambda = screen.lambda;
-    float scaledOuter = lambda == 0. ? 1. + log(radialSize) : 1. + (pow(radialSize, lambda) - 1.) / lambda;
-    float scaled = 1. + (t - limb) * (scaledOuter - 1.) / (1. - limb);
-    return lambda == 0. ? exp(scaled - 1.) : pow(1. + lambda * (scaled - 1.), 1. / lambda);
+    float scaledOuter = lambda == 0.
+            ? 1. + log(outerRadius)
+            : 1. + (pow(outerRadius, lambda) - 1.) / lambda;
+    float scaled = 1. + (normalizedRadius - limbPosition) * (scaledOuter - 1.) / (1. - limbPosition);
+    return lambda == 0.
+            ? exp(scaled - 1.)
+            : pow(1. + lambda * (scaled - 1.), 1. / lambda);
 }
 
 vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {

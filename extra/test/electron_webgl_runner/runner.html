@@ -404,12 +404,12 @@ function warpGeometry(mode) {
     float t = 2. * length(w);
     if (t > 1. || t == 0.)
         discard;
-    float radialCoordinate = radialCoordinateFromNormalizedRadius(t);
+    float radialCoordinate = unwarpRadius(t);
     vec2 hpcXY = (radialCoordinate / length(w)) * w;`;
   if (mode === "rect_warp")
     return `vec2 mapPos = getNormalizedMapPos();
     float angle = mapPos.x * TWOPI;
-    float radialCoordinate = radialCoordinateFromNormalizedRadius(mapPos.y);
+    float radialCoordinate = unwarpRadius(mapPos.y);
     vec2 hpcXY = radialCoordinate * vec2(-sin(angle), cos(angle));`;
   throw new Error(`Unsupported warp mode: ${mode}`);
 }

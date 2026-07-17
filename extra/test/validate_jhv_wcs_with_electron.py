@@ -43,6 +43,10 @@ DEFAULT_ELECTRON = Path(os.environ.get(
     str(Path.home() / "electron-v42.1.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
 ))
 ALL_MODES = ("hpc", "ortho", "lati_zenithal", "radial_warp", "rect_warp")
+WARP_MODES = ("radial_warp", "rect_warp")
+WARP_OUTER_RADIUS = 4.0
+WARP_LAMBDAS = (-1.0, 0.0, 1.0)
+DEFAULT_WARP_LAMBDA = 0.0
 HPC_PROJECTION_CASES = (
     ("arc_punch", "PUNCH_L3_CAM_20260425001600_v0k.fits", 1, 0.3),
     ("azp_hi1", "20250622_000831_s4h1A.fts", None, 0.2),
@@ -389,6 +393,8 @@ def cpu_texcoord_for_mode(
     sy: float,
     meta,
     image_data: np.ndarray,
+    outer_radius: float,
+    warp_lambda: float,
 ) -> tuple[float, float]:
     if mode == "ortho":
         screen_xy = (2.0 * sx - 1.0, 2.0 * sy - 1.0)
@@ -405,8 +411,8 @@ def cpu_texcoord_for_mode(
             grid=(0.0, 0.0, 0.0),
         )
         return texcoord
-    if mode == "radial_warp" or mode == "rect_warp":
-        hpc_xy = warp_hpc_xy(mode, sx, sy)
+    if mode in WARP_MODES:
+        hpc_xy = warp_hpc_xy(mode, sx, sy, outer_radius, warp_lambda)
         if not is_finite_texcoord(hpc_xy) or not clipHpcGeometry(hpc_xy):
             return (math.nan, math.nan)
         helioprojective = worldToHelioprojective((hpc_xy[0], hpc_xy[1], 0.0), meta.observer_distance)
@@ -415,17 +421,39 @@ def cpu_texcoord_for_mode(
     raise ValueError(f"Unsupported Electron WebGL mode: {mode}")
 
 
-def warp_hpc_xy(mode: str, sx: float, sy: float) -> tuple[float, float]:
+def unwarp_radius(normalized_radius: float, outer_radius: float, warp_lambda: float) -> float:
+    limb_position = 1.0 / outer_radius
+    if outer_radius <= 1.0 or normalized_radius <= limb_position:
+        return normalized_radius / limb_position
+
+    scaled_outer = (
+        1.0 + math.log(outer_radius)
+        if warp_lambda == 0.0
+        else 1.0 + (math.pow(outer_radius, warp_lambda) - 1.0) / warp_lambda
+    )
+    scaled = 1.0 + (normalized_radius - limb_position) * (scaled_outer - 1.0) / (1.0 - limb_position)
+    return (
+        math.exp(scaled - 1.0)
+        if warp_lambda == 0.0
+        else math.pow(1.0 + warp_lambda * (scaled - 1.0), 1.0 / warp_lambda)
+    )
+
+
+def warp_hpc_xy(mode: str, sx: float, sy: float, outer_radius: float, warp_lambda: float) -> tuple[float, float]:
     if mode == "radial_warp":
         x = sx - 0.5
         y = sy - 0.5
-        t = 2.0 * math.hypot(x, y)
+        radius = math.hypot(x, y)
+        t = 2.0 * radius
         if t > 1.0 or t == 0.0:
             return (math.nan, math.nan)
-        return (2.0 * x, 2.0 * y)
+        radial_coordinate = unwarp_radius(t, outer_radius, warp_lambda)
+        scale = radial_coordinate / radius
+        return (scale * x, scale * y)
     if mode == "rect_warp":
         angle = sx * 2.0 * math.pi
-        return (-sy * math.sin(angle), sy * math.cos(angle))
+        radial_coordinate = unwarp_radius(sy, outer_radius, warp_lambda)
+        return (-radial_coordinate * math.sin(angle), radial_coordinate * math.cos(angle))
     raise ValueError(f"Unsupported warp mode: {mode}")
 
 
@@ -464,8 +492,8 @@ def expected_plane_internal_for_mode(
 def bounds_for_mode(mode: str) -> tuple[float, float, float, float]:
     if mode == "lati_zenithal":
         return LATI_ZENITHAL_BOUNDS_DEG
-    if mode == "radial_warp" or mode == "rect_warp":
-        return (0.0, 360.0, 0.0, 1.0)
+    if mode in WARP_MODES:
+        return (0.0, 360.0, 0.0, WARP_OUTER_RADIUS)
     return (0.0, 1.0, 0.0, 1.0)
 
 
@@ -480,6 +508,8 @@ def make_mode_job(
     diff_selfcheck: bool = False,
     color_smoke: bool = False,
     color_diff_smoke: bool = False,
+    warp_lambda: float = DEFAULT_WARP_LAMBDA,
+    name: str | None = None,
 ) -> dict:
     job = common_job(
         mode,
@@ -490,13 +520,15 @@ def make_mode_job(
         bounds_for_mode(mode),
         sample_texture,
         backend,
-        f"{mode}_diff_selfcheck" if diff_selfcheck else None,
+        name if name is not None else f"{mode}_diff_selfcheck" if diff_selfcheck else None,
         diff_selfcheck=diff_selfcheck,
         color_smoke=color_smoke,
         color_diff_smoke=color_diff_smoke,
     )
     if mode == "lati_zenithal":
         job["latiGrid"] = [0.0, 0.0, 0.0]
+    if mode in WARP_MODES:
+        job["warpLambda"] = warp_lambda
     return job
 
 
@@ -572,7 +604,15 @@ def evaluate_shader_to_cpu(
             sx = (ix + 0.5) / render_size
             shader_texcoord = (float(pixels[iy, ix, 0]), float(pixels[iy, ix, 1]))
             shader_valid = float(pixels[iy, ix, 3]) > 0.5 and is_finite_texcoord(shader_texcoord)
-            cpu_texcoord = cpu_texcoord_for_mode(mode, sx, sy, meta, image_data)
+            cpu_texcoord = cpu_texcoord_for_mode(
+                mode,
+                sx,
+                sy,
+                meta,
+                image_data,
+                job["boundsDeg"][3],
+                job.get("warpLambda", DEFAULT_WARP_LAMBDA),
+            )
             cpu_valid = is_finite_texcoord(cpu_texcoord)
 
             if not shader_valid and not cpu_valid:
@@ -677,6 +717,22 @@ def compare_batch(
             job = common_job("hpc", fits_file, render_size, output_dir, meta, bounds, sample_texture, backend)
             jobs.append(job)
             metadata.append({"mode": mode, "pixel_wcs": pixel_wcs, "bounds": bounds})
+        elif mode in WARP_MODES:
+            for warp_lambda in WARP_LAMBDAS:
+                lambda_name = str(int(warp_lambda)).replace("-", "minus")
+                job = make_mode_job(
+                    mode,
+                    fits_file,
+                    render_size,
+                    output_dir,
+                    sample_texture,
+                    meta,
+                    backend,
+                    warp_lambda=warp_lambda,
+                    name=f"{mode}_lambda_{lambda_name}",
+                )
+                jobs.append(job)
+                metadata.append({"mode": mode, "projection_wcs": projection_wcs, "pixel_wcs": pixel_wcs})
         else:
             if mode == "ortho" and meta.projection not in PROJECTION_CODES:
                 continue
