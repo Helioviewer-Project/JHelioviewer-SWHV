@@ -7,7 +7,6 @@ in vec2 normalizedScreenpos;
 
 struct Screen {
     mat4 inverseMVP;
-    vec4 viewport;
 };
 
 layout(std140) uniform ScreenBlock {
