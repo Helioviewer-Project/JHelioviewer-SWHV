@@ -286,44 +286,45 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
         byte[] color = Colors.bytes(evtr.getColor());
 
-        float x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
-        float y = (float) scale.getYValueInv(DIST_SUN_BEGIN);
+        float x = (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect);
+        float y = (float) (scale.toUnitY(DIST_SUN_BEGIN) - 0.5);
         vexBuf.putVertex(x, y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
 
-        y = (float) scale.getYValueInv(distSun + 0.05);
+        y = (float) (scale.toUnitY(distSun + 0.05) - 0.5);
         vexBuf.putVertex(x, y, 0, 1, color);
         vexBuf.repeatVertex(Colors.Null);
 
-        x = (float) (scale.getXValueInv(principalAngleDegree) * vp.aspect);
-        y = (float) scale.getYValueInv(DIST_SUN_BEGIN);
+        x = (float) ((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect);
+        y = (float) (scale.toUnitY(DIST_SUN_BEGIN) - 0.5);
         vexBuf.putVertex(x, y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
 
-        y = (float) scale.getYValueInv(distSun + 0.05);
+        y = (float) (scale.toUnitY(distSun + 0.05) - 0.5);
         vexBuf.putVertex(x, y, 0, 1, color);
         vexBuf.repeatVertex(Colors.Null);
 
-        x = (float) (scale.getXValueInv(thetaEnd) * vp.aspect);
-        y = (float) scale.getYValueInv(DIST_SUN_BEGIN);
+        x = (float) ((scale.toUnitX(thetaEnd) - 0.5) * vp.aspect);
+        y = (float) (scale.toUnitY(DIST_SUN_BEGIN) - 0.5);
         vexBuf.putVertex(x, y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
 
-        y = (float) scale.getYValueInv(distSun + 0.05);
+        y = (float) (scale.toUnitY(distSun + 0.05) - 0.5);
         vexBuf.putVertex(x, y, 0, 1, color);
         vexBuf.repeatVertex(Colors.Null);
 
-        y = (float) scale.getYValueInv(distSun);
+        y = (float) (scale.toUnitY(distSun) - 0.5);
         vexBuf.putVertex(x, y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
 
-        x = (float) (scale.getXValueInv(thetaStart) * vp.aspect);
+        x = (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect);
         vexBuf.putVertex(x, y, 0, 1, color);
         vexBuf.repeatVertex(Colors.Null);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
-            drawImageScale(scale.getXValueInv(principalAngleDegree) * vp.aspect, scale.getYValueInv(distSun), sz, sz);
+            drawImageScale((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect,
+                    scale.toUnitY(distSun) - 0.5, sz, sz);
         }
     }
 

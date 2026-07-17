@@ -145,8 +145,9 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put(inv);
         inv.flip();
         screenBuf.put((float) (1 / vp.aspect));
-        screenBuf.put((float) scale.getInterpolatedXValue(0)).put((float) scale.getInterpolatedXValue(1));
-        screenBuf.put((float) scale.getYstart()).put((float) scale.getYstop()).put((float) scale.getLambda());
+        screenBuf.put((float) scale.toMapX(0)).put((float) scale.toMapX(1));
+        screenBuf.put((float) scale.toMapY(0)).put((float) scale.toMapY(1));
+        screenBuf.put((float) scale.getLambda());
 
         screenBuf.flip();
         screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes

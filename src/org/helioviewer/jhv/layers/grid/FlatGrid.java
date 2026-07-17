@@ -44,10 +44,10 @@ public class FlatGrid {
         double xCenter = 0.5 - mv.cameraTranslationX() / vp.aspect;
         double yCenter = 0.5 - mv.cameraTranslationY();
         double halfWidth = 0.5 * width;
-        double x0 = scale.getInterpolatedXValue(Math.clamp(xCenter - halfWidth, 0, 1));
-        double x1 = scale.getInterpolatedXValue(Math.clamp(xCenter + halfWidth, 0, 1));
-        double y0 = scale.getInterpolatedYValue(Math.clamp(yCenter - halfWidth, 0, 1));
-        double y1 = scale.getInterpolatedYValue(Math.clamp(yCenter + halfWidth, 0, 1));
+        double x0 = scale.toMapX(Math.clamp(xCenter - halfWidth, 0, 1));
+        double x1 = scale.toMapX(Math.clamp(xCenter + halfWidth, 0, 1));
+        double y0 = scale.toMapY(Math.clamp(yCenter - halfWidth, 0, 1));
+        double y1 = scale.toMapY(Math.clamp(yCenter + halfWidth, 0, 1));
         Axis xAxis = buildAxis(scale, true, true, mv.gridType() == GridType.Carrington,
                 x0, x1, vp.width);
         Axis yAxis = buildAxis(scale, false, mv.isHpc() || mv.isLatitudinal(), false,
@@ -114,7 +114,7 @@ public class FlatGrid {
         for (int i = 0; i < count; i++) {
             double value = first + i * step;
             labelValues[i] = wrap0to360 ? wrapCarrington(value) : value;
-            double position = xAxis ? scale.getXValueInv(value) : scale.getYValueInv(value);
+            double position = (xAxis ? scale.toUnitX(value) : scale.toUnitY(value)) - 0.5;
             positions[i] = Math.abs(position) < AXIS_EPSILON ? 0 : position;
         }
         return new Axis(labelValues, positions);

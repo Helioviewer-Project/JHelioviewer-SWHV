@@ -42,8 +42,8 @@ public final class RadialWarpGrid {
     }
 
     private int chooseRings(MapScale scale) {
-        double rMin = scale.getInterpolatedYValue(0);
-        double rMax = scale.getInterpolatedYValue(1);
+        double rMin = scale.toMapY(0);
+        double rMax = scale.toMapY(1);
         int count = 0;
         double lastT = -1;
         double decade = Math.pow(10, Math.floor(Math.log10(Math.max(rMin, 1e-3 * rMax))));
@@ -52,7 +52,7 @@ public final class RadialWarpGrid {
                 double r = factor * decade;
                 if (r < rMin || r > rMax || count == MAX_RINGS)
                     continue;
-                double t = scale.getYValueInv(r) + .5;
+                double t = scale.toUnitY(r);
                 if (t - lastT < MIN_RING_SPACING)
                     continue;
                 rings[count++] = r;
@@ -64,7 +64,7 @@ public final class RadialWarpGrid {
     }
 
     private static float ringRho(MapScale scale, double r) {
-        return (float) (.5 * (scale.getYValueInv(r) + .5));
+        return (float) (.5 * scale.toUnitY(r));
     }
 
     private void updateLine(MapScale scale, int ringCount, double spokeStep, byte[] color) {

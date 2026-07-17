@@ -63,7 +63,7 @@ final class ProjectedMap {
         double r = Math.hypot(hpcXY.x, hpcXY.y);
         if (r == 0)
             return new Vec2(0, 0);
-        double t = Math.max(0, scale.getYValueInv(r) + .5);
+        double t = Math.max(0, scale.toUnitY(r));
         double f = .5 * t / r;
         return new Vec2(f * hpcXY.x, f * hpcXY.y);
     }
@@ -72,7 +72,7 @@ final class ProjectedMap {
         Vec2 hpcXY = projectToHpcPlane(viewpoint, v0);
         double r = Math.hypot(hpcXY.x, hpcXY.y);
         double theta = PolarBasis.angle(hpcXY.x, hpcXY.y);
-        return new Vec2(scale.getXValueInv(Math.toDegrees(theta)), scale.getYValueInv(r));
+        return new Vec2(scale.toUnitX(Math.toDegrees(theta)) - 0.5, scale.toUnitY(r) - 0.5);
     }
 
     private static Vec2 projectToHpcPlane(Position viewpoint, Vec3 v0) {
@@ -192,8 +192,8 @@ final class ProjectedMap {
         }
         Vec2 mouseGrid = mouseToRawGrid(camera, width, vp, scale, x, y);
         return new Vec2(
-                scale.getXValueInv(mouseGrid.x) * vp.aspect,
-                scale.getYValueInv(mouseGrid.y));
+                (scale.toUnitX(mouseGrid.x) - 0.5) * vp.aspect,
+                scale.toUnitY(mouseGrid.y) - 0.5);
     }
 
     static Vec2 mouseToGrid(Kind kind, Camera camera, double width, Viewport vp, MapScale scale, GridType gridType, int x, int y) {
@@ -207,13 +207,13 @@ final class ProjectedMap {
         double upX = ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x);
         double upY = ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y);
         double t = 2 * Math.hypot(upX, upY);
-        return new Vec2(Math.toDegrees(PolarBasis.angle(upX, upY)), scale.getInterpolatedYValue(t));
+        return new Vec2(Math.toDegrees(PolarBasis.angle(upX, upY)), scale.toMapY(t));
     }
 
     private static Vec2 mouseToRawGrid(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
         return new Vec2(
-                scale.getInterpolatedXValue(ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
-                scale.getInterpolatedYValue(ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
+                scale.toMapX(ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
+                scale.toMapY(ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
     private static Vec3 toHpcViewpointSpace(Position viewpoint, Vec3 v) {
@@ -225,8 +225,8 @@ final class ProjectedMap {
         double longitude = Math.atan2(view.x, zeta);
         double latitude = Math.atan2(view.y, Math.sqrt(view.x * view.x + zeta * zeta));
         return new Vec2(
-                scale.getXValueInv(Math.toDegrees(longitude)),
-                scale.getYValueInv(Math.toDegrees(latitude)));
+                scale.toUnitX(Math.toDegrees(longitude)) - 0.5,
+                scale.toUnitY(Math.toDegrees(latitude)) - 0.5);
     }
 
     private static boolean isVisibleHpcViewpointSpace(Vec3 view) {
@@ -275,8 +275,8 @@ final class ProjectedMap {
         // Positive latitude corresponds to positive Y in the non-ortho map basis.
         double latitude = SphericalCoords.latitude(v);
         double longitude = SphericalCoords.longitude(v);
-        double scaledphi = scale.getXValueInv(Math.toDegrees(longitude));
-        double scaledtheta = scale.getYValueInv(Math.toDegrees(latitude));
+        double scaledphi = scale.toUnitX(Math.toDegrees(longitude)) - 0.5;
+        double scaledtheta = scale.toUnitY(Math.toDegrees(latitude)) - 0.5;
         return new Vec2(scaledphi, scaledtheta);
     }
 
