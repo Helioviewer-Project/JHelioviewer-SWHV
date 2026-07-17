@@ -10,8 +10,6 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 public abstract class MapView {
 
-    static final double NORMALIZED_FIT_WIDTH = 1.1;
-
     protected final Camera camera;
     protected final Position viewpoint;
     protected final MapMode mode;
@@ -37,7 +35,7 @@ public abstract class MapView {
     }
 
     public double cameraWidth(Viewport vp) {
-        return camera.baseCameraWidth() * vp.zoom;
+        return mode.baseCameraWidth(camera) * vp.zoom;
     }
 
     public double cameraTranslationX() {
@@ -156,11 +154,6 @@ public abstract class MapView {
         ProjectedView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode, MapScale[] _scales) {
             super(_camera, _viewpoint, _mode, _gridType, _scales);
             rotation = _gridType.mapRotation(viewpoint);
-        }
-
-        @Override
-        public double cameraWidth(Viewport vp) {
-            return mode.usesNormalizedFitWidth() ? mode.normalizedFitWidth() * vp.zoom : super.cameraWidth(vp);
         }
 
         @Override

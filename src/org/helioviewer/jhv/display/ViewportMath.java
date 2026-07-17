@@ -19,8 +19,7 @@ public final class ViewportMath {
     }
 
     private static double zoomedCameraWidth(Camera camera, Viewport vp) {
-        double base = Display.mode.usesNormalizedFitWidth() ? Display.mode.normalizedFitWidth() : camera.baseCameraWidth();
-        return base * vp.zoom;
+        return Display.mode.baseCameraWidth(camera) * vp.zoom;
     }
 
     private static double computeUpX(Camera camera, Viewport vp, double screenX) {
