@@ -3,7 +3,7 @@ void main(void) {
     vec2 mapPos = getNormalizedMapPos();
 
     float angle = mapPos.x * TWOPI;
-    float radialCoordinate = radialCoordinateFromNormalizedRadius(mapPos.y);
+    float radialCoordinate = unwarpRadius(mapPos.y);
     vec2 hpcXY = radialCoordinate * vec2(-sin(angle), cos(angle));
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
     float enhancementFactor;
