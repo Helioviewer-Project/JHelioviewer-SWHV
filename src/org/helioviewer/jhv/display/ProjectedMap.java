@@ -35,11 +35,19 @@ final class ProjectedMap {
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
     private static Vec2 projectLatitudinal(Quat rotation, MapScale scale, Vec3 v) {
-        return projectLatitudinalVector(rotation.rotateVector(v), scale);
+        Vec3 rotated = rotation.rotateVector(v);
+        // Positive latitude corresponds to positive Y in the non-ortho map basis.
+        double latitude = SphericalCoords.latitude(rotated);
+        double longitude = SphericalCoords.longitude(rotated);
+        double scaledphi = scale.toUnitX(Math.toDegrees(longitude)) - 0.5;
+        double scaledtheta = scale.toUnitY(Math.toDegrees(latitude)) - 0.5;
+        return new Vec2(scaledphi, scaledtheta);
     }
 
     private static Vec3 unprojectLatitudinal(Quat rotation, double longitudeDeg, double latitudeDeg) {
-        return rotation.rotateInverseVector(unprojectLatitudinalPoint(longitudeDeg, latitudeDeg));
+        double longitude = Math.toRadians(longitudeDeg);
+        double latitude = Math.toRadians(latitudeDeg);
+        return rotation.rotateInverseVector(SphericalCoords.unit(longitude, latitude));
     }
 
     private static Vec3 unprojectRadialWarp(Position viewpoint, double angleDeg, double radius) {
@@ -246,21 +254,6 @@ final class ProjectedMap {
 
     private static void emitProjectedVertex(Viewport vp, Vec2 projected, byte[] color, BufVertex vexBuf) {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
-    }
-
-    private static Vec2 projectLatitudinalVector(Vec3 v, MapScale scale) {
-        // Positive latitude corresponds to positive Y in the non-ortho map basis.
-        double latitude = SphericalCoords.latitude(v);
-        double longitude = SphericalCoords.longitude(v);
-        double scaledphi = scale.toUnitX(Math.toDegrees(longitude)) - 0.5;
-        double scaledtheta = scale.toUnitY(Math.toDegrees(latitude)) - 0.5;
-        return new Vec2(scaledphi, scaledtheta);
-    }
-
-    private static Vec3 unprojectLatitudinalPoint(double longitudeDeg, double latitudeDeg) {
-        double longitude = Math.toRadians(longitudeDeg);
-        double latitude = Math.toRadians(latitudeDeg);
-        return SphericalCoords.unit(longitude, latitude);
     }
 
     private ProjectedMap() {}
