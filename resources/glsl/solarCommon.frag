@@ -198,14 +198,11 @@ float unwarpRadius(float normalizedRadius) {
     if (outerRadius <= 1. || normalizedRadius <= limbPosition)
         return normalizedRadius / limbPosition;
 
+    float u = (normalizedRadius - limbPosition) / (1. - limbPosition);
     float lambda = screen.lambda;
-    float scaledOuter = lambda == 0.
-            ? 1. + log(outerRadius)
-            : 1. + (pow(outerRadius, lambda) - 1.) / lambda;
-    float scaled = 1. + (normalizedRadius - limbPosition) * (scaledOuter - 1.) / (1. - limbPosition);
     return lambda == 0.
-            ? exp(scaled - 1.)
-            : pow(1. + lambda * (scaled - 1.), 1. / lambda);
+            ? pow(outerRadius, u)
+            : pow(1. + u * (pow(outerRadius, lambda) - 1.), 1. / lambda);
 }
 
 vec3 rotate_vector_inverse(const vec4 quat, const vec3 vec) {
