@@ -93,38 +93,30 @@ public interface MapScale {
             return lambda();
         }
 
-        private static double scaleY(double val) {
-            if (val <= 1)
-                return val;
-
-            double lambda = lambda();
-            return lambda == 0 ? 1 + Math.log(val) : 1 + (Math.pow(val, lambda) - 1) / lambda;
-        }
-
-        private static double invScaleY(double val) {
-            if (val <= 1)
-                return val;
-
-            double lambda = lambda();
-            return lambda == 0 ? Math.exp(val - 1) : Math.pow(1 + lambda * (val - 1), 1 / lambda);
-        }
-
         @Override
         public double toMapY(double unitY) {
             double limb = limb();
             if (radialSize <= 1 || unitY <= limb)
                 return unitY / limb;
 
-            double scaled = 1 + (unitY - limb) * (scaleY(radialSize) - 1) / (1 - limb);
-            return invScaleY(scaled);
+            double u = (unitY - limb) / (1 - limb);
+            double lambda = lambda();
+            return lambda == 0
+                    ? Math.pow(radialSize, u)
+                    : Math.pow(1 + u * (Math.pow(radialSize, lambda) - 1), 1 / lambda);
         }
 
         @Override
         public double toUnitY(double mapY) {
             double limb = limb();
-            return radialSize <= 1 || mapY <= 1
-                    ? mapY * limb
-                    : limb + (scaleY(mapY) - 1) * (1 - limb) / (scaleY(radialSize) - 1);
+            if (radialSize <= 1 || mapY <= 1)
+                return mapY * limb;
+
+            double lambda = lambda();
+            double u = lambda == 0
+                    ? Math.log(mapY) / Math.log(radialSize)
+                    : (Math.pow(mapY, lambda) - 1) / (Math.pow(radialSize, lambda) - 1);
+            return limb + u * (1 - limb);
         }
 
         private double limb() {

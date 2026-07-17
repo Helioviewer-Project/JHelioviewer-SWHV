@@ -45,7 +45,7 @@ DEFAULT_ELECTRON = Path(os.environ.get(
 ALL_MODES = ("hpc", "ortho", "lati_zenithal", "radial_warp", "rect_warp")
 WARP_MODES = ("radial_warp", "rect_warp")
 WARP_OUTER_RADIUS = 4.0
-WARP_LAMBDAS = (-1.0, 0.0, 1.0)
+WARP_LAMBDAS = (-1.0, -0.5, 0.0, 0.5, 1.0)
 DEFAULT_WARP_LAMBDA = 0.0
 HPC_PROJECTION_CASES = (
     ("arc_punch", "PUNCH_L3_CAM_20260425001600_v0k.fits", 1, 0.3),
@@ -426,16 +426,11 @@ def unwarp_radius(normalized_radius: float, outer_radius: float, warp_lambda: fl
     if outer_radius <= 1.0 or normalized_radius <= limb_position:
         return normalized_radius / limb_position
 
-    scaled_outer = (
-        1.0 + math.log(outer_radius)
-        if warp_lambda == 0.0
-        else 1.0 + (math.pow(outer_radius, warp_lambda) - 1.0) / warp_lambda
-    )
-    scaled = 1.0 + (normalized_radius - limb_position) * (scaled_outer - 1.0) / (1.0 - limb_position)
+    u = (normalized_radius - limb_position) / (1.0 - limb_position)
     return (
-        math.exp(scaled - 1.0)
+        math.pow(outer_radius, u)
         if warp_lambda == 0.0
-        else math.pow(1.0 + warp_lambda * (scaled - 1.0), 1.0 / warp_lambda)
+        else math.pow(1.0 + u * (math.pow(outer_radius, warp_lambda) - 1.0), 1.0 / warp_lambda)
     )
 
 
@@ -719,7 +714,7 @@ def compare_batch(
             metadata.append({"mode": mode, "pixel_wcs": pixel_wcs, "bounds": bounds})
         elif mode in WARP_MODES:
             for warp_lambda in WARP_LAMBDAS:
-                lambda_name = str(int(warp_lambda)).replace("-", "minus")
+                lambda_name = f"{warp_lambda:g}".replace("-", "minus").replace(".", "_")
                 job = make_mode_job(
                     mode,
                     fits_file,
