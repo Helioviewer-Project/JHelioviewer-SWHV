@@ -48,7 +48,7 @@ layout(std140) uniform ProjectionBlock {
     ProjectionParams projection[2];
 };
 
-struct Screen {
+layout(std140) uniform ScreenBlock {
     mat4 inverseMVP;
     float iaspect;
     float xStart;
@@ -56,13 +56,9 @@ struct Screen {
     float yStart;
     float yStop;
     float lambda;
-};
+} screen;
 
-layout(std140) uniform ScreenBlock {
-    Screen screen;
-};
-
-struct Display {
+layout(std140) uniform DisplayBlock {
     vec4 color;
     vec3 sharpen;
     float isDiff;
@@ -75,11 +71,7 @@ struct Display {
     vec2 slit;
     float upsilonLow;
     float upsilonHigh;
-};
-
-layout(std140) uniform DisplayBlock {
-    Display display;
-};
+} display;
 
 uniform sampler2D image;
 uniform sampler2D diffImage;

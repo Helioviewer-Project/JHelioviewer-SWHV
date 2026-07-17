@@ -5,13 +5,9 @@ precision highp float;
 out vec4 outColor;
 in vec2 normalizedScreenpos;
 
-struct Screen {
-    mat4 inverseMVP;
-};
-
 layout(std140) uniform ScreenBlock {
-    Screen screen;
-};
+    mat4 inverseMVP;
+} screen;
 
 const vec4 black = vec4(0, 0, 0, 1);
 

@@ -16,15 +16,11 @@ flat out float hasPrev;
 flat out float hasFollow;
 flat out float halfWidthPixels;
 
-struct Screen {
+layout(std140) uniform ScreenBlock {
     mat4 mvp;
     vec4 viewport;
     float thickness;
-};
-
-layout(std140) uniform ScreenBlock {
-    Screen screen;
-};
+} screen;
 
 const float dir[2] = float[2](1.0, -1.0);
 
