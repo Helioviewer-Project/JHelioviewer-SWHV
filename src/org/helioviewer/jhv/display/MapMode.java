@@ -14,12 +14,12 @@ public enum MapMode {
 
     public final GLSLSolarShader shader;
 
-    public boolean usesNormalizedFitWidth() {
-        return this == RadialWarp || this == RectWarp;
-    }
-
-    public double normalizedFitWidth() {
-        return this == RectWarp ? 1.0 : MapView.NORMALIZED_FIT_WIDTH;
+    public double baseCameraWidth(Camera camera) {
+        return switch (this) {
+            case RadialWarp -> 1.1;
+            case RectWarp -> 1.0;
+            case Orthographic, HPC, Latitudinal -> camera.baseCameraWidth();
+        };
     }
 
     public boolean usesWarpLambda() {
