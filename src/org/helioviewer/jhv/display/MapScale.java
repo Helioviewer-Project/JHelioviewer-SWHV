@@ -25,7 +25,7 @@ public interface MapScale {
         return new BoxCoxRadialScale(Math.max(radialSize, 1));
     }
 
-    class LinearMapScale implements MapScale {
+    final class LinearMapScale implements MapScale {
 
         private final double xStart;
         private final double yStart;
@@ -72,15 +72,24 @@ public interface MapScale {
 
     // Box-Cox radial scale outside radius 1, anchored so the limb has the
     // same normalized position as the linear scale for every lambda.
-    final class BoxCoxRadialScale extends LinearMapScale {
+    final class BoxCoxRadialScale implements MapScale {
 
         private final double radialSize;
         private final double limb;
 
         BoxCoxRadialScale(double _radialSize) {
-            super(0, 360, 0, _radialSize);
             radialSize = _radialSize;
             limb = 1 / _radialSize;
+        }
+
+        @Override
+        public double toMapX(double unitX) {
+            return 360 * unitX;
+        }
+
+        @Override
+        public double toUnitX(double mapX) {
+            return mapX / 360;
         }
 
         @Override
