@@ -14,22 +14,22 @@ import org.helioviewer.jhv.wcs.WcsProjection;
 
 final class ProjectedMap {
 
-    enum Kind {HPC, LATITUDINAL, RADIAL_WARP, RECT_WARP}
-
-    private static Vec2 project(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
-        return switch (kind) {
+    private static Vec2 project(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
+        return switch (mode) {
             case HPC -> projectHpc(viewpoint, v, scale);
-            case LATITUDINAL -> projectLatitudinal(rotation, scale, v);
-            case RADIAL_WARP -> projectRadialWarp(viewpoint, scale, v);
-            case RECT_WARP -> projectRectWarp(viewpoint, scale, v);
+            case Latitudinal -> projectLatitudinal(rotation, scale, v);
+            case RadialWarp -> projectRadialWarp(viewpoint, scale, v);
+            case RectWarp -> projectRectWarp(viewpoint, scale, v);
+            case Orthographic -> throw new IllegalArgumentException("Orthographic mode is not projected");
         };
     }
 
-    static Vec3 unproject(Kind kind, Position viewpoint, Quat rotation, Vec2 pt) {
-        return switch (kind) {
+    static Vec3 unproject(MapMode mode, Position viewpoint, Quat rotation, Vec2 pt) {
+        return switch (mode) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
-            case LATITUDINAL -> unprojectLatitudinal(rotation, pt.x, pt.y);
-            case RADIAL_WARP, RECT_WARP -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
+            case Latitudinal -> unprojectLatitudinal(rotation, pt.x, pt.y);
+            case RadialWarp, RectWarp -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
+            case Orthographic -> throw new IllegalArgumentException("Orthographic mode is not projected");
         };
     }
 
@@ -84,40 +84,40 @@ final class ProjectedMap {
         return WcsProjection.helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
-    static Vec2 projectToScreen(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 v) {
-        Vec2 pt = project(kind, viewpoint, scale, rotation, v);
-        return kind == Kind.RADIAL_WARP ? pt : new Vec2(pt.x * vp.aspect, pt.y);
+    static Vec2 projectToScreen(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 v) {
+        Vec2 pt = project(mode, viewpoint, scale, rotation, v);
+        return mode == MapMode.RadialWarp ? pt : new Vec2(pt.x * vp.aspect, pt.y);
     }
 
-    static void emitMapLine(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+    static void emitMapLine(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
         if (vertices.isEmpty())
             return;
-        if (kind == Kind.HPC) {
+        if (mode == MapMode.HPC) {
             emitHpcLine(viewpoint, scale, vp, vertices, color, vexBuf);
             return;
         }
-        if (kind == Kind.RADIAL_WARP) {
+        if (mode == MapMode.RadialWarp) {
             emitRadialWarpLine(viewpoint, scale, rotation, vertices, color, vexBuf);
             return;
         }
 
-        Vec2 current = project(kind, viewpoint, scale, rotation, vertices.getFirst());
+        Vec2 current = project(mode, viewpoint, scale, rotation, vertices.getFirst());
         emitProjectedVertex(vp, current, Colors.Null, vexBuf);
         vexBuf.repeatVertex(color);
         for (int i = 1; i < vertices.size(); i++) {
             Vec2 previous = current;
-            current = project(kind, viewpoint, scale, rotation, vertices.get(i));
+            current = project(mode, viewpoint, scale, rotation, vertices.get(i));
             emitWrappedVertex(vp, previous, current, color, vexBuf);
         }
         vexBuf.repeatVertex(Colors.Null);
     }
 
     private static void emitRadialWarpLine(Position viewpoint, MapScale scale, Quat rotation, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
-        Vec2 current = project(Kind.RADIAL_WARP, viewpoint, scale, rotation, vertices.getFirst());
+        Vec2 current = project(MapMode.RadialWarp, viewpoint, scale, rotation, vertices.getFirst());
         vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, Colors.Null);
         vexBuf.repeatVertex(color);
         for (int i = 1; i < vertices.size(); i++) {
-            current = project(Kind.RADIAL_WARP, viewpoint, scale, rotation, vertices.get(i));
+            current = project(MapMode.RadialWarp, viewpoint, scale, rotation, vertices.get(i));
             vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, color);
         }
         vexBuf.repeatVertex(Colors.Null);
@@ -148,22 +148,22 @@ final class ProjectedMap {
         }
     }
 
-    static void emitMapPoints(Kind kind, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
-        if (kind == Kind.HPC) {
+    static void emitMapPoints(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
+        if (mode == MapMode.HPC) {
             emitHpcPoints(viewpoint, scale, vp, vertices, size, color, vexBuf);
             return;
         }
 
         float pointSize = (float) size;
-        if (kind == Kind.RADIAL_WARP) {
+        if (mode == MapMode.RadialWarp) {
             for (Vec3 vertex : vertices) {
-                Vec2 pt = project(kind, viewpoint, scale, rotation, vertex);
+                Vec2 pt = project(mode, viewpoint, scale, rotation, vertex);
                 vexBuf.putVertex((float) pt.x, (float) pt.y, 0, pointSize, color);
             }
             return;
         }
         for (Vec3 vertex : vertices) {
-            Vec2 pt = project(kind, viewpoint, scale, rotation, vertex);
+            Vec2 pt = project(mode, viewpoint, scale, rotation, vertex);
             vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
         }
     }
@@ -178,8 +178,8 @@ final class ProjectedMap {
         }
     }
 
-    static Vec2 mouseToMap(Kind kind, Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
-        if (kind == Kind.RADIAL_WARP)
+    static Vec2 mouseToMap(MapMode mode, Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+        if (mode == MapMode.RadialWarp)
             return mouseToRadialWarpMap(camera, width, vp, scale, x, y);
         return new Vec2(
                 scale.toMapX(ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),

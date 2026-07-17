@@ -6,21 +6,16 @@ import org.helioviewer.jhv.opengl.GLSLSolarShader;
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
 // through an explicit map basis shared by rendering and mouse unprojection.
 public enum MapMode {
-    Orthographic(GLSLSolarShader.ortho, Kind.ORTHOGRAPHIC),
-    HPC(GLSLSolarShader.hpc, Kind.HPC),
-    Latitudinal(GLSLSolarShader.lati, Kind.LATITUDINAL),
-    RadialWarp(GLSLSolarShader.radialWarp, Kind.RADIAL_WARP),
-    RectWarp(GLSLSolarShader.rectWarp, Kind.RECT_WARP);
-
-    enum Kind {
-        ORTHOGRAPHIC, HPC, LATITUDINAL, RADIAL_WARP, RECT_WARP
-    }
+    Orthographic(GLSLSolarShader.ortho),
+    HPC(GLSLSolarShader.hpc),
+    Latitudinal(GLSLSolarShader.lati),
+    RadialWarp(GLSLSolarShader.radialWarp),
+    RectWarp(GLSLSolarShader.rectWarp);
 
     public final GLSLSolarShader shader;
-    final Kind kind;
 
     public boolean usesNormalizedFitWidth() {
-        return kind == Kind.RADIAL_WARP || kind == Kind.RECT_WARP;
+        return this == RadialWarp || this == RectWarp;
     }
 
     public double normalizedFitWidth() {
@@ -31,9 +26,8 @@ public enum MapMode {
         return this == RadialWarp || this == RectWarp;
     }
 
-    MapMode(GLSLSolarShader _shader, Kind _kind) {
+    MapMode(GLSLSolarShader _shader) {
         shader = _shader;
-        kind = _kind;
     }
 
     public MapView createMapView(Camera camera, Position viewpoint, GridType gridType, MapScale[] scales) {

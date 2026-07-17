@@ -31,7 +31,7 @@ public abstract class MapView {
     }
 
     static MapView create(Camera camera, Position viewpoint, GridType gridType, MapMode mode, MapScale[] scales) {
-        return mode.kind == MapMode.Kind.ORTHOGRAPHIC
+        return mode == MapMode.Orthographic
                 ? new OrthographicView(camera, viewpoint, gridType, mode, scales)
                 : new ProjectedView(camera, viewpoint, gridType, mode, scales);
     }
@@ -85,11 +85,11 @@ public abstract class MapView {
     }
 
     public boolean isRadialWarp() {
-        return mode.kind == MapMode.Kind.RADIAL_WARP;
+        return mode == MapMode.RadialWarp;
     }
 
     public boolean isRectWarp() {
-        return mode.kind == MapMode.Kind.RECT_WARP;
+        return mode == MapMode.RectWarp;
     }
 
     public Vec3 mouseToSky(Viewport vp, int x, int y) {
@@ -151,23 +151,11 @@ public abstract class MapView {
 
     private static final class ProjectedView extends MapView {
 
-        private final ProjectedMap.Kind kind;
         private final Quat rotation;
 
         ProjectedView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode, MapScale[] _scales) {
             super(_camera, _viewpoint, _mode, _gridType, _scales);
-            kind = projectedKind(_mode.kind);
             rotation = _gridType.mapRotation(viewpoint);
-        }
-
-        private static ProjectedMap.Kind projectedKind(MapMode.Kind kind) {
-            return switch (kind) {
-                case HPC -> ProjectedMap.Kind.HPC;
-                case LATITUDINAL -> ProjectedMap.Kind.LATITUDINAL;
-                case RADIAL_WARP -> ProjectedMap.Kind.RADIAL_WARP;
-                case RECT_WARP -> ProjectedMap.Kind.RECT_WARP;
-                case ORTHOGRAPHIC -> throw new IllegalArgumentException("Orthographic mode has no projected kind");
-            };
         }
 
         @Override
@@ -177,17 +165,17 @@ public abstract class MapView {
 
         @Override
         public Vec2 projectToScreen(Viewport vp, Vec3 v) {
-            return ProjectedMap.projectToScreen(kind, viewpoint, scale(vp), rotation, vp, v);
+            return ProjectedMap.projectToScreen(mode, viewpoint, scale(vp), rotation, vp, v);
         }
 
         @Override
         public Vec2 mouseToMap(Viewport vp, int x, int y) {
-            return ProjectedMap.mouseToMap(kind, camera, cameraWidth(vp), vp, scale(vp), x, y);
+            return ProjectedMap.mouseToMap(mode, camera, cameraWidth(vp), vp, scale(vp), x, y);
         }
 
         @Override
         public Vec3 mouseToSurface(Viewport vp, int x, int y) {
-            return ProjectedMap.unproject(kind, viewpoint, rotation, mouseToMap(vp, x, y));
+            return ProjectedMap.unproject(mode, viewpoint, rotation, mouseToMap(vp, x, y));
         }
 
         @Override
@@ -200,12 +188,12 @@ public abstract class MapView {
 
         @Override
         public void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
-            ProjectedMap.emitMapLine(kind, viewpoint, scale(vp), rotation, vp, vertices, color, vexBuf);
+            ProjectedMap.emitMapLine(mode, viewpoint, scale(vp), rotation, vp, vertices, color, vexBuf);
         }
 
         @Override
         public void emitMapPoints(Viewport vp, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
-            ProjectedMap.emitMapPoints(kind, viewpoint, scale(vp), rotation, vp, vertices, size, color, vexBuf);
+            ProjectedMap.emitMapPoints(mode, viewpoint, scale(vp), rotation, vp, vertices, size, color, vexBuf);
         }
     }
 }
