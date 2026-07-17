@@ -45,6 +45,7 @@ import com.jidesoft.swing.JideToggleButton;
 public final class ToolBar extends JToolBar implements ViewState.ModeListener {
 
     private static final int ZOOM_HOLD_REPEAT_MS = 33;
+    private static final int POPUP_SLIDER_WIDTH = 120;
 
     private static DisplayMode displayMode = DisplayMode.ICONANDTEXT;
 
@@ -328,8 +329,8 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
     private JPanel createWarpLambdaPanel() {
         warpLambdaSlider = new JHVSlider(-1000, 1000, (int) Math.round(ViewState.getWarpLambda() * 1000));
         warpLambdaSlider.setToolTipText("Box-Cox lambda for warp projections");
-        warpLambdaSlider.setPreferredSize(new Dimension(110, warpLambdaSlider.getPreferredSize().height));
-        JLabel label = new JLabel("lambda");
+        warpLambdaSlider.setPreferredSize(new Dimension(POPUP_SLIDER_WIDTH, warpLambdaSlider.getPreferredSize().height));
+        JLabel label = new JLabel("λ");
         warpLambdaValue = new JLabel(String.format("%.3f", ViewState.getWarpLambda()), JLabel.RIGHT);
         warpLambdaValue.setPreferredSize(new JLabel("-0.000").getPreferredSize());
         warpLambdaSlider.addChangeListener(e -> {
@@ -351,7 +352,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         slider.setMajorTickSpacing(1);
         slider.setSnapToTicks(true);
         slider.setToolTipText("Annotation thickness");
-        slider.setPreferredSize(new Dimension(110, slider.getPreferredSize().height));
+        slider.setPreferredSize(new Dimension(POPUP_SLIDER_WIDTH, slider.getPreferredSize().height));
         slider.addChangeListener(e -> Annotations.setThicknessValue(slider.getValue()));
 
         JPanel panel = new JPanel(new BorderLayout());
