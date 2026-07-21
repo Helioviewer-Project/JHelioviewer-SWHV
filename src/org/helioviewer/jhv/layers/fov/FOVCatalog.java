@@ -62,6 +62,7 @@ public final class FOVCatalog {
         plat.add(new FOVInstrument("AIA", FOVInstrument.FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
         plat.add(new FOVInstrument("HMI", FOVInstrument.FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
         plat.add(new FOVInstrument("SWAP", FOVInstrument.FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600., jpo));
+        plat.add(new FOVInstrument("SUVI", FOVInstrument.FOVType.RECTANGULAR, 0, (2.5 * 1280) / 3600., (2.5 * 1280) / 3600., jpo));
         plat.add(new FOVInstrument("ASPIICS", FOVInstrument.FOVType.RECTANGULAR, .5850334, 1.6, 1.6, jpo));
         addPlatform(plat);
     }
