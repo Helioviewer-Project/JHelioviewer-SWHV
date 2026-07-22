@@ -40,7 +40,7 @@ REPO_ROOT = SCRIPT_DIR.parent.parent
 RUNNER_DIR = SCRIPT_DIR / "electron_webgl_runner"
 DEFAULT_ELECTRON = Path(os.environ.get(
     "JHV_ELECTRON",
-    str(Path.home() / "electron-v42.1.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
+    str(Path.home() / "electron-v43.2.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
 ))
 ALL_MODES = ("hpc", "ortho", "lati_zenithal", "radial_warp", "rect_warp")
 WARP_MODES = ("radial_warp", "rect_warp")
