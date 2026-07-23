@@ -58,7 +58,10 @@ public final class UIGlobals {
             cursor = cursor == null ? IconBank.getBlank() : cursor;
             closedHandCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursor.getImage(), new Point(16, 8), cursor.toString());
         }
-        openHandCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        ImageIcon openHand = IconBank.getIcon(JHVIcon.OPEN_HAND);
+        openHandCursor = openHand != null && openHand.getIconWidth() > 0
+                ? Toolkit.getDefaultToolkit().createCustomCursor(openHand.getImage(), new Point(openHand.getIconWidth() / 2, openHand.getIconHeight() / 2), "openHand")
+                : Cursor.getPredefinedCursor(Cursor.HAND_CURSOR); // flat open palm, falling back to the pointing hand
 
         uiFont = UIManager.getFont("defaultFont");
         uiFont = uiFont == null ? UIManager.getFont("Label.font") : uiFont; // when not FlatLaf

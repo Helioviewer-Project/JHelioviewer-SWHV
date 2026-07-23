@@ -14,7 +14,7 @@ public final class IconBank {
 
     // The enum has all the icons, you supply these enums to the getIcon method
     public enum JHVIcon {
-        CLOSED_HAND("ClosedHand.gif"), CLOSED_HAND_MAC("drag.png"), HVLOGO_SMALL("hvImage_160x160.png");
+        CLOSED_HAND("ClosedHand.gif"), CLOSED_HAND_MAC("drag.png"), OPEN_HAND("OpenedHand.gif"), HVLOGO_SMALL("hvImage_160x160.png");
 
         final String fname;
 
