@@ -14,6 +14,7 @@ import javax.swing.JTabbedPane;
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
+import org.helioviewer.jhv.gui.MainFrame;
 
 // This panel acts as a container for the GUI elements which are shown in the
 // main area of the application. Usually it contains the main image area. Below
@@ -70,6 +71,13 @@ public final class MainContentPanel extends JPanel {
     // area. A split pane will be provided, if necessary, to readjust the
     // height of the components.
     private void updateLayout() {
+        updateLayoutImpl();
+        // Collapsing or expanding the timelines/plugins panel resizes the canvas the same way the
+        // sidebar does, so the native surface needs the same synchronous re-sync.
+        MainFrame.resyncRenderSurface();
+    }
+
+    private void updateLayoutImpl() {
         splitPane.remove(collapsiblePane);
         remove(collapsiblePane);
         splitPane.setDividerSize(0);

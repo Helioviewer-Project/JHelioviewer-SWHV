@@ -295,6 +295,27 @@ public final class MainFrame {
         return renderCanvas != null ? renderCanvas.getFramerate() : 0;
     }
 
+    // A programmatic layout change resizes the canvas, and the native GL surface has to follow it.
+    //
+    // The canvas can settle over more than one layout pass -- collapsing the timelines panel takes it
+    // 602 -> 736 -> 806 -- so the surface has to be matched against the size Swing finally settles on,
+    // not an intermediate one. Rendering is suppressed until then, or GL reshapes to the new size and
+    // draws into a drawable that is still the old one, which is what shows up as a stretched frame.
+    //
+    // The handover is asynchronous by necessity: dispatching synchronously to the main thread from
+    // here deadlocks against AppKit.
+    public static void resyncRenderSurface() {
+        if (mainFrame == null)
+            return;
+        if (renderCanvas != null)
+            renderCanvas.beginHostResync();
+        mainFrame.validate();
+        EventQueue.invokeLater(() -> EventQueue.invokeLater(() -> {
+            if (renderCanvas != null)
+                renderCanvas.resyncHostDeferred();
+        }));
+    }
+
     public static MainContentPanel getMainContentPanel() {
         return mainContentPanel;
     }

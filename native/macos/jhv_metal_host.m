@@ -38,6 +38,21 @@ static CAMetalLayer *jhv_create_metal_layer(id<MTLDevice> device, CGFloat conten
     metalLayer.framebufferOnly = NO;
     metalLayer.opaque = YES;
     metalLayer.contentsScale = contentsScale;
+    // Without this the layer defaults to kCAGravityResize: when the layer is resized, Core Animation
+    // stretches the *previous* frame to the new bounds until fresh content is drawn, so a programmatic
+    // layout change (collapsing a panel) briefly shows a distorted frame even though the drawable and
+    // the viewport both end up correct.
+    //
+    // Without this the layer defaults to kCAGravityResize, which stretches the previous frame to the
+    // new bounds until fresh content is drawn -- a visibly distorted frame on any programmatic resize.
+    //
+    // No anchor makes a stale frame correct: the right placement depends on which edge moved. Centre
+    // is the deliberate choice, because it keeps the sidebar collapse -- the frequent one -- clean,
+    // the Sun being drawn about the canvas centre. It leaves a brief vertical shift when the timelines
+    // panel is collapsed, which is a once-a-session action. The only fix without this trade is an
+    // atomic native resize-and-render, and every route to that dispatches synchronously to the main
+    // thread, which deadlocks against AppKit.
+    metalLayer.contentsGravity = kCAGravityCenter;
     jhv_set_metal_layer_frame(metalLayer, frame);
     return metalLayer;
 }
@@ -134,6 +149,19 @@ void *jhv_metal_host_create(void *surfaceLayersPtr, double x, double y, double w
     return result;
 }
 
+static void jhv_apply_frame(JHVMetalHostBox *retainedBox, double x, double y, double width, double height) {
+    @try {
+        CGFloat layerY = jhv_layer_y(retainedBox.windowLayer, y, height);
+        CGFloat windowScale = jhv_window_scale(retainedBox.windowLayer);
+        if (retainedBox.metalLayer.contentsScale != windowScale)
+            retainedBox.metalLayer.contentsScale = windowScale;
+        CGRect frame = CGRectMake(x, layerY, width, height);
+        jhv_set_metal_layer_frame(retainedBox.metalLayer, frame);
+    } @finally {
+        CFRelease((__bridge CFTypeRef)retainedBox);
+    }
+}
+
 void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, double height) {
     if (boxPtr == NULL)
         return;
@@ -141,19 +169,21 @@ void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, do
     JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
     CFRetain((__bridge CFTypeRef)box);
     jhv_run_on_main_async(^{
-        @autoreleasepool {
-            JHVMetalHostBox *retainedBox = box;
-            @try {
-                CGFloat layerY = jhv_layer_y(retainedBox.windowLayer, y, height);
-                CGFloat windowScale = jhv_window_scale(retainedBox.windowLayer);
-                if (retainedBox.metalLayer.contentsScale != windowScale)
-                    retainedBox.metalLayer.contentsScale = windowScale;
-                CGRect frame = CGRectMake(x, layerY, width, height);
-                jhv_set_metal_layer_frame(retainedBox.metalLayer, frame);
-            } @finally {
-                CFRelease((__bridge CFTypeRef)retainedBox);
-            }
-        }
+        @autoreleasepool { jhv_apply_frame(box, x, y, width, height); }
+    });
+}
+
+// Synchronous variant: the CAMetalLayer frame AND drawableSize are updated before returning, so a
+// render issued immediately afterwards draws at the new resolution (no oblate frame, no flash).
+// Used for programmatic resizes (collapsing the sidebar), not the frequent window-drag path.
+void jhv_metal_host_set_frame_sync(void *boxPtr, double x, double y, double width, double height) {
+    if (boxPtr == NULL)
+        return;
+
+    JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
+    CFRetain((__bridge CFTypeRef)box);
+    jhv_run_on_main_sync(^{
+        @autoreleasepool { jhv_apply_frame(box, x, y, width, height); }
     });
 }
 

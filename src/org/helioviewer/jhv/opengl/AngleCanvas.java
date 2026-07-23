@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.astronomy.Position;
+import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
@@ -42,6 +43,7 @@ public final class AngleCanvas extends Canvas {
     private int lastGlWidth = -1;
     private int lastGlHeight = -1;
     private Rectangle lastHostBounds;
+    private boolean hostResyncPending; // suppress renders that would draw at a size the drawable lacks
 
     public AngleCanvas() {
         setFocusable(true);
@@ -120,6 +122,69 @@ public final class AngleCanvas extends Canvas {
         paint(g);
     }
 
+    // Synchronously resize the native host frame to the current canvas bounds and re-render, in the
+    // same event. Needed after a programmatic layout change (e.g. collapsing the sidebar): the
+    // ordinary resize path is deferred, so AWT paints the old framebuffer stretched to the new width
+    // before the correct frame lands. Doing it inline here removes both the stretch and the flash.
+    public void refreshHost() {
+        if (getWidth() <= 0 || getHeight() <= 0)
+            return;
+        lastHostBounds = null; // force MacAngleBridge.setFrame even if bounds look unchanged
+        invalidateGlSize();    // force GLRenderer.reshape in renderNow
+        refreshPixelScale();
+        if (nativeWindowHandle == 0L) {
+            attachIfNeeded();
+            if (nativeWindowHandle == 0L)
+                return;
+        }
+        if (angleRenderer == null)
+            return;
+
+        Rectangle bounds = hostBounds();
+        if (Platform.isMacOS())
+            // Synchronous so the native drawable is resized before we render — otherwise the frame
+            // renders at the old resolution (oblate) until a later native cycle (a click) fixes it.
+            MacAngleBridge.setFrameSync(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
+        lastHostBounds = bounds;
+        renderNow(GLRenderer.getDisplayedViewpoint());
+    }
+
+    // Called as soon as a programmatic layout change starts, before Swing repaints: from here until
+    // resyncHostDeferred runs, we refuse to draw at a size the drawable has not reached.
+    public void beginHostResync() {
+        hostResyncPending = true;
+    }
+
+    public void resyncHostDeferred() {
+        if (getWidth() <= 0 || getHeight() <= 0) {
+            hostResyncPending = false;
+            return;
+        }
+        attachIfNeeded();
+        if (nativeWindowHandle == 0L || angleRenderer == null) {
+            hostResyncPending = false;
+            return;
+        }
+
+        refreshPixelScale();
+        Rectangle bounds = hostBounds();
+        // Asynchronous, always. A synchronous dispatch to the main thread from here deadlocks against
+        // AppKit -- it does it when collapsing, and it does it when expanding.
+        if (Platform.isMacOS())
+            MacAngleBridge.setFrame(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
+        lastHostBounds = bounds;
+        invalidateGlSize();
+
+        // Give the queued native resize a moment to land, then draw. Until it does, renders stay
+        // suppressed, so no frame is drawn at a size the drawable has not reached.
+        javax.swing.Timer timer = new javax.swing.Timer(16, e -> { // one frame: long enough for the queued native resize, short enough not to be seen
+            hostResyncPending = false;
+            renderNow(GLRenderer.getDisplayedViewpoint());
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+
     public void requestRender() {
         requestRender(GLRenderer.getDisplayedViewpoint());
     }
@@ -165,6 +230,12 @@ public final class AngleCanvas extends Canvas {
         int glWidth = (int) (getWidth() * Display.pixelScale[0] + .5);
         int glHeight = (int) (getHeight() * Display.pixelScale[1] + .5);
         if (glWidth != lastGlWidth || glHeight != lastGlHeight) {
+            // A layout change is in flight and the native drawable has not been brought to the new
+            // size yet. Drawing now would reshape GL to the new size against the old drawable, and
+            // that one frame is exactly the stretch the user sees. Skip it; resyncHostDeferred will
+            // resize the drawable and render immediately afterwards.
+            if (hostResyncPending)
+                return;
             GLRenderer.reshape(glWidth, glHeight);
             lastGlWidth = glWidth;
             lastGlHeight = glHeight;
