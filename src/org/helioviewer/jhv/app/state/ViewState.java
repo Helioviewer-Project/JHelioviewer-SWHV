@@ -149,6 +149,17 @@ public final class ViewState {
         return new PlaybackData(playbackAdvanceMode, playbackSpeed, playbackSpeedUnit, playbackFirstFrame, playbackLastFrame);
     }
 
+    // Estimated real-time length (seconds) of one pass through a movie of `frames` frames spanning
+    // `spanMillis` of solar time, at the current playback speed. Frames/sec mode records at `speed`
+    // fps (length = frames/speed); solar-time modes play the span at speed*secPerSecond (see ExportMovie).
+    public static double estimateVideoSeconds(int frames, long spanMillis) {
+        PlaybackData pd = playbackData();
+        if (pd.speedUnit().isRelative())
+            return pd.speed() <= 0 ? 0 : frames / (double) pd.speed();
+        long rate = (long) pd.speed() * pd.speedUnit().secPerSecond();
+        return rate <= 0 ? 0 : (spanMillis / 1000.) / rate;
+    }
+
     public static RecordingData recordingData() {
         return new RecordingData(recordingMode, recordingSize);
     }

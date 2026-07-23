@@ -31,6 +31,7 @@ class TimeField extends JTextField {
     private Popup calPopup = null;
 
     TimeField(String tip) {
+        setColumns(16); // keep the preferred width compact; weightx layouts still stretch it to fill
         calendarButton.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {

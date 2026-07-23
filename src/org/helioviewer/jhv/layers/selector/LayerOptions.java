@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.layers.ConnectionLayer;
 import org.helioviewer.jhv.layers.FOVLayer;
 import org.helioviewer.jhv.layers.GridLayer;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
@@ -29,7 +28,6 @@ public final class LayerOptions implements Layers.Listener {
         register(ConnectionLayer.class, layer -> new ConnectionLayerOptions((ConnectionLayer) layer));
         register(FOVLayer.class, layer -> new FOVTreePane(((FOVLayer) layer).getCatalog()));
         register(GridLayer.class, layer -> new GridLayerOptions((GridLayer) layer));
-        register(ImageLayer.class, layer -> new ImageLayerOptions((ImageLayer) layer));
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
         register(ViewpointLayer.class, layer -> new ViewpointLayerOptionsPanel((ViewpointLayer) layer));
@@ -78,10 +76,7 @@ public final class LayerOptions implements Layers.Listener {
     public void nameUpdated(Layer layer) {}
 
     @Override
-    public void layerUpdated(Layer layer) {
-        if (panels.get(layer) instanceof ImageLayerOptions panel)
-            panel.refresh(layer);
-    }
+    public void layerUpdated(Layer layer) {}
 
     @Override
     public void timeUpdated(Layer layer) {}

@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Rectangle;
 
+import javax.annotation.Nullable;
+
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -12,8 +14,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.component.BusyIndicator;
 import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.view.View;
 
 @SuppressWarnings("serial")
 class CellRenderer {
@@ -48,8 +52,10 @@ class CellRenderer {
             // https://stackoverflow.com/questions/3054775/jtable-strange-behavior-from-getaccessiblechild-method-resulting-in-null-point
             if (value instanceof Layer layer) {
                 if (layer.isDownloading()) {
+                    // Repaint the whole row (not just the spinner cell) each animation tick so the
+                    // finished/total count in the Time column keeps up as frames stream in.
                     Rectangle rect = table.getCellRect(row, column, false);
-                    table.repaint(rect.x, rect.y, rect.width, rect.height); // lazy
+                    table.repaint(0, rect.y, table.getWidth(), rect.height); // lazy
 
                     over.setForeground(label.getForeground());
                     over.setBackground(label.getBackground());
@@ -104,11 +110,36 @@ class CellRenderer {
 
         static final Font font = UIGlobals.sansFont;
 
+        // "2026-07-08T03:43:39.715" -> "03:43:39"
+        @Nullable
+        private static String shortTime(@Nullable String timeString) {
+            if (timeString == null)
+                return null;
+            int t = timeString.indexOf('T');
+            if (t < 0)
+                return timeString;
+            int dot = timeString.indexOf('.', t);
+            return timeString.substring(t + 1, dot > t ? dot : timeString.length());
+        }
+
         @Override
         public void setValue(Object value) {
             if (value instanceof Layer layer) {
                 setFont(font);
-                setText(layer.getTimeString());
+                // While downloading, append finished/total to the right of the timestamp (still
+                // just left of the row's download spinner) rather than replacing the time.
+                if (layer.isDownloading() && layer instanceof ImageLayer il) {
+                    View view = il.getView();
+                    int max = view.getMaximumFrameNumber();
+                    // Before the download scope is known (max == 0) show 0 / 0 rather than 1 / 1.
+                    String count = max == 0 ? "0 / 0" : view.getCompleteFrameCount() + " / " + (max + 1);
+                    // Compact time-of-day (drop date + millis) so the count fits without widening
+                    // the column; the full timestamp returns once the download completes.
+                    String time = shortTime(layer.getTimeString());
+                    setText(time == null ? count : time + "   " + count);
+                } else {
+                    setText(layer.getTimeString());
+                }
             }
         }
 

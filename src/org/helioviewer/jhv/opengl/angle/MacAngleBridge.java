@@ -28,6 +28,9 @@ public final class MacAngleBridge {
     private static final MethodHandle SET_FRAME = downcall("jhv_metal_host_set_frame",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
                     ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
+    private static final MethodHandle SET_FRAME_SYNC = downcall("jhv_metal_host_set_frame_sync",
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
+                    ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
     private static final MethodHandle DESTROY = downcall("jhv_metal_host_destroy",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
     private static final MethodHandle DEVICE_INFO = downcall("jhv_metal_device_info",
@@ -81,6 +84,16 @@ public final class MacAngleBridge {
         try {
             MemorySegment metalHost = MemorySegment.ofAddress(handle);
             SET_FRAME.invokeExact(metalHost, x, y, width, height);
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to resize Metal host layer", t);
+        }
+    }
+
+    // Blocks until the layer frame + drawableSize are updated, so an immediate render is at-size.
+    public static void setFrameSync(long handle, double x, double y, double width, double height) {
+        try {
+            MemorySegment metalHost = MemorySegment.ofAddress(handle);
+            SET_FRAME_SYNC.invokeExact(metalHost, x, y, width, height);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to resize Metal host layer", t);
         }

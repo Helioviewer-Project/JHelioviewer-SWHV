@@ -11,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.TransferHandler;
@@ -20,6 +21,8 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.ImageLayersPane;
 import org.helioviewer.jhv.gui.component.MainContentPanel;
 import org.helioviewer.jhv.gui.component.MenuBar;
 import org.helioviewer.jhv.gui.component.MoviePanel;
@@ -32,10 +35,14 @@ import org.helioviewer.jhv.gui.status.ViewpointStatusPanel;
 import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.selector.LayerOptionSections;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
+import org.helioviewer.jhv.layers.selector.LayersSectionPanel;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
+
+import com.jidesoft.swing.JideButton;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
 
@@ -96,6 +103,10 @@ public final class MainFrame {
     private static JScrollPane leftScrollPane;
     private static FixedWidthPanel leftPaneHost;
 
+    private static JPanel centerPanel;
+    private static JideButton sidebarCollapseHandle;
+    private static boolean sidebarCollapsed;
+
     private static SideContentPane leftPane;
 
     private static AngleCanvas renderCanvas;
@@ -104,6 +115,8 @@ public final class MainFrame {
     private static MainContentPanel mainContentPanel;
 
     private static LayersPanel layersPanel;
+    private static LayersSectionPanel layersSectionPanel;
+    private static ImageLayersPane imageLayersPane;
 
     private static MenuBar menuBar;
 
@@ -118,10 +131,20 @@ public final class MainFrame {
         renderCanvas = null;
         renderHost = new RenderStartupHost();
 
-        layersPanel = new LayersPanel();
-
         leftPane = new SideContentPane();
-        leftPane.add("Image Layers", MoviePanel.getInstance(), true);
+        JPanel layerOptionsWrapper = new JPanel(new BorderLayout());
+        JPanel geometryWrapper = new JPanel(new BorderLayout());
+        JPanel manageWrapper = new JPanel(new BorderLayout());
+        LayerOptionSections sections = new LayerOptionSections(layerOptionsWrapper, geometryWrapper, manageWrapper);
+        layersPanel = new LayersPanel(sections);                       // table needs the controller
+        layersSectionPanel = new LayersSectionPanel(); // ctor calls MainFrame.getLayersPanel()
+        MoviePanel moviePanel = MoviePanel.getInstance();
+        imageLayersPane = new ImageLayersPane(moviePanel.getTimeSelectorPanel(), layersSectionPanel, layerOptionsWrapper, geometryWrapper, manageWrapper);
+        // The scrubber + playback buttons are always docked at the top (see below); the sidebar keeps
+        // the recording/speed settings as their own "Playback options" pane, and the master time range
+        // now lives atop Image Layers where it belongs.
+        leftPane.add("Playback and Recording", moviePanel.getPlaybackOptions(), true);
+        leftPane.add("Image Layers", imageLayersPane, true);
 
         leftScrollPane = new JScrollPane(leftPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         leftScrollPane.setFocusable(false);
@@ -133,8 +156,22 @@ public final class MainFrame {
         awtInputAdapter = new AwtInputAdapter();
 
         mainContentPanel = new MainContentPanel(renderHost);
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(leftPaneHost, BorderLayout.WEST);
+        centerPanel = new JPanel(new BorderLayout());
+
+        // The scrubber + playback controls are always docked at the top, so playback stays
+        // reachable whether or not the sidebar is open. Collapsing the sidebar (thin handle on its
+        // right edge) just folds away the layers/settings and lets the canvas reflow to full width.
+        sidebarCollapseHandle = new JideButton(Buttons.collapseLeft);
+        sidebarCollapseHandle.setToolTipText("Collapse the sidebar");
+        sidebarCollapseHandle.setPreferredSize(new Dimension(16, 0));
+        sidebarCollapseHandle.addActionListener(e -> setSidebarCollapsed(!sidebarCollapsed));
+
+        JPanel westWrap = new JPanel(new BorderLayout());
+        westWrap.add(leftPaneHost, BorderLayout.CENTER);
+        westWrap.add(sidebarCollapseHandle, BorderLayout.LINE_END);
+
+        centerPanel.add(MoviePanel.getInstance().getNorthTransport(), BorderLayout.PAGE_START);
+        centerPanel.add(westWrap, BorderLayout.WEST);
         centerPanel.add(mainContentPanel, BorderLayout.CENTER);
 
         ViewpointStatusPanel viewpointStatus = new ViewpointStatusPanel();
@@ -263,28 +300,66 @@ public final class MainFrame {
     }
 
     public static void stabilizeLeftPaneWidth() {
-        MoviePanel moviePanel = MoviePanel.getInstance();
         // Freeze the left pane to the widest startup state so the scrollbar never overlaps options panels.
-        moviePanel.setAdvanced(true);
-        int contentWidth = measureMoviePanelWidth(moviePanel, null);
-        contentWidth = Math.max(contentWidth, measureMoviePanelWidth(moviePanel, Layers.getViewpointLayer()));
-        contentWidth = Math.max(contentWidth, measureMoviePanelWidth(moviePanel, Layers.getConnectionLayer()));
+        int contentWidth = measureImageLayersPaneWidth(null);
+        contentWidth = Math.max(contentWidth, measureImageLayersPaneWidth(Layers.getViewpointLayer()));
+        contentWidth = Math.max(contentWidth, measureImageLayersPaneWidth(Layers.getConnectionLayer()));
+        // The Playback options pane is its own top-level section, so fold its width in explicitly.
+        JComponent playbackOptions = MoviePanel.getInstance().getPlaybackOptions();
+        playbackOptions.revalidate();
+        playbackOptions.doLayout();
+        contentWidth = Math.max(contentWidth, playbackOptions.getPreferredSize().width);
 
-        layersPanel.setOptionsPanel(null);
-        moviePanel.setAdvanced(false);
-        moviePanel.setFixedPreferredWidth(contentWidth);
+        layersPanel.setSelectedLayer(null);
         leftPane.revalidate();
 
+        // The fixed host width stretches every top-level pane (via SideContentPane's fill) to match.
         int scrollbarWidth = leftScrollPane.getVerticalScrollBar().getPreferredSize().width;
-        leftPaneHost.setFixedWidth(contentWidth + scrollbarWidth);
+        fixedContentWidth = contentWidth + scrollbarWidth;
+        leftPaneHost.setFixedWidth(fixedContentWidth);
         leftPaneHost.revalidate();
+        // Dynamic content (CR button, Sync, video/duration labels, per-layer options) can get wider
+        // than the startup measurement, and there is no horizontal scrollbar — so grow to fit. Only
+        // ever growing keeps the width from oscillating as layers are selected.
+        UITimer.register(MainFrame::growLeftPaneToFit);
     }
 
-    private static int measureMoviePanelWidth(MoviePanel moviePanel, Layer optionsLayer) {
-        layersPanel.setOptionsPanel(optionsLayer);
-        moviePanel.revalidate();
-        moviePanel.doLayout();
-        return moviePanel.getPreferredSize().width;
+    private static int fixedContentWidth;
+
+    private static void growLeftPaneToFit() {
+        int needed = Math.max(imageLayersPane.getPreferredSize().width, MoviePanel.getInstance().getPlaybackOptions().getPreferredSize().width)
+                + leftScrollPane.getVerticalScrollBar().getPreferredSize().width;
+        if (needed > fixedContentWidth) {
+            fixedContentWidth = needed;
+            leftPaneHost.setFixedWidth(fixedContentWidth);
+            leftPaneHost.revalidate();
+        }
+    }
+
+    private static int measureImageLayersPaneWidth(Layer optionsLayer) {
+        layersPanel.setSelectedLayer(optionsLayer);
+        imageLayersPane.revalidate();
+        imageLayersPane.doLayout();
+        return imageLayersPane.getPreferredSize().width;
+    }
+
+    public static void setSidebarCollapsed(boolean collapsed) {
+        if (collapsed == sidebarCollapsed)
+            return;
+        sidebarCollapsed = collapsed;
+
+        leftPaneHost.setVisible(!collapsed); // the handle stays; westWrap shrinks to just it
+        sidebarCollapseHandle.setText(collapsed ? Buttons.collapseRight : Buttons.collapseLeft);
+        sidebarCollapseHandle.setToolTipText(collapsed ? "Show the sidebar" : "Collapse the sidebar");
+
+        // The canvas is nested deep inside a JSplitPane, so validate the whole frame to push its
+        // new bounds all the way down, then force the native GL surface to match and re-render.
+        // A plain display() only reshapes the GL viewport, not the native surface.
+        centerPanel.revalidate();
+        mainFrame.validate(); // push the new bounds down to the deeply-nested canvas synchronously
+        centerPanel.repaint();
+        if (renderCanvas != null)
+            renderCanvas.refreshHost(); // synchronously resizes the native surface + renders at-size
     }
 
     public static Component getRenderComponent() {
@@ -301,6 +376,10 @@ public final class MainFrame {
 
     public static LayersPanel getLayersPanel() {
         return layersPanel;
+    }
+
+    public static LayersSectionPanel getLayersSectionPanel() {
+        return layersSectionPanel;
     }
 
     public static MenuBar getMenuBar() {

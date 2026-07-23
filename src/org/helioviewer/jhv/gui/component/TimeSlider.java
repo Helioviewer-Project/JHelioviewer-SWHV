@@ -35,6 +35,7 @@ import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.view.View;
 
 // Extension of JSlider displaying the caching status on the track.
@@ -285,6 +286,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         private int frame = -1;
         private int maximum = -1;
         private String text = "";
+        private String timeText = ""; // elapsed / total video time, under the frame count
 
         FrameNumberPanel(int _value, int _maximum) {
             Object hints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
@@ -295,16 +297,28 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         }
 
         void setFrame(int _value, int _maximum) {
-            if (frame == _value && maximum == _maximum)
-                return;
-
             boolean maximumChanged = maximum != _maximum;
             frame = _value;
             maximum = _maximum;
-            text = (frame + 1) + "/" + (maximum + 1);
+            String newText = (frame + 1) + "/" + (maximum + 1);
+            String newTimeText = computeTimeText(); // also tracks playback-speed changes at a fixed frame
+            if (newText.equals(text) && newTimeText.equals(timeText) && !maximumChanged)
+                return;
+
+            text = newText;
+            timeText = newTimeText;
             repaint();
             if (maximumChanged)
                 revalidate();
+        }
+
+        // Video position as elapsed / total real-time, consistent with the frame count above it.
+        private String computeTimeText() {
+            if (maximum < 1)
+                return "";
+            double total = ViewState.estimateVideoSeconds(maximum + 1, Player.getEndTime() - Player.getStartTime());
+            double elapsed = total * (frame + 1) / (maximum + 1);
+            return TimeUtils.formatDurationSig(Math.round(elapsed * 1000)) + " / " + TimeUtils.formatDurationSig(Math.round(total * 1000));
         }
 
         @Override
@@ -312,9 +326,10 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
             Insets insets = getInsets();
             FontMetrics fm = getFontMetrics(getFont());
             String maximumText = (maximum + 1) + "/" + (maximum + 1);
+            int width = Math.max(fm.stringWidth(maximumText), fm.stringWidth(timeText));
             return new Dimension(
-                    insets.left + fm.stringWidth(maximumText) + insets.right,
-                    insets.top + fm.getHeight() + insets.bottom);
+                    insets.left + width + insets.right,
+                    insets.top + 2 * fm.getHeight() + insets.bottom); // frame count + video time
         }
 
         @Override
@@ -332,9 +347,16 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
 
                 FontMetrics fm = g.getFontMetrics();
                 Insets insets = getInsets();
-                int x = getWidth() - insets.right - fm.stringWidth(text);
-                int y = insets.top + (getHeight() - insets.top - insets.bottom - fm.getHeight()) / 2 + fm.getAscent();
-                BasicGraphicsUtils.drawString(this, g, text, x, y);
+                int lineHeight = fm.getHeight();
+                int blockHeight = timeText.isEmpty() ? lineHeight : 2 * lineHeight;
+                int top = insets.top + (getHeight() - insets.top - insets.bottom - blockHeight) / 2;
+
+                int xFrame = getWidth() - insets.right - fm.stringWidth(text);
+                BasicGraphicsUtils.drawString(this, g, text, xFrame, top + fm.getAscent());
+                if (!timeText.isEmpty()) {
+                    int xTime = getWidth() - insets.right - fm.stringWidth(timeText);
+                    BasicGraphicsUtils.drawString(this, g, timeText, xTime, top + lineHeight + fm.getAscent());
+                }
             } finally {
                 g.dispose();
             }

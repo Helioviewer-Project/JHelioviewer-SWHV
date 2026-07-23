@@ -120,6 +120,33 @@ public final class AngleCanvas extends Canvas {
         paint(g);
     }
 
+    // Synchronously resize the native host frame to the current canvas bounds and re-render, in the
+    // same event. Needed after a programmatic layout change (e.g. collapsing the sidebar): the
+    // ordinary resize path is deferred, so AWT paints the old framebuffer stretched to the new width
+    // before the correct frame lands. Doing it inline here removes both the stretch and the flash.
+    public void refreshHost() {
+        if (getWidth() <= 0 || getHeight() <= 0)
+            return;
+        lastHostBounds = null; // force MacAngleBridge.setFrame even if bounds look unchanged
+        invalidateGlSize();    // force GLRenderer.reshape in renderNow
+        refreshPixelScale();
+        if (nativeWindowHandle == 0L) {
+            attachIfNeeded();
+            if (nativeWindowHandle == 0L)
+                return;
+        }
+        if (angleRenderer == null)
+            return;
+
+        Rectangle bounds = hostBounds();
+        if (Platform.isMacOS())
+            // Synchronous so the native drawable is resized before we render — otherwise the frame
+            // renders at the old resolution (oblate) until a later native cycle (a click) fixes it.
+            MacAngleBridge.setFrameSync(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
+        lastHostBounds = bounds;
+        renderNow(GLRenderer.getDisplayedViewpoint());
+    }
+
     public void requestRender() {
         requestRender(GLRenderer.getDisplayedViewpoint());
     }

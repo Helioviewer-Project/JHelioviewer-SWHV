@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.Buttons;
-import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.opengl.GLImage;
 
@@ -39,7 +39,7 @@ public class DifferencePanel implements FilterDetails {
 
         JideButton syncButton = new JideButton(Buttons.sync);
         syncButton.setToolTipText("Synchronize time intervals of other layers");
-        syncButton.addActionListener(e -> MoviePanel.getInstance().syncLayersSpan(layer.getStartTime(), layer.getEndTime()));
+        syncButton.addActionListener(e -> MainFrame.getLayersSectionPanel().syncLayersSpan(layer.getStartTime(), layer.getEndTime()));
         buttonPanel.add(syncButton, BorderLayout.LINE_END);
     }
 

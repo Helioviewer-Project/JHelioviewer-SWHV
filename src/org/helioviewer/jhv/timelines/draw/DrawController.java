@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.event.JHVEventListener;
 import org.helioviewer.jhv.gui.Interfaces;
+import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.UITimer;
-import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.thread.EDTTimer;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
@@ -48,7 +48,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         layersUpdater.stop();
         long start = TimeUtils.ceilSec(selectedAxis.start());
         long end = TimeUtils.floorSec(selectedAxis.end());
-        MoviePanel.getInstance().syncLayersSpan(start, end);
+        MainFrame.getLayersSectionPanel().syncLayersSpan(start, end);
     }
 
     public DrawController() {

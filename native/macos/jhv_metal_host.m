@@ -134,6 +134,19 @@ void *jhv_metal_host_create(void *surfaceLayersPtr, double x, double y, double w
     return result;
 }
 
+static void jhv_apply_frame(JHVMetalHostBox *retainedBox, double x, double y, double width, double height) {
+    @try {
+        CGFloat layerY = jhv_layer_y(retainedBox.windowLayer, y, height);
+        CGFloat windowScale = jhv_window_scale(retainedBox.windowLayer);
+        if (retainedBox.metalLayer.contentsScale != windowScale)
+            retainedBox.metalLayer.contentsScale = windowScale;
+        CGRect frame = CGRectMake(x, layerY, width, height);
+        jhv_set_metal_layer_frame(retainedBox.metalLayer, frame);
+    } @finally {
+        CFRelease((__bridge CFTypeRef)retainedBox);
+    }
+}
+
 void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, double height) {
     if (boxPtr == NULL)
         return;
@@ -141,19 +154,21 @@ void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, do
     JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
     CFRetain((__bridge CFTypeRef)box);
     jhv_run_on_main_async(^{
-        @autoreleasepool {
-            JHVMetalHostBox *retainedBox = box;
-            @try {
-                CGFloat layerY = jhv_layer_y(retainedBox.windowLayer, y, height);
-                CGFloat windowScale = jhv_window_scale(retainedBox.windowLayer);
-                if (retainedBox.metalLayer.contentsScale != windowScale)
-                    retainedBox.metalLayer.contentsScale = windowScale;
-                CGRect frame = CGRectMake(x, layerY, width, height);
-                jhv_set_metal_layer_frame(retainedBox.metalLayer, frame);
-            } @finally {
-                CFRelease((__bridge CFTypeRef)retainedBox);
-            }
-        }
+        @autoreleasepool { jhv_apply_frame(box, x, y, width, height); }
+    });
+}
+
+// Synchronous variant: the CAMetalLayer frame AND drawableSize are updated before returning, so a
+// render issued immediately afterwards draws at the new resolution (no oblate frame, no flash).
+// Used for programmatic resizes (collapsing the sidebar), not the frequent window-drag path.
+void jhv_metal_host_set_frame_sync(void *boxPtr, double x, double y, double width, double height) {
+    if (boxPtr == NULL)
+        return;
+
+    JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
+    CFRetain((__bridge CFTypeRef)box);
+    jhv_run_on_main_sync(^{
+        @autoreleasepool { jhv_apply_frame(box, x, y, width, height); }
     });
 }
 

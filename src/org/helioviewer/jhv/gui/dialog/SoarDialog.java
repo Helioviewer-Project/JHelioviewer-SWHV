@@ -27,6 +27,7 @@ import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.SoarClient;
 
@@ -222,6 +223,8 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
     }
 
     public void showDialog() {
+        // Preset the main window's time range so it does not have to be retyped.
+        timeSelectorPanel.setTime(MoviePanel.getInstance().getStartTime(), MoviePanel.getInstance().getEndTime());
         pack();
         setLocationRelativeTo(MainFrame.get());
         setVisible(true);

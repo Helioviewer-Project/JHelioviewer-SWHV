@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.layers.selector;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -26,7 +24,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.TransferAccess;
@@ -53,7 +50,7 @@ public final class LayersPanel extends JPanel {
     private static final int NUMBEROFVISIBLEROWS = 9;
 
     private final LayersTable grid;
-    private final JPanel optionsPanelWrapper;
+    private final LayerOptionSections sections;
 
     private static class LayersTable extends JTable implements Interfaces.LazyComponent {
 
@@ -130,7 +127,8 @@ public final class LayersPanel extends JPanel {
 
     }
 
-    public LayersPanel() {
+    public LayersPanel(LayerOptionSections sections) {
+        this.sections = sections;
         setLayout(new GridBagLayout());
         LayersTableModel model = new LayersTableModel();
 
@@ -244,11 +242,6 @@ public final class LayersPanel extends JPanel {
         grid.setTransferHandler(new TableRowTransferHandler(grid));
 
         jsp.setPreferredSize(new Dimension(-1, grid.getRowHeight() * NUMBEROFVISIBLEROWS + 1));
-
-        gc.gridy = 1;
-        gc.weighty = 0;
-        optionsPanelWrapper = new JPanel(new BorderLayout());
-        add(optionsPanelWrapper, gc);
     }
 
     public int getGridRowHeight() {
@@ -266,7 +259,7 @@ public final class LayersPanel extends JPanel {
     private void selectExistingRow(int preferredRow) {
         int rowCount = grid.getRowCount();
         if (rowCount == 0) {
-            setOptionsPanel(null);
+            sections.setSelectedLayer(null);
             return;
         }
         int row = Math.min(preferredRow, rowCount - 1);
@@ -275,18 +268,11 @@ public final class LayersPanel extends JPanel {
     }
 
     private void refreshSelectedOptionsPanel() {
-        setOptionsPanel(selectedLayer());
+        sections.setSelectedLayer(selectedLayer());
     }
 
-    public void setOptionsPanel(@Nullable Layer layer) {
-        optionsPanelWrapper.removeAll();
-        Component optionsPanel = layer == null ? null : LayerOptions.getOptionsPanel(layer);
-        if (optionsPanel != null) {
-            ComponentUtils.setEnabled(optionsPanel, layer.isEnabled());
-            optionsPanelWrapper.add(optionsPanel, BorderLayout.CENTER);
-        }
-        revalidate();
-        repaint();
+    public void setSelectedLayer(@Nullable Layer layer) {
+        sections.setSelectedLayer(layer);
     }
 
 }

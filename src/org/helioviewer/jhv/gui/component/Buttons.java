@@ -17,15 +17,19 @@ public class Buttons {
     public static final String forward = MaterialDesign.STEP_FORWARD.toString();
     public static final String record = MaterialDesign.RECORD.toString();
     public static final String check = MaterialDesign.CHECK.toString();
+    public static final String collapseLeft = "<html><font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_LEFT + "</font>";
+    public static final String collapseRight = "<html><font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_RIGHT + "</font>";
 
     public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_RIGHT + "</font>&nbsp;";
     public static final String chevronDown = "<html><font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_DOWN + "</font>&nbsp;";
 
-    public static final String optionsRight = "<html>Options<font face='Material Design Icons' size=4>" +
+    public static final String optionsRight = "<html>Output options<font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_RIGHT;
-    public static final String optionsDown = "<html>Options<font face='Material Design Icons' size=4>" +
+    public static final String optionsDown = "<html>Output options<font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_DOWN;
 
     public static final String adjustmentsRight = "<html>More Adjustments<font face='Material Design Icons' size=4>" +
