@@ -409,18 +409,6 @@ public final class Band extends TimelineLayer {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        return o instanceof Band band && bandType.equals(band.bandType);
-    }
-
-    @Override
-    public int hashCode() {
-        return bandType.hashCode();
-    }
-
-    @Override
     public String toString() {
         return bandType.getName();
     }

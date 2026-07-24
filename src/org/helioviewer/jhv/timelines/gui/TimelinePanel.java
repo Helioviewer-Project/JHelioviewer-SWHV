@@ -11,7 +11,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -284,11 +283,17 @@ public final class TimelinePanel extends JPanel {
         if (bandTypes == null)
             return;
 
-        List<TimelineLayer> predefinedLayers = new ArrayList<>(bandTypes.size());
-        for (BandType bandType : bandTypes)
-            predefinedLayers.add(layers.getOrCreateBand(bandType));
+        layers.replaceBands(bandTypes);
+        selectFirstBand();
+    }
 
-        layers.restore(predefinedLayers);
+    private void selectFirstBand() {
+        for (int row = 0; row < grid.getRowCount(); row++) {
+            if (grid.getValueAt(row, 0) instanceof Band) {
+                selectExistingRow(row);
+                return;
+            }
+        }
         selectExistingRow(0);
     }
 
