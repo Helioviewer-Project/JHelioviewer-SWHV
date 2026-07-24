@@ -38,7 +38,7 @@ public final class Band extends TimelineLayer {
         }
     }
 
-    private record Bar(int x1, int y1, int x2, int y2, Color color) {}
+    private record Bar(int x1, int y1, int x2, int y2, Color levelColor) {}
 
     private record GraphData(List<Polyline> polylines, List<Bar> bars) {}
 
@@ -237,7 +237,7 @@ public final class Band extends TimelineLayer {
         GraphData data = graphData;
         if (!data.bars().isEmpty()) {
             for (Bar bar : data.bars()) {
-                g.setColor(bar.color());
+                g.setColor(bar.levelColor() != null ? bar.levelColor() : graphColor);
                 g.fillRect(bar.x1(), bar.y1(), bar.x2() - bar.x1(), bar.y2() - bar.y1());
             }
         } else if (multicolor && bandType.hasLevels()) {
@@ -324,15 +324,13 @@ public final class Band extends TimelineLayer {
 
                         if (isBar) {
                             for (int i = 0; i < size; i++) {
-                                Color barColor = useMulticolor ? bandType.getLevelColor(floatValues[i]) : null;
-                                if (barColor == null)
-                                    barColor = graphColor;
+                                Color levelColor = useMulticolor ? bandType.getLevelColor(floatValues[i]) : null;
                                 int right = dates[i];
                                 int mappedLeft = xMapper.toPixel(viewpointTime.applyAsLong(list.get(i).milli) - barWidthMillis);
                                 int left = barLeftPixel(mappedLeft, right);
                                 int top = Math.min(yPixels[i], baselineY);
                                 int bottom = Math.max(yPixels[i], baselineY);
-                                resultBars.add(new Bar(left, top, right, bottom, barColor));
+                                resultBars.add(new Bar(left, top, right, bottom, levelColor));
                             }
                         } else {
                             resultPolylines.add(new Polyline(dates, yPixels, (useMulticolor && bandType.hasLevels()) ? floatValues : null));
