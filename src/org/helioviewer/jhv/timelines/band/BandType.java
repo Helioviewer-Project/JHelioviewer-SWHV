@@ -3,6 +3,8 @@ package org.helioviewer.jhv.timelines.band;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import org.helioviewer.jhv.base.Colors;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -159,7 +161,7 @@ public class BandType {
             else
                 max = range.optDouble(1, Double.MAX_VALUE);
             String colorName = jo.optString("color", "black");
-            Color color = namedColor(colorName);
+            Color color = Colors.parseColor(colorName);
             if (color != null)
                 list.add(new Level(min, max, color));
         }
@@ -184,30 +186,6 @@ public class BandType {
         return entries.toArray(PredefinedEntry[]::new);
     }
 
-    private static Color namedColor(String name) {
-        if (name.startsWith("#")) {
-            try {
-                return Color.decode(name);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
-        return switch (name.toLowerCase()) {
-            case "red" -> Color.RED;
-            case "green" -> Color.GREEN;
-            case "blue" -> Color.BLUE;
-            case "yellow" -> Color.YELLOW;
-            case "orange" -> Color.ORANGE;
-            case "cyan" -> Color.CYAN;
-            case "magenta" -> Color.MAGENTA;
-            case "white" -> Color.WHITE;
-            case "black" -> Color.BLACK;
-            case "gray", "grey" -> Color.GRAY;
-            case "pink" -> Color.PINK;
-            default -> null;
-        };
-    }
-
     private static WarningLevel[] parseWarningLevels(JSONArray ja) {
         if (ja == null || ja.length() == 0)
             return new WarningLevel[0];
@@ -219,7 +197,7 @@ public class BandType {
             String label = jo.optString("label", null);
             double value = jo.optDouble("value", 0);
             String colorName = jo.optString("color", "white");
-            Color color = namedColor(colorName);
+            Color color = Colors.parseColor(colorName);
             if (label != null && color != null)
                 list.add(new WarningLevel(label, value, color));
         }
