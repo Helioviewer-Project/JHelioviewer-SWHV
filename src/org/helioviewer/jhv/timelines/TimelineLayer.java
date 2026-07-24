@@ -14,65 +14,71 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 
 import org.json.JSONObject;
 
-public interface TimelineLayer {
+public abstract class TimelineLayer {
 
-    void remove();
+    protected boolean enabled = true;
 
-    void setEnabled(boolean enabled);
+    public abstract void remove();
 
-    boolean isEnabled();
+    public void setEnabled(boolean _enabled) {
+        enabled = _enabled;
+    }
 
-    String getName();
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public abstract String getName();
 
     @Nullable
-    Color getDataColor();
+    public abstract Color getDataColor();
 
-    boolean isDownloading();
+    public abstract boolean isDownloading();
 
-    boolean hasData();
+    public abstract boolean hasData();
 
     @Nullable
-    JPanel getOptionsPanel();
+    public abstract JPanel getOptionsPanel();
 
-    boolean isDeletable();
+    public abstract boolean isDeletable();
 
-    boolean hasYAxis();
+    public abstract boolean hasYAxis();
 
-    void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
+    public abstract void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    YAxis getYAxis();
+    public abstract YAxis getYAxis();
 
-    void fetchData(TimeAxis selectedAxis);
+    public abstract void fetchData(TimeAxis selectedAxis);
 
-    default void graphGeometryChanged() {}
+    public void graphGeometryChanged() {}
 
-    default void yaxisChanged() {}
+    public void yaxisChanged() {}
 
-    default void zoomToFitAxis() {}
+    public void zoomToFitAxis() {}
 
-    default void resetAxis() {}
+    public void resetAxis() {}
 
-    default boolean highlightChanged(Point p) {
+    public boolean highlightChanged(Point p) {
         return false;
     }
 
     @Nullable
-    default String getStringValue(long ts) {
+    public String getStringValue(long ts) {
         return null;
     }
 
     @Nullable
-    default ClickableDrawable getDrawableUnderMouse() {
+    public ClickableDrawable getDrawableUnderMouse() {
         return null;
     }
 
-    void serialize(JSONObject jo);
+    public abstract void serialize(JSONObject jo);
 
-    default boolean isPropagated() {
+    public boolean isPropagated() {
         return false;
     }
 
-    default long getObservationTime(long ts) {
+    public long getObservationTime(long ts) {
         return ts;
     }
 

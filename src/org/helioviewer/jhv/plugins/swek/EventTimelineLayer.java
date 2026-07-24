@@ -18,7 +18,7 @@ import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -29,7 +29,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis.YAxisIdentityScale;
 import org.json.JSONObject;
 
 // has to be public for state
-public final class EventTimelineLayer extends AbstractTimelineLayer implements JHVEventListener.Handle {
+public final class EventTimelineLayer extends TimelineLayer implements JHVEventListener.Handle {
 
     private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
     private EventPlotConfiguration eventUnderMouse;
@@ -39,7 +39,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
         registerAndRefresh();
     }
 
-    public static AbstractTimelineLayer deserialize(JSONObject ignore) { // has to be implemented for state
+    public static TimelineLayer deserialize(JSONObject ignore) { // has to be implemented for state
         return new EventTimelineLayer();
     }
 

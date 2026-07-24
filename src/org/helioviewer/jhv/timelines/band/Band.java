@@ -17,7 +17,7 @@ import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
+import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
@@ -28,7 +28,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public final class Band extends AbstractTimelineLayer {
+public final class Band extends TimelineLayer {
 
     record Data(BandType bandType, long[] dates, float[] values) {}
 
@@ -102,7 +102,7 @@ public final class Band extends AbstractTimelineLayer {
         jo.put("multicolor", multicolor);
     }
 
-    public static AbstractTimelineLayer deserialize(JSONObject jo) throws Exception { // has to be implemented for state
+    public static TimelineLayer deserialize(JSONObject jo) throws Exception { // has to be implemented for state
         JSONObject jobt = jo.optJSONObject("bandType");
         if (jobt == null)
             throw new Exception("Missing bandType: " + jo);
