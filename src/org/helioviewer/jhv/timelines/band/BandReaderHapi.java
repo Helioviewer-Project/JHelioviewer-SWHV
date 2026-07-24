@@ -93,18 +93,14 @@ public class BandReaderHapi {
             onCatalogLoaded.run();
     }
 
-    public static LinkedHashMap<String, List<BandType>> getPredefinedGroups() {
+    public static Map<String, List<BandType>> getPredefinedGroups() {
         LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
         if (theCatalog == null)
             return groups;
         for (BandType type : theCatalog.types) {
             BandType.PredefinedEntry[] entries = type.getPredefinedEntries();
-            if (entries != null) {
-                for (BandType.PredefinedEntry entry : entries) {
-                    if (entry.name() != null)
-                        groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
-                }
-            }
+            for (BandType.PredefinedEntry entry : entries)
+                groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
         }
         for (var e : groups.entrySet())
             e.getValue().sort((a, b) -> Integer.compare(orderFor(a, e.getKey()), orderFor(b, e.getKey())));
@@ -113,11 +109,9 @@ public class BandReaderHapi {
 
     private static int orderFor(BandType type, String groupName) {
         BandType.PredefinedEntry[] entries = type.getPredefinedEntries();
-        if (entries != null) {
-            for (BandType.PredefinedEntry entry : entries) {
-                if (groupName.equals(entry.name()))
-                    return entry.order();
-            }
+        for (BandType.PredefinedEntry entry : entries) {
+            if (groupName.equals(entry.name()))
+                return entry.order();
         }
         return 0;
     }
@@ -134,9 +128,9 @@ public class BandReaderHapi {
 
     private record BandReader(BandType type, HapiTableReader tableReader) {}
 
-  private record Parameter(String name, String units, String scale, JSONArray range, JSONArray predefined,
-                              String plotType, long barWidth, JSONArray levels,
-                              JSONArray warningLevels) {}
+    private record Parameter(String name, String units, String scale, JSONArray range, JSONArray predefined,
+                             String plotType, long barWidth, JSONArray levels,
+                             JSONArray warningLevels) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -275,6 +269,8 @@ public class BandReaderHapi {
             scale = jhvparams.optString("scale", null);
             range = jhvparams.optJSONArray("range");
             predefined = jhvparams.optJSONArray("predefined");
+            if (predefined == null)
+                predefined = jhvparams.optJSONArray("groups");
             plotType = jhvparams.optString("plottype", null);
             barWidth = jhvparams.optLong("barWidth", 0);
             levels = jhvparams.optJSONArray("levels");

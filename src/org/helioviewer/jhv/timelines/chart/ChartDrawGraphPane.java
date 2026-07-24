@@ -202,7 +202,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 setCursor(UIGlobals.openHandCursor);
                 if (mousePressedPosition != null && chartDragged) {
                     DrawController.moveX(mousePressedPosition.x - p.x);
-                    DrawController.moveAllAxes(p.y - mousePressedPosition.y);
+                    DrawController.moveAllAxes(p, p.y - mousePressedPosition.y);
                 }
             }
             case MOVIELINE -> DrawController.setMovieFrame(p);

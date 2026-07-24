@@ -12,8 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
@@ -231,7 +231,7 @@ public final class TimelinePanel extends JPanel {
                     if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
-                } else if (v.col == LINECOLOR_COL && timeline instanceof Band band) {
+                } else if (v.col == LINECOLOR_COL && timeline instanceof Band band && band.hasLevelColors()) {
                     band.setMulticolor(!band.isMulticolor());
                     layers.updateCell(v.row, v.col);
                 } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
@@ -283,7 +283,7 @@ public final class TimelinePanel extends JPanel {
     }
 
     private void loadPredefinedGroup(String groupName) {
-        LinkedHashMap<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
+        Map<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
         List<BandType> bandTypes = groups.get(groupName);
         if (bandTypes == null)
             return;
@@ -298,7 +298,7 @@ public final class TimelinePanel extends JPanel {
 
     private void refreshPredefinedCombo() {
         suppressComboAction = true;
-        LinkedHashMap<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
+        Map<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
         List<String> items = new ArrayList<>();
         items.add(NONE_ITEM);
         items.addAll(groups.keySet());

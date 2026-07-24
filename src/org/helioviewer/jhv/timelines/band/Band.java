@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.event.GOESLevel;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -63,13 +64,14 @@ public final class Band extends AbstractTimelineLayer {
     private BandCache bandCache;
     private Color graphColor = bandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
-    private boolean multicolor = true;
+    private boolean multicolor;
     private Runnable onColorChanged;
 
     public boolean drawWarnings = true;
 
     private Band(BandType _bandType) {
         bandType = _bandType;
+        multicolor = bandType.hasLevels();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
         warnPixels = new int[bandType.getWarningLevels().length];
         // those should be cleared
@@ -103,6 +105,7 @@ public final class Band extends AbstractTimelineLayer {
     public void serialize(JSONObject jo) {
         bandType.serialize(jo);
         jo.put("color", new JSONObject().put("r", graphColor.getRed()).put("g", graphColor.getGreen()).put("b", graphColor.getBlue()));
+        jo.put("multicolor", multicolor);
     }
 
     public static AbstractTimelineLayer deserialize(JSONObject jo) throws Exception { // has to be implemented for state
@@ -118,6 +121,7 @@ public final class Band extends AbstractTimelineLayer {
             int b = Math.clamp(jcolor.optInt("b", 0), 0, 255);
             band.setDataColor(new Color(r, g, b));
         }
+        band.multicolor = band.hasLevelColors() && jo.optBoolean("multicolor", band.bandType.hasLevels());
         return band;
     }
 
@@ -178,8 +182,16 @@ public final class Band extends AbstractTimelineLayer {
         return multicolor;
     }
 
+    public boolean hasLevelColors() {
+        return bandType.hasLevels();
+    }
+
+    public boolean hasWarningLevels() {
+        return bandType.hasWarningLevels();
+    }
+
     public void setMulticolor(boolean _multicolor) {
-        multicolor = _multicolor;
+        multicolor = hasLevelColors() && _multicolor;
         updateGraph();
         notifyColorChanged();
     }
@@ -228,7 +240,7 @@ public final class Band extends AbstractTimelineLayer {
                 g.setColor(bar.color());
                 g.fillRect(bar.x1(), bar.y1(), bar.x2() - bar.x1(), bar.y2() - bar.y1());
             }
-        } else if (multicolor && bandType.getLevels() != null) {
+        } else if (multicolor && bandType.hasLevels()) {
             for (Polyline line : polylines) {
                 int[] xp = line.xPoints();
                 int[] yp = line.yPoints();
@@ -247,7 +259,8 @@ public final class Band extends AbstractTimelineLayer {
         if (drawWarnings) {
             BandType.WarningLevel[] wls = bandType.getWarningLevels();
             for (int i = 0; i < warnPixels.length; i++) {
-                g.setColor(wls[i].color());
+                Color warningColor = wls[i].color();
+                g.setColor(warningColor == null ? graphColor : warningColor);
                 g.drawLine(graphArea.x, warnPixels[i], graphArea.x + graphArea.width, warnPixels[i]);
                 g.drawString(wls[i].label(), graphArea.x, warnPixels[i] - 2);
             }
@@ -276,9 +289,11 @@ public final class Band extends AbstractTimelineLayer {
 
         LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
         TimeAxis.Mapper xMapper = geometry.xMapper(timeAxis);
-        final boolean isBar = "bar".equals(bandType.getPlotType());
+        final boolean isBar = "bar".equals(bandType.getPlotType()) && bandType.getBarWidth() > 0;
         final long barWidthMillis = isBar ? bandType.getBarWidth() * 1000 : 0;
-        List<List<BandCache.DateValue>> rawData = bandCache.getValues(SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width, start - barWidthMillis, end + barWidthMillis);
+        List<List<BandCache.DateValue>> rawData = bandCache.getValues(
+                SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width,
+                start - barWidthMillis, end + barWidthMillis);
         final int baselineY = yMapper.dataToPixel(0);
         final boolean useMulticolor = multicolor;
 
@@ -308,16 +323,15 @@ public final class Band extends AbstractTimelineLayer {
                                 Color barColor = useMulticolor ? bandType.getLevelColor(floatValues[i]) : null;
                                 if (barColor == null)
                                     barColor = graphColor;
-      int right = dates[i];
-                                 int left = xMapper.toPixel(viewpointTime.applyAsLong(list.get(i).milli) - barWidthMillis);
-                                 int barWidth = Math.max(1, right - left);
-                                 int gap = barWidth / 40;
+                                int right = dates[i];
+                                int mappedLeft = xMapper.toPixel(viewpointTime.applyAsLong(list.get(i).milli) - barWidthMillis);
+                                int left = barLeftPixel(mappedLeft, right);
                                 int top = Math.min(yPixels[i], baselineY);
                                 int bottom = Math.max(yPixels[i], baselineY);
-                                result.add(new Bar(left + gap, top, right, bottom, barColor));
+                                result.add(new Bar(left, top, right, bottom, barColor));
                             }
                         } else {
-                            result.add(new Polyline(dates, yPixels, (useMulticolor && bandType.getLevels() != null) ? floatValues : null));
+                            result.add(new Polyline(dates, yPixels, (useMulticolor && bandType.hasLevels()) ? floatValues : null));
                         }
                     }
                     return result;
@@ -344,7 +358,15 @@ public final class Band extends AbstractTimelineLayer {
         if (val == YAxis.BLANK) {
             return "--";
         }
+        if (bandType.isXRSB())
+            return GOESLevel.getStringValue(val);
         return DrawConstants.valueFormatter.format(yAxis.scale(val));
+    }
+
+    static int barLeftPixel(int mappedLeft, int right) {
+        int width = Math.max(1, right - mappedLeft);
+        int gap = width / 40;
+        return right - width + gap;
     }
 
     @Override
