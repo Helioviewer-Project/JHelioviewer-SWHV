@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class BandReaderHapi {
             //new CatalogEndpoint("ROB Test", "http://swhv-test:4000/hapi/")
     };
 
-    private static final LinkedHashMap<String, CatalogSource> catalogs = new LinkedHashMap<>();
+    private static final HashMap<CatalogEndpoint, Catalog> catalogs = new HashMap<>();
     private static Runnable onCatalogLoaded;
 
     public static void setOnCatalogLoaded(@Nullable Runnable callback) {
@@ -62,7 +63,7 @@ public class BandReaderHapi {
             String server = catalogEndpoint.server;
             String endpoint = server.endsWith("/") ? server : server + '/';
             Task.submit(endpoint, new LoadHapiCatalog(endpoint),
-                    catalog -> onSuccessCatalog(catalogEndpoint.groupName, endpoint, catalog),
+                    catalog -> onSuccessCatalog(catalogEndpoint, catalog),
                     BandReaderHapi::onFailure);
         }
     }
@@ -101,10 +102,9 @@ public class BandReaderHapi {
             BandDataProvider.acceptData(line);
     }
 
-    private static void onSuccessCatalog(String group, String endpoint, @Nonnull Catalog catalog) {
-        CatalogSource source = new CatalogSource(group, catalog);
-        catalogs.put(endpoint, source);
-        Timelines.td.setupDataset(source.groupName, source.catalog.types);
+    private static void onSuccessCatalog(CatalogEndpoint endpoint, @Nonnull Catalog catalog) {
+        catalogs.put(endpoint, catalog);
+        Timelines.td.setupDataset(endpoint.groupName, catalog.types);
         if (onCatalogLoaded != null)
             onCatalogLoaded.run();
     }
@@ -113,12 +113,15 @@ public class BandReaderHapi {
         if (catalogs.isEmpty())
             return Map.of();
         if (catalogs.size() == 1)
-            return catalogs.values().iterator().next().catalog.predefinedGroups;
+            return catalogs.values().iterator().next().predefinedGroups;
 
         LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
-        for (CatalogSource source : catalogs.values()) {
-            source.catalog.predefinedGroups.forEach((name, bandTypes) ->
-                    groups.computeIfAbsent(name, k -> new ArrayList<>()).addAll(bandTypes));
+        for (CatalogEndpoint endpoint : catalogEndpoints) {
+            Catalog catalog = catalogs.get(endpoint);
+            if (catalog != null) {
+                catalog.predefinedGroups.forEach((name, bandTypes) ->
+                        groups.computeIfAbsent(name, k -> new ArrayList<>()).addAll(bandTypes));
+            }
         }
         return finishPredefinedGroups(groups);
     }
@@ -142,9 +145,9 @@ public class BandReaderHapi {
 
     @Nullable
     private static Catalog findCatalog(String baseUrl) {
-        for (CatalogSource source : catalogs.values()) {
-            if (source.catalog.parameters.containsKey(baseUrl))
-                return source.catalog;
+        for (Catalog catalog : catalogs.values()) {
+            if (catalog.parameters.containsKey(baseUrl))
+                return catalog;
         }
         return null;
     }
@@ -163,8 +166,6 @@ public class BandReaderHapi {
     }
 
     private record CatalogEndpoint(String groupName, String server) {}
-
-    private record CatalogSource(String groupName, Catalog catalog) {}
 
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types,
                            Map<String, List<BandType>> predefinedGroups) {}
