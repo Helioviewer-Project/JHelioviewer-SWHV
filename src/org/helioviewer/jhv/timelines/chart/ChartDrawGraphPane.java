@@ -304,4 +304,14 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         repaint();
     }
 
+    @Override
+    public void layoutChanged() {
+        Dimension preferredSize = getPreferredSize();
+        int minimumHeight = DrawController.getGeometry().minimumHeight();
+        if (preferredSize.height != minimumHeight) {
+            setPreferredSize(new Dimension(preferredSize.width, minimumHeight));
+            revalidate();
+        }
+    }
+
 }
