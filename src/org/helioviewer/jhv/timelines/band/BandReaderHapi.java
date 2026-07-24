@@ -3,6 +3,7 @@ package org.helioviewer.jhv.timelines.band;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,8 +103,8 @@ public class BandReaderHapi {
             for (BandType.PredefinedEntry entry : entries)
                 groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
         }
-        for (var e : groups.entrySet())
-            e.getValue().sort((a, b) -> Integer.compare(orderFor(a, e.getKey()), orderFor(b, e.getKey())));
+        for (Map.Entry<String, List<BandType>> e : groups.entrySet())
+            e.getValue().sort(Comparator.comparingInt(type -> orderFor(type, e.getKey())));
         return groups;
     }
 
@@ -234,7 +235,7 @@ public class BandReaderHapi {
             }
             if (p.plotType != null) {
                 jobt.put("plottype", p.plotType)
-                    .put("barWidth", p.barWidth);
+                        .put("barWidth", p.barWidth);
             }
             if (p.levels != null) {
                 jobt.put("levels", p.levels);
