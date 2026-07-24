@@ -43,6 +43,7 @@ public final class Band extends AbstractTimelineLayer {
 
     private record GraphData(List<Polyline> polylines, List<Bar> bars) {}
 
+    private static final GraphData EMPTY_GRAPH_DATA = new GraphData(List.of(), List.of());
     private static final Colors.Data bandColors = new Colors.Data();
     private static final HashMap<BandType, Band> bandMap = new HashMap<>();
 
@@ -58,12 +59,11 @@ public final class Band extends AbstractTimelineLayer {
 
     private final YAxis yAxis;
     private final int[] warnPixels;
-    private final List<Polyline> polylines = new ArrayList<>();
-    private final List<Bar> bars = new ArrayList<>();
     private final LatestWorker<GraphData> graphWorker = new LatestWorker<>("Timeline-Graph");
 
     private RequestCache requestCache;
     private BandCache bandCache;
+    private GraphData graphData = EMPTY_GRAPH_DATA;
     private Color graphColor = bandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
     private boolean multicolor;
@@ -156,6 +156,7 @@ public final class Band extends AbstractTimelineLayer {
     @Override
     public void remove() {
         graphWorker.cancel();
+        graphData = EMPTY_GRAPH_DATA;
         BandDataProvider.stopDownloads(this);
         // clear caches
         requestCache = new RequestCache();
@@ -239,13 +240,14 @@ public final class Band extends AbstractTimelineLayer {
         if (!enabled)
             return;
 
-        if (!bars.isEmpty()) {
-            for (Bar bar : bars) {
+        GraphData data = graphData;
+        if (!data.bars().isEmpty()) {
+            for (Bar bar : data.bars()) {
                 g.setColor(bar.color());
                 g.fillRect(bar.x1(), bar.y1(), bar.x2() - bar.x1(), bar.y2() - bar.y1());
             }
         } else if (multicolor && bandType.hasLevels()) {
-            for (Polyline line : polylines) {
+            for (Polyline line : data.polylines()) {
                 int[] xp = line.xPoints();
                 int[] yp = line.yPoints();
                 float[] vals = line.values();
@@ -257,7 +259,7 @@ public final class Band extends AbstractTimelineLayer {
             }
         } else {
             g.setColor(graphColor);
-            polylines.forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length()));
+            data.polylines().forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length()));
         }
 
         if (drawWarnings) {
@@ -345,10 +347,7 @@ public final class Band extends AbstractTimelineLayer {
                     if (!fresh)
                         return;
 
-                    polylines.clear();
-                    polylines.addAll(result.polylines());
-                    bars.clear();
-                    bars.addAll(result.bars());
+                    graphData = result;
                     DrawController.drawRequest();
                 });
     }
@@ -413,12 +412,12 @@ public final class Band extends AbstractTimelineLayer {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        return o instanceof Band && o.toString().equals(toString());
+        return o instanceof Band band && bandType.equals(band.bandType);
     }
 
     @Override
     public int hashCode() {
-        return toString().hashCode();
+        return bandType.hashCode();
     }
 
     @Override
