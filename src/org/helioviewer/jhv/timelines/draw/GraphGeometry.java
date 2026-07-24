@@ -72,11 +72,6 @@ public final class GraphGeometry {
         return area;
     }
 
-    @Nullable
-    public TimelineLayer getLayer(int index) {
-        return index >= 0 && index < layerLayouts.size() ? layerLayouts.get(index).layer() : null;
-    }
-
     public Rectangle size() {
         return size;
     }
@@ -129,17 +124,16 @@ public final class GraphGeometry {
         return size.height - p.y - area.y;
     }
 
-    public int layerIndexAtPoint(Point p) {
-        if (!stacked) {
-            return -1;
+    @Nullable
+    public LayerLayout getLayerLayout(Point p) {
+        if (!stacked)
+            return null;
+        for (LayerLayout layout : layerLayouts) {
+            Rectangle r = layout.area();
+            if (p.x <= r.x + r.width && p.y >= r.y && p.y <= r.y + r.height)
+                return layout;
         }
-        for (int i = 0; i < layerLayouts.size(); i++) {
-            Rectangle r = layerLayouts.get(i).area();
-            if (p.x >= r.x && p.x <= r.x + r.width && p.y >= r.y && p.y <= r.y + r.height) {
-                return i;
-            }
-        }
-        return -1;
+        return null;
     }
 
     public YAxisHit yAxisHit(Point p) {
