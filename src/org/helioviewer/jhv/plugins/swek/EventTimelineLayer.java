@@ -178,7 +178,7 @@ public final class EventTimelineLayer extends AbstractTimelineLayer implements J
     }
 
     @Override
-    public boolean showYAxis() {
+    public boolean hasYAxis() {
         return false;
     }
 

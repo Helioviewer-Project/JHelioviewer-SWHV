@@ -40,14 +40,16 @@ public class TimelineLayers extends AbstractTableModel {
             if (!layer.isEnabled())
                 continue;
 
-            Rectangle area = stackedMode && layer.showYAxis() ? geometry.getLayerArea(layer) : graphArea;
+            Rectangle area = stackedMode && layer.hasYAxis() ? geometry.getLayerArea(layer) : graphArea;
 
             g.setClip(area);
             if (layer instanceof Band band) {
-                band.drawWarnings = stackedMode || !warningBandDrawn;
+                boolean drawWarnings = stackedMode || !warningBandDrawn;
                 warningBandDrawn |= band.hasWarningLevels();
+                band.draw(g, area, timeAxis, mousePosition, drawWarnings);
+            } else {
+                layer.draw(g, area, timeAxis, mousePosition);
             }
-            layer.draw(g, area, timeAxis, mousePosition);
         }
         g.setClip(graphArea);
     }
@@ -150,21 +152,17 @@ public class TimelineLayers extends AbstractTableModel {
     public static void forEachYAxis(ObjIntConsumer<TimelineLayer> consumer) {
         int axisIndex = -1;
         for (TimelineLayer tl : layers) {
-            if (tl.showYAxis()) {
+            if (tl.isEnabled() && tl.hasYAxis()) {
                 consumer.accept(tl, axisIndex);
                 axisIndex++;
             }
         }
     }
 
-    public static int getNumberOfYAxes() {
-        return count(TimelineLayer::showYAxis);
-    }
-
     public static List<TimelineLayer> getVisibleYAxisLayers() {
         List<TimelineLayer> result = new ArrayList<>();
         for (TimelineLayer tl : layers) {
-            if (tl.showYAxis() && tl.isEnabled()) {
+            if (tl.isEnabled() && tl.hasYAxis()) {
                 result.add(tl);
             }
         }
@@ -189,7 +187,7 @@ public class TimelineLayers extends AbstractTableModel {
         boolean changed = false;
         int axisIndex = -1;
         for (TimelineLayer tl : layers) {
-            if (tl.showYAxis()) {
+            if (tl.isEnabled() && tl.hasYAxis()) {
                 boolean highlighted = hit != null && hit.targets(axisIndex);
                 changed = changed || tl.getYAxis().isHighlighted() != highlighted;
                 tl.getYAxis().setHighlighted(highlighted);

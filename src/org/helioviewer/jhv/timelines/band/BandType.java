@@ -19,7 +19,7 @@ public class BandType {
     private final double min;
     private final double max;
     private final String scale;
-    private final String bandCacheType;
+    private final CacheType cacheType;
     private final boolean isXRSB;
 
     private record Level(double min, double max, Color color) {}
@@ -29,7 +29,7 @@ public class BandType {
     record PredefinedEntry(String name, int order) {}
 
     private final PredefinedEntry[] predefinedEntries;
-    private final String plotType;
+    private final PlotType plotType;
     private final long barWidth;
     private final Level[] levels;
 
@@ -57,10 +57,10 @@ public class BandType {
         }
 
         scale = jo.optString("scale", "linear");
-        bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
+        cacheType = CacheType.parse(jo.optString("bandCacheType", "BandCacheMinute"));
         predefinedEntries = parsePredefinedEntries(jo.optJSONArray("predefined"));
 
-        plotType = jo.optString("plottype", null);
+        plotType = PlotType.parse(jo.optString("plottype", null));
         barWidth = Math.max(0, jo.optLong("barWidth", 0));
         levels = parseLevels(jo.optJSONArray("levels"));
 
@@ -79,8 +79,8 @@ public class BandType {
         return name;
     }
 
-    String getBandCacheType() {
-        return bandCacheType;
+    boolean cacheAllValues() {
+        return cacheType == CacheType.ALL;
     }
 
     String getScale() {
@@ -111,8 +111,8 @@ public class BandType {
         return predefinedEntries;
     }
 
-    String getPlotType() {
-        return plotType;
+    boolean isBarPlot() {
+        return plotType == PlotType.BAR;
     }
 
     long getBarWidth() {
@@ -232,6 +232,22 @@ public class BandType {
         for (int i = 0; i < result.length; i++)
             result[i] = new WarningLevel(xWarnLabels[i], xWarnValues[i], null);
         return result;
+    }
+
+    private enum CacheType {
+        ALL, MINUTE;
+
+        static CacheType parse(String value) {
+            return "BandCacheAll".equals(value) ? ALL : MINUTE;
+        }
+    }
+
+    private enum PlotType {
+        BAR, LINE;
+
+        static PlotType parse(String value) {
+            return "bar".equals(value) ? BAR : LINE;
+        }
     }
 
     @Override

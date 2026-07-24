@@ -319,7 +319,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void graphAreaChanged() {
-        geometry.layout(Math.max(0, TimelineLayers.getNumberOfPropagationAxes()), TimelineLayers.getNumberOfYAxes(),
+        geometry.layout(Math.max(0, TimelineLayers.getNumberOfPropagationAxes()),
                 stacked, TimelineLayers.getVisibleYAxisLayers());
         setAvailableInterval();
     }

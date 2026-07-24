@@ -351,7 +351,7 @@ public class BandReaderHapi {
 
         long[] dates = longArray(numPoints, dateList);
         float[] values = floatArray(numPoints, valueList);
-        DatesValues dvs = "bar".equals(type.getPlotType())
+        DatesValues dvs = type.isBarPlot()
                 ? new DatesValues(dates, new float[][]{values})
                 : new DatesValues(dates, new float[][]{values}).rebin();
 
