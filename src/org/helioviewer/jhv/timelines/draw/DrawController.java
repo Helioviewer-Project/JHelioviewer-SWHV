@@ -39,7 +39,6 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     private static long currentTime;
 
     private static boolean locked;
-    private static boolean stacked;
     private static final EDTTimer layersUpdater = new EDTTimer(1000 / 2, DrawController::syncLockedLayers);
 
     static {
@@ -65,7 +64,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         js.put("endTime", TimeUtils.format(selectedAxis.end()));
         jo.put("selectedAxis", js);
         jo.put("locked", locked);
-        jo.put("stacked", stacked);
+        jo.put("stacked", geometry.isStacked());
     }
 
     public static void loadState(JSONObject jo) {
@@ -262,12 +261,8 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     static void setStacked(boolean _stacked) {
-        stacked = _stacked;
+        geometry.setStacked(_stacked);
         layoutChanged();
-    }
-
-    static boolean isStacked() {
-        return stacked;
     }
 
     @Override
@@ -307,7 +302,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void layoutChanged() {
-        geometry.layout(stacked, TimelineLayers.get());
+        geometry.layout(TimelineLayers.get());
         TimelineLayers.get().forEach(TimelineLayer::graphGeometryChanged);
         drawRequest();
     }

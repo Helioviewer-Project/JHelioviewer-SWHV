@@ -28,8 +28,11 @@ public final class GraphGeometry {
         size = new Rectangle(graphSize.x, graphSize.y, Math.max(1, graphSize.width), Math.max(1, graphSize.height));
     }
 
-    public void layout(boolean _stacked, List<TimelineLayer> layers) {
+    void setStacked(boolean _stacked) {
         stacked = _stacked;
+    }
+
+    public void layout(List<TimelineLayer> layers) {
         layerLayouts.clear();
         propagatedLayers.clear();
 
