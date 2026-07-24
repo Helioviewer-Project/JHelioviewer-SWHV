@@ -8,6 +8,9 @@ import org.json.JSONObject;
 
 public class BandType {
 
+    private static final String[] xWarnLabels = {"B", "C", "M", "X"};
+    private static final double[] xWarnValues = {1e-7, 1e-6, 1e-5, 1e-4};
+
     private final String name;
     private final String baseUrl;
     private final String label;
@@ -17,6 +20,7 @@ public class BandType {
     private final double max;
     private final String scale;
     private final String bandCacheType;
+    private final boolean isXRSB;
     private record Level(double min, double max, Color color) {}
 
     record WarningLevel(String label, double value, Color color) {}
@@ -53,23 +57,17 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
         bandCacheType = jo.optString("bandCacheType", "BandCacheMinute");
-        JSONArray predefinedArray = jo.optJSONArray("predefined");
-        if (predefinedArray != null && predefinedArray.length() > 0) {
-            predefinedEntries = new PredefinedEntry[predefinedArray.length()];
-            for (int i = 0; i < predefinedArray.length(); i++) {
-                JSONObject pe = predefinedArray.optJSONObject(i);
-                if (pe != null)
-                    predefinedEntries[i] = new PredefinedEntry(pe.optString("name", null), pe.optInt("order", 0));
-            }
-        } else {
-            predefinedEntries = null;
-        }
+        predefinedEntries = parsePredefinedEntries(jo.optJSONArray("predefined"));
 
         plotType = jo.optString("plottype", null);
-        barWidth = jo.optLong("barWidth", 0);
+        barWidth = Math.max(0, jo.optLong("barWidth", 0));
         levels = parseLevels(jo.optJSONArray("levels"));
 
-        warningLevels = parseWarningLevels(jo.optJSONArray("warninglevels"));
+        isXRSB = label.contains("XRAY long");
+        WarningLevel[] parsedWarningLevels = parseWarningLevels(jo.optJSONArray("warninglevels"));
+        warningLevels = parsedWarningLevels.length == 0 && isXRSB
+                ? defaultXRayWarningLevels()
+                : parsedWarningLevels;
     }
 
     void serialize(JSONObject jo) {
@@ -120,8 +118,16 @@ public class BandType {
         return barWidth;
     }
 
-    Level[] getLevels() {
-        return levels;
+    boolean hasLevels() {
+        return levels != null;
+    }
+
+    boolean hasWarningLevels() {
+        return warningLevels.length > 0;
+    }
+
+    boolean isXRSB() {
+        return isXRSB;
     }
 
     Color getLevelColor(double value) {
@@ -158,6 +164,24 @@ public class BandType {
                 list.add(new Level(min, max, color));
         }
         return list.isEmpty() ? null : list.toArray(Level[]::new);
+    }
+
+    private static PredefinedEntry[] parsePredefinedEntries(JSONArray ja) {
+        if (ja == null || ja.length() == 0)
+            return new PredefinedEntry[0];
+
+        ArrayList<PredefinedEntry> entries = new ArrayList<>();
+        for (int i = 0; i < ja.length(); i++) {
+            Object value = ja.opt(i);
+            if (value instanceof JSONObject jo) {
+                String name = jo.optString("name", null);
+                if (name != null)
+                    entries.add(new PredefinedEntry(name, jo.optInt("order", 0)));
+            } else if (value instanceof String name && !name.isBlank()) {
+                entries.add(new PredefinedEntry(name, 0));
+            }
+        }
+        return entries.toArray(PredefinedEntry[]::new);
     }
 
     private static Color namedColor(String name) {
@@ -200,6 +224,13 @@ public class BandType {
                 list.add(new WarningLevel(label, value, color));
         }
         return list.toArray(WarningLevel[]::new);
+    }
+
+    private static WarningLevel[] defaultXRayWarningLevels() {
+        WarningLevel[] result = new WarningLevel[xWarnLabels.length];
+        for (int i = 0; i < result.length; i++)
+            result[i] = new WarningLevel(xWarnLabels[i], xWarnValues[i], null);
+        return result;
     }
 
     @Override

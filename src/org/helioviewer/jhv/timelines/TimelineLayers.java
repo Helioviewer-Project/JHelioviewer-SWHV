@@ -35,7 +35,7 @@ public class TimelineLayers extends AbstractTableModel {
         GraphGeometry geometry = DrawController.getGeometry();
         boolean stackedMode = geometry.isStacked();
         int yAxisIndex = 0;
-        boolean firstBand = true;
+        boolean warningBandDrawn = false;
 
         for (TimelineLayer layer : layers) {
             if (!layer.isEnabled())
@@ -51,8 +51,8 @@ public class TimelineLayers extends AbstractTableModel {
 
             g.setClip(area);
             if (layer instanceof Band band) {
-                band.drawWarnings = stackedMode || firstBand;
-                firstBand = false;
+                band.drawWarnings = stackedMode || !warningBandDrawn;
+                warningBandDrawn |= band.hasWarningLevels();
             }
             layer.draw(g, area, timeAxis, mousePosition);
         }
@@ -86,8 +86,7 @@ public class TimelineLayers extends AbstractTableModel {
             return;
         layers.add(tl);
 
-        if (tl instanceof Band band)
-            band.setOnColorChanged(() -> updateCell(layers.indexOf(band), TimelinePanel.LINECOLOR_COL));
+        configureLayer(tl);
 
         int row = layers.size() - 1;
         fireTableRowsInserted(row, row);
@@ -119,6 +118,7 @@ public class TimelineLayers extends AbstractTableModel {
 
         layers.clear();
         layers.addAll(restoredLayers);
+        restoredLayers.forEach(this::configureLayer);
         fireTableDataChanged();
         DrawController.graphAreaChanged();
     }
@@ -200,7 +200,7 @@ public class TimelineLayers extends AbstractTableModel {
             if (!tl.isEnabled() || !tl.showYAxis()) {
                 continue;
             }
-            if (tl == layer) {
+            if (tl.equals(layer)) {
                 return geometry.getLayerArea(index);
             }
             index++;
@@ -244,6 +244,11 @@ public class TimelineLayers extends AbstractTableModel {
             }
         }
         return ct;
+    }
+
+    private void configureLayer(TimelineLayer layer) {
+        if (layer instanceof Band band)
+            band.setOnColorChanged(() -> updateCell(layers.indexOf(band), TimelinePanel.LINECOLOR_COL));
     }
 
 }

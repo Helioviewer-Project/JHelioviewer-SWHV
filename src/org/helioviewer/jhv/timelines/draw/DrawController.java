@@ -127,6 +127,14 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     public static void resetAxis(Point p) {
+        if (geometry.isStacked()) {
+            TimelineLayer layer = getStackedLayer(p);
+            if (layer != null)
+                layer.resetAxis();
+            drawRequest();
+            return;
+        }
+
         GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
         if (hit.outsideAxes()) {
             TimelineLayers.forEachYAxis((tl, axisIndex) -> tl.zoomToFitAxis());
@@ -144,21 +152,18 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             return;
 
         if (geometry.isStacked()) {
-            int layerIdx = geometry.layerIndexAtPoint(p);
-            if (layerIdx >= 0) {
-                TimelineLayer tl = TimelineLayers.getVisibleYAxisLayerAt(layerIdx);
-                if (tl != null) {
-                    moveYAxis(tl, distanceY);
-                }
-            }
+            int layerIndex = getStackedLayerIndex(p);
+            TimelineLayer layer = TimelineLayers.getVisibleYAxisLayerAt(layerIndex);
+            if (layer != null)
+                moveYAxis(layer, distanceY, geometry.getLayerArea(layerIndex).height);
         } else {
             GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
             if (hit.outsideAxes()) {
-                TimelineLayers.forEachYAxis((tl, axisIndex) -> moveYAxis(tl, distanceY));
+                TimelineLayers.forEachYAxis((tl, axisIndex) -> moveYAxis(tl, distanceY, geometry.graphHeight()));
             } else {
                 TimelineLayers.forEachYAxis((tl, axisIndex) -> {
                     if (hit.targets(axisIndex))
-                        moveYAxis(tl, distanceY);
+                        moveYAxis(tl, distanceY, geometry.graphHeight());
                 });
             }
         }
@@ -170,15 +175,13 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             return;
 
         if (geometry.isStacked()) {
-            int layerIdx = geometry.layerIndexAtPoint(p);
-            if (layerIdx >= 0) {
-                TimelineLayer tl = TimelineLayers.getVisibleYAxisLayerAt(layerIdx);
-                if (tl != null) {
-                    Rectangle stripArea = geometry.getLayerArea(layerIdx);
-                    tl.getYAxis().zoomSelectedRange(scrollDistance,
+            int layerIndex = getStackedLayerIndex(p);
+            TimelineLayer layer = TimelineLayers.getVisibleYAxisLayerAt(layerIndex);
+            if (layer != null) {
+                Rectangle stripArea = geometry.getLayerArea(layerIndex);
+                layer.getYAxis().zoomSelectedRange(scrollDistance,
                             stripArea.y + stripArea.height - p.y, stripArea.height);
-                    tl.yaxisChanged();
-                }
+                layer.yaxisChanged();
             }
         } else {
             GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
@@ -194,8 +197,8 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         drawRequest();
     }
 
-    private static void moveYAxis(TimelineLayer tl, double distanceY) {
-        tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
+    private static void moveYAxis(TimelineLayer tl, double distanceY, int graphHeight) {
+        tl.getYAxis().shiftDownPixels(distanceY, graphHeight);
         tl.yaxisChanged();
     }
 
@@ -217,23 +220,20 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             }
         }
         boolean onYAxis = !geometry.yAxisHit(p).outsideAxes();
-        if ((inGraphArea && alt) || (inGraphArea && ctrl) || (!geometry.isStacked() && onYAxis)) {
+        if ((inGraphArea && alt) || (inGraphArea && ctrl) || onYAxis) {
             zoomY(p, scrollDistance);
         }
     }
 
-    public static void moveAllAxes(double distanceY) {
+    public static void moveAllAxes(Point p, double distanceY) {
         if (distanceY == 0)
             return;
 
         if (geometry.isStacked()) {
-            int layerIdx = geometry.layerIndexAtPoint(new Point(0, (int) distanceY));
-            if (layerIdx >= 0) {
-                TimelineLayer tl = TimelineLayers.getVisibleYAxisLayerAt(layerIdx);
-                if (tl != null) {
-                    moveYAxis(tl, distanceY);
-                }
-            }
+            int layerIndex = getStackedLayerIndex(p);
+            TimelineLayer layer = TimelineLayers.getVisibleYAxisLayerAt(layerIndex);
+            if (layer != null)
+                moveYAxis(layer, distanceY, geometry.getLayerArea(layerIndex).height);
         } else {
             TimelineLayers.forEachYAxis((tl, axisIndex) -> {
                 tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
@@ -241,6 +241,19 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             });
         }
         drawRequest();
+    }
+
+    private static int getStackedLayerIndex(Point p) {
+        int layerIndex = geometry.layerIndexAtPoint(p);
+        if (layerIndex >= 0)
+            return layerIndex;
+
+        GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
+        return hit.outsideAxes() ? -1 : hit.axisIndex() + 1;
+    }
+
+    private static TimelineLayer getStackedLayer(Point p) {
+        return TimelineLayers.getVisibleYAxisLayerAt(getStackedLayerIndex(p));
     }
 
     private static void setAvailableInterval() {

@@ -88,6 +88,7 @@ final class TimelineLabelPainter {
         List<Rectangle> layerAreas = geometry.getLayerAreas();
 
         drawHorizontalLabels(g, geometry, xAxis, 0, null);
+        TimelineLayers.forEachPropagated((tl, row) -> drawHorizontalLabels(g, geometry, xAxis, row + 1, tl));
 
         for (int i = 0; i < visibleLayers.size() && i < layerAreas.size(); i++) {
             TimelineLayer tl = visibleLayers.get(i);
