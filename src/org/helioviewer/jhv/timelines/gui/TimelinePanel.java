@@ -47,7 +47,7 @@ import com.jidesoft.swing.JideButton;
 public final class TimelinePanel extends JPanel {
 
     private static final int ICON_WIDTH = 12;
-    private static final String NONE_ITEM = "Predefined";
+    private static final String PREDEFINED_PLACEHOLDER = "Predefined";
 
     private static final int ENABLED_COL = 0;
     private static final int TITLE_COL = 1;
@@ -150,7 +150,8 @@ public final class TimelinePanel extends JPanel {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (index == 0 && NONE_ITEM.equals(value)) {
+                if (value == null) {
+                    label.setText(PREDEFINED_PLACEHOLDER);
                     label.setForeground(Color.GRAY);
                 }
                 return label;
@@ -160,8 +161,10 @@ public final class TimelinePanel extends JPanel {
             if (suppressComboAction)
                 return;
             Object selected = predefinedCombo.getSelectedItem();
-            if (selected instanceof String groupName && !NONE_ITEM.equals(groupName))
+            if (selected instanceof String groupName) {
                 loadPredefinedGroup(groupName);
+                clearPredefinedSelection();
+            }
         });
 
         refreshPredefinedCombo();
@@ -298,11 +301,14 @@ public final class TimelinePanel extends JPanel {
     private void refreshPredefinedCombo() {
         suppressComboAction = true;
         Map<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
-        List<String> items = new ArrayList<>();
-        items.add(NONE_ITEM);
-        items.addAll(groups.keySet());
-        predefinedCombo.setModel(new DefaultComboBoxModel<>(items.toArray(String[]::new)));
-        predefinedCombo.setSelectedIndex(0);
+        predefinedCombo.setModel(new DefaultComboBoxModel<>(groups.keySet().toArray(String[]::new)));
+        predefinedCombo.setSelectedItem(null);
+        suppressComboAction = false;
+    }
+
+    private void clearPredefinedSelection() {
+        suppressComboAction = true;
+        predefinedCombo.setSelectedItem(null);
         suppressComboAction = false;
     }
 
