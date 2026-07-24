@@ -101,7 +101,8 @@ final class TimelineLabelPainter {
         g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
         for (int i = 1; i < layerLayouts.size(); i++) {
             Rectangle prev = layerLayouts.get(i - 1).area();
-            int sepY = prev.y + prev.height + 1;
+            Rectangle next = layerLayouts.get(i).area();
+            int sepY = (prev.y + prev.height + next.y) / 2;
             g.drawLine(geometry.area().x, sepY, geometry.graphRight(), sepY);
         }
     }
@@ -114,33 +115,31 @@ final class TimelineLabelPainter {
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, stripArea);
         YAxis.Ticks ticks = yAxis.ticks(yMapper);
 
-        drawStackedHorizontalTickline(g, stripArea, yMapper, ticks.start(), axisX, false);
         int count = 0;
         for (double tick = ticks.first(); tick <= ticks.last() && count < 20; tick += ticks.step(), count++) {
             if (ticks.start() <= tick && tick <= ticks.end()) {
-                drawStackedHorizontalTickline(g, stripArea, yMapper, tick, axisX, true);
+                drawStackedHorizontalTickline(g, stripArea, yMapper, tick, axisX);
             }
         }
-        drawStackedHorizontalTickline(g, stripArea, yMapper, ticks.end(), axisX, false);
 
         g.drawLine(axisX, stripArea.y, axisX, stripArea.y + stripArea.height);
         drawRotatedLabel(g, yAxis.getLabel(), axisX, stripArea);
     }
 
-    private static void drawStackedHorizontalTickline(Graphics g, Rectangle stripArea, YAxis.Mapper yMapper, double tick, int axisX, boolean needTxt) {
+    private static void drawStackedHorizontalTickline(Graphics g, Rectangle stripArea, YAxis.Mapper yMapper, double tick, int axisX) {
         String tickText = DrawConstants.valueFormatter.format(tick);
         int y = yMapper.scaledToPixel(tick);
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
 
-        java.awt.Color lineColor = g.getColor();
-        g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
-        g.drawLine(axisX + 1, y, stripArea.x + stripArea.width, y);
-        g.setColor(lineColor);
-
-        if (needTxt) {
-            int xText = axisX - 6 - (int) bounds.getWidth();
-            g.drawString(tickText, xText, y + (int) (bounds.getHeight() / 2));
+        if (stripArea.y < y && y < stripArea.y + stripArea.height) {
+            java.awt.Color lineColor = g.getColor();
+            g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
+            g.drawLine(axisX + 1, y, stripArea.x + stripArea.width, y);
+            g.setColor(lineColor);
         }
+
+        int xText = axisX - 6 - (int) bounds.getWidth();
+        g.drawString(tickText, xText, y + (int) (bounds.getHeight() / 2));
     }
 
     private static int drawString(Graphics2D g, String text, int x, int y) {

@@ -12,7 +12,9 @@ import org.helioviewer.jhv.timelines.TimelineLayer;
 
 public final class GraphGeometry {
 
-    private static final int STACKED_SEPARATOR = 2;
+    private static final int MINIMUM_HEIGHT = 50;
+    private static final int MINIMUM_STACKED_LAYER_HEIGHT = 64;
+    private static final int STACKED_SEPARATOR = 8;
 
     private Rectangle size = new Rectangle();
     private Rectangle area = new Rectangle();
@@ -84,6 +86,16 @@ public final class GraphGeometry {
 
     public boolean isStacked() {
         return stacked;
+    }
+
+    public int minimumHeight() {
+        if (!stacked || layerLayouts.isEmpty())
+            return MINIMUM_HEIGHT;
+
+        return DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE
+                + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (propagatedLayers.size() + 1)
+                + MINIMUM_STACKED_LAYER_HEIGHT * layerLayouts.size()
+                + STACKED_SEPARATOR * (layerLayouts.size() - 1);
     }
 
     public List<LayerLayout> getLayerLayouts() {

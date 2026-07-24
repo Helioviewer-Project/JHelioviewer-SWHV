@@ -27,6 +27,8 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         void drawRequest();
 
         void drawMovieLineRequest();
+
+        default void layoutChanged() {}
     }
 
     public static final TimeAxis selectedAxis = new TimeAxis(0, 0);
@@ -303,6 +305,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
     public static void layoutChanged() {
         geometry.layout(TimelineLayers.get());
+        listeners.forEach(Listener::layoutChanged);
         TimelineLayers.get().forEach(TimelineLayer::graphGeometryChanged);
         drawRequest();
     }
