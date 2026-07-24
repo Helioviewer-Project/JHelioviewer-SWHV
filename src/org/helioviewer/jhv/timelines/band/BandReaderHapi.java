@@ -39,9 +39,11 @@ import uk.ac.starlink.table.RowSequence;
 
 public class BandReaderHapi {
 
-    private static final String groupName = "HAPI";
     private static final String hapiFormat = "binary";
-    private static final String ROBserver = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
+    private static final CatalogEndpoint[] catalogEndpoints = {
+            new CatalogEndpoint("ROB", "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/"),
+            //new CatalogEndpoint("ROB Test", "http://swhv-test:4000/hapi/")
+    };
 
     private static final LinkedHashMap<String, CatalogSource> catalogs = new LinkedHashMap<>();
     private static Runnable onCatalogLoaded;
@@ -51,7 +53,8 @@ public class BandReaderHapi {
     }
 
     public static void requestCatalog() {
-        requestCatalog(groupName, ROBserver);
+        for (CatalogEndpoint endpoint : catalogEndpoints)
+            requestCatalog(endpoint.groupName, endpoint.server);
     }
 
     public static void requestCatalog(String group, String server) {
@@ -154,6 +157,8 @@ public class BandReaderHapi {
     private static void onFailure(String ignoredLogContext, Throwable t) {
         Log.errorStack(t);
     }
+
+    private record CatalogEndpoint(String groupName, String server) {}
 
     private record CatalogSource(String groupName, Catalog catalog) {}
 
