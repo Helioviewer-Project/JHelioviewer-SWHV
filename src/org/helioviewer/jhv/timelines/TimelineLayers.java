@@ -85,15 +85,18 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public Band getOrCreateBand(BandType bandType) {
-        for (TimelineLayer layer : layers) {
-            if (layer instanceof Band band && band.getBandType().equals(bandType))
-                return band;
-        }
-        return new Band(bandType);
+        Band band = findBand(layers, bandType);
+        return band == null ? new Band(bandType) : band;
+    }
+
+    public Band addBand(BandType bandType) {
+        Band band = getOrCreateBand(bandType);
+        add(band);
+        return band;
     }
 
     public void add(TimelineLayer tl) {
-        if (layers.contains(tl)) // avoid band duplication via file load
+        if (containsLayer(layers, tl))
             return;
         layers.add(tl);
 
@@ -111,26 +114,37 @@ public class TimelineLayers extends AbstractTableModel {
             return;
 
         tl.remove();
-        layers.remove(tl);
+        layers.remove(row);
         fireTableRowsDeleted(row, row);
         DrawController.layoutChanged();
     }
 
     public void restore(List<TimelineLayer> newLayers) {
         ArrayList<TimelineLayer> restoredLayers = new ArrayList<>();
-        for (TimelineLayer layer : newLayers) {
-            if (!restoredLayers.contains(layer)) // avoid duplicated bands in restored state
-                restoredLayers.add(layer);
-        }
+        for (TimelineLayer layer : newLayers)
+            addUnique(restoredLayers, layer);
+        replaceAll(restoredLayers);
+    }
 
+    public void replaceBands(List<BandType> bandTypes) {
+        ArrayList<TimelineLayer> replacement = new ArrayList<>();
         for (TimelineLayer layer : layers) {
-            if (!containsIdentity(restoredLayers, layer))
+            if (!(layer instanceof Band))
+                replacement.add(layer);
+        }
+        for (BandType bandType : bandTypes)
+            addUnique(replacement, getOrCreateBand(bandType));
+        replaceAll(replacement);
+    }
+
+    private void replaceAll(List<TimelineLayer> replacement) {
+        for (TimelineLayer layer : layers) {
+            if (!replacement.contains(layer))
                 layer.remove();
         }
-
         layers.clear();
-        layers.addAll(restoredLayers);
-        restoredLayers.forEach(this::configureLayer);
+        layers.addAll(replacement);
+        replacement.forEach(this::configureLayer);
         fireTableDataChanged();
         DrawController.layoutChanged();
         fetchData(DrawController.selectedAxis);
@@ -172,12 +186,24 @@ public class TimelineLayers extends AbstractTableModel {
             band.setOnAppearanceChanged(() -> updateCell(layers.indexOf(band), APPEARANCE_COLUMN));
     }
 
-    private static boolean containsIdentity(List<TimelineLayer> searchLayers, TimelineLayer target) {
+    private static void addUnique(List<TimelineLayer> target, TimelineLayer layer) {
+        if (!containsLayer(target, layer))
+            target.add(layer);
+    }
+
+    private static boolean containsLayer(List<TimelineLayer> searchLayers, TimelineLayer target) {
+        if (target instanceof Band band)
+            return findBand(searchLayers, band.getBandType()) != null;
+        return searchLayers.contains(target);
+    }
+
+    @Nullable
+    private static Band findBand(List<TimelineLayer> searchLayers, BandType bandType) {
         for (TimelineLayer layer : searchLayers) {
-            if (layer == target)
-                return true;
+            if (layer instanceof Band band && band.getBandType().equals(bandType))
+                return band;
         }
-        return false;
+        return null;
     }
 
 }

@@ -38,9 +38,8 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         @Override
         public void actionPerformed(ActionEvent e) {
             TimelineLayers layers = Timelines.getLayers();
-            for (BandType bandType : listBand.getSelectedValuesList()) {
-                layers.add(layers.getOrCreateBand(bandType));
-            }
+            for (BandType bandType : listBand.getSelectedValuesList())
+                layers.addBand(bandType);
             setVisible(false);
         }
     };
