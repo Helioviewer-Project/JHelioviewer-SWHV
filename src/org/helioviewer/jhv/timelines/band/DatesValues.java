@@ -5,24 +5,6 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 
 record DatesValues(long[] dates, float[][] values) {
 
-    private static class Bin {
-
-        private int n = 0;
-        private float mean = 0;
-
-        void add(float val) {
-            if (val != YAxis.BLANK) {
-                n++;
-                mean += (val - mean) / n;
-            }
-        }
-
-        float getMean() {
-            return n == 0 ? YAxis.BLANK : mean;
-        }
-
-    }
-
     DatesValues rebin() {
         int numPoints = dates.length;
         if (numPoints == 0)
@@ -70,20 +52,22 @@ record DatesValues(long[] dates, float[][] values) {
             return new DatesValues(datesBinned, valuesBinned);
         }
 
-        Bin[][] bins = new Bin[numAxes][numBins];
+        int[] counts = new int[numBins];
         for (int j = 0; j < numAxes; j++) {
-            for (int i = 0; i < numBins; i++) {
-                bins[j][i] = new Bin();
-            }
-        }
-        for (int j = 0; j < numAxes; j++) {
+            float[] binned = valuesBinned[j];
             for (int i = 0; i < numPoints; i++) {
-                bins[j][(int) (dates[i] / timeStep - startMin)].add(values[j][i]);
+                float value = values[j][i];
+                if (value != YAxis.BLANK) {
+                    int idx = (int) (dates[i] / timeStep - startMin);
+                    int n = ++counts[idx];
+                    binned[idx] += (value - binned[idx]) / n;
+                }
             }
-        }
-        for (int j = 0; j < numAxes; j++) {
             for (int i = 0; i < numBins; i++) {
-                valuesBinned[j][i] = bins[j][i].getMean();
+                if (counts[i] == 0)
+                    binned[i] = YAxis.BLANK;
+                else
+                    counts[i] = 0;
             }
         }
         return new DatesValues(datesBinned, valuesBinned);
