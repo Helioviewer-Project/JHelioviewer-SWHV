@@ -7,6 +7,7 @@ import java.util.concurrent.Future;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.Interval;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
 
 import org.json.JSONArray;
@@ -47,11 +48,12 @@ public class BandDataProvider {
     }
 
     static void acceptData(Band.Data line) {
-        Band band = Band.createFromType(line.bandType());
-        Timelines.getLayers().add(band);
+        TimelineLayers layers = Timelines.getLayers();
+        Band band = layers.getOrCreateBand(line.bandType());
+        layers.add(band);
         boolean hasDataChanged = band.addToCache(line.values(), line.dates());
         if (hasDataChanged)
-            Timelines.getLayers().updateRow(band);
+            layers.updateRow(band);
     }
 
     private record BandLoad(JSONObject jo) implements Callable<Band.Data> {

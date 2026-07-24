@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.timelines.band.Band;
+import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
@@ -83,6 +84,14 @@ public class TimelineLayers extends AbstractTableModel {
         updateCell(layers.indexOf(tl), LOADING_COLUMN);
     }
 
+    public Band getOrCreateBand(BandType bandType) {
+        for (TimelineLayer layer : layers) {
+            if (layer instanceof Band band && band.getBandType().equals(bandType))
+                return band;
+        }
+        return new Band(bandType);
+    }
+
     public void add(TimelineLayer tl) {
         if (layers.contains(tl)) // avoid band duplication via file load
             return;
@@ -115,7 +124,7 @@ public class TimelineLayers extends AbstractTableModel {
         }
 
         for (TimelineLayer layer : layers) {
-            if (!restoredLayers.contains(layer))
+            if (!containsIdentity(restoredLayers, layer))
                 layer.remove();
         }
 
@@ -161,6 +170,14 @@ public class TimelineLayers extends AbstractTableModel {
     private void configureLayer(TimelineLayer layer) {
         if (layer instanceof Band band)
             band.setOnAppearanceChanged(() -> updateCell(layers.indexOf(band), APPEARANCE_COLUMN));
+    }
+
+    private static boolean containsIdentity(List<TimelineLayer> searchLayers, TimelineLayer target) {
+        for (TimelineLayer layer : searchLayers) {
+            if (layer == target)
+                return true;
+        }
+        return false;
     }
 
 }

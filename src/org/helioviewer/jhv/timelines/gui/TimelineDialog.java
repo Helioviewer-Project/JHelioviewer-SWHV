@@ -22,8 +22,8 @@ import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.band.Band;
 import org.helioviewer.jhv.timelines.band.BandType;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -37,8 +37,9 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            TimelineLayers layers = Timelines.getLayers();
             for (BandType bandType : listBand.getSelectedValuesList()) {
-                Timelines.getLayers().add(Band.createFromType(bandType));
+                layers.add(layers.getOrCreateBand(bandType));
             }
             setVisible(false);
         }
