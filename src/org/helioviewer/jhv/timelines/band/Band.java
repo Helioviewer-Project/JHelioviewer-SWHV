@@ -280,14 +280,10 @@ public final class Band extends AbstractTimelineLayer {
         }
 
         GraphGeometry geometry = DrawController.getGeometry();
-        Rectangle graphArea = geometry.area();
-        Rectangle drawArea = graphArea;
-        if (geometry.isStacked()) {
-            drawArea = geometry.getLayerArea(this);
-            if (drawArea == null) {
-                graphWorker.cancel();
-                return;
-            }
+        Rectangle drawArea = geometry.getLayerArea(this);
+        if (drawArea == null) {
+            graphWorker.cancel();
+            return;
         }
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, drawArea);
 
@@ -403,6 +399,11 @@ public final class Band extends AbstractTimelineLayer {
     }
 
     @Override
+    public void graphGeometryChanged() {
+        updateGraph();
+    }
+
+    @Override
     public void yaxisChanged() {
         updateGraph();
     }
@@ -444,7 +445,8 @@ public final class Band extends AbstractTimelineLayer {
 
     void setPropagationModel(PropagationModel _propagationModel) {
         propagationModel = _propagationModel;
-        DrawController.graphAreaChanged();
+        DrawController.layoutChanged();
+        fetchData(DrawController.selectedAxis);
     }
 
 }

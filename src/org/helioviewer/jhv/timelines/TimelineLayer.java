@@ -44,6 +44,8 @@ public interface TimelineLayer {
 
     void fetchData(TimeAxis selectedAxis);
 
+    default void graphGeometryChanged() {}
+
     default void yaxisChanged() {}
 
     default void zoomToFitAxis() {}

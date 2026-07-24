@@ -225,7 +225,9 @@ public final class TimelinePanel extends JPanel {
                     layers.updateCell(v.row, v.col);
                     if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(timeline);
-                    DrawController.graphAreaChanged();
+                    DrawController.layoutChanged();
+                    if (timeline.isEnabled())
+                        timeline.fetchData(DrawController.selectedAxis);
                 } else if (v.col == TimelineLayers.APPEARANCE_COLUMN && timeline instanceof Band band && band.hasLevelColors()) {
                     band.setMulticolor(!band.isMulticolor());
                 } else if (v.col == TimelineLayers.REMOVE_COLUMN && timeline.isDeletable()) {
