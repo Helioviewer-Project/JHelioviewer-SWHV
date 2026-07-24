@@ -53,14 +53,18 @@ public class BandReaderHapi {
     }
 
     public static void requestCatalog() {
-        for (CatalogEndpoint endpoint : catalogEndpoints)
-            requestCatalog(endpoint.groupName, endpoint.server);
-    }
+        String[] groups = new String[catalogEndpoints.length];
+        for (int i = 0; i < catalogEndpoints.length; i++)
+            groups[i] = catalogEndpoints[i].groupName;
+        Timelines.td.setupDatasetGroups(groups);
 
-    public static void requestCatalog(String group, String server) {
-        String endpoint = server.endsWith("/") ? server : server + '/';
-        Task.submit(endpoint, new LoadHapiCatalog(endpoint),
-                catalog -> onSuccessCatalog(group, endpoint, catalog), BandReaderHapi::onFailure);
+        for (CatalogEndpoint catalogEndpoint : catalogEndpoints) {
+            String server = catalogEndpoint.server;
+            String endpoint = server.endsWith("/") ? server : server + '/';
+            Task.submit(endpoint, new LoadHapiCatalog(endpoint),
+                    catalog -> onSuccessCatalog(catalogEndpoint.groupName, endpoint, catalog),
+                    BandReaderHapi::onFailure);
+        }
     }
 
     static Future<Band.Data> requestData(String url, long start, long end) {
@@ -100,7 +104,7 @@ public class BandReaderHapi {
     private static void onSuccessCatalog(String group, String endpoint, @Nonnull Catalog catalog) {
         CatalogSource source = new CatalogSource(group, catalog);
         catalogs.put(endpoint, source);
-        Timelines.td.setupDatasets(source.groupName, source.catalog.types);
+        Timelines.td.setupDataset(source.groupName, source.catalog.types);
         if (onCatalogLoaded != null)
             onCatalogLoaded.run();
     }

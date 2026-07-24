@@ -115,14 +115,21 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
 
     private final LinkedHashMap<String, BandType[]> groups = new LinkedHashMap<>();
 
-    public void setupDatasets(String group, BandType[] types) {
-        groups.put(group, types);
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(groups.keySet().toArray(String[]::new));
-        if (model.getSize() > 0) {
-            comboGroup.setModel(model);
+    public void setupDatasetGroups(String[] groupNames) {
+        if (comboGroup.getItemCount() != 0)
+            return;
+
+        for (String group : groupNames)
+            groups.put(group, new BandType[0]);
+        comboGroup.setModel(new DefaultComboBoxModel<>(groupNames));
+        if (groupNames.length > 0)
             comboGroup.setSelectedIndex(0);
+    }
+
+    public void setupDataset(String group, BandType[] types) {
+        groups.put(group, types);
+        if (group.equals(comboGroup.getSelectedItem()))
             updateGroupValues();
-        }
     }
 
     private void updateGroupValues() {
