@@ -153,9 +153,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
         if (geometry.isStacked()) {
             int layerIndex = getStackedLayerIndex(p);
-            TimelineLayer layer = TimelineLayers.getVisibleYAxisLayerAt(layerIndex);
+            TimelineLayer layer = geometry.getLayer(layerIndex);
             if (layer != null)
-                moveYAxis(layer, distanceY, geometry.getLayerArea(layerIndex).height);
+                moveYAxis(layer, distanceY, geometry.getLayerArea(layer).height);
         } else {
             GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
             if (hit.outsideAxes()) {
@@ -176,9 +176,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
         if (geometry.isStacked()) {
             int layerIndex = getStackedLayerIndex(p);
-            TimelineLayer layer = TimelineLayers.getVisibleYAxisLayerAt(layerIndex);
+            TimelineLayer layer = geometry.getLayer(layerIndex);
             if (layer != null) {
-                Rectangle stripArea = geometry.getLayerArea(layerIndex);
+                Rectangle stripArea = geometry.getLayerArea(layer);
                 layer.getYAxis().zoomSelectedRange(scrollDistance,
                         stripArea.y + stripArea.height - p.y, stripArea.height);
                 layer.yaxisChanged();
@@ -231,9 +231,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
 
         if (geometry.isStacked()) {
             int layerIndex = getStackedLayerIndex(p);
-            TimelineLayer layer = TimelineLayers.getVisibleYAxisLayerAt(layerIndex);
+            TimelineLayer layer = geometry.getLayer(layerIndex);
             if (layer != null)
-                moveYAxis(layer, distanceY, geometry.getLayerArea(layerIndex).height);
+                moveYAxis(layer, distanceY, geometry.getLayerArea(layer).height);
         } else {
             TimelineLayers.forEachYAxis((tl, axisIndex) -> {
                 tl.getYAxis().shiftDownPixels(distanceY, geometry.graphHeight());
@@ -253,7 +253,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
     }
 
     private static TimelineLayer getStackedLayer(Point p) {
-        return TimelineLayers.getVisibleYAxisLayerAt(getStackedLayerIndex(p));
+        return geometry.getLayer(getStackedLayerIndex(p));
     }
 
     private static void setAvailableInterval() {

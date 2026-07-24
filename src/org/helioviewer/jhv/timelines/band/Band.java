@@ -41,6 +41,8 @@ public final class Band extends AbstractTimelineLayer {
 
     private record Bar(int x1, int y1, int x2, int y2, Color color) {}
 
+    private record GraphData(List<Polyline> polylines, List<Bar> bars) {}
+
     private static final Colors.Data bandColors = new Colors.Data();
     private static final HashMap<BandType, Band> bandMap = new HashMap<>();
 
@@ -58,14 +60,14 @@ public final class Band extends AbstractTimelineLayer {
     private final int[] warnPixels;
     private final List<Polyline> polylines = new ArrayList<>();
     private final List<Bar> bars = new ArrayList<>();
-    private final LatestWorker<List<Object>> graphWorker = new LatestWorker<>("Timeline-Graph");
+    private final LatestWorker<GraphData> graphWorker = new LatestWorker<>("Timeline-Graph");
 
     private RequestCache requestCache;
     private BandCache bandCache;
     private Color graphColor = bandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
     private boolean multicolor;
-    private Runnable onColorChanged;
+    private Runnable onAppearanceChanged;
 
     public boolean drawWarnings = true;
 
@@ -175,7 +177,7 @@ public final class Band extends AbstractTimelineLayer {
     void setDataColor(Color c) {
         graphColor = c;
         DrawController.drawRequest();
-        notifyColorChanged();
+        notifyAppearanceChanged();
     }
 
     public boolean isMulticolor() {
@@ -193,16 +195,16 @@ public final class Band extends AbstractTimelineLayer {
     public void setMulticolor(boolean _multicolor) {
         multicolor = hasLevelColors() && _multicolor;
         updateGraph();
-        notifyColorChanged();
+        notifyAppearanceChanged();
     }
 
-    public void setOnColorChanged(Runnable callback) {
-        onColorChanged = callback;
+    public void setOnAppearanceChanged(Runnable callback) {
+        onAppearanceChanged = callback;
     }
 
-    private void notifyColorChanged() {
-        if (onColorChanged != null)
-            onColorChanged.run();
+    private void notifyAppearanceChanged() {
+        if (onAppearanceChanged != null)
+            onAppearanceChanged.run();
     }
 
     @Override
@@ -275,7 +277,7 @@ public final class Band extends AbstractTimelineLayer {
 
         GraphGeometry geometry = DrawController.getGeometry();
         Rectangle graphArea = geometry.area();
-        Rectangle drawArea = TimelineLayers.getDrawArea(this, graphArea);
+        Rectangle drawArea = geometry.isStacked() ? geometry.getLayerArea(this) : graphArea;
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, drawArea);
 
         BandType.WarningLevel[] wls = bandType.getWarningLevels();
@@ -298,7 +300,8 @@ public final class Band extends AbstractTimelineLayer {
         final boolean useMulticolor = multicolor;
 
         graphWorker.submit(() -> {
-                    List<Object> result = new ArrayList<>();
+                    List<Polyline> resultPolylines = new ArrayList<>();
+                    List<Bar> resultBars = new ArrayList<>();
                     for (List<BandCache.DateValue> list : rawData) {
                         if (Thread.currentThread().isInterrupted()) {
                             throw new InterruptedException();
@@ -328,26 +331,22 @@ public final class Band extends AbstractTimelineLayer {
                                 int left = barLeftPixel(mappedLeft, right);
                                 int top = Math.min(yPixels[i], baselineY);
                                 int bottom = Math.max(yPixels[i], baselineY);
-                                result.add(new Bar(left, top, right, bottom, barColor));
+                                resultBars.add(new Bar(left, top, right, bottom, barColor));
                             }
                         } else {
-                            result.add(new Polyline(dates, yPixels, (useMulticolor && bandType.hasLevels()) ? floatValues : null));
+                            resultPolylines.add(new Polyline(dates, yPixels, (useMulticolor && bandType.hasLevels()) ? floatValues : null));
                         }
                     }
-                    return result;
+                    return new GraphData(resultPolylines, resultBars);
                 },
                 (result, fresh) -> {
                     if (!fresh)
                         return;
 
                     polylines.clear();
+                    polylines.addAll(result.polylines());
                     bars.clear();
-                    for (Object o : result) {
-                        if (o instanceof Polyline pl)
-                            polylines.add(pl);
-                        else if (o instanceof Bar bar)
-                            bars.add(bar);
-                    }
+                    bars.addAll(result.bars());
                     DrawController.drawRequest();
                 });
     }

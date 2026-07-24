@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.timelines.TimelineLayer;
 
 public final class GraphGeometry {
@@ -15,7 +17,9 @@ public final class GraphGeometry {
     private Rectangle size = new Rectangle();
     private Rectangle area = new Rectangle();
     private boolean stacked;
-    private final ArrayList<Rectangle> layerAreas = new ArrayList<>();
+    private final ArrayList<LayerLayout> layerLayouts = new ArrayList<>();
+
+    public record LayerLayout(TimelineLayer layer, Rectangle area) {}
 
     public void setSize(Rectangle graphSize) {
         size = new Rectangle(graphSize.x, graphSize.y, Math.max(1, graphSize.width), Math.max(1, graphSize.height));
@@ -23,7 +27,7 @@ public final class GraphGeometry {
 
     public void layout(int propagatedAxisCount, int yAxisCount, boolean _stacked, List<TimelineLayer> visibleYAxisLayers) {
         stacked = _stacked;
-        layerAreas.clear();
+        layerLayouts.clear();
 
         int height = size.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (propagatedAxisCount + 1));
 
@@ -40,7 +44,8 @@ public final class GraphGeometry {
 
             int y = DrawConstants.GRAPH_TOP_SPACE;
             for (int i = 0; i < nLayers; i++) {
-                layerAreas.add(new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, y, Math.max(1, width), stripHeight));
+                Rectangle layerArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, y, Math.max(1, width), stripHeight);
+                layerLayouts.add(new LayerLayout(visibleYAxisLayers.get(i), layerArea));
                 y += stripHeight + STACKED_SEPARATOR;
             }
         } else {
@@ -59,15 +64,21 @@ public final class GraphGeometry {
         return stacked;
     }
 
-    public List<Rectangle> getLayerAreas() {
-        return Collections.unmodifiableList(layerAreas);
+    public List<LayerLayout> getLayerLayouts() {
+        return Collections.unmodifiableList(layerLayouts);
     }
 
-    public Rectangle getLayerArea(int index) {
-        if (index >= 0 && index < layerAreas.size()) {
-            return layerAreas.get(index);
+    public Rectangle getLayerArea(TimelineLayer layer) {
+        for (LayerLayout layout : layerLayouts) {
+            if (layout.layer() == layer)
+                return layout.area();
         }
         return area;
+    }
+
+    @Nullable
+    public TimelineLayer getLayer(int index) {
+        return index >= 0 && index < layerLayouts.size() ? layerLayouts.get(index).layer() : null;
     }
 
     public Rectangle size() {
@@ -126,8 +137,8 @@ public final class GraphGeometry {
         if (!stacked) {
             return -1;
         }
-        for (int i = 0; i < layerAreas.size(); i++) {
-            Rectangle r = layerAreas.get(i);
+        for (int i = 0; i < layerLayouts.size(); i++) {
+            Rectangle r = layerLayouts.get(i).area();
             if (p.x >= r.x && p.x <= r.x + r.width && p.y >= r.y && p.y <= r.y + r.height) {
                 return i;
             }
@@ -151,8 +162,8 @@ public final class GraphGeometry {
     }
 
     private YAxisHit yAxisHitStacked(Point p) {
-        for (int i = 0; i < layerAreas.size(); i++) {
-            Rectangle r = layerAreas.get(i);
+        for (int i = 0; i < layerLayouts.size(); i++) {
+            Rectangle r = layerLayouts.get(i).area();
             if (p.y >= r.y && p.y <= r.y + r.height) {
                 boolean leftAxis = p.x < r.x;
                 return new YAxisHit(leftAxis, i - 1);
