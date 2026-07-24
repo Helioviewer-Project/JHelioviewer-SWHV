@@ -44,7 +44,12 @@ public class TimelineLayers extends AbstractTableModel {
             if (!layer.isEnabled())
                 continue;
 
-            Rectangle area = stackedMode && layer.hasYAxis() ? geometry.getLayerArea(layer) : graphArea;
+            Rectangle area = graphArea;
+            if (stackedMode && layer.hasYAxis()) {
+                area = geometry.getLayerArea(layer);
+                if (area == null)
+                    continue;
+            }
 
             g.setClip(area);
             if (layer instanceof Band band) {

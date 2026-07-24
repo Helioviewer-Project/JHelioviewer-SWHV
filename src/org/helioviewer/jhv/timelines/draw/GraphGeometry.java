@@ -64,12 +64,13 @@ public final class GraphGeometry {
         return Collections.unmodifiableList(layerLayouts);
     }
 
+    @Nullable
     public Rectangle getLayerArea(TimelineLayer layer) {
         for (LayerLayout layout : layerLayouts) {
             if (layout.layer() == layer)
                 return layout.area();
         }
-        return area;
+        return null;
     }
 
     public Rectangle size() {

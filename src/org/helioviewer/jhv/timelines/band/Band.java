@@ -281,7 +281,14 @@ public final class Band extends AbstractTimelineLayer {
 
         GraphGeometry geometry = DrawController.getGeometry();
         Rectangle graphArea = geometry.area();
-        Rectangle drawArea = geometry.isStacked() ? geometry.getLayerArea(this) : graphArea;
+        Rectangle drawArea = graphArea;
+        if (geometry.isStacked()) {
+            drawArea = geometry.getLayerArea(this);
+            if (drawArea == null) {
+                graphWorker.cancel();
+                return;
+            }
+        }
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, drawArea);
 
         BandType.WarningLevel[] wls = bandType.getWarningLevels();
