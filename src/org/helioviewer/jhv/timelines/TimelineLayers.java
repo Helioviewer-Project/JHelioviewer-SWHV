@@ -163,6 +163,17 @@ public class TimelineLayers extends AbstractTableModel {
         }
     }
 
+    public static void forEachTargetYAxis(GraphGeometry.YAxisHit hit, ObjIntConsumer<TimelineLayer> consumer) {
+        int axisIndex = -1;
+        for (TimelineLayer tl : layers) {
+            if (tl.isEnabled() && tl.hasYAxis()) {
+                if (hit.outsideAxes() || hit.targets(axisIndex))
+                    consumer.accept(tl, axisIndex);
+                axisIndex++;
+            }
+        }
+    }
+
     public static List<TimelineLayer> getVisibleYAxisLayers() {
         List<TimelineLayer> result = new ArrayList<>();
         for (TimelineLayer tl : layers) {
