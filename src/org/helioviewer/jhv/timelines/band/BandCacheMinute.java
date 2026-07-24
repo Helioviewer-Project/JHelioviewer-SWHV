@@ -62,11 +62,11 @@ class BandCacheMinute implements BandCache {
                 continue;
             }
             float[] values = cache.getValues(0);
-            long[] dates = cache.getDates(0);
 
             for (int i = 0; i < values.length; i++) {
                 float value = values[i];
-                if (value != YAxis.BLANK && start <= dates[i] && dates[i] <= end) {
+                long date = cache.getDate(0, i);
+                if (value != YAxis.BLANK && start <= date && date <= end) {
                     min = Math.min(value, min);
                     max = Math.max(value, max);
                 }
@@ -102,11 +102,10 @@ class BandCacheMinute implements BandCache {
                 continue;
             }
             float[] values = cache.getValues(level);
-            long[] dates = cache.getDates(level);
             int i = 0;
             while (i < values.length) {
                 float value = values[i];
-                long date = dates[i];
+                long date = cache.getDate(level, i);
                 if (date < start || date > end || value == YAxis.BLANK) {
                     ret.add(list);
                     list = new ArrayList<>();
@@ -125,16 +124,10 @@ class BandCacheMinute implements BandCache {
         long key = date2key(ts);
         DataChunk cache = cacheMap.get(key);
         if (cache != null) {
-            long[] dates = cache.getDates(0);
-            int len = dates.length;
-            if (len <= 1) { // avoid out of bounds and division by 0
-                return len == 1 ? cache.getValues(0)[0] : YAxis.BLANK;
-            }
-            int idx = (int) ((len - 1) * 1. * (ts - dates[0]) / (dates[len - 1] - dates[0]) + 0.5);
-
-            if (idx >= 0 && idx < len) {
-                return cache.getValues(0)[idx];
-            }
+            float[] values = cache.getValues(0);
+            int idx = (int) ((ts - cache.startDate) / (double) MILLIS_PER_TICK + 0.5);
+            if (idx >= 0 && idx < values.length)
+                return values[idx];
         }
         return YAxis.BLANK;
     }
@@ -149,23 +142,14 @@ class BandCacheMinute implements BandCache {
     private static class DataChunk {
 
         private final float[][] values = new float[MAX_LEVEL][];
-        private final long[][] dates = new long[MAX_LEVEL][];
+        private final long startDate;
 
         DataChunk(long key) {
+            startDate = key * MILLIS_PER_CHUNK;
             int factor = 1;
             for (int i = 0; i < MAX_LEVEL; i++) {
                 values[i] = new float[(int) CHUNKED_SIZE / factor];
                 Arrays.fill(values[i], YAxis.BLANK);
-                dates[i] = new long[(int) CHUNKED_SIZE / factor];
-                factor *= FACTOR_STEP;
-            }
-
-            long startDate = key * MILLIS_PER_CHUNK;
-            factor = 1;
-            for (int j = 0; j < values.length; j++) {
-                for (int i = 0; i < values[j].length; i++) {
-                    dates[j][i] = startDate + i * MILLIS_PER_TICK * factor;
-                }
                 factor *= FACTOR_STEP;
             }
         }
@@ -189,15 +173,14 @@ class BandCacheMinute implements BandCache {
             return values[level];
         }
 
-        long[] getDates(int level) {
-            return dates[level];
+        long getDate(int level, int index) {
+            return startDate + index * MILLIS_PER_TICK * (1L << level);
         }
 
         void serialize(JSONArray ja, double f) {
-            long[] d = dates[0];
             float[] v = values[0];
             for (int i = 0; i < v.length; i++)
-                ja.put(new JSONArray().put(d[i] / 1000L).put(f * v[i]));
+                ja.put(new JSONArray().put(getDate(0, i) / 1000L).put(f * v[i]));
         }
 
     }
