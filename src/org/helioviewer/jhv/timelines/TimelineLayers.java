@@ -34,20 +34,13 @@ public class TimelineLayers extends AbstractTableModel {
     public static void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         GraphGeometry geometry = DrawController.getGeometry();
         boolean stackedMode = geometry.isStacked();
-        int yAxisIndex = 0;
         boolean warningBandDrawn = false;
 
         for (TimelineLayer layer : layers) {
             if (!layer.isEnabled())
                 continue;
 
-            Rectangle area;
-            if (stackedMode && layer.showYAxis()) {
-                area = geometry.getLayerArea(yAxisIndex);
-                yAxisIndex++;
-            } else {
-                area = graphArea;
-            }
+            Rectangle area = stackedMode && layer.showYAxis() ? geometry.getLayerArea(layer) : graphArea;
 
             g.setClip(area);
             if (layer instanceof Band band) {
@@ -178,36 +171,6 @@ public class TimelineLayers extends AbstractTableModel {
         return result;
     }
 
-    @Nullable
-    public static TimelineLayer getVisibleYAxisLayerAt(int index) {
-        List<TimelineLayer> visible = getVisibleYAxisLayers();
-        if (index >= 0 && index < visible.size()) {
-            return visible.get(index);
-        }
-        return null;
-    }
-
-    public static Rectangle getDrawArea(TimelineLayer layer, Rectangle graphArea) {
-        GraphGeometry geometry = DrawController.getGeometry();
-        if (!geometry.isStacked()) {
-            return graphArea;
-        }
-        if (!layer.showYAxis()) {
-            return graphArea;
-        }
-        int index = 0;
-        for (TimelineLayer tl : layers) {
-            if (!tl.isEnabled() || !tl.showYAxis()) {
-                continue;
-            }
-            if (tl.equals(layer)) {
-                return geometry.getLayerArea(index);
-            }
-            index++;
-        }
-        return graphArea;
-    }
-
     public static void forEachPropagated(ObjIntConsumer<TimelineLayer> consumer) {
         int index = 0;
         for (TimelineLayer tl : layers) {
@@ -248,7 +211,7 @@ public class TimelineLayers extends AbstractTableModel {
 
     private void configureLayer(TimelineLayer layer) {
         if (layer instanceof Band band)
-            band.setOnColorChanged(() -> updateCell(layers.indexOf(band), TimelinePanel.LINECOLOR_COL));
+            band.setOnAppearanceChanged(() -> updateCell(layers.indexOf(band), TimelinePanel.LINECOLOR_COL));
     }
 
 }

@@ -83,22 +83,17 @@ final class TimelineLabelPainter {
     }
 
     private void drawStackedLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
-        List<TimelineLayer> visibleLayers = TimelineLayers.getVisibleYAxisLayers();
-        List<Rectangle> layerAreas = geometry.getLayerAreas();
+        List<GraphGeometry.LayerLayout> layerLayouts = geometry.getLayerLayouts();
 
         drawHorizontalLabels(g, geometry, xAxis, 0, null);
         TimelineLayers.forEachPropagated((tl, row) -> drawHorizontalLabels(g, geometry, xAxis, row + 1, tl));
 
-        for (int i = 0; i < visibleLayers.size() && i < layerAreas.size(); i++) {
-            TimelineLayer tl = visibleLayers.get(i);
-            Rectangle stripArea = layerAreas.get(i);
-
-            drawStackedVerticalLabels(g, geometry, stripArea, tl);
-        }
+        for (GraphGeometry.LayerLayout layout : layerLayouts)
+            drawStackedVerticalLabels(g, geometry, layout.area(), layout.layer());
 
         g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
-        for (int i = 1; i < layerAreas.size(); i++) {
-            Rectangle prev = layerAreas.get(i - 1);
+        for (int i = 1; i < layerLayouts.size(); i++) {
+            Rectangle prev = layerLayouts.get(i - 1).area();
             int sepY = prev.y + prev.height + 1;
             g.drawLine(geometry.area().x, sepY, geometry.graphRight(), sepY);
         }

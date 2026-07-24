@@ -233,7 +233,6 @@ public final class TimelinePanel extends JPanel {
                     DrawController.graphAreaChanged();
                 } else if (v.col == LINECOLOR_COL && timeline instanceof Band band && band.hasLevelColors()) {
                     band.setMulticolor(!band.isMulticolor());
-                    layers.updateCell(v.row, v.col);
                 } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
                     layers.remove(timeline);
                     selectExistingRow(v.row);
