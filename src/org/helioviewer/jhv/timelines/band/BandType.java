@@ -253,14 +253,16 @@ public class BandType {
     public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (o instanceof BandType t)
-            return name.equals(t.name);
-        return false;
+        if (!(o instanceof BandType t))
+            return false;
+        return baseUrl.isEmpty()
+                ? t.baseUrl.isEmpty() && name.equals(t.name)
+                : baseUrl.equals(t.baseUrl);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return baseUrl.isEmpty() ? name.hashCode() : baseUrl.hashCode();
     }
 
     @Override

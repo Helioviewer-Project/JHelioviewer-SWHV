@@ -43,7 +43,7 @@ public class BandReaderHapi {
     private static final String hapiFormat = "binary";
     private static final String ROBserver = "https://hapi.swhv.oma.be/SWHV_Timelines/hapi/";
 
-    private static Catalog theCatalog; //!
+    private static final LinkedHashMap<String, CatalogSource> catalogs = new LinkedHashMap<>();
     private static Runnable onCatalogLoaded;
 
     public static void setOnCatalogLoaded(@Nullable Runnable callback) {
@@ -51,11 +51,17 @@ public class BandReaderHapi {
     }
 
     public static void requestCatalog() {
-        Task.submit(ROBserver, new LoadHapiCatalog(ROBserver), BandReaderHapi::onSuccessCatalog, BandReaderHapi::onFailure);
+        requestCatalog(groupName, ROBserver);
+    }
+
+    public static void requestCatalog(String group, String server) {
+        String endpoint = server.endsWith("/") ? server : server + '/';
+        Task.submit(endpoint, new LoadHapiCatalog(endpoint),
+                catalog -> onSuccessCatalog(group, endpoint, catalog), BandReaderHapi::onFailure);
     }
 
     static Future<Band.Data> requestData(String url, long start, long end) {
-        return Task.submit(url, new LoadHapiStream(theCatalog, url, start, end), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
+        return Task.submit(url, new LoadHapiStream(findCatalog(url), url, start, end), BandReaderHapi::onSuccessData, BandReaderHapi::onFailure);
     }
 
     public static void loadUri(URI uri) {
@@ -88,15 +94,26 @@ public class BandReaderHapi {
             BandDataProvider.acceptData(line);
     }
 
-    private static void onSuccessCatalog(@Nonnull Catalog catalog) {
-        theCatalog = catalog;
-        Timelines.td.setupDatasets(groupName, theCatalog.types);
+    private static void onSuccessCatalog(String group, String endpoint, @Nonnull Catalog catalog) {
+        CatalogSource source = new CatalogSource(group, catalog);
+        catalogs.put(endpoint, source);
+        Timelines.td.setupDatasets(source.groupName, source.catalog.types);
         if (onCatalogLoaded != null)
             onCatalogLoaded.run();
     }
 
     public static Map<String, List<BandType>> getPredefinedGroups() {
-        return theCatalog == null ? Map.of() : theCatalog.predefinedGroups;
+        if (catalogs.isEmpty())
+            return Map.of();
+        if (catalogs.size() == 1)
+            return catalogs.values().iterator().next().catalog.predefinedGroups;
+
+        LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
+        for (CatalogSource source : catalogs.values()) {
+            source.catalog.predefinedGroups.forEach((name, bandTypes) ->
+                    groups.computeIfAbsent(name, k -> new ArrayList<>()).addAll(bandTypes));
+        }
+        return finishPredefinedGroups(groups);
     }
 
     private static Map<String, List<BandType>> createPredefinedGroups(BandType[] types) {
@@ -106,10 +123,23 @@ public class BandReaderHapi {
             for (BandType.PredefinedEntry entry : entries)
                 groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
         }
+        return finishPredefinedGroups(groups);
+    }
+
+    private static Map<String, List<BandType>> finishPredefinedGroups(LinkedHashMap<String, List<BandType>> groups) {
         for (Map.Entry<String, List<BandType>> e : groups.entrySet())
             e.getValue().sort(Comparator.comparingInt(type -> orderFor(type, e.getKey())));
         groups.replaceAll((name, bandTypes) -> List.copyOf(bandTypes));
         return Collections.unmodifiableMap(groups);
+    }
+
+    @Nullable
+    private static Catalog findCatalog(String baseUrl) {
+        for (CatalogSource source : catalogs.values()) {
+            if (source.catalog.parameters.containsKey(baseUrl))
+                return source.catalog;
+        }
+        return null;
     }
 
     private static int orderFor(BandType type, String groupName) {
@@ -124,6 +154,8 @@ public class BandReaderHapi {
     private static void onFailure(String ignoredLogContext, Throwable t) {
         Log.errorStack(t);
     }
+
+    private record CatalogSource(String groupName, Catalog catalog) {}
 
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types,
                            Map<String, List<BandType>> predefinedGroups) {}
