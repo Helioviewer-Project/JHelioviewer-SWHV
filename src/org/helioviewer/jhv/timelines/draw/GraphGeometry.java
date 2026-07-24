@@ -27,7 +27,7 @@ public final class GraphGeometry {
 
         int height = size.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (propagatedAxisCount + 1));
 
-        if (stacked && visibleYAxisLayers.size() > 1) {
+        if (stacked && !visibleYAxisLayers.isEmpty()) {
             int nLayers = visibleYAxisLayers.size();
             int totalSeparatorHeight = STACKED_SEPARATOR * (nLayers - 1);
             int availableForStrips = Math.max(nLayers, height - totalSeparatorHeight);
