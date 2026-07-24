@@ -94,8 +94,8 @@ public final class GraphGeometry {
     @Nullable
     public Rectangle getLayerArea(TimelineLayer layer) {
         for (LayerLayout layout : layerLayouts) {
-            if (layout.layer() == layer)
-                return layout.area();
+            if (layout.layer == layer)
+                return layout.area;
         }
         return null;
     }
@@ -157,7 +157,7 @@ public final class GraphGeometry {
         if (!stacked)
             return null;
         for (LayerLayout layout : layerLayouts) {
-            Rectangle r = layout.area();
+            Rectangle r = layout.area;
             if (p.x <= r.x + r.width && p.y >= r.y && p.y <= r.y + r.height)
                 return layout;
         }
@@ -181,10 +181,10 @@ public final class GraphGeometry {
 
     private YAxisHit yAxisHitStacked(Point p) {
         for (LayerLayout layout : layerLayouts) {
-            Rectangle r = layout.area();
+            Rectangle r = layout.area;
             if (p.y >= r.y && p.y <= r.y + r.height) {
                 boolean leftAxis = p.x < r.x;
-                return new YAxisHit(leftAxis, layout.axisIndex());
+                return new YAxisHit(leftAxis, layout.axisIndex);
             }
         }
         return new YAxisHit(false, -1);
