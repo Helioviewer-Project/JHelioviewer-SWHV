@@ -3,6 +3,7 @@ package org.helioviewer.jhv.timelines.band;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -95,17 +96,20 @@ public class BandReaderHapi {
     }
 
     public static Map<String, List<BandType>> getPredefinedGroups() {
+        return theCatalog == null ? Map.of() : theCatalog.predefinedGroups;
+    }
+
+    private static Map<String, List<BandType>> createPredefinedGroups(BandType[] types) {
         LinkedHashMap<String, List<BandType>> groups = new LinkedHashMap<>();
-        if (theCatalog == null)
-            return groups;
-        for (BandType type : theCatalog.types) {
+        for (BandType type : types) {
             BandType.PredefinedEntry[] entries = type.getPredefinedEntries();
             for (BandType.PredefinedEntry entry : entries)
                 groups.computeIfAbsent(entry.name(), k -> new ArrayList<>()).add(type);
         }
         for (Map.Entry<String, List<BandType>> e : groups.entrySet())
             e.getValue().sort(Comparator.comparingInt(type -> orderFor(type, e.getKey())));
-        return groups;
+        groups.replaceAll((name, bandTypes) -> List.copyOf(bandTypes));
+        return Collections.unmodifiableMap(groups);
     }
 
     private static int orderFor(BandType type, String groupName) {
@@ -121,7 +125,8 @@ public class BandReaderHapi {
         Log.errorStack(t);
     }
 
-    private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types) {}
+    private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types,
+                           Map<String, List<BandType>> predefinedGroups) {}
 
     private record Dataset(String id, List<BandReader> readers, long start, long stop) {}
 
@@ -181,7 +186,8 @@ public class BandReaderHapi {
         }
         ArrayList<BandType> types = new ArrayList<>();
         parameters.values().forEach(parameter -> types.add(parameter.reader.type));
-        return new Catalog(version, parameters, types.toArray(BandType[]::new));
+        BandType[] typeArray = types.toArray(BandType[]::new);
+        return new Catalog(version, parameters, typeArray, createPredefinedGroups(typeArray));
     }
 
     private static Dataset getDataset(HapiVersion version, String urlData, @Nullable String id, @Nullable String title, JSONObject jo) throws Exception {
