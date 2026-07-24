@@ -235,16 +235,16 @@ public final class Band extends TimelineLayer {
             return;
 
         GraphData data = graphData;
-        if (!data.bars().isEmpty()) {
-            for (Bar bar : data.bars()) {
-                g.setColor(bar.levelColor() != null ? bar.levelColor() : graphColor);
-                g.fillRect(bar.x1(), bar.y1(), bar.x2() - bar.x1(), bar.y2() - bar.y1());
+        if (!data.bars.isEmpty()) {
+            for (Bar bar : data.bars) {
+                g.setColor(bar.levelColor != null ? bar.levelColor : graphColor);
+                g.fillRect(bar.x1, bar.y1, bar.x2 - bar.x1, bar.y2 - bar.y1);
             }
         } else if (multicolor && bandType.hasLevels()) {
-            for (Polyline line : data.polylines()) {
-                int[] xp = line.xPoints();
-                int[] yp = line.yPoints();
-                float[] vals = line.values();
+            for (Polyline line : data.polylines) {
+                int[] xp = line.xPoints;
+                int[] yp = line.yPoints;
+                float[] vals = line.values;
                 for (int i = 0; i < line.length() - 1; i++) {
                     Color segColor = vals != null ? bandType.getLevelColor(vals[i]) : null;
                     g.setColor(segColor != null ? segColor : graphColor);
@@ -253,7 +253,7 @@ public final class Band extends TimelineLayer {
             }
         } else {
             g.setColor(graphColor);
-            data.polylines().forEach(line -> g.drawPolyline(line.xPoints(), line.yPoints(), line.length()));
+            data.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.length()));
         }
 
         if (drawWarnings) {
