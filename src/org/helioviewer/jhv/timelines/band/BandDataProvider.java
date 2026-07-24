@@ -48,8 +48,8 @@ public class BandDataProvider {
 
     static void acceptData(Band.Data line) {
         Band band = Band.createFromType(line.bandType());
-        boolean hasDataChanged = band.addToCache(line.values(), line.dates());
         Timelines.getLayers().add(band);
+        boolean hasDataChanged = band.addToCache(line.values(), line.dates());
         if (hasDataChanged)
             Timelines.getLayers().updateRow(band);
     }

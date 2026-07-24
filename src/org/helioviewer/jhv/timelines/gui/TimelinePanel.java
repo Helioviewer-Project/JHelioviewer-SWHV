@@ -155,10 +155,8 @@ public final class TimelinePanel extends JPanel {
             if (suppressComboAction)
                 return;
             Object selected = predefinedCombo.getSelectedItem();
-            if (selected instanceof String groupName) {
+            if (selected instanceof String groupName)
                 loadPredefinedGroup(groupName);
-                clearPredefinedSelection();
-            }
         });
 
         refreshPredefinedCombo();
@@ -296,12 +294,6 @@ public final class TimelinePanel extends JPanel {
         suppressComboAction = true;
         Map<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
         predefinedCombo.setModel(new DefaultComboBoxModel<>(groups.keySet().toArray(String[]::new)));
-        predefinedCombo.setSelectedItem(null);
-        suppressComboAction = false;
-    }
-
-    private void clearPredefinedSelection() {
-        suppressComboAction = true;
         predefinedCombo.setSelectedItem(null);
         suppressComboAction = false;
     }
