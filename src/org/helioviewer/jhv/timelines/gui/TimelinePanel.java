@@ -288,12 +288,12 @@ public final class TimelinePanel extends JPanel {
         if (bandTypes == null)
             return;
 
-        List<TimelineLayer> existing = new ArrayList<>(TimelineLayers.get());
-        for (TimelineLayer layer : existing)
-            layers.remove(layer);
-
+        List<TimelineLayer> predefinedLayers = new ArrayList<>(bandTypes.size());
         for (BandType bandType : bandTypes)
-            layers.add(Band.createFromType(bandType));
+            predefinedLayers.add(Band.createFromType(bandType));
+
+        layers.restore(predefinedLayers);
+        selectExistingRow(0);
     }
 
     private void refreshPredefinedCombo() {
