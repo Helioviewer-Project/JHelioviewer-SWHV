@@ -75,18 +75,25 @@ final class TimelineLabelPainter {
 
     private void drawTimeLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
         drawHorizontalLabels(g, geometry, xAxis, 0, null);
-        TimelineLayers.forEachPropagated((tl, row) -> drawHorizontalLabels(g, geometry, xAxis, row + 1, tl));
+        List<TimelineLayer> propagatedLayers = geometry.getPropagatedLayers();
+        for (int row = 0; row < propagatedLayers.size(); row++)
+            drawHorizontalLabels(g, geometry, xAxis, row + 1, propagatedLayers.get(row));
     }
 
     private void drawYAxisLabels(Graphics2D g, GraphGeometry geometry) {
-        TimelineLayers.forEachYAxis((tl, axisIndex) -> drawVerticalLabels(g, geometry, tl, axisIndex, tl.getYAxis().isHighlighted()));
+        for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts()) {
+            TimelineLayer layer = layout.layer();
+            drawVerticalLabels(g, geometry, layer, layout.axisIndex(), layer.getYAxis().isHighlighted());
+        }
     }
 
     private void drawStackedLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
         List<GraphGeometry.LayerLayout> layerLayouts = geometry.getLayerLayouts();
 
         drawHorizontalLabels(g, geometry, xAxis, 0, null);
-        TimelineLayers.forEachPropagated((tl, row) -> drawHorizontalLabels(g, geometry, xAxis, row + 1, tl));
+        List<TimelineLayer> propagatedLayers = geometry.getPropagatedLayers();
+        for (int row = 0; row < propagatedLayers.size(); row++)
+            drawHorizontalLabels(g, geometry, xAxis, row + 1, propagatedLayers.get(row));
 
         for (GraphGeometry.LayerLayout layout : layerLayouts)
             drawStackedVerticalLabels(g, geometry, layout.area(), layout.layer());

@@ -18,41 +18,64 @@ public final class GraphGeometry {
     private Rectangle area = new Rectangle();
     private boolean stacked;
     private final ArrayList<LayerLayout> layerLayouts = new ArrayList<>();
+    private final ArrayList<TimelineLayer> propagatedLayers = new ArrayList<>();
+    private final List<LayerLayout> exposedLayerLayouts = Collections.unmodifiableList(layerLayouts);
+    private final List<TimelineLayer> exposedPropagatedLayers = Collections.unmodifiableList(propagatedLayers);
 
-    public record LayerLayout(TimelineLayer layer, Rectangle area) {}
+    public record LayerLayout(TimelineLayer layer, Rectangle area, int axisIndex) {}
 
     public void setSize(Rectangle graphSize) {
         size = new Rectangle(graphSize.x, graphSize.y, Math.max(1, graphSize.width), Math.max(1, graphSize.height));
     }
 
-    public void layout(int propagatedAxisCount, boolean _stacked, List<TimelineLayer> visibleYAxisLayers) {
+    public void layout(boolean _stacked, List<TimelineLayer> layers) {
         stacked = _stacked;
         layerLayouts.clear();
+        propagatedLayers.clear();
 
-        int height = size.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (propagatedAxisCount + 1));
+        int yAxisCount = 0;
+        for (TimelineLayer layer : layers) {
+            if (layer.isPropagated())
+                propagatedLayers.add(layer);
+            if (layer.isEnabled() && layer.hasYAxis())
+                yAxisCount++;
+        }
 
-        if (stacked && !visibleYAxisLayers.isEmpty()) {
-            int nLayers = visibleYAxisLayers.size();
-            int totalSeparatorHeight = STACKED_SEPARATOR * (nLayers - 1);
-            int availableForStrips = Math.max(nLayers, height - totalSeparatorHeight);
-            int stripHeight = Math.max(1, availableForStrips / nLayers);
+        int height = size.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE
+                + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (propagatedLayers.size() + 1));
 
-            int totalHeight = stripHeight * nLayers + totalSeparatorHeight;
+        if (stacked && yAxisCount > 0) {
+            int totalSeparatorHeight = STACKED_SEPARATOR * (yAxisCount - 1);
+            int availableForStrips = Math.max(yAxisCount, height - totalSeparatorHeight);
+            int stripHeight = Math.max(1, availableForStrips / yAxisCount);
+
+            int totalHeight = stripHeight * yAxisCount + totalSeparatorHeight;
             int width = size.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE);
             area = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE,
                     Math.max(1, width), Math.max(1, totalHeight));
 
             int y = DrawConstants.GRAPH_TOP_SPACE;
-            for (int i = 0; i < nLayers; i++) {
-                Rectangle layerArea = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, y, Math.max(1, width), stripHeight);
-                layerLayouts.add(new LayerLayout(visibleYAxisLayers.get(i), layerArea));
+            int axisIndex = -1;
+            for (TimelineLayer layer : layers) {
+                if (!layer.isEnabled() || !layer.hasYAxis())
+                    continue;
+                Rectangle layerArea = new Rectangle(area.x, y, area.width, stripHeight);
+                layerLayouts.add(new LayerLayout(layer, layerArea, axisIndex));
                 y += stripHeight + STACKED_SEPARATOR;
+                axisIndex++;
             }
         } else {
-            int yAxisCount = visibleYAxisLayers.size();
             int rightAxisCount = Math.max(0, yAxisCount - 1);
             int width = size.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + rightAxisCount * DrawConstants.RIGHT_AXIS_WIDTH);
             area = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, Math.max(1, width), Math.max(1, height));
+
+            int axisIndex = -1;
+            for (TimelineLayer layer : layers) {
+                if (layer.isEnabled() && layer.hasYAxis()) {
+                    layerLayouts.add(new LayerLayout(layer, area, axisIndex));
+                    axisIndex++;
+                }
+            }
         }
     }
 
@@ -61,7 +84,11 @@ public final class GraphGeometry {
     }
 
     public List<LayerLayout> getLayerLayouts() {
-        return Collections.unmodifiableList(layerLayouts);
+        return exposedLayerLayouts;
+    }
+
+    public List<TimelineLayer> getPropagatedLayers() {
+        return exposedPropagatedLayers;
     }
 
     @Nullable
@@ -153,11 +180,11 @@ public final class GraphGeometry {
     }
 
     private YAxisHit yAxisHitStacked(Point p) {
-        for (int i = 0; i < layerLayouts.size(); i++) {
-            Rectangle r = layerLayouts.get(i).area();
+        for (LayerLayout layout : layerLayouts) {
+            Rectangle r = layout.area();
             if (p.y >= r.y && p.y <= r.y + r.height) {
                 boolean leftAxis = p.x < r.x;
-                return new YAxisHit(leftAxis, i - 1);
+                return new YAxisHit(leftAxis, layout.axisIndex());
             }
         }
         return new YAxisHit(false, -1);

@@ -6,8 +6,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.ObjIntConsumer;
-import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
@@ -45,7 +43,7 @@ public class TimelineLayers extends AbstractTableModel {
                 continue;
 
             Rectangle area = graphArea;
-            if (stackedMode && layer.hasYAxis()) {
+            if (layer.hasYAxis()) {
                 area = geometry.getLayerArea(layer);
                 if (area == null)
                     continue;
@@ -94,7 +92,8 @@ public class TimelineLayers extends AbstractTableModel {
 
         int row = layers.size() - 1;
         fireTableRowsInserted(row, row);
-        DrawController.graphAreaChanged();
+        DrawController.layoutChanged();
+        tl.fetchData(DrawController.selectedAxis);
     }
 
     public void remove(TimelineLayer tl) {
@@ -105,7 +104,7 @@ public class TimelineLayers extends AbstractTableModel {
         tl.remove();
         layers.remove(tl);
         fireTableRowsDeleted(row, row);
-        DrawController.graphAreaChanged();
+        DrawController.layoutChanged();
     }
 
     public void restore(List<TimelineLayer> newLayers) {
@@ -124,7 +123,8 @@ public class TimelineLayers extends AbstractTableModel {
         layers.addAll(restoredLayers);
         restoredLayers.forEach(this::configureLayer);
         fireTableDataChanged();
-        DrawController.graphAreaChanged();
+        DrawController.layoutChanged();
+        fetchData(DrawController.selectedAxis);
     }
 
     public void updateCell(int row, int col) {
@@ -156,75 +156,6 @@ public class TimelineLayers extends AbstractTableModel {
             }
         }
         return null;
-    }
-
-    public static void forEachYAxis(ObjIntConsumer<TimelineLayer> consumer) {
-        int axisIndex = -1;
-        for (TimelineLayer tl : layers) {
-            if (tl.isEnabled() && tl.hasYAxis()) {
-                consumer.accept(tl, axisIndex);
-                axisIndex++;
-            }
-        }
-    }
-
-    public static void forEachTargetYAxis(GraphGeometry.YAxisHit hit, ObjIntConsumer<TimelineLayer> consumer) {
-        int axisIndex = -1;
-        for (TimelineLayer tl : layers) {
-            if (tl.isEnabled() && tl.hasYAxis()) {
-                if (hit.outsideAxes() || hit.targets(axisIndex))
-                    consumer.accept(tl, axisIndex);
-                axisIndex++;
-            }
-        }
-    }
-
-    public static List<TimelineLayer> getVisibleYAxisLayers() {
-        List<TimelineLayer> result = new ArrayList<>();
-        for (TimelineLayer tl : layers) {
-            if (tl.isEnabled() && tl.hasYAxis()) {
-                result.add(tl);
-            }
-        }
-        return result;
-    }
-
-    public static void forEachPropagated(ObjIntConsumer<TimelineLayer> consumer) {
-        int index = 0;
-        for (TimelineLayer tl : layers) {
-            if (tl.isPropagated()) {
-                consumer.accept(tl, index);
-                index++;
-            }
-        }
-    }
-
-    public static int getNumberOfPropagationAxes() {
-        return count(TimelineLayer::isPropagated);
-    }
-
-    public static boolean setYAxisHighlight(@Nullable GraphGeometry.YAxisHit hit) {
-        boolean changed = false;
-        int axisIndex = -1;
-        for (TimelineLayer tl : layers) {
-            if (tl.isEnabled() && tl.hasYAxis()) {
-                boolean highlighted = hit != null && hit.targets(axisIndex);
-                changed = changed || tl.getYAxis().isHighlighted() != highlighted;
-                tl.getYAxis().setHighlighted(highlighted);
-                axisIndex++;
-            }
-        }
-        return changed;
-    }
-
-    private static int count(Predicate<TimelineLayer> predicate) {
-        int ct = 0;
-        for (TimelineLayer tl : layers) {
-            if (predicate.test(tl)) {
-                ct++;
-            }
-        }
-        return ct;
     }
 
     private void configureLayer(TimelineLayer layer) {

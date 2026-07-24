@@ -173,7 +173,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     public void mouseExited(MouseEvent e) {
         JHVEventCache.highlight(null);
         mousePosition = null;
-        if (!DrawController.getGeometry().isStacked() && TimelineLayers.setYAxisHighlight(null)) {
+        if (!DrawController.getGeometry().isStacked() && DrawController.setYAxisHighlight(null)) {
             drawRequest();
             return;
         }
@@ -259,7 +259,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 repaint();
             }
         } else {
-            boolean axisHighlightChanged = TimelineLayers.setYAxisHighlight(geometry.yAxisHit(mousePosition));
+            boolean axisHighlightChanged = DrawController.setYAxisHighlight(geometry.yAxisHit(mousePosition));
             boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
             if (axisHighlightChanged || eventHighlightChanged) {
                 drawRequest();
@@ -287,7 +287,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     public void componentResized(ComponentEvent e) {
         DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
         if (mousePosition != null && !DrawController.getGeometry().isStacked())
-            TimelineLayers.setYAxisHighlight(DrawController.getGeometry().yAxisHit(mousePosition));
+            DrawController.setYAxisHighlight(DrawController.getGeometry().yAxisHit(mousePosition));
     }
 
     @Override
