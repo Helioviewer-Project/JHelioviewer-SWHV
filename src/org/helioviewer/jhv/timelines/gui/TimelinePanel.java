@@ -49,12 +49,6 @@ public final class TimelinePanel extends JPanel {
     private static final int ICON_WIDTH = 12;
     private static final String PREDEFINED_PLACEHOLDER = "Predefined";
 
-    private static final int ENABLED_COL = 0;
-    private static final int TITLE_COL = 1;
-    public static final int LOADING_COL = 2;
-    public static final int LINECOLOR_COL = 3;
-    private static final int REMOVE_COL = 4;
-
     private static final int NUMBEROFVISIBLEROWS = 6;
 
     private final TimelineTable grid;
@@ -72,7 +66,7 @@ public final class TimelinePanel extends JPanel {
 
         @Override
         public void changeSelection(int row, int col, boolean toggle, boolean extend) {
-            if (col != ENABLED_COL && col != REMOVE_COL && col != LINECOLOR_COL)
+            if (col != TimelineLayers.ENABLED_COLUMN && col != TimelineLayers.REMOVE_COLUMN && col != TimelineLayers.APPEARANCE_COLUMN)
                 super.changeSelection(row, col, toggle, extend);
             // otherwise prevent changing selection
         }
@@ -194,27 +188,27 @@ public final class TimelinePanel extends JPanel {
         grid.setIntercellSpacing(new Dimension(0, 0));
         grid.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        grid.getColumnModel().getColumn(ENABLED_COL).setCellRenderer(new CellRenderer.Enabled());
-        grid.getColumnModel().getColumn(ENABLED_COL).setPreferredWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(ENABLED_COL).setMinWidth(ICON_WIDTH + 8);
-        grid.getColumnModel().getColumn(ENABLED_COL).setMaxWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(TimelineLayers.ENABLED_COLUMN).setCellRenderer(new CellRenderer.Enabled());
+        grid.getColumnModel().getColumn(TimelineLayers.ENABLED_COLUMN).setPreferredWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(TimelineLayers.ENABLED_COLUMN).setMinWidth(ICON_WIDTH + 8);
+        grid.getColumnModel().getColumn(TimelineLayers.ENABLED_COLUMN).setMaxWidth(ICON_WIDTH + 8);
 
-        grid.getColumnModel().getColumn(TITLE_COL).setCellRenderer(new CellRenderer.Name());
+        grid.getColumnModel().getColumn(TimelineLayers.TITLE_COLUMN).setCellRenderer(new CellRenderer.Name());
 
-        grid.getColumnModel().getColumn(LOADING_COL).setCellRenderer(new CellRenderer.Loading());
-        grid.getColumnModel().getColumn(LOADING_COL).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(LOADING_COL).setMinWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(LOADING_COL).setMaxWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(TimelineLayers.LOADING_COLUMN).setCellRenderer(new CellRenderer.Loading());
+        grid.getColumnModel().getColumn(TimelineLayers.LOADING_COLUMN).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(TimelineLayers.LOADING_COLUMN).setMinWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(TimelineLayers.LOADING_COLUMN).setMaxWidth(ICON_WIDTH + 2);
 
-        grid.getColumnModel().getColumn(LINECOLOR_COL).setCellRenderer(new CellRenderer.LineColor());
-        grid.getColumnModel().getColumn(LINECOLOR_COL).setPreferredWidth(20);
-        grid.getColumnModel().getColumn(LINECOLOR_COL).setMinWidth(20);
-        grid.getColumnModel().getColumn(LINECOLOR_COL).setMaxWidth(20);
+        grid.getColumnModel().getColumn(TimelineLayers.APPEARANCE_COLUMN).setCellRenderer(new CellRenderer.LineColor());
+        grid.getColumnModel().getColumn(TimelineLayers.APPEARANCE_COLUMN).setPreferredWidth(20);
+        grid.getColumnModel().getColumn(TimelineLayers.APPEARANCE_COLUMN).setMinWidth(20);
+        grid.getColumnModel().getColumn(TimelineLayers.APPEARANCE_COLUMN).setMaxWidth(20);
 
-        grid.getColumnModel().getColumn(REMOVE_COL).setCellRenderer(new CellRenderer.Remove());
-        grid.getColumnModel().getColumn(REMOVE_COL).setPreferredWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(REMOVE_COL).setMinWidth(ICON_WIDTH + 2);
-        grid.getColumnModel().getColumn(REMOVE_COL).setMaxWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(TimelineLayers.REMOVE_COLUMN).setCellRenderer(new CellRenderer.Remove());
+        grid.getColumnModel().getColumn(TimelineLayers.REMOVE_COLUMN).setPreferredWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(TimelineLayers.REMOVE_COLUMN).setMinWidth(ICON_WIDTH + 2);
+        grid.getColumnModel().getColumn(TimelineLayers.REMOVE_COLUMN).setMaxWidth(ICON_WIDTH + 2);
 
         grid.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting())
@@ -228,15 +222,15 @@ public final class TimelinePanel extends JPanel {
                 if (v == null || !(v.value instanceof TimelineLayer timeline))
                     return;
 
-                if (v.col == ENABLED_COL) {
+                if (v.col == TimelineLayers.ENABLED_COLUMN) {
                     timeline.setEnabled(!timeline.isEnabled());
                     layers.updateCell(v.row, v.col);
                     if (grid.getSelectedRow() == v.row)
                         setOptionsPanel(timeline);
                     DrawController.graphAreaChanged();
-                } else if (v.col == LINECOLOR_COL && timeline instanceof Band band && band.hasLevelColors()) {
+                } else if (v.col == TimelineLayers.APPEARANCE_COLUMN && timeline instanceof Band band && band.hasLevelColors()) {
                     band.setMulticolor(!band.isMulticolor());
-                } else if (v.col == REMOVE_COL && timeline.isDeletable()) {
+                } else if (v.col == TimelineLayers.REMOVE_COLUMN && timeline.isDeletable()) {
                     layers.remove(timeline);
                     selectExistingRow(v.row);
                 }

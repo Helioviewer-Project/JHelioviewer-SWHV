@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 public class BandType {
 
+    private static final Level[] NO_LEVELS = {};
     private static final String[] xWarnLabels = {"B", "C", "M", "X"};
     private static final double[] xWarnValues = {1e-7, 1e-6, 1e-5, 1e-4};
 
@@ -120,7 +121,7 @@ public class BandType {
     }
 
     boolean hasLevels() {
-        return levels != null;
+        return levels.length > 0;
     }
 
     boolean hasWarningLevels() {
@@ -132,8 +133,6 @@ public class BandType {
     }
 
     Color getLevelColor(double value) {
-        if (levels == null)
-            return null;
         for (Level level : levels) {
             if (value >= level.min && value <= level.max)
                 return level.color;
@@ -143,7 +142,7 @@ public class BandType {
 
     private static Level[] parseLevels(JSONArray ja) {
         if (ja == null || ja.length() == 0)
-            return null;
+            return NO_LEVELS;
         ArrayList<Level> list = new ArrayList<>();
         for (int i = 0; i < ja.length(); i++) {
             JSONObject jo = ja.optJSONObject(i);
@@ -164,7 +163,7 @@ public class BandType {
             if (color != null)
                 list.add(new Level(min, max, color));
         }
-        return list.isEmpty() ? null : list.toArray(Level[]::new);
+        return list.isEmpty() ? NO_LEVELS : list.toArray(Level[]::new);
     }
 
     private static PredefinedEntry[] parsePredefinedEntries(JSONArray ja) {

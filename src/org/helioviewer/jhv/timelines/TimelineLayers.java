@@ -17,12 +17,16 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.timelines.gui.TimelinePanel;
 
 @SuppressWarnings("serial")
 public class TimelineLayers extends AbstractTableModel {
 
-    public static final int NUMBEROFCOLUMNS = 5;
+    public static final int ENABLED_COLUMN = 0;
+    public static final int TITLE_COLUMN = 1;
+    public static final int LOADING_COLUMN = 2;
+    public static final int APPEARANCE_COLUMN = 3;
+    public static final int REMOVE_COLUMN = 4;
+    public static final int COLUMN_COUNT = 5;
 
     private static final ArrayList<TimelineLayer> layers = new ArrayList<>();
     private static final List<TimelineLayer> extLayers = Collections.unmodifiableList(layers);
@@ -73,7 +77,7 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public void updateLoadingCell(TimelineLayer tl) {
-        updateCell(layers.indexOf(tl), TimelinePanel.LOADING_COL);
+        updateCell(layers.indexOf(tl), LOADING_COLUMN);
     }
 
     public void add(TimelineLayer tl) {
@@ -130,7 +134,7 @@ public class TimelineLayers extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return NUMBEROFCOLUMNS;
+        return COLUMN_COUNT;
     }
 
     @Override
@@ -209,7 +213,7 @@ public class TimelineLayers extends AbstractTableModel {
 
     private void configureLayer(TimelineLayer layer) {
         if (layer instanceof Band band)
-            band.setOnAppearanceChanged(() -> updateCell(layers.indexOf(band), TimelinePanel.LINECOLOR_COL));
+            band.setOnAppearanceChanged(() -> updateCell(layers.indexOf(band), APPEARANCE_COLUMN));
     }
 
 }
