@@ -2,8 +2,6 @@ package org.helioviewer.jhv.base;
 
 import java.awt.Color;
 
-import javax.annotation.Nullable;
-
 import org.helioviewer.jhv.app.DisplaySettings;
 
 public class Colors {
@@ -34,17 +32,8 @@ public class Colors {
         return new float[]{(float) (color[0] * alpha), (float) (color[1] * alpha), (float) (color[2] * alpha), (float) (color[3] * alpha)};
     }
 
-    @Nullable
     public static Color parseColor(String name) {
-        if (name.startsWith("#")) {
-            try {
-                return Color.decode(name);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
-        NamedColor color = NamedColor.parse(name, null);
-        return color == null ? null : color.awtColor;
+        return name.startsWith("#") ? Color.decode(name) : NamedColor.parse(name).awtColor;
     }
 
     public static final byte[] Null = {0, 0, 0, 0};
@@ -92,8 +81,7 @@ public class Colors {
             return parse(name, Blue);
         }
 
-        @Nullable
-        public static NamedColor parse(String name, @Nullable NamedColor fallback) {
+        public static NamedColor parse(String name, NamedColor fallback) {
             String normalized = "grey".equalsIgnoreCase(name) ? "gray" : name;
             for (NamedColor color : values()) {
                 if (color.name().equalsIgnoreCase(normalized))

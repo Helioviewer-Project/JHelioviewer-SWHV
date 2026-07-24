@@ -162,8 +162,7 @@ public class BandType {
                 max = range.optDouble(1, Double.MAX_VALUE);
             String colorName = jo.optString("color", "black");
             Color color = Colors.parseColor(colorName);
-            if (color != null)
-                list.add(new Level(min, max, color));
+            list.add(new Level(min, max, color));
         }
         return list.isEmpty() ? NO_LEVELS : list.toArray(Level[]::new);
     }
@@ -198,7 +197,7 @@ public class BandType {
             double value = jo.optDouble("value", 0);
             String colorName = jo.optString("color", "white");
             Color color = Colors.parseColor(colorName);
-            if (label != null && color != null)
+            if (label != null)
                 list.add(new WarningLevel(label, value, color));
         }
         return list.toArray(WarningLevel[]::new);
