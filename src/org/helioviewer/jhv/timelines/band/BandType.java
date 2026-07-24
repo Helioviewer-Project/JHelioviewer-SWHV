@@ -21,6 +21,7 @@ public class BandType {
     private final String scale;
     private final String bandCacheType;
     private final boolean isXRSB;
+
     private record Level(double min, double max, Color color) {}
 
     record WarningLevel(String label, double value, Color color) {}

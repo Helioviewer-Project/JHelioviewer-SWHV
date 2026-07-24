@@ -55,7 +55,7 @@ public final class Band extends AbstractTimelineLayer {
     private final BandOptions optionsPanel = new BandOptions(this);
 
     private final YAxis yAxis;
-    private int[] warnPixels;
+    private final int[] warnPixels;
     private final List<Polyline> polylines = new ArrayList<>();
     private final List<Bar> bars = new ArrayList<>();
     private final LatestWorker<List<Object>> graphWorker = new LatestWorker<>("Timeline-Graph");

@@ -180,7 +180,7 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
             if (layer != null) {
                 Rectangle stripArea = geometry.getLayerArea(layerIndex);
                 layer.getYAxis().zoomSelectedRange(scrollDistance,
-                            stripArea.y + stripArea.height - p.y, stripArea.height);
+                        stripArea.y + stripArea.height - p.y, stripArea.height);
                 layer.yaxisChanged();
             }
         } else {
