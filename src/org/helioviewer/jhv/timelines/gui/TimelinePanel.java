@@ -286,7 +286,7 @@ public final class TimelinePanel extends JPanel {
 
         List<TimelineLayer> predefinedLayers = new ArrayList<>(bandTypes.size());
         for (BandType bandType : bandTypes)
-            predefinedLayers.add(Band.createFromType(bandType));
+            predefinedLayers.add(layers.getOrCreateBand(bandType));
 
         layers.restore(predefinedLayers);
         selectExistingRow(0);

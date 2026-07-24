@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.LongUnaryOperator;
 
@@ -19,7 +18,7 @@ import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.AbstractTimelineLayer;
-import org.helioviewer.jhv.timelines.TimelineLayers;
+import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
@@ -45,11 +44,6 @@ public final class Band extends AbstractTimelineLayer {
 
     private static final GraphData EMPTY_GRAPH_DATA = new GraphData(List.of(), List.of());
     private static final Colors.Data bandColors = new Colors.Data();
-    private static final HashMap<BandType, Band> bandMap = new HashMap<>();
-
-    public static Band createFromType(BandType _bandType) {
-        return bandMap.computeIfAbsent(_bandType, Band::new);
-    }
 
     private static final int SUPER_SAMPLE = 1; // 8 for dots
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
@@ -69,7 +63,7 @@ public final class Band extends AbstractTimelineLayer {
     private boolean multicolor;
     private Runnable onAppearanceChanged;
 
-    private Band(BandType _bandType) {
+    public Band(BandType _bandType) {
         bandType = _bandType;
         multicolor = bandType.hasLevels();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
@@ -112,7 +106,7 @@ public final class Band extends AbstractTimelineLayer {
         JSONObject jobt = jo.optJSONObject("bandType");
         if (jobt == null)
             throw new Exception("Missing bandType: " + jo);
-        Band band = createFromType(new BandType(jobt));
+        Band band = Timelines.getLayers().getOrCreateBand(new BandType(jobt));
 
         JSONObject jcolor = jo.optJSONObject("color");
         if (jcolor != null) {
@@ -155,7 +149,7 @@ public final class Band extends AbstractTimelineLayer {
 
     @Override
     public void remove() {
-        graphWorker.cancel();
+        graphWorker.abolish();
         graphData = EMPTY_GRAPH_DATA;
         BandDataProvider.stopDownloads(this);
         // clear caches
