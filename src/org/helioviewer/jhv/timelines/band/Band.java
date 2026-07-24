@@ -69,8 +69,6 @@ public final class Band extends AbstractTimelineLayer {
     private boolean multicolor;
     private Runnable onAppearanceChanged;
 
-    public boolean drawWarnings = true;
-
     private Band(BandType _bandType) {
         bandType = _bandType;
         multicolor = bandType.hasLevels();
@@ -78,11 +76,11 @@ public final class Band extends AbstractTimelineLayer {
         warnPixels = new int[bandType.getWarningLevels().length];
         // those should be cleared
         requestCache = new RequestCache();
-        bandCache = createBandCache(bandType.getBandCacheType());
+        bandCache = createBandCache();
     }
 
-    private static BandCache createBandCache(String cacheType) {
-        return "BandCacheAll".equals(cacheType) ? new BandCacheAll() : new BandCacheMinute();
+    private BandCache createBandCache() {
+        return bandType.cacheAllValues() ? new BandCacheAll() : new BandCacheMinute();
     }
 
     JSONObject toJson() {
@@ -161,7 +159,7 @@ public final class Band extends AbstractTimelineLayer {
         BandDataProvider.stopDownloads(this);
         // clear caches
         requestCache = new RequestCache();
-        bandCache = createBandCache(bandType.getBandCacheType());
+        bandCache = createBandCache();
     }
 
     @Override
@@ -228,12 +226,16 @@ public final class Band extends AbstractTimelineLayer {
     }
 
     @Override
-    public boolean showYAxis() {
-        return enabled;
+    public boolean hasYAxis() {
+        return true;
     }
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
+        draw(g, graphArea, timeAxis, mousePosition, true);
+    }
+
+    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition, boolean drawWarnings) {
         if (!enabled)
             return;
 
@@ -291,7 +293,7 @@ public final class Band extends AbstractTimelineLayer {
 
         LongUnaryOperator viewpointTime = propagationModel.viewpointTimeMapper();
         TimeAxis.Mapper xMapper = geometry.xMapper(timeAxis);
-        final boolean isBar = "bar".equals(bandType.getPlotType()) && bandType.getBarWidth() > 0;
+        final boolean isBar = bandType.isBarPlot() && bandType.getBarWidth() > 0;
         final long barWidthMillis = isBar ? bandType.getBarWidth() * 1000 : 0;
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(
                 SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width,

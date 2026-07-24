@@ -25,7 +25,7 @@ public final class GraphGeometry {
         size = new Rectangle(graphSize.x, graphSize.y, Math.max(1, graphSize.width), Math.max(1, graphSize.height));
     }
 
-    public void layout(int propagatedAxisCount, int yAxisCount, boolean _stacked, List<TimelineLayer> visibleYAxisLayers) {
+    public void layout(int propagatedAxisCount, boolean _stacked, List<TimelineLayer> visibleYAxisLayers) {
         stacked = _stacked;
         layerLayouts.clear();
 
@@ -49,15 +49,11 @@ public final class GraphGeometry {
                 y += stripHeight + STACKED_SEPARATOR;
             }
         } else {
+            int yAxisCount = visibleYAxisLayers.size();
             int rightAxisCount = Math.max(0, yAxisCount - 1);
             int width = size.width - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + rightAxisCount * DrawConstants.RIGHT_AXIS_WIDTH);
             area = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, Math.max(1, width), Math.max(1, height));
         }
-    }
-
-    // legacy overload for backward compatibility (overlaid mode)
-    public void layout(int propagatedAxisCount, int yAxisCount) {
-        layout(propagatedAxisCount, yAxisCount, false, Collections.emptyList());
     }
 
     public boolean isStacked() {

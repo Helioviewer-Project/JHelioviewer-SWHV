@@ -36,7 +36,7 @@ public interface TimelineLayer {
 
     boolean isDeletable();
 
-    boolean showYAxis();
+    boolean hasYAxis();
 
     void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 

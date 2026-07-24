@@ -183,8 +183,8 @@ public final class RadioData extends AbstractTimelineLayer {
     }
 
     @Override
-    public boolean showYAxis() {
-        return enabled;
+    public boolean hasYAxis() {
+        return true;
     }
 
     @Override
