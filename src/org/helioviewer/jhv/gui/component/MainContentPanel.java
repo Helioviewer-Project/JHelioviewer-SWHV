@@ -24,7 +24,7 @@ import org.helioviewer.jhv.gui.MainFrame;
 @SuppressWarnings("serial")
 public final class MainContentPanel extends JPanel {
 
-    private static final int DIVIDER_SIZE = 3;
+    private static final int DIVIDER_SIZE = 5;
 
     private final ArrayList<Interfaces.MainContentPanelPlugin> pluginList = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public final class MainContentPanel extends JPanel {
         collapsiblePane.addHeaderComponent(maximizeButton);
         updateMaximizeButton();
 
-        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setDividerSize(0);
         splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
         splitPane.setResizeWeight(0.75);
