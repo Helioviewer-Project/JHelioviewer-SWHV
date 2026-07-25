@@ -41,9 +41,15 @@ public final class Band extends TimelineLayer {
 
     private record Bar(int x1, int y1, int x2, int y2, Color levelColor) {}
 
-    private record GraphData(List<Polyline> polylines, List<Bar> bars) {}
+    private sealed interface GraphData {}
 
-    private static final GraphData EMPTY_GRAPH_DATA = new GraphData(List.of(), List.of());
+    private record EmptyGraph() implements GraphData {}
+
+    private record LineGraph(List<Polyline> polylines) implements GraphData {}
+
+    private record BarGraph(List<Bar> bars) implements GraphData {}
+
+    private static final GraphData EMPTY_GRAPH_DATA = new EmptyGraph();
     private static final Colors.Data bandColors = new Colors.Data();
 
     private static final int SUPER_SAMPLE = 1; // 8 for dots
@@ -236,16 +242,22 @@ public final class Band extends TimelineLayer {
             return;
 
         GraphData data = graphData;
-        if (!data.bars.isEmpty()) {
-            for (Bar bar : data.bars) {
-                g.setColor(bar.levelColor != null ? bar.levelColor : graphColor);
-                g.fillRect(bar.x1, bar.y1, bar.x2 - bar.x1, bar.y2 - bar.y1);
+        switch (data) {
+            case EmptyGraph ignored -> {}
+            case BarGraph bars -> {
+                for (Bar bar : bars.bars) {
+                    g.setColor(bar.levelColor != null ? bar.levelColor : graphColor);
+                    g.fillRect(bar.x1, bar.y1, bar.x2 - bar.x1, bar.y2 - bar.y1);
+                }
             }
-        } else if (multicolor) {
-            drawMulticolorPolylines(g, data.polylines);
-        } else {
-            g.setColor(graphColor);
-            data.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.length()));
+            case LineGraph lines -> {
+                if (multicolor) {
+                    drawMulticolorPolylines(g, lines.polylines);
+                } else {
+                    g.setColor(graphColor);
+                    lines.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.length()));
+                }
+            }
         }
 
         if (drawWarnings) {
@@ -318,55 +330,72 @@ public final class Band extends TimelineLayer {
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(
                 SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width,
                 start - barWidthMillis, end + barWidthMillis);
-        final int baselineY = yMapper.dataToPixel(0);
         final boolean useMulticolor = multicolor;
 
-        graphWorker.submit(() -> {
-                    List<Polyline> resultPolylines = new ArrayList<>();
-                    List<Bar> resultBars = new ArrayList<>();
-                    for (List<BandCache.DateValue> list : rawData) {
-                        if (Thread.currentThread().isInterrupted()) {
-                            throw new InterruptedException();
-                        }
-                        int size = list.size();
-                        if (size == 0) {
-                            continue;
-                        }
+        graphWorker.submit(
+                () -> isBar
+                        ? buildBars(rawData, xMapper, yMapper, viewpointTime, useMulticolor)
+                        : buildPolylines(rawData, xMapper, yMapper, viewpointTime, useMulticolor),
+                this::graphUpdated);
+    }
 
-                        int[] dates = new int[size];
-                        int[] yPixels = new int[size];
-                        float[] floatValues = useMulticolor && !isBar ? new float[size] : null;
-                        for (int i = 0; i < size; i++) {
-                            BandCache.DateValue dv = list.get(i);
-                            dates[i] = xMapper.toPixel(viewpointTime.applyAsLong(dv.milli));
-                            yPixels[i] = yMapper.dataToPixel(dv.value);
-                            if (floatValues != null)
-                                floatValues[i] = dv.value;
-                        }
+    private BarGraph buildBars(List<List<BandCache.DateValue>> rawData, TimeAxis.Mapper xMapper,
+                               YAxis.Mapper yMapper, LongUnaryOperator viewpointTime,
+                               boolean useMulticolor) throws InterruptedException {
+        long barWidthMillis = bandType.getBarWidth() * 1000;
+        int baselineY = yMapper.dataToPixel(0);
+        List<Bar> bars = new ArrayList<>();
+        for (List<BandCache.DateValue> list : rawData) {
+            if (Thread.currentThread().isInterrupted())
+                throw new InterruptedException();
 
-                        if (isBar) {
-                            for (int i = 0; i < size; i++) {
-                                Color levelColor = useMulticolor ? bandType.getLevelColor(list.get(i).value) : null;
-                                int right = dates[i];
-                                int mappedLeft = xMapper.toPixel(viewpointTime.applyAsLong(list.get(i).milli) - barWidthMillis);
-                                int left = barLeftPixel(mappedLeft, right);
-                                int top = Math.min(yPixels[i], baselineY);
-                                int bottom = Math.max(yPixels[i], baselineY);
-                                resultBars.add(new Bar(left, top, right, bottom, levelColor));
-                            }
-                        } else {
-                            resultPolylines.add(new Polyline(dates, yPixels, floatValues));
-                        }
-                    }
-                    return new GraphData(resultPolylines, resultBars);
-                },
-                (result, fresh) -> {
-                    if (!fresh)
-                        return;
+            for (BandCache.DateValue dv : list) {
+                int right = xMapper.toPixel(viewpointTime.applyAsLong(dv.milli));
+                int mappedLeft = xMapper.toPixel(viewpointTime.applyAsLong(dv.milli) - barWidthMillis);
+                int left = barLeftPixel(mappedLeft, right);
+                int valueY = yMapper.dataToPixel(dv.value);
+                int top = Math.min(valueY, baselineY);
+                int bottom = Math.max(valueY, baselineY);
+                Color levelColor = useMulticolor ? bandType.getLevelColor(dv.value) : null;
+                bars.add(new Bar(left, top, right, bottom, levelColor));
+            }
+        }
+        return new BarGraph(bars);
+    }
 
-                    graphData = result;
-                    DrawController.drawRequest();
-                });
+    private static LineGraph buildPolylines(List<List<BandCache.DateValue>> rawData, TimeAxis.Mapper xMapper,
+                                            YAxis.Mapper yMapper, LongUnaryOperator viewpointTime,
+                                            boolean useMulticolor) throws InterruptedException {
+        List<Polyline> polylines = new ArrayList<>();
+        for (List<BandCache.DateValue> list : rawData) {
+            if (Thread.currentThread().isInterrupted())
+                throw new InterruptedException();
+
+            int size = list.size();
+            if (size == 0)
+                continue;
+
+            int[] dates = new int[size];
+            int[] yPixels = new int[size];
+            float[] values = useMulticolor ? new float[size] : null;
+            for (int i = 0; i < size; i++) {
+                BandCache.DateValue dv = list.get(i);
+                dates[i] = xMapper.toPixel(viewpointTime.applyAsLong(dv.milli));
+                yPixels[i] = yMapper.dataToPixel(dv.value);
+                if (values != null)
+                    values[i] = dv.value;
+            }
+            polylines.add(new Polyline(dates, yPixels, values));
+        }
+        return new LineGraph(polylines);
+    }
+
+    private void graphUpdated(GraphData result, boolean fresh) {
+        if (!fresh)
+            return;
+
+        graphData = result;
+        DrawController.drawRequest();
     }
 
     @Override
