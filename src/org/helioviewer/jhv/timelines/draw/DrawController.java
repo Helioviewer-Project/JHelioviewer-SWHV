@@ -109,13 +109,11 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         timeRangeChanged();
     }
 
-    public static void moveXAvailableBased(int x0, int x1) {
-        if (x0 == x1)
+    public static void moveSelectedInterval(long distance) {
+        if (distance == 0)
             return;
 
-        TimeAxis.Mapper mapper = availableAxis.mapper(0, geometry.size().width);
-        long av_diff = mapper.toValue(x1) - mapper.toValue(x0);
-        selectedAxis.move(av_diff);
+        selectedAxis.move(distance);
         timeRangeChanged();
     }
 
