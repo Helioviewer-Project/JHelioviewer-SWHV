@@ -54,7 +54,7 @@ public final class TimelinePanel extends JPanel {
     private final TimelineLayers layers;
     private final JPanel optionsPanelWrapper;
     private final JComboBox<String> predefinedCombo;
-    private boolean suppressComboAction;
+    private boolean updatingPredefinedGroup;
 
     private static class TimelineTable extends JTable implements Interfaces.LazyComponent {
 
@@ -151,11 +151,21 @@ public final class TimelinePanel extends JPanel {
             }
         });
         predefinedCombo.addActionListener(e -> {
-            if (suppressComboAction)
+            if (updatingPredefinedGroup)
                 return;
             Object selected = predefinedCombo.getSelectedItem();
-            if (selected instanceof String groupName)
+            if (selected instanceof String groupName) {
+                updatingPredefinedGroup = true;
                 loadPredefinedGroup(groupName);
+                updatingPredefinedGroup = false;
+            }
+        });
+        layers.addTableModelListener(e -> {
+            boolean compositionChanged = e.getType() == TableModelEvent.INSERT
+                    || e.getType() == TableModelEvent.DELETE
+                    || e.getLastRow() == Integer.MAX_VALUE;
+            if (compositionChanged && !updatingPredefinedGroup)
+                predefinedCombo.setSelectedItem(null);
         });
 
         refreshPredefinedCombo();
@@ -298,11 +308,11 @@ public final class TimelinePanel extends JPanel {
     }
 
     private void refreshPredefinedCombo() {
-        suppressComboAction = true;
+        updatingPredefinedGroup = true;
         Map<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
         predefinedCombo.setModel(new DefaultComboBoxModel<>(groups.keySet().toArray(String[]::new)));
         predefinedCombo.setSelectedItem(null);
-        suppressComboAction = false;
+        updatingPredefinedGroup = false;
     }
 
 }
