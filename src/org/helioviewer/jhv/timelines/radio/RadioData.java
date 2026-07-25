@@ -233,6 +233,16 @@ public final class RadioData extends TimelineLayer {
         return false;
     }
 
+    private static boolean isLoading() {
+        if (!downloading.isEmpty())
+            return true;
+        for (RadioJ2KData data : cache.asMap().values()) {
+            if (data.isLoading())
+                return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean isDeletable() {
         return false;
@@ -252,10 +262,10 @@ public final class RadioData extends TimelineLayer {
             return;
 
         if (canShow(xAxis)) {
-            drawMessage(g, graphArea, "No data available");
+            drawMessage(g, graphArea, !hasData() && isLoading() ? "Fetching data" : "No data available");
             TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
             YAxis.Mapper yMapper = yAxis.mapper(graphArea.y, graphArea.height);
-            cache.asMap().values().forEach(data -> data.draw(g, graphArea, xMapper, yMapper));
+            cache.asMap().values().forEach(data -> data.draw(g, xMapper, yMapper));
         } else {
             drawMessage(g, graphArea, "Reduce the time interval to see the radio spectrograms.");
         }

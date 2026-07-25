@@ -170,14 +170,9 @@ class RadioJ2KData implements View.DataHandler {
         return new Rectangle(x0, 0, width, j2kHeight);
     }
 
-    void draw(Graphics2D g, Rectangle ga, TimeAxis.Mapper xMapper, YAxis.Mapper yMapper) {
-        if (!willDraw) {
+    void draw(Graphics2D g, TimeAxis.Mapper xMapper, YAxis.Mapper yMapper) {
+        if (!willDraw || !hasData())
             return;
-        }
-        if (!hasData()) {
-            RadioData.drawMessage(g, ga, "Fetching data");
-            return;
-        }
 
         long timeWidth = endDate - startDate;
         long imStart = (long) (startDate + timeWidth * region.llx / j2kWidth);
@@ -193,6 +188,10 @@ class RadioJ2KData implements View.DataHandler {
                 xMapper.toPixel(imEnd),
                 yMapper.dataToPixel(freqimEnd),
                 0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null);
+    }
+
+    boolean isLoading() {
+        return willDraw && !disposed && !hasData();
     }
 
     void changeColormap(ColorModel cm) {
