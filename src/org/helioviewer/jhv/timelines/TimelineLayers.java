@@ -204,8 +204,7 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     private void configureLayer(TimelineLayer layer) {
-        if (layer instanceof Band band)
-            band.setOnStateChanged(() -> updateRow(band));
+        layer.setOnStateChanged(() -> updateRow(layer));
     }
 
     private static void addUnique(List<TimelineLayer> target, TimelineLayer layer) {

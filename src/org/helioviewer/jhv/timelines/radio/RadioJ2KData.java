@@ -29,6 +29,7 @@ import org.helioviewer.jhv.view.j2k.ResolutionSet;
 class RadioJ2KData implements View.DataHandler {
 
     private final LatestWorker<DecodedImage> executor = new LatestWorker<>("Radio-Decoder");
+    private final RadioData owner;
     private final J2KViewCallisto view;
     private boolean disposed;
 
@@ -43,7 +44,8 @@ class RadioJ2KData implements View.DataHandler {
     private BufferedImage bufferedImage;
     private Region region;
 
-    RadioJ2KData(APIRequest req, DataUri dataUri) throws Exception {
+    RadioJ2KData(RadioData _owner, APIRequest req, DataUri dataUri) throws Exception {
+        owner = _owner;
         J2KViewCallisto v = null;
         try {
             v = new J2KViewCallisto(executor, req, dataUri);
@@ -97,10 +99,10 @@ class RadioJ2KData implements View.DataHandler {
 
         region = imageData.region();
         boolean hadData = bufferedImage != null;
-        bufferedImage = createIndexedImage((ByteBuffer) imageBuffer.buffer, w, h, RadioData.getColorModel());
+        bufferedImage = createIndexedImage((ByteBuffer) imageBuffer.buffer, w, h, owner.getColorModel());
         imageBuffer.allowExplicitFree();
         if (!hadData)
-            RadioData.dataUpdated();
+            owner.dataUpdated();
         DrawController.drawRequest();
     }
 
