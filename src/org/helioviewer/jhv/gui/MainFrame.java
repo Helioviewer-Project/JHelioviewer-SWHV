@@ -72,22 +72,20 @@ public final class MainFrame {
 
     @SuppressWarnings("serial")
     private static final class RenderStartupHost extends JPanel {
-        private final JPanel placeholder = new JPanel();
         private AngleCanvas canvas;
         private boolean surfaceVisible = true;
 
         RenderStartupHost() {
             super(new BorderLayout());
+            JPanel placeholder = new JPanel();
             placeholder.setBackground(Color.BLACK);
             add(placeholder, BorderLayout.CENTER);
         }
 
         void attachCanvas(AngleCanvas _canvas) {
-            if (canvas != null)
-                return;
             canvas = _canvas;
             canvas.setHostVisible(surfaceVisible);
-            remove(placeholder);
+            removeAll();
             add(canvas, BorderLayout.CENTER);
             revalidate();
             repaint();
@@ -106,8 +104,7 @@ public final class MainFrame {
 
     private static SideContentPane leftPane;
 
-    private static AngleCanvas renderCanvas;
-    private static RenderStartupHost renderHost;
+    private static final RenderStartupHost renderHost = new RenderStartupHost();
     private static AwtInputAdapter awtInputAdapter;
     private static MainContentPanel mainContentPanel;
 
@@ -122,9 +119,6 @@ public final class MainFrame {
 
         menuBar = new MenuBar();
         mainFrame.setJMenuBar(menuBar);
-
-        renderCanvas = null;
-        renderHost = new RenderStartupHost();
 
         layersPanel = new LayersPanel();
 
@@ -184,19 +178,19 @@ public final class MainFrame {
     }
 
     private static void attachAndRender() {
-        if (renderCanvas != null) // impossible
+        if (renderHost.canvas != null) // impossible
             return;
 
-        renderCanvas = new AngleCanvas();
-        renderCanvas.setMinimumSize(new Dimension(1, 1)); // allow resize
-        renderCanvas.addMouseListener(awtInputAdapter);
-        renderCanvas.addMouseMotionListener(awtInputAdapter);
-        renderCanvas.addMouseWheelListener(awtInputAdapter);
-        renderCanvas.addKeyListener(awtInputAdapter);
-        renderHost.attachCanvas(renderCanvas);
+        AngleCanvas canvas = new AngleCanvas();
+        canvas.setMinimumSize(new Dimension(1, 1)); // allow resize
+        canvas.addMouseListener(awtInputAdapter);
+        canvas.addMouseMotionListener(awtInputAdapter);
+        canvas.addMouseWheelListener(awtInputAdapter);
+        canvas.addKeyListener(awtInputAdapter);
+        renderHost.attachCanvas(canvas);
         // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
-        renderCanvas.requestRender();
-        DisplayController.setRenderRequestHandler(renderCanvas::requestRender);
+        canvas.requestRender();
+        DisplayController.setRenderRequestHandler(canvas::requestRender);
     }
 
     private static JFrame createFrame() {
@@ -296,11 +290,11 @@ public final class MainFrame {
     }
 
     public static Component getRenderComponent() {
-        return renderCanvas != null ? renderCanvas : renderHost;
+        return renderHost.canvas != null ? renderHost.canvas : renderHost;
     }
 
     public static int getFramerate() {
-        return renderCanvas != null ? renderCanvas.getFramerate() : 0;
+        return renderHost.canvas != null ? renderHost.canvas.getFramerate() : 0;
     }
 
     public static void setRenderSurfaceVisible(boolean visible) {
