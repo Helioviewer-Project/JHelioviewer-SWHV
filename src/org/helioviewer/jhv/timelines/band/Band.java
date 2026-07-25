@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.LongUnaryOperator;
@@ -241,14 +242,30 @@ public final class Band extends TimelineLayer {
                 g.fillRect(bar.x1, bar.y1, bar.x2 - bar.x1, bar.y2 - bar.y1);
             }
         } else if (multicolor && bandType.hasLevels()) {
+            Path2D.Float path = new Path2D.Float();
             for (Polyline line : data.polylines) {
                 int[] xp = line.xPoints;
                 int[] yp = line.yPoints;
                 float[] vals = line.values;
+                Color pathColor = null;
                 for (int i = 0; i < line.length() - 1; i++) {
-                    Color segColor = vals != null ? bandType.getLevelColor(vals[i]) : null;
-                    g.setColor(segColor != null ? segColor : graphColor);
-                    g.drawLine(xp[i], yp[i], xp[i + 1], yp[i + 1]);
+                    Color segmentColor = vals != null ? bandType.getLevelColor(vals[i]) : null;
+                    if (segmentColor == null)
+                        segmentColor = graphColor;
+                    if (!segmentColor.equals(pathColor)) {
+                        if (pathColor != null) {
+                            g.setColor(pathColor);
+                            g.draw(path);
+                        }
+                        path.reset();
+                        path.moveTo(xp[i], yp[i]);
+                        pathColor = segmentColor;
+                    }
+                    path.lineTo(xp[i + 1], yp[i + 1]);
+                }
+                if (pathColor != null) {
+                    g.setColor(pathColor);
+                    g.draw(path);
                 }
             }
         } else {
