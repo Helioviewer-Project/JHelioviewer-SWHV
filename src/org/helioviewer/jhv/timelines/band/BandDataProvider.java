@@ -28,8 +28,7 @@ public class BandDataProvider {
         if ("".equals(baseUrl))
             return;
         pruneFinished(band);
-        intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(
-                baseUrl, interval.start(), interval.end(), () -> band.requestFailed(interval))));
+        intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(baseUrl, interval.start(), interval.end())));
         Timelines.getLayers().updateRow(band);
     }
 
