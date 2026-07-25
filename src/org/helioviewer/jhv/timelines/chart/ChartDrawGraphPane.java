@@ -39,14 +39,11 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     private Point mousePressedPosition;
-    private boolean chartDragged;
 
     private BufferedImage screenImage;
 
     private final TimelineLabelPainter labelPainter = new TimelineLabelPainter();
     private Point mousePosition;
-    private int lastWidth = -1;
-    private int lastHeight = -1;
 
     private boolean redrawGraphArea;
 
@@ -61,7 +58,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
-        DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
+        DrawController.setGraphSize(getWidth(), getHeight());
     }
 
     @Override
@@ -116,12 +113,9 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         int width = (int) (sx * graphSize.getWidth() + .5);
         int height = (int) (sy * graphSize.getHeight() + .5);
 
-        if (width != lastWidth || height != lastHeight) {
+        if (screenImage == null || width != screenImage.getWidth() || height != screenImage.getHeight()) {
             screenImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
             ExportMovie.EVEImage = screenImage;
-
-            lastWidth = width;
-            lastHeight = height;
         }
 
         Graphics2D fullG = screenImage.createGraphics();
@@ -206,17 +200,14 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         switch (dragMode) {
             case CHART -> {
                 setCursor(UIGlobals.openHandCursor);
-                if (mousePressedPosition != null && chartDragged) {
-                    DrawController.moveX(mousePressedPosition.x - p.x);
-                    DrawController.moveAllAxes(p, p.y - mousePressedPosition.y);
-                }
+                if (mousePressedPosition != null)
+                    moveChart(p);
             }
             case MOVIELINE -> DrawController.setMovieFrame(p);
             case NODRAG -> {}
         }
         dragMode = DragMode.NODRAG;
         mousePressedPosition = null;
-        chartDragged = false;
     }
 
     @Override
@@ -225,16 +216,19 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         if (mousePressedPosition != null) {
             switch (dragMode) {
                 case CHART -> {
-                    chartDragged = true;
                     setCursor(UIGlobals.closedHandCursor);
-                    DrawController.moveX(mousePressedPosition.x - p.x);
-                    DrawController.moveY(p, p.y - mousePressedPosition.y);
+                    moveChart(p);
                 }
                 case MOVIELINE -> DrawController.setMovieFrame(p);
                 case NODRAG -> {}
             }
         }
         mousePressedPosition = p;
+    }
+
+    private void moveChart(Point p) {
+        DrawController.moveX(mousePressedPosition.x - p.x);
+        DrawController.moveY(p, p.y - mousePressedPosition.y);
     }
 
     private static boolean overMovieLine(Point p) {
@@ -291,7 +285,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     @Override
     public void componentResized(ComponentEvent e) {
-        DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
+        DrawController.setGraphSize(getWidth(), getHeight());
         if (mousePosition != null && !DrawController.getGeometry().isStacked())
             DrawController.setYAxisHighlight(DrawController.getGeometry().yAxisHit(mousePosition));
     }

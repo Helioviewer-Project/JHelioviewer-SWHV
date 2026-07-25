@@ -16,7 +16,7 @@ public final class GraphGeometry {
     private static final int MINIMUM_STACKED_LAYER_HEIGHT = 64;
     private static final int STACKED_SEPARATOR = 8;
 
-    private Rectangle size = new Rectangle();
+    private final Rectangle size = new Rectangle();
     private Rectangle area = new Rectangle();
     private boolean stacked;
     private final ArrayList<LayerLayout> layerLayouts = new ArrayList<>();
@@ -26,8 +26,8 @@ public final class GraphGeometry {
 
     public record LayerLayout(TimelineLayer layer, Rectangle area, int axisIndex) {}
 
-    public void setSize(Rectangle graphSize) {
-        size = new Rectangle(graphSize.x, graphSize.y, Math.max(1, graphSize.width), Math.max(1, graphSize.height));
+    public void setSize(int width, int height) {
+        size.setBounds(0, 0, Math.max(1, width), Math.max(1, height));
     }
 
     void setStacked(boolean _stacked) {
