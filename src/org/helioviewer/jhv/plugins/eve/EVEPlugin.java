@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 public class EVEPlugin extends Plugin {
 
-    private Timelines tl;
+    private Timelines timelines;
     private JMenuItem newItem;
     private JMenuItem openItem;
 
@@ -28,8 +28,9 @@ public class EVEPlugin extends Plugin {
 
     @Override
     public void installGUI() {
-        tl = new Timelines();
-        tl.installTimelines();
+        if (timelines == null)
+            timelines = new Timelines();
+        timelines.installTimelines();
         newItem = new JMenuItem(new TimelineActions.NewLayer());
         openItem = new JMenuItem(new TimelineActions.OpenLocalFile());
         MainFrame.getMenuBar().getMenu(0).add(newItem, 5);
@@ -44,8 +45,7 @@ public class EVEPlugin extends Plugin {
         MainFrame.getMenuBar().getMenu(0).remove(newItem);
         openItem = null;
         newItem = null;
-        tl.uninstallTimelines();
-        tl = null;
+        timelines.uninstallTimelines();
     }
 
     @Override
