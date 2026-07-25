@@ -39,6 +39,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     private Point mousePressedPosition;
+    private Point dragTargetPosition;
 
     private BufferedImage screenImage;
 
@@ -184,6 +185,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     public void mousePressed(MouseEvent e) {
         Point p = e.getPoint();
         mousePressedPosition = p;
+        dragTargetPosition = p;
         if (overMovieLine(p)) {
             // setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
             dragMode = DragMode.MOVIELINE;
@@ -208,6 +210,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         }
         dragMode = DragMode.NODRAG;
         mousePressedPosition = null;
+        dragTargetPosition = null;
     }
 
     @Override
@@ -228,7 +231,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     private void moveChart(Point p) {
         DrawController.moveX(mousePressedPosition.x - p.x);
-        DrawController.moveY(p, p.y - mousePressedPosition.y);
+        DrawController.moveY(dragTargetPosition, p.y - mousePressedPosition.y);
     }
 
     private static boolean overMovieLine(Point p) {
