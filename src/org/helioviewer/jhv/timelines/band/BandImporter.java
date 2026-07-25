@@ -1,12 +1,15 @@
 package org.helioviewer.jhv.timelines.band;
 
+import java.awt.EventQueue;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
+import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,6 +25,20 @@ public final class BandImporter {
             if (data != null)
                 acceptData(data);
         }, BandImporter::onFailure);
+    }
+
+    public static void loadCdf(URI uri) throws Exception {
+        List<BandData> bands = BandReaderCdf.read(uri);
+        if (bands.isEmpty())
+            return;
+        long[] dates = bands.getFirst().dates();
+        if (dates.length == 0)
+            return;
+
+        EventQueue.invokeLater(() -> {
+            bands.forEach(BandImporter::acceptData);
+            DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
+        });
     }
 
     static void acceptData(BandData data) {
