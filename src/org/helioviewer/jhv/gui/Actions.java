@@ -31,7 +31,7 @@ import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.band.BandReaderHapi;
+import org.helioviewer.jhv.timelines.Timelines;
 
 @SuppressWarnings({"serial", "this-escape"})
 public final class Actions {
@@ -211,7 +211,7 @@ public final class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             DataSources.loadSources(false);
-            BandReaderHapi.requestCatalog();
+            Timelines.requestCatalog();
         }
     }
 

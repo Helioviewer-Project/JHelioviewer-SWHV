@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.LongUnaryOperator;
 
+import javax.annotation.Nullable;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.base.Colors;
@@ -19,7 +20,6 @@ import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
@@ -30,8 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public final class Band extends TimelineLayer {
-
-    record Data(BandType bandType, long[] dates, float[] values) {}
 
     private record Polyline(int[] xPoints, int[] yPoints, float[] values) {}
 
@@ -63,7 +61,7 @@ public final class Band extends TimelineLayer {
     private Color graphColor = bandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
     private boolean multicolor;
-    private Runnable onAppearanceChanged;
+    private Runnable onStateChanged;
 
     public Band(BandType _bandType) {
         bandType = _bandType;
@@ -107,7 +105,7 @@ public final class Band extends TimelineLayer {
         JSONObject jobt = jo.optJSONObject("bandType");
         if (jobt == null)
             throw new Exception("Missing bandType: " + jo);
-        Band band = Timelines.getLayers().getOrCreateBand(new BandType(jobt));
+        Band band = new Band(new BandType(jobt));
 
         JSONObject jcolor = jo.optJSONObject("color");
         if (jcolor != null) {
@@ -118,6 +116,12 @@ public final class Band extends TimelineLayer {
         }
         band.multicolor = band.hasLevelColors() && jo.optBoolean("multicolor", band.bandType.hasLevels());
         return band;
+    }
+
+    public void applyStateFrom(Band restored) {
+        enabled = restored.enabled;
+        graphColor = restored.graphColor;
+        multicolor = restored.multicolor;
     }
 
     @Override
@@ -152,7 +156,7 @@ public final class Band extends TimelineLayer {
     public void remove() {
         graphWorker.abolish();
         graphData = EMPTY_GRAPH_DATA;
-        BandDataProvider.stopDownloads(this);
+        BandDownloads.stop(this);
         requestCache = new RequestCache();
         bandCache = createBandCache();
     }
@@ -170,7 +174,7 @@ public final class Band extends TimelineLayer {
     void setDataColor(Color c) {
         graphColor = c;
         DrawController.drawRequest();
-        notifyAppearanceChanged();
+        notifyStateChanged();
     }
 
     public boolean isMulticolor() {
@@ -188,21 +192,21 @@ public final class Band extends TimelineLayer {
     public void setMulticolor(boolean _multicolor) {
         multicolor = hasLevelColors() && _multicolor;
         updateGraph();
-        notifyAppearanceChanged();
+        notifyStateChanged();
     }
 
-    public void setOnAppearanceChanged(Runnable callback) {
-        onAppearanceChanged = callback;
+    public void setOnStateChanged(Runnable callback) {
+        onStateChanged = callback;
     }
 
-    private void notifyAppearanceChanged() {
-        if (onAppearanceChanged != null)
-            onAppearanceChanged.run();
+    private void notifyStateChanged() {
+        if (onStateChanged != null)
+            onStateChanged.run();
     }
 
     @Override
     public boolean isDownloading() {
-        return BandDataProvider.isDownloadActive(this);
+        return BandDownloads.isActive(this);
     }
 
     @Override
@@ -414,6 +418,9 @@ public final class Band extends TimelineLayer {
     }
 
     private void updateData(long start, long end) {
+        if (!BandDownloads.isAvailable(this))
+            return;
+
         List<Interval> missingIntervals = requestCache.getMissingIntervals(start, end);
         if (!missingIntervals.isEmpty()) {
             // extend
@@ -422,8 +429,23 @@ public final class Band extends TimelineLayer {
 
             List<Interval> intervals = new ArrayList<>();
             requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
-            BandDataProvider.addDownloads(this, intervals);
+            BandDownloads.start(this, intervals);
         }
+    }
+
+    void requestFailed(Interval interval) {
+        requestCache.removeRequestedInterval(interval.start(), interval.end());
+        notifyStateChanged();
+    }
+
+    void downloadSucceeded(@Nullable BandData data) {
+        if (data != null)
+            addToCache(data.values(), data.dates());
+        notifyStateChanged();
+    }
+
+    void downloadStateChanged() {
+        notifyStateChanged();
     }
 
     @Override

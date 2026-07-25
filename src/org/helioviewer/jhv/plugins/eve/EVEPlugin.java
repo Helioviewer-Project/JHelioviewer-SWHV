@@ -5,7 +5,6 @@ import javax.swing.JMenuItem;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.plugins.Plugin;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 import org.helioviewer.jhv.timelines.gui.TimelineActions;
 
 import org.json.JSONObject;
@@ -36,7 +35,7 @@ public class EVEPlugin extends Plugin {
         MainFrame.getMenuBar().getMenu(0).add(newItem, 5);
         MainFrame.getMenuBar().getMenu(0).add(openItem, 6);
 
-        BandReaderHapi.requestCatalog();
+        Timelines.requestCatalog();
     }
 
     @Override

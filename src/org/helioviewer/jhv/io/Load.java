@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.layers.connect.LoadSunJSON;
-import org.helioviewer.jhv.timelines.band.BandReaderHapi;
+import org.helioviewer.jhv.timelines.band.BandImporter;
 
 public final class Load {
 
@@ -81,7 +81,7 @@ public final class Load {
     }
 
     public static void hapi(@Nonnull URI uri) {
-        BandReaderHapi.loadUri(uri);
+        BandImporter.loadHapi(uri);
     }
 
     public static void hapi(@Nonnull List<URI> uris) {
