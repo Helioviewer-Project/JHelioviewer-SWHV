@@ -42,6 +42,8 @@ public final class AngleCanvas extends Canvas {
     private int lastGlWidth = -1;
     private int lastGlHeight = -1;
     private Rectangle lastHostBounds;
+    private boolean hostVisible = true;
+    private boolean nativeHostVisible = true;
 
     public AngleCanvas() {
         setFocusable(true);
@@ -155,8 +157,24 @@ public final class AngleCanvas extends Canvas {
         return fps;
     }
 
+    public void setHostVisible(boolean visible) {
+        if (!Platform.isMacOS())
+            return;
+
+        hostVisible = visible;
+        if (!visible && macHostHandle != 0L && nativeHostVisible) {
+            MacAngleBridge.setVisible(macHostHandle, false);
+            nativeHostVisible = false;
+        } else if (visible) {
+            scheduleHostUpdate(true);
+        }
+    }
+
     // Render one frame and keep the shared viewport state in sync with the canvas size.
     private void renderNow(Position viewpoint) {
+        if (!hostVisible)
+            return;
+
         attachIfNeeded();
         if (angleRenderer == null)
             return;
@@ -188,6 +206,8 @@ public final class AngleCanvas extends Canvas {
                     return;
                 newHostHandle = host.handle();
                 newNativeWindowHandle = host.layer();
+                if (!hostVisible)
+                    MacAngleBridge.setVisible(newHostHandle, false);
             } else if (Platform.isWindows()) {
                 newNativeWindowHandle = WinAngleBridge.hwnd(this);
             } else if (Platform.isLinux()) {
@@ -201,6 +221,7 @@ public final class AngleCanvas extends Canvas {
             nativeWindowHandle = newNativeWindowHandle;
             angleRenderer = renderer;
             lastHostBounds = bounds;
+            nativeHostVisible = hostVisible;
             invalidateGlSize();
         } catch (RuntimeException | Error e) {
             if (newHostHandle != 0L)
@@ -225,10 +246,16 @@ public final class AngleCanvas extends Canvas {
             return;
 
         Rectangle bounds = hostBounds();
-        if (Platform.isMacOS() && (!bounds.equals(lastHostBounds) || pixelScaleChanged))
-            MacAngleBridge.setFrame(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
+        if (Platform.isMacOS()) {
+            if (!bounds.equals(lastHostBounds) || pixelScaleChanged)
+                MacAngleBridge.setFrame(macHostHandle, bounds.x, bounds.y, bounds.width, bounds.height);
+            if (hostVisible != nativeHostVisible) {
+                MacAngleBridge.setVisible(macHostHandle, hostVisible);
+                nativeHostVisible = hostVisible;
+            }
+        }
         lastHostBounds = bounds;
-        if (renderNeeded || pixelScaleChanged || lastGlWidth < 0 || lastGlHeight < 0)
+        if (hostVisible && (renderNeeded || pixelScaleChanged || lastGlWidth < 0 || lastGlHeight < 0))
             requestRender(viewpoint);
     }
 
@@ -264,6 +291,7 @@ public final class AngleCanvas extends Canvas {
             } finally {
                 macHostHandle = 0L;
                 nativeWindowHandle = 0L;
+                nativeHostVisible = true;
                 displayPending = hostUpdatePending = hostRenderPending = false;
                 lastHostBounds = null;
                 invalidateGlSize();

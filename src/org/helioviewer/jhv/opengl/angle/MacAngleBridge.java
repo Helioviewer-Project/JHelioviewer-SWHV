@@ -28,6 +28,8 @@ public final class MacAngleBridge {
     private static final MethodHandle SET_FRAME = downcall("jhv_metal_host_set_frame",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
                     ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
+    private static final MethodHandle SET_VISIBLE = downcall("jhv_metal_host_set_visible",
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
     private static final MethodHandle DESTROY = downcall("jhv_metal_host_destroy",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
     private static final MethodHandle DEVICE_INFO = downcall("jhv_metal_device_info",
@@ -83,6 +85,15 @@ public final class MacAngleBridge {
             SET_FRAME.invokeExact(metalHost, x, y, width, height);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to resize Metal host layer", t);
+        }
+    }
+
+    public static void setVisible(long handle, boolean visible) {
+        try {
+            MemorySegment metalHost = MemorySegment.ofAddress(handle);
+            SET_VISIBLE.invokeExact(metalHost, visible ? 1 : 0);
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to change Metal host visibility", t);
         }
     }
 

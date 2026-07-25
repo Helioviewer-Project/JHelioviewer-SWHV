@@ -100,6 +100,7 @@ public final class MainFrame {
 
     private static AngleCanvas renderCanvas;
     private static RenderStartupHost renderHost;
+    private static boolean renderSurfaceVisible = true;
     private static AwtInputAdapter awtInputAdapter;
     private static MainContentPanel mainContentPanel;
 
@@ -185,6 +186,7 @@ public final class MainFrame {
         renderCanvas.addMouseMotionListener(awtInputAdapter);
         renderCanvas.addMouseWheelListener(awtInputAdapter);
         renderCanvas.addKeyListener(awtInputAdapter);
+        renderCanvas.setHostVisible(renderSurfaceVisible);
         renderHost.attachCanvas(renderCanvas);
         // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
         renderCanvas.requestRender();
@@ -293,6 +295,12 @@ public final class MainFrame {
 
     public static int getFramerate() {
         return renderCanvas != null ? renderCanvas.getFramerate() : 0;
+    }
+
+    public static void setRenderSurfaceVisible(boolean visible) {
+        renderSurfaceVisible = visible;
+        if (renderCanvas != null)
+            renderCanvas.setHostVisible(visible);
     }
 
     public static MainContentPanel getMainContentPanel() {
