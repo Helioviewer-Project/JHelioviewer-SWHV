@@ -418,7 +418,7 @@ public final class Band extends TimelineLayer {
     }
 
     private void updateData(long start, long end) {
-        if (!BandDownloads.isAvailable(this))
+        if (!BandDownloads.hasCatalog(this))
             return;
 
         List<Interval> missingIntervals = requestCache.getMissingIntervals(start, end);

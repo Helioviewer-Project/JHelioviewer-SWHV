@@ -18,7 +18,7 @@ final class BandDownloads {
         workers.get(band).removeIf(Future::isDone);
     }
 
-    static boolean isAvailable(Band band) {
+    static boolean hasCatalog(Band band) {
         String baseUrl = band.getBandType().getBaseUrl();
         return !baseUrl.isEmpty() && BandReaderHapi.hasCatalog(baseUrl);
     }

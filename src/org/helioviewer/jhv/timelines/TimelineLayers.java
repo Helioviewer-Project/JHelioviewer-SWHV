@@ -91,11 +91,7 @@ public class TimelineLayers extends AbstractTableModel {
             fireTableRowsUpdated(row, row);
     }
 
-    public void updateLoadingCell(TimelineLayer tl) {
-        updateCell(layers.indexOf(tl), LOADING_COLUMN);
-    }
-
-    public Band getOrCreateBand(BandType bandType) {
+    private Band getOrCreateBand(BandType bandType) {
         Band band = findBand(layers, bandType);
         return band == null ? new Band(bandType) : band;
     }
