@@ -158,7 +158,7 @@ public final class AngleCanvas extends Canvas {
     }
 
     public void setHostVisible(boolean visible) {
-        if (!Platform.isMacOS())
+        if (!Platform.isMacOS() || hostVisible == visible)
             return;
 
         hostVisible = visible;
