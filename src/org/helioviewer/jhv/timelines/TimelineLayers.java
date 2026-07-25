@@ -173,6 +173,8 @@ public class TimelineLayers extends AbstractTableModel {
     @Nullable
     public static ClickableDrawable getDrawableUnderMouse() {
         for (TimelineLayer tl : layers) {
+            if (!tl.isEnabled())
+                continue;
             ClickableDrawable tlUnderMouse = tl.getDrawableUnderMouse();
             if (tlUnderMouse != null) {
                 return tlUnderMouse;
