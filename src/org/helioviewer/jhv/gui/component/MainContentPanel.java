@@ -92,6 +92,7 @@ public final class MainContentPanel extends JPanel {
         splitPane.setDividerSize(0);
 
         if (pluginList.isEmpty()) {
+            pluginContainer.removeAll();
             revalidate();
             repaint();
             return;
