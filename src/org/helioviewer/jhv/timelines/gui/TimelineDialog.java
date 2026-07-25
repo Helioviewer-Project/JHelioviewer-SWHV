@@ -23,7 +23,6 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.timelines.TimelineLayers;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.band.BandType;
 
 import com.jidesoft.dialog.ButtonPanel;
@@ -32,20 +31,21 @@ import com.jidesoft.dialog.StandardDialog;
 @SuppressWarnings("serial")
 public final class TimelineDialog extends StandardDialog implements Interfaces.ShowableDialog {
 
+    private final TimelineLayers layers;
     private final JComboBox<String> comboGroup = new JComboBox<>();
     private final JList<BandType> listBand = new JList<>();
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            TimelineLayers layers = Timelines.getLayers();
             for (BandType bandType : listBand.getSelectedValuesList())
                 layers.addBand(bandType);
             setVisible(false);
         }
     };
 
-    public TimelineDialog() {
+    public TimelineDialog(TimelineLayers _layers) {
         super(MainFrame.get(), "New Layer", true);
+        layers = _layers;
         setResizable(false);
     }
 
