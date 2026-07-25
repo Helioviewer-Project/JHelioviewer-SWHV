@@ -63,7 +63,10 @@ public class TimelineLayers extends AbstractTableModel {
     }
 
     public static void fetchData(TimeAxis timeAxis) {
-        layers.forEach(layer -> layer.fetchData(timeAxis));
+        for (TimelineLayer layer : layers) {
+            if (layer.isEnabled())
+                layer.fetchData(timeAxis);
+        }
     }
 
     public static boolean highlightChanged(Point p) {
