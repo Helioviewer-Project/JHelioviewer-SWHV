@@ -63,6 +63,11 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
         addMouseListener(this);
         addMouseMotionListener(this);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
         DrawController.addDrawListener(this);
     }
 

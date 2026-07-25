@@ -61,8 +61,14 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         addComponentListener(this);
-        DrawController.addDrawListener(this);
         DrawController.setGraphSize(new Rectangle(getWidth(), getHeight()));
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        DrawController.addDrawListener(this);
+        drawRequest();
     }
 
     @Override
