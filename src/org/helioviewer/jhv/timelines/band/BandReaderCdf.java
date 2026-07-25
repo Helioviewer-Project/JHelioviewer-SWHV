@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -14,7 +13,6 @@ import java.util.Set;
 import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.time.TimeUtils;
-import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
 import org.json.JSONArray;
@@ -32,20 +30,6 @@ import uk.ac.bristol.star.cdf.VariableAttribute;
 
 public class BandReaderCdf {
 
-    public static void load(URI uri) throws Exception {
-        List<BandData> lines = read(NetFileCache.get(uri).uri()); // tbd : sniff type
-        if (lines.isEmpty()) // failed
-            return;
-        long[] dates = lines.getFirst().dates();
-        if (dates.length == 0) // empty file
-            return;
-
-        EventQueue.invokeLater(() -> {
-            lines.forEach(BandImporter::acceptData);
-            DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
-        });
-    }
-
     private static final double eV2K = 11604.5250061657;
     private static final Set<String> SWAIncluded = Set.of("N", "V_RTN", "T");
 
@@ -54,7 +38,8 @@ public class BandReaderCdf {
 
     private record CDFVariable(Variable variable, Map<String, String> attributes) {}
 
-    private static List<BandData> read(URI uri) throws IOException {
+    static List<BandData> read(URI uri) throws Exception {
+        uri = NetFileCache.get(uri).uri(); // tbd : sniff type
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
 
         LinkedListMultimap<String, String> globalAttrs = LinkedListMultimap.create();
