@@ -1,48 +1,16 @@
 package org.helioviewer.jhv.timelines.band;
 
-import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.Task;
-import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.Timelines;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.common.collect.ArrayListMultimap;
-
 public class BandDataProvider {
-
-    private static final ArrayListMultimap<Band, Future<Band.Data>> workers = ArrayListMultimap.create();
-
-    private static void pruneFinished(Band band) {
-        workers.get(band).removeIf(Future::isDone);
-    }
-
-    static void addDownloads(Band band, List<Interval> intervals) {
-        String baseUrl = band.getBandType().getBaseUrl();
-        if ("".equals(baseUrl))
-            return;
-        pruneFinished(band);
-        intervals.forEach(interval -> workers.put(band, BandReaderHapi.requestData(
-                baseUrl, interval.start(), interval.end(), () -> band.requestFailed(interval))));
-        Timelines.getLayers().updateRow(band);
-    }
-
-    static void stopDownloads(Band band) {
-        workers.get(band).forEach(worker -> worker.cancel(true));
-        workers.removeAll(band);
-        Timelines.getLayers().updateRow(band);
-    }
-
-    static boolean isDownloadActive(Band band) {
-        pruneFinished(band);
-        return !workers.get(band).isEmpty();
-    }
 
     public static void loadBand(JSONObject jo) {
         Task.submit("band", new BandLoad(jo), BandDataProvider::acceptData, BandDataProvider::onFailure);
