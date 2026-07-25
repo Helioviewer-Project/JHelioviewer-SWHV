@@ -164,7 +164,7 @@ public final class GraphGeometry {
     }
 
     public int axisZoomY(Point p) {
-        return size.height - p.y - area.y;
+        return graphBottom() - p.y;
     }
 
     @Nullable
