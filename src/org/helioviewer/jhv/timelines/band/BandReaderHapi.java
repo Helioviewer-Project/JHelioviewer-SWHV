@@ -3,6 +3,7 @@ package org.helioviewer.jhv.timelines.band;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,8 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.Future;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
@@ -40,7 +42,7 @@ public class BandReaderHapi {
 
     @FunctionalInterface
     public interface CatalogListener {
-        void catalogLoaded(String group, BandType[] bandTypes);
+        void catalogsLoaded(Map<String, BandType[]> catalogs);
     }
 
     private static final String hapiFormat = "binary";
@@ -50,7 +52,7 @@ public class BandReaderHapi {
     };
 
     private static final HashMap<CatalogEndpoint, Catalog> catalogs = new HashMap<>();
-    private static int catalogRequest;
+    private static Future<?> catalogRequest;
 
     public static String[] getCatalogGroups() {
         String[] groups = new String[catalogEndpoints.length];
@@ -60,14 +62,10 @@ public class BandReaderHapi {
     }
 
     public static void requestCatalog(CatalogListener listener) {
-        int request = ++catalogRequest;
-        for (CatalogEndpoint catalogEndpoint : catalogEndpoints) {
-            String server = catalogEndpoint.server;
-            String endpoint = server.endsWith("/") ? server : server + '/';
-            Task.submit(endpoint, new LoadHapiCatalog(endpoint),
-                    catalog -> onSuccessCatalog(catalogEndpoint, catalog, listener, request),
-                    BandReaderHapi::onFailure);
-        }
+        if (catalogRequest != null)
+            catalogRequest.cancel(true);
+        catalogRequest = Task.submit(BandReaderHapi::loadCatalogs,
+                loaded -> onSuccessCatalogs(loaded, listener), BandReaderHapi::onFailure);
     }
 
     static boolean hasCatalog(String url) {
@@ -82,13 +80,6 @@ public class BandReaderHapi {
         return getHapiUri(uri);
     }
 
-    private record LoadHapiCatalog(String server) implements Callable<Catalog> {
-        @Override
-        public Catalog call() throws Exception {
-            return getCatalog(server);
-        }
-    }
-
     private record LoadHapiStream(Catalog catalog, String url, long start, long end) implements Callable<BandData> {
         @Override
         public BandData call() throws Exception {
@@ -96,12 +87,35 @@ public class BandReaderHapi {
         }
     }
 
-    private static void onSuccessCatalog(CatalogEndpoint endpoint, @Nonnull Catalog catalog,
-                                         CatalogListener listener, int request) {
-        if (request != catalogRequest)
-            return;
-        catalogs.put(endpoint, catalog);
-        listener.catalogLoaded(endpoint.groupName, catalog.types);
+    private static Catalog[] loadCatalogs() {
+        return Arrays.stream(catalogEndpoints).parallel()
+                .map(BandReaderHapi::loadCatalog)
+                .toArray(Catalog[]::new);
+    }
+
+    @Nullable
+    private static Catalog loadCatalog(CatalogEndpoint catalogEndpoint) {
+        String server = catalogEndpoint.server;
+        String endpoint = server.endsWith("/") ? server : server + '/';
+        try {
+            return getCatalog(endpoint);
+        } catch (Exception e) {
+            Log.error(endpoint, e);
+            return null;
+        }
+    }
+
+    private static void onSuccessCatalogs(Catalog[] loadedCatalogs, CatalogListener listener) {
+        LinkedHashMap<String, BandType[]> bandTypes = new LinkedHashMap<>();
+        for (int i = 0; i < loadedCatalogs.length; i++) {
+            Catalog catalog = loadedCatalogs[i];
+            if (catalog != null) {
+                CatalogEndpoint endpoint = catalogEndpoints[i];
+                catalogs.put(endpoint, catalog);
+                bandTypes.put(endpoint.groupName, catalog.types);
+            }
+        }
+        listener.catalogsLoaded(bandTypes);
     }
 
     public static Map<String, List<BandType>> getPredefinedGroups() {
@@ -156,8 +170,9 @@ public class BandReaderHapi {
         return 0;
     }
 
-    private static void onFailure(String ignoredLogContext, Throwable t) {
-        Log.errorStack(t);
+    private static void onFailure(Throwable t) {
+        if (!(t instanceof CancellationException))
+            Log.errorStack(t);
     }
 
     private record CatalogEndpoint(String groupName, String server) {}
