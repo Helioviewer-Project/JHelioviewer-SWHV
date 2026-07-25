@@ -241,33 +241,8 @@ public final class Band extends TimelineLayer {
                 g.setColor(bar.levelColor != null ? bar.levelColor : graphColor);
                 g.fillRect(bar.x1, bar.y1, bar.x2 - bar.x1, bar.y2 - bar.y1);
             }
-        } else if (multicolor && bandType.hasLevels()) {
-            Path2D.Float path = new Path2D.Float();
-            for (Polyline line : data.polylines) {
-                int[] xp = line.xPoints;
-                int[] yp = line.yPoints;
-                float[] vals = line.values;
-                Color pathColor = null;
-                for (int i = 0; i < line.length() - 1; i++) {
-                    Color segmentColor = vals != null ? bandType.getLevelColor(vals[i]) : null;
-                    if (segmentColor == null)
-                        segmentColor = graphColor;
-                    if (!segmentColor.equals(pathColor)) {
-                        if (pathColor != null) {
-                            g.setColor(pathColor);
-                            g.draw(path);
-                        }
-                        path.reset();
-                        path.moveTo(xp[i], yp[i]);
-                        pathColor = segmentColor;
-                    }
-                    path.lineTo(xp[i + 1], yp[i + 1]);
-                }
-                if (pathColor != null) {
-                    g.setColor(pathColor);
-                    g.draw(path);
-                }
-            }
+        } else if (multicolor) {
+            drawMulticolorPolylines(g, data.polylines);
         } else {
             g.setColor(graphColor);
             data.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.length()));
@@ -280,6 +255,35 @@ public final class Band extends TimelineLayer {
                 g.setColor(warningColor == null ? graphColor : warningColor);
                 g.drawLine(graphArea.x, warnPixels[i], graphArea.x + graphArea.width, warnPixels[i]);
                 g.drawString(wls[i].label(), graphArea.x, warnPixels[i] - 2);
+            }
+        }
+    }
+
+    private void drawMulticolorPolylines(Graphics2D g, List<Polyline> polylines) {
+        Path2D.Float path = new Path2D.Float();
+        for (Polyline line : polylines) {
+            int[] xp = line.xPoints;
+            int[] yp = line.yPoints;
+            float[] vals = line.values;
+            Color pathColor = null;
+            for (int i = 0; i < line.length() - 1; i++) {
+                Color segmentColor = vals != null ? bandType.getLevelColor(vals[i]) : null;
+                if (segmentColor == null)
+                    segmentColor = graphColor;
+                if (!segmentColor.equals(pathColor)) {
+                    if (pathColor != null) {
+                        g.setColor(pathColor);
+                        g.draw(path);
+                    }
+                    path.reset();
+                    path.moveTo(xp[i], yp[i]);
+                    pathColor = segmentColor;
+                }
+                path.lineTo(xp[i + 1], yp[i + 1]);
+            }
+            if (pathColor != null) {
+                g.setColor(pathColor);
+                g.draw(path);
             }
         }
     }
@@ -350,7 +354,7 @@ public final class Band extends TimelineLayer {
                                 resultBars.add(new Bar(left, top, right, bottom, levelColor));
                             }
                         } else {
-                            resultPolylines.add(new Polyline(dates, yPixels, (useMulticolor && bandType.hasLevels()) ? floatValues : null));
+                            resultPolylines.add(new Polyline(dates, yPixels, useMulticolor ? floatValues : null));
                         }
                     }
                     return new GraphData(resultPolylines, resultBars);

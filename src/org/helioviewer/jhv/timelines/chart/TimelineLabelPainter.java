@@ -90,10 +90,7 @@ final class TimelineLabelPainter {
     private void drawStackedLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
         List<GraphGeometry.LayerLayout> layerLayouts = geometry.getLayerLayouts();
 
-        drawHorizontalLabels(g, geometry, xAxis, 0, null);
-        List<TimelineLayer> propagatedLayers = geometry.getPropagatedLayers();
-        for (int row = 0; row < propagatedLayers.size(); row++)
-            drawHorizontalLabels(g, geometry, xAxis, row + 1, propagatedLayers.get(row));
+        drawTimeLabels(g, geometry, xAxis);
 
         for (GraphGeometry.LayerLayout layout : layerLayouts)
             drawStackedVerticalLabels(g, geometry, layout.area(), layout.layer());
