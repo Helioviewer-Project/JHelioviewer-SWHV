@@ -219,21 +219,6 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         }
     }
 
-    public static void moveAllAxes(Point p, double distanceY) {
-        if (distanceY == 0)
-            return;
-
-        if (geometry.isStacked()) {
-            GraphGeometry.LayerLayout layout = geometry.getLayerLayout(p);
-            if (layout != null)
-                moveYAxis(layout.layer(), distanceY, layout.area().height);
-        } else {
-            for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts())
-                moveYAxis(layout.layer(), distanceY, geometry.graphHeight());
-        }
-        drawRequest();
-    }
-
     private static void timeRangeChanged() {
         if (locked)
             layersUpdater.restart();
@@ -247,8 +232,8 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         drawRequest();
     }
 
-    public static void setGraphSize(Rectangle _graphSize) {
-        geometry.setSize(_graphSize);
+    public static void setGraphSize(int width, int height) {
+        geometry.setSize(width, height);
         layoutChanged();
     }
 
