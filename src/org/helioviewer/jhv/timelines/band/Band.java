@@ -335,17 +335,18 @@ public final class Band extends TimelineLayer {
 
                         int[] dates = new int[size];
                         int[] yPixels = new int[size];
-                        float[] floatValues = new float[size];
+                        float[] floatValues = useMulticolor && !isBar ? new float[size] : null;
                         for (int i = 0; i < size; i++) {
                             BandCache.DateValue dv = list.get(i);
                             dates[i] = xMapper.toPixel(viewpointTime.applyAsLong(dv.milli));
                             yPixels[i] = yMapper.dataToPixel(dv.value);
-                            floatValues[i] = dv.value;
+                            if (floatValues != null)
+                                floatValues[i] = dv.value;
                         }
 
                         if (isBar) {
                             for (int i = 0; i < size; i++) {
-                                Color levelColor = useMulticolor ? bandType.getLevelColor(floatValues[i]) : null;
+                                Color levelColor = useMulticolor ? bandType.getLevelColor(list.get(i).value) : null;
                                 int right = dates[i];
                                 int mappedLeft = xMapper.toPixel(viewpointTime.applyAsLong(list.get(i).milli) - barWidthMillis);
                                 int left = barLeftPixel(mappedLeft, right);
@@ -354,7 +355,7 @@ public final class Band extends TimelineLayer {
                                 resultBars.add(new Bar(left, top, right, bottom, levelColor));
                             }
                         } else {
-                            resultPolylines.add(new Polyline(dates, yPixels, useMulticolor ? floatValues : null));
+                            resultPolylines.add(new Polyline(dates, yPixels, floatValues));
                         }
                     }
                     return new GraphData(resultPolylines, resultBars);
