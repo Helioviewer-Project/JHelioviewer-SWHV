@@ -38,6 +38,7 @@ static CAMetalLayer *jhv_create_metal_layer(id<MTLDevice> device, CGFloat conten
     metalLayer.framebufferOnly = NO;
     metalLayer.opaque = YES;
     metalLayer.contentsScale = contentsScale;
+    metalLayer.contentsGravity = kCAGravityCenter;
     jhv_set_metal_layer_frame(metalLayer, frame);
     return metalLayer;
 }
@@ -153,6 +154,21 @@ void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, do
             } @finally {
                 CFRelease((__bridge CFTypeRef)retainedBox);
             }
+        }
+    });
+}
+
+void jhv_metal_host_set_visible(void *boxPtr, int visible) {
+    if (boxPtr == NULL)
+        return;
+
+    JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
+    CFRetain((__bridge CFTypeRef)box);
+    jhv_run_on_main_async(^{
+        @autoreleasepool {
+            JHVMetalHostBox *retainedBox = box;
+            retainedBox.metalLayer.hidden = visible == 0;
+            CFRelease((__bridge CFTypeRef)retainedBox);
         }
     });
 }

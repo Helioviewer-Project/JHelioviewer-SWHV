@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.component;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -10,10 +11,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 
 import org.helioviewer.jhv.app.Settings;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
+import org.helioviewer.jhv.gui.MainFrame;
 
 // This panel acts as a container for the GUI elements which are shown in the
 // main area of the application. Usually it contains the main image area. Below
@@ -28,11 +31,22 @@ public final class MainContentPanel extends JPanel {
     private final JSplitPane splitPane;
     private final JPanel pluginContainer;
     private final CollapsiblePane collapsiblePane;
+    private final CollapsiblePaneButton maximizeButton;
+
+    private boolean pluginMaximized;
+    private int normalDividerLocation;
 
     public MainContentPanel(Component mainComponent) {
         pluginContainer = new JPanel(new BorderLayout());
         collapsiblePane = new CollapsiblePane("Plugins", pluginContainer, !"false".equals(Settings.getProperty("display.plugins")));
         collapsiblePane.toggleButton.addActionListener(e -> updateLayout());
+
+        maximizeButton = new CollapsiblePaneButton();
+        maximizeButton.setFont(Buttons.getMaterialFont(16));
+        maximizeButton.setHorizontalAlignment(SwingConstants.CENTER);
+        maximizeButton.addActionListener(e -> togglePluginMaximized());
+        collapsiblePane.addHeaderComponent(maximizeButton);
+        updateMaximizeButton();
 
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
         splitPane.setDividerSize(0);
@@ -70,6 +84,9 @@ public final class MainContentPanel extends JPanel {
     // area. A split pane will be provided, if necessary, to readjust the
     // height of the components.
     private void updateLayout() {
+        if ((pluginList.isEmpty() || !collapsiblePane.toggleButton.isSelected()) && pluginMaximized)
+            restorePluginSize();
+
         splitPane.remove(collapsiblePane);
         remove(collapsiblePane);
         splitPane.setDividerSize(0);
@@ -99,14 +116,53 @@ public final class MainContentPanel extends JPanel {
                 pluginContainer.add(tabbedPane, BorderLayout.CENTER);
             }
             splitPane.setBottomComponent(collapsiblePane);
-            splitPane.setDividerSize(DIVIDER_SIZE);
+            if (pluginMaximized) {
+                splitPane.setDividerLocation(0);
+            } else {
+                splitPane.setDividerSize(DIVIDER_SIZE);
+            }
         } else {
             add(collapsiblePane, BorderLayout.PAGE_END);
         }
+        maximizeButton.setVisible(isSelected);
         Settings.setProperty("display.plugins", Boolean.toString(isSelected));
 
         revalidate();
         repaint();
+    }
+
+    private void togglePluginMaximized() {
+        if (pluginMaximized) {
+            restorePluginSize();
+        } else {
+            normalDividerLocation = splitPane.getDividerLocation();
+            MainFrame.setRenderSurfaceVisible(false);
+            splitPane.setDividerSize(0);
+            splitPane.setDividerLocation(0);
+            pluginMaximized = true;
+            updateMaximizeButton();
+            revalidate();
+            repaint();
+        }
+    }
+
+    private void restorePluginSize() {
+        splitPane.setDividerSize(DIVIDER_SIZE);
+        splitPane.setDividerLocation(normalDividerLocation);
+        pluginMaximized = false;
+        updateMaximizeButton();
+        revalidate();
+        repaint();
+        EventQueue.invokeLater(() -> {
+            if (!pluginMaximized)
+                MainFrame.setRenderSurfaceVisible(true);
+        });
+    }
+
+    private void updateMaximizeButton() {
+        maximizeButton.setSelected(true);
+        maximizeButton.setText((pluginMaximized ? MaterialDesign.CHEVRON_DOWN : MaterialDesign.CHEVRON_UP).toString());
+        maximizeButton.setToolTipText(pluginMaximized ? "Restore panel size" : "Maximize panel");
     }
 
 }

@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -16,6 +17,7 @@ public class CollapsiblePane extends JComponent implements ActionListener {
 
     final CollapsiblePaneButton toggleButton;
     private final JComponent managed;
+    private final JPanel header;
     private String title;
 
     public CollapsiblePane(String _title, JComponent _managed, boolean startExpanded) {
@@ -30,8 +32,15 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         toggleButton.addActionListener(this);
         setTitle(_title);
 
-        add(toggleButton, BorderLayout.PAGE_START);
+        header = new JPanel(new BorderLayout());
+        header.add(toggleButton, BorderLayout.CENTER);
+
+        add(header, BorderLayout.PAGE_START);
         add(managed, BorderLayout.CENTER);
+    }
+
+    void addHeaderComponent(JComponent component) {
+        header.add(component, BorderLayout.LINE_END);
     }
 
     void setTitle(String _title) {
