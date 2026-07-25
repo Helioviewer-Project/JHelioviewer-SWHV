@@ -7,7 +7,6 @@ import java.awt.Rectangle;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.function.LongUnaryOperator;
 
 import javax.swing.JPanel;
@@ -57,7 +56,6 @@ public final class Band extends TimelineLayer {
     private final YAxis yAxis;
     private final int[] warnPixels;
     private final LatestWorker<GraphData> graphWorker = new LatestWorker<>("Timeline-Graph");
-    private final List<Future<Data>> downloads = new ArrayList<>();
 
     private RequestCache requestCache;
     private BandCache bandCache;
@@ -154,8 +152,7 @@ public final class Band extends TimelineLayer {
     public void remove() {
         graphWorker.abolish();
         graphData = EMPTY_GRAPH_DATA;
-        downloads.forEach(download -> download.cancel(true));
-        downloads.clear();
+        BandDataProvider.stopDownloads(this);
         requestCache = new RequestCache();
         bandCache = createBandCache();
     }
@@ -205,8 +202,7 @@ public final class Band extends TimelineLayer {
 
     @Override
     public boolean isDownloading() {
-        downloads.removeIf(Future::isDone);
-        return !downloads.isEmpty();
+        return BandDataProvider.isDownloadActive(this);
     }
 
     @Override
@@ -429,10 +425,7 @@ public final class Band extends TimelineLayer {
 
         List<Interval> intervals = new ArrayList<>();
         requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
-        downloads.removeIf(Future::isDone);
-        intervals.forEach(interval -> downloads.add(BandReaderHapi.requestData(
-                bandType.getBaseUrl(), interval.start(), interval.end(), () -> requestFailed(interval))));
-        Timelines.getLayers().updateRow(this);
+        BandDataProvider.addDownloads(this, intervals);
     }
 
     void requestFailed(Interval interval) {
