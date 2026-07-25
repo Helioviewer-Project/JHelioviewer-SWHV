@@ -31,23 +31,13 @@ record DatesValues(long[] dates, float[][] values) {
         }
 
         if (scale < 1) { // upscaling
-            int numMiddles = numPoints - 1;
-            long[] middles = new long[numMiddles];
-            for (int i = 0; i < numMiddles; i++) {
-                middles[i] = (dates[i + 1] + dates[i]) / 2;
-            }
-
-            for (int j = 0; j < numAxes; j++) {
-                for (int i = 0; i < numBins; i++) {
-                    int idx = -1 + (int) (i * scale + 0.5);
-                    if (idx < 0) {
-                        valuesBinned[j][i] = values[j][0];
-                    } else if (idx > numMiddles - 1) {
-                        valuesBinned[j][i] = values[j][numPoints - 1];
-                    } else {
-                        valuesBinned[j][i] = datesBinned[i] < middles[idx] ? values[j][idx] : values[j][idx + 1];
-                    }
-                }
+            int source = 0;
+            for (int i = 0; i < numBins; i++) {
+                while (source + 1 < numPoints
+                        && datesBinned[i] >= dates[source] + (dates[source + 1] - dates[source]) / 2)
+                    source++;
+                for (int j = 0; j < numAxes; j++)
+                    valuesBinned[j][i] = values[j][source];
             }
             return new DatesValues(datesBinned, valuesBinned);
         }
