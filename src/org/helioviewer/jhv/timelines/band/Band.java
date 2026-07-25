@@ -33,11 +33,7 @@ public final class Band extends TimelineLayer {
 
     record Data(BandType bandType, long[] dates, float[] values) {}
 
-    private record Polyline(int[] xPoints, int[] yPoints, float[] values) {
-        int length() {
-            return xPoints.length;
-        }
-    }
+    private record Polyline(int[] xPoints, int[] yPoints, float[] values) {}
 
     private record Bar(int x1, int y1, int x2, int y2, Color levelColor) {}
 
@@ -52,7 +48,6 @@ public final class Band extends TimelineLayer {
     private static final GraphData EMPTY_GRAPH_DATA = new EmptyGraph();
     private static final Colors.Data bandColors = new Colors.Data();
 
-    private static final int SUPER_SAMPLE = 1; // 8 for dots
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
     private final BandType bandType;
@@ -75,7 +70,6 @@ public final class Band extends TimelineLayer {
         multicolor = bandType.hasLevels();
         yAxis = new YAxis(bandType.getMin(), bandType.getMax(), YAxis.generateScale(bandType.getScale(), bandType.getUnitLabel()));
         warnPixels = new int[bandType.getWarningLevels().length];
-        // those should be cleared
         requestCache = new RequestCache();
         bandCache = createBandCache();
     }
@@ -159,7 +153,6 @@ public final class Band extends TimelineLayer {
         graphWorker.abolish();
         graphData = EMPTY_GRAPH_DATA;
         BandDataProvider.stopDownloads(this);
-        // clear caches
         requestCache = new RequestCache();
         bandCache = createBandCache();
     }
@@ -234,10 +227,10 @@ public final class Band extends TimelineLayer {
 
     @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
-        draw(g, graphArea, timeAxis, mousePosition, true);
+        draw(g, graphArea, true);
     }
 
-    public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition, boolean drawWarnings) {
+    public void draw(Graphics2D g, Rectangle graphArea, boolean drawWarnings) {
         if (!enabled)
             return;
 
@@ -255,7 +248,7 @@ public final class Band extends TimelineLayer {
                     drawMulticolorPolylines(g, lines.polylines);
                 } else {
                     g.setColor(graphColor);
-                    lines.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.length()));
+                    lines.polylines.forEach(line -> g.drawPolyline(line.xPoints, line.yPoints, line.xPoints.length));
                 }
             }
         }
@@ -278,7 +271,7 @@ public final class Band extends TimelineLayer {
             int[] yp = line.yPoints;
             float[] vals = line.values;
             Color pathColor = null;
-            for (int i = 0; i < line.length() - 1; i++) {
+            for (int i = 0; i < xp.length - 1; i++) {
                 Color segmentColor = vals != null ? bandType.getLevelColor(vals[i]) : null;
                 if (segmentColor == null)
                     segmentColor = graphColor;
@@ -328,7 +321,7 @@ public final class Band extends TimelineLayer {
         final boolean isBar = bandType.isBarPlot() && bandType.getBarWidth() > 0;
         final long barWidthMillis = isBar ? bandType.getBarWidth() * 1000 : 0;
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(
-                SUPER_SAMPLE * Display.pixelScale[0] * drawArea.width,
+                Display.pixelScale[0] * drawArea.width,
                 start - barWidthMillis, end + barWidthMillis);
         final boolean useMulticolor = multicolor;
 
@@ -424,16 +417,15 @@ public final class Band extends TimelineLayer {
         if (!BandReaderHapi.hasCatalog(bandType.getBaseUrl()))
             return;
 
-        List<Interval> missingIntervals = requestCache.getMissingIntervals(start, end);
-        if (!missingIntervals.isEmpty()) {
-            // extend
-            start -= 7 * TimeUtils.DAY_IN_MILLIS;
-            end += 7 * TimeUtils.DAY_IN_MILLIS;
+        if (requestCache.getMissingIntervals(start, end).isEmpty())
+            return;
 
-            List<Interval> intervals = new ArrayList<>();
-            requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
-            BandDataProvider.addDownloads(this, intervals);
-        }
+        start -= 7 * TimeUtils.DAY_IN_MILLIS;
+        end += 7 * TimeUtils.DAY_IN_MILLIS;
+
+        List<Interval> intervals = new ArrayList<>();
+        requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
+        BandDataProvider.addDownloads(this, intervals);
     }
 
     void requestFailed(Interval interval) {
@@ -462,7 +454,6 @@ public final class Band extends TimelineLayer {
         boolean hadData = bandCache.hasData();
         bandCache.addToCache(yAxis, values, dates);
         updateGraph();
-        DrawController.drawRequest();
         return !hadData && bandCache.hasData();
     }
 
@@ -483,8 +474,9 @@ public final class Band extends TimelineLayer {
 
     void setPropagationModel(PropagationModel _propagationModel) {
         propagationModel = _propagationModel;
+        TimeAxis timeAxis = DrawController.selectedAxis;
+        updateData(propagationModel.getObservationTime(timeAxis.start()), propagationModel.getObservationTime(timeAxis.end()));
         DrawController.layoutChanged();
-        fetchData(DrawController.selectedAxis);
     }
 
 }

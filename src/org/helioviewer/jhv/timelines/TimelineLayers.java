@@ -54,7 +54,7 @@ public class TimelineLayers extends AbstractTableModel {
             if (layer instanceof Band band) {
                 boolean drawWarnings = stackedMode || !warningBandDrawn;
                 warningBandDrawn |= band.hasWarningLevels();
-                band.draw(g, area, timeAxis, mousePosition, drawWarnings);
+                band.draw(g, area, drawWarnings);
             } else {
                 layer.draw(g, area, timeAxis, mousePosition);
             }
