@@ -30,30 +30,32 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     private boolean draggingInterval;
     private Point mousePressed;
 
-    private int leftIntervalBorderPosition = -10;
-    private int rightIntervalBorderPosition = -10;
-
     private record LabelTick(long date, String text) {}
 
-    private record IntervalPixels(TimeAxis interval, int width, double ratioX) {
+    private record IntervalGeometry(TimeAxis interval, int width, double ratioX, int selectedLeft, int selectedRight) {
 
         int pixel(long date) {
             return DrawConstants.GRAPH_LEFT_SPACE + (int) ((date - interval.start()) * ratioX);
         }
 
-        int minutePixel(long date) {
-            long widthMillis = interval.end() - interval.start();
-            double minutes = widthMillis == 0 ? 1 : widthMillis / (double) TimeUtils.MINUTE_IN_MILLIS;
-            long offsetMinutes = Math.round((date - interval.start()) / (double) TimeUtils.MINUTE_IN_MILLIS);
-            return DrawConstants.GRAPH_LEFT_SPACE + (int) ((offsetMinutes / minutes) * width);
-        }
-
-        int right() {
+        int availableRight() {
             return DrawConstants.GRAPH_LEFT_SPACE + width;
         }
 
         boolean contains(long date) {
             return interval.start() <= date && date <= interval.end();
+        }
+
+        boolean containsSelected(Point p) {
+            return p.x >= selectedLeft && p.x <= selectedRight;
+        }
+
+        int selectedMiddle() {
+            return selectedLeft + (selectedRight - selectedLeft) / 2;
+        }
+
+        long timeAt(int x) {
+            return (long) (interval.start() + (x - DrawConstants.GRAPH_LEFT_SPACE) / ratioX);
         }
 
     }
@@ -83,55 +85,48 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         Graphics2D g = (Graphics2D) g1;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setFont(DrawConstants.font);
-        drawBackground(g);
 
-        TimeAxis availableAxis = DrawController.availableAxis;
         TimeAxis selectedAxis = DrawController.selectedAxis;
-        IntervalPixels pixels = intervalPixels(availableAxis);
+        IntervalGeometry geometry = intervalGeometry();
 
-        computeIntervalBorderPositions(pixels, selectedAxis);
-        drawIntervalBackground(g);
-        drawInterval(g);
-        drawMovieInterval(g, pixels);
-        drawLabels(g, pixels, selectedAxis);
-        drawIntervalGraspPoints(g);
-        drawIntervalHBar(g);
+        drawBackground(g, geometry);
+        drawIntervalBackground(g, geometry);
+        drawInterval(g, geometry);
+        drawMovieInterval(g, geometry);
+        drawLabels(g, geometry, selectedAxis);
+        drawIntervalGraspPoints(g, geometry);
+        drawIntervalHBar(g, geometry);
     }
 
-    private void drawIntervalBackground(Graphics2D g) {
+    private void drawIntervalBackground(Graphics2D g, IntervalGeometry geometry) {
         g.setColor(UIGlobals.TL_SELECTED_INTERVAL_BACKGROUND_COLOR);
-        g.fillRect(leftIntervalBorderPosition - 1, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, getHeight() - 3);
+        g.fillRect(geometry.selectedLeft - 1, 0, geometry.selectedRight - geometry.selectedLeft, getHeight() - 3);
     }
 
-    private void computeIntervalBorderPositions(IntervalPixels pixels, TimeAxis selectedInterval) {
-        leftIntervalBorderPosition = pixels.minutePixel(selectedInterval.start());
-        rightIntervalBorderPosition = pixels.minutePixel(selectedInterval.end());
-    }
-
-    private void drawBackground(Graphics2D g) {
+    private void drawBackground(Graphics2D g, IntervalGeometry geometry) {
         g.setColor(UIGlobals.TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR);
-        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 2, availableIntervalWidth(), getHeight() - 3);
+        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 2, geometry.width, getHeight() - 3);
     }
 
-    private void drawInterval(Graphics2D g) {
+    private void drawInterval(Graphics2D g, IntervalGeometry geometry) {
         g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
-        g.fillRect(leftIntervalBorderPosition, getHeight() - 2, rightIntervalBorderPosition - leftIntervalBorderPosition, 2);
+        g.fillRect(geometry.selectedLeft, getHeight() - 2, geometry.selectedRight - geometry.selectedLeft, 2);
         g.setColor(UIGlobals.TL_BORDER_COLOR);
-        g.fillRect(leftIntervalBorderPosition, 0, rightIntervalBorderPosition - leftIntervalBorderPosition, 1);
+        g.fillRect(geometry.selectedLeft, 0, geometry.selectedRight - geometry.selectedLeft, 1);
     }
 
-    private void drawMovieInterval(Graphics2D g, IntervalPixels pixels) {
+    private void drawMovieInterval(Graphics2D g, IntervalGeometry geometry) {
         long movieStart = Player.getStartTime();
         long movieEnd = Player.getEndTime();
 
-        if (movieEnd < pixels.interval().start() || movieStart > pixels.interval().end()) {
+        if (movieEnd < geometry.interval.start() || movieStart > geometry.interval.end()) {
             return;
         }
 
-        long clampedStart = Math.max(movieStart, pixels.interval().start());
-        long clampedEnd = Math.min(movieEnd, pixels.interval().end());
-        int min = pixels.pixel(clampedStart);
-        int max = pixels.pixel(clampedEnd);
+        long clampedStart = Math.max(movieStart, geometry.interval.start());
+        long clampedEnd = Math.min(movieEnd, geometry.interval.end());
+        int min = geometry.pixel(clampedStart);
+        int max = geometry.pixel(clampedEnd);
 
         int offset = 7;
         g.setColor(UIGlobals.TL_MOVIE_INTERVAL_COLOR);
@@ -150,43 +145,43 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         }
     }
 
-    private void drawIntervalGraspPoints(Graphics2D g) {
+    private void drawIntervalGraspPoints(Graphics2D g, IntervalGeometry geometry) {
         g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
-        g.fillRect(leftIntervalBorderPosition - 1, 0, 2, getHeight());
-        g.fillRect(rightIntervalBorderPosition - 1, 0, 2, getHeight());
+        g.fillRect(geometry.selectedLeft - 1, 0, 2, getHeight());
+        g.fillRect(geometry.selectedRight - 1, 0, 2, getHeight());
     }
 
-    private void drawIntervalHBar(Graphics2D g) {
+    private void drawIntervalHBar(Graphics2D g, IntervalGeometry geometry) {
         g.setColor(UIGlobals.TL_INTERVAL_BORDER_COLOR);
-        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 0, leftIntervalBorderPosition - DrawConstants.GRAPH_LEFT_SPACE, 2);
-        g.fillRect(rightIntervalBorderPosition, 0, getWidth() - rightIntervalBorderPosition - DrawConstants.GRAPH_RIGHT_SPACE, 2);
+        g.fillRect(DrawConstants.GRAPH_LEFT_SPACE, 0, geometry.selectedLeft - DrawConstants.GRAPH_LEFT_SPACE, 2);
+        g.fillRect(geometry.selectedRight, 0, getWidth() - geometry.selectedRight - DrawConstants.GRAPH_RIGHT_SPACE, 2);
     }
 
-    private void drawLabels(Graphics2D g, IntervalPixels pixels, TimeAxis selectedInterval) {
-        TimeAxis availableInterval = pixels.interval();
+    private void drawLabels(Graphics2D g, IntervalGeometry geometry, TimeAxis selectedInterval) {
+        TimeAxis availableInterval = geometry.interval;
         String tickText = TimeUtils.format(DrawConstants.FULL_DATE_TIME_FORMAT, availableInterval.start());
         int tickTextWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        int maxTicks = Math.max(2, (pixels.width() - tickTextWidth * 2) / tickTextWidth);
+        int maxTicks = Math.max(2, (geometry.width - tickTextWidth * 2) / tickTextWidth);
 
-        for (LabelTick tick : labelTicks(pixels, maxTicks)) {
-            drawLabel(g, selectedInterval, tick.text, tick.date, pixels);
+        for (LabelTick tick : labelTicks(geometry, maxTicks)) {
+            drawLabel(g, selectedInterval, tick.text, tick.date, geometry);
         }
     }
 
-    private static List<LabelTick> labelTicks(IntervalPixels pixels, int maxTicks) {
-        TimeAxis availableInterval = pixels.interval();
+    private static List<LabelTick> labelTicks(IntervalGeometry geometry, int maxTicks) {
+        TimeAxis availableInterval = geometry.interval;
         long ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 366 * 3;
-        if (pixels.contains(ts)) {
+        if (geometry.contains(ts)) {
             return yearTicks(availableInterval, maxTicks);
         }
 
         ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 31 * 3;
-        if (pixels.contains(ts)) {
+        if (geometry.contains(ts)) {
             return monthTicks(availableInterval, maxTicks);
         }
 
         ts = availableInterval.start() + TimeUtils.DAY_IN_MILLIS * 3;
-        return pixels.contains(ts) ? dayTicks(availableInterval, maxTicks) : timeTicks(availableInterval, maxTicks);
+        return geometry.contains(ts) ? dayTicks(availableInterval, maxTicks) : timeTicks(availableInterval, maxTicks);
     }
 
     private static List<LabelTick> timeTicks(TimeAxis availableInterval, int maxTicks) {
@@ -307,9 +302,9 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         return ticks;
     }
 
-    private void drawLabel(Graphics2D g, TimeAxis selectedInterval, String tickText, long date, IntervalPixels pixels) {
+    private void drawLabel(Graphics2D g, TimeAxis selectedInterval, String tickText, long date, IntervalGeometry geometry) {
         int textWidth = (int) g.getFontMetrics().getStringBounds(tickText, g).getWidth();
-        int x = pixels.pixel(date);
+        int x = geometry.pixel(date);
         if (selectedInterval.start() <= date && date <= selectedInterval.end()) {
             g.setColor(UIGlobals.TL_AVAILABLE_INTERVAL_BACKGROUND_COLOR);
         } else {
@@ -317,8 +312,8 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         }
         g.drawLine(x, 2, x, getHeight() - 1);
         g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-        if (x + textWidth > pixels.right()) {
-            if ((x - 2) < pixels.right()) {
+        if (x + textWidth > geometry.availableRight()) {
+            if ((x - 2) < geometry.availableRight()) {
                 g.drawString(tickText, x - 2 - textWidth, getHeight() - 5);
             }
         } else {
@@ -330,16 +325,27 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
         return getWidth() - (DrawConstants.GRAPH_LEFT_SPACE + DrawConstants.GRAPH_RIGHT_SPACE + DrawConstants.RANGE_SELECTION_WIDTH) - 1;
     }
 
-    private IntervalPixels intervalPixels(TimeAxis availableInterval) {
-        int pixelWidth = availableIntervalWidth();
-        long width = availableInterval.end() - availableInterval.start();
-        double ratioX = pixelWidth / (double) (width == 0 ? 1 : width);
-        return new IntervalPixels(availableInterval, pixelWidth, ratioX);
+    private IntervalGeometry intervalGeometry() {
+        TimeAxis availableInterval = DrawController.availableAxis;
+        TimeAxis selectedInterval = DrawController.selectedAxis;
+        int pixelWidth = Math.max(1, availableIntervalWidth());
+        long intervalWidth = availableInterval.end() - availableInterval.start();
+        double ratioX = pixelWidth / (double) (intervalWidth == 0 ? 1 : intervalWidth);
+        int selectedLeft = minutePixel(availableInterval, selectedInterval.start(), pixelWidth);
+        int selectedRight = minutePixel(availableInterval, selectedInterval.end(), pixelWidth);
+        return new IntervalGeometry(availableInterval, pixelWidth, ratioX, selectedLeft, selectedRight);
     }
 
-    private void moveSelectedInterval(Point newMousePosition) {
+    private static int minutePixel(TimeAxis interval, long date, int width) {
+        long widthMillis = interval.end() - interval.start();
+        double minutes = widthMillis == 0 ? 1 : widthMillis / (double) TimeUtils.MINUTE_IN_MILLIS;
+        long offsetMinutes = Math.round((date - interval.start()) / (double) TimeUtils.MINUTE_IN_MILLIS);
+        return DrawConstants.GRAPH_LEFT_SPACE + (int) ((offsetMinutes / minutes) * width);
+    }
+
+    private void moveSelectedInterval(Point newMousePosition, IntervalGeometry geometry) {
         if (mousePressed != null) {
-            DrawController.moveXAvailableBased(mousePressed.x, newMousePosition.x);
+            DrawController.moveSelectedInterval(geometry.timeAt(newMousePosition.x) - geometry.timeAt(mousePressed.x));
             mousePressed = newMousePosition;
         }
     }
@@ -349,27 +355,27 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     @Override
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
+        IntervalGeometry geometry = intervalGeometry();
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
-                mousePressed = new Point(leftIntervalBorderPosition + (rightIntervalBorderPosition - leftIntervalBorderPosition) / 2, 0);
-                moveSelectedInterval(p);
+            if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= geometry.availableRight()) {
+                mousePressed = new Point(geometry.selectedMiddle(), 0);
+                moveSelectedInterval(p, geometry);
                 mousePressed = null;
             }
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            jumpSelectedInterval(p);
+            jumpSelectedInterval(p, geometry);
         }
     }
 
-    private void jumpSelectedInterval(Point point) {
-        double intervalWidthPixel = (1. * rightIntervalBorderPosition - leftIntervalBorderPosition);
-        double middle = leftIntervalBorderPosition + 0.5 * intervalWidthPixel;
-        DrawController.moveXAvailableBased(point.x, (int) middle);
+    private static void jumpSelectedInterval(Point point, IntervalGeometry geometry) {
+        DrawController.moveSelectedInterval(geometry.timeAt(geometry.selectedMiddle()) - geometry.timeAt(point.x));
     }
 
     private void updateCursor(Point p) {
-        if (isInSelectedInterval(p)) {
+        IntervalGeometry geometry = intervalGeometry();
+        if (geometry.containsSelected(p)) {
             setCursor(UIGlobals.openHandCursor);
-        } else if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= getWidth() - DrawConstants.GRAPH_RIGHT_SPACE) {
+        } else if (p.x >= DrawConstants.GRAPH_LEFT_SPACE && p.x <= geometry.availableRight()) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else {
             setCursor(Cursor.getDefaultCursor());
@@ -385,7 +391,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     @Override
     public void mousePressed(MouseEvent e) {
         mousePressed = e.getPoint();
-        draggingInterval = isInSelectedInterval(mousePressed);
+        draggingInterval = intervalGeometry().containsSelected(mousePressed);
         if (draggingInterval) {
             setCursor(UIGlobals.closedHandCursor);
         }
@@ -395,7 +401,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     public void mouseReleased(MouseEvent e) {
         Point p = e.getPoint();
         if (draggingInterval) {
-            moveSelectedInterval(p);
+            moveSelectedInterval(p, intervalGeometry());
             updateCursor(p);
         }
         draggingInterval = false;
@@ -407,7 +413,7 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
     @Override
     public void mouseDragged(MouseEvent e) {
         if (draggingInterval) {
-            moveSelectedInterval(e.getPoint());
+            moveSelectedInterval(e.getPoint(), intervalGeometry());
         }
     }
 
@@ -423,9 +429,5 @@ class ChartDrawIntervalPane extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void drawMovieLineRequest() {}
-
-    private boolean isInSelectedInterval(Point p) {
-        return p.x >= leftIntervalBorderPosition && p.x <= rightIntervalBorderPosition;
-    }
 
 }
