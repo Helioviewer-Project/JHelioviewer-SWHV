@@ -414,22 +414,16 @@ public final class Band extends TimelineLayer {
     }
 
     private void updateData(long start, long end) {
-        if (!BandReaderHapi.hasCatalog(bandType.getBaseUrl()))
-            return;
+        List<Interval> missingIntervals = requestCache.getMissingIntervals(start, end);
+        if (!missingIntervals.isEmpty()) {
+            // extend
+            start -= 7 * TimeUtils.DAY_IN_MILLIS;
+            end += 7 * TimeUtils.DAY_IN_MILLIS;
 
-        if (requestCache.getMissingIntervals(start, end).isEmpty())
-            return;
-
-        start -= 7 * TimeUtils.DAY_IN_MILLIS;
-        end += 7 * TimeUtils.DAY_IN_MILLIS;
-
-        List<Interval> intervals = new ArrayList<>();
-        requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
-        BandDataProvider.addDownloads(this, intervals);
-    }
-
-    void requestFailed(Interval interval) {
-        requestCache.removeRequestedInterval(interval.start(), interval.end());
+            List<Interval> intervals = new ArrayList<>();
+            requestCache.adaptRequestCache(start, end).forEach(interval -> intervals.addAll(Interval.splitInterval(interval, DOWNLOADER_MAX_DAYS_PER_BLOCK)));
+            BandDataProvider.addDownloads(this, intervals);
+        }
     }
 
     @Override
