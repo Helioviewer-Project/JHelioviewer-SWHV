@@ -39,8 +39,9 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
         registerAndRefresh();
     }
 
+    @Nullable
     public static TimelineLayer deserialize(JSONObject ignore) { // has to be implemented for state
-        return new EventTimelineLayer();
+        return SWEKPlugin.getTimelineLayer();
     }
 
     @Override
