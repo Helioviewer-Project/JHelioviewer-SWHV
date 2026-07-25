@@ -99,6 +99,10 @@ class BandCacheMinute implements BandCache {
             DataChunk cache = cacheMap.get(key);
             key++;
             if (cache == null) {
+                if (!list.isEmpty()) {
+                    ret.add(list);
+                    list = new ArrayList<>();
+                }
                 continue;
             }
             float[] values = cache.getValues(level);
@@ -107,8 +111,10 @@ class BandCacheMinute implements BandCache {
                 float value = values[i];
                 long date = cache.getDate(level, i);
                 if (date < start || date > end || value == YAxis.BLANK) {
-                    ret.add(list);
-                    list = new ArrayList<>();
+                    if (!list.isEmpty()) {
+                        ret.add(list);
+                        list = new ArrayList<>();
+                    }
                 } else {
                     list.add(new DateValue(date, value));
                 }
