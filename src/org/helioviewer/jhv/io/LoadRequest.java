@@ -12,7 +12,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.thread.EDTQueue;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.timelines.Timelines;
-import org.helioviewer.jhv.timelines.band.BandDataProvider;
+import org.helioviewer.jhv.timelines.band.BandImporter;
 import org.helioviewer.jhv.timelines.band.BandReaderCdf;
 
 import org.json.JSONArray;
@@ -90,7 +90,7 @@ class LoadRequest {
         if (jt != null) {
             int len = jt.length();
             for (int i = 0; i < len; i++) {
-                BandDataProvider.loadBand(jt.getJSONObject(i));
+                BandImporter.loadBand(jt.getJSONObject(i));
             }
         }
     }

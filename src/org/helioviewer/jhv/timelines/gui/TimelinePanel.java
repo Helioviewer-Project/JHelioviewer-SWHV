@@ -36,7 +36,6 @@ import org.helioviewer.jhv.gui.component.TableValue;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.band.Band;
-import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
@@ -54,6 +53,7 @@ public final class TimelinePanel extends JPanel {
     private final TimelineLayers layers;
     private final JPanel optionsPanelWrapper;
     private final JComboBox<String> predefinedCombo;
+    private Map<String, List<BandType>> predefinedGroups = Map.of();
     private boolean updatingPredefinedGroup;
 
     private static class TimelineTable extends JTable implements Interfaces.LazyComponent {
@@ -167,9 +167,6 @@ public final class TimelinePanel extends JPanel {
             if (compositionChanged && !updatingPredefinedGroup)
                 predefinedCombo.setSelectedItem(null);
         });
-
-        refreshPredefinedCombo();
-        BandReaderHapi.setOnCatalogLoaded(this::refreshPredefinedCombo);
 
         JPanel leftButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
         leftButtonPanel.add(addLayerButton);
@@ -288,8 +285,7 @@ public final class TimelinePanel extends JPanel {
     }
 
     private void loadPredefinedGroup(String groupName) {
-        Map<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
-        List<BandType> bandTypes = groups.get(groupName);
+        List<BandType> bandTypes = predefinedGroups.get(groupName);
         if (bandTypes == null)
             return;
 
@@ -307,9 +303,9 @@ public final class TimelinePanel extends JPanel {
         selectExistingRow(0);
     }
 
-    private void refreshPredefinedCombo() {
+    public void setPredefinedGroups(Map<String, List<BandType>> groups) {
+        predefinedGroups = groups;
         updatingPredefinedGroup = true;
-        Map<String, List<BandType>> groups = BandReaderHapi.getPredefinedGroups();
         predefinedCombo.setModel(new DefaultComboBoxModel<>(groups.keySet().toArray(String[]::new)));
         predefinedCombo.setSelectedItem(null);
         updatingPredefinedGroup = false;

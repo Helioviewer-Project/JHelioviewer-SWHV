@@ -69,6 +69,14 @@ public class TimelineLayers extends AbstractTableModel {
         }
     }
 
+    public static void fetchBands(BandType[] bandTypes, TimeAxis timeAxis) {
+        List<BandType> types = List.of(bandTypes);
+        for (TimelineLayer layer : layers) {
+            if (layer.isEnabled() && layer instanceof Band band && types.contains(band.getBandType()))
+                band.fetchData(timeAxis);
+        }
+    }
+
     public static boolean highlightChanged(Point p) {
         boolean changed = false;
         for (TimelineLayer tl : layers) {
@@ -124,9 +132,22 @@ public class TimelineLayers extends AbstractTableModel {
 
     public void restore(List<TimelineLayer> newLayers) {
         ArrayList<TimelineLayer> restoredLayers = new ArrayList<>();
-        for (TimelineLayer layer : newLayers)
+        for (TimelineLayer newLayer : newLayers) {
+            TimelineLayer layer = reuseBand(newLayer);
             addUnique(restoredLayers, layer);
+        }
         replaceAll(restoredLayers);
+    }
+
+    private static TimelineLayer reuseBand(TimelineLayer restored) {
+        if (restored instanceof Band restoredBand) {
+            Band band = findBand(layers, restoredBand.getBandType());
+            if (band != null) {
+                band.applyStateFrom(restoredBand);
+                return band;
+            }
+        }
+        return restored;
     }
 
     public void replaceBands(List<BandType> bandTypes) {
@@ -188,7 +209,7 @@ public class TimelineLayers extends AbstractTableModel {
 
     private void configureLayer(TimelineLayer layer) {
         if (layer instanceof Band band)
-            band.setOnAppearanceChanged(() -> updateCell(layers.indexOf(band), APPEARANCE_COLUMN));
+            band.setOnStateChanged(() -> updateRow(band));
     }
 
     private static void addUnique(List<TimelineLayer> target, TimelineLayer layer) {

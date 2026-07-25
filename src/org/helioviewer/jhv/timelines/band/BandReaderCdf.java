@@ -33,7 +33,7 @@ import uk.ac.bristol.star.cdf.VariableAttribute;
 public class BandReaderCdf {
 
     public static void load(URI uri) throws Exception {
-        List<Band.Data> lines = read(NetFileCache.get(uri).uri()); // tbd : sniff type
+        List<BandData> lines = read(NetFileCache.get(uri).uri()); // tbd : sniff type
         if (lines.isEmpty()) // failed
             return;
         long[] dates = lines.getFirst().dates();
@@ -41,7 +41,7 @@ public class BandReaderCdf {
             return;
 
         EventQueue.invokeLater(() -> {
-            lines.forEach(BandDataProvider::acceptData);
+            lines.forEach(BandImporter::acceptData);
             DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
         });
     }
@@ -54,7 +54,7 @@ public class BandReaderCdf {
 
     private record CDFVariable(Variable variable, Map<String, String> attributes) {}
 
-    private static List<Band.Data> read(URI uri) throws IOException {
+    private static List<BandData> read(URI uri) throws IOException {
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
 
         LinkedListMultimap<String, String> globalAttrs = LinkedListMultimap.create();
@@ -88,7 +88,7 @@ public class BandReaderCdf {
         }
 
         long[] dates = readEpoch(variables, uri);
-        List<Band.Data> ret = new ArrayList<>();
+        List<BandData> ret = new ArrayList<>();
 
         for (CDFVariable v : variables) {
             if ("data".equals(v.attributes.get("VAR_TYPE"))) {
@@ -99,11 +99,11 @@ public class BandReaderCdf {
         return ret;
     }
 
-    private static List<Band.Data> readBandData(CDFVariable v, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
+    private static List<BandData> readBandData(CDFVariable v, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
         CDFData data = readData(v, dates, instrumentName, variables, uri);
         int numAxes = data.datesValues.values().length;
 
-        List<Band.Data> ret = new ArrayList<>(numAxes);
+        List<BandData> ret = new ArrayList<>(numAxes);
         for (int i = 0; i < numAxes; i++) {
             String name = instrumentName + ' ' + data.labels[i];
             JSONObject jo = new JSONObject().
@@ -113,7 +113,7 @@ public class BandReaderCdf {
                     put("range", new JSONArray().put(data.scaleMin).put(data.scaleMax)).
                     put("scale", data.scaleType).
                     put("label", "<html>" + name.replaceAll("_(r|t|n|x|y|z|RTN|SRF|VSO|URF)", "<sub>$1</sub>"));
-            ret.add(new Band.Data(new BandType(jo), data.datesValues.dates(), data.datesValues.values()[i]));
+            ret.add(new BandData(new BandType(jo), data.datesValues.dates(), data.datesValues.values()[i]));
         }
         return ret;
     }
