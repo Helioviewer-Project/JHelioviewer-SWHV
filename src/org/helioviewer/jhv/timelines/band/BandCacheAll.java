@@ -62,13 +62,16 @@ class BandCacheAll implements BandCache {
         List<DateValue> list = new ArrayList<>();
         for (DateValue dv : dateVals) {
             if (dv.value == YAxis.BLANK) {
-                ret.add(list);
-                list = new ArrayList<>();
+                if (!list.isEmpty()) {
+                    ret.add(list);
+                    list = new ArrayList<>();
+                }
             } else if (start <= dv.milli && dv.milli <= end) {
                 list.add(dv);
             }
         }
-        ret.add(list);
+        if (!list.isEmpty())
+            ret.add(list);
         return ret;
     }
 
