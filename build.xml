@@ -6,6 +6,10 @@
     <property name="resources" location="resources"/>
     <property name="jarfile" location= "JHelioviewer.jar"/>
 
+    <condition property="is.macos">
+        <os family="mac"/>
+    </condition>
+
     <fileset id="libfiles" dir="./">
         <include name="lib/**/*.jar"/>
     </fileset>
@@ -21,13 +25,15 @@
         <delete file="lib/natives-macos/libjhvmetalhost.dylib"/>
     </target>
 
-    <target name="build-metal-host">
+    <target name="build-metal-host" if="is.macos">
         <mkdir dir="lib/natives-macos"/>
-        <exec executable="xcrun" failonerror="false">
+        <exec executable="xcrun" failonerror="true">
             <arg value="clang"/>
             <arg value="-O2"/>
             <arg value="-fobjc-arc"/>
             <arg value="-dynamiclib"/>
+            <arg value="-mmacosx-version-min=12.0"/>
+            <arg value="-Werror=unguarded-availability-new"/>
             <arg value="-arch"/>
             <arg value="arm64"/>
             <arg value="-arch"/>
