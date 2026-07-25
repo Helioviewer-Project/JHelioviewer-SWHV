@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JComponent;
 
@@ -38,13 +39,15 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
 
     public static void requestCatalog() {
         td.setupDatasetGroups(BandReaderHapi.getCatalogGroups());
-        BandReaderHapi.requestCatalog(Timelines::catalogLoaded);
+        BandReaderHapi.requestCatalog(Timelines::catalogsLoaded);
     }
 
-    private static void catalogLoaded(String group, BandType[] bandTypes) {
-        td.setupDataset(group, bandTypes);
+    private static void catalogsLoaded(Map<String, BandType[]> catalogs) {
+        catalogs.forEach((group, bandTypes) -> {
+            td.setupDataset(group, bandTypes);
+            TimelineLayers.fetchBands(bandTypes, DrawController.selectedAxis);
+        });
         timelinePanel.setPredefinedGroups(BandReaderHapi.getPredefinedGroups());
-        TimelineLayers.fetchBands(bandTypes, DrawController.selectedAxis);
     }
 
     public void installTimelines() {
