@@ -18,8 +18,8 @@ public final class YAxis {
     private final float min;
     private final float max;
 
-    private final double scaledMinBound;
-    private final double scaledMaxBound;
+    private final double scaledLowerLimit;
+    private final double scaledUpperLimit;
     private boolean highlighted = false;
 
     public YAxis(double _start, double _end, YAxisScale _scale) {
@@ -29,8 +29,10 @@ public final class YAxis {
 
         min = scale.getMin();
         max = scale.getMax();
-        scaledMinBound = scale(min);
-        scaledMaxBound = scale(max);
+        double scaledStart = scale(start);
+        double scaledEnd = scale(end);
+        scaledLowerLimit = Math.min(scale(min), Math.min(scaledStart, scaledEnd));
+        scaledUpperLimit = Math.max(scale(max), Math.max(scaledStart, scaledEnd));
     }
 
     public double start() {
@@ -89,7 +91,7 @@ public final class YAxis {
         double shift = distanceY * ratioValue;
         double lower = Math.min(scaledStart, scaledEnd);
         double upper = Math.max(scaledStart, scaledEnd);
-        shift = Math.clamp(shift, scaledMinBound - lower, scaledMaxBound - upper);
+        shift = Math.clamp(shift, scaledLowerLimit - lower, scaledUpperLimit - upper);
         start = invScale(scaledStart + shift);
         end = invScale(scaledEnd + shift);
     }
@@ -101,9 +103,9 @@ public final class YAxis {
         double delta = scrollValue * ZOOMSTEP_PERCENTAGE;
 
         double newScaledStart = Math.clamp((1 + delta) * scaledStart - delta * scaled,
-                scaledMinBound, scaledMaxBound);
+                scaledLowerLimit, scaledUpperLimit);
         double newScaledEnd = Math.clamp((1 + delta) * scaledEnd - delta * scaled,
-                scaledMinBound, scaledMaxBound);
+                scaledLowerLimit, scaledUpperLimit);
 
         start = invScale(newScaledStart);
         end = invScale(newScaledEnd);
