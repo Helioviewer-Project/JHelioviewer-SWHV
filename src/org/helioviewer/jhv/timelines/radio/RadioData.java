@@ -10,7 +10,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.net.URI;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
@@ -30,7 +30,6 @@ import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
-import org.helioviewer.jhv.timelines.Timelines;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
 import org.helioviewer.jhv.timelines.draw.YAxis;
@@ -49,20 +48,17 @@ public final class RadioData extends TimelineLayer {
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
-    private static final Cache<Long, RadioJ2KData> cache = Caffeine.newBuilder().maximumSize(DAYS_IN_CACHE)
+    private final Cache<Long, RadioJ2KData> cache = Caffeine.newBuilder().maximumSize(DAYS_IN_CACHE)
             .removalListener((Long k, RadioJ2KData v, RemovalCause c) -> {
                 if (v != null)
                     v.removeData();
             }).build();
-    private static final HashSet<Long> downloading = new HashSet<>();
-    private static RadioData currentInstance;
-
+    private final HashMap<Long, RadioJPXDownload> downloads = new HashMap<>();
     private final LUTComboBox lutCombo;
     private final JPanel optionsPanel;
-    private static IndexColorModel colorModel;
+    private IndexColorModel colorModel;
 
     public RadioData(JSONObject jo) {
-        currentInstance = this;
         LUT lut = LUT.spectral();
         if (jo != null) {
             LUT configured = LUT.get(jo.optString("colormap", lut.name()));
@@ -94,19 +90,19 @@ public final class RadioData extends TimelineLayer {
         return new IndexColorModel(8, source.length, source, 0, false, -1, DataBuffer.TYPE_BYTE);
     }
 
-    private static void setLUT(LUT lut) {
+    private void setLUT(LUT lut) {
         colorModel = createIndexColorModelFromLUT(lut);
         cache.asMap().values().forEach(data -> data.changeColormap(colorModel));
         DrawController.drawRequest();
     }
 
-    static IndexColorModel getColorModel() {
+    IndexColorModel getColorModel() {
         return colorModel;
     }
 
-    private static void clearCache() {
+    private void clearCache() {
         cache.invalidateAll();
-        downloading.clear();
+        downloads.clear();
         DrawController.drawRequest();
     }
 
@@ -114,14 +110,22 @@ public final class RadioData extends TimelineLayer {
         long end = Math.min(TimeUtils.floorDay(start) + (DAYS_IN_CACHE - 2) * TimeUtils.DAY_IN_MILLIS, TimeUtils.floorDay(System.currentTimeMillis()));
         for (int i = 0; i < DAYS_IN_CACHE; i++) {
             long date = end - i * TimeUtils.DAY_IN_MILLIS;
-            if (!downloading.contains(date) && cache.getIfPresent(date) == null) {
-                downloadStarted(date);
-                Task.submit(Long.toString(date), new RadioJPXDownload(date), result -> onSuccessRadioJPX(date, result), (logContext, t) -> onFailureRadioJPX(date, t));
+            if (!downloads.containsKey(date) && cache.getIfPresent(date) == null) {
+                RadioJPXDownload download = new RadioJPXDownload(date);
+                downloads.put(date, download);
+                notifyStateChanged();
+                Task.submit(Long.toString(date), download, result -> onSuccessRadioJPX(download, result),
+                        (logContext, t) -> onFailureRadioJPX(download, t));
             }
         }
     }
 
-    private record RadioJPXDownload(long date) implements Callable<RadioJ2KData> {
+    private final class RadioJPXDownload implements Callable<RadioJ2KData> {
+        private final long date;
+
+        RadioJPXDownload(long _date) {
+            date = _date;
+        }
 
         @Override
         public RadioJ2KData call() throws Exception {
@@ -130,51 +134,42 @@ public final class RadioData extends TimelineLayer {
             if (dataUri.format() != DataUri.Format.Image.JP2) // paranoia
                 throw new Exception("Invalid data format");
 
-            return new RadioJ2KData(req, dataUri);
+            return new RadioJ2KData(RadioData.this, req, dataUri);
         }
 
     }
 
-    private static void downloadStarted(long date) {
-        downloading.add(date);
-        refreshRow();
-    }
-
-    private void onSuccessRadioJPX(long date, @Nonnull RadioJ2KData result) {
-        doneRadioJPX(date);
-        if (currentInstance != this || !enabled) {
+    private void onSuccessRadioJPX(RadioJPXDownload download, @Nonnull RadioJ2KData result) {
+        if (finishDownload(download) && enabled) {
+            cache.put(download.date, result);
+            fetchData(DrawController.selectedAxis);
+        } else {
             result.removeData();
-            return;
         }
-        cache.put(date, result);
-        fetchData(DrawController.selectedAxis);
     }
 
-    private void onFailureRadioJPX(long date, @Nonnull Throwable t) {
-        doneRadioJPX(date);
-        if (AppThread.isInterrupted(t)) {
-            Log.warn(t);
-            return;
+    private void onFailureRadioJPX(RadioJPXDownload download, @Nonnull Throwable t) {
+        if (finishDownload(download)) {
+            if (AppThread.isInterrupted(t))
+                Log.warn(t);
+            else
+                Log.errorStack(t);
         }
-        Log.errorStack(t);
     }
 
-    private static void doneRadioJPX(long date) {
-        downloading.remove(date);
-        refreshRow();
+    private boolean finishDownload(RadioJPXDownload download) {
+        boolean removed = downloads.remove(download.date, download);
+        if (removed)
+            notifyStateChanged();
+        return removed;
     }
 
     private static boolean canShow(TimeAxis timeAxis) {
         return timeAxis.end() - timeAxis.start() <= TimeUtils.DAY_IN_MILLIS * MAX_AMOUNT_OF_DAYS;
     }
 
-    private static void refreshRow() {
-        if (currentInstance != null)
-            Timelines.getLayers().updateRow(currentInstance);
-    }
-
-    static void dataUpdated() {
-        refreshRow();
+    void dataUpdated() {
+        notifyStateChanged();
     }
 
     @Override
@@ -190,9 +185,6 @@ public final class RadioData extends TimelineLayer {
     @Override
     public void remove() {
         clearCache();
-        if (currentInstance == this)
-            currentInstance = null;
-        refreshRow();
     }
 
     @Override
@@ -200,7 +192,7 @@ public final class RadioData extends TimelineLayer {
         super.setEnabled(_enabled);
         if (!enabled)
             clearCache();
-        refreshRow();
+        notifyStateChanged();
     }
 
     @Override
@@ -215,7 +207,7 @@ public final class RadioData extends TimelineLayer {
 
     @Override
     public boolean isDownloading() {
-        return !downloading.isEmpty();
+        return !downloads.isEmpty();
     }
 
     @Override
@@ -233,8 +225,8 @@ public final class RadioData extends TimelineLayer {
         return false;
     }
 
-    private static boolean isLoading() {
-        if (!downloading.isEmpty())
+    private boolean isLoading() {
+        if (!downloads.isEmpty())
             return true;
         for (RadioJ2KData data : cache.asMap().values()) {
             if (data.isLoading())

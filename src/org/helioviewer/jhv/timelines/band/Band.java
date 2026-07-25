@@ -61,7 +61,6 @@ public final class Band extends TimelineLayer {
     private Color graphColor = bandColors.getNextColor();
     private PropagationModel propagationModel = new PropagationModel.Delay(0);
     private boolean multicolor;
-    private Runnable onStateChanged;
 
     public Band(BandType _bandType) {
         bandType = _bandType;
@@ -193,15 +192,6 @@ public final class Band extends TimelineLayer {
         multicolor = hasLevelColors() && _multicolor;
         updateGraph();
         notifyStateChanged();
-    }
-
-    public void setOnStateChanged(Runnable callback) {
-        onStateChanged = callback;
-    }
-
-    private void notifyStateChanged() {
-        if (onStateChanged != null)
-            onStateChanged.run();
     }
 
     @Override

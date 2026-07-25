@@ -17,6 +17,15 @@ import org.json.JSONObject;
 public abstract class TimelineLayer {
 
     protected boolean enabled = true;
+    private Runnable onStateChanged = () -> {};
+
+    void setOnStateChanged(Runnable callback) {
+        onStateChanged = callback;
+    }
+
+    protected final void notifyStateChanged() {
+        onStateChanged.run();
+    }
 
     public abstract void remove();
 
