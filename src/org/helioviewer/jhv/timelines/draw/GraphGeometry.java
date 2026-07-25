@@ -40,7 +40,7 @@ public final class GraphGeometry {
 
         int yAxisCount = 0;
         for (TimelineLayer layer : layers) {
-            if (layer.isPropagated())
+            if (layer.isEnabled() && layer.isPropagated())
                 propagatedLayers.add(layer);
             if (layer.isEnabled() && layer.hasYAxis())
                 yAxisCount++;
