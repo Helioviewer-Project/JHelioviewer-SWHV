@@ -74,6 +74,7 @@ public final class MainFrame {
     private static final class RenderStartupHost extends JPanel {
         private final JPanel placeholder = new JPanel();
         private AngleCanvas canvas;
+        private boolean surfaceVisible = true;
 
         RenderStartupHost() {
             super(new BorderLayout());
@@ -85,10 +86,17 @@ public final class MainFrame {
             if (canvas != null)
                 return;
             canvas = _canvas;
+            canvas.setHostVisible(surfaceVisible);
             remove(placeholder);
             add(canvas, BorderLayout.CENTER);
             revalidate();
             repaint();
+        }
+
+        void setSurfaceVisible(boolean visible) {
+            surfaceVisible = visible;
+            if (canvas != null)
+                canvas.setHostVisible(visible);
         }
     }
 
@@ -100,7 +108,6 @@ public final class MainFrame {
 
     private static AngleCanvas renderCanvas;
     private static RenderStartupHost renderHost;
-    private static boolean renderSurfaceVisible = true;
     private static AwtInputAdapter awtInputAdapter;
     private static MainContentPanel mainContentPanel;
 
@@ -186,7 +193,6 @@ public final class MainFrame {
         renderCanvas.addMouseMotionListener(awtInputAdapter);
         renderCanvas.addMouseWheelListener(awtInputAdapter);
         renderCanvas.addKeyListener(awtInputAdapter);
-        renderCanvas.setHostVisible(renderSurfaceVisible);
         renderHost.attachCanvas(renderCanvas);
         // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
         renderCanvas.requestRender();
@@ -298,9 +304,7 @@ public final class MainFrame {
     }
 
     public static void setRenderSurfaceVisible(boolean visible) {
-        renderSurfaceVisible = visible;
-        if (renderCanvas != null)
-            renderCanvas.setHostVisible(visible);
+        renderHost.setSurfaceVisible(visible);
     }
 
     public static MainContentPanel getMainContentPanel() {
