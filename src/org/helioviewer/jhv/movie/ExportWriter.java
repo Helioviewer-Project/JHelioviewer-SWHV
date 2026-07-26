@@ -40,14 +40,6 @@ class ExportWriter {
         fps = _fps;
     }
 
-    int width() {
-        return w;
-    }
-
-    int height() {
-        return h;
-    }
-
     void encode(@Nullable BufferedImage mainImage, @Nullable BufferedImage timelineImage,
                 int movieLinePosition) throws Exception {
         if (tempFile == null) {
