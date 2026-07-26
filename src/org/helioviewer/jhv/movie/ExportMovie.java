@@ -60,7 +60,7 @@ public final class ExportMovie {
             RecordingSession failedSession = recordingSession;
             recordingSession = null;
             if (failedSession != null)
-                failedSession.dispose();
+                failedSession.disposeGrabber();
             notifyStatusChanged();
             String message = e.getMessage() == null || e.getMessage().isBlank() ? "Recording failed." : e.getMessage();
             Commands.notifyRecordingFinished(context, false, message, null);
@@ -129,7 +129,7 @@ public final class ExportMovie {
     public static void dispose() {
         RecordingSession session = recordingSession;
         if (session != null)
-            session.dispose();
+            session.disposeGrabber();
     }
 
     public static void shutdown() {
@@ -145,6 +145,8 @@ public final class ExportMovie {
     private static final class RecordingSession {
         private final @Nullable Commands.OperationContext operationContext;
         private final ViewState.RecordingMode mode;
+        private final int width;
+        private final int height;
         private final ExportWriter writer;
 
         private @Nullable GLGrab grabber;
@@ -157,7 +159,7 @@ public final class ExportMovie {
             mode = recordingData.mode();
 
             ViewState.Size size = recordingData.size().getSize();
-            int width = mode == ViewState.RecordingMode.SHOT ?
+            width = mode == ViewState.RecordingMode.SHOT ?
                     size.width() : size.width() / MACROBLOCK * MACROBLOCK;
 
             TimelineFrame timelineFrame = getTimelineFrame();
@@ -166,10 +168,11 @@ public final class ExportMovie {
 
             int timelineHeight = timelineFrame == null ? 0 :
                     scaledHeight(timelineFrame.image(), width);
-            int height = size.internal() ? size.height() :
+            int outputHeight = size.internal() ? size.height() :
                     mainCanvasVisible ? size.height() + timelineHeight : timelineHeight;
             if (mode != ViewState.RecordingMode.SHOT)
-                height = height / MACROBLOCK * MACROBLOCK;
+                outputHeight = outputHeight / MACROBLOCK * MACROBLOCK;
+            height = outputHeight;
 
             writer = new ExportWriter(mode == ViewState.RecordingMode.SHOT ?
                     ExportFormat.PNG : videoFormat(), width, height, fps);
@@ -247,7 +250,7 @@ public final class ExportMovie {
                 TimelineFrame timelineFrame = getTimelineFrame();
                 int timelineHeight = timelineFrame == null ? 0 : timelineHeight(timelineFrame.image());
                 if (mainCanvasVisible) {
-                    int mainHeight = writer.height() - timelineHeight;
+                    int mainHeight = height - timelineHeight;
                     ensureGrabber(mainHeight);
                     mainImage = MappedImageFactory.createRGBImage(grabber.w, grabber.h);
                     grabber.renderFrame(MappedImageFactory.getByteBuffer(mainImage));
@@ -275,18 +278,18 @@ public final class ExportMovie {
                 finish();
         }
 
-        private void ensureGrabber(int height) {
-            if (grabber != null && grabber.w == writer.width() && grabber.h == height)
+        private void ensureGrabber(int grabberHeight) {
+            if (grabber != null && grabber.w == width && grabber.h == grabberHeight)
                 return;
             if (grabber != null)
                 grabber.dispose();
-            grabber = new GLGrab(writer.width(), height);
+            grabber = new GLGrab(width, grabberHeight);
         }
 
         private int timelineHeight(BufferedImage image) {
             if (!mainCanvasVisible)
-                return writer.height();
-            return Math.min(scaledHeight(image, writer.width()), writer.height() - 1);
+                return height;
+            return Math.min(scaledHeight(image, width), height - 1);
         }
 
         private static int scaledHeight(BufferedImage image, int width) {
@@ -297,12 +300,12 @@ public final class ExportMovie {
             if (recordingSession != this)
                 return;
             recordingSession = null;
-            dispose();
+            disposeGrabber();
             notifyStatusChanged();
             encodeExecutor.execute(new CloseWriter(writer, operationContext));
         }
 
-        void dispose() {
+        void disposeGrabber() {
             if (grabber != null) {
                 grabber.dispose();
                 grabber = null;
