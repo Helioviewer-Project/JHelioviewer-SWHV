@@ -240,7 +240,7 @@ public class Player {
     }
 
     private static void syncTime(JHVTime dateTime) {
-        if (ExportMovie.isRecording() && notDone)
+        if (ExportMovie.isCanvasRecording() && notDone)
             return;
 
         lastTimestamp = dateTime;
@@ -256,8 +256,9 @@ public class Player {
         boolean last = view.getFrameTime(activeFrame).equals(playbackLastTime);
 
         frameListeners.forEach(listener -> listener.frameChanged(activeFrame, last));
+        ExportMovie.playerFrameChanged(last);
 
-        if (ExportMovie.isRecording())
+        if (ExportMovie.isCanvasRecording())
             notDone = true;
     }
 
@@ -326,8 +327,10 @@ public class Player {
 
     private static boolean notDone;
 
-    public static void grabDone() {
+    public static boolean grabDone() {
+        boolean wasPending = notDone;
         notDone = false;
+        return wasPending;
     }
 
 }

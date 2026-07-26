@@ -33,6 +33,7 @@ import org.helioviewer.jhv.input.InputController;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.selector.LayersPanel;
+import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
@@ -298,6 +299,7 @@ public final class MainFrame {
     }
 
     public static void setRenderSurfaceVisible(boolean visible) {
+        ExportMovie.setMainCanvasVisible(visible);
         renderHost.setSurfaceVisible(visible);
     }
 
