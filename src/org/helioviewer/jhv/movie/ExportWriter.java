@@ -31,6 +31,7 @@ class ExportWriter {
     private final int fps;
 
     private File tempFile;
+    private @Nullable Exception failure;
 
     ExportWriter(ExportFormat _format, int _w, int _h, int _fps) {
         prefix = Directories.EXPORTS.getPath() + "JHV_" + TimeUtils.formatFilename(System.currentTimeMillis());
@@ -76,6 +77,11 @@ class ExportWriter {
         }
     }
 
+    void recordFailure(Exception e) {
+        if (failure == null)
+            failure = e;
+    }
+
     private static void writeFully(FileChannel channel, ByteBuffer data) throws Exception {
         while (data.hasRemaining()) {
             channel.write(data);
@@ -98,6 +104,11 @@ class ExportWriter {
 
     @Nullable
     String close() throws Exception {
+        if (failure != null) {
+            if (tempFile != null)
+                tempFile.delete();
+            throw failure;
+        }
         if (tempFile == null) // unlikely reach here on encode error
             return null;
 

@@ -269,6 +269,7 @@ public final class ExportMovie {
                 submitted = true;
             } catch (Exception e) {
                 Log.error(e);
+                writer.recordFailure(e);
             } finally {
                 if (!submitted) {
                     NativeImageFactory.free(timelineImage);
@@ -324,6 +325,7 @@ public final class ExportMovie {
                 writer.encode(mainImage, timelineImage, movieLinePosition);
             } catch (Exception e) {
                 Log.error(e);
+                writer.recordFailure(e);
             } finally {
                 NativeImageFactory.free(timelineImage);
                 MappedImageFactory.free(mainImage);
