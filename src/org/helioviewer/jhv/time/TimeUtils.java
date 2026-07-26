@@ -20,7 +20,7 @@ public class TimeUtils {
     public static final DateTimeFormatter sqlTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final ZoneId zoneId = ZoneId.of(System.getProperty("user.timezone"));
-    private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss").withZone(zoneId); //! local time
+    private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss.SSS").withZone(zoneId); //! local time
     private static final DateTimeFormatter logFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(zoneId); //! local time
 
     private static final PrettyTimeParser prettyParser = new PrettyTimeParser();
