@@ -68,9 +68,8 @@ public final class ExportMovie {
     }
 
     public static void shallStop() {
-        RecordingSession session = recordingSession;
-        if (session != null)
-            session.requestStop();
+        if (recordingSession != null)
+            recordingSession.requestStop();
     }
 
     public static boolean isRecording() {
@@ -78,29 +77,25 @@ public final class ExportMovie {
     }
 
     static boolean beginPlaybackFrame() {
-        RecordingSession session = recordingSession;
-        return session == null || session.beginPlaybackFrame();
+        return recordingSession == null || recordingSession.beginPlaybackFrame();
     }
 
     static void playbackFrameReady(boolean last) {
-        RecordingSession session = recordingSession;
-        if (session != null)
-            session.playbackFrameReady(last);
+        if (recordingSession != null)
+            recordingSession.playbackFrameReady(last);
     }
 
     public static void renderedFrame() {
-        RecordingSession session = recordingSession;
-        if (session != null)
-            session.renderedFrame();
+        if (recordingSession != null)
+            recordingSession.renderedFrame();
     }
 
     public static void setMainCanvasVisible(boolean visible) {
         if (mainCanvasVisible == visible)
             return;
         mainCanvasVisible = visible;
-        RecordingSession session = recordingSession;
-        if (session != null)
-            session.canvasVisibilityChanged();
+        if (recordingSession != null)
+            recordingSession.canvasVisibilityChanged();
     }
 
     public static void setTimelineFrameSource(@Nullable TimelineFrameSource source) {
@@ -127,17 +122,16 @@ public final class ExportMovie {
     }
 
     public static void dispose() {
-        RecordingSession session = recordingSession;
-        if (session != null)
-            session.disposeGrabber();
+        if (recordingSession != null)
+            recordingSession.disposeGrabber();
     }
 
     public static void shutdown() {
         recordingSession = null;
         for (Runnable runnable : encodeExecutor.shutdownNow()) {
             if (runnable instanceof FrameConsumer frameConsumer) {
-                NativeImageFactory.free(frameConsumer.timelineImage());
-                MappedImageFactory.free(frameConsumer.mainImage());
+                NativeImageFactory.free(frameConsumer.timelineImage);
+                MappedImageFactory.free(frameConsumer.mainImage);
             }
         }
     }
@@ -169,7 +163,7 @@ public final class ExportMovie {
                 throw new IllegalStateException("The timeline is not available.");
 
             int timelineHeight = timelineFrame == null ? 0 :
-                    scaledHeight(timelineFrame.image(), width);
+                    scaledHeight(timelineFrame.image, width);
             int outputHeight = size.internal() ? size.height() :
                     mainCanvasVisible ? size.height() + timelineHeight : timelineHeight;
             if (mode != ViewState.RecordingMode.SHOT)
@@ -250,7 +244,7 @@ public final class ExportMovie {
             boolean submitted = false;
             try {
                 TimelineFrame timelineFrame = getTimelineFrame();
-                int timelineHeight = timelineFrame == null ? 0 : timelineHeight(timelineFrame.image());
+                int timelineHeight = timelineFrame == null ? 0 : timelineHeight(timelineFrame.image);
                 if (mainCanvasVisible) {
                     int mainHeight = height - timelineHeight;
                     ensureGrabber(mainHeight);
@@ -262,8 +256,8 @@ public final class ExportMovie {
 
                 int movieLinePosition = -1;
                 if (timelineFrame != null) {
-                    timelineImage = NativeImageFactory.copyImage(timelineFrame.image());
-                    movieLinePosition = timelineFrame.movieLinePosition();
+                    timelineImage = NativeImageFactory.copyImage(timelineFrame.image);
+                    movieLinePosition = timelineFrame.movieLinePosition;
                 }
                 encodeExecutor.execute(new FrameConsumer(writer, mainImage, timelineImage, movieLinePosition));
                 submitted = true;
