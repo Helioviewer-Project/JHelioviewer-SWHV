@@ -230,6 +230,10 @@ public class Player {
         return layer != null && layer.getView().isMultiFrame();
     }
 
+    static boolean hasActiveImage() {
+        return Layers.getActiveImageLayer() != null;
+    }
+
     public static int getMaximumFrameNumber() {
         ImageLayer layer = Layers.getActiveImageLayer();
         return layer == null ? 0 : layer.getView().getMaximumFrameNumber();
