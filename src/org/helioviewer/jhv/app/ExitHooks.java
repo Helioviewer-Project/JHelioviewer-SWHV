@@ -6,7 +6,7 @@ public class ExitHooks {
 
     private static final Thread finishMovieThread = new Thread(() -> {
         try {
-            ExportMovie.disposeMovieWriter(false);
+            ExportMovie.shutdown();
         } catch (Exception e) {
             Log.warn("Movie was not shut down properly");
         }
