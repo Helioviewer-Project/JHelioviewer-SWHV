@@ -40,30 +40,41 @@ class ExportWriter {
         fps = _fps;
     }
 
-    void encode(BufferedImage mainImage, BufferedImage eveImage, int movieLinePosition) throws Exception {
+    int width() {
+        return w;
+    }
+
+    int height() {
+        return h;
+    }
+
+    void encode(@Nullable BufferedImage mainImage, @Nullable BufferedImage timelineImage,
+                int movieLinePosition) throws Exception {
         if (tempFile == null) {
             tempFile = File.createTempFile("dump", null, Directories.exportCacheDir);
             tempFile.deleteOnExit();
         }
 
-        int mainH = mainImage.getHeight();
+        int mainH = mainImage == null ? 0 : mainImage.getHeight();
         BufferedImage scaled = null;
-        ByteBuffer eveData = null;
-        if (eveImage != null) {
-            scaled = ExportUtils.scaleImage(eveImage, w, h - mainH, movieLinePosition);
-            eveData = NativeImageFactory.getByteBuffer(scaled).clear().limit(3 * w * scaled.getHeight());
+        ByteBuffer timelineData = null;
+        if (timelineImage != null) {
+            scaled = ExportUtils.scaleImage(timelineImage, w, h - mainH, movieLinePosition);
+            timelineData = NativeImageFactory.getByteBuffer(scaled).clear().limit(3 * w * scaled.getHeight());
         }
 
-        ByteBuffer mainData = MappedImageFactory.getByteBuffer(mainImage).clear().limit(3 * w * mainH);
         try (FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.APPEND)) {
-            for (int j = mainH - 1; j >= 0; j--) { // write image flipped
-                int pos = 3 * w * j;
-                mainData.position(pos);
-                mainData.limit(pos + 3 * w);
-                writeFully(channel, mainData);
+            if (mainImage != null) {
+                ByteBuffer mainData = MappedImageFactory.getByteBuffer(mainImage).clear().limit(3 * w * mainH);
+                for (int j = mainH - 1; j >= 0; j--) { // write image flipped
+                    int pos = 3 * w * j;
+                    mainData.position(pos);
+                    mainData.limit(pos + 3 * w);
+                    writeFully(channel, mainData);
+                }
             }
-            if (eveData != null)
-                writeFully(channel, eveData);
+            if (timelineData != null)
+                writeFully(channel, timelineData);
         } catch (Exception e) {
             tempFile.delete();
             tempFile = null;

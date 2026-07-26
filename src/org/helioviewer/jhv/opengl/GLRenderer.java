@@ -112,8 +112,7 @@ public final class GLRenderer {
             renderSceneScale();
         renderFullFloatScene();
 
-        if (ExportMovie.isRecording())
-            ExportMovie.handleMovieExport();
+        ExportMovie.renderedFrame();
     }
 
     public static void dispose() {

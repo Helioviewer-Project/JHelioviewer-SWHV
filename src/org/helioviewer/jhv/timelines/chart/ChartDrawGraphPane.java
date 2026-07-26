@@ -42,6 +42,8 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     private Point dragTargetPosition;
 
     private BufferedImage screenImage;
+    private final ExportMovie.TimelineFrameSource recordingSource =
+            () -> screenImage == null ? null : new ExportMovie.TimelineFrame(screenImage, DrawController.getMovieLinePosition());
 
     private final TimelineLabelPainter labelPainter = new TimelineLabelPainter();
     private Point mousePosition;
@@ -79,10 +81,10 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
-            ExportMovie.EVEImage = screenImage;
+            ExportMovie.setTimelineFrameSource(recordingSource);
             DrawController.start();
         } else {
-            ExportMovie.EVEImage = null;
+            ExportMovie.setTimelineFrameSource(null);
             DrawController.stop();
         }
     }
@@ -116,7 +118,6 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
         if (screenImage == null || width != screenImage.getWidth() || height != screenImage.getHeight()) {
             screenImage = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.OPAQUE);
-            ExportMovie.EVEImage = screenImage;
         }
 
         Graphics2D fullG = screenImage.createGraphics();
@@ -143,7 +144,6 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     private static void drawMovieLine(Graphics2D g) {
         int movieLinePosition = DrawController.getMovieLinePosition();
-        ExportMovie.EVEMovieLinePosition = movieLinePosition;
         if (movieLinePosition < 0) {
             return;
         }

@@ -17,13 +17,20 @@ import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.opengl.GLGrab;
 import org.helioviewer.jhv.thread.AppThread;
 
-public final class ExportMovie implements Player.Listener {
+public final class ExportMovie {
 
     public interface StatusListener {
         void recordingStatusChanged();
     }
 
-    private static final ExportMovie instance = new ExportMovie();
+    @FunctionalInterface
+    public interface TimelineFrameSource {
+        @Nullable
+        TimelineFrame getFrame();
+    }
+
+    public record TimelineFrame(BufferedImage image, int movieLinePosition) {}
+
     private static final ExecutorService encodeExecutor = Executors.newSingleThreadExecutor(new AppThread.NamedThreadFactory("JHV-EncodeMovie"));
     private static final ArrayList<StatusListener> statusListeners = new ArrayList<>();
 
@@ -33,10 +40,9 @@ public final class ExportMovie implements Player.Listener {
     private static ViewState.RecordingMode mode;
     private static boolean recording;
     private static boolean shallStop;
+    private static boolean mainCanvasVisible = true;
     private static @Nullable Commands.OperationContext operationContext;
-
-    public static BufferedImage EVEImage = null;
-    public static int EVEMovieLinePosition = -1;
+    private static @Nullable TimelineFrameSource timelineFrameSource;
 
     public static void disposeMovieWriter(boolean keep) {
         if (exporter != null) {
@@ -45,7 +51,7 @@ public final class ExportMovie implements Player.Listener {
             } else {
                 for (Runnable runnable : encodeExecutor.shutdownNow()) {
                     if (runnable instanceof FrameConsumer frameConsumer) {
-                        NativeImageFactory.free(frameConsumer.eveImage());
+                        NativeImageFactory.free(frameConsumer.timelineImage());
                         MappedImageFactory.free(frameConsumer.mainImage());
                     }
                 }
@@ -59,30 +65,65 @@ public final class ExportMovie implements Player.Listener {
             grabber.dispose();
     }
 
-    public static void handleMovieExport() {
+    public static void renderedFrame() {
+        if (!isCanvasRecording())
+            return;
+        captureFrame();
+        Player.grabDone();
+    }
+
+    private static void captureFrame() {
         BufferedImage screen = null;
-        BufferedImage eve = null;
+        BufferedImage timeline = null;
         boolean submitted = false;
         try {
-            screen = MappedImageFactory.createRGBImage(grabber.w, grabber.h);
-            grabber.renderFrame(MappedImageFactory.getByteBuffer(screen));
-            eve = EVEImage == null ? null : NativeImageFactory.copyImage(EVEImage);
-            encodeExecutor.execute(new FrameConsumer(exporter, screen, eve, EVEMovieLinePosition));
+            TimelineFrame timelineFrame = getTimelineFrame();
+            int timelineHeight = timelineFrame == null ? 0 : timelineHeight(timelineFrame.image());
+            if (mainCanvasVisible) {
+                int canvasHeight = exporter.height() - timelineHeight;
+                ensureGrabber(canvasHeight);
+                screen = MappedImageFactory.createRGBImage(grabber.w, grabber.h);
+                grabber.renderFrame(MappedImageFactory.getByteBuffer(screen));
+            } else if (timelineFrame == null) {
+                throw new IllegalStateException("The timeline is not available.");
+            }
+
+            int movieLinePosition = -1;
+            if (timelineFrame != null) {
+                timeline = NativeImageFactory.copyImage(timelineFrame.image());
+                movieLinePosition = timelineFrame.movieLinePosition();
+            }
+            encodeExecutor.execute(new FrameConsumer(exporter, screen, timeline, movieLinePosition));
             submitted = true;
         } catch (Exception e) {
             Log.error(e);
         } finally {
             if (!submitted) {
-                NativeImageFactory.free(eve);
+                NativeImageFactory.free(timeline);
                 MappedImageFactory.free(screen);
             }
         }
-        Player.grabDone();
 
         if (shallStop) {
-            grabber.dispose();
+            if (mainCanvasVisible && grabber != null) {
+                grabber.dispose();
+                grabber = null;
+            }
             stop();
         }
+    }
+
+    private static void ensureGrabber(int height) {
+        if (grabber != null && grabber.w == exporter.width() && grabber.h == height)
+            return;
+        if (grabber != null)
+            grabber.dispose();
+        grabber = new GLGrab(exporter.width(), height);
+    }
+
+    private static int timelineHeight(BufferedImage image) {
+        int height = (int) (image.getHeight() / (double) image.getWidth() * exporter.width() + .5);
+        return mainCanvasVisible ? Math.min(height, exporter.height() - 1) : exporter.height();
     }
 
     private static final int MACROBLOCK = 8;
@@ -106,7 +147,6 @@ public final class ExportMovie implements Player.Listener {
             Log.error(e);
             recording = false;
             shallStop = false;
-            Player.removeFrameListener(instance);
             if (grabber != null) {
                 grabber.dispose();
                 grabber = null;
@@ -121,13 +161,6 @@ public final class ExportMovie implements Player.Listener {
     private static void startRecording(ViewState.RecordingData recordingData, int fps) {
         shallStop = false;
 
-        int scrw = 1;
-        int scrh = 0;
-        if (EVEImage != null) {
-            scrw = Math.max(1, EVEImage.getWidth());
-            scrh = EVEImage.getHeight();
-        }
-
         ViewState.Size size = recordingData.size().getSize();
         int width = size.width();
         int height = size.height();
@@ -135,12 +168,14 @@ public final class ExportMovie implements Player.Listener {
 
         mode = recordingData.mode();
         int canvasWidth = mode == ViewState.RecordingMode.SHOT ? width : (width / MACROBLOCK) * MACROBLOCK;
-        int sh = (int) (scrh / (double) scrw * canvasWidth + .5);
-        int canvasHeight = internal ? height - sh : height;
-        int exportHeight = mode == ViewState.RecordingMode.SHOT ? canvasHeight + sh : ((canvasHeight + sh) / MACROBLOCK) * MACROBLOCK;
-
-        canvasHeight = exportHeight - sh;
-        grabber = new GLGrab(canvasWidth, canvasHeight);
+        TimelineFrame timelineFrame = getTimelineFrame();
+        int timelineHeight = timelineFrame == null ? 0 :
+                (int) (timelineFrame.image().getHeight() / (double) timelineFrame.image().getWidth() * canvasWidth + .5);
+        int exportHeight = internal ? height : mainCanvasVisible ? height + timelineHeight : timelineHeight;
+        if (mode != ViewState.RecordingMode.SHOT)
+            exportHeight = (exportHeight / MACROBLOCK) * MACROBLOCK;
+        if (!mainCanvasVisible && timelineFrame == null)
+            throw new IllegalStateException("The timeline is not available.");
 
         if (mode == ViewState.RecordingMode.SHOT) {
             exporter = new ExportWriter(ExportFormat.PNG, canvasWidth, exportHeight, fps);
@@ -148,7 +183,10 @@ public final class ExportMovie implements Player.Listener {
 
             recording = true;
             notifyStatusChanged();
-            DisplayController.render(1);
+            if (mainCanvasVisible)
+                DisplayController.render(1);
+            else
+                captureFrame();
         } else {
             ExportFormat format = ExportFormat.H264;
             try {
@@ -160,7 +198,6 @@ public final class ExportMovie implements Player.Listener {
             notifyStatusChanged();
 
             if (mode == ViewState.RecordingMode.LOOP) {
-                Player.addFrameListener(instance);
                 Commands.seekFrame(0);
                 Commands.play();
             }
@@ -170,9 +207,6 @@ public final class ExportMovie implements Player.Listener {
     private static void stop() {
         recording = false;
         notifyStatusChanged();
-        if (mode == ViewState.RecordingMode.LOOP) {
-            Player.removeFrameListener(instance);
-        }
 
         try {
             disposeMovieWriter(true);
@@ -189,22 +223,46 @@ public final class ExportMovie implements Player.Listener {
         operationContext = null;
     }
 
-    // loop mode only
-    @Override
-    public void frameChanged(int frame, boolean last) {
-        if (last)
+    static void playerFrameChanged(boolean last) {
+        if (!recording)
+            return;
+        if (mode == ViewState.RecordingMode.LOOP && last)
             shallStop = true;
+        if (!mainCanvasVisible)
+            captureFrame();
     }
 
     public static void shallStop() {
         if (!isRecording())
             return;
         shallStop = true;
-        DisplayController.display(); // force detach
+        if (mainCanvasVisible)
+            DisplayController.display(); // force detach
+        else
+            captureFrame();
     }
 
     public static boolean isRecording() {
         return recording;
+    }
+
+    static boolean isCanvasRecording() {
+        return recording && mainCanvasVisible;
+    }
+
+    public static void setMainCanvasVisible(boolean visible) {
+        if (mainCanvasVisible == visible)
+            return;
+        mainCanvasVisible = visible;
+        if (!visible) {
+            boolean pendingFrame = Player.grabDone();
+            if (recording && (pendingFrame || shallStop))
+                captureFrame();
+        }
+    }
+
+    public static void setTimelineFrameSource(@Nullable TimelineFrameSource source) {
+        timelineFrameSource = source;
     }
 
     public static void addStatusListener(StatusListener listener) {
@@ -222,16 +280,21 @@ public final class ExportMovie implements Player.Listener {
         statusListeners.forEach(StatusListener::recordingStatusChanged);
     }
 
-    private record FrameConsumer(ExportWriter exportWriter, BufferedImage mainImage, BufferedImage eveImage,
+    private static @Nullable TimelineFrame getTimelineFrame() {
+        return timelineFrameSource == null ? null : timelineFrameSource.getFrame();
+    }
+
+    private record FrameConsumer(ExportWriter exportWriter, @Nullable BufferedImage mainImage,
+                                 @Nullable BufferedImage timelineImage,
                                  int movieLinePosition) implements Runnable {
         @Override
         public void run() {
             try {
-                exportWriter.encode(mainImage, eveImage, movieLinePosition);
+                exportWriter.encode(mainImage, timelineImage, movieLinePosition);
             } catch (Exception e) {
                 Log.error(e);
             } finally {
-                NativeImageFactory.free(eveImage);
+                NativeImageFactory.free(timelineImage);
                 MappedImageFactory.free(mainImage);
             }
         }
