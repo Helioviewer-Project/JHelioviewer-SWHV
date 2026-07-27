@@ -47,10 +47,10 @@ public final class URIView extends BaseView {
             try {
                 if (readXml == null)
                     throw new Exception("Missing XML metadata");
-                m = new FitsMetaData(new XMLMetaDataContainer(readXml));
+                m = new FitsMetaData(new XMLMetaDataContainer(readXml), dataUri.sourceUri());
             } catch (Exception e) {
                 readXml = EMPTY_METAXML;
-                m = new BasicMetaData(buffer.width, buffer.height, dataUri.baseName());
+                m = new BasicMetaData(buffer.width, buffer.height, dataUri.baseName(), dataUri.sourceUri());
                 Log.warn("Helioviewer metadata missing for " + dataUri.baseName(), e);
             }
             xml = readXml;

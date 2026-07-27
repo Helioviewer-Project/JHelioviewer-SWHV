@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
+import java.net.URI;
+
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -14,6 +16,7 @@ class CommonMetaData implements MetaData {
 
     protected Region region = Region.DEFAULT;
     protected String displayName = "unknown";
+    protected URI sourceUri = MetaData.UNKNOWN_SOURCE_URI;
     protected DetectorMask detectorMask = DetectorMask.NONE;
 
     protected boolean calculateDepth;
@@ -48,6 +51,12 @@ class CommonMetaData implements MetaData {
     @Override
     public String getDisplayName() {
         return displayName;
+    }
+
+    @Nonnull
+    @Override
+    public URI getSourceUri() {
+        return sourceUri;
     }
 
     @Nonnull

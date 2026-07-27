@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.metadata;
 
+import java.net.URI;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -27,7 +28,8 @@ public final class FitsMetaData extends CommonMetaData {
     private double referenceX = 0;
     private double referenceY = 0;
 
-    public FitsMetaData(@Nonnull MetaDataContainer m) {
+    public FitsMetaData(@Nonnull MetaDataContainer m, @Nonnull URI _sourceUri) {
+        sourceUri = _sourceUri;
         identifyObservation(m);
 
         instrument = instrument.trim().intern();

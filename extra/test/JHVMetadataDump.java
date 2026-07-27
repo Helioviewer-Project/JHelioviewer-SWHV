@@ -1,10 +1,12 @@
 package org.helioviewer.jhv.metadata;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.helioviewer.jhv.JHVGlobals;
+import org.helioviewer.jhv.app.AppInit;
+import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.io.Directories;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -133,23 +135,10 @@ public final class JHVMetadataDump {
     }
 
     private static void initSpice() throws Exception {
-        Class<?> platform = Class.forName("org.helioviewer.jhv.Platform");
-        Method platformInit = platform.getDeclaredMethod("init");
-        platformInit.setAccessible(true);
-        platformInit.invoke(null);
-
-        Method createPersistentDirs = JHVGlobals.class.getDeclaredMethod("createPersistentDirs");
-        createPersistentDirs.setAccessible(true);
-        createPersistentDirs.invoke(null);
-
-        Method createCacheDirs = JHVGlobals.class.getDeclaredMethod("createCacheDirs");
-        createCacheDirs.setAccessible(true);
-        createCacheDirs.invoke(null);
-
-        Class<?> init = Class.forName("org.helioviewer.jhv.JHVInit");
-        Method loadSpice = init.getDeclaredMethod("loadSpice");
-        loadSpice.setAccessible(true);
-        loadSpice.invoke(null);
+        Platform.init();
+        Directories.createPersistentDirs();
+        Directories.createCacheDirs();
+        AppInit.loadSpice();
     }
 
     public static void main(String[] args) throws Exception {
@@ -169,10 +158,11 @@ public final class JHVMetadataDump {
         FitsFactory.setLongStringsEnabled(true);
         initSpice();
 
-        try (Fits fits = new Fits(new File(args[0]))) {
+        File file = new File(args[0]);
+        try (Fits fits = new Fits(file)) {
             ImageHDU hdu = findImageHdu(fits, requestedHdu);
             Header header = hdu.getHeader();
-            FitsMetaData meta = new FitsMetaData(new FITSMetaDataContainer(header));
+            FitsMetaData meta = new FitsMetaData(new FITSMetaDataContainer(header), file.toURI());
             System.out.println(dumpMetadata(meta, header).toString());
         }
     }
