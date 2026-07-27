@@ -112,7 +112,11 @@ record J2KDecoder(J2KSource src, J2KParams.Decode params, int numComps, ImageFil
             Kdu_dims newRegion = scratch.newRegion;
             newRegion.From_u32(0, 0, 0, 0);
             //sw.reset().start();
-            while (compositor.Process(MAX_RENDER_SAMPLES, newRegion)) {
+            while (!compositor.Is_processing_complete()) {
+                if (!compositor.Process(MAX_RENDER_SAMPLES, newRegion))
+                    throw new KduException("JPEG 2000 rendering failed, invalid scale code "
+                            + compositor.Check_invalid_scale_code());
+
                 Kdu_coords newSize = newRegion.Access_size();
                 int newWidth = newSize.Get_x();
                 int newHeight = newSize.Get_y();
