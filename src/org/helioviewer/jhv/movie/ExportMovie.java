@@ -25,7 +25,8 @@ public final class ExportMovie {
 
     @FunctionalInterface
     public interface TimelineFrameSource {
-        @Nullable TimelineFrame getFrame();
+        @Nullable
+        TimelineFrame getFrame();
     }
 
     public record TimelineFrame(BufferedImage image, int movieLinePosition) {}
