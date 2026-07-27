@@ -25,6 +25,7 @@ import org.helioviewer.jhv.gui.MainFrame;
 public final class MainContentPanel extends JPanel {
 
     private static final int DIVIDER_SIZE = 5;
+    private static final double NORMAL_RESIZE_WEIGHT = 0.75;
 
     private final ArrayList<Interfaces.MainContentPanelPlugin> pluginList = new ArrayList<>();
 
@@ -51,7 +52,7 @@ public final class MainContentPanel extends JPanel {
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setDividerSize(0);
         splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
-        splitPane.setResizeWeight(0.75);
+        splitPane.setResizeWeight(NORMAL_RESIZE_WEIGHT);
 
         splitPane.setTopComponent(mainComponent);
 
@@ -138,6 +139,7 @@ public final class MainContentPanel extends JPanel {
         } else {
             normalDividerLocation = splitPane.getDividerLocation();
             MainFrame.setRenderSurfaceVisible(false);
+            splitPane.setResizeWeight(0);
             splitPane.setDividerSize(0);
             splitPane.setDividerLocation(0);
             pluginMaximized = true;
@@ -148,6 +150,7 @@ public final class MainContentPanel extends JPanel {
     }
 
     private void restorePluginSize() {
+        splitPane.setResizeWeight(NORMAL_RESIZE_WEIGHT);
         splitPane.setDividerSize(DIVIDER_SIZE);
         splitPane.setDividerLocation(normalDividerLocation);
         pluginMaximized = false;
