@@ -50,6 +50,14 @@ public final class WcsProjection {
         return viewpoint.toQuat().rotateInverseVector(view);
     }
 
+    @Nullable
+    static Vec2 helioprojectiveToHpcPlane(double observerDistance, double longitude, double latitude) {
+        Vec3 ray = helioprojectiveRay(longitude, latitude);
+        if (ray.z >= 0)
+            return null;
+        return new Vec2(-observerDistance * ray.x / ray.z, -observerDistance * ray.y / ray.z);
+    }
+
     private static Vec3 helioprojectiveRay(double longitude, double latitude) {
         double cosLon = Math.cos(longitude);
         double cosLat = Math.cos(latitude);
