@@ -56,6 +56,8 @@ def suite_cases() -> list[tuple[Path, int | None]]:
     cases: list[tuple[Path, int | None]] = []
     seen: set[tuple[str, int | None]] = set()
     for run in suite_module.RUNS:
+        if run.validator != "wcs":
+            continue
         file_path = Path(run.args[0])
         hdu = None
         if "--hdu" in run.args:

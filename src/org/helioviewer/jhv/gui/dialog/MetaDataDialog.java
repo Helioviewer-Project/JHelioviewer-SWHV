@@ -3,6 +3,7 @@ package org.helioviewer.jhv.gui.dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
@@ -28,6 +30,7 @@ import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.io.XMLUtils;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.FitsMetaData;
+import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -36,6 +39,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.google.common.html.HtmlEscapers;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.swing.JideSplitPane;
@@ -68,6 +72,9 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
 
         setInitFocusedComponent(fitsTable);
         com.jidesoft.swing.SearchableUtils.installSearchable(fitsTable);
+        basicArea.addHyperlinkListener(DesktopIntegration.hyperOpenURL);
+        basicArea.setPreferredSize(new Dimension(600, 100));
+        hvArea.setPreferredSize(new Dimension(600, 100));
 
         content.add(new JScrollPane(basicArea));
         content.add(new JScrollPane(fitsTable));
@@ -111,6 +118,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     public void showDialog() {
         fitsTable.updateRowHeights();
         pack();
+        setMinimumSize(getSize());
         setLocationRelativeTo(MainFrame.get());
         setVisible(true);
     }
@@ -118,24 +126,29 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
     public void setMetaData(ImageLayer layer) {
         fitsModel.setRows(List.of());
         hvArea.setText("");
-        hvArea.setPreferredSize(new Dimension(600, 100));
         exportXml = null;
         exportFilename = null;
         exportFitsButton.setEnabled(false);
+        int request = ++metadataRequest;
 
-        if (!(layer.getMetaData() instanceof FitsMetaData m)) {
-            basicArea.setText("No Helioviewer metadata available");
+        MetaData metadata = layer.getMetaData();
+        URI sourceUri = metadata.getSourceUri();
+        boolean hasSourceUri = !sourceUri.equals(MetaData.UNKNOWN_SOURCE_URI);
+        String source = HtmlEscapers.htmlEscaper().escape(sourceUri.toString());
+        String sourceText = "Source URI: <a href=\"" + source + "\">" + source + "</a>";
+        if (!(metadata instanceof FitsMetaData fitsMetadata)) {
+            basicArea.setText(hasSourceUri ? sourceText : "No Helioviewer metadata available");
             return;
         }
 
-        basicArea.setText("Observatory: " + m.getObservatory() + "<br/>" +
-                "Instrument: " + m.getInstrument() + "<br/>" +
-                "Detector: " + m.getDetector() + "<br/>" +
-                "Measurement: " + m.getMeasurement() + "<br/>" +
-                "Observation Date: " + m.getViewpoint().time);
+        basicArea.setText("Observatory: " + fitsMetadata.getObservatory() + "<br/>" +
+                "Instrument: " + fitsMetadata.getInstrument() + "<br/>" +
+                "Detector: " + fitsMetadata.getDetector() + "<br/>" +
+                "Measurement: " + fitsMetadata.getMeasurement() + "<br/>" +
+                "Observation Date: " + fitsMetadata.getViewpoint().time +
+                (hasSourceUri ? "<br/>" + sourceText : ""));
 
-        int request = ++metadataRequest;
-        Task.submit("metadata", () -> parseMetadata(layer, m), parsed -> applyMetadata(request, parsed), Log::error);
+        Task.submit("metadata", () -> parseMetadata(layer, fitsMetadata), parsed -> applyMetadata(request, parsed), Log::error);
     }
 
     private void applyMetadata(int request, ParsedMetadata parsed) {

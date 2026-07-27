@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.metadata;
 
+import java.net.URI;
+
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
@@ -8,8 +10,13 @@ import org.helioviewer.jhv.wcs.WcsHeader;
 
 public interface MetaData {
 
+    URI UNKNOWN_SOURCE_URI = URI.create("unknown:unknown");
+
     @Nonnull
     String getDisplayName();
+
+    @Nonnull
+    URI getSourceUri();
 
     @Nonnull
     Region getPhysicalRegion();

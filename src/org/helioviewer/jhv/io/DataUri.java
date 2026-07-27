@@ -44,16 +44,22 @@ public class DataUri {
         enum Timeline implements Format {CDF, CSV}
     }
 
+    private final URI sourceUri;
     private final URI uri;
     private final Format format;
     private final File file;
     private final String baseName;
 
     DataUri(URI originalUri, URI cachedUri, File _file) throws IOException {
+        sourceUri = originalUri;
         uri = cachedUri;
         file = _file;
         format = file == null ? Format.Image.JPIP : detect(file); // JPIP not backed by file
         baseName = FilenameUtils.getName(originalUri.toString());
+    }
+
+    public URI sourceUri() {
+        return sourceUri;
     }
 
     public URI uri() {
