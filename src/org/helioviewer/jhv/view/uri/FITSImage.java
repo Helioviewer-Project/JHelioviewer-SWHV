@@ -388,7 +388,7 @@ public final class FITSImage implements URIImageReader {
                 SampleBuffer sampleData = sampleImage(pixels, hasBlank, blank, bzero, bscale, width, height);
                 int sampleLen = sampleData.length();
                 if (sampleLen < MIN_SAMPLES) // couldn't find enough acceptable samples, return blank image
-                    return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).finish();
+                    return ImageBuffer.createWriteBuffer(width, height, ImageBuffer.Format.Gray8, filter).clearPixels().finish();
 
                 if (state.clippingMode().percentile() > 0) {
                     double percentile = state.clippingMode().percentile();
