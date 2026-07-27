@@ -20,6 +20,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.MainContentPanel;
 import org.helioviewer.jhv.gui.component.MenuBar;
 import org.helioviewer.jhv.gui.component.MoviePanel;
@@ -39,6 +40,8 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
+
+import com.jidesoft.swing.JideButton;
 
 public final class MainFrame {
 
@@ -137,7 +140,24 @@ public final class MainFrame {
 
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(leftPaneHost, BorderLayout.WEST);
+
+        JideButton sidebarCollapseHandle = new JideButton(Buttons.collapseLeft);
+        sidebarCollapseHandle.setToolTipText("Collapse the sidebar");
+        sidebarCollapseHandle.setPreferredSize(new Dimension(16, 0));
+        sidebarCollapseHandle.addActionListener(e -> {
+            boolean collapsed = leftPaneHost.isVisible();
+            leftPaneHost.setVisible(!collapsed);
+            sidebarCollapseHandle.setText(collapsed ? Buttons.collapseRight : Buttons.collapseLeft);
+            sidebarCollapseHandle.setToolTipText(collapsed ? "Show the sidebar" : "Collapse the sidebar");
+            centerPanel.revalidate();
+            mainFrame.validate();
+            centerPanel.repaint();
+        });
+
+        JPanel westPanel = new JPanel(new BorderLayout());
+        westPanel.add(leftPaneHost, BorderLayout.CENTER);
+        westPanel.add(sidebarCollapseHandle, BorderLayout.LINE_END);
+        centerPanel.add(westPanel, BorderLayout.WEST);
         centerPanel.add(mainContentPanel, BorderLayout.CENTER);
 
         ViewpointStatusPanel viewpointStatus = new ViewpointStatusPanel();

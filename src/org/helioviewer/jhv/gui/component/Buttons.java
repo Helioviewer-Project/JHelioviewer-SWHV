@@ -17,6 +17,10 @@ public class Buttons {
     public static final String forward = MaterialDesign.STEP_FORWARD.toString();
     public static final String record = MaterialDesign.RECORD.toString();
     public static final String check = MaterialDesign.CHECK.toString();
+    public static final String collapseLeft = "<html><font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_LEFT + "</font>";
+    public static final String collapseRight = "<html><font face='Material Design Icons' size=4>" +
+            MaterialDesign.CHEVRON_RIGHT + "</font>";
 
     public static final String chevronRight = "<html><font face='Material Design Icons' size=4>" +
             MaterialDesign.CHEVRON_RIGHT + "</font>&nbsp;";
