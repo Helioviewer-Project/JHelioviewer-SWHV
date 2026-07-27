@@ -8,6 +8,27 @@ public final class ImageBounds {
 
     public static double radial(MetaData metaData) {
         Region region = metaData.getPhysicalRegion();
+        WcsHeader wcsHeader = metaData.getWcsHeader();
+        if (!wcsHeader.projection.isSurfaceMap()) {
+            double x0 = region.llx;
+            double x1 = region.urx;
+            double y0 = region.lly;
+            double y1 = region.ury;
+            double xm = 0.5 * (x0 + x1);
+            double ym = 0.5 * (y0 + y1);
+            double distance = metaData.getViewpoint().distance;
+            double radius = radialBound(wcsHeader, distance, x0, y0);
+            radius = Math.max(radius, radialBound(wcsHeader, distance, x1, y0));
+            radius = Math.max(radius, radialBound(wcsHeader, distance, x0, y1));
+            radius = Math.max(radius, radialBound(wcsHeader, distance, x1, y1));
+            radius = Math.max(radius, radialBound(wcsHeader, distance, xm, y0));
+            radius = Math.max(radius, radialBound(wcsHeader, distance, xm, y1));
+            radius = Math.max(radius, radialBound(wcsHeader, distance, x0, ym));
+            radius = Math.max(radius, radialBound(wcsHeader, distance, x1, ym));
+            if (radius > 0)
+                return radius;
+        }
+
         Vec2 sun = sunCenter(metaData);
         double x0 = region.llx - sun.x;
         double x1 = region.urx - sun.x;
@@ -16,6 +37,14 @@ public final class ImageBounds {
         return Math.max(
                 Math.max(Math.hypot(x0, y0), Math.hypot(x1, y0)),
                 Math.max(Math.hypot(x0, y1), Math.hypot(x1, y1)));
+    }
+
+    private static double radialBound(WcsHeader wcsHeader, double distance, double x, double y) {
+        Vec2 helioprojective = WcsProjection.planeToHelioprojective(wcsHeader, x, y);
+        Vec2 hpcPlane = WcsProjection.helioprojectiveToHpcPlane(distance, helioprojective.x, helioprojective.y);
+        if (hpcPlane != null && Double.isFinite(hpcPlane.x) && Double.isFinite(hpcPlane.y))
+            return Math.hypot(hpcPlane.x, hpcPlane.y);
+        return 0;
     }
 
     private static Vec2 sunCenter(MetaData metaData) {
