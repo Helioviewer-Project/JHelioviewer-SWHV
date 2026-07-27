@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import org.helioviewer.jhv.app.AppInfo;
@@ -21,6 +22,7 @@ import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.gui.component.Buttons;
+import org.helioviewer.jhv.gui.component.CollapsiblePaneButton;
 import org.helioviewer.jhv.gui.component.MainContentPanel;
 import org.helioviewer.jhv.gui.component.MenuBar;
 import org.helioviewer.jhv.gui.component.MoviePanel;
@@ -40,8 +42,6 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
-
-import com.jidesoft.swing.JideButton;
 
 public final class MainFrame {
 
@@ -141,12 +141,16 @@ public final class MainFrame {
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
 
-        JideButton sidebarCollapseHandle = new JideButton(Buttons.collapseLeft);
+        CollapsiblePaneButton sidebarCollapseHandle = new CollapsiblePaneButton(SwingConstants.VERTICAL);
+        sidebarCollapseHandle.setSelected(true);
+        sidebarCollapseHandle.setFont(UIGlobals.uiFontSmallBold);
+        sidebarCollapseHandle.setHorizontalAlignment(SwingConstants.CENTER);
         sidebarCollapseHandle.setToolTipText("Collapse the sidebar");
-        sidebarCollapseHandle.setPreferredSize(new Dimension(16, 0));
+        sidebarCollapseHandle.setText(Buttons.collapseLeft);
         sidebarCollapseHandle.addActionListener(e -> {
             boolean collapsed = leftPaneHost.isVisible();
             leftPaneHost.setVisible(!collapsed);
+            sidebarCollapseHandle.setSelected(true);
             sidebarCollapseHandle.setText(collapsed ? Buttons.collapseRight : Buttons.collapseLeft);
             sidebarCollapseHandle.setToolTipText(collapsed ? "Show the sidebar" : "Collapse the sidebar");
             centerPanel.revalidate();

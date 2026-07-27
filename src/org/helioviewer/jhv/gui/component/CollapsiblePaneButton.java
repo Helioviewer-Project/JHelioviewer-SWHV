@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.gui.component;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,17 +14,37 @@ import javax.swing.SwingConstants;
 import org.helioviewer.jhv.gui.UIGlobals;
 
 @SuppressWarnings("serial")
-class CollapsiblePaneButton extends JToggleButton {
+public final class CollapsiblePaneButton extends JToggleButton {
 
     private static final Color bright = brighter(UIGlobals.backColor, 0.85);
     private static final Color dark = darker(UIGlobals.backColor, 0.9);
+    private static final int THICKNESS_HORZ = 14;
+    private static final int THICKNESS_VERT = 12;
 
-    CollapsiblePaneButton() {
-        setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
+    private final boolean vertical;
+
+    public CollapsiblePaneButton() {
+        this(SwingConstants.HORIZONTAL);
+    }
+
+    public CollapsiblePaneButton(int orientation) {
+        vertical = orientation == SwingConstants.VERTICAL;
+        setBorder(BorderFactory.createEmptyBorder());
         setContentAreaFilled(false);
         setFocusPainted(false);
         setBorderPainted(false);
         setHorizontalAlignment(SwingConstants.LEFT);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension size = super.getPreferredSize();
+        if (vertical) {
+            size.width = THICKNESS_VERT;
+        } else {
+            size.height = THICKNESS_HORZ;
+        }
+        return size;
     }
 
     private static Color brighter(Color c, double FACTOR) {
@@ -56,18 +77,19 @@ class CollapsiblePaneButton extends JToggleButton {
         int w = getWidth();
         int h = getHeight();
         Point p0 = new Point(0, 0);
-        Point ph = new Point(0, h);
+        Point ph = vertical ? new Point(w, 0) : new Point(0, h);
+        int half = vertical ? w / 2 : h / 2;
 
         if (isSelected()) {
             g.setPaint(new GradientPaint(p0, bright, ph, dark));
-            g.fillRect(0, 0, w, h / 2);
+            g.fillRect(0, 0, vertical ? half : w, vertical ? h : half);
             g.setPaint(new GradientPaint(p0, dark, ph, bright));
-            g.fillRect(0, h / 2, w, h / 2);
+            g.fillRect(vertical ? half : 0, vertical ? 0 : half, vertical ? half : w, vertical ? h : half);
         } else {
             g.setPaint(new GradientPaint(p0, dark, ph, bright));
-            g.fillRect(0, 0, w, h / 2);
+            g.fillRect(0, 0, vertical ? half : w, vertical ? h : half);
             g.setPaint(new GradientPaint(p0, bright, ph, dark));
-            g.fillRect(0, h / 2, w, h / 2);
+            g.fillRect(vertical ? half : 0, vertical ? 0 : half, vertical ? half : w, vertical ? h : half);
         }
         g.dispose();
 
