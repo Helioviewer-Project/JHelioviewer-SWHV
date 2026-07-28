@@ -24,6 +24,7 @@ public final class RadialWarpGrid {
     private final GLSLLine line = new GLSLLine(true);
     private final BufVertex vexBuf = new BufVertex(0);
     private final double[] rings = new double[MAX_RINGS];
+    private final String[] ringLabels = new String[MAX_RINGS];
 
     public void init() {
         line.init();
@@ -39,7 +40,7 @@ public final class RadialWarpGrid {
         updateLine(scale, ringCount, spokeStep, color);
         line.renderLine(vp, GridMath.LINEWIDTH * lineScale);
         if (showLabels)
-            drawLabels(mv, vp, scale, rings, ringCount, labelColor, labelSize, labelAngle);
+            drawLabels(mv, vp, scale, ringCount, labelColor, labelSize, labelAngle);
     }
 
     private int chooseRings(MapScale scale) {
@@ -56,7 +57,11 @@ public final class RadialWarpGrid {
                 double t = scale.toUnitY(r);
                 if (t - lastT < MIN_RING_SPACING)
                     continue;
-                rings[count++] = r;
+                if (ringLabels[count] == null || rings[count] != r) {
+                    rings[count] = r;
+                    ringLabels[count] = FastFormat.rounded2(r);
+                }
+                count++;
                 lastT = t;
             }
             decade *= 10;
@@ -98,7 +103,7 @@ public final class RadialWarpGrid {
         line.setVertex(vexBuf);
     }
 
-    private static void drawLabels(MapView mv, Viewport vp, MapScale scale, double[] rings, int ringCount, float[] color, double labelSize, double labelAngle) {
+    private void drawLabels(MapView mv, Viewport vp, MapScale scale, int ringCount, float[] color, double labelSize, double labelAngle) {
         SdfTextRenderer renderer = GLText.renderer();
         double width = mv.cameraWidth(vp);
         double worldTextHeight = TEXT_SIZE * labelSize / GridLayer.GRID_LABEL_SIZE_REF * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
@@ -113,7 +118,7 @@ public final class RadialWarpGrid {
         for (int i = 0; i < ringCount; i++) {
             double r = rings[i];
             double rho = ringRho(scale, r);
-            renderer.draw(FastFormat.rounded2(r), (float) (sin * rho + labelOffset), (float) (cos * rho + labelOffset), 0, textScaleFactor);
+            renderer.draw(ringLabels[i], (float) (sin * rho + labelOffset), (float) (cos * rho + labelOffset), 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }
