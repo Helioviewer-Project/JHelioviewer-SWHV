@@ -296,22 +296,15 @@ public class BandReaderHapi {
             throw new Exception("Bins not supported");
         if (jo.optJSONArray("size") != null)
             throw new Exception("Only scalars supported");
-        String name = jo.optString("name", null);
-        name = name == null ? "unknown" : name;
-        String units = jo.optString("units", null);
-        units = units == null ? "unknown" : units;
-
-        return new Parameter(name, units, jo.optJSONObject("jhvparams"));
+        return new Parameter(jo.optString("name", "unknown"), jo.optString("units", "unknown"), jo.optJSONObject("jhvparams"));
     }
 
     private static JSONObject getBandOptions(@Nullable JSONObject jhvparams) {
         if (jhvparams == null)
             return new JSONObject();
 
-        JSONObject options = new JSONObject(jhvparams,
-                "scale", "range", "plotType", "barWidth", "levels", "warningLevels");
-        JSONArray predefined = jhvparams.optJSONArray("predefined");
-        options.putOpt("predefined", predefined != null ? predefined : jhvparams.optJSONArray("groups"));
+        JSONObject options = new JSONObject(jhvparams, "scale", "range", "plotType", "barWidth", "levels", "warningLevels");
+        options.putOpt("predefined", jhvparams.optJSONArray("predefined", jhvparams.optJSONArray("groups")));
         return options;
     }
 
