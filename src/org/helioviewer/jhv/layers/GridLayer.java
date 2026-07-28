@@ -48,6 +48,8 @@ public final class GridLayer extends AbstractLayer {
     private static final double LINEWIDTH_THICK = 2 * LINEWIDTH;
     private static final double LINEWIDTH_EARTH = LINEWIDTH;
     private static final double LINEWIDTH_AXES = 2 * LINEWIDTH;
+    private static final float[] LABEL_COLOR = Colors.WhiteFloat;
+    private static final float[] RADIAL_LABEL_COLOR = Colors.MiddleGrayFloat;
     // private static final double PLANETEXT_Z = 0.01;
 
     private double lonStep = 15;
@@ -62,6 +64,8 @@ public final class GridLayer extends AbstractLayer {
     private double gridAlpha = 1;
     private byte[] gridColorBytes = gridColor.bytes();
     private double labelAlpha = 1;
+    private float[] labelColor = LABEL_COLOR;
+    private float[] radialLabelColor = RADIAL_LABEL_COLOR;
     private double gridLineScale = 1;
     private double gridLabelSize = GRID_LABEL_SIZE_REF;
     private double gridLabelAngle = 120;
@@ -109,6 +113,7 @@ public final class GridLayer extends AbstractLayer {
         gridAlpha = Math.clamp(jo.optDouble("alpha", gridAlpha), 0, 1);
         updateGridColorBytes();
         labelAlpha = Math.clamp(jo.optDouble("labelAlpha", labelAlpha), 0, 1);
+        updateLabelColors();
         gridLineScale = Math.clamp(jo.optDouble("lineScale", gridLineScale), GRID_LINE_SCALE_MIN, GRID_LINE_SCALE_MAX);
         gridLabelSize = Math.clamp(jo.optDouble("labelSize", gridLabelSize), GRID_LABEL_SIZE_MIN, GRID_LABEL_SIZE_MAX);
         gridLabelAngle = jo.optDouble("labelAngle", gridLabelAngle);
@@ -172,12 +177,12 @@ public final class GridLayer extends AbstractLayer {
                     radialCircleLineFar.renderLine(vp, LINEWIDTH);
                     radialThickLineFar.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabelsFar, ztext, R_LABEL_POS_FAR, Colors.fade(Colors.MiddleGrayFloat, labelAlpha));
+                        drawRadialGridText(radialLabelsFar, ztext, R_LABEL_POS_FAR, radialLabelColor);
                 } else {
                     radialCircleLine.renderLine(vp, LINEWIDTH);
                     radialThickLine.renderLine(vp, LINEWIDTH_THICK);
                     if (showLabels)
-                        drawRadialGridText(radialLabels, ztext, R_LABEL_POS, Colors.fade(Colors.MiddleGrayFloat, labelAlpha));
+                        drawRadialGridText(radialLabels, ztext, R_LABEL_POS, radialLabelColor);
                 }
             }
             Transform.popView();
@@ -189,9 +194,9 @@ public final class GridLayer extends AbstractLayer {
         if (!isVisible[vp.idx])
             return;
         if (mv.isRadialWarp())
-            radialWarpGrid.render(mv, vp, showLabels, lonStep, gridColorBytes, gridLineScale, Colors.fade(Colors.WhiteFloat, labelAlpha), gridLabelSize, gridLabelAngle);
+            radialWarpGrid.render(mv, vp, showLabels, lonStep, gridColorBytes, gridLineScale, labelColor, gridLabelSize, gridLabelAngle);
         else
-            flatGrid.render(mv, vp, showLabels, gridColorBytes, gridLineScale, Colors.fade(Colors.WhiteFloat, labelAlpha), gridLabelSize);
+            flatGrid.render(mv, vp, showLabels, gridColorBytes, gridLineScale, labelColor, gridLabelSize);
     }
 
     private void drawEarthCircles(Viewport vp, double factor, Position p) {
@@ -221,7 +226,7 @@ public final class GridLayer extends AbstractLayer {
 
     private void drawGridText(float z) {
         SdfTextRenderer renderer = GLText.renderer();
-        renderer.setColor(Colors.fade(Colors.WhiteFloat, labelAlpha));
+        renderer.setColor(labelColor);
         // the scale factor has to be divided by the current font size
         float textScaleFactor = (float) (textScale * gridLabelSize / GRID_LABEL_SIZE_REF / renderer.getFontSize());
 
@@ -371,6 +376,7 @@ public final class GridLayer extends AbstractLayer {
 
     public void setLabelAlpha(double _labelAlpha) {
         labelAlpha = Math.clamp(_labelAlpha, 0, 1);
+        updateLabelColors();
         DisplayController.display();
     }
 
@@ -403,6 +409,11 @@ public final class GridLayer extends AbstractLayer {
 
     private void updateGridColorBytes() {
         gridColorBytes = gridAlpha == 1 ? gridColor.bytes() : Colors.bytes(gridColor.awtColor(), gridAlpha);
+    }
+
+    private void updateLabelColors() {
+        labelColor = Colors.fade(LABEL_COLOR, labelAlpha);
+        radialLabelColor = Colors.fade(RADIAL_LABEL_COLOR, labelAlpha);
     }
 
 }
