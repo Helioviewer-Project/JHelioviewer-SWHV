@@ -19,14 +19,14 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 public final class ImageSelectorPanel extends JPanel implements DataSources.Listener {
 
-    private final Interfaces.ObservationSelector selector;
+    private final Interfaces.DatasetSelectionHandler selectionHandler;
     private final DataSourcesTree sourcesTree;
 
-    public ImageSelectorPanel(Interfaces.ObservationSelector _selector) {
+    public ImageSelectorPanel(Interfaces.DatasetSelectionHandler _selectionHandler) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setPreferredSize(new Dimension(250, 350));
-        selector = _selector;
-        sourcesTree = new DataSourcesTree(selector);
+        selectionHandler = _selectionHandler;
+        sourcesTree = new DataSourcesTree(selectionHandler);
         add(new JScrollPane(sourcesTree));
         DataSources.addListener(this);
     }
@@ -44,7 +44,7 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
         if (item != null) { // valid
             long start = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
             long end = item.end;
-            selector.setTime(start, end);
+            selectionHandler.setTime(start, end);
         }
     }
 
