@@ -1,19 +1,19 @@
 package org.helioviewer.jhv.gui.component;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 
 import javax.annotation.Nullable;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
-import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.DataSourcesParser;
 import org.helioviewer.jhv.io.DataSourcesTree;
-import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
@@ -23,60 +23,54 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
     private final DataSourcesTree sourcesTree;
 
     public ImageSelectorPanel(Interfaces.DatasetSelectionHandler _selectionHandler) {
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        setPreferredSize(new Dimension(250, 350));
+        setLayout(new BorderLayout());
         selectionHandler = _selectionHandler;
         sourcesTree = new DataSourcesTree(selectionHandler);
-        add(new JScrollPane(sourcesTree));
+
+        JScrollPane scrollPane = new JScrollPane(sourcesTree);
+        scrollPane.setPreferredSize(new Dimension(250, 350));
+        add(scrollPane, BorderLayout.CENTER);
+
+        JButton availabilityButton = new JButton("Available data");
+        availabilityButton.setEnabled(false);
+        availabilityButton.addActionListener(e -> DesktopIntegration.openURL(getAvailabilityURL()));
+        sourcesTree.addTreeSelectionListener(e -> availabilityButton.setEnabled(getAvailabilityURL() != null));
+
+        JPanel availabilityPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        availabilityPanel.add(availabilityButton);
+        add(availabilityPanel, BorderLayout.PAGE_END);
+
         DataSources.addListener(this);
     }
 
-    public JComponent getFocused() {
-        return sourcesTree;
+    @Override
+    public boolean requestFocusInWindow() {
+        return sourcesTree.requestFocusInWindow();
     }
 
     @Override
     public void setupSources(DataSourcesParser parser) {
-        if (!sourcesTree.setParsedData(parser)) // not preferred
+        if (!sourcesTree.setParsedData(parser))
             return;
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-        if (item != null) { // valid
-            long start = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
-            long end = item.end;
-            selectionHandler.setTime(start, end);
-        }
+        if (item == null)
+            return;
+
+        long start = item.end - 2 * TimeUtils.DAY_IN_MILLIS;
+        selectionHandler.setDefaultTimeRange(start, item.end);
     }
 
     @Nullable
-    public String getAvailabilityURL() {
-        DataSourcesTree.SourceItem item = getSelected();
+    private String getAvailabilityURL() {
+        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item == null) return null;
 
         String availability = DataSources.getServerSetting(item.server, "availability.images");
         return availability == null ? null : availability + "ID=" + item.sourceId;
     }
 
-    public void setupLayer(APIRequest req) {
-        setSelected(req.server(), req.sourceId());
-    }
-
-    private void setSelected(String server, int sourceId) {
+    public void selectDataset(String server, int sourceId) {
         sourcesTree.setSelectedItem(server, sourceId);
-    }
-
-    @Nullable
-    public DataSourcesTree.SourceItem getSelected() {
-        return sourcesTree.getSelectedItem();
-    }
-
-    public void load(ImageLayer layer, String server, int sourceId, long startTime, long endTime, int cadence) {
-        setSelected(server, sourceId);
-        load(layer, new APIRequest(server, sourceId, startTime, endTime, cadence));
-    }
-
-    private static void load(ImageLayer layer, APIRequest req) {
-        ImageLayer imageLayer = layer == null ? ImageLayer.create(null) : layer;
-        imageLayer.load(req);
     }
 }
