@@ -146,14 +146,12 @@ public final class MainFrame {
         sidebarCollapseHandle.setSelected(true);
         sidebarCollapseHandle.setFont(UIGlobals.uiFontSmallBold);
         sidebarCollapseHandle.setHorizontalAlignment(SwingConstants.CENTER);
-        sidebarCollapseHandle.setToolTipText("Collapse the sidebar");
         sidebarCollapseHandle.setText(Buttons.collapseLeft);
         sidebarCollapseHandle.addActionListener(e -> {
             boolean collapsed = leftPaneHost.isVisible();
             leftPaneHost.setVisible(!collapsed);
             sidebarCollapseHandle.setSelected(true);
             sidebarCollapseHandle.setText(collapsed ? Buttons.collapseRight : Buttons.collapseLeft);
-            sidebarCollapseHandle.setToolTipText(collapsed ? "Show the sidebar" : "Collapse the sidebar");
             centerPanel.revalidate();
             mainFrame.validate();
             centerPanel.repaint();
