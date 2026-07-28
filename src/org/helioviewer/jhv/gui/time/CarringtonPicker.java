@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.time;
 
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,6 +13,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
 
 import org.helioviewer.jhv.astronomy.Carrington;
 import org.helioviewer.jhv.time.JHVTime;
@@ -34,7 +36,20 @@ class CarringtonPicker extends JideButton {
         public Integer getElementAt(int index) {
             return index + Carrington.CR_MINIMAL;
         }
-    });
+    }) {
+        @Override
+        public String getToolTipText(MouseEvent e) {
+            int index = locationToIndex(e.getPoint());
+            Rectangle bounds = index < 0 ? null : getCellBounds(index, index);
+            if (bounds == null || !bounds.contains(e.getPoint()))
+                return null;
+
+            long end = index + 1 < Carrington.CR_start.length
+                    ? Carrington.CR_start[index + 1]
+                    : TimeUtils.MAXIMAL_TIME.milli;
+            return TimeUtils.formatShort(Carrington.CR_start[index]) + " - " + TimeUtils.formatShort(end);
+        }
+    };
 
     private long time;
 
@@ -44,6 +59,7 @@ class CarringtonPicker extends JideButton {
 
         list.setVisibleRowCount(15);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ToolTipManager.sharedInstance().registerComponent(list);
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
