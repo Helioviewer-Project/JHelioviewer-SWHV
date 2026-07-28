@@ -16,14 +16,8 @@ public final class Interfaces {
         List<JComponent> getVisualInterfaces();
     }
 
-    public interface ObservationSelector {
-        int getCadence();
-
+    public interface DatasetSelectionHandler {
         void setTime(long start, long end);
-
-        long getStartTime();
-
-        long getEndTime();
 
         void load(String server, int sourceId);
 

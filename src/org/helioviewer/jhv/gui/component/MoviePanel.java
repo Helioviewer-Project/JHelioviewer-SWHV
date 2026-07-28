@@ -48,7 +48,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements Interfaces.ObservationSelector, Player.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
+public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHandler, Player.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;
@@ -229,7 +229,6 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         ViewState.addRecordingConfigListener(this);
     }
 
-    @Override
     public int getCadence() {
         return samplingPanel.getCadence();
     }
@@ -239,12 +238,10 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         timeSelectorPanel.setTime(start, end);
     }
 
-    @Override
     public long getStartTime() {
         return timeSelectorPanel.getStartTime();
     }
 
-    @Override
     public long getEndTime() {
         return timeSelectorPanel.getEndTime();
     }

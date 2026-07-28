@@ -64,7 +64,7 @@ public final class DataSourcesTree extends JTree {
     private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
-    public DataSourcesTree(Interfaces.ObservationSelector selector) {
+    public DataSourcesTree(Interfaces.DatasetSelectionHandler selectionHandler) {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
@@ -82,7 +82,7 @@ public final class DataSourcesTree extends JTree {
             defaultRenderer.setLeafIcon(null);
         }
 
-        setSelectionModel(new OneLeafTreeSelectionModel(selector));
+        setSelectionModel(new OneLeafTreeSelectionModel(selectionHandler));
         ToolTipManager.sharedInstance().registerComponent(this);
         com.jidesoft.swing.SearchableUtils.installSearchable(this).setRecursive(true);
 
@@ -93,7 +93,7 @@ public final class DataSourcesTree extends JTree {
                 if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1 && (path = getPathForLocation(e.getX(), e.getY())) != null) {
                     Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
                     if (obj instanceof SourceItem si)
-                        selector.load(si.server, si.sourceId);
+                        selectionHandler.load(si.server, si.sourceId);
                 }
             }
         });
@@ -103,7 +103,7 @@ public final class DataSourcesTree extends JTree {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     SourceItem item = getSelectedItem();
                     if (item != null)
-                        selector.load(item.server, item.sourceId);
+                        selectionHandler.load(item.server, item.sourceId);
                 }
             }
         });
@@ -199,11 +199,11 @@ public final class DataSourcesTree extends JTree {
 
     private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
 
-        private final Interfaces.ObservationSelector selector;
+        private final Interfaces.DatasetSelectionHandler selectionHandler;
         private TreePath selectedPath;
 
-        OneLeafTreeSelectionModel(Interfaces.ObservationSelector _selector) {
-            selector = _selector;
+        OneLeafTreeSelectionModel(Interfaces.DatasetSelectionHandler _selectionHandler) {
+            selectionHandler = _selectionHandler;
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         }
 
@@ -212,7 +212,7 @@ public final class DataSourcesTree extends JTree {
             if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 super.setSelectionPath(path);
                 selectedPath = path;
-                selector.setAvailabilityEnabled(DataSources.getServerSetting(((SourceItem) node.getUserObject()).server, "availability.images") != null);
+                selectionHandler.setAvailabilityEnabled(DataSources.getServerSetting(((SourceItem) node.getUserObject()).server, "availability.images") != null);
             }
         }
 
