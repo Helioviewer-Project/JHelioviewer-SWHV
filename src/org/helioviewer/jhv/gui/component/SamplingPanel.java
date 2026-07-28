@@ -85,10 +85,6 @@ public final class SamplingPanel extends JPanel {
         updateEnabled();
     }
 
-    public void setFrameCount(int frameCount) {
-        frameCountSpinner.setValue(Math.clamp(frameCount, FRAME_COUNT_MIN, FRAME_COUNT_MAX));
-    }
-
     public boolean isSingleFrame() {
         return frameCountButton.isSelected() && spinnerValue(frameCountSpinner) == 1;
     }
