@@ -9,8 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -26,10 +24,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
-import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
-import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
@@ -323,22 +319,13 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         }
     }
 
-    private static class RecordButton extends JideToggleButton implements ActionListener {
+    private static class RecordButton extends JideToggleButton {
         RecordButton(float fontSize) {
             super(Buttons.record);
             setFont(Buttons.getMaterialFont(fontSize));
             setForeground(Color.decode("#800000"));
             setToolTipText("Record movie");
-            addActionListener(this);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (isSelected()) {
-                Commands.recordStart(CompletionNotifications.recordingContext(), null);
-            } else {
-                Commands.recordStop();
-            }
+            addActionListener(Actions.RECORD);
         }
     }
 

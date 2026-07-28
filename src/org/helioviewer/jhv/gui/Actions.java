@@ -29,6 +29,7 @@ import org.helioviewer.jhv.gui.dialog.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
@@ -39,6 +40,7 @@ public final class Actions {
     public static final AbstractAction PLAY_PAUSE = new PlayPauseAction();
     public static final AbstractAction PREVIOUS_FRAME = new PreviousFrameAction();
     public static final AbstractAction NEXT_FRAME = new NextFrameAction();
+    public static final AbstractAction RECORD = new RecordAction();
 
     public abstract static class AbstractKeyAction extends AbstractAction {
         public AbstractKeyAction(String name, KeyStroke key) {
@@ -205,7 +207,8 @@ public final class Actions {
 
     public static class ReloadSources extends AbstractKeyAction {
         public ReloadSources() {
-            super("Reload Datasets Listings", KeyStroke.getKeyStroke(KeyEvent.VK_R, DesktopIntegration.menuShortcutMask));
+            super("Reload Datasets Listings",
+                    KeyStroke.getKeyStroke(KeyEvent.VK_R, DesktopIntegration.menuShortcutMask | InputEvent.SHIFT_DOWN_MASK));
         }
 
         @Override
@@ -285,6 +288,20 @@ public final class Actions {
             if (Player.isPlaying())
                 Commands.pause();
             Commands.nextFrame();
+        }
+    }
+
+    private static class RecordAction extends AbstractKeyAction {
+        RecordAction() {
+            super("Start/Stop Recording", KeyStroke.getKeyStroke(KeyEvent.VK_R, DesktopIntegration.menuShortcutMask));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (ExportMovie.isRecording())
+                Commands.recordStop();
+            else
+                Commands.recordStart(CompletionNotifications.recordingContext(), null);
         }
     }
 
