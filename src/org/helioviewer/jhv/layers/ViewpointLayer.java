@@ -49,7 +49,7 @@ public class ViewpointLayer extends AbstractLayer {
 
     private final GLSLLine spiral = new GLSLLine(true);
     private final BufVertex spiralBuf = new BufVertex(SPIRAL_ARMS * (2 * SPIRAL_DIVISIONS + 1 + 2) * GLSLLine.stride);
-    private final byte[] spiralColor = Colors.ReducedGreen;
+    private final byte[] spiralColor = Colors.ReducedGreen.bytes();
 
     private final double[] lati = new double[3];
     private final double[] hoverPoint = new double[3];

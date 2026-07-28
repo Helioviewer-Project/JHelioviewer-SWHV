@@ -32,28 +32,28 @@ public class FOVShape {
             if (i == 0) { // first
                 vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
-            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
+            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White.bytes());
         }
 
         for (int i = 1; i <= RECT_SUBDIVS; i++) {
             x = bw + centerX;
             y = bh - 2 * bh / RECT_SUBDIVS * i + centerY;
             z = computeZ(x, y, flat, lineWidth);
-            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
+            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White.bytes());
         }
 
         for (int i = 1; i <= RECT_SUBDIVS; i++) {
             x = bw - 2 * bw / RECT_SUBDIVS * i + centerX;
             y = -bh + centerY;
             z = computeZ(x, y, flat, lineWidth);
-            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
+            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White.bytes());
         }
 
         for (int i = 1; i <= RECT_SUBDIVS; i++) {
             x = -bw + centerX;
             y = -bh + 2 * bh / RECT_SUBDIVS * i + centerY;
             z = computeZ(x, y, flat, lineWidth);
-            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
+            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White.bytes());
             if (i == RECT_SUBDIVS) { // last
                 vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
@@ -70,7 +70,7 @@ public class FOVShape {
             if (i == 0) {
                 vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }
-            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White);
+            vexBuf.putVertex((float) x, (float) y, (float) z, 1, i % 2 == 0 ? color : Colors.White.bytes());
             if (i == CIRC_SUBDIVS) {
                 vexBuf.putVertex((float) x, (float) y, (float) z, 1, Colors.Null);
             }

@@ -4,7 +4,58 @@ import java.awt.Color;
 
 import org.helioviewer.jhv.app.DisplaySettings;
 
-public class Colors {
+public enum Colors {
+
+    Red("Red", Color.RED),
+    Green("Green", Color.GREEN),
+    ReducedGreen("Reduced Green", new Color(100, 175, 100)),
+    Blue("Blue", Color.BLUE),
+    Yellow("Yellow", Color.YELLOW),
+    Orange("Orange", Color.ORANGE),
+    Cyan("Cyan", Color.CYAN),
+    Magenta("Magenta", Color.MAGENTA),
+    Pink("Pink", Color.PINK),
+    White("White", Color.WHITE),
+    Black("Black", Color.BLACK),
+    Gray("Gray", Color.GRAY),
+    DarkGray("Dark Gray", Color.DARK_GRAY),
+    LightGray("Light Gray", Color.LIGHT_GRAY);
+
+    private final String displayName;
+    private final Color awtColor;
+    private final byte[] bytes;
+
+    Colors(String _displayName, Color _awtColor) {
+        displayName = _displayName;
+        awtColor = _awtColor;
+        bytes = bytes(_awtColor);
+    }
+
+    public Color awtColor() {
+        return awtColor;
+    }
+
+    public byte[] bytes() {
+        return bytes;
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
+
+    public static Colors parse(String serializedName) {
+        return parse(serializedName, Blue);
+    }
+
+    public static Colors parse(String serializedName, Colors fallback) {
+        String normalized = "grey".equalsIgnoreCase(serializedName) ? "gray" : serializedName;
+        for (Colors color : values()) {
+            if (color.name().equalsIgnoreCase(normalized))
+                return color;
+        }
+        return fallback;
+    }
 
     public static byte[] bytes(Color c) {
         return new byte[]{(byte) c.getRed(), (byte) c.getGreen(), (byte) c.getBlue(), (byte) 255};
@@ -32,79 +83,11 @@ public class Colors {
         return new float[]{(float) (color[0] * alpha), (float) (color[1] * alpha), (float) (color[2] * alpha), (float) (color[3] * alpha)};
     }
 
-    public static Color parseColor(String name) {
-        return name.startsWith("#") ? Color.decode(name) : NamedColor.parse(name).awtColor;
+    public static Color parseColor(String value) {
+        return value.startsWith("#") ? Color.decode(value) : parse(value).awtColor;
     }
 
     public static final byte[] Null = {0, 0, 0, 0};
-
-    public enum NamedColor {
-        Red("Red", Color.RED),
-        Green("Green", Color.GREEN),
-        ReducedGreen("Reduced Green", new Color(100, 175, 100)),
-        Blue("Blue", Color.BLUE),
-        Yellow("Yellow", Color.YELLOW),
-        Orange("Orange", Color.ORANGE),
-        Cyan("Cyan", Color.CYAN),
-        Magenta("Magenta", Color.MAGENTA),
-        Pink("Pink", Color.PINK),
-        White("White", Color.WHITE),
-        Black("Black", Color.BLACK),
-        Gray("Gray", Color.GRAY),
-        DarkGray("Dark Gray", Color.DARK_GRAY),
-        LightGray("Light Gray", Color.LIGHT_GRAY);
-
-        private final String label;
-        private final Color awtColor;
-        private final byte[] bytes;
-
-        NamedColor(String _label, Color _awtColor) {
-            label = _label;
-            awtColor = _awtColor;
-            bytes = Colors.bytes(_awtColor);
-        }
-
-        public Color awtColor() {
-            return awtColor;
-        }
-
-        public byte[] bytes() {
-            return bytes;
-        }
-
-        @Override
-        public String toString() {
-            return label;
-        }
-
-        public static NamedColor parse(String name) {
-            return parse(name, Blue);
-        }
-
-        public static NamedColor parse(String name, NamedColor fallback) {
-            String normalized = "grey".equalsIgnoreCase(name) ? "gray" : name;
-            for (NamedColor color : values()) {
-                if (color.name().equalsIgnoreCase(normalized))
-                    return color;
-            }
-            return fallback;
-        }
-    }
-
-    public static final byte[] Red = NamedColor.Red.bytes();
-    public static final byte[] Green = NamedColor.Green.bytes();
-    public static final byte[] ReducedGreen = NamedColor.ReducedGreen.bytes();
-    public static final byte[] Blue = NamedColor.Blue.bytes();
-    public static final byte[] Yellow = NamedColor.Yellow.bytes();
-    public static final byte[] Orange = NamedColor.Orange.bytes();
-    public static final byte[] Cyan = NamedColor.Cyan.bytes();
-    public static final byte[] Magenta = NamedColor.Magenta.bytes();
-    public static final byte[] Pink = NamedColor.Pink.bytes();
-    public static final byte[] White = NamedColor.White.bytes();
-    public static final byte[] Black = NamedColor.Black.bytes();
-    public static final byte[] Gray = NamedColor.Gray.bytes();
-    public static final byte[] DarkGray = NamedColor.DarkGray.bytes();
-    public static final byte[] LightGray = NamedColor.LightGray.bytes();
 
     public static final float[] WhiteFloat = {1, 1, 1, 1};
     public static final float[] LightGrayFloat = {.75f, .75f, .75f, 1};

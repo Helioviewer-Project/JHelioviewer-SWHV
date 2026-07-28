@@ -22,7 +22,7 @@ public class FlatGrid {
     private static final double[] ANGULAR_STEPS = {0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 45, 90, 180};
     private static final double[] LINEAR_STEP_FACTORS = {1, 2, 5, 10};
     private static final double TARGET_GRID_PIXELS = 12 * TEXT_SIZE;
-    private static final byte[] AXIS_COLOR = Colors.Green;
+    private static final byte[] AXIS_COLOR = Colors.Green.bytes();
     private static final double AXIS_EPSILON = 1e-9;
 
     private final GLSLShape shape = new GLSLShape(true);

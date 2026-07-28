@@ -58,7 +58,7 @@ public final class FOVCatalog {
     private void addEarthOrbit(JSONObject jo, JSONObject empty) {
         String uiName = "Earth orbit";
         JSONObject jpo = jo.optJSONObject(uiName, empty);
-        FOVPlatform plat = new FOVPlatform(uiName, "EARTH", Colors.Blue, jpo); // Earth approximate
+        FOVPlatform plat = new FOVPlatform(uiName, "EARTH", Colors.Blue.bytes(), jpo); // Earth approximate
         plat.add(new FOVInstrument("AIA", FOVInstrument.FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
         plat.add(new FOVInstrument("HMI", FOVInstrument.FOVType.RECTANGULAR, 0, (0.6 * 4096) / 3600., (0.6 * 4096) / 3600., jpo));
         plat.add(new FOVInstrument("SWAP", FOVInstrument.FOVType.RECTANGULAR, 0, (3.1646941 * 1024) / 3600., (3.1646941 * 1024) / 3600., jpo));

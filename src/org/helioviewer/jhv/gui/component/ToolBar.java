@@ -313,7 +313,7 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
         panel.setBorder(BorderFactory.createEmptyBorder(0, 8, 3, 8));
         ButtonGroup colorGroup = new ButtonGroup();
-        for (Colors.NamedColor color : Annotations.BASE_COLORS) {
+        for (Colors color : Annotations.BASE_COLORS) {
             JToggleButton button = new JToggleButton(new ColorIcon(color.awtColor()));
             button.setSelected(color == Annotations.getBaseColor());
             button.setToolTipText(color.toString());
