@@ -12,10 +12,10 @@ import org.helioviewer.jhv.opengl.GLSLShape;
 public class GridMath {
     private static final int SUBDIVISIONS = 360;
 
-    private static final byte[] radialLineColor = Colors.DarkGray;
-    private static final byte[] axisNorthColor = Colors.Red;
-    private static final byte[] axisSouthColor = Colors.Blue;
-    private static final byte[] earthLineColor = Colors.Yellow;
+    private static final byte[] radialLineColor = Colors.DarkGray.bytes();
+    private static final byte[] axisNorthColor = Colors.Red.bytes();
+    private static final byte[] axisSouthColor = Colors.Blue.bytes();
+    private static final byte[] earthLineColor = Colors.Yellow.bytes();
 
     private static final float earthPointSize = 0.02f;
 

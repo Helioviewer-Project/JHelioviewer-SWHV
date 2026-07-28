@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 abstract class AbstractAnnotateable implements Annotateable {
 
-    static final byte[] dragColor = Colors.Green;
+    static final byte[] dragColor = Colors.Green.bytes();
     private static final double ACTIVE_THICKNESS_FACTOR = 1.5;
     protected static final double ANNOTATION_RADIUS = Sun.Radius * 1.01;
 
@@ -30,11 +30,11 @@ abstract class AbstractAnnotateable implements Annotateable {
     Vec3 dragEndPoint;
 
     private final double thickness;
-    private final Colors.NamedColor baseColor;
+    private final Colors baseColor;
 
     AbstractAnnotateable(JSONObject jo) {
         thickness = jo == null ? Annotations.getThickness() : jo.optDouble("thickness", Annotations.getDefaultThickness());
-        baseColor = jo == null ? Annotations.getBaseColor() : Colors.NamedColor.parse(jo.optString("color", Colors.NamedColor.Blue.name()));
+        baseColor = jo == null ? Annotations.getBaseColor() : Colors.parse(jo.optString("color", Colors.Blue.name()));
         if (jo != null) {
             startPoint = fromPointJson(jo, "startPoint");
             endPoint = fromPointJson(jo, "endPoint");

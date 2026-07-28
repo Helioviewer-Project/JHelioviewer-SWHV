@@ -43,7 +43,7 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     private final GLSLLine hcsLine = new GLSLLine(true); // TBD
     private final BufVertex hcsBuf = new BufVertex(512 * GLSLLine.stride);
 
-    private final byte[] footpointColor = Colors.White;
+    private final byte[] footpointColor = Colors.White.bytes();
     private final GLSLLine footpointLine = new GLSLLine(true);
     private final BufVertex footpointBuf = new BufVertex(12 * GLSLLine.stride);
 

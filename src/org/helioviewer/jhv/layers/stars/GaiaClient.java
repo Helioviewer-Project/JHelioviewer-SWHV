@@ -50,8 +50,8 @@ public final class GaiaClient {
 
     private static final float SIZE_STAR = 0.08f;
     private static final float SIZE_PLANET = 0.12f;
-    private static final byte[] COLOR_PLANET = Colors.Green;
-    private static final byte[] COLOR_STAR = Colors.Blue;
+    private static final byte[] COLOR_PLANET = Colors.Green.bytes();
+    private static final byte[] COLOR_STAR = Colors.Blue.bytes();
 
     private static final double JYEAR_SEC = 365.25 * 86400;
     // uk.ac.starlink.table.TimeMapper.DECIMAL_YEAR.toUnixSeconds(2015.5)

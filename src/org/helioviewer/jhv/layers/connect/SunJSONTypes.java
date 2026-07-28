@@ -88,7 +88,7 @@ public class SunJSONTypes {
         GeometryType type = GeometryType.valueOf(typeString);
 
         if (colors.isEmpty())
-            colors.add(Colors.Green);
+            colors.add(Colors.Green.bytes());
         adjustColorsSize(type, coordinates, colors);
 
         BufVertex vexBuf = getVertices(type, coordinates, colors, thickness);

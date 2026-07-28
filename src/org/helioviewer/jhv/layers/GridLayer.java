@@ -60,7 +60,7 @@ public final class GridLayer extends AbstractLayer {
     private boolean showLabels = true;
     private boolean showRadial = false;
 
-    private Colors.NamedColor gridColor = Colors.NamedColor.ReducedGreen;
+    private Colors gridColor = Colors.ReducedGreen;
     private double gridAlpha = 1;
     private byte[] gridColorBytes = gridColor.bytes();
     private double labelAlpha = 1;
@@ -109,7 +109,7 @@ public final class GridLayer extends AbstractLayer {
         showAxis = jo.optBoolean("showAxis", showAxis);
         showLabels = jo.optBoolean("showLabels", showLabels);
         showRadial = jo.optBoolean("showRadial", showRadial);
-        gridColor = Colors.NamedColor.parse(jo.optString("color", gridColor.name()), gridColor);
+        gridColor = Colors.parse(jo.optString("color", gridColor.name()), gridColor);
         gridAlpha = Math.clamp(jo.optDouble("alpha", gridAlpha), 0, 1);
         updateGridColorBytes();
         labelAlpha = Math.clamp(jo.optDouble("labelAlpha", labelAlpha), 0, 1);
@@ -348,11 +348,11 @@ public final class GridLayer extends AbstractLayer {
         DisplayController.display();
     }
 
-    public Colors.NamedColor getGridColor() {
+    public Colors getGridColor() {
         return gridColor;
     }
 
-    public void setGridColor(Colors.NamedColor _gridColor) {
+    public void setGridColor(Colors _gridColor) {
         gridColor = _gridColor;
         updateGridColorBytes();
         gridNeedsInit = true;

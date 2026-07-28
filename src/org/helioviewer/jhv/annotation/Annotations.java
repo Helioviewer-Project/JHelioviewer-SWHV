@@ -23,12 +23,12 @@ public final class Annotations {
     public static final int MIN_THICKNESS = 1;
     public static final int MAX_THICKNESS = 8;
     public static final int DEFAULT_THICKNESS = 1;
-    public static final Colors.NamedColor[] BASE_COLORS = {
-            Colors.NamedColor.Blue,
-            Colors.NamedColor.Yellow,
-            Colors.NamedColor.Cyan,
-            Colors.NamedColor.Magenta,
-            Colors.NamedColor.White
+    public static final Colors[] BASE_COLORS = {
+            Colors.Blue,
+            Colors.Yellow,
+            Colors.Cyan,
+            Colors.Magenta,
+            Colors.White
     };
 
     private static final ArrayList<Annotateable> annotations = new ArrayList<>();
@@ -42,7 +42,7 @@ public final class Annotations {
     private static Annotateable pending;
     private static int activeIndex = -1;
     private static double thickness = DEFAULT_THICKNESS * LINEWIDTH;
-    private static Colors.NamedColor baseColor = Colors.NamedColor.Blue;
+    private static Colors baseColor = Colors.Blue;
 
     public static void start(Annotateable annotateable) {
         pending = annotateable;
@@ -64,11 +64,11 @@ public final class Annotations {
         thickness = Math.clamp(value, MIN_THICKNESS, MAX_THICKNESS) * LINEWIDTH;
     }
 
-    public static Colors.NamedColor getBaseColor() {
+    public static Colors getBaseColor() {
         return baseColor;
     }
 
-    public static void setBaseColor(Colors.NamedColor color) {
+    public static void setBaseColor(Colors color) {
         baseColor = color;
     }
 

@@ -5,8 +5,8 @@ import org.helioviewer.jhv.opengl.BufVertex;
 
 class PfssLine {
 
-    private static final byte[] openFieldColor = Colors.Red;
-    private static final byte[] insideFieldColor = Colors.Blue;
+    private static final byte[] openFieldColor = Colors.Red.bytes();
+    private static final byte[] insideFieldColor = Colors.Blue.bytes();
 
     private static void computeBrightColor(float b, boolean whiteBackground, byte[] brightColor) {
         byte midpoint = whiteBackground ? 0 : (byte) 255;
@@ -37,7 +37,7 @@ class PfssLine {
         int points = data.points();
         int nlines = lineX.length / points;
 
-        byte[] loopColor = whiteBackground ? Colors.Black : Colors.White;
+        byte[] loopColor = whiteBackground ? Colors.Black.bytes() : Colors.White.bytes();
         byte[] oneColor = loopColor;
         byte[] brightColor = new byte[4];
 
