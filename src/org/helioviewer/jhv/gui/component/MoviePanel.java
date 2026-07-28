@@ -178,7 +178,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
         c.gridy = 1;
         c.gridx = 2;
-        recordPanel.add(new JLabel("Size ", JLabel.RIGHT), c);
+        recordPanel.add(new JLabel("Output size ", JLabel.RIGHT), c);
 
         recordSizeComboBox = new JComboBox<>(ViewState.RecordingSize.values());
         recordSizeComboBox.addActionListener(e -> ViewState.setRecordingSize((ViewState.RecordingSize) recordSizeComboBox.getSelectedItem()));
