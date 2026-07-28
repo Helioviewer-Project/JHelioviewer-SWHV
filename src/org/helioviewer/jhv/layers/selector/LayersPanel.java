@@ -32,8 +32,8 @@ import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.TransferAccess;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.gui.UITimer;
+import org.helioviewer.jhv.gui.component.MoviePanel;
 import org.helioviewer.jhv.gui.component.TableValue;
-import org.helioviewer.jhv.gui.dialog.ObservationDialog;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.Layers;
@@ -195,7 +195,7 @@ public final class LayersPanel extends JPanel {
                     return;
 
                 if ((v.col == NAME_COL || v.col == TIME_COL) && layer instanceof ImageLayer il && e.getClickCount() == 2) {
-                    ObservationDialog.getInstance().showDialog(false, il);
+                    MoviePanel.getInstance().changeDataset(il);
                     return;
                 }
 
