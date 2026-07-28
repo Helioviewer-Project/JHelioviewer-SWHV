@@ -63,12 +63,12 @@ public class BandType {
         cacheType = CacheType.parse(jo.optString("bandCacheType", "BandCacheMinute"));
         predefinedEntries = parsePredefinedEntries(jo.optJSONArray("predefined"));
 
-        plotType = PlotType.parse(jo.optString("plottype", null));
+        plotType = PlotType.parse(jo.optString("plotType", null));
         barWidth = Math.max(0, jo.optLong("barWidth", 0));
         levels = parseLevels(jo.optJSONArray("levels"));
 
         isXRSB = label.contains("XRAY long");
-        WarningLevel[] parsedWarningLevels = parseWarningLevels(jo.optJSONArray("warninglevels"));
+        WarningLevel[] parsedWarningLevels = parseWarningLevels(jo.optJSONArray("warningLevels"));
         warningLevels = parsedWarningLevels.length == 0 && isXRSB
                 ? defaultXRayWarningLevels()
                 : parsedWarningLevels;
