@@ -29,6 +29,8 @@
   membership in multiple groups
 - Support HAPI-defined bar plots, value-level colors, warning thresholds, and
   switching between multicolor and single-color rendering
+- Add controls to collapse the sidebar and hide the toolbar or its text
+- Show the original image URI in the Image Information dialog
 - Map HEK Flare Trigger events to Flare events (fixes #105)
 - Fix CACTus event loading from HEK (fixes #190)
 - Filter HEK events by supplier and improve SWEK event loading, paging, storage, and cancellation
