@@ -18,6 +18,8 @@ public class Settings {
             setProperty("startup.sampHub", "true");
             setProperty("display.normalizeAIA", "true");
             setProperty("display.normalizeRadius", "false");
+            setProperty("display.toolbar", "iconandtext");
+            setProperty("display.toolbar.visible", "true");
             setProperty("display.time", "Observer");
             setProperty("video.format", "H264");
             setProperty("dataSources.defaultServer", "IAS");

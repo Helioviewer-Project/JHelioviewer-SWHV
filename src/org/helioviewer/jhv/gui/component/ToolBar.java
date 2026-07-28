@@ -6,8 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.EnumMap;
 //import java.util.LinkedHashMap;
 //import java.util.Map;
@@ -19,7 +17,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -106,27 +103,11 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, getBackground().brighter()));
         setRollover(true);
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-        });
-
         try {
             displayMode = DisplayMode.valueOf(Settings.getProperty("display.toolbar").toUpperCase());
         } catch (Exception ignore) {}
         setDisplayMode(displayMode);
+        setVisible(Boolean.parseBoolean(Settings.getProperty("display.toolbar.visible")));
         ViewState.addModeListener(this);
     }
 
@@ -390,6 +371,19 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
         }
     }
 
+    public boolean isTextVisible() {
+        return displayMode == DisplayMode.ICONANDTEXT;
+    }
+
+    public void setTextVisible(boolean visible) {
+        setDisplayMode(visible ? DisplayMode.ICONANDTEXT : DisplayMode.ICONONLY);
+    }
+
+    public void setToolbarVisible(boolean visible) {
+        Settings.setProperty("display.toolbar.visible", Boolean.toString(visible));
+        setVisible(visible);
+    }
+
     private void setDisplayMode(DisplayMode mode) {
         displayMode = mode;
         Settings.setProperty("display.toolbar", mode.toString().toLowerCase());
@@ -414,25 +408,6 @@ public final class ToolBar extends JToolBar implements ViewState.ModeListener {
             recreate();
         }
     */
-    private void maybeShowPopup(MouseEvent me) {
-        if (me.isPopupTrigger() || me.getButton() == MouseEvent.BUTTON3) {
-            JPopupMenu popUpMenu = new JPopupMenu();
-            ButtonGroup group = new ButtonGroup();
-
-            JRadioButtonMenuItem iconAndText = new JRadioButtonMenuItem("Icon and Text", displayMode == DisplayMode.ICONANDTEXT);
-            iconAndText.addActionListener(e -> setDisplayMode(DisplayMode.ICONANDTEXT));
-            group.add(iconAndText);
-            popUpMenu.add(iconAndText);
-
-            JRadioButtonMenuItem iconOnly = new JRadioButtonMenuItem("Icon Only", displayMode == DisplayMode.ICONONLY);
-            iconOnly.addActionListener(e -> setDisplayMode(DisplayMode.ICONONLY));
-            group.add(iconOnly);
-            popUpMenu.add(iconOnly);
-
-            popUpMenu.show(me.getComponent(), me.getX(), me.getY());
-        }
-    }
-
     @Override
     public void modeStateChanged() {
         trackingButton.setSelected(ViewState.isTracking());
