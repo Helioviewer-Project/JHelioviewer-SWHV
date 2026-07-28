@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.component;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
@@ -44,20 +43,23 @@ public final class SamplingPanel extends JPanel {
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
-        c.insets = new Insets(0, 2, 0, 2);
 
         c.gridy = 0;
         c.gridx = 0;
+        c.weightx = 1;
         add(timeStepButton, c);
         c.gridx = 1;
+        c.weightx = 0;
         add(cadenceSpinner, c);
         c.gridx = 2;
         add(unitCombo, c);
 
         c.gridy = 1;
         c.gridx = 0;
+        c.weightx = 1;
         add(frameCountButton, c);
         c.gridx = 1;
+        c.weightx = 0;
         add(frameCountSpinner, c);
 
         updateEnabled();
