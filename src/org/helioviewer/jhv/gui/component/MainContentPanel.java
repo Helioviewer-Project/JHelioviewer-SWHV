@@ -44,6 +44,7 @@ public final class MainContentPanel extends JPanel {
         maximizeButton = new CollapsiblePaneButton();
         maximizeButton.setFont(Buttons.getMaterialFont(12));
         maximizeButton.setHorizontalAlignment(SwingConstants.CENTER);
+        maximizeButton.setPreferredSize(new Dimension(28, maximizeButton.getPreferredSize().height));
         maximizeButton.addActionListener(e -> togglePluginMaximized());
         collapsiblePane.addHeaderComponent(maximizeButton);
         updateMaximizeButton();
