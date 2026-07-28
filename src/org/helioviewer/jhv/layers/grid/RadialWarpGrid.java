@@ -21,7 +21,8 @@ public final class RadialWarpGrid {
     private static final double MIN_RING_SPACING = 0.04;
     private static final double[] RING_FACTORS = {1, 2, 5};
 
-    private final GLSLLine line = new GLSLLine(false);
+    private final GLSLLine line = new GLSLLine(true);
+    private final BufVertex vexBuf = new BufVertex(0);
     private final double[] rings = new double[MAX_RINGS];
 
     public void init() {
@@ -69,8 +70,6 @@ public final class RadialWarpGrid {
 
     private void updateLine(MapScale scale, int ringCount, double spokeStep, byte[] color) {
         int spokes = (int) Math.round(360 / spokeStep);
-        int noPoints = ringCount * (SUBDIVISIONS + 3) + 4 * spokes;
-        BufVertex vexBuf = new BufVertex(noPoints * GLSLLine.stride);
 
         for (int i = 0; i < ringCount; i++) {
             double r = rings[i];
