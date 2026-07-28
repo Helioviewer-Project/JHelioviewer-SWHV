@@ -7,39 +7,44 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
+import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
+import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
-import org.helioviewer.jhv.gui.dialog.ObservationDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
+import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.JideSplitButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
@@ -53,7 +58,9 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final SamplingPanel samplingPanel = new SamplingPanel(timeSelectorPanel);
     private final ImageSelectorPanel imageSelectorPanel;
-    private final JideSplitButton addLayerButton;
+    private final JDialog imageSelectorDialog;
+    private final JButton availabilityButton = new JButton("Available data");
+    private ImageLayer layerToReplace;
 
     private static TimeSlider timeSlider;
     private final JideButton playButton;
@@ -199,24 +206,11 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         add(recordPanel);
         add(timeSelectorPanel);
 
-        ObservationDialog.getInstance(); // make sure it's instanced
         imageSelectorPanel = new ImageSelectorPanel(this);
+        imageSelectorDialog = createImageSelectorDialog();
 
-        addLayerButton = new JideSplitButton(Buttons.newLayer);
-        addLayerButton.setAlwaysDropdown(true);
-        addLayerButton.add(imageSelectorPanel);
-        addLayerButton.getPopupMenu().addPopupMenuListener(new PopupMenuListener() {
-            @Override
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                EventQueue.invokeLater(() -> imageSelectorPanel.getFocused().grabFocus());
-            }
-
-            @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
-
-            @Override
-            public void popupMenuCanceled(PopupMenuEvent e) {}
-        });
+        JideButton addLayerButton = new JideButton(Buttons.newLayer);
+        addLayerButton.addActionListener(e -> showNewLayerSelector());
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
         syncButton.setToolTipText("Synchronize time intervals of all layers");
@@ -257,16 +251,69 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     @Override
     public void load(String server, int sourceId) {
-        addLayerButton.doClickOnMenu();
+        ImageLayer target = layerToReplace;
+        layerToReplace = null;
+        imageSelectorDialog.setVisible(false);
         if (checkSanity()) {
             long start = getStartTime();
             long end = samplingPanel.isSingleFrame() ? start : getEndTime();
-            imageSelectorPanel.load(null, server, sourceId, start, end, getCadence());
+            imageSelectorPanel.load(target, server, sourceId, start, end, getCadence());
         }
     }
 
+    public void showNewLayerSelector() {
+        layerToReplace = null;
+        imageSelectorDialog.setTitle("New Image Layer");
+        showImageSelector();
+    }
+
+    public void changeDataset(ImageLayer layer) {
+        layerToReplace = layer;
+        imageSelectorDialog.setTitle("Change Dataset");
+        APIRequest req = layer.getView().getAPIRequest();
+        if (req != null)
+            imageSelectorPanel.setupLayer(req);
+        showImageSelector();
+    }
+
+    private void showImageSelector() {
+        if (!imageSelectorDialog.isVisible()) {
+            JPanel layersPanel = MainFrame.getLayersPanel();
+            Point location = new Point(layersPanel.getWidth(), 0);
+            SwingUtilities.convertPointToScreen(location, layersPanel);
+            imageSelectorDialog.setLocation(location);
+            imageSelectorDialog.setVisible(true);
+        } else {
+            imageSelectorDialog.toFront();
+        }
+        EventQueue.invokeLater(() -> imageSelectorPanel.getFocused().requestFocusInWindow());
+    }
+
+    private JDialog createImageSelectorDialog() {
+        JDialog dialog = new JDialog(MainFrame.get());
+        dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        dialog.setResizable(false);
+        dialog.setType(Window.Type.UTILITY);
+
+        availabilityButton.setEnabled(false);
+        availabilityButton.addActionListener(e -> DesktopIntegration.openURL(imageSelectorPanel.getAvailabilityURL()));
+        JPanel availabilityPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        availabilityPanel.add(availabilityButton);
+
+        dialog.add(imageSelectorPanel, BorderLayout.CENTER);
+        dialog.add(availabilityPanel, BorderLayout.PAGE_END);
+        dialog.getRootPane().registerKeyboardAction(
+                e -> dialog.setVisible(false),
+                KeyStroke.getKeyStroke("ESCAPE"),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        dialog.pack();
+        return dialog;
+    }
+
     @Override
-    public void setAvailabilityEnabled(boolean enabled) {}
+    public void setAvailabilityEnabled(boolean enabled) {
+        availabilityButton.setEnabled(enabled);
+    }
 
     private boolean checkSanity() {
         long start = getStartTime();
