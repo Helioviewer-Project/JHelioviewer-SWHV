@@ -38,7 +38,7 @@ public class DifferencePanel implements FilterDetails {
         }
 
         JideButton syncButton = new JideButton(Buttons.sync);
-        syncButton.setToolTipText("Synchronize time intervals of other layers");
+        syncButton.setToolTipText("Sync all layers to this layer's time range using selected sampling");
         syncButton.addActionListener(e -> MoviePanel.getInstance().syncLayersSpan(layer.getStartTime(), layer.getEndTime()));
         buttonPanel.add(syncButton, BorderLayout.LINE_END);
     }

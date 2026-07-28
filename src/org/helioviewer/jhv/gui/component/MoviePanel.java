@@ -210,7 +210,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         addLayerButton.addActionListener(e -> showNewLayerSelector());
 
         JideButton syncButton = new JideButton(Buttons.syncLayers);
-        syncButton.setToolTipText("Synchronize time intervals of all layers");
+        syncButton.setToolTipText("Apply the selected time range and sampling to all layers");
         syncButton.addActionListener(e -> syncLayersSpan());
 
         JPanel addLayerPanel = new JPanel(new BorderLayout());
