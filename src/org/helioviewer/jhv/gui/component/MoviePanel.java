@@ -36,7 +36,6 @@ import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 
 import com.jidesoft.swing.JideButton;
@@ -52,6 +51,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private boolean isAdvanced;
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
+    private final SamplingPanel samplingPanel = new SamplingPanel(timeSelectorPanel);
     private final ImageSelectorPanel imageSelectorPanel;
     private final JideSplitButton addLayerButton;
 
@@ -186,6 +186,12 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
         recordPanel.add(recordSizeComboBox, c);
 
         timeSelectorPanel.addListener(Layers.timeSelectionListener);
+        GridBagConstraints samplingConstraints = new GridBagConstraints();
+        samplingConstraints.gridy = 2;
+        samplingConstraints.gridx = 0;
+        samplingConstraints.weightx = 1;
+        samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
+        timeSelectorPanel.add(samplingPanel, samplingConstraints);
 
         add(sliderPanel);
         add(secondLine);
@@ -231,7 +237,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
 
     @Override
     public int getCadence() {
-        return TimeUtils.defaultCadence(getStartTime(), getEndTime());
+        return samplingPanel.getCadence();
     }
 
     @Override
@@ -252,8 +258,11 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     @Override
     public void load(String server, int sourceId) {
         addLayerButton.doClickOnMenu();
-        if (checkSanity())
-            imageSelectorPanel.load(null, server, sourceId, getStartTime(), getEndTime(), getCadence());
+        if (checkSanity()) {
+            long start = getStartTime();
+            long end = samplingPanel.isSingleFrame() ? start : getEndTime();
+            imageSelectorPanel.load(null, server, sourceId, start, end, getCadence());
+        }
     }
 
     @Override
@@ -278,7 +287,7 @@ public class MoviePanel extends JPanel implements Interfaces.ObservationSelector
     private void syncLayersSpan() {
         if (checkSanity()) {
             long start = getStartTime();
-            long end = getEndTime();
+            long end = samplingPanel.isSingleFrame() ? start : getEndTime();
             DrawController.setSelectedInterval(start, end);
             ImageLayers.syncLayersSpan(start, end, getCadence());
         }

@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.gui.dialog;
 
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 
 import javax.annotation.Nullable;
@@ -55,6 +56,12 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
 
         imageSelectorPanel = new ImageSelectorPanel(this);
         availabilityBtn.addActionListener(e -> DesktopIntegration.openURL(imageSelectorPanel.getAvailabilityURL()));
+        GridBagConstraints samplingConstraints = new GridBagConstraints();
+        samplingConstraints.gridy = 2;
+        samplingConstraints.gridx = 0;
+        samplingConstraints.weightx = 1;
+        samplingConstraints.fill = GridBagConstraints.HORIZONTAL;
+        timeSelectorPanel.add(samplingPanel, samplingConstraints);
         setInitFocusedComponent(imageSelectorPanel.getFocused());
     }
 
@@ -84,7 +91,6 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         content.add(timeSelectorPanel);
-        content.add(samplingPanel);
         content.add(imageSelectorPanel);
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return content;
