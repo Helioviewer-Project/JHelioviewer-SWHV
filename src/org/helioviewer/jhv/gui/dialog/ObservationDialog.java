@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
-import org.helioviewer.jhv.gui.component.CadencePanel;
 import org.helioviewer.jhv.gui.component.ImageSelectorPanel;
+import org.helioviewer.jhv.gui.component.SamplingPanel;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DataSourcesTree;
@@ -39,7 +39,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
     private final JButton availabilityBtn = new JButton("Available data");
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
-    private final CadencePanel cadencePanel = new CadencePanel();
+    private final SamplingPanel samplingPanel = new SamplingPanel(timeSelectorPanel);
     private final ImageSelectorPanel imageSelectorPanel;
     private ImageLayer layer;
 
@@ -84,7 +84,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
         content.add(timeSelectorPanel);
-        content.add(cadencePanel);
+        content.add(samplingPanel);
         content.add(imageSelectorPanel);
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         return content;
@@ -103,7 +103,8 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
         if (layer != null && (req = layer.getView().getAPIRequest()) != null) {
             imageSelectorPanel.setupLayer(req);
             timeSelectorPanel.setTime(req.startTime(), req.endTime());
-            cadencePanel.setCadence(req.cadence());
+            samplingPanel.setCadence(req.cadence());
+            samplingPanel.setFrameCount(layer.getView().getMaximumFrameNumber() + 1);
         }
 
         if (newLayer) {
@@ -121,7 +122,7 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
 
     @Override
     public int getCadence() {
-        return cadencePanel.getCadence();
+        return samplingPanel.getCadence();
     }
 
     @Override
@@ -141,7 +142,8 @@ public class ObservationDialog extends StandardDialog implements Interfaces.Obse
 
     @Override
     public void load(String server, int sourceId) {
-        setTime(getStartTime(), getEndTime());
+        long start = getStartTime();
+        setTime(start, samplingPanel.isSingleFrame() ? start : getEndTime());
         imageSelectorPanel.load(layer, server, sourceId, getStartTime(), getEndTime(), getCadence()); // time selector might have changed
         layer = null;
         setVisible(false);
