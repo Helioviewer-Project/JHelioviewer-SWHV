@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -51,7 +50,7 @@ public final class MainContentPanel extends JPanel {
 
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setDividerSize(0);
-        splitPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
+        splitPane.setBorder(null);
         splitPane.setResizeWeight(NORMAL_RESIZE_WEIGHT);
 
         splitPane.setTopComponent(mainComponent);
