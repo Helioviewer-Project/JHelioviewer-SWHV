@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.state.ViewState;
+import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layers;
@@ -142,9 +143,35 @@ public class Player {
 
             if (next == null)
                 pause();
+            else if (isStalled(next))
+                return; // frame data hasn't arrived; leave the playhead put and let the next tick retry
             else
                 syncTime(next);
         }
+    }
+
+    // Relative playback advances by asking the view for the next decoded frame. If that frame's
+    // data never arrives (a failed or very slow archive fetch), getHigherTime keeps returning the
+    // current time and the playhead silently spins in place. One repeat is a legitimate wait for a
+    // streaming frame; past STALL_TICK_LIMIT consecutive repeats we treat it as a genuine stall,
+    // pause, and name the frame that failed so the user isn't left watching a frozen playhead.
+    // ponytail: minimal safety net — detect and report, no gap-skipping. Add a direct frame-index
+    // scan-past-the-gap here if stalling on transient single-frame gaps turns out to be common.
+    private static int stallTicks;
+    private static final int STALL_TICK_LIMIT = 5;
+
+    private static boolean isStalled(JHVTime next) {
+        if (next.milli != lastTimestamp.milli || next.milli == playbackLastTime.milli) {
+            stallTicks = 0; // advanced normally, or legitimately parked at the playback end
+            return false;
+        }
+        if (++stallTicks < STALL_TICK_LIMIT)
+            return true; // still within the grace window; keep waiting quietly
+        stallTicks = 0;
+        pause();
+        Message.warn("Playback stalled", "Could not advance past " + TimeUtils.format(next.milli)
+                + " — the frame's data did not load. Playback paused.");
+        return true;
     }
 
     private static void absoluteTimeAdvance() {
