@@ -142,21 +142,7 @@ public final class MainFrame {
         mainContentPanel = new MainContentPanel(renderHost);
         JPanel centerPanel = new JPanel(new BorderLayout());
 
-        CollapsiblePaneButton sidebarCollapseHandle = new CollapsiblePaneButton(SwingConstants.VERTICAL);
-        sidebarCollapseHandle.setSelected(true);
-        sidebarCollapseHandle.setFont(UIGlobals.uiFontSmallBold);
-        sidebarCollapseHandle.setHorizontalAlignment(SwingConstants.CENTER);
-        sidebarCollapseHandle.setText(Buttons.collapseLeft);
-        sidebarCollapseHandle.addActionListener(e -> {
-            boolean collapsed = leftPaneHost.isVisible();
-            leftPaneHost.setVisible(!collapsed);
-            sidebarCollapseHandle.setSelected(true);
-            sidebarCollapseHandle.setText(collapsed ? Buttons.collapseRight : Buttons.collapseLeft);
-            centerPanel.revalidate();
-            mainFrame.validate();
-            centerPanel.repaint();
-        });
-
+        CollapsiblePaneButton sidebarCollapseHandle = createSidebarCollapseHandle(centerPanel);
         JPanel westPanel = new JPanel(new BorderLayout());
         westPanel.add(leftPaneHost, BorderLayout.CENTER);
         westPanel.add(sidebarCollapseHandle, BorderLayout.LINE_END);
@@ -208,6 +194,24 @@ public final class MainFrame {
         // Prewarm ANGLE off the EDT, then return here via attachAndRender() to attach the real render canvas.
         startAngleWarmup();
         return mainFrame;
+    }
+
+    private static CollapsiblePaneButton createSidebarCollapseHandle(JPanel centerPanel) {
+        CollapsiblePaneButton handle = new CollapsiblePaneButton(SwingConstants.VERTICAL);
+        handle.setSelected(true);
+        handle.setFont(UIGlobals.uiFontSmallBold);
+        handle.setHorizontalAlignment(SwingConstants.CENTER);
+        handle.setText(Buttons.collapseLeft);
+        handle.addActionListener(e -> {
+            boolean collapsed = leftPaneHost.isVisible();
+            leftPaneHost.setVisible(!collapsed);
+            handle.setSelected(true);
+            handle.setText(collapsed ? Buttons.collapseRight : Buttons.collapseLeft);
+            centerPanel.revalidate();
+            mainFrame.validate();
+            centerPanel.repaint();
+        });
+        return handle;
     }
 
     private static void startAngleWarmup() {
