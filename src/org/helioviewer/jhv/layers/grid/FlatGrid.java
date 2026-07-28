@@ -2,7 +2,6 @@ package org.helioviewer.jhv.layers.grid;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
@@ -28,8 +27,24 @@ public class FlatGrid {
 
     private final GLSLShape shape = new GLSLShape(true);
     private final BufVertex vexBuf = new BufVertex(0);
+    private final Axis xAxis = new Axis();
+    private final Axis yAxis = new Axis();
 
-    private record Axis(double[] labelValues, double[] positions) {}
+    private static final class Axis {
+        private double first;
+        private double step;
+        private int count;
+
+        private double value(int i) {
+            return first + i * step;
+        }
+
+        private double position(MapScale scale, boolean horizontal, int i) {
+            double value = value(i);
+            double position = (horizontal ? scale.toUnitX(value) : scale.toUnitY(value)) - 0.5;
+            return Math.abs(position) < AXIS_EPSILON ? 0 : position;
+        }
+    }
 
     public void init() {
         shape.init();
@@ -49,17 +64,15 @@ public class FlatGrid {
         double x1 = scale.toMapX(Math.clamp(xCenter + halfWidth, 0, 1));
         double y0 = scale.toMapY(Math.clamp(yCenter - halfWidth, 0, 1));
         double y1 = scale.toMapY(Math.clamp(yCenter + halfWidth, 0, 1));
-        Axis xAxis = buildAxis(scale, true, true, mv.isLatitudinal(), mv.gridType(),
-                x0, x1, vp.width);
-        Axis yAxis = buildAxis(scale, false, mv.isHpc() || mv.isLatitudinal(), false, mv.gridType(),
-                y0, y1, vp.height);
-        updateShape(xAxis, yAxis, mv, vp, width, gridColor, lineScale);
+        updateAxis(xAxis, true, x0, x1, vp.width);
+        updateAxis(yAxis, mv.isHpc() || mv.isLatitudinal(), y0, y1, vp.height);
+        updateShape(scale, mv, vp, width, gridColor, lineScale);
         shape.renderShape(GL.TRIANGLES);
         if (showLabels)
-            drawLabels(xAxis, yAxis, mv, vp, width, labelColor, labelSize);
+            drawLabels(scale, mv, vp, width, labelColor, labelSize);
     }
 
-    private static void drawLabels(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, float[] labelColor, double labelSize) {
+    private void drawLabels(MapScale scale, MapView mv, Viewport vp, double width, float[] labelColor, double labelSize) {
         SdfTextRenderer renderer = GLText.renderer();
         //float textScaleFactor = 0.3f * TEXT_SCALE / renderer.getFontSize(); // scalable text
         double worldTextHeight = TEXT_SIZE * labelSize / GridLayer.GRID_LABEL_SIZE_REF * Display.pixelScale[1] * Math.min(width, 1) / vp.height;
@@ -68,33 +81,40 @@ public class FlatGrid {
 
         renderer.setColor(labelColor);
         renderer.begin3DRendering();
-        for (int i = 0; i < xAxis.labelValues().length; i++) {
-            if (xAxis.positions()[i] == 0)
+        for (int i = 0; i < xAxis.count; i++) {
+            double position = xAxis.position(scale, true, i);
+            if (position == 0)
                 continue;
-            double x = RasterLine.snapVertical(vp, width, mv.cameraTranslationX(), xAxis.positions()[i]);
-            renderer.draw(FastFormat.rounded2(xAxis.labelValues()[i]), (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
+            double x = RasterLine.snapVertical(vp, width, mv.cameraTranslationX(), position);
+            double value = xAxis.value(i);
+            if (mv.isLatitudinal())
+                value = mv.gridType().displayLongitude(value);
+            renderer.draw(FastFormat.rounded2(value), (float) (vp.aspect * x), labelOffset, 0, textScaleFactor);
         }
-        for (int i = 0; i < yAxis.labelValues().length; i++) {
-            double y = RasterLine.snapHorizontal(vp, width, mv.cameraTranslationY(), yAxis.positions()[i]);
-            renderer.draw(FastFormat.rounded2(yAxis.labelValues()[i]), 0, (float) y + labelOffset, 0, textScaleFactor);
+        for (int i = 0; i < yAxis.count; i++) {
+            double position = yAxis.position(scale, false, i);
+            double y = RasterLine.snapHorizontal(vp, width, mv.cameraTranslationY(), position);
+            renderer.draw(FastFormat.rounded2(yAxis.value(i)), 0, (float) y + labelOffset, 0, textScaleFactor);
         }
         renderer.end3DRendering();
     }
 
-    private void updateShape(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, byte[] gridColor, double lineScale) {
+    private void updateShape(MapScale scale, MapView mv, Viewport vp, double width, byte[] gridColor, double lineScale) {
         double thickness = BASE_THICKNESS_PIXELS * lineScale;
-        for (int i = 0; i < xAxis.positions().length; i++) {
-            byte[] color = xAxis.positions()[i] == 0 ? AXIS_COLOR : gridColor;
-            RasterLine.putVertical(vp, width, mv.cameraTranslationX(), vp.aspect * xAxis.positions()[i], -0.5, 0.5, thickness, color, vexBuf);
+        for (int i = 0; i < xAxis.count; i++) {
+            double position = xAxis.position(scale, true, i);
+            byte[] color = position == 0 ? AXIS_COLOR : gridColor;
+            RasterLine.putVertical(vp, width, mv.cameraTranslationX(), vp.aspect * position, -0.5, 0.5, thickness, color, vexBuf);
         }
-        for (int i = 0; i < yAxis.positions().length; i++) {
-            byte[] color = yAxis.positions()[i] == 0 ? AXIS_COLOR : gridColor;
-            RasterLine.putHorizontal(vp, width, mv.cameraTranslationY(), -0.5 * vp.aspect, 0.5 * vp.aspect, yAxis.positions()[i], thickness, color, vexBuf);
+        for (int i = 0; i < yAxis.count; i++) {
+            double position = yAxis.position(scale, false, i);
+            byte[] color = position == 0 ? AXIS_COLOR : gridColor;
+            RasterLine.putHorizontal(vp, width, mv.cameraTranslationY(), -0.5 * vp.aspect, 0.5 * vp.aspect, position, thickness, color, vexBuf);
         }
         shape.setVertex(vexBuf);
     }
 
-    private static Axis buildAxis(MapScale scale, boolean xAxis, boolean angularStep, boolean longitudeAxis, GridType gridType, double start, double stop, int pixels) {
+    private static void updateAxis(Axis axis, boolean angularStep, double start, double stop, int pixels) {
         double range = Math.abs(stop - start);
         double first = start;
         double step = 0;
@@ -107,15 +127,9 @@ public class FlatGrid {
             count = (int) Math.max(0, Math.floor((last - first) / step) + 1);
         }
 
-        double[] labelValues = new double[count];
-        double[] positions = new double[count];
-        for (int i = 0; i < count; i++) {
-            double value = first + i * step;
-            labelValues[i] = longitudeAxis ? gridType.displayLongitude(value) : value;
-            double position = (xAxis ? scale.toUnitX(value) : scale.toUnitY(value)) - 0.5;
-            positions[i] = Math.abs(position) < AXIS_EPSILON ? 0 : position;
-        }
-        return new Axis(labelValues, positions);
+        axis.first = first;
+        axis.step = step;
+        axis.count = count;
     }
 
     private static double chooseAngularStep(double range, double targetDivisions) {
