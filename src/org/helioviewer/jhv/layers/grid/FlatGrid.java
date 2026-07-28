@@ -26,7 +26,8 @@ public class FlatGrid {
     private static final byte[] AXIS_COLOR = Colors.Green;
     private static final double AXIS_EPSILON = 1e-9;
 
-    private final GLSLShape shape = new GLSLShape(false);
+    private final GLSLShape shape = new GLSLShape(true);
+    private final BufVertex vexBuf = new BufVertex(0);
 
     private record Axis(double[] labelValues, double[] positions) {}
 
@@ -81,9 +82,6 @@ public class FlatGrid {
     }
 
     private void updateShape(Axis xAxis, Axis yAxis, MapView mv, Viewport vp, double width, byte[] gridColor, double lineScale) {
-        int noPoints = RasterLine.vertexCount(xAxis.positions().length + yAxis.positions().length);
-        BufVertex vexBuf = new BufVertex(noPoints * GLSLShape.stride);
-
         double thickness = BASE_THICKNESS_PIXELS * lineScale;
         for (int i = 0; i < xAxis.positions().length; i++) {
             byte[] color = xAxis.positions()[i] == 0 ? AXIS_COLOR : gridColor;
