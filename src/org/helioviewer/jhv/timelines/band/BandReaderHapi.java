@@ -186,9 +186,7 @@ public class BandReaderHapi {
 
     private record BandReader(BandType type, HapiTableReader tableReader) {}
 
-    private record Parameter(String name, String units, String scale, JSONArray range, JSONArray predefined,
-                             String plotType, long barWidth, JSONArray levels,
-                             JSONArray warningLevels) {}
+    private record Parameter(String name, String units, JSONObject jhvparams) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -281,24 +279,11 @@ public class BandReaderHapi {
                 request.set(version.getDatasetRequestParam(), id)
                         .set("format", hapiFormat)
                         .set("parameters", p.name);
-            JSONObject jobt = new JSONObject().
+            JSONObject jobt = getBandOptions(p.jhvparams).
                     put("baseUrl", new UriTemplate(urlData).expand(request)).
                     put("unitLabel", p.units).
                     put("name", id == null ? p.name : id + ' ' + p.name).
-                    put("range", p.range).
-                    put("scale", p.scale).
                     put("label", title == null ? p.name : title + ' ' + p.name);
-            if (p.predefined != null) {
-                jobt.put("predefined", p.predefined);
-            }
-            if (p.plotType != null) {
-                jobt.put("plottype", p.plotType)
-                        .put("barWidth", p.barWidth);
-            }
-            if (p.levels != null) {
-                jobt.put("levels", p.levels);
-            }
-            jobt.put("warninglevels", p.warningLevels);
 
             HapiParam[] typeParams = new HapiParam[]{params[0], params[i]};
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
@@ -316,27 +301,18 @@ public class BandReaderHapi {
         String units = jo.optString("units", null);
         units = units == null ? "unknown" : units;
 
-        String scale = null;
-        JSONArray range = null;
-        JSONArray predefined = null;
-        String plotType = null;
-        long barWidth = 0;
-        JSONArray levels = null;
-        JSONArray warningLevels = null;
-        JSONObject jhvparams = jo.optJSONObject("jhvparams");
-        if (jhvparams != null) {
-            scale = jhvparams.optString("scale", null);
-            range = jhvparams.optJSONArray("range");
-            predefined = jhvparams.optJSONArray("predefined");
-            if (predefined == null)
-                predefined = jhvparams.optJSONArray("groups");
-            plotType = jhvparams.optString("plottype", null);
-            barWidth = jhvparams.optLong("barWidth", 0);
-            levels = jhvparams.optJSONArray("levels");
-            warningLevels = jhvparams.optJSONArray("warninglevels");
-        }
+        return new Parameter(name, units, jo.optJSONObject("jhvparams"));
+    }
 
-        return new Parameter(name, units, scale, range, predefined, plotType, barWidth, levels, warningLevels);
+    private static JSONObject getBandOptions(@Nullable JSONObject jhvparams) {
+        if (jhvparams == null)
+            return new JSONObject();
+
+        JSONObject options = new JSONObject(jhvparams,
+                "scale", "range", "plotType", "barWidth", "levels", "warningLevels");
+        JSONArray predefined = jhvparams.optJSONArray("predefined");
+        options.putOpt("predefined", predefined != null ? predefined : jhvparams.optJSONArray("groups"));
+        return options;
     }
 
     private static BandData getHapiStream(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
