@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -42,6 +44,8 @@ import org.helioviewer.jhv.opengl.AngleCanvas;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.angle.MacAngleBridge;
 import org.helioviewer.jhv.thread.Task;
+
+import com.formdev.flatlaf.FlatClientProperties;
 
 public final class MainFrame {
 
@@ -121,9 +125,6 @@ public final class MainFrame {
 
         Message.setHandler(new MessageHandler());
 
-        menuBar = new MenuBar();
-        mainFrame.setJMenuBar(menuBar);
-
         layersPanel = new LayersPanel();
 
         leftPane = new SideContentPane();
@@ -175,6 +176,27 @@ public final class MainFrame {
         statusPanel.addPlugin(viewpointStatus, StatusPanel.Alignment.RIGHT);
 
         ToolBar toolBar = new ToolBar();
+
+        menuBar = new MenuBar(toolBar);
+        mainFrame.setJMenuBar(menuBar);
+
+        if (Platform.isMacOS()) {
+            JPanel titleBarInset = new JPanel();
+            titleBarInset.putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT_BUTTONS_PLACEHOLDER, "mac vertical");
+            titleBarInset.setVisible(!toolBar.isVisible());
+            toolBar.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentShown(ComponentEvent e) {
+                    titleBarInset.setVisible(false);
+                }
+
+                @Override
+                public void componentHidden(ComponentEvent e) {
+                    titleBarInset.setVisible(true);
+                }
+            });
+            leftPaneHost.add(titleBarInset, BorderLayout.NORTH);
+        }
 
         JPanel toolBarPanel = new JPanel(new BorderLayout());
         toolBarPanel.add(toolBar, BorderLayout.CENTER);
