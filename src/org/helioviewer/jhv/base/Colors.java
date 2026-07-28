@@ -58,7 +58,7 @@ public enum Colors {
     }
 
     public static byte[] bytes(Color c) {
-        return new byte[]{(byte) c.getRed(), (byte) c.getGreen(), (byte) c.getBlue(), (byte) 255};
+        return bytes(c.getRed(), c.getGreen(), c.getBlue());
     }
 
     public static byte[] bytes(Color c, double alpha) {
@@ -66,7 +66,7 @@ public enum Colors {
     }
 
     public static byte[] bytes(int r, int g, int b) {
-        return new byte[]{(byte) r, (byte) g, (byte) b, (byte) 255};
+        return bytes(r, g, b, 255);
     }
 
     public static byte[] bytes(int r, int g, int b, int a) {
@@ -146,46 +146,21 @@ public enum Colors {
     public static class Data {
 
         private final Color[] colors;
-        private final int[] used;
-        private int minValue = 0;
+        private int next;
 
         public Data() {
             colors = switch (DisplaySettings.getUITheme()) {
                 case Dark -> brightColors;
                 case Light -> darkColors;
             };
-            used = new int[colors.length];
         }
 
         public Color getNextColor() {
-            while (true) {
-                for (int i = 0; i < used.length; i++) {
-                    if (used[i] == minValue) {
-                        used[i]++;
-                        return colors[i];
-                    }
-                }
-                minValue++;
-            }
+            Color color = colors[next++];
+            if (next == colors.length)
+                next = 0;
+            return color;
         }
-/*
-        public void resetColor(Color c) {
-            for (int i = 0; i < used.length; i++) {
-                if (colors[i].equals(c)) {
-                    used[i]--;
-                    minValue = used[i];
-                }
-            }
-        }
-
-        public void setColorUsed(Color c) {
-            for (int i = 0; i < used.length; i++) {
-                if (colors[i].equals(c)) {
-                    used[i]++;
-                }
-            }
-        }
-*/
     }
 
 }
