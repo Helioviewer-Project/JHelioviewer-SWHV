@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -32,7 +31,6 @@ import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
@@ -59,7 +57,6 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
     private final SamplingPanel samplingPanel = new SamplingPanel(timeSelectorPanel);
     private final ImageSelectorPanel imageSelectorPanel;
     private final JDialog imageSelectorDialog;
-    private final JButton availabilityButton = new JButton("Available data");
     private ImageLayer layerToReplace;
 
     private static TimeSlider timeSlider;
@@ -229,32 +226,33 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         ViewState.addRecordingConfigListener(this);
     }
 
-    public int getCadence() {
+    private int getCadence() {
         return samplingPanel.getCadence();
     }
 
     @Override
-    public void setTime(long start, long end) {
+    public void setDefaultTimeRange(long start, long end) {
         timeSelectorPanel.setTime(start, end);
     }
 
-    public long getStartTime() {
+    private long getStartTime() {
         return timeSelectorPanel.getStartTime();
     }
 
-    public long getEndTime() {
+    private long getEndTime() {
         return timeSelectorPanel.getEndTime();
     }
 
     @Override
-    public void load(String server, int sourceId) {
+    public void loadDataset(String server, int sourceId) {
         ImageLayer target = layerToReplace;
         layerToReplace = null;
         imageSelectorDialog.setVisible(false);
         if (checkSanity()) {
             long start = getStartTime();
             long end = samplingPanel.isSingleFrame() ? start : getEndTime();
-            imageSelectorPanel.load(target, server, sourceId, start, end, getCadence());
+            ImageLayer imageLayer = target == null ? ImageLayer.create(null) : target;
+            imageLayer.load(new APIRequest(server, sourceId, start, end, getCadence()));
         }
     }
 
@@ -269,7 +267,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         imageSelectorDialog.setTitle("Change Dataset");
         APIRequest req = layer.getView().getAPIRequest();
         if (req != null)
-            imageSelectorPanel.setupLayer(req);
+            imageSelectorPanel.selectDataset(req.server(), req.sourceId());
         showImageSelector();
     }
 
@@ -283,7 +281,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         } else {
             imageSelectorDialog.toFront();
         }
-        EventQueue.invokeLater(() -> imageSelectorPanel.getFocused().requestFocusInWindow());
+        EventQueue.invokeLater(imageSelectorPanel::requestFocusInWindow);
     }
 
     private JDialog createImageSelectorDialog() {
@@ -291,14 +289,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         dialog.setResizable(false);
         dialog.setType(Window.Type.UTILITY);
-
-        availabilityButton.setEnabled(false);
-        availabilityButton.addActionListener(e -> DesktopIntegration.openURL(imageSelectorPanel.getAvailabilityURL()));
-        JPanel availabilityPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        availabilityPanel.add(availabilityButton);
-
-        dialog.add(imageSelectorPanel, BorderLayout.CENTER);
-        dialog.add(availabilityPanel, BorderLayout.PAGE_END);
+        dialog.setContentPane(imageSelectorPanel);
         dialog.getRootPane().registerKeyboardAction(
                 e -> dialog.setVisible(false),
                 KeyStroke.getKeyStroke("ESCAPE"),
@@ -307,16 +298,11 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         return dialog;
     }
 
-    @Override
-    public void setAvailabilityEnabled(boolean enabled) {
-        availabilityButton.setEnabled(enabled);
-    }
-
     private boolean checkSanity() {
         long start = getStartTime();
         long end = getEndTime();
         if (start > end) {
-            setTime(end, end);
+            timeSelectorPanel.setTime(end, end);
             JOptionPane.showMessageDialog(null, "End date is before start date", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -324,7 +310,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
     }
 
     public void syncLayersSpan(long start, long end) {
-        setTime(start, end);
+        timeSelectorPanel.setTime(start, end);
         syncLayersSpan();
     }
 

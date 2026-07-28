@@ -17,11 +17,9 @@ public final class Interfaces {
     }
 
     public interface DatasetSelectionHandler {
-        void setTime(long start, long end);
+        void setDefaultTimeRange(long start, long end);
 
-        void load(String server, int sourceId);
-
-        void setAvailabilityEnabled(boolean enable);
+        void loadDataset(String server, int sourceId);
     }
 
     public interface ShowableDialog {

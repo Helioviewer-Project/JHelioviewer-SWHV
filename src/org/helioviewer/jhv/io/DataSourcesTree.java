@@ -82,7 +82,7 @@ public final class DataSourcesTree extends JTree {
             defaultRenderer.setLeafIcon(null);
         }
 
-        setSelectionModel(new OneLeafTreeSelectionModel(selectionHandler));
+        setSelectionModel(new OneLeafTreeSelectionModel());
         ToolTipManager.sharedInstance().registerComponent(this);
         com.jidesoft.swing.SearchableUtils.installSearchable(this).setRecursive(true);
 
@@ -93,7 +93,7 @@ public final class DataSourcesTree extends JTree {
                 if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1 && (path = getPathForLocation(e.getX(), e.getY())) != null) {
                     Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
                     if (obj instanceof SourceItem si)
-                        selectionHandler.load(si.server, si.sourceId);
+                        selectionHandler.loadDataset(si.server, si.sourceId);
                 }
             }
         });
@@ -103,7 +103,7 @@ public final class DataSourcesTree extends JTree {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     SourceItem item = getSelectedItem();
                     if (item != null)
-                        selectionHandler.load(item.server, item.sourceId);
+                        selectionHandler.loadDataset(item.server, item.sourceId);
                 }
             }
         });
@@ -199,11 +199,9 @@ public final class DataSourcesTree extends JTree {
 
     private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
 
-        private final Interfaces.DatasetSelectionHandler selectionHandler;
         private TreePath selectedPath;
 
-        OneLeafTreeSelectionModel(Interfaces.DatasetSelectionHandler _selectionHandler) {
-            selectionHandler = _selectionHandler;
+        OneLeafTreeSelectionModel() {
             setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         }
 
@@ -212,7 +210,6 @@ public final class DataSourcesTree extends JTree {
             if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
                 super.setSelectionPath(path);
                 selectedPath = path;
-                selectionHandler.setAvailabilityEnabled(DataSources.getServerSetting(((SourceItem) node.getUserObject()).server, "availability.images") != null);
             }
         }
 
