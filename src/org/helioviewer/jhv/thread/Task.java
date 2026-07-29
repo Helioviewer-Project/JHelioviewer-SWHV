@@ -27,12 +27,6 @@ public final class Task {
         return EDTCallbackExecutor.pool.submit(task, onSuccess, t -> onFailure.onFailure(logContext, t));
     }
 
-    public static <T> Future<T> submit(@Nonnull ExecutorService executor, @Nonnull String logContext,
-                                       @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
-                                       @Nonnull FailureHandler onFailure) {
-        return submit(executor, task, onSuccess, t -> onFailure.onFailure(logContext, t));
-    }
-
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                        @Nonnull String errorMessage) {
         return submit(logContext, task, onSuccess, (ctx, t) -> defaultOnFailure(ctx, t, errorMessage));

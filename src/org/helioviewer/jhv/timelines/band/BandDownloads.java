@@ -11,6 +11,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.Interval;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 
@@ -36,10 +37,10 @@ final class BandDownloads {
         String baseUrl = band.getBandType().getBaseUrl();
         pruneFinished(band);
         for (Interval interval : intervals) {
-            Future<BandData> download = Task.submit(downloadPool, baseUrl,
+            Future<BandData> download = Task.submit(downloadPool,
                     BandReaderHapi.dataRequest(baseUrl, interval.start(), interval.end()),
                     data -> acceptData(band, data),
-                    (logContext, t) -> downloadFailed(band, interval, t));
+                    t -> downloadFailed(band, interval, t));
             workers.put(band, download);
         }
         band.downloadStateChanged();
@@ -61,8 +62,11 @@ final class BandDownloads {
     }
 
     private static void downloadFailed(Band band, Interval interval, Throwable t) {
-        if (!(t instanceof CancellationException))
-            Log.error(t);
+        if (!(t instanceof CancellationException)) {
+            String context = band.getBandType().getName() + " [" +
+                    TimeUtils.formatShort(interval.start()) + " - " + TimeUtils.formatShort(interval.end()) + "]";
+            Log.error(context, t);
+        }
         band.requestFailed(interval);
     }
 
