@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -41,10 +42,8 @@ import uk.ac.starlink.table.RowSequence;
 
 public class BandReaderHapi {
 
-    @FunctionalInterface
-    public interface CatalogListener {
-        void catalogsLoaded(Map<String, BandDataset[]> catalogs);
-    }
+    public record CatalogData(Map<String, BandDataset[]> datasets,
+                              Map<String, List<BandType>> predefinedGroups) {}
 
     private static final String hapiFormat = "binary";
     private static final CatalogEndpoint[] catalogEndpoints = {
@@ -62,7 +61,7 @@ public class BandReaderHapi {
         return groups;
     }
 
-    public static void requestCatalog(CatalogListener listener) {
+    public static void requestCatalog(Consumer<CatalogData> listener) {
         catalogWorker.submit(BandReaderHapi::loadCatalogs, (loaded, fresh) -> {
             if (fresh)
                 onSuccessCatalogs(loaded, listener);
@@ -118,7 +117,7 @@ public class BandReaderHapi {
         }
     }
 
-    private static void onSuccessCatalogs(Catalog[] loadedCatalogs, CatalogListener listener) {
+    private static void onSuccessCatalogs(Catalog[] loadedCatalogs, Consumer<CatalogData> listener) {
         catalogs.clear();
         LinkedHashMap<String, BandDataset[]> datasets = new LinkedHashMap<>();
         for (int i = 0; i < loadedCatalogs.length; i++) {
@@ -129,10 +128,10 @@ public class BandReaderHapi {
             }
             datasets.put(endpoint.groupName, catalog == null ? new BandDataset[0] : catalog.datasets);
         }
-        listener.catalogsLoaded(datasets);
+        listener.accept(new CatalogData(Collections.unmodifiableMap(datasets), combinedPredefinedGroups()));
     }
 
-    public static Map<String, List<BandType>> getPredefinedGroups() {
+    private static Map<String, List<BandType>> combinedPredefinedGroups() {
         if (catalogs.isEmpty())
             return Map.of();
         if (catalogs.size() == 1)
