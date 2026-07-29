@@ -14,13 +14,10 @@ class BandCacheAll implements BandCache {
     private static final int MAX_SIZE = 86400;
 
     private final List<DateValue> dateVals = new ArrayList<>();
-    private boolean hasData;
-    private DateValue first;
-    private DateValue last;
 
     @Override
     public boolean hasData() {
-        return hasData;
+        return !dateVals.isEmpty();
     }
 
     @Override
@@ -30,16 +27,12 @@ class BandCacheAll implements BandCache {
             return;
         }
 
-        hasData = true;
         for (int i = 0; i < len; i++) {
             dateVals.add(new DateValue(dates[i], yAxis.clip(values[i])));
             if (dateVals.size() >= MAX_SIZE)
                 break;
         }
         Collections.sort(dateVals);
-
-        first = dateVals.getFirst();
-        last = dateVals.getLast();
     }
 
     @Override
@@ -77,7 +70,7 @@ class BandCacheAll implements BandCache {
 
     @Override
     public float getValue(long ts) {
-        if (first == null || ts < first.milli || ts > last.milli) // if first is not null, last cannot be null
+        if (dateVals.isEmpty() || ts < dateVals.getFirst().milli || ts > dateVals.getLast().milli)
             return YAxis.BLANK;
 
         int low = 0, high = dateVals.size();

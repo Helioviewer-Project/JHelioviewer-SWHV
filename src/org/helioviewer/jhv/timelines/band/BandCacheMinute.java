@@ -20,8 +20,6 @@ class BandCacheMinute implements BandCache {
     private static final int MAX_LEVEL = 12;
     private static final int FACTOR_STEP = 2;
 
-    private boolean hasData;
-
     private final HashMap<Long, DataChunk> cacheMap = new HashMap<>();
 
     private static long date2key(long date) {
@@ -30,16 +28,12 @@ class BandCacheMinute implements BandCache {
 
     @Override
     public boolean hasData() {
-        return hasData;
+        return !cacheMap.isEmpty();
     }
 
     @Override
     public void addToCache(YAxis yAxis, float[] values, long[] dates) {
         int len = values.length;
-        if (len > 0) {
-            hasData = true;
-        }
-
         boolean max = yAxis.preferMax();
         for (int i = 0; i < len; i++) {
             long key = date2key(dates[i]);
