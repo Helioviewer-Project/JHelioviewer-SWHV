@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.thread;
 
+import java.awt.EventQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -9,7 +10,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Log;
 
@@ -26,87 +26,94 @@ public final class LatestWorker<T> {
         }
     }
 
-    @Nullable
-    private final ThreadPoolExecutor worker;
-    private final EDTCallbackExecutor executor;
+    private final ExecutorService executor;
+    private final boolean ownsExecutor;
 
-    @Nullable
     private Request<T> pending;
-    @Nullable
-    private Future<T> running;
+    private Future<?> scheduled;
 
     private int generation;
     private boolean abolished;
 
     public LatestWorker(String name) {
-        worker = new ThreadPoolExecutor(
+        this(createExecutor(name), true);
+    }
+
+    public LatestWorker(ExecutorService _executor) {
+        this(_executor, false);
+    }
+
+    private LatestWorker(ExecutorService _executor, boolean _ownsExecutor) {
+        executor = _executor;
+        ownsExecutor = _ownsExecutor;
+    }
+
+    private static ExecutorService createExecutor(String name) {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 1, 1, 10000L, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(1),
-                new AppThread.NamedThreadFactory(name),
-                new ThreadPoolExecutor.DiscardOldestPolicy());
-        worker.allowCoreThreadTimeOut(true);
-        executor = new EDTCallbackExecutor(worker);
+                new AppThread.NamedThreadFactory(name));
+        executor.allowCoreThreadTimeOut(true);
+        return executor;
     }
 
-    public LatestWorker(ExecutorService sharedWorker) {
-        worker = null;
-        executor = new EDTCallbackExecutor(sharedWorker);
+    public synchronized void submit(Callable<T> task, Callback<T> callback) {
+        if (abolished)
+            throw new IllegalStateException("Worker has been abolished");
+
+        pending = new Request<>(task, callback, ++generation);
+        schedule();
     }
 
-    public void submit(Callable<T> task, Callback<T> callback) {
-        int request = ++generation;
-        if (worker != null) {
-            executor.submit(task, result -> callback.onSuccess(result, request == generation),
-                    t -> callback.onFailure(t, request == generation));
-            return;
+    private void schedule() {
+        if (scheduled == null && pending != null)
+            scheduled = executor.submit(this::runPending);
+    }
+
+    private void runPending() {
+        Request<T> request;
+        synchronized (this) {
+            request = pending;
+            pending = null;
+            if (request == null) {
+                scheduled = null;
+                return;
+            }
         }
 
-        pending = new Request<>(task, callback, request);
-        if (running == null)
-            startPending();
+        try {
+            T result = request.task().call();
+            EventQueue.invokeLater(() ->
+                    request.callback().onSuccess(result, isFresh(request.generation())));
+        } catch (Throwable t) {
+            EventQueue.invokeLater(() ->
+                    request.callback().onFailure(t, isFresh(request.generation())));
+        } finally {
+            synchronized (this) {
+                scheduled = null;
+                if (!abolished)
+                    schedule();
+            }
+        }
     }
 
-    private void startPending() {
-        Request<T> request = pending;
-        if (request == null || abolished)
-            return;
-
-        pending = null;
-        running = executor.submit(request.task(),
-                result -> finished(request, result),
-                t -> failed(request, t));
+    private synchronized boolean isFresh(int request) {
+        return request == generation;
     }
 
-    private void finished(Request<T> request, T result) {
-        running = null;
-        startPending();
-        request.callback().onSuccess(result, request.generation() == generation);
-    }
-
-    private void failed(Request<T> request, Throwable t) {
-        running = null;
-        startPending();
-        request.callback().onFailure(t, request.generation() == generation);
-    }
-
-    public void cancel() {
+    public synchronized void cancel() {
         generation++;
-        if (worker != null)
-            worker.getQueue().clear();
-        else
-            pending = null;
+        pending = null;
     }
 
-    public void abolish() {
+    public synchronized void abolish() {
         generation++;
         abolished = true;
-        if (worker != null) {
-            worker.shutdownNow();
-        } else {
-            pending = null;
-            if (running != null)
-                running.cancel(true);
-        }
+        pending = null;
+        if (scheduled != null)
+            scheduled.cancel(true);
+        if (ownsExecutor)
+            executor.shutdownNow();
     }
 
 }
