@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.awt.EventQueue;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -21,10 +22,8 @@ public final class BandImporter {
     }
 
     public static void loadHapi(URI uri) {
-        Task.submit(uri.toString(), () -> BandReaderHapi.readUri(uri), data -> {
-            if (data != null)
-                acceptData(data);
-        }, BandImporter::onFailure);
+        Task.submit(uri.toString(), () -> BandReaderHapi.readUri(uri), BandImporter::acceptData,
+                BandImporter::onFailure);
     }
 
     public static void loadCdf(URI uri) throws Exception {
@@ -36,22 +35,30 @@ public final class BandImporter {
             return;
 
         EventQueue.invokeLater(() -> {
-            bands.forEach(BandImporter::acceptData);
+            acceptData(bands);
             DrawController.setSelectedInterval(dates[0], dates[dates.length - 1]);
         });
     }
 
-    static void acceptData(BandData data) {
+    private static void acceptData(List<BandData> data) {
+        if (data.isEmpty())
+            return;
+
         TimelineLayers layers = Timelines.getLayers();
-        Band band = layers.addBand(data.bandType());
-        boolean hasDataChanged = band.addToCache(data.values(), data.dates());
-        if (hasDataChanged)
-            layers.updateRow(band);
+        List<Band> bands = layers.addBands(data.stream().map(BandData::bandType).toList());
+        List<Band> changedBands = new ArrayList<>();
+        for (int i = 0; i < data.size(); i++) {
+            BandData bandData = data.get(i);
+            Band band = bands.get(i);
+            if (band.addToCache(bandData.values(), bandData.dates()))
+                changedBands.add(band);
+        }
+        layers.updateRows(changedBands);
     }
 
-    private record BandLoad(JSONObject jo) implements Callable<BandData> {
+    private record BandLoad(JSONObject jo) implements Callable<List<BandData>> {
         @Override
-        public BandData call() throws Exception {
+        public List<BandData> call() throws Exception {
             JSONObject bo = jo.optJSONObject("bandType");
             if (bo == null)
                 throw new Exception("Missing bandType: " + jo);
@@ -74,7 +81,7 @@ public final class BandImporter {
                 dates = new long[0];
                 values = new float[0];
             }
-            return new BandData(bandType, dates, values);
+            return List.of(new BandData(bandType, dates, values));
         }
     }
 
