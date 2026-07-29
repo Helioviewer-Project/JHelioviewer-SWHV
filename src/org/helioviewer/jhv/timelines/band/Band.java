@@ -7,6 +7,8 @@ import java.awt.Rectangle;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.LongUnaryOperator;
 
 import javax.annotation.Nullable;
@@ -15,6 +17,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.event.GOESLevel;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
@@ -45,6 +48,10 @@ public final class Band extends TimelineLayer {
 
     private static final GraphData EMPTY_GRAPH_DATA = new EmptyGraph();
     private static final Colors.Data bandColors = new Colors.Data();
+    private static final int GRAPH_THREADS =
+            Math.max(1, Math.min(8, Runtime.getRuntime().availableProcessors() - 1));
+    private static final ExecutorService graphPool =
+            Executors.newFixedThreadPool(GRAPH_THREADS, new AppThread.NamedThreadFactory("Timeline-Graph"));
 
     private static final int DOWNLOADER_MAX_DAYS_PER_BLOCK = 21;
 
@@ -53,7 +60,7 @@ public final class Band extends TimelineLayer {
 
     private final YAxis yAxis;
     private final int[] warnPixels;
-    private final LatestWorker<GraphData> graphWorker = new LatestWorker<>("Timeline-Graph");
+    private final LatestWorker<GraphData> graphWorker = new LatestWorker<>(graphPool);
 
     private RequestCache requestCache;
     private BandCache bandCache;
@@ -317,6 +324,12 @@ public final class Band extends TimelineLayer {
         List<List<BandCache.DateValue>> rawData = bandCache.getValues(
                 Display.pixelScale[0] * drawArea.width,
                 start - barWidthMillis, end + barWidthMillis);
+        if (rawData.stream().allMatch(List::isEmpty)) {
+            graphWorker.cancel();
+            graphData = EMPTY_GRAPH_DATA;
+            DrawController.drawRequest();
+            return;
+        }
         final boolean useMulticolor = multicolor;
 
         graphWorker.submit(
