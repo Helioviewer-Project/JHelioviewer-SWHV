@@ -5,6 +5,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -148,18 +150,25 @@ public class TimelineLayers extends AbstractTableModel {
 
     public void replaceBands(List<BandType> bandTypes) {
         ArrayList<TimelineLayer> replacement = new ArrayList<>();
+        HashMap<BandType, Band> existingBands = new HashMap<>();
         for (TimelineLayer layer : layers) {
-            if (!(layer instanceof Band))
+            if (layer instanceof Band band)
+                existingBands.putIfAbsent(band.getBandType(), band);
+            else
                 replacement.add(layer);
         }
-        for (BandType bandType : bandTypes)
-            addUnique(replacement, getOrCreateBand(bandType));
+
+        bandTypes.stream()
+                .distinct()
+                .map(type -> existingBands.computeIfAbsent(type, Band::new))
+                .forEach(replacement::add);
         replaceAll(replacement);
     }
 
     private void replaceAll(List<TimelineLayer> replacement) {
+        HashSet<TimelineLayer> retained = new HashSet<>(replacement);
         for (TimelineLayer layer : layers) {
-            if (!replacement.contains(layer))
+            if (!retained.contains(layer))
                 layer.remove();
         }
         layers.clear();
