@@ -47,7 +47,7 @@ public class TimelineLayers extends AbstractTableModel {
                 continue;
 
             Rectangle area = graphArea;
-            if (layer.hasYAxis()) {
+            if (layer.getYAxis() != null) {
                 area = geometry.getLayerArea(layer);
                 if (area == null)
                     continue;

@@ -178,11 +178,6 @@ public final class RadioData extends TimelineLayer {
     }
 
     @Override
-    public boolean hasYAxis() {
-        return true;
-    }
-
-    @Override
     public void remove() {
         clearCache();
     }

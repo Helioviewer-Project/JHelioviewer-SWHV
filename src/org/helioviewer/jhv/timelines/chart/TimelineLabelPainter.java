@@ -81,10 +81,8 @@ final class TimelineLabelPainter {
     }
 
     private void drawYAxisLabels(Graphics2D g, GraphGeometry geometry) {
-        for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts()) {
-            TimelineLayer layer = layout.layer();
-            drawVerticalLabels(g, geometry, layer, layout.axisIndex(), layer.getYAxis().isHighlighted());
-        }
+        for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts())
+            drawVerticalLabels(g, geometry, layout);
     }
 
     private void drawStackedLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
@@ -93,7 +91,7 @@ final class TimelineLabelPainter {
         drawTimeLabels(g, geometry, xAxis);
 
         for (GraphGeometry.LayerLayout layout : layerLayouts)
-            drawStackedVerticalLabels(g, geometry, layout.area(), layout.layer());
+            drawStackedVerticalLabels(g, geometry, layout);
 
         g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
         for (int i = 1; i < layerLayouts.size(); i++) {
@@ -104,11 +102,12 @@ final class TimelineLabelPainter {
         }
     }
 
-    private void drawStackedVerticalLabels(Graphics2D g, GraphGeometry geometry, Rectangle stripArea, TimelineLayer tl) {
+    private void drawStackedVerticalLabels(Graphics2D g, GraphGeometry geometry, GraphGeometry.LayerLayout layout) {
+        Rectangle stripArea = layout.area();
         int axisX = stripArea.x;
 
-        g.setColor(tl.getDataColor());
-        YAxis yAxis = tl.getYAxis();
+        g.setColor(layout.layer().getDataColor());
+        YAxis yAxis = layout.yAxis();
         YAxis.Mapper yMapper = geometry.yMapper(yAxis, stripArea);
         YAxis.Ticks ticks = yAxis.ticks(yMapper);
 
@@ -216,15 +215,17 @@ final class TimelineLabelPainter {
         }
     }
 
-    private void drawVerticalLabels(Graphics2D g, GraphGeometry geometry, TimelineLayer tl, int leftSide, boolean highlight) {
+    private void drawVerticalLabels(Graphics2D g, GraphGeometry geometry, GraphGeometry.LayerLayout layout) {
         Rectangle graphArea = geometry.area();
+        int leftSide = layout.axisIndex();
         int axisX = graphArea.x;
         if (leftSide != -1) {
             axisX += graphArea.width + leftSide * DrawConstants.RIGHT_AXIS_WIDTH;
         }
 
-        g.setColor(tl.getDataColor());
-        YAxis yAxis = tl.getYAxis();
+        g.setColor(layout.layer().getDataColor());
+        YAxis yAxis = layout.yAxis();
+        boolean highlight = yAxis.isHighlighted();
         YAxis.Mapper yMapper = geometry.yMapper(yAxis);
         YAxis.Ticks ticks = yAxis.ticks(yMapper);
 

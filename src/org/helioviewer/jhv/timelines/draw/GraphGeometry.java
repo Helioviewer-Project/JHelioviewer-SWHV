@@ -24,7 +24,9 @@ public final class GraphGeometry {
     private final List<LayerLayout> exposedLayerLayouts = Collections.unmodifiableList(layerLayouts);
     private final List<TimelineLayer> exposedPropagatedLayers = Collections.unmodifiableList(propagatedLayers);
 
-    public record LayerLayout(TimelineLayer layer, Rectangle area, int axisIndex) {}
+    public record LayerLayout(TimelineLayer layer, YAxis yAxis, Rectangle area, int axisIndex) {}
+
+    private record AxisLayer(TimelineLayer layer, YAxis yAxis) {}
 
     public void setSize(int width, int height) {
         size.setBounds(0, 0, Math.max(1, width), Math.max(1, height));
@@ -38,13 +40,17 @@ public final class GraphGeometry {
         layerLayouts.clear();
         propagatedLayers.clear();
 
-        int yAxisCount = 0;
+        ArrayList<AxisLayer> axisLayers = new ArrayList<>();
         for (TimelineLayer layer : layers) {
             if (layer.isEnabled() && layer.isPropagated())
                 propagatedLayers.add(layer);
-            if (layer.isEnabled() && layer.hasYAxis())
-                yAxisCount++;
+            if (layer.isEnabled()) {
+                YAxis yAxis = layer.getYAxis();
+                if (yAxis != null)
+                    axisLayers.add(new AxisLayer(layer, yAxis));
+            }
         }
+        int yAxisCount = axisLayers.size();
 
         int height = size.height - (DrawConstants.GRAPH_TOP_SPACE + DrawConstants.GRAPH_BOTTOM_SPACE
                 + DrawConstants.GRAPH_BOTTOM_AXIS_SPACE * (propagatedLayers.size() + 1));
@@ -61,11 +67,9 @@ public final class GraphGeometry {
 
             int y = DrawConstants.GRAPH_TOP_SPACE;
             int axisIndex = -1;
-            for (TimelineLayer layer : layers) {
-                if (!layer.isEnabled() || !layer.hasYAxis())
-                    continue;
+            for (AxisLayer axisLayer : axisLayers) {
                 Rectangle layerArea = new Rectangle(area.x, y, area.width, stripHeight);
-                layerLayouts.add(new LayerLayout(layer, layerArea, axisIndex));
+                layerLayouts.add(new LayerLayout(axisLayer.layer, axisLayer.yAxis, layerArea, axisIndex));
                 y += stripHeight + STACKED_SEPARATOR;
                 axisIndex++;
             }
@@ -75,11 +79,9 @@ public final class GraphGeometry {
             area = new Rectangle(DrawConstants.GRAPH_LEFT_SPACE, DrawConstants.GRAPH_TOP_SPACE, Math.max(1, width), Math.max(1, height));
 
             int axisIndex = -1;
-            for (TimelineLayer layer : layers) {
-                if (layer.isEnabled() && layer.hasYAxis()) {
-                    layerLayouts.add(new LayerLayout(layer, area, axisIndex));
-                    axisIndex++;
-                }
+            for (AxisLayer axisLayer : axisLayers) {
+                layerLayouts.add(new LayerLayout(axisLayer.layer, axisLayer.yAxis, area, axisIndex));
+                axisIndex++;
             }
         }
     }

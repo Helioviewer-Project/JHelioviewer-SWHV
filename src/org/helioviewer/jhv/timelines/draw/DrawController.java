@@ -155,12 +155,12 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         if (geometry.isStacked()) {
             GraphGeometry.LayerLayout layout = geometry.getLayerLayout(p);
             if (layout != null)
-                moveYAxis(layout.layer(), distanceY, layout.area().height);
+                moveYAxis(layout, distanceY, layout.area().height);
         } else {
             GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
             for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts()) {
                 if (hit.outsideAxes() || hit.targets(layout.axisIndex()))
-                    moveYAxis(layout.layer(), distanceY, geometry.graphHeight());
+                    moveYAxis(layout, distanceY, geometry.graphHeight());
             }
         }
         drawRequest();
@@ -173,30 +173,29 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         if (geometry.isStacked()) {
             GraphGeometry.LayerLayout layout = geometry.getLayerLayout(p);
             if (layout != null) {
-                TimelineLayer layer = layout.layer();
                 Rectangle stripArea = layout.area();
-                layer.getYAxis().zoomSelectedRange(scrollDistance,
+                layout.yAxis().zoomSelectedRange(scrollDistance,
                         stripArea.y + stripArea.height - p.y, stripArea.height);
-                layer.yaxisChanged();
+                layout.layer().yaxisChanged();
             }
         } else {
             GraphGeometry.YAxisHit hit = geometry.yAxisHit(p);
             for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts()) {
                 if (hit.outsideAxes() || hit.targets(layout.axisIndex()))
-                    zoomYAxis(layout.layer(), p, scrollDistance);
+                    zoomYAxis(layout, p, scrollDistance);
             }
         }
         drawRequest();
     }
 
-    private static void moveYAxis(TimelineLayer tl, double distanceY, int graphHeight) {
-        tl.getYAxis().shiftDownPixels(distanceY, graphHeight);
-        tl.yaxisChanged();
+    private static void moveYAxis(GraphGeometry.LayerLayout layout, double distanceY, int graphHeight) {
+        layout.yAxis().shiftDownPixels(distanceY, graphHeight);
+        layout.layer().yaxisChanged();
     }
 
-    private static void zoomYAxis(TimelineLayer tl, Point p, int scrollDistance) {
-        tl.getYAxis().zoomSelectedRange(scrollDistance, geometry.axisZoomY(p), geometry.graphHeight());
-        tl.yaxisChanged();
+    private static void zoomYAxis(GraphGeometry.LayerLayout layout, Point p, int scrollDistance) {
+        layout.yAxis().zoomSelectedRange(scrollDistance, geometry.axisZoomY(p), geometry.graphHeight());
+        layout.layer().yaxisChanged();
     }
 
     public static void zoomXY(Point p, int scrollDistance, boolean shift, boolean alt, boolean ctrl) {
@@ -279,9 +278,9 @@ public final class DrawController implements Interfaces.LazyComponent, Interface
         boolean changed = false;
         for (GraphGeometry.LayerLayout layout : geometry.getLayerLayouts()) {
             boolean highlighted = hit != null && hit.targets(layout.axisIndex());
-            TimelineLayer layer = layout.layer();
-            changed = changed || layer.getYAxis().isHighlighted() != highlighted;
-            layer.getYAxis().setHighlighted(highlighted);
+            YAxis yAxis = layout.yAxis();
+            changed = changed || yAxis.isHighlighted() != highlighted;
+            yAxis.setHighlighted(highlighted);
         }
         return changed;
     }

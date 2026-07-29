@@ -221,11 +221,6 @@ public final class Band extends TimelineLayer {
     }
 
     @Override
-    public boolean hasYAxis() {
-        return true;
-    }
-
-    @Override
     public void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition) {
         draw(g, graphArea, true);
     }
