@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import uk.ac.starlink.hapi.HapiInfo;
 import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiTableReader;
+import uk.ac.starlink.hapi.HapiType;
 import uk.ac.starlink.hapi.HapiVersion;
 import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
@@ -273,6 +274,11 @@ public class BandReaderHapi {
         int numAxes = parameters.size() - 1;
         List<BandReader> readers = new ArrayList<>(numAxes);
         for (int i = 1; i <= numAxes; i++) {
+            HapiParam valueParam = params[i];
+            HapiType<?, ?> valueType = valueParam.getType();
+            if (valueType != HapiType.DOUBLE && valueType != HapiType.INTEGER)
+                continue;
+
             Parameter p = parameters.get(i);
             UriTemplate.Variables request = UriTemplate.vars();
             if (id != null)
@@ -285,7 +291,7 @@ public class BandReaderHapi {
                     put("name", id == null ? p.name : id + ' ' + p.name).
                     put("label", title == null ? p.name : title + ' ' + p.name);
 
-            HapiParam[] typeParams = new HapiParam[]{params[0], params[i]};
+            HapiParam[] typeParams = new HapiParam[]{params[0], valueParam};
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
         }
         return new Dataset(id, readers, start, stop);
