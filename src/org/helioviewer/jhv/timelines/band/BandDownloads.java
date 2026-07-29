@@ -23,6 +23,7 @@ final class BandDownloads {
             new LinkedBlockingQueue<>(),
             new AppThread.NamedThreadFactory("Timeline-Download"));
     private static final ArrayListMultimap<Band, Future<BandData>> workers = ArrayListMultimap.create();
+    private static boolean purgeNeeded;
 
     private static void pruneFinished(Band band) {
         workers.get(band).removeIf(Future::isDone);
@@ -34,6 +35,11 @@ final class BandDownloads {
     }
 
     static void start(Band band, List<Interval> intervals) {
+        if (purgeNeeded) {
+            downloadPool.purge();
+            purgeNeeded = false;
+        }
+
         String baseUrl = band.getBandType().getBaseUrl();
         pruneFinished(band);
         for (Interval interval : intervals) {
@@ -49,7 +55,7 @@ final class BandDownloads {
     static void stop(Band band) {
         workers.get(band).forEach(worker -> worker.cancel(true));
         workers.removeAll(band);
-        downloadPool.purge();
+        purgeNeeded = true;
     }
 
     static boolean isActive(Band band) {
