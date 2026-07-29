@@ -18,8 +18,6 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.common.collect.LinkedListMultimap;
-
 import uk.ac.bristol.star.cdf.AttributeEntry;
 import uk.ac.bristol.star.cdf.CdfContent;
 import uk.ac.bristol.star.cdf.CdfReader;
@@ -30,11 +28,11 @@ import uk.ac.bristol.star.cdf.VariableAttribute;
 
 public class BandReaderCdf {
 
-    private static final double eV2K = 11604.5250061657;
-    private static final Set<String> SWAIncluded = Set.of("N", "V_RTN", "T");
+    private static final double EV_TO_KELVIN = 11604.5250061657;
+    private static final Set<String> SWA_INCLUDED = Set.of("N", "V_RTN", "T");
 
-    private record CDFData(DatesValues datesValues, float scaleMin, float scaleMax, String scaleType, String units,
-                           String[] labels) {}
+    private record DecodedVariable(DatesValues datesValues, float scaleMin, float scaleMax, String scaleType,
+                                   String units, String[] labels) {}
 
     private record CDFVariable(Variable variable, Map<String, String> attributes) {}
 
@@ -42,15 +40,13 @@ public class BandReaderCdf {
         uri = NetFileCache.get(uri).uri(); // tbd : sniff type
         CdfContent cdf = new CdfContent(new CdfReader(new File(uri)));
 
-        LinkedListMultimap<String, String> globalAttrs = LinkedListMultimap.create();
+        List<String> descriptors = new ArrayList<>();
         for (GlobalAttribute attr : cdf.getGlobalAttributes()) {
-            String name = attr.getName();
-            for (AttributeEntry entry : attr.getEntries()) {
-                globalAttrs.put(name, entry.toString());
-            }
+            if ("Descriptor".equals(attr.getName()))
+                for (AttributeEntry entry : attr.getEntries())
+                    descriptors.add(entry.toString());
         }
-        // dumpGlobalAttrs(globalAttrs);
-        String descriptor = String.join(" ", globalAttrs.get("Descriptor")).trim();
+        String descriptor = String.join(" ", descriptors).trim();
         String[] descriptorParts = Regex.GT.split(descriptor);
         if (descriptorParts.length == 0 || descriptorParts[0].isBlank()) {
             throw new IOException("Missing or invalid Descriptor global attribute: " + uri);
@@ -61,6 +57,8 @@ public class BandReaderCdf {
         VariableAttribute[] cdfAttrs = cdf.getVariableAttributes();
 
         CDFVariable[] variables = new CDFVariable[cdfVars.length];
+        Map<String, CDFVariable> variablesByName = new HashMap<>();
+        CDFVariable epoch = null;
         for (int i = 0; i < cdfVars.length; i++) {
             Variable v = cdfVars[i];
             Map<String, String> attrs = new HashMap<>();
@@ -69,23 +67,28 @@ public class BandReaderCdf {
                 if (e != null)
                     attrs.put(a.getName(), e.toString());
             }
-            variables[i] = new CDFVariable(v, attrs);
+            CDFVariable variable = new CDFVariable(v, attrs);
+            variables[i] = variable;
+            variablesByName.putIfAbsent(v.getName(), variable);
+            if (epoch == null && "EPOCH".equalsIgnoreCase(v.getName()))
+                epoch = variable;
         }
 
-        long[] dates = readEpoch(variables, uri);
+        long[] dates = readEpoch(epoch, uri);
         List<BandData> ret = new ArrayList<>();
 
         for (CDFVariable v : variables) {
             if ("data".equals(v.attributes.get("VAR_TYPE"))) {
-                if (!"SWA-PAS".equals(instrumentName) || SWAIncluded.contains(v.variable.getName()))
-                    ret.addAll(readBandData(v, dates, instrumentName, variables, uri));
+                if (!"SWA-PAS".equals(instrumentName) || SWA_INCLUDED.contains(v.variable.getName()))
+                    ret.addAll(readBandData(v, dates, instrumentName, variablesByName, uri));
             }
         }
         return ret;
     }
 
-    private static List<BandData> readBandData(CDFVariable v, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
-        CDFData data = readData(v, dates, instrumentName, variables, uri);
+    private static List<BandData> readBandData(CDFVariable v, long[] dates, String instrumentName,
+                                               Map<String, CDFVariable> variablesByName, URI uri) throws IOException {
+        DecodedVariable data = readData(v, dates, instrumentName, variablesByName, uri);
         int numAxes = data.datesValues.values().length;
 
         List<BandData> ret = new ArrayList<>(numAxes);
@@ -103,14 +106,7 @@ public class BandReaderCdf {
         return ret;
     }
 
-    private static long[] readEpoch(CDFVariable[] variables, URI uri) throws IOException {
-        CDFVariable epoch = null;
-        for (CDFVariable v : variables) {
-            if ("EPOCH".equalsIgnoreCase(v.variable.getName())) { // mandated by MetadataStandard
-                epoch = v;
-                break;
-            }
-        }
+    private static long[] readEpoch(CDFVariable epoch, URI uri) throws IOException {
         if (epoch == null)
             throw new IOException("Epoch not found: " + uri);
 
@@ -119,8 +115,6 @@ public class BandReaderCdf {
                 List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000") :
                 List.of("9999-12-31T23:59:59.999999999", "0000-01-01T00:00:00.000000000", fillVal); // FILLVAL may be duplicate
         String[][] epochVals = readCDFVariableString(epoch.variable);
-        // dumpVariableAttrs(epoch);
-        // dumpValues(epochVals);
 
         // Refuse to fill timestamps
         long[] dates = new long[epochVals.length];
@@ -145,7 +139,8 @@ public class BandReaderCdf {
         }
     }
 
-    private static CDFData readData(CDFVariable data, long[] dates, String instrumentName, CDFVariable[] variables, URI uri) throws IOException {
+    private static DecodedVariable readData(CDFVariable data, long[] dates, String instrumentName,
+                                            Map<String, CDFVariable> variablesByName, URI uri) throws IOException {
         String variableName = data.variable.getName();
 
         Map<String, String> dataAttrs = data.attributes;
@@ -153,17 +148,15 @@ public class BandReaderCdf {
             throw new IOException("Inconsistent variable " + variableName + ": " + uri);
         }
         String dataFillVal = dataAttrs.get("FILLVAL");
-        String dataScaleTyp = "linear"; //dataAttrs.get("SCALETYP"); -- don't trust value in CDF
-        String dataScaleMax = dataAttrs.computeIfAbsent("SCALEMAX", k -> dataAttrs.get("VALIDMAX"));
-        String dataScaleMin = dataAttrs.computeIfAbsent("SCALEMIN", k -> dataAttrs.get("VALIDMIN"));
+        String scaleType = "linear"; //dataAttrs.get("SCALETYP"); -- don't trust value in CDF
+        String dataScaleMax = getAttribute(dataAttrs, "SCALEMAX", "VALIDMAX");
+        String dataScaleMin = getAttribute(dataAttrs, "SCALEMIN", "VALIDMIN");
         String dataUnits = dataAttrs.get("UNITS");
-        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null /*|| dataScaleTyp == null*/ || dataUnits == null) {
+        if (dataFillVal == null || dataScaleMax == null || dataScaleMin == null || dataUnits == null) {
             throw new IOException("Missing attributes for variable " + variableName + ": " + uri);
         }
 
         float[][] values = readCDFVariableFloat(data.variable, parseFloatAttr("FILLVAL", dataFillVal, variableName, uri));
-        // dumpVariableAttrs(data);
-        // dumpValues(dataVals);
 
         int numAxes = values.length;
         if (numAxes == 0) {
@@ -174,38 +167,7 @@ public class BandReaderCdf {
             throw new IOException("Inconsistent lengths of epoch (" + dates.length + ") and data (" + numPoints + ") variables: " + uri);
         }
 
-        String[] labels = new String[numAxes];
-
-        CDFVariable label = null;
-        String labelRef = data.attributes.get("LABL_PTR_1");
-        for (CDFVariable v : variables) {
-            if (v.variable.getName().equals(labelRef)) {
-                label = v;
-                break;
-            }
-        }
-        if (label == null) {
-            String labelAxis = dataAttrs.get("LABLAXIS");
-            if (labelAxis == null || labelAxis.isBlank()) labelAxis = variableName;
-
-            if (numAxes == 1) labels[0] = labelAxis;
-            else {
-                for (int i = 0; i < numAxes; i++)
-                    labels[i] = labelAxis + String.format(" ch_%d", i);
-            }
-        } else {
-            String[][] labelVals = readCDFVariableString(label.variable);
-            // dumpVariableAttrs(label);
-            // dumpValues(labelVals);
-            if (labelVals.length == 0) {
-                throw new IOException("No labels found for variable " + variableName + ": " + uri);
-            }
-            if (labelVals[0].length != numAxes) {
-                throw new IOException("Inconsistent number of labels (" + labelVals[0].length + ") with number of data axes (" + numAxes + "): " + uri);
-            }
-            for (int i = 0; i < numAxes; i++)
-                labels[i] = variableName + ' ' + labelVals[0][i];
-        }
+        String[] labels = readLabels(data, numAxes, variablesByName, uri);
 
         // Temporary
         String datasetId = instrumentName + '_' + variableName;
@@ -226,55 +188,28 @@ public class BandReaderCdf {
 
         DatesValues rebinned = new DatesValues(dates, values).rebin();
         if ("SWA-PAS".equals(instrumentName) && "V_RTN".equals(variableName)) { // replace with velocity modulus
-            int rNumPoints = rebinned.dates().length;
             float[][] rValues = rebinned.values();
-            if (rValues.length < 3)
-                throw new IOException("Expected at least 3 axes for " + datasetId + ", got " + rValues.length + ": " + uri);
-
-            float[][] modValues = new float[1][rNumPoints];
-            for (int i = 0; i < rNumPoints; i++) {
-                float x = rValues[0][i];
-                float y = rValues[1][i];
-                float z = rValues[2][i];
-                if (x == YAxis.BLANK || y == YAxis.BLANK || z == YAxis.BLANK)
-                    modValues[0][i] = YAxis.BLANK;
-                else
-                    modValues[0][i] = (float) Math.sqrt(x * x + y * y + z * z);
-            }
-
+            float[][] modValues = {vectorMagnitude(rValues, datasetId, uri)};
             rebinned = new DatesValues(rebinned.dates(), modValues);
             labels = new String[]{"Speed"};
         } else if ("SWA-PAS".equals(instrumentName) && "N".equals(variableName)) { // show log
             dataUnits = "cm^-3";
-            dataScaleTyp = "logarithmic";
+            scaleType = "logarithmic";
         } else if ("SWA-PAS".equals(instrumentName) && "T".equals(variableName)) { // transform to Kelvin + show log
             int rNumPoints = rebinned.dates().length;
             float[][] rValues = rebinned.values();
             for (int i = 0; i < rNumPoints; i++) {
                 float v = rValues[0][i];
                 if (v != YAxis.BLANK)
-                    rValues[0][i] = (float) (v * eV2K);
+                    rValues[0][i] = (float) (v * EV_TO_KELVIN);
             }
             dataUnits = "K";
-            dataScaleTyp = "logarithmic";
+            scaleType = "logarithmic";
         } else if ("MAG".equals(instrumentName) && variableName.startsWith("B_")) { // prepend column with modulus
-            int rNumPoints = rebinned.dates().length;
             float[][] rValues = rebinned.values();
-            if (rValues.length < 3)
-                throw new IOException("Expected at least 3 axes for " + datasetId + ", got " + rValues.length + ": " + uri);
-
             int rNumAxes = rValues.length;
             float[][] modValues = new float[rNumAxes + 1][];
-            modValues[0] = new float[rNumPoints];
-            for (int i = 0; i < rNumPoints; i++) {
-                float x = rValues[0][i];
-                float y = rValues[1][i];
-                float z = rValues[2][i];
-                if (x == YAxis.BLANK || y == YAxis.BLANK || z == YAxis.BLANK)
-                    modValues[0][i] = YAxis.BLANK;
-                else
-                    modValues[0][i] = (float) Math.sqrt(x * x + y * y + z * z);
-            }
+            modValues[0] = vectorMagnitude(rValues, datasetId, uri);
             System.arraycopy(rValues, 0, modValues, 1, rNumAxes);
             rebinned = new DatesValues(rebinned.dates(), modValues);
 
@@ -283,7 +218,60 @@ public class BandReaderCdf {
             System.arraycopy(labels, 0, modLabels, 1, rNumAxes);
             labels = modLabels;
         }
-        return new CDFData(rebinned, scaleMin, scaleMax, dataScaleTyp, dataUnits, labels);
+        return new DecodedVariable(rebinned, scaleMin, scaleMax, scaleType, dataUnits, labels);
+    }
+
+    private static String[] readLabels(CDFVariable data, int numAxes, Map<String, CDFVariable> variablesByName,
+                                       URI uri) throws IOException {
+        String variableName = data.variable.getName();
+        String[] labels = new String[numAxes];
+        CDFVariable label = variablesByName.get(data.attributes.get("LABL_PTR_1"));
+        if (label == null) {
+            String labelAxis = data.attributes.get("LABLAXIS");
+            if (labelAxis == null || labelAxis.isBlank())
+                labelAxis = variableName;
+
+            if (numAxes == 1) {
+                labels[0] = labelAxis;
+            } else {
+                for (int i = 0; i < numAxes; i++)
+                    labels[i] = labelAxis + String.format(" ch_%d", i);
+            }
+            return labels;
+        }
+
+        String[][] labelValues = readCDFVariableString(label.variable);
+        if (labelValues.length == 0)
+            throw new IOException("No labels found for variable " + variableName + ": " + uri);
+        if (labelValues[0].length != numAxes)
+            throw new IOException("Inconsistent number of labels (" + labelValues[0].length
+                    + ") with number of data axes (" + numAxes + "): " + uri);
+
+        for (int i = 0; i < numAxes; i++)
+            labels[i] = variableName + ' ' + labelValues[0][i];
+        return labels;
+    }
+
+    private static String getAttribute(Map<String, String> attributes, String name, String fallbackName) {
+        String value = attributes.get(name);
+        return value != null ? value : attributes.get(fallbackName);
+    }
+
+    private static float[] vectorMagnitude(float[][] values, String datasetId, URI uri) throws IOException {
+        if (values.length < 3)
+            throw new IOException("Expected at least 3 axes for " + datasetId + ", got " + values.length + ": " + uri);
+
+        int length = values[0].length;
+        float[] magnitude = new float[length];
+        for (int i = 0; i < length; i++) {
+            float x = values[0][i];
+            float y = values[1][i];
+            float z = values[2][i];
+            magnitude[i] = x == YAxis.BLANK || y == YAxis.BLANK || z == YAxis.BLANK
+                    ? YAxis.BLANK
+                    : (float) Math.sqrt(x * x + y * y + z * z);
+        }
+        return magnitude;
     }
 
     private static String[][] readCDFVariableString(Variable v) throws IOException {
@@ -319,17 +307,7 @@ public class BandReaderCdf {
         String variableName = v.getName();
 
         float[][] ret = new float[numAxes][numPoints];
-        if (numPoints == 0) return ret;
-
-        v.readRawRecord(0, abuf);
-        try {
-            for (int i = 0; i < numAxes; i++)
-                ret[i][0] = fill(dataType.getScalar(abuf, i), fillVal);
-        } catch (Exception e) {
-            throw new IOException("Invalid numeric value for variable " + variableName, e);
-        }
-
-        for (int j = 1; j < numPoints; j++) {
+        for (int j = 0; j < numPoints; j++) {
             v.readRawRecord(j, abuf);
             int len = Array.getLength(abuf);
             if (len != numAxes)
@@ -344,25 +322,5 @@ public class BandReaderCdf {
         }
         return ret;
     }
-/*
-    private static void dumpGlobalAttrs(LinkedListMultimap<String, String> map) {
-        for (String key : map.keySet()) {
-            System.out.println(">>> " + key);
-            System.out.println("\t" + String.join("\n\t", map.get(key)));
-        }
-    }
 
-    private static void dumpVariableAttrs(CDFVariable v) {
-        System.out.println(">>> " + v.variable.getName());
-        for (Map.Entry<String, String> entry : v.attributes.entrySet()) {
-            System.out.println("\t" + entry.getKey() + ' ' + entry.getValue());
-        }
-    }
-
-    private static void dumpValues(String[][] vals) {
-        for (String[] val : vals) {
-            System.out.println("\t\t" + String.join(" ", val));
-        }
-    }
-*/
 }
