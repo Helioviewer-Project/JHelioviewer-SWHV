@@ -3,8 +3,12 @@ package org.helioviewer.jhv.timelines.band;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.Interval;
 
@@ -12,6 +16,11 @@ import com.google.common.collect.ArrayListMultimap;
 
 final class BandDownloads {
 
+    private static final int DOWNLOAD_THREADS = 8;
+    private static final ThreadPoolExecutor downloadPool = new ThreadPoolExecutor(
+            DOWNLOAD_THREADS, DOWNLOAD_THREADS, 0, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(),
+            new AppThread.NamedThreadFactory("Timeline-Download"));
     private static final ArrayListMultimap<Band, Future<BandData>> workers = ArrayListMultimap.create();
 
     private static void pruneFinished(Band band) {
@@ -27,7 +36,7 @@ final class BandDownloads {
         String baseUrl = band.getBandType().getBaseUrl();
         pruneFinished(band);
         for (Interval interval : intervals) {
-            Future<BandData> download = Task.submit(baseUrl,
+            Future<BandData> download = Task.submit(downloadPool, baseUrl,
                     BandReaderHapi.dataRequest(baseUrl, interval.start(), interval.end()),
                     data -> acceptData(band, data),
                     (logContext, t) -> downloadFailed(band, interval, t));
@@ -39,6 +48,7 @@ final class BandDownloads {
     static void stop(Band band) {
         workers.get(band).forEach(worker -> worker.cancel(true));
         workers.removeAll(band);
+        downloadPool.purge();
     }
 
     static boolean isActive(Band band) {
