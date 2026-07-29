@@ -2,45 +2,33 @@
 #import <dispatch/dispatch.h>
 #import <jawt_md.h>
 #import <Metal/Metal.h>
-#import <QuartzCore/CATransaction.h>
 #import <QuartzCore/CAMetalLayer.h>
 
 @interface JHVMetalHostBox : NSObject
-@property(nonatomic, strong) CALayer *windowLayer;
+@property(nonatomic, strong) id<JAWT_SurfaceLayers> surfaceLayers;
+@property(nonatomic, strong) CALayer *rootLayer;
 @property(nonatomic, strong) CAMetalLayer *metalLayer;
 @end
 
 @implementation JHVMetalHostBox
 @end
 
-static void jhv_run_without_actions(void (^block)(void)) {
-    [CATransaction begin];
-    [CATransaction setDisableActions:YES];
-    block();
-    [CATransaction commit];
-}
-
-static void jhv_set_metal_layer_frame(CAMetalLayer *metalLayer, CGRect frame) {
-    jhv_run_without_actions(^{
-        if (!CGRectEqualToRect(metalLayer.frame, frame))
-            metalLayer.frame = frame;
-
-        CGSize drawableSize = CGSizeMake(frame.size.width * metalLayer.contentsScale, frame.size.height * metalLayer.contentsScale);
-        if (!CGSizeEqualToSize(metalLayer.drawableSize, drawableSize))
-            metalLayer.drawableSize = drawableSize;
-    });
-}
-
-static CAMetalLayer *jhv_create_metal_layer(id<MTLDevice> device, CGFloat contentsScale, CGRect frame) {
+static CAMetalLayer *jhv_create_metal_layer(CGFloat contentsScale, CGSize size) {
     CAMetalLayer *metalLayer = [CAMetalLayer layer];
-    metalLayer.device = device;
-    metalLayer.pixelFormat = MTLPixelFormatBGRA8Unorm;
-    metalLayer.framebufferOnly = NO;
     metalLayer.opaque = YES;
     metalLayer.contentsScale = contentsScale;
     metalLayer.contentsGravity = kCAGravityCenter;
-    jhv_set_metal_layer_frame(metalLayer, frame);
+    metalLayer.frame = CGRectMake(0.0, 0.0, size.width, size.height);
+    metalLayer.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
     return metalLayer;
+}
+
+static CALayer *jhv_create_root_layer(CAMetalLayer *metalLayer, CGRect frame) {
+    CALayer *rootLayer = [CALayer layer];
+    rootLayer.masksToBounds = YES;
+    rootLayer.frame = frame;
+    [rootLayer addSublayer:metalLayer];
+    return rootLayer;
 }
 
 static void jhv_run_on_main_sync(void (^block)(void)) {
@@ -73,8 +61,6 @@ static id<JAWT_SurfaceLayers> jhv_surface_layers(void *surfaceLayersPtr) {
 }
 
 static CGFloat jhv_layer_y(CALayer *windowLayer, double y, double height) {
-    if (windowLayer == nil)
-        return 0.0;
     return windowLayer.geometryFlipped ? y : (windowLayer.bounds.size.height - y - height);
 }
 
@@ -118,42 +104,28 @@ void *jhv_metal_host_create(void *surfaceLayersPtr, double x, double y, double w
             if (windowLayer == nil)
                 return;
 
-            id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-            if (device == nil)
-                return;
-
             JHVMetalHostBox *box = [JHVMetalHostBox new];
-            CGFloat layerY = jhv_layer_y(windowLayer, y, height);
             CGFloat windowScale = jhv_window_scale(windowLayer);
-            CGRect frame = CGRectMake(x, layerY, width, height);
-            box.windowLayer = windowLayer;
-            box.metalLayer = jhv_create_metal_layer(device, windowScale, frame);
-            [windowLayer addSublayer:box.metalLayer];
+            CGRect frame = CGRectMake(x, jhv_layer_y(windowLayer, y, height), width, height);
+            box.surfaceLayers = surfaceLayers;
+            box.metalLayer = jhv_create_metal_layer(windowScale, frame.size);
+            box.rootLayer = jhv_create_root_layer(box.metalLayer, frame);
+            surfaceLayers.layer = box.rootLayer;
             result = (__bridge_retained void *)box;
         }
     });
     return result;
 }
 
-void jhv_metal_host_set_frame(void *boxPtr, double x, double y, double width, double height) {
+void jhv_metal_host_set_scale(void *boxPtr, double scale) {
     if (boxPtr == NULL)
         return;
 
     JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
-    CFRetain((__bridge CFTypeRef)box);
-    jhv_run_on_main_async(^{
+    jhv_run_on_main_sync(^{
         @autoreleasepool {
-            JHVMetalHostBox *retainedBox = box;
-            @try {
-                CGFloat layerY = jhv_layer_y(retainedBox.windowLayer, y, height);
-                CGFloat windowScale = jhv_window_scale(retainedBox.windowLayer);
-                if (retainedBox.metalLayer.contentsScale != windowScale)
-                    retainedBox.metalLayer.contentsScale = windowScale;
-                CGRect frame = CGRectMake(x, layerY, width, height);
-                jhv_set_metal_layer_frame(retainedBox.metalLayer, frame);
-            } @finally {
-                CFRelease((__bridge CFTypeRef)retainedBox);
-            }
+            if (box.metalLayer.contentsScale != scale)
+                box.metalLayer.contentsScale = scale;
         }
     });
 }
@@ -163,12 +135,9 @@ void jhv_metal_host_set_visible(void *boxPtr, int visible) {
         return;
 
     JHVMetalHostBox *box = (__bridge JHVMetalHostBox *)boxPtr;
-    CFRetain((__bridge CFTypeRef)box);
     jhv_run_on_main_async(^{
         @autoreleasepool {
-            JHVMetalHostBox *retainedBox = box;
-            retainedBox.metalLayer.hidden = visible == 0;
-            CFRelease((__bridge CFTypeRef)retainedBox);
+            box.metalLayer.hidden = visible == 0;
         }
     });
 }
@@ -188,7 +157,8 @@ void jhv_metal_host_destroy(void *boxPtr) {
     jhv_run_on_main_sync(^{
         @autoreleasepool {
             JHVMetalHostBox *box = (__bridge_transfer JHVMetalHostBox *)boxPtr;
-            [box.metalLayer removeFromSuperlayer];
+            if (box.surfaceLayers.layer == box.rootLayer)
+                box.surfaceLayers.layer = nil;
         }
     });
 }

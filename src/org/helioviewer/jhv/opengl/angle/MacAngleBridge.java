@@ -25,9 +25,8 @@ public final class MacAngleBridge {
                     ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
     private static final MethodHandle GET_LAYER = downcall("jhv_metal_host_get_layer",
             FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-    private static final MethodHandle SET_FRAME = downcall("jhv_metal_host_set_frame",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
-                    ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
+    private static final MethodHandle SET_SCALE = downcall("jhv_metal_host_set_scale",
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE));
     private static final MethodHandle SET_VISIBLE = downcall("jhv_metal_host_set_visible",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
     private static final MethodHandle DESTROY = downcall("jhv_metal_host_destroy",
@@ -65,11 +64,8 @@ public final class MacAngleBridge {
 
                 MemorySegment metalHost = MemorySegment.ofAddress(handle);
                 long layer = ((MemorySegment) GET_LAYER.invokeExact(metalHost)).address();
-                if (layer == 0L) {
-                    DESTROY.invokeExact(metalHost);
-                    handle = 0L;
+                if (layer == 0L)
                     throw new IllegalStateException("Metal host did not expose a CAMetalLayer");
-                }
                 return new Host(handle, layer);
             } catch (Throwable t) {
                 if (handle != 0L)
@@ -79,12 +75,12 @@ public final class MacAngleBridge {
         });
     }
 
-    public static void setFrame(long handle, double x, double y, double width, double height) {
+    public static void setScale(long handle, double scale) {
         try {
             MemorySegment metalHost = MemorySegment.ofAddress(handle);
-            SET_FRAME.invokeExact(metalHost, x, y, width, height);
+            SET_SCALE.invokeExact(metalHost, scale);
         } catch (Throwable t) {
-            throw new RuntimeException("Failed to resize Metal host layer", t);
+            throw new RuntimeException("Failed to scale Metal host layer", t);
         }
     }
 
