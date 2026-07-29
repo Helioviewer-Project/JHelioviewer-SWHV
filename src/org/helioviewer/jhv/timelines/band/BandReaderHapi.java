@@ -181,13 +181,11 @@ public class BandReaderHapi {
     private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types,
                            Map<String, List<BandType>> predefinedGroups) {}
 
-    private record Dataset(String id, List<BandReader> readers, long start, long stop) {}
+    private record Dataset(List<BandReader> readers, long start, long stop) {}
 
     private record BandParameter(BandReader reader, long start, long stop) {}
 
     private record BandReader(BandType type, HapiTableReader tableReader) {}
-
-    private record Parameter(String name, String units, JSONObject jhvparams) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -255,54 +253,47 @@ public class BandReaderHapi {
         if (jaParameters == null)
             throw new Exception("Missing parameters object");
 
-        int numParameters = jaParameters.length();
-        List<Parameter> parameters = new ArrayList<>(numParameters);
-        for (int j = 0; j < numParameters; j++) {
-            JSONObject joParameter = jaParameters.optJSONObject(j);
-            if (joParameter == null)
-                continue;
-            parameters.add(getParameter(joParameter));
-        }
-        if (parameters.size() < 2)
+        HapiParam[] params = HapiInfo.fromJson(jo).getParameters();
+        if (params.length < 2)
             throw new Exception("At least two parameters should be present");
-        if (!"time".equalsIgnoreCase(parameters.getFirst().name))
+        if (!"time".equalsIgnoreCase(params[0].getName()))
             throw new Exception("First parameter should be time");
 
-        HapiInfo info = HapiInfo.fromJson(jo);
-        HapiParam[] params = info.getParameters();
-
-        int numAxes = parameters.size() - 1;
-        List<BandReader> readers = new ArrayList<>(numAxes);
-        for (int i = 1; i <= numAxes; i++) {
+        List<BandReader> readers = new ArrayList<>(params.length - 1);
+        for (int i = 1; i < params.length; i++) {
             HapiParam valueParam = params[i];
-            HapiType<?, ?> valueType = valueParam.getType();
-            if (valueType != HapiType.DOUBLE && valueType != HapiType.INTEGER)
+            if (!isNumericScalar(valueParam))
                 continue;
 
-            Parameter p = parameters.get(i);
+            JSONObject joParameter = jaParameters.getJSONObject(i);
+            String name = Objects.requireNonNullElse(valueParam.getName(), "unknown");
             UriTemplate.Variables request = UriTemplate.vars();
             if (id != null)
                 request.set(version.getDatasetRequestParam(), id)
                         .set("format", hapiFormat)
-                        .set("parameters", p.name);
-            JSONObject jobt = getBandOptions(p.jhvparams).
+                        .set("parameters", name);
+            JSONObject jobt = getBandOptions(joParameter.optJSONObject("jhvparams")).
                     put("baseUrl", new UriTemplate(urlData).expand(request)).
-                    put("unitLabel", p.units).
-                    put("name", id == null ? p.name : id + ' ' + p.name).
-                    put("label", title == null ? p.name : title + ' ' + p.name);
+                    put("unitLabel", getUnit(valueParam)).
+                    put("name", id == null ? name : id + ' ' + name).
+                    put("label", title == null ? name : title + ' ' + name);
 
             HapiParam[] typeParams = new HapiParam[]{params[0], valueParam};
             readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
         }
-        return new Dataset(id, readers, start, stop);
+        return new Dataset(readers, start, stop);
     }
 
-    private static Parameter getParameter(JSONObject jo) throws Exception {
-        if (jo.optJSONArray("bins") != null)
-            throw new Exception("Bins not supported");
-        if (jo.optJSONArray("size") != null)
-            throw new Exception("Only scalars supported");
-        return new Parameter(jo.optString("name", "unknown"), jo.optString("units", "unknown"), jo.optJSONObject("jhvparams"));
+    private static boolean isNumericScalar(HapiParam param) {
+        HapiType<?, ?> type = param.getType();
+        return (type == HapiType.DOUBLE || type == HapiType.INTEGER)
+                && param.getSize() == null
+                && param.getBins() == null;
+    }
+
+    private static String getUnit(HapiParam param) {
+        String[] units = param.getUnits();
+        return units == null || units.length == 0 || units[0] == null ? "unknown" : units[0];
     }
 
     private static JSONObject getBandOptions(@Nullable JSONObject jhvparams) {
