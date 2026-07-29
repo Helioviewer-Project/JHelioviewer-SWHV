@@ -15,7 +15,6 @@ import java.util.List;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.TimelineLayer;
-import org.helioviewer.jhv.timelines.TimelineLayers;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.GraphGeometry;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
@@ -42,7 +41,7 @@ final class TimelineLabelPainter {
         }
     }
 
-    void drawMouseValues(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, Point mousePosition) {
+    void drawMouseValues(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis, Point mousePosition, List<TimelineLayer> layers) {
         g.setFont(DrawConstants.font);
         Rectangle graphArea = geometry.area();
         if (mousePosition == null || !graphArea.contains(mousePosition))
@@ -55,7 +54,7 @@ final class TimelineLabelPainter {
         g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
         int currWidth = drawString(g, "(" + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts), x, y);
 
-        for (TimelineLayer tl : TimelineLayers.get()) {
+        for (TimelineLayer tl : layers) {
             if (!tl.isEnabled()) {
                 continue;
             }
