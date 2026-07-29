@@ -94,7 +94,7 @@ public class BandReaderHapi {
         return () -> getHapiStream(dataset, schema, start, end);
     }
 
-    static BandData readUri(URI uri) throws Exception {
+    static List<BandData> readUri(URI uri) throws Exception {
         return getHapiUri(uri);
     }
 
@@ -391,7 +391,7 @@ public class BandReaderHapi {
         }
     }
 
-    private static BandData getHapiLocalCSV(DataUri dataUri) throws Exception {
+    private static List<BandData> getHapiLocalCSV(DataUri dataUri) throws Exception {
         URI uri = dataUri.uri();
         try (NetClient nc = NetClient.of(uri)) {
             InputStream in = nc.getStream();
@@ -416,9 +416,7 @@ public class BandReaderHapi {
                 valueColumn += ParamReader.createReader(params[i]).getColumnCount();
             BandDecoder decoder = new BandDecoder(type, valueColumn);
 
-            List<BandData> data = readBands(List.of(decoder), new HapiTableReader(params),
-                    in, (byte) overread1[0], fmt);
-            return data.isEmpty() ? null : data.getFirst();
+            return readBands(List.of(decoder), new HapiTableReader(params), in, (byte) overread1[0], fmt);
         }
     }
 
@@ -487,7 +485,7 @@ public class BandReaderHapi {
         return jo;
     }
 
-    private static BandData getHapiUri(URI uri) throws Exception { // tbd
+    private static List<BandData> getHapiUri(URI uri) throws Exception { // tbd
         DataUri dataUri = NetFileCache.get(uri);
         return switch (dataUri.format()) {
             case DataUri.Format.Image.ZIP -> loadZIP(dataUri);
@@ -496,7 +494,7 @@ public class BandReaderHapi {
         };
     }
 
-    private static BandData loadZIP(DataUri dataUri) throws Exception {
+    private static List<BandData> loadZIP(DataUri dataUri) throws Exception {
         List<URI> uriList = FileUtils.unZip(dataUri.uri());
         if (uriList.size() != 1)
             throw new Exception("Only one CSV file per zip supported");

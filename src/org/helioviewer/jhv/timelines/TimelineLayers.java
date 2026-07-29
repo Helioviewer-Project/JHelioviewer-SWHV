@@ -87,10 +87,24 @@ public class TimelineLayers extends AbstractTableModel {
         return changed;
     }
 
-    public void updateRow(TimelineLayer tl) {
-        int row = layers.indexOf(tl);
+    private void updateRow(TimelineLayer layer) {
+        int row = layers.indexOf(layer);
         if (row >= 0)
             fireTableRowsUpdated(row, row);
+    }
+
+    public void updateRows(Collection<? extends TimelineLayer> changedLayers) {
+        int firstRow = layers.size();
+        int lastRow = -1;
+        for (TimelineLayer layer : changedLayers) {
+            int row = layers.indexOf(layer);
+            if (row >= 0) {
+                firstRow = Math.min(firstRow, row);
+                lastRow = Math.max(lastRow, row);
+            }
+        }
+        if (lastRow >= 0)
+            fireTableRowsUpdated(firstRow, lastRow);
     }
 
     private Band getOrCreateBand(BandType bandType) {
@@ -98,29 +112,25 @@ public class TimelineLayers extends AbstractTableModel {
         return band == null ? new Band(bandType) : band;
     }
 
-    public Band addBand(BandType bandType) {
-        Band band = getOrCreateBand(bandType);
-        add(band);
-        return band;
-    }
-
-    public void addBands(List<BandType> bandTypes) {
+    public List<Band> addBands(List<BandType> bandTypes) {
         int firstRow = layers.size();
+        ArrayList<Band> bands = new ArrayList<>(bandTypes.size());
         ArrayList<Band> added = new ArrayList<>();
         for (BandType bandType : bandTypes) {
             Band band = getOrCreateBand(bandType);
+            bands.add(band);
             if (containsLayer(layers, band))
                 continue;
             layers.add(band);
             configureLayer(band);
             added.add(band);
         }
-        if (added.isEmpty())
-            return;
-
-        fireTableRowsInserted(firstRow, layers.size() - 1);
-        DrawController.layoutChanged();
-        added.forEach(layer -> layer.fetchData(DrawController.selectedAxis));
+        if (!added.isEmpty()) {
+            fireTableRowsInserted(firstRow, layers.size() - 1);
+            DrawController.layoutChanged();
+            added.forEach(layer -> layer.fetchData(DrawController.selectedAxis));
+        }
+        return bands;
     }
 
     public void add(TimelineLayer tl) {
