@@ -80,7 +80,7 @@ public final class YAxis {
     }
 
     public String getLabel() {
-        return scale.getLabel();
+        return scale.label();
     }
 
     public void shiftDownPixels(double distanceY, int height) {
@@ -151,17 +151,27 @@ public final class YAxis {
 
     public interface YAxisScale {
 
-        boolean preferMax();
+        String label();
 
-        float getMin();
+        default boolean preferMax() {
+            return false;
+        }
 
-        float getMax();
+        default float getMin() {
+            return DISCARD_LEVEL_LINEAR_LOW;
+        }
 
-        double scale(double val);
+        default float getMax() {
+            return DISCARD_LEVEL_HIGH;
+        }
 
-        double invScale(double val);
+        default double scale(double val) {
+            return val;
+        }
 
-        String getLabel();
+        default double invScale(double val) {
+            return val;
+        }
 
     }
 
@@ -200,11 +210,6 @@ public final class YAxis {
         }
 
         @Override
-        public float getMax() {
-            return DISCARD_LEVEL_HIGH;
-        }
-
-        @Override
         public double scale(double val) {
             return Math.log10(val);
         }
@@ -214,46 +219,12 @@ public final class YAxis {
             return Math.pow(10, val);
         }
 
-        @Override
-        public String getLabel() {
-            return label;
-        }
     }
 
     public record YAxisIdentityScale(String label) implements YAxisScale {
 
         public YAxisIdentityScale {
             label = fixupUnit(label);
-        }
-
-        @Override
-        public boolean preferMax() {
-            return false;
-        }
-
-        @Override
-        public float getMin() {
-            return DISCARD_LEVEL_LINEAR_LOW;
-        }
-
-        @Override
-        public float getMax() {
-            return DISCARD_LEVEL_HIGH;
-        }
-
-        @Override
-        public double scale(double val) {
-            return val;
-        }
-
-        @Override
-        public double invScale(double val) {
-            return val;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
         }
 
     }
@@ -272,26 +243,6 @@ public final class YAxis {
         @Override
         public float getMin() {
             return 0;
-        }
-
-        @Override
-        public float getMax() {
-            return DISCARD_LEVEL_HIGH;
-        }
-
-        @Override
-        public double scale(double val) {
-            return val;
-        }
-
-        @Override
-        public double invScale(double val) {
-            return val;
-        }
-
-        @Override
-        public String getLabel() {
-            return label;
         }
 
     }
