@@ -10,6 +10,7 @@ import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.timelines.band.BandDataset;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
 import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.chart.PlotPanel;
@@ -42,9 +43,12 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
         BandReaderHapi.requestCatalog(Timelines::catalogsLoaded);
     }
 
-    private static void catalogsLoaded(Map<String, BandType[]> catalogs) {
-        catalogs.forEach((group, bandTypes) -> {
-            td.setupDataset(group, bandTypes);
+    private static void catalogsLoaded(Map<String, BandDataset[]> catalogs) {
+        catalogs.forEach((group, datasets) -> {
+            td.setupDataset(group, datasets);
+            List<BandType> bandTypes = new ArrayList<>();
+            for (BandDataset dataset : datasets)
+                bandTypes.addAll(dataset.bandTypes());
             TimelineLayers.fetchBands(bandTypes, DrawController.selectedAxis);
         });
         timelinePanel.setPredefinedGroups(BandReaderHapi.getPredefinedGroups());

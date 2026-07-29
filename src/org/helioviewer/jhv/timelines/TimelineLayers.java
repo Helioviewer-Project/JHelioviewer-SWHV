@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,10 +72,9 @@ public class TimelineLayers extends AbstractTableModel {
         }
     }
 
-    public static void fetchBands(BandType[] bandTypes, TimeAxis timeAxis) {
-        List<BandType> types = List.of(bandTypes);
+    public static void fetchBands(Collection<BandType> bandTypes, TimeAxis timeAxis) {
         for (TimelineLayer layer : layers) {
-            if (layer.isEnabled() && layer instanceof Band band && types.contains(band.getBandType()))
+            if (layer.isEnabled() && layer instanceof Band band && bandTypes.contains(band.getBandType()))
                 band.fetchData(timeAxis);
         }
     }
@@ -102,6 +102,25 @@ public class TimelineLayers extends AbstractTableModel {
         Band band = getOrCreateBand(bandType);
         add(band);
         return band;
+    }
+
+    public void addBands(List<BandType> bandTypes) {
+        int firstRow = layers.size();
+        ArrayList<Band> added = new ArrayList<>();
+        for (BandType bandType : bandTypes) {
+            Band band = getOrCreateBand(bandType);
+            if (containsLayer(layers, band))
+                continue;
+            layers.add(band);
+            configureLayer(band);
+            added.add(band);
+        }
+        if (added.isEmpty())
+            return;
+
+        fireTableRowsInserted(firstRow, layers.size() - 1);
+        DrawController.layoutChanged();
+        added.forEach(layer -> layer.fetchData(DrawController.selectedAxis));
     }
 
     public void add(TimelineLayer tl) {

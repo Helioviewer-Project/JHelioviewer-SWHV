@@ -48,8 +48,7 @@ public final class Band extends TimelineLayer {
 
     private static final GraphData EMPTY_GRAPH_DATA = new EmptyGraph();
     private static final Colors.Data bandColors = new Colors.Data();
-    private static final int GRAPH_THREADS =
-            Math.max(1, Math.min(8, Runtime.getRuntime().availableProcessors() - 1));
+    private static final int GRAPH_THREADS = Math.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 8);
     private static final ExecutorService graphPool =
             Executors.newFixedThreadPool(GRAPH_THREADS, new AppThread.NamedThreadFactory("Timeline-Graph"));
 
