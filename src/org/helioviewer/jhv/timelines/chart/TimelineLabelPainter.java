@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.timelines.chart;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -128,7 +129,7 @@ final class TimelineLabelPainter {
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
 
         if (stripArea.y < y && y < stripArea.y + stripArea.height) {
-            java.awt.Color lineColor = g.getColor();
+            Color lineColor = g.getColor();
             g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
             g.drawLine(axisX + 1, y, stripArea.x + stripArea.width, y);
             g.setColor(lineColor);
@@ -269,7 +270,7 @@ final class TimelineLabelPainter {
         int xText;
         if (leftSide == -1) {
             xText = axisX - 6 - (int) bounds.getWidth();
-            java.awt.Color lineColor = g.getColor();
+            Color lineColor = g.getColor();
             g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
             g.drawLine(axisX - 3, y, graphArea.x + graphArea.width, y);
             g.setColor(lineColor);

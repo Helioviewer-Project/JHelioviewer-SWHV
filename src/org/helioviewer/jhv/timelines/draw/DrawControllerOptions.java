@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.draw;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.Objects;
 
 import javax.swing.JComboBox;
@@ -68,7 +69,7 @@ class DrawControllerOptions extends JPanel {
 
         statusLabel = new JLabel("", JLabel.RIGHT);
 
-        JPanel togglePanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         togglePanel.add(stackedButton);
         togglePanel.add(zoomCombo);
         togglePanel.add(lockButton);

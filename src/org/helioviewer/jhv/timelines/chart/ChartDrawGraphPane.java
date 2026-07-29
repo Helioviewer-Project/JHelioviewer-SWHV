@@ -254,22 +254,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
             setCursor(Cursor.getDefaultCursor());
         }
 
-        if (geometry.isStacked()) {
-            boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
-            if (eventHighlightChanged) {
-                drawRequest();
-            } else {
-                repaint();
-            }
-        } else {
-            boolean axisHighlightChanged = DrawController.setYAxisHighlight(geometry.yAxisHit(mousePosition));
-            boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
-            if (axisHighlightChanged || eventHighlightChanged) {
-                drawRequest();
-            } else {
-                repaint();
-            }
-        }
+        boolean axisHighlightChanged = !geometry.isStacked()
+                && DrawController.setYAxisHighlight(geometry.yAxisHit(mousePosition));
+        boolean eventHighlightChanged = TimelineLayers.highlightChanged(mousePosition);
+        if (axisHighlightChanged || eventHighlightChanged)
+            drawRequest();
+        else
+            repaint();
     }
 
     @Override

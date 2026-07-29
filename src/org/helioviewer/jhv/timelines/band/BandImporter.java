@@ -85,8 +85,8 @@ public final class BandImporter {
         }
     }
 
-    private static void onFailure(String ignoredLogContext, Throwable t) {
-        Log.error(t);
+    private static void onFailure(String logContext, Throwable t) {
+        Log.error(logContext, t);
     }
 
     private BandImporter() {}
