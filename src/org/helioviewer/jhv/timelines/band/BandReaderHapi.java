@@ -36,6 +36,7 @@ import uk.ac.starlink.hapi.HapiParam;
 import uk.ac.starlink.hapi.HapiTableReader;
 import uk.ac.starlink.hapi.HapiType;
 import uk.ac.starlink.hapi.HapiVersion;
+import uk.ac.starlink.hapi.ParamReader;
 import uk.ac.starlink.hapi.Times;
 import uk.ac.starlink.table.RowSequence;
 
@@ -185,7 +186,7 @@ public class BandReaderHapi {
 
     private record BandParameter(BandReader reader, long start, long stop) {}
 
-    private record BandReader(BandType type, HapiTableReader tableReader) {}
+    private record BandReader(BandType type, HapiTableReader tableReader, int valueColumn) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -249,15 +250,8 @@ public class BandReaderHapi {
             stop = Math.min(stop, toMillis(stopDate));
         }
 
-        JSONArray jaParameters = jo.optJSONArray("parameters");
-        if (jaParameters == null)
-            throw new Exception("Missing parameters object");
-
-        HapiParam[] params = HapiInfo.fromJson(jo).getParameters();
-        if (params.length < 2)
-            throw new Exception("At least two parameters should be present");
-        if (!"time".equalsIgnoreCase(params[0].getName()))
-            throw new Exception("First parameter should be time");
+        HapiParam[] params = getParameters(jo);
+        JSONArray jaParameters = jo.getJSONArray("parameters");
 
         List<BandReader> readers = new ArrayList<>(params.length - 1);
         for (int i = 1; i < params.length; i++) {
@@ -272,16 +266,24 @@ public class BandReaderHapi {
                 request.set(version.getDatasetRequestParam(), id)
                         .set("format", hapiFormat)
                         .set("parameters", name);
-            JSONObject jobt = getBandOptions(joParameter.optJSONObject("jhvparams")).
-                    put("baseUrl", new UriTemplate(urlData).expand(request)).
-                    put("unitLabel", getUnit(valueParam)).
-                    put("name", id == null ? name : id + ' ' + name).
-                    put("label", title == null ? name : title + ' ' + name);
-
+            String baseUrl = new UriTemplate(urlData).expand(request);
+            BandType type = createBandType(baseUrl, id, title, joParameter, valueParam);
             HapiParam[] typeParams = new HapiParam[]{params[0], valueParam};
-            readers.add(new BandReader(new BandType(jobt), new HapiTableReader(typeParams)));
+            readers.add(new BandReader(type, new HapiTableReader(typeParams), 1));
         }
         return new Dataset(readers, start, stop);
+    }
+
+    private static HapiParam[] getParameters(JSONObject jo) throws Exception {
+        if (jo.optJSONArray("parameters") == null)
+            throw new Exception("Missing parameters object");
+
+        HapiParam[] params = HapiInfo.fromJson(jo).getParameters();
+        if (params.length < 2)
+            throw new Exception("At least two parameters should be present");
+        if (!"time".equalsIgnoreCase(params[0].getName()))
+            throw new Exception("First parameter should be time");
+        return params;
     }
 
     private static boolean isNumericScalar(HapiParam param) {
@@ -294,6 +296,17 @@ public class BandReaderHapi {
     private static String getUnit(HapiParam param) {
         String[] units = param.getUnits();
         return units == null || units.length == 0 || units[0] == null ? "unknown" : units[0];
+    }
+
+    private static BandType createBandType(String baseUrl, @Nullable String id, @Nullable String title,
+                                           JSONObject joParameter, HapiParam param) {
+        String name = Objects.requireNonNullElse(param.getName(), "unknown");
+        JSONObject options = getBandOptions(joParameter.optJSONObject("jhvparams")).
+                put("baseUrl", baseUrl).
+                put("unitLabel", getUnit(param)).
+                put("name", id == null ? name : id + ' ' + name).
+                put("label", title == null ? name : title + ' ' + name);
+        return new BandType(options);
     }
 
     private static JSONObject getBandOptions(@Nullable JSONObject jhvparams) {
@@ -327,7 +340,7 @@ public class BandReaderHapi {
         String uri = baseUrl + request.expand("");
 
         try (NetClient nc = NetClient.of(new URI(uri), false, NetClient.NetCache.NETWORK)) {
-            return readBand(parameter.reader.type, parameter.reader.tableReader, nc.getStream(), null, hapiFormat);
+            return readBand(parameter.reader, nc.getStream(), null, hapiFormat);
         }
     }
 
@@ -342,25 +355,35 @@ public class BandReaderHapi {
                 throw new Exception("Could not read HAPI info from " + uri);
             JSONObject jo = new JSONObject(jsonText);
             String fmt = jo.optString("format", "csv");
-            // not catalog, thus no 'id' nor 'title'
-            Dataset dataset = getDataset(HapiVersion.ASSUMED, uri.toString(), null, null, jo);
-            BandReader reader = dataset.readers.getFirst();
+            HapiParam[] params = getParameters(jo);
+            int parameterIndex = 1;
+            while (parameterIndex < params.length && !isNumericScalar(params[parameterIndex]))
+                parameterIndex++;
+            if (parameterIndex == params.length)
+                throw new Exception("No numeric scalar HAPI parameters");
 
-            return readBand(reader.type, reader.tableReader, in, (byte) overread1[0], fmt);
+            JSONObject joParameter = jo.getJSONArray("parameters").getJSONObject(parameterIndex);
+            BandType type = createBandType(uri.toString(), null, null, joParameter, params[parameterIndex]);
+            int valueColumn = 0;
+            for (int i = 0; i < parameterIndex; i++)
+                valueColumn += ParamReader.createReader(params[i]).getColumnCount();
+            BandReader reader = new BandReader(type, new HapiTableReader(params), valueColumn);
+
+            return readBand(reader, in, (byte) overread1[0], fmt);
         }
     }
 
-    private static BandData readBand(BandType type, HapiTableReader tableReader, InputStream in, Byte byte0, String fmt) throws Exception {
+    private static BandData readBand(BandReader reader, InputStream in, Byte byte0, String fmt) throws Exception {
         List<Long> dateList = new ArrayList<>();
         List<Float> valueList = new ArrayList<>();
-        try (RowSequence rseq = tableReader.createRowSequence(in, byte0, fmt)) {
+        try (RowSequence rseq = reader.tableReader.createRowSequence(in, byte0, fmt)) {
             while (rseq.next()) {
                 String time = (String) rseq.getCell(0);
                 if (time == null) // fill
                     continue;
                 dateList.add(toMillis(time));
 
-                Number value = (Number) rseq.getCell(1);
+                Number value = (Number) rseq.getCell(reader.valueColumn);
                 float f = value == null ? YAxis.BLANK : value.floatValue();
                 valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
             }
@@ -372,11 +395,11 @@ public class BandReaderHapi {
 
         long[] dates = longArray(numPoints, dateList);
         float[] values = floatArray(numPoints, valueList);
-        DatesValues dvs = type.isBarPlot()
+        DatesValues dvs = reader.type.isBarPlot()
                 ? new DatesValues(dates, new float[][]{values})
                 : new DatesValues(dates, new float[][]{values}).rebin();
 
-        return new BandData(type, dvs.dates(), dvs.values()[0]);
+        return new BandData(reader.type, dvs.dates(), dvs.values()[0]);
     }
 
     private static long[] longArray(int numPoints, List<Long> dateList) {
