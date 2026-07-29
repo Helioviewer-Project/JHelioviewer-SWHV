@@ -237,7 +237,7 @@ public class BandReaderHapi {
         return new Catalog(version, parameters, typeArray, createPredefinedGroups(typeArray));
     }
 
-    private static Dataset getDataset(HapiVersion version, String urlData, @Nullable String id, @Nullable String title, JSONObject jo) throws Exception {
+    private static Dataset getDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {
         long start = TimeUtils.MINIMAL_TIME.milli;
         long stop = TimeUtils.MAXIMAL_TIME.milli;
         String startDate = jo.optString("startDate", null);
@@ -253,7 +253,7 @@ public class BandReaderHapi {
         List<BandDecoder> decoders = new ArrayList<>(params.length - 1);
         for (int i = 1; i < params.length; i++) {
             HapiParam valueParam = params[i];
-            if (isUnsupportedParameter(valueParam))
+            if (isUnsupportedValueParameter(valueParam))
                 continue;
 
             String name = valueParam.getName();
@@ -261,11 +261,10 @@ public class BandReaderHapi {
                 continue;
 
             JSONObject joParameter = jaParameters.getJSONObject(i);
-            UriTemplate.Variables request = UriTemplate.vars();
-            if (id != null)
-                request.set(version.getDatasetRequestParam(), id)
-                        .set("format", hapiFormat)
-                        .set("parameters", name);
+            UriTemplate.Variables request = UriTemplate.vars()
+                    .set(version.getDatasetRequestParam(), id)
+                    .set("format", hapiFormat)
+                    .set("parameters", name);
             String baseUrl = new UriTemplate(urlData).expand(request);
             BandType type = createBandType(baseUrl, id, title, joParameter, valueParam);
             HapiParam[] typeParams = new HapiParam[]{params[0], valueParam};
@@ -288,7 +287,7 @@ public class BandReaderHapi {
         return params;
     }
 
-    private static boolean isUnsupportedParameter(HapiParam param) {
+    private static boolean isUnsupportedValueParameter(HapiParam param) {
         HapiType<?, ?> type = param.getType();
         return (type != HapiType.DOUBLE && type != HapiType.INTEGER)
                 || param.getSize() != null
@@ -359,7 +358,7 @@ public class BandReaderHapi {
             String fmt = jo.optString("format", "csv");
             HapiParam[] params = getParameters(jo);
             int parameterIndex = 1;
-            while (parameterIndex < params.length && isUnsupportedParameter(params[parameterIndex]))
+            while (parameterIndex < params.length && isUnsupportedValueParameter(params[parameterIndex]))
                 parameterIndex++;
             if (parameterIndex == params.length)
                 throw new Exception("No numeric scalar HAPI parameters");
