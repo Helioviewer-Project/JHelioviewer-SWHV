@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class BandReaderHapi {
 
     @FunctionalInterface
     public interface CatalogListener {
-        void catalogsLoaded(Map<String, BandType[]> catalogs);
+        void catalogsLoaded(Map<String, BandDataset[]> catalogs);
     }
 
     private static final String hapiFormat = "binary";
@@ -72,20 +73,32 @@ public class BandReaderHapi {
         return findCatalog(url) != null;
     }
 
-    static Callable<BandData> dataRequest(String url, long start, long end) {
-        return new LoadHapiStream(findCatalog(url), url, start, end);
+    static DatasetRef dataset(String url) {
+        Dataset dataset = findDataset(url);
+        return new DatasetRef(dataset.requestUrl, dataset.title);
+    }
+
+    static Callable<List<BandData>> dataRequest(List<BandType> types, long start, long end) {
+        if (types.isEmpty())
+            throw new IllegalArgumentException("No HAPI parameters requested");
+
+        Dataset dataset = findDataset(types.getFirst().getBaseUrl());
+        HashSet<BandType> requestedTypes = new HashSet<>(types);
+        List<DatasetParameter> parameters = dataset.parameters.stream()
+                .filter(parameter -> requestedTypes.contains(parameter.type))
+                .toList();
+        if (parameters.size() != requestedTypes.size())
+            throw new IllegalArgumentException("HAPI parameters do not belong to one dataset");
+
+        RequestSchema schema = createRequestSchema(dataset, parameters);
+        return () -> getHapiStream(dataset, schema, start, end);
     }
 
     static BandData readUri(URI uri) throws Exception {
         return getHapiUri(uri);
     }
 
-    private record LoadHapiStream(Catalog catalog, String url, long start, long end) implements Callable<BandData> {
-        @Override
-        public BandData call() throws Exception {
-            return getHapiStream(catalog, url, start, end);
-        }
-    }
+    record DatasetRef(String key, String title) {}
 
     private static Catalog[] loadCatalogs() {
         return Arrays.stream(catalogEndpoints).parallel()
@@ -107,16 +120,16 @@ public class BandReaderHapi {
 
     private static void onSuccessCatalogs(Catalog[] loadedCatalogs, CatalogListener listener) {
         catalogs.clear();
-        LinkedHashMap<String, BandType[]> bandTypes = new LinkedHashMap<>();
+        LinkedHashMap<String, BandDataset[]> datasets = new LinkedHashMap<>();
         for (int i = 0; i < loadedCatalogs.length; i++) {
             Catalog catalog = loadedCatalogs[i];
             CatalogEndpoint endpoint = catalogEndpoints[i];
             if (catalog != null) {
                 catalogs.put(endpoint, catalog);
             }
-            bandTypes.put(endpoint.groupName, catalog == null ? new BandType[0] : catalog.types);
+            datasets.put(endpoint.groupName, catalog == null ? new BandDataset[0] : catalog.datasets);
         }
-        listener.catalogsLoaded(bandTypes);
+        listener.catalogsLoaded(datasets);
     }
 
     public static Map<String, List<BandType>> getPredefinedGroups() {
@@ -156,10 +169,18 @@ public class BandReaderHapi {
     @Nullable
     private static Catalog findCatalog(String baseUrl) {
         for (Catalog catalog : catalogs.values()) {
-            if (catalog.parameters.containsKey(baseUrl))
+            if (catalog.datasetsByParameter.containsKey(baseUrl))
                 return catalog;
         }
         return null;
+    }
+
+    private static Dataset findDataset(String url) {
+        Catalog catalog = findCatalog(url);
+        Dataset dataset = catalog == null ? null : catalog.datasetsByParameter.get(url);
+        if (dataset == null)
+            throw new IllegalArgumentException("Unknown HAPI parameter: " + url);
+        return dataset;
     }
 
     private static int orderFor(BandType type, String groupName) {
@@ -173,14 +194,17 @@ public class BandReaderHapi {
 
     private record CatalogEndpoint(String groupName, String server) {}
 
-    private record Catalog(HapiVersion version, Map<String, BandParameter> parameters, BandType[] types,
+    private record Catalog(Map<String, Dataset> datasetsByParameter, BandDataset[] datasets,
                            Map<String, List<BandType>> predefinedGroups) {}
 
-    private record Dataset(List<BandDecoder> decoders, long start, long stop) {}
+    private record Dataset(HapiVersion version, String title, String requestUrl, HapiParam timeParameter,
+                           List<DatasetParameter> parameters, long start, long stop) {}
 
-    private record BandParameter(BandDecoder decoder, long start, long stop) {}
+    private record DatasetParameter(BandType type, HapiParam hapiParameter) {}
 
-    private record BandDecoder(BandType type, HapiTableReader tableReader, int valueColumn) {}
+    private record RequestSchema(String url, HapiTableReader tableReader, List<BandDecoder> decoders) {}
+
+    private record BandDecoder(BandType type, int valueColumn) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -202,39 +226,43 @@ public class BandReaderHapi {
         }
 
         List<Dataset> datasets = ids.parallelStream().map(item -> {
-            String id = item.optString("id", null);
-            if (id == null)
-                return null;
-            String title = item.optString("title", id);
+                    String id = item.optString("id", null);
+                    if (id == null)
+                        return null;
+                    String title = item.optString("title", id);
 
-            UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
-            String uri = new UriTemplate(urlInfo).expand(vars);
-            try {
-                JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
-                return getDataset(version, urlData, id, title, joInfo);
-            } catch (Exception e) {
-                Log.error(uri, e);
-            }
-            return null;
-        }).filter(Objects::nonNull).toList();
+                    UriTemplate.Variables vars = UriTemplate.vars().set(version.getDatasetRequestParam(), id);
+                    String uri = new UriTemplate(urlInfo).expand(vars);
+                    try {
+                        JSONObject joInfo = verifyResponse(JSONUtils.get(new URI(uri)));
+                        return getDataset(version, urlData, id, title, joInfo);
+                    } catch (Exception e) {
+                        Log.error(uri, e);
+                    }
+                    return null;
+                }).filter(Objects::nonNull)
+                .filter(dataset -> !dataset.parameters.isEmpty())
+                .toList();
         if (datasets.isEmpty())
             throw new Exception("Empty catalog");
 
-        LinkedHashMap<String, BandParameter> parameters = new LinkedHashMap<>();
+        LinkedHashMap<String, Dataset> datasetsByParameter = new LinkedHashMap<>();
         for (Dataset dataset : datasets) {
-            long start = dataset.start;
-            long stop = dataset.stop;
-            for (BandDecoder decoder : dataset.decoders) {
-                parameters.put(decoder.type.getBaseUrl(), new BandParameter(decoder, start, stop));
-            }
+            for (DatasetParameter parameter : dataset.parameters)
+                datasetsByParameter.put(parameter.type.getBaseUrl(), dataset);
         }
-        if (parameters.isEmpty())
+        if (datasetsByParameter.isEmpty())
             throw new Exception("Catalog contains no supported parameters");
 
-        ArrayList<BandType> types = new ArrayList<>();
-        parameters.values().forEach(parameter -> types.add(parameter.decoder.type));
-        BandType[] typeArray = types.toArray(BandType[]::new);
-        return new Catalog(version, parameters, typeArray, createPredefinedGroups(typeArray));
+        BandType[] typeArray = datasets.stream()
+                .flatMap(dataset -> dataset.parameters.stream())
+                .map(DatasetParameter::type)
+                .toArray(BandType[]::new);
+        BandDataset[] datasetArray = datasets.stream()
+                .map(dataset -> new BandDataset(dataset.title,
+                        dataset.parameters.stream().map(DatasetParameter::type).toList()))
+                .toArray(BandDataset[]::new);
+        return new Catalog(datasetsByParameter, datasetArray, createPredefinedGroups(typeArray));
     }
 
     private static Dataset getDataset(HapiVersion version, String urlData, String id, String title, JSONObject jo) throws Exception {
@@ -250,7 +278,7 @@ public class BandReaderHapi {
         HapiParam[] params = getParameters(jo);
         JSONArray jaParameters = jo.getJSONArray("parameters");
 
-        List<BandDecoder> decoders = new ArrayList<>(params.length - 1);
+        List<DatasetParameter> parameters = new ArrayList<>(params.length - 1);
         for (int i = 1; i < params.length; i++) {
             HapiParam valueParam = params[i];
             if (isUnsupportedValueParameter(valueParam))
@@ -267,10 +295,33 @@ public class BandReaderHapi {
                     .set("parameters", name);
             String baseUrl = new UriTemplate(urlData).expand(request);
             BandType type = createBandType(baseUrl, id, title, joParameter, valueParam);
-            HapiParam[] typeParams = new HapiParam[]{params[0], valueParam};
-            decoders.add(new BandDecoder(type, new HapiTableReader(typeParams), 1));
+            parameters.add(new DatasetParameter(type, valueParam));
         }
-        return new Dataset(decoders, start, stop);
+
+        UriTemplate.Variables datasetRequest = UriTemplate.vars()
+                .set(version.getDatasetRequestParam(), id)
+                .set("format", hapiFormat);
+        String requestUrl = new UriTemplate(urlData).expand(datasetRequest);
+        return new Dataset(version, title, requestUrl, params[0], parameters, start, stop);
+    }
+
+    private static RequestSchema createRequestSchema(Dataset dataset, List<DatasetParameter> parameters) {
+        List<HapiParam> hapiParameters = new ArrayList<>(parameters.size() + 1);
+        hapiParameters.add(dataset.timeParameter);
+        List<BandDecoder> decoders = new ArrayList<>(parameters.size());
+        List<String> parameterNames = new ArrayList<>(parameters.size());
+        int valueColumn = ParamReader.createReader(dataset.timeParameter).getColumnCount();
+        for (DatasetParameter parameter : parameters) {
+            decoders.add(new BandDecoder(parameter.type, valueColumn));
+            hapiParameters.add(parameter.hapiParameter);
+            parameterNames.add(parameter.hapiParameter.getName());
+            valueColumn += ParamReader.createReader(parameter.hapiParameter).getColumnCount();
+        }
+
+        String url = dataset.requestUrl + UriTemplate.vars()
+                .set("parameters", String.join(",", parameterNames))
+                .expand("");
+        return new RequestSchema(url, new HapiTableReader(hapiParameters.toArray(HapiParam[]::new)), decoders);
     }
 
     private static HapiParam[] getParameters(JSONObject jo) throws Exception {
@@ -319,29 +370,24 @@ public class BandReaderHapi {
         return options;
     }
 
-    private static BandData getHapiStream(Catalog catalog, String baseUrl, long startTime, long endTime) throws Exception {
-        if (catalog == null) // we may be offline
-            return null;
-        BandParameter parameter = catalog.parameters.get(baseUrl);
-        if (parameter == null)
-            return null;
-
-        startTime = Math.max(startTime, parameter.start);
-        endTime = Math.min(endTime, parameter.stop);
+    private static List<BandData> getHapiStream(Dataset dataset, RequestSchema schema,
+                                                long startTime, long endTime) throws Exception {
+        startTime = Math.max(startTime, dataset.start);
+        endTime = Math.min(endTime, dataset.stop);
         if (endTime <= startTime)
-            return null;
+            return List.of();
 
         String start = TimeUtils.formatZ(startTime);
         String stop = TimeUtils.formatZ(endTime);
 
-        HapiVersion version = catalog.version;
+        HapiVersion version = dataset.version;
         UriTemplate.Variables request = UriTemplate.vars()
                 .set(version.getStartRequestParam(), start)
                 .set(version.getStopRequestParam(), stop);
-        String uri = baseUrl + request.expand("");
+        String uri = schema.url + request.expand("");
 
         try (NetClient nc = NetClient.of(new URI(uri), false, NetClient.NetCache.NETWORK)) {
-            return readBand(parameter.decoder, nc.getStream(), null, hapiFormat);
+            return readBands(schema.decoders, schema.tableReader, nc.getStream(), null, hapiFormat);
         }
     }
 
@@ -368,39 +414,54 @@ public class BandReaderHapi {
             int valueColumn = 0;
             for (int i = 0; i < parameterIndex; i++)
                 valueColumn += ParamReader.createReader(params[i]).getColumnCount();
-            BandDecoder decoder = new BandDecoder(type, new HapiTableReader(params), valueColumn);
+            BandDecoder decoder = new BandDecoder(type, valueColumn);
 
-            return readBand(decoder, in, (byte) overread1[0], fmt);
+            List<BandData> data = readBands(List.of(decoder), new HapiTableReader(params),
+                    in, (byte) overread1[0], fmt);
+            return data.isEmpty() ? null : data.getFirst();
         }
     }
 
-    private static BandData readBand(BandDecoder decoder, InputStream in, Byte byte0, String fmt) throws Exception {
+    private static List<BandData> readBands(List<BandDecoder> decoders, HapiTableReader tableReader,
+                                            InputStream in, Byte byte0, String fmt) throws Exception {
         List<Long> dateList = new ArrayList<>();
-        List<Float> valueList = new ArrayList<>();
-        try (RowSequence rseq = decoder.tableReader.createRowSequence(in, byte0, fmt)) {
+        List<List<Float>> valueLists = new ArrayList<>(decoders.size());
+        decoders.forEach(ignored -> valueLists.add(new ArrayList<>()));
+        try (RowSequence rseq = tableReader.createRowSequence(in, byte0, fmt)) {
             while (rseq.next()) {
                 String time = (String) rseq.getCell(0);
                 if (time == null) // fill
                     continue;
                 dateList.add(toMillis(time));
 
-                Number value = (Number) rseq.getCell(decoder.valueColumn);
-                float f = value == null ? YAxis.BLANK : value.floatValue();
-                valueList.add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
+                for (int i = 0; i < decoders.size(); i++) {
+                    Number value = (Number) rseq.getCell(decoders.get(i).valueColumn);
+                    float f = value == null ? YAxis.BLANK : value.floatValue();
+                    valueLists.get(i).add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
+                }
             }
         }
 
         int numPoints = dateList.size();
         if (numPoints == 0) // empty
-            return null;
+            return List.of();
 
         long[] dates = longArray(numPoints, dateList);
-        float[] values = floatArray(numPoints, valueList);
-        DatesValues dvs = decoder.type.isBarPlot()
-                ? new DatesValues(dates, new float[][]{values})
-                : new DatesValues(dates, new float[][]{values}).rebin();
+        float[][] values = new float[decoders.size()][];
+        for (int i = 0; i < decoders.size(); i++) {
+            values[i] = floatArray(numPoints, valueLists.get(i));
+        }
 
-        return new BandData(decoder.type, dvs.dates(), dvs.values()[0]);
+        DatesValues raw = new DatesValues(dates, values);
+        DatesValues rebinned = decoders.stream().anyMatch(decoder -> !decoder.type.isBarPlot())
+                ? raw.rebin()
+                : raw;
+        List<BandData> result = new ArrayList<>(decoders.size());
+        for (int i = 0; i < decoders.size(); i++) {
+            DatesValues data = decoders.get(i).type.isBarPlot() ? raw : rebinned;
+            result.add(new BandData(decoders.get(i).type, data.dates(), data.values()[i]));
+        }
+        return result;
     }
 
     private static long[] longArray(int numPoints, List<Long> dateList) {

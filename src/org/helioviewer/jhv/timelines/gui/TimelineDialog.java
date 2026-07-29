@@ -23,7 +23,7 @@ import javax.swing.JScrollPane;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.timelines.TimelineLayers;
-import org.helioviewer.jhv.timelines.band.BandType;
+import org.helioviewer.jhv.timelines.band.BandDataset;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -33,12 +33,13 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
 
     private final TimelineLayers layers;
     private final JComboBox<String> comboGroup = new JComboBox<>();
-    private final JList<BandType> listBand = new JList<>();
+    private final JList<BandDataset> listDataset = new JList<>();
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (BandType bandType : listBand.getSelectedValuesList())
-                layers.addBand(bandType);
+            layers.addBands(listDataset.getSelectedValuesList().stream()
+                    .flatMap(dataset -> dataset.bandTypes().stream())
+                    .toList());
             setVisible(false);
         }
     };
@@ -59,7 +60,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         };
         setDefaultCancelAction(close);
         setDefaultAction(load);
-        setInitFocusedComponent(listBand);
+        setInitFocusedComponent(listDataset);
 
         JButton cancelBtn = new JButton(close);
         cancelBtn.setText("Cancel");
@@ -76,7 +77,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     @Override
     public JComponent createContentPanel() {
         comboGroup.addActionListener(e -> updateGroupValues());
-        listBand.addMouseListener(new MouseAdapter() {
+        listDataset.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -84,8 +85,8 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
                 }
             }
         });
-        com.jidesoft.swing.SearchableUtils.installSearchable(listBand);
-        JScrollPane scrollPane = new JScrollPane(listBand);
+        com.jidesoft.swing.SearchableUtils.installSearchable(listDataset);
+        JScrollPane scrollPane = new JScrollPane(listDataset);
         scrollPane.setPreferredSize(new Dimension(350, 350));
 
         JPanel groupPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 0));
@@ -113,29 +114,29 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         setVisible(true);
     }
 
-    private final LinkedHashMap<String, BandType[]> groups = new LinkedHashMap<>();
+    private final LinkedHashMap<String, BandDataset[]> groups = new LinkedHashMap<>();
 
     public void setupDatasetGroups(String[] groupNames) {
         if (comboGroup.getItemCount() != 0)
             return;
 
         for (String group : groupNames)
-            groups.put(group, new BandType[0]);
+            groups.put(group, new BandDataset[0]);
         comboGroup.setModel(new DefaultComboBoxModel<>(groupNames));
         if (groupNames.length > 0)
             comboGroup.setSelectedIndex(0);
     }
 
-    public void setupDataset(String group, BandType[] types) {
-        groups.put(group, types);
+    public void setupDataset(String group, BandDataset[] datasets) {
+        groups.put(group, datasets);
         if (group.equals(comboGroup.getSelectedItem()))
             updateGroupValues();
     }
 
     private void updateGroupValues() {
         if (comboGroup.getSelectedItem() instanceof String group) {
-            listBand.setListData(groups.get(group));
-            listBand.setSelectedIndex(0);
+            listDataset.setListData(groups.get(group));
+            listDataset.setSelectedIndex(0);
         }
     }
 
