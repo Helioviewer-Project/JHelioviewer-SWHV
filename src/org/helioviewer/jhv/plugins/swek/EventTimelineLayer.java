@@ -23,15 +23,12 @@ import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.draw.TimeAxis;
-import org.helioviewer.jhv.timelines.draw.YAxis;
-import org.helioviewer.jhv.timelines.draw.YAxis.YAxisIdentityScale;
 
 import org.json.JSONObject;
 
 // has to be public for state
 public final class EventTimelineLayer extends TimelineLayer implements JHVEventListener.Handle {
 
-    private final YAxis yAxis = new YAxis(0, 0, new YAxisIdentityScale("Events"));
     private EventPlotConfiguration eventUnderMouse;
     private List<JHVRelatedEvents> visibleEvents = Collections.emptyList();
 
@@ -137,11 +134,6 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
     }
 
     @Override
-    public YAxis getYAxis() {
-        return yAxis;
-    }
-
-    @Override
     public void remove() {
         JHVEventCache.unregisterHandler(this);
     }
@@ -175,11 +167,6 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
 
     @Override
     public boolean isDeletable() {
-        return false;
-    }
-
-    @Override
-    public boolean hasYAxis() {
         return false;
     }
 

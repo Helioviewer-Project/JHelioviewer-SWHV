@@ -51,11 +51,12 @@ public abstract class TimelineLayer {
 
     public abstract boolean isDeletable();
 
-    public abstract boolean hasYAxis();
-
     public abstract void draw(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition);
 
-    public abstract YAxis getYAxis();
+    @Nullable
+    public YAxis getYAxis() {
+        return null;
+    }
 
     public abstract void fetchData(TimeAxis selectedAxis);
 
