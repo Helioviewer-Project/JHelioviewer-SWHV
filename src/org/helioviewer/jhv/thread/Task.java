@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.thread;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
@@ -16,9 +17,20 @@ public final class Task {
         return EDTCallbackExecutor.pool.submit(task, onSuccess, onFailure);
     }
 
+    public static <T> Future<T> submit(@Nonnull ExecutorService executor, @Nonnull Callable<T> task,
+                                       @Nonnull Consumer<T> onSuccess, @Nonnull Consumer<Throwable> onFailure) {
+        return new EDTCallbackExecutor(executor).submit(task, onSuccess, onFailure);
+    }
+
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
                                        @Nonnull FailureHandler onFailure) {
         return EDTCallbackExecutor.pool.submit(task, onSuccess, t -> onFailure.onFailure(logContext, t));
+    }
+
+    public static <T> Future<T> submit(@Nonnull ExecutorService executor, @Nonnull String logContext,
+                                       @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
+                                       @Nonnull FailureHandler onFailure) {
+        return submit(executor, task, onSuccess, t -> onFailure.onFailure(logContext, t));
     }
 
     public static <T> Future<T> submit(@Nonnull String logContext, @Nonnull Callable<T> task, @Nonnull Consumer<T> onSuccess,
