@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +22,7 @@ import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.NetClient;
 import org.helioviewer.jhv.io.NetFileCache;
 import org.helioviewer.jhv.io.UriTemplate;
-import org.helioviewer.jhv.thread.Task;
+import org.helioviewer.jhv.thread.LatestWorker;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.draw.YAxis;
 
@@ -54,7 +52,7 @@ public class BandReaderHapi {
     };
 
     private static final HashMap<CatalogEndpoint, Catalog> catalogs = new HashMap<>();
-    private static Future<?> catalogRequest;
+    private static final LatestWorker<Catalog[]> catalogWorker = new LatestWorker<>("HAPI-Catalog");
 
     public static String[] getCatalogGroups() {
         String[] groups = new String[catalogEndpoints.length];
@@ -64,10 +62,10 @@ public class BandReaderHapi {
     }
 
     public static void requestCatalog(CatalogListener listener) {
-        if (catalogRequest != null)
-            catalogRequest.cancel(true);
-        catalogRequest = Task.submit(BandReaderHapi::loadCatalogs,
-                loaded -> onSuccessCatalogs(loaded, listener), BandReaderHapi::onFailure);
+        catalogWorker.submit(BandReaderHapi::loadCatalogs, (loaded, fresh) -> {
+            if (fresh)
+                onSuccessCatalogs(loaded, listener);
+        });
     }
 
     static boolean hasCatalog(String url) {
@@ -108,14 +106,15 @@ public class BandReaderHapi {
     }
 
     private static void onSuccessCatalogs(Catalog[] loadedCatalogs, CatalogListener listener) {
+        catalogs.clear();
         LinkedHashMap<String, BandType[]> bandTypes = new LinkedHashMap<>();
         for (int i = 0; i < loadedCatalogs.length; i++) {
             Catalog catalog = loadedCatalogs[i];
+            CatalogEndpoint endpoint = catalogEndpoints[i];
             if (catalog != null) {
-                CatalogEndpoint endpoint = catalogEndpoints[i];
                 catalogs.put(endpoint, catalog);
-                bandTypes.put(endpoint.groupName, catalog.types);
             }
+            bandTypes.put(endpoint.groupName, catalog == null ? new BandType[0] : catalog.types);
         }
         listener.catalogsLoaded(bandTypes);
     }
@@ -170,11 +169,6 @@ public class BandReaderHapi {
                 return entry.order();
         }
         return 0;
-    }
-
-    private static void onFailure(Throwable t) {
-        if (!(t instanceof CancellationException))
-            Log.errorStack(t);
     }
 
     private record CatalogEndpoint(String groupName, String server) {}
@@ -234,6 +228,9 @@ public class BandReaderHapi {
                 parameters.put(reader.type.getBaseUrl(), new BandParameter(reader, start, stop));
             }
         }
+        if (parameters.isEmpty())
+            throw new Exception("Catalog contains no supported parameters");
+
         ArrayList<BandType> types = new ArrayList<>();
         parameters.values().forEach(parameter -> types.add(parameter.reader.type));
         BandType[] typeArray = types.toArray(BandType[]::new);
