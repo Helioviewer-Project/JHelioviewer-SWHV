@@ -44,13 +44,13 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
     }
 
     private static void catalogsLoaded(Map<String, BandDataset[]> catalogs) {
+        List<BandType> bandTypes = new ArrayList<>();
         catalogs.forEach((group, datasets) -> {
             td.setupDataset(group, datasets);
-            List<BandType> bandTypes = new ArrayList<>();
             for (BandDataset dataset : datasets)
                 bandTypes.addAll(dataset.bandTypes());
-            TimelineLayers.fetchBands(bandTypes, DrawController.selectedAxis);
         });
+        TimelineLayers.fetchBands(bandTypes, DrawController.selectedAxis);
         timelinePanel.setPredefinedGroups(BandReaderHapi.getPredefinedGroups());
     }
 
