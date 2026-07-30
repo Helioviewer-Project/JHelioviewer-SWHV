@@ -3,32 +3,27 @@ package org.helioviewer.jhv.gui.component;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.Window;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
+import org.helioviewer.jhv.gui.dialog.ImageDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.layers.ImageLayers;
@@ -51,8 +46,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
 
     private final TimeSelectorPanel timeSelectorPanel = new TimeSelectorPanel();
     private final SamplingPanel samplingPanel = new SamplingPanel(timeSelectorPanel);
-    private final ImageSelectorPanel imageSelectorPanel;
-    private final JDialog imageSelectorDialog;
+    private final ImageDialog imageDialog;
     private ImageLayer layerToReplace;
 
     private static TimeSlider timeSlider;
@@ -199,8 +193,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         add(recordPanel);
         add(timeSelectorPanel);
 
-        imageSelectorPanel = new ImageSelectorPanel(this);
-        imageSelectorDialog = createImageSelectorDialog();
+        imageDialog = new ImageDialog(this);
 
         JideButton addLayerButton = new JideButton(Buttons.newLayer);
         addLayerButton.addActionListener(e -> showNewLayerSelector());
@@ -243,7 +236,6 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
     public void loadDataset(String server, int sourceId) {
         ImageLayer target = layerToReplace;
         layerToReplace = null;
-        imageSelectorDialog.setVisible(false);
         if (checkSanity()) {
             long start = getStartTime();
             long end = samplingPanel.isSingleFrame() ? start : getEndTime();
@@ -254,44 +246,15 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
 
     public void showNewLayerSelector() {
         layerToReplace = null;
-        imageSelectorDialog.setTitle("New Image Layer");
-        showImageSelector();
+        imageDialog.showDialog(false);
     }
 
     public void changeDataset(ImageLayer layer) {
         layerToReplace = layer;
-        imageSelectorDialog.setTitle("Change Dataset");
         APIRequest req = layer.getView().getAPIRequest();
         if (req != null)
-            imageSelectorPanel.selectDataset(req.server(), req.sourceId());
-        showImageSelector();
-    }
-
-    private void showImageSelector() {
-        if (!imageSelectorDialog.isVisible()) {
-            JPanel layersPanel = MainFrame.getLayersPanel();
-            Point location = new Point(layersPanel.getWidth(), 0);
-            SwingUtilities.convertPointToScreen(location, layersPanel);
-            imageSelectorDialog.setLocation(location);
-            imageSelectorDialog.setVisible(true);
-        } else {
-            imageSelectorDialog.toFront();
-        }
-        EventQueue.invokeLater(imageSelectorPanel::requestFocusInWindow);
-    }
-
-    private JDialog createImageSelectorDialog() {
-        JDialog dialog = new JDialog(MainFrame.get());
-        dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-        dialog.setResizable(false);
-        dialog.setType(Window.Type.UTILITY);
-        dialog.setContentPane(imageSelectorPanel);
-        dialog.getRootPane().registerKeyboardAction(
-                e -> dialog.setVisible(false),
-                KeyStroke.getKeyStroke("ESCAPE"),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        dialog.pack();
-        return dialog;
+            imageDialog.selectDataset(req.server(), req.sourceId());
+        imageDialog.showDialog(true);
     }
 
     private boolean checkSanity() {

@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -55,9 +56,11 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     };
 
     public TimelineDialog(TimelineLayers _layers) {
-        super(MainFrame.get(), "New Timeline Layer", true);
+        super(MainFrame.get(), "New Timeline Layer", false);
         layers = _layers;
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
         setResizable(false);
+        setType(Window.Type.UTILITY);
     }
 
     @Override
@@ -76,6 +79,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         cancelBtn.setText("Cancel");
         JButton okBtn = new JButton(load);
         okBtn.setText("Add");
+        getRootPane().setDefaultButton(okBtn);
 
         ButtonPanel panel = new ButtonPanel();
         panel.add(okBtn, ButtonPanel.AFFIRMATIVE_BUTTON);
@@ -120,9 +124,13 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
 
     @Override
     public void showDialog() {
-        pack();
-        setLocationRelativeTo(MainFrame.get());
-        setVisible(true);
+        if (!isVisible()) {
+            pack();
+            setLocationRelativeTo(MainFrame.get());
+            setVisible(true);
+        } else {
+            toFront();
+        }
     }
 
     public void setCatalogs(Map<String, BandDataset[]> catalogs) {

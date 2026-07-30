@@ -74,6 +74,7 @@ public final class UIGlobals {
 
         int arc = 6;
         UIManager.put("Button.arc", arc);
+        UIManager.put("ButtonPanel.order", "OCA");
         UIManager.put("CheckBox.arc", arc);
         UIManager.put("Component.arc", arc);
         UIManager.put("ProgressBar.arc", arc);
