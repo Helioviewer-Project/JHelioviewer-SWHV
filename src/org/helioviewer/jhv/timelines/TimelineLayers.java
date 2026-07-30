@@ -39,10 +39,10 @@ public class TimelineLayers extends AbstractTableModel {
         }
     }
 
-    public static void fetchBands(Collection<BandType> bandTypes, TimeAxis timeAxis) {
+    static void fetchBands() {
         for (TimelineLayer layer : layers) {
-            if (layer.isEnabled() && layer instanceof Band band && bandTypes.contains(band.getBandType()))
-                band.fetchData(timeAxis);
+            if (layer.isEnabled() && layer instanceof Band band)
+                band.fetchData(DrawController.selectedAxis);
         }
     }
 

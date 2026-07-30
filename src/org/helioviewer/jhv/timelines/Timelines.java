@@ -9,9 +9,7 @@ import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.movie.Player;
-import org.helioviewer.jhv.timelines.band.BandDataset;
 import org.helioviewer.jhv.timelines.band.BandReaderHapi;
-import org.helioviewer.jhv.timelines.band.BandType;
 import org.helioviewer.jhv.timelines.chart.PlotPanel;
 import org.helioviewer.jhv.timelines.draw.DrawController;
 import org.helioviewer.jhv.timelines.gui.TimelineDialog;
@@ -43,12 +41,7 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
 
     private static void catalogsLoaded(BandReaderHapi.CatalogData catalogData) {
         td.setCatalogs(catalogData.datasets());
-        List<BandType> bandTypes = new ArrayList<>();
-        for (BandDataset[] datasets : catalogData.datasets().values()) {
-            for (BandDataset dataset : datasets)
-                bandTypes.addAll(dataset.bandTypes());
-        }
-        TimelineLayers.fetchBands(bandTypes, DrawController.selectedAxis);
+        TimelineLayers.fetchBands();
         timelinePanel.setPredefinedGroups(catalogData.predefinedGroups());
     }
 
