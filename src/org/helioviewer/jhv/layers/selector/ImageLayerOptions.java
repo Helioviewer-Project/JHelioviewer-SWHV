@@ -10,11 +10,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import org.helioviewer.jhv.app.Message;
 import org.helioviewer.jhv.gui.CompletionNotifications;
 import org.helioviewer.jhv.gui.component.Buttons;
 import org.helioviewer.jhv.gui.component.CircularProgressUI;
 import org.helioviewer.jhv.gui.dialog.MetaDataDialog;
 import org.helioviewer.jhv.io.DownloadLayer;
+import org.helioviewer.jhv.io.PunchClient;
 import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.layers.Layer;
 import org.helioviewer.jhv.layers.filters.ChannelMixerPanel;
@@ -136,9 +138,38 @@ final class ImageLayerOptions extends JPanel {
             metaDialog.showDialog();
         });
 
+        // Only PUNCH layers carry a remembered query; the button stays hidden otherwise
+        JideButton refreshButton = new JideButton(Buttons.refresh);
+        refreshButton.setToolTipText("Check the PUNCH archive for new frames in this layer's time range");
+        refreshButton.setVisible(PunchClient.hasRememberedQuery(layer));
+        JProgressBar refreshSpinner = new JProgressBar();
+        refreshSpinner.setUI(new CircularProgressUI());
+        refreshSpinner.setIndeterminate(true);
+        refreshSpinner.setVisible(false);
+        refreshSpinner.setPreferredSize(new Dimension(20, 20));
+        refreshButton.addActionListener(e -> {
+            refreshButton.setEnabled(false);
+            refreshButton.setText(null);
+            refreshButton.add(refreshSpinner);
+            refreshSpinner.setVisible(true);
+            PunchClient.submitRefresh(layer, result -> {
+                refreshSpinner.setVisible(false);
+                refreshButton.remove(refreshSpinner);
+                refreshButton.setText(Buttons.refresh);
+                refreshButton.setEnabled(true);
+                Message.warn("PUNCH refresh", result.newCount() == 0
+                        ? "No new frames in the archive for this layer."
+                        : String.format("Loaded %d new frame%s as a new layer.", result.newCount(), result.newCount() == 1 ? "" : "s"));
+            });
+        });
+
+        JPanel rightCluster = new JPanel(new BorderLayout());
+        rightCluster.add(refreshButton, BorderLayout.LINE_START);
+        rightCluster.add(metaButton, BorderLayout.LINE_END);
+
         JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.add(downloadButton, BorderLayout.LINE_START);
-        buttonPanel.add(metaButton, BorderLayout.LINE_END);
+        buttonPanel.add(rightCluster, BorderLayout.LINE_END);
 
         c.gridx = 2;
         c.anchor = GridBagConstraints.LINE_END;
