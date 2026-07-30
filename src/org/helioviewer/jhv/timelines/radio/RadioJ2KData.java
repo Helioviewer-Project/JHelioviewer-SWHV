@@ -90,20 +90,23 @@ class RadioJ2KData implements View.DataHandler {
     @Override
     public void handleData(View.ImageData imageData) {
         ImageBuffer imageBuffer = imageData.imageBuffer();
-        int w = imageBuffer.width;
-        int h = imageBuffer.height;
-        if (w < 1 || h < 1) {
-            Log.error("width: " + w + " height: " + h);
-            return;
-        }
+        try {
+            int w = imageBuffer.width;
+            int h = imageBuffer.height;
+            if (w < 1 || h < 1) {
+                Log.error("width: " + w + " height: " + h);
+                return;
+            }
 
-        region = imageData.region();
-        boolean hadData = bufferedImage != null;
-        bufferedImage = createIndexedImage((ByteBuffer) imageBuffer.buffer, w, h, owner.getColorModel());
-        imageBuffer.allowExplicitFree();
-        if (!hadData)
-            owner.dataUpdated();
-        DrawController.drawRequest();
+            region = imageData.region();
+            boolean hadData = bufferedImage != null;
+            bufferedImage = createIndexedImage((ByteBuffer) imageBuffer.buffer, w, h, owner.getColorModel());
+            if (!hadData)
+                owner.dataUpdated();
+            DrawController.drawRequest();
+        } finally {
+            imageBuffer.allowExplicitFree();
+        }
     }
 
     private static BufferedImage createIndexedImage(ByteBuffer byteBuffer, int width, int height, IndexColorModel colorModel) {
