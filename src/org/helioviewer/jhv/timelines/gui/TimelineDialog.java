@@ -146,8 +146,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
                 groupedTypes.forEach((group, types) -> groupNode(catalogNode, groupNodes, group)
                         .add(new DefaultMutableTreeNode(new BandDataset(dataset.title(), types))));
                 if (!ungroupedTypes.isEmpty())
-                    groupNode(catalogNode, groupNodes, "Ungrouped")
-                            .add(new DefaultMutableTreeNode(new BandDataset(dataset.title(), ungroupedTypes)));
+                    catalogNode.add(new DefaultMutableTreeNode(new BandDataset(dataset.title(), ungroupedTypes)));
             }
         }
         treeModel.reload();
