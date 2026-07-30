@@ -150,10 +150,8 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
             }
         }
         treeModel.reload();
-        if (root.getChildCount() > 0) {
+        if (root.getChildCount() > 0)
             tree.expandPath(new TreePath(((DefaultMutableTreeNode) root.getFirstChild()).getPath()));
-            tree.setSelectionRow(0);
-        }
     }
 
     private List<BandType> selectedBandTypes() {
@@ -162,6 +160,9 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
             return List.of();
 
         DefaultMutableTreeNode selected = (DefaultMutableTreeNode) path.getLastPathComponent();
+        if (selected.getParent() == root)
+            return List.of();
+
         LinkedHashSet<BandType> bandTypes = new LinkedHashSet<>();
         Enumeration<?> nodes = selected.depthFirstEnumeration();
         while (nodes.hasMoreElements()) {
