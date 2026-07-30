@@ -27,6 +27,7 @@ import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.Interfaces;
@@ -60,8 +61,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     private int dragRangeMax;
     private DragMode dragMode = DragMode.Frame;
 
-    public TimeSlider(int _orientation, int min, int max, int value) {
-        super(_orientation, min, max, value);
+    public TimeSlider(int min, int max, int value) {
+        super(HORIZONTAL, min, max, value);
         setSnapToTicks(true);
 
         sliderUI = new TimeSliderUI(this);
@@ -81,6 +82,9 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         Player.addStatusListener(this);
         UITimer.register(this);
         ViewState.addPlaybackRangeListener(this);
+        setToolTipText(Platform.isMacOS()
+                ? "Drag: scrub • ⌥-drag: trim • ⌘-drag: move"
+                : "Drag: scrub • Alt-drag: trim • Ctrl-drag: move");
 
         getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "nextFrame");
         getActionMap().put("nextFrame", Actions.NEXT_FRAME);
@@ -112,7 +116,6 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         Commands.setPlaybackRange(
                 Math.clamp(Math.min(min, max), getMinimum(), getMaximum()),
                 Math.clamp(Math.max(min, max), getMinimum(), getMaximum()));
-        repaint();
     }
 
     // Overrides updateUI, to keep own SliderUI
@@ -199,7 +202,6 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         dragAnchorValue = sliderUI.valueForXPosition(e.getX());
         dragRangeMin = getPlaybackFirstFrame();
         dragRangeMax = getPlaybackLastFrame();
-        setCursor(cursorFor(e));
         mouseDragged(e);
     }
 
@@ -234,7 +236,7 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
         if ((e.getModifiersEx() & MENU_SHORTCUT_MASK) != 0)
             return DragMode.Range;
         if (e.isAltDown())
-            return nearestBoundary(e.getX()) == DragMode.RangeStart ? DragMode.RangeStart : DragMode.RangeEnd;
+            return nearestBoundary(e.getX());
         return DragMode.Frame;
     }
 
@@ -273,10 +275,8 @@ public final class TimeSlider extends JSlider implements Interfaces.LazyComponen
     @Override
     public void movieStatusChanged() {
         int maximum = Player.isAvailable() ? Player.getMaximumFrameNumber() : 0;
-        if (getMaximum() != maximum) {
+        if (getMaximum() != maximum)
             setMaximum(maximum);
-            repaint();
-        }
     }
 
     private static final class FrameNumberPanel extends JComponent {

@@ -76,7 +76,7 @@ public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHan
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         // Time slider
-        timeSlider = new TimeSlider(TimeSlider.HORIZONTAL, 0, 0, 0);
+        timeSlider = new TimeSlider(0, 0, 0);
 
         JPanel sliderPanel = new JPanel(new BorderLayout());
         sliderPanel.add(timeSlider);
