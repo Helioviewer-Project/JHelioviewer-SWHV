@@ -48,7 +48,7 @@ public final class RadioData extends TimelineLayer {
     private static final int MAX_AMOUNT_OF_DAYS = 3;
     private static final int DAYS_IN_CACHE = MAX_AMOUNT_OF_DAYS + 4;
 
-    private final Cache<Long, RadioJ2KData> cache = Caffeine.newBuilder().maximumSize(DAYS_IN_CACHE)
+    private final Cache<Long, RadioJ2KData> cache = Caffeine.newBuilder().maximumSize(DAYS_IN_CACHE).executor(Runnable::run)
             .removalListener((Long k, RadioJ2KData v, RemovalCause c) -> {
                 if (v != null)
                     v.removeData();
