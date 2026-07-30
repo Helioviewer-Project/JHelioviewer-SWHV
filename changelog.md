@@ -4,20 +4,16 @@
 ## JHelioviewer 5.6.0 (pending)
 
 ### Display and rendering
-- Add options to choose colors and line thickness for annotations (fixes #156)
-- Draw the active annotation thicker instead of forcing it to red
+- Add annotation color and line-thickness controls, and draw the active annotation thicker instead of forcing it to red (fixes #156)
 - Improve thick-line joins, rectangle corners, annotation loops, and FOV outline rendering
 - Improve flat-grid stability and grid label formatting
 - Adjust trajectory colors for white canvas (fixes #260)
 - Add a `New PUNCH Layer` source that loads FITS frames from the PUNCH archive at `umbra.nascom.nasa.gov/punch` (by @GillySpace27)
 - Add `RHEF` radial histogram equalizing filter with an Upsilon midtone control (by @GillySpace27)
-- Add `RadialWarp` and `RectWarp` views for exploring wide-field solar images.
-  `RadialWarp` keeps the view circular, while `RectWarp` unwraps it into angle
-  versus distance from the Sun. The λ slider controls how distances beyond the
-  solar limb are displayed: λ = 1 is linear, λ = 0 is logarithmic, and λ = −1
-  gives the strongest compression of the outer corona. Lower values give more
-  screen space to structures near the Sun while keeping the solar disk linear. (by @GillySpace27)
-- Remove the redundant Polar and LogPolar projections, subsumed by RectWarp
+- Add `RadialWarp` (circular) and `RectWarp` (angle versus solar distance)
+  wide-field views with λ-controlled outer-corona compression while keeping
+  the solar disk linear (λ = 1 linear, 0 logarithmic, −1 strongest), replacing
+  the redundant Polar and LogPolar projections (by @GillySpace27)
 - Add grid line color, opacity and width controls to the grid layer (by @GillySpace27)
 - Improve image canvas positioning and resizing on macOS
 
@@ -25,9 +21,8 @@
 - Add a stacked timeline mode with independent vertical scales, scrolling when
   the plots no longer fit vertically, and a control to maximize and restore the
   timeline panel
-- Load timeline datasets from multiple HAPI catalogs
-- Add predefined timeline plots supplied by HAPI metadata
-- Browse HAPI catalogs by catalog and group in the New Timeline Layer dialog
+- Expand HAPI timelines with datasets from multiple catalogs, predefined plots
+  from HAPI metadata, and catalog/group browsing in the New Timeline Layer dialog
 - Support HAPI-defined bar plots, value-level colors, warning thresholds, and
   switching between multicolor and single-color rendering
 - Add frame-count sampling and use the selected sampling setting when adding,
@@ -35,16 +30,16 @@
 - Add a Movie menu command and `Cmd-R` shortcut to start or stop recording
 - Add controls to collapse the sidebar and hide the toolbar or its text
 - Show the original image URI in the Image Information dialog
-- Map HEK Flare Trigger events to Flare events (fixes #105)
-- Fix CACTus event loading from HEK (fixes #190)
-- Filter HEK events by supplier and improve SWEK event loading, paging, storage, and cancellation
-- Move SWEK event indexing, highlight dispatch, and supplier configuration into clearer event-cache/catalog code
+- Improve HEK event handling by mapping Flare Trigger events to Flare events
+  (fixes #105) and fixing CACTus event loading (fixes #190)
+- Improve SWEK supplier filtering and configuration, loading, paging, storage,
+  cancellation, indexing, and highlight dispatch
 - Disable COMESEP event source
 - Improve layer-table update/repaint behavior when layer names or metadata change
 
 ### Performance and data
-- Offload viewpoint orbit trail and PFSS coordinate preparation from the rendering thread
-- Cache viewpoint orbit trail samples
+- Offload and cache viewpoint orbit-trail preparation, and offload PFSS
+  coordinate preparation, from the rendering thread
 - Reduce allocations in status panels, grid labels, FITS scaling, time maps, and interpolation paths
 - Update bundled libraries, SPICE kernels, and supporting build tools
 
