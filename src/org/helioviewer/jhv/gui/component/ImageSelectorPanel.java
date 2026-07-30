@@ -2,10 +2,10 @@ package org.helioviewer.jhv.gui.component;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 
 import javax.annotation.Nullable;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -21,6 +21,7 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
 
     private final Interfaces.DatasetSelectionHandler selectionHandler;
     private final DataSourcesTree sourcesTree;
+    private final JButton availabilityButton = new JButton("Available data");
 
     public ImageSelectorPanel(Interfaces.DatasetSelectionHandler _selectionHandler) {
         setLayout(new BorderLayout());
@@ -31,21 +32,15 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
         scrollPane.setPreferredSize(new Dimension(250, 350));
         add(scrollPane, BorderLayout.CENTER);
 
-        JButton availabilityButton = new JButton("Available data");
         availabilityButton.setEnabled(false);
         availabilityButton.addActionListener(e -> DesktopIntegration.openURL(getAvailabilityURL()));
         sourcesTree.addTreeSelectionListener(e -> availabilityButton.setEnabled(getAvailabilityURL() != null));
 
-        JPanel availabilityPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        availabilityPanel.add(availabilityButton);
-        add(availabilityPanel, BorderLayout.PAGE_END);
-
         DataSources.addListener(this);
     }
 
-    @Override
-    public boolean requestFocusInWindow() {
-        return sourcesTree.requestFocusInWindow();
+    public JComponent getFocusedComponent() {
+        return sourcesTree;
     }
 
     @Override
@@ -72,5 +67,15 @@ public final class ImageSelectorPanel extends JPanel implements DataSources.List
 
     public void selectDataset(String server, int sourceId) {
         sourcesTree.setSelectedItem(server, sourceId);
+    }
+
+    public void loadSelectedDataset() {
+        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
+        if (item != null)
+            selectionHandler.loadDataset(item.server, item.sourceId);
+    }
+
+    public JButton getAvailabilityButton() {
+        return availabilityButton;
     }
 }

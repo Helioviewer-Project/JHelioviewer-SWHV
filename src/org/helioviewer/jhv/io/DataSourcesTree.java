@@ -1,7 +1,5 @@
 package org.helioviewer.jhv.io;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
@@ -74,7 +72,8 @@ public final class DataSourcesTree extends JTree {
         }
 
         setModel(new DefaultTreeModel(nodeRoot));
-        // setRootVisible(false);
+        setRootVisible(false);
+        setShowsRootHandles(true);
 
         if (getCellRenderer() instanceof DefaultTreeCellRenderer defaultRenderer) {
             defaultRenderer.setOpenIcon(null);
@@ -94,16 +93,6 @@ public final class DataSourcesTree extends JTree {
                     Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
                     if (obj instanceof SourceItem si)
                         selectionHandler.loadDataset(si.server, si.sourceId);
-                }
-            }
-        });
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    SourceItem item = getSelectedItem();
-                    if (item != null)
-                        selectionHandler.loadDataset(item.server, item.sourceId);
                 }
             }
         });
