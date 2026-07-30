@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.chart;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -52,7 +53,8 @@ final class TimelineLabelPainter {
         int y = DrawConstants.GRAPH_TOP_SPACE / 2;
 
         g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-        int currWidth = drawString(g, "(" + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts), x, y);
+        FontMetrics fontMetrics = g.getFontMetrics();
+        int currWidth = drawString(g, fontMetrics, "(" + TimeUtils.format(TimeUtils.sqlTimeFormatter, ts), x, y);
 
         for (TimelineLayer tl : layers) {
             if (!tl.isEnabled()) {
@@ -62,15 +64,15 @@ final class TimelineLabelPainter {
             String value = tl.getStringValue(ts);
             if (value != null) {
                 g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-                currWidth += drawString(g, ", ", x + currWidth, y);
+                currWidth += drawString(g, fontMetrics, ", ", x + currWidth, y);
 
                 g.setColor(tl.getDataColor());
-                currWidth += drawString(g, value, x + currWidth, y);
+                currWidth += drawString(g, fontMetrics, value, x + currWidth, y);
             }
         }
 
         g.setColor(UIGlobals.TL_LABEL_TEXT_COLOR);
-        drawString(g, ")", x + currWidth, y);
+        drawString(g, fontMetrics, ")", x + currWidth, y);
     }
 
     private void drawTimeLabels(Graphics2D g, GraphGeometry geometry, TimeAxis xAxis) {
@@ -138,9 +140,9 @@ final class TimelineLabelPainter {
         g.drawString(tickText, xText, y + (int) (bounds.getHeight() / 2));
     }
 
-    private static int drawString(Graphics2D g, String text, int x, int y) {
+    private static int drawString(Graphics2D g, FontMetrics fontMetrics, String text, int x, int y) {
         g.drawString(text, x, y);
-        return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
+        return fontMetrics.stringWidth(text);
     }
 
     private static void drawRotatedLabel(Graphics2D g, String label, int axisX, Rectangle stripArea) {
@@ -242,19 +244,18 @@ final class TimelineLabelPainter {
     }
 
     private void drawVerticalTitle(Graphics2D g, Rectangle graphArea, int axisX, String verticalLabel, boolean highlight) {
-        Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
-        int vWidth = (int) verticalLabelBounds.getWidth();
-        int vHeight = (int) verticalLabelBounds.getHeight();
-        int labelCompensation = vWidth / 2;
-
         Stroke stroke = g.getStroke();
         if (highlight) {
             g.setStroke(boldStroke);
             g.setFont(DrawConstants.fontBold);
         }
 
+        Rectangle2D verticalLabelBounds = g.getFontMetrics().getStringBounds(verticalLabel, g);
+        int vWidth = (int) verticalLabelBounds.getWidth();
+        int vHeight = (int) verticalLabelBounds.getHeight();
+
         g.drawLine(axisX, graphArea.y, axisX, graphArea.y + graphArea.height + 3);
-        g.drawString(verticalLabel, axisX - labelCompensation, vHeight);
+        g.drawString(verticalLabel, axisX - vWidth / 2, vHeight);
 
         if (highlight) {
             g.setStroke(stroke);
@@ -265,25 +266,21 @@ final class TimelineLabelPainter {
     private static void drawHorizontalTickline(Graphics g, Rectangle graphArea, YAxis.Mapper yMapper, double tick, int axisX, int leftSide, boolean needTxt, boolean highlight) {
         String tickText = DrawConstants.valueFormatter.format(tick);
         int y = yMapper.scaledToPixel(tick);
+        if (needTxt && highlight)
+            g.setFont(DrawConstants.fontBold);
+
         Rectangle2D bounds = g.getFontMetrics().getStringBounds(tickText, g);
-        int xText;
         if (leftSide == -1) {
-            xText = axisX - 6 - (int) bounds.getWidth();
             Color lineColor = g.getColor();
             g.setColor(UIGlobals.TL_TICK_LINE_COLOR);
             g.drawLine(axisX - 3, y, graphArea.x + graphArea.width, y);
             g.setColor(lineColor);
-        } else {
-            xText = axisX;
         }
         if (needTxt) {
-            if (highlight) {
-                g.setFont(DrawConstants.fontBold);
-            }
+            int xText = leftSide == -1 ? axisX - 6 - (int) bounds.getWidth() : axisX;
             g.drawString(tickText, xText, y + (int) (bounds.getHeight() / 2));
-            if (highlight) {
+            if (highlight)
                 g.setFont(DrawConstants.font);
-            }
         }
     }
 
