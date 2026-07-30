@@ -2,6 +2,7 @@ package org.helioviewer.jhv.timelines.band;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
 
@@ -24,6 +25,7 @@ public class BandType {
     private final String scale;
     private final CacheType cacheType;
     private final boolean isXRSB;
+    private final List<String> groups;
 
     private record Level(double min, double max, Color color) {}
 
@@ -61,6 +63,7 @@ public class BandType {
 
         scale = jo.optString("scale", "linear");
         cacheType = CacheType.parse(jo.optString("bandCacheType", "BandCacheMinute"));
+        groups = parseGroups(jo.optJSONArray("groups"));
         predefinedEntries = parsePredefinedEntries(jo.optJSONArray("predefined"));
 
         plotType = PlotType.parse(jo.optString("plotType", null));
@@ -108,6 +111,10 @@ public class BandType {
 
     String getBaseUrl() {
         return baseUrl;
+    }
+
+    public List<String> getGroups() {
+        return groups;
     }
 
     PredefinedEntry[] getPredefinedEntries() {
@@ -183,6 +190,19 @@ public class BandType {
             }
         }
         return entries.toArray(PredefinedEntry[]::new);
+    }
+
+    private static List<String> parseGroups(JSONArray ja) {
+        if (ja == null || ja.length() == 0)
+            return List.of();
+
+        ArrayList<String> groups = new ArrayList<>();
+        for (int i = 0; i < ja.length(); i++) {
+            String group = ja.optString(i, null);
+            if (group != null && !group.isBlank() && !groups.contains(group))
+                groups.add(group);
+        }
+        return List.copyOf(groups);
     }
 
     private static WarningLevel[] parseWarningLevels(JSONArray ja) {

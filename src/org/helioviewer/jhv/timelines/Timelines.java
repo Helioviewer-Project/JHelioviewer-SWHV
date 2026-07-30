@@ -38,17 +38,16 @@ public class Timelines implements Interfaces.MainContentPanelPlugin {
     }
 
     public static void requestCatalog() {
-        td.setupDatasetGroups(BandReaderHapi.getCatalogGroups());
         BandReaderHapi.requestCatalog(Timelines::catalogsLoaded);
     }
 
     private static void catalogsLoaded(BandReaderHapi.CatalogData catalogData) {
+        td.setCatalogs(catalogData.datasets());
         List<BandType> bandTypes = new ArrayList<>();
-        catalogData.datasets().forEach((group, datasets) -> {
-            td.setupDataset(group, datasets);
+        for (BandDataset[] datasets : catalogData.datasets().values()) {
             for (BandDataset dataset : datasets)
                 bandTypes.addAll(dataset.bandTypes());
-        });
+        }
         TimelineLayers.fetchBands(bandTypes, DrawController.selectedAxis);
         timelinePanel.setPredefinedGroups(catalogData.predefinedGroups());
     }
