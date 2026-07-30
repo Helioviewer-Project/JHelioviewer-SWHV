@@ -19,18 +19,20 @@
   screen space to structures near the Sun while keeping the solar disk linear. (by @GillySpace27)
 - Remove the redundant Polar and LogPolar projections, subsumed by RectWarp
 - Add grid line color, opacity and width controls to the grid layer (by @GillySpace27)
+- Improve image canvas positioning and resizing on macOS
 
 ### Timeline, events, and UI
 - Add a stacked timeline mode with independent vertical scales, scrolling when
   the plots no longer fit vertically, and a control to maximize and restore the
   timeline panel
-- Allow timeline datasets to be loaded from multiple HAPI catalogs, with
-  predefined layouts supplied by HAPI metadata, including ordered groups and
-  membership in multiple groups
+- Load timeline datasets from multiple HAPI catalogs
+- Add predefined timeline plots supplied by HAPI metadata
+- Browse HAPI catalogs by catalog and group in the New Timeline Layer dialog
 - Support HAPI-defined bar plots, value-level colors, warning thresholds, and
   switching between multicolor and single-color rendering
 - Add frame-count sampling and use the selected sampling setting when adding,
   replacing, and synchronizing image layers
+- Add a Movie menu command and `Cmd-R` shortcut to start or stop recording
 - Add controls to collapse the sidebar and hide the toolbar or its text
 - Show the original image URI in the Image Information dialog
 - Map HEK Flare Trigger events to Flare events (fixes #105)
