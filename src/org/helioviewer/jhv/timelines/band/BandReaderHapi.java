@@ -412,32 +412,38 @@ public class BandReaderHapi {
 
     private static List<BandData> readBands(List<BandDecoder> decoders, HapiTableReader tableReader,
                                             InputStream in, Byte byte0, String fmt) throws Exception {
-        List<Long> dateList = new ArrayList<>();
-        List<List<Float>> valueLists = new ArrayList<>(decoders.size());
-        decoders.forEach(ignored -> valueLists.add(new ArrayList<>()));
+        int numPoints = 0;
+        long[] dates = new long[(int) (TimeUtils.DAY_IN_MILLIS / TimeUtils.MINUTE_IN_MILLIS)];
+        float[][] values = new float[decoders.size()][dates.length];
         try (RowSequence rseq = tableReader.createRowSequence(in, byte0, fmt)) {
             while (rseq.next()) {
                 String time = (String) rseq.getCell(0);
                 if (time == null) // fill
                     continue;
-                dateList.add(toMillis(time));
+
+                if (numPoints == dates.length) {
+                    dates = Arrays.copyOf(dates, dates.length * 2);
+                    for (int i = 0; i < values.length; i++)
+                        values[i] = Arrays.copyOf(values[i], dates.length);
+                }
+                dates[numPoints] = toMillis(time);
 
                 for (int i = 0; i < decoders.size(); i++) {
                     Number value = (Number) rseq.getCell(decoders.get(i).valueColumn);
                     float f = value == null ? YAxis.BLANK : value.floatValue();
-                    valueLists.get(i).add(Float.isFinite(f) ? f : YAxis.BLANK); // fill
+                    values[i][numPoints] = Float.isFinite(f) ? f : YAxis.BLANK; // fill
                 }
+                numPoints++;
             }
         }
 
-        int numPoints = dateList.size();
         if (numPoints == 0) // empty
             return List.of();
 
-        long[] dates = longArray(numPoints, dateList);
-        float[][] values = new float[decoders.size()][];
-        for (int i = 0; i < decoders.size(); i++) {
-            values[i] = floatArray(numPoints, valueLists.get(i));
+        if (numPoints != dates.length) {
+            dates = Arrays.copyOf(dates, numPoints);
+            for (int i = 0; i < values.length; i++)
+                values[i] = Arrays.copyOf(values[i], numPoints);
         }
 
         DatesValues raw = new DatesValues(dates, values);
@@ -450,20 +456,6 @@ public class BandReaderHapi {
             result.add(new BandData(decoders.get(i).type, data.dates(), data.values()[i]));
         }
         return result;
-    }
-
-    private static long[] longArray(int numPoints, List<Long> dateList) {
-        long[] ret = new long[numPoints];
-        for (int j = 0; j < numPoints; j++)
-            ret[j] = dateList.get(j);
-        return ret;
-    }
-
-    private static float[] floatArray(int numPoints, List<Float> valueList) {
-        float[] ret = new float[numPoints];
-        for (int j = 0; j < numPoints; j++)
-            ret[j] = valueList.get(j);
-        return ret;
     }
 
     private static JSONObject verifyResponse(JSONObject jo) throws Exception {
