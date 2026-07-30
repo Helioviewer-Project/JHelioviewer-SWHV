@@ -54,13 +54,6 @@ public class BandReaderHapi {
     private static final HashMap<CatalogEndpoint, Catalog> catalogs = new HashMap<>();
     private static final LatestWorker<Catalog[]> catalogWorker = new LatestWorker<>("HAPI-Catalog");
 
-    public static String[] getCatalogGroups() {
-        String[] groups = new String[catalogEndpoints.length];
-        for (int i = 0; i < catalogEndpoints.length; i++)
-            groups[i] = catalogEndpoints[i].groupName;
-        return groups;
-    }
-
     public static void requestCatalog(Consumer<CatalogData> listener) {
         catalogWorker.submit(BandReaderHapi::loadCatalogs, (loaded, fresh) -> {
             if (fresh)
@@ -364,9 +357,7 @@ public class BandReaderHapi {
         if (jhvparams == null)
             return new JSONObject();
 
-        JSONObject options = new JSONObject(jhvparams, "scale", "range", "plotType", "barWidth", "levels", "warningLevels");
-        options.putOpt("predefined", jhvparams.optJSONArray("predefined", jhvparams.optJSONArray("groups")));
-        return options;
+        return new JSONObject(jhvparams, "scale", "range", "plotType", "barWidth", "levels", "warningLevels", "groups", "predefined");
     }
 
     private static List<BandData> getHapiStream(Dataset dataset, RequestSchema schema,
