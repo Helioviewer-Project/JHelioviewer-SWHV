@@ -28,7 +28,7 @@
 - Add frame-count sampling and use the selected sampling setting when adding,
   replacing, and synchronizing image layers
 - Add a Movie menu command and `Cmd-R` shortcut to start or stop recording
-- Add controls to collapse the sidebar and hide the toolbar or its text
+- Add controls to collapse the sidebar and hide the status bar, the toolbar, or the toolbar text
 - Show the original image URI in the Image Information dialog
 - Improve HEK event handling by mapping Flare Trigger events to Flare events
   (fixes #105) and fixing CACTus event loading (fixes #190)
