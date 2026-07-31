@@ -21,7 +21,7 @@ import org.helioviewer.jhv.view.uri.FITSSettings;
 @SuppressWarnings("serial")
 public final class MenuBar extends JMenuBar {
 
-    public MenuBar(ToolBar toolBar) {
+    public MenuBar(ToolBar toolBar, StatusPanel statusPanel) {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         fileMenu.add(new Actions.NewLayer());
@@ -49,6 +49,8 @@ public final class MenuBar extends JMenuBar {
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
         editMenu.add(new Actions.Paste());
+        editMenu.addSeparator();
+        editMenu.add(new Actions.ClearAnnotations());
         add(editMenu);
 
         JMenu viewMenu = new JMenu("View");
@@ -57,6 +59,21 @@ public final class MenuBar extends JMenuBar {
         viewMenu.add(new Actions.ZoomFit());
         viewMenu.add(new Actions.ZoomIn());
         viewMenu.add(new Actions.ZoomOut());
+        viewMenu.add(new Actions.ResetCameraAxis());
+        viewMenu.add(new Actions.ResetCamera());
+        viewMenu.addSeparator();
+
+        JCheckBoxMenuItem separateMultiviewZoom = new JCheckBoxMenuItem(new Actions.SeparateMultiviewZoom());
+        separateMultiviewZoom.setState(Display.separateViewportZoom);
+        viewMenu.add(separateMultiviewZoom);
+
+        JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
+        white.addItemListener(e -> {
+            Display.whiteBackground = white.getState();
+            DisplayController.display();
+        });
+        viewMenu.add(white);
+
         viewMenu.addSeparator();
 
         JCheckBoxMenuItem showToolbar = new JCheckBoxMenuItem("Show Toolbar", toolBar.isVisible());
@@ -67,23 +84,9 @@ public final class MenuBar extends JMenuBar {
         showToolbarText.addItemListener(e -> toolBar.setTextVisible(showToolbarText.getState()));
         viewMenu.add(showToolbarText);
 
-        viewMenu.addSeparator();
-        JCheckBoxMenuItem separateMultiviewZoom = new JCheckBoxMenuItem(new Actions.SeparateMultiviewZoom());
-        separateMultiviewZoom.setState(Display.separateViewportZoom);
-        viewMenu.add(separateMultiviewZoom);
-
-        viewMenu.addSeparator();
-        viewMenu.add(new Actions.ResetCameraAxis());
-        viewMenu.add(new Actions.ResetCamera());
-        viewMenu.addSeparator();
-        viewMenu.add(new Actions.ClearAnnotations());
-
-        JCheckBoxMenuItem white = new JCheckBoxMenuItem("Use White Background");
-        white.addItemListener(e -> {
-            Display.whiteBackground = white.getState();
-            DisplayController.display();
-        });
-        viewMenu.add(white);
+        JCheckBoxMenuItem showStatusBar = new JCheckBoxMenuItem("Show Status Bar", statusPanel.isVisible());
+        showStatusBar.addItemListener(e -> statusPanel.setStatusBarVisible(showStatusBar.getState()));
+        viewMenu.add(showStatusBar);
 
         viewMenu.addSeparator();
         viewMenu.add(new Actions.ShowDialog("FITS Settings...", new FITSSettings.SettingsDialog()));

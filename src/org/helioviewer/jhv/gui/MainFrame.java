@@ -161,7 +161,7 @@ public final class MainFrame {
 
         ToolBar toolBar = new ToolBar();
 
-        menuBar = new MenuBar(toolBar);
+        menuBar = new MenuBar(toolBar, statusPanel);
         mainFrame.setJMenuBar(menuBar);
 
         if (Platform.isMacOS()) {
