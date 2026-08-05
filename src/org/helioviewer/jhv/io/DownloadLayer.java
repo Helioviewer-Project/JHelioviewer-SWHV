@@ -62,7 +62,6 @@ public class DownloadLayer {
                             EventQueue.invokeLater(() -> progress.progress(percent));
                         }
                     }
-                    sink.flush();
                 }
                 return dstPath;
             } catch (Exception e) {
