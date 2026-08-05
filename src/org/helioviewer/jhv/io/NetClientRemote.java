@@ -68,9 +68,8 @@ class NetClientRemote implements NetClient {
             builder.cacheControl(noStore);
         if (body != null)
             builder.post(RequestBody.create(body, MediaType.get(contentType)));
-        Request request = builder.build();
-        //System.out.println(">>> " + url);
 
+        Request request = builder.build();
         Response response = client.newCall(request).execute();
         isSuccessful = response.isSuccessful();
         if (!allowError && !isSuccessful) {
@@ -80,13 +79,6 @@ class NetClientRemote implements NetClient {
         }
 
         responseBody = response.body();
-        if (responseBody == null) {
-            response.close();
-            throw new IOException("Empty response body for " + uri);
-        }
-
-        //if (response.cacheResponse() != null)
-        //    System.out.println(">>> cached response: " + url);
     }
 
     @Override
@@ -106,9 +98,7 @@ class NetClientRemote implements NetClient {
 
     @Override
     public void close() {
-        if (responseBody != null) {
-            responseBody.close();
-        }
+        responseBody.close();
     }
 /*
     private static class LoggingInterceptor implements Interceptor {
