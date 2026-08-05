@@ -4,6 +4,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,7 +19,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.app.Settings;
-import org.helioviewer.jhv.gui.Interfaces;
 
 @SuppressWarnings("serial")
 public final class DataSourcesTree extends JTree {
@@ -62,7 +62,7 @@ public final class DataSourcesTree extends JTree {
     private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
-    public DataSourcesTree(Interfaces.DatasetSelectionHandler selectionHandler) {
+    public DataSourcesTree(Consumer<SourceItem> activationHandler) {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
@@ -92,7 +92,7 @@ public final class DataSourcesTree extends JTree {
                 if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1 && (path = getPathForLocation(e.getX(), e.getY())) != null) {
                     Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
                     if (obj instanceof SourceItem si)
-                        selectionHandler.loadDataset(si.server, si.sourceId);
+                        activationHandler.accept(si);
                 }
             }
         });
