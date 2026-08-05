@@ -41,6 +41,7 @@ public class DownloadLayer {
     }
 
     private static final int BUFSIZ = 1024 * 1024;
+    private static final long PROGRESS_INTERVAL = 8L * BUFSIZ;
 
     private record LayerDownload(APIRequest req, Progress progress, Path dstPath) implements Callable<Path> {
         @Override
@@ -48,16 +49,16 @@ public class DownloadLayer {
             URI uri = new URI(req.toFileRequest());
             try {
                 try (NetClient nc = NetClient.of(uri); BufferedSource source = nc.getSource(); BufferedSink sink = Okio.buffer(Okio.sink(dstPath))) {
-                    long count = 0, contentLength = nc.getContentLength();
-                    long bytesRead, totalRead = 0;
+                    long contentLength = nc.getContentLength();
+                    long bytesRead, totalRead = 0, lastProgress = 0;
                     Buffer sinkBuffer = sink.getBuffer();
                     while ((bytesRead = source.read(sinkBuffer, BUFSIZ)) != -1) {
                         // stream out buffered data during download to avoid large memory growth
                         sink.emitCompleteSegments();
 
                         totalRead += bytesRead;
-                        count++;
-                        if (count % 8 == 0) { // approx 8MB with BUFSIZ=1MB
+                        if (totalRead - lastProgress >= PROGRESS_INTERVAL) {
+                            lastProgress = totalRead;
                             int percent = contentLength > 0 ? (int) (100. / contentLength * totalRead + .5) : -1;
                             EventQueue.invokeLater(() -> progress.progress(percent));
                         }
