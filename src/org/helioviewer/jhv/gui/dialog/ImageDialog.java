@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.helioviewer.jhv.gui.DesktopIntegration;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.io.DataSources;
@@ -28,9 +27,15 @@ import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 
 @SuppressWarnings("serial")
-public final class ImageDialog extends StandardDialog implements Interfaces.DatasetSelectionHandler, DataSources.Listener {
+public final class ImageDialog extends StandardDialog implements DataSources.Listener {
 
-    private final Interfaces.DatasetSelectionHandler selectionHandler;
+    public interface Handler {
+        void setDefaultTimeRange(long start, long end);
+
+        void loadDataset(String server, int sourceId);
+    }
+
+    private final Handler handler;
     private final DataSourcesTree sourcesTree;
     private final HTMLPane datasetExtent = new HTMLPane();
     private final JButton availabilityButton = new JButton("Available data");
@@ -39,15 +44,15 @@ public final class ImageDialog extends StandardDialog implements Interfaces.Data
         public void actionPerformed(ActionEvent e) {
             DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
             if (item != null)
-                loadDataset(item.server, item.sourceId);
+                loadDataset(item);
         }
     };
     private final JButton actionButton = new JButton(load);
 
-    public ImageDialog(Interfaces.DatasetSelectionHandler _selectionHandler) {
+    public ImageDialog(Handler _handler) {
         super(MainFrame.get(), "New Image Layer", false);
-        selectionHandler = _selectionHandler;
-        sourcesTree = new DataSourcesTree(this);
+        handler = _handler;
+        sourcesTree = new DataSourcesTree(this::loadDataset);
         sourcesTree.addTreeSelectionListener(e -> selectionChanged());
         availabilityButton.setEnabled(false);
         availabilityButton.addActionListener(e -> {
@@ -142,17 +147,11 @@ public final class ImageDialog extends StandardDialog implements Interfaces.Data
 
         DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
         if (item != null)
-            selectionHandler.setDefaultTimeRange(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
+            handler.setDefaultTimeRange(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
     }
 
-    @Override
-    public void setDefaultTimeRange(long start, long end) {
-        selectionHandler.setDefaultTimeRange(start, end);
-    }
-
-    @Override
-    public void loadDataset(String server, int sourceId) {
+    private void loadDataset(DataSourcesTree.SourceItem item) {
         setVisible(false);
-        selectionHandler.loadDataset(server, sourceId);
+        handler.loadDataset(item.server, item.sourceId);
     }
 }

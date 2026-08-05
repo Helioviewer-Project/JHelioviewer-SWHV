@@ -21,7 +21,6 @@ import javax.swing.SpinnerNumberModel;
 import org.helioviewer.jhv.app.state.ViewState;
 import org.helioviewer.jhv.gui.Actions;
 import org.helioviewer.jhv.gui.ComponentUtils;
-import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.dialog.ImageDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
@@ -37,7 +36,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
 
 @SuppressWarnings("serial")
-public class MoviePanel extends JPanel implements Interfaces.DatasetSelectionHandler, Player.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
+public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.StatusListener, ExportMovie.StatusListener, ViewState.PlaybackConfigListener, ViewState.RecordingConfigListener {
 
     private static final int FRAME_HOLD_REPEAT_MS = 125;
     private int fixedPreferredWidth = -1;

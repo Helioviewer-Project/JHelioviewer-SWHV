@@ -16,12 +16,6 @@ public final class Interfaces {
         List<JComponent> getVisualInterfaces();
     }
 
-    public interface DatasetSelectionHandler {
-        void setDefaultTimeRange(long start, long end);
-
-        void loadDataset(String server, int sourceId);
-    }
-
     public interface ShowableDialog {
         void showDialog();
     }
