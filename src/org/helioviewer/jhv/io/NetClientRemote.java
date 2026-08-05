@@ -13,7 +13,6 @@ import org.helioviewer.jhv.app.Log;
 import okhttp3.Authenticator;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
-import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 //import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -27,12 +26,8 @@ import okio.BufferedSource;
 
 class NetClientRemote implements NetClient {
 
-    private static final Dispatcher dispatcher;
-
     static {
         Log.setLoggerLevel(OkHttpClient.class.getName(), Level.FINE);
-        dispatcher = new Dispatcher();
-        dispatcher.setMaxRequestsPerHost(8);
     }
 
     //private static final HttpLoggingInterceptor logging = new HttpLoggingInterceptor(Log::info).setLevel(HttpLoggingInterceptor.Level.HEADERS);
@@ -43,7 +38,6 @@ class NetClientRemote implements NetClient {
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .cache(new Cache(Directories.clientCacheDir, cacheSize))
-            .dispatcher(dispatcher)
             .proxyAuthenticator(Authenticator.JAVA_NET_AUTHENTICATOR)
             //.addInterceptor(logging)
             //.addInterceptor(new LoggingInterceptor())
