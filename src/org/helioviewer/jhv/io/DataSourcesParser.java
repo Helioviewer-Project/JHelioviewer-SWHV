@@ -57,7 +57,7 @@ public class DataSourcesParser {
                 int sourceId = json.getInt("sourceId");
                 long start = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("start"));
                 long end = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("end"));
-                String description = json.getString("description") + " [" + TimeUtils.formatDate(start) + " : " + TimeUtils.formatDate(end) + ']';
+                String description = json.getString("description");
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
                         description, sourceId, start, end,
                         json.optBoolean("default", false));
