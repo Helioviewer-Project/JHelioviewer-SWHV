@@ -46,15 +46,13 @@ public final class DataSourcesTree extends JTree {
         public final int sourceId;
         public final long start;
         public final long end;
-        public final boolean defaultItem;
 
-        public SourceItem(String _server, String _name, String _description, int _sourceId, long _start, long _end, boolean _defaultItem) {
+        public SourceItem(String _server, String _name, String _description, int _sourceId, long _start, long _end) {
             super(_name, _description);
             server = _server;
             sourceId = _sourceId;
             start = _start;
             end = _end;
-            defaultItem = _defaultItem;
         }
 
     }
@@ -127,13 +125,10 @@ public final class DataSourcesTree extends JTree {
 
     public boolean setParsedData(DataSourcesParser parser) {
         String server = parser.getRoot().toString();
-        for (String serverName : DataSources.getServers()) {
-            if (serverName.equals(server)) {
-                DefaultMutableTreeNode node = nodes.get(serverName);
-                reattach(node, parser.getRoot());
-                ((DefaultTreeModel) getModel()).nodeStructureChanged(node);
-                break;
-            }
+        DefaultMutableTreeNode node = nodes.get(server);
+        if (node != null) {
+            reattach(node, parser.getRoot());
+            ((DefaultTreeModel) getModel()).nodeStructureChanged(node);
         }
 
         boolean preferred = server.equals(Settings.getProperty("dataSources.defaultServer"));

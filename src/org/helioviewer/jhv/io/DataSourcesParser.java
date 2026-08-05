@@ -59,8 +59,7 @@ public class DataSourcesParser {
                 long end = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("end"));
                 String description = json.getString("description");
                 DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
-                        description, sourceId, start, end,
-                        json.optBoolean("default", false));
+                        description, sourceId, start, end);
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
 
@@ -68,7 +67,7 @@ public class DataSourcesParser {
                 if (path.length == 3) {
                     DataSources.insertDataset(sourceId, path[0].toString(), path[1].toString(), path[2].toString());
                 }
-                if (item.defaultItem)
+                if (json.optBoolean("default", false))
                     defaultNode = treeNode;
             } else {
                 if (str == null) { // show only top level, else flatten hierarchy
