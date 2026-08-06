@@ -24,31 +24,28 @@ public class DataSources {
         void setupSources(DataSourcesParser parser);
     }
 
+    public record Server(String label, String catalogURL, String jp2URL, String jpxURL, @Nullable String availabilityURL) {}
+
     private static final String enabledDatasetsV2 = "[MLSO,TRACE,Hinode,Yohkoh,STEREO_A,STEREO_B,PROBA2,SOLO,GOES-R,IRIS,GONG,ROB,Kanzelhoehe,RHESSI,GOES,PUNCH]";
 
-    private static ImmutableMap<String, Map<String, String>> serverSettings;
+    private static ImmutableMap<String, Server> servers;
 
-    private static Map<String, String> getSourceMap(String api, String label, String availability) {
-        ImmutableMap.Builder<String, String> builder = new ImmutableMap.Builder<>();
-        if (availability != null)
-            builder.put("availability.images", availability);
-
-        return builder.
-                put("API.getDataSources", api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2).
-                put("API.getJP2Image", api + "getJP2Image/?").
-                put("API.getJPX", api + "getJPX/?").
-                put("label", label).
-                build();
+    private static Server createServer(String api, String label, @Nullable String availability) {
+        return new Server(label,
+                api + "getDataSources/?verbose=true&enable=" + enabledDatasetsV2,
+                api + "getJP2Image/?",
+                api + "getJPX/?",
+                availability);
     }
 
-    private static void loadUserServers(JSONObject json, ImmutableMap.Builder<String, Map<String, String>> builder) {
+    private static void loadUserServers(JSONObject json, ImmutableMap.Builder<String, Server> builder) {
         JSONArray ja = json.optJSONArray("org.helioviewer.jhv.source.image");
         if (ja != null) {
             int len = ja.length();
             for (int i = 0; i < len; i++) {
                 try {
                     JSONObject jo = ja.getJSONObject(i);
-                    builder.put(jo.getString("name"), getSourceMap(jo.getString("api"), jo.getString("label"), jo.optString("availability", null)));
+                    builder.put(jo.getString("name"), createServer(jo.getString("api"), jo.getString("label"), jo.optString("availability", null)));
                 } catch (Exception e) {
                     Log.warn(e);
                 }
@@ -57,7 +54,7 @@ public class DataSources {
     }
 
     public static void initSources() {
-        ImmutableMap.Builder<String, Map<String, String>> builder = new ImmutableMap.Builder<>();
+        ImmutableMap.Builder<String, Server> builder = new ImmutableMap.Builder<>();
         Path userSources = Path.of(Directories.SETTINGS.getPath(), "sources.json");
         if (Files.exists(userSources)) { // user servers
             try (BufferedReader reader = Files.newBufferedReader(userSources)) {
@@ -67,21 +64,19 @@ public class DataSources {
             }
         }
 
-        builder
-                .put("ROB", getSourceMap("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?"))
-                .put("IAS", getSourceMap("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null))
-                .put("GSFC", getSourceMap("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null));
-        serverSettings = builder.buildKeepingLast(); // Avoid crash on duplicated server names
+        builder.put("ROB", createServer("https://api.swhv.oma.be/hv_docpage/v2/", "Royal Observatory of Belgium", "https://swhv.oma.be/availability/?"))
+                .put("IAS", createServer("https://helioviewer-api.ias.u-psud.fr/v2/", "Institut d'Astrophysique Spatiale", null))
+                .put("GSFC", createServer("https://api.helioviewer.org/v2/", "Goddard Space Flight Center", null));
+        servers = builder.buildKeepingLast(); // Avoid crash on duplicated server names
     }
 
     public static Set<String> getServers() {
-        return serverSettings.keySet();
+        return servers.keySet();
     }
 
     @Nullable
-    public static String getServerSetting(@Nonnull String server, @Nonnull String setting) {
-        Map<String, String> settings = serverSettings.get(server);
-        return settings == null ? null : settings.get(setting);
+    public static Server getServer(@Nullable String name) {
+        return servers.get(name);
     }
 
     private static final ArrayList<Listener> listeners = new ArrayList<>();
@@ -96,9 +91,9 @@ public class DataSources {
 
     public static void loadSources(boolean requestAfterLoad) {
         datasetMap.clear(); // clear stale datasets on reload of DataSources
-        toLoad = serverSettings.size();
+        toLoad = servers.size();
         loadCommandLineRequest = requestAfterLoad;
-        serverSettings.keySet().forEach(serverName -> LoadSources.submit(serverName));
+        servers.keySet().forEach(serverName -> LoadSources.submit(serverName));
     }
 
     static void setupSources(@Nullable DataSourcesParser parser) {
@@ -133,5 +128,4 @@ public class DataSources {
         }
         return -1;
     }
-
 }

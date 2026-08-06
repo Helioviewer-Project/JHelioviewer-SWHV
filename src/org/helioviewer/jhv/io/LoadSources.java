@@ -25,8 +25,8 @@ class LoadSources {
     private record SourcesLoad(String server) implements Callable<DataSourcesParser> {
         @Override
         public DataSourcesParser call() throws Exception {
-            String serverUrl = DataSources.getServerSetting(server, "API.getDataSources");
-            if (serverUrl == null) // can't happen
+            DataSources.Server source = DataSources.getServer(server);
+            if (source == null) // can't happen
                 throw new Exception("Unknown server: " + server);
 
             Schema schema;
@@ -36,7 +36,7 @@ class LoadSources {
                 schema = schemaLoader.load().build();
             }
 
-            JSONObject jo = JSONUtils.getUncached(new URI(serverUrl));
+            JSONObject jo = JSONUtils.getUncached(new URI(source.catalogURL()));
             Validator.builder().failEarly().build().performValidation(schema, jo);
 
             return new DataSourcesParser(server).parse(jo);

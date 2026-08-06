@@ -136,7 +136,8 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     private static String getAvailabilityURL(@Nullable DataSourcesTree.SourceItem item) {
         if (item == null) return null;
 
-        String availability = DataSources.getServerSetting(item.server, "availability.images");
+        DataSources.Server server = DataSources.getServer(item.server);
+        String availability = server == null ? null : server.availabilityURL();
         return availability == null ? null : availability + "ID=" + item.sourceId;
     }
 

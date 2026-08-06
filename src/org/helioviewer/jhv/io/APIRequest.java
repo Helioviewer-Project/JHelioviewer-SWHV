@@ -26,16 +26,15 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
     }
 
     public String toFileRequest() throws Exception {
-        String api;
+        DataSources.Server source = DataSources.getServer(server);
+        if (source == null)
+            throw new Exception("Unknown server: " + server);
+
         String fileReq;
         if (startTime == endTime) {
-            if ((api = DataSources.getServerSetting(server, "API.getJP2Image")) == null)
-                throw new Exception("Unknown server: " + server);
-            fileReq = api + "sourceId=" + sourceId + "&date=" + TimeUtils.formatZ(startTime);
+            fileReq = source.jp2URL() + "sourceId=" + sourceId + "&date=" + TimeUtils.formatZ(startTime);
         } else {
-            if ((api = DataSources.getServerSetting(server, "API.getJPX")) == null)
-                throw new Exception("Unknown server: " + server);
-            fileReq = api + "sourceId=" + sourceId + "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
+            fileReq = source.jpxURL() + "sourceId=" + sourceId + "&startTime=" + TimeUtils.formatZ(startTime) + "&endTime=" + TimeUtils.formatZ(endTime);
             if (cadence != CADENCE_ALL)
                 fileReq += "&cadence=" + cadence;
         }
@@ -59,7 +58,7 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
 
     public static APIRequest fromJson(JSONObject jo) {
         String _server = jo.optString("server", "");
-        if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
+        if (DataSources.getServer(_server) == null)
             _server = Settings.getProperty("dataSources.defaultServer");
 
         int _sourceId = jo.optInt("sourceId", 10);
@@ -82,9 +81,9 @@ public record APIRequest(@Nonnull String server, int sourceId, long startTime, l
         String dataset = jo.getString("dataset");
 
         String _server = jo.optString("server", "");
-        if (DataSources.getServerSetting(_server, "API.getDataSources") == null)
+        if (DataSources.getServer(_server) == null)
             _server = Settings.getProperty("dataSources.defaultServer");
-        if (_server == null || DataSources.getServerSetting(_server, "API.getDataSources") == null) // very unlikely
+        if (DataSources.getServer(_server) == null) // very unlikely
             throw new Exception("Unknown server");
 
         int _sourceId = DataSources.selectDataset(_server, observatory, dataset);

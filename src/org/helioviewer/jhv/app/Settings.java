@@ -42,7 +42,7 @@ public class Settings {
         if (getProperty("path.state") == null)
             setProperty("path.state", Directories.STATES.getPath());
         String server = getProperty("dataSources.defaultServer");
-        if (server == null || DataSources.getServerSetting(server, "API.getDataSources") == null)
+        if (DataSources.getServer(server) == null)
             setProperty("dataSources.defaultServer", "IAS");
     }
 

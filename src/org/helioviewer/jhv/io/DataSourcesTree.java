@@ -64,7 +64,7 @@ public final class DataSourcesTree extends JTree {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, DataSources.getServerSetting(serverName, "label")));
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(new Item(serverName, DataSources.getServer(serverName).label()));
             nodes.put(serverName, node);
             nodeRoot.add(node);
         }
