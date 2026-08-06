@@ -287,7 +287,7 @@ public final class RadioData extends TimelineLayer {
 
     private static JPanel optionsPanel(LUTComboBox combo) {
         JButton availabilityBtn = new JButton("Available data");
-        availabilityBtn.addActionListener(e -> DesktopIntegration.openURL(DataSources.getServerSetting("ROB", "availability.images") +
+        availabilityBtn.addActionListener(e -> DesktopIntegration.openURL(DataSources.getServer("ROB").availabilityURL() +
                 "ID=" + APIRequest.CallistoID));
 
         JPanel panel = new JPanel(new GridBagLayout());
