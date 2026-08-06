@@ -102,25 +102,10 @@ public final class DataSourcesTree extends JTree {
         return null; // disable builtin search
     }
 
-    private static DefaultMutableTreeNode copyNode(DefaultMutableTreeNode src) {
-        DefaultMutableTreeNode copy = new DefaultMutableTreeNode(src.getUserObject());
-        if (src.isLeaf()) {
-            return copy;
-        } else {
-            int cc = src.getChildCount();
-            for (int i = 0; i < cc; i++) {
-                copy.add(copyNode((DefaultMutableTreeNode) src.getChildAt(i)));
-            }
-            return copy;
-        }
-    }
-
     private static void reattach(DefaultMutableTreeNode tgt, DefaultMutableTreeNode src) {
         tgt.removeAllChildren();
-        Enumeration<?> children = src.children();
-        while (children.hasMoreElements()) {
-            tgt.add(copyNode((DefaultMutableTreeNode) children.nextElement()));
-        }
+        while (src.getChildCount() > 0)
+            tgt.add((DefaultMutableTreeNode) src.getFirstChild());
     }
 
     public boolean setParsedData(DataSourcesParser parser) {

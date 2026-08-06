@@ -60,7 +60,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
             if (url != null)
                 DesktopIntegration.openURL(url);
         });
-        DataSources.addListener(this);
+        DataSources.setListener(this);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setResizable(false);
         setType(Window.Type.UTILITY);
