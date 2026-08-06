@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import org.helioviewer.jhv.base.NaturalSort;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -14,7 +13,7 @@ public class DataSourcesParser {
 
     private final String server;
     private final DefaultMutableTreeNode rootNode;
-    private DefaultMutableTreeNode defaultNode;
+    private DataSourcesTree.SourceItem defaultItem;
 
     DataSourcesParser(String _server) {
         server = _server;
@@ -30,8 +29,8 @@ public class DataSourcesParser {
         return rootNode;
     }
 
-    DefaultMutableTreeNode getDefault() {
-        return defaultNode;
+    DataSourcesTree.SourceItem getDefault() {
+        return defaultItem;
     }
 
     private static String mergeNames(String str1, String str2) {
@@ -63,12 +62,9 @@ public class DataSourcesParser {
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
 
-                TreeNode[] path = treeNode.getPath();
-                if (path.length == 3) {
-                    DataSources.insertDataset(sourceId, path[0].toString(), path[1].toString(), path[2].toString());
-                }
+                DataSources.insertDataset(sourceId, server, parentNode.toString(), item.toString());
                 if (json.optBoolean("default", false))
-                    defaultNode = treeNode;
+                    defaultItem = item;
             } else {
                 if (str == null) { // show only top level, else flatten hierarchy
                     DataSourcesTree.Item item = new DataSourcesTree.Item(name.replace('_', '-'), json.getString("description"));
