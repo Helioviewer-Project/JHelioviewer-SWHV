@@ -143,10 +143,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
 
     @Override
     public void setupSources(DataSourcesParser parser) {
-        if (!sourcesTree.setParsedData(parser))
-            return;
-
-        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
+        DataSourcesTree.SourceItem item = sourcesTree.setParsedData(parser);
         if (item != null)
             handler.setDefaultTimeRange(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
     }

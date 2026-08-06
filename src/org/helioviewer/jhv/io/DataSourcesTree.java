@@ -86,14 +86,18 @@ public final class DataSourcesTree extends JTree {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                TreePath path;
-                if (e.getClickCount() == 2 && getRowForLocation(e.getX(), e.getY()) != -1 && (path = getPathForLocation(e.getX(), e.getY())) != null) {
-                    Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                    if (obj instanceof SourceItem si)
-                        activationHandler.accept(si);
-                }
+                if (e.getClickCount() == 2 && getItemAt(e) instanceof SourceItem item)
+                    activationHandler.accept(item);
             }
         });
+    }
+
+    @Nullable
+    private Item getItemAt(MouseEvent e) {
+        TreePath path = getPathForLocation(e.getX(), e.getY());
+        if (path != null && ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject() instanceof Item item)
+            return item;
+        return null;
     }
 
     @Nullable
@@ -108,7 +112,8 @@ public final class DataSourcesTree extends JTree {
             tgt.add((DefaultMutableTreeNode) src.getFirstChild());
     }
 
-    public boolean setParsedData(DataSourcesParser parser) {
+    @Nullable
+    public SourceItem setParsedData(DataSourcesParser parser) {
         String server = parser.getRoot().toString();
         DefaultMutableTreeNode node = nodes.get(server);
         if (node != null) {
@@ -117,10 +122,13 @@ public final class DataSourcesTree extends JTree {
         }
 
         boolean preferred = server.equals(Settings.getProperty("dataSources.defaultServer"));
+        if (!preferred)
+            return null;
+
         SourceItem defaultItem = parser.getDefault();
-        if (preferred && defaultItem != null)
+        if (defaultItem != null)
             setSelectedItem(defaultItem.server, defaultItem.sourceId);
-        return preferred;
+        return getSelectedItem();
     }
 
     public void setSelectedItem(String server, int sourceId) {
@@ -138,12 +146,9 @@ public final class DataSourcesTree extends JTree {
 
     @Nullable
     public SourceItem getSelectedItem() {
-        TreePath path = getSelectionPath();
-        if (path != null) {
-            Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-            if (obj instanceof SourceItem si)
-                return si;
-        }
+        Object obj = getLastSelectedPathComponent();
+        if (obj instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SourceItem item)
+            return item;
         return null; // only on source load error
     }
 
@@ -153,14 +158,8 @@ public final class DataSourcesTree extends JTree {
         if (e == null) // may receive null according to docs
             return null;
 
-        TreePath path;
-        if (getRowForLocation(e.getX(), e.getY()) == -1 || (path = getPathForLocation(e.getX(), e.getY())) == null)
-            return null;
-
-        Object obj = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-        if (obj instanceof Item item)
-            return item.description;
-        return null;
+        Item item = getItemAt(e);
+        return item == null ? null : item.description;
     }
 
     private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {

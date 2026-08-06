@@ -32,7 +32,7 @@ class LoadSources {
         JSONObject jo = JSONUtils.getUncached(new URI(server.catalogURL()));
         Validator.builder().failEarly().build().performValidation(schema, jo);
 
-        return new DataSourcesParser(serverName).parse(jo);
+        return new DataSourcesParser(serverName, jo);
     }
 
     private static void onFailure(String serverName, Throwable t) {
