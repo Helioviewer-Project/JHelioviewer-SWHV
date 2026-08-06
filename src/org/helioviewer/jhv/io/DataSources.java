@@ -3,7 +3,6 @@ package org.helioviewer.jhv.io;
 import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,11 +78,10 @@ public class DataSources {
         return servers.get(name);
     }
 
-    private static final ArrayList<Listener> listeners = new ArrayList<>();
+    private static Listener listener;
 
-    public static void addListener(Listener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
+    public static void setListener(Listener _listener) {
+        listener = _listener;
     }
 
     private static int toLoad;
@@ -97,8 +95,8 @@ public class DataSources {
     }
 
     static void setupSources(@Nullable DataSourcesParser parser) {
-        if (parser != null) // didn't fail
-            listeners.forEach(listener -> listener.setupSources(parser));
+        if (parser != null && listener != null) // didn't fail
+            listener.setupSources(parser);
 
         toLoad--;
         if (toLoad == 0 && loadCommandLineRequest) {
