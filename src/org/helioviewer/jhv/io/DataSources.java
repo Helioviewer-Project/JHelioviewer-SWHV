@@ -93,7 +93,7 @@ public class DataSources {
         datasetMap.clear(); // clear stale datasets on reload of DataSources
         toLoad = servers.size();
         loadCommandLineRequest = requestAfterLoad;
-        servers.keySet().forEach(serverName -> LoadSources.submit(serverName));
+        servers.forEach(LoadSources::submit);
     }
 
     static void setupSources(@Nullable DataSourcesParser parser) {
