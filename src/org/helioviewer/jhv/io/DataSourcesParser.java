@@ -15,14 +15,10 @@ public class DataSourcesParser {
     private final DefaultMutableTreeNode rootNode;
     private DataSourcesTree.SourceItem defaultItem;
 
-    DataSourcesParser(String _server) {
+    DataSourcesParser(String _server, JSONObject json) {
         server = _server;
         rootNode = new DefaultMutableTreeNode(server);
-    }
-
-    DataSourcesParser parse(JSONObject json) {
         parse(rootNode, json, null);
-        return this;
     }
 
     DefaultMutableTreeNode getRoot() {
@@ -56,9 +52,7 @@ public class DataSourcesParser {
                 int sourceId = json.getInt("sourceId");
                 long start = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("start"));
                 long end = TimeUtils.parse(TimeUtils.sqlTimeFormatter, json.getString("end"));
-                String description = json.getString("description");
-                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name),
-                        description, sourceId, start, end);
+                DataSourcesTree.SourceItem item = new DataSourcesTree.SourceItem(server, mergeNames(str, name), json.getString("description"), sourceId, start, end);
                 DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(item, false);
                 parentNode.add(treeNode);
 
