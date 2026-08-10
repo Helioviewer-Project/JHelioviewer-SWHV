@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +28,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -87,12 +87,7 @@ public class SynopticDialog extends StandardDialog {
             setVisible(false);
         });
 
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
+        AbstractAction close = ComponentUtils.hideAction(this);
         setDefaultCancelAction(close);
 
         JButton closeButton = new JButton(close);

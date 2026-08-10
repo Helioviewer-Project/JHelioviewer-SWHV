@@ -1,9 +1,9 @@
 package org.helioviewer.jhv.gui.dialog;
 
-import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+
+import org.helioviewer.jhv.gui.ComponentUtils;
 
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -12,7 +12,7 @@ import com.jidesoft.dialog.StandardDialog;
 class CloseButtonPanel extends ButtonPanel {
 
     CloseButtonPanel(StandardDialog dialog) {
-        AbstractAction close = new CloseAction(dialog);
+        AbstractAction close = ComponentUtils.hideAction(dialog);
         dialog.setDefaultAction(close);
         dialog.setDefaultCancelAction(close);
 
@@ -20,21 +20,6 @@ class CloseButtonPanel extends ButtonPanel {
         button.setText("Close");
         dialog.setInitFocusedComponent(button);
         add(button, ButtonPanel.AFFIRMATIVE_BUTTON);
-    }
-
-    private static class CloseAction extends AbstractAction {
-
-        private final StandardDialog dialog;
-
-        CloseAction(StandardDialog _dialog) {
-            dialog = _dialog;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            dialog.setVisible(false);
-        }
-
     }
 
 }

@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.gui.dialog;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.net.URI;
 import java.nio.file.Files;
@@ -21,6 +20,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.CompletionNotifications;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
@@ -84,12 +84,7 @@ public final class MetaDataDialog extends StandardDialog implements Interfaces.S
 
     @Override
     public ButtonPanel createButtonPanel() {
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
+        AbstractAction close = ComponentUtils.hideAction(this);
         setDefaultAction(close);
         setDefaultCancelAction(close);
 

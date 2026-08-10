@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,6 +29,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.app.Commands;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.thread.Task;
@@ -88,15 +88,11 @@ public class AspiicsDialog extends StandardDialog {
             setVisible(false);
         });
 
-        AbstractAction close = new AbstractAction("Close") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
+        AbstractAction close = ComponentUtils.hideAction(this);
         setDefaultCancelAction(close);
 
         JButton closeButton = new JButton(close);
+        closeButton.setText("Close");
 
         ButtonPanel panel = new ButtonPanel();
         panel.add(addButton, ButtonPanel.AFFIRMATIVE_BUTTON);

@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -82,12 +81,7 @@ public class SoarDialog extends StandardDialog implements SoarClient.ReceiverIte
 
     @Override
     public ButtonPanel createButtonPanel() {
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
+        AbstractAction close = ComponentUtils.hideAction(this);
         setDefaultCancelAction(close);
 
         JButton loadButton = getLoadButton();

@@ -27,6 +27,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.timelines.TimelineLayers;
@@ -65,12 +66,7 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
 
     @Override
     public ButtonPanel createButtonPanel() {
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
+        AbstractAction close = ComponentUtils.hideAction(this);
         setDefaultCancelAction(close);
         setDefaultAction(load);
         setInitFocusedComponent(tree);
