@@ -113,11 +113,6 @@ public class SliderFilterPanel {
             return label;
         }
 
-        public void setVisible(boolean visible) {
-            title.setVisible(visible);
-            slider.setVisible(visible);
-            label.setVisible(visible);
-        }
     }
 
 }
