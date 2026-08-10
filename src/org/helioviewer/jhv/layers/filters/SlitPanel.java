@@ -44,10 +44,4 @@ public class SlitPanel implements FilterDetails {
         return label;
     }
 
-    public void setVisible(boolean visible) {
-        title.setVisible(visible);
-        slider.setVisible(visible);
-        label.setVisible(visible);
-    }
-
 }

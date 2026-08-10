@@ -10,4 +10,10 @@ public interface FilterDetails {
 
     Component getThird();
 
+    default void setVisible(boolean visible) {
+        getFirst().setVisible(visible);
+        getSecond().setVisible(visible);
+        getThird().setVisible(visible);
+    }
+
 }
