@@ -274,6 +274,13 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
+    private static void putLineScale(BufVertex vexBuf, float x0, float y0, float x1, float y1, byte[] color) {
+        vexBuf.putVertex(x0, y0, 0, 1, Colors.Null);
+        vexBuf.repeatVertex(color);
+        vexBuf.putVertex(x1, y1, 0, 1, color);
+        vexBuf.repeatVertex(Colors.Null);
+    }
+
     private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, MapScale scale) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
@@ -288,38 +295,18 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
 
         float x = (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect);
         float y = (float) (scale.toUnitY(DIST_SUN_BEGIN) - 0.5);
-        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-        vexBuf.repeatVertex(color);
-
-        y = (float) (scale.toUnitY(distSun + 0.05) - 0.5);
-        vexBuf.putVertex(x, y, 0, 1, color);
-        vexBuf.repeatVertex(Colors.Null);
+        putLineScale(vexBuf, x, y, x, (float) (scale.toUnitY(distSun + 0.05) - 0.5), color);
 
         x = (float) ((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect);
         y = (float) (scale.toUnitY(DIST_SUN_BEGIN) - 0.5);
-        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-        vexBuf.repeatVertex(color);
-
-        y = (float) (scale.toUnitY(distSun + 0.05) - 0.5);
-        vexBuf.putVertex(x, y, 0, 1, color);
-        vexBuf.repeatVertex(Colors.Null);
+        putLineScale(vexBuf, x, y, x, (float) (scale.toUnitY(distSun + 0.05) - 0.5), color);
 
         x = (float) ((scale.toUnitX(thetaEnd) - 0.5) * vp.aspect);
         y = (float) (scale.toUnitY(DIST_SUN_BEGIN) - 0.5);
-        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-        vexBuf.repeatVertex(color);
-
-        y = (float) (scale.toUnitY(distSun + 0.05) - 0.5);
-        vexBuf.putVertex(x, y, 0, 1, color);
-        vexBuf.repeatVertex(Colors.Null);
+        putLineScale(vexBuf, x, y, x, (float) (scale.toUnitY(distSun + 0.05) - 0.5), color);
 
         y = (float) (scale.toUnitY(distSun) - 0.5);
-        vexBuf.putVertex(x, y, 0, 1, Colors.Null);
-        vexBuf.repeatVertex(color);
-
-        x = (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect);
-        vexBuf.putVertex(x, y, 0, 1, color);
-        vexBuf.repeatVertex(Colors.Null);
+        putLineScale(vexBuf, x, y, (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect), y, color);
 
         if (icons) {
             double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
