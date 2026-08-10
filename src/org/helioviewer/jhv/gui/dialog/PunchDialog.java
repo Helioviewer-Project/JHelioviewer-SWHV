@@ -2,7 +2,6 @@ package org.helioviewer.jhv.gui.dialog;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.helioviewer.jhv.app.Message;
+import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.component.HTMLPane;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
@@ -98,12 +98,7 @@ public class PunchDialog extends StandardDialog implements PunchClient.ReceiverI
 
     @Override
     public ButtonPanel createButtonPanel() {
-        AbstractAction close = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
+        AbstractAction close = ComponentUtils.hideAction(this);
         setDefaultCancelAction(close);
 
         JButton loadButton = getLoadButton();
