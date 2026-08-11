@@ -479,12 +479,19 @@ float hpcEnhancementFactor(const vec2 hpcXY) {
     return max(1., length(hpcXY));
 }
 
+void clipSectorOpening(const vec2 point) {
+    if (display.sector.y <= 0.)
+        return;
+
+    float theta = atan(point.y, point.x);
+    float delta = abs(theta - display.sector.x);
+    float angularDistance = min(delta, TWOPI - delta);
+    if (angularDistance < display.sector.y)
+        discard;
+}
+
 void clipHpcGeometry(const vec2 hpcXY) {
-    if (display.sector.z != 0.) {
-        float theta = atan(hpcXY.y, hpcXY.x);
-        if (theta < display.sector.x || theta > display.sector.y)
-            discard;
-    }
+    clipSectorOpening(hpcXY);
 
     float radial2 = dot(hpcXY, hpcXY);
     float minRadius2 = display.radii.x * display.radii.x;
