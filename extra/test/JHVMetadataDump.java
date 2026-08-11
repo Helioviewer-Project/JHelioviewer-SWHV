@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.math.Vec2;
+import org.helioviewer.jhv.wcs.ImageBounds;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -113,6 +115,8 @@ public final class JHVMetadataDump {
         double arcsecPerPixelY = meta.wcsProjection == org.helioviewer.jhv.wcs.WcsHeader.Projection.CEA
                 ? meta.unitPerPixelY
                 : meta.unitPerPixelY / meta.unitPerArcsec;
+        Region hpcBounds = ImageBounds.hpc(meta);
+        Vec2 sunShift = meta.getSunShift();
 
         return new JSONObject()
                 .put("pixel_width", pixelWidth)
@@ -129,6 +133,13 @@ public final class JHVMetadataDump {
                 .put("crval_internal_y", meta.crval.y)
                 .put("crota_rad", crotaRad(meta))
                 .put("observer_distance", meta.viewpoint.distance)
+                .put("hpc_min_x", hpcBounds.llx)
+                .put("hpc_max_x", hpcBounds.urx)
+                .put("hpc_min_y", hpcBounds.lly)
+                .put("hpc_max_y", hpcBounds.ury)
+                .put("radial_bound", ImageBounds.radial(meta))
+                .put("sun_shift_x", sunShift.x)
+                .put("sun_shift_y", sunShift.y)
                 .put("projection", meta.wcsProjection.name())
                 .put("zpn_upper_eta", meta.getWcsHeader().zpnUpperEta)
                 .put("pv2", pv2);

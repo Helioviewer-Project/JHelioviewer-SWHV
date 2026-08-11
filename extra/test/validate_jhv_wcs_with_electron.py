@@ -19,6 +19,7 @@ from validate_jhv_wcs_against_astropy import (
     clipHpcGeometry,
     displayLatitudinalWorld,
     hpc_bounds_degrees,
+    image_radial_bound,
     is_surface_map_projection,
     load_validation_context,
     pixel_center_error_px,
@@ -44,7 +45,6 @@ DEFAULT_ELECTRON = Path(os.environ.get(
 ))
 ALL_MODES = ("hpc", "ortho", "lati_zenithal", "radial_warp", "rect_warp")
 WARP_MODES = ("radial_warp", "rect_warp")
-WARP_OUTER_RADIUS = 4.0
 WARP_LAMBDAS = (-1.0, -0.5, 0.0, 0.5, 1.0)
 DEFAULT_WARP_LAMBDA = 0.0
 HPC_PROJECTION_CASES = (
@@ -484,11 +484,11 @@ def expected_plane_internal_for_mode(
     return (math.nan, math.nan)
 
 
-def bounds_for_mode(mode: str) -> tuple[float, float, float, float]:
+def bounds_for_mode(mode: str, meta) -> tuple[float, float, float, float]:
     if mode == "lati_zenithal":
         return LATI_ZENITHAL_BOUNDS_DEG
     if mode in WARP_MODES:
-        return (0.0, 360.0, 0.0, WARP_OUTER_RADIUS)
+        return (0.0, 360.0, 0.0, max(image_radial_bound(meta), 1.0))
     return (0.0, 1.0, 0.0, 1.0)
 
 
@@ -512,7 +512,7 @@ def make_mode_job(
         render_size,
         output_dir,
         meta,
-        bounds_for_mode(mode),
+        bounds_for_mode(mode, meta),
         sample_texture,
         backend,
         name if name is not None else f"{mode}_diff_selfcheck" if diff_selfcheck else None,

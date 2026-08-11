@@ -30,6 +30,7 @@ REPO_ROOT = SCRIPT_DIR.parent.parent
 VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_against_astropy.py"
 GLSL_VALIDATOR = SCRIPT_DIR / "validate_glsl_syntax.py"
 ELECTRON_VALIDATOR = SCRIPT_DIR / "validate_jhv_wcs_with_electron.py"
+JAVA_METADATA_VALIDATOR = SCRIPT_DIR / "compare_java_metadata_to_validator.py"
 DATA = SCRIPT_DIR / "data"
 
 
@@ -41,6 +42,11 @@ RUNS: tuple[ValidationRun, ...] = (
         "glsl_syntax",
         (),
         "glsl",
+    ),
+    ValidationRun(
+        "java_metadata",
+        (),
+        "java_metadata",
     ),
     ValidationRun(
         "forward_wcs_random_sample",
@@ -167,14 +173,6 @@ RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--latitudinal-zenithal-render", "--render-size", "512"),
     ),
     ValidationRun(
-        "polar_render",
-        (str(DATA / "sample.171.fits"), "--hdu", "1", "--polar-render", "--render-size", "512"),
-    ),
-    ValidationRun(
-        "logpolar_render",
-        (str(DATA / "sample.171.fits"), "--hdu", "1", "--logpolar-render", "--render-size", "512"),
-    ),
-    ValidationRun(
         "hpc_diff_selfcheck",
         (str(DATA / "20241224_194245_d4c2A.fts"), "--hpc-diff-selfcheck", "--render-size", "512"),
     ),
@@ -185,14 +183,6 @@ RUNS: tuple[ValidationRun, ...] = (
     ValidationRun(
         "orthographic_diff_selfcheck",
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--orthographic-diff-selfcheck", "--render-size", "512"),
-    ),
-    ValidationRun(
-        "polar_diff_selfcheck",
-        (str(DATA / "sample.171.fits"), "--hdu", "1", "--polar-diff-selfcheck", "--render-size", "512"),
-    ),
-    ValidationRun(
-        "logpolar_diff_selfcheck",
-        (str(DATA / "sample.171.fits"), "--hdu", "1", "--logpolar-diff-selfcheck", "--render-size", "512"),
     ),
     ValidationRun(
         "ortho_vs_hpc_screen_compare",
@@ -377,10 +367,17 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Include Electron/ANGLE shader-execution validation runs",
     )
+    parser.add_argument(
+        "--electron-only",
+        action="store_true",
+        help="Run only Electron/ANGLE shader-execution validation runs",
+    )
     return parser.parse_args()
 
 
-def available_runs(include_electron: bool, only: list[str] | None) -> list[ValidationRun]:
+def available_runs(include_electron: bool, electron_only: bool, only: list[str] | None) -> list[ValidationRun]:
+    if electron_only:
+        return list(ELECTRON_RUNS)
     runs = list(RUNS)
     if include_electron or (only and any(name.startswith("electron_") for name in only)):
         runs.extend(ELECTRON_RUNS)
@@ -403,6 +400,8 @@ def validator_for(run: ValidationRun) -> Path:
         return GLSL_VALIDATOR
     if run.validator == "electron":
         return ELECTRON_VALIDATOR
+    if run.validator == "java_metadata":
+        return JAVA_METADATA_VALIDATOR
     return VALIDATOR
 
 
@@ -492,7 +491,7 @@ def run_parallel(runs: list[ValidationRun], keep_going: bool, jobs: int) -> list
 
 def main() -> int:
     args = parse_args()
-    all_runs = available_runs(args.include_electron, args.only)
+    all_runs = available_runs(args.include_electron, args.electron_only, args.only)
     if args.list:
         for run in all_runs:
             print(run.name)
