@@ -13,7 +13,7 @@ import org.helioviewer.jhv.opengl.GLImage;
 
 public class SliderFilterPanel {
 
-    public static class Blend extends AbstractSliderFilterPanel {
+    public static class Blend extends SliderDetails {
         public Blend(ImageLayer layer) {
             super("Blend ",
                     0, 100, (int) (layer.getGLImage().getBlend() * 100),
@@ -22,7 +22,7 @@ public class SliderFilterPanel {
         }
     }
 
-    public static class DeltaCROTA extends AbstractSliderFilterPanel {
+    public static class DeltaCROTA extends SliderDetails {
         public DeltaCROTA(ImageLayer layer) {
             super("δCROTA",
                     GLImage.MIN_DCROTA * 10, GLImage.MAX_DCROTA * 10, (int) (layer.getGLImage().getDeltaCROTA() * 10),
@@ -31,7 +31,7 @@ public class SliderFilterPanel {
         }
     }
 
-    public static class DeltaCRVAL1 extends AbstractSliderFilterPanel {
+    public static class DeltaCRVAL1 extends SliderDetails {
         public DeltaCRVAL1(ImageLayer layer) {
             super("δCRVAL1",
                     GLImage.MIN_DCRVAL, GLImage.MAX_DCRVAL, layer.getGLImage().getDeltaCRVAL1(),
@@ -40,7 +40,7 @@ public class SliderFilterPanel {
         }
     }
 
-    public static class DeltaCRVAL2 extends AbstractSliderFilterPanel {
+    public static class DeltaCRVAL2 extends SliderDetails {
         public DeltaCRVAL2(ImageLayer layer) {
             super("δCRVAL2",
                     GLImage.MIN_DCRVAL, GLImage.MAX_DCRVAL, layer.getGLImage().getDeltaCRVAL2(),
@@ -49,7 +49,7 @@ public class SliderFilterPanel {
         }
     }
 
-    public static class Opacity extends AbstractSliderFilterPanel {
+    public static class Opacity extends SliderDetails {
         public Opacity(ImageLayer layer) {
             super("Opacity ",
                     0, 100, (int) (layer.getGLImage().getOpacity() * 100),
@@ -58,7 +58,7 @@ public class SliderFilterPanel {
         }
     }
 
-    public static class Sharpen extends AbstractSliderFilterPanel {
+    public static class Sharpen extends SliderDetails {
         public Sharpen(ImageLayer layer) {
             super("Sharpen ",
                     -100, 100, (int) (layer.getGLImage().getSharpen() * 100),
@@ -75,13 +75,21 @@ public class SliderFilterPanel {
         return "<html><p align='right'>" + value + "″</p>";
     }
 
-    private static abstract class AbstractSliderFilterPanel implements FilterDetails {
+    static FilterDetails create(
+            String title,
+            int min, int max, int initial,
+            IntFunction<String> formatter,
+            IntConsumer onValueChange) {
+        return new SliderDetails(title, min, max, initial, formatter, onValueChange);
+    }
+
+    private static class SliderDetails implements FilterDetails {
 
         private final JLabel title;
         private final JHVSlider slider;
         private final JLabel label;
 
-        protected AbstractSliderFilterPanel(
+        protected SliderDetails(
                 String titleText,
                 int min, int max, int initial,
                 IntFunction<String> formatter,

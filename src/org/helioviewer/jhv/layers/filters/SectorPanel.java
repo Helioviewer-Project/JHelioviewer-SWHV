@@ -1,51 +1,46 @@
 package org.helioviewer.jhv.layers.filters;
 
-import java.awt.Component;
-
-import javax.swing.JLabel;
-
-import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.gui.component.JHVRangeSlider;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.metadata.MetaData;
+import org.helioviewer.jhv.opengl.GLImage;
 
-class SectorPanel implements FilterDetails {
+public class SectorPanel {
 
-    private final JHVRangeSlider slider;
-    private final JLabel label;
-    private final JLabel title = new JLabel("Sector", JLabel.RIGHT);
+    private final FilterDetails directionDetails;
+    private final FilterDetails widthDetails;
+    private int direction;
+    private int width;
 
-    SectorPanel(ImageLayer layer) {
-        int left = 0; // (int) (layer.getGLImage().getSector0() + .5);
-        int right = 0; // (int) (layer.getGLImage().getSector1() + .5);
-        slider = new JHVRangeSlider(-180, 180, left, right);
-
-        label = new JLabel(formatDegree(slider.getLowValue(), slider.getHighValue()), JLabel.RIGHT);
-        slider.addChangeListener(e -> {
-            int lo = slider.getLowValue();
-            int hi = slider.getHighValue();
-            // layer.getGLImage().setSector(lo, hi);
-            label.setText(formatDegree(lo, hi));
-            DisplayController.display();
+    public SectorPanel(ImageLayer layer) {
+        GLImage image = layer.getGLImage();
+        MetaData metaData = layer.getMetaData();
+        direction = (int) Math.round(image.getSectorCenter(metaData));
+        width = (int) Math.round(image.getSectorWidth(metaData));
+        directionDetails = SliderFilterPanel.create("Sector", -180, 180, direction, SectorPanel::formatDegree, value -> {
+            direction = value;
+            image.setSector(direction, width);
+        });
+        widthDetails = SliderFilterPanel.create("Opening", 0, 360, width, SectorPanel::formatDegree, value -> {
+            width = value;
+            image.setSector(direction, width);
         });
     }
 
-    private static String formatDegree(int low, int high) {
-        return "<html><p align='right'>" + low + "°</p><p align='right'>" + high + "°</p>";
+    public FilterDetails getDirectionDetails() {
+        return directionDetails;
     }
 
-    @Override
-    public Component getFirst() {
-        return title;
+    public FilterDetails getWidthDetails() {
+        return widthDetails;
     }
 
-    @Override
-    public Component getSecond() {
-        return slider;
+    public void setVisible(boolean visible) {
+        directionDetails.setVisible(visible);
+        widthDetails.setVisible(visible);
     }
 
-    @Override
-    public Component getThird() {
-        return label;
+    private static String formatDegree(int angle) {
+        return angle + "°";
     }
 
 }

@@ -41,8 +41,8 @@ public class GLImage {
     private double innerMask = 0;
     private double slitLeft = 0;
     private double slitRight = 1;
-    // private double sector0 = -Math.PI;
-    // private double sector1 = Math.PI;
+    private double sectorCenter;
+    private double sectorWidth;
     private double brightOffset = 0;
     private double brightScale = 1;
     private double opacity = 1;
@@ -90,14 +90,21 @@ public class GLImage {
 
     public void applyFilters(boolean rhefActive) {
         MetaData metaData = uploadedImageData.metaData();
-        // shader.bindSector(gl, -Math.max(Math.abs(metaData.getSector0()), Math.abs(sector0)), Math.max(metaData.getSector1(), sector1));
+
+        double effectiveSectorCenter = sectorCenter;
+        double effectiveSectorWidth = sectorWidth;
+        if (effectiveSectorWidth == 0) {
+            effectiveSectorWidth = metadataSectorWidth(metaData);
+            effectiveSectorCenter = metadataSectorCenter(metaData, effectiveSectorWidth);
+        }
+
         color[0] = (float) (opacity * red); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         color[1] = (float) (opacity * green);
         color[2] = (float) (opacity * blue);
         color[3] = (float) (opacity * blend);
         GLSLSolarShader.bindDisplay(color,
                 1f / uploadedImageData.imageBuffer().width, 1f / uploadedImageData.imageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
-                metaData.getSector0(), metaData.getSector1(), (float) enhanced,
+                (float) Math.toRadians(effectiveSectorCenter), (float) Math.toRadians(effectiveSectorWidth / 2), (float) enhanced,
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 // RHEF output is already a normalized rank in [0, 1]; the raw-DN response
                 // factor must NOT rescale it (that pushes the uniform upper half past 1 and
@@ -189,12 +196,11 @@ public class GLImage {
         slitRight = Math.clamp(right, slitLeft, 1);
     }
 
-    /*
-        public void setSector(double left, double right) {
-            sector0 = Math.toRadians(Math.clamp(left, -180, 0));
-            sector1 = Math.toRadians(Math.clamp(right, 0, 180));
-        }
-    */
+    public void setSector(double center, double width) {
+        sectorCenter = Math.clamp(center, -180, 180);
+        sectorWidth = Math.clamp(width, 0, 360);
+    }
+
     public void setBrightness(double offset, double scale) {
         brightOffset = Math.clamp(offset, -1, 2);
         brightScale = Math.clamp(scale, 0, 2 - brightOffset);
@@ -220,15 +226,37 @@ public class GLImage {
         return slitLeft;
     }
 
-    /*
-        public double getSector0() {
-            return Math.toDegrees(sector0);
-        }
+    public double getSectorCenter(MetaData metaData) {
+        if (sectorWidth != 0)
+            return sectorCenter;
+        double width = metadataSectorWidth(metaData);
+        return metadataSectorCenter(metaData, width);
+    }
 
-        public double getSector1() {
-            return Math.toDegrees(sector1);
-        }
-    */
+    public double getSectorWidth(MetaData metaData) {
+        if (sectorWidth != 0)
+            return sectorWidth;
+        return metadataSectorWidth(metaData);
+    }
+
+    private static double metadataSectorCenter(MetaData metaData, double width) {
+        if (width == 0)
+            return 0;
+        double center = Math.toDegrees(metaData.getSector1()) + width / 2;
+        return (center + 540) % 360 - 180;
+    }
+
+    private static double metadataSectorWidth(MetaData metaData) {
+        double start = Math.toDegrees(metaData.getSector0());
+        double end = Math.toDegrees(metaData.getSector1());
+        if (start == end)
+            return 0;
+        double keptWidth = end - start;
+        if (keptWidth < 0)
+            keptWidth += 360;
+        return 360 - Math.clamp(keptWidth, 0, 360);
+    }
+
     public double getSlitRight() {
         return slitRight;
     }
@@ -333,7 +361,7 @@ public class GLImage {
         setOpacity(jo.optDouble("opacity", opacity));
         setBlend(jo.optDouble("blend", blend));
         setSlit(jo.optDouble("slitLeft", slitLeft), jo.optDouble("slitRight", slitRight));
-        // setSector(jo.optDouble("sector0", sector0), jo.optDouble("sector1", sector1));
+        setSector(jo.optDouble("sectorCenter", 0), jo.optDouble("sectorWidth", 0));
         setInnerMask(jo.optDouble("innerMask", innerMask));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         setEnhanced(jo.optDouble("enhanced", enhanced));
@@ -358,8 +386,8 @@ public class GLImage {
         jo.put("blend", blend);
         jo.put("slitLeft", slitLeft);
         jo.put("slitRight", slitRight);
-        // jo.put("sector0", getSector0());
-        // jo.put("sector1", getSector1());
+        jo.put("sectorCenter", sectorCenter);
+        jo.put("sectorWidth", sectorWidth);
         jo.put("innerMask", innerMask);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);

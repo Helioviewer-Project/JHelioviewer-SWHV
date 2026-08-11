@@ -24,6 +24,7 @@ import org.helioviewer.jhv.layers.filters.ImageFilterPanel;
 import org.helioviewer.jhv.layers.filters.InnerMaskPanel;
 import org.helioviewer.jhv.layers.filters.LUTPanel;
 import org.helioviewer.jhv.layers.filters.LevelsPanel;
+import org.helioviewer.jhv.layers.filters.SectorPanel;
 import org.helioviewer.jhv.layers.filters.SliderFilterPanel;
 import org.helioviewer.jhv.layers.filters.SlitPanel;
 
@@ -35,7 +36,7 @@ final class ImageLayerOptions extends JPanel {
 
     private final LUTPanel lutPanel;
     private final SlitPanel slitPanel;
-    // private final SectorPanel sectorPanel;
+    private final SectorPanel sectorPanel;
     private final InnerMaskPanel innerMaskPanel;
     private final SliderFilterPanel.DeltaCROTA deltaCROTAPanel;
     private final SliderFilterPanel.DeltaCRVAL1 deltaCRVAL1Panel;
@@ -57,7 +58,7 @@ final class ImageLayerOptions extends JPanel {
 
         slitPanel = new SlitPanel(layer);
         innerMaskPanel = new InnerMaskPanel(layer);
-        // sectorPanel = new SectorPanel(layer);
+        sectorPanel = new SectorPanel(layer);
         deltaCROTAPanel = new SliderFilterPanel.DeltaCROTA(layer);
         deltaCRVAL1Panel = new SliderFilterPanel.DeltaCRVAL1(layer);
         deltaCRVAL2Panel = new SliderFilterPanel.DeltaCRVAL2(layer);
@@ -149,8 +150,10 @@ final class ImageLayerOptions extends JPanel {
         addToGridBag(c, slitPanel);
         c.gridy++;
         addToGridBag(c, innerMaskPanel);
-        // c.gridy++;
-        // addToGridBag(c, sectorPanel);
+        c.gridy++;
+        addToGridBag(c, sectorPanel.getDirectionDetails());
+        c.gridy++;
+        addToGridBag(c, sectorPanel.getWidthDetails());
         c.gridy++;
         addToGridBag(c, deltaCROTAPanel);
         c.gridy++;
@@ -187,7 +190,7 @@ final class ImageLayerOptions extends JPanel {
     private void setAdjustmentsVisibility(boolean visibility) {
         slitPanel.setVisible(visibility);
         innerMaskPanel.setVisible(visibility);
-        // sectorPanel.setVisible(visibility);
+        sectorPanel.setVisible(visibility);
         deltaCROTAPanel.setVisible(visibility);
         deltaCRVAL1Panel.setVisible(visibility);
         deltaCRVAL2Panel.setVisible(visibility);
