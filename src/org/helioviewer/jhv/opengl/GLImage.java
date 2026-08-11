@@ -23,7 +23,7 @@ public class GLImage {
     public static final int MAX_DCROTA = 15;
     public static final int MIN_DCRVAL = -180;
     public static final int MAX_DCRVAL = 180;
-    public static final int MAX_INNER = 5;
+    public static final int MAX_MASK = 32;
 
     private GLTexture tex;
     private GLTexture lutTex;
@@ -39,6 +39,7 @@ public class GLImage {
     private int deltaCRVAL2 = 0;
 
     private double innerMask = 0;
+    private double outerMask = Double.POSITIVE_INFINITY;
     private double slitLeft = 0;
     private double slitRight = 1;
     private double sectorCenter;
@@ -112,7 +113,8 @@ public class GLImage {
                 // clamps it to white). The user's Levels (brightOffset/brightScale) still
                 // apply as a black/white-point control on the equalized output.
                 (float) brightOffset, (float) (brightScale * (rhefActive ? 1 : metaData.getResponseFactor())),
-                Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1,
+                Math.max(metaData.getInnerRadius(), (float) innerMask),
+                Math.min(Display.getShowCorona() ? metaData.getOuterRadius() : 1, (float) outerMask),
                 (float) slitLeft, (float) slitRight,
                 (float) enhanced,
                 (float) (rhefActive ? upsilonLow : 1), (float) (rhefActive ? upsilonHigh : 1));
@@ -189,8 +191,9 @@ public class GLImage {
         deltaCRVAL2 = Math.clamp(delta, MIN_DCRVAL, MAX_DCRVAL);
     }
 
-    public void setInnerMask(double mask) {
-        innerMask = Math.clamp(mask, 0, MAX_INNER);
+    public void setMask(double inner, double outer) {
+        innerMask = Math.clamp(inner, 0, MAX_MASK);
+        outerMask = Double.isFinite(outer) ? Math.clamp(outer, innerMask, MAX_MASK) : Double.POSITIVE_INFINITY;
     }
 
     public void setSlit(double left, double right) {
@@ -222,6 +225,10 @@ public class GLImage {
 
     public double getInnerMask() {
         return innerMask;
+    }
+
+    public double getOuterMask() {
+        return outerMask;
     }
 
     public double getSlitLeft() {
@@ -354,7 +361,7 @@ public class GLImage {
         setBlend(jo.optDouble("blend", blend));
         setSlit(jo.optDouble("slitLeft", slitLeft), jo.optDouble("slitRight", slitRight));
         setSector(jo.optDouble("sectorCenter", 0), jo.optDouble("sectorWidth", 0));
-        setInnerMask(jo.optDouble("innerMask", innerMask));
+        setMask(jo.optDouble("innerMask", innerMask), jo.optDouble("outerMask", Double.POSITIVE_INFINITY));
         setBrightness(jo.optDouble("brightOffset", brightOffset), jo.optDouble("brightScale", brightScale));
         setEnhanced(jo.optDouble("enhanced", enhanced));
         setUpsilon(jo.optDouble("upsilonLow", upsilonLow), jo.optDouble("upsilonHigh", upsilonHigh));
@@ -381,6 +388,7 @@ public class GLImage {
         jo.put("sectorCenter", sectorCenter);
         jo.put("sectorWidth", sectorWidth);
         jo.put("innerMask", innerMask);
+        jo.put("outerMask", Double.isFinite(outerMask) ? outerMask : JSONObject.NULL);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
         jo.put("enhanced", enhanced);

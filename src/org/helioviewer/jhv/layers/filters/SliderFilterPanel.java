@@ -35,11 +35,6 @@ public final class SliderFilterPanel {
                 SliderFilterPanel::formatArcsec, layer.getGLImage()::setDeltaCRVAL2);
     }
 
-    public static FilterDetails innerMask(ImageLayer layer) {
-        return create("Mask ", 0, GLImage.MAX_INNER * 100, (int) (layer.getGLImage().getInnerMask() * 100),
-                SliderFilterPanel::formatRadius, value -> layer.getGLImage().setInnerMask(value / 100.));
-    }
-
     public static FilterDetails opacity(ImageLayer layer) {
         return create("Opacity ", 0, 100, (int) (layer.getGLImage().getOpacity() * 100),
                 SliderFilterPanel::formatPercent, value -> layer.getGLImage().setOpacity(value / 100.));
@@ -60,10 +55,6 @@ public final class SliderFilterPanel {
 
     private static String formatPercent(int value) {
         return "<html><p align='right'>" + value + "%</p>";
-    }
-
-    private static String formatRadius(int value) {
-        return "<html><p align='right'>" + String.format("%.2f", value / 100.) + "R☉</p>";
     }
 
     static FilterDetails create(

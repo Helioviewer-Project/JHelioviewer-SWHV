@@ -35,7 +35,7 @@ final class ImageLayerOptions extends JPanel {
     private final LUTPanel lutPanel;
     private final FilterDetails slitPanel;
     private final SectorPanel sectorPanel;
-    private final FilterDetails innerMaskPanel;
+    private final FilterDetails maskPanel;
     private final FilterDetails deltaCROTAPanel;
     private final FilterDetails deltaCRVAL1Panel;
     private final FilterDetails deltaCRVAL2Panel;
@@ -55,7 +55,7 @@ final class ImageLayerOptions extends JPanel {
         FilterDetails imageFilterPanel = new ImageFilterPanel(layer);
 
         slitPanel = RangeSliderFilterPanel.slit(layer);
-        innerMaskPanel = SliderFilterPanel.innerMask(layer);
+        maskPanel = RangeSliderFilterPanel.mask(layer);
         sectorPanel = new SectorPanel(layer);
         deltaCROTAPanel = SliderFilterPanel.deltaCROTA(layer);
         deltaCRVAL1Panel = SliderFilterPanel.deltaCRVAL1(layer);
@@ -147,7 +147,7 @@ final class ImageLayerOptions extends JPanel {
         c.gridy++;
         addToGridBag(c, slitPanel);
         c.gridy++;
-        addToGridBag(c, innerMaskPanel);
+        addToGridBag(c, maskPanel);
         c.gridy++;
         addToGridBag(c, sectorPanel.getDirectionDetails());
         c.gridy++;
@@ -187,7 +187,7 @@ final class ImageLayerOptions extends JPanel {
 
     private void setAdjustmentsVisibility(boolean visibility) {
         slitPanel.setVisible(visibility);
-        innerMaskPanel.setVisible(visibility);
+        maskPanel.setVisible(visibility);
         sectorPanel.setVisible(visibility);
         deltaCROTAPanel.setVisible(visibility);
         deltaCRVAL1Panel.setVisible(visibility);

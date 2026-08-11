@@ -15,7 +15,7 @@
   the solar disk linear (λ = 1 linear, 0 logarithmic, −1 strongest), replacing
   the redundant Polar and LogPolar projections (by @GillySpace27)
 - Add grid line color, opacity and width controls to the grid layer (by @GillySpace27)
-- Add image-layer sector direction and opening controls
+- Add image-layer controls for outer-radius masking and for sector direction and opening
 - Improve image canvas positioning and resizing on macOS
 
 ### Timeline, events, and UI
