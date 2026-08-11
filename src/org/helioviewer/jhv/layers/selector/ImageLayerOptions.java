@@ -21,12 +21,10 @@ import org.helioviewer.jhv.layers.filters.ChannelMixerPanel;
 import org.helioviewer.jhv.layers.filters.DifferencePanel;
 import org.helioviewer.jhv.layers.filters.FilterDetails;
 import org.helioviewer.jhv.layers.filters.ImageFilterPanel;
-import org.helioviewer.jhv.layers.filters.InnerMaskPanel;
 import org.helioviewer.jhv.layers.filters.LUTPanel;
-import org.helioviewer.jhv.layers.filters.LevelsPanel;
+import org.helioviewer.jhv.layers.filters.RangeSliderFilterPanel;
 import org.helioviewer.jhv.layers.filters.SectorPanel;
 import org.helioviewer.jhv.layers.filters.SliderFilterPanel;
-import org.helioviewer.jhv.layers.filters.SlitPanel;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideToggleButton;
@@ -35,12 +33,12 @@ import com.jidesoft.swing.JideToggleButton;
 final class ImageLayerOptions extends JPanel {
 
     private final LUTPanel lutPanel;
-    private final SlitPanel slitPanel;
+    private final FilterDetails slitPanel;
     private final SectorPanel sectorPanel;
-    private final InnerMaskPanel innerMaskPanel;
-    private final SliderFilterPanel.DeltaCROTA deltaCROTAPanel;
-    private final SliderFilterPanel.DeltaCRVAL1 deltaCRVAL1Panel;
-    private final SliderFilterPanel.DeltaCRVAL2 deltaCRVAL2Panel;
+    private final FilterDetails innerMaskPanel;
+    private final FilterDetails deltaCROTAPanel;
+    private final FilterDetails deltaCRVAL1Panel;
+    private final FilterDetails deltaCRVAL2Panel;
 
     private final JideToggleButton downloadButton = new JideToggleButton(Buttons.download);
     private final JProgressBar progressBar = new JProgressBar();
@@ -48,20 +46,20 @@ final class ImageLayerOptions extends JPanel {
 
     ImageLayerOptions(ImageLayer layer) {
         DifferencePanel differencePanel = new DifferencePanel(layer);
-        FilterDetails opacityPanel = new SliderFilterPanel.Opacity(layer);
-        FilterDetails blendPanel = new SliderFilterPanel.Blend(layer);
+        FilterDetails opacityPanel = SliderFilterPanel.opacity(layer);
+        FilterDetails blendPanel = SliderFilterPanel.blend(layer);
         FilterDetails channelMixerPanel = new ChannelMixerPanel(layer);
         lutPanel = new LUTPanel(layer);
-        FilterDetails levelsPanel = new LevelsPanel(layer);
-        FilterDetails sharpenPanel = new SliderFilterPanel.Sharpen(layer);
+        FilterDetails levelsPanel = RangeSliderFilterPanel.levels(layer);
+        FilterDetails sharpenPanel = SliderFilterPanel.sharpen(layer);
         FilterDetails imageFilterPanel = new ImageFilterPanel(layer);
 
-        slitPanel = new SlitPanel(layer);
-        innerMaskPanel = new InnerMaskPanel(layer);
+        slitPanel = RangeSliderFilterPanel.slit(layer);
+        innerMaskPanel = SliderFilterPanel.innerMask(layer);
         sectorPanel = new SectorPanel(layer);
-        deltaCROTAPanel = new SliderFilterPanel.DeltaCROTA(layer);
-        deltaCRVAL1Panel = new SliderFilterPanel.DeltaCRVAL1(layer);
-        deltaCRVAL2Panel = new SliderFilterPanel.DeltaCRVAL2(layer);
+        deltaCROTAPanel = SliderFilterPanel.deltaCROTA(layer);
+        deltaCRVAL1Panel = SliderFilterPanel.deltaCRVAL1(layer);
+        deltaCRVAL2Panel = SliderFilterPanel.deltaCRVAL2(layer);
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));

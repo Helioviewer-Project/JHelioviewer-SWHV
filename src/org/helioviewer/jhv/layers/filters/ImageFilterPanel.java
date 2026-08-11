@@ -16,7 +16,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.swing.JideSplitButton;
 
-public class ImageFilterPanel implements FilterDetails {
+public final class ImageFilterPanel implements FilterDetails {
 
     private final JPanel filterPanel = new JPanel(new BorderLayout());
     private final JPanel buttonPanel = new JPanel(new BorderLayout());
