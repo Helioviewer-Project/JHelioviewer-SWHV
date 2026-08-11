@@ -17,7 +17,7 @@ import org.helioviewer.jhv.opengl.GLImage;
 
 import com.jidesoft.swing.JideButton;
 
-public class DifferencePanel implements FilterDetails {
+public final class DifferencePanel implements FilterDetails {
 
     private final JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
     private final JPanel buttonPanel = new JPanel(new BorderLayout());

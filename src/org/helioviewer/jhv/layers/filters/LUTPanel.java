@@ -15,7 +15,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 
 import com.jidesoft.swing.JideToggleButton;
 
-public class LUTPanel implements FilterDetails {
+public final class LUTPanel implements FilterDetails {
 
     private final LUTComboBox lutCombo;
     private final JPanel buttonPanel = new JPanel(new BorderLayout());

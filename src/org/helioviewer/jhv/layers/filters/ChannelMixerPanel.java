@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.layers.filters;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
@@ -12,23 +11,24 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.layers.ImageLayer;
 
-public class ChannelMixerPanel implements FilterDetails {
+public final class ChannelMixerPanel implements FilterDetails {
 
     private final JPanel boxPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+    private final JPanel emptyPanel = new JPanel();
     private final JLabel title = new JLabel("Channels ", JLabel.RIGHT);
 
     public ChannelMixerPanel(ImageLayer layer) {
         JCheckBox redCheckBox = new JCheckBox("Red", layer.getGLImage().getRed());
         redCheckBox.setToolTipText("Toggle red channel");
-        boxPanel.add(redCheckBox, BorderLayout.LINE_START);
+        boxPanel.add(redCheckBox);
 
         JCheckBox greenCheckBox = new JCheckBox("Green", layer.getGLImage().getGreen());
         greenCheckBox.setToolTipText("Toggle green channel");
-        boxPanel.add(greenCheckBox, BorderLayout.CENTER);
+        boxPanel.add(greenCheckBox);
 
         JCheckBox blueCheckBox = new JCheckBox("Blue", layer.getGLImage().getBlue());
         blueCheckBox.setToolTipText("Toggle blue channel");
-        boxPanel.add(blueCheckBox, BorderLayout.LINE_END);
+        boxPanel.add(blueCheckBox);
 
         ActionListener listener = e -> {
             layer.getGLImage().setColor(redCheckBox.isSelected() ? 1 : 0,
@@ -53,7 +53,7 @@ public class ChannelMixerPanel implements FilterDetails {
 
     @Override
     public Component getThird() {
-        return new JPanel();
+        return emptyPanel;
     }
 
 }

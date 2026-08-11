@@ -4,7 +4,7 @@ import org.helioviewer.jhv.layers.ImageLayer;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 
-public class SectorPanel {
+public final class SectorPanel {
 
     private final FilterDetails directionDetails;
     private final FilterDetails widthDetails;
