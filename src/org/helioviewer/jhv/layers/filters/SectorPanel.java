@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
 import org.helioviewer.jhv.layers.ImageLayer;
-import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
 
 public final class SectorPanel {
@@ -13,9 +12,8 @@ public final class SectorPanel {
 
     public SectorPanel(ImageLayer layer) {
         GLImage image = layer.getGLImage();
-        MetaData metaData = layer.getMetaData();
-        direction = (int) Math.round(image.getSectorCenter(metaData));
-        width = (int) Math.round(image.getSectorWidth(metaData));
+        direction = (int) Math.round(image.getSectorCenter());
+        width = (int) Math.round(image.getSectorWidth());
         directionDetails = SliderFilterPanel.create("Sector", -180, 180, direction, SectorPanel::formatDegree, value -> {
             direction = value;
             image.setSector(direction, width);

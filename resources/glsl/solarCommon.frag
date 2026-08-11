@@ -62,13 +62,14 @@ layout(std140) uniform DisplayBlock {
     vec4 color;
     vec3 sharpen;
     float isDiff;
-    vec3 sector;
-    float enhanced;
+    vec2 userSector;
+    vec2 metadataSector;
     vec3 cutOff;
     float calculateDepth;
     vec2 brightness;
     vec2 radii;
     vec2 slit;
+    float enhanced;
     float upsilonLow;
     float upsilonHigh;
 } display;
@@ -479,19 +480,27 @@ float hpcEnhancementFactor(const vec2 hpcXY) {
     return max(1., length(hpcXY));
 }
 
-void clipSectorOpening(const vec2 point) {
-    if (display.sector.y <= 0.)
+void clipSectorOpening(const float theta, const vec2 sector) {
+    if (sector.y <= 0.)
         return;
 
-    float theta = atan(point.y, point.x);
-    float delta = abs(theta - display.sector.x);
+    float delta = abs(theta - sector.x);
     float angularDistance = min(delta, TWOPI - delta);
-    if (angularDistance < display.sector.y)
+    if (angularDistance < sector.y)
         discard;
 }
 
+void clipSectors(const vec2 point) {
+    if (display.metadataSector.y <= 0. && display.userSector.y <= 0.)
+        return;
+
+    float theta = atan(point.y, point.x);
+    clipSectorOpening(theta, display.metadataSector);
+    clipSectorOpening(theta, display.userSector);
+}
+
 void clipHpcGeometry(const vec2 hpcXY) {
-    clipSectorOpening(hpcXY);
+    clipSectors(hpcXY);
 
     float radial2 = dot(hpcXY, hpcXY);
     float minRadius2 = display.radii.x * display.radii.x;
