@@ -91,11 +91,15 @@ public class GLImage {
     public void applyFilters(boolean rhefActive) {
         MetaData metaData = uploadedImageData.metaData();
 
-        double effectiveSectorCenter = sectorCenter;
-        double effectiveSectorWidth = sectorWidth;
-        if (effectiveSectorWidth == 0) {
-            effectiveSectorWidth = metadataSectorWidth(metaData);
-            effectiveSectorCenter = metadataSectorCenter(metaData, effectiveSectorWidth);
+        double effectiveSectorCenter;
+        double effectiveSectorHalfWidth;
+        if (sectorWidth == 0) {
+            double metadataWidth = metadataSectorWidth(metaData);
+            effectiveSectorCenter = metadataSectorCenter(metaData, metadataWidth);
+            effectiveSectorHalfWidth = metadataWidth / 2;
+        } else {
+            effectiveSectorCenter = Math.toRadians(sectorCenter);
+            effectiveSectorHalfWidth = Math.toRadians(sectorWidth / 2);
         }
 
         color[0] = (float) (opacity * red); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
@@ -104,7 +108,7 @@ public class GLImage {
         color[3] = (float) (opacity * blend);
         GLSLSolarShader.bindDisplay(color,
                 1f / uploadedImageData.imageBuffer().width, 1f / uploadedImageData.imageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
-                (float) Math.toRadians(effectiveSectorCenter), (float) Math.toRadians(effectiveSectorWidth / 2), (float) enhanced,
+                (float) effectiveSectorCenter, (float) effectiveSectorHalfWidth, (float) enhanced,
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 // RHEF output is already a normalized rank in [0, 1]; the raw-DN response
                 // factor must NOT rescale it (that pushes the uniform upper half past 1 and
@@ -230,31 +234,31 @@ public class GLImage {
         if (sectorWidth != 0)
             return sectorCenter;
         double width = metadataSectorWidth(metaData);
-        return metadataSectorCenter(metaData, width);
+        return Math.toDegrees(metadataSectorCenter(metaData, width));
     }
 
     public double getSectorWidth(MetaData metaData) {
         if (sectorWidth != 0)
             return sectorWidth;
-        return metadataSectorWidth(metaData);
+        return Math.toDegrees(metadataSectorWidth(metaData));
     }
 
     private static double metadataSectorCenter(MetaData metaData, double width) {
         if (width == 0)
             return 0;
-        double center = Math.toDegrees(metaData.getSector1()) + width / 2;
-        return (center + 540) % 360 - 180;
+        double center = metaData.getSector1() + width / 2;
+        return (center + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
     }
 
     private static double metadataSectorWidth(MetaData metaData) {
-        double start = Math.toDegrees(metaData.getSector0());
-        double end = Math.toDegrees(metaData.getSector1());
+        float start = metaData.getSector0();
+        float end = metaData.getSector1();
         if (start == end)
             return 0;
         double keptWidth = end - start;
         if (keptWidth < 0)
-            keptWidth += 360;
-        return 360 - Math.clamp(keptWidth, 0, 360);
+            keptWidth += 2 * Math.PI;
+        return 2 * Math.PI - Math.clamp(keptWidth, 0, 2 * Math.PI);
     }
 
     public double getSlitRight() {
@@ -386,8 +390,10 @@ public class GLImage {
         jo.put("blend", blend);
         jo.put("slitLeft", slitLeft);
         jo.put("slitRight", slitRight);
-        jo.put("sectorCenter", sectorCenter);
-        jo.put("sectorWidth", sectorWidth);
+        if (sectorWidth != 0) {
+            jo.put("sectorCenter", sectorCenter);
+            jo.put("sectorWidth", sectorWidth);
+        }
         jo.put("innerMask", innerMask);
         jo.put("brightOffset", brightOffset);
         jo.put("brightScale", brightScale);
