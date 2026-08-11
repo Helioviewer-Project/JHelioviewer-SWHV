@@ -46,8 +46,8 @@ not a natural fit for the multi-viewpoint aspect of JHV.
 The `CAR` and `CEA` cases in this note are surface-map cases: they
 describe solar longitude/latitude on the sphere rather than observer-centered
 image geometry. They are a natural fit for `Latitudinal` and for
-wrapping the visible sphere in `Orthographic`, but not for `HPC`, `Polar`, or
-`LogPolar`.
+wrapping the visible sphere in `Orthographic`, but not for `HPC`, `RadialWarp`,
+or `RectWarp`.
 
 Heliospheric imager datasets often use `AZP` or `ZPN` projections. For these
 datasets, these tests support the correctness of the `HPC` WCS and sampling
@@ -98,7 +98,7 @@ Bottom line:
 - the position numbers reported in the panel at the bottom of the JHV window
   are display-geometry numbers derived from the mouse pointer position, not
   coordinates read back from the active image WCS. In `HPC`, `Latitudinal`,
-  `Polar`, and `LogPolar`, they follow the matching JHV display projection. In
+  `RadialWarp`, and `RectWarp`, they follow the matching JHV display projection. In
   `Orthographic`, they are derived purely from the inferred 3D scene point and
   do not, in general, reflect the image WCS.
 
@@ -285,9 +285,21 @@ The documented test set can also be run as a suite with:
 
 - `extra/test/run_jhv_wcs_hpc_validation_suite.py`
 
-A companion Java/Python metadata-comparison check is also available:
+The suite includes the Java/Python metadata-comparison check:
 
 - `extra/test/compare_java_metadata_to_validator.py`
+
+Run the CPU, GLSL-syntax, and Java-metadata suite with:
+
+```text
+python3 extra/test/run_jhv_wcs_hpc_validation_suite.py
+```
+
+Run only the Electron/ANGLE cases with:
+
+```text
+python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --electron-only
+```
 
 Run the Python validator with:
 
@@ -366,6 +378,10 @@ The compared derived quantities include:
 - projection family and projection parameters:
   - `projection`
   - `pv2`
+- image bounds derived from that metadata:
+  - the `HPC` footprint bounds for observer-centered projections
+  - the radial bound used by `RadialWarp` and `RectWarp`
+  - the Sun shift used by radius-aware image filters
 
 This comparison catches Java-side metadata interpretation drift that may not be
 visible from the Astropy agreement alone.
@@ -1069,7 +1085,11 @@ Backend maxima:
 | `TAN`/`ARC`/`AZP`/`ZPN` `HPC` render | `1.121007e-03` | `2.833492e-01` |
 | `TAN` orthographic | `4.649544e-04` | `4.862770e-04` |
 | surface maps | `1.945496e-03` | `2.964020e-02` |
-| latitudinal/polar/log-polar | `8.688674e-04` | `5.916016e-01` |
+| latitudinal | `8.688674e-04` | `5.916016e-01` |
+| radial/rect warp | `1.479215e-03` | `6.703000e-01` |
+
+At the sampled warp boundaries, SwiftShader also disagreed with the CPU model's
+validity mask for a small number of pixels; Metal/ANGLE had no such mismatch.
 
 The Metal result validates the production GLSL coordinate path to about
 `0.002` source-image pixels against the Python/Astropy reference.

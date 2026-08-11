@@ -22,7 +22,6 @@ SUN_MEAN_EARTH_DISTANCE = SUN_MEAN_EARTH_DISTANCE_METER / SUN_RADIUS_METER
 SUN_EARTH_MASS_RATIO = 332946.0487
 SUN_L1_FACTOR = 1.0 - (1.0 / SUN_EARTH_MASS_RATIO / 3.0) ** (1.0 / 3.0)
 ARCSEC_PER_RAD = 180.0 * 3600.0 / math.pi
-LOGPOLAR_MIN_RADIUS = 0.05
 IDENTITY_QUAT = (0.0, 0.0, 0.0, 1.0)
 LATI_SURFACE_BOUNDS_DEG = (-180.0, 180.0, -90.0, 90.0)
 LATI_ZENITHAL_BOUNDS_DEG = (0.0, 360.0, -90.0, 90.0)
@@ -912,27 +911,32 @@ def build_jhv_equivalent_astropy_wcs(header, meta: JHVMeta) -> WCS:
     return wcs
 
 
+def image_plane_edge_samples(meta: JHVMeta) -> tuple[tuple[float, float], ...]:
+    x0 = -meta.crpix1_gl * meta.unit_per_pixel_x
+    x1 = (meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x
+    y0 = -meta.crpix2_gl * meta.unit_per_pixel_y
+    y1 = (meta.pixel_height - meta.crpix2_gl) * meta.unit_per_pixel_y
+    xm = 0.5 * (x0 + x1)
+    ym = 0.5 * (y0 + y1)
+    return (
+        (x0, y0), (x1, y0), (x0, y1), (x1, y1),
+        (xm, y0), (xm, y1), (x0, ym), (x1, ym),
+    )
+
+
+def rotated_image_plane_edge_samples(meta: JHVMeta) -> tuple[tuple[float, float], ...]:
+    c = math.cos(meta.crota_rad)
+    s = math.sin(meta.crota_rad)
+    return tuple((c * x - s * y, s * x + c * y) for x, y in image_plane_edge_samples(meta))
+
+
 def raw_hpc_footprint_bounds_degrees(meta: JHVMeta) -> tuple[float, float, float, float]:
-    samples = [
-        (-meta.crpix1_gl * meta.unit_per_pixel_x, -meta.crpix2_gl * meta.unit_per_pixel_y),
-        ((meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x, -meta.crpix2_gl * meta.unit_per_pixel_y),
-        (-meta.crpix1_gl * meta.unit_per_pixel_x, (meta.pixel_height - meta.crpix2_gl) * meta.unit_per_pixel_y),
-        ((meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x, (meta.pixel_height - meta.crpix2_gl) * meta.unit_per_pixel_y),
-        (0.0, -meta.crpix2_gl * meta.unit_per_pixel_y),
-        (0.0, (meta.pixel_height - meta.crpix2_gl) * meta.unit_per_pixel_y),
-        (-meta.crpix1_gl * meta.unit_per_pixel_x, 0.0),
-        ((meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x, 0.0),
-    ]
     min_x = math.inf
     max_x = -math.inf
     min_y = math.inf
     max_y = -math.inf
-    c = math.cos(meta.crota_rad)
-    s = math.sin(meta.crota_rad)
-    for x, y in samples:
-        plane_x = c * x - s * y
-        plane_y = s * x + c * y
-        world_rad = project_plane_internal_to_world((plane_x, plane_y), meta) if meta.projection != "TAN" else project_plane_internal_to_world_tan((plane_x, plane_y), meta)
+    for plane in rotated_image_plane_edge_samples(meta):
+        world_rad = project_plane_internal_to_world(plane, meta)
         lon_deg = math.degrees(world_rad[0])
         lat_deg = math.degrees(world_rad[1])
         min_x = min(min_x, lon_deg)
@@ -940,6 +944,35 @@ def raw_hpc_footprint_bounds_degrees(meta: JHVMeta) -> tuple[float, float, float
         min_y = min(min_y, lat_deg)
         max_y = max(max_y, lat_deg)
     return (min_x, max_x, min_y, max_y)
+
+
+def image_radial_bound(meta: JHVMeta) -> float:
+    if not is_surface_map_projection(meta):
+        radius = 0.0
+        for plane in rotated_image_plane_edge_samples(meta):
+            helioprojective = project_plane_internal_to_world(plane, meta)
+            hpc_xy = helioprojectiveToHpcXY(helioprojective, meta.observer_distance)
+            if math.isfinite(hpc_xy[0]) and math.isfinite(hpc_xy[1]):
+                radius = max(radius, math.hypot(hpc_xy[0], hpc_xy[1]))
+        if radius > 0.0:
+            return radius
+
+    x0 = -meta.crpix1_gl * meta.unit_per_pixel_x - meta.crval_internal_x
+    x1 = (meta.pixel_width - meta.crpix1_gl) * meta.unit_per_pixel_x - meta.crval_internal_x
+    y0 = -meta.crpix2_gl * meta.unit_per_pixel_y - meta.crval_internal_y
+    y1 = (meta.pixel_height - meta.crpix2_gl) * meta.unit_per_pixel_y - meta.crval_internal_y
+    return max(math.hypot(x0, y0), math.hypot(x1, y0), math.hypot(x0, y1), math.hypot(x1, y1))
+
+
+def image_sun_shift(meta: JHVMeta) -> tuple[float, float]:
+    if is_surface_map_projection(meta) or (meta.crval_internal_x == 0.0 and meta.crval_internal_y == 0.0):
+        return (0.0, 0.0)
+    try:
+        sun_plane = project_world_to_plane_internal((0.0, 0.0), meta)
+    except ValueError:
+        return (0.0, 0.0)
+    image_plane = rotate_inverse_z(sun_plane, meta.crota_rad)
+    return (image_plane[0], -image_plane[1])
 
 
 def hpc_bounds_degrees(meta: JHVMeta, aspect: float) -> tuple[float, float, float, float]:
@@ -1650,7 +1683,7 @@ def sampleLatiZenithalTexcoord(
     )
     rect = wcsRect(meta)
     texcoord = (rect[2] * (centered[0] - rect[0]), rect[3] * (-centered[1] - rect[1]))
-    return texcoord if texcoord_in_bounds(texcoord) else (math.nan, math.nan)
+    return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
 
 
 def sampleLatiTexcoord(
@@ -1908,75 +1941,6 @@ def renderOrthographicPixel(
     return texcoord, world_xyz
 
 
-# solarPolar.frag / solarLogPolar.frag mirror.
-
-def texcoord_in_bounds(texcoord: tuple[float, float]) -> bool:
-    return math.isfinite(texcoord[0]) and math.isfinite(texcoord[1]) and 0.0 <= texcoord[0] <= 1.0 and 0.0 <= texcoord[1] <= 1.0
-
-
-def samplePolarTexcoord(
-    scrpos: tuple[float, float],
-    radial_coordinate: float,
-    meta: JHVMeta,
-    _image2d: np.ndarray,
-) -> tuple[float, float]:
-    if radial_coordinate > DISPLAY_RADII[1] or radial_coordinate < DISPLAY_RADII[0]:
-        return (math.nan, math.nan)
-
-    theta = -(scrpos[0] * 2.0 * math.pi + 0.5 * math.pi)
-    polar_xy = (
-        math.cos(theta) * radial_coordinate,
-        math.sin(theta) * radial_coordinate,
-    )
-    if DISPLAY_CUTOFF[2] >= 0.0:
-        display_xy = (polar_xy[1], polar_xy[0])
-        cutoff_alt = (-DISPLAY_CUTOFF[1], DISPLAY_CUTOFF[0])
-        geometry_flat_dist = abs(display_xy[0] * DISPLAY_CUTOFF[0] + display_xy[1] * DISPLAY_CUTOFF[1])
-        geometry_flat_dist_alt = abs(display_xy[0] * cutoff_alt[0] + display_xy[1] * cutoff_alt[1])
-        if geometry_flat_dist > DISPLAY_CUTOFF[2] or geometry_flat_dist_alt > DISPLAY_CUTOFF[2]:
-            return (math.nan, math.nan)
-
-    centered = rotate_plane_inverse(
-        crota_quaternion(meta),
-        (polar_xy[0] - meta.crval_internal_x, -polar_xy[1] - meta.crval_internal_y),
-    )
-    rect = wcsRect(meta)
-    texcoord = (rect[2] * (centered[0] - rect[0]), rect[3] * (-centered[1] - rect[1]))
-    return texcoord if texcoord_in_bounds(texcoord) else (math.nan, math.nan)
-
-
-def sampleLogPolarTexcoord(
-    scrpos: tuple[float, float],
-    radial_coordinate: float,
-    meta: JHVMeta,
-    image2d: np.ndarray,
-) -> tuple[float, float]:
-    return samplePolarTexcoord(scrpos, radial_coordinate, meta, image2d)
-
-
-def renderPolarTexcoords(
-    scrpos: tuple[float, float],
-    radial_coordinate: float,
-    meta: JHVMeta,
-    image2d: np.ndarray,
-    diff_meta: JHVMeta | None = None,
-    diff_image2d: np.ndarray | None = None,
-    logpolar: bool = False,
-) -> tuple[tuple[float, float], tuple[float, float]]:
-    clamped_scrpos = getScrPos(scrpos)
-    if not math.isfinite(clamped_scrpos[0]) or not math.isfinite(clamped_scrpos[1]):
-        return (math.nan, math.nan), (math.nan, math.nan)
-
-    sample_texcoord = sampleLogPolarTexcoord if logpolar else samplePolarTexcoord
-    texcoord = sample_texcoord(clamped_scrpos, radial_coordinate, meta, image2d)
-    if diff_meta is None:
-        return texcoord, texcoord
-
-    diff_source = diff_image2d if diff_image2d is not None else image2d
-    diff_texcoord = sample_texcoord(clamped_scrpos, radial_coordinate, diff_meta, diff_source)
-    return texcoord, diff_texcoord
-
-
 # Shared render utilities.
 
 def normalize_image_for_png(img: np.ndarray) -> np.ndarray:
@@ -2112,27 +2076,6 @@ def render_zenithal_latitudinal_image(
     )
 
 
-def render_polar_mode_image(size: int, meta: JHVMeta, image2d: np.ndarray, logpolar: bool) -> np.ndarray:
-    if logpolar:
-        radial_start = math.log(LOGPOLAR_MIN_RADIUS)
-        radial_stop = math.log(max(LOGPOLAR_MIN_RADIUS, 1.0))
-    else:
-        radial_start = 0.0
-        radial_stop = 1.0
-
-    def polar_texcoord(sx: float, sy: float) -> tuple[float, float]:
-        radial_coordinate = math.exp(radial_start + sy * (radial_stop - radial_start)) if logpolar else radial_start + sy * (radial_stop - radial_start)
-        if radial_coordinate > 1.0 or radial_coordinate < 0.0:
-            return (math.nan, math.nan)
-        return renderPolarTexcoords((sx, sy), radial_coordinate, meta, image2d, logpolar=logpolar)[0]
-
-    return render_square_image(
-        size,
-        polar_texcoord,
-        lambda texcoord: sample_texture_linear(image2d, texcoord),
-    )
-
-
 def render_orthographic_image(size: int, meta: JHVMeta, image2d: np.ndarray) -> np.ndarray:
     return render_square_signed_image(
         size,
@@ -2194,21 +2137,6 @@ def run_latitudinal_zenithal_render(fits_file: Path, output_dir: Path, render_si
     print(f"file={fits_file}")
     print(f"mode=latitudinal_zenithal_render size={render_size}")
     print(f"default_lati_grid=({grid[0]:.12f}, {grid[1]:.12f}, {grid[2]:.12f})")
-    print(f"jhv_png={jhv_path}")
-    return 0
-
-
-def run_polar_render(fits_file: Path, output_dir: Path, render_size: int, meta: JHVMeta, image_data: np.ndarray, logpolar: bool) -> int:
-    require_2d_image(image_data, "Polar render")
-
-    mode_name = "logpolar_render" if logpolar else "polar_render"
-    suffix = "logpolar_jhv" if logpolar else "polar_jhv"
-    jhv_img = render_polar_mode_image(render_size, meta, image_data, logpolar=logpolar)
-    jhv_path = output_dir / f"{fits_file.stem}_{suffix}.png"
-    save_png(jhv_path, jhv_img)
-
-    print(f"file={fits_file}")
-    print(f"mode={mode_name} size={render_size}")
     print(f"jhv_png={jhv_path}")
     return 0
 
@@ -2399,61 +2327,6 @@ def run_orthographic_diff_selfcheck(
 
     print(f"file={fits_file}")
     print(f"mode=orthographic_diff_selfcheck size={render_size}")
-    print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
-    print(f"sample_max_abs_error={max_sample_err:.6e}")
-    print(f"base_png={base_path}")
-    print(f"diff_png={diff_path}")
-    return 0
-
-
-def run_polar_diff_selfcheck(
-    fits_file: Path,
-    output_dir: Path,
-    render_size: int,
-    meta: JHVMeta,
-    image_data: np.ndarray,
-    logpolar: bool,
-) -> int:
-    require_2d_image(image_data, "Polar diff selfcheck")
-
-    mode_name = "logpolar_diff_selfcheck" if logpolar else "polar_diff_selfcheck"
-    prefix = "logpolar" if logpolar else "polar"
-    if logpolar:
-        radial_start = math.log(LOGPOLAR_MIN_RADIUS)
-        radial_stop = math.log(max(LOGPOLAR_MIN_RADIUS, 1.0))
-    else:
-        radial_start = 0.0
-        radial_stop = 1.0
-
-    def polar_diff_texcoords(scrpos: tuple[float, float]) -> tuple[tuple[float, float], tuple[float, float]]:
-        radial_coordinate = math.exp(radial_start + scrpos[1] * (radial_stop - radial_start)) if logpolar else radial_start + scrpos[1] * (radial_stop - radial_start)
-        if radial_coordinate > 1.0 or radial_coordinate < 0.0:
-            nan2 = (math.nan, math.nan)
-            return nan2, nan2
-        return renderPolarTexcoords(
-            scrpos,
-            radial_coordinate,
-            meta,
-            image_data,
-            diff_meta=meta,
-            diff_image2d=image_data,
-            logpolar=logpolar,
-        )
-
-    base_img, diff_img, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
-        render_size,
-        square_screen_positions,
-        polar_diff_texcoords,
-        lambda texcoord: sample_texture_linear(image_data, texcoord),
-    )
-
-    base_path = output_dir / f"{fits_file.stem}_{prefix}_diff_self_base.png"
-    diff_path = output_dir / f"{fits_file.stem}_{prefix}_diff_self_diff.png"
-    save_png(base_path, base_img)
-    save_png(diff_path, diff_img)
-
-    print(f"file={fits_file}")
-    print(f"mode={mode_name} size={render_size}")
     print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
     print(f"sample_max_abs_error={max_sample_err:.6e}")
     print(f"base_png={base_path}")
@@ -3039,14 +2912,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--latitudinal-render", action="store_true", help="Render the CAR/CEA latitudinal surface-map path mirrored from solarLati.frag")
     parser.add_argument("--surface-map-render-compare", action="store_true", help="Render CAR/CEA surface maps through JHV and Astropy over a dense lon/lat grid and write diagnostic PNGs")
     parser.add_argument("--latitudinal-zenithal-render", action="store_true", help="Render the legacy zenithal latitudinal path mirrored from solarLati.frag")
-    parser.add_argument("--polar-render", action="store_true", help="Render the polar path mirrored from solarPolar.frag")
-    parser.add_argument("--logpolar-render", action="store_true", help="Render the log-polar path mirrored from solarLogPolar.frag")
     parser.add_argument("--orthographic-render", action="store_true", help="Render the orthographic path mirrored from solarOrtho.frag")
     parser.add_argument("--hpc-diff-selfcheck", action="store_true", help="Exercise the mirrored HPC diff branch with identical source/meta on both sides")
     parser.add_argument("--latitudinal-diff-selfcheck", action="store_true", help="Exercise the mirrored Latitudinal diff branch with identical source/meta on both sides")
     parser.add_argument("--orthographic-diff-selfcheck", action="store_true", help="Exercise the mirrored Orthographic diff branch with identical source/meta on both sides")
-    parser.add_argument("--polar-diff-selfcheck", action="store_true", help="Exercise the mirrored Polar diff branch with identical source/meta on both sides")
-    parser.add_argument("--logpolar-diff-selfcheck", action="store_true", help="Exercise the mirrored LogPolar diff branch with identical source/meta on both sides")
     parser.add_argument("--ortho-vs-hpc-screen-compare", action="store_true", help="Compare formal-TAN in Orthographic mode against JHV HPC over the full rendered comparison frame")
     parser.add_argument("--compare-initial-tan-image-frame", action="store_true", help="Compare simple-TAN against formal-TAN over the full image frame")
     parser.add_argument("--compare-initial-tan-vs-hpc", action="store_true", help="Compare simple-TAN against the JHV HPC display sampling over the full rendered comparison frame")
@@ -3091,9 +2960,6 @@ def main() -> int:
     if args.latitudinal_zenithal_render:
         return run_latitudinal_zenithal_render(args.fits_file, args.output_dir, args.render_size, meta, image_data)
 
-    if args.polar_render or args.logpolar_render:
-        return run_polar_render(args.fits_file, args.output_dir, args.render_size, meta, image_data, logpolar=args.logpolar_render)
-
     if args.orthographic_render:
         return run_orthographic_render(args.fits_file, args.output_dir, args.render_size, meta, image_data)
 
@@ -3105,16 +2971,6 @@ def main() -> int:
 
     if args.orthographic_diff_selfcheck:
         return run_orthographic_diff_selfcheck(args.fits_file, args.output_dir, args.render_size, meta, image_data)
-
-    if args.polar_diff_selfcheck or args.logpolar_diff_selfcheck:
-        return run_polar_diff_selfcheck(
-            args.fits_file,
-            args.output_dir,
-            args.render_size,
-            meta,
-            image_data,
-            logpolar=args.logpolar_diff_selfcheck,
-        )
 
     if args.hpc_render_compare:
         return run_hpc_render_compare(
