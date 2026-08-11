@@ -90,13 +90,14 @@ public class GLImage {
 
     public void applyFilters(boolean rhefActive) {
         MetaData metaData = uploadedImageData.metaData();
-
-        double effectiveSectorCenter = sectorCenter;
-        double effectiveSectorWidth = sectorWidth;
-        if (effectiveSectorWidth == 0) {
-            effectiveSectorWidth = metadataSectorWidth(metaData);
-            effectiveSectorCenter = metadataSectorCenter(metaData, effectiveSectorWidth);
+        float userSectorCenter = 0;
+        float userSectorHalfWidth = 0;
+        if (sectorWidth != 0) {
+            userSectorCenter = (float) Math.toRadians(sectorCenter);
+            userSectorHalfWidth = (float) Math.toRadians(sectorWidth / 2);
         }
+        double metadataHalfWidth = metadataSectorHalfWidth(metaData);
+        float metadataSectorCenter = (float) metadataSectorCenter(metaData, metadataHalfWidth);
 
         color[0] = (float) (opacity * red); // https://amindforeverprogramming.blogspot.com/2013/07/why-alpha-premultiplied-colour-blending.html
         color[1] = (float) (opacity * green);
@@ -104,7 +105,7 @@ public class GLImage {
         color[3] = (float) (opacity * blend);
         GLSLSolarShader.bindDisplay(color,
                 1f / uploadedImageData.imageBuffer().width, 1f / uploadedImageData.imageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
-                (float) Math.toRadians(effectiveSectorCenter), (float) Math.toRadians(effectiveSectorWidth / 2), (float) enhanced,
+                userSectorCenter, userSectorHalfWidth, metadataSectorCenter, (float) metadataHalfWidth,
                 metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 // RHEF output is already a normalized rank in [0, 1]; the raw-DN response
                 // factor must NOT rescale it (that pushes the uniform upper half past 1 and
@@ -113,6 +114,7 @@ public class GLImage {
                 (float) brightOffset, (float) (brightScale * (rhefActive ? 1 : metaData.getResponseFactor())),
                 Math.max(metaData.getInnerRadius(), (float) innerMask), Display.getShowCorona() ? metaData.getOuterRadius() : 1,
                 (float) slitLeft, (float) slitRight,
+                (float) enhanced,
                 (float) (rhefActive ? upsilonLow : 1), (float) (rhefActive ? upsilonHigh : 1));
 
         applyLUT();
@@ -226,35 +228,25 @@ public class GLImage {
         return slitLeft;
     }
 
-    public double getSectorCenter(MetaData metaData) {
-        if (sectorWidth != 0)
-            return sectorCenter;
-        double width = metadataSectorWidth(metaData);
-        return metadataSectorCenter(metaData, width);
+    public double getSectorCenter() {
+        return sectorCenter;
     }
 
-    public double getSectorWidth(MetaData metaData) {
-        if (sectorWidth != 0)
-            return sectorWidth;
-        return metadataSectorWidth(metaData);
+    public double getSectorWidth() {
+        return sectorWidth;
     }
 
-    private static double metadataSectorCenter(MetaData metaData, double width) {
-        if (width == 0)
+    private static double metadataSectorCenter(MetaData metaData, double halfWidth) {
+        if (halfWidth == 0)
             return 0;
-        double center = Math.toDegrees(metaData.getSector1()) + width / 2;
-        return (center + 540) % 360 - 180;
+        double center = metaData.getSector1() + halfWidth;
+        return (center + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
     }
 
-    private static double metadataSectorWidth(MetaData metaData) {
-        double start = Math.toDegrees(metaData.getSector0());
-        double end = Math.toDegrees(metaData.getSector1());
-        if (start == end)
-            return 0;
-        double keptWidth = end - start;
-        if (keptWidth < 0)
-            keptWidth += 360;
-        return 360 - Math.clamp(keptWidth, 0, 360);
+    private static double metadataSectorHalfWidth(MetaData metaData) {
+        float start = metaData.getSector0();
+        float end = metaData.getSector1();
+        return start == end ? 0 : Math.PI + (start - end) / 2;
     }
 
     public double getSlitRight() {

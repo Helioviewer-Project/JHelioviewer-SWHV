@@ -43,7 +43,7 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO displayBO;
-    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 2 + 2 + 2 + 1 + 1);
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 2 + 2 + 2 + 1 + 1 + 1);
     private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
 
     public static void init() {
@@ -155,19 +155,20 @@ public class GLSLSolarShader extends GLSLShader {
 
     static void bindDisplay(float[] color,
                             float shWidth, float shHeight, float shWeight, int isDiff,
-                            float sectorCenter, float sectorHalfWidth, float enhanced,
+                            float userSectorCenter, float userSectorHalfWidth, float metadataSectorCenter, float metadataSectorHalfWidth,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
                             float bOffset, float bScale,
                             float innerRadius, float outerRadius,
                             float slitLeft, float slitRight,
+                            float enhanced,
                             float upsilonLow, float upsilonHigh) {
         displayBuf.put(color);
         displayBuf.put(shWidth).put(shHeight).put(shWeight).put(isDiff);
-        displayBuf.put(sectorCenter).put(sectorHalfWidth).put(0).put(enhanced);
+        displayBuf.put(userSectorCenter).put(userSectorHalfWidth).put(metadataSectorCenter).put(metadataSectorHalfWidth);
         displayBuf.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
         displayBuf.put(bOffset).put(bScale);
         displayBuf.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
-        displayBuf.put(upsilonLow).put(upsilonHigh);
+        displayBuf.put(enhanced).put(upsilonLow).put(upsilonHigh);
 
         displayBuf.flip();
         displayBO.setBufferDataIfChanged(DISPLAY_SIZE, displayBuf);

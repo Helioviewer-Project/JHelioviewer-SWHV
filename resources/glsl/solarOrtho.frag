@@ -33,7 +33,7 @@ vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams
 }
 
 void clipOrthoGeometry(const vec3 samplePoint) {
-    clipSectorOpening(samplePoint.xy);
+    clipSectors(samplePoint.xy);
 
     float radial2 = dot(samplePoint.xy, samplePoint.xy);
     float minRadius2 = display.radii.x * display.radii.x;

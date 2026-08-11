@@ -159,7 +159,7 @@ function screenBlock(job) {
 }
 
 function displayBlock(job) {
-  const block = new Float32Array(24);
+  const block = new Float32Array(25);
   block[0] = 1;      // color.r
   block[1] = 1;      // color.g
   block[2] = 1;      // color.b
@@ -171,6 +171,8 @@ function displayBlock(job) {
   block[19] = 1e30;  // radii.y
   block[20] = 0;     // slit.x
   block[21] = 1;     // slit.y
+  block[23] = 1;     // upsilonLow
+  block[24] = 1;     // upsilonHigh
   return block;
 }
 
