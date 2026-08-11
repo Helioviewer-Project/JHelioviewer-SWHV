@@ -399,12 +399,12 @@ vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeU
 vec2 projectCeaToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
     // CEA is a direct surface lon/lat map with equal-area latitude scaling.
     float lon = atan(world.x, world.z);
-    float lat = asin(clamp(world.y / length(world), -1., 1.));
+    float sinLat = clamp(world.y / length(world), -1., 1.);
     float lambda = max(abs(PV[1]), 1e-12);
     vec2 referenceCoord = crval / planeUnitsPerRad;
     return vec2(
         planeUnitsPerRad * wrapDeltaLongitude(lon, referenceCoord.x),
-        planeUnitsPerRad * (sin(lat) / lambda - referenceCoord.y));
+        planeUnitsPerRad * (sinLat / lambda - referenceCoord.y));
 }
 
 // Projection-space to texture-space mapping.
