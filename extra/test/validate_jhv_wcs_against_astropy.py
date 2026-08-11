@@ -387,13 +387,13 @@ def projectCeaToWcsPlane(world_xyz: tuple[float, float, float], meta: JHVMeta) -
     if norm == 0.0:
         return (math.nan, math.nan)
     lon = math.atan2(world_xyz[0], world_xyz[2])
-    lat = math.asin(max(-1.0, min(1.0, world_xyz[1] / norm)))
+    sin_lat = max(-1.0, min(1.0, world_xyz[1] / norm))
     lon0 = meta.crval_internal_x
     y0 = meta.crval_internal_y
     lam = max(abs(meta.pv2[1]), 1e-12)
     return (
         meta.plane_units_per_rad * wrapDeltaLongitude(lon, lon0),
-        meta.plane_units_per_rad * (math.sin(lat) / lam - y0),
+        meta.plane_units_per_rad * (sin_lat / lam - y0),
     )
 
 
