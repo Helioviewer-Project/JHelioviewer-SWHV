@@ -9,6 +9,7 @@ import org.helioviewer.jhv.app.DisplaySettings;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
+import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.WcsHeader;
@@ -266,18 +267,19 @@ public final class FitsMetaData extends CommonMetaData {
             region = new Region(0, 0, pixelW, pixelH);
         } else {
             WcsInterpreter.Result wcs = WcsInterpreter.read(m);
-            wcsProjection = wcs.projection();
-            boolean isSurfaceMap = wcsProjection.isSurfaceMap();
+            WcsHeader.Projection projection = wcs.projection();
+            boolean isSurfaceMap = projection.isSurfaceMap();
+            float planeUnitsPerRad;
 
             if (isSurfaceMap) {
                 unitPerArcsec = Math.PI / (180. * 3600.);
-                wcsPlaneUnitsPerRad = 1f;
+                planeUnitsPerRad = 1f;
                 unitPerPixelX = wcs.unitPerPixelX();
                 unitPerPixelY = wcs.unitPerPixelY();
             } else {
                 double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
                 unitPerArcsec = Sun.Radius / radiusSunInArcsec;
-                wcsPlaneUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
+                planeUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
                 unitPerPixelX = Math.abs(wcs.arcsecPerPixelX() * unitPerArcsec);
                 unitPerPixelY = Math.abs(wcs.arcsecPerPixelY() * unitPerArcsec);
             }
@@ -290,25 +292,21 @@ public final class FitsMetaData extends CommonMetaData {
 
             region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            crval = isSurfaceMap
+            Vec2 crval = isSurfaceMap
                     ? new Vec2(wcs.internalCrvalX(), wcs.internalCrvalY())
                     : new Vec2(wcs.internalCrvalX() * unitPerArcsec, wcs.internalCrvalY() * unitPerArcsec);
 
-            if (wcsProjection.usesPv2())
-                System.arraycopy(wcs.pv2(), 0, pv2, 0, pv2.length);
+            float[] pv2 = projection.usesPv2() ? wcs.pv2() : new float[6];
+            Mat2 imageToPlane = CROTABlockSet.contains(instrument) ? Mat2.IDENTITY : wcs.imageToPlane();
+            wcsHeader = new WcsHeader(projection, pv2, planeUnitsPerRad, crval, imageToPlane);
 
-            if (!CROTABlockSet.contains(instrument))
-                imageToPlane = wcs.imageToPlane();
-        }
-
-        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, imageToPlane);
-
-        // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
-        if (!wcsProjection.isSurfaceMap() && (crval.x != 0 || crval.y != 0)) {
-            Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
-            if (sun != null) {
-                sunShiftX = sun.x;
-                sunShiftY = -sun.y;
+            // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
+            if (!isSurfaceMap && (crval.x != 0 || crval.y != 0)) {
+                Vec2 sun = WcsProjection.helioprojectiveToPlane(wcsHeader, 0, 0);
+                if (sun != null) {
+                    sunShiftX = sun.x;
+                    sunShiftY = -sun.y;
+                }
             }
         }
     }
