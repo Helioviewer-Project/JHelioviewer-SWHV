@@ -154,7 +154,7 @@ def generated_matrix_cases(
             },
         ),
         (
-            "pc_precedes_crota",
+            "pc_precedes_cd_crota",
             {
                 "CDELT1": -0.7,
                 "CDELT2": 1.1,
@@ -162,7 +162,42 @@ def generated_matrix_cases(
                 "PC1_2": 0.17,
                 "PC2_1": -0.13,
                 "PC2_2": 1.04,
+                "CD1_1": 12.0,
+                "CD1_2": 13.0,
+                "CD2_1": 14.0,
+                "CD2_2": 15.0,
                 "CROTA2": 71.0,
+            },
+        ),
+        (
+            "cd_without_cdelt",
+            {
+                "CD1_1": -0.7,
+                "CD1_2": 0.2,
+                "CD2_1": -0.1,
+                "CD2_2": 1.1,
+            },
+        ),
+        (
+            "partial_cd_ignores_cdelt_crota",
+            {
+                "CDELT1": 19.0,
+                "CDELT2": 23.0,
+                "CD1_2": 0.2,
+                "CD2_1": -0.1,
+                "CD2_2": 1.1,
+                "CROTA2": 47.0,
+            },
+        ),
+        (
+            "cd_mixed_angular_units",
+            {
+                "CUNIT1": "arcmin",
+                "CUNIT2": "mas",
+                "CD1_1": -0.012,
+                "CD1_2": 0.003,
+                "CD2_1": -180.0,
+                "CD2_2": 730.0,
             },
         ),
         (
@@ -200,6 +235,7 @@ def generated_matrix_cases(
     reset_keys = (
         "CROTA", "CROTA1", "CROTA2",
         "PC1_1", "PC1_2", "PC2_1", "PC2_2",
+        "CD1_1", "CD1_2", "CD2_1", "CD2_2",
         "PV2_0", "PV2_1", "PV2_2", "PV2_3", "PV2_4", "PV2_5",
     )
 
@@ -210,6 +246,9 @@ def generated_matrix_cases(
         if name == "missing_observer_cunit":
             header.remove("CUNIT1", ignore_missing=True, remove_all=True)
             header.remove("CUNIT2", ignore_missing=True, remove_all=True)
+        if name in ("cd_without_cdelt", "cd_mixed_angular_units"):
+            header.remove("CDELT1", ignore_missing=True, remove_all=True)
+            header.remove("CDELT2", ignore_missing=True, remove_all=True)
         header["CRPIX1"] = 4.5
         header["CRPIX2"] = 4.5
         for key, value in values.items():
@@ -245,11 +284,33 @@ def generated_matrix_cases(
                 "PC2_2": 0.999,
             },
         ),
+        (
+            "car_cd",
+            SCRIPT_DIR / "data" / "sunerf_map.fits",
+            {
+                "CD1_1": -0.08,
+                "CD1_2": 0.01,
+                "CD2_1": -0.005,
+                "CD2_2": 0.05,
+            },
+        ),
+        (
+            "cea_cd",
+            SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
+            {
+                "CD1_1": -0.8,
+                "CD1_2": 0.01,
+                "CD2_1": -0.01,
+                "CD2_2": 0.006,
+            },
+        ),
     )
     for name, source, values in surface_cases:
         with validator.fits.open(source) as hdul:
             source_hdu = validator.find_image_hdu(hdul, None)
             header = source_hdu.header.copy()
+        for key in ("PC1_1", "PC1_2", "PC2_1", "PC2_2", "CD1_1", "CD1_2", "CD2_1", "CD2_2"):
+            header.remove(key, ignore_missing=True, remove_all=True)
         header["CRPIX1"] = 4.5
         header["CRPIX2"] = 4.5
         for key, value in values.items():

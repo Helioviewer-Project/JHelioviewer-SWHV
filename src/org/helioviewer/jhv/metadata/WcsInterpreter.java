@@ -24,10 +24,7 @@ final class WcsInterpreter {
             double arcsecY,
             double arcsecPerPixelX,
             double arcsecPerPixelY,
-            double pc11,
-            double pc12,
-            double pc21,
-            double pc22) {}
+            Mat2 pc) {}
 
     private record LinearTransform(
             Mat2 imageToPlane,
@@ -40,11 +37,10 @@ final class WcsInterpreter {
             double crval1,
             double crval2,
             double pv2_1,
-            boolean hasPc,
-            double pc11,
-            double pc12,
-            double pc21,
-            double pc22) {}
+            MatrixKeywords pc,
+            MatrixKeywords cd) {}
+
+    private record MatrixKeywords(boolean present, Mat2 matrix) {}
 
     static Result read(MetaDataContainer m) {
         String ctype1 = m.getString("CTYPE1").orElse("");
@@ -74,28 +70,37 @@ final class WcsInterpreter {
     }
 
     private static WcsInput readWcsInput(MetaDataContainer m) {
-        Optional<Double> pc11 = m.getDouble("PC1_1");
-        Optional<Double> pc12 = m.getDouble("PC1_2");
-        Optional<Double> pc21 = m.getDouble("PC2_1");
-        Optional<Double> pc22 = m.getDouble("PC2_2");
-        boolean hasPc = pc11.isPresent() || pc12.isPresent() || pc21.isPresent() || pc22.isPresent();
+        MatrixKeywords pc = readMatrix(m, "PC", 1.);
+        MatrixKeywords cd = readMatrix(m, "CD", 0.);
+        // FITS WCS/wcslib: PC takes precedence if both are present. Otherwise,
+        // any CD card selects a zero-defaulted CD matrix; CDELT and CROTA are ignored.
+        boolean usesCd = cd.present && !pc.present;
         return new WcsInput(
-                m.getRequiredDouble("CDELT1"),
-                m.getRequiredDouble("CDELT2"),
+                usesCd ? 1. : m.getRequiredDouble("CDELT1"),
+                usesCd ? 1. : m.getRequiredDouble("CDELT2"),
                 m.getDouble("CRVAL1").orElse(0.),
                 m.getDouble("CRVAL2").orElse(0.),
                 m.getDouble("PV2_1").orElse(1.),
-                hasPc,
-                pc11.orElse(1.),
-                pc12.orElse(0.),
-                pc21.orElse(0.),
-                pc22.orElse(1.));
+                pc,
+                cd);
+    }
+
+    private static MatrixKeywords readMatrix(MetaDataContainer m, String prefix, double diagonalDefault) {
+        Optional<Double> m11 = m.getDouble(prefix + "1_1");
+        Optional<Double> m12 = m.getDouble(prefix + "1_2");
+        Optional<Double> m21 = m.getDouble(prefix + "2_1");
+        Optional<Double> m22 = m.getDouble(prefix + "2_2");
+        boolean present = m11.isPresent() || m12.isPresent() || m21.isPresent() || m22.isPresent();
+        return new MatrixKeywords(present, new Mat2(
+                m11.orElse(diagonalDefault), m12.orElse(0.),
+                m21.orElse(0.), m22.orElse(diagonalDefault)));
     }
 
     private static PixelAxes computePixelAxes(WcsInput wcs, MetaDataContainer m, boolean isSurfaceMap) {
         double arcsecX = readAngularAxisScaleArcsec(m, "CUNIT1", isSurfaceMap);
         double arcsecY = readAngularAxisScaleArcsec(m, "CUNIT2", isSurfaceMap);
-        return new PixelAxes(arcsecX, arcsecY, wcs.cdelt1 * arcsecX, wcs.cdelt2 * arcsecY, wcs.pc11, wcs.pc12, wcs.pc21, wcs.pc22);
+        return new PixelAxes(
+                arcsecX, arcsecY, wcs.cdelt1 * arcsecX, wcs.cdelt2 * arcsecY, wcs.pc.matrix);
     }
 
     private static double readAngularAxisScaleArcsec(MetaDataContainer m, String cunitKey, boolean defaultDegrees) {
@@ -128,22 +133,42 @@ final class WcsInterpreter {
 
     private static LinearTransform computeSurfaceTransform(WcsInput wcs, PixelAxes axes, boolean isCea) {
         // Surface-map X is angular longitude. Y is angular latitude for CAR and equal-area Y for CEA.
+        if (!wcs.pc.present && wcs.cd.present) {
+            double axis1Scale = axes.arcsecX / ARCSEC_PER_RAD;
+            double axis2Scale = isCea ? 1 : axes.arcsecY / ARCSEC_PER_RAD;
+            Mat2 cd = wcs.cd.matrix;
+            return normalize(
+                    axis1Scale * cd.m00,
+                    axis1Scale * cd.m01,
+                    axis2Scale * cd.m10,
+                    axis2Scale * cd.m11);
+        }
+
         double cdelt1Rad = Math.toRadians(axes.arcsecPerPixelX / 3600.);
         double cdelt2Surface = isCea ? wcs.cdelt2 : Math.toRadians(axes.arcsecPerPixelY / 3600.);
         return normalize(
-                cdelt1Rad * axes.pc11,
-                cdelt1Rad * axes.pc12,
-                cdelt2Surface * axes.pc21,
-                cdelt2Surface * axes.pc22);
+                cdelt1Rad * axes.pc.m00,
+                cdelt1Rad * axes.pc.m01,
+                cdelt2Surface * axes.pc.m10,
+                cdelt2Surface * axes.pc.m11);
     }
 
     private static LinearTransform computeObserverTransform(MetaDataContainer m, WcsInput wcs, PixelAxes axes) {
-        if (wcs.hasPc) {
+        if (wcs.pc.present) {
             return normalize(
-                    axes.arcsecPerPixelX * axes.pc11,
-                    axes.arcsecPerPixelX * axes.pc12,
-                    axes.arcsecPerPixelY * axes.pc21,
-                    axes.arcsecPerPixelY * axes.pc22);
+                    axes.arcsecPerPixelX * axes.pc.m00,
+                    axes.arcsecPerPixelX * axes.pc.m01,
+                    axes.arcsecPerPixelY * axes.pc.m10,
+                    axes.arcsecPerPixelY * axes.pc.m11);
+        }
+
+        if (wcs.cd.present) {
+            Mat2 cd = wcs.cd.matrix;
+            return normalize(
+                    axes.arcsecX * cd.m00,
+                    axes.arcsecX * cd.m01,
+                    axes.arcsecY * cd.m10,
+                    axes.arcsecY * cd.m11);
         }
 
         double crota = m.getDouble("CROTA").or(() -> m.getDouble("CROTA1")).or(() -> m.getDouble("CROTA2"))
