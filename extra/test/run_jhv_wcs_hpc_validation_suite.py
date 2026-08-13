@@ -350,7 +350,6 @@ CORE_RUN_NAMES = {
     "hpc_render_compare_wispr_2222",
     "surface_map_render_compare_car_sunerf",
     "surface_map_render_compare_cea",
-    "latitudinal_zenithal_render",
 }
 
 CORE_ELECTRON_RUN_NAMES = {
@@ -424,12 +423,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--include-electron",
         action="store_true",
-        help="Include Electron/ANGLE shader-execution validation runs",
+        help="Include the focused Metal/ANGLE and SwiftShader validation runs",
     )
     parser.add_argument(
         "--electron-only",
         action="store_true",
-        help="Run only Electron/ANGLE shader-execution validation runs",
+        help="Run only the Metal/ANGLE and SwiftShader validation runs",
     )
     return parser.parse_args()
 
