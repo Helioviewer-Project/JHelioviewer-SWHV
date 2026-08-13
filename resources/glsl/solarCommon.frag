@@ -499,19 +499,19 @@ void clipSectors(const vec2 point) {
     clipSectorOpening(theta, display.userSector);
 }
 
-void clipHpcGeometry(const vec2 hpcXY) {
-    clipSectors(hpcXY);
+void clipPlanarMasks(const vec2 point) {
+    clipSectors(point);
 
-    float radial2 = dot(hpcXY, hpcXY);
+    float radial2 = dot(point, point);
     float minRadius2 = display.radii.x * display.radii.x;
     float maxRadius2 = display.radii.y * display.radii.y;
     if (radial2 > maxRadius2 || radial2 < minRadius2)
         discard;
 
     if (display.cutOff.z >= 0.) {
-        float flatDist = abs(dot(hpcXY, display.cutOff.xy));
+        float flatDist = abs(dot(point, display.cutOff.xy));
         vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-        float flatDistAlt = abs(dot(hpcXY, cutOffAlt));
+        float flatDistAlt = abs(dot(point, cutOffAlt));
         if (flatDist > display.cutOff.z || flatDistAlt > display.cutOff.z)
             discard;
     }
