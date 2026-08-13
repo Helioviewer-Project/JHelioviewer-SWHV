@@ -105,26 +105,28 @@ function putVec4(block, offset, values) {
 }
 
 function wcsBlock(job) {
+  const secondary = job.secondary || job;
   const block = new Float32Array(32);
-  putVec4(block, 0, [0, 0, 0, 1]);
+  putVec4(block, 0, job.cameraDiff || [0, 0, 0, 1]);
   putVec4(block, 4, job.rect);
   putVec4(block, 8, job.planeToImage);
   block[12] = job.crval[0];
   block[13] = job.crval[1];
   block[14] = job.zpnUpperEta;
-  block[15] = 0;
+  block[15] = job.deltaT || 0;
 
-  putVec4(block, 16, [0, 0, 0, 1]);
-  putVec4(block, 20, job.rect);
-  putVec4(block, 24, job.planeToImage);
-  block[28] = job.crval[0];
-  block[29] = job.crval[1];
-  block[30] = job.zpnUpperEta;
-  block[31] = 0;
+  putVec4(block, 16, secondary.cameraDiff || [0, 0, 0, 1]);
+  putVec4(block, 20, secondary.rect);
+  putVec4(block, 24, secondary.planeToImage);
+  block[28] = secondary.crval[0];
+  block[29] = secondary.crval[1];
+  block[30] = secondary.zpnUpperEta;
+  block[31] = secondary.deltaT || 0;
   return block;
 }
 
 function projectionBlock(job) {
+  const secondary = job.secondary || job;
   const block = new Float32Array(24);
   block[0] = job.projectionCode;
   block[1] = job.planeUnitsPerRadian;
@@ -133,12 +135,12 @@ function projectionBlock(job) {
   putVec4(block, 4, [0, 0, 0, 1]);
   putVec4(block, 8, [0, 0, 0, 1]);
 
-  block[12] = job.projectionCode;
-  block[13] = job.planeUnitsPerRadian;
-  block[14] = job.observerDistance;
+  block[12] = secondary.projectionCode;
+  block[13] = secondary.planeUnitsPerRadian;
+  block[14] = secondary.observerDistance;
   block[15] = 0;
-  putVec4(block, 16, [0, 0, 0, 1]);
-  putVec4(block, 20, [0, 0, 0, 1]);
+  putVec4(block, 16, secondary.sourceViewQuat || [0, 0, 0, 1]);
+  putVec4(block, 20, secondary.displayMapQuat || [0, 0, 0, 1]);
   return block;
 }
 
@@ -160,16 +162,18 @@ function screenBlock(job) {
 
 function displayBlock(job) {
   const block = new Float32Array(25);
+  const radii = job.radii || [0, 1e30];
   block[0] = 1;      // color.r
   block[1] = 1;      // color.g
   block[2] = 1;      // color.b
   block[3] = 1;      // color.a
   block[7] = job.diffSelfcheck || job.colorDiffSmoke ? 1 : 0; // isDiff
-  block[14] = -1;    // cutOff.z
+  putVec4(block, 8, [...(job.userSector || [0, 0]), ...(job.metadataSector || [0, 0])]);
+  putVec4(block, 12, [...(job.cutOff || [0, 0, -1]), 0]);
   block[16] = 0;     // brightness.x
   block[17] = 1;     // brightness.y
-  block[18] = 0;     // radii.x
-  block[19] = 1e30;  // radii.y
+  block[18] = radii[0];
+  block[19] = radii[1];
   block[20] = 0;     // slit.x
   block[21] = 1;     // slit.y
   block[23] = 1;     // upsilonLow
@@ -209,6 +213,7 @@ void main(void) {
     vec2 mapPos = getNormalizedMapPos();
     vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
     vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, projection[0].observerDistance);
+    clipPlanarMasks(hpcXY);
 
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(
@@ -595,6 +600,7 @@ function prepareFullscreenQuad(gl) {
 
 function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   const errors = {};
+  const secondary = job.secondary || job;
   const canvas = document.getElementById("canvas");
   canvas.width = job.width;
   canvas.height = job.height;
@@ -606,10 +612,10 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
 
   setUniform(gl, program, "uPv", job.pv2);
   setUniform(gl, program, "pv0", job.pv2);
-  setUniform(gl, program, "pv1", job.pv2);
+  setUniform(gl, program, "pv1", secondary.pv2);
   setUniform(gl, program, "uLatiGrid", job.latiGrid || [0, 0, 0]);
   setUniform(gl, program, "latiGrid[0]", job.latiGrid || [0, 0, 0]);
-  setUniform(gl, program, "latiGrid[1]", job.latiGrid || [0, 0, 0]);
+  setUniform(gl, program, "latiGrid[1]", secondary.latiGrid || [0, 0, 0]);
   setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
   setUniformInt(gl, program, "image", 0);
   setUniformInt(gl, program, "diffImage", 1);
