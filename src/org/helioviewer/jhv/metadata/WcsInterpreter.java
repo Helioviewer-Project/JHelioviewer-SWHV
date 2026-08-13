@@ -3,20 +3,21 @@ package org.helioviewer.jhv.metadata;
 import java.util.Optional;
 
 import org.helioviewer.jhv.math.Mat2;
+import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 final class WcsInterpreter {
 
+    private static final double ARCSEC_PER_RAD = 180. * 3600. / Math.PI;
+
     record Result(
             WcsHeader.Projection projection,
             float[] pv2,
-            double internalCrvalX,
-            double internalCrvalY,
+            Vec2 crval,
             Mat2 imageToPlane,
             double unitPerPixelX,
             double unitPerPixelY,
-            double arcsecPerPixelX,
-            double arcsecPerPixelY) {}
+            double unitsPerRad) {}
 
     private record PixelAxes(
             double arcsecX,
@@ -54,31 +55,22 @@ final class WcsInterpreter {
         WcsInput wcs = readWcsInput(m);
         PixelAxes axes = computePixelAxes(wcs, m, isSurfaceMap);
         float[] pv2 = readPv2(m, wcs, projection);
-        double crvalX;
-        double crvalY;
+        Vec2 crval;
         LinearTransform transform;
+        double unitsPerRad;
 
         if (isSurfaceMap) {
             boolean isCea = projection == WcsHeader.Projection.CEA;
             transform = computeSurfaceTransform(wcs, axes, isCea);
-            crvalX = Math.toRadians(wcs.crval1);
-            crvalY = isCea ? readCeaLatitudeY(wcs) : Math.toRadians(wcs.crval2);
+            crval = new Vec2(Math.toRadians(wcs.crval1), isCea ? readCeaLatitudeY(wcs) : Math.toRadians(wcs.crval2));
+            unitsPerRad = 1;
         } else {
             transform = computeObserverTransform(m, wcs, axes);
-            crvalX = wcs.crval1 * axes.arcsecX;
-            crvalY = wcs.crval2 * axes.arcsecY;
+            crval = new Vec2(wcs.crval1 * axes.arcsecX, wcs.crval2 * axes.arcsecY);
+            unitsPerRad = ARCSEC_PER_RAD;
         }
 
-        return new Result(
-                projection,
-                pv2,
-                crvalX,
-                crvalY,
-                transform.imageToPlane,
-                isSurfaceMap ? transform.unitPerPixelX : 0,
-                isSurfaceMap ? transform.unitPerPixelY : 0,
-                isSurfaceMap ? axes.arcsecPerPixelX : transform.unitPerPixelX,
-                isSurfaceMap ? axes.arcsecPerPixelY : transform.unitPerPixelY);
+        return new Result(projection, pv2, crval, transform.imageToPlane, transform.unitPerPixelX, transform.unitPerPixelY, unitsPerRad);
     }
 
     private static WcsInput readWcsInput(MetaDataContainer m) {
@@ -125,6 +117,8 @@ final class WcsInterpreter {
 
     private static float[] readPv2(MetaDataContainer m, WcsInput wcs, WcsHeader.Projection projection) {
         float[] pv2 = new float[6];
+        if (!projection.usesPv2())
+            return pv2;
         for (int i = 0; i < pv2.length; i++)
             pv2[i] = m.getDouble("PV2_" + i).map(Double::floatValue).orElse(0f);
         if (projection == WcsHeader.Projection.CEA) // Thompson (2006): CEA defaults PV2_1 to 1 when omitted.
