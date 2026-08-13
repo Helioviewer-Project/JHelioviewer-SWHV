@@ -259,13 +259,15 @@ Here, Astropy is the external reference for:
   - the script reports both the raw image-footprint bounds and the centered
     display bounds used by the JHV `HPC` screen mapping
 - full pixel-center validation for `CAR`
-  - using the effective linear transform (`PC * CDELT`) together with the
-    native `CRLN-CAR / CRLT-CAR` axis semantics
+  - using the effective linear transform
+    (`diag(CDELT1, CDELT2) * PC`) together with the native
+    `CRLN-CAR / CRLT-CAR` axis semantics
 - inverse `CAR`
   - plane -> world lon/lat, checked by the same round-trip strategy
 - full pixel-center validation for `CEA`
-  - using the effective linear transform (`PC * CDELT`) together with the
-    native `CRLN-CEA / CRLT-CEA` axis semantics
+  - using the effective linear transform
+    (`diag(CDELT1, CDELT2) * PC`) together with the native
+    `CRLN-CEA / CRLT-CEA` axis semantics
 - inverse `CEA`
   - plane -> world lon/lat, checked by the same round-trip strategy
 
@@ -321,16 +323,17 @@ python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --include-electron
 
 These focused checks execute the production coordinate and WCS sampling helpers
 over JHV's viewport bounds and render a synthetic `R16F` texture rather than
-stopping at raw coordinates. They do not execute the complete production
-fragment entry point or layer display masks such as sectors, radii, and cutoffs;
-they validate coordinate mapping, source-image validity, and texture sampling,
-not complete frame equivalence. `rendered_sample_*` compares the diagnostic GPU
-output over the complete viewport with a value sampled at the independent
-CPU/Astropy coordinate, or transparent black when that reference coordinate is
-outside the source image. `texture_interpolation_*` separately compares GPU and
-CPU filtering at the GPU coordinate; it is a filtering diagnostic, not a
-coordinate-correctness oracle. The CPU sampler uses the same half-float source
-values and clamp-to-edge filtering as the WebGL/JHV texture.
+stopping at raw coordinates. Separate focused checks exercise differential
+rotation, independently populated primary and secondary WCS uniform-block
+slots, and the user-sector, metadata-sector, radial, and cutoff display masks.
+They do not execute every complete production fragment path, so they are not a
+claim of complete frame equivalence. `rendered_sample_*` compares the
+diagnostic GPU output over the complete viewport with a value sampled at the
+independent CPU/Astropy coordinate, or transparent black when that reference
+coordinate is outside the source image. `texture_interpolation_*` separately
+compares GPU and CPU filtering at the GPU coordinate; it is a filtering
+diagnostic, not a coordinate-correctness oracle. The CPU sampler uses the same
+half-float source values and clamp-to-edge filtering as the WebGL/JHV texture.
 
 The Metal run also covers Orthographic and both warp modes against the CPU
 model. The routine SwiftShader run covers the primary HPC and cylindrical
@@ -424,7 +427,7 @@ The compared derived quantities include:
 - normalized WCS reference values:
   - `crval_internal_x`
   - `crval_internal_y`
-  - `crota_rad`
+  - `image_to_plane`
 - projection family and projection parameters:
   - `projection`
   - `pv2`
@@ -438,6 +441,12 @@ visible from the Astropy agreement alone.
 
 In the code state documented here, this Java/Python metadata comparison agrees
 on all cases used by the comparison script.
+
+The comparison script also generates small temporary FITS cases for unequal
+and negative axis scales with a non-orthogonal `PC`, partial `PC` defaults,
+`CROTA` with unequal axis scales, and radian-valued axes. Each case is checked
+against Astropy as well as the Java metadata interpretation. A separate LASCO
+case asserts the existing JHV policy of suppressing the image WCS transform.
 
 One caveat remains for the `observer_distance` field when `DSUN_OBS` is absent:
 
@@ -525,7 +534,8 @@ pixel-center error.
 
 For the `CAR` and `CEA` cases, the same mode also validates
 surface maps against Astropy over the full source image grid. In those cases,
-the Python validator uses the effective linear transform `PC * CDELT`, not bare
+the Python validator uses the effective linear transform
+`diag(CDELT1, CDELT2) * PC`, not bare
 `CDELT`, and keeps the original axis types (`CRLN-CAR / CRLT-CAR` or
 `CRLN-CEA / CRLT-CEA`) when constructing the Astropy comparison WCS.
 
@@ -987,7 +997,7 @@ full-Sun `CAR` surface-map case.
   - `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits`
 - all three files are `CRLN-CAR / CRLT-CAR` surface maps
 - the correct effective scale comes from the linear WCS transform
-  `PC * CDELT`, not from bare `CDELT`
+  `diag(CDELT1, CDELT2) * PC`, not from bare `CDELT`
 - the Python validator keeps the original `CRLN-CAR / CRLT-CAR` axis types
   and uses the effective linear transform when constructing the Astropy
   comparison WCS
@@ -1034,7 +1044,7 @@ full-Sun `CEA` surface-map case.
   - `extra/test/data/mrzqs260301t2314c2308_169.fits`
 - it is a `CRLN-CEA / CRLT-CEA` surface map
 - the correct effective scale comes from the linear WCS transform
-  `PC * CDELT`, not from bare `CDELT`
+  `diag(CDELT1, CDELT2) * PC`, not from bare `CDELT`
 - the second WCS axis is the `CEA` equal-area latitude coordinate, not direct
   angular latitude
 - the Python validator keeps the original `CRLN-CEA / CRLT-CEA` axis types
@@ -1153,7 +1163,8 @@ from the independent reference. The current sampled-texture comparison instead
 uses Astropy-derived coordinates for `HPC`, and the corresponding independent
 CPU mapping for JHV-specific geometry. Both-valid, shader-only, reference-only,
 and both-discarded viewport pixels contribute to `rendered_sample_*`. This is a
-source-boundary diagnostic; production layer masks are outside its scope.
+source-boundary diagnostic; the separate planar-mask checks cover the display
+mask predicates but do not change the interpretation of these results.
 
 At `512x512`, Metal/ANGLE had no `HPC` validity-mask differences in the five
 `ARC`/`AZP`/`ZPN` projection cases and remained below the `1e-3` rendered-value

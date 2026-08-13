@@ -339,6 +339,21 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "sample.171.fits"), "--hdu", "1", "--all-modes-color-diff-smoke", "--render-size", "128", "--backend", "default"),
         "electron",
     ),
+    ValidationRun(
+        "electron_default_differential_rotation",
+        ("--differential-rotation", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_distinct_wcs_slots",
+        ("--distinct-wcs-slots", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_planar_masks",
+        ("--planar-masks", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
 )
 
 
@@ -359,12 +374,18 @@ CORE_RUN_NAMES = {
 
 CORE_ELECTRON_RUN_NAMES = {
     "electron_default_all_modes_sample_texture",
+    "electron_default_differential_rotation",
+    "electron_default_distinct_wcs_slots",
     "electron_default_hpc_projection_cases_sample_texture",
+    "electron_default_planar_masks",
     "electron_default_surface_map_cases_sample_texture",
 }
 
 SWIFTSHADER_CORE_SOURCE_NAMES = {
+    "electron_default_differential_rotation",
+    "electron_default_distinct_wcs_slots",
     "electron_default_hpc_projection_cases_sample_texture",
+    "electron_default_planar_masks",
     "electron_default_surface_map_cases_sample_texture",
 }
 

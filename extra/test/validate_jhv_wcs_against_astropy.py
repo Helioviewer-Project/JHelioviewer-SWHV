@@ -266,7 +266,10 @@ def build_jhv_meta(header) -> JHVMeta:
     if str(header.get("INSTRUME", "")) == "LASCO":
         image_to_plane = (1.0, 0.0, 0.0, 1.0)
     plane_to_image = invert_mat2(image_to_plane)
-    pv2 = [float(np.float32(header.get(f"PV2_{i}", 0.0))) for i in range(6)]
+    pv2 = (
+        [float(np.float32(header.get(f"PV2_{i}", 0.0))) for i in range(6)]
+        if projection in PV2_PROJECTIONS else [0.0] * 6
+    )
     if projection == "CEA":
         pv2[1] = float(np.float32(header.get("PV2_1", 1.0)))
 
@@ -355,6 +358,22 @@ def rotate_vector(quat: tuple[float, float, float, float], vec: tuple[float, flo
 
 def rotate_vector_inverse(quat: tuple[float, float, float, float], vec: tuple[float, float, float]) -> tuple[float, float, float]:
     return quat_rotate_vector_inverse(quat, vec)
+
+
+def differentialRotation(delta_t: float, sin_latitude: float) -> float:
+    sin_latitude2 = sin_latitude * sin_latitude
+    return delta_t * (0.01367 - 0.339 * sin_latitude2 - 0.485 * sin_latitude2 * sin_latitude2)
+
+
+def differential(delta_t: float, vector: tuple[float, float, float]) -> tuple[float, float, float]:
+    delta = differentialRotation(delta_t, vector[1])
+    sin_delta = math.sin(delta)
+    cos_delta = math.cos(delta)
+    return (
+        vector[0] * cos_delta - vector[2] * sin_delta,
+        vector[1],
+        vector[2] * cos_delta + vector[0] * sin_delta,
+    )
 
 
 def nativeZenithalCoordinates(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float, float]:
@@ -1298,11 +1317,19 @@ def projectHelioprojectiveToWcsPlane(helioprojective: tuple[float, float], meta:
     raise ValueError(f"HPC path does not support projection {meta.projection!r}")
 
 
-def sampleHpcTexcoord(helioprojective: tuple[float, float], hpc_xy: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[tuple[float, float], float]:
+def sampleHpcTexcoord(
+    helioprojective: tuple[float, float],
+    hpc_xy: tuple[float, float],
+    meta: JHVMeta,
+    image2d: np.ndarray,
+    delta_t: float = 0.0,
+) -> tuple[tuple[float, float], float]:
     enhancement_factor = 1.0
     hp = helioprojective
     hit, world = helioprojectiveToWorld(hp, meta.observer_distance)
     if hit:
+        if delta_t != 0.0:
+            world = differential(delta_t, world)
         hp = worldToHelioprojective(world, meta.observer_distance)
     else:
         enhancement_factor = hpcEnhancementFactor(hpc_xy)
@@ -1323,6 +1350,8 @@ def renderHpcTexcoords(
     image2d: np.ndarray,
     diff_meta: JHVMeta | None = None,
     diff_image2d: np.ndarray | None = None,
+    delta_t: float = 0.0,
+    diff_delta_t: float = 0.0,
 ) -> tuple[tuple[float, float], tuple[float, float], float, float, tuple[float, float], tuple[float, float]]:
     clamped_scrpos = getScrPos(scrpos)
     if not math.isfinite(clamped_scrpos[0]) or not math.isfinite(clamped_scrpos[1]):
@@ -1335,7 +1364,7 @@ def renderHpcTexcoords(
         nan2 = (math.nan, math.nan)
         return nan2, nan2, math.nan, math.nan, helioprojective, nan2
 
-    texcoord, enhancement_factor = sampleHpcTexcoord(helioprojective, hpc_xy, meta, image2d)
+    texcoord, enhancement_factor = sampleHpcTexcoord(helioprojective, hpc_xy, meta, image2d, delta_t)
     if diff_meta is None:
         return texcoord, texcoord, enhancement_factor, enhancement_factor, helioprojective, hpc_xy
 
@@ -1349,6 +1378,7 @@ def renderHpcTexcoords(
         diff_hpc_xy,
         diff_meta,
         diff_image2d if diff_image2d is not None else image2d,
+        diff_delta_t,
     )
     return texcoord, diff_texcoord, enhancement_factor, diff_enhancement_factor, helioprojective, diff_hpc_xy
 
@@ -1650,7 +1680,7 @@ def sampleLatiZenithalTexcoord(
         return (math.nan, math.nan)
 
     if delta_t != 0.0:
-        longitude -= differentialRotation(delta_t, latitude)
+        longitude -= differentialRotation(delta_t, math.sin(latitude))
 
     cos_latitude = math.cos(latitude)
     spherical = (
@@ -1843,6 +1873,8 @@ def renderOrthographicTexcoords(
     diff_camera_diff_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     diff_source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
+    delta_t: float = 0.0,
+    diff_delta_t: float = 0.0,
 ) -> tuple[tuple[float, float], tuple[float, float], tuple[float, float, float], tuple[float, float, float]]:
     radius2 = screen_xy[0] * screen_xy[0] + screen_xy[1] * screen_xy[1]
     on_disk = radius2 <= 1.0
@@ -1858,7 +1890,7 @@ def renderOrthographicTexcoords(
         world_xyz = (
             rotate_vector_inverse(source_view_quat, hit_point)
             if surface_map_mode
-            else rotateOnDiskPoint(hit_point, meta, camera_diff_quat)
+            else rotateOnDiskPoint(hit_point, meta, camera_diff_quat, delta_t)
         )
     else:
         hit_point = (math.nan, math.nan, math.nan)
@@ -1884,7 +1916,7 @@ def renderOrthographicTexcoords(
         diff_world_xyz = (
             rotate_vector_inverse(diff_source_view_quat, diff_hit_point)
             if diff_surface_map_mode
-            else rotateOnDiskPoint(diff_hit_point, diff_meta, diff_camera_diff_quat)
+            else rotateOnDiskPoint(diff_hit_point, diff_meta, diff_camera_diff_quat, diff_delta_t)
         )
     else:
         diff_hit_point = (math.nan, math.nan, math.nan)
@@ -2777,30 +2809,41 @@ def run_forward_validation(
 
     if all_pixels:
         worst_pixels: list[tuple[float, tuple[int, int], tuple[float, float], tuple[float, float]]] = []
+        compared_pixels = 0
+        reference_invalid_pixels = 0
+        implementation_invalid_pixels = 0
         for y in range(meta.pixel_height):
             fits_y = np.full(meta.pixel_width, y + 1.0, dtype=np.float64)
             fits_x = np.arange(meta.pixel_width, dtype=np.float64) + 1.0
-            world = pixel_wcs.wcs_pix2world(np.column_stack((fits_x, fits_y)), 1)
-            if not np.all(np.isfinite(world)):
-                world = np.array([
-                    pixel_center_to_world_deg((float(ax - 0.5), float(ay - 0.5)), meta)
-                    if not np.all(np.isfinite(w))
-                    else (float(w[0]), float(w[1]))
-                    for w, ax, ay in zip(world, fits_x, fits_y, strict=True)
-                ], dtype=np.float64)
-            jhv_pixel_center = mirrored_world_array_to_pixel_center(world, meta)
-            astro_pixel_center = fits_pixel_to_texture_pixel(np.column_stack((fits_x, fits_y)), meta)
-            errors = np.array([
+            fits_pixels = np.column_stack((fits_x, fits_y))
+            world = pixel_wcs.wcs_pix2world(fits_pixels, 1)
+            reference_valid = np.all(np.isfinite(world), axis=1)
+            reference_invalid_pixels += int(np.count_nonzero(~reference_valid))
+            if not np.any(reference_valid):
+                continue
+
+            valid_indices = np.flatnonzero(reference_valid)
+            jhv_pixel_center = mirrored_world_array_to_pixel_center(world[reference_valid], meta)
+            astro_pixel_center = fits_pixel_to_texture_pixel(fits_pixels[reference_valid], meta)
+            implementation_valid = np.all(np.isfinite(jhv_pixel_center), axis=1)
+            implementation_invalid_pixels += int(np.count_nonzero(~implementation_valid))
+            errors = np.full(len(jhv_pixel_center), math.inf, dtype=np.float64)
+            errors[implementation_valid] = np.array([
                 pixel_center_error_px((float(jx), float(jy)), (float(ax), float(ay)), meta)
-                for (jx, jy), (ax, ay) in zip(jhv_pixel_center, astro_pixel_center, strict=True)
+                for (jx, jy), (ax, ay) in zip(
+                    jhv_pixel_center[implementation_valid],
+                    astro_pixel_center[implementation_valid],
+                    strict=True,
+                )
             ], dtype=np.float64)
+            compared_pixels += len(errors)
             row_max = float(np.max(errors))
             pixel_err_max = max(pixel_err_max, row_max)
             if report_worst > 0:
                 idx = int(np.argmax(errors))
                 worst_pixels.append((
                     float(errors[idx]),
-                    (int(idx), y),
+                    (int(valid_indices[idx]), y),
                     (float(jhv_pixel_center[idx, 0]), float(jhv_pixel_center[idx, 1])),
                     (float(astro_pixel_center[idx, 0]), float(astro_pixel_center[idx, 1])),
                 ))
@@ -2808,6 +2851,9 @@ def run_forward_validation(
         worst_pixels.sort(key=lambda item: item[0], reverse=True)
         print(f"file={fits_file}")
         print("mode=all_pixels")
+        print(f"compared_pixels={compared_pixels}")
+        print(f"reference_invalid_pixels={reference_invalid_pixels}")
+        print(f"implementation_invalid_pixels={implementation_invalid_pixels}")
         print(f"pixel_center_max_error_px={pixel_err_max:.6e}")
         print("worst_pixels:")
         for pixel_err, pixel_xy, jhv_pixel_center, astro_pixel_center in worst_pixels[:report_worst]:
@@ -2815,6 +2861,12 @@ def run_forward_validation(
                 f"  err={pixel_err:.6e} pixel={pixel_xy!r} "
                 f"jhv={jhv_pixel_center!r} astropy={astro_pixel_center!r}"
             )
+        if compared_pixels == 0:
+            print("FAILED: no pixels with a finite Astropy reference")
+            return 1
+        if implementation_invalid_pixels:
+            print("FAILED: JHV produced non-finite pixels for finite Astropy coordinates")
+            return 1
         if pixel_err_max > max_error_px:
             print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
             return 1
