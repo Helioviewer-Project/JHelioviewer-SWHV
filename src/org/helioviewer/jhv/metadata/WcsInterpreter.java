@@ -115,8 +115,19 @@ final class WcsInterpreter {
 
     private static double readAngularAxisScaleArcsec(MetaDataContainer m, String cunitKey, boolean defaultDegrees) {
         return m.getString(cunitKey)
-                .map(u -> u.equalsIgnoreCase("deg") ? 3600. : 1.)
+                .map(WcsInterpreter::arcsecPerUnit)
                 .orElse(defaultDegrees ? 3600. : 1.);
+    }
+
+    private static double arcsecPerUnit(String unit) {
+        return switch (unit.strip().toLowerCase()) {
+            case "deg" -> 3600.;
+            case "arcmin" -> 60.;
+            case "arcsec" -> 1.;
+            case "mas" -> .001;
+            case "rad" -> 180. * 3600. / Math.PI;
+            default -> 1.;
+        };
     }
 
     private static float[] readPv2(MetaDataContainer m, WcsInput wcs, WcsHeader.Projection projection) {
