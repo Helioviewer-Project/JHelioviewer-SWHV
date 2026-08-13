@@ -77,15 +77,19 @@ def default_angular_cunit(header, axis: int) -> str | None:
 
 
 def unit_scale_from_cunit(cunit: str | None) -> float:
-    if cunit and cunit.lower() == "deg":
-        return 3600.0
-    return 1.0
+    if cunit is None:
+        return 1.0
+    return {
+        "deg": 3600.0,
+        "arcmin": 60.0,
+        "arcsec": 1.0,
+        "mas": 0.001,
+        "rad": 180.0 * 3600.0 / math.pi,
+    }.get(cunit.strip().lower(), 1.0)
 
 
 def angular_header_value_to_deg(value: float, cunit: str | None) -> float:
-    if cunit and cunit.lower() == "deg":
-        return float(value)
-    return float(value) / 3600.0
+    return float(value) * unit_scale_from_cunit(cunit) / 3600.0
 
 
 def wrap_angle_diff_deg(a: float, b: float) -> float:
