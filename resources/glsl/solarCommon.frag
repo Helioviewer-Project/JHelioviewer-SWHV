@@ -25,7 +25,7 @@ in vec2 normalizedScreenpos;
 struct WCS {
     vec4 cameraDiff; // not strictly WCS
     vec4 rect;
-    vec4 crota;
+    vec4 planeToImage; // row-major 2x2 matrix
     vec2 crval;
     float zpnUpperEta;
     float deltaT; // not strictly WCS
@@ -214,16 +214,10 @@ vec3 rotate_vector(const vec4 quat, const vec3 vec) {
     return vec + 2. * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec);
 }
 
-vec2 rotate_plane_inverse(const vec4 quat, const vec2 vec) {
-    vec3 q = quat.xyz;
-    float qx2 = q.x * q.x;
-    float qy2 = q.y * q.y;
-    float qz2 = q.z * q.z;
-    float qxqy = q.x * q.y;
-    float qwqz = quat.w * q.z;
+vec2 transform_plane_to_image(const vec4 transform, const vec2 vec) {
     return vec2(
-        vec.x * (1. - 2. * (qy2 + qz2)) + vec.y * 2. * (qxqy + qwqz),
-        vec.x * 2. * (qxqy - qwqz) + vec.y * (1. - 2. * (qx2 + qz2)));
+        transform.x * vec.x + transform.y * vec.y,
+        transform.z * vec.x + transform.w * vec.y);
 }
 
 // Differential solar rotation.
@@ -419,7 +413,7 @@ vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs,
 }
 
 vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 centered = rotate_plane_inverse(wcs.crota, plane);
+    vec2 centered = transform_plane_to_image(wcs.planeToImage, plane);
     vec4 rect = wcs.rect;
     vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     clamp_coord(texcoord);
@@ -427,7 +421,7 @@ vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
 }
 
 vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 centered = rotate_plane_inverse(wcs.crota, plane);
+    vec2 centered = transform_plane_to_image(wcs.planeToImage, plane);
     vec4 rect = wcs.rect;
     vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
     texcoord.x = fract(texcoord.x);

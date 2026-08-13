@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.wcs;
 
-import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Vec2;
 
 public final class WcsHeader {
@@ -47,14 +47,15 @@ public final class WcsHeader {
     final double radPerUnit;
 
     public final Vec2 crval;
-    public final Quat crota;
+    public final Mat2 imageToPlane;
+    public final Mat2 planeToImage;
 
     final double phi0;
     final double theta0;
     final double sinTheta0;
     final double cosTheta0;
 
-    public WcsHeader(Projection _projection, float[] _pv2, double _unitsPerRad, Vec2 _crval, Quat _crota) {
+    public WcsHeader(Projection _projection, float[] _pv2, double _unitsPerRad, Vec2 _crval, Mat2 _imageToPlane) {
         projection = _projection;
         pv2 = _pv2;
 
@@ -87,7 +88,8 @@ public final class WcsHeader {
         radPerUnit = 1 / unitsPerRad;
 
         crval = _crval;
-        crota = _crota;
+        imageToPlane = _imageToPlane;
+        planeToImage = imageToPlane.inverse();
 
         phi0 = crval.x * radPerUnit;
         theta0 = crval.y * radPerUnit;

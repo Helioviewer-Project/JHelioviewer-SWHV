@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.Region;
 import org.helioviewer.jhv.wcs.WcsHeader;
@@ -97,16 +98,16 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindWCS(
-            Quat cameraDiff0, Region r0, Quat crota0, float[] crval0, float zpnUpperEta0, float deltaT0,
-            Quat cameraDiff1, Region r1, Quat crota1, float[] crval1, float zpnUpperEta1, float deltaT1) {
+            Quat cameraDiff0, Region r0, Mat2 planeToImage0, float[] crval0, float zpnUpperEta0, float deltaT0,
+            Quat cameraDiff1, Region r1, Mat2 planeToImage1, float[] crval1, float zpnUpperEta1, float deltaT1) {
         cameraDiff0.setFloatBuffer(wcsBuf);
         wcsBuf.put(r0.glslArray);
-        crota0.setFloatBuffer(wcsBuf);
+        planeToImage0.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval0).put(zpnUpperEta0).put(deltaT0);
 
         cameraDiff1.setFloatBuffer(wcsBuf);
         wcsBuf.put(r1.glslArray);
-        crota1.setFloatBuffer(wcsBuf);
+        planeToImage1.setFloatBuffer(wcsBuf);
         wcsBuf.put(crval1).put(zpnUpperEta1).put(deltaT1);
 
         wcsBuf.flip();

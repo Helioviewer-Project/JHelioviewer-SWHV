@@ -94,11 +94,8 @@ def main() -> int:
         "unit_per_pixel_x": (1e-15, 1e-12),
         "unit_per_pixel_y": (1e-15, 1e-12),
         "plane_units_per_rad": (1e-6, 1e-7),
-        "crpix1_gl": (0.0, 0.0),
-        "crpix2_gl": (0.0, 0.0),
         "crval_internal_x": (1e-15, 1e-12),
         "crval_internal_y": (1e-15, 1e-12),
-        "crota_rad": (1e-12, 1e-12),
         "observer_distance": (1e-2, 1e-4),
     }
 
@@ -116,16 +113,24 @@ def main() -> int:
 
             case_errors: list[str] = []
 
-            for field in ("pixel_width", "pixel_height", "projection"):
-                py_value = getattr(py_meta, field)
-                java_value = java_meta[field]
-                if java_value != py_value:
-                    case_errors.append(f"{field}: java={java_value!r} python={py_value!r}")
+            if java_meta["projection"] != py_meta.projection:
+                case_errors.append(
+                    f"projection: java={java_meta['projection']!r} python={py_meta.projection!r}"
+                )
 
             for field, (abs_tol, rel_tol) in float_fields.items():
                 py_value = float(getattr(py_meta, field))
                 java_value = float(java_meta[field])
                 mismatch = compare_scalars(field, java_value, py_value, abs_tol, rel_tol)
+                if mismatch is not None:
+                    case_errors.append(mismatch)
+
+            for index, (java_value, py_value) in enumerate(zip(
+                java_meta["image_to_plane"], py_meta.image_to_plane, strict=True
+            )):
+                mismatch = compare_scalars(
+                    f"image_to_plane[{index}]", float(java_value), float(py_value), 1e-12, 1e-12
+                )
                 if mismatch is not None:
                     case_errors.append(mismatch)
 

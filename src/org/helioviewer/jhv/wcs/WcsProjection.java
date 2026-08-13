@@ -3,7 +3,6 @@ package org.helioviewer.jhv.wcs;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
 
@@ -12,13 +11,8 @@ public final class WcsProjection {
     private static final int ZPN_BISECTION_STEPS = 50;
 
     public static Vec2 planeToHelioprojective(WcsHeader wcsHeader, double x, double y) {
-        Quat crota = wcsHeader.crota;
-        double vx = crota.w * x - crota.z * y;
-        double vy = crota.z * x + crota.w * y;
-        double vz = crota.x * y - crota.y * x;
-        double planeX = (vz * crota.y - vy * crota.z) * 2 + x;
-        double planeY = (vx * crota.z - vz * crota.x) * 2 + y;
-        return inverseWcsPlaneToHelioprojective(wcsHeader, planeX, planeY);
+        Vec2 plane = wcsHeader.imageToPlane.transform(x, y);
+        return inverseWcsPlaneToHelioprojective(wcsHeader, plane.x, plane.y);
     }
 
     @Nullable
@@ -26,8 +20,7 @@ public final class WcsProjection {
         Vec2 plane = helioprojectiveToWcsPlane(wcsHeader, longitude, latitude);
         if (plane == null)
             return null;
-        Vec3 rotated = wcsHeader.crota.rotateInverseVector(new Vec3(plane.x, plane.y, 0));
-        return new Vec2(rotated.x, rotated.y);
+        return wcsHeader.planeToImage.transform(plane.x, plane.y);
     }
 
     public static Vec3 helioprojectiveToWorld(Position viewpoint, double longitude, double latitude) {

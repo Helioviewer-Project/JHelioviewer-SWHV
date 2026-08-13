@@ -9,7 +9,6 @@ import org.helioviewer.jhv.app.DisplaySettings;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.wcs.WcsHeader;
@@ -299,10 +298,10 @@ public final class FitsMetaData extends CommonMetaData {
                 System.arraycopy(wcs.pv2(), 0, pv2, 0, pv2.length);
 
             if (!CROTABlockSet.contains(instrument))
-                crota = Quat.createAxisZ(wcs.crotaRad());
+                imageToPlane = wcs.imageToPlane();
         }
 
-        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
+        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, imageToPlane);
 
         // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
         if (!wcsProjection.isSurfaceMap() && (crval.x != 0 || crval.y != 0)) {

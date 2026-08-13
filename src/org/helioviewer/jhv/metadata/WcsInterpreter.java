@@ -2,6 +2,7 @@ package org.helioviewer.jhv.metadata;
 
 import java.util.Optional;
 
+import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
 final class WcsInterpreter {
@@ -11,7 +12,7 @@ final class WcsInterpreter {
             float[] pv2,
             double internalCrvalX,
             double internalCrvalY,
-            double crotaRad,
+            Mat2 imageToPlane,
             double unitPerPixelX,
             double unitPerPixelY,
             double arcsecPerPixelX,
@@ -27,11 +28,10 @@ final class WcsInterpreter {
             double pc21,
             double pc22) {}
 
-    private record SurfaceCd(
-            double cd11,
-            double cd12,
-            double cd21,
-            double cd22) {}
+    private record LinearTransform(
+            Mat2 imageToPlane,
+            double unitPerPixelX,
+            double unitPerPixelY) {}
 
     private record WcsInput(
             double cdelt1,
@@ -56,24 +56,17 @@ final class WcsInterpreter {
         float[] pv2 = readPv2(m, wcs, projection);
         double crvalX;
         double crvalY;
-        double crotaRad;
-        double unitPerPixelX;
-        double unitPerPixelY;
+        LinearTransform transform;
 
         if (isSurfaceMap) {
             boolean isCea = projection == WcsHeader.Projection.CEA;
-            SurfaceCd surfaceCd = computeSurfaceCd(wcs, axes, isCea);
+            transform = computeSurfaceTransform(wcs, axes, isCea);
             crvalX = Math.toRadians(wcs.crval1);
             crvalY = isCea ? readCeaLatitudeY(wcs) : Math.toRadians(wcs.crval2);
-            crotaRad = Math.atan2(surfaceCd.cd21, surfaceCd.cd11);
-            unitPerPixelX = Math.hypot(surfaceCd.cd11, surfaceCd.cd21);
-            unitPerPixelY = Math.hypot(surfaceCd.cd12, surfaceCd.cd22);
         } else {
+            transform = computeObserverTransform(m, wcs, axes);
             crvalX = wcs.crval1 * axes.arcsecX;
             crvalY = wcs.crval2 * axes.arcsecY;
-            crotaRad = readObserverImageCrota(m, wcs, axes);
-            unitPerPixelX = 0;
-            unitPerPixelY = 0;
         }
 
         return new Result(
@@ -81,11 +74,11 @@ final class WcsInterpreter {
                 pv2,
                 crvalX,
                 crvalY,
-                crotaRad,
-                unitPerPixelX,
-                unitPerPixelY,
-                axes.arcsecPerPixelX,
-                axes.arcsecPerPixelY);
+                transform.imageToPlane,
+                isSurfaceMap ? transform.unitPerPixelX : 0,
+                isSurfaceMap ? transform.unitPerPixelY : 0,
+                isSurfaceMap ? axes.arcsecPerPixelX : transform.unitPerPixelX,
+                isSurfaceMap ? axes.arcsecPerPixelY : transform.unitPerPixelY);
     }
 
     private static WcsInput readWcsInput(MetaDataContainer m) {
@@ -139,15 +132,46 @@ final class WcsInterpreter {
         return pv2;
     }
 
-    private static SurfaceCd computeSurfaceCd(WcsInput wcs, PixelAxes axes, boolean isCea) {
+    private static LinearTransform computeSurfaceTransform(WcsInput wcs, PixelAxes axes, boolean isCea) {
         // Surface-map X is angular longitude. Y is angular latitude for CAR and equal-area Y for CEA.
         double cdelt1Rad = Math.toRadians(axes.arcsecPerPixelX / 3600.);
         double cdelt2Surface = isCea ? wcs.cdelt2 : Math.toRadians(axes.arcsecPerPixelY / 3600.);
-        return new SurfaceCd(
+        return normalize(
                 cdelt1Rad * axes.pc11,
                 cdelt1Rad * axes.pc12,
                 cdelt2Surface * axes.pc21,
                 cdelt2Surface * axes.pc22);
+    }
+
+    private static LinearTransform computeObserverTransform(MetaDataContainer m, WcsInput wcs, PixelAxes axes) {
+        if (wcs.hasPc) {
+            return normalize(
+                    axes.arcsecPerPixelX * axes.pc11,
+                    axes.arcsecPerPixelX * axes.pc12,
+                    axes.arcsecPerPixelY * axes.pc21,
+                    axes.arcsecPerPixelY * axes.pc22);
+        }
+
+        double crota = m.getDouble("CROTA").or(() -> m.getDouble("CROTA1")).or(() -> m.getDouble("CROTA2"))
+                .map(Math::toRadians).orElse(0.);
+        double c = Math.cos(crota);
+        double s = Math.sin(crota);
+        return normalize(
+                axes.arcsecPerPixelX * c,
+                -axes.arcsecPerPixelY * s,
+                axes.arcsecPerPixelX * s,
+                axes.arcsecPerPixelY * c);
+    }
+
+    private static LinearTransform normalize(double m00, double m01, double m10, double m11) {
+        double unitPerPixelX = Math.hypot(m00, m10);
+        double unitPerPixelY = Math.hypot(m01, m11);
+        double divisorX = unitPerPixelX == 0 ? 1 : unitPerPixelX;
+        double divisorY = unitPerPixelY == 0 ? 1 : unitPerPixelY;
+        return new LinearTransform(
+                new Mat2(m00 / divisorX, m01 / divisorY, m10 / divisorX, m11 / divisorY),
+                unitPerPixelX,
+                unitPerPixelY);
     }
 
     private static double readCeaLatitudeY(WcsInput wcs) {
@@ -155,16 +179,6 @@ final class WcsInterpreter {
         double latitude = Math.toRadians(wcs.crval2);
         double lambda = Math.max(wcs.pv2_1, 1e-12);
         return Math.sin(latitude) / lambda;
-    }
-
-    private static double readObserverImageCrota(MetaDataContainer m, WcsInput wcs, PixelAxes axes) {
-        if (wcs.hasPc) {
-            return Math.atan2(axes.pc21 * axes.arcsecPerPixelY / axes.arcsecPerPixelX, axes.pc11);
-        }
-        return m.getDouble("CROTA").map(Math::toRadians)
-                .or(() -> m.getDouble("CROTA1").map(Math::toRadians))
-                .or(() -> m.getDouble("CROTA2").map(Math::toRadians))
-                .orElse(0.);
     }
 
     private WcsInterpreter() {}

@@ -8,7 +8,7 @@ public class NullMetaData extends CommonMetaData {
 
     public NullMetaData(JHVTime time) {
         viewpoint = Sun.getEarth(time);
-        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
+        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, imageToPlane);
     }
 
 }

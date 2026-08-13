@@ -108,7 +108,7 @@ function wcsBlock(job) {
   const block = new Float32Array(32);
   putVec4(block, 0, [0, 0, 0, 1]);
   putVec4(block, 4, job.rect);
-  putVec4(block, 8, job.crota);
+  putVec4(block, 8, job.planeToImage);
   block[12] = job.crval[0];
   block[13] = job.crval[1];
   block[14] = job.zpnUpperEta;
@@ -116,7 +116,7 @@ function wcsBlock(job) {
 
   putVec4(block, 16, [0, 0, 0, 1]);
   putVec4(block, 20, job.rect);
-  putVec4(block, 24, job.crota);
+  putVec4(block, 24, job.planeToImage);
   block[28] = job.crval[0];
   block[29] = job.crval[1];
   block[30] = job.zpnUpperEta;

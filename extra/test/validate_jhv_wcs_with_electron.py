@@ -86,11 +86,6 @@ TAN_SCREEN_CASES = (
 )
 
 
-def crota_quat(crota_rad: float) -> list[float]:
-    half = 0.5 * crota_rad
-    return [0.0, 0.0, math.sin(half), math.cos(half)]
-
-
 def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
     env = os.environ.copy()
     env["JHV_ELECTRON_GL_BACKEND"] = backend
@@ -170,7 +165,7 @@ def common_job(
         "boundsDeg": list(bounds),
         "warpLambda": 1.0,
         "rect": list(wcsRect(meta)),
-        "crota": crota_quat(meta.crota_rad),
+        "planeToImage": list(meta.plane_to_image),
         "crval": [meta.crval_internal_x, meta.crval_internal_y],
         "zpnUpperEta": zpn_primary_branch_upper_eta(meta) if meta.projection == "ZPN" else 0.0,
         "projectionCode": PROJECTION_CODES[meta.projection],

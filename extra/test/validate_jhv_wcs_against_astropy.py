@@ -52,7 +52,8 @@ class JHVMeta:
     crpix2_gl: float
     crval_internal_x: float
     crval_internal_y: float
-    crota_rad: float
+    image_to_plane: tuple[float, float, float, float]
+    plane_to_image: tuple[float, float, float, float]
     observer_distance: float
     projection: str
     pv2: tuple[float, float, float, float, float, float]
@@ -90,6 +91,29 @@ def unit_scale_from_cunit(cunit: str | None) -> float:
 
 def angular_header_value_to_deg(value: float, cunit: str | None) -> float:
     return float(value) * unit_scale_from_cunit(cunit) / 3600.0
+
+
+def invert_mat2(matrix: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    m00, m01, m10, m11 = matrix
+    determinant = m00 * m11 - m01 * m10
+    if not math.isfinite(determinant) or determinant == 0.0:
+        return (1.0, 0.0, 0.0, 1.0)
+    return (m11 / determinant, -m01 / determinant, -m10 / determinant, m00 / determinant)
+
+
+def transform_mat2(matrix: tuple[float, float, float, float], vector: tuple[float, float]) -> tuple[float, float]:
+    m00, m01, m10, m11 = matrix
+    x, y = vector
+    return (m00 * x + m01 * y, m10 * x + m11 * y)
+
+
+def normalize_effective_cd(cd: tuple[float, float, float, float]) -> tuple[tuple[float, float, float, float], float, float]:
+    cd11, cd12, cd21, cd22 = cd
+    scale_x = math.hypot(cd11, cd21)
+    scale_y = math.hypot(cd12, cd22)
+    divisor_x = scale_x or 1.0
+    divisor_y = scale_y or 1.0
+    return ((cd11 / divisor_x, cd12 / divisor_y, cd21 / divisor_x, cd22 / divisor_y), scale_x, scale_y)
 
 
 def wrap_angle_diff_deg(a: float, b: float) -> float:
@@ -166,6 +190,23 @@ def cea_effective_cd(header) -> tuple[float, float, float, float]:
     )
 
 
+def observer_effective_cd_arcsec(header) -> tuple[float, float, float, float]:
+    cdelt1 = float(header["CDELT1"]) * unit_scale_from_cunit(default_angular_cunit(header, 1))
+    cdelt2 = float(header["CDELT2"]) * unit_scale_from_cunit(default_angular_cunit(header, 2))
+    if any(key in header for key in ("PC1_1", "PC1_2", "PC2_1", "PC2_2")):
+        return (
+            cdelt1 * float(header.get("PC1_1", 1.0)),
+            cdelt1 * float(header.get("PC1_2", 0.0)),
+            cdelt2 * float(header.get("PC2_1", 0.0)),
+            cdelt2 * float(header.get("PC2_2", 1.0)),
+        )
+
+    crota = math.radians(float(header.get("CROTA", header.get("CROTA1", header.get("CROTA2", 0.0)))))
+    c = math.cos(crota)
+    s = math.sin(crota)
+    return (cdelt1 * c, -cdelt2 * s, cdelt1 * s, cdelt2 * c)
+
+
 def build_astropy_wcs_base(header, projection: str, crval1_deg: float, crval2_deg: float) -> WCS:
     ctype1, ctype2 = ctype_pair(header)
     wcs = WCS(naxis=2)
@@ -198,9 +239,8 @@ def build_jhv_meta(header) -> JHVMeta:
     if projection in SURFACE_MAP_PROJECTIONS:
         unit_per_arcsec = math.pi / (180.0 * 3600.0)
         plane_units_per_rad = 1.0
-        cd11, cd12, cd21, cd22 = cea_effective_cd(header) if projection == "CEA" else car_effective_cd_rad(header)
-        unit_per_pixel_x = math.hypot(cd11, cd21)
-        unit_per_pixel_y = math.hypot(cd12, cd22)
+        effective_cd = cea_effective_cd(header) if projection == "CEA" else car_effective_cd_rad(header)
+        image_to_plane, unit_per_pixel_x, unit_per_pixel_y = normalize_effective_cd(effective_cd)
         arcsec_per_pixel_x = math.degrees(unit_per_pixel_x) * 3600.0
         arcsec_per_pixel_y = math.degrees(unit_per_pixel_y) * 3600.0 if projection == "CAR" else unit_per_pixel_y
         crval_internal_x = math.radians(angular_header_value_to_deg(header.get("CRVAL1", 0.0), default_angular_cunit(header, 1)))
@@ -214,31 +254,18 @@ def build_jhv_meta(header) -> JHVMeta:
         radius_sun_in_arcsec = math.degrees(math.atan2(1.0, observer_distance)) * 3600.0
         unit_per_arcsec = 1.0 / radius_sun_in_arcsec
         plane_units_per_rad = unit_per_arcsec * ARCSEC_PER_RAD
-        unit_per_pixel_x = abs(arcsec_per_pixel_x * unit_per_arcsec)
-        unit_per_pixel_y = abs(arcsec_per_pixel_y * unit_per_arcsec)
+        image_to_plane, arcsec_per_pixel_x, arcsec_per_pixel_y = normalize_effective_cd(observer_effective_cd_arcsec(header))
+        unit_per_pixel_x = arcsec_per_pixel_x * unit_per_arcsec
+        unit_per_pixel_y = arcsec_per_pixel_y * unit_per_arcsec
         crval_internal_x = float(header.get("CRVAL1", 0.0)) * arcsec_x * unit_per_arcsec
         crval_internal_y = float(header.get("CRVAL2", 0.0)) * arcsec_y * unit_per_arcsec
 
     crpix1_gl = float(header.get("CRPIX1", (pixel_width + 1) / 2.0)) - 0.5
     crpix2_gl = float(header.get("CRPIX2", (pixel_height + 1) / 2.0)) - 0.5
 
-    try:
-        pc2_1 = float(header["PC2_1"])
-        pc1_1 = float(header["PC1_1"])
-        if projection in SURFACE_MAP_PROJECTIONS:
-            cd11, _, cd21, _ = cea_effective_cd(header) if projection == "CEA" else car_effective_cd_rad(header)
-            crota_rad = math.atan2(cd21, cd11)
-        else:
-            crota_rad = math.atan2(pc2_1 / (arcsec_per_pixel_x / arcsec_per_pixel_y), pc1_1)
-    except Exception:
-        crota_deg = (
-            header.get("CROTA")
-            or header.get("CROTA1")
-            or header.get("CROTA2")
-            or 0.0
-        )
-        crota_rad = math.radians(float(crota_deg))
-
+    if str(header.get("INSTRUME", "")) == "LASCO":
+        image_to_plane = (1.0, 0.0, 0.0, 1.0)
+    plane_to_image = invert_mat2(image_to_plane)
     pv2 = [float(np.float32(header.get(f"PV2_{i}", 0.0))) for i in range(6)]
     if projection == "CEA":
         pv2[1] = float(np.float32(header.get("PV2_1", 1.0)))
@@ -256,7 +283,8 @@ def build_jhv_meta(header) -> JHVMeta:
         crpix2_gl=crpix2_gl,
         crval_internal_x=crval_internal_x,
         crval_internal_y=crval_internal_y,
-        crota_rad=crota_rad,
+        image_to_plane=image_to_plane,
+        plane_to_image=plane_to_image,
         observer_distance=observer_distance,
         projection=projection,
         pv2=tuple(pv2),
@@ -327,20 +355,6 @@ def rotate_vector(quat: tuple[float, float, float, float], vec: tuple[float, flo
 
 def rotate_vector_inverse(quat: tuple[float, float, float, float], vec: tuple[float, float, float]) -> tuple[float, float, float]:
     return quat_rotate_vector_inverse(quat, vec)
-
-
-def rotate_plane_inverse(quat: tuple[float, float, float, float], vec: tuple[float, float]) -> tuple[float, float]:
-    qx, qy, qz, qw = quat
-    qx2 = qx * qx
-    qy2 = qy * qy
-    qz2 = qz * qz
-    qxqy = qx * qy
-    qwqz = qw * qz
-    x, y = vec
-    return (
-        x * (1.0 - 2.0 * (qy2 + qz2)) + y * 2.0 * (qxqy + qwqz),
-        x * 2.0 * (qxqy - qwqz) + y * (1.0 - 2.0 * (qx2 + qz2)),
-    )
 
 
 def nativeZenithalCoordinates(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float, float]:
@@ -753,26 +767,6 @@ def project_world_to_plane_internal_array(world_deg: np.ndarray, meta: JHVMeta) 
     raise ValueError(f"Unsupported projection {meta.projection!r}")
 
 
-def rotate_inverse_z(vec_xy: tuple[float, float], angle_rad: float) -> tuple[float, float]:
-    x, y = vec_xy
-    c = math.cos(angle_rad)
-    s = math.sin(angle_rad)
-    return (
-        c * x + s * y,
-        -s * x + c * y,
-    )
-
-
-def rotate_z(vec_xy: tuple[float, float], angle_rad: float) -> tuple[float, float]:
-    x, y = vec_xy
-    c = math.cos(angle_rad)
-    s = math.sin(angle_rad)
-    return (
-        c * x - s * y,
-        s * x + c * y,
-    )
-
-
 def surface_map_wraps_x(meta: JHVMeta) -> bool:
     if meta.projection not in SURFACE_MAP_PROJECTIONS:
         return False
@@ -813,21 +807,20 @@ def texture_reference_pixel_y(meta: JHVMeta) -> float:
 
 
 def plane_internal_to_pixel_center(plane_internal: tuple[float, float], meta: JHVMeta, wrap_x: bool = False) -> tuple[float, float]:
-    rotated_internal = rotate_inverse_z(plane_internal, meta.crota_rad)
-    px = rotated_internal[0] / meta.unit_per_pixel_x + meta.crpix1_gl
-    py = -rotated_internal[1] / meta.unit_per_pixel_y + texture_reference_pixel_y(meta)
+    image_internal = transform_mat2(meta.plane_to_image, plane_internal)
+    px = image_internal[0] / meta.unit_per_pixel_x + meta.crpix1_gl
+    py = -image_internal[1] / meta.unit_per_pixel_y + texture_reference_pixel_y(meta)
     return (wrap_source_x_pixel(px, meta) if wrap_x else px, py)
 
 
 def plane_internal_array_to_pixel_center(plane_internal: np.ndarray, meta: JHVMeta, wrap_x: bool = False) -> np.ndarray:
-    c = math.cos(meta.crota_rad)
-    s = math.sin(meta.crota_rad)
-    rotated_x = c * plane_internal[:, 0] + s * plane_internal[:, 1]
-    rotated_y = -s * plane_internal[:, 0] + c * plane_internal[:, 1]
-    px = rotated_x / meta.unit_per_pixel_x + meta.crpix1_gl
+    m00, m01, m10, m11 = meta.plane_to_image
+    image_x = m00 * plane_internal[:, 0] + m01 * plane_internal[:, 1]
+    image_y = m10 * plane_internal[:, 0] + m11 * plane_internal[:, 1]
+    px = image_x / meta.unit_per_pixel_x + meta.crpix1_gl
     if wrap_x and surface_map_wraps_x(meta):
         px = np.mod(px, meta.pixel_width)
-    py = -rotated_y / meta.unit_per_pixel_y + texture_reference_pixel_y(meta)
+    py = -image_y / meta.unit_per_pixel_y + texture_reference_pixel_y(meta)
     return np.column_stack((px, py))
 
 
@@ -836,7 +829,7 @@ def pixel_center_to_plane_internal(pixel_center: tuple[float, float], meta: JHVM
         (pixel_center[0] - meta.crpix1_gl) * meta.unit_per_pixel_x,
         -(pixel_center[1] - texture_reference_pixel_y(meta)) * meta.unit_per_pixel_y,
     )
-    return rotate_z(rotated_internal, meta.crota_rad)
+    return transform_mat2(meta.image_to_plane, rotated_internal)
 
 
 def pixel_center_to_world_deg(pixel_center: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
@@ -936,9 +929,7 @@ def image_plane_edge_samples(meta: JHVMeta) -> tuple[tuple[float, float], ...]:
 
 
 def rotated_image_plane_edge_samples(meta: JHVMeta) -> tuple[tuple[float, float], ...]:
-    c = math.cos(meta.crota_rad)
-    s = math.sin(meta.crota_rad)
-    return tuple((c * x - s * y, s * x + c * y) for x, y in image_plane_edge_samples(meta))
+    return tuple(transform_mat2(meta.image_to_plane, point) for point in image_plane_edge_samples(meta))
 
 
 def raw_hpc_footprint_bounds_degrees(meta: JHVMeta) -> tuple[float, float, float, float]:
@@ -982,7 +973,7 @@ def image_sun_shift(meta: JHVMeta) -> tuple[float, float]:
         sun_plane = project_world_to_plane_internal((0.0, 0.0), meta)
     except ValueError:
         return (0.0, 0.0)
-    image_plane = rotate_inverse_z(sun_plane, meta.crota_rad)
+    image_plane = transform_mat2(meta.plane_to_image, sun_plane)
     return (image_plane[0], -image_plane[1])
 
 
@@ -1018,7 +1009,7 @@ def wcsRect(meta: JHVMeta) -> tuple[float, float, float, float]:
 
 
 def wcsPlaneToTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
-    centered = rotate_plane_inverse(crota_quaternion(meta), plane_internal)
+    centered = transform_mat2(meta.plane_to_image, plane_internal)
     rect = wcsRect(meta)
     texcoord = (
         rect[2] * (centered[0] - rect[0]),
@@ -1028,7 +1019,7 @@ def wcsPlaneToTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image
 
 
 def wcsPlaneToWrappedXTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
-    centered = rotate_plane_inverse(crota_quaternion(meta), plane_internal)
+    centered = transform_mat2(meta.plane_to_image, plane_internal)
     rect = wcsRect(meta)
     texcoord = (
         (rect[2] * (centered[0] - rect[0])) % 1.0,
@@ -1538,22 +1529,17 @@ def projectHelioprojectiveToWcsPlaneFloat32(helioprojective: tuple[float, float]
     raise ValueError(f"HPC path does not support projection {meta.projection!r}")
 
 
-def rotatePlaneInverseFloat32(quat: tuple[float, float, float, float], vec: tuple[float, float]) -> tuple[float, float]:
-    qx, qy, qz, qw = [f32(v) for v in quat]
+def transformPlaneToImageFloat32(transform: tuple[float, float, float, float], vec: tuple[float, float]) -> tuple[float, float]:
+    m00, m01, m10, m11 = [f32(v) for v in transform]
     x, y = [f32(v) for v in vec]
-    qx2 = f32(qx * qx)
-    qy2 = f32(qy * qy)
-    qz2 = f32(qz * qz)
-    qxqy = f32(qx * qy)
-    qwqz = f32(qw * qz)
     return (
-        f32(f32(x * f32(1.0 - f32(2.0 * f32(qy2 + qz2)))) + f32(y * f32(2.0 * f32(qxqy + qwqz)))),
-        f32(f32(x * f32(2.0 * f32(qxqy - qwqz))) + f32(y * f32(1.0 - f32(2.0 * f32(qx2 + qz2))))),
+        f32(f32(m00 * x) + f32(m01 * y)),
+        f32(f32(m10 * x) + f32(m11 * y)),
     )
 
 
 def wcsPlaneToTexcoordFloat32(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
-    centered = rotatePlaneInverseFloat32(crota_quaternion(meta), plane_internal)
+    centered = transformPlaneToImageFloat32(meta.plane_to_image, plane_internal)
     width = f32(f32(meta.pixel_width) * f32(meta.unit_per_pixel_x))
     height = f32(f32(meta.pixel_height) * f32(meta.unit_per_pixel_y))
     rect = (
@@ -1607,11 +1593,6 @@ def renderHpcTexcoordsFloat32(
 
 
 # solarLati.frag mirror.
-
-def crota_quaternion(meta: JHVMeta) -> tuple[float, float, float, float]:
-    half = 0.5 * meta.crota_rad
-    return (0.0, 0.0, math.sin(half), math.cos(half))
-
 
 def displayLatitudinalWorld(
     scrpos: tuple[float, float],
@@ -1688,8 +1669,8 @@ def sampleLatiZenithalTexcoord(
     if rotated_spherical[0] < 0.0:
         return (math.nan, math.nan)
 
-    centered = rotate_plane_inverse(
-        crota_quaternion(meta),
+    centered = transform_mat2(
+        meta.plane_to_image,
         (rotated_spherical[1] - meta.crval_internal_x, rotated_spherical[2] - meta.crval_internal_y),
     )
     rect = wcsRect(meta)
