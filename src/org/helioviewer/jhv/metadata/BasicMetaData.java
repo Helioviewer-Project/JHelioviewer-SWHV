@@ -23,7 +23,7 @@ public class BasicMetaData extends CommonMetaData {
 
         displayName = _displayName;
         sourceUri = _sourceUri;
-        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, crota);
+        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, imageToPlane);
     }
 
 }

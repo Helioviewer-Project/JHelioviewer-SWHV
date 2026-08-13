@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.wcs.WcsHeader;
 
@@ -33,7 +33,7 @@ class CommonMetaData implements MetaData {
     protected float outerRadius = Float.MAX_VALUE;
 
     protected Vec2 crval = new Vec2(0, 0);
-    protected Quat crota = Quat.ZERO;
+    protected Mat2 imageToPlane = Mat2.IDENTITY;
 
     protected float sector0 = 0;
     protected float sector1 = 0;

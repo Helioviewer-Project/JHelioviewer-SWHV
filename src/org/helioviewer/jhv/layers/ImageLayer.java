@@ -18,6 +18,7 @@ import org.helioviewer.jhv.image.ImageBuffer;
 import org.helioviewer.jhv.image.ImageFilter;
 import org.helioviewer.jhv.io.APIRequest;
 import org.helioviewer.jhv.io.DownloadLayer;
+import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.metadata.MetaData;
 import org.helioviewer.jhv.opengl.GLImage;
@@ -225,13 +226,15 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         Quat cameraDiff0 = Quat.rotateWithConjugate(q, metaViewpoint0.toQuat());
         Quat cameraDiff1 = Quat.rotateWithConjugate(q, metaViewpoint1.toQuat());
 
-        Quat crota0 = wcs0.crota;
-        Quat crota1 = wcs1.crota;
+        Mat2 planeToImage0 = wcs0.planeToImage;
+        Mat2 planeToImage1 = wcs1.planeToImage;
         double deltaCROTA = glImage.getDeltaCROTA();
         if (deltaCROTA != 0) {
-            Quat dquat = Quat.createAxisZ(Math.toRadians(deltaCROTA));
-            crota0 = Quat.rotate(dquat, crota0);
-            crota1 = Quat.rotate(dquat, crota1);
+            // The user rotation follows the metadata image-to-plane transform,
+            // so it precedes that transform's inverse in plane-to-image order.
+            Mat2 inverseAdjustment = Mat2.rotation(Math.toRadians(-deltaCROTA));
+            planeToImage0 = Mat2.multiply(planeToImage0, inverseAdjustment);
+            planeToImage1 = Mat2.multiply(planeToImage1, inverseAdjustment);
         }
 
         int deltaCRVAL1 = glImage.getDeltaCRVAL1();
@@ -260,8 +263,8 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
         }
 
         GLSLSolarShader.bindWCS(
-                cameraDiff0, imageData.region(), crota0, crval0, (float) wcs0.zpnUpperEta, deltaT0,
-                cameraDiff1, imageDataDiff.region(), crota1, crval1, (float) wcs1.zpnUpperEta, deltaT1);
+                cameraDiff0, imageData.region(), planeToImage0, crval0, (float) wcs0.zpnUpperEta, deltaT0,
+                cameraDiff1, imageDataDiff.region(), planeToImage1, crval1, (float) wcs1.zpnUpperEta, deltaT1);
         shader.bindPV(wcs0.pv2, wcs1.pv2);
 
         Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();
