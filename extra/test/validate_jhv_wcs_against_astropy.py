@@ -160,46 +160,69 @@ def earth_distance_solar_radii(header) -> float:
     return float(get_sun(time).distance.to_value(u.m) / SUN_RADIUS_METER)
 
 
-def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
-    pc11 = float(header.get("PC1_1", 1.0))
-    pc12 = float(header.get("PC1_2", 0.0))
-    pc21 = float(header.get("PC2_1", 0.0))
-    pc22 = float(header.get("PC2_2", 1.0))
-    cdelt1_rad = math.radians(angular_header_value_to_deg(float(header["CDELT1"]), default_angular_cunit(header, 1)))
-    cdelt2_rad = math.radians(angular_header_value_to_deg(float(header["CDELT2"]), default_angular_cunit(header, 2)))
+def matrix_keywords_present(header, prefix: str) -> bool:
+    return any(f"{prefix}{row}_{column}" in header for row in (1, 2) for column in (1, 2))
+
+
+def read_matrix_keywords(header, prefix: str, diagonal_default: float) -> tuple[float, float, float, float]:
     return (
-        cdelt1_rad * pc11,
-        cdelt1_rad * pc12,
-        cdelt2_rad * pc21,
-        cdelt2_rad * pc22,
+        float(header.get(f"{prefix}1_1", diagonal_default)),
+        float(header.get(f"{prefix}1_2", 0.0)),
+        float(header.get(f"{prefix}2_1", 0.0)),
+        float(header.get(f"{prefix}2_2", diagonal_default)),
     )
+
+
+def scale_matrix_rows(
+    matrix: tuple[float, float, float, float],
+    axis1_scale: float,
+    axis2_scale: float,
+) -> tuple[float, float, float, float]:
+    return (
+        axis1_scale * matrix[0],
+        axis1_scale * matrix[1],
+        axis2_scale * matrix[2],
+        axis2_scale * matrix[3],
+    )
+
+
+def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
+    if matrix_keywords_present(header, "CD") and not matrix_keywords_present(header, "PC"):
+        matrix = read_matrix_keywords(header, "CD", 0.0)
+        axis1_scale = math.radians(angular_header_value_to_deg(1.0, default_angular_cunit(header, 1)))
+        axis2_scale = math.radians(angular_header_value_to_deg(1.0, default_angular_cunit(header, 2)))
+    else:
+        matrix = read_matrix_keywords(header, "PC", 1.0)
+        axis1_scale = math.radians(angular_header_value_to_deg(
+            float(header.get("CDELT1", 1.0)), default_angular_cunit(header, 1)))
+        axis2_scale = math.radians(angular_header_value_to_deg(
+            float(header.get("CDELT2", 1.0)), default_angular_cunit(header, 2)))
+    return scale_matrix_rows(matrix, axis1_scale, axis2_scale)
 
 
 def cea_effective_cd(header) -> tuple[float, float, float, float]:
-    pc11 = float(header.get("PC1_1", 1.0))
-    pc12 = float(header.get("PC1_2", 0.0))
-    pc21 = float(header.get("PC2_1", 0.0))
-    pc22 = float(header.get("PC2_2", 1.0))
-    cdelt1_rad = math.radians(angular_header_value_to_deg(float(header["CDELT1"]), default_angular_cunit(header, 1)))
-    cdelt2_eq = float(header["CDELT2"])
-    return (
-        cdelt1_rad * pc11,
-        cdelt1_rad * pc12,
-        cdelt2_eq * pc21,
-        cdelt2_eq * pc22,
-    )
+    if matrix_keywords_present(header, "CD") and not matrix_keywords_present(header, "PC"):
+        matrix = read_matrix_keywords(header, "CD", 0.0)
+        axis1_scale = math.radians(angular_header_value_to_deg(1.0, default_angular_cunit(header, 1)))
+        axis2_scale = 1.0
+    else:
+        matrix = read_matrix_keywords(header, "PC", 1.0)
+        axis1_scale = math.radians(angular_header_value_to_deg(
+            float(header.get("CDELT1", 1.0)), default_angular_cunit(header, 1)))
+        axis2_scale = float(header.get("CDELT2", 1.0))
+    return scale_matrix_rows(matrix, axis1_scale, axis2_scale)
 
 
 def observer_effective_cd_arcsec(header) -> tuple[float, float, float, float]:
-    cdelt1 = float(header["CDELT1"]) * unit_scale_from_cunit(default_angular_cunit(header, 1))
-    cdelt2 = float(header["CDELT2"]) * unit_scale_from_cunit(default_angular_cunit(header, 2))
-    if any(key in header for key in ("PC1_1", "PC1_2", "PC2_1", "PC2_2")):
-        return (
-            cdelt1 * float(header.get("PC1_1", 1.0)),
-            cdelt1 * float(header.get("PC1_2", 0.0)),
-            cdelt2 * float(header.get("PC2_1", 0.0)),
-            cdelt2 * float(header.get("PC2_2", 1.0)),
-        )
+    axis1_scale = unit_scale_from_cunit(default_angular_cunit(header, 1))
+    axis2_scale = unit_scale_from_cunit(default_angular_cunit(header, 2))
+    cdelt1 = float(header.get("CDELT1", 1.0)) * axis1_scale
+    cdelt2 = float(header.get("CDELT2", 1.0)) * axis2_scale
+    if matrix_keywords_present(header, "PC"):
+        return scale_matrix_rows(read_matrix_keywords(header, "PC", 1.0), cdelt1, cdelt2)
+
+    if matrix_keywords_present(header, "CD"):
+        return scale_matrix_rows(read_matrix_keywords(header, "CD", 0.0), axis1_scale, axis2_scale)
 
     crota = math.radians(float(header.get("CROTA", header.get("CROTA1", header.get("CROTA2", 0.0)))))
     c = math.cos(crota)
@@ -226,8 +249,11 @@ def build_jhv_meta(header) -> JHVMeta:
 
     arcsec_x = unit_scale_from_cunit(default_angular_cunit(header, 1))
     arcsec_y = unit_scale_from_cunit(default_angular_cunit(header, 2))
-    arcsec_per_pixel_x = float(header["CDELT1"]) * arcsec_x
-    arcsec_per_pixel_y = float(header["CDELT2"]) * arcsec_y
+    uses_cd = matrix_keywords_present(header, "CD") and not matrix_keywords_present(header, "PC")
+    cdelt1 = float(header.get("CDELT1", 1.0)) if uses_cd else float(header["CDELT1"])
+    cdelt2 = float(header.get("CDELT2", 1.0)) if uses_cd else float(header["CDELT2"])
+    arcsec_per_pixel_x = cdelt1 * arcsec_x
+    arcsec_per_pixel_y = cdelt2 * arcsec_y
 
     dsun_obs = header.get("DSUN_OBS")
     if dsun_obs is not None:
@@ -930,7 +956,14 @@ def build_original_astropy_wcs(header) -> WCS:
         # JHV uses the dimensionless CEA coordinate sin(latitude) / lambda;
         # FITS WCS and Astropy express the same intermediate coordinate in degrees.
         header = header.copy()
-        header["CDELT2"] = math.degrees(header["CDELT2"])
+        has_pc = matrix_keywords_present(header, "PC")
+        has_cd = matrix_keywords_present(header, "CD")
+        if has_cd and not has_pc:
+            for key in ("CD2_1", "CD2_2"):
+                if key in header:
+                    header[key] = math.degrees(header[key])
+        else:
+            header["CDELT2"] = math.degrees(header.get("CDELT2", 1.0))
     return WCS(header, naxis=2)
 
 

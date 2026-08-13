@@ -135,12 +135,12 @@ that display point, JHV derives the helioprojective coordinates needed to
 evaluate the image WCS. For zenithal FITS data in the formal WCS paths, this
 means using the inverse form of the relevant projection model, such as `TAN`,
 `ARC`, `AZP`, or `ZPN`, and then applying the linear WCS terms (`CRVAL`, `CRPIX`,
-`CDELT`, and `PC`/`CROTA`) to obtain the source-image coordinates. The screen
-pixel is then produced by sampling the source image at those coordinates with
-interpolation. In this sense, the WCS projection determines how image
-coordinates relate to observer geometry, while the JHV rendering mode
-determines which display geometry is sampled before that WCS mapping is
-evaluated.
+and either `CD` or `CDELT` with `PC`/`CROTA`) to obtain the source-image
+coordinates. The screen pixel is then produced by sampling the source image at
+those coordinates with interpolation. In this sense, the WCS projection
+determines how image coordinates relate to observer geometry, while the JHV
+rendering mode determines which display geometry is sampled before that WCS
+mapping is evaluated.
 
 The sampling pipeline described above, and the point at which `simple-TAN`
 departs from the formal WCS path, can be summarized as follows:
@@ -176,8 +176,7 @@ Included in the Python validator:
 - FITS metadata parsing into the same effective quantities JHV uses:
   - `CRPIX`
   - `CRVAL`
-  - `CDELT`
-  - `PC`/`CROTA`
+  - `CD`, or `CDELT` with `PC`/`CROTA`
   - `DSUN_OBS`
   - `PV2_0..PV2_5`
 - the shared WCS projection math for:
@@ -260,13 +259,13 @@ Here, Astropy is the external reference for:
     display bounds used by the JHV `HPC` screen mapping
 - full pixel-center validation for `CAR`
   - using the effective linear transform
-    (`diag(CDELT1, CDELT2) * PC`) together with the native
+    (`CD`, or `diag(CDELT1, CDELT2) * PC`) together with the native
     `CRLN-CAR / CRLT-CAR` axis semantics
 - inverse `CAR`
   - plane -> world lon/lat, checked by the same round-trip strategy
 - full pixel-center validation for `CEA`
   - using the effective linear transform
-    (`diag(CDELT1, CDELT2) * PC`) together with the native
+    (`CD`, or `diag(CDELT1, CDELT2) * PC`) together with the native
     `CRLN-CEA / CRLT-CEA` axis semantics
 - inverse `CEA`
   - plane -> world lon/lat, checked by the same round-trip strategy
@@ -444,9 +443,11 @@ on all cases used by the comparison script.
 
 The comparison script also generates small temporary FITS cases for unequal
 and negative axis scales with a non-orthogonal `PC`, partial `PC` defaults,
-`CROTA` with unequal axis scales, and radian-valued axes. Each case is checked
-against Astropy as well as the Java metadata interpretation. A separate LASCO
-case asserts the existing JHV policy of suppressing the image WCS transform.
+full and partial `CD` matrices, omitted `CDELT`, `PC`/`CD`/`CROTA` precedence,
+mixed angular units, and `CD` matrices on `CAR` and `CEA` surface maps. Each
+case is checked against Astropy as well as the Java metadata interpretation. A
+separate LASCO case asserts the existing JHV policy of suppressing the image
+WCS transform.
 
 One caveat remains for the `observer_distance` field when `DSUN_OBS` is absent:
 
@@ -535,7 +536,7 @@ pixel-center error.
 For the `CAR` and `CEA` cases, the same mode also validates
 surface maps against Astropy over the full source image grid. In those cases,
 the Python validator uses the effective linear transform
-`diag(CDELT1, CDELT2) * PC`, not bare
+`CD`, or `diag(CDELT1, CDELT2) * PC`, not bare
 `CDELT`, and keeps the original axis types (`CRLN-CAR / CRLT-CAR` or
 `CRLN-CEA / CRLT-CEA`) when constructing the Astropy comparison WCS.
 
@@ -997,7 +998,7 @@ full-Sun `CAR` surface-map case.
   - `extra/test/data/syn_AIA_171_2026-01-12T00-00-00_f_V3.fits`
 - all three files are `CRLN-CAR / CRLT-CAR` surface maps
 - the correct effective scale comes from the linear WCS transform
-  `diag(CDELT1, CDELT2) * PC`, not from bare `CDELT`
+  `CD`, or `diag(CDELT1, CDELT2) * PC`, not from bare `CDELT`
 - the Python validator keeps the original `CRLN-CAR / CRLT-CAR` axis types
   and uses the effective linear transform when constructing the Astropy
   comparison WCS
@@ -1044,7 +1045,7 @@ full-Sun `CEA` surface-map case.
   - `extra/test/data/mrzqs260301t2314c2308_169.fits`
 - it is a `CRLN-CEA / CRLT-CEA` surface map
 - the correct effective scale comes from the linear WCS transform
-  `diag(CDELT1, CDELT2) * PC`, not from bare `CDELT`
+  `CD`, or `diag(CDELT1, CDELT2) * PC`, not from bare `CDELT`
 - the second WCS axis is the `CEA` equal-area latitude coordinate, not direct
   angular latitude
 - the Python validator keeps the original `CRLN-CEA / CRLT-CEA` axis types
