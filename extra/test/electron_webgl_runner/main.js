@@ -3,6 +3,9 @@ const fs = require("fs");
 const path = require("path");
 
 const backend = process.env.JHV_ELECTRON_GL_BACKEND || "swiftshader";
+if (process.platform === "darwin")
+  app.setActivationPolicy("accessory");
+
 if (backend === "swiftshader") {
   app.commandLine.appendSwitch("use-gl", "angle");
   app.commandLine.appendSwitch("use-angle", "swiftshader");
