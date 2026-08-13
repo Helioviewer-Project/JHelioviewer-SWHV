@@ -319,14 +319,18 @@ Add the focused Metal/ANGLE and SwiftShader shader checks with:
 python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --include-electron
 ```
 
-These focused checks render a synthetic `R16F` texture rather than stopping at
-raw coordinates. `rendered_sample_*` compares the GPU output over the complete
-viewport with a value sampled at the independent CPU/Astropy coordinate, or
-transparent black when that reference coordinate is outside the rendered
-source bounds. `texture_interpolation_*` separately compares GPU and CPU
-filtering at the GPU coordinate; it is a filtering diagnostic, not a rendering
-correctness oracle. The CPU sampler uses the same half-float source values and
-clamp-to-edge filtering as the WebGL/JHV texture.
+These focused checks execute the production coordinate and WCS sampling helpers
+over JHV's viewport bounds and render a synthetic `R16F` texture rather than
+stopping at raw coordinates. They do not execute the complete production
+fragment entry point or layer display masks such as sectors, radii, and cutoffs;
+they validate coordinate mapping, source-image validity, and texture sampling,
+not complete frame equivalence. `rendered_sample_*` compares the diagnostic GPU
+output over the complete viewport with a value sampled at the independent
+CPU/Astropy coordinate, or transparent black when that reference coordinate is
+outside the source image. `texture_interpolation_*` separately compares GPU and
+CPU filtering at the GPU coordinate; it is a filtering diagnostic, not a
+coordinate-correctness oracle. The CPU sampler uses the same half-float source
+values and clamp-to-edge filtering as the WebGL/JHV texture.
 
 The Metal run also covers Orthographic and both warp modes against the CPU
 model. The routine SwiftShader run covers the primary HPC and cylindrical
@@ -1144,11 +1148,12 @@ The Metal result validates the production GLSL coordinate path to about
 
 The earlier `sample_max_error` diagnostic sampled the CPU texture at the
 shader-produced coordinate. It therefore tested texture filtering but could
-not reveal that the coordinate, or the decision to discard a pixel, differed
+not reveal that the coordinate, or the source-image validity decision, differed
 from the independent reference. The current sampled-texture comparison instead
 uses Astropy-derived coordinates for `HPC`, and the corresponding independent
 CPU mapping for JHV-specific geometry. Both-valid, shader-only, reference-only,
-and both-discarded viewport pixels contribute to `rendered_sample_*`.
+and both-discarded viewport pixels contribute to `rendered_sample_*`. This is a
+source-boundary diagnostic; production layer masks are outside its scope.
 
 At `512x512`, Metal/ANGLE had no `HPC` validity-mask differences in the five
 `ARC`/`AZP`/`ZPN` projection cases and remained below the `1e-3` rendered-value
@@ -1166,9 +1171,37 @@ Those dropped or extra pixels are real output differences: the synthetic-source
 maximum errors were between about `0.50` and `0.99`, so all five SwiftShader
 `HPC` cases correctly fail the `1e-3` rendered-value threshold. Away from the
 mask boundary, the SwiftShader texture-interpolation maximum remained about
-`1.6e-4`. The distinction matters: the large failure is caused by sparse
+`6e-8` after matching the CPU oracle to the uploaded `R16F` values. The
+distinction matters: the large failure is caused by sparse
 visibility decisions, not by texture filtering, and it was invisible to the
 old circular sample comparison.
+
+A direct Metal/ANGLE-to-SwiftShader comparison of those `512x512` frames gives
+the same localization:
+
+| Case | Different mask pixels | Jointly visible sample max |
+|---|---:|---:|
+| PUNCH `ARC` | 12 | `2.90e-4` |
+| HI1 `AZP` | 10 | `3.30e-4` |
+| HI2 `AZP` | 3 | `2.77e-4` |
+| WISPR 1211 `ZPN` | 11 | `3.55e-4` |
+| WISPR 2222 `ZPN` | 2 | `3.11e-4` |
+
+Within this source-boundary diagnostic, all large backend-to-backend differences
+occur at those validity-mask pixels. The ordinary float32 CPU model still
+classifies the reference-only coordinates as inside the image, often by only
+hundredths of a source pixel. SwiftShader's accumulated coordinate error moves
+them across the hard `clamp_coord` boundary.
+
+JHV estimates an image's HPC footprint from eight source-boundary points: four
+corners and four edge midpoints. A separate 4097-samples-per-edge audit found
+that this exactly reproduces the dense extrema for PUNCH `ARC`, HI1 `AZP`, and
+WISPR 1211 `ZPN`. It misses HI2's latitude extrema by approximately
+`-0.188/+0.245` degrees and WISPR 2222's minimum latitude by approximately
+`-0.382` degrees. Those misses are a separate bounds-quality issue: in both
+cases the square HPC view is controlled by the much larger longitude extent,
+so the actual bounds supplied to the shader are unchanged and cannot explain
+the backend disagreement.
 
 At `512x512`, SwiftShader's four surface-map cases had matching validity masks
 and rendered-sample maxima below `2.5e-5`. Their larger raw coordinate

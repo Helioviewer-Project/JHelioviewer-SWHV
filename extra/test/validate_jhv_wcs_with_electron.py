@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import math
 import os
 import subprocess
 import sys
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, gettempdir
 
 import numpy as np
 
@@ -39,6 +40,7 @@ from validate_jhv_wcs_against_astropy import (
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
 RUNNER_DIR = SCRIPT_DIR / "electron_webgl_runner"
+ELECTRON_LAUNCH_LOCK = Path(gettempdir()) / "jhv-electron-webgl-runner.lock"
 DEFAULT_ELECTRON = Path(os.environ.get(
     "JHV_ELECTRON",
     str(Path.home() / "electron-v43.2.0-darwin-arm64/Electron.app/Contents/MacOS/Electron"),
@@ -91,13 +93,18 @@ def crota_quat(crota_rad: float) -> list[float]:
 def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
     env = os.environ.copy()
     env["JHV_ELECTRON_GL_BACKEND"] = backend
-    completed = subprocess.run(
-        [str(electron), str(RUNNER_DIR), str(job_path)],
-        cwd=REPO_ROOT,
-        env=env,
-        capture_output=True,
-        text=True,
-    )
+    with ELECTRON_LAUNCH_LOCK.open("a+") as launch_lock, TemporaryDirectory(prefix="jhv-electron-profile-") as profile_dir:
+        # Concurrent Electron application registration is unreliable on macOS
+        # and has repeatedly aborted in _RegisterApplication. Serialize starts
+        # across validator processes and isolate Chromium's per-run state.
+        fcntl.flock(launch_lock, fcntl.LOCK_EX)
+        completed = subprocess.run(
+            [str(electron), f"--user-data-dir={profile_dir}", str(RUNNER_DIR), str(job_path)],
+            cwd=REPO_ROOT,
+            env=env,
+            capture_output=True,
+            text=True,
+        )
 
     result = None
     for line in completed.stdout.splitlines():
@@ -307,7 +314,7 @@ def evaluate_hpc_shader_to_astropy(
     skipped = 0
     shader_only = 0
     reference_only = 0
-    mismatch_locations: list[tuple[int, int, str]] = []
+    mismatch_locations: list[dict[str, object]] = []
 
     for iy in range(render_size):
         sy = (iy + 0.5) / render_size
@@ -349,7 +356,13 @@ def evaluate_hpc_shader_to_astropy(
                     reference_only += 1
                     mismatch = "reference-only"
                 if len(mismatch_locations) < 10:
-                    mismatch_locations.append((ix, iy, mismatch))
+                    float32_texcoord, _, _, _ = renderHpcTexcoordsFloat32((sx, sy), bounds_deg, meta, image_data)
+                    mismatch_locations.append({
+                        "screen": (ix, iy),
+                        "kind": mismatch,
+                        "reference_pixel": (float(astro_px[ix, 0]), float(astro_px[ix, 1])),
+                        "float32_texcoord": float32_texcoord,
+                    })
                 skipped += 1
                 continue
             if not shader_valid:
