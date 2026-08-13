@@ -307,9 +307,8 @@ vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     if (cosNativeDistance <= 0.)
         discard;
 
-    return planeUnitsPerRad * vec2(
-        nativeX / cosNativeDistance,
-        nativeY / cosNativeDistance);
+    float scale = planeUnitsPerRad / cosNativeDistance;
+    return scale * vec2(nativeX, nativeY);
 }
 
 vec2 projectArcToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
@@ -322,9 +321,8 @@ vec2 projectArcToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
         return vec2(0.);
 
     float nativeDistance = atan(nativeRadius, cosNativeDistance);
-    return planeUnitsPerRad * vec2(
-        nativeDistance * nativeX / nativeRadius,
-        nativeDistance * nativeY / nativeRadius);
+    float scale = planeUnitsPerRad * nativeDistance / nativeRadius;
+    return scale * vec2(nativeX, nativeY);
 }
 
 vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
@@ -348,10 +346,8 @@ vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     if (denom <= 0.)
         discard;
 
-    float radial = (mu + 1.) * nativeRadius / denom;
-    return planeUnitsPerRad * vec2(
-        radial * nativeX / nativeRadius,
-        radial * nativeY / (nativeRadius * cos(gamma)));
+    float scale = planeUnitsPerRad * (mu + 1.) / denom;
+    return scale * vec2(nativeX, nativeY / cos(gamma));
 }
 
 float zpnRadial(const float eta, const float[6] PV) {
@@ -378,9 +374,8 @@ vec2 projectZpnToWcsPlane(const vec2 helioprojective, const WCS wcs, const float
     if (radial < 0.)
         discard;
 
-    return planeUnitsPerRad * vec2(
-        radial * nativeX / nativeRadius,
-        radial * nativeY / nativeRadius);
+    float scale = planeUnitsPerRad * radial / nativeRadius;
+    return scale * vec2(nativeX, nativeY);
 }
 
 float wrapDeltaLongitude(float lon, float lon0) {
