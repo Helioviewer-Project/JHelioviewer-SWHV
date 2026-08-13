@@ -43,7 +43,7 @@ def compile_java_helper(java_out: Path) -> None:
 
 
 def java_dump(java_out: Path, file_path: Path, hdu: int | None) -> dict:
-    cmd = ["java", "-cp", java_classpath(java_out), JAVA_CLASS, str(file_path)]
+    cmd = ["java", f"-Duser.home={java_out}", "-cp", java_classpath(java_out), JAVA_CLASS, str(file_path)]
     if hdu is not None:
         cmd.extend(["--hdu", str(hdu)])
     completed = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True)

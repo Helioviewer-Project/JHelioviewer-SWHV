@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
+import tempfile
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from pathlib import Path
@@ -336,6 +338,58 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
 )
 
 
+# The default suite answers the highest-value rendering questions without
+# running every historical diagnostic. The complete catalog remains available
+# through --extended or --only.
+CORE_RUN_NAMES = {
+    "glsl_syntax",
+    "java_metadata",
+    "hpc_render_compare",
+    "hpc_render_compare_arc_punch",
+    "hpc_render_compare_hi1",
+    "hpc_render_compare_wispr_2222",
+    "surface_map_render_compare_car_sunerf",
+    "surface_map_render_compare_cea",
+    "latitudinal_zenithal_render",
+}
+
+CORE_ELECTRON_RUN_NAMES = {
+    "electron_default_all_modes_sample_texture",
+    "electron_default_hpc_projection_cases_sample_texture",
+    "electron_default_surface_map_cases_sample_texture",
+}
+
+SWIFTSHADER_CORE_SOURCE_NAMES = {
+    "electron_default_hpc_projection_cases_sample_texture",
+    "electron_default_surface_map_cases_sample_texture",
+}
+
+
+def core_variant(run: ValidationRun) -> ValidationRun:
+    args = list(run.args)
+    for index, arg in enumerate(args[:-1]):
+        if arg == "--render-size":
+            args[index + 1] = "512"
+        elif arg == "--surface-map-grid-factor":
+            args[index + 1] = "1"
+    return ValidationRun(run.name, tuple(args), run.validator)
+
+
+def swiftshader_variant(run: ValidationRun) -> ValidationRun:
+    args = tuple("swiftshader" if arg == "default" else arg for arg in run.args) + ("--report-validity-mismatches",)
+    return ValidationRun(run.name.replace("electron_default_", "electron_swiftshader_"), args, run.validator)
+
+
+CORE_RUNS = tuple(core_variant(run) for run in RUNS if run.name in CORE_RUN_NAMES)
+CORE_ELECTRON_RUNS = tuple(core_variant(run) for run in ELECTRON_RUNS if run.name in CORE_ELECTRON_RUN_NAMES)
+SWIFTSHADER_CORE_RUNS = tuple(
+    swiftshader_variant(core_variant(run))
+    for run in ELECTRON_RUNS
+    if run.name in SWIFTSHADER_CORE_SOURCE_NAMES
+)
+ALL_ELECTRON_RUNS = ELECTRON_RUNS + tuple(swiftshader_variant(run) for run in ELECTRON_RUNS)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run the validation suite documented in docs/wcs-validation/jhv_wcs_hpc_validation_note.md"
@@ -357,6 +411,11 @@ def parse_args() -> argparse.Namespace:
         help="Continue after failures and report them at the end",
     )
     parser.add_argument(
+        "--extended",
+        action="store_true",
+        help="Run the complete historical catalog instead of the prioritized core",
+    )
+    parser.add_argument(
         "--jobs",
         type=int,
         default=1,
@@ -375,12 +434,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def available_runs(include_electron: bool, electron_only: bool, only: list[str] | None) -> list[ValidationRun]:
+def available_runs(extended: bool, include_electron: bool, electron_only: bool, only: list[str] | None) -> list[ValidationRun]:
+    if only:
+        return list(RUNS + ALL_ELECTRON_RUNS)
     if electron_only:
-        return list(ELECTRON_RUNS)
-    runs = list(RUNS)
-    if include_electron or (only and any(name.startswith("electron_") for name in only)):
-        runs.extend(ELECTRON_RUNS)
+        return list(ALL_ELECTRON_RUNS if extended else CORE_ELECTRON_RUNS + SWIFTSHADER_CORE_RUNS)
+    runs = list(RUNS if extended else CORE_RUNS)
+    if include_electron:
+        runs.extend(ALL_ELECTRON_RUNS if extended else CORE_ELECTRON_RUNS + SWIFTSHADER_CORE_RUNS)
     return runs
 
 
@@ -408,17 +469,27 @@ def validator_for(run: ValidationRun) -> Path:
 def run_case(run: ValidationRun) -> ValidationResult:
     validator = validator_for(run)
     cmd = [sys.executable, str(validator), *run.args]
+    artifact_dir: Path | None = None
+    if run.validator in ("electron", "wcs"):
+        artifact_dir = Path(tempfile.mkdtemp(prefix=f"jhv-{run.name}-"))
+        cmd.extend(("--output-dir", str(artifact_dir)))
     completed = subprocess.run(
         cmd,
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
     )
+    stderr = completed.stderr
+    if artifact_dir is not None:
+        if completed.returncode == 0:
+            shutil.rmtree(artifact_dir)
+        else:
+            stderr += f"\nFailure artifacts retained at {artifact_dir}\n"
     return ValidationResult(
         run=run,
         returncode=completed.returncode,
         stdout=completed.stdout,
-        stderr=completed.stderr,
+        stderr=stderr,
     )
 
 
@@ -491,7 +562,7 @@ def run_parallel(runs: list[ValidationRun], keep_going: bool, jobs: int) -> list
 
 def main() -> int:
     args = parse_args()
-    all_runs = available_runs(args.include_electron, args.electron_only, args.only)
+    all_runs = available_runs(args.extended, args.include_electron, args.electron_only, args.only)
     if args.list:
         for run in all_runs:
             print(run.name)

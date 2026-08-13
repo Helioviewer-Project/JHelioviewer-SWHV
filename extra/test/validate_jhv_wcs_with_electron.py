@@ -209,9 +209,21 @@ def is_finite_texcoord(texcoord: tuple[float, float]) -> bool:
     return math.isfinite(texcoord[0]) and math.isfinite(texcoord[1])
 
 
+def is_source_pixel_in_image(pixel: np.ndarray, width: int, height: int) -> bool:
+    # FitsMetaData subtracts 0.5 from FITS CRPIX, so Astropy origin-1 pixels
+    # minus 0.5 are in JHV's OpenGL image space. The complete image edges are
+    # inclusive at 0 and width/height; pixel centres are 0.5..size-0.5.
+    return (
+        bool(np.all(np.isfinite(pixel)))
+        and 0.0 <= pixel[0] <= width
+        and 0.0 <= pixel[1] <= height
+    )
+
+
 def synthetic_texture(width: int, height: int) -> np.ndarray:
     y, x = np.indices((height, width), dtype=np.float64)
-    return (x + 2.0 * (height - 1 - y)) / (width + 2.0 * height)
+    values = (x + 2.0 * (height - 1 - y)) / (width + 2.0 * height)
+    return values.astype(np.float16).astype(np.float64)
 
 
 def print_gl_setup_errors(result: dict) -> None:
@@ -230,6 +242,7 @@ def compare_hpc_shader_to_astropy(
     max_sample_error: float,
     sample_texture: bool,
     backend: str,
+    report_validity_mismatches: bool,
 ) -> int:
     image_data, meta, _projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
     if meta.projection not in PROJECTION_CODES:
@@ -252,6 +265,7 @@ def compare_hpc_shader_to_astropy(
         job,
         result,
         pixels,
+        report_validity_mismatches,
     )
 
 
@@ -268,6 +282,7 @@ def evaluate_hpc_shader_to_astropy(
     job: dict,
     result: dict,
     pixels: np.ndarray,
+    report_validity_mismatches: bool = False,
 ) -> int:
     texture_data = synthetic_texture(job["textureWidth"], job["textureHeight"]) if sample_texture else None
 
@@ -275,6 +290,9 @@ def evaluate_hpc_shader_to_astropy(
     sum_px_err2 = 0.0
     max_sample_err = 0.0
     sum_sample_err2 = 0.0
+    max_interpolation_err = 0.0
+    sum_interpolation_err2 = 0.0
+    interpolation_count = 0
     max_shader_cpu_px_err = 0.0
     sum_shader_cpu_px_err2 = 0.0
     max_cpu_astropy_px_err = 0.0
@@ -287,6 +305,9 @@ def evaluate_hpc_shader_to_astropy(
     cpu_compare_count = 0
     float32_compare_count = 0
     skipped = 0
+    shader_only = 0
+    reference_only = 0
+    mismatch_locations: list[tuple[int, int, str]] = []
 
     for iy in range(render_size):
         sy = (iy + 0.5) / render_size
@@ -302,20 +323,40 @@ def evaluate_hpc_shader_to_astropy(
         for ix in range(render_size):
             sx = (ix + 0.5) / render_size
             texcoord = (float(pixels[iy, ix, 0]), float(pixels[iy, ix, 1]))
-            valid = float(pixels[iy, ix, 3]) > 0.5
-            if not valid or not math.isfinite(texcoord[0]) or not math.isfinite(texcoord[1]):
+            shader_valid = float(pixels[iy, ix, 3]) > 0.5 and is_finite_texcoord(texcoord)
+            reference_valid = is_source_pixel_in_image(astro_px[ix], meta.pixel_width, meta.pixel_height)
+            if sample_texture and texture_data is not None:
+                shader_sample = float(pixels[iy, ix, 2]) if shader_valid else 0.0
+                reference_texcoord = (
+                    float(astro_px[ix, 0]) / meta.pixel_width,
+                    float(astro_px[ix, 1]) / meta.pixel_height,
+                )
+                reference_sample = sample_texture_linear(texture_data, reference_texcoord) if reference_valid else 0.0
+                sample_err = abs(shader_sample - reference_sample)
+                max_sample_err = max(max_sample_err, float(sample_err))
+                sum_sample_err2 += float(sample_err * sample_err)
+                if shader_valid:
+                    interpolation_sample = sample_texture_linear(texture_data, texcoord)
+                    interpolation_err = abs(shader_sample - interpolation_sample)
+                    max_interpolation_err = max(max_interpolation_err, float(interpolation_err))
+                    sum_interpolation_err2 += float(interpolation_err * interpolation_err)
+                    interpolation_count += 1
+            if shader_valid != reference_valid:
+                if shader_valid:
+                    shader_only += 1
+                    mismatch = "shader-only"
+                else:
+                    reference_only += 1
+                    mismatch = "reference-only"
+                if len(mismatch_locations) < 10:
+                    mismatch_locations.append((ix, iy, mismatch))
+                skipped += 1
+                continue
+            if not shader_valid:
                 skipped += 1
                 continue
 
-            try:
-                shader_px = texcoord_to_pixel_center(texcoord, meta.pixel_width, meta.pixel_height)
-            except ValueError:
-                skipped += 1
-                continue
-
-            if not np.all(np.isfinite(astro_px[ix])):
-                skipped += 1
-                continue
+            shader_px = texcoord_to_pixel_center(texcoord, meta.pixel_width, meta.pixel_height)
 
             cpu_texcoord, _, _, _, _, _ = renderHpcTexcoords((sx, sy), bounds_deg, meta, image_data)
             float32_texcoord, _, _, _ = renderHpcTexcoordsFloat32((sx, sy), bounds_deg, meta, image_data)
@@ -323,12 +364,6 @@ def evaluate_hpc_shader_to_astropy(
             err = max(abs(shader_px[0] - astro_px[ix, 0]), abs(shader_px[1] - astro_px[ix, 1]))
             max_px_err = max(max_px_err, float(err))
             sum_px_err2 += float(err * err)
-            if sample_texture and texture_data is not None:
-                shader_sample = float(pixels[iy, ix, 2])
-                cpu_sample = sample_texture_linear(texture_data, texcoord)
-                sample_err = abs(shader_sample - cpu_sample)
-                max_sample_err = max(max_sample_err, float(sample_err))
-                sum_sample_err2 += float(sample_err * sample_err)
             count += 1
 
             if math.isfinite(cpu_texcoord[0]) and math.isfinite(cpu_texcoord[1]):
@@ -359,11 +394,17 @@ def evaluate_hpc_shader_to_astropy(
     print(f"bounds_deg=({bounds_deg[0]:.12f}, {bounds_deg[1]:.12f}, {bounds_deg[2]:.12f}, {bounds_deg[3]:.12f})")
     print(f"valid_samples={count}")
     print(f"skipped_samples={skipped}")
+    print(f"shader_only_samples={shader_only}")
+    print(f"reference_only_samples={reference_only}")
+    if mismatch_locations:
+        print(f"first_validity_mismatches={mismatch_locations}")
     print(f"pixel_center_max_error_px={max_px_err:.6e}")
     print(f"pixel_center_rms_error_px={math.sqrt(sum_px_err2 / count):.6e}" if count > 0 else "pixel_center_rms_error_px=nan")
     if sample_texture:
-        print(f"sample_max_error={max_sample_err:.6e}")
-        print(f"sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "sample_rms_error=nan")
+        print(f"rendered_sample_max_error={max_sample_err:.6e}")
+        print(f"rendered_sample_rms_error={math.sqrt(sum_sample_err2 / (render_size * render_size)):.6e}")
+        print(f"texture_interpolation_max_error={max_interpolation_err:.6e}")
+        print(f"texture_interpolation_rms_error={math.sqrt(sum_interpolation_err2 / interpolation_count):.6e}" if interpolation_count > 0 else "texture_interpolation_rms_error=nan")
     print(f"cpu_comparable_samples={cpu_compare_count}")
     print(f"shader_vs_cpu_max_error_px={max_shader_cpu_px_err:.6e}")
     print(f"shader_vs_cpu_rms_error_px={math.sqrt(sum_shader_cpu_px_err2 / cpu_compare_count):.6e}" if cpu_compare_count > 0 else "shader_vs_cpu_rms_error_px=nan")
@@ -378,11 +419,14 @@ def evaluate_hpc_shader_to_astropy(
     if count == 0:
         print("FAILED: no valid Electron WebGL samples")
         return 1
+    if (shader_only or reference_only) and not report_validity_mismatches:
+        print("FAILED: shader and production-bounded Astropy validity differ")
+        return 1
     if max_px_err > max_error_px:
         print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
         return 1
     if sample_texture and max_sample_err > max_sample_error:
-        print(f"FAILED: sample_max_error exceeds {max_sample_error:.6e}")
+        print(f"FAILED: rendered_sample_max_error exceeds {max_sample_error:.6e}")
         return 1
     return 0
 
@@ -585,6 +629,9 @@ def evaluate_shader_to_cpu(
     sum_px_err2 = 0.0
     max_sample_err = 0.0
     sum_sample_err2 = 0.0
+    max_interpolation_err = 0.0
+    sum_interpolation_err2 = 0.0
+    interpolation_count = 0
     count = 0
     skipped = 0
     shader_only = 0
@@ -609,6 +656,18 @@ def evaluate_shader_to_cpu(
                 job.get("warpLambda", DEFAULT_WARP_LAMBDA),
             )
             cpu_valid = is_finite_texcoord(cpu_texcoord)
+            if sample_texture and texture_data is not None:
+                shader_sample = float(pixels[iy, ix, 2]) if shader_valid else 0.0
+                cpu_sample = sample_texture_linear(texture_data, cpu_texcoord) if cpu_valid else 0.0
+                sample_err = abs(shader_sample - cpu_sample)
+                max_sample_err = max(max_sample_err, float(sample_err))
+                sum_sample_err2 += float(sample_err * sample_err)
+                if shader_valid:
+                    interpolation_sample = sample_texture_linear(texture_data, shader_texcoord)
+                    interpolation_err = abs(shader_sample - interpolation_sample)
+                    max_interpolation_err = max(max_interpolation_err, float(interpolation_err))
+                    sum_interpolation_err2 += float(interpolation_err * interpolation_err)
+                    interpolation_count += 1
 
             if not shader_valid and not cpu_valid:
                 skipped += 1
@@ -628,12 +687,6 @@ def evaluate_shader_to_cpu(
             )
             max_px_err = max(max_px_err, float(err))
             sum_px_err2 += float(err * err)
-            if sample_texture and texture_data is not None:
-                shader_sample = float(pixels[iy, ix, 2])
-                cpu_sample = sample_texture_linear(texture_data, shader_texcoord)
-                sample_err = abs(shader_sample - cpu_sample)
-                max_sample_err = max(max_sample_err, float(sample_err))
-                sum_sample_err2 += float(sample_err * sample_err)
             if projection_wcs is not None and pixel_wcs is not None:
                 expected_plane_internal = expected_plane_internal_for_mode(mode, sx, sy, meta)
                 if math.isfinite(expected_plane_internal[0]) and math.isfinite(expected_plane_internal[1]):
@@ -667,8 +720,10 @@ def evaluate_shader_to_cpu(
     print(f"shader_vs_astropy_max_error_px={max_shader_astropy_px_err:.6e}")
     print(f"shader_vs_astropy_rms_error_px={math.sqrt(sum_shader_astropy_px_err2 / astropy_count):.6e}" if astropy_count > 0 else "shader_vs_astropy_rms_error_px=nan")
     if sample_texture:
-        print(f"sample_max_error={max_sample_err:.6e}")
-        print(f"sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "sample_rms_error=nan")
+        print(f"rendered_sample_max_error={max_sample_err:.6e}")
+        print(f"rendered_sample_rms_error={math.sqrt(sum_sample_err2 / (render_size * render_size)):.6e}")
+        print(f"texture_interpolation_max_error={max_interpolation_err:.6e}")
+        print(f"texture_interpolation_rms_error={math.sqrt(sum_interpolation_err2 / interpolation_count):.6e}" if interpolation_count > 0 else "texture_interpolation_rms_error=nan")
     print(f"electron_rgba32f={job['outputPath']}")
     if count == 0:
         print("FAILED: no comparable Electron WebGL samples")
@@ -683,7 +738,7 @@ def evaluate_shader_to_cpu(
         print(f"FAILED: shader_vs_astropy_max_error_px exceeds {max_error_px:.6e}")
         return 1
     if sample_texture and max_sample_err > max_sample_error:
-        print(f"FAILED: sample_max_error exceeds {max_sample_error:.6e}")
+        print(f"FAILED: rendered_sample_max_error exceeds {max_sample_error:.6e}")
         return 1
     return 0
 
@@ -698,6 +753,7 @@ def compare_batch(
     max_sample_error: float,
     sample_texture: bool,
     backend: str,
+    report_validity_mismatches: bool,
 ) -> int:
     image_data, meta, projection_wcs, pixel_wcs = load_validation_context(fits_file, hdu)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -754,6 +810,7 @@ def compare_batch(
                 job,
                 result,
                 pixels,
+                report_validity_mismatches,
             )
         else:
             mode_max_error = 1.0 if mode == "lati_zenithal" else max_error_px
@@ -1078,6 +1135,7 @@ def compare_hpc_projection_batch(
     max_sample_error: float,
     sample_texture: bool,
     backend: str,
+    report_validity_mismatches: bool,
 ) -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1117,6 +1175,7 @@ def compare_hpc_projection_batch(
             job,
             result,
             pixels,
+            report_validity_mismatches,
         )
         failed = failed or code != 0
 
@@ -1131,6 +1190,7 @@ def compare_hpc_render_case_batch(
     max_sample_error: float,
     sample_texture: bool,
     backend: str,
+    report_validity_mismatches: bool,
 ) -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1170,6 +1230,7 @@ def compare_hpc_render_case_batch(
             job,
             result,
             pixels,
+            report_validity_mismatches,
         )
         failed = failed or code != 0
 
@@ -1194,6 +1255,9 @@ def evaluate_surface_map_shader_to_cpu(
     sum_px_err2 = 0.0
     max_sample_err = 0.0
     sum_sample_err2 = 0.0
+    max_interpolation_err = 0.0
+    sum_interpolation_err2 = 0.0
+    interpolation_count = 0
     count = 0
     skipped = 0
     shader_only = 0
@@ -1210,6 +1274,18 @@ def evaluate_surface_map_shader_to_cpu(
             shader_valid = float(pixels[iy, ix, 3]) > 0.5 and is_finite_texcoord(shader_texcoord)
             cpu_texcoord, _ = renderLatitudinalTexcoords((sx, sy), LATI_SURFACE_BOUNDS_DEG, meta, image_data)
             cpu_valid = is_finite_texcoord(cpu_texcoord)
+            if sample_texture and texture_data is not None:
+                shader_sample = float(pixels[iy, ix, 2]) if shader_valid else 0.0
+                cpu_sample = sample_texture_linear(texture_data, cpu_texcoord) if cpu_valid else 0.0
+                sample_err = abs(shader_sample - cpu_sample)
+                max_sample_err = max(max_sample_err, float(sample_err))
+                sum_sample_err2 += float(sample_err * sample_err)
+                if shader_valid:
+                    interpolation_sample = sample_texture_linear(texture_data, shader_texcoord)
+                    interpolation_err = abs(shader_sample - interpolation_sample)
+                    max_interpolation_err = max(max_interpolation_err, float(interpolation_err))
+                    sum_interpolation_err2 += float(interpolation_err * interpolation_err)
+                    interpolation_count += 1
 
             if not shader_valid and not cpu_valid:
                 skipped += 1
@@ -1229,10 +1305,6 @@ def evaluate_surface_map_shader_to_cpu(
             )
             max_px_err = max(max_px_err, float(err))
             sum_px_err2 += float(err * err)
-            if sample_texture and texture_data is not None:
-                sample_err = abs(float(pixels[iy, ix, 2]) - sample_texture_linear(texture_data, shader_texcoord, wrap_x=True))
-                max_sample_err = max(max_sample_err, float(sample_err))
-                sum_sample_err2 += float(sample_err * sample_err)
             if pixel_wcs is not None:
                 world_xyz = displayLatitudinalWorld((sx, sy), LATI_SURFACE_BOUNDS_DEG)
                 if math.isfinite(world_xyz[0]) and math.isfinite(world_xyz[1]) and math.isfinite(world_xyz[2]):
@@ -1265,8 +1337,10 @@ def evaluate_surface_map_shader_to_cpu(
     print(f"shader_vs_astropy_max_error_px={max_shader_astropy_px_err:.6e}")
     print(f"shader_vs_astropy_rms_error_px={math.sqrt(sum_shader_astropy_px_err2 / astropy_count):.6e}" if astropy_count > 0 else "shader_vs_astropy_rms_error_px=nan")
     if sample_texture:
-        print(f"sample_max_error={max_sample_err:.6e}")
-        print(f"sample_rms_error={math.sqrt(sum_sample_err2 / count):.6e}" if count > 0 else "sample_rms_error=nan")
+        print(f"rendered_sample_max_error={max_sample_err:.6e}")
+        print(f"rendered_sample_rms_error={math.sqrt(sum_sample_err2 / (render_size * render_size)):.6e}")
+        print(f"texture_interpolation_max_error={max_interpolation_err:.6e}")
+        print(f"texture_interpolation_rms_error={math.sqrt(sum_interpolation_err2 / interpolation_count):.6e}" if interpolation_count > 0 else "texture_interpolation_rms_error=nan")
     print(f"electron_rgba32f={job['outputPath']}")
     if count == 0:
         print("FAILED: no comparable Electron WebGL samples")
@@ -1281,7 +1355,7 @@ def evaluate_surface_map_shader_to_cpu(
         print(f"FAILED: shader_vs_astropy_max_error_px exceeds {max_error_px:.6e}")
         return 1
     if sample_texture and max_sample_err > max_sample_error:
-        print(f"FAILED: sample_max_error exceeds {max_sample_error:.6e}")
+        print(f"FAILED: rendered_sample_max_error exceeds {max_sample_error:.6e}")
         return 1
     return 0
 
@@ -1746,8 +1820,17 @@ def main() -> int:
     parser.add_argument("--electron", type=Path, default=DEFAULT_ELECTRON)
     parser.add_argument("--output-dir", type=Path, default=Path("extra/test/out"))
     parser.add_argument("--max-error-px", type=float, default=0.5)
-    parser.add_argument("--max-sample-error", type=float, default=1e-3)
-    parser.add_argument("--sample-texture", action="store_true")
+    parser.add_argument(
+        "--max-sample-error",
+        type=float,
+        default=1e-3,
+        help="Maximum rendered synthetic-source error (default: 1e-3)",
+    )
+    parser.add_argument(
+        "--sample-texture",
+        action="store_true",
+        help="Render a synthetic R16F source and compare output with the independent mapping",
+    )
     parser.add_argument("--all-modes", action="store_true")
     parser.add_argument("--tan-all-modes-cases", action="store_true")
     parser.add_argument("--tan-screen-cases", action="store_true")
@@ -1771,6 +1854,11 @@ def main() -> int:
     parser.add_argument("--all-modes-color-diff-smoke", action="store_true")
     parser.add_argument("--backend", choices=("default", "swiftshader"), default="default")
     parser.add_argument(
+        "--report-validity-mismatches",
+        action="store_true",
+        help="Report raw coordinate/discard mismatches without making them a failure; use rendered-pixel tests as the gate",
+    )
+    parser.add_argument(
         "--mode",
         choices=ALL_MODES,
         default="hpc",
@@ -1786,6 +1874,7 @@ def main() -> int:
             args.max_sample_error,
             args.sample_texture,
             args.backend,
+            args.report_validity_mismatches,
         )
 
     if args.tan_all_modes_cases:
@@ -1819,6 +1908,7 @@ def main() -> int:
             args.max_sample_error,
             args.sample_texture,
             args.backend,
+            args.report_validity_mismatches,
         )
 
     if args.surface_map_cases:
@@ -1980,6 +2070,7 @@ def main() -> int:
             args.max_sample_error,
             args.sample_texture,
             args.backend,
+            args.report_validity_mismatches,
         )
 
     if args.mode != "hpc":
@@ -2006,6 +2097,7 @@ def main() -> int:
         args.max_sample_error,
         args.sample_texture,
         args.backend,
+        args.report_validity_mismatches,
     )
 
 
