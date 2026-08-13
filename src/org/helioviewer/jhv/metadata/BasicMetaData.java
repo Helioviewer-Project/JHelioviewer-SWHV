@@ -5,7 +5,6 @@ import java.net.URI;
 import javax.annotation.Nonnull;
 
 import org.helioviewer.jhv.astronomy.Sun;
-import org.helioviewer.jhv.wcs.WcsHeader;
 
 public class BasicMetaData extends CommonMetaData {
 
@@ -23,7 +22,6 @@ public class BasicMetaData extends CommonMetaData {
 
         displayName = _displayName;
         sourceUri = _sourceUri;
-        wcsHeader = new WcsHeader(wcsProjection, pv2, wcsPlaneUnitsPerRad, crval, imageToPlane);
     }
 
 }
