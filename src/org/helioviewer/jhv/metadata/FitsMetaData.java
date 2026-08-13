@@ -269,20 +269,18 @@ public final class FitsMetaData extends CommonMetaData {
             WcsInterpreter.Result wcs = WcsInterpreter.read(m);
             WcsHeader.Projection projection = wcs.projection();
             boolean isSurfaceMap = projection.isSurfaceMap();
-            float planeUnitsPerRad;
+            double planeScale;
 
             if (isSurfaceMap) {
                 unitPerArcsec = Math.PI / (180. * 3600.);
-                planeUnitsPerRad = 1f;
-                unitPerPixelX = wcs.unitPerPixelX();
-                unitPerPixelY = wcs.unitPerPixelY();
+                planeScale = 1;
             } else {
                 double radiusSunInArcsec = Math.toDegrees(Math.atan2(Sun.Radius * getSolarRadiusFactor(), viewpoint.distance)) * 3600;
                 unitPerArcsec = Sun.Radius / radiusSunInArcsec;
-                planeUnitsPerRad = (float) (unitPerArcsec * 180. * 3600. / Math.PI);
-                unitPerPixelX = Math.abs(wcs.arcsecPerPixelX() * unitPerArcsec);
-                unitPerPixelY = Math.abs(wcs.arcsecPerPixelY() * unitPerArcsec);
+                planeScale = unitPerArcsec;
             }
+            unitPerPixelX = wcs.unitPerPixelX() * planeScale;
+            unitPerPixelY = wcs.unitPerPixelY() * planeScale;
 
             // Pixel center: FITS = integer from 1, OpenGL = half-integer from 0
             double crpix1 = m.getDouble("CRPIX1").orElseGet(() -> (pixelW + 1) / 2.) - .5;
@@ -292,13 +290,9 @@ public final class FitsMetaData extends CommonMetaData {
 
             region = new Region(-crpix1 * unitPerPixelX, -crpix2 * unitPerPixelY, pixelW * unitPerPixelX, pixelH * unitPerPixelY);
 
-            Vec2 crval = isSurfaceMap
-                    ? new Vec2(wcs.internalCrvalX(), wcs.internalCrvalY())
-                    : new Vec2(wcs.internalCrvalX() * unitPerArcsec, wcs.internalCrvalY() * unitPerArcsec);
-
-            float[] pv2 = projection.usesPv2() ? wcs.pv2() : new float[6];
+            Vec2 crval = new Vec2(wcs.crval().x * planeScale, wcs.crval().y * planeScale);
             Mat2 imageToPlane = CROTABlockSet.contains(instrument) ? Mat2.IDENTITY : wcs.imageToPlane();
-            wcsHeader = new WcsHeader(projection, pv2, planeUnitsPerRad, crval, imageToPlane);
+            wcsHeader = new WcsHeader(projection, wcs.pv2(), wcs.unitsPerRad() * planeScale, crval, imageToPlane);
 
             // Sun center in region coordinates for radius-aware image filters; region Y is image-row oriented, opposite to WCS plane Y.
             if (!isSurfaceMap && (crval.x != 0 || crval.y != 0)) {
