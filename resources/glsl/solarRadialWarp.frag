@@ -15,7 +15,7 @@ void main(void) {
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
     float enhancementFactor;
     bool diffMode = display.isDiff != NODIFFERENCE;
-    clipHpcGeometry(hpcXY);
+    clipPlanarMasks(hpcXY);
     vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, wcs[0].deltaT, pv0, enhancementFactor);
     if (!diffMode) {
         color = getColor(texCoord, texCoord, enhancementFactor);
