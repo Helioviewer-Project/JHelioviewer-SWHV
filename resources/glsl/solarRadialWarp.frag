@@ -1,7 +1,8 @@
 void main(void) {
     vec4 color;
     vec2 w = getViewPosition();
-    float t = 2. * length(w);
+    float viewRadius = length(w);
+    float t = 2. * viewRadius;
     if (t > 1. || t == 0.)
         discard;
 
@@ -11,7 +12,7 @@ void main(void) {
     clamp_coord(vec2(angle / TWOPI, t));
 
     float radialCoordinate = unwarpRadius(t);
-    vec2 hpcXY = (radialCoordinate / length(w)) * w;
+    vec2 hpcXY = (radialCoordinate / viewRadius) * w;
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
     float enhancementFactor;
     bool diffMode = display.isDiff != NODIFFERENCE;
