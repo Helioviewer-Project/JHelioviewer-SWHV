@@ -28,11 +28,6 @@ final class WcsInterpreter {
             double unitPerPixelX,
             double unitPerPixelY) {}
 
-    private record WcsInput(
-            double crval1,
-            double crval2,
-            double pv2_1) {}
-
     private record MatrixKeywords(boolean present, Mat2 matrix) {}
 
     static Result read(MetaDataContainer m) {
@@ -41,30 +36,25 @@ final class WcsInterpreter {
         WcsHeader.Projection projection = WcsHeader.Projection.fromCtype(ctype1, ctype2);
         boolean isSurfaceMap = projection.isSurfaceMap();
 
-        WcsInput wcs = readWcsInput(m);
         AxisUnits units = readAxisUnits(m, isSurfaceMap);
-        float[] pv2 = readPv2(m, wcs, projection);
+        double pv2_1 = m.getDouble("PV2_1").orElse(1.);
+        float[] pv2 = readPv2(m, projection, pv2_1);
         LinearTransform transform = computeLinearTransform(m, units, projection);
+        double crval1 = m.getDouble("CRVAL1").orElse(0.);
+        double crval2 = m.getDouble("CRVAL2").orElse(0.);
         Vec2 crval;
         double unitsPerRad;
 
         if (isSurfaceMap) {
             boolean isCea = projection == WcsHeader.Projection.CEA;
-            crval = new Vec2(Math.toRadians(wcs.crval1), isCea ? readCeaLatitudeY(wcs) : Math.toRadians(wcs.crval2));
+            crval = new Vec2(Math.toRadians(crval1), isCea ? readCeaLatitudeY(crval2, pv2_1) : Math.toRadians(crval2));
             unitsPerRad = 1;
         } else {
-            crval = new Vec2(wcs.crval1 * units.arcsecX, wcs.crval2 * units.arcsecY);
+            crval = new Vec2(crval1 * units.arcsecX, crval2 * units.arcsecY);
             unitsPerRad = ARCSEC_PER_RAD;
         }
 
         return new Result(projection, pv2, crval, transform.imageToPlane, transform.unitPerPixelX, transform.unitPerPixelY, unitsPerRad);
-    }
-
-    private static WcsInput readWcsInput(MetaDataContainer m) {
-        return new WcsInput(
-                m.getDouble("CRVAL1").orElse(0.),
-                m.getDouble("CRVAL2").orElse(0.),
-                m.getDouble("PV2_1").orElse(1.));
     }
 
     private static MatrixKeywords readMatrix(MetaDataContainer m, String prefix, double diagonalDefault) {
@@ -101,14 +91,14 @@ final class WcsInterpreter {
         };
     }
 
-    private static float[] readPv2(MetaDataContainer m, WcsInput wcs, WcsHeader.Projection projection) {
+    private static float[] readPv2(MetaDataContainer m, WcsHeader.Projection projection, double pv2_1) {
         float[] pv2 = new float[6];
         if (!projection.usesPv2())
             return pv2;
         for (int i = 0; i < pv2.length; i++)
             pv2[i] = m.getDouble("PV2_" + i).map(Double::floatValue).orElse(0f);
         if (projection == WcsHeader.Projection.CEA) // Thompson (2006): CEA defaults PV2_1 to 1 when omitted.
-            pv2[1] = (float) wcs.pv2_1;
+            pv2[1] = (float) pv2_1;
         return pv2;
     }
 
@@ -171,10 +161,10 @@ final class WcsInterpreter {
                 unitPerPixelY);
     }
 
-    private static double readCeaLatitudeY(WcsInput wcs) {
+    private static double readCeaLatitudeY(double crval2, double pv2_1) {
         // JHV stores the CEA second axis as the equal-area latitude coordinate y = sin(lat) / lambda.
-        double latitude = Math.toRadians(wcs.crval2);
-        double lambda = Math.max(wcs.pv2_1, 1e-12);
+        double latitude = Math.toRadians(crval2);
+        double lambda = Math.max(pv2_1, 1e-12);
         return Math.sin(latitude) / lambda;
     }
 

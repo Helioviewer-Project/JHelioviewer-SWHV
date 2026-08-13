@@ -249,11 +249,6 @@ def build_jhv_meta(header) -> JHVMeta:
 
     arcsec_x = unit_scale_from_cunit(default_angular_cunit(header, 1))
     arcsec_y = unit_scale_from_cunit(default_angular_cunit(header, 2))
-    uses_cd = matrix_keywords_present(header, "CD") and not matrix_keywords_present(header, "PC")
-    cdelt1 = float(header.get("CDELT1", 1.0)) if uses_cd else float(header["CDELT1"])
-    cdelt2 = float(header.get("CDELT2", 1.0)) if uses_cd else float(header["CDELT2"])
-    arcsec_per_pixel_x = cdelt1 * arcsec_x
-    arcsec_per_pixel_y = cdelt2 * arcsec_y
 
     dsun_obs = header.get("DSUN_OBS")
     if dsun_obs is not None:
