@@ -790,10 +790,28 @@ def pixel_center_error_px(jhv_px: tuple[float, float], astro_px: tuple[float, fl
     return max(dx, dy)
 
 
+def fits_pixel_to_texture_pixel(
+    fits_pixel: tuple[float, float] | np.ndarray,
+    meta: JHVMeta,
+) -> tuple[float, float] | np.ndarray:
+    """Convert FITS one-based, bottom-up pixels to OpenGL texture pixel centers."""
+    pixels = np.asarray(fits_pixel, dtype=np.float64)
+    converted = np.empty_like(pixels)
+    converted[..., 0] = pixels[..., 0] - 0.5
+    converted[..., 1] = meta.pixel_height - (pixels[..., 1] - 0.5)
+    if converted.ndim == 1:
+        return (float(converted[0]), float(converted[1]))
+    return converted
+
+
+def texture_reference_pixel_y(meta: JHVMeta) -> float:
+    return meta.pixel_height - meta.crpix2_gl
+
+
 def plane_internal_to_pixel_center(plane_internal: tuple[float, float], meta: JHVMeta, wrap_x: bool = False) -> tuple[float, float]:
     rotated_internal = rotate_inverse_z(plane_internal, meta.crota_rad)
     px = rotated_internal[0] / meta.unit_per_pixel_x + meta.crpix1_gl
-    py = -rotated_internal[1] / meta.unit_per_pixel_y + meta.crpix2_gl
+    py = -rotated_internal[1] / meta.unit_per_pixel_y + texture_reference_pixel_y(meta)
     return (wrap_source_x_pixel(px, meta) if wrap_x else px, py)
 
 
@@ -805,14 +823,14 @@ def plane_internal_array_to_pixel_center(plane_internal: np.ndarray, meta: JHVMe
     px = rotated_x / meta.unit_per_pixel_x + meta.crpix1_gl
     if wrap_x and surface_map_wraps_x(meta):
         px = np.mod(px, meta.pixel_width)
-    py = -rotated_y / meta.unit_per_pixel_y + meta.crpix2_gl
+    py = -rotated_y / meta.unit_per_pixel_y + texture_reference_pixel_y(meta)
     return np.column_stack((px, py))
 
 
 def pixel_center_to_plane_internal(pixel_center: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
     rotated_internal = (
         (pixel_center[0] - meta.crpix1_gl) * meta.unit_per_pixel_x,
-        -(pixel_center[1] - meta.crpix2_gl) * meta.unit_per_pixel_y,
+        -(pixel_center[1] - texture_reference_pixel_y(meta)) * meta.unit_per_pixel_y,
     )
     return rotate_z(rotated_internal, meta.crota_rad)
 
@@ -890,25 +908,9 @@ def build_projection_only_wcs(header) -> WCS:
     return wcs
 
 
-def build_jhv_equivalent_astropy_wcs(header, meta: JHVMeta) -> WCS:
-    crval1_deg = angular_header_value_to_deg(header.get("CRVAL1", 0.0), default_angular_cunit(header, 1))
-    crval2_deg = angular_header_value_to_deg(header.get("CRVAL2", 0.0), default_angular_cunit(header, 2))
-    projection = projection_suffix(header)
-
-    sx = abs(meta.arcsec_per_pixel_x) / 3600.0
-    sy = abs(meta.arcsec_per_pixel_y) / 3600.0 if projection != "CEA" else abs(meta.arcsec_per_pixel_y) * 180.0 / math.pi
-    c = math.cos(meta.crota_rad)
-    s = math.sin(meta.crota_rad)
-
-    wcs = build_astropy_wcs_base(header, projection, crval1_deg, crval2_deg)
-    wcs.wcs.crpix = [meta.crpix1_gl + 0.5, meta.crpix2_gl + 0.5]
-    wcs.wcs.cd = np.array([
-        [c * sx, s * sy],
-        [s * sx, -c * sy],
-    ])
-    if projection in PV2_PROJECTIONS:
-        wcs.wcs.set_pv([(2, i, float(header.get(f"PV2_{i}", 0.0))) for i in range(6) if f"PV2_{i}" in header])
-    return wcs
+def build_original_astropy_wcs(header) -> WCS:
+    """Build the reference from the FITS WCS, without reproducing JHV's reductions."""
+    return WCS(header, naxis=2)
 
 
 def image_plane_edge_samples(meta: JHVMeta) -> tuple[tuple[float, float], ...]:
@@ -1000,7 +1002,7 @@ def wcsRect(meta: JHVMeta) -> tuple[float, float, float, float]:
     height = meta.pixel_height * meta.unit_per_pixel_y
     return (
         -meta.crpix1_gl * meta.unit_per_pixel_x,
-        -meta.crpix2_gl * meta.unit_per_pixel_y,
+        -texture_reference_pixel_y(meta) * meta.unit_per_pixel_y,
         1.0 / width,
         1.0 / height,
     )
@@ -1547,7 +1549,7 @@ def wcsPlaneToTexcoordFloat32(plane_internal: tuple[float, float], meta: JHVMeta
     height = f32(f32(meta.pixel_height) * f32(meta.unit_per_pixel_y))
     rect = (
         f32(-f32(meta.crpix1_gl) * f32(meta.unit_per_pixel_x)),
-        f32(-f32(meta.crpix2_gl) * f32(meta.unit_per_pixel_y)),
+        f32(-f32(texture_reference_pixel_y(meta)) * f32(meta.unit_per_pixel_y)),
         f32(1.0 / width),
         f32(1.0 / height),
     )
@@ -2161,6 +2163,7 @@ def run_surface_map_render_compare(
     meta: JHVMeta,
     image_data: np.ndarray,
     pixel_wcs: WCS,
+    max_error_px: float,
 ) -> int:
     require_2d_image(image_data, "Surface-map render compare")
     if not is_surface_map_projection(meta):
@@ -2174,7 +2177,7 @@ def run_surface_map_render_compare(
 
     jhv_px = mirrored_world_array_to_pixel_center(world_deg, meta)
     astro_px_raw = pixel_wcs.wcs_world2pix(world_deg, 1)
-    astro_px = np.column_stack((astro_px_raw[:, 0] - 0.5, astro_px_raw[:, 1] - 0.5))
+    astro_px = fits_pixel_to_texture_pixel(astro_px_raw, meta)
 
     jhv_samples = sample_source_linear_array(image_data, jhv_px[:, 0], jhv_px[:, 1], meta)
     astro_samples = sample_source_linear_array(image_data, astro_px[:, 0], astro_px[:, 1], meta)
@@ -2218,6 +2221,9 @@ def run_surface_map_render_compare(
     print(f"jhv_png={jhv_path}")
     print(f"astropy_png={astro_path}")
     print(f"diff_png={diff_path}")
+    if not math.isfinite(max_px_err) or max_px_err > max_error_px:
+        print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
+        return 1
     return 0
 
 
@@ -2341,6 +2347,7 @@ def run_hpc_render_compare(
     meta: JHVMeta,
     image_data: np.ndarray,
     pixel_wcs: WCS,
+    max_error_px: float,
 ) -> int:
     require_2d_image(image_data, "HPC render compare")
 
@@ -2378,7 +2385,7 @@ def run_hpc_render_compare(
         row_astro_px = np.full((render_size, 2), np.nan, dtype=np.float64)
         if np.any(world_mask):
             astro_px_raw = pixel_wcs.wcs_world2pix(row_world_deg[world_mask], 1)
-            row_astro_px[world_mask] = np.column_stack((astro_px_raw[:, 0] - 0.5, astro_px_raw[:, 1] - 0.5))
+            row_astro_px[world_mask] = fits_pixel_to_texture_pixel(astro_px_raw, meta)
 
         finite_mask = (
             np.isfinite(row_jhv_px[:, 0]) & np.isfinite(row_jhv_px[:, 1]) &
@@ -2414,6 +2421,9 @@ def run_hpc_render_compare(
     print(f"jhv_png={jhv_path}")
     print(f"astropy_png={astro_path}")
     print(f"diff_png={diff_path}")
+    if count == 0 or max_px_err > max_error_px:
+        print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
+        return 1
     return 0
 
 
@@ -2504,7 +2514,7 @@ def run_compare_initial_tan_image_frame(
         fits_y = np.full(meta.pixel_width, iy + 1.0, dtype=np.float64)
         fits_x = np.arange(meta.pixel_width, dtype=np.float64) + 1.0
         world_deg = pixel_wcs.wcs_pix2world(np.column_stack((fits_x, fits_y)), 1)
-        astro_px = np.column_stack((fits_x - 0.5, fits_y - 0.5))
+        astro_px = fits_pixel_to_texture_pixel(np.column_stack((fits_x, fits_y)), meta)
         world_xyz = ortho_carrier_world_array_from_hpc_world_deg(world_deg, meta)
         screen_xy = np.column_stack((world_xyz[:, 0], world_xyz[:, 1]))
         new_px = np.array([
@@ -2769,6 +2779,7 @@ def run_forward_validation(
     seed: int,
     report_worst: int,
     all_pixels: bool,
+    max_error_px: float,
 ) -> int:
     proj_err_max = 0.0
     pixel_err_max = 0.0
@@ -2788,7 +2799,7 @@ def run_forward_validation(
                     for w, ax, ay in zip(world, fits_x, fits_y, strict=True)
                 ], dtype=np.float64)
             jhv_pixel_center = mirrored_world_array_to_pixel_center(world, meta)
-            astro_pixel_center = np.column_stack((fits_x - 0.5, fits_y - 0.5))
+            astro_pixel_center = fits_pixel_to_texture_pixel(np.column_stack((fits_x, fits_y)), meta)
             errors = np.array([
                 pixel_center_error_px((float(jx), float(jy)), (float(ax), float(ay)), meta)
                 for (jx, jy), (ax, ay) in zip(jhv_pixel_center, astro_pixel_center, strict=True)
@@ -2814,6 +2825,9 @@ def run_forward_validation(
                 f"  err={pixel_err:.6e} pixel={pixel_xy!r} "
                 f"jhv={jhv_pixel_center!r} astropy={astro_pixel_center!r}"
             )
+        if pixel_err_max > max_error_px:
+            print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
+            return 1
         return 0
 
     valid_samples = 0
@@ -2853,7 +2867,7 @@ def run_forward_validation(
         if not np.all(np.isfinite(astro_pixel_center)):
             skipped_samples += 1
             continue
-        astro_pixel_center = (astro_pixel_center[0] - 0.5, astro_pixel_center[1] - 0.5)
+        astro_pixel_center = fits_pixel_to_texture_pixel(astro_pixel_center, meta)
         pixel_err = pixel_center_error_px(jhv_pixel_center, astro_pixel_center, meta)
         pixel_err_max = max(pixel_err_max, pixel_err)
 
@@ -2880,6 +2894,9 @@ def run_forward_validation(
             f"jhv={jhv_pixel_center!r} astropy={astro_pixel_center!r}"
         )
 
+    if valid_samples == 0 or pixel_err_max > max_error_px:
+        print(f"FAILED: pixel_center_max_error_px exceeds {max_error_px:.6e}")
+        return 1
     return 0
 
 
@@ -2900,6 +2917,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--samples", type=int, default=1000, help="Number of random 3D samples")
     parser.add_argument("--seed", type=int, default=0, help="Random seed")
     parser.add_argument("--report-worst", type=int, default=5, help="How many worst samples to print")
+    parser.add_argument("--max-error-px", type=float, default=0.5, help="Maximum Astropy pixel-coordinate error for correctness comparisons")
     parser.add_argument("--all-pixels", action="store_true", help="Validate all pixel centers instead of random 3D samples")
     parser.add_argument("--inverse-tan", action="store_true", help="Validate the TAN inverse plane->world mapping")
     parser.add_argument("--inverse-arc", action="store_true", help="Validate the ARC inverse plane->world mapping")
@@ -2937,7 +2955,7 @@ def load_validation_context(
     ensure_supported_projection(header)
     meta = build_jhv_meta(header)
     projection_wcs = build_projection_only_wcs(header)
-    pixel_wcs = build_jhv_equivalent_astropy_wcs(header, meta)
+    pixel_wcs = build_original_astropy_wcs(header)
     return image_data, meta, projection_wcs, pixel_wcs
 
 
@@ -2955,7 +2973,9 @@ def main() -> int:
         return run_latitudinal_render(args.fits_file, args.output_dir, args.render_size, meta, image_data)
 
     if args.surface_map_render_compare:
-        return run_surface_map_render_compare(args.fits_file, args.output_dir, args.surface_map_grid_factor, meta, image_data, pixel_wcs)
+        return run_surface_map_render_compare(
+            args.fits_file, args.output_dir, args.surface_map_grid_factor,
+            meta, image_data, pixel_wcs, args.max_error_px)
 
     if args.latitudinal_zenithal_render:
         return run_latitudinal_zenithal_render(args.fits_file, args.output_dir, args.render_size, meta, image_data)
@@ -2980,6 +3000,7 @@ def main() -> int:
             meta,
             image_data,
             pixel_wcs,
+            args.max_error_px,
         )
 
     if args.ortho_vs_hpc_screen_compare:
@@ -3034,6 +3055,7 @@ def main() -> int:
         args.seed,
         args.report_worst,
         args.all_pixels,
+        args.max_error_px,
     )
 
 
