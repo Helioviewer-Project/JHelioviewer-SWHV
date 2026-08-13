@@ -356,6 +356,14 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
     ),
 )
 
+BACKEND_COMPARISON_RUNS: tuple[ValidationRun, ...] = (
+    ValidationRun(
+        "electron_hpc_projection_backend_compare",
+        ("--hpc-projection-backend-compare", "--render-size", "128"),
+        "electron",
+    ),
+)
+
 
 # The default suite answers the highest-value rendering questions without
 # running every historical diagnostic. The complete catalog remains available
@@ -376,7 +384,6 @@ CORE_ELECTRON_RUN_NAMES = {
     "electron_default_all_modes_sample_texture",
     "electron_default_differential_rotation",
     "electron_default_distinct_wcs_slots",
-    "electron_default_hpc_projection_cases_sample_texture",
     "electron_default_planar_masks",
     "electron_default_surface_map_cases_sample_texture",
 }
@@ -384,13 +391,22 @@ CORE_ELECTRON_RUN_NAMES = {
 SWIFTSHADER_CORE_SOURCE_NAMES = {
     "electron_default_differential_rotation",
     "electron_default_distinct_wcs_slots",
-    "electron_default_hpc_projection_cases_sample_texture",
     "electron_default_planar_masks",
     "electron_default_surface_map_cases_sample_texture",
 }
 
+SWIFTSHADER_DIAGNOSTIC_SOURCE_NAMES = {
+    "electron_default_all_modes",
+    "electron_default_all_modes_sample_texture",
+    "electron_default_tan_all_modes_cases",
+    "electron_default_tan_all_modes_cases_sample_texture",
+}
 
-def core_variant(run: ValidationRun) -> ValidationRun:
+
+def reduced_cpu_variant(run: ValidationRun) -> ValidationRun:
+    if run.validator != "wcs":
+        return run
+
     args = list(run.args)
     for index, arg in enumerate(args[:-1]):
         if arg == "--render-size":
@@ -405,14 +421,24 @@ def swiftshader_variant(run: ValidationRun) -> ValidationRun:
     return ValidationRun(run.name.replace("electron_default_", "electron_swiftshader_"), args, run.validator)
 
 
-CORE_RUNS = tuple(core_variant(run) for run in RUNS if run.name in CORE_RUN_NAMES)
-CORE_ELECTRON_RUNS = tuple(core_variant(run) for run in ELECTRON_RUNS if run.name in CORE_ELECTRON_RUN_NAMES)
+CORE_RUNS = tuple(reduced_cpu_variant(run) for run in RUNS if run.name in CORE_RUN_NAMES)
+CORE_ELECTRON_RUNS = tuple(run for run in ELECTRON_RUNS if run.name in CORE_ELECTRON_RUN_NAMES)
 SWIFTSHADER_CORE_RUNS = tuple(
-    swiftshader_variant(core_variant(run))
+    swiftshader_variant(run)
     for run in ELECTRON_RUNS
     if run.name in SWIFTSHADER_CORE_SOURCE_NAMES
 )
-ALL_ELECTRON_RUNS = ELECTRON_RUNS + tuple(swiftshader_variant(run) for run in ELECTRON_RUNS)
+SWIFTSHADER_RUNS = tuple(
+    swiftshader_variant(run)
+    for run in ELECTRON_RUNS
+    if run.name not in SWIFTSHADER_DIAGNOSTIC_SOURCE_NAMES
+)
+SWIFTSHADER_DIAGNOSTIC_RUNS = tuple(
+    swiftshader_variant(run)
+    for run in ELECTRON_RUNS
+    if run.name in SWIFTSHADER_DIAGNOSTIC_SOURCE_NAMES
+)
+ALL_ELECTRON_RUNS = ELECTRON_RUNS + SWIFTSHADER_RUNS + BACKEND_COMPARISON_RUNS
 
 
 def parse_args() -> argparse.Namespace:
@@ -461,12 +487,12 @@ def parse_args() -> argparse.Namespace:
 
 def available_runs(extended: bool, include_electron: bool, electron_only: bool, only: list[str] | None) -> list[ValidationRun]:
     if only:
-        return list(RUNS + ALL_ELECTRON_RUNS)
+        return list(RUNS + ALL_ELECTRON_RUNS + SWIFTSHADER_DIAGNOSTIC_RUNS)
     if electron_only:
-        return list(ALL_ELECTRON_RUNS if extended else CORE_ELECTRON_RUNS + SWIFTSHADER_CORE_RUNS)
+        return list(ALL_ELECTRON_RUNS if extended else CORE_ELECTRON_RUNS + SWIFTSHADER_CORE_RUNS + BACKEND_COMPARISON_RUNS)
     runs = list(RUNS if extended else CORE_RUNS)
     if include_electron:
-        runs.extend(ALL_ELECTRON_RUNS if extended else CORE_ELECTRON_RUNS + SWIFTSHADER_CORE_RUNS)
+        runs.extend(ALL_ELECTRON_RUNS if extended else CORE_ELECTRON_RUNS + SWIFTSHADER_CORE_RUNS + BACKEND_COMPARISON_RUNS)
     return runs
 
 

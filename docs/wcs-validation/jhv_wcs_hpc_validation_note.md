@@ -326,19 +326,22 @@ stopping at raw coordinates. Separate focused checks exercise differential
 rotation, independently populated primary and secondary WCS uniform-block
 slots, and the user-sector, metadata-sector, radial, and cutoff display masks.
 They do not execute every complete production fragment path, so they are not a
-claim of complete frame equivalence. `rendered_sample_*` compares the
-diagnostic GPU output over the complete viewport with a value sampled at the
-independent CPU/Astropy coordinate, or transparent black when that reference
-coordinate is outside the source image. `texture_interpolation_*` separately
-compares GPU and CPU filtering at the GPU coordinate; it is a filtering
-diagnostic, not a coordinate-correctness oracle. The CPU sampler uses the same
-half-float source values and clamp-to-edge filtering as the WebGL/JHV texture.
+claim of complete frame equivalence. `frame_sample_*` measures the complete
+viewport, including visibility differences. `joint_sample_*` measures rendered
+values only where both implementations consider the source visible, and is the
+sample-accuracy gate. `texture_interpolation_*` separately compares GPU and CPU
+filtering at the GPU coordinate; it is a filtering diagnostic, not a
+coordinate-correctness oracle. The CPU sampler uses the same half-float source
+values and clamp-to-edge filtering as the WebGL/JHV texture.
 
 The Metal run also covers Orthographic and both warp modes against the CPU
-model. The routine SwiftShader run covers the primary HPC and cylindrical
-paths. Use the explicit `electron_swiftshader_all_modes` diagnostic when
-investigating the known larger SwiftShader warp errors; it is not hidden behind
-a relaxed routine threshold.
+model. The routine SwiftShader run covers the cylindrical paths. A combined HPC
+projection check compares Metal and SwiftShader independently with Astropy and
+then directly with each other. Use the explicit
+`electron_swiftshader_all_modes` diagnostic when investigating the known larger
+SwiftShader warp errors. The all-mode SwiftShader warp diagnostics remain
+available through `--only`, but are not part of the gating `--extended` suite
+and are not hidden behind relaxed thresholds.
 
 Run only those focused shader checks with:
 
@@ -348,10 +351,11 @@ python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --electron-only
 
 Successful suite runs write generated PNGs and Electron float buffers to
 temporary storage and delete them after evaluation. Failure artifacts are
-retained and their temporary path is printed. The routine core uses 512 by 512
-Electron viewports and native-resolution CPU surface-map grids; use
-`--extended` for the complete historical catalog at its documented larger
-sizes, or `--only <name> [...]` for selected diagnostics.
+retained and their temporary path is printed. Expensive CPU/Astropy rendering
+diagnostics are reduced to 512 by 512 in the routine core. Electron checks keep
+the resolution declared by each case, normally 128 by 128 for sampled-texture
+comparisons. Use `--extended` for the complete historical catalog at its
+documented larger sizes, or `--only <name> [...]` for selected diagnostics.
 
 Run the Python validator with:
 
@@ -1162,10 +1166,29 @@ shader-produced coordinate. It therefore tested texture filtering but could
 not reveal that the coordinate, or the source-image validity decision, differed
 from the independent reference. The current sampled-texture comparison instead
 uses Astropy-derived coordinates for `HPC`, and the corresponding independent
-CPU mapping for JHV-specific geometry. Both-valid, shader-only, reference-only,
-and both-discarded viewport pixels contribute to `rendered_sample_*`. This is a
-source-boundary diagnostic; the separate planar-mask checks cover the display
-mask predicates but do not change the interpretation of these results.
+CPU mapping for JHV-specific geometry. `frame_sample_*` includes both-valid,
+shader-only, reference-only, and both-discarded pixels. `joint_sample_*`
+excludes visibility mismatches so that sample accuracy and visibility are
+reported independently. This is a source-boundary diagnostic; the separate
+planar-mask checks cover the display mask predicates but do not change the
+interpretation of these results.
+
+The routine 128 by 128 direct-backend check currently reports:
+
+| Case | Mask differences | Metal/reference px | SwiftShader/reference px | Metal/SwiftShader px | Joint sample max | Frame sample max |
+|---|---:|---:|---:|---:|---:|---:|
+| PUNCH `ARC` | 0 | `9.230371e-04` | `2.447729e-01` | `2.446795e-01` | `2.840757e-04` | `2.840757e-04` |
+| HI1 `AZP` | 1 | `2.362557e-04` | `1.284197e-01` | `1.284790e-01` | `3.268719e-04` | `7.719727e-01` |
+| HI2 `AZP` | 0 | `2.075942e-04` | `5.126388e-02` | `5.126953e-02` | `2.683401e-04` | `2.683401e-04` |
+| WISPR 1211 `ZPN` | 1 | `2.437399e-04` | `1.304122e-01` | `1.304175e-01` | `3.395677e-04` | `4.458008e-01` |
+| WISPR 2222 `ZPN` | 0 | `2.881453e-04` | `8.154246e-02` | `8.146718e-02` | `3.011227e-04` | `3.011227e-04` |
+
+The two large frame maxima are each caused by one reference-only source-edge
+pixel. Over jointly visible pixels, all five rendered-value differences remain
+below `3.4e-4`. The source-coordinate differences remain much larger on
+SwiftShader, up to about `0.245` source-image pixels; the smoother synthetic
+source does not turn that entire coordinate error into the same-sized value
+error.
 
 At `512x512`, Metal/ANGLE had no `HPC` validity-mask differences in the five
 `ARC`/`AZP`/`ZPN` projection cases and remained below the `1e-3` rendered-value
@@ -1179,17 +1202,17 @@ threshold. SwiftShader had sparse edge-mask differences in every case:
 | WISPR 1211 `ZPN` | 0 | 11 |
 | WISPR 2222 `ZPN` | 0 | 2 |
 
-Those dropped or extra pixels are real output differences: the synthetic-source
-maximum errors were between about `0.50` and `0.99`, so all five SwiftShader
-`HPC` cases correctly fail the `1e-3` rendered-value threshold. Away from the
-mask boundary, the SwiftShader texture-interpolation maximum remained about
-`6e-8` after matching the CPU oracle to the uploaded `R16F` values. The
-distinction matters: the large failure is caused by sparse
-visibility decisions, not by texture filtering, and it was invisible to the
-old circular sample comparison.
+Those dropped or extra pixels are real full-frame output differences: the
+synthetic-source maxima were between about `0.50` and `0.99`. They are now
+reported as visibility mismatches and `frame_sample_max_error`, rather than also
+being misclassified as jointly valid sample errors. Without
+`--report-validity-mismatches`, a visibility difference fails the test. With
+that diagnostic option, jointly valid sample accuracy remains the gate. Away
+from the mask boundary, the SwiftShader texture-interpolation maximum remained
+about `6e-8` after matching the CPU oracle to the uploaded `R16F` values.
 
-A direct Metal/ANGLE-to-SwiftShader comparison of those `512x512` frames gives
-the same localization:
+A direct Metal/ANGLE-to-SwiftShader comparison is now part of the routine 128
+by 128 suite. The earlier 512 by 512 diagnostic gave the same localization:
 
 | Case | Different mask pixels | Jointly visible sample max |
 |---|---:|---:|
