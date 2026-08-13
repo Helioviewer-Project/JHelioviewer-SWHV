@@ -168,6 +168,12 @@ def main() -> int:
                 if mismatch is not None:
                     case_errors.append(mismatch)
 
+            render_rect = validator.wcsRect(py_meta)
+            for index, (java_value, py_value) in enumerate(zip(java_meta["render_rect"], render_rect, strict=True)):
+                mismatch = compare_scalars(f"render_rect[{index}]", float(java_value), float(py_value), 1e-12, 1e-12)
+                if mismatch is not None:
+                    case_errors.append(mismatch)
+
             case_label = f"{file_path.name}" + (f" [hdu={hdu}]" if hdu is not None else "")
             if case_errors:
                 failures.append(case_label)

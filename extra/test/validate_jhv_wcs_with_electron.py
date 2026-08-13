@@ -19,6 +19,7 @@ from validate_jhv_wcs_against_astropy import (
     LATI_SURFACE_BOUNDS_DEG,
     clipHpcGeometry,
     displayLatitudinalWorld,
+    fits_pixel_to_texture_pixel,
     hpc_bounds_degrees,
     image_radial_bound,
     is_surface_map_projection,
@@ -325,7 +326,7 @@ def evaluate_hpc_shader_to_astropy(
             row_world_deg[ix, 1] = bounds_deg[2] + sy * (bounds_deg[3] - bounds_deg[2])
 
         astro_px_raw = pixel_wcs.wcs_world2pix(row_world_deg, 1)
-        astro_px = np.column_stack((astro_px_raw[:, 0] - 0.5, astro_px_raw[:, 1] - 0.5))
+        astro_px = fits_pixel_to_texture_pixel(astro_px_raw, meta)
 
         for ix in range(render_size):
             sx = (ix + 0.5) / render_size
@@ -711,7 +712,7 @@ def evaluate_shader_to_cpu(
                     astro_px = pixel_wcs.wcs_world2pix([expected_world_deg], 1)[0]
                     if np.all(np.isfinite(astro_px)):
                         shader_px = texcoord_to_pixel_center(shader_texcoord, meta.pixel_width, meta.pixel_height)
-                        astro_pixel_center = (float(astro_px[0] - 0.5), float(astro_px[1] - 0.5))
+                        astro_pixel_center = fits_pixel_to_texture_pixel(astro_px, meta)
                         astropy_err = pixel_center_error_px(shader_px, astro_pixel_center, meta)
                         max_shader_astropy_px_err = max(max_shader_astropy_px_err, float(astropy_err))
                         sum_shader_astropy_px_err2 += float(astropy_err * astropy_err)
@@ -1328,7 +1329,7 @@ def evaluate_surface_map_shader_to_cpu(
                     astro_px = pixel_wcs.wcs_world2pix([world_deg], 1)[0]
                     if np.all(np.isfinite(astro_px)):
                         shader_px = texcoord_to_pixel_center(shader_texcoord, meta.pixel_width, meta.pixel_height)
-                        astro_pixel_center = (float(astro_px[0] - 0.5), float(astro_px[1] - 0.5))
+                        astro_pixel_center = fits_pixel_to_texture_pixel(astro_px, meta)
                         astropy_err = pixel_center_error_px(shader_px, astro_pixel_center, meta)
                         max_shader_astropy_px_err = max(max_shader_astropy_px_err, float(astropy_err))
                         sum_shader_astropy_px_err2 += float(astropy_err * astropy_err)

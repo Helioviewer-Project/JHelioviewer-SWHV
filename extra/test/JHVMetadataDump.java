@@ -116,6 +116,7 @@ public final class JHVMetadataDump {
                 ? meta.unitPerPixelY
                 : meta.unitPerPixelY / meta.unitPerArcsec;
         Region hpcBounds = ImageBounds.hpc(meta);
+        Region renderRegion = meta.roiToRegion(0, 0, pixelWidth, pixelHeight, 1, 1);
         Vec2 sunShift = meta.getSunShift();
 
         return new JSONObject()
@@ -132,6 +133,11 @@ public final class JHVMetadataDump {
                 .put("crval_internal_x", meta.crval.x)
                 .put("crval_internal_y", meta.crval.y)
                 .put("crota_rad", crotaRad(meta))
+                .put("render_rect", new JSONArray(new double[]{
+                        renderRegion.llx,
+                        renderRegion.lly,
+                        1 / renderRegion.width,
+                        1 / renderRegion.height}))
                 .put("observer_distance", meta.viewpoint.distance)
                 .put("hpc_min_x", hpcBounds.llx)
                 .put("hpc_max_x", hpcBounds.urx)

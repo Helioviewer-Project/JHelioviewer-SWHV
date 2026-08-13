@@ -87,6 +87,10 @@ RUNS: tuple[ValidationRun, ...] = (
         (str(DATA / "psp_L3_wispr_20231227T150704_V1_2222.fits"), "--inverse-zpn"),
     ),
     ValidationRun(
+        "all_pixels_zpn_wispr_1211",
+        (str(DATA / "psp_L3_wispr_20231227T150508_V1_1211.fits"), "--all-pixels"),
+    ),
+    ValidationRun(
         "hpc_render_compare",
         (str(DATA / "20241224_194245_d4c2A.fts"), "--hpc-render-compare", "--render-size", "2048"),
     ),
@@ -348,6 +352,7 @@ CORE_RUN_NAMES = {
     "hpc_render_compare_arc_punch",
     "hpc_render_compare_hi1",
     "hpc_render_compare_wispr_2222",
+    "all_pixels_zpn_wispr_1211",
     "surface_map_render_compare_car_sunerf",
     "surface_map_render_compare_cea",
 }
