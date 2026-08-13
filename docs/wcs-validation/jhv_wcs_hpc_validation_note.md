@@ -277,6 +277,24 @@ Not compared against Astropy:
 
 ## Running the validation tools
 
+Validation follows the rendering paths that matter in JHV:
+
+1. `HPC` rendering is the primary WCS test. Astropy validates the FITS WCS
+   portion, while JHV's bounds, pixel centres, viewport mapping, and source-image
+   discard rules define the rendered population.
+2. Latitudinal `CAR`/`CEA` rendering is the primary cylindrical-WCS test.
+3. Orthographic and warp geometry are JHV-specific and are compared with the
+   corresponding CPU model; Astropy is used only for a downstream FITS WCS
+   operation where applicable.
+4. Metal/ANGLE and SwiftShader are each compared with the appropriate reference.
+   Their direct difference is diagnostic and does not replace correctness.
+
+Raw coordinate differences outside JHV's rendered source-image bounds are not
+errors. Conversely, sparse coordinate/discard differences at an image edge are
+reported separately. The sampled-texture checks determine their actual output
+effect by comparing the rendered value, including transparent-black discarded
+pixels, with an independently mapped reference value.
+
 The main Python validator is:
 
 - `extra/test/validate_jhv_wcs_against_astropy.py`
@@ -289,17 +307,45 @@ The suite includes the Java/Python metadata-comparison check:
 
 - `extra/test/compare_java_metadata_to_validator.py`
 
-Run the CPU, GLSL-syntax, and Java-metadata suite with:
+Run the prioritized CPU, GLSL-syntax, and Java-metadata suite with:
 
 ```text
 python3 extra/test/run_jhv_wcs_hpc_validation_suite.py
 ```
 
-Run only the Electron/ANGLE cases with:
+Add the focused Metal/ANGLE and SwiftShader shader checks with:
+
+```text
+python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --include-electron
+```
+
+These focused checks render a synthetic `R16F` texture rather than stopping at
+raw coordinates. `rendered_sample_*` compares the GPU output over the complete
+viewport with a value sampled at the independent CPU/Astropy coordinate, or
+transparent black when that reference coordinate is outside the rendered
+source bounds. `texture_interpolation_*` separately compares GPU and CPU
+filtering at the GPU coordinate; it is a filtering diagnostic, not a rendering
+correctness oracle. The CPU sampler uses the same half-float source values and
+clamp-to-edge filtering as the WebGL/JHV texture.
+
+The Metal run also covers Orthographic and both warp modes against the CPU
+model. The routine SwiftShader run covers the primary HPC and cylindrical
+paths. Use the explicit `electron_swiftshader_all_modes` diagnostic when
+investigating the known larger SwiftShader warp errors; it is not hidden behind
+a relaxed routine threshold.
+
+Run only those focused shader checks with:
 
 ```text
 python3 extra/test/run_jhv_wcs_hpc_validation_suite.py --electron-only
 ```
+
+Successful suite runs write generated PNGs and Electron float buffers to
+temporary storage and delete them after evaluation. Failure artifacts are
+retained and their temporary path is printed. The routine core uses 512 by 512
+Electron viewports and native-resolution CPU surface-map grids; use
+`--extended` for the complete historical catalog at its documented larger
+sizes, or `--only <name> [...]` for selected diagnostics.
 
 Run the Python validator with:
 
@@ -1093,6 +1139,42 @@ validity mask for a small number of pixels; Metal/ANGLE had no such mismatch.
 
 The Metal result validates the production GLSL coordinate path to about
 `0.002` source-image pixels against the Python/Astropy reference.
+
+### Rendered synthetic-source results
+
+The earlier `sample_max_error` diagnostic sampled the CPU texture at the
+shader-produced coordinate. It therefore tested texture filtering but could
+not reveal that the coordinate, or the decision to discard a pixel, differed
+from the independent reference. The current sampled-texture comparison instead
+uses Astropy-derived coordinates for `HPC`, and the corresponding independent
+CPU mapping for JHV-specific geometry. Both-valid, shader-only, reference-only,
+and both-discarded viewport pixels contribute to `rendered_sample_*`.
+
+At `512x512`, Metal/ANGLE had no `HPC` validity-mask differences in the five
+`ARC`/`AZP`/`ZPN` projection cases and remained below the `1e-3` rendered-value
+threshold. SwiftShader had sparse edge-mask differences in every case:
+
+| Case | Shader-only | Reference-only |
+|---|---:|---:|
+| PUNCH `ARC` | 0 | 12 |
+| HI1 `AZP` | 0 | 10 |
+| HI2 `AZP` | 1 | 2 |
+| WISPR 1211 `ZPN` | 0 | 11 |
+| WISPR 2222 `ZPN` | 0 | 2 |
+
+Those dropped or extra pixels are real output differences: the synthetic-source
+maximum errors were between about `0.50` and `0.99`, so all five SwiftShader
+`HPC` cases correctly fail the `1e-3` rendered-value threshold. Away from the
+mask boundary, the SwiftShader texture-interpolation maximum remained about
+`1.6e-4`. The distinction matters: the large failure is caused by sparse
+visibility decisions, not by texture filtering, and it was invisible to the
+old circular sample comparison.
+
+At `512x512`, SwiftShader's four surface-map cases had matching validity masks
+and rendered-sample maxima below `2.5e-5`. Their larger raw coordinate
+differences therefore did not translate into a failure for this smooth
+synthetic source at that viewport and sampling density. The corresponding
+Metal/ANGLE checks also stayed below the `1e-3` rendered-value threshold.
 
 # Appendix A: Theoretical Orthographic vs HPC discrepancy
 
