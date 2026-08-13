@@ -31,7 +31,7 @@ vec2 sampleLatiZenithalTexcoord(const vec2 mapPos, const WCS wcs, const vec3 gri
     float latitude = grid.y + (mapPos.y - 0.5) * PI;
 
     if (wcs.deltaT != 0.)
-        longitude -= differentialRotation(wcs.deltaT, latitude);
+        longitude -= differentialRotation(wcs.deltaT, sin(latitude));
 
     clamp_value(latitude, -HALFPI, HALFPI);
 

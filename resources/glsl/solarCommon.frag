@@ -227,18 +227,20 @@ vec2 rotate_plane_inverse(const vec4 quat, const vec2 vec) {
 }
 
 // Differential solar rotation.
-float differentialRotation(const float dt, const float theta) {
-    float sinLat2 = sin(theta);
-    sinLat2 *= sinLat2;
+float differentialRotation(const float dt, const float sinLatitude) {
+    float sinLat2 = sinLatitude * sinLatitude;
     // Snodgrass, Table 1 Magnetic - http://articles.adsabs.harvard.edu/pdf/1990ApJ...351..309S
     return dt * (0.01367 - 0.339 * sinLat2 - 0.485 * sinLat2 * sinLat2); // 2.879 urad/s - 14.1844 deg/86400s (not fully right: 1st SI, 2nd TDB)
 }
 
 vec3 differential(const float dt, const vec3 v) {
-    float phi = atan(v.x, v.z);
-    float theta = asin(v.y);
-    phi -= differentialRotation(dt, theta); // difference from rigid rotation
-    return vec3(cos(theta) * sin(phi), v.y, cos(theta) * cos(phi));
+    float delta = differentialRotation(dt, v.y);
+    float sinDelta = sin(delta);
+    float cosDelta = cos(delta);
+    return vec3(
+        v.x * cosDelta - v.z * sinDelta,
+        v.y,
+        v.z * cosDelta + v.x * sinDelta);
 }
 
 // Observer-centred helioprojective geometry.
