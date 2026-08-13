@@ -32,16 +32,10 @@ class CommonMetaData implements MetaData {
     protected float innerRadius = 0;
     protected float outerRadius = Float.MAX_VALUE;
 
-    protected Vec2 crval = new Vec2(0, 0);
-    protected Mat2 imageToPlane = Mat2.IDENTITY;
-
     protected float sector0 = 0;
     protected float sector1 = 0;
 
-    protected final float[] pv2 = new float[6];
-    protected WcsHeader.Projection wcsProjection = WcsHeader.Projection.TAN;
-    protected float wcsPlaneUnitsPerRad = (float) Sun.MeanEarthDistance;
-    protected WcsHeader wcsHeader;
+    protected WcsHeader wcsHeader = new WcsHeader(WcsHeader.Projection.TAN, new float[6], (float) Sun.MeanEarthDistance, Vec2.ZERO, Mat2.IDENTITY);
     // Serves only for LASCO cutOff edges
     protected float cutOffValue = -1;
     protected float cutOffX = 0;
