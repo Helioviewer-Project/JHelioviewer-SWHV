@@ -21,6 +21,7 @@ from validate_jhv_wcs_against_astropy import (
     displayLatitudinalWorld,
     fits_pixel_to_texture_pixel,
     hpc_bounds_degrees,
+    helioprojectiveToHpcXY,
     image_radial_bound,
     is_surface_map_projection,
     load_validation_context,
@@ -31,6 +32,7 @@ from validate_jhv_wcs_against_astropy import (
     renderOrthographicTexcoords,
     sampleHpcTexcoord,
     sample_texture_linear,
+    screenToHelioprojective,
     texcoord_to_pixel_center,
     worldToHelioprojective,
     wcsRect,
@@ -89,18 +91,26 @@ TAN_SCREEN_CASES = (
 def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
     env = os.environ.copy()
     env["JHV_ELECTRON_GL_BACKEND"] = backend
-    with ELECTRON_LAUNCH_LOCK.open("a+") as launch_lock, TemporaryDirectory(prefix="jhv-electron-profile-") as profile_dir:
+    attempt_count = 0
+    with ELECTRON_LAUNCH_LOCK.open("a+") as launch_lock:
         # Concurrent Electron application registration is unreliable on macOS
         # and has repeatedly aborted in _RegisterApplication. Serialize starts
         # across validator processes and isolate Chromium's per-run state.
         fcntl.flock(launch_lock, fcntl.LOCK_EX)
-        completed = subprocess.run(
-            [str(electron), f"--user-data-dir={profile_dir}", str(RUNNER_DIR), str(job_path)],
-            cwd=REPO_ROOT,
-            env=env,
-            capture_output=True,
-            text=True,
-        )
+        for _ in range(2):
+            attempt_count += 1
+            with TemporaryDirectory(prefix="jhv-electron-profile-") as profile_dir:
+                completed = subprocess.run(
+                    [str(electron), f"--user-data-dir={profile_dir}", str(RUNNER_DIR), str(job_path)],
+                    cwd=REPO_ROOT,
+                    env=env,
+                    capture_output=True,
+                    text=True,
+                )
+            # Retry only an abort before the runner produced any output. Shader,
+            # WebGL, and job failures must remain visible on the first attempt.
+            if completed.returncode != -6 or completed.stdout or completed.stderr:
+                break
 
     result = None
     for line in completed.stdout.splitlines():
@@ -117,6 +127,7 @@ def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
     if completed.returncode != 0 or result is None:
         raise RuntimeError(
             "Electron WebGL runner failed\n"
+            f"attempts={attempt_count}\n"
             f"returncode={completed.returncode}\n"
             f"stdout={completed.stdout}\n"
             f"stderr={completed.stderr}"
@@ -136,6 +147,19 @@ def run_electron_jobs(electron: Path, jobs: list[dict], backend: str) -> list[di
         job_path.write_text(json.dumps({"jobs": jobs}))
         result = run_electron(electron, job_path, backend)
     return result["results"]
+
+
+def wcs_job_fields(meta) -> dict:
+    return {
+        "rect": list(wcsRect(meta)),
+        "planeToImage": list(meta.plane_to_image),
+        "crval": [meta.crval_internal_x, meta.crval_internal_y],
+        "zpnUpperEta": zpn_primary_branch_upper_eta(meta) if meta.projection == "ZPN" else 0.0,
+        "projectionCode": PROJECTION_CODES[meta.projection],
+        "planeUnitsPerRadian": meta.plane_units_per_rad,
+        "observerDistance": meta.observer_distance,
+        "pv2": list(meta.pv2),
+    }
 
 
 def common_job(
@@ -164,14 +188,7 @@ def common_job(
         "outputPath": str(output_path),
         "boundsDeg": list(bounds),
         "warpLambda": 1.0,
-        "rect": list(wcsRect(meta)),
-        "planeToImage": list(meta.plane_to_image),
-        "crval": [meta.crval_internal_x, meta.crval_internal_y],
-        "zpnUpperEta": zpn_primary_branch_upper_eta(meta) if meta.projection == "ZPN" else 0.0,
-        "projectionCode": PROJECTION_CODES[meta.projection],
-        "planeUnitsPerRadian": meta.plane_units_per_rad,
-        "observerDistance": meta.observer_distance,
-        "pv2": list(meta.pv2),
+        **wcs_job_fields(meta),
         "sampleTexture": sample_texture,
         "diffSelfcheck": diff_selfcheck,
         "colorSmoke": color_smoke,
@@ -448,12 +465,14 @@ def cpu_texcoord_for_mode(
     image_data: np.ndarray,
     outer_radius: float,
     warp_lambda: float,
+    delta_t: float = 0.0,
 ) -> tuple[float, float]:
     if mode == "ortho":
         screen_xy = (2.0 * sx - 1.0, 2.0 * sy - 1.0)
         if screen_xy[0] * screen_xy[0] + screen_xy[1] * screen_xy[1] > 1.0:
             return (math.nan, math.nan)
-        texcoord, _, _, _ = renderOrthographicTexcoords(screen_xy, meta, image_data, simple_tan=True)
+        texcoord, _, _, _ = renderOrthographicTexcoords(
+            screen_xy, meta, image_data, simple_tan=True, delta_t=delta_t)
         return texcoord
     if mode == "lati_zenithal":
         texcoord, _ = renderLatitudinalTexcoords(
@@ -462,6 +481,7 @@ def cpu_texcoord_for_mode(
             meta,
             image_data,
             grid=(0.0, 0.0, 0.0),
+            delta_t=delta_t,
         )
         return texcoord
     if mode in WARP_MODES:
@@ -469,7 +489,7 @@ def cpu_texcoord_for_mode(
         if not is_finite_texcoord(hpc_xy) or not clipHpcGeometry(hpc_xy):
             return (math.nan, math.nan)
         helioprojective = worldToHelioprojective((hpc_xy[0], hpc_xy[1], 0.0), meta.observer_distance)
-        texcoord, _ = sampleHpcTexcoord(helioprojective, hpc_xy, meta, image_data)
+        texcoord, _ = sampleHpcTexcoord(helioprojective, hpc_xy, meta, image_data, delta_t)
         return texcoord
     raise ValueError(f"Unsupported Electron WebGL mode: {mode}")
 
@@ -617,6 +637,205 @@ def compare_shader_to_cpu(
     )
 
 
+def compare_differential_rotation(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    max_sample_error: float,
+    backend: str,
+) -> int:
+    fits_file = SCRIPT_DIR / "data" / "sample.171.fits"
+    image_data, meta, _, _ = load_validation_context(fits_file, 1)
+    # ImageLayer converts an elapsed millisecond interval to the shader's time
+    # unit with a factor of 1e-9.
+    delta_t = 12.0 * 60.0 * 60.0 * 1000.0 * 1e-9
+    jobs = []
+    for mode in ("ortho", "lati_zenithal"):
+        job = make_mode_job(
+            mode, fits_file, render_size, output_dir, True, meta, backend,
+            name=f"{mode}_differential")
+        job["deltaT"] = delta_t
+        jobs.append(job)
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, result in zip(jobs, results, strict=True):
+        pixels = read_job_pixels(job)
+        mode_error = (
+            1.0
+            if backend == "swiftshader" and job["mode"] == "lati_zenithal"
+            else max_error_px
+        )
+        code = evaluate_shader_to_cpu(
+            job["mode"], fits_file, render_size, mode_error, max_sample_error,
+            True, image_data, meta, None, None, job, result, pixels)
+        failed = failed or code != 0
+    return 1 if failed else 0
+
+
+def compare_distinct_wcs_slots(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    max_error_px: float,
+    backend: str,
+) -> int:
+    primary_file = SCRIPT_DIR / "data" / "sample.171.fits"
+    secondary_file = SCRIPT_DIR / "data" / "solo_L2_eui-fsi174-image_20251002T150055171_V00.fits"
+    primary_image, primary_meta, _, _ = load_validation_context(primary_file, 1)
+    secondary_image, secondary_meta, _, _ = load_validation_context(secondary_file, None)
+    bounds = hpc_bounds_degrees(primary_meta, 1.0)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    job = common_job(
+        "hpc", primary_file, render_size, output_dir, primary_meta, bounds,
+        False, backend, "distinct_wcs_slots", diff_selfcheck=True)
+    job["secondary"] = wcs_job_fields(secondary_meta)
+    result, pixels = run_shader_job(electron, backend, job)
+
+    primary_max_error = 0.0
+    secondary_max_error = 0.0
+    compared = 0
+    shader_only = 0
+    cpu_only = 0
+    for iy in range(render_size):
+        sy = (iy + 0.5) / render_size
+        for ix in range(render_size):
+            sx = (ix + 0.5) / render_size
+            primary_cpu, secondary_cpu, _, _, _, _ = renderHpcTexcoords(
+                (sx, sy), bounds, primary_meta, primary_image, secondary_meta, secondary_image)
+            cpu_valid = is_finite_texcoord(primary_cpu) and is_finite_texcoord(secondary_cpu)
+            shader_valid = bool(np.all(np.isfinite(pixels[iy, ix])) and np.any(pixels[iy, ix] != 0.0))
+            if shader_valid and not cpu_valid:
+                shader_only += 1
+                continue
+            if cpu_valid and not shader_valid:
+                cpu_only += 1
+                continue
+            if not cpu_valid:
+                continue
+
+            primary_shader = (float(pixels[iy, ix, 0]), float(pixels[iy, ix, 1]))
+            secondary_shader = (float(pixels[iy, ix, 2]), float(pixels[iy, ix, 3]))
+            primary_max_error = max(
+                primary_max_error,
+                pixel_error(primary_shader, primary_cpu, primary_meta.pixel_width, primary_meta.pixel_height),
+            )
+            secondary_max_error = max(
+                secondary_max_error,
+                pixel_error(secondary_shader, secondary_cpu, secondary_meta.pixel_width, secondary_meta.pixel_height),
+            )
+            compared += 1
+
+    print(f"mode=electron_distinct_wcs_slots size={render_size}")
+    print(f"renderer={result['renderer']}")
+    print(f"compared_samples={compared}")
+    print(f"shader_only_samples={shader_only}")
+    print(f"cpu_only_samples={cpu_only}")
+    print(f"primary_max_error_px={primary_max_error:.6e}")
+    print(f"secondary_max_error_px={secondary_max_error:.6e}")
+    print(f"electron_rgba32f={job['outputPath']}")
+    if compared == 0 or shader_only or cpu_only:
+        print("FAILED: distinct WCS slots have no common samples or different validity")
+        return 1
+    if max(primary_max_error, secondary_max_error) > max_error_px:
+        print(f"FAILED: distinct WCS slot error exceeds {max_error_px:.6e}")
+        return 1
+    return 0
+
+
+def passes_planar_masks(point: tuple[float, float], job: dict) -> bool:
+    theta = math.atan2(point[1], point[0])
+    sectors = (job.get("userSector", (0.0, 0.0)), job.get("metadataSector", (0.0, 0.0)))
+    for center, half_width in sectors:
+        if half_width > 0.0:
+            delta = abs(theta - center)
+            if min(delta, 2.0 * math.pi - delta) < half_width:
+                return False
+
+    radius2 = point[0] * point[0] + point[1] * point[1]
+    inner_radius, outer_radius = job.get("radii", (0.0, 1e30))
+    if radius2 < inner_radius * inner_radius or radius2 > outer_radius * outer_radius:
+        return False
+
+    cut_off_x, cut_off_y, cut_off_value = job.get("cutOff", (0.0, 0.0, -1.0))
+    if cut_off_value >= 0.0:
+        flat_distance = abs(point[0] * cut_off_x + point[1] * cut_off_y)
+        alternate_distance = abs(-point[0] * cut_off_y + point[1] * cut_off_x)
+        if flat_distance > cut_off_value or alternate_distance > cut_off_value:
+            return False
+    return True
+
+
+def compare_planar_masks(
+    electron: Path,
+    output_dir: Path,
+    render_size: int,
+    backend: str,
+) -> int:
+    fits_file = SCRIPT_DIR / "data" / "sample.171.fits"
+    image_data, meta, _, _ = load_validation_context(fits_file, 1)
+    cases = (
+        ("hpc_metadata_sector", "hpc", {"metadataSector": [0.4, 0.37]}),
+        ("hpc_user_sector", "hpc", {"userSector": [0.4, 0.29]}),
+        ("ortho_radii", "ortho", {"radii": [0.23, 0.82]}),
+        ("radial_warp_cutoff", "radial_warp", {"cutOff": [0.8, 0.6, 0.55]}),
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    jobs = []
+    for name, mode, mask in cases:
+        job = make_mode_job(mode, fits_file, render_size, output_dir, False, meta, backend, name=name)
+        job.update(mask)
+        jobs.append(job)
+
+    results = run_electron_jobs(electron, jobs, backend)
+    failed = False
+    for job, result in zip(jobs, results, strict=True):
+        pixels = read_job_pixels(job)
+        mismatches = 0
+        expected_kept = 0
+        expected_masked = 0
+        for iy in range(render_size):
+            sy = (iy + 0.5) / render_size
+            for ix in range(render_size):
+                sx = (ix + 0.5) / render_size
+                if job["mode"] == "hpc":
+                    helioprojective = screenToHelioprojective((sx, sy), tuple(job["boundsDeg"]))
+                    point = helioprojectiveToHpcXY(helioprojective, meta.observer_distance)
+                    texcoord = renderHpcTexcoords(
+                        (sx, sy), tuple(job["boundsDeg"]), meta, image_data)[0]
+                else:
+                    point = (
+                        (2.0 * sx - 1.0, 2.0 * sy - 1.0)
+                        if job["mode"] == "ortho"
+                        else warp_hpc_xy(
+                            job["mode"], sx, sy, job["boundsDeg"][3],
+                            job.get("warpLambda", DEFAULT_WARP_LAMBDA),
+                        )
+                    )
+                    texcoord = cpu_texcoord_for_mode(
+                        job["mode"], sx, sy, meta, image_data, job["boundsDeg"][3],
+                        job.get("warpLambda", DEFAULT_WARP_LAMBDA))
+                source_valid = is_finite_texcoord(texcoord)
+                expected = source_valid and passes_planar_masks(point, job)
+                actual = bool(pixels[iy, ix, 3] > 0.5)
+                expected_kept += int(expected)
+                expected_masked += int(source_valid and not expected)
+                mismatches += int(expected != actual)
+
+        print(f"mode=electron_{job['name']} size={render_size}")
+        print(f"renderer={result['renderer']}")
+        print(f"expected_kept_samples={expected_kept}")
+        print(f"expected_masked_samples={expected_masked}")
+        print(f"validity_mismatches={mismatches}")
+        print(f"electron_rgba32f={job['outputPath']}")
+        if expected_kept == 0 or expected_masked == 0 or mismatches:
+            print("FAILED: planar mask does not match the independent CPU predicate")
+            failed = True
+    return 1 if failed else 0
+
+
 def evaluate_shader_to_cpu(
     mode: str,
     fits_file: Path,
@@ -663,6 +882,7 @@ def evaluate_shader_to_cpu(
                 image_data,
                 job["boundsDeg"][3],
                 job.get("warpLambda", DEFAULT_WARP_LAMBDA),
+                job.get("deltaT", 0.0),
             )
             cpu_valid = is_finite_texcoord(cpu_texcoord)
             if sample_texture and texture_data is not None:
@@ -1856,6 +2076,9 @@ def main() -> int:
     parser.add_argument("--surface-map-cases-color-smoke", action="store_true")
     parser.add_argument("--surface-map-cases-color-diff-smoke", action="store_true")
     parser.add_argument("--surface-map-cases-diff-selfcheck", action="store_true")
+    parser.add_argument("--differential-rotation", action="store_true")
+    parser.add_argument("--distinct-wcs-slots", action="store_true")
+    parser.add_argument("--planar-masks", action="store_true")
     parser.add_argument("--surface-map-diff-selfcheck-mode", choices=("normal", "same-slot", "assign"), default="normal")
     parser.add_argument("--hpc-diff-selfcheck", action="store_true")
     parser.add_argument("--all-modes-diff-selfcheck", action="store_true")
@@ -2018,6 +2241,33 @@ def main() -> int:
             args.max_sample_error,
             args.backend,
             args.surface_map_diff_selfcheck_mode,
+        )
+
+    if args.differential_rotation:
+        return compare_differential_rotation(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.max_sample_error,
+            args.backend,
+        )
+
+    if args.distinct_wcs_slots:
+        return compare_distinct_wcs_slots(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.max_error_px,
+            args.backend,
+        )
+
+    if args.planar_masks:
+        return compare_planar_masks(
+            args.electron,
+            args.output_dir,
+            args.render_size,
+            args.backend,
         )
 
     if args.fits_file is None:
