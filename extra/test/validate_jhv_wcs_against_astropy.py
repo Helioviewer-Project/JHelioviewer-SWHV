@@ -914,6 +914,11 @@ def build_projection_only_wcs(header) -> WCS:
 
 def build_original_astropy_wcs(header) -> WCS:
     """Build the reference from the FITS WCS, without reproducing JHV's reductions."""
+    if projection_suffix(header) == "CEA":
+        # JHV uses the dimensionless CEA coordinate sin(latitude) / lambda;
+        # FITS WCS and Astropy express the same intermediate coordinate in degrees.
+        header = header.copy()
+        header["CDELT2"] = math.degrees(header["CDELT2"])
     return WCS(header, naxis=2)
 
 
