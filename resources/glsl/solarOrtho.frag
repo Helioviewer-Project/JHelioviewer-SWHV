@@ -32,24 +32,6 @@ vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams
     return wcsPlaneToTexcoord(plane, wcs);
 }
 
-void clipOrthoGeometry(const vec3 samplePoint) {
-    clipSectors(samplePoint.xy);
-
-    float radial2 = dot(samplePoint.xy, samplePoint.xy);
-    float minRadius2 = display.radii.x * display.radii.x;
-    float maxRadius2 = display.radii.y * display.radii.y;
-    if (radial2 > maxRadius2 || radial2 < minRadius2)
-        discard;
-
-    if (display.cutOff.z >= 0.) {
-        float geometryFlatDist = abs(dot(samplePoint.xy, display.cutOff.xy));
-        vec2 cutOffAlt = vec2(-display.cutOff.y, display.cutOff.x);
-        float geometryFlatDistAlt = abs(dot(samplePoint.xy, cutOffAlt));
-        if (geometryFlatDist > display.cutOff.z || geometryFlatDistAlt > display.cutOff.z)
-            discard;
-    }
-}
-
 float intersectPlane(const vec4 quat, const vec2 viewPosition, const bool discardBackFacing) {
     vec3 altnormal = rotate_vector(quat, zAxis);
     if (discardBackFacing && altnormal.z <= 0.)
@@ -114,7 +96,7 @@ void main(void) {
     if (didFallback && display.calculateDepth != 0.) // intersecting Euhforia planes
         gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
 
-    clipOrthoGeometry(rotatedHitPoint);
+    clipPlanarMasks(rotatedHitPoint.xy);
     vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
 
     vec2 diffTexCoord = texCoord;
@@ -140,7 +122,7 @@ void main(void) {
                 discard;
         }
 
-        clipOrthoGeometry(diffRotatedHitPoint);
+        clipPlanarMasks(diffRotatedHitPoint.xy);
         diffTexCoord = sampleOrthoTexcoord(diffRotatedHitPoint, wcs[1], projection[1], pv1);
     }
     outColor = getColor(texCoord, diffTexCoord, enhancementFactor);
