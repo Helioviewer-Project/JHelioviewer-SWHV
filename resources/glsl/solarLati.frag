@@ -1,6 +1,6 @@
 vec3 latitudinalWorld(const vec2 mapPos) {
-    float longitude = radians(mix(screen.xStart, screen.xStop, mapPos.x)) - screen.latiOrigin.x;
-    float latitude = radians(mix(screen.yStart, screen.yStop, mapPos.y)) + screen.latiOrigin.y;
+    float longitude = radians(mix(screen.mapBounds.x, screen.mapBounds.y, mapPos.x)) - screen.latiOrigin.x;
+    float latitude = radians(mix(screen.mapBounds.z, screen.mapBounds.w, mapPos.y)) + screen.latiOrigin.y;
     if (latitude < -HALFPI || latitude > HALFPI)
         discard;
     float cosLatitude = cos(latitude);
@@ -10,19 +10,19 @@ vec3 latitudinalWorld(const vec2 mapPos) {
         cosLatitude * cos(longitude));
 }
 
-vec2 sampleLatiTexcoord(vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    if (isSurfaceMap(projection))
-        return sampleSurfaceMapTexcoord(world, wcs, projection, PV);
+vec2 sampleLatiTexcoord(vec3 world, const Image img, const float[6] PV) {
+    if (isSurfaceMap(img))
+        return sampleSurfaceMapTexcoord(world, img, PV);
 
-    if (wcs.deltaT != 0.)
-        world = differential(wcs.deltaT, world);
+    if (img.deltaT != 0.)
+        world = differential(img.deltaT, world);
 
-    vec3 sourceWorld = rotate_vector(projection.sourceViewQuat, world);
+    vec3 sourceWorld = rotate_vector(img.sourceViewQuat, world);
     if (sourceWorld.z < 0.)
         discard;
 
-    vec2 helioprojective = worldToHelioprojective(sourceWorld, projection.observerDistance);
-    return helioprojectiveToTexcoord(helioprojective, wcs, projection, PV);
+    vec2 helioprojective = worldToHelioprojective(sourceWorld, img.observerDistance);
+    return helioprojectiveToTexcoord(helioprojective, img, PV);
 }
 
 void main(void) {
@@ -33,7 +33,7 @@ void main(void) {
     bool diffMode = display.isDiff != NODIFFERENCE;
     vec3 world = latitudinalWorld(mapPos);
 
-    vec2 texCoord = sampleLatiTexcoord(world, wcs[0], projection[0], pv0);
-    vec2 diffTexCoord = diffMode ? sampleLatiTexcoord(world, wcs[1], projection[1], pv1) : texCoord;
+    vec2 texCoord = sampleLatiTexcoord(world, images[0], pv0);
+    vec2 diffTexCoord = diffMode ? sampleLatiTexcoord(world, images[1], pv1) : texCoord;
     outColor = getColor(texCoord, diffTexCoord, 1.0);
 }

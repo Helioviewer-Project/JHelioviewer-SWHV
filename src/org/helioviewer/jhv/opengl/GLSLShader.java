@@ -7,11 +7,10 @@ abstract class GLSLShader {
     private static final String COMMON_FRAGMENT = "/glsl/solarCommon.frag";
 
     protected static final class UBO {
-        static final int WCS = 0;
-        static final int PROJECTION = 1;
-        static final int SOLAR_SCREEN = 2;
-        static final int DISPLAY = 3;
-        static final int LINE_SCREEN = 4;
+        static final int IMAGE = 0;
+        static final int SOLAR_SCREEN = 1;
+        static final int DISPLAY = 2;
+        static final int LINE_SCREEN = 3;
 
         private UBO() {
         }
