@@ -147,6 +147,7 @@ public final class AngleRenderer {
             GLES.createCapabilities();
             glesInitialized = true;
             GL.initInfo();
+            Log.info("OpenGL context: " + GL.contextDescription());
             initRenderer();
         } catch (RuntimeException | Error e) {
             if (glesInitialized)
