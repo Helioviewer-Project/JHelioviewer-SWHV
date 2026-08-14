@@ -160,11 +160,6 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     return texture(lut, vec2(value, 0.5)) * display.color;
 }
 
-void clamp_texture(const vec2 texcoord) {
-    if (texcoord.x < 0. || texcoord.y < 0. || texcoord.x > 1. || texcoord.y > 1.)
-        discard;
-}
-
 void clamp_coord(const vec2 coord) {
     if (coord.x < display.slit.x || coord.y < 0. || coord.x > display.slit.y || coord.y > 1.)
         discard;
@@ -507,14 +502,14 @@ void clipPlanarMasks(const vec2 point) {
     }
 }
 
-vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 helioprojective, const vec2 hpcXY, const float dt, const float[6] PV, out float enhancementFactor) {
+vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 helioprojective, const vec2 hpcXY, const float[6] PV, out float enhancementFactor) {
     enhancementFactor = 1.;
     float observerDistance = projection.observerDistance;
 
     vec3 world;
     if (helioprojectiveToWorld(helioprojective, observerDistance, world)) {
-        if (dt != 0.) {
-            vec3 rotatedWorld = differential(dt, world);
+        if (wcs.deltaT != 0.) {
+            vec3 rotatedWorld = differential(wcs.deltaT, world);
             helioprojective = worldToHelioprojective(rotatedWorld, observerDistance);
         }
     } else {
