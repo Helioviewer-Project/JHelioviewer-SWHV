@@ -24,7 +24,7 @@ SUN_L1_FACTOR = 1.0 - (1.0 / SUN_EARTH_MASS_RATIO / 3.0) ** (1.0 / 3.0)
 ARCSEC_PER_RAD = 180.0 * 3600.0 / math.pi
 IDENTITY_QUAT = (0.0, 0.0, 0.0, 1.0)
 LATI_SURFACE_BOUNDS_DEG = (-180.0, 180.0, -90.0, 90.0)
-LATI_ZENITHAL_BOUNDS_DEG = (0.0, 360.0, -90.0, 90.0)
+LATI_ZENITHAL_BOUNDS_DEG = LATI_SURFACE_BOUNDS_DEG
 SURFACE_MAP_PROJECTIONS = {"CAR", "CEA"}
 PV2_PROJECTIONS = {"AZP", "ZPN", "CEA"}
 PIXEL_SAMPLED_FORWARD_PROJECTIONS = {"ZPN", "CAR", "CEA"}
@@ -1652,22 +1652,21 @@ def renderHpcTexcoordsFloat32(
 
 # solarLati.frag mirror.
 
-def displayLatitudinalWorld(
+def latitudinalWorld(
     scrpos: tuple[float, float],
     bounds_deg: tuple[float, float, float, float],
-    display_map_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
+    origin: tuple[float, float] = (0.0, 0.0),
 ) -> tuple[float, float, float]:
-    longitude = math.radians(bounds_deg[0] + scrpos[0] * (bounds_deg[1] - bounds_deg[0]))
-    latitude = math.radians(bounds_deg[2] + scrpos[1] * (bounds_deg[3] - bounds_deg[2]))
+    longitude = math.radians(bounds_deg[0] + scrpos[0] * (bounds_deg[1] - bounds_deg[0])) - origin[0]
+    latitude = math.radians(bounds_deg[2] + scrpos[1] * (bounds_deg[3] - bounds_deg[2])) + origin[1]
     if not clamp_value(latitude, -0.5 * math.pi, 0.5 * math.pi):
         return (math.nan, math.nan, math.nan)
     cos_latitude = math.cos(latitude)
-    display_surface = (
+    return (
         cos_latitude * math.sin(longitude),
         math.sin(latitude),
         cos_latitude * math.cos(longitude),
     )
-    return rotate_vector_inverse(display_map_quat, display_surface)
 
 
 def sampleLatiCarTexcoord(
@@ -1675,9 +1674,9 @@ def sampleLatiCarTexcoord(
     bounds_deg: tuple[float, float, float, float],
     meta: JHVMeta,
     image2d: np.ndarray,
-    display_map_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
+    lati_origin: tuple[float, float] = (0.0, 0.0),
 ) -> tuple[float, float]:
-    world = displayLatitudinalWorld(scrpos, bounds_deg, display_map_quat)
+    world = latitudinalWorld(scrpos, bounds_deg, lati_origin)
     plane = projectCarToWcsPlane(world, meta)
     return wcsPlaneToWrappedXTexcoord(plane, meta, image2d)
 
@@ -1687,9 +1686,9 @@ def sampleLatiCeaTexcoord(
     bounds_deg: tuple[float, float, float, float],
     meta: JHVMeta,
     image2d: np.ndarray,
-    display_map_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
+    lati_origin: tuple[float, float] = (0.0, 0.0),
 ) -> tuple[float, float]:
-    world = displayLatitudinalWorld(scrpos, bounds_deg, display_map_quat)
+    world = latitudinalWorld(scrpos, bounds_deg, lati_origin)
     plane = projectCeaToWcsPlane(world, meta)
     return wcsPlaneToWrappedXTexcoord(plane, meta, image2d)
 
@@ -1699,41 +1698,24 @@ def sampleLatiZenithalTexcoord(
     bounds_deg: tuple[float, float, float, float],
     meta: JHVMeta,
     image2d: np.ndarray,
-    grid: tuple[float, float, float],
+    lati_origin: tuple[float, float] = (0.0, 0.0),
+    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
 ) -> tuple[float, float]:
-    longitude = grid[0] + scrpos[0] * (2.0 * math.pi)
-    latitude = grid[1] + (scrpos[1] - 0.5) * math.pi
-    if latitude < -0.5 * math.pi or latitude > 0.5 * math.pi:
+    world = latitudinalWorld(scrpos, bounds_deg, lati_origin)
+    if not all(math.isfinite(value) for value in world):
         return (math.nan, math.nan)
 
     if delta_t != 0.0:
-        longitude -= differentialRotation(delta_t, math.sin(latitude))
+        world = differential(delta_t, world)
 
-    cos_latitude = math.cos(latitude)
-    spherical = (
-        cos_latitude * math.cos(longitude),
-        cos_latitude * math.sin(longitude),
-        math.sin(latitude),
-    )
-
-    sin_grid_latitude = -math.sin(grid[2])
-    cos_grid_latitude = math.cos(grid[2])
-    rotated_spherical = (
-        cos_grid_latitude * spherical[0] + sin_grid_latitude * spherical[2],
-        spherical[1],
-        -sin_grid_latitude * spherical[0] + cos_grid_latitude * spherical[2],
-    )
-    if rotated_spherical[0] < 0.0:
+    source_world = rotate_vector(source_view_quat, world)
+    if source_world[2] < 0.0:
         return (math.nan, math.nan)
 
-    centered = transform_mat2(
-        meta.plane_to_image,
-        (rotated_spherical[1] - meta.crval_internal_x, rotated_spherical[2] - meta.crval_internal_y),
-    )
-    rect = wcsRect(meta)
-    texcoord = (rect[2] * (centered[0] - rect[0]), rect[3] * (-centered[1] - rect[1]))
-    return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
+    helioprojective = worldToHelioprojective(source_world, meta.observer_distance)
+    plane = projectHelioprojectiveToWcsPlane(helioprojective, meta)
+    return wcsPlaneToTexcoord(plane, meta, image2d)
 
 
 def sampleLatiTexcoord(
@@ -1741,17 +1723,16 @@ def sampleLatiTexcoord(
     bounds_deg: tuple[float, float, float, float],
     meta: JHVMeta,
     image2d: np.ndarray,
-    display_map_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
-    grid: tuple[float, float, float] | None = None,
+    lati_origin: tuple[float, float] = (0.0, 0.0),
+    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
 ) -> tuple[float, float]:
     if meta.projection == "CAR":
-        return sampleLatiCarTexcoord(scrpos, bounds_deg, meta, image2d, display_map_quat)
+        return sampleLatiCarTexcoord(scrpos, bounds_deg, meta, image2d, lati_origin)
     if meta.projection == "CEA":
-        return sampleLatiCeaTexcoord(scrpos, bounds_deg, meta, image2d, display_map_quat)
-    if grid is not None:
-        return sampleLatiZenithalTexcoord(scrpos, bounds_deg, meta, image2d, grid, delta_t)
-    raise ValueError("Latitudinal render mode currently mirrors CAR/CEA surface maps or requires an explicit zenithal latiGrid")
+        return sampleLatiCeaTexcoord(scrpos, bounds_deg, meta, image2d, lati_origin)
+    return sampleLatiZenithalTexcoord(
+        scrpos, bounds_deg, meta, image2d, lati_origin, source_view_quat, delta_t)
 
 
 def renderLatitudinalTexcoords(
@@ -1761,10 +1742,10 @@ def renderLatitudinalTexcoords(
     image2d: np.ndarray,
     diff_meta: JHVMeta | None = None,
     diff_image2d: np.ndarray | None = None,
-    display_map_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
-    diff_display_map_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
-    grid: tuple[float, float, float] | None = None,
-    diff_grid: tuple[float, float, float] | None = None,
+    lati_origin: tuple[float, float] = (0.0, 0.0),
+    diff_lati_origin: tuple[float, float] = (0.0, 0.0),
+    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
+    diff_source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
     diff_delta_t: float = 0.0,
 ) -> tuple[tuple[float, float], tuple[float, float]]:
@@ -1773,7 +1754,8 @@ def renderLatitudinalTexcoords(
     clamped_scrpos = getScrPos(scrpos)
     if not math.isfinite(clamped_scrpos[0]) or not math.isfinite(clamped_scrpos[1]):
         return (math.nan, math.nan), (math.nan, math.nan)
-    texcoord = sampleLatiTexcoord(clamped_scrpos, bounds_deg, meta, image2d, display_map_quat, grid, delta_t)
+    texcoord = sampleLatiTexcoord(
+        clamped_scrpos, bounds_deg, meta, image2d, lati_origin, source_view_quat, delta_t)
     if diff_meta is None:
         return texcoord, texcoord
     diff_texcoord = sampleLatiTexcoord(
@@ -1781,8 +1763,8 @@ def renderLatitudinalTexcoords(
         bounds_deg,
         diff_meta,
         diff_image2d if diff_image2d is not None else image2d,
-        diff_display_map_quat,
-        diff_grid,
+        diff_lati_origin,
+        diff_source_view_quat,
         diff_delta_t,
     )
     return texcoord, diff_texcoord
@@ -1793,8 +1775,8 @@ def renderLatitudinalPixel(
     bounds_deg: tuple[float, float, float, float],
     meta: JHVMeta,
     image2d: np.ndarray,
-    display_map_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
-    grid: tuple[float, float, float] | None = None,
+    lati_origin: tuple[float, float] = (0.0, 0.0),
+    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
 ) -> tuple[float, float]:
     texcoord, _ = renderLatitudinalTexcoords(
@@ -1802,8 +1784,8 @@ def renderLatitudinalPixel(
         bounds_deg,
         meta,
         image2d,
-        display_map_quat=display_map_quat,
-        grid=grid,
+        lati_origin=lati_origin,
+        source_view_quat=source_view_quat,
         delta_t=delta_t,
     )
     return texcoord
@@ -2118,12 +2100,15 @@ def render_zenithal_latitudinal_image(
     size: int,
     meta: JHVMeta,
     image2d: np.ndarray,
-    grid: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    lati_origin: tuple[float, float] = (0.0, 0.0),
+    source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
 ) -> np.ndarray:
     return render_square_image(
         size,
-        lambda sx, sy: renderLatitudinalPixel((sx, sy), LATI_ZENITHAL_BOUNDS_DEG, meta, image2d, grid=grid, delta_t=delta_t),
+        lambda sx, sy: renderLatitudinalPixel(
+            (sx, sy), LATI_ZENITHAL_BOUNDS_DEG, meta, image2d,
+            lati_origin=lati_origin, source_view_quat=source_view_quat, delta_t=delta_t),
         lambda texcoord: sample_texture_linear(image2d, texcoord),
     )
 
@@ -2181,14 +2166,14 @@ def run_latitudinal_zenithal_render(fits_file: Path, output_dir: Path, render_si
     if is_surface_map_projection(meta):
         raise ValueError("Latitudinal zenithal render is for the legacy zenithal path, not CAR/CEA surface maps")
 
-    grid = (0.0, 0.0, 0.0)
-    jhv_img = render_zenithal_latitudinal_image(render_size, meta, image_data, grid=grid)
+    lati_origin = (0.0, 0.0)
+    jhv_img = render_zenithal_latitudinal_image(render_size, meta, image_data, lati_origin=lati_origin)
     jhv_path = output_dir / f"{fits_file.stem}_lati_zenithal_jhv.png"
     save_png(jhv_path, jhv_img)
 
     print(f"file={fits_file}")
     print(f"mode=latitudinal_zenithal_render size={render_size}")
-    print(f"default_lati_grid=({grid[0]:.12f}, {grid[1]:.12f}, {grid[2]:.12f})")
+    print(f"default_lati_origin=({lati_origin[0]:.12f}, {lati_origin[1]:.12f})")
     print(f"jhv_png={jhv_path}")
     return 0
 

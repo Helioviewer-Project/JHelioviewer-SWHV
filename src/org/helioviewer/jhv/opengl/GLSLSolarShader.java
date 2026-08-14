@@ -23,8 +23,6 @@ public class GLSLSolarShader extends GLSLShader {
 
     private int pv0Ref;
     private int pv1Ref;
-    private int latiGridRef;
-    private static final float[] latiGridBuf = new float[6];
 
     private GLSLSolarShader(String vertex, String fragment, boolean _hasCommon) {
         super(vertex, fragment);
@@ -72,7 +70,6 @@ public class GLSLSolarShader extends GLSLShader {
     protected void initUniforms(int id) {
         pv0Ref = GL.glGetUniformLocation(id, "pv0");
         pv1Ref = GL.glGetUniformLocation(id, "pv1");
-        latiGridRef = GL.glGetUniformLocation(id, "latiGrid");
 
         setupCommonBlocks(id);
 
@@ -116,29 +113,19 @@ public class GLSLSolarShader extends GLSLShader {
 
     public static void bindProjection(
             WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
-            Quat sourceView0, Quat displayMap0,
+            Quat sourceView0, float latiLongitude0, float latiLatitude0,
             WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
-            Quat sourceView1, Quat displayMap1) {
+            Quat sourceView1, float latiLongitude1, float latiLatitude1) {
         projectionBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
         sourceView0.setFloatBuffer(projectionBuf);
-        displayMap0.setFloatBuffer(projectionBuf);
+        projectionBuf.put(latiLongitude0).put(latiLatitude0).put(0).put(0);
 
         projectionBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
         sourceView1.setFloatBuffer(projectionBuf);
-        displayMap1.setFloatBuffer(projectionBuf);
+        projectionBuf.put(latiLongitude1).put(latiLatitude1).put(0).put(0);
 
         projectionBuf.flip();
         projectionBO.setBufferDataIfChanged(PROJECTION_SIZE, projectionBuf);
-    }
-
-    public void bindLatiGrid(float[] latiGrid0, float[] latiGrid1) {
-        latiGridBuf[0] = latiGrid0[0];
-        latiGridBuf[1] = latiGrid0[1];
-        latiGridBuf[2] = latiGrid0[2];
-        latiGridBuf[3] = latiGrid1[0];
-        latiGridBuf[4] = latiGrid1[1];
-        latiGridBuf[5] = latiGrid1[2];
-        GL.glUniform3fv(latiGridRef, latiGridBuf);
     }
 
     public static void bindScreen(Viewport vp, MapScale scale) {
