@@ -250,6 +250,16 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
         "electron",
     ),
     ValidationRun(
+        "electron_default_tan_screen_cases_color_smoke",
+        ("--tan-screen-cases-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_tan_screen_cases_color_diff_smoke",
+        ("--tan-screen-cases-color-diff-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
         "electron_default_tan_all_modes_cases",
         ("--tan-all-modes-cases", "--render-size", "256", "--backend", "default"),
         "electron",
@@ -262,6 +272,11 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
     ValidationRun(
         "electron_default_tan_all_modes_cases_color_smoke",
         ("--tan-all-modes-cases-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_tan_all_modes_cases_color_diff_smoke",
+        ("--tan-all-modes-cases-color-diff-smoke", "--render-size", "128", "--backend", "default"),
         "electron",
     ),
     ValidationRun(
@@ -297,6 +312,11 @@ ELECTRON_RUNS: tuple[ValidationRun, ...] = (
     ValidationRun(
         "electron_default_surface_map_cases_color_smoke",
         ("--surface-map-cases-color-smoke", "--render-size", "128", "--backend", "default"),
+        "electron",
+    ),
+    ValidationRun(
+        "electron_default_surface_map_cases_color_diff_smoke",
+        ("--surface-map-cases-color-diff-smoke", "--render-size", "128", "--backend", "default"),
         "electron",
     ),
     ValidationRun(
@@ -382,6 +402,8 @@ CORE_RUN_NAMES = {
 
 CORE_ELECTRON_RUN_NAMES = {
     "electron_default_all_modes_sample_texture",
+    "electron_default_all_modes_color_smoke",
+    "electron_default_all_modes_color_diff_smoke",
     "electron_default_differential_rotation",
     "electron_default_distinct_wcs_slots",
     "electron_default_planar_masks",
