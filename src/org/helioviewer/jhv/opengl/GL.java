@@ -9,6 +9,9 @@ import org.lwjgl.opengles.GLES30;
 
 public final class GL {
     public static final int SAMPLES = 0; // values greater than 1 request MSAA.
+    public static String renderer = "";
+    public static String shadingLanguageVersion = "";
+    public static String vendor = "";
     public static String version = "";
     public static int maxTextureSize;
 
@@ -58,10 +61,12 @@ public final class GL {
     public static final int R16F = GLES30.GL_R16F;
     public static final int READ_FRAMEBUFFER = GLES30.GL_READ_FRAMEBUFFER;
     public static final int RED = GLES30.GL_RED;
+    public static final int RENDERER = GLES30.GL_RENDERER;
     public static final int RENDERBUFFER = GLES30.GL_RENDERBUFFER;
     public static final int RGB = GLES30.GL_RGB;
     public static final int RGB8 = GLES30.GL_RGB8;
     public static final int RGBA = GLES30.GL_RGBA;
+    public static final int SHADING_LANGUAGE_VERSION = GLES30.GL_SHADING_LANGUAGE_VERSION;
     public static final int STATIC_DRAW = GLES30.GL_STATIC_DRAW;
     public static final int STREAM_DRAW = GLES30.GL_STREAM_DRAW;
     public static final int TEXTURE0 = GLES30.GL_TEXTURE0;
@@ -78,16 +83,27 @@ public final class GL {
     public static final int UNPACK_ALIGNMENT = GLES30.GL_UNPACK_ALIGNMENT;
     public static final int UNPACK_ROW_LENGTH = GLES30.GL_UNPACK_ROW_LENGTH;
     public static final int UNSIGNED_BYTE = GLES30.GL_UNSIGNED_BYTE;
+    public static final int VENDOR = GLES30.GL_VENDOR;
     public static final int VERSION = GLES30.GL_VERSION;
     public static final int VERTEX_SHADER = GLES30.GL_VERTEX_SHADER;
 
-    public static String formatVersionString(String version) {
+    private static String formatVersionString(String version) {
         return version != null && version.startsWith("OpenGL ") ? version : "OpenGL " + version;
     }
 
     public static void initInfo() {
+        vendor = glGetString(VENDOR);
+        renderer = glGetString(RENDERER);
         version = formatVersionString(glGetString(VERSION));
+        shadingLanguageVersion = glGetString(SHADING_LANGUAGE_VERSION);
         maxTextureSize = glGetInteger(MAX_TEXTURE_SIZE);
+    }
+
+    public static String contextDescription() {
+        return "vendor=" + vendor
+                + ", renderer=" + renderer
+                + ", version=" + version
+                + ", shadingLanguageVersion=" + shadingLanguageVersion;
     }
 
     public static void glActiveTexture(int unit) {
