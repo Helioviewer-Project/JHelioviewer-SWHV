@@ -259,15 +259,8 @@ vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDist
     return -observerDistance * ray.xy / ray.z;
 }
 
-// Native zenithal coordinates for TAN/AZP/ZPN forward projection.
-void nativeZenithalCoordinates(
-    const vec2 helioprojective,
-    const vec2 crval,
-    const float planeUnitsPerRad,
-    out float nativeX,
-    out float nativeY,
-    out float cosNativeDistance
-) {
+// Native zenithal coordinates for TAN/ARC/AZP/ZPN forward projection.
+vec3 nativeZenithalCoordinates(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
     float phi = helioprojective.x;
     float theta = helioprojective.y;
     vec2 referenceAngles = crval / planeUnitsPerRad;
@@ -282,59 +275,51 @@ void nativeZenithalCoordinates(
     float sinDeltaLon = sin(deltaLon);
     float cosDeltaLon = cos(deltaLon);
 
-    nativeX = cosLat * sinDeltaLon;
-    nativeY = cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon;
-    cosNativeDistance = sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon;
+    return vec3(
+        cosLat * sinDeltaLon,
+        cosLat0 * sinLat - sinLat0 * cosLat * cosDeltaLon,
+        sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon);
 }
 
 vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
-    float nativeX;
-    float nativeY;
-    float cosNativeDistance;
-    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
-    if (cosNativeDistance <= 0.)
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad);
+    if (nativeCoords.z <= 0.)
         discard;
 
-    float scale = planeUnitsPerRad / cosNativeDistance;
-    return scale * vec2(nativeX, nativeY);
+    float scale = planeUnitsPerRad / nativeCoords.z;
+    return scale * nativeCoords.xy;
 }
 
 vec2 projectArcToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
-    float nativeX;
-    float nativeY;
-    float cosNativeDistance;
-    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
-    float nativeRadius = length(vec2(nativeX, nativeY));
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad);
+    float nativeRadius = length(nativeCoords.xy);
     if (nativeRadius == 0.)
         return vec2(0.);
 
-    float nativeDistance = atan(nativeRadius, cosNativeDistance);
+    float nativeDistance = atan(nativeRadius, nativeCoords.z);
     float scale = planeUnitsPerRad * nativeDistance / nativeRadius;
-    return scale * vec2(nativeX, nativeY);
+    return scale * nativeCoords.xy;
 }
 
 vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
     float mu = PV[1];
     float gamma = radians(PV[2]);
 
-    float nativeX;
-    float nativeY;
-    float cosNativeDistance;
-    nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
-    if (nativeX == 0. && nativeY == 0.)
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad);
+    if (nativeCoords.x == 0. && nativeCoords.y == 0.)
         return vec2(0.);
 
     // For the non-slanted AZP case, mu > 1 folds back once dR/dtheta changes sign.
     // Keep only the primary forward branch.
-    if (gamma == 0. && mu > 1. && mu * cosNativeDistance + 1. <= 0.)
+    if (gamma == 0. && mu > 1. && mu * nativeCoords.z + 1. <= 0.)
         discard;
 
-    float denom = mu + cosNativeDistance - nativeY * tan(gamma);
+    float denom = mu + nativeCoords.z - nativeCoords.y * tan(gamma);
     if (denom <= 0.)
         discard;
 
     float scale = planeUnitsPerRad * (mu + 1.) / denom;
-    return scale * vec2(nativeX, nativeY / cos(gamma));
+    return scale * vec2(nativeCoords.x, nativeCoords.y / cos(gamma));
 }
 
 float zpnRadial(const float eta, const float[6] PV) {
@@ -345,15 +330,12 @@ float zpnRadial(const float eta, const float[6] PV) {
 }
 
 vec2 projectZpnToWcsPlane(const vec2 helioprojective, const WCS wcs, const float planeUnitsPerRad, const float[6] PV) {
-    float nativeX;
-    float nativeY;
-    float cosNativeDistance;
-    nativeZenithalCoordinates(helioprojective, wcs.crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
-    float nativeRadius = length(vec2(nativeX, nativeY));
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, wcs.crval, planeUnitsPerRad);
+    float nativeRadius = length(nativeCoords.xy);
     if (nativeRadius == 0.)
         return vec2(0.);
 
-    float nativeDistance = atan(nativeRadius, cosNativeDistance);
+    float nativeDistance = atan(nativeRadius, nativeCoords.z);
     if (nativeDistance > wcs.zpnUpperEta)
         discard;
 
@@ -362,7 +344,7 @@ vec2 projectZpnToWcsPlane(const vec2 helioprojective, const WCS wcs, const float
         discard;
 
     float scale = planeUnitsPerRad * radial / nativeRadius;
-    return scale * vec2(nativeX, nativeY);
+    return scale * nativeCoords.xy;
 }
 
 float wrapDeltaLongitude(float lon, float lon0) {
