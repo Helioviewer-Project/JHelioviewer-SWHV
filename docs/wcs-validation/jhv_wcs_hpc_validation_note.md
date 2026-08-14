@@ -482,8 +482,8 @@ The Electron runner:
 - starts the bundled Electron executable
 - creates a WebGL2 context
 - compiles the JHV shader sources from `resources/glsl`
-- binds UBO data matching the JHV `WCSBlock`, `ProjectionBlock`,
-  `ScreenBlock`, and `DisplayBlock` layouts
+- verifies the reflected sizes and active-member offsets of the JHV
+  `ImageBlock`, `ScreenBlock`, and `DisplayBlock`, then binds matching UBO data
 - renders diagnostic or production shader variants into an `RGBA32F`
   framebuffer
 - reads the float framebuffer back to Python

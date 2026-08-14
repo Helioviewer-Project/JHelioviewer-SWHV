@@ -78,23 +78,24 @@ The implementation crosses several coordinate spaces. Keeping them distinct is e
 
 ## Java to GLSL interface
 
-The projection-related uniform blocks deliberately separate different kinds of state.
+The projection-related uniform blocks separate per-image mapping, screen, and display state.
 
-`WCSBlock` contains per-image WCS and image-alignment state:
+`ImageBlock` contains two per-image records, one for the primary image and one for the difference image. Each record
+contains the fixed-layout state used to map rendered solar coordinates into that image:
 
 - image rectangle
 - row-major `planeToImage` matrix
 - `crval` in the internal WCS plane units
+- projection code and plane units per radian
 - upper limit of the primary monotonic `ZPN` branch
+- source-observer distance
 - relative display/source-observer rotation (`cameraDiff`)
 - differential-rotation interval (`deltaT`)
-
-`ProjectionBlock` contains per-image projection and observer state:
-
-- projection code
-- plane units per radian
-- source-observer distance
 - source-view quaternion
+
+Each std140 image record occupies 96 bytes, including one padding float, so the two-record block occupies 192 bytes.
+The six `PV2` coefficients remain ordinary uniforms for direct indexed access rather than becoming padded std140
+scalar arrays.
 
 `ScreenBlock` contains display-map state shared by both image slots:
 
@@ -104,9 +105,17 @@ The projection-related uniform blocks deliberately separate different kinds of s
 - Box-Cox lambda
 - Latitudinal longitude and latitude origins
 
+`ScreenBlock` occupies 96 bytes.
+
 `DisplayBlock` contains the shared rendering controls, including two independent angular openings (`userSector` and
 `metadataSector`), radial limits, the planar cut-off, and normalized X slit limits. These are display masks, not WCS
 parameters.
+
+`DisplayBlock` has 25 meaningful floats and three trailing padding floats. Its std140 backing buffer therefore occupies
+112 bytes; Java and the WebGL runner must allocate all 28 floats.
+
+The Electron validation runner checks the reflected block sizes and active-member offsets against its WebGL buffer
+mirror.
 
 The meaning of `sourceViewQuat` depends on the sampling path. For observer images in `Latitudinal`, it rotates a
 solar-world point into that image's observer frame. For surface maps, `ImageLayer` uploads the displayed view rotation;
