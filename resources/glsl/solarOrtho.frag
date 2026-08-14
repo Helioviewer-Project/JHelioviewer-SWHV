@@ -69,7 +69,6 @@ void main(void) {
         gl_FragDepth = 1.;
     }
 
-    bool didFallback = false;
     // Observer-image projections keep the existing off-limb / back-side fallback.
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) { // off-limb or back
         hitPoint = vec3(viewPosition, intersectPlane(wcs[0].cameraDiff, viewPosition, onDisk));
@@ -78,11 +77,9 @@ void main(void) {
             discard;
         if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
             discard;
-        didFallback = true;
+        if (display.calculateDepth != 0.) // intersecting Euhforia planes
+            gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
     }
-
-    if (didFallback && display.calculateDepth != 0.) // intersecting Euhforia planes
-        gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
 
     clipPlanarMasks(rotatedHitPoint.xy);
     vec2 texCoord = sampleOrthoTexcoord(rotatedHitPoint, wcs[0], projection[0], pv0);
