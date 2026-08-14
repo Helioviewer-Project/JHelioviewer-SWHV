@@ -41,8 +41,8 @@ public final class GLRenderer {
     private static MapScale[] createHpcScales(Viewport[] viewports) {
         Region bounds = ImageLayers.computeHpcScaleBounds();
         MapScale[] scales = new MapScale[viewports.length];
+        double halfWidth = 0.5 * bounds.width;
         for (Viewport vp : viewports) {
-            double halfWidth = 0.5 * bounds.width;
             double halfHeight = Math.max(0.5 * bounds.height, halfWidth / vp.aspect);
             scales[vp.idx] = MapScale.hpc(halfHeight * vp.aspect, halfHeight);
         }
