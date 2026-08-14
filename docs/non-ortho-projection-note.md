@@ -143,6 +143,16 @@ This distinction explains the apparent geometry when switching between `Orthogra
 `CAR` and `CEA` surface maps are sampled directly from longitude and latitude on the visible sphere. They wrap in
 longitude and have no off-limb representation.
 
+For CEA, an explicit `CUNIT2` selects the angular FITS WCS convention used by wcslib/Astropy. Historical normalized
+maps with no `CUNIT2` retain JHV's compatibility convention in which the second plane coordinate is stored directly as
+`sin(latitude) / PV2_1`. This is a missing-unit compatibility assumption, not Astropy's interpretation of the original
+header; validation canonicalizes that legacy row to equivalent angular values before comparing it with Astropy.
+
+The supported solar WCS subset also assumes the canonical native poles used by the current data: observer-image
+`HPLN/HPLT` projections use `LONPOLE=180°`, while `CRLN/CRLT` surface maps use `LONPOLE=0°` and `LATPOLE=90°`. JHV
+does not implement arbitrary FITS celestial/native pole rotations; in particular, a noncanonical surface `CRVAL2`
+cannot be interpreted independently of `LONPOLE` and `LATPOLE`.
+
 ### HPC
 
 `HPC` is a flat observer-centered angular map:
@@ -266,7 +276,8 @@ The validation suite in `extra/test` separates several questions:
 
 - Astropy validates the FITS WCS calculations and the modeled HPC source-sampling path for `TAN`, `ARC`, `AZP`, and
   primary-branch six-term `ZPN`.
-- Astropy validates `CAR` and `CEA` source WCS and Latitudinal surface-map sampling.
+- Astropy directly validates `CAR` and explicitly unit-labelled `CEA` source WCS and Latitudinal surface-map sampling.
+  Normalized CEA maps with no `CUNIT2` are first canonicalized to an equivalent angular CEA header.
 - Java/Python metadata tests validate the projection parameters and linear WCS transforms that Java derives for GLSL.
 - Electron/WebGL2 runs execute the production shaders on Metal/ANGLE and SwiftShader.
 - Orthographic and warp modes are compared with their independent CPU mirrors because Astropy does not define JHV's

@@ -77,6 +77,13 @@ def default_angular_cunit(header, axis: int) -> str | None:
     return None
 
 
+def uses_normalized_cea_y(header) -> bool:
+    # Historical normalized CEA maps omit CUNIT2 and store the second plane
+    # coordinate directly as sin(latitude) / lambda. Explicit units select
+    # the FITS angular convention used by wcslib/Astropy.
+    return projection_suffix(header) == "CEA" and header.get("CUNIT2") is None
+
+
 def unit_scale_from_cunit(cunit: str | None) -> float:
     if cunit is None:
         return 1.0
@@ -201,15 +208,19 @@ def car_effective_cd_rad(header) -> tuple[float, float, float, float]:
 
 
 def cea_effective_cd(header) -> tuple[float, float, float, float]:
+    normalized_y = uses_normalized_cea_y(header)
     if matrix_keywords_present(header, "CD") and not matrix_keywords_present(header, "PC"):
         matrix = read_matrix_keywords(header, "CD", 0.0)
         axis1_scale = math.radians(angular_header_value_to_deg(1.0, default_angular_cunit(header, 1)))
-        axis2_scale = 1.0
+        axis2_scale = 1.0 if normalized_y else math.radians(
+            angular_header_value_to_deg(1.0, default_angular_cunit(header, 2)))
     else:
         matrix = read_matrix_keywords(header, "PC", 1.0)
         axis1_scale = math.radians(angular_header_value_to_deg(
             float(header.get("CDELT1", 1.0)), default_angular_cunit(header, 1)))
-        axis2_scale = float(header.get("CDELT2", 1.0))
+        axis2_scale = float(header.get("CDELT2", 1.0)) if normalized_y else math.radians(
+            angular_header_value_to_deg(
+                float(header.get("CDELT2", 1.0)), default_angular_cunit(header, 2)))
     return scale_matrix_rows(matrix, axis1_scale, axis2_scale)
 
 
@@ -945,11 +956,11 @@ def build_projection_only_wcs(header) -> WCS:
     return wcs
 
 
-def build_original_astropy_wcs(header) -> WCS:
-    """Build the reference from the FITS WCS, without reproducing JHV's reductions."""
-    if projection_suffix(header) == "CEA":
-        # JHV uses the dimensionless CEA coordinate sin(latitude) / lambda;
-        # FITS WCS and Astropy express the same intermediate coordinate in degrees.
+def astropy_compatible_header(header):
+    if uses_normalized_cea_y(header):
+        # Astropy correctly defaults a missing celestial CUNIT2 to degrees. Convert the
+        # explicitly supported legacy normalized convention to an equivalent angular CEA
+        # header before using Astropy as the reference for the intended full-latitude map.
         header = header.copy()
         has_pc = matrix_keywords_present(header, "PC")
         has_cd = matrix_keywords_present(header, "CD")
@@ -959,6 +970,13 @@ def build_original_astropy_wcs(header) -> WCS:
                     header[key] = math.degrees(header[key])
         else:
             header["CDELT2"] = math.degrees(header.get("CDELT2", 1.0))
+        header["CUNIT2"] = "deg"
+    return header
+
+
+def build_astropy_pixel_wcs(header) -> WCS:
+    """Build the reference, canonicalizing only the documented legacy CEA convention."""
+    header = astropy_compatible_header(header)
     return WCS(header, naxis=2)
 
 
@@ -3018,7 +3036,7 @@ def load_validation_context(
     ensure_supported_projection(header)
     meta = build_jhv_meta(header)
     projection_wcs = build_projection_only_wcs(header)
-    pixel_wcs = build_original_astropy_wcs(header)
+    pixel_wcs = build_astropy_pixel_wcs(header)
     return image_data, meta, projection_wcs, pixel_wcs
 
 

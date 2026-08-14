@@ -49,6 +49,20 @@ image geometry. They are a natural fit for `Latitudinal` and for
 wrapping the visible sphere in `Orthographic`, but not for `HPC`, `RadialWarp`,
 or `RectWarp`.
 
+JHV accepts two CEA second-axis conventions. When `CUNIT2` is present, the
+linear transform is angular and follows FITS WCS/wcslib. Historical normalized
+maps that omit `CUNIT2` are kept compatible by interpreting their second plane
+coordinate directly as `sin(latitude) / PV2_1`. This missing-unit convention is
+a documented JHV compatibility assumption: FITS WCS and Astropy otherwise
+default a missing celestial unit to degrees.
+
+The supported solar WCS subset assumes the canonical native poles present in
+the validation data. Observer-image `HPLN/HPLT` projections use
+`LONPOLE=180°`; `CRLN/CRLT` surface maps use `LONPOLE=0°` and `LATPOLE=90°`.
+JHV does not implement arbitrary FITS celestial/native pole rotations, so a
+noncanonical surface `CRVAL2` cannot be treated independently of those pole
+parameters.
+
 Heliospheric imager datasets often use `AZP` or `ZPN` projections. For these
 datasets, these tests support the correctness of the `HPC` WCS and sampling
 path. That conclusion does not extend automatically to
@@ -73,8 +87,10 @@ Main conclusions:
   here.
 - JHV `HPC` rendering is validated against Astropy for the WCS and sampling
   path covered by this note.
-- the `CAR` and `CEA` cases are validated against Astropy for the source WCS
-  interpretation and sampling path on full-Sun surface maps.
+- the `CAR` and explicitly unit-labelled `CEA` cases are validated directly
+  against Astropy for the source WCS interpretation and sampling path; the
+  normalized missing-unit CEA case is first converted to its equivalent
+  angular CEA header for the Astropy comparison.
 - the Electron/WebGL2 checks run the JHV GLSL coordinate path directly;
   on Metal/ANGLE, the worst measured difference from the Python/Astropy
   reference is about `0.002` source-image pixels.
@@ -267,6 +283,9 @@ Here, Astropy is the external reference for:
   - using the effective linear transform
     (`CD`, or `diag(CDELT1, CDELT2) * PC`) together with the native
     `CRLN-CEA / CRLT-CEA` axis semantics
+  - headers with an explicit `CUNIT2` are passed to Astropy unchanged
+  - the supported normalized missing-unit convention is canonicalized to an
+    equivalent degree-valued second row before constructing the Astropy WCS
 - inverse `CEA`
   - plane -> world lon/lat, checked by the same round-trip strategy
 
@@ -448,10 +467,11 @@ on all cases used by the comparison script.
 The comparison script also generates small temporary FITS cases for unequal
 and negative axis scales with a non-orthogonal `PC`, partial `PC` defaults,
 full and partial `CD` matrices, omitted `CDELT`, `PC`/`CD`/`CROTA` precedence,
-mixed angular units, and `CD` matrices on `CAR` and `CEA` surface maps. Each
-case is checked against Astropy as well as the Java metadata interpretation. A
-separate LASCO case asserts the existing JHV policy of suppressing the image
-WCS transform.
+mixed angular units, unit-aware surface-map reference longitude, and `PC`/`CD`
+matrices on `CAR` and both explicitly unit-labelled and normalized missing-unit
+`CEA` surface maps. Each case is checked against Astropy as well as the Java
+metadata interpretation. A separate LASCO case asserts the existing JHV policy
+of suppressing the image WCS transform.
 
 One caveat remains for the `observer_distance` field when `DSUN_OBS` is absent:
 
@@ -542,7 +562,11 @@ surface maps against Astropy over the full source image grid. In those cases,
 the Python validator uses the effective linear transform
 `CD`, or `diag(CDELT1, CDELT2) * PC`, not bare
 `CDELT`, and keeps the original axis types (`CRLN-CAR / CRLT-CAR` or
-`CRLN-CEA / CRLT-CEA`) when constructing the Astropy comparison WCS.
+`CRLN-CEA / CRLT-CEA`) when constructing the Astropy comparison WCS. Explicitly
+unit-labelled CEA headers are passed through unchanged. For normalized CEA
+headers with no `CUNIT2`, it converts only the second linear-transform row to
+the equivalent angular values and sets `CUNIT2=deg`, because Astropy otherwise
+correctly applies the FITS default of degrees to the original missing unit.
 
 3. Inverse `TAN`
 
@@ -1052,9 +1076,13 @@ full-Sun `CEA` surface-map case.
   `CD`, or `diag(CDELT1, CDELT2) * PC`, not from bare `CDELT`
 - the second WCS axis is the `CEA` equal-area latitude coordinate, not direct
   angular latitude
-- the Python validator keeps the original `CRLN-CEA / CRLT-CEA` axis types
-  and uses the effective linear transform when constructing the Astropy
-  comparison WCS
+- this file uses JHV's historical normalized missing-unit convention:
+  `CUNIT2` is absent and its second plane coordinate is stored directly as
+  `sin(latitude) / PV2_1`
+- Astropy interprets the missing unit as degrees, so the validator explicitly
+  converts the second linear-transform row to the equivalent angular values
+  before constructing the Astropy comparison WCS; it retains the original
+  `CRLN-CEA / CRLT-CEA` axis types
 - JHV and Astropy agree to numerical precision
 - measured results on
   `extra/test/data/mrzqs260301t2314c2308_169.fits`:
@@ -1067,8 +1095,9 @@ full-Sun `CEA` surface-map case.
     - `inverse_world_max_error_deg=1.136868e-13`
     - `roundtrip_plane_max_error_internal=1.776357e-15`
 - this `CEA` case validates the source WCS interpretation and
-  sampling path, not the full interactive display policy for these surface
-  maps
+  sampling path after that documented compatibility normalization, not
+  Astropy's interpretation of the unmodified missing-unit header or the full
+  interactive display policy for these surface maps
 
 ## Dense surface-map render compare
 
@@ -1100,8 +1129,9 @@ source-pixel validation numbers reported above.
   - `sample_max_abs_error=6.195933e-11`
 
 These dense rendered checks stay in the same numerical range as the main
-`CAR`/`CEA` Astropy validation and show that the modeled JHV
-surface-map sampling path agrees with Astropy to numerical precision.
+`CAR`/`CEA` Astropy validation and show that the modeled JHV surface-map
+sampling path agrees with Astropy to numerical precision, after the documented
+canonicalization for the normalized missing-unit CEA file.
 
 ## GLSL/Electron validation results
 

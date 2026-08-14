@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -273,11 +274,43 @@ def generated_matrix_cases(
             },
         ),
         (
+            "car_pc_radian_units",
+            SCRIPT_DIR / "data" / "sunerf_map.fits",
+            {
+                "CUNIT1": "rad",
+                "CUNIT2": "rad",
+                "CDELT1": math.radians(-0.08),
+                "CDELT2": math.radians(0.05),
+                "CRVAL1": math.radians(12.0),
+                "CRVAL2": 0.0,
+                "PC1_1": 0.94,
+                "PC1_2": 0.18,
+                "PC2_1": -0.11,
+                "PC2_2": 1.03,
+            },
+        ),
+        (
             "cea_pc_unequal_negative",
             SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
             {
                 "CDELT1": -0.8,
                 "CDELT2": 0.006,
+                "PC1_1": 0.999,
+                "PC1_2": 0.01,
+                "PC2_1": -0.01,
+                "PC2_2": 0.999,
+            },
+        ),
+        (
+            "cea_pc_degree_units",
+            SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
+            {
+                "CUNIT1": "deg",
+                "CUNIT2": "deg",
+                "CDELT1": -0.8,
+                "CDELT2": math.degrees(0.006),
+                "CRVAL1": 12.0,
+                "CRVAL2": 0.0,
                 "PC1_1": 0.999,
                 "PC1_2": 0.01,
                 "PC2_1": -0.01,
@@ -300,6 +333,20 @@ def generated_matrix_cases(
             {
                 "CD1_1": -0.8,
                 "CD1_2": 0.01,
+                "CD2_1": -0.01,
+                "CD2_2": 0.006,
+            },
+        ),
+        (
+            "cea_cd_radian_units",
+            SCRIPT_DIR / "data" / "mrzqs260301t2314c2308_169.fits",
+            {
+                "CUNIT1": "rad",
+                "CUNIT2": "rad",
+                "CRVAL1": math.radians(12.0),
+                "CRVAL2": 0.0,
+                "CD1_1": math.radians(-0.8),
+                "CD1_2": math.radians(0.01),
                 "CD2_1": -0.01,
                 "CD2_2": 0.006,
             },
