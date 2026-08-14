@@ -113,8 +113,7 @@ public final class WcsProjection {
 
     @Nullable
     private static Vec2 nativeToAzp(WcsHeader wcsHeader, double nativeX, double nativeY, double cosNativeDistance) {
-        double nativeRadius = Math.hypot(nativeX, nativeY);
-        if (nativeRadius == 0)
+        if (nativeX == 0 && nativeY == 0)
             return new Vec2(0, 0);
 
         double mu = wcsHeader.azpMu;
