@@ -26,7 +26,7 @@ public final class GLRenderer {
 
     private static MapView createMapView(Camera camera, Position viewpoint) {
         MapMode mode = Display.mode;
-        return mode.createMapView(camera, viewpoint, Display.gridType, createScales(mode, Display.getViewports()));
+        return MapView.create(camera, viewpoint, mode, Display.gridType, createScales(mode, Display.getViewports()));
     }
 
     private static MapScale[] createScales(MapMode mode, Viewport[] viewports) {
@@ -149,12 +149,7 @@ public final class GLRenderer {
     private static final MapScale[] miniScales = new MapScale[]{MapScale.ortho};
 
     private static MapView createMiniMapView(Position viewpoint) {
-        return MapMode.Orthographic.createMapView(
-                Display.getMiniCamera(),
-                viewpoint,
-                GridType.Viewpoint,
-                miniScales
-        );
+        return MapView.create(Display.getMiniCamera(), viewpoint, MapMode.Orthographic, GridType.Viewpoint, miniScales);
     }
 
     private static void renderMiniview() {

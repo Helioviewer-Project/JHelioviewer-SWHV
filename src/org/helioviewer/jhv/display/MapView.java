@@ -32,9 +32,9 @@ public abstract class MapView {
         latiLatitudeOrigin = mode == MapMode.Latitudinal ? gridType.toLatitude(viewpoint) : 0;
     }
 
-    static MapView create(Camera camera, Position viewpoint, GridType gridType, MapMode mode, MapScale[] scales) {
+    public static MapView create(Camera camera, Position viewpoint, MapMode mode, GridType gridType, MapScale[] scales) {
         return mode == MapMode.Orthographic
-                ? new OrthographicView(camera, viewpoint, gridType, mode, scales)
+                ? new OrthographicView(camera, viewpoint, gridType, scales)
                 : new ProjectedView(camera, viewpoint, gridType, mode, scales);
     }
 
@@ -124,8 +124,8 @@ public abstract class MapView {
 
     private static final class OrthographicView extends MapView {
 
-        OrthographicView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode, MapScale[] _scales) {
-            super(_camera, _viewpoint, _mode, _gridType, _scales);
+        OrthographicView(Camera _camera, Position _viewpoint, GridType _gridType, MapScale[] _scales) {
+            super(_camera, _viewpoint, MapMode.Orthographic, _gridType, _scales);
         }
 
         @Override
