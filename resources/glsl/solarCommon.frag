@@ -405,18 +405,20 @@ vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs,
     return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
 }
 
-vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
+vec2 wcsPlaneToUnclampedTexcoord(const vec2 plane, const WCS wcs) {
     vec2 centered = transform_plane_to_image(wcs.planeToImage, plane);
     vec4 rect = wcs.rect;
-    vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+    return rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+}
+
+vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
+    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, wcs);
     clamp_coord(texcoord);
     return texcoord;
 }
 
 vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 centered = transform_plane_to_image(wcs.planeToImage, plane);
-    vec4 rect = wcs.rect;
-    vec2 texcoord = rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
+    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, wcs);
     texcoord.x = fract(texcoord.x);
     clamp_coord(texcoord);
     return texcoord;
