@@ -1,6 +1,5 @@
 package org.helioviewer.jhv.display;
 
-import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.opengl.GLSLSolarShader;
 
 // Orthographic mode renders directly in 3D, while non-orthographic modes project
@@ -28,9 +27,5 @@ public enum MapMode {
 
     MapMode(GLSLSolarShader _shader) {
         shader = _shader;
-    }
-
-    public MapView createMapView(Camera camera, Position viewpoint, GridType gridType, MapScale[] scales) {
-        return MapView.create(camera, viewpoint, gridType, this, scales);
     }
 }
