@@ -321,8 +321,7 @@ vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     float nativeY;
     float cosNativeDistance;
     nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad, nativeX, nativeY, cosNativeDistance);
-    float nativeRadius = length(vec2(nativeX, nativeY));
-    if (nativeRadius == 0.)
+    if (nativeX == 0. && nativeY == 0.)
         return vec2(0.);
 
     // For the non-slanted AZP case, mu > 1 folds back once dR/dtheta changes sign.
