@@ -47,7 +47,9 @@ final class WcsInterpreter {
 
         if (isSurfaceMap) {
             boolean isCea = projection == WcsHeader.Projection.CEA;
-            crval = new Vec2(Math.toRadians(crval1), isCea ? readCeaLatitudeY(crval2, pv2_1) : Math.toRadians(crval2));
+            double longitude = crval1 * units.arcsecX / ARCSEC_PER_RAD;
+            double latitude = crval2 * units.arcsecY / ARCSEC_PER_RAD;
+            crval = new Vec2(longitude, isCea ? ceaLatitudeCoordinate(latitude, pv2_1) : latitude);
             unitsPerRad = 1;
         } else {
             crval = new Vec2(crval1 * units.arcsecX, crval2 * units.arcsecY);
@@ -110,7 +112,12 @@ final class WcsInterpreter {
         double axis2Scale = units.arcsecY;
         if (isSurfaceMap) {
             axis1Scale /= ARCSEC_PER_RAD;
-            axis2Scale = projection == WcsHeader.Projection.CEA ? 1 : axis2Scale / ARCSEC_PER_RAD;
+            // Historical normalized CEA maps omit CUNIT2 and store the second plane coordinate
+            // directly as sin(latitude) / lambda. An explicit CUNIT2 selects the FITS angular
+            // convention used by wcslib/Astropy, which JHV converts to the same internal coordinate.
+            // This deliberately overrides the FITS default of degrees when CUNIT2 is absent.
+            boolean normalizedCeaY = projection == WcsHeader.Projection.CEA && m.getString("CUNIT2").isEmpty();
+            axis2Scale = normalizedCeaY ? 1 : axis2Scale / ARCSEC_PER_RAD;
         }
 
         // FITS WCS/wcslib gives PC precedence over CD when both are present.
@@ -161,9 +168,8 @@ final class WcsInterpreter {
                 unitPerPixelY);
     }
 
-    private static double readCeaLatitudeY(double crval2, double pv2_1) {
+    private static double ceaLatitudeCoordinate(double latitude, double pv2_1) {
         // JHV stores the CEA second axis as the equal-area latitude coordinate y = sin(lat) / lambda.
-        double latitude = Math.toRadians(crval2);
         double lambda = Math.max(pv2_1, 1e-12);
         return Math.sin(latitude) / lambda;
     }
