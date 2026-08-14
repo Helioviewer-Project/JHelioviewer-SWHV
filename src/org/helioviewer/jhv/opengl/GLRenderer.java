@@ -1,5 +1,7 @@
 package org.helioviewer.jhv.opengl;
 
+import java.util.Arrays;
+
 import org.helioviewer.jhv.annotation.Annotations;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
@@ -18,11 +20,7 @@ import org.helioviewer.jhv.movie.ExportMovie;
 
 public final class GLRenderer {
 
-    private static MapView mapView = initialMapView();
-
-    private static MapView initialMapView() {
-        return createMapView(Display.getCamera(), Sun.StartEarth);
-    }
+    private static MapView mapView = createMapView(Display.getCamera(), Sun.StartEarth);
 
     private static MapView createMapView(Camera camera, Position viewpoint) {
         MapMode mode = Display.mode;
@@ -51,8 +49,7 @@ public final class GLRenderer {
 
     private static MapScale[] createConstantScales(Viewport[] viewports, MapScale scale) {
         MapScale[] scales = new MapScale[viewports.length];
-        for (Viewport vp : viewports)
-            scales[vp.idx] = scale;
+        Arrays.fill(scales, scale);
         return scales;
     }
 
@@ -146,27 +143,24 @@ public final class GLRenderer {
         }
     }
 
-    private static final MapScale[] miniScales = new MapScale[]{MapScale.ortho};
-
-    private static MapView createMiniMapView(Position viewpoint) {
-        return MapView.create(Display.getMiniCamera(), viewpoint, MapMode.Orthographic, GridType.Viewpoint, miniScales);
-    }
+    private static final MapScale[] MINI_SCALES = {MapScale.ortho};
 
     private static void renderMiniview() {
         MiniviewLayer miniview = Layers.getMiniviewLayer();
-        if (miniview != null && miniview.isEnabled()) {
-            Viewport vp = miniview.getViewport();
-            MapView mv = createMiniMapView(mapView.viewpoint());
+        if (miniview == null || !miniview.isEnabled())
+            return;
 
-            GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
-            GLSLSolarShader.bindScreen(mv, vp);
+        Viewport vp = miniview.getViewport();
+        MapView mv = MapView.create(Display.getMiniCamera(), mapView.viewpoint(), MapMode.Orthographic, GridType.Viewpoint, MINI_SCALES);
 
-            GL.glDisable(GL.DEPTH_TEST);
-            miniview.renderBackground();
-            Layers.renderMiniview(mv, vp);
-            GL.glEnable(GL.DEPTH_TEST);
-        }
+        GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
+        Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
+        GLSLSolarShader.bindScreen(mv, vp);
+
+        GL.glDisable(GL.DEPTH_TEST);
+        miniview.renderBackground();
+        Layers.renderMiniview(mv, vp);
+        GL.glEnable(GL.DEPTH_TEST);
     }
 
     static void renderSceneScale() {
