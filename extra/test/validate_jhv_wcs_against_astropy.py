@@ -28,7 +28,7 @@ LATI_ZENITHAL_BOUNDS_DEG = LATI_SURFACE_BOUNDS_DEG
 SURFACE_MAP_PROJECTIONS = {"CAR", "CEA"}
 PV2_PROJECTIONS = {"AZP", "ZPN", "CEA"}
 PIXEL_SAMPLED_FORWARD_PROJECTIONS = {"ZPN", "CAR", "CEA"}
-DISPLAY_SECTOR = (0.0, 0.0, 0.0)
+DISPLAY_SECTORS = ((0.0, 0.0), (0.0, 0.0))
 DISPLAY_CUTOFF = (0.0, 0.0, -1.0)
 DISPLAY_RADII = (0.0, math.inf)
 DISPLAY_SLIT = (0.0, 1.0)
@@ -1062,7 +1062,7 @@ def wcsPlaneToTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image
         rect[2] * (centered[0] - rect[0]),
         rect[3] * (-centered[1] - rect[1]),
     )
-    return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
+    return texcoord if normalized_coord_visible(texcoord) else (math.nan, math.nan)
 
 
 def wcsPlaneToWrappedXTexcoord(plane_internal: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[float, float]:
@@ -1072,7 +1072,7 @@ def wcsPlaneToWrappedXTexcoord(plane_internal: tuple[float, float], meta: JHVMet
         (rect[2] * (centered[0] - rect[0])) % 1.0,
         rect[3] * (-centered[1] - rect[1]),
     )
-    return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
+    return texcoord if normalized_coord_visible(texcoord) else (math.nan, math.nan)
 
 
 def sample_texture_linear(image2d: np.ndarray, texcoord: tuple[float, float], wrap_x: bool = False) -> float:
@@ -1292,15 +1292,20 @@ def helioprojectiveToHpcXY(helioprojective: tuple[float, float], observer_distan
     return float(scale * ray[0]), float(scale * ray[1])
 
 
-def hpcEnhancementFactor(hpc_xy: tuple[float, float]) -> float:
-    return max(1.0, math.hypot(hpc_xy[0], hpc_xy[1]))
-
-
-def passes_sector(xy: tuple[float, float], sector: tuple[float, float, float] = DISPLAY_SECTOR) -> bool:
-    if sector[2] == 0.0:
+def passes_sector_opening(theta: float, sector: tuple[float, float]) -> bool:
+    center, half_width = sector
+    if half_width <= 0.0:
         return True
+    delta = abs(theta - center)
+    return min(delta, 2.0 * math.pi - delta) >= half_width
+
+
+def passes_sectors(
+    xy: tuple[float, float],
+    sectors: tuple[tuple[float, float], tuple[float, float]] = DISPLAY_SECTORS,
+) -> bool:
     theta = math.atan2(xy[1], xy[0])
-    return sector[0] <= theta <= sector[1]
+    return all(passes_sector_opening(theta, sector) for sector in sectors)
 
 
 def passes_radii(radial2: float, radii: tuple[float, float] = DISPLAY_RADII) -> bool:
@@ -1316,21 +1321,22 @@ def passes_cutoff(xy: tuple[float, float], cutoff: tuple[float, float, float] = 
     return geometry_flat_dist <= cutoff[2] and geometry_flat_dist_alt <= cutoff[2]
 
 
-def clamp_coord(coord: tuple[float, float], slit: tuple[float, float] = DISPLAY_SLIT) -> bool:
+def normalized_coord_visible(coord: tuple[float, float], slit: tuple[float, float] = DISPLAY_SLIT) -> bool:
     return slit[0] <= coord[0] <= slit[1] and 0.0 <= coord[1] <= 1.0
 
 
-def clamp_value(value: float, low: float, high: float) -> bool:
-    return low <= value <= high
-
-
 def getScrPos(scrpos: tuple[float, float], slit: tuple[float, float] = DISPLAY_SLIT) -> tuple[float, float]:
-    return scrpos if clamp_coord(scrpos, slit) else (math.nan, math.nan)
+    return scrpos if normalized_coord_visible(scrpos, slit) else (math.nan, math.nan)
 
 
-def clipHpcGeometry(hpc_xy: tuple[float, float]) -> bool:
+def clipHpcGeometry(
+    hpc_xy: tuple[float, float],
+    sectors: tuple[tuple[float, float], tuple[float, float]] = DISPLAY_SECTORS,
+    radii: tuple[float, float] = DISPLAY_RADII,
+    cutoff: tuple[float, float, float] = DISPLAY_CUTOFF,
+) -> bool:
     radial2 = hpc_xy[0] * hpc_xy[0] + hpc_xy[1] * hpc_xy[1]
-    return passes_sector(hpc_xy) and passes_radii(radial2) and passes_cutoff(hpc_xy)
+    return passes_sectors(hpc_xy, sectors) and passes_radii(radial2, radii) and passes_cutoff(hpc_xy, cutoff)
 
 
 def projectHelioprojectiveToWcsPlane(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float]:
@@ -1360,7 +1366,7 @@ def sampleHpcTexcoord(
             world = differential(delta_t, world)
         hp = worldToHelioprojective(world, meta.observer_distance)
     else:
-        enhancement_factor = hpcEnhancementFactor(hpc_xy)
+        enhancement_factor = max(1.0, math.hypot(hpc_xy[0], hpc_xy[1]))
 
     try:
         plane = projectHelioprojectiveToWcsPlane(hp, meta)
@@ -1500,15 +1506,11 @@ def worldToHelioprojectiveFloat32(world_xyz: tuple[float, float, float], observe
     )
 
 
-def hpcEnhancementFactorFloat32(hpc_xy: tuple[float, float]) -> float:
-    return max(1.0, length32(hpc_xy[0], hpc_xy[1]))
-
-
 def clipHpcGeometryFloat32(hpc_xy: tuple[float, float]) -> bool:
     if not math.isfinite(hpc_xy[0]) or not math.isfinite(hpc_xy[1]):
         return False
     radial2 = f32(f32(hpc_xy[0] * hpc_xy[0]) + f32(hpc_xy[1] * hpc_xy[1]))
-    return passes_sector(hpc_xy) and passes_radii(radial2) and passes_cutoff(hpc_xy)
+    return passes_sectors(hpc_xy) and passes_radii(radial2) and passes_cutoff(hpc_xy)
 
 
 def nativeZenithalCoordinatesFloat32(helioprojective: tuple[float, float], meta: JHVMeta) -> tuple[float, float, float]:
@@ -1610,7 +1612,7 @@ def wcsPlaneToTexcoordFloat32(plane_internal: tuple[float, float], meta: JHVMeta
         f32(rect[2] * f32(centered[0] - rect[0])),
         f32(rect[3] * f32(-centered[1] - rect[1])),
     )
-    return texcoord if clamp_coord(texcoord) else (math.nan, math.nan)
+    return texcoord if normalized_coord_visible(texcoord) else (math.nan, math.nan)
 
 
 def sampleHpcTexcoordFloat32(helioprojective: tuple[float, float], hpc_xy: tuple[float, float], meta: JHVMeta, image2d: np.ndarray) -> tuple[tuple[float, float], float]:
@@ -1620,7 +1622,7 @@ def sampleHpcTexcoordFloat32(helioprojective: tuple[float, float], hpc_xy: tuple
     if hit:
         hp = worldToHelioprojectiveFloat32(world, meta.observer_distance)
     else:
-        enhancement_factor = hpcEnhancementFactorFloat32(hpc_xy)
+        enhancement_factor = max(1.0, length32(hpc_xy[0], hpc_xy[1]))
 
     try:
         plane = projectHelioprojectiveToWcsPlaneFloat32(hp, meta)
@@ -1659,7 +1661,7 @@ def latitudinalWorld(
 ) -> tuple[float, float, float]:
     longitude = math.radians(bounds_deg[0] + scrpos[0] * (bounds_deg[1] - bounds_deg[0])) - origin[0]
     latitude = math.radians(bounds_deg[2] + scrpos[1] * (bounds_deg[3] - bounds_deg[2])) + origin[1]
-    if not clamp_value(latitude, -0.5 * math.pi, 0.5 * math.pi):
+    if latitude < -0.5 * math.pi or latitude > 0.5 * math.pi:
         return (math.nan, math.nan, math.nan)
     cos_latitude = math.cos(latitude)
     return (
@@ -1669,7 +1671,7 @@ def latitudinalWorld(
     )
 
 
-def sampleLatiCarTexcoord(
+def sampleLatiSurfaceTexcoord(
     scrpos: tuple[float, float],
     bounds_deg: tuple[float, float, float, float],
     meta: JHVMeta,
@@ -1677,19 +1679,7 @@ def sampleLatiCarTexcoord(
     lati_origin: tuple[float, float] = (0.0, 0.0),
 ) -> tuple[float, float]:
     world = latitudinalWorld(scrpos, bounds_deg, lati_origin)
-    plane = projectCarToWcsPlane(world, meta)
-    return wcsPlaneToWrappedXTexcoord(plane, meta, image2d)
-
-
-def sampleLatiCeaTexcoord(
-    scrpos: tuple[float, float],
-    bounds_deg: tuple[float, float, float, float],
-    meta: JHVMeta,
-    image2d: np.ndarray,
-    lati_origin: tuple[float, float] = (0.0, 0.0),
-) -> tuple[float, float]:
-    world = latitudinalWorld(scrpos, bounds_deg, lati_origin)
-    plane = projectCeaToWcsPlane(world, meta)
+    plane = projectCarToWcsPlane(world, meta) if meta.projection == "CAR" else projectCeaToWcsPlane(world, meta)
     return wcsPlaneToWrappedXTexcoord(plane, meta, image2d)
 
 
@@ -1727,10 +1717,8 @@ def sampleLatiTexcoord(
     source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
 ) -> tuple[float, float]:
-    if meta.projection == "CAR":
-        return sampleLatiCarTexcoord(scrpos, bounds_deg, meta, image2d, lati_origin)
-    if meta.projection == "CEA":
-        return sampleLatiCeaTexcoord(scrpos, bounds_deg, meta, image2d, lati_origin)
+    if meta.projection in SURFACE_MAP_PROJECTIONS:
+        return sampleLatiSurfaceTexcoord(scrpos, bounds_deg, meta, image2d, lati_origin)
     return sampleLatiZenithalTexcoord(
         scrpos, bounds_deg, meta, image2d, lati_origin, source_view_quat, delta_t)
 
@@ -1845,7 +1833,7 @@ def intersectPlane(camera_diff_quat: tuple[float, float, float, float], vecin: t
 
 def clipOrthoGeometry(sample_point: tuple[float, float, float]) -> bool:
     xy = (sample_point[0], sample_point[1])
-    if not passes_sector(xy):
+    if not passes_sectors(xy):
         return False
     radial2 = sample_point[0] * sample_point[0] + sample_point[1] * sample_point[1]
     return passes_radii(radial2) and passes_cutoff(xy)
@@ -2032,11 +2020,13 @@ def evaluate_diff_selfcheck(
     screen_positions,
     texcoords_at_pixel,
     sample_value,
-) -> tuple[np.ndarray, np.ndarray, float, float]:
+) -> tuple[np.ndarray, np.ndarray, int, int, float, float]:
     base_img = np.full((size, size), np.nan, dtype=np.float64)
     diff_img = np.full((size, size), np.nan, dtype=np.float64)
     max_texcoord_err = 0.0
     max_sample_err = 0.0
+    compared = 0
+    validity_mismatches = 0
 
     for iy, ix, screen_pos in screen_positions(size):
         texcoord, diff_texcoord = texcoords_at_pixel(screen_pos)
@@ -2045,7 +2035,11 @@ def evaluate_diff_selfcheck(
         base_img[iy, ix] = base_sample
         err = abs(base_sample - diff_sample) if math.isfinite(base_sample) and math.isfinite(diff_sample) else math.nan
         diff_img[iy, ix] = err
-        if math.isfinite(texcoord[0]) and math.isfinite(texcoord[1]) and math.isfinite(diff_texcoord[0]) and math.isfinite(diff_texcoord[1]):
+        base_valid = math.isfinite(texcoord[0]) and math.isfinite(texcoord[1])
+        diff_valid = math.isfinite(diff_texcoord[0]) and math.isfinite(diff_texcoord[1])
+        validity_mismatches += int(base_valid != diff_valid)
+        if base_valid and diff_valid:
+            compared += 1
             max_texcoord_err = max(
                 max_texcoord_err,
                 max(abs(texcoord[0] - diff_texcoord[0]), abs(texcoord[1] - diff_texcoord[1])),
@@ -2053,7 +2047,7 @@ def evaluate_diff_selfcheck(
         if math.isfinite(err):
             max_sample_err = max(max_sample_err, err)
 
-    return base_img, diff_img, max_texcoord_err, max_sample_err
+    return base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err
 
 
 def square_screen_positions(size: int):
@@ -2271,7 +2265,7 @@ def run_hpc_diff_selfcheck(
     require_2d_image(image_data, "HPC diff selfcheck")
 
     bounds_deg = hpc_bounds_degrees(meta, 1.0)
-    base_img, diff_img, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
+    base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
         render_size,
         square_screen_positions,
         lambda scrpos: renderHpcTexcoords(
@@ -2292,10 +2286,15 @@ def run_hpc_diff_selfcheck(
 
     print(f"file={fits_file}")
     print(f"mode=hpc_diff_selfcheck size={render_size}")
+    print(f"compared_samples={compared}")
+    print(f"validity_mismatches={validity_mismatches}")
     print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
     print(f"sample_max_abs_error={max_sample_err:.6e}")
     print(f"base_png={base_path}")
     print(f"diff_png={diff_path}")
+    if compared == 0 or validity_mismatches or max_texcoord_err != 0.0 or max_sample_err != 0.0:
+        print("FAILED: identical HPC inputs produced different results")
+        return 1
     return 0
 
 
@@ -2310,7 +2309,7 @@ def run_latitudinal_diff_selfcheck(
     if not is_surface_map_projection(meta):
         raise ValueError("Latitudinal diff selfcheck currently supports CAR/CEA surface maps only")
 
-    base_img, diff_img, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
+    base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
         render_size,
         square_screen_positions,
         lambda scrpos: renderLatitudinalTexcoords(
@@ -2331,10 +2330,15 @@ def run_latitudinal_diff_selfcheck(
 
     print(f"file={fits_file}")
     print(f"mode=latitudinal_diff_selfcheck size={render_size}")
+    print(f"compared_samples={compared}")
+    print(f"validity_mismatches={validity_mismatches}")
     print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
     print(f"sample_max_abs_error={max_sample_err:.6e}")
     print(f"base_png={base_path}")
     print(f"diff_png={diff_path}")
+    if compared == 0 or validity_mismatches or max_texcoord_err != 0.0 or max_sample_err != 0.0:
+        print("FAILED: identical Latitudinal inputs produced different results")
+        return 1
     return 0
 
 
@@ -2347,7 +2351,7 @@ def run_orthographic_diff_selfcheck(
 ) -> int:
     require_2d_image(image_data, "Orthographic diff selfcheck")
 
-    base_img, diff_img, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
+    base_img, diff_img, compared, validity_mismatches, max_texcoord_err, max_sample_err = evaluate_diff_selfcheck(
         render_size,
         signed_square_screen_positions,
         lambda screen_xy: renderOrthographicTexcoords(
@@ -2367,10 +2371,15 @@ def run_orthographic_diff_selfcheck(
 
     print(f"file={fits_file}")
     print(f"mode=orthographic_diff_selfcheck size={render_size}")
+    print(f"compared_samples={compared}")
+    print(f"validity_mismatches={validity_mismatches}")
     print(f"texcoord_max_abs_error={max_texcoord_err:.6e}")
     print(f"sample_max_abs_error={max_sample_err:.6e}")
     print(f"base_png={base_path}")
     print(f"diff_png={diff_path}")
+    if compared == 0 or validity_mismatches or max_texcoord_err != 0.0 or max_sample_err != 0.0:
+        print("FAILED: identical Orthographic inputs produced different results")
+        return 1
     return 0
 
 
