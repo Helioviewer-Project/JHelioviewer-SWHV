@@ -243,10 +243,10 @@ vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDist
 }
 
 // Native zenithal coordinates for TAN/ARC/AZP/ZPN forward projection.
-vec3 nativeZenithalCoordinates(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
+vec3 nativeZenithalCoordinates(const vec2 helioprojective, const Image img) {
     float phi = helioprojective.x;
     float theta = helioprojective.y;
-    vec2 referenceAngles = crval / planeUnitsPerRad;
+    vec2 referenceAngles = img.crval / img.planeUnitsPerRadian;
     float phi0 = referenceAngles.x;
     float theta0 = referenceAngles.y;
 
@@ -264,31 +264,31 @@ vec3 nativeZenithalCoordinates(const vec2 helioprojective, const vec2 crval, con
         sinLat0 * sinLat + cosLat0 * cosLat * cosDeltaLon);
 }
 
-vec2 projectTanToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
-    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad);
+vec2 projectTanToWcsPlane(const vec2 helioprojective, const Image img) {
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, img);
     if (nativeCoords.z <= 0.)
         discard;
 
-    float scale = planeUnitsPerRad / nativeCoords.z;
+    float scale = img.planeUnitsPerRadian / nativeCoords.z;
     return scale * nativeCoords.xy;
 }
 
-vec2 projectArcToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad) {
-    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad);
+vec2 projectArcToWcsPlane(const vec2 helioprojective, const Image img) {
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, img);
     float nativeRadius = length(nativeCoords.xy);
     if (nativeRadius == 0.)
         return vec2(0.);
 
     float nativeDistance = atan(nativeRadius, nativeCoords.z);
-    float scale = planeUnitsPerRad * nativeDistance / nativeRadius;
+    float scale = img.planeUnitsPerRadian * nativeDistance / nativeRadius;
     return scale * nativeCoords.xy;
 }
 
-vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
+vec2 projectAzpToWcsPlane(const vec2 helioprojective, const Image img, const float[6] PV) {
     float mu = PV[1];
     float gamma = radians(PV[2]);
 
-    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, crval, planeUnitsPerRad);
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, img);
     if (nativeCoords.x == 0. && nativeCoords.y == 0.)
         return vec2(0.);
 
@@ -301,7 +301,7 @@ vec2 projectAzpToWcsPlane(const vec2 helioprojective, const vec2 crval, const fl
     if (denom <= 0.)
         discard;
 
-    float scale = planeUnitsPerRad * (mu + 1.) / denom;
+    float scale = img.planeUnitsPerRadian * (mu + 1.) / denom;
     return scale * vec2(nativeCoords.x, nativeCoords.y / cos(gamma));
 }
 
@@ -312,8 +312,8 @@ float zpnRadial(const float eta, const float[6] PV) {
     return radial;
 }
 
-vec2 projectZpnToWcsPlane(const vec2 helioprojective, const Image img, const float planeUnitsPerRad, const float[6] PV) {
-    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, img.crval, planeUnitsPerRad);
+vec2 projectZpnToWcsPlane(const vec2 helioprojective, const Image img, const float[6] PV) {
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, img);
     float nativeRadius = length(nativeCoords.xy);
     if (nativeRadius == 0.)
         return vec2(0.);
@@ -326,7 +326,7 @@ vec2 projectZpnToWcsPlane(const vec2 helioprojective, const Image img, const flo
     if (radial < 0.)
         discard;
 
-    float scale = planeUnitsPerRad * radial / nativeRadius;
+    float scale = img.planeUnitsPerRadian * radial / nativeRadius;
     return scale * nativeCoords.xy;
 }
 
@@ -337,15 +337,15 @@ float wrapDeltaLongitude(float lon, float lon0) {
 // Projection-space to texture-space mapping.
 vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const Image img, const float[6] PV) {
     if (img.projectionCode == WCS_PROJECTION_TAN)
-        return projectTanToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian);
+        return projectTanToWcsPlane(helioprojective, img);
     if (img.projectionCode == WCS_PROJECTION_ARC)
-        return projectArcToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian);
+        return projectArcToWcsPlane(helioprojective, img);
     if (img.projectionCode == WCS_PROJECTION_AZP)
-        return projectAzpToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian, PV);
+        return projectAzpToWcsPlane(helioprojective, img, PV);
     if (img.projectionCode == WCS_PROJECTION_ZPN)
-        return projectZpnToWcsPlane(helioprojective, img, img.planeUnitsPerRadian, PV);
+        return projectZpnToWcsPlane(helioprojective, img, PV);
 
-    return projectTanToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian);
+    return projectTanToWcsPlane(helioprojective, img);
 }
 
 vec2 wcsPlaneToUnclampedTexcoord(const vec2 plane, const Image img) {
