@@ -22,56 +22,48 @@ const float WCS_PROJECTION_CEA = 5.;
 out vec4 outColor;
 in vec2 normalizedScreenpos;
 
-struct WCS {
-    vec4 cameraDiff; // not strictly WCS
+struct Image {
     vec4 rect;
     vec4 planeToImage; // row-major 2x2 matrix
     vec2 crval;
-    float zpnUpperEta;
-    float deltaT; // not strictly WCS
-};
-
-layout(std140) uniform WCSBlock {
-    WCS wcs[2];
-};
-
-struct ProjectionParams {
-    float projectionCode;
     float planeUnitsPerRadian;
+    float projectionCode;
+    float zpnUpperEta;
     float observerDistance;
-    float padding0;
+    float deltaT;
+    float padding;
+    vec4 cameraDiff;
     vec4 sourceViewQuat;
 };
 
-layout(std140) uniform ProjectionBlock {
-    ProjectionParams projection[2];
+layout(std140) uniform ImageBlock {
+    Image images[2];
 };
 
 layout(std140) uniform ScreenBlock {
     mat4 inverseMVP;
-    float iaspect;
-    float xStart;
-    float xStop;
-    float yStart;
-    float yStop;
-    float lambda;
+    vec4 mapBounds; // xStart, xStop, yStart, yStop
     vec2 latiOrigin;
+    float iaspect;
+    float lambda;
 } screen;
 
 layout(std140) uniform DisplayBlock {
     vec4 color;
     vec3 sharpen;
     float isDiff;
+    vec2 brightness;
+    vec2 upsilon;
     vec2 userSector;
     vec2 metadataSector;
     vec3 cutOff;
     float calculateDepth;
-    vec2 brightness;
     vec2 radii;
     vec2 slit;
     float enhanced;
-    float upsilonLow;
-    float upsilonHigh;
+    float padding0;
+    float padding1;
+    float padding2;
 } display;
 
 uniform sampler2D image;
@@ -148,11 +140,11 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
         value = mix(value, blurredValue, sharpenMix);
     }
 
-    if (display.upsilonLow != 1. || display.upsilonHigh != 1.) {
+    if (display.upsilon.x != 1. || display.upsilon.y != 1.) {
         // Two-sided gamma about the median (Gilly & DeForest Eq. 2): upsilonLow and
         // upsilonHigh independently set the curvature below and above I = 0.5
         value = clamp(value, 0., 1.);
-        value = value < .5 ? .5 * pow(2. * value, display.upsilonLow) : 1. - .5 * pow(2. - 2. * value, display.upsilonHigh);
+        value = value < .5 ? .5 * pow(2. * value, display.upsilon.x) : 1. - .5 * pow(2. - 2. * value, display.upsilon.y);
     }
 
     value += dither(texcoord);
@@ -183,7 +175,7 @@ vec2 getNormalizedMapPos(void) {
 // Convert a normalized warp radius back to radial distance in solar radii.
 // The disk is linear; only distances beyond the limb use Box-Cox scaling.
 float unwarpRadius(float normalizedRadius) {
-    float outerRadius = screen.yStop;
+    float outerRadius = screen.mapBounds.w;
     float limbPosition = 1. / outerRadius;
     if (outerRadius <= 1. || normalizedRadius <= limbPosition)
         return normalizedRadius / limbPosition;
@@ -320,14 +312,14 @@ float zpnRadial(const float eta, const float[6] PV) {
     return radial;
 }
 
-vec2 projectZpnToWcsPlane(const vec2 helioprojective, const WCS wcs, const float planeUnitsPerRad, const float[6] PV) {
-    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, wcs.crval, planeUnitsPerRad);
+vec2 projectZpnToWcsPlane(const vec2 helioprojective, const Image img, const float planeUnitsPerRad, const float[6] PV) {
+    vec3 nativeCoords = nativeZenithalCoordinates(helioprojective, img.crval, planeUnitsPerRad);
     float nativeRadius = length(nativeCoords.xy);
     if (nativeRadius == 0.)
         return vec2(0.);
 
     float nativeDistance = atan(nativeRadius, nativeCoords.z);
-    if (nativeDistance > wcs.zpnUpperEta)
+    if (nativeDistance > img.zpnUpperEta)
         discard;
 
     float radial = zpnRadial(nativeDistance, PV);
@@ -343,68 +335,68 @@ float wrapDeltaLongitude(float lon, float lon0) {
 }
 
 // Projection-space to texture-space mapping.
-vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    if (projection.projectionCode == WCS_PROJECTION_TAN)
-        return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
-    if (projection.projectionCode == WCS_PROJECTION_ARC)
-        return projectArcToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
-    if (projection.projectionCode == WCS_PROJECTION_AZP)
-        return projectAzpToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian, PV);
-    if (projection.projectionCode == WCS_PROJECTION_ZPN)
-        return projectZpnToWcsPlane(helioprojective, wcs, projection.planeUnitsPerRadian, PV);
+vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const Image img, const float[6] PV) {
+    if (img.projectionCode == WCS_PROJECTION_TAN)
+        return projectTanToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian);
+    if (img.projectionCode == WCS_PROJECTION_ARC)
+        return projectArcToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian);
+    if (img.projectionCode == WCS_PROJECTION_AZP)
+        return projectAzpToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian, PV);
+    if (img.projectionCode == WCS_PROJECTION_ZPN)
+        return projectZpnToWcsPlane(helioprojective, img, img.planeUnitsPerRadian, PV);
 
-    return projectTanToWcsPlane(helioprojective, wcs.crval, projection.planeUnitsPerRadian);
+    return projectTanToWcsPlane(helioprojective, img.crval, img.planeUnitsPerRadian);
 }
 
-vec2 wcsPlaneToUnclampedTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 centered = transform_plane_to_image(wcs.planeToImage, plane);
-    vec4 rect = wcs.rect;
+vec2 wcsPlaneToUnclampedTexcoord(const vec2 plane, const Image img) {
+    vec2 centered = transform_plane_to_image(img.planeToImage, plane);
+    vec4 rect = img.rect;
     return rect.zw * vec2(centered.x - rect.x, -centered.y - rect.y);
 }
 
-vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, wcs);
+vec2 wcsPlaneToTexcoord(const vec2 plane, const Image img) {
+    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, img);
     clipNormalizedCoord(texcoord);
     return texcoord;
 }
 
-vec2 helioprojectiveToTexcoord(const vec2 helioprojective, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
-    return wcsPlaneToTexcoord(plane, wcs);
+vec2 helioprojectiveToTexcoord(const vec2 helioprojective, const Image img, const float[6] PV) {
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, img, PV);
+    return wcsPlaneToTexcoord(plane, img);
 }
 
-vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
-    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, wcs);
+vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const Image img) {
+    vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, img);
     texcoord.x = fract(texcoord.x);
     clipNormalizedCoord(texcoord);
     return texcoord;
 }
 
-bool isSurfaceMap(const ProjectionParams projection) {
-    return projection.projectionCode == WCS_PROJECTION_CAR
-        || projection.projectionCode == WCS_PROJECTION_CEA;
+bool isSurfaceMap(const Image img) {
+    return img.projectionCode == WCS_PROJECTION_CAR
+        || img.projectionCode == WCS_PROJECTION_CEA;
 }
 
-vec2 sampleSurfaceMapTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
+vec2 sampleSurfaceMapTexcoord(const vec3 world, const Image img, const float[6] PV) {
     float longitude = atan(world.x, world.z);
     float sinLatitude = clamp(world.y / length(world), -1., 1.);
     float latitudeCoordinate;
-    if (projection.projectionCode == WCS_PROJECTION_CAR)
+    if (img.projectionCode == WCS_PROJECTION_CAR)
         latitudeCoordinate = asin(sinLatitude);
     else
         latitudeCoordinate = sinLatitude / max(abs(PV[1]), 1e-12);
-    float planeUnitsPerRadian = projection.planeUnitsPerRadian;
-    vec2 referenceCoordinate = wcs.crval / planeUnitsPerRadian;
+    float planeUnitsPerRadian = img.planeUnitsPerRadian;
+    vec2 referenceCoordinate = img.crval / planeUnitsPerRadian;
     vec2 plane = vec2(
         planeUnitsPerRadian * wrapDeltaLongitude(longitude, referenceCoordinate.x),
         planeUnitsPerRadian * (latitudeCoordinate - referenceCoordinate.y));
-    return wcsPlaneToWrappedXTexcoord(plane, wcs);
+    return wcsPlaneToWrappedXTexcoord(plane, img);
 }
 
 vec2 normalizedMapToHelioprojective(const vec2 mapPos) {
     return vec2(
-        radians(screen.xStart + mapPos.x * (screen.xStop - screen.xStart)),
-        radians(screen.yStart + mapPos.y * (screen.yStop - screen.yStart)));
+        radians(screen.mapBounds.x + mapPos.x * (screen.mapBounds.y - screen.mapBounds.x)),
+        radians(screen.mapBounds.z + mapPos.y * (screen.mapBounds.w - screen.mapBounds.z)));
 }
 
 bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDistance, out vec3 world) {
@@ -472,33 +464,33 @@ void clipPlanarMasks(const vec2 point) {
     }
 }
 
-vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 helioprojective, const vec2 hpcXY, const float[6] PV, out float enhancementFactor) {
+vec2 sampleHpcTexcoord(const Image img, vec2 helioprojective, const vec2 hpcXY, const float[6] PV, out float enhancementFactor) {
     enhancementFactor = 1.;
-    float observerDistance = projection.observerDistance;
+    float observerDistance = img.observerDistance;
 
     vec3 world;
     if (helioprojectiveToWorld(helioprojective, observerDistance, world)) {
-        if (wcs.deltaT != 0.) {
-            vec3 rotatedWorld = differential(wcs.deltaT, world);
+        if (img.deltaT != 0.) {
+            vec3 rotatedWorld = differential(img.deltaT, world);
             helioprojective = worldToHelioprojective(rotatedWorld, observerDistance);
         }
     } else {
         enhancementFactor = max(1., length(hpcXY));
     }
 
-    return helioprojectiveToTexcoord(helioprojective, wcs, projection, PV);
+    return helioprojectiveToTexcoord(helioprojective, img, PV);
 }
 
 vec4 sampleWarpedHpcColor(const vec2 hpcXY) {
-    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
+    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, images[0].observerDistance);
     clipPlanarMasks(hpcXY);
     float enhancementFactor;
-    vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, pv0, enhancementFactor);
+    vec2 texCoord = sampleHpcTexcoord(images[0], helioprojective, hpcXY, pv0, enhancementFactor);
     if (display.isDiff == NODIFFERENCE)
         return getColor(texCoord, texCoord, enhancementFactor);
 
-    vec2 diffHelioprojective = hpcXYToHelioprojective(hpcXY, projection[1].observerDistance);
+    vec2 diffHelioprojective = hpcXYToHelioprojective(hpcXY, images[1].observerDistance);
     float diffEnhancementFactor;
-    vec2 diffTexCoord = sampleHpcTexcoord(wcs[1], projection[1], diffHelioprojective, hpcXY, pv1, diffEnhancementFactor);
+    vec2 diffTexCoord = sampleHpcTexcoord(images[1], diffHelioprojective, hpcXY, pv1, diffEnhancementFactor);
     return getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
 }

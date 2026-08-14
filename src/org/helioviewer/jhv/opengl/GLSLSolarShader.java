@@ -30,25 +30,23 @@ public class GLSLSolarShader extends GLSLShader {
         hasCommon = _hasCommon;
     }
 
-    private static GLBO wcsBO;
-    private static final FloatBuffer wcsBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4 + 4));
-    private static final int WCS_SIZE = wcsBuf.capacity() * 4;
-
-    private static GLBO projectionBO;
-    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4));
-    private static final int PROJECTION_SIZE = projectionBuf.capacity() * 4;
+    private static GLBO imageBO;
+    private static final int IMAGE_FLOATS = 48;
+    private static final FloatBuffer imageBuf = BufferUtils.newFloatBuffer(IMAGE_FLOATS);
+    private static final int IMAGE_SIZE = IMAGE_FLOATS * Float.BYTES;
 
     private static GLBO screenBO;
-    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 8);
-    private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
+    private static final int SCREEN_FLOATS = 24;
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(SCREEN_FLOATS);
+    private static final int SCREEN_SIZE = SCREEN_FLOATS * Float.BYTES;
 
     private static GLBO displayBO;
-    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(4 + 4 + 4 + 4 + 2 + 2 + 2 + 1 + 1 + 1);
-    private static final int DISPLAY_SIZE = displayBuf.capacity() * 4;
+    private static final int DISPLAY_FLOATS = 28;
+    private static final FloatBuffer displayBuf = BufferUtils.newFloatBuffer(DISPLAY_FLOATS);
+    private static final int DISPLAY_SIZE = DISPLAY_FLOATS * Float.BYTES;
 
     public static void init() {
-        wcsBO = new GLBO(GL.UNIFORM_BUFFER, GL.STREAM_DRAW);
-        projectionBO = new GLBO(GL.UNIFORM_BUFFER, GL.STREAM_DRAW);
+        imageBO = new GLBO(GL.UNIFORM_BUFFER, GL.STREAM_DRAW);
         screenBO = new GLBO(GL.UNIFORM_BUFFER, GL.STREAM_DRAW);
         displayBO = new GLBO(GL.UNIFORM_BUFFER, GL.STREAM_DRAW);
 
@@ -61,8 +59,7 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     private static void setupCommonBlocks(int programID) {
-        setupUBO(programID, "WCSBlock", wcsBO.getID(), UBO.WCS);
-        setupUBO(programID, "ProjectionBlock", projectionBO.getID(), UBO.PROJECTION);
+        setupUBO(programID, "ImageBlock", imageBO.getID(), UBO.IMAGE);
         setupUBO(programID, "ScreenBlock", screenBO.getID(), UBO.SOLAR_SCREEN);
         setupUBO(programID, "DisplayBlock", displayBO.getID(), UBO.DISPLAY);
     }
@@ -89,41 +86,31 @@ public class GLSLSolarShader extends GLSLShader {
         lati._dispose();
         radialWarp._dispose();
         rectWarp._dispose();
-        wcsBO.delete();
-        projectionBO.delete();
+        imageBO.delete();
         screenBO.delete();
         displayBO.delete();
     }
 
-    public static void bindWCS(
-            Quat cameraDiff0, Region r0, Mat2 planeToImage0, float[] crval0, float zpnUpperEta0, float deltaT0,
-            Quat cameraDiff1, Region r1, Mat2 planeToImage1, float[] crval1, float zpnUpperEta1, float deltaT1) {
-        cameraDiff0.setFloatBuffer(wcsBuf);
-        wcsBuf.put(r0.glslArray);
-        planeToImage0.setFloatBuffer(wcsBuf);
-        wcsBuf.put(crval0).put(zpnUpperEta0).put(deltaT0);
+    public static void bindImages(
+            Quat cameraDiff0, Region r0, Mat2 planeToImage0, float[] crval0, WcsHeader wcs0,
+            float observerDistance0, float deltaT0, Quat sourceView0,
+            Quat cameraDiff1, Region r1, Mat2 planeToImage1, float[] crval1, WcsHeader wcs1,
+            float observerDistance1, float deltaT1, Quat sourceView1) {
+        putImage(cameraDiff0, r0, planeToImage0, crval0, wcs0, observerDistance0, deltaT0, sourceView0);
+        putImage(cameraDiff1, r1, planeToImage1, crval1, wcs1, observerDistance1, deltaT1, sourceView1);
 
-        cameraDiff1.setFloatBuffer(wcsBuf);
-        wcsBuf.put(r1.glslArray);
-        planeToImage1.setFloatBuffer(wcsBuf);
-        wcsBuf.put(crval1).put(zpnUpperEta1).put(deltaT1);
-
-        wcsBuf.flip();
-        wcsBO.setBufferDataIfChanged(WCS_SIZE, wcsBuf);
+        imageBuf.flip();
+        imageBO.setBufferDataIfChanged(IMAGE_SIZE, imageBuf);
     }
 
-    public static void bindProjection(WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0, Quat sourceView0,
-                                      WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1, Quat sourceView1) {
-        putProjection(projection0, planeUnitsPerRad0, observerDistance0, sourceView0);
-        putProjection(projection1, planeUnitsPerRad1, observerDistance1, sourceView1);
-
-        projectionBuf.flip();
-        projectionBO.setBufferDataIfChanged(PROJECTION_SIZE, projectionBuf);
-    }
-
-    private static void putProjection(WcsHeader.Projection projection, float planeUnitsPerRad, float observerDistance, Quat sourceView) {
-        projectionBuf.put(projection.ordinal()).put(planeUnitsPerRad).put(observerDistance).put(0);
-        sourceView.setFloatBuffer(projectionBuf);
+    private static void putImage(Quat cameraDiff, Region r, Mat2 planeToImage, float[] crval, WcsHeader wcs,
+                                 float observerDistance, float deltaT, Quat sourceView) {
+        imageBuf.put(r.glslArray);
+        planeToImage.setFloatBuffer(imageBuf);
+        imageBuf.put(crval).put((float) wcs.unitsPerRad).put(wcs.projection.ordinal());
+        imageBuf.put((float) wcs.zpnUpperEta).put(observerDistance).put(deltaT).put(0);
+        cameraDiff.setFloatBuffer(imageBuf);
+        sourceView.setFloatBuffer(imageBuf);
     }
 
     public static void bindScreen(MapView mv, Viewport vp) {
@@ -131,11 +118,11 @@ public class GLSLSolarShader extends GLSLShader {
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
         inv.flip();
-        screenBuf.put((float) (1 / vp.aspect));
         screenBuf.put((float) scale.toMapX(0)).put((float) scale.toMapX(1));
         screenBuf.put((float) scale.toMapY(0)).put((float) scale.toMapY(1));
-        screenBuf.put((float) scale.warpLambda());
         screenBuf.put((float) mv.latiLongitudeOrigin()).put((float) mv.latiLatitudeOrigin());
+        screenBuf.put((float) (1 / vp.aspect));
+        screenBuf.put((float) scale.warpLambda());
 
         screenBuf.flip();
         screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes
@@ -152,11 +139,11 @@ public class GLSLSolarShader extends GLSLShader {
                             float upsilonLow, float upsilonHigh) {
         displayBuf.put(color);
         displayBuf.put(shWidth).put(shHeight).put(shWeight).put(isDiff);
+        displayBuf.put(bOffset).put(bScale).put(upsilonLow).put(upsilonHigh);
         displayBuf.put(userSectorCenter).put(userSectorHalfWidth).put(metadataSectorCenter).put(metadataSectorHalfWidth);
         displayBuf.put(cutOffX).put(cutOffY).put(cutOffVal).put(calculateDepth);
-        displayBuf.put(bOffset).put(bScale);
         displayBuf.put(innerRadius).put(outerRadius).put(slitLeft).put(slitRight);
-        displayBuf.put(enhanced).put(upsilonLow).put(upsilonHigh);
+        displayBuf.put(enhanced).put(0).put(0).put(0);
 
         displayBuf.flip();
         displayBO.setBufferDataIfChanged(DISPLAY_SIZE, displayBuf);
