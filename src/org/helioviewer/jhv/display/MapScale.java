@@ -21,8 +21,8 @@ public interface MapScale {
         return new LinearMapScale(-halfWidth, halfWidth, -halfHeight, halfHeight);
     }
 
-    static MapScale boxCoxRadial(double radialSize) {
-        return new BoxCoxRadialScale(Math.max(radialSize, 1));
+    static MapScale boxCoxRadial(double radialSize, double lambda) {
+        return new BoxCoxRadialScale(Math.max(radialSize, 1), lambda);
     }
 
     final class LinearMapScale implements MapScale {
@@ -76,10 +76,12 @@ public interface MapScale {
 
         private final double radialSize;
         private final double limb;
+        private final double lambda;
 
-        BoxCoxRadialScale(double _radialSize) {
+        BoxCoxRadialScale(double _radialSize, double _lambda) {
             radialSize = _radialSize;
             limb = 1 / _radialSize;
+            lambda = _lambda;
         }
 
         @Override
@@ -94,7 +96,7 @@ public interface MapScale {
 
         @Override
         public double warpLambda() {
-            return Display.getWarpLambda();
+            return lambda;
         }
 
         @Override
@@ -103,7 +105,6 @@ public interface MapScale {
                 return unitY / limb;
 
             double u = (unitY - limb) / (1 - limb);
-            double lambda = warpLambda();
             return lambda == 0
                     ? Math.pow(radialSize, u)
                     : Math.pow(1 + u * (Math.pow(radialSize, lambda) - 1), 1 / lambda);
@@ -114,7 +115,6 @@ public interface MapScale {
             if (radialSize <= 1 || mapY <= 1)
                 return mapY * limb;
 
-            double lambda = warpLambda();
             double u = lambda == 0
                     ? Math.log(mapY) / Math.log(radialSize)
                     : (Math.pow(mapY, lambda) - 1) / (Math.pow(radialSize, lambda) - 1);
