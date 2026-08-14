@@ -160,13 +160,8 @@ vec4 getColor(const vec2 texcoord, const vec2 difftexcoord, const float factor) 
     return texture(lut, vec2(value, 0.5)) * display.color;
 }
 
-void clamp_coord(const vec2 coord) {
+void clipNormalizedCoord(const vec2 coord) {
     if (coord.x < display.slit.x || coord.y < 0. || coord.x > display.slit.y || coord.y > 1.)
-        discard;
-}
-
-void clamp_value(const float value, const float low, const float high) {
-    if (value < low || value > high)
         discard;
 }
 
@@ -181,7 +176,7 @@ vec2 getViewPosition(void) {
 vec2 getNormalizedMapPos(void) {
     vec2 pos = getViewPosition();
     pos = vec2(screen.iaspect * pos.x, pos.y) + .5;
-    clamp_coord(pos);
+    clipNormalizedCoord(pos);
     return pos;
 }
 
@@ -351,28 +346,6 @@ float wrapDeltaLongitude(float lon, float lon0) {
     return mod(lon - lon0 + PI, TWOPI) - PI;
 }
 
-// Surface-map forward projections used by Latitudinal and Orthographic.
-vec2 projectCarToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad) {
-    // CAR is a direct surface lon/lat map, not observer-image geometry.
-    float lon = atan(world.x, world.z);
-    float lat = asin(clamp(world.y / length(world), -1., 1.));
-    vec2 referenceAngles = crval / planeUnitsPerRad;
-    return vec2(
-        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceAngles.x),
-        planeUnitsPerRad * (lat - referenceAngles.y));
-}
-
-vec2 projectCeaToWcsPlane(const vec3 world, const vec2 crval, const float planeUnitsPerRad, const float[6] PV) {
-    // CEA is a direct surface lon/lat map with equal-area latitude scaling.
-    float lon = atan(world.x, world.z);
-    float sinLat = clamp(world.y / length(world), -1., 1.);
-    float lambda = max(abs(PV[1]), 1e-12);
-    vec2 referenceCoord = crval / planeUnitsPerRad;
-    return vec2(
-        planeUnitsPerRad * wrapDeltaLongitude(lon, referenceCoord.x),
-        planeUnitsPerRad * (sinLat / lambda - referenceCoord.y));
-}
-
 // Projection-space to texture-space mapping.
 vec2 projectHelioprojectiveToWcsPlane(const vec2 helioprojective, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
     if (projection.projectionCode == WCS_PROJECTION_TAN)
@@ -395,14 +368,19 @@ vec2 wcsPlaneToUnclampedTexcoord(const vec2 plane, const WCS wcs) {
 
 vec2 wcsPlaneToTexcoord(const vec2 plane, const WCS wcs) {
     vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, wcs);
-    clamp_coord(texcoord);
+    clipNormalizedCoord(texcoord);
     return texcoord;
+}
+
+vec2 helioprojectiveToTexcoord(const vec2 helioprojective, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
+    return wcsPlaneToTexcoord(plane, wcs);
 }
 
 vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
     vec2 texcoord = wcsPlaneToUnclampedTexcoord(plane, wcs);
     texcoord.x = fract(texcoord.x);
-    clamp_coord(texcoord);
+    clipNormalizedCoord(texcoord);
     return texcoord;
 }
 
@@ -412,11 +390,18 @@ bool isSurfaceMap(const ProjectionParams projection) {
 }
 
 vec2 sampleSurfaceMapTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    vec2 plane;
+    float longitude = atan(world.x, world.z);
+    float sinLatitude = clamp(world.y / length(world), -1., 1.);
+    float latitudeCoordinate;
     if (projection.projectionCode == WCS_PROJECTION_CAR)
-        plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
+        latitudeCoordinate = asin(sinLatitude);
     else
-        plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
+        latitudeCoordinate = sinLatitude / max(abs(PV[1]), 1e-12);
+    float planeUnitsPerRadian = projection.planeUnitsPerRadian;
+    vec2 referenceCoordinate = wcs.crval / planeUnitsPerRadian;
+    vec2 plane = vec2(
+        planeUnitsPerRadian * wrapDeltaLongitude(longitude, referenceCoordinate.x),
+        planeUnitsPerRadian * (latitudeCoordinate - referenceCoordinate.y));
     return wcsPlaneToWrappedXTexcoord(plane, wcs);
 }
 
@@ -509,8 +494,7 @@ vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 he
         enhancementFactor = hpcEnhancementFactor(hpcXY);
     }
 
-    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
-    return wcsPlaneToTexcoord(plane, wcs);
+    return helioprojectiveToTexcoord(helioprojective, wcs, projection, PV);
 }
 
 vec4 sampleWarpedHpcColor(const vec2 hpcXY) {
