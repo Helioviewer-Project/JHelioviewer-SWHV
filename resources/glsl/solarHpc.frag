@@ -1,3 +1,16 @@
+vec2 normalizedMapToHelioprojective(const vec2 mapPos) {
+    return vec2(
+        radians(screen.mapBounds.x + mapPos.x * (screen.mapBounds.y - screen.mapBounds.x)),
+        radians(screen.mapBounds.z + mapPos.y * (screen.mapBounds.w - screen.mapBounds.z)));
+}
+
+vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDistance) {
+    vec3 ray = helioprojectiveToObserverRay(helioprojective);
+    if (ray.z >= 0.)
+        discard;
+    return -observerDistance * ray.xy / ray.z;
+}
+
 void main(void) {
     vec2 mapPos = getNormalizedMapPos();
     vec2 helioprojective = normalizedMapToHelioprojective(mapPos);

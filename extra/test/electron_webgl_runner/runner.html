@@ -438,7 +438,7 @@ ${commonDiagnosticUniforms()}
 
 void main(void) {
     vec2 hpcXY = warpHpcXY();
-    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, images[0].observerDistance);
+    vec2 helioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[0].observerDistance);
     clipPlanarMasks(hpcXY);
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(images[0], helioprojective, hpcXY, uPv, enhancementFactor);
@@ -453,11 +453,11 @@ ${stripMain(warpSource)}
 
 void main(void) {
     vec2 hpcXY = warpHpcXY();
-    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, images[0].observerDistance);
+    vec2 helioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[0].observerDistance);
     clipPlanarMasks(hpcXY);
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(images[0], helioprojective, hpcXY, pv0, enhancementFactor);
-    vec2 diffHelioprojective = hpcXYToHelioprojective(hpcXY, images[1].observerDistance);
+    vec2 diffHelioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[1].observerDistance);
     float diffEnhancementFactor;
     vec2 diffTexCoord = sampleHpcTexcoord(images[1], diffHelioprojective, hpcXY, pv1, diffEnhancementFactor);
     outColor = vec4(texCoord, diffTexCoord);
