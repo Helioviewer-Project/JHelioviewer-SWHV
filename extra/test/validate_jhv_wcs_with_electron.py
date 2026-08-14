@@ -130,9 +130,10 @@ def run_electron(electron: Path, job_path: Path, backend: str) -> dict:
                         capture_output=True,
                         text=True,
                     )
-            # Retry only an abort before the runner produced any output. Shader,
-            # WebGL, and job failures must remain visible on the first attempt.
-            if completed.returncode != -6 or completed.stdout or completed.stderr:
+            # Retry only known macOS failures which happen before Electron starts.
+            # Shader, WebGL, and job failures must remain visible on the first attempt.
+            startup_failure = completed.returncode == -6 or "kLSNoExecutableErr" in completed.stderr
+            if not startup_failure or completed.stdout:
                 break
 
     result = None
@@ -862,29 +863,6 @@ def compare_distinct_wcs_slots(
     return 0
 
 
-def passes_planar_masks(point: tuple[float, float], job: dict) -> bool:
-    theta = math.atan2(point[1], point[0])
-    sectors = (job.get("userSector", (0.0, 0.0)), job.get("metadataSector", (0.0, 0.0)))
-    for center, half_width in sectors:
-        if half_width > 0.0:
-            delta = abs(theta - center)
-            if min(delta, 2.0 * math.pi - delta) < half_width:
-                return False
-
-    radius2 = point[0] * point[0] + point[1] * point[1]
-    inner_radius, outer_radius = job.get("radii", (0.0, 1e30))
-    if radius2 < inner_radius * inner_radius or radius2 > outer_radius * outer_radius:
-        return False
-
-    cut_off_x, cut_off_y, cut_off_value = job.get("cutOff", (0.0, 0.0, -1.0))
-    if cut_off_value >= 0.0:
-        flat_distance = abs(point[0] * cut_off_x + point[1] * cut_off_y)
-        alternate_distance = abs(-point[0] * cut_off_y + point[1] * cut_off_x)
-        if flat_distance > cut_off_value or alternate_distance > cut_off_value:
-            return False
-    return True
-
-
 def compare_planar_masks(
     electron: Path,
     output_dir: Path,
@@ -892,25 +870,39 @@ def compare_planar_masks(
     backend: str,
 ) -> int:
     fits_file = SCRIPT_DIR / "data" / "sample.171.fits"
-    image_data, meta, _, _ = load_validation_context(fits_file, 1)
+    _image_data, meta, _, _ = load_validation_context(fits_file, 1)
     cases = (
         ("hpc_metadata_sector", "hpc", {"metadataSector": [0.4, 0.37]}),
         ("hpc_user_sector", "hpc", {"userSector": [0.4, 0.29]}),
+        ("radial_warp_wrapped_sector", "radial_warp", {"userSector": [3.0, 0.35]}),
+        ("hpc_combined_sectors", "hpc", {"userSector": [-1.1, 0.24], "metadataSector": [1.3, 0.31]}),
         ("ortho_radii", "ortho", {"radii": [0.23, 0.82]}),
         ("radial_warp_cutoff", "radial_warp", {"cutOff": [0.8, 0.6, 0.55]}),
     )
     output_dir.mkdir(parents=True, exist_ok=True)
-    jobs = []
+    modes = tuple(dict.fromkeys(mode for _, mode, _ in cases))
+    baseline_jobs = [
+        make_mode_job(mode, fits_file, render_size, output_dir, False, meta, backend, name=f"{mode}_unmasked")
+        for mode in modes
+    ]
+    masked_jobs = []
     for name, mode, mask in cases:
         job = make_mode_job(mode, fits_file, render_size, output_dir, False, meta, backend, name=name)
         job.update(mask)
-        jobs.append(job)
+        masked_jobs.append(job)
 
+    jobs = baseline_jobs + masked_jobs
     results = run_electron_jobs(electron, jobs, backend)
+    baseline_pixels = {
+        job["mode"]: read_job_pixels(job)
+        for job in baseline_jobs
+    }
     failed = False
-    for job, result in zip(jobs, results, strict=True):
+    for job, result in zip(masked_jobs, results[len(baseline_jobs):], strict=True):
         pixels = read_job_pixels(job)
+        unmasked_pixels = baseline_pixels[job["mode"]]
         mismatches = 0
+        mismatch_locations = []
         expected_kept = 0
         expected_masked = 0
         for iy in range(render_size):
@@ -918,34 +910,45 @@ def compare_planar_masks(
             for ix in range(render_size):
                 sx = (ix + 0.5) / render_size
                 if job["mode"] == "hpc":
-                    helioprojective = screenToHelioprojective((sx, sy), tuple(job["boundsDeg"]))
-                    point = helioprojectiveToHpcXY(helioprojective, meta.observer_distance)
-                    texcoord = renderHpcTexcoords(
-                        (sx, sy), tuple(job["boundsDeg"]), meta, image_data)[0]
-                else:
-                    point = (
-                        (2.0 * sx - 1.0, 2.0 * sy - 1.0)
-                        if job["mode"] == "ortho"
-                        else warp_hpc_xy(
-                            job["mode"], sx, sy, job["boundsDeg"][3],
-                            job.get("warpLambda", DEFAULT_WARP_LAMBDA),
-                        )
+                    point = helioprojectiveToHpcXY(
+                        screenToHelioprojective((sx, sy), tuple(job["boundsDeg"])),
+                        meta.observer_distance,
                     )
-                    texcoord = cpu_texcoord_for_mode(
-                        job["mode"], sx, sy, meta, image_data, job["boundsDeg"][3],
-                        job.get("warpLambda", DEFAULT_WARP_LAMBDA))
-                source_valid = is_finite_texcoord(texcoord)
-                expected = source_valid and passes_planar_masks(point, job)
+                elif job["mode"] == "ortho":
+                    point = (2.0 * sx - 1.0, 2.0 * sy - 1.0)
+                else:
+                    point = warp_hpc_xy(
+                        job["mode"], sx, sy, job["boundsDeg"][3],
+                        job.get("warpLambda", DEFAULT_WARP_LAMBDA),
+                    )
+                unmasked = bool(unmasked_pixels[iy, ix, 3] > 0.5)
+                passes_mask = clipHpcGeometry(
+                    point,
+                    (tuple(job.get("userSector", (0.0, 0.0))), tuple(job.get("metadataSector", (0.0, 0.0)))),
+                    tuple(job.get("radii", (0.0, 1e30))),
+                    tuple(job.get("cutOff", (0.0, 0.0, -1.0))),
+                )
+                expected = unmasked and passes_mask
                 actual = bool(pixels[iy, ix, 3] > 0.5)
                 expected_kept += int(expected)
-                expected_masked += int(source_valid and not expected)
+                expected_masked += int(unmasked and not passes_mask)
                 mismatches += int(expected != actual)
+                if expected != actual and len(mismatch_locations) < 10:
+                    mismatch_locations.append({
+                        "pixel": (ix, iy),
+                        "point": point,
+                        "theta": math.atan2(point[1], point[0]),
+                        "expected": expected,
+                        "actual": actual,
+                    })
 
         print(f"mode=electron_{job['name']} size={render_size}")
         print(f"renderer={result['renderer']}")
         print(f"expected_kept_samples={expected_kept}")
         print(f"expected_masked_samples={expected_masked}")
         print(f"validity_mismatches={mismatches}")
+        if mismatch_locations:
+            print(f"first_validity_mismatches={mismatch_locations}")
         print(f"electron_rgba32f={job['outputPath']}")
         if expected_kept == 0 or expected_masked == 0 or mismatches:
             print("FAILED: planar mask does not match the independent CPU predicate")
