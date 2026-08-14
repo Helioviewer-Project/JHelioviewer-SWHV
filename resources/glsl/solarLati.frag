@@ -1,60 +1,39 @@
-// Common latitudinal display geometry.
-vec3 displayLatitudinalWorld(const vec2 mapPos, const vec4 displayMapQuat) {
-    float longitude = radians(mix(screen.xStart, screen.xStop, mapPos.x));
-    float latitude = radians(mix(screen.yStart, screen.yStop, mapPos.y));
+vec3 latitudinalWorld(const vec2 mapPos, const vec2 origin) {
+    float longitude = radians(mix(screen.xStart, screen.xStop, mapPos.x)) - origin.x;
+    float latitude = radians(mix(screen.yStart, screen.yStop, mapPos.y)) + origin.y;
     clamp_value(latitude, -HALFPI, HALFPI);
-    vec3 displaySurface = vec3(
-        cos(latitude) * sin(longitude),
+    float cosLatitude = cos(latitude);
+    return vec3(
+        cosLatitude * sin(longitude),
         sin(latitude),
-        cos(latitude) * cos(longitude));
-    return rotate_vector_inverse(displayMapQuat, displaySurface);
+        cosLatitude * cos(longitude));
 }
 
-// Surface-map sampling paths.
 vec2 sampleLatiCarTexcoord(const vec2 mapPos, const WCS wcs, const ProjectionParams projection) {
-    // Interpret the latitudinal screen in the selected map frame, then sample the CAR surface map.
-    vec3 world = displayLatitudinalWorld(mapPos, projection.displayMapQuat);
+    vec3 world = latitudinalWorld(mapPos, projection.latiOrigin);
     vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
     return wcsPlaneToWrappedXTexcoord(plane, wcs);
 }
 
 vec2 sampleLatiCeaTexcoord(const vec2 mapPos, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    // Interpret the latitudinal screen in the selected map frame, then sample the CEA surface map.
-    vec3 world = displayLatitudinalWorld(mapPos, projection.displayMapQuat);
+    vec3 world = latitudinalWorld(mapPos, projection.latiOrigin);
     vec2 plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
     return wcsPlaneToWrappedXTexcoord(plane, wcs);
 }
 
-// Legacy zenithal latitudinal path.
-vec2 sampleLatiZenithalTexcoord(const vec2 mapPos, const WCS wcs, const vec3 grid) {
-    float longitude = grid.x + mapPos.x * TWOPI;
-    float latitude = grid.y + (mapPos.y - 0.5) * PI;
-
+vec2 sampleLatiZenithalTexcoord(const vec2 mapPos, const WCS wcs,
+                                const ProjectionParams projection, const float[6] PV) {
+    vec3 world = latitudinalWorld(mapPos, projection.latiOrigin);
     if (wcs.deltaT != 0.)
-        longitude -= differentialRotation(wcs.deltaT, sin(latitude));
+        world = differential(wcs.deltaT, world);
 
-    clamp_value(latitude, -HALFPI, HALFPI);
-
-    float cosLatitude = cos(latitude);
-    vec3 spherical = vec3(
-        cosLatitude * cos(longitude),
-        cosLatitude * sin(longitude),
-        sin(latitude));
-
-    float sinGridLatitude = -sin(grid.z);
-    float cosGridLatitude = cos(grid.z);
-    mat3 rot = mat3(
-        cosGridLatitude, 0., sinGridLatitude,
-        0., 1., 0.,
-        -sinGridLatitude, 0., cosGridLatitude);
-    vec3 rotatedSpherical = rot * spherical;
-    if (rotatedSpherical.x < 0.)
+    vec3 sourceWorld = rotate_vector(projection.sourceViewQuat, world);
+    if (sourceWorld.z < 0.)
         discard;
 
-    vec2 centered = transform_plane_to_image(wcs.planeToImage, vec2(rotatedSpherical.y, rotatedSpherical.z) - wcs.crval);
-    vec2 texCoord = wcs.rect.zw * vec2(centered.x - wcs.rect.x, -centered.y - wcs.rect.y);
-    clamp_texture(texCoord);
-    return texCoord;
+    vec2 helioprojective = worldToHelioprojective(sourceWorld, projection.observerDistance);
+    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
+    return wcsPlaneToTexcoord(plane, wcs);
 }
 
 void main(void) {
@@ -64,18 +43,17 @@ void main(void) {
     vec2 mapPos = getNormalizedMapPos();
     bool diffMode = display.isDiff != NODIFFERENCE;
 
-    // Surface maps use explicit world-lon/lat reprojection. Zenithal inputs keep the legacy latiGrid path.
     vec2 texCoord = projection[0].projectionCode == WCS_PROJECTION_CAR
             ? sampleLatiCarTexcoord(mapPos, wcs[0], projection[0])
             : projection[0].projectionCode == WCS_PROJECTION_CEA
             ? sampleLatiCeaTexcoord(mapPos, wcs[0], projection[0], pv0)
-            : sampleLatiZenithalTexcoord(mapPos, wcs[0], latiGrid[0]);
+            : sampleLatiZenithalTexcoord(mapPos, wcs[0], projection[0], pv0);
     vec2 diffTexCoord = texCoord;
     if (diffMode)
         diffTexCoord = projection[1].projectionCode == WCS_PROJECTION_CAR
                 ? sampleLatiCarTexcoord(mapPos, wcs[1], projection[1])
                 : projection[1].projectionCode == WCS_PROJECTION_CEA
                 ? sampleLatiCeaTexcoord(mapPos, wcs[1], projection[1], pv1)
-                : sampleLatiZenithalTexcoord(mapPos, wcs[1], latiGrid[1]);
+                : sampleLatiZenithalTexcoord(mapPos, wcs[1], projection[1], pv1);
     outColor = getColor(texCoord, diffTexCoord, 1.0);
 }

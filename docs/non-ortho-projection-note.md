@@ -29,9 +29,10 @@ This note documents the convention used by the non-orthographic display modes (`
   - `WcsHeader` / `WcsProjection`: shared image-WCS bundle and plane-to-helioprojective conversion
   - `ImageBounds`: intrinsic image-side `HPC` footprint bounds
   - `DisplayMapBounds`: display-map bounds used for non-ortho `1:1` sizing
-- Non-ortho modes use an explicit map-basis rotation on the Java side. For
-  `GridType.Viewpoint`, that rotation uses positive latitude in
-  `GridType.mapRotation(...)`.
+- Latitudinal maps define their frame with explicit longitude and latitude
+  origins. Display longitude adds the longitude origin to solar longitude;
+  display latitude subtracts the latitude origin from solar latitude. This is
+  an angular map offset, not a rigid 3D rotation.
 - Java picking distinguishes between:
   - solar-point unprojection
   - current-view sphere/plane picking for transformed display annotations such as line/FOV
@@ -59,8 +60,12 @@ This note documents the convention used by the non-orthographic display modes (`
   - Java overlay emission clips to the visible hemisphere and does not wrap
     horizontally
 - `Latitudinal` uses `x = longitude`, `y = latitude`.
-  - the GLSL latitudinal shader uses explicit latitude internally as well, with
-    `0` at the equator and positive northward
+  - Java projection/picking and GLSL image reprojection use the same angular
+    origin convention, with `0` at the equator and positive latitude northward
+  - every image slot uses the displayed viewpoint's origin; source viewpoint
+    differences are handled by that slot's source quaternion and differential rotation
+  - source-view quaternions are used only to transform solar-world points into
+    an observer image's frame; they do not define the displayed map frame
   - `CRLN-CAR / CRLT-CAR` and `CRLN-CEA / CRLT-CEA` surface maps are handled
     here as direct solar longitude/latitude maps, not as observer-image
     reprojections

@@ -41,7 +41,8 @@ struct ProjectionParams {
     float observerDistance;
     float padding0;
     vec4 sourceViewQuat;
-    vec4 displayMapQuat;
+    vec2 latiOrigin;
+    vec2 padding1;
 };
 
 layout(std140) uniform ProjectionBlock {
@@ -81,7 +82,6 @@ uniform sampler2D mask;
 
 uniform float pv0[6]; // kept as plain uniforms for simple indexed access
 uniform float pv1[6];
-uniform vec3 latiGrid[2];
 
 #define BLUR_TAP_COUNT (3 * 3)
 // float[] bc = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 }

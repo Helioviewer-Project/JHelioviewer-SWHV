@@ -199,8 +199,6 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
     private final float[] crval0 = new float[2];
     private final float[] crval1 = new float[2];
-    private final float[] latiGrid0 = new float[3];
-    private final float[] latiGrid1 = new float[3];
 
     @Override
     public void render(MapView mv, Viewport vp) {
@@ -269,31 +267,21 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();
         Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
-        Quat displayMap0 = Quat.ZERO;
-        Quat displayMap1 = Quat.ZERO;
+        float latiLongitude = 0;
+        float latiLatitude = 0;
         if (mv.isLatitudinal()) {
             GridType gridType = mv.gridType();
-            displayMap0 = displayMap1 = gridType.mapRotation(renderViewpoint);
-            latiGrid0[0] = (float) latiLongitude(gridType, renderViewpoint, metaViewpoint0);
-            latiGrid0[1] = (float) gridType.toLatitude(metaViewpoint0);
-            latiGrid0[2] = (float) metaViewpoint0.lat;
-            latiGrid1[0] = (float) latiLongitude(gridType, renderViewpoint, metaViewpoint1);
-            latiGrid1[1] = (float) gridType.toLatitude(metaViewpoint1);
-            latiGrid1[2] = (float) metaViewpoint1.lat;
+            latiLongitude = (float) gridType.toLongitude(renderViewpoint);
+            latiLatitude = (float) gridType.toLatitude(renderViewpoint);
         }
-        shader.bindLatiGrid(latiGrid0, latiGrid1);
 
         GLSLSolarShader.bindProjection(
-                wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance, sourceView0, displayMap0,
-                wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance, sourceView1, displayMap1);
+                wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance,
+                sourceView0, latiLongitude, latiLatitude,
+                wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance,
+                sourceView1, latiLongitude, latiLatitude);
 
         GLSLSolar.quad.render();
-    }
-
-    private static double latiLongitude(GridType gridType, Position decodeViewpoint, Position metaViewpoint) {
-        double gridLon = gridType.toLongitude(metaViewpoint);
-        double lon = gridType == GridType.Viewpoint ? gridLon - decodeViewpoint.lon : metaViewpoint.lon - gridLon;
-        return (lon + 3. * Math.PI) % (2. * Math.PI); // centered
     }
 
     @Override
