@@ -10,14 +10,8 @@ vec3 latitudinalWorld(const vec2 mapPos) {
 }
 
 vec2 sampleLatiTexcoord(vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
-    if (projection.projectionCode == WCS_PROJECTION_CAR) {
-        vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
-        return wcsPlaneToWrappedXTexcoord(plane, wcs);
-    }
-    if (projection.projectionCode == WCS_PROJECTION_CEA) {
-        vec2 plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
-        return wcsPlaneToWrappedXTexcoord(plane, wcs);
-    }
+    if (isSurfaceMap(projection))
+        return sampleSurfaceMapTexcoord(world, wcs, projection, PV);
 
     if (wcs.deltaT != 0.)
         world = differential(wcs.deltaT, world);

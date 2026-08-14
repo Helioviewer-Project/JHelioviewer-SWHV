@@ -7,22 +7,11 @@ const float PLANE_Z_EPS = 1e-8;
 // 1 = simple-TAN
 #define SIMPLE_TAN 1
 
-bool isSurfaceMap(const ProjectionParams projection) {
-    return projection.projectionCode == WCS_PROJECTION_CAR
-        || projection.projectionCode == WCS_PROJECTION_CEA;
-}
-
 // Source-image sampling from the orthographic scene point.
 vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
     // Surface maps sample directly from world lon/lat, without observer-image geometry.
-    if (projection.projectionCode == WCS_PROJECTION_CAR) {
-        vec2 plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
-        return wcsPlaneToWrappedXTexcoord(plane, wcs);
-    }
-    if (projection.projectionCode == WCS_PROJECTION_CEA) {
-        vec2 plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
-        return wcsPlaneToWrappedXTexcoord(plane, wcs);
-    }
+    if (isSurfaceMap(projection))
+        return sampleSurfaceMapTexcoord(world, wcs, projection, PV);
 #if SIMPLE_TAN
     if (projection.projectionCode == WCS_PROJECTION_TAN)
         return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);

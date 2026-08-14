@@ -406,6 +406,20 @@ vec2 wcsPlaneToWrappedXTexcoord(const vec2 plane, const WCS wcs) {
     return texcoord;
 }
 
+bool isSurfaceMap(const ProjectionParams projection) {
+    return projection.projectionCode == WCS_PROJECTION_CAR
+        || projection.projectionCode == WCS_PROJECTION_CEA;
+}
+
+vec2 sampleSurfaceMapTexcoord(const vec3 world, const WCS wcs, const ProjectionParams projection, const float[6] PV) {
+    vec2 plane;
+    if (projection.projectionCode == WCS_PROJECTION_CAR)
+        plane = projectCarToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian);
+    else
+        plane = projectCeaToWcsPlane(world, wcs.crval, projection.planeUnitsPerRadian, PV);
+    return wcsPlaneToWrappedXTexcoord(plane, wcs);
+}
+
 vec2 normalizedMapToHelioprojective(const vec2 mapPos) {
     return vec2(
         radians(screen.xStart + mapPos.x * (screen.xStop - screen.xStart)),
