@@ -86,7 +86,6 @@ final class WcsInterpreter {
         return switch (unit.strip().toLowerCase()) {
             case "deg" -> 3600.;
             case "arcmin" -> 60.;
-            case "arcsec" -> 1.;
             case "mas" -> .001;
             case "rad" -> 180. * 3600. / Math.PI;
             default -> 1.;
