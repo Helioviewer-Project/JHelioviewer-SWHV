@@ -235,13 +235,6 @@ vec3 helioprojectiveToObserverRay(const vec2 helioprojective) {
     return vec3(raySign * sin(phi) * cosTheta, raySign * sin(theta), -raySign * cosPhi * cosTheta);
 }
 
-vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDistance) {
-    vec3 ray = helioprojectiveToObserverRay(helioprojective);
-    if (ray.z >= 0.)
-        discard;
-    return -observerDistance * ray.xy / ray.z;
-}
-
 // Native zenithal coordinates for TAN/ARC/AZP/ZPN forward projection.
 vec3 nativeZenithalCoordinates(const vec2 helioprojective, const Image img) {
     float phi = helioprojective.x;
@@ -393,12 +386,6 @@ vec2 sampleSurfaceMapTexcoord(const vec3 world, const Image img, const float[6] 
     return wcsPlaneToWrappedXTexcoord(plane, img);
 }
 
-vec2 normalizedMapToHelioprojective(const vec2 mapPos) {
-    return vec2(
-        radians(screen.mapBounds.x + mapPos.x * (screen.mapBounds.y - screen.mapBounds.x)),
-        radians(screen.mapBounds.z + mapPos.y * (screen.mapBounds.w - screen.mapBounds.z)));
-}
-
 bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDistance, out vec3 world) {
     vec3 ray = helioprojectiveToObserverRay(helioprojective);
     float b = observerDistance * ray.z;
@@ -421,10 +408,6 @@ bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDist
 
     world = observer + t * ray;
     return true;
-}
-
-vec2 hpcXYToHelioprojective(const vec2 hpcXY, const float observerDistance) {
-    return worldToHelioprojective(vec3(hpcXY, 0.), observerDistance);
 }
 
 void clipSectorOpening(const float theta, const vec2 sector) {
@@ -482,14 +465,14 @@ vec2 sampleHpcTexcoord(const Image img, vec2 helioprojective, const vec2 hpcXY, 
 }
 
 vec4 sampleWarpedHpcColor(const vec2 hpcXY) {
-    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, images[0].observerDistance);
+    vec2 helioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[0].observerDistance);
     clipPlanarMasks(hpcXY);
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(images[0], helioprojective, hpcXY, pv0, enhancementFactor);
     if (display.isDiff == NODIFFERENCE)
         return getColor(texCoord, texCoord, enhancementFactor);
 
-    vec2 diffHelioprojective = hpcXYToHelioprojective(hpcXY, images[1].observerDistance);
+    vec2 diffHelioprojective = worldToHelioprojective(vec3(hpcXY, 0.), images[1].observerDistance);
     float diffEnhancementFactor;
     vec2 diffTexCoord = sampleHpcTexcoord(images[1], diffHelioprojective, hpcXY, pv1, diffEnhancementFactor);
     return getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
