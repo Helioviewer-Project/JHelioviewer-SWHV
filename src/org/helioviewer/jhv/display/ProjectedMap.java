@@ -221,21 +221,16 @@ final class ProjectedMap {
                 scale.toUnitY(Math.toDegrees(latitude)) - 0.5);
     }
 
-    private static boolean isVisibleHpcViewpointSpace(Vec3 view) {
-        return view.z >= 0;
-    }
-
     private static Vec2 projectVisibleHpcSurfacePoint(Position viewpoint, Vec3 vertex, MapScale scale) {
         Vec3 view = toHpcViewpointSpace(viewpoint, vertex);
-        if (!isVisibleHpcViewpointSpace(view))
+        if (view.z < 0)
             return null;
         return projectHpcViewpointSpace(view, viewpoint.distance, scale);
     }
 
     private static void emitWrappedVertex(Viewport vp, Vec2 previous, Vec2 current, byte[] color, BufVertex vexBuf) {
-        if (previous != null && Math.abs(previous.x - current.x) > 0.5) {
+        if (Math.abs(previous.x - current.x) > 0.5)
             emitHorizontalWrap(vp, current, previous, color, vexBuf);
-        }
         emitProjectedVertex(vp, current, color, vexBuf);
     }
 
