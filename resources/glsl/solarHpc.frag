@@ -1,24 +1,19 @@
 void main(void) {
-    vec4 color;
     vec2 mapPos = getNormalizedMapPos();
     vec2 helioprojective = normalizedMapToHelioprojective(mapPos);
     bool diffMode = display.isDiff != NODIFFERENCE;
-    float observerDistance = projection[0].observerDistance;
-    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, observerDistance);
-    vec2 texCoord;
+    vec2 hpcXY = helioprojectiveToHpcXY(helioprojective, projection[0].observerDistance);
     float enhancementFactor;
     clipPlanarMasks(hpcXY);
-    texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, pv0, enhancementFactor);
+    vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, pv0, enhancementFactor);
     if (!diffMode) {
-        color = getColor(texCoord, texCoord, enhancementFactor);
-    } else {
-        float diffObserverDistance = projection[1].observerDistance;
-        vec2 diffHpcXY = helioprojectiveToHpcXY(helioprojective, diffObserverDistance);
-        vec2 diffTexCoord;
-        float diffEnhancementFactor;
-        clipPlanarMasks(diffHpcXY);
-        diffTexCoord = sampleHpcTexcoord(wcs[1], projection[1], helioprojective, diffHpcXY, pv1, diffEnhancementFactor);
-        color = getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
+        outColor = getColor(texCoord, texCoord, enhancementFactor);
+        return;
     }
-    outColor = color;
+
+    vec2 diffHpcXY = helioprojectiveToHpcXY(helioprojective, projection[1].observerDistance);
+    float diffEnhancementFactor;
+    clipPlanarMasks(diffHpcXY);
+    vec2 diffTexCoord = sampleHpcTexcoord(wcs[1], projection[1], helioprojective, diffHpcXY, pv1, diffEnhancementFactor);
+    outColor = getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
 }
