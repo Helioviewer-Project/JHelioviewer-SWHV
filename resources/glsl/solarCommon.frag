@@ -234,10 +234,6 @@ vec2 worldToHelioprojective(const vec3 world, const float observerDistance) {
         atan(world.y, sqrt(world.x * world.x + zeta * zeta)));
 }
 
-vec3 observerPosition(const float observerDistance) {
-    return vec3(0., 0., observerDistance);
-}
-
 vec3 helioprojectiveToObserverRay(const vec2 helioprojective) {
     float phi = helioprojective.x;
     float theta = helioprojective.y;
@@ -415,7 +411,7 @@ bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDist
     vec3 ray = helioprojectiveToObserverRay(helioprojective);
     float b = observerDistance * ray.z;
     float c = observerDistance * observerDistance - 1.;
-    vec3 observer = observerPosition(observerDistance);
+    vec3 observer = vec3(0., 0., observerDistance);
     float discriminant = b * b - c;
     if (discriminant < 0.) {
         world = vec3(0.);
@@ -437,10 +433,6 @@ bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDist
 
 vec2 hpcXYToHelioprojective(const vec2 hpcXY, const float observerDistance) {
     return worldToHelioprojective(vec3(hpcXY, 0.), observerDistance);
-}
-
-float hpcEnhancementFactor(const vec2 hpcXY) {
-    return max(1., length(hpcXY));
 }
 
 void clipSectorOpening(const float theta, const vec2 sector) {
@@ -491,7 +483,7 @@ vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 he
             helioprojective = worldToHelioprojective(rotatedWorld, observerDistance);
         }
     } else {
-        enhancementFactor = hpcEnhancementFactor(hpcXY);
+        enhancementFactor = max(1., length(hpcXY));
     }
 
     return helioprojectiveToTexcoord(helioprojective, wcs, projection, PV);
