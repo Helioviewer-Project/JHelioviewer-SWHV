@@ -92,19 +92,19 @@ public class GLSLSolarShader extends GLSLShader {
     }
 
     public static void bindImages(
-            Quat cameraDiff0, Region r0, Mat2 planeToImage0, float[] crval0, WcsHeader wcs0,
-            float observerDistance0, float deltaT0, Quat sourceView0,
-            Quat cameraDiff1, Region r1, Mat2 planeToImage1, float[] crval1, WcsHeader wcs1,
-            float observerDistance1, float deltaT1, Quat sourceView1) {
-        putImage(cameraDiff0, r0, planeToImage0, crval0, wcs0, observerDistance0, deltaT0, sourceView0);
-        putImage(cameraDiff1, r1, planeToImage1, crval1, wcs1, observerDistance1, deltaT1, sourceView1);
+            Region r0, Mat2 planeToImage0, float[] crval0, WcsHeader wcs0,
+            float observerDistance0, float deltaT0, Quat cameraDiff0, Quat sourceView0,
+            Region r1, Mat2 planeToImage1, float[] crval1, WcsHeader wcs1,
+            float observerDistance1, float deltaT1, Quat cameraDiff1, Quat sourceView1) {
+        putImage(r0, planeToImage0, crval0, wcs0, observerDistance0, deltaT0, cameraDiff0, sourceView0);
+        putImage(r1, planeToImage1, crval1, wcs1, observerDistance1, deltaT1, cameraDiff1, sourceView1);
 
         imageBuf.flip();
         imageBO.setBufferDataIfChanged(IMAGE_SIZE, imageBuf);
     }
 
-    private static void putImage(Quat cameraDiff, Region r, Mat2 planeToImage, float[] crval, WcsHeader wcs,
-                                 float observerDistance, float deltaT, Quat sourceView) {
+    private static void putImage(Region r, Mat2 planeToImage, float[] crval, WcsHeader wcs,
+                                 float observerDistance, float deltaT, Quat cameraDiff, Quat sourceView) {
         imageBuf.put(r.glslArray);
         planeToImage.setFloatBuffer(imageBuf);
         imageBuf.put(crval).put((float) wcs.unitsPerRad).put(wcs.projection.ordinal());
@@ -130,13 +130,13 @@ public class GLSLSolarShader extends GLSLShader {
 
     static void bindDisplay(float[] color,
                             float shWidth, float shHeight, float shWeight, int isDiff,
+                            float bOffset, float bScale,
+                            float upsilonLow, float upsilonHigh,
                             float userSectorCenter, float userSectorHalfWidth, float metadataSectorCenter, float metadataSectorHalfWidth,
                             float cutOffX, float cutOffY, float cutOffVal, int calculateDepth,
-                            float bOffset, float bScale,
                             float innerRadius, float outerRadius,
                             float slitLeft, float slitRight,
-                            float enhanced,
-                            float upsilonLow, float upsilonHigh) {
+                            float enhanced) {
         displayBuf.put(color);
         displayBuf.put(shWidth).put(shHeight).put(shWeight).put(isDiff);
         displayBuf.put(bOffset).put(bScale).put(upsilonLow).put(upsilonHigh);

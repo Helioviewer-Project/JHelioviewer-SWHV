@@ -106,18 +106,18 @@ public class GLImage {
         color[3] = (float) (opacity * blend);
         GLSLSolarShader.bindDisplay(color,
                 1f / uploadedImageData.imageBuffer().width, 1f / uploadedImageData.imageBuffer().height, (float) (-2 * sharpen), diffMode.ordinal(),
-                userSectorCenter, userSectorHalfWidth, metadataSectorCenter, (float) metadataHalfWidth,
-                metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 // RHEF output is already a normalized rank in [0, 1]; the raw-DN response
                 // factor must NOT rescale it (that pushes the uniform upper half past 1 and
                 // clamps it to white). The user's Levels (brightOffset/brightScale) still
                 // apply as a black/white-point control on the equalized output.
                 (float) brightOffset, (float) (brightScale * (rhefActive ? 1 : metaData.getResponseFactor())),
+                (float) (rhefActive ? upsilonLow : 1), (float) (rhefActive ? upsilonHigh : 1),
+                userSectorCenter, userSectorHalfWidth, metadataSectorCenter, (float) metadataHalfWidth,
+                metaData.getCutOffX(), metaData.getCutOffY(), metaData.getCutOffValue(), metaData.getCalculateDepth() ? 1 : 0,
                 Math.max(metaData.getInnerRadius(), (float) innerMask),
                 Math.min(Display.getShowCorona() ? metaData.getOuterRadius() : 1, (float) outerMask),
                 (float) slitLeft, (float) slitRight,
-                (float) enhanced,
-                (float) (rhefActive ? upsilonLow : 1), (float) (rhefActive ? upsilonHigh : 1));
+                (float) enhanced);
 
         applyLUT();
         applyMask(metaData.getDetectorMask());
