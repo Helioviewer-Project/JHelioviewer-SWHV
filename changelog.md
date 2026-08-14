@@ -16,7 +16,7 @@
   the redundant Polar and LogPolar projections (by @GillySpace27)
 - Add grid line color, opacity and width controls to the grid layer (by @GillySpace27)
 - Add image-layer controls for outer-radius masking and for sector direction and opening
-- Support FITS WCS `CDi_j` linear-transformation matrices
+- Improve FITS WCS interpretation of angular units and full `PCi_j` and `CDi_j` linear transformations
 - Improve image canvas positioning and resizing on macOS
 
 ### Timeline, events, and UI
