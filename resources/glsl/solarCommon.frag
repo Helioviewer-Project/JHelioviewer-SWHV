@@ -252,11 +252,11 @@ vec3 helioprojectiveToObserverRay(const vec2 helioprojective) {
     return vec3(raySign * sin(phi) * cosTheta, raySign * sin(theta), -raySign * cosPhi * cosTheta);
 }
 
-vec3 helioprojectiveToHpcPlanePoint(const vec2 helioprojective, const float observerDistance) {
+vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDistance) {
     vec3 ray = helioprojectiveToObserverRay(helioprojective);
     if (ray.z >= 0.)
         discard;
-    return observerPosition(observerDistance) - observerDistance * ray / ray.z;
+    return -observerDistance * ray.xy / ray.z;
 }
 
 // Native zenithal coordinates for TAN/AZP/ZPN forward projection.
@@ -450,10 +450,6 @@ bool helioprojectiveToWorld(const vec2 helioprojective, const float observerDist
 
     world = observer + t * ray;
     return true;
-}
-
-vec2 helioprojectiveToHpcXY(const vec2 helioprojective, const float observerDistance) {
-    return helioprojectiveToHpcPlanePoint(helioprojective, observerDistance).xy;
 }
 
 vec2 hpcXYToHelioprojective(const vec2 hpcXY, const float observerDistance) {
