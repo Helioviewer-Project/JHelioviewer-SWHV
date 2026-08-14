@@ -1743,7 +1743,6 @@ def renderLatitudinalTexcoords(
     diff_meta: JHVMeta | None = None,
     diff_image2d: np.ndarray | None = None,
     lati_origin: tuple[float, float] = (0.0, 0.0),
-    diff_lati_origin: tuple[float, float] = (0.0, 0.0),
     source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     diff_source_view_quat: tuple[float, float, float, float] = IDENTITY_QUAT,
     delta_t: float = 0.0,
@@ -1763,7 +1762,7 @@ def renderLatitudinalTexcoords(
         bounds_deg,
         diff_meta,
         diff_image2d if diff_image2d is not None else image2d,
-        diff_lati_origin,
+        lati_origin,
         diff_source_view_quat,
         diff_delta_t,
     )

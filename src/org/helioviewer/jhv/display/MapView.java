@@ -17,6 +17,8 @@ public abstract class MapView {
     private final MapScale[] scales;
     private final Quat dragRotation;
     private final Quat viewRotation;
+    private final double latiLongitudeOrigin;
+    private final double latiLatitudeOrigin;
 
     private MapView(Camera _camera, Position _viewpoint, MapMode _mode, GridType _gridType, MapScale[] _scales) {
         camera = _camera;
@@ -26,6 +28,8 @@ public abstract class MapView {
         scales = _scales;
         dragRotation = camera.getDragRotation();
         viewRotation = Quat.rotate(dragRotation, viewpoint.toQuat());
+        latiLongitudeOrigin = mode == MapMode.Latitudinal ? gridType.toLongitude(viewpoint) : 0;
+        latiLatitudeOrigin = mode == MapMode.Latitudinal ? gridType.toLatitude(viewpoint) : 0;
     }
 
     static MapView create(Camera camera, Position viewpoint, GridType gridType, MapMode mode, MapScale[] scales) {
@@ -60,6 +64,14 @@ public abstract class MapView {
 
     public Quat viewRotation() {
         return viewRotation;
+    }
+
+    public double latiLongitudeOrigin() {
+        return latiLongitudeOrigin;
+    }
+
+    public double latiLatitudeOrigin() {
+        return latiLatitudeOrigin;
     }
 
     public MapScale scale(Viewport vp) {
@@ -149,18 +161,13 @@ public abstract class MapView {
 
     private static final class ProjectedView extends MapView {
 
-        private final double longitudeOrigin;
-        private final double latitudeOrigin;
-
         ProjectedView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode, MapScale[] _scales) {
             super(_camera, _viewpoint, _mode, _gridType, _scales);
-            longitudeOrigin = _gridType.toLongitude(viewpoint);
-            latitudeOrigin = _gridType.toLatitude(viewpoint);
         }
 
         @Override
         public Vec2 projectToScreen(Viewport vp, Vec3 v) {
-            return ProjectedMap.projectToScreen(mode, viewpoint, scale(vp), longitudeOrigin, latitudeOrigin, vp, v);
+            return ProjectedMap.projectToScreen(mode, viewpoint, scale(vp), latiLongitudeOrigin(), latiLatitudeOrigin(), vp, v);
         }
 
         @Override
@@ -170,7 +177,7 @@ public abstract class MapView {
 
         @Override
         public Vec3 mouseToSurface(Viewport vp, int x, int y) {
-            return ProjectedMap.unproject(mode, viewpoint, longitudeOrigin, latitudeOrigin, mouseToMap(vp, x, y));
+            return ProjectedMap.unproject(mode, viewpoint, latiLongitudeOrigin(), latiLatitudeOrigin(), mouseToMap(vp, x, y));
         }
 
         @Override
@@ -183,12 +190,12 @@ public abstract class MapView {
 
         @Override
         public void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
-            ProjectedMap.emitMapLine(mode, viewpoint, scale(vp), longitudeOrigin, latitudeOrigin, vp, vertices, color, vexBuf);
+            ProjectedMap.emitMapLine(mode, viewpoint, scale(vp), latiLongitudeOrigin(), latiLatitudeOrigin(), vp, vertices, color, vexBuf);
         }
 
         @Override
         public void emitMapPoints(Viewport vp, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
-            ProjectedMap.emitMapPoints(mode, viewpoint, scale(vp), longitudeOrigin, latitudeOrigin, vp, vertices, size, color, vexBuf);
+            ProjectedMap.emitMapPoints(mode, viewpoint, scale(vp), latiLongitudeOrigin(), latiLatitudeOrigin(), vp, vertices, size, color, vexBuf);
         }
     }
 }

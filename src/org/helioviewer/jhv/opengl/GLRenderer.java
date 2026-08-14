@@ -133,10 +133,9 @@ public final class GLRenderer {
     static void renderScene() {
         MapView mv = mapView;
         for (Viewport vp : Display.getViewports()) {
-            MapScale scale = mv.scale(vp);
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY(), mv.viewRotation());
-            GLSLSolarShader.bindScreen(vp, scale);
+            GLSLSolarShader.bindScreen(mv, vp);
 
             GLSLSolarShader.sphere.use();
             GLSLSolar.quad.render();
@@ -166,8 +165,7 @@ public final class GLRenderer {
 
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
-            MapScale scale = mv.scale(vp);
-            GLSLSolarShader.bindScreen(vp, scale);
+            GLSLSolarShader.bindScreen(mv, vp);
 
             GL.glDisable(GL.DEPTH_TEST);
             miniview.renderBackground();
@@ -179,10 +177,9 @@ public final class GLRenderer {
     static void renderSceneScale() {
         MapView mv = mapView;
         for (Viewport vp : Display.getViewports()) {
-            MapScale scale = mv.scale(vp);
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
-            GLSLSolarShader.bindScreen(vp, scale);
+            GLSLSolarShader.bindScreen(mv, vp);
 
             Layers.renderScale(mv, vp);
             Annotations.render(mv, vp);

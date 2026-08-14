@@ -41,8 +41,6 @@ struct ProjectionParams {
     float observerDistance;
     float padding0;
     vec4 sourceViewQuat;
-    vec2 latiOrigin;
-    vec2 padding1;
 };
 
 layout(std140) uniform ProjectionBlock {
@@ -57,6 +55,7 @@ layout(std140) uniform ScreenBlock {
     float yStart;
     float yStop;
     float lambda;
+    vec2 latiOrigin;
 } screen;
 
 layout(std140) uniform DisplayBlock {

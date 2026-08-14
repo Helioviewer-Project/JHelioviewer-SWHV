@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.DisplayController;
-import org.helioviewer.jhv.display.GridType;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.image.ImageBuffer;
@@ -267,19 +266,10 @@ public class ImageLayer extends AbstractLayer implements View.DataHandler {
 
         Quat sourceView0 = wcs0.projection.isSurfaceMap() ? q : metaViewpoint0.toQuat();
         Quat sourceView1 = wcs1.projection.isSurfaceMap() ? q : metaViewpoint1.toQuat();
-        float latiLongitude = 0;
-        float latiLatitude = 0;
-        if (mv.isLatitudinal()) {
-            GridType gridType = mv.gridType();
-            latiLongitude = (float) gridType.toLongitude(renderViewpoint);
-            latiLatitude = (float) gridType.toLatitude(renderViewpoint);
-        }
 
         GLSLSolarShader.bindProjection(
-                wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance,
-                sourceView0, latiLongitude, latiLatitude,
-                wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance,
-                sourceView1, latiLongitude, latiLatitude);
+                wcs0.projection, (float) wcs0.unitsPerRad, (float) metaViewpoint0.distance, sourceView0,
+                wcs1.projection, (float) wcs1.unitsPerRad, (float) metaViewpoint1.distance, sourceView1);
 
         GLSLSolar.quad.render();
     }

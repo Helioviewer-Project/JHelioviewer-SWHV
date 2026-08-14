@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.MapScale;
+import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.math.Mat2;
 import org.helioviewer.jhv.math.Quat;
@@ -34,11 +35,11 @@ public class GLSLSolarShader extends GLSLShader {
     private static final int WCS_SIZE = wcsBuf.capacity() * 4;
 
     private static GLBO projectionBO;
-    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4 + 4));
+    private static final FloatBuffer projectionBuf = BufferUtils.newFloatBuffer(2 * (4 + 4));
     private static final int PROJECTION_SIZE = projectionBuf.capacity() * 4;
 
     private static GLBO screenBO;
-    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 6);
+    private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 8);
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
     private static GLBO displayBO;
@@ -111,24 +112,22 @@ public class GLSLSolarShader extends GLSLShader {
         wcsBO.setBufferDataIfChanged(WCS_SIZE, wcsBuf);
     }
 
-    public static void bindProjection(
-            WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0,
-            Quat sourceView0, float latiLongitude0, float latiLatitude0,
-            WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1,
-            Quat sourceView1, float latiLongitude1, float latiLatitude1) {
-        projectionBuf.put(projection0.ordinal()).put(planeUnitsPerRad0).put(observerDistance0).put(0);
-        sourceView0.setFloatBuffer(projectionBuf);
-        projectionBuf.put(latiLongitude0).put(latiLatitude0).put(0).put(0);
-
-        projectionBuf.put(projection1.ordinal()).put(planeUnitsPerRad1).put(observerDistance1).put(0);
-        sourceView1.setFloatBuffer(projectionBuf);
-        projectionBuf.put(latiLongitude1).put(latiLatitude1).put(0).put(0);
+    public static void bindProjection(WcsHeader.Projection projection0, float planeUnitsPerRad0, float observerDistance0, Quat sourceView0,
+                                      WcsHeader.Projection projection1, float planeUnitsPerRad1, float observerDistance1, Quat sourceView1) {
+        putProjection(projection0, planeUnitsPerRad0, observerDistance0, sourceView0);
+        putProjection(projection1, planeUnitsPerRad1, observerDistance1, sourceView1);
 
         projectionBuf.flip();
         projectionBO.setBufferDataIfChanged(PROJECTION_SIZE, projectionBuf);
     }
 
-    public static void bindScreen(Viewport vp, MapScale scale) {
+    private static void putProjection(WcsHeader.Projection projection, float planeUnitsPerRad, float observerDistance, Quat sourceView) {
+        projectionBuf.put(projection.ordinal()).put(planeUnitsPerRad).put(observerDistance).put(0);
+        sourceView.setFloatBuffer(projectionBuf);
+    }
+
+    public static void bindScreen(MapView mv, Viewport vp) {
+        MapScale scale = mv.scale(vp);
         FloatBuffer inv = Transform.getInverse();
         screenBuf.put(inv);
         inv.flip();
@@ -136,6 +135,7 @@ public class GLSLSolarShader extends GLSLShader {
         screenBuf.put((float) scale.toMapX(0)).put((float) scale.toMapX(1));
         screenBuf.put((float) scale.toMapY(0)).put((float) scale.toMapY(1));
         screenBuf.put((float) scale.warpLambda());
+        screenBuf.put((float) mv.latiLongitudeOrigin()).put((float) mv.latiLatitudeOrigin());
 
         screenBuf.flip();
         screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes

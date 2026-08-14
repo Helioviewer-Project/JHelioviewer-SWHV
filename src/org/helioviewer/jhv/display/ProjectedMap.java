@@ -40,9 +40,7 @@ final class ProjectedMap {
         double longitude = MathUtils.mapToMinus180To180(
                 Math.toDegrees(SphericalCoords.longitude(v) + longitudeOrigin));
         double latitude = Math.toDegrees(SphericalCoords.latitude(v) - latitudeOrigin);
-        double scaledphi = scale.toUnitX(longitude) - 0.5;
-        double scaledtheta = scale.toUnitY(latitude) - 0.5;
-        return new Vec2(scaledphi, scaledtheta);
+        return new Vec2(scale.toUnitX(longitude) - 0.5, scale.toUnitY(latitude) - 0.5);
     }
 
     private static Vec3 unprojectLatitudinal(double longitudeOrigin, double latitudeOrigin,

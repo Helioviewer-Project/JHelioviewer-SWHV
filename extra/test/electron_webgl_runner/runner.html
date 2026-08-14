@@ -127,27 +127,23 @@ function wcsBlock(job) {
 
 function projectionBlock(job) {
   const secondary = job.secondary || job;
-  const block = new Float32Array(24);
+  const block = new Float32Array(16);
   block[0] = job.projectionCode;
   block[1] = job.planeUnitsPerRadian;
   block[2] = job.observerDistance;
   block[3] = 0;
   putVec4(block, 4, job.sourceViewQuat || [0, 0, 0, 1]);
-  block[8] = (job.latiOrigin || [0, 0])[0];
-  block[9] = (job.latiOrigin || [0, 0])[1];
 
-  block[12] = secondary.projectionCode;
-  block[13] = secondary.planeUnitsPerRadian;
-  block[14] = secondary.observerDistance;
-  block[15] = 0;
-  putVec4(block, 16, secondary.sourceViewQuat || [0, 0, 0, 1]);
-  block[20] = (secondary.latiOrigin || [0, 0])[0];
-  block[21] = (secondary.latiOrigin || [0, 0])[1];
+  block[8] = secondary.projectionCode;
+  block[9] = secondary.planeUnitsPerRadian;
+  block[10] = secondary.observerDistance;
+  block[11] = 0;
+  putVec4(block, 12, secondary.sourceViewQuat || [0, 0, 0, 1]);
   return block;
 }
 
 function screenBlock(job) {
-  const block = new Float32Array(22);
+  const block = new Float32Array(24);
   const inverseScale = job.mode === "ortho" ? 1 : 0.5;
   block[0] = inverseScale;    // inverseMVP[0][0]
   block[5] = inverseScale;    // inverseMVP[1][1]
@@ -159,6 +155,8 @@ function screenBlock(job) {
   block[19] = job.boundsDeg[2];
   block[20] = job.boundsDeg[3];
   block[21] = job.warpLambda ?? 1;
+  block[22] = (job.latiOrigin || [0, 0])[0];
+  block[23] = (job.latiOrigin || [0, 0])[1];
   return block;
 }
 
@@ -367,22 +365,15 @@ ${commonDiagnosticUniforms()}
 
 void main(void) {
     vec2 mapPos = getNormalizedMapPos();
-    vec2 texCoord = projection[0].projectionCode == WCS_PROJECTION_CAR
-            ? sampleLatiCarTexcoord(mapPos, wcs[0], projection[0])
-            : projection[0].projectionCode == WCS_PROJECTION_CEA
-            ? sampleLatiCeaTexcoord(mapPos, wcs[0], projection[0], pv0)
-            : sampleLatiZenithalTexcoord(mapPos, wcs[0], projection[0], pv0);
+    vec3 world = latitudinalWorld(mapPos);
+    vec2 texCoord = sampleLatiTexcoord(world, wcs[0], projection[0], pv0);
     diagnosticOutput(texCoord, 1.);
 }
 `;
 }
 
 function latiTexcoordExpression(index, pv) {
-  return `projection[${index}].projectionCode == WCS_PROJECTION_CAR
-            ? sampleLatiCarTexcoord(mapPos, wcs[${index}], projection[${index}])
-            : projection[${index}].projectionCode == WCS_PROJECTION_CEA
-            ? sampleLatiCeaTexcoord(mapPos, wcs[${index}], projection[${index}], ${pv})
-            : sampleLatiZenithalTexcoord(mapPos, wcs[${index}], projection[${index}], ${pv})`;
+  return `sampleLatiTexcoord(world, wcs[${index}], projection[${index}], ${pv})`;
 }
 
 function latiDiffSelfcheckDiagnostic(commonSource, latiSource, mode) {
@@ -401,6 +392,7 @@ void main(void) {
         discard;
 
     vec2 mapPos = getNormalizedMapPos();
+    vec3 world = latitudinalWorld(mapPos);
     vec2 texCoord = ${texcoordExpression};
     vec2 diffTexCoord = ${diffExpression};
     outColor = vec4(texCoord, diffTexCoord);
