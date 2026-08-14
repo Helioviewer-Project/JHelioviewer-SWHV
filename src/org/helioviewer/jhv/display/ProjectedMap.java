@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.base.Colors;
+import org.helioviewer.jhv.math.MathUtils;
 import org.helioviewer.jhv.math.PolarBasis;
-import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec2;
 import org.helioviewer.jhv.math.Vec3;
@@ -14,40 +14,44 @@ import org.helioviewer.jhv.wcs.WcsProjection;
 
 final class ProjectedMap {
 
-    private static Vec2 project(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Vec3 v) {
+    private static Vec2 project(MapMode mode, Position viewpoint, MapScale scale,
+                                double longitudeOrigin, double latitudeOrigin, Vec3 v) {
         return switch (mode) {
             case HPC -> projectHpc(viewpoint, v, scale);
-            case Latitudinal -> projectLatitudinal(rotation, scale, v);
+            case Latitudinal -> projectLatitudinal(longitudeOrigin, latitudeOrigin, scale, v);
             case RadialWarp -> projectRadialWarp(viewpoint, scale, v);
             case RectWarp -> projectRectWarp(viewpoint, scale, v);
             case Orthographic -> throw new IllegalArgumentException("Orthographic mode is not projected");
         };
     }
 
-    static Vec3 unproject(MapMode mode, Position viewpoint, Quat rotation, Vec2 pt) {
+    static Vec3 unproject(MapMode mode, Position viewpoint,
+                          double longitudeOrigin, double latitudeOrigin, Vec2 pt) {
         return switch (mode) {
             case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
-            case Latitudinal -> unprojectLatitudinal(rotation, pt.x, pt.y);
+            case Latitudinal -> unprojectLatitudinal(longitudeOrigin, latitudeOrigin, pt.x, pt.y);
             case RadialWarp, RectWarp -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
             case Orthographic -> throw new IllegalArgumentException("Orthographic mode is not projected");
         };
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
-    private static Vec2 projectLatitudinal(Quat rotation, MapScale scale, Vec3 v) {
-        Vec3 rotated = rotation.rotateVector(v);
-        // Positive latitude corresponds to positive Y in the non-ortho map basis.
-        double latitude = SphericalCoords.latitude(rotated);
-        double longitude = SphericalCoords.longitude(rotated);
-        double scaledphi = scale.toUnitX(Math.toDegrees(longitude)) - 0.5;
-        double scaledtheta = scale.toUnitY(Math.toDegrees(latitude)) - 0.5;
+    private static Vec2 projectLatitudinal(double longitudeOrigin, double latitudeOrigin, MapScale scale, Vec3 v) {
+        double longitude = MathUtils.mapToMinus180To180(
+                Math.toDegrees(SphericalCoords.longitude(v) + longitudeOrigin));
+        double latitude = Math.toDegrees(SphericalCoords.latitude(v) - latitudeOrigin);
+        double scaledphi = scale.toUnitX(longitude) - 0.5;
+        double scaledtheta = scale.toUnitY(latitude) - 0.5;
         return new Vec2(scaledphi, scaledtheta);
     }
 
-    private static Vec3 unprojectLatitudinal(Quat rotation, double longitudeDeg, double latitudeDeg) {
-        double longitude = Math.toRadians(longitudeDeg);
-        double latitude = Math.toRadians(latitudeDeg);
-        return rotation.rotateInverseVector(SphericalCoords.unit(longitude, latitude));
+    private static Vec3 unprojectLatitudinal(double longitudeOrigin, double latitudeOrigin,
+                                             double longitudeDeg, double latitudeDeg) {
+        double longitude = Math.toRadians(longitudeDeg) - longitudeOrigin;
+        double latitude = Math.toRadians(latitudeDeg) + latitudeOrigin;
+        return latitude < -Math.PI / 2 || latitude > Math.PI / 2
+                ? null
+                : SphericalCoords.unit(longitude, latitude);
     }
 
     private static Vec3 unprojectRadialWarp(Position viewpoint, double angleDeg, double radius) {
@@ -92,12 +96,15 @@ final class ProjectedMap {
         return WcsProjection.helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
-    static Vec2 projectToScreen(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, Vec3 v) {
-        Vec2 pt = project(mode, viewpoint, scale, rotation, v);
+    static Vec2 projectToScreen(MapMode mode, Position viewpoint, MapScale scale,
+                                double longitudeOrigin, double latitudeOrigin, Viewport vp, Vec3 v) {
+        Vec2 pt = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, v);
         return mode == MapMode.RadialWarp ? pt : new Vec2(pt.x * vp.aspect, pt.y);
     }
 
-    static void emitMapLine(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+    static void emitMapLine(MapMode mode, Position viewpoint, MapScale scale,
+                            double longitudeOrigin, double latitudeOrigin, Viewport vp,
+                            List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
         if (vertices.isEmpty())
             return;
         if (mode == MapMode.HPC) {
@@ -109,12 +116,12 @@ final class ProjectedMap {
             return;
         }
 
-        Vec2 current = project(mode, viewpoint, scale, rotation, vertices.getFirst());
+        Vec2 current = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, vertices.getFirst());
         emitProjectedVertex(vp, current, Colors.Null, vexBuf);
         vexBuf.repeatVertex(color);
         for (int i = 1; i < vertices.size(); i++) {
             Vec2 previous = current;
-            current = project(mode, viewpoint, scale, rotation, vertices.get(i));
+            current = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, vertices.get(i));
             emitWrappedVertex(vp, previous, current, color, vexBuf);
         }
         vexBuf.repeatVertex(Colors.Null);
@@ -156,7 +163,9 @@ final class ProjectedMap {
         }
     }
 
-    static void emitMapPoints(MapMode mode, Position viewpoint, MapScale scale, Quat rotation, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
+    static void emitMapPoints(MapMode mode, Position viewpoint, MapScale scale,
+                              double longitudeOrigin, double latitudeOrigin, Viewport vp,
+                              List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
         if (mode == MapMode.HPC) {
             emitHpcPoints(viewpoint, scale, vp, vertices, size, color, vexBuf);
             return;
@@ -171,7 +180,7 @@ final class ProjectedMap {
             return;
         }
         for (Vec3 vertex : vertices) {
-            Vec2 pt = project(mode, viewpoint, scale, rotation, vertex);
+            Vec2 pt = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, vertex);
             vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
         }
     }

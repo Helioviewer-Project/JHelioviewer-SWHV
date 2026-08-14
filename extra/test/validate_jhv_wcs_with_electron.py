@@ -19,7 +19,8 @@ from validate_jhv_wcs_against_astropy import (
     LATI_ZENITHAL_BOUNDS_DEG,
     LATI_SURFACE_BOUNDS_DEG,
     clipHpcGeometry,
-    displayLatitudinalWorld,
+    differential,
+    latitudinalWorld,
     fits_pixel_to_texture_pixel,
     hpc_bounds_degrees,
     helioprojectiveToHpcXY,
@@ -27,10 +28,12 @@ from validate_jhv_wcs_against_astropy import (
     is_surface_map_projection,
     load_validation_context,
     pixel_center_error_px,
+    projectHelioprojectiveToWcsPlane,
     renderHpcTexcoordsFloat32,
     renderHpcTexcoords,
     renderLatitudinalTexcoords,
     renderOrthographicTexcoords,
+    rotate_vector,
     sampleHpcTexcoord,
     sample_texture_linear,
     screenToHelioprojective,
@@ -208,6 +211,8 @@ def common_job(
         "outputPath": str(output_path),
         "boundsDeg": list(bounds),
         "warpLambda": 1.0,
+        "sourceViewQuat": [0.0, 0.0, 0.0, 1.0],
+        "latiOrigin": [0.0, 0.0],
         **wcs_job_fields(meta),
         "sampleTexture": sample_texture,
         "diffSelfcheck": diff_selfcheck,
@@ -524,6 +529,8 @@ def cpu_texcoord_for_mode(
     outer_radius: float,
     warp_lambda: float,
     delta_t: float = 0.0,
+    lati_origin: tuple[float, float] = (0.0, 0.0),
+    source_view_quat: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 1.0),
 ) -> tuple[float, float]:
     if mode == "ortho":
         screen_xy = (2.0 * sx - 1.0, 2.0 * sy - 1.0)
@@ -538,7 +545,8 @@ def cpu_texcoord_for_mode(
             LATI_ZENITHAL_BOUNDS_DEG,
             meta,
             image_data,
-            grid=(0.0, 0.0, 0.0),
+            lati_origin=lati_origin,
+            source_view_quat=source_view_quat,
             delta_t=delta_t,
         )
         return texcoord
@@ -588,6 +596,7 @@ def expected_plane_internal_for_mode(
     sx: float,
     sy: float,
     meta,
+    job: dict,
 ) -> tuple[float, float]:
     if mode == "ortho":
         x = 2.0 * sx - 1.0
@@ -598,19 +607,17 @@ def expected_plane_internal_for_mode(
         return (x - meta.crval_internal_x, y - meta.crval_internal_y)
 
     if mode == "lati_zenithal":
-        longitude = sx * (2.0 * math.pi)
-        latitude = (sy - 0.5) * math.pi
-        if latitude < -0.5 * math.pi or latitude > 0.5 * math.pi:
+        world = latitudinalWorld(
+            (sx, sy), tuple(job["boundsDeg"]), tuple(job.get("latiOrigin", (0.0, 0.0))))
+        if not all(math.isfinite(value) for value in world):
             return (math.nan, math.nan)
-        cos_latitude = math.cos(latitude)
-        spherical = (
-            cos_latitude * math.cos(longitude),
-            cos_latitude * math.sin(longitude),
-            math.sin(latitude),
-        )
-        if spherical[0] < 0.0:
+        if job.get("deltaT", 0.0) != 0.0:
+            world = differential(job["deltaT"], world)
+        source_world = rotate_vector(tuple(job.get("sourceViewQuat", (0.0, 0.0, 0.0, 1.0))), world)
+        if source_world[2] < 0.0:
             return (math.nan, math.nan)
-        return (spherical[1] - meta.crval_internal_x, spherical[2] - meta.crval_internal_y)
+        helioprojective = worldToHelioprojective(source_world, meta.observer_distance)
+        return projectHelioprojectiveToWcsPlane(helioprojective, meta)
 
     return (math.nan, math.nan)
 
@@ -651,8 +658,6 @@ def make_mode_job(
         color_smoke=color_smoke,
         color_diff_smoke=color_diff_smoke,
     )
-    if mode == "lati_zenithal":
-        job["latiGrid"] = [0.0, 0.0, 0.0]
     if mode in WARP_MODES:
         job["warpLambda"] = warp_lambda
     return job
@@ -695,6 +700,37 @@ def compare_shader_to_cpu(
     )
 
 
+def verify_latitudinal_origin_equivalence(
+    source_longitude: float,
+    source_latitude: float,
+    display_longitude: float,
+    source_view_quat: tuple[float, float, float, float],
+) -> None:
+    legacy_longitude_origin = (
+        source_longitude - display_longitude + 3.0 * math.pi) % (2.0 * math.pi)
+    for sx, sy in ((0.03, 0.2), (0.19, 0.5), (0.41, 0.75), (0.67, 0.2), (0.91, 0.5)):
+        latitude = source_latitude + (sy - 0.5) * math.pi
+        cos_latitude = math.cos(latitude)
+        longitude = legacy_longitude_origin + sx * 2.0 * math.pi
+        spherical = (
+            cos_latitude * math.cos(longitude),
+            cos_latitude * math.sin(longitude),
+            math.sin(latitude),
+        )
+        legacy_source_world = (
+            spherical[1],
+            -math.sin(source_latitude) * spherical[0] + math.cos(source_latitude) * spherical[2],
+            math.cos(source_latitude) * spherical[0] + math.sin(source_latitude) * spherical[2],
+        )
+        source_world = rotate_vector(
+            source_view_quat,
+            latitudinalWorld(
+                (sx, sy), LATI_ZENITHAL_BOUNDS_DEG, (display_longitude, source_latitude)),
+        )
+        if max(abs(a - b) for a, b in zip(legacy_source_world, source_world, strict=True)) > 1e-12:
+            raise AssertionError("Latitudinal angular-origin mapping changed the legacy observer geometry")
+
+
 def compare_differential_rotation(
     electron: Path,
     output_dir: Path,
@@ -708,12 +744,31 @@ def compare_differential_rotation(
     # ImageLayer converts an elapsed millisecond interval to the shader's time
     # unit with a factor of 1e-9.
     delta_t = 12.0 * 60.0 * 60.0 * 1000.0 * 1e-9
+    source_longitude = math.radians(11.0)
+    source_latitude = math.radians(7.0)
+    display_longitude = math.radians(3.0)
+    display_latitude = math.radians(-3.5)
+    sin_lon = math.sin(source_longitude / 2.0)
+    cos_lon = math.cos(source_longitude / 2.0)
+    sin_lat = math.sin(source_latitude / 2.0)
+    cos_lat = math.cos(source_latitude / 2.0)
+    source_view_quat = (
+        sin_lat * cos_lon,
+        cos_lat * sin_lon,
+        sin_lat * sin_lon,
+        cos_lat * cos_lon,
+    )
+    verify_latitudinal_origin_equivalence(
+        source_longitude, source_latitude, display_longitude, source_view_quat)
     jobs = []
     for mode in ("ortho", "lati_zenithal"):
         job = make_mode_job(
             mode, fits_file, render_size, output_dir, True, meta, backend,
             name=f"{mode}_differential")
         job["deltaT"] = delta_t
+        if mode == "lati_zenithal":
+            job["sourceViewQuat"] = list(source_view_quat)
+            job["latiOrigin"] = [display_longitude, display_latitude]
         jobs.append(job)
 
     results = run_electron_jobs(electron, jobs, backend)
@@ -942,6 +997,8 @@ def evaluate_shader_to_cpu(
                 job["boundsDeg"][3],
                 job.get("warpLambda", DEFAULT_WARP_LAMBDA),
                 job.get("deltaT", 0.0),
+                tuple(job.get("latiOrigin", (0.0, 0.0))),
+                tuple(job.get("sourceViewQuat", (0.0, 0.0, 0.0, 1.0))),
             )
             cpu_valid = is_finite_texcoord(cpu_texcoord)
             if sample_texture and texture_data is not None:
@@ -974,7 +1031,7 @@ def evaluate_shader_to_cpu(
             max_px_err = max(max_px_err, float(err))
             sum_px_err2 += float(err * err)
             if projection_wcs is not None and pixel_wcs is not None:
-                expected_plane_internal = expected_plane_internal_for_mode(mode, sx, sy, meta)
+                expected_plane_internal = expected_plane_internal_for_mode(mode, sx, sy, meta, job)
                 if math.isfinite(expected_plane_internal[0]) and math.isfinite(expected_plane_internal[1]):
                     expected_plane_deg = (
                         math.degrees(expected_plane_internal[0] / meta.plane_units_per_rad),
@@ -1096,7 +1153,7 @@ def compare_batch(
                 report_validity_mismatches,
             )
         else:
-            mode_max_error = 1.0 if mode == "lati_zenithal" else max_error_px
+            mode_max_error = 1.0 if backend == "swiftshader" and mode == "lati_zenithal" else max_error_px
             code = evaluate_shader_to_cpu(
                 mode,
                 fits_file,
@@ -1188,7 +1245,7 @@ def compare_tan_all_modes_case_batch(
                 report_validity_mismatches,
             )
         else:
-            mode_max_error = 1.0 if mode == "lati_zenithal" else max_error_px
+            mode_max_error = 1.0 if backend == "swiftshader" and mode == "lati_zenithal" else max_error_px
             code = evaluate_shader_to_cpu(
                 mode,
                 info["fits_file"],
@@ -1671,7 +1728,7 @@ def evaluate_surface_map_shader_to_cpu(
             max_px_err = max(max_px_err, float(err))
             sum_px_err2 += float(err * err)
             if pixel_wcs is not None:
-                world_xyz = displayLatitudinalWorld((sx, sy), LATI_SURFACE_BOUNDS_DEG)
+                world_xyz = latitudinalWorld((sx, sy), LATI_SURFACE_BOUNDS_DEG)
                 if math.isfinite(world_xyz[0]) and math.isfinite(world_xyz[1]) and math.isfinite(world_xyz[2]):
                     world_deg = (
                         math.degrees(math.atan2(world_xyz[0], world_xyz[2])),

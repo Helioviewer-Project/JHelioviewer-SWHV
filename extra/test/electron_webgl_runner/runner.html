@@ -132,15 +132,17 @@ function projectionBlock(job) {
   block[1] = job.planeUnitsPerRadian;
   block[2] = job.observerDistance;
   block[3] = 0;
-  putVec4(block, 4, [0, 0, 0, 1]);
-  putVec4(block, 8, [0, 0, 0, 1]);
+  putVec4(block, 4, job.sourceViewQuat || [0, 0, 0, 1]);
+  block[8] = (job.latiOrigin || [0, 0])[0];
+  block[9] = (job.latiOrigin || [0, 0])[1];
 
   block[12] = secondary.projectionCode;
   block[13] = secondary.planeUnitsPerRadian;
   block[14] = secondary.observerDistance;
   block[15] = 0;
   putVec4(block, 16, secondary.sourceViewQuat || [0, 0, 0, 1]);
-  putVec4(block, 20, secondary.displayMapQuat || [0, 0, 0, 1]);
+  block[20] = (secondary.latiOrigin || [0, 0])[0];
+  block[21] = (secondary.latiOrigin || [0, 0])[1];
   return block;
 }
 
@@ -369,27 +371,27 @@ void main(void) {
             ? sampleLatiCarTexcoord(mapPos, wcs[0], projection[0])
             : projection[0].projectionCode == WCS_PROJECTION_CEA
             ? sampleLatiCeaTexcoord(mapPos, wcs[0], projection[0], pv0)
-            : sampleLatiZenithalTexcoord(mapPos, wcs[0], uLatiGrid);
+            : sampleLatiZenithalTexcoord(mapPos, wcs[0], projection[0], pv0);
     diagnosticOutput(texCoord, 1.);
 }
 `;
 }
 
-function latiTexcoordExpression(index, pv, grid) {
+function latiTexcoordExpression(index, pv) {
   return `projection[${index}].projectionCode == WCS_PROJECTION_CAR
             ? sampleLatiCarTexcoord(mapPos, wcs[${index}], projection[${index}])
             : projection[${index}].projectionCode == WCS_PROJECTION_CEA
             ? sampleLatiCeaTexcoord(mapPos, wcs[${index}], projection[${index}], ${pv})
-            : sampleLatiZenithalTexcoord(mapPos, wcs[${index}], ${grid})`;
+            : sampleLatiZenithalTexcoord(mapPos, wcs[${index}], projection[${index}], ${pv})`;
 }
 
 function latiDiffSelfcheckDiagnostic(commonSource, latiSource, mode) {
-  const texcoordExpression = latiTexcoordExpression(0, "pv0", "latiGrid[0]");
+  const texcoordExpression = latiTexcoordExpression(0, "pv0");
   const diffExpression = mode === "assign"
       ? "texCoord"
       : mode === "same-slot"
       ? texcoordExpression
-      : latiTexcoordExpression(1, "pv1", "latiGrid[1]");
+      : latiTexcoordExpression(1, "pv1");
 
   return `${commonSource}
 ${stripMain(latiSource)}
@@ -613,9 +615,6 @@ function renderJob(gl, commonSource, vertexSource, renderer, quadVao, job) {
   setUniform(gl, program, "uPv", job.pv2);
   setUniform(gl, program, "pv0", job.pv2);
   setUniform(gl, program, "pv1", secondary.pv2);
-  setUniform(gl, program, "uLatiGrid", job.latiGrid || [0, 0, 0]);
-  setUniform(gl, program, "latiGrid[0]", job.latiGrid || [0, 0, 0]);
-  setUniform(gl, program, "latiGrid[1]", secondary.latiGrid || [0, 0, 0]);
   setUniform(gl, program, "uSampleTexture", job.sampleTexture ? 1 : 0);
   setUniformInt(gl, program, "image", 0);
   setUniformInt(gl, program, "diffImage", 1);
