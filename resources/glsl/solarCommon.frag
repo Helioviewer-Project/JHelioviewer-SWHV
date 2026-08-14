@@ -512,3 +512,17 @@ vec2 sampleHpcTexcoord(const WCS wcs, const ProjectionParams projection, vec2 he
     vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
     return wcsPlaneToTexcoord(plane, wcs);
 }
+
+vec4 sampleWarpedHpcColor(const vec2 hpcXY) {
+    vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
+    clipPlanarMasks(hpcXY);
+    float enhancementFactor;
+    vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, pv0, enhancementFactor);
+    if (display.isDiff == NODIFFERENCE)
+        return getColor(texCoord, texCoord, enhancementFactor);
+
+    vec2 diffHelioprojective = hpcXYToHelioprojective(hpcXY, projection[1].observerDistance);
+    float diffEnhancementFactor;
+    vec2 diffTexCoord = sampleHpcTexcoord(wcs[1], projection[1], diffHelioprojective, hpcXY, pv1, diffEnhancementFactor);
+    return getColor(texCoord, diffTexCoord, max(enhancementFactor, diffEnhancementFactor));
+}
