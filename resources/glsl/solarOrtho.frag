@@ -17,8 +17,7 @@ vec2 sampleOrthoTexcoord(const vec3 world, const WCS wcs, const ProjectionParams
         return wcsPlaneToTexcoord(world.xy - wcs.crval, wcs);
 #endif
     vec2 helioprojective = worldToHelioprojective(world, projection.observerDistance);
-    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
-    return wcsPlaneToTexcoord(plane, wcs);
+    return helioprojectiveToTexcoord(helioprojective, wcs, projection, PV);
 }
 
 float intersectPlane(const vec4 quat, const vec2 viewPosition, const bool discardBackFacing) {

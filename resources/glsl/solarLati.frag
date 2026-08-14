@@ -1,7 +1,8 @@
 vec3 latitudinalWorld(const vec2 mapPos) {
     float longitude = radians(mix(screen.xStart, screen.xStop, mapPos.x)) - screen.latiOrigin.x;
     float latitude = radians(mix(screen.yStart, screen.yStop, mapPos.y)) + screen.latiOrigin.y;
-    clamp_value(latitude, -HALFPI, HALFPI);
+    if (latitude < -HALFPI || latitude > HALFPI)
+        discard;
     float cosLatitude = cos(latitude);
     return vec3(
         cosLatitude * sin(longitude),
@@ -21,8 +22,7 @@ vec2 sampleLatiTexcoord(vec3 world, const WCS wcs, const ProjectionParams projec
         discard;
 
     vec2 helioprojective = worldToHelioprojective(sourceWorld, projection.observerDistance);
-    vec2 plane = projectHelioprojectiveToWcsPlane(helioprojective, wcs, projection, PV);
-    return wcsPlaneToTexcoord(plane, wcs);
+    return helioprojectiveToTexcoord(helioprojective, wcs, projection, PV);
 }
 
 void main(void) {

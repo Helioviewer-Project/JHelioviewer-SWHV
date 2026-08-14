@@ -397,46 +397,31 @@ void main(void) {
 `;
 }
 
-function warpGeometry(mode) {
-  if (mode === "radial_warp")
-    return `vec2 w = getViewPosition();
-    float viewRadius = length(w);
-    float t = 2. * viewRadius;
-    if (t > 1. || t == 0.)
-        discard;
-    float radialCoordinate = unwarpRadius(t);
-    vec2 hpcXY = (radialCoordinate / viewRadius) * w;`;
-  if (mode === "rect_warp")
-    return `vec2 mapPos = getNormalizedMapPos();
-    float angle = mapPos.x * TWOPI;
-    float radialCoordinate = unwarpRadius(mapPos.y);
-    vec2 hpcXY = radialCoordinate * vec2(-sin(angle), cos(angle));`;
-  throw new Error(`Unsupported warp mode: ${mode}`);
-}
-
-function warpDiagnostic(commonSource, mode) {
+function warpDiagnostic(commonSource, warpSource) {
   return `${commonSource}
+${stripMain(warpSource)}
 
 ${commonDiagnosticUniforms()}
 
 void main(void) {
-    ${warpGeometry(mode)}
+    vec2 hpcXY = warpHpcXY();
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
     clipPlanarMasks(hpcXY);
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, uPv, enhancementFactor);
-    diagnosticOutput(texCoord, radialCoordinate);
+    diagnosticOutput(texCoord, length(hpcXY));
 }
 `;
 }
 
-function warpDiffSelfcheckDiagnostic(commonSource, mode) {
+function warpDiffSelfcheckDiagnostic(commonSource, warpSource) {
   return `${commonSource}
+${stripMain(warpSource)}
 
 void main(void) {
-    ${warpGeometry(mode)}
-    clipPlanarMasks(hpcXY);
+    vec2 hpcXY = warpHpcXY();
     vec2 helioprojective = hpcXYToHelioprojective(hpcXY, projection[0].observerDistance);
+    clipPlanarMasks(hpcXY);
     float enhancementFactor;
     vec2 texCoord = sampleHpcTexcoord(wcs[0], projection[0], helioprojective, hpcXY, pv0, enhancementFactor);
     vec2 diffHelioprojective = hpcXYToHelioprojective(hpcXY, projection[1].observerDistance);
@@ -568,8 +553,11 @@ function diagnosticFragment(job, commonSource) {
     return job.diffSelfcheck
         ? latiDiffSelfcheckDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"), job.latiDiffSelfcheckMode || "normal")
         : latiDiagnostic(commonSource, fs.readFileSync(path.join(job.repoRoot, "resources/glsl/solarLati.frag"), "utf8"));
-  if (job.mode === "radial_warp" || job.mode === "rect_warp")
-    return job.diffSelfcheck ? warpDiffSelfcheckDiagnostic(commonSource, job.mode) : warpDiagnostic(commonSource, job.mode);
+  if (job.mode === "radial_warp" || job.mode === "rect_warp") {
+    const warpShader = job.mode === "radial_warp" ? "solarRadialWarp.frag" : "solarRectWarp.frag";
+    const warpSource = fs.readFileSync(path.join(job.repoRoot, "resources/glsl", warpShader), "utf8");
+    return job.diffSelfcheck ? warpDiffSelfcheckDiagnostic(commonSource, warpSource) : warpDiagnostic(commonSource, warpSource);
+  }
   throw new Error(`Unsupported mode: ${job.mode}`);
 }
 
