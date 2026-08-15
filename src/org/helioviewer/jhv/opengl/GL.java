@@ -22,7 +22,9 @@ public final class GL {
     public static final int COLOR_ATTACHMENT0 = GLES30.GL_COLOR_ATTACHMENT0;
     public static final int COLOR_BUFFER_BIT = GLES30.GL_COLOR_BUFFER_BIT;
     public static final int COMPILE_STATUS = GLES30.GL_COMPILE_STATUS;
+    public static final int CCW = GLES30.GL_CCW;
     public static final int CULL_FACE = GLES30.GL_CULL_FACE;
+    public static final int CW = GLES30.GL_CW;
     public static final int DEPTH_ATTACHMENT = GLES30.GL_DEPTH_ATTACHMENT;
     public static final int DEPTH_BUFFER_BIT = GLES30.GL_DEPTH_BUFFER_BIT;
     public static final int DEPTH_COMPONENT16 = GLES30.GL_DEPTH_COMPONENT16;
@@ -32,6 +34,7 @@ public final class GL {
     public static final int DEPTH_TEST = GLES30.GL_DEPTH_TEST;
     public static final int DRAW_FRAMEBUFFER = GLES30.GL_DRAW_FRAMEBUFFER;
     public static final int DYNAMIC_DRAW = GLES30.GL_DYNAMIC_DRAW;
+    public static final int ELEMENT_ARRAY_BUFFER = GLES30.GL_ELEMENT_ARRAY_BUFFER;
     public static final int FLOAT = GLES30.GL_FLOAT;
     public static final int FRAGMENT_SHADER = GLES30.GL_FRAGMENT_SHADER;
     public static final int FRAMEBUFFER = GLES30.GL_FRAMEBUFFER;
@@ -46,10 +49,14 @@ public final class GL {
     public static final int LEQUAL = GLES30.GL_LEQUAL;
     public static final int LINEAR = GLES30.GL_LINEAR;
     public static final int LINEAR_MIPMAP_LINEAR = GLES30.GL_LINEAR_MIPMAP_LINEAR;
+    public static final int LINEAR_MIPMAP_NEAREST = GLES30.GL_LINEAR_MIPMAP_NEAREST;
     public static final int LINK_STATUS = GLES30.GL_LINK_STATUS;
     public static final int MAX_SAMPLES = GLES30.GL_MAX_SAMPLES;
     public static final int MAX_TEXTURE_SIZE = GLES30.GL_MAX_TEXTURE_SIZE;
+    public static final int MIRRORED_REPEAT = GLES30.GL_MIRRORED_REPEAT;
     public static final int NEAREST = GLES30.GL_NEAREST;
+    public static final int NEAREST_MIPMAP_LINEAR = GLES30.GL_NEAREST_MIPMAP_LINEAR;
+    public static final int NEAREST_MIPMAP_NEAREST = GLES30.GL_NEAREST_MIPMAP_NEAREST;
     public static final int NO_ERROR = GLES30.GL_NO_ERROR;
     public static final int ONE = GLES30.GL_ONE;
     public static final int ONE_MINUS_SRC_ALPHA = GLES30.GL_ONE_MINUS_SRC_ALPHA;
@@ -63,6 +70,7 @@ public final class GL {
     public static final int RED = GLES30.GL_RED;
     public static final int RENDERER = GLES30.GL_RENDERER;
     public static final int RENDERBUFFER = GLES30.GL_RENDERBUFFER;
+    public static final int REPEAT = GLES30.GL_REPEAT;
     public static final int RGB = GLES30.GL_RGB;
     public static final int RGB8 = GLES30.GL_RGB8;
     public static final int RGBA = GLES30.GL_RGBA;
@@ -83,6 +91,7 @@ public final class GL {
     public static final int UNPACK_ALIGNMENT = GLES30.GL_UNPACK_ALIGNMENT;
     public static final int UNPACK_ROW_LENGTH = GLES30.GL_UNPACK_ROW_LENGTH;
     public static final int UNSIGNED_BYTE = GLES30.GL_UNSIGNED_BYTE;
+    public static final int UNSIGNED_INT = GLES30.GL_UNSIGNED_INT;
     public static final int VENDOR = GLES30.GL_VENDOR;
     public static final int VERSION = GLES30.GL_VERSION;
     public static final int VERTEX_SHADER = GLES30.GL_VERTEX_SHADER;
@@ -250,6 +259,10 @@ public final class GL {
         GLES30.glDrawArraysInstanced(mode, first, count, primcount);
     }
 
+    public static void glDrawElements(int mode, int count, int type, long offset) {
+        GLES30.glDrawElements(mode, count, type, offset);
+    }
+
     public static void glEnable(int cap) {
         GLES30.glEnable(cap);
     }
@@ -264,6 +277,10 @@ public final class GL {
 
     public static void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
         GLES30.glFramebufferTexture2D(target, attachment, textarget, texture, level);
+    }
+
+    public static void glFrontFace(int mode) {
+        GLES30.glFrontFace(mode);
     }
 
     public static int glGenBuffer() {

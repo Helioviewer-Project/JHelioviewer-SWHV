@@ -15,6 +15,11 @@ public record ModelNode(String name, Matrix4fc transform, IntBuffer meshIndices,
     }
 
     @Override
+    public Matrix4fc transform() {
+        return new Matrix4f(transform);
+    }
+
+    @Override
     public IntBuffer meshIndices() {
         return meshIndices.duplicate();
     }

@@ -7,6 +7,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 
@@ -64,6 +65,10 @@ public final class Transform {
         view.rotateAffine(quat.set((float) q.x, (float) q.y, (float) q.z, (float) q.w));
     }
 
+    static void multiplyView(Matrix4fc transform) {
+        view.mul(transform);
+    }
+
     static void ortho2D(double aspect, double width, double tx, double ty) {
         setup((float) (width * aspect), (float) width, -1, 1, (float) tx, (float) ty);
         cacheMVP();
@@ -101,6 +106,13 @@ public final class Transform {
 
     static FloatBuffer getInverse() {
         return inv;
+    }
+
+    static float viewZ(Matrix4fc model, float x, float y, float z) {
+        float worldX = model.m00() * x + model.m10() * y + model.m20() * z + model.m30();
+        float worldY = model.m01() * x + model.m11() * y + model.m21() * z + model.m31();
+        float worldZ = model.m02() * x + model.m12() * y + model.m22() * z + model.m32();
+        return view.m02() * worldX + view.m12() * worldY + view.m22() * worldZ + view.m32();
     }
 
     private Transform() {}

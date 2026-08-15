@@ -52,8 +52,13 @@ public class GLTexture {
     }
 
     private static void genTexture2D(int internalFormat, int width, int height, int inputFormat, int inputType, int filter, Buffer buffer) {
+        genTexture2D(internalFormat, width, height, inputFormat, inputType, filter, filter, GL.CLAMP_TO_EDGE, GL.CLAMP_TO_EDGE, 0, buffer);
+    }
+
+    private static void genTexture2D(int internalFormat, int width, int height, int inputFormat, int inputType, int minFilter, int magFilter,
+                                     int wrapS, int wrapT, int maxLevel, Buffer buffer) {
         GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_BASE_LEVEL, 0);
-        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, 0);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAX_LEVEL, maxLevel);
         switch (buffer) {
             case null -> GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, (ByteBuffer) null);
             case ByteBuffer byteBuffer ->
@@ -62,10 +67,10 @@ public class GLTexture {
                     GL.glTexImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, inputFormat, inputType, BufferUtils.directShortBuffer(shortBuffer));
             default -> throw new IllegalArgumentException("Unsupported texture buffer type: " + buffer.getClass().getName());
         }
-        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, filter);
-        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, filter);
-        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, minFilter);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, magFilter);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, wrapS);
+        GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, wrapT);
     }
 
     public void copyImageBuffer(ImageBuffer imageBuffer, int glFilter) {
@@ -109,6 +114,19 @@ public class GLTexture {
         GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, w);
         genTexture2D(GL.RGBA, w, h, GL.RGBA, GL.UNSIGNED_BYTE, glFilter, source);
+    }
+
+    static void copyByteImage(int w, int h, int minFilter, int magFilter, int wrapS, int wrapT, boolean mipmaps, ByteBuffer source) {
+        if (w < 1 || h < 1 || w > GL.maxTextureSize || h > GL.maxTextureSize) {
+            Log.warn("w= " + w + " h=" + h);
+            return;
+        }
+        GL.glPixelStorei(GL.UNPACK_ALIGNMENT, 4);
+        GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, w);
+        int maxLevel = mipmaps ? 31 - Integer.numberOfLeadingZeros(Math.max(w, h)) : 0;
+        genTexture2D(GL.RGBA, w, h, GL.RGBA, GL.UNSIGNED_BYTE, minFilter, magFilter, wrapS, wrapT, maxLevel, source);
+        if (mipmaps)
+            GL.glGenerateMipmap(GL.TEXTURE_2D);
     }
 
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {

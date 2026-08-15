@@ -78,6 +78,7 @@ public final class GLRenderer {
         GLSLSolar.quad.init();
         GLSLSolarShader.init();
         GLSLLineShader.init();
+        GLSLMeshShader.init();
         GLSLShapeShader.init();
         GLSLTextureShader.init();
 
@@ -121,6 +122,7 @@ public final class GLRenderer {
         GLSLSolar.quad.dispose();
         GLSLSolarShader.dispose();
         GLSLLineShader.dispose();
+        GLSLMeshShader.dispose();
         GLSLShapeShader.dispose();
         GLSLTextureShader.dispose();
 
