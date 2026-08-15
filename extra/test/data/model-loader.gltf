@@ -1,0 +1,86 @@
+{
+  "asset": {"version": "2.0", "generator": "JHV Assimp loader test"},
+  "scene": 0,
+  "scenes": [{"name": "loader-showcase", "nodes": [0]}],
+  "nodes": [
+    {"name": "root", "children": [1, 2]},
+    {"name": "primary", "translation": [-1.35, 0, 0], "scale": [0.9, 0.9, 0.9], "mesh": 0},
+    {"name": "secondary-group", "translation": [1.35, 0, 0], "rotation": [0, 0, 0.13052619222005157, 0.9914448613738104], "children": [3]},
+    {"name": "mirrored", "scale": [-0.75, 0.75, 1], "mesh": 0}
+  ],
+  "buffers": [{
+    "byteLength": 546,
+    "uri": "data:application/octet-stream;base64,AACAvwAAgL8AAAAAAACAPwAAgL8AAAAAAACAPwAAgD8AAAAAAACAvwAAgD8AAAAA///////Sqv+q///m/7T/0gAAAAAAAAAAAACAPwAAAAAAAIA/AACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAACAPwAAgD8AAAEAAgAAAAIAAwCamVm/MzMzv83MzD2amVk/MzMzv83MzD0AAAAAmplZP83MzD3/////////tP///+YAAAAAAAAAAAAAgD8AAAAAAAAAPwAAgD8AAAEAAgAAAGZmZr+uR2G+zcxMPmZmZj+uR2G+zcxMPmZmZj+uR2E+zcxMPmZmZr+uR2E+zcxMPgAAAAAAAAAAAAAAQAAAAAAAAABAAACAPwAAAAAAAIA/AAABAAIAAAACAAMAPQqXPwAAAACamZk+UppVP1KaVT+amZk+VJumJD0Klz+amZk+UppVv1KaVT+amZk+PQqXv1SbJiWamZk+UppVv1KaVb+amZk+/uh5pT0Kl7+amZk+UppVP1KaVb+amZk+//9G///tWv//227//8mC//+3lv//par//5O+//+B0v8AAAEAAgADAAQABQAGAAcAAACAvwAAgL/NzMw+AACAPwAAgL/NzMw+AACAPwAAgD/NzMw+AACAvwAAgD/NzMw+AAAAAAAAAADNzMw+/1rc/1Dc/9z/3FDIZP+CtP////8AAAEAAgADAAQA"
+  }],
+  "bufferViews": [
+    {"buffer": 0, "byteOffset": 0, "byteLength": 48, "target": 34962},
+    {"buffer": 0, "byteOffset": 48, "byteLength": 16, "target": 34962},
+    {"buffer": 0, "byteOffset": 64, "byteLength": 32, "target": 34962},
+    {"buffer": 0, "byteOffset": 96, "byteLength": 32, "target": 34962},
+    {"buffer": 0, "byteOffset": 128, "byteLength": 12, "target": 34963},
+    {"buffer": 0, "byteOffset": 140, "byteLength": 36, "target": 34962},
+    {"buffer": 0, "byteOffset": 176, "byteLength": 12, "target": 34962},
+    {"buffer": 0, "byteOffset": 188, "byteLength": 24, "target": 34962},
+    {"buffer": 0, "byteOffset": 212, "byteLength": 6, "target": 34963},
+    {"buffer": 0, "byteOffset": 220, "byteLength": 48, "target": 34962},
+    {"buffer": 0, "byteOffset": 268, "byteLength": 32, "target": 34962},
+    {"buffer": 0, "byteOffset": 300, "byteLength": 12, "target": 34963},
+    {"buffer": 0, "byteOffset": 312, "byteLength": 96, "target": 34962},
+    {"buffer": 0, "byteOffset": 408, "byteLength": 32, "target": 34962},
+    {"buffer": 0, "byteOffset": 440, "byteLength": 16, "target": 34963},
+    {"buffer": 0, "byteOffset": 456, "byteLength": 60, "target": 34962},
+    {"buffer": 0, "byteOffset": 516, "byteLength": 20, "target": 34962},
+    {"buffer": 0, "byteOffset": 536, "byteLength": 10, "target": 34963}
+  ],
+  "accessors": [
+    {"bufferView": 0, "componentType": 5126, "count": 4, "type": "VEC3", "min": [-1, -1, 0], "max": [1, 1, 0]},
+    {"bufferView": 1, "componentType": 5121, "normalized": true, "count": 4, "type": "VEC4"},
+    {"bufferView": 2, "componentType": 5126, "count": 4, "type": "VEC2"},
+    {"bufferView": 3, "componentType": 5126, "count": 4, "type": "VEC2"},
+    {"bufferView": 4, "componentType": 5123, "count": 6, "type": "SCALAR"},
+    {"bufferView": 5, "componentType": 5126, "count": 3, "type": "VEC3", "min": [-0.85, -0.7, 0.1], "max": [0.85, 0.85, 0.1]},
+    {"bufferView": 6, "componentType": 5121, "normalized": true, "count": 3, "type": "VEC4"},
+    {"bufferView": 7, "componentType": 5126, "count": 3, "type": "VEC2"},
+    {"bufferView": 8, "componentType": 5123, "count": 3, "type": "SCALAR"},
+    {"bufferView": 9, "componentType": 5126, "count": 4, "type": "VEC3", "min": [-0.9, -0.22, 0.2], "max": [0.9, 0.22, 0.2]},
+    {"bufferView": 10, "componentType": 5126, "count": 4, "type": "VEC2"},
+    {"bufferView": 11, "componentType": 5123, "count": 6, "type": "SCALAR"},
+    {"bufferView": 12, "componentType": 5126, "count": 8, "type": "VEC3", "min": [-1.18, -1.18, 0.3], "max": [1.18, 1.18, 0.3]},
+    {"bufferView": 13, "componentType": 5121, "normalized": true, "count": 8, "type": "VEC4"},
+    {"bufferView": 14, "componentType": 5123, "count": 8, "type": "SCALAR"},
+    {"bufferView": 15, "componentType": 5126, "count": 5, "type": "VEC3", "min": [-1, -1, 0.4], "max": [1, 1, 0.4]},
+    {"bufferView": 16, "componentType": 5121, "normalized": true, "count": 5, "type": "VEC4"},
+    {"bufferView": 17, "componentType": 5123, "count": 5, "type": "SCALAR"}
+  ],
+  "images": [
+    {"name": "color-grid", "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAATUlEQVR4nGP8b6PxnyHqGwNDqAZDIIMGA8NXmy3/QSDg9f//Rin//zN1fJRjeBPNwPDo8mWG55fnMLBsfT6JQfIjF8MjSUmGb893MQAAP9AgBh55Jy4AAAAASUVORK5CYII="},
+    {"name": "alpha-checker", "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAT0lEQVR4AQFEALv/Af////8AAAABAAAA/wAAAAECAAAAAQAAAP8AAAABAAAA/wIAAAD/AAAAAQAAAP8AAAABAgAAAAEAAAD/AAAAAQAAAP/KnQsF+AIVgAAAAABJRU5ErkJggg=="}
+  ],
+  "samplers": [
+    {"magFilter": 9729, "minFilter": 9987, "wrapS": 10497, "wrapT": 10497},
+    {"magFilter": 9728, "minFilter": 9728, "wrapS": 33071, "wrapT": 33648},
+    {"magFilter": 9728, "minFilter": 9984, "wrapS": 10497, "wrapT": 33071}
+  ],
+  "textures": [
+    {"sampler": 0, "source": 0},
+    {"sampler": 1, "source": 0},
+    {"sampler": 2, "source": 1}
+  ],
+  "materials": [
+    {"name": "surface-uv1", "pbrMetallicRoughness": {"baseColorTexture": {"index": 0, "texCoord": 1}}},
+    {"name": "overlay-blend", "pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 0.6], "baseColorTexture": {"index": 1}}, "alphaMode": "BLEND", "doubleSided": true},
+    {"name": "checker-mask", "pbrMetallicRoughness": {"baseColorFactor": [1, 0.9, 0.25, 1], "baseColorTexture": {"index": 2}}, "alphaMode": "MASK", "alphaCutoff": 0.5, "doubleSided": true},
+    {"name": "ring", "pbrMetallicRoughness": {"baseColorFactor": [0.1, 0.85, 1, 1]}},
+    {"name": "markers", "pbrMetallicRoughness": {"baseColorFactor": [1, 0.3, 0.9, 0.85]}, "alphaMode": "BLEND"}
+  ],
+  "meshes": [{
+    "name": "showcase",
+    "primitives": [
+      {"attributes": {"POSITION": 0, "COLOR_0": 1, "TEXCOORD_0": 2, "TEXCOORD_1": 3}, "indices": 4, "material": 0, "mode": 4},
+      {"attributes": {"POSITION": 5, "COLOR_0": 6, "TEXCOORD_0": 7}, "indices": 8, "material": 1, "mode": 4},
+      {"attributes": {"POSITION": 9, "TEXCOORD_0": 10}, "indices": 11, "material": 2, "mode": 4},
+      {"attributes": {"POSITION": 12, "COLOR_0": 13}, "indices": 14, "material": 3, "mode": 2},
+      {"attributes": {"POSITION": 15, "COLOR_0": 16}, "indices": 17, "material": 4, "mode": 0}
+    ]
+  }]
+}

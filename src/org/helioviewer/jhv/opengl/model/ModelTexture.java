@@ -2,6 +2,7 @@ package org.helioviewer.jhv.opengl.model;
 
 import java.nio.ByteBuffer;
 
+// RGBA rows are stored bottom-to-top, matching texture coordinates with a lower-left origin.
 public record ModelTexture(String name, int width, int height, ByteBuffer rgba, ModelSampler sampler) {
 
     public ModelTexture {
