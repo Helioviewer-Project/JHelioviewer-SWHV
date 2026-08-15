@@ -31,9 +31,9 @@ public final class GLSLModel {
     private final GLSLShape[] pointMeshes;
     private final DirectBufVertex[] lineVertices;
     private final DirectBufVertex[] pointVertices;
+    private final float[] meshCenters;
     private final ArrayList<Instance> opaqueInstances = new ArrayList<>();
-    private final ArrayList<Instance> drawingInstances = new ArrayList<>();
-    private final ArrayList<Instance> blendedInstances = new ArrayList<>();
+    private final ArrayList<Instance> transparentInstances = new ArrayList<>();
 
     private GLTexture[] textures;
     private boolean initialized;
@@ -46,9 +46,11 @@ public final class GLSLModel {
         pointMeshes = new GLSLShape[meshCount];
         lineVertices = new DirectBufVertex[meshCount];
         pointVertices = new DirectBufVertex[meshCount];
+        meshCenters = new float[Math.multiplyExact(meshCount, 3)];
 
         for (int i = 0; i < meshCount; i++) {
             ModelMesh mesh = scene.meshes().get(i);
+            storeCenter(mesh, i);
             ModelMaterial material = getMaterial(mesh);
             validateTexture(material);
             switch (mesh.primitive()) {
@@ -96,12 +98,10 @@ public final class GLSLModel {
 
             Instance instance = new Instance(meshIndex, new Matrix4f(worldTransform));
             GLSLMesh triangleMesh = triangleMeshes[meshIndex];
-            if (triangleMesh == null)
-                drawingInstances.add(instance);
-            else if (triangleMesh.material().alphaMode() == ModelMaterial.AlphaMode.BLEND)
-                blendedInstances.add(instance);
-            else
+            if (triangleMesh != null && triangleMesh.material().alphaMode() != ModelMaterial.AlphaMode.BLEND)
                 opaqueInstances.add(instance);
+            else
+                transparentInstances.add(instance);
         }
         for (ModelNode child : node.children())
             flattenNode(child, worldTransform);
@@ -154,22 +154,45 @@ public final class GLSLModel {
             renderTriangle(instance);
 
         double pointFactor = ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp));
-        for (Instance instance : drawingInstances)
-            renderDrawing(instance, vp, pointFactor);
-
-        blendedInstances.sort(Comparator.comparingDouble(this::viewZ));
-        GL.glDepthMask(false);
+        transparentInstances.sort(Comparator.comparingDouble(this::viewZ));
         try {
-            for (Instance instance : blendedInstances)
-                renderTriangle(instance);
+            for (Instance instance : transparentInstances) {
+                // GLSLLine restores depth writes after drawing, so establish the transparent-pass state for every primitive.
+                GL.glDepthMask(false);
+                if (triangleMeshes[instance.meshIndex] == null)
+                    renderDrawing(instance, vp, pointFactor);
+                else
+                    renderTriangle(instance);
+            }
         } finally {
             GL.glDepthMask(true);
         }
     }
 
     private double viewZ(Instance instance) {
-        GLSLMesh mesh = triangleMeshes[instance.meshIndex];
-        return Transform.viewZ(instance.transform, mesh.centerX(), mesh.centerY(), mesh.centerZ());
+        int center = 3 * instance.meshIndex;
+        return Transform.viewZ(instance.transform, meshCenters[center], meshCenters[center + 1], meshCenters[center + 2]);
+    }
+
+    private void storeCenter(ModelMesh mesh, int meshIndex) {
+        FloatBuffer positions = mesh.positions();
+        float minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY, minZ = Float.POSITIVE_INFINITY;
+        float maxX = Float.NEGATIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY, maxZ = Float.NEGATIVE_INFINITY;
+        for (int i = 0; i < mesh.vertexCount(); i++) {
+            float x = positions.get(3 * i);
+            float y = positions.get(3 * i + 1);
+            float z = positions.get(3 * i + 2);
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            minZ = Math.min(minZ, z);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+            maxZ = Math.max(maxZ, z);
+        }
+        int center = 3 * meshIndex;
+        meshCenters[center] = 0.5f * (minX + maxX);
+        meshCenters[center + 1] = 0.5f * (minY + maxY);
+        meshCenters[center + 2] = 0.5f * (minZ + maxZ);
     }
 
     private void renderDrawing(Instance instance, Viewport vp, double pointFactor) {

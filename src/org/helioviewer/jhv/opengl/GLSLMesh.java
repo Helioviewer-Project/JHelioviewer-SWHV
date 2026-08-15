@@ -18,9 +18,6 @@ final class GLSLMesh extends VAO1 {
     private final ModelMesh data;
     private final ModelMaterial material;
     private final int indexCount;
-    private final float centerX;
-    private final float centerY;
-    private final float centerZ;
 
     private GLBO elementBuffer;
 
@@ -35,24 +32,6 @@ final class GLSLMesh extends VAO1 {
         data = _data;
         material = _material;
         indexCount = data.indices().remaining();
-
-        FloatBuffer positions = data.positions();
-        float minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY, minZ = Float.POSITIVE_INFINITY;
-        float maxX = Float.NEGATIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY, maxZ = Float.NEGATIVE_INFINITY;
-        for (int i = 0; i < data.vertexCount(); i++) {
-            float x = positions.get(3 * i);
-            float y = positions.get(3 * i + 1);
-            float z = positions.get(3 * i + 2);
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            minZ = Math.min(minZ, z);
-            maxX = Math.max(maxX, x);
-            maxY = Math.max(maxY, y);
-            maxZ = Math.max(maxZ, z);
-        }
-        centerX = 0.5f * (minX + maxX);
-        centerY = 0.5f * (minY + maxY);
-        centerZ = 0.5f * (minZ + maxZ);
     }
 
     @Override
@@ -114,18 +93,6 @@ final class GLSLMesh extends VAO1 {
 
     ModelMaterial material() {
         return material;
-    }
-
-    float centerX() {
-        return centerX;
-    }
-
-    float centerY() {
-        return centerY;
-    }
-
-    float centerZ() {
-        return centerZ;
     }
 
 }
