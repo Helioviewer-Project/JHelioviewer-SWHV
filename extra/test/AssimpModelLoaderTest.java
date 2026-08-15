@@ -310,6 +310,15 @@ public final class AssimpModelLoaderTest {
             check(rightPixels > 14_000, "mirrored model instance is missing or misplaced");
             check(centerPixels == 0, "model instances overlap the expected center gap");
 
+            layer.dispose();
+            layer.init();
+            GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+            layer.render(mv, vp);
+            GLException.checkErrors("AssimpModelLoaderTest.reinitialized");
+            ByteBuffer reinitializedPixels = BufferUtils.newByteBuffer(RENDER_SIZE * RENDER_SIZE * 4);
+            GL.glReadPixels(0, 0, RENDER_SIZE, RENDER_SIZE, GL.RGBA, GL.UNSIGNED_BYTE, reinitializedPixels);
+            checkByteBuffer(reinitializedPixels, pixels);
+
             checkMeshRendering(scene, mv, vp, 0, 20_000, "single-sided surface");
             checkMeshRendering(scene, mv, vp, 1, 10_000, "blended overlay");
             checkMeshRendering(scene, mv, vp, 2, 2_000, "masked surface");

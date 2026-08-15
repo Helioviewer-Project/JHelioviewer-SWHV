@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.display.MapView;
@@ -25,7 +26,7 @@ public final class GLSLModel {
     private static final float DEFAULT_POINT_SIZE = 0.02f;
     private static final double DEFAULT_LINE_WIDTH = GLSLLine.LINEWIDTH_BASIC;
 
-    private final ModelScene scene;
+    private final List<ModelTexture> textureData;
     private final GLSLMesh[] triangleMeshes;
     private final GLSLLine[] lineMeshes;
     private final GLSLShape[] pointMeshes;
@@ -39,8 +40,8 @@ public final class GLSLModel {
     private boolean initialized;
 
     public GLSLModel(ModelScene _scene) {
-        scene = _scene;
-        int meshCount = scene.meshes().size();
+        textureData = _scene.textures();
+        int meshCount = _scene.meshes().size();
         triangleMeshes = new GLSLMesh[meshCount];
         lineMeshes = new GLSLLine[meshCount];
         pointMeshes = new GLSLShape[meshCount];
@@ -49,10 +50,10 @@ public final class GLSLModel {
         meshCenters = new float[Math.multiplyExact(meshCount, 3)];
 
         for (int i = 0; i < meshCount; i++) {
-            ModelMesh mesh = scene.meshes().get(i);
+            ModelMesh mesh = _scene.meshes().get(i);
             storeCenter(mesh, i);
-            ModelMaterial material = getMaterial(mesh);
-            validateTexture(material);
+            ModelMaterial material = getMaterial(_scene, mesh);
+            validateTexture(_scene, material);
             switch (mesh.primitive()) {
                 case TRIANGLES -> triangleMeshes[i] = new GLSLMesh(mesh, material);
                 case LINES -> {
@@ -67,17 +68,17 @@ public final class GLSLModel {
                 }
             }
         }
-        flattenNode(scene.root(), new Matrix4f());
+        flattenNode(_scene.root(), new Matrix4f());
     }
 
-    private ModelMaterial getMaterial(ModelMesh mesh) {
+    private static ModelMaterial getMaterial(ModelScene scene, ModelMesh mesh) {
         int index = mesh.materialIndex();
         if (index < 0 || index >= scene.materials().size())
             throw new IllegalArgumentException("Invalid material index " + index + " in mesh " + mesh.name());
         return scene.materials().get(index);
     }
 
-    private void validateTexture(ModelMaterial material) {
+    private static void validateTexture(ModelScene scene, ModelMaterial material) {
         int index = material.baseColorTexture();
         if (index < ModelMaterial.NO_TEXTURE || index >= scene.textures().size())
             throw new IllegalArgumentException("Invalid base-color texture index: " + index);
@@ -93,7 +94,7 @@ public final class GLSLModel {
         IntBuffer meshIndices = node.meshIndices();
         while (meshIndices.hasRemaining()) {
             int meshIndex = meshIndices.get();
-            if (meshIndex < 0 || meshIndex >= scene.meshes().size())
+            if (meshIndex < 0 || meshIndex >= triangleMeshes.length)
                 throw new IllegalArgumentException("Invalid mesh index " + meshIndex + " in node " + node.name());
 
             Instance instance = new Instance(meshIndex, new Matrix4f(worldTransform));
@@ -132,9 +133,9 @@ public final class GLSLModel {
     }
 
     private void initTextures() {
-        textures = new GLTexture[scene.textures().size()];
+        textures = new GLTexture[textureData.size()];
         for (int i = 0; i < textures.length; i++) {
-            ModelTexture data = scene.textures().get(i);
+            ModelTexture data = textureData.get(i);
             if (data.width() > GL.maxTextureSize || data.height() > GL.maxTextureSize)
                 throw new IllegalArgumentException("Texture exceeds the OpenGL size limit: " + data.width() + 'x' + data.height());
             ModelSampler sampler = data.sampler();
