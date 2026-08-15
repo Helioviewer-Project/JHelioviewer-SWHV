@@ -38,7 +38,7 @@ import org.lwjgl.stb.STBImage;
 public final class AssimpModelLoader {
 
     private static final int IMPORT_FLAGS = Assimp.aiProcess_Triangulate | Assimp.aiProcess_ValidateDataStructure |
-            Assimp.aiProcess_SortByPType | Assimp.aiProcess_EmbedTextures;
+            Assimp.aiProcess_SortByPType | Assimp.aiProcess_EmbedTextures | Assimp.aiProcess_RemoveRedundantMaterials;
 
     private final AIScene source;
     private final Path assetDirectory;

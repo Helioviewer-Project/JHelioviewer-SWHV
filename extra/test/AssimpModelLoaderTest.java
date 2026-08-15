@@ -64,6 +64,7 @@ public final class AssimpModelLoaderTest {
 
         if (defaultFixture) {
             checkUntexturedUVsIgnored(path);
+            checkRedundantMaterialsRemoved(path);
             Path glb = createGlb(path);
             try {
                 checkScene(AssimpModelLoader.load(glb));
@@ -90,6 +91,30 @@ public final class AssimpModelLoaderTest {
         }
     }
 
+    private static void checkRedundantMaterialsRemoved(Path gltf) throws IOException {
+        String markerMaterial = "{\"name\": \"markers\", \"pbrMetallicRoughness\": {\"baseColorFactor\": [1, 0.3, 0.9, 1]}}";
+        String duplicateMarkerMaterial = "{\"name\": \"duplicate-markers\", \"pbrMetallicRoughness\": {\"baseColorFactor\": [1, 0.3, 0.9, 1]}}";
+        String unusedMaterial = "{\"name\": \"unused\", \"pbrMetallicRoughness\": {\"baseColorFactor\": [0.2, 0.4, 0.6, 1]}}";
+        String markerPrimitive = "{\"attributes\": {\"POSITION\": 15, \"COLOR_0\": 16}, \"indices\": 17, \"material\": 4, \"mode\": 0}";
+        String duplicateMarkerPrimitive = "{\"attributes\": {\"POSITION\": 15, \"COLOR_0\": 16}, \"indices\": 17, \"material\": 5, \"mode\": 0}";
+        String document = Files.readString(gltf);
+        check(document.contains(markerMaterial), "marker material");
+        check(document.contains(markerPrimitive), "marker primitive");
+        document = document.replace(markerMaterial, markerMaterial + ",\n    " + duplicateMarkerMaterial + ",\n    " + unusedMaterial);
+        document = document.replace(markerPrimitive, markerPrimitive + ",\n      " + duplicateMarkerPrimitive);
+
+        Path redundant = Files.createTempFile("model-loader-redundant-materials-", ".gltf");
+        try {
+            Files.writeString(redundant, document);
+            ModelScene scene = AssimpModelLoader.load(redundant);
+            check(scene.meshes().size() == 6, "redundant-material mesh count");
+            check(scene.materials().size() == 5, "redundant materials were not removed");
+            check(scene.meshes().get(4).materialIndex() == scene.meshes().get(5).materialIndex(), "duplicate material was not remapped");
+        } finally {
+            Files.deleteIfExists(redundant);
+        }
+    }
+
     private static void checkLayer(ModelLayer layer, Path path) throws IOException {
         check(layer.getName().equals("loader-showcase"), "layer name");
         check(layer.isEnabled(), "layer enabled");
@@ -104,6 +129,7 @@ public final class AssimpModelLoaderTest {
     private static void checkScene(ModelScene scene) {
         check(scene.name().equals("loader-showcase"), "scene name");
         check(scene.meshes().size() == 5, "mesh count");
+        check(scene.materials().size() == 5, "material count");
         check(scene.textures().size() == 3, "texture count");
 
         ModelMesh surface = scene.meshes().get(0);
