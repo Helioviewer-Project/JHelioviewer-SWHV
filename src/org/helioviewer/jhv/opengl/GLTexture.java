@@ -17,7 +17,7 @@ public class GLTexture {
     private int texID;
     private final int unit;
     private final int target;
-    private final GLBO pbo;
+    private GLBO pbo;
 
     private int previousWidth = -1;
     private int previousHeight = -1;
@@ -26,7 +26,6 @@ public class GLTexture {
 
     public GLTexture(int textureTarget, Unit textureUnit) {
         texID = GL.glGenTexture();
-        pbo = new GLBO(GL.PIXEL_UNPACK_BUFFER, GL.STREAM_DRAW);
 
         target = textureTarget;
         unit = GL.TEXTURE0 + textureUnit.ordinal();
@@ -41,7 +40,10 @@ public class GLTexture {
         if (texID == -1)
             return;
         GL.glDeleteTexture(texID);
-        pbo.delete();
+        if (pbo != null) {
+            pbo.delete();
+            pbo = null;
+        }
         texID = -1;
         previousWidth = -1;
         previousHeight = -1;
@@ -92,6 +94,8 @@ public class GLTexture {
         GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, w);
 
         int size = imageBuffer.byteSize();
+        if (pbo == null)
+            pbo = new GLBO(GL.PIXEL_UNPACK_BUFFER, GL.STREAM_DRAW);
         pbo.setBufferData(size, imageBuffer.buffer);
         GL.glTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, w, h, inputGLFormat, bppGLType, 0L);
         GL.glBindBuffer(GL.PIXEL_UNPACK_BUFFER, 0);
