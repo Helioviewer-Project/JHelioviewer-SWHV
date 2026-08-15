@@ -30,6 +30,7 @@ public final class MenuBar extends JMenuBar {
         fileMenu.add(new Actions.NewAspiicsLayer());
         fileMenu.add(new Actions.NewPunchLayer());
         fileMenu.add(new Actions.OpenLocalFile());
+        fileMenu.add(new Actions.OpenModel());
         fileMenu.addSeparator();
         fileMenu.add(new Actions.LoadState());
         fileMenu.add(new Actions.SaveState());

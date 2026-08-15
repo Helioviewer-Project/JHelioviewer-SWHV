@@ -29,8 +29,11 @@ import org.helioviewer.jhv.gui.dialog.SynopticDialog;
 import org.helioviewer.jhv.io.DataSources;
 import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.layers.Layers;
+import org.helioviewer.jhv.layers.ModelLayer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
+import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.TimeUtils;
 import org.helioviewer.jhv.timelines.Timelines;
 
@@ -166,6 +169,29 @@ public final class Actions {
                 }
                 Commands.loadImage(uris);
             }
+        }
+    }
+
+    public static class OpenModel extends AbstractAction {
+        public OpenModel() {
+            super("Open Model Layer...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            FileDialog fileDialog = new FileDialog(MainFrame.get(), "Choose a 3D model", FileDialog.LOAD);
+            fileDialog.setDirectory(Settings.getProperty("path.local"));
+            fileDialog.setVisible(true);
+
+            String directory = fileDialog.getDirectory();
+            String fileName = fileDialog.getFile();
+            if (directory == null || fileName == null)
+                return;
+
+            Settings.setProperty("path.local", directory);
+            File file = new File(directory, fileName);
+            if (file.isFile() && file.canRead())
+                Task.submit(file.toString(), () -> new ModelLayer(file.toPath()), Layers::add, "Error loading model");
         }
     }
 

@@ -23,6 +23,7 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.layers.ModelLayer;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.model.AssimpModelLoader;
@@ -57,6 +58,8 @@ public final class AssimpModelLoaderTest {
 
         ModelScene scene = AssimpModelLoader.load(path);
         checkScene(scene);
+        ModelLayer layer = new ModelLayer(path);
+        checkLayer(layer, path);
 
         if (defaultFixture) {
             Path glb = createGlb(path);
@@ -68,8 +71,19 @@ public final class AssimpModelLoaderTest {
         }
 
         if (renderOutput != null)
-            render(scene, renderOutput);
+            render(layer, scene, renderOutput);
         System.out.println("AssimpModelLoaderTest passed");
+    }
+
+    private static void checkLayer(ModelLayer layer, Path path) throws IOException {
+        check(layer.getName().equals("loader-showcase"), "layer name");
+        check(layer.isEnabled(), "layer enabled");
+        check(layer.isDeletable(), "layer deletable");
+        check(layer.isLocal(), "layer local");
+        JSONObject state = new JSONObject();
+        layer.serialize(state);
+        check(Path.of(state.getString("path")).equals(path.toAbsolutePath().normalize()), "layer path");
+        check(new ModelLayer(state).getName().equals(layer.getName()), "restored layer name");
     }
 
     private static void checkScene(ModelScene scene) {
@@ -79,42 +93,49 @@ public final class AssimpModelLoaderTest {
 
         ModelMesh surface = scene.meshes().get(0);
         check(surface.primitive() == ModelMesh.Primitive.TRIANGLES, "surface primitive");
-        check(surface.vertexCount() == 4, "surface vertex count");
-        checkBuffer(surface.indices(), 0, 1, 2, 0, 2, 3);
+        check(surface.vertexCount() == 34, "surface vertex count");
+        checkIndices(surface.indices(), 96, surface.vertexCount(), "surface indices");
         check(surface.lineOffsets().remaining() == 0, "surface line offsets");
-        checkFloatBuffer(surface.positions(), -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0);
+        checkWave(surface, 0);
         // Material 0 selects TEXCOORD_1, and Assimp normalizes glTF V coordinates to its lower-left convention.
-        checkFloatBuffer(surface.texCoords(), 0, 0, 0, 1, 1, 1, 1, 0);
-        checkByteBuffer(surface.colors(), 255, 255, 255, 255, 255, 210, 170, 255, 170, 255, 255, 230, 255, 180, 255, 210);
+        checkSurfaceTexCoords(surface);
+        checkColor(surface, -1, -1, 255, 255, 255, 255);
+        checkColor(surface, 1, -1, 255, 210, 170, 255);
+        checkColor(surface, -1, 1, 255, 180, 255, 210);
+        checkColor(surface, 1, 1, 170, 255, 255, 230);
 
         ModelMesh overlay = scene.meshes().get(1);
         check(overlay.primitive() == ModelMesh.Primitive.TRIANGLES, "overlay primitive");
-        check(overlay.vertexCount() == 3, "overlay vertex count");
-        checkBuffer(overlay.indices(), 0, 1, 2);
-        checkFloatBuffer(overlay.texCoords(), 0, 1, 1, 1, 0.5f, 0);
+        check(overlay.vertexCount() == 28, "overlay vertex count");
+        checkIndices(overlay.indices(), 78, overlay.vertexCount(), "overlay indices");
+        checkWave(overlay, 0.1f);
+        check(overlay.texCoords().remaining() == 2 * overlay.vertexCount(), "overlay texture coordinates");
+        check(overlay.colors().remaining() == 4 * overlay.vertexCount(), "overlay colors");
 
         ModelMesh mask = scene.meshes().get(2);
         check(mask.primitive() == ModelMesh.Primitive.TRIANGLES, "mask primitive");
-        check(mask.vertexCount() == 4, "mask vertex count");
-        checkBuffer(mask.indices(), 0, 1, 2, 0, 2, 3);
-        checkFloatBuffer(mask.texCoords(), 0, 1, 2, 1, 2, 0, 0, 0);
-        checkByteBuffer(mask.colors(), 255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 255, 255, 255);
+        check(mask.vertexCount() == 34, "mask vertex count");
+        checkIndices(mask.indices(), 96, mask.vertexCount(), "mask indices");
+        checkWave(mask, 0.2f);
+        check(mask.texCoords().remaining() == 2 * mask.vertexCount(), "mask texture coordinates");
+        checkWhite(mask.colors(), 4 * mask.vertexCount(), "mask colors");
 
         ModelMesh ring = scene.meshes().get(3);
         check(ring.primitive() == ModelMesh.Primitive.LINES, "ring primitive");
-        check(ring.vertexCount() == 8, "ring vertex count");
-        checkBuffer(ring.indices(), 0, 1, 2, 3, 4, 5, 6, 7, 0);
-        checkBuffer(ring.lineOffsets(), 0, 9);
+        check(ring.vertexCount() == 32, "ring vertex count");
+        checkIndices(ring.indices(), 33, ring.vertexCount(), "ring indices");
+        checkBuffer(ring.lineOffsets(), 0, 33);
+        checkWave(ring, 0.3f);
 
         ModelMesh markers = scene.meshes().get(4);
         check(markers.primitive() == ModelMesh.Primitive.POINTS, "marker primitive");
         check(markers.vertexCount() == 5, "marker vertex count");
         checkBuffer(markers.indices(), 0, 1, 2, 3, 4);
+        checkWave(markers, 0.4f);
 
         ModelMaterial surfaceMaterial = scene.materials().get(surface.materialIndex());
         check(surfaceMaterial.alphaMode() == ModelMaterial.AlphaMode.OPAQUE, "surface alpha mode");
-        check(!surfaceMaterial.doubleSided(), "surface culling");
+        check(!surfaceMaterial.doubleSided(), "surface single-sided mode");
         check(surfaceMaterial.baseColorTexture() == 0, "surface texture index");
 
         ModelMaterial overlayMaterial = scene.materials().get(overlay.materialIndex());
@@ -136,8 +157,8 @@ public final class AssimpModelLoaderTest {
         check(ringMaterial.baseColorTexture() == ModelMaterial.NO_TEXTURE, "ring texture");
 
         ModelMaterial markerMaterial = scene.materials().get(markers.materialIndex());
-        checkClose(markerMaterial.alpha(), 0.85f, "marker alpha");
-        check(markerMaterial.alphaMode() == ModelMaterial.AlphaMode.BLEND, "marker alpha mode");
+        checkClose(markerMaterial.alpha(), 1, "marker alpha");
+        check(markerMaterial.alphaMode() == ModelMaterial.AlphaMode.OPAQUE, "marker alpha mode");
 
         ModelTexture smoothColor = scene.textures().get(0);
         check(smoothColor.name().equals("color-grid"), "smooth texture name");
@@ -220,7 +241,7 @@ public final class AssimpModelLoaderTest {
         return Base64.getDecoder().decode(uri.substring(separator + 1));
     }
 
-    private static void render(ModelScene scene, Path output) throws Exception {
+    private static void render(ModelLayer layer, ModelScene scene, Path output) throws Exception {
         System.setProperty("user.timezone", TimeZone.getDefault().getID());
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         Locale.setDefault(Locale.US);
@@ -231,37 +252,54 @@ public final class AssimpModelLoaderTest {
         AppInit.loadSpice();
 
         AngleRenderer renderer = AngleRenderer.pbuffer(RENDER_SIZE, RENDER_SIZE);
-        GLSLModel model = null;
         try {
             GLRenderer.reshape(RENDER_SIZE, RENDER_SIZE);
-            model = new GLSLModel(scene);
-            model.init();
+            layer.init();
 
             Viewport vp = Display.getViewport(0);
             MapView mv = GLRenderer.getMapView();
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
             GL.glClearColor(0, 0, 0, 1);
             GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-            Transform.ortho(vp.aspect, 5, 0, 0, Quat.ZERO);
-            model.render(mv, vp);
+            Transform.ortho(vp.aspect, 5, 0, 0, Quat.createXY(Math.toRadians(18), Math.toRadians(-28)));
+            layer.render(mv, vp);
             GLException.checkErrors("AssimpModelLoaderTest.render");
 
             ByteBuffer pixels = BufferUtils.newByteBuffer(RENDER_SIZE * RENDER_SIZE * 4);
             GL.glReadPixels(0, 0, RENDER_SIZE, RENDER_SIZE, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
             BufferedImage image = new BufferedImage(RENDER_SIZE, RENDER_SIZE, BufferedImage.TYPE_INT_RGB);
             int visiblePixels = 0;
+            int leftPixels = 0;
+            int rightPixels = 0;
+            int centerPixels = 0;
             for (int y = 0; y < RENDER_SIZE; y++) {
                 for (int x = 0; x < RENDER_SIZE; x++) {
                     int offset = 4 * (y * RENDER_SIZE + x);
                     int red = pixels.get(offset) & 0xff;
                     int green = pixels.get(offset + 1) & 0xff;
                     int blue = pixels.get(offset + 2) & 0xff;
-                    if ((red | green | blue) != 0)
+                    if ((red | green | blue) != 0) {
                         visiblePixels++;
+                        if (x < RENDER_SIZE / 2)
+                            leftPixels++;
+                        else
+                            rightPixels++;
+                        if (x >= 235 && x <= 276)
+                            centerPixels++;
+                    }
                     image.setRGB(x, RENDER_SIZE - 1 - y, red << 16 | green << 8 | blue);
                 }
             }
-            check(visiblePixels != 0, "rendered image is empty");
+            check(visiblePixels > 40_000, "too little model geometry was rendered");
+            check(leftPixels > 20_000, "primary model instance is missing or misplaced");
+            check(rightPixels > 14_000, "mirrored model instance is missing or misplaced");
+            check(centerPixels == 0, "model instances overlap the expected center gap");
+
+            checkMeshRendering(scene, mv, vp, 0, 20_000, "single-sided surface");
+            checkMeshRendering(scene, mv, vp, 1, 10_000, "blended overlay");
+            checkMeshRendering(scene, mv, vp, 2, 2_000, "masked surface");
+            checkMeshRendering(scene, mv, vp, 3, 500, "line mesh");
+            checkMeshRendering(scene, mv, vp, 4, 20, "point mesh");
 
             Path absoluteOutput = output.toAbsolutePath().normalize();
             Path parent = absoluteOutput.getParent();
@@ -270,10 +308,55 @@ public final class AssimpModelLoaderTest {
             check(ImageIO.write(image, "png", absoluteOutput.toFile()), "PNG writer unavailable");
             System.out.println("Rendered image: " + absoluteOutput);
         } finally {
-            if (model != null)
-                model.dispose();
+            layer.dispose();
             renderer.destroy();
         }
+    }
+
+    private static void checkMeshRendering(ModelScene scene, MapView mv, Viewport vp, int meshIndex, int minimumPixels, String label) {
+        GLSLModel model = new GLSLModel(new ModelScene(scene.name(), selectMesh(scene.root(), meshIndex), scene.meshes(), scene.materials(),
+                scene.textures()));
+        try {
+            model.init();
+            GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+            model.render(mv, vp);
+            GLException.checkErrors("AssimpModelLoaderTest." + label);
+
+            ByteBuffer pixels = BufferUtils.newByteBuffer(RENDER_SIZE * RENDER_SIZE * 4);
+            GL.glReadPixels(0, 0, RENDER_SIZE, RENDER_SIZE, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+            int visiblePixels = 0;
+            int leftPixels = 0;
+            int rightPixels = 0;
+            for (int i = 0; i < RENDER_SIZE * RENDER_SIZE; i++) {
+                int offset = 4 * i;
+                if ((pixels.get(offset) | pixels.get(offset + 1) | pixels.get(offset + 2)) != 0) {
+                    visiblePixels++;
+                    if (i % RENDER_SIZE < RENDER_SIZE / 2)
+                        leftPixels++;
+                    else
+                        rightPixels++;
+                }
+            }
+            check(visiblePixels > minimumPixels, label + " rendered only " + visiblePixels + " pixels");
+            if (meshIndex == 0) {
+                check(leftPixels > 10_000, "single-sided primary surface is missing");
+                check(rightPixels > 7_000, "single-sided mirrored surface is missing");
+            }
+        } finally {
+            model.dispose();
+        }
+    }
+
+    private static ModelNode selectMesh(ModelNode node, int meshIndex) {
+        IntBuffer sourceIndices = node.meshIndices();
+        IntBuffer selectedIndices = BufferUtils.newIntBuffer(sourceIndices.remaining());
+        while (sourceIndices.hasRemaining()) {
+            int index = sourceIndices.get();
+            if (index == meshIndex)
+                selectedIndices.put(index);
+        }
+        return new ModelNode(node.name(), node.transform(), selectedIndices.flip(), node.children().stream()
+                .map(child -> selectMesh(child, meshIndex)).toList());
     }
 
     private static void checkBuffer(IntBuffer actual, int... expected) {
@@ -282,16 +365,54 @@ public final class AssimpModelLoaderTest {
             check(actual.get(i) == expected[i], "integer buffer element " + i);
     }
 
-    private static void checkFloatBuffer(FloatBuffer actual, float... expected) {
-        check(actual.remaining() == expected.length, "float buffer length");
-        for (int i = 0; i < expected.length; i++)
-            checkClose(actual.get(i), expected[i], "float buffer element " + i);
+    private static void checkIndices(IntBuffer indices, int count, int vertexCount, String label) {
+        check(indices.remaining() == count, label + " length");
+        for (int i = 0; i < count; i++)
+            check(indices.get(i) >= 0 && indices.get(i) < vertexCount, label + " element " + i);
     }
 
-    private static void checkByteBuffer(ByteBuffer actual, int... expected) {
-        check(actual.remaining() == expected.length, "byte buffer length");
-        for (int i = 0; i < expected.length; i++)
-            check((actual.get(i) & 0xff) == expected[i], "byte buffer element " + i);
+    private static void checkWave(ModelMesh mesh, float offset) {
+        FloatBuffer positions = mesh.positions();
+        check(positions.remaining() == 3 * mesh.vertexCount(), "position count");
+        for (int i = 0; i < mesh.vertexCount(); i++) {
+            float x = positions.get(3 * i);
+            float expectedZ = (float) (0.25 * Math.sin(Math.PI * (x + 1))) + offset;
+            checkClose(positions.get(3 * i + 2), expectedZ, "wave Z at vertex " + i);
+        }
+    }
+
+    private static void checkSurfaceTexCoords(ModelMesh surface) {
+        FloatBuffer positions = surface.positions();
+        FloatBuffer texCoords = surface.texCoords();
+        check(texCoords.remaining() == 2 * surface.vertexCount(), "surface texture coordinates");
+        for (int i = 0; i < surface.vertexCount(); i++) {
+            float x = positions.get(3 * i);
+            float y = positions.get(3 * i + 1);
+            checkClose(texCoords.get(2 * i), (y + 1) / 2, "surface texture U at vertex " + i);
+            checkClose(texCoords.get(2 * i + 1), (x + 1) / 2, "surface texture V at vertex " + i);
+        }
+    }
+
+    private static void checkColor(ModelMesh mesh, float x, float y, int red, int green, int blue, int alpha) {
+        FloatBuffer positions = mesh.positions();
+        ByteBuffer colors = mesh.colors();
+        for (int i = 0; i < mesh.vertexCount(); i++) {
+            if (positions.get(3 * i) != x || positions.get(3 * i + 1) != y)
+                continue;
+            int offset = 4 * i;
+            check((colors.get(offset) & 0xff) == red, "vertex color red");
+            check((colors.get(offset + 1) & 0xff) == green, "vertex color green");
+            check((colors.get(offset + 2) & 0xff) == blue, "vertex color blue");
+            check((colors.get(offset + 3) & 0xff) == alpha, "vertex color alpha");
+            return;
+        }
+        throw new AssertionError("vertex not found at " + x + ", " + y);
+    }
+
+    private static void checkWhite(ByteBuffer colors, int count, String label) {
+        check(colors.remaining() == count, label + " length");
+        for (int i = 0; i < count; i++)
+            check((colors.get(i) & 0xff) == 255, label + " element " + i);
     }
 
     private static void checkByteBuffer(ByteBuffer actual, ByteBuffer expected) {
