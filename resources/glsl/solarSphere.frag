@@ -10,11 +10,15 @@ layout(std140) uniform ScreenBlock {
 } screen;
 
 const vec4 black = vec4(0, 0, 0, 1);
+const float CLIP_SCALE_NARROW = 1. / (2. * 32.);
 
 void main(void) {
     vec2 viewPosition = (screen.inverseMVP * vec4(normalizedScreenpos, -1., 1.)).xy;
 
-    if (dot(viewPosition, viewPosition) > 1.)
+    float radius2 = dot(viewPosition, viewPosition);
+    if (radius2 > 1.)
         discard;
+    gl_FragDepth = 0.5 - sqrt(1. - radius2) * CLIP_SCALE_NARROW;
+
     outColor = black;
 }
