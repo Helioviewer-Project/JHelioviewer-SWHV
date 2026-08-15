@@ -9,6 +9,7 @@ import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -62,6 +63,7 @@ public final class AssimpModelLoaderTest {
         checkLayer(layer, path);
 
         if (defaultFixture) {
+            checkUntexturedUVsIgnored(path);
             Path glb = createGlb(path);
             try {
                 checkScene(AssimpModelLoader.load(glb));
@@ -73,6 +75,19 @@ public final class AssimpModelLoaderTest {
         if (renderOutput != null)
             render(layer, scene, renderOutput);
         System.out.println("AssimpModelLoaderTest passed");
+    }
+
+    private static void checkUntexturedUVsIgnored(Path gltf) throws IOException {
+        String texture = ", \"baseColorTexture\": {\"index\": 1}";
+        String document = Files.readString(gltf);
+        check(document.contains(texture), "overlay texture reference");
+        Path untextured = Files.createTempFile("model-loader-untextured-", ".gltf");
+        try {
+            Files.writeString(untextured, document.replace(texture, ""));
+            check(AssimpModelLoader.load(untextured).meshes().get(1).texCoords() == null, "unused texture coordinates");
+        } finally {
+            Files.deleteIfExists(untextured);
+        }
     }
 
     private static void checkLayer(ModelLayer layer, Path path) throws IOException {
@@ -300,6 +315,7 @@ public final class AssimpModelLoaderTest {
             checkMeshRendering(scene, mv, vp, 2, 2_000, "masked surface");
             checkMeshRendering(scene, mv, vp, 3, 500, "line mesh");
             checkMeshRendering(scene, mv, vp, 4, 20, "point mesh");
+            checkMeshRendering(withoutBaseColorTexture(scene, 0), mv, vp, 0, 20_000, "untextured surface");
 
             Path absoluteOutput = output.toAbsolutePath().normalize();
             Path parent = absoluteOutput.getParent();
@@ -311,6 +327,15 @@ public final class AssimpModelLoaderTest {
             layer.dispose();
             renderer.destroy();
         }
+    }
+
+    private static ModelScene withoutBaseColorTexture(ModelScene scene, int meshIndex) {
+        int materialIndex = scene.meshes().get(meshIndex).materialIndex();
+        ArrayList<ModelMaterial> materials = new ArrayList<>(scene.materials());
+        ModelMaterial material = materials.get(materialIndex);
+        materials.set(materialIndex, new ModelMaterial(material.red(), material.green(), material.blue(), material.alpha(),
+                ModelMaterial.NO_TEXTURE, material.alphaMode(), material.alphaCutoff(), material.doubleSided()));
+        return new ModelScene(scene.name(), scene.root(), scene.meshes(), materials, scene.textures());
     }
 
     private static void checkMeshRendering(ModelScene scene, MapView mv, Viewport vp, int meshIndex, int minimumPixels, String label) {

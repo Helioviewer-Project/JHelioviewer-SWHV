@@ -272,18 +272,15 @@ public final class AssimpModelLoader {
     }
 
     private static FloatBuffer copyTexCoords(AIMesh mesh, MaterialData material, int meshIndex) throws IOException {
+        if (material.material().baseColorTexture() == ModelMaterial.NO_TEXTURE)
+            return null;
+
         int channel = material.uvIndex();
         if (channel < 0 || channel >= Assimp.AI_MAX_NUMBER_OF_TEXTURECOORDS)
             throw new IOException("Mesh " + meshIndex + " uses invalid UV channel " + channel);
         AIVector3D.Buffer coords = mesh.mTextureCoords(channel);
-        if (coords == null) {
-            if (material.material().baseColorTexture() != ModelMaterial.NO_TEXTURE)
-                throw new IOException("Textured mesh " + meshIndex + " has no UV channel " + channel);
-            coords = mesh.mTextureCoords(0);
-            if (coords == null)
-                return null;
-            channel = 0;
-        }
+        if (coords == null)
+            throw new IOException("Textured mesh " + meshIndex + " has no UV channel " + channel);
         if (mesh.mNumUVComponents(channel) < 2)
             throw new IOException("Mesh " + meshIndex + " has one-dimensional texture coordinates");
 
