@@ -48,10 +48,10 @@ public final class GLSLModel {
         lineVertices = new DirectBufVertex[meshCount];
         pointVertices = new DirectBufVertex[meshCount];
         meshCenters = new float[Math.multiplyExact(meshCount, 3)];
+        boolean[] transparentMeshes = new boolean[meshCount];
 
         for (int i = 0; i < meshCount; i++) {
             ModelMesh mesh = _scene.meshes().get(i);
-            storeCenter(mesh, i);
             ModelMaterial material = getMaterial(_scene, mesh);
             validateTexture(_scene, material);
             switch (mesh.primitive()) {
@@ -67,8 +67,11 @@ public final class GLSLModel {
                     pointVertices[i] = createPointVertices(mesh, material);
                 }
             }
+            transparentMeshes[i] = triangleMeshes[i] == null || material.alphaMode() == ModelMaterial.AlphaMode.BLEND;
+            if (transparentMeshes[i])
+                storeCenter(mesh, i);
         }
-        flattenNode(_scene.root(), new Matrix4f());
+        flattenNode(_scene.root(), new Matrix4f(), transparentMeshes);
     }
 
     private static ModelMaterial getMaterial(ModelScene scene, ModelMesh mesh) {
@@ -89,7 +92,7 @@ public final class GLSLModel {
             throw new IllegalArgumentException("Textures are not supported on " + mesh.primitive().name().toLowerCase() + " mesh " + mesh.name());
     }
 
-    private void flattenNode(ModelNode node, Matrix4fc parentTransform) {
+    private void flattenNode(ModelNode node, Matrix4fc parentTransform, boolean[] transparentMeshes) {
         Matrix4f worldTransform = new Matrix4f(parentTransform).mul(node.transform());
         IntBuffer meshIndices = node.meshIndices();
         while (meshIndices.hasRemaining()) {
@@ -97,15 +100,15 @@ public final class GLSLModel {
             if (meshIndex < 0 || meshIndex >= triangleMeshes.length)
                 throw new IllegalArgumentException("Invalid mesh index " + meshIndex + " in node " + node.name());
 
-            Instance instance = new Instance(meshIndex, new Matrix4f(worldTransform));
-            GLSLMesh triangleMesh = triangleMeshes[meshIndex];
-            if (triangleMesh != null && triangleMesh.material().alphaMode() != ModelMaterial.AlphaMode.BLEND)
-                opaqueInstances.add(instance);
-            else
+            Matrix4f transform = new Matrix4f(worldTransform);
+            Instance instance = new Instance(meshIndex, transform, transform.determinant3x3() < 0);
+            if (transparentMeshes[meshIndex])
                 transparentInstances.add(instance);
+            else
+                opaqueInstances.add(instance);
         }
         for (ModelNode child : node.children())
-            flattenNode(child, worldTransform);
+            flattenNode(child, worldTransform, transparentMeshes);
     }
 
     public void init() {
@@ -213,10 +216,9 @@ public final class GLSLModel {
     private void renderTriangle(Instance instance) {
         GLSLMesh mesh = triangleMeshes[instance.meshIndex];
         ModelMaterial material = mesh.material();
-        boolean reverseWinding = instance.transform.determinant3x3() < 0;
         if (material.doubleSided())
             GL.glDisable(GL.CULL_FACE);
-        else if (reverseWinding)
+        else if (instance.reverseWinding)
             GL.glFrontFace(GL.CW);
 
         try {
@@ -230,7 +232,7 @@ public final class GLSLModel {
         } finally {
             if (material.doubleSided())
                 GL.glEnable(GL.CULL_FACE);
-            else if (reverseWinding)
+            else if (instance.reverseWinding)
                 GL.glFrontFace(GL.CCW);
         }
     }
@@ -356,6 +358,6 @@ public final class GLSLModel {
         return filter != ModelSampler.MinFilter.NEAREST && filter != ModelSampler.MinFilter.LINEAR;
     }
 
-    private record Instance(int meshIndex, Matrix4f transform) {}
+    private record Instance(int meshIndex, Matrix4f transform, boolean reverseWinding) {}
 
 }

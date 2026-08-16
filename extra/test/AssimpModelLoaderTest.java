@@ -176,7 +176,7 @@ public final class AssimpModelLoaderTest {
 
         ModelMaterial surfaceMaterial = scene.materials().get(surface.materialIndex());
         check(surfaceMaterial.alphaMode() == ModelMaterial.AlphaMode.OPAQUE, "surface alpha mode");
-        check(!surfaceMaterial.doubleSided(), "surface single-sided mode");
+        check(surfaceMaterial.doubleSided(), "surface double-sided mode");
         check(surfaceMaterial.baseColorTexture() == 0, "surface texture index");
 
         ModelMaterial overlayMaterial = scene.materials().get(overlay.materialIndex());
@@ -351,6 +351,7 @@ public final class AssimpModelLoaderTest {
             checkMeshRendering(scene, mv, vp, 3, 500, "line mesh");
             checkMeshRendering(scene, mv, vp, 4, 20, "point mesh");
             checkMeshRendering(withoutBaseColorTexture(scene, 0), mv, vp, 0, 20_000, "untextured surface");
+            checkMeshRendering(singleSidedSurface(scene, 0), mv, vp, 0, 20_000, "single-sided surface");
 
             Path absoluteOutput = output.toAbsolutePath().normalize();
             Path parent = absoluteOutput.getParent();
@@ -366,10 +367,21 @@ public final class AssimpModelLoaderTest {
 
     private static ModelScene withoutBaseColorTexture(ModelScene scene, int meshIndex) {
         int materialIndex = scene.meshes().get(meshIndex).materialIndex();
-        ArrayList<ModelMaterial> materials = new ArrayList<>(scene.materials());
-        ModelMaterial material = materials.get(materialIndex);
-        materials.set(materialIndex, new ModelMaterial(material.red(), material.green(), material.blue(), material.alpha(),
+        ModelMaterial material = scene.materials().get(materialIndex);
+        return withMaterial(scene, materialIndex, new ModelMaterial(material.red(), material.green(), material.blue(), material.alpha(),
                 ModelMaterial.NO_TEXTURE, material.alphaMode(), material.alphaCutoff(), material.doubleSided()));
+    }
+
+    private static ModelScene singleSidedSurface(ModelScene scene, int meshIndex) {
+        int materialIndex = scene.meshes().get(meshIndex).materialIndex();
+        ModelMaterial material = scene.materials().get(materialIndex);
+        return withMaterial(scene, materialIndex, new ModelMaterial(material.red(), material.green(), material.blue(), material.alpha(),
+                material.baseColorTexture(), material.alphaMode(), material.alphaCutoff(), false));
+    }
+
+    private static ModelScene withMaterial(ModelScene scene, int materialIndex, ModelMaterial material) {
+        ArrayList<ModelMaterial> materials = new ArrayList<>(scene.materials());
+        materials.set(materialIndex, material);
         return new ModelScene(scene.name(), scene.root(), scene.meshes(), materials, scene.textures());
     }
 

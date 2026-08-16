@@ -43,7 +43,11 @@ class GLSLMeshShader extends GLSLShader {
         baseColor[3] = material.alpha();
         GL.glUniform4fv(baseColorRef, baseColor);
         GL.glUniform1i(hasBaseColorTextureRef, hasBaseColorTexture ? 1 : 0);
-        GL.glUniform1i(alphaModeRef, material.alphaMode().ordinal());
+        GL.glUniform1i(alphaModeRef, switch (material.alphaMode()) {
+            case OPAQUE -> 0;
+            case MASK -> 1;
+            case BLEND -> 2;
+        });
         GL.glUniform1f(alphaCutoffRef, material.alphaCutoff());
         GL.glUniformMatrix4fv(refModelViewProjectionMatrix, false, Transform.get());
     }

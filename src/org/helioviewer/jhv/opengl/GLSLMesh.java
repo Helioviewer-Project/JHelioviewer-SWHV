@@ -2,7 +2,6 @@ package org.helioviewer.jhv.opengl;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.opengl.model.ModelMaterial;

@@ -64,7 +64,7 @@
     {"sampler": 2, "source": 1}
   ],
   "materials": [
-    {"name": "surface-uv1", "pbrMetallicRoughness": {"baseColorTexture": {"index": 0, "texCoord": 1}}},
+    {"name": "surface-uv1", "pbrMetallicRoughness": {"baseColorTexture": {"index": 0, "texCoord": 1}}, "doubleSided": true},
     {"name": "overlay-blend", "pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 0.6], "baseColorTexture": {"index": 1}}, "alphaMode": "BLEND", "doubleSided": true},
     {"name": "checker-mask", "pbrMetallicRoughness": {"baseColorFactor": [1, 0.9, 0.25, 1], "baseColorTexture": {"index": 2}}, "alphaMode": "MASK", "alphaCutoff": 0.5, "doubleSided": true},
     {"name": "ring", "pbrMetallicRoughness": {"baseColorFactor": [0.1, 0.85, 1, 1]}},

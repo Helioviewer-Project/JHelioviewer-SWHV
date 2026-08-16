@@ -12,11 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.base.BufferUtils;
-import org.helioviewer.jhv.opengl.model.ModelMaterial.AlphaMode;
-import org.helioviewer.jhv.opengl.model.ModelMesh.Primitive;
-import org.helioviewer.jhv.opengl.model.ModelSampler.MagFilter;
-import org.helioviewer.jhv.opengl.model.ModelSampler.MinFilter;
-import org.helioviewer.jhv.opengl.model.ModelSampler.Wrap;
 
 import org.joml.Matrix4f;
 import org.lwjgl.PointerBuffer;
@@ -101,7 +96,7 @@ public final class AssimpModelLoader {
             color.set(1, 1, 1, 1);
 
         float alpha = getFloat(material, Assimp.AI_MATKEY_OPACITY, 0, 0, color.a());
-        AlphaMode alphaMode = getAlphaMode(material, alpha);
+        ModelMaterial.AlphaMode alphaMode = getAlphaMode(material, alpha);
         float alphaCutoff = getFloat(material, Assimp.AI_MATKEY_GLTF_ALPHACUTOFF, 0, 0, 0.5f);
         boolean doubleSided = getInt(material, Assimp.AI_MATKEY_TWOSIDED, 0, 0, 0) != 0;
         if (getInt(material, Assimp.AI_MATKEY_BLEND_FUNC, 0, 0, Assimp.aiBlendMode_Default) != Assimp.aiBlendMode_Default)
@@ -229,7 +224,7 @@ public final class AssimpModelLoader {
         if (mesh.mNumAnimMeshes() != 0)
             throw new IOException("Mesh " + meshIndex + " uses unsupported morph targets");
 
-        Primitive primitive = primitive(mesh.mPrimitiveTypes(), meshIndex);
+        ModelMesh.Primitive primitive = primitive(mesh.mPrimitiveTypes(), meshIndex);
         int materialIndex = mesh.mMaterialIndex();
         if (materialIndex < 0 || materialIndex >= materials.size())
             throw new IOException("Mesh " + meshIndex + " has invalid material index " + materialIndex);
@@ -292,8 +287,8 @@ public final class AssimpModelLoader {
         return result.flip();
     }
 
-    private static IndexData copyIndices(AIMesh mesh, Primitive primitive, int meshIndex) throws IOException {
-        if (primitive == Primitive.LINES)
+    private static IndexData copyIndices(AIMesh mesh, ModelMesh.Primitive primitive, int meshIndex) throws IOException {
+        if (primitive == ModelMesh.Primitive.LINES)
             return copyLineIndices(mesh, meshIndex);
 
         int indicesPerFace = switch (primitive) {
@@ -421,23 +416,23 @@ public final class AssimpModelLoader {
                 m.a4(), m.b4(), m.c4(), m.d4());
     }
 
-    private static Primitive primitive(int type, int meshIndex) throws IOException {
+    private static ModelMesh.Primitive primitive(int type, int meshIndex) throws IOException {
         return switch (type) {
-            case Assimp.aiPrimitiveType_POINT -> Primitive.POINTS;
-            case Assimp.aiPrimitiveType_LINE -> Primitive.LINES;
-            case Assimp.aiPrimitiveType_TRIANGLE -> Primitive.TRIANGLES;
+            case Assimp.aiPrimitiveType_POINT -> ModelMesh.Primitive.POINTS;
+            case Assimp.aiPrimitiveType_LINE -> ModelMesh.Primitive.LINES;
+            case Assimp.aiPrimitiveType_TRIANGLE -> ModelMesh.Primitive.TRIANGLES;
             default -> throw new IOException("Mesh " + meshIndex + " has unsupported or mixed primitive types: " + type);
         };
     }
 
-    private static AlphaMode getAlphaMode(AIMaterial material, float alpha) throws IOException {
+    private static ModelMaterial.AlphaMode getAlphaMode(AIMaterial material, float alpha) throws IOException {
         AIString value = AIString.create();
         if (Assimp.aiGetMaterialString(material, Assimp.AI_MATKEY_GLTF_ALPHAMODE, 0, 0, value) != Assimp.aiReturn_SUCCESS)
-            return alpha < 1 ? AlphaMode.BLEND : AlphaMode.OPAQUE;
+            return alpha < 1 ? ModelMaterial.AlphaMode.BLEND : ModelMaterial.AlphaMode.OPAQUE;
         return switch (value.dataString()) {
-            case "OPAQUE" -> AlphaMode.OPAQUE;
-            case "MASK" -> AlphaMode.MASK;
-            case "BLEND" -> AlphaMode.BLEND;
+            case "OPAQUE" -> ModelMaterial.AlphaMode.OPAQUE;
+            case "MASK" -> ModelMaterial.AlphaMode.MASK;
+            case "BLEND" -> ModelMaterial.AlphaMode.BLEND;
             default -> throw new IOException("Unsupported alpha mode: " + value.dataString());
         };
     }
@@ -454,31 +449,31 @@ public final class AssimpModelLoader {
         return Assimp.aiGetMaterialIntegerArray(material, key, type, index, value, count) == Assimp.aiReturn_SUCCESS ? value[0] : fallback;
     }
 
-    private static MinFilter minFilter(int filter) throws IOException {
+    private static ModelSampler.MinFilter minFilter(int filter) throws IOException {
         return switch (filter) {
-            case 9728 -> MinFilter.NEAREST;
-            case 9729 -> MinFilter.LINEAR;
-            case 9984 -> MinFilter.NEAREST_MIPMAP_NEAREST;
-            case 9985 -> MinFilter.LINEAR_MIPMAP_NEAREST;
-            case 9986 -> MinFilter.NEAREST_MIPMAP_LINEAR;
-            case 9987 -> MinFilter.LINEAR_MIPMAP_LINEAR;
+            case 9728 -> ModelSampler.MinFilter.NEAREST;
+            case 9729 -> ModelSampler.MinFilter.LINEAR;
+            case 9984 -> ModelSampler.MinFilter.NEAREST_MIPMAP_NEAREST;
+            case 9985 -> ModelSampler.MinFilter.LINEAR_MIPMAP_NEAREST;
+            case 9986 -> ModelSampler.MinFilter.NEAREST_MIPMAP_LINEAR;
+            case 9987 -> ModelSampler.MinFilter.LINEAR_MIPMAP_LINEAR;
             default -> throw new IOException("Unsupported texture minification filter: " + filter);
         };
     }
 
-    private static MagFilter magFilter(int filter) throws IOException {
+    private static ModelSampler.MagFilter magFilter(int filter) throws IOException {
         return switch (filter) {
-            case 9728 -> MagFilter.NEAREST;
-            case 9729 -> MagFilter.LINEAR;
+            case 9728 -> ModelSampler.MagFilter.NEAREST;
+            case 9729 -> ModelSampler.MagFilter.LINEAR;
             default -> throw new IOException("Unsupported texture magnification filter: " + filter);
         };
     }
 
-    private static Wrap wrap(int mode) throws IOException {
+    private static ModelSampler.Wrap wrap(int mode) throws IOException {
         return switch (mode) {
-            case Assimp.aiTextureMapMode_Wrap -> Wrap.REPEAT;
-            case Assimp.aiTextureMapMode_Clamp -> Wrap.CLAMP_TO_EDGE;
-            case Assimp.aiTextureMapMode_Mirror -> Wrap.MIRRORED_REPEAT;
+            case Assimp.aiTextureMapMode_Wrap -> ModelSampler.Wrap.REPEAT;
+            case Assimp.aiTextureMapMode_Clamp -> ModelSampler.Wrap.CLAMP_TO_EDGE;
+            case Assimp.aiTextureMapMode_Mirror -> ModelSampler.Wrap.MIRRORED_REPEAT;
             default -> throw new IOException("Unsupported texture wrap mode: " + mode);
         };
     }

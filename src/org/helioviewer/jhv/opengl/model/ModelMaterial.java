@@ -11,6 +11,4 @@ public record ModelMaterial(float red, float green, float blue, float alpha, int
         BLEND
     }
 
-    public static final ModelMaterial DEFAULT = new ModelMaterial(1, 1, 1, 1, NO_TEXTURE, AlphaMode.OPAQUE, 0.5f, false);
-
 }
