@@ -81,6 +81,7 @@ public final class GLRenderer {
         GLSLMeshShader.init();
         GLSLShapeShader.init();
         GLSLTextureShader.init();
+        GLSLVolumeShader.init();
 
         Annotations.init();
     }
@@ -125,6 +126,7 @@ public final class GLRenderer {
         GLSLMeshShader.dispose();
         GLSLShapeShader.dispose();
         GLSLTextureShader.dispose();
+        GLSLVolumeShader.dispose();
 
         GLException.checkErrors("GLRenderer.dispose()");
     }

@@ -129,6 +129,44 @@ public class GLTexture {
             GL.glGenerateMipmap(GL.TEXTURE_2D);
     }
 
+    void copyByteVolume(int width, int height, int depth, ByteBuffer source) {
+        validateVolumeDimensions(width, height, depth);
+        prepareVolumeUpload(Byte.BYTES);
+        GL.glTexImage3D(GL.TEXTURE_3D, 0, GL.R8, width, height, depth, 0, GL.RED, GL.UNSIGNED_BYTE,
+                BufferUtils.directByteBuffer(source));
+        configureVolumeTexture();
+    }
+
+    void copyHalfFloatVolume(int width, int height, int depth, ShortBuffer source) {
+        validateVolumeDimensions(width, height, depth);
+        prepareVolumeUpload(Short.BYTES);
+        GL.glTexImage3D(GL.TEXTURE_3D, 0, GL.R16F, width, height, depth, 0, GL.RED, GL.HALF_FLOAT,
+                BufferUtils.directShortBuffer(source));
+        configureVolumeTexture();
+    }
+
+    private static void validateVolumeDimensions(int width, int height, int depth) {
+        if (width < 1 || height < 1 || depth < 1 || width > GL.max3DTextureSize || height > GL.max3DTextureSize ||
+                depth > GL.max3DTextureSize)
+            throw new IllegalArgumentException("Volume dimensions exceed the OpenGL limit: " + width + 'x' + height + 'x' + depth);
+    }
+
+    private static void prepareVolumeUpload(int alignment) {
+        GL.glPixelStorei(GL.UNPACK_ALIGNMENT, alignment);
+        GL.glPixelStorei(GL.UNPACK_ROW_LENGTH, 0);
+        GL.glPixelStorei(GL.UNPACK_IMAGE_HEIGHT, 0);
+    }
+
+    private static void configureVolumeTexture() {
+        GL.glTexParameteri(GL.TEXTURE_3D, GL.TEXTURE_BASE_LEVEL, 0);
+        GL.glTexParameteri(GL.TEXTURE_3D, GL.TEXTURE_MAX_LEVEL, 0);
+        GL.glTexParameteri(GL.TEXTURE_3D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+        GL.glTexParameteri(GL.TEXTURE_3D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+        GL.glTexParameteri(GL.TEXTURE_3D, GL.TEXTURE_WRAP_R, GL.CLAMP_TO_EDGE);
+        GL.glTexParameteri(GL.TEXTURE_3D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+        GL.glTexParameteri(GL.TEXTURE_3D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+    }
+
     private static int mapImageFormatToInternalGLFormat(ImageBuffer.Format format) {
         return switch (format) {
             case Gray8 -> GL.R8;

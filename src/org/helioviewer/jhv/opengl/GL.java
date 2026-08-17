@@ -14,6 +14,7 @@ public final class GL {
     public static String vendor = "";
     public static String version = "";
     public static int maxTextureSize;
+    public static int max3DTextureSize;
 
     public static final int ARRAY_BUFFER = GLES30.GL_ARRAY_BUFFER;
     public static final int BACK = GLES30.GL_BACK;
@@ -51,6 +52,7 @@ public final class GL {
     public static final int LINEAR_MIPMAP_LINEAR = GLES30.GL_LINEAR_MIPMAP_LINEAR;
     public static final int LINEAR_MIPMAP_NEAREST = GLES30.GL_LINEAR_MIPMAP_NEAREST;
     public static final int LINK_STATUS = GLES30.GL_LINK_STATUS;
+    public static final int MAX_3D_TEXTURE_SIZE = GLES30.GL_MAX_3D_TEXTURE_SIZE;
     public static final int MAX_SAMPLES = GLES30.GL_MAX_SAMPLES;
     public static final int MAX_TEXTURE_SIZE = GLES30.GL_MAX_TEXTURE_SIZE;
     public static final int MIRRORED_REPEAT = GLES30.GL_MIRRORED_REPEAT;
@@ -79,16 +81,19 @@ public final class GL {
     public static final int STREAM_DRAW = GLES30.GL_STREAM_DRAW;
     public static final int TEXTURE0 = GLES30.GL_TEXTURE0;
     public static final int TEXTURE_2D = GLES30.GL_TEXTURE_2D;
+    public static final int TEXTURE_3D = GLES30.GL_TEXTURE_3D;
     public static final int TEXTURE_BASE_LEVEL = GLES30.GL_TEXTURE_BASE_LEVEL;
     public static final int TEXTURE_MAG_FILTER = GLES30.GL_TEXTURE_MAG_FILTER;
     public static final int TEXTURE_MAX_LEVEL = GLES30.GL_TEXTURE_MAX_LEVEL;
     public static final int TEXTURE_MIN_FILTER = GLES30.GL_TEXTURE_MIN_FILTER;
+    public static final int TEXTURE_WRAP_R = GLES30.GL_TEXTURE_WRAP_R;
     public static final int TEXTURE_WRAP_S = GLES30.GL_TEXTURE_WRAP_S;
     public static final int TEXTURE_WRAP_T = GLES30.GL_TEXTURE_WRAP_T;
     public static final int TRIANGLES = GLES30.GL_TRIANGLES;
     public static final int TRIANGLE_STRIP = GLES30.GL_TRIANGLE_STRIP;
     public static final int UNIFORM_BUFFER = GLES30.GL_UNIFORM_BUFFER;
     public static final int UNPACK_ALIGNMENT = GLES30.GL_UNPACK_ALIGNMENT;
+    public static final int UNPACK_IMAGE_HEIGHT = GLES30.GL_UNPACK_IMAGE_HEIGHT;
     public static final int UNPACK_ROW_LENGTH = GLES30.GL_UNPACK_ROW_LENGTH;
     public static final int UNSIGNED_BYTE = GLES30.GL_UNSIGNED_BYTE;
     public static final int UNSIGNED_INT = GLES30.GL_UNSIGNED_INT;
@@ -106,6 +111,7 @@ public final class GL {
         version = formatVersionString(glGetString(VERSION));
         shadingLanguageVersion = glGetString(SHADING_LANGUAGE_VERSION);
         maxTextureSize = glGetInteger(MAX_TEXTURE_SIZE);
+        max3DTextureSize = glGetInteger(MAX_3D_TEXTURE_SIZE);
     }
 
     public static String contextDescription() {
@@ -373,6 +379,16 @@ public final class GL {
 
     public static void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border, int inputFormat, int inputType, ShortBuffer buffer) {
         GLES30.glTexImage2D(target, level, internalFormat, width, height, border, inputFormat, inputType, buffer);
+    }
+
+    public static void glTexImage3D(int target, int level, int internalFormat, int width, int height, int depth, int border, int inputFormat,
+                                    int inputType, ByteBuffer buffer) {
+        GLES30.glTexImage3D(target, level, internalFormat, width, height, depth, border, inputFormat, inputType, buffer);
+    }
+
+    public static void glTexImage3D(int target, int level, int internalFormat, int width, int height, int depth, int border, int inputFormat,
+                                    int inputType, ShortBuffer buffer) {
+        GLES30.glTexImage3D(target, level, internalFormat, width, height, depth, border, inputFormat, inputType, buffer);
     }
 
     public static void glTexParameteri(int target, int pname, int value) {

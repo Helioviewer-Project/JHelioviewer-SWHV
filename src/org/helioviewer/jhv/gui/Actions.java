@@ -31,6 +31,7 @@ import org.helioviewer.jhv.io.ExtensionFileFilter;
 import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.ModelLayer;
+import org.helioviewer.jhv.layers.VolumeLayer;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.thread.Task;
@@ -192,6 +193,30 @@ public final class Actions {
             File file = new File(directory, fileName);
             if (file.isFile() && file.canRead())
                 Task.submit(file.toString(), () -> new ModelLayer(file.toPath()), Layers::add, "Error loading model");
+        }
+    }
+
+    public static class OpenVolume extends AbstractAction {
+        public OpenVolume() {
+            super("Open Volume Layer...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            FileDialog fileDialog = new FileDialog(MainFrame.get(), "Choose a Cartesian Carrington FITS volume", FileDialog.LOAD);
+            fileDialog.setFilenameFilter(ExtensionFileFilter.Volume);
+            fileDialog.setDirectory(Settings.getProperty("path.local"));
+            fileDialog.setVisible(true);
+
+            String directory = fileDialog.getDirectory();
+            String fileName = fileDialog.getFile();
+            if (directory == null || fileName == null)
+                return;
+
+            Settings.setProperty("path.local", directory);
+            File file = new File(directory, fileName);
+            if (file.isFile() && file.canRead())
+                Task.submit(file.toString(), () -> new VolumeLayer(file.toPath()), Layers::add, "Error loading volume");
         }
     }
 

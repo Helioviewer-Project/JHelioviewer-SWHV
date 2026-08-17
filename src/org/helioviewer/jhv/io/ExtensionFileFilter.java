@@ -16,6 +16,9 @@ public class ExtensionFileFilter {
     public static final FilenameFilter JHV = new Filter(new ExtensionFilter(
             new String[]{"jhv"},
             "State files (\".jhv\")"));
+    public static final FilenameFilter Volume = new Filter(new ExtensionFilter(
+            new String[]{"fts", "fits", "fits.gz"},
+            "FITS volume files (\".fts\", \".fits\", \".fits.gz\")"));
     /*  public static final FilenameFilter JSON = new Filter(new ExtensionFilter(
                 new String[]{"json"},
                 "JSON files (\".json\")")); */

@@ -115,5 +115,11 @@ public final class Transform {
         return view.m02() * worldX + view.m12() * worldY + view.m22() * worldZ + view.m32();
     }
 
+    static void viewRayDirection(float[] direction) {
+        direction[0] = -view.m02();
+        direction[1] = -view.m12();
+        direction[2] = -view.m22();
+    }
+
     private Transform() {}
 }
