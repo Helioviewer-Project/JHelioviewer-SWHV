@@ -13,8 +13,6 @@ class GLSLVolumeShader extends GLSLShader {
     private final float[] axisY = new float[3];
     private final float[] axisZ = new float[3];
     private final float[] rayDirection = new float[3];
-    private final float[] cropMin = new float[3];
-    private final float[] cropMax = new float[3];
 
     private int mvpRef;
     private int cornerRef;
@@ -56,7 +54,7 @@ class GLSLVolumeShader extends GLSLShader {
         setTextureUnit(id, "lut", GLTexture.Unit.ONE);
     }
 
-    void bind(VolumeData data, double opacity, double[] cropMinimum, double[] cropMaximum) {
+    void bind(VolumeData data, double opacity, float[] cropMin, float[] cropMax) {
         set(corner, data.corner());
         set(axisX, data.axisX());
         set(axisY, data.axisY());
@@ -64,9 +62,6 @@ class GLSLVolumeShader extends GLSLShader {
         dimensions[0] = data.width();
         dimensions[1] = data.height();
         dimensions[2] = data.depth();
-        set(cropMin, cropMinimum);
-        set(cropMax, cropMaximum);
-
         Transform.viewRayDirection(rayDirection);
         double worldX = rayDirection[0];
         double worldY = rayDirection[1];
@@ -99,11 +94,4 @@ class GLSLVolumeShader extends GLSLShader {
         target[1] = (float) source.y;
         target[2] = (float) source.z;
     }
-
-    private static void set(float[] target, double[] source) {
-        target[0] = (float) source[0];
-        target[1] = (float) source[1];
-        target[2] = (float) source[2];
-    }
-
 }

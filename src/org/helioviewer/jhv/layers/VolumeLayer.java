@@ -19,8 +19,8 @@ public final class VolumeLayer extends AbstractLayer {
     private final GLSLVolume volume;
     private double opacity = 1;
     private LUT lut = LUT.gray();
-    private final double[] cropMin = {0, 0, 0};
-    private final double[] cropMax = {1, 1, 1};
+    private final float[] cropMin = {0, 0, 0};
+    private final float[] cropMax = {1, 1, 1};
 
     public VolumeLayer(Path _path) throws IOException {
         path = _path.toAbsolutePath().normalize();
@@ -86,8 +86,8 @@ public final class VolumeLayer extends AbstractLayer {
     public void setCrop(int axis, double minimum, double maximum) {
         minimum = Math.clamp(minimum, 0, 1);
         maximum = Math.clamp(maximum, 0, 1);
-        cropMin[axis] = Math.min(minimum, maximum);
-        cropMax[axis] = Math.max(minimum, maximum);
+        cropMin[axis] = (float) Math.min(minimum, maximum);
+        cropMax[axis] = (float) Math.max(minimum, maximum);
     }
 
     @Override

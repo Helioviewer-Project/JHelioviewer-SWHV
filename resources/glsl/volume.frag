@@ -33,14 +33,6 @@ bool outside(vec3 p) {
     return any(lessThan(p, vec3(0.0))) || any(greaterThan(p, vec3(1.0)));
 }
 
-float exitDistance(float position, float direction) {
-    if (direction > 0.0)
-        return (1.0 - position) / direction;
-    if (direction < 0.0)
-        return -position / direction;
-    return 1e30;
-}
-
 bool intersectAxis(float position, float direction, float minimum, float maximum,
                    inout float entry, inout float exit) {
     if (direction == 0.0)
@@ -54,18 +46,15 @@ bool intersectAxis(float position, float direction, float minimum, float maximum
 
 void main(void) {
     float idealStepDistance = 0.5 / max(max(abs(rayDirection.x) * dimensions.x,
-                                                abs(rayDirection.y) * dimensions.y),
+                                        abs(rayDirection.y) * dimensions.y),
                                         abs(rayDirection.z) * dimensions.z);
     float entryDistance = 0.0;
-    float exitPosition = min(min(exitDistance(texturePosition.x, rayDirection.x),
-                                 exitDistance(texturePosition.y, rayDirection.y)),
-                             exitDistance(texturePosition.z, rayDirection.z));
-    if ((any(greaterThan(cropMin, vec3(0.0))) || any(lessThan(cropMax, vec3(1.0)))) &&
-            (!intersectAxis(texturePosition.x, rayDirection.x, cropMin.x, cropMax.x, entryDistance, exitPosition) ||
-             !intersectAxis(texturePosition.y, rayDirection.y, cropMin.y, cropMax.y, entryDistance, exitPosition) ||
-             !intersectAxis(texturePosition.z, rayDirection.z, cropMin.z, cropMax.z, entryDistance, exitPosition)))
+    float exitDistance = 1e30;
+    if (!intersectAxis(texturePosition.x, rayDirection.x, cropMin.x, cropMax.x, entryDistance, exitDistance) ||
+            !intersectAxis(texturePosition.y, rayDirection.y, cropMin.y, cropMax.y, entryDistance, exitDistance) ||
+            !intersectAxis(texturePosition.z, rayDirection.z, cropMin.z, cropMax.z, entryDistance, exitDistance))
         discard;
-    float totalDistance = exitPosition - entryDistance;
+    float totalDistance = exitDistance - entryDistance;
     int stepCount = max(1, min(MAX_STEPS, int(ceil(totalDistance / idealStepDistance))));
     float stepDistance = totalDistance / float(stepCount);
     vec3 stepVector = rayDirection * stepDistance;

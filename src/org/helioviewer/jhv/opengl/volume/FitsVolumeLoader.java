@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
@@ -93,11 +94,12 @@ public final class FitsVolumeLoader {
         Position observer = readObserver(source, header);
         // Position.toQuat() maps JHV's Carrington world into the observer-aligned SOL frame;
         // its inverse therefore places the FITS heliocentric coordinates in JHV's world.
-        Vec3 reference = observer.toQuat().rotateInverseVector(new Vec3(
+        Quat observerRotation = observer.toQuat();
+        Vec3 reference = observerRotation.rotateInverseVector(new Vec3(
                 referenceValue[componentRows[0]], referenceValue[componentRows[1]], referenceValue[componentRows[2]]));
         Vec3[] step = new Vec3[3];
         for (int pixelAxis = 0; pixelAxis < 3; pixelAxis++) {
-            step[pixelAxis] = observer.toQuat().rotateInverseVector(new Vec3(
+            step[pixelAxis] = observerRotation.rotateInverseVector(new Vec3(
                     matrix[componentRows[0]][pixelAxis],
                     matrix[componentRows[1]][pixelAxis],
                     matrix[componentRows[2]][pixelAxis]));
@@ -165,8 +167,9 @@ public final class FitsVolumeLoader {
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 3; column++) {
                 String key = prefix + (row + 1) + '_' + (column + 1);
-                present |= header.containsKey(key);
-                matrix[row][column] = header.containsKey(key) ? requiredDouble(source, header, key) : row == column ? diagonalDefault : 0;
+                boolean defined = header.containsKey(key);
+                present |= defined;
+                matrix[row][column] = defined ? requiredDouble(source, header, key) : row == column ? diagonalDefault : 0;
             }
         }
         return new MatrixKeywords(present, matrix);
