@@ -11,6 +11,8 @@ flat in float hasFollow;
 flat in float halfWidthPixels;
 out vec4 outColor;
 
+uniform bool opaquePass;
+
 const float aaPixels = 1.5;
 
 // Shade in framebuffer pixels. Each instance owns one segment body; at the
@@ -78,5 +80,10 @@ void main(void) {
 
     if (coverage <= 0.0)
         discard;
+
+    bool opaqueCore = fragColor.a >= 1.0 && coverage >= 1.0;
+    if (opaqueCore != opaquePass)
+        discard;
+
     outColor = fragColor * coverage;
 }

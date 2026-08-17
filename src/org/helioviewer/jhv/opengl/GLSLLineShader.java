@@ -13,6 +13,8 @@ class GLSLLineShader extends GLSLShader {
     private static final FloatBuffer screenBuf = BufferUtils.newFloatBuffer(16 + 4 + 4);
     private static final int SCREEN_SIZE = screenBuf.capacity() * 4;
 
+    private int opaquePassRef;
+
     private GLSLLineShader(String vertex, String fragment) {
         super(vertex, fragment);
     }
@@ -30,6 +32,7 @@ class GLSLLineShader extends GLSLShader {
     @Override
     protected void initUniforms(int id) {
         setupUBO(id, "ScreenBlock", screenBO.getID(), UBO.LINE_SCREEN);
+        opaquePassRef = GL.glGetUniformLocation(id, "opaquePass");
     }
 
     void bindParams(Viewport vp, double _thickness) {
@@ -39,6 +42,10 @@ class GLSLLineShader extends GLSLShader {
         screenBuf.put(vp.glslArray).put((float) (0.5 * _thickness)); // +3 floats padding
         screenBuf.flip();
         screenBO.setBufferData(SCREEN_SIZE, screenBuf); // always changes
+    }
+
+    void bindOpaquePass(boolean opaque) {
+        GL.glUniform1i(opaquePassRef, opaque ? 1 : 0);
     }
 
 }
