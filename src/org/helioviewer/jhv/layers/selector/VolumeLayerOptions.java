@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.display.DisplayController;
+import org.helioviewer.jhv.gui.component.JHVRangeSlider;
 import org.helioviewer.jhv.image.lut.LUTComboBox;
 import org.helioviewer.jhv.layers.VolumeLayer;
 import org.helioviewer.jhv.layers.filters.FilterDetails;
@@ -29,6 +30,30 @@ final class VolumeLayerOptions extends JPanel {
             DisplayController.display();
         });
         addRow(new JLabel("Color ", JLabel.RIGHT), lutCombo, new JPanel(), 1);
+
+        for (int axis = 0; axis < 3; axis++)
+            addCropRow(layer, axis, axis + 2);
+    }
+
+    private void addCropRow(VolumeLayer layer, int axis, int y) {
+        int low = (int) Math.round(100 * layer.getCropMin(axis));
+        int high = (int) Math.round(100 * layer.getCropMax(axis));
+        JHVRangeSlider slider = new JHVRangeSlider(0, 100, low, high);
+        JLabel values = new JLabel(formatRange(low, high), JLabel.RIGHT);
+        slider.addChangeListener(e -> {
+            int newLow = slider.getLowValue();
+            int newHigh = slider.getHighValue();
+            layer.setCrop(axis, newLow / 100., newHigh / 100.);
+            values.setText(formatRange(newLow, newHigh));
+            DisplayController.display();
+        });
+        JLabel title = new JLabel("Crop " + (axis + 1) + ' ', JLabel.RIGHT);
+        title.setToolTipText("Crop along FITS pixel axis " + (axis + 1));
+        addRow(title, slider, values, y);
+    }
+
+    private static String formatRange(int low, int high) {
+        return "<html><p align='right'>" + low + "%</p><p align='right'>" + high + "%</p>";
     }
 
     private void addRow(FilterDetails details, int y) {

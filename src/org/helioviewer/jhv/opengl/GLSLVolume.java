@@ -63,7 +63,7 @@ public final class GLSLVolume extends VAO1 {
         }
     }
 
-    public void render(LUT lut, double opacity) {
+    public void render(LUT lut, double opacity, double[] cropMin, double[] cropMax) {
         texture.bind();
         validityMask.bind();
         lutTexture.bind();
@@ -73,7 +73,7 @@ public final class GLSLVolume extends VAO1 {
             uploadedLut = lut;
         }
         GLSLVolumeShader.volume.use();
-        GLSLVolumeShader.volume.bind(data, opacity);
+        GLSLVolumeShader.volume.bind(data, opacity, cropMin, cropMax);
         bind();
 
         boolean mirrored = data.determinant() < 0;

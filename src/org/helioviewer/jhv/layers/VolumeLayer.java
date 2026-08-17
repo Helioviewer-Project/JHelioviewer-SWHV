@@ -19,6 +19,8 @@ public final class VolumeLayer extends AbstractLayer {
     private final GLSLVolume volume;
     private double opacity = 1;
     private LUT lut = LUT.gray();
+    private final double[] cropMin = {0, 0, 0};
+    private final double[] cropMax = {1, 1, 1};
 
     public VolumeLayer(Path _path) throws IOException {
         path = _path.toAbsolutePath().normalize();
@@ -33,6 +35,10 @@ public final class VolumeLayer extends AbstractLayer {
         LUT configured = LUT.get(jo.optString("colormap", lut.name()));
         if (configured != null)
             lut = configured;
+        for (int axis = 0; axis < 3; axis++) {
+            int number = axis + 1;
+            setCrop(axis, jo.optDouble("cropMin" + number, 0), jo.optDouble("cropMax" + number, 1));
+        }
     }
 
     @Override
@@ -40,12 +46,17 @@ public final class VolumeLayer extends AbstractLayer {
         jo.put("path", path.toString());
         jo.put("opacity", opacity);
         jo.put("colormap", lut.name());
+        for (int axis = 0; axis < 3; axis++) {
+            int number = axis + 1;
+            jo.put("cropMin" + number, cropMin[axis]);
+            jo.put("cropMax" + number, cropMax[axis]);
+        }
     }
 
     @Override
     public void render(MapView mv, Viewport vp) {
         if (isVisible[vp.idx] && mv.isOrthographic() && opacity > 0)
-            volume.render(lut, opacity);
+            volume.render(lut, opacity, cropMin, cropMax);
     }
 
     public double getOpacity() {
@@ -62,6 +73,21 @@ public final class VolumeLayer extends AbstractLayer {
 
     public void setLUT(LUT _lut) {
         lut = _lut == null ? LUT.gray() : _lut;
+    }
+
+    public double getCropMin(int axis) {
+        return cropMin[axis];
+    }
+
+    public double getCropMax(int axis) {
+        return cropMax[axis];
+    }
+
+    public void setCrop(int axis, double minimum, double maximum) {
+        minimum = Math.clamp(minimum, 0, 1);
+        maximum = Math.clamp(maximum, 0, 1);
+        cropMin[axis] = Math.min(minimum, maximum);
+        cropMax[axis] = Math.max(minimum, maximum);
     }
 
     @Override

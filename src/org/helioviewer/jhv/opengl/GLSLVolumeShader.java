@@ -13,6 +13,8 @@ class GLSLVolumeShader extends GLSLShader {
     private final float[] axisY = new float[3];
     private final float[] axisZ = new float[3];
     private final float[] rayDirection = new float[3];
+    private final float[] cropMin = new float[3];
+    private final float[] cropMax = new float[3];
 
     private int mvpRef;
     private int cornerRef;
@@ -22,6 +24,8 @@ class GLSLVolumeShader extends GLSLShader {
     private int axisZRef;
     private int rayDirectionRef;
     private int opacityRef;
+    private int cropMinRef;
+    private int cropMaxRef;
 
     private GLSLVolumeShader() {
         super("/glsl/volume.vert", "/glsl/volume.frag");
@@ -45,12 +49,14 @@ class GLSLVolumeShader extends GLSLShader {
         axisZRef = GL.glGetUniformLocation(id, "axisZ");
         rayDirectionRef = GL.glGetUniformLocation(id, "rayDirection");
         opacityRef = GL.glGetUniformLocation(id, "opacity");
+        cropMinRef = GL.glGetUniformLocation(id, "cropMin");
+        cropMaxRef = GL.glGetUniformLocation(id, "cropMax");
         setTextureUnit(id, "volume", GLTexture.Unit.THREE);
         setTextureUnit(id, "validityMask", GLTexture.Unit.TWO);
         setTextureUnit(id, "lut", GLTexture.Unit.ONE);
     }
 
-    void bind(VolumeData data, double opacity) {
+    void bind(VolumeData data, double opacity, double[] cropMinimum, double[] cropMaximum) {
         set(corner, data.corner());
         set(axisX, data.axisX());
         set(axisY, data.axisY());
@@ -58,6 +64,8 @@ class GLSLVolumeShader extends GLSLShader {
         dimensions[0] = data.width();
         dimensions[1] = data.height();
         dimensions[2] = data.depth();
+        set(cropMin, cropMinimum);
+        set(cropMax, cropMaximum);
 
         Transform.viewRayDirection(rayDirection);
         double worldX = rayDirection[0];
@@ -82,12 +90,20 @@ class GLSLVolumeShader extends GLSLShader {
         GL.glUniform3fv(axisZRef, axisZ);
         GL.glUniform3fv(rayDirectionRef, rayDirection);
         GL.glUniform1f(opacityRef, (float) opacity);
+        GL.glUniform3fv(cropMinRef, cropMin);
+        GL.glUniform3fv(cropMaxRef, cropMax);
     }
 
     private static void set(float[] target, Vec3 source) {
         target[0] = (float) source.x;
         target[1] = (float) source.y;
         target[2] = (float) source.z;
+    }
+
+    private static void set(float[] target, double[] source) {
+        target[0] = (float) source[0];
+        target[1] = (float) source[1];
+        target[2] = (float) source[2];
     }
 
 }

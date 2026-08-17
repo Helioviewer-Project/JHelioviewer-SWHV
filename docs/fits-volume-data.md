@@ -417,6 +417,7 @@ The current renderer:
 - is available only in JHV's orthographic 3D view;
 - uses trilinear texture filtering;
 - maps normalized values through a user-selectable JHV color table;
+- can crop the rendered region along each FITS pixel axis without changing the source data;
 - treats the unit solar sphere as opaque and stops integration when a ray reaches it;
 - uses premultiplied-alpha accumulation;
 - does not write depth for the translucent volume;
