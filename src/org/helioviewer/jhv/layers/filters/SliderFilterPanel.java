@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.layers.filters;
 
+import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 
@@ -36,8 +37,12 @@ public final class SliderFilterPanel {
     }
 
     public static FilterDetails opacity(ImageLayer layer) {
-        return create("Opacity ", 0, 100, (int) (layer.getGLImage().getOpacity() * 100),
-                SliderFilterPanel::formatPercent, value -> layer.getGLImage().setOpacity(value / 100.));
+        return opacity(layer.getGLImage().getOpacity(), layer.getGLImage()::setOpacity);
+    }
+
+    public static FilterDetails opacity(double initialValue, DoubleConsumer setter) {
+        return create("Opacity ", 0, 100, (int) (initialValue * 100),
+                SliderFilterPanel::formatPercent, value -> setter.accept(value / 100.));
     }
 
     public static FilterDetails sharpen(ImageLayer layer) {

@@ -18,6 +18,7 @@ import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
+import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.layers.VolumeLayer;
 import org.helioviewer.jhv.math.Quat;
@@ -350,6 +351,7 @@ public final class VolumeLayerTest {
             Transform.ortho(vp.aspect, 7, 0, 0, Quat.createXY(Math.toRadians(18), Math.toRadians(-28)));
             renderLayer(layer8, output8, mv, vp);
             renderLayer(layer16, output16, mv, vp);
+            checkColorAndOpacity(layer16, mv, vp);
         } finally {
             layer8.dispose();
             layer16.dispose();
@@ -396,6 +398,30 @@ public final class VolumeLayerTest {
         Path absoluteOutput = output.toAbsolutePath().normalize();
         Files.createDirectories(absoluteOutput.getParent());
         check(ImageIO.write(image, "png", absoluteOutput.toFile()), "PNG writer unavailable");
+    }
+
+    private static void checkColorAndOpacity(VolumeLayer layer, MapView mv, Viewport vp) {
+        layer.setLUT(LUT.spectral());
+        layer.setOpacity(0.5);
+        GL.glClearColor(0, 0, 0, 0);
+        GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+        layer.render(mv, vp);
+
+        ByteBuffer pixels = BufferUtils.newByteBuffer(RENDER_SIZE * RENDER_SIZE * 4);
+        GL.glReadPixels(0, 0, RENDER_SIZE, RENDER_SIZE, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+        int coloredPixels = 0;
+        for (int offset = 0; offset < pixels.limit(); offset += 4) {
+            int red = pixels.get(offset) & 0xff;
+            int green = pixels.get(offset + 1) & 0xff;
+            int blue = pixels.get(offset + 2) & 0xff;
+            int alpha = pixels.get(offset + 3) & 0xff;
+            check(red <= alpha + 1 && green <= alpha + 1 && blue <= alpha + 1, "volume output is not premultiplied");
+            check(alpha <= 128, "volume opacity was not applied to alpha");
+            if (alpha != 0 && (red != green || green != blue))
+                coloredPixels++;
+        }
+        check(coloredPixels > 2_000, "color table did not produce colored volume pixels");
+        GL.glClearColor(0, 0, 0, 1);
     }
 
     private static void checkClose(double actual, double expected, String description) {

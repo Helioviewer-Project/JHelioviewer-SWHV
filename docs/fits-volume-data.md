@@ -143,8 +143,8 @@ JHV normalizes the stored range to `[0, 1]`, converts it to IEEE binary16 on the
 Consequently, `BITPIX=16` preserves much more input precision than `BITPIX=8`, but the GPU representation is
 half-precision floating point rather than a 16-bit normalized integer texture.
 
-The physical endpoint values derived from `BSCALE` and `BZERO` are retained in `VolumeData`. The current renderer
-does not yet expose an interactive physical transfer function based on those endpoints.
+The physical endpoint values derived from `BSCALE` and `BZERO` are retained in `VolumeData`. The renderer does not
+use them to apply an interactive physical transfer function.
 
 ### `BUNIT`
 
@@ -156,8 +156,7 @@ grammar. In particular:
 BUNIT  = '1'                 / not valid FITS unit syntax
 ```
 
-must not be used. JHV retains `BUNIT` as metadata but the current grayscale renderer does not alter rendering based
-on the unit.
+must not be used. JHV retains `BUNIT` as metadata but the renderer does not alter rendering based on the unit.
 
 ## Undefined voxels and `BLANK`
 
@@ -417,12 +416,13 @@ The current renderer:
 
 - is available only in JHV's orthographic 3D view;
 - uses trilinear texture filtering;
-- renders a fixed grayscale emission/opacity mapping;
+- maps normalized values through a user-selectable JHV color table;
 - treats the unit solar sphere as opaque and stops integration when a ray reaches it;
 - uses premultiplied-alpha accumulation;
 - does not write depth for the translucent volume;
 - applies small output dithering to reduce visible display banding;
-- has no producer-controlled transfer function, color map, clipping range, or opacity curve yet.
+- provides a global layer-opacity control which multiplies the final premultiplied RGBA result;
+- has no producer-controlled transfer function, clipping range, or opacity curve yet.
 
 These limitations make producer-side scalar preparation important. A general physical cube with a large dynamic
 range will usually need a deliberate transform—linear, logarithmic, or another domain-appropriate mapping—before

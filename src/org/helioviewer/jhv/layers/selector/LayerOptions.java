@@ -17,6 +17,7 @@ import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.layers.MiniviewLayer;
 import org.helioviewer.jhv.layers.TimestampLayer;
 import org.helioviewer.jhv.layers.ViewpointLayer;
+import org.helioviewer.jhv.layers.VolumeLayer;
 import org.helioviewer.jhv.layers.fov.FOVTreePane;
 
 public final class LayerOptions implements Layers.Listener {
@@ -33,6 +34,7 @@ public final class LayerOptions implements Layers.Listener {
         register(MiniviewLayer.class, layer -> new MiniviewLayerOptions((MiniviewLayer) layer));
         register(TimestampLayer.class, layer -> new TimestampLayerOptions((TimestampLayer) layer));
         register(ViewpointLayer.class, layer -> new ViewpointLayerOptionsPanel((ViewpointLayer) layer));
+        register(VolumeLayer.class, layer -> new VolumeLayerOptions((VolumeLayer) layer));
         Layers.addListener(listener);
     }
 

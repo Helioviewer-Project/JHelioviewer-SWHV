@@ -8,12 +8,14 @@ out vec4 outColor;
 
 uniform sampler3D volume;
 uniform sampler3D validityMask;
+uniform sampler2D lut;
 uniform vec3 corner;
 uniform vec3 dimensions;
 uniform vec3 axisX;
 uniform vec3 axisY;
 uniform vec3 axisZ;
 uniform vec3 rayDirection;
+uniform float opacity;
 
 const int MAX_STEPS = 2048;
 const float MAX_OPTICAL_DEPTH = 2.0;
@@ -68,9 +70,10 @@ void main(void) {
         }
         float filteredValue = texture(volume, position).r;
         float value = filteredValue / validity;
-        float opacity = 1.0 - exp(-MAX_OPTICAL_DEPTH * filteredValue * stepDistance);
-        accumulated.rgb += (1.0 - accumulated.a) * opacity * vec3(value);
-        accumulated.a += (1.0 - accumulated.a) * opacity;
+        vec4 sampleColor = texture(lut, vec2(value, 0.5));
+        float sampleOpacity = sampleColor.a * (1.0 - exp(-MAX_OPTICAL_DEPTH * filteredValue * stepDistance));
+        accumulated.rgb += (1.0 - accumulated.a) * sampleOpacity * sampleColor.rgb;
+        accumulated.a += (1.0 - accumulated.a) * sampleOpacity;
         if (accumulated.a >= 0.995)
             break;
 
@@ -80,5 +83,5 @@ void main(void) {
     if (accumulated.a <= 0.0)
         discard;
     accumulated.rgb = clamp(accumulated.rgb + dither(texturePosition), vec3(0.0), vec3(accumulated.a));
-    outColor = accumulated;
+    outColor = opacity * accumulated;
 }

@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import org.helioviewer.jhv.base.BufferUtils;
+import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.opengl.volume.VolumeData;
 
 public final class GLSLVolume extends VAO1 {
@@ -23,6 +24,8 @@ public final class GLSLVolume extends VAO1 {
     private final VolumeData data;
     private GLTexture texture;
     private GLTexture validityMask;
+    private GLTexture lutTexture;
+    private LUT uploadedLut;
 
     public GLSLVolume(VolumeData _data) {
         super(false, new VAA[]{new VAA(0, 3, false, 0, 0, 0)});
@@ -52,17 +55,25 @@ public final class GLSLVolume extends VAO1 {
                 validityMask.copyByteVolume(1, 1, 1, ALL_VALID.duplicate());
             else
                 validityMask.copyByteVolume(data.width(), data.height(), data.depth(), mask);
+
+            lutTexture = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.ONE);
         } catch (RuntimeException | Error e) {
             dispose();
             throw e;
         }
     }
 
-    public void render() {
+    public void render(LUT lut, double opacity) {
         texture.bind();
         validityMask.bind();
+        lutTexture.bind();
+        if (uploadedLut != lut) {
+            ByteBuffer rgba = lut.rgba();
+            GLTexture.copyByteImage(rgba.remaining() / 4, 1, GL.NEAREST, rgba);
+            uploadedLut = lut;
+        }
         GLSLVolumeShader.volume.use();
-        GLSLVolumeShader.volume.bind(data);
+        GLSLVolumeShader.volume.bind(data, opacity);
         bind();
 
         boolean mirrored = data.determinant() < 0;
@@ -80,6 +91,11 @@ public final class GLSLVolume extends VAO1 {
 
     @Override
     public void dispose() {
+        if (lutTexture != null) {
+            lutTexture.delete();
+            lutTexture = null;
+            uploadedLut = null;
+        }
         if (validityMask != null) {
             validityMask.delete();
             validityMask = null;

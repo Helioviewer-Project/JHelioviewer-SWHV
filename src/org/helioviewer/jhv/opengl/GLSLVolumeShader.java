@@ -21,6 +21,7 @@ class GLSLVolumeShader extends GLSLShader {
     private int axisYRef;
     private int axisZRef;
     private int rayDirectionRef;
+    private int opacityRef;
 
     private GLSLVolumeShader() {
         super("/glsl/volume.vert", "/glsl/volume.frag");
@@ -43,11 +44,13 @@ class GLSLVolumeShader extends GLSLShader {
         axisYRef = GL.glGetUniformLocation(id, "axisY");
         axisZRef = GL.glGetUniformLocation(id, "axisZ");
         rayDirectionRef = GL.glGetUniformLocation(id, "rayDirection");
+        opacityRef = GL.glGetUniformLocation(id, "opacity");
         setTextureUnit(id, "volume", GLTexture.Unit.THREE);
         setTextureUnit(id, "validityMask", GLTexture.Unit.TWO);
+        setTextureUnit(id, "lut", GLTexture.Unit.ONE);
     }
 
-    void bind(VolumeData data) {
+    void bind(VolumeData data, double opacity) {
         set(corner, data.corner());
         set(axisX, data.axisX());
         set(axisY, data.axisY());
@@ -78,6 +81,7 @@ class GLSLVolumeShader extends GLSLShader {
         GL.glUniform3fv(axisYRef, axisY);
         GL.glUniform3fv(axisZRef, axisZ);
         GL.glUniform3fv(rayDirectionRef, rayDirection);
+        GL.glUniform1f(opacityRef, (float) opacity);
     }
 
     private static void set(float[] target, Vec3 source) {
