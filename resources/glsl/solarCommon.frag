@@ -7,9 +7,6 @@ precision highp float;
 #define HALFPI (PI / 2.)
 #define TWOPI  (2. * PI)
 
-#define CLIP_SCALE_NARROW 1. / (2. * 32.)
-#define CLIP_SCALE_WIDE   1. / (2. * 50. * 215.09151684811678)
-
 #define BOOST 1. / (0.2 * 2.)
 
 const float WCS_PROJECTION_TAN = 0.;
@@ -161,6 +158,10 @@ void clipNormalizedCoord(const vec2 coord) {
 // The projection is orthographic, so xy is independent of clip-space z and needs no perspective divide.
 vec2 getViewPosition(void) {
     return (screen.inverseMVP * vec4(normalizedScreenpos, -1., 1.)).xy;
+}
+
+float getDepth(const float viewZ) {
+    return 0.5 * (1. + viewZ / screen.inverseMVP[2][2]);
 }
 
 // Map the centered view plane to the [0, 1] map domain: remove the viewport's
