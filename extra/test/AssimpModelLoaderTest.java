@@ -138,6 +138,11 @@ public final class AssimpModelLoaderTest {
             glb = createGlb(positioned);
             checkPositionTransform(AssimpModelLoader.load(glb));
 
+            String bothCoordinatePairs = extras.replace("\"RSUN_REF\": 695700000, ",
+                    "\"HGLN_OBS\": -80, \"HGLT_OBS\": 45, \"RSUN_REF\": 695700000, ");
+            Files.writeString(positioned, document.replace(scene, bothCoordinatePairs));
+            checkPositionTransform(AssimpModelLoader.load(positioned));
+
             Files.writeString(positioned, document.replace(scene, extras.replace("\"CRLT_OBS\": -12, ", "")));
             try {
                 AssimpModelLoader.load(positioned);

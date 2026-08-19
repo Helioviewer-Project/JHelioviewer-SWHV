@@ -30,6 +30,8 @@ import org.helioviewer.jhv.opengl.volume.VolumeData;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.ImageHDU;
+import nom.tam.fits.header.Compression;
+import nom.tam.image.compression.hdu.CompressedImageHDU;
 
 public final class VolumeLayerTest {
 
@@ -67,6 +69,7 @@ public final class VolumeLayerTest {
         check(!isValid(data8, 151 + GRID_SIZE * (113 + GRID_SIZE * 205)), "synthetic BITPIX=8 BLANK sample");
         compareQuantization(data8, data16);
         checkSample(data16, 151, 113, 205);
+        checkCompressedVolume(volume16Path, temporaryDirectory.resolve("synthetic-corona-16-compressed.fits"), data16);
         checkFixedStoredRanges(temporaryDirectory);
         checkBlankRanges(temporaryDirectory);
         checkUnsupportedBitpix(temporaryDirectory);
@@ -102,7 +105,7 @@ public final class VolumeLayerTest {
         header.addValue("BZERO", bzero, "physical value represented by stored zero");
         if (blank != null)
             header.addValue("BLANK", blank, "undefined stored value");
-        header.addValue("WCSNAME", "Heliocentric Cartesian", "coordinate system name");
+        header.addValue("WCSNAME", "Heliocentric-cartesian", "coordinate system name");
         header.addValue("RSUN_REF", SOLAR_RADIUS_METERS, 1, "[m] assumed physical solar radius");
         header.addValue("DSUN_OBS", OBSERVER_DISTANCE_METERS, 1, "[m] distance from centre of Sun to observer");
         header.addValue("CRLN_OBS", OBSERVER_CARRINGTON_LONGITUDE, "[deg] Carrington longitude of observer");
@@ -172,6 +175,36 @@ public final class VolumeLayerTest {
             maximumDifference = Math.max(maximumDifference, Math.abs(value8 - value16));
         }
         check(maximumDifference <= 1.0 / 255 + 1e-6, "8-bit and 16-bit decoded values disagree: " + maximumDifference);
+    }
+
+    private static void checkCompressedVolume(Path source, Path destination, VolumeData expected) throws Exception {
+        try (Fits input = new Fits(source.toFile())) {
+            ImageHDU image = (ImageHDU) input.readHDU();
+            CompressedImageHDU compressed = CompressedImageHDU.fromImageHDU(image, GRID_SIZE, GRID_SIZE, 1)
+                    .setCompressAlgorithm(Compression.ZCMPTYPE_GZIP_2);
+            compressed.compress();
+            try (Fits output = new Fits()) {
+                output.addHDU(compressed);
+                output.write(destination.toFile());
+            }
+        }
+
+        VolumeData actual = FitsVolumeLoader.load(destination);
+        check(actual.name().equals(expected.name()), "compressed volume name");
+        check(actual.time().toString().equals(expected.time().toString()), "compressed volume observation time");
+        check(actual.width() == expected.width() && actual.height() == expected.height() && actual.depth() == expected.depth(),
+                "compressed volume dimensions");
+        checkVector(actual.corner(), expected.corner().x, expected.corner().y, expected.corner().z, "compressed volume corner");
+        checkVector(actual.axisX(), expected.axisX().x, expected.axisX().y, expected.axisX().z, "compressed volume X axis");
+        checkVector(actual.axisY(), expected.axisY().x, expected.axisY().y, expected.axisY().z, "compressed volume Y axis");
+        checkVector(actual.axisZ(), expected.axisZ().x, expected.axisZ().y, expected.axisZ().z, "compressed volume Z axis");
+        check(actual.sampleUnits().equals(expected.sampleUnits()), "compressed volume sample units");
+        check(actual.minimum() == expected.minimum() && actual.maximum() == expected.maximum(), "compressed volume scalar range");
+        check(actual.format() == expected.format(), "compressed volume texture format");
+        check(actual.samples().equals(expected.samples()), "compressed volume samples");
+        ByteBuffer actualMask = actual.validityMask();
+        ByteBuffer expectedMask = expected.validityMask();
+        check(actualMask == null ? expectedMask == null : actualMask.equals(expectedMask), "compressed volume validity mask");
     }
 
     private static void checkSample(VolumeData data, int x, int y, int z) {

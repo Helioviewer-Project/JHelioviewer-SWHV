@@ -107,16 +107,16 @@ public final class HeliocentricCartesianMetaData {
         double longitude;
         double latitude;
         // JHV's view rotation is the inverse of the observer's physical heliographic longitude.
-        if (source.contains("HGLN_OBS") && source.contains("HGLT_OBS")) {
+        if (source.contains("CRLN_OBS") && source.contains("CRLT_OBS")) {
+            longitude = -Math.toRadians(source.number("CRLN_OBS"));
+            latitude = Math.toRadians(source.number("CRLT_OBS"));
+        } else if (source.contains("HGLN_OBS") && source.contains("HGLT_OBS")) {
             if (time == null)
                 throw source.error("HGLN_OBS/HGLT_OBS require DATE-OBS or DATE-AVG");
             longitude = Sun.getEarth(time).lon - Math.toRadians(source.number("HGLN_OBS"));
             latitude = Math.toRadians(source.number("HGLT_OBS"));
-        } else if (source.contains("CRLN_OBS") && source.contains("CRLT_OBS")) {
-            longitude = -Math.toRadians(source.number("CRLN_OBS"));
-            latitude = Math.toRadians(source.number("CRLT_OBS"));
         } else {
-            throw source.error("heliocentric Cartesian coordinates require HGLN_OBS/HGLT_OBS or CRLN_OBS/CRLT_OBS");
+            throw source.error("heliocentric Cartesian coordinates require CRLN_OBS/CRLT_OBS or HGLN_OBS/HGLT_OBS");
         }
         if (Math.abs(latitude) > Math.PI / 2)
             throw source.error("observer latitude must be between -90 and 90 degrees");
