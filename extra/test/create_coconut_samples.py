@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Create reference-quality JHV volume and field-line products from COCONUT CFmesh.
+"""Create reference-quality JHV volume and geometry products from COCONUT CFmesh.
 
 The input CFmesh does not identify its observation time or spatial frame.  This converter assumes
 that its Cartesian axes are Carrington-aligned and requires the solution time on the command line.
-It resamples the solution into the observer-aligned Heliocentric (SOLX/SOLY/SOLZ) frame used by
-JHelioviewer.
+It resamples the solution once in that model frame, then rotates both output products into the
+observer-aligned Heliocentric (SOLX/SOLY/SOLZ) frame used by JHelioviewer.
 
 The volume contains a display-ready, clipped logarithm of electron density.  Qorona converts the
 model-normalized mass density to a *relative* electron-density shape by dividing by its mean
@@ -18,9 +18,9 @@ does not offer a separate fast mode: changing resolution, resampling, tracing, c
 calibration changes the product and should be an explicit, reviewed source change.  Both completed
 products are reopened and validated before the script reports that they were written.
 
-Requires Qorona 0.4.0, PyVista, and pygltflib.  Qorona's standard installation supplies
-NumPy, SciPy, Astropy, SunPy, and the optional Numba acceleration used during resampling;
-PyVista installs VTK.
+Developed and validated with Qorona 0.4.0, PyVista, Matplotlib, and pygltflib.  Qorona's standard
+installation supplies NumPy, SciPy, Astropy, SunPy, and optional Numba acceleration for resampling
+and field-line tracing; PyVista installs VTK.
 """
 
 from __future__ import annotations
@@ -36,15 +36,19 @@ import pyvista as pv
 import qorona
 from astropy.io import fits
 from astropy.time import Time
+from astropy.wcs import WCS
+from matplotlib import colormaps
 from pygltflib import GLTF2
+from scipy.ndimage import map_coordinates
+from sunpy.coordinates.sun import B0, L0, earth_distance
 from vtkmodules.vtkIOExport import vtkGLTFExporter
 
-from qorona.field.density import MEAN_MOLECULAR_WEIGHT
+from qorona.field.density import DensityVolume, MEAN_MOLECULAR_WEIGHT
 from qorona.field.sampled import SampledField
 from qorona.io.readers.coconut.cfmesh import CFmeshReader
-from qorona.pipeline import sub_earth_point
 from qorona.render.fieldlines import polarity_colours
 from qorona.resample import KnnMlsResampler, LogarithmicSpacing, SphericalGrid
+from qorona.resample.grid import pad_field
 from qorona.trace import lonlat_seeds, trace_field_lines
 
 RSUN_REF = 695_700_000.0
@@ -63,6 +67,12 @@ SEED_N_THETA = 18
 SEED_N_PHI = 36
 TRACE_RTOL = 1.0e-8
 TRACE_CFL = 0.125
+CURRENT_SHEET_OPACITY = 0.35
+# COOLFluiD's "corona" normalization uses v0 = 4.8e7 cm/s (Guo et al. 2024).
+CURRENT_SHEET_VELOCITY_SCALE_KM_S = 480.0
+CURRENT_SHEET_VELOCITY_MIN_KM_S = -30.0
+CURRENT_SHEET_VELOCITY_MAX_KM_S = 300.0
+CURRENT_SHEET_COLORMAP = "turbo"
 
 
 def main() -> None:
@@ -75,7 +85,7 @@ def main() -> None:
     world_to_sol = observer_basis(observer["CRLN_OBS"], observer["CRLT_OBS"])
     solution = CFmeshReader().read(args.input, show_progress=True)
     resampler = KnnMlsResampler()
-    field = build_field(solution, resampler)
+    field, velocity = build_field(solution, resampler)
     processing = {
         "qoronaVersion": qorona.__version__,
         "source": args.input.name,
@@ -87,15 +97,17 @@ def main() -> None:
         "ridge": resampler.ridge,
         "fieldGrid": [FIELD_N_R, FIELD_N_THETA, FIELD_N_PHI],
         "fieldGridRadialSpacing": "logarithmic",
-        "interpolator": "Keys tricubic",
+        "volumeInterpolator": "Keys tricubic",
         "meanMolecularWeightPerElectron": MEAN_MOLECULAR_WEIGHT,
     }
 
     volume_path = args.output_directory / "coconut-corona-density-16.fits"
     write_volume(field, world_to_sol, observer, timestamp, processing, volume_path)
 
-    scene_path = args.output_directory / "coconut-corona-field-lines.glb"
-    write_scene(field, world_to_sol, observer, timestamp, processing, scene_path)
+    scene_path = args.output_directory / "coconut-corona-scene.glb"
+    write_scene(
+        field, velocity, world_to_sol, observer, timestamp, processing, scene_path
+    )
 
     print(f"Wrote {volume_path}")
     print(f"Wrote {scene_path}")
@@ -133,11 +145,11 @@ def sha256(path: Path) -> str:
 
 
 def observer_metadata(timestamp: str) -> dict[str, float]:
-    longitude, latitude, distance_au = sub_earth_point(timestamp)
+    time = Time(timestamp, scale="utc")
     return {
-        "DSUN_OBS": float((distance_au * u.au).to_value(u.m)),
-        "CRLN_OBS": longitude,
-        "CRLT_OBS": latitude,
+        "DSUN_OBS": float(earth_distance(time).to_value(u.m)),
+        "CRLN_OBS": float(L0(time).to_value(u.deg)),
+        "CRLT_OBS": float(B0(time).to_value(u.deg)),
         "RSUN_REF": RSUN_REF,
     }
 
@@ -164,19 +176,29 @@ def observer_basis(longitude_degrees: float, latitude_degrees: float) -> np.ndar
     return np.stack((west, north, toward_observer))
 
 
-def build_field(solution, resampler: KnnMlsResampler) -> SampledField:
+def build_field(
+    solution, resampler: KnnMlsResampler
+) -> tuple[SampledField, np.ndarray]:
     grid = SphericalGrid(
         spacing=LogarithmicSpacing(inner=1.0, outer=VOLUME_EXTENT),
         n_r=FIELD_N_R,
         n_theta=FIELD_N_THETA,
         n_phi=FIELD_N_PHI,
     )
-    return SampledField.from_solution(
-        solution,
-        grid,
-        resampler=resampler,
-        show_progress=True,
+    names = ("Bx", "By", "Bz", "rho", "vx", "vy", "vz")
+    missing = [name for name in names if name not in solution.variables]
+    if missing:
+        raise ValueError(f"COCONUT solution lacks variables: {', '.join(missing)}")
+    components = resampler.resample(solution, grid, names, show_progress=True)
+    magnetic_field = pad_field(
+        np.stack([components[name] for name in names[:3]], axis=-1)
     )
+    density = DensityVolume.from_grid_values(grid, components["rho"])
+    field = SampledField(
+        grid, magnetic_field, solution.metadata.normalization, density=density
+    )
+    velocity = np.stack([components[name] for name in names[4:]], axis=-1)
+    return field, velocity
 
 
 def write_volume(
@@ -243,7 +265,7 @@ def write_volume(
         f"{processing['fieldGridRadialSpacing']} spherical field grid"
     )
     header["HISTORY"] = (
-        f"{processing['interpolator']} interpolation to Cartesian voxel centres"
+        f"{processing['volumeInterpolator']} interpolation to Cartesian voxel centres"
     )
     header["HISTORY"] = (
         f"Qorona density is model-normalized rho/{MEAN_MOLECULAR_WEIGHT} (relative shape only)"
@@ -366,10 +388,35 @@ def validate_fits_volume(
             "RSUN_REF",
         )
         for keyword in metadata_keys:
-            if header.get(keyword) != expected_header.get(keyword):
+            actual_value = header.get(keyword)
+            expected_value = expected_header.get(keyword)
+            # Floating-point header values are serialized as decimal text in 80-character FITS
+            # cards. Compare their recovered values at that representation's precision; image
+            # integers, checksums, and all non-floating metadata remain exact checks.
+            matches = (
+                np.isclose(actual_value, expected_value, rtol=1.0e-14, atol=0.0)
+                if isinstance(expected_value, float)
+                else actual_value == expected_value
+            )
+            if not matches:
                 raise RuntimeError(f"unexpected FITS {keyword} value")
         if list(header["HISTORY"]) != list(expected_header["HISTORY"]):
             raise RuntimeError("unexpected FITS HISTORY")
+
+        reference_pixel = (VOLUME_SIZE + 1) / 2
+        world = WCS(header, fix=False).all_pix2world(
+            [[1.0] * 3, [reference_pixel] * 3, [float(VOLUME_SIZE)] * 3], 1
+        )
+        half_step = VOLUME_EXTENT / VOLUME_SIZE
+        expected_world = np.array(
+            [
+                [-VOLUME_EXTENT + half_step] * 3,
+                [0.0] * 3,
+                [VOLUME_EXTENT - half_step] * 3,
+            ]
+        )
+        if not np.allclose(world, expected_world, rtol=0.0, atol=1.0e-12):
+            raise RuntimeError("unexpected FITS voxel-centre coordinates")
 
 
 def add_observer_metadata(
@@ -387,6 +434,7 @@ def add_observer_metadata(
 
 def write_scene(
     field: SampledField,
+    velocity: np.ndarray,
     world_to_sol: np.ndarray,
     observer: dict[str, float],
     timestamp: str,
@@ -405,6 +453,19 @@ def write_scene(
         cfl=TRACE_CFL,
     )
     colors = polarity_colours(field, lines, 1.0, VOLUME_EXTENT)
+    current_sheet = extract_current_sheet(field, velocity, world_to_sol)
+    open_boundary_points = (
+        lines.feet[lines.is_open].reshape(-1, 3) @ world_to_sol.T
+    ).astype(np.float32)
+    open_boundary_colors = np.rint(
+        np.column_stack(
+            (
+                np.repeat(colors[lines.is_open], 2, axis=0),
+                np.ones(len(open_boundary_points)),
+            )
+        )
+        * 255
+    ).astype(np.uint8)
 
     positions = []
     vertex_colors = []
@@ -463,25 +524,151 @@ def write_scene(
             "precision": "float64",
             "seedGrid": [SEED_N_THETA, SEED_N_PHI],
             "incompletePathsDiscarded": True,
+            "currentSheet": {
+                "definition": "B_r=0",
+                "grid": [FIELD_N_R, FIELD_N_THETA, FIELD_N_PHI],
+                "meshing": "VTK flying edges",
+                "velocityInterpolation": "trilinear on the spherical field grid",
+                "colorQuantity": "radial velocity",
+                "colorMap": CURRENT_SHEET_COLORMAP,
+                "colorRangeKmPerS": [
+                    CURRENT_SHEET_VELOCITY_MIN_KM_S,
+                    CURRENT_SHEET_VELOCITY_MAX_KM_S,
+                ],
+                "modelVelocityUnitKmPerS": CURRENT_SHEET_VELOCITY_SCALE_KM_S,
+                "dataRangeKmPerS": [
+                    float(np.min(current_sheet.point_data["radialVelocity"])),
+                    float(np.max(current_sheet.point_data["radialVelocity"])),
+                ],
+                "vertices": current_sheet.n_points,
+                "triangles": current_sheet.n_cells,
+            },
+            "openFieldBoundaryPoints": {
+                "definition": "inner and outer boundary endpoints of complete open field lines",
+                "count": len(open_boundary_points),
+                "colorQuantity": "polarity of the corresponding field line",
+            },
         },
     }
     segment_count = sum(len(position) - 1 for position in positions)
-    write_line_glb(
+    write_scene_glb(
         output,
         position_array,
         color_array,
         polyline_array,
         segment_count,
+        current_sheet,
+        open_boundary_points,
+        open_boundary_colors,
         metadata,
     )
 
 
-def write_line_glb(
+def extract_current_sheet(
+    field: SampledField, velocity: np.ndarray, world_to_sol: np.ndarray
+) -> pv.PolyData:
+    grid = field.grid
+    if velocity.shape != (grid.n_r, grid.n_theta, grid.n_phi, 3):
+        raise ValueError(
+            "velocity must contain one Cartesian vector per field-grid node"
+        )
+    if not np.isfinite(velocity).all():
+        raise ValueError("velocity contains non-finite values")
+    theta = grid.colatitudes[:, None]
+    phi = grid.azimuths[None, :]
+    radial_direction = np.stack(
+        np.broadcast_arrays(
+            np.sin(theta) * np.cos(phi),
+            np.sin(theta) * np.sin(phi),
+            np.cos(theta) * np.ones_like(phi),
+        ),
+        axis=-1,
+    )
+    b_radial = np.einsum(
+        "rtpc,tpc->rtp", field.b_at_nodes(), radial_direction, optimize=True
+    )
+    if not np.isfinite(b_radial).all() or not (
+        np.min(b_radial) <= 0.0 <= np.max(b_radial)
+    ):
+        raise RuntimeError("resampled magnetic field has no finite B_r=0 surface")
+
+    # Close the periodic longitude axis before contouring. ImageData keeps the logical grid
+    # implicit, avoiding another full Cartesian copy of the high-resolution magnetic field.
+    b_radial = np.concatenate((b_radial, b_radial[:, :, :1]), axis=2).astype(np.float32)
+    logical_grid = pv.ImageData(dimensions=b_radial.shape)
+    logical_grid.point_data["B_r"] = b_radial.ravel(order="F")
+    surface = logical_grid.contour(
+        [0.0],
+        scalars="B_r",
+        compute_normals=False,
+        compute_scalars=False,
+        method="flying_edges",
+    ).triangulate()
+    if surface.n_points == 0 or surface.n_cells == 0:
+        raise RuntimeError("B_r=0 contouring produced an empty current sheet")
+
+    logical = np.asarray(surface.points, dtype=np.float64)
+    periodic_velocity = np.concatenate((velocity, velocity[:, :, :1]), axis=2)
+    surface_velocity = np.column_stack(
+        [
+            map_coordinates(
+                periodic_velocity[..., component],
+                logical.T,
+                order=1,
+                mode="nearest",
+                prefilter=False,
+            )
+            for component in range(3)
+        ]
+    )
+    radius = grid.spacing.radius(logical[:, 0] / (grid.n_r - 1))
+    colatitude = (logical[:, 1] + 0.5) * (np.pi / grid.n_theta)
+    azimuth = logical[:, 2] * (2.0 * np.pi / grid.n_phi)
+    sin_colatitude = np.sin(colatitude)
+    model_points = np.column_stack(
+        (
+            radius * sin_colatitude * np.cos(azimuth),
+            radius * sin_colatitude * np.sin(azimuth),
+            radius * np.cos(colatitude),
+        )
+    )
+    radial_velocity = (
+        np.einsum("ij,ij->i", surface_velocity, model_points / radius[:, None])
+        * CURRENT_SHEET_VELOCITY_SCALE_KM_S
+    )
+    normalized_velocity = np.clip(
+        (radial_velocity - CURRENT_SHEET_VELOCITY_MIN_KM_S)
+        / (CURRENT_SHEET_VELOCITY_MAX_KM_S - CURRENT_SHEET_VELOCITY_MIN_KM_S),
+        0.0,
+        1.0,
+    )
+    rgba = colormaps[CURRENT_SHEET_COLORMAP](normalized_velocity, bytes=True)
+    rgba[:, 3] = round(255 * CURRENT_SHEET_OPACITY)
+    surface.points = np.asarray(model_points @ world_to_sol.T, dtype=np.float32)
+    surface.point_data["RGBA"] = np.ascontiguousarray(rgba, dtype=np.uint8)
+    surface.point_data["radialVelocity"] = radial_velocity
+    surface = surface.clean(tolerance=1.0e-6, absolute=True)
+    # Joining the coincident longitude seam can collapse a handful of seam triangles. VTK's
+    # cleaner preserves those degeneracies as line or point cells; retain only the polygonal
+    # faces so the exported object remains a pure triangle mesh.
+    polygon_surface = pv.PolyData(surface.points, surface.faces)
+    polygon_surface.point_data["RGBA"] = surface.point_data["RGBA"]
+    polygon_surface.point_data["radialVelocity"] = surface.point_data["radialVelocity"]
+    surface = polygon_surface.remove_unused_points()
+    if not surface.is_all_triangles:
+        raise RuntimeError("current-sheet contour is not a triangle mesh")
+    return surface
+
+
+def write_scene_glb(
     output: Path,
     positions: np.ndarray,
     colors: np.ndarray,
     polylines: np.ndarray,
     segment_count: int,
+    current_sheet: pv.PolyData,
+    boundary_points: np.ndarray,
+    boundary_colors: np.ndarray,
     metadata: dict[str, object],
 ) -> None:
     if (
@@ -494,16 +681,74 @@ def write_line_glb(
         raise ValueError("colors must contain one RGBA value per position")
     if polylines.ndim != 1 or len(polylines) == 0:
         raise ValueError("polylines must be a non-empty VTK line-cell array")
+    if current_sheet.n_points == 0 or current_sheet.n_cells == 0:
+        raise ValueError("current sheet must be a non-empty triangle mesh")
+    if (
+        boundary_points.ndim != 2
+        or boundary_points.shape[1] != 3
+        or len(boundary_points) == 0
+        or not np.isfinite(boundary_points).all()
+    ):
+        raise ValueError("boundary points must be a finite, non-empty Nx3 array")
+    if boundary_colors.shape != (len(boundary_points), 4):
+        raise ValueError("boundary colors must contain one RGBA value per point")
+    boundary_radii = np.linalg.norm(boundary_points, axis=1)
+    inner_boundary = np.isclose(boundary_radii, 1.0, atol=1.0e-5)
+    outer_boundary = np.isclose(boundary_radii, VOLUME_EXTENT, atol=1.0e-5)
+    if not np.all(inner_boundary | outer_boundary) or not (
+        np.any(inner_boundary) and np.any(outer_boundary)
+    ):
+        raise ValueError("boundary points must include both model boundaries")
+    if (
+        np.any(boundary_colors[:, 3] != 255)
+        or len(np.unique(boundary_colors[:, :3], axis=0)) < 2
+    ):
+        raise ValueError(
+            "boundary-point colors must be opaque and encode both polarities"
+        )
+    surface_colors = np.asarray(current_sheet.point_data.get("RGBA"))
+    if surface_colors.shape != (current_sheet.n_points, 4):
+        raise ValueError("current sheet must contain one RGBA value per vertex")
+    if (
+        np.any(surface_colors[:, 3] != round(255 * CURRENT_SHEET_OPACITY))
+        or len(np.unique(surface_colors[:, :3], axis=0)) < 2
+    ):
+        raise ValueError(
+            "current-sheet colors must vary in RGB and use the configured opacity"
+        )
 
     mesh = pv.PolyData(
         np.ascontiguousarray(positions, dtype=np.float32), lines=polylines
     )
     mesh.point_data["RGBA"] = np.ascontiguousarray(colors, dtype=np.uint8)
+    point_cloud = pv.PolyData(np.ascontiguousarray(boundary_points, dtype=np.float32))
+    point_cloud.point_data["RGBA"] = np.ascontiguousarray(
+        boundary_colors, dtype=np.uint8
+    )
     plotter = pv.Plotter(off_screen=True)
     try:
         plotter.add_mesh(
             mesh,
             name="COCONUT magnetic field lines",
+            scalars="RGBA",
+            rgba=True,
+            color="white",
+            lighting=False,
+            show_scalar_bar=False,
+        )
+        plotter.add_mesh(
+            current_sheet,
+            name="Heliospheric current sheet",
+            scalars="RGBA",
+            rgba=True,
+            color="white",
+            lighting=False,
+            show_scalar_bar=False,
+        )
+        plotter.add_mesh(
+            point_cloud,
+            name="Open-field-line boundary endpoints",
+            style="points",
             scalars="RGBA",
             rgba=True,
             color="white",
@@ -525,19 +770,70 @@ def write_line_glb(
     scene["name"] = "COCONUT corona"
     scene["extras"] = metadata
 
+    line_meshes = []
+    surface_meshes = []
+    point_meshes = []
+    for mesh_index, exported_mesh in enumerate(document.get("meshes", [])):
+        modes = {primitive.get("mode", 4) for primitive in exported_mesh["primitives"]}
+        if modes == {1}:
+            line_meshes.append(mesh_index)
+        elif modes == {4}:
+            surface_meshes.append(mesh_index)
+        elif modes == {0}:
+            point_meshes.append(mesh_index)
+    if len(line_meshes) != 1 or len(surface_meshes) != 1 or len(point_meshes) != 1:
+        raise RuntimeError(
+            "VTK did not export one line, one triangle, and one point mesh"
+        )
+
+    line_mesh = line_meshes[0]
+    surface_mesh = surface_meshes[0]
+    point_mesh = point_meshes[0]
+    document["meshes"][line_mesh]["name"] = "COCONUT magnetic field lines"
+    document["meshes"][surface_mesh]["name"] = "Heliospheric current sheet"
+    document["meshes"][point_mesh]["name"] = "Open-field-line boundary endpoints"
+    for node in document.get("nodes", []):
+        if node.get("mesh") == line_mesh:
+            node["name"] = "COCONUT magnetic field lines"
+        elif node.get("mesh") == surface_mesh:
+            node["name"] = "Heliospheric current sheet"
+        elif node.get("mesh") == point_mesh:
+            node["name"] = "Open-field-line boundary endpoints"
+
+    surface_primitive = document["meshes"][surface_mesh]["primitives"][0]
+    material_index = surface_primitive.get("material")
+    if material_index is None or not 0 <= material_index < len(
+        document.get("materials", [])
+    ):
+        raise RuntimeError("VTK current-sheet mesh has no valid material")
+    surface_material = document["materials"][material_index]
+    surface_material["alphaMode"] = "BLEND"
+    surface_material["doubleSided"] = True
+
     # VTK owns the glTF geometry and buffers.  pygltflib only packages that in-memory document as
     # one binary GLB while preserving the application-specific scene metadata added above.
     GLTF2.gltf_from_json(json.dumps(document)).save_binary(output)
 
     # Validate the finished file, not the in-memory document: this catches packaging errors and
     # proves that the metadata and rendering attributes survived the GLB round trip.
-    validate_line_glb(output, len(positions), segment_count, metadata)
+    validate_scene_glb(
+        output,
+        len(positions),
+        segment_count,
+        current_sheet.n_points,
+        current_sheet.n_cells,
+        len(boundary_points),
+        metadata,
+    )
 
 
-def validate_line_glb(
+def validate_scene_glb(
     path: Path,
     expected_vertex_count: int,
     expected_segment_count: int,
+    expected_surface_vertex_count: int,
+    expected_surface_triangle_count: int,
+    expected_point_count: int,
     expected_metadata: dict[str, object],
 ) -> None:
     document = GLTF2().load(path)
@@ -549,11 +845,9 @@ def validate_line_glb(
         or len(document.scenes) != 1
         or not 0 <= scene_index < len(document.scenes)
         or document.meshes is None
-        or len(document.meshes) != 1
-        or document.meshes[0].primitives is None
-        or len(document.meshes[0].primitives) != 1
+        or len(document.meshes) != 3
         or document.materials is None
-        or len(document.materials) != 1
+        or len(document.materials) != 3
         or document.accessors is None
         or document.buffers is None
         or len(document.buffers) != 1
@@ -561,43 +855,115 @@ def validate_line_glb(
         raise RuntimeError("completed GLB has an unexpected scene structure")
 
     scene = document.scenes[scene_index]
-    primitive = document.meshes[0].primitives[0]
+    primitives = [
+        primitive
+        for mesh in document.meshes
+        for primitive in (mesh.primitives if mesh.primitives is not None else [])
+    ]
+    line_primitives = [primitive for primitive in primitives if primitive.mode == 1]
+    surface_primitives = [primitive for primitive in primitives if primitive.mode == 4]
+    point_primitives = [primitive for primitive in primitives if primitive.mode == 0]
     if (
-        primitive.attributes is None
-        or primitive.attributes.POSITION is None
-        or primitive.attributes.COLOR_0 is None
-        or primitive.indices is None
-        or primitive.material is None
-        or not 0 <= primitive.attributes.POSITION < len(document.accessors)
-        or not 0 <= primitive.attributes.COLOR_0 < len(document.accessors)
-        or not 0 <= primitive.indices < len(document.accessors)
-        or not 0 <= primitive.material < len(document.materials)
-        or document.materials[primitive.material].pbrMetallicRoughness is None
+        len(primitives) != 3
+        or len(line_primitives) != 1
+        or len(surface_primitives) != 1
+        or len(point_primitives) != 1
+    ):
+        raise RuntimeError(
+            "completed GLB does not contain one line, one triangle, and one point primitive"
+        )
+
+    line = line_primitives[0]
+    surface = surface_primitives[0]
+    points = point_primitives[0]
+    if (
+        line.attributes is None
+        or line.attributes.POSITION is None
+        or line.attributes.COLOR_0 is None
+        or line.indices is None
+        or line.material is None
+        or surface.attributes is None
+        or surface.attributes.POSITION is None
+        or surface.attributes.COLOR_0 is None
+        or surface.indices is None
+        or surface.material is None
+        or points.attributes is None
+        or points.attributes.POSITION is None
+        or points.attributes.COLOR_0 is None
+        or points.indices is None
+        or points.material is None
+        or any(
+            index is None or not 0 <= index < len(document.accessors)
+            for index in (
+                line.attributes.POSITION,
+                line.attributes.COLOR_0,
+                line.indices,
+                surface.attributes.POSITION,
+                surface.attributes.COLOR_0,
+                surface.indices,
+                points.attributes.POSITION,
+                points.attributes.COLOR_0,
+                points.indices,
+            )
+        )
+        or not 0 <= line.material < len(document.materials)
+        or not 0 <= surface.material < len(document.materials)
+        or not 0 <= points.material < len(document.materials)
+        or document.materials[line.material].pbrMetallicRoughness is None
+        or document.materials[surface.material].pbrMetallicRoughness is None
+        or document.materials[points.material].pbrMetallicRoughness is None
     ):
         raise RuntimeError("completed GLB contains invalid primitive references")
 
-    position_accessor = document.accessors[primitive.attributes.POSITION]
-    color_accessor = document.accessors[primitive.attributes.COLOR_0]
-    index_accessor = document.accessors[primitive.indices]
-    base_color = document.materials[
-        primitive.material
+    line_position = document.accessors[line.attributes.POSITION]
+    line_color = document.accessors[line.attributes.COLOR_0]
+    line_indices = document.accessors[line.indices]
+    surface_position = document.accessors[surface.attributes.POSITION]
+    surface_color = document.accessors[surface.attributes.COLOR_0]
+    surface_indices = document.accessors[surface.indices]
+    point_position = document.accessors[points.attributes.POSITION]
+    point_color = document.accessors[points.attributes.COLOR_0]
+    point_indices = document.accessors[points.indices]
+    line_base_color = document.materials[
+        line.material
+    ].pbrMetallicRoughness.baseColorFactor
+    surface_material = document.materials[surface.material]
+    surface_base_color = surface_material.pbrMetallicRoughness.baseColorFactor
+    point_base_color = document.materials[
+        points.material
     ].pbrMetallicRoughness.baseColorFactor
     binary_blob = document.binary_blob()
     if (
         scene.name != "COCONUT corona"
         or scene.extras != expected_metadata
-        or primitive.mode != 1
-        or position_accessor.count != expected_vertex_count
-        or color_accessor.count != expected_vertex_count
-        or index_accessor.count != 2 * expected_segment_count
-        or color_accessor.componentType != 5121
-        or color_accessor.normalized is not True
-        or base_color != [1.0, 1.0, 1.0, 1.0]
+        or line_position.count != expected_vertex_count
+        or line_color.count != expected_vertex_count
+        or line_indices.count != 2 * expected_segment_count
+        or line_color.componentType != 5121
+        or line_color.type != "VEC4"
+        or line_color.normalized is not True
+        or line_base_color != [1.0, 1.0, 1.0, 1.0]
+        or surface_position.count != expected_surface_vertex_count
+        or surface_color.count != expected_surface_vertex_count
+        or surface_indices.count != 3 * expected_surface_triangle_count
+        or surface_color.componentType != 5121
+        or surface_color.type != "VEC4"
+        or surface_color.normalized is not True
+        or surface_material.alphaMode != "BLEND"
+        or surface_material.doubleSided is not True
+        or surface_base_color != [1.0, 1.0, 1.0, 1.0]
+        or point_position.count != expected_point_count
+        or point_color.count != expected_point_count
+        or point_indices.count != expected_point_count
+        or point_color.componentType != 5121
+        or point_color.type != "VEC4"
+        or point_color.normalized is not True
+        or point_base_color != [1.0, 1.0, 1.0, 1.0]
         or document.buffers[0].uri is not None
         or binary_blob is None
         or len(binary_blob) != document.buffers[0].byteLength
     ):
-        raise RuntimeError("completed GLB does not contain the expected line scene")
+        raise RuntimeError("completed GLB does not contain the expected geometry scene")
 
 
 if __name__ == "__main__":

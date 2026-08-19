@@ -56,7 +56,7 @@ JHV's timeline; it is not used to rotate an observer-relative coordinate frame.
 Qorona uses the SunJSON line primitive for its field-line products. It assumes that the solution is
 Carrington-aligned and converts each Cartesian trace to radius, Carrington longitude, and latitude. SunJSON also
 carries the JHV-specific line thickness and per-vertex RGBA colour. A Qorona field-line product intended primarily
-for JHV should therefore normally use SunJSON and load into the Connection Layer.
+for JHV should therefore normally use SunJSON.
 
 ## Why glTF for a scene
 
@@ -73,8 +73,9 @@ frame.
 
 For field lines alone, glTF gives up useful SunJSON semantics—notably portable JHV line thickness—and introduces
 additional coordinate-frame metadata. Its value is that the same scene can represent field lines together with
-meshes or other general scene geometry. The GLB field-line fixture later in this document deliberately exercises that
-general Model Layer route; it is not a recommendation to replace Qorona's SunJSON export.
+meshes or other general scene geometry. The GLB fixture later in this document combines field lines, a meshed current
+sheet, and point markers at the inner and outer boundary endpoints of open field lines to exercise the general glTF
+scene interface; it is not a recommendation to replace Qorona's SunJSON export for field-line-only products.
 
 Qorona's FITS exports are likewise distinct from the volume profile below. They are floating-point 2D helioprojective
 rasters with `HPLN-TAN`/`HPLT-TAN` WCS: the squashing-factor export contains the line-of-sight-averaged `log10(Qperp)`,
@@ -155,8 +156,8 @@ product time rather than replaced by a nominal `(0, 0)` observer.
 ## Placement in JHV
 
 Product coordinates are expressed in the declared `SOLX/SOLY/SOLZ` basis. On loading, JHV uses the observation
-metadata to rotate them into its Carrington world. This placement happens before model geometry is prepared for
-rendering, so meshes, lines, points, transparency sorting, face winding, and depth all use the same world geometry.
+metadata to rotate them into its Carrington world. The same placement is applied consistently to meshes, lines, and
+points before the scene is displayed.
 
 The user's subsequent rotation of the JHV scene is a view operation. It does not change the product's physical
 placement.
@@ -244,8 +245,8 @@ For `BITPIX=8`, JHV uploads the stored byte codes to an `R8` normalized texture.
 signed 16-bit codes, converts them to IEEE binary16, and uploads them to `R16F`.
 
 JHV does not apply `BZERO + BSCALE * stored_value` to every voxel. It uses `BSCALE` and `BZERO` to retain the physical
-range as metadata; the current renderer does not use that range. `BSCALE` must be finite and non-zero, and `BZERO`
-must be finite.
+range as metadata; the current renderer does not use that range. The sign of `BSCALE` selects whether stored codes
+are uploaded in forward or reverse order. `BSCALE` must be finite and non-zero, and `BZERO` must be finite.
 
 `BUNIT` describes the physical value represented by the scaled FITS data. It may be omitted for a dimensionless
 scalar. For example, `log10(ne / m^-3)` is dimensionless; its meaning can be recorded in `BTYPE` and `HISTORY` without
@@ -382,12 +383,11 @@ cell boundary is at +3.
 # glTF geometry-scene profile
 
 glTF scenes are suitable for explicit geometry such as field lines, triangulated surfaces, or point samples. JHV
-loads both `.gltf` and `.glb` files through Assimp, the Open Asset Import Library. Assimp parses either file form into
-its common in-memory scene representation and performs format-independent processing such as triangulation and
-separation by primitive type. JHV then converts the supported nodes, meshes, materials, and textures into its own
-internal scene representation and renders its triangles, lines, and points with the same world transform and depth
-buffer as other JHV layers. Assimp is the asset importer, not the renderer or the definition of the solar metadata;
-JHV handles those parts itself.
+uses Assimp, the Open Asset Import Library, to read both `.gltf` and `.glb` files. Assimp reads the asset, while JHV
+defines the supported feature set, interprets the solar metadata below, and places the geometry in the solar scene.
+
+glTF defines many features beyond this profile. A file that works in a general glTF viewer may contain features that
+JHV does not support. The following sections describe the subset producers can currently rely on.
 
 ## Solar metadata in scene extras
 
@@ -427,24 +427,42 @@ JHV reads the metadata imported for the scene and incorporates the resulting sol
 transform. A general glTF viewer will ignore these application-specific extras and display the same geometry in its
 local frame, as expected by the glTF standard.
 
-## Geometry and colour
+## What JHV currently displays
 
-JHV currently handles triangle, line, and point primitives after Assimp has triangulated and separated the source
-primitive types. glTF line primitives describe geometric lines but do not carry a portable pixel thickness; point
-primitives likewise do not define a portable display size. JHV therefore applies its own line and point rendering
-rules.
+JHV supports the following static scene content:
 
-Base-colour factors, vertex colours, and one base-colour texture are multiplied in the fragment shader. glTF colour
-inputs are straight-alpha values. For `BLEND` materials JHV multiplies RGB by the resulting alpha before blending,
-which converts them to JHV's premultiplied-alpha framebuffer convention. `OPAQUE` and accepted `MASK` fragments are
-rendered with alpha one.
+- triangle meshes, including open or closed surfaces;
+- connected lines and polylines;
+- point sets;
+- a hierarchy of nodes with static translations, rotations, and scales, including repeated use of a mesh;
+- a base colour and per-vertex RGBA colours on triangles, lines, and points;
+- one base-colour texture per triangle material, embedded in the file or stored alongside a `.gltf` file;
+- opaque, cut-out (`MASK`), and translucent (`BLEND`) materials; and
+- single- or double-sided triangle surfaces.
 
-For line primitives, `MASK` is currently applied at vertices before colour interpolation and is therefore only an
-approximation of fragment-level alpha masking. Opaque or conventionally blended lines are the clearer interchange
-choices at present.
+All three primitive types use the same solar placement, scene rotation, depth buffer, and observation time as other
+JHV layers. Colours in glTF use ordinary straight alpha; JHV performs the premultiplication required by its renderer.
+Producers should therefore write normal, non-premultiplied glTF colours.
 
-The present importer supports the core material subset needed by the test and COCONUT scenes. Additive blending,
-separate opacity textures, UV transforms, animations, and skeletons are outside the current profile.
+glTF does not define a portable visual width for a line or size for a point. JHV assigns its own fixed display width
+and size, so a file cannot currently request thicker lines or larger markers. SunJSON remains the better choice when
+JHV-specific line thickness or point size is part of the product.
+
+## Current limits
+
+JHV intentionally treats these files as scientific geometry rather than as fully lit 3D artwork. It uses base colour,
+vertex colour, and a base-colour texture, but does not currently reproduce glTF lighting, metallic/roughness,
+normal-map, or emissive effects. Cameras and lights stored in the scene do not control the JHV view.
+
+Animations, skeletons, and morph targets are not supported. Textures on lines and points are not supported, nor are
+additive blending, separate opacity textures, or transformed texture coordinates. Simple translucent surfaces work,
+but complex overlapping translucent geometry may depend on draw order; splitting it into sensible objects generally
+gives a more predictable result. Opaque or normally blended lines are preferable to cut-out (`MASK`) lines, whose
+edge masking is only approximate in the current line renderer.
+
+JHV also does not interpret arbitrary scientific vertex attributes as interactive data channels. A producer should
+convert the chosen quantity to display-ready vertex colours or a base-colour texture and record the quantity, units,
+and colour mapping in scene `extras`. Volumes remain separate FITS cube products.
 
 # Worked COCONUT conversion
 
@@ -452,7 +470,8 @@ separate opacity textures, UV transforms, animations, and skeletons are outside 
 produces:
 
 - `coconut-corona-density-16.fits`, a compressed scalar density volume;
-- `coconut-corona-field-lines.glb`, a scene of traced magnetic field lines.
+- `coconut-corona-scene.glb`, a scene containing traced magnetic field lines, a triangulated heliospheric current
+  sheet, and point markers at the inner and outer boundary endpoints of open field lines.
 
 Qorona can export the same class of traced field lines directly as SunJSON, which is the simpler product when JHV is
 the only consumer. This example uses GLB specifically to demonstrate the general scene interface and to keep the
@@ -463,7 +482,7 @@ Run it from the repository root in an environment containing Qorona, PyVista/VTK
 ```shell
 python extra/test/create_coconut_samples.py \
     /path/to/coconut_corona.CFmesh.xz \
-    --timestamp 2025-10-09T18:19:52Z \
+    --timestamp 2025-10-09T18:19:52 \
     --output-directory extra/test/data
 ```
 
@@ -480,19 +499,29 @@ conversion therefore makes the following choices explicit:
 - it reserves `-32768` for blank voxels and writes the defined values with `BITPIX=16`, `BSCALE`, and `BZERO`;
 - it compresses the FITS image losslessly with `GZIP_2` and one xy plane per tile;
 - it traces field lines in float64 with DOPRI5, `rtol=10^-8`, and `cfl=0.125`, while glTF positions are stored as
-  float32.
+  float32;
+- it marks both boundary endpoints of every complete open field line as glTF points, using the same polarity colour as
+  the corresponding line;
+- it defines the heliospheric current sheet as the zero isosurface of the radial magnetic-field component on the same
+  high-resolution spherical grid, closes the periodic longitude seam before contouring, and exports the resulting
+  triangle mesh as a translucent, double-sided surface; and
+- it colours that surface by radial velocity with the `turbo` colour map over a fixed `-30` to `300 km/s` display
+  interval. The model's dimensionless velocity is converted using the COOLFluiD `corona` normalization
+  `v0 = 480 km/s`. Values outside the display interval use its endpoint colours.
 
 Those values document one high-quality reference product; another producing project may make different justified
 choices. The important interface points are the final grid or geometry, shared frame metadata, scalar meaning,
 undefined-domain treatment, and enough provenance to reproduce the conversion.
 
 The FITS `HISTORY` cards and glTF scene `extras` record the source name and SHA-256 digest, software version,
-resampling configuration, source-cell count, and consequential density or tracing parameters.
+resampling configuration, source-cell count, and consequential density, tracing, and current-sheet parameters.
 
-For the GLB, PyVista creates the polyline scene through VTK's glTF exporter. The script obtains VTK's glTF document
-in memory, adds the solar metadata to the default scene, and uses pygltflib to package it as one GLB without an
-intermediate `.gltf` file. Vertex colours are normalized unsigned-byte, opaque RGBA values and the base material is
-white so it does not tint them.
+For the GLB, PyVista creates the polyline, triangle, and point geometry through VTK's glTF exporter. The script obtains
+VTK's glTF document in memory, adds the solar metadata to the default scene, and uses pygltflib to package it as one
+GLB without an intermediate `.gltf` file. Field-line and boundary-point vertex colours are normalized unsigned-byte,
+opaque RGBA values. Current-sheet vertices likewise carry normalized unsigned-byte RGBA values, with RGB encoding
+radial velocity and a common straight alpha. All base materials are white so they do not tint those vertex colours.
+JHV converts the glTF colours to premultiplied alpha while rendering.
 
 # Validation shared by both projects
 
@@ -505,9 +534,10 @@ Validation is most useful when it is divided between format production and integ
 - Check the first, reference, and last voxel-centre coordinates, plus the eight half-voxel outer corners.
 - Use an asymmetric test pattern to expose axis permutations and reflections.
 - Check representative `BLANK` regions and recovered physical values.
-- Ask Astropy/SunPy to interpret the WCS and observer metadata.
+- Use Astropy to check the linear WCS coordinates and SunPy to calculate the expected observer metadata independently.
 
-The reference converter performs both physical-HDU checksum checks and an exact logical-image round trip.
+The reference converter checks the physical-HDU checksums, compares the decompressed stored integers exactly, and
+checks the recovered logical-image metadata.
 
 ## Checks performed while producing a glTF scene
 
@@ -516,8 +546,14 @@ The reference converter performs both physical-HDU checksum checks and an exact 
   embedded binary payload.
 - Confirm that coordinates remain finite after float32 conversion and that line conversion emits no degenerate
   adjacent segments.
+- For an isosurface, confirm that the result is non-empty, triangulated, periodic where required, and uses the intended
+  transparency and sidedness.
+- Confirm that point samples remain point primitives and retain their per-vertex colours.
+- For boundary markers, confirm that every point lies on the intended boundary and that its colour encodes the
+  intended classification.
 
-The reference converter performs these checks after final GLB packaging.
+The reference converter checks the semantic inputs before export, then reopens the completed GLB and verifies its
+metadata, primitive structure, accessors, materials, and binary packaging.
 
 ## Integration checks in JHV
 
@@ -528,13 +564,8 @@ The reference converter performs these checks after final GLB packaging.
 - For FITS, inspect mask boundaries and colour/opacity transfer at representative values.
 - For geometry, inspect winding, transparency, lines, points, and scene rotation as applicable.
 
-Repository tests provide additional synthetic coverage:
-
-- `extra/test/VolumeLayerTest.java` exercises axis permutations, non-zero reference coordinates, PC and CD matrices,
-  blank masks, rendering, and state restoration;
-- `extra/test/AssimpModelLoaderTest.java` exercises scene metadata placement, geometry, materials, depth, rendering,
-  and state restoration;
-- `extra/test/create_coconut_samples.py` generates and validates the paired reference products.
+Repository tests provide additional synthetic coverage of volume WCS and masks, scene placement and materials,
+primitive rendering, depth behaviour, rendering-state restoration, and generation of the paired reference products.
 
 # Current extension points
 
@@ -543,18 +574,6 @@ scalar channels, time-sequenced products, vector quantities, alternative regular
 glTF materials. When a new need arises, the producing and JHV teams can define the extension together, supported by
 a representative product and matching JHV integration tests. This keeps the document practical and ensures that new
 capabilities work from production through visualization.
-
-# Implementation references
-
-The principal JHV readers are:
-
-- `src/org/helioviewer/jhv/opengl/volume/FitsVolumeLoader.java`
-- `src/org/helioviewer/jhv/metadata/HeliocentricCartesianMetaData.java`
-- `src/org/helioviewer/jhv/opengl/model/AssimpSceneMetadata.java`
-- `src/org/helioviewer/jhv/opengl/model/AssimpModelLoader.java`
-
-The volume rendering path continues through `VolumeData`, `GLSLVolume`, and `resources/glsl/volume.*`. Model scenes
-continue through `ModelScene`, `GLSLModel`, and the mesh, line, and point shaders.
 
 # External references
 
@@ -567,7 +586,11 @@ continue through `ModelScene`, `GLSLModel`, and the mesh, line, and point shader
   [squashing-factor render](https://rayandhib.github.io/Qorona/products/squashing-factor/),
   [white-light imaging](https://rayandhib.github.io/Qorona/products/white-light/), and
   [field lines](https://rayandhib.github.io/Qorona/products/fieldlines/)
-- [glTF 2.0 specification](https://registry.khronos.org/GLTF/specs/2.0/glTF-2.0.html)
+- J. H. Guo et al., [Modeling the propagation of coronal mass ejections with COCONUT: Implementation of the
+  regularized Biot-Savart law flux rope model](https://doi.org/10.1051/0004-6361/202347634), *Astronomy &
+  Astrophysics* 683 (2024), A54; its COCONUT visualization depicts the heliospheric current sheet as the
+  `B_r=0` isosurface
+- [Khronos glTF Registry and current specification](https://registry.khronos.org/glTF/)
 - [Open Asset Import Library (Assimp)](https://www.assimp.org/)
 - [VTK `vtkGLTFExporter`](https://vtk.org/doc/nightly/html/classvtkGLTFExporter.html)
 - [pygltflib](https://github.com/avaturn/pygltflib)
