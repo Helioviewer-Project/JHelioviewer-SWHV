@@ -138,6 +138,12 @@ public final class AssimpModelLoaderTest {
             glb = createGlb(positioned);
             checkPositionTransform(AssimpModelLoader.load(glb));
 
+            String conflictingTimeSpellings = extras.replace("\"DSUN_OBS\": 150000000000, ",
+                    "\"DATE_OBS\": \"2000-01-01T00:00:00\", \"DSUN_OBS\": 150000000000, ");
+            Files.writeString(positioned, document.replace(scene, conflictingTimeSpellings));
+            check(AssimpModelLoader.load(positioned).time().toString().equals("2025-10-09T18:19:52.000"),
+                    "DATE-OBS precedence over DATE_OBS");
+
             String bothCoordinatePairs = extras.replace("\"RSUN_REF\": 695700000, ",
                     "\"HGLN_OBS\": -80, \"HGLT_OBS\": 45, \"RSUN_REF\": 695700000, ");
             Files.writeString(positioned, document.replace(scene, bothCoordinatePairs));

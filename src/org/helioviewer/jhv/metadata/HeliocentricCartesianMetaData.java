@@ -51,7 +51,7 @@ public final class HeliocentricCartesianMetaData {
     }
 
     public static @Nullable JHVTime observationTime(Source source) throws IOException {
-        for (String key : new String[]{"DATE-AVG", "DATE_AVG", "DATE_OBS", "DATE-OBS"}) {
+        for (String key : new String[]{"DATE-AVG", "DATE_AVG", "DATE-OBS", "DATE_OBS"}) {
             if (!source.contains(key))
                 continue;
             String value = source.string(key).strip();
