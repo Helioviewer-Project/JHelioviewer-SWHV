@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapView;
@@ -26,6 +27,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.io.Directories;
 import org.helioviewer.jhv.layers.ModelLayer;
 import org.helioviewer.jhv.math.Quat;
+import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.angle.AngleRenderer;
 import org.helioviewer.jhv.opengl.model.AssimpModelLoader;
 import org.helioviewer.jhv.opengl.model.ModelMaterial;
@@ -35,6 +37,8 @@ import org.helioviewer.jhv.opengl.model.ModelSampler;
 import org.helioviewer.jhv.opengl.model.ModelScene;
 import org.helioviewer.jhv.opengl.model.ModelTexture;
 
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.json.JSONObject;
 
 public final class AssimpModelLoaderTest {
@@ -65,6 +69,7 @@ public final class AssimpModelLoaderTest {
         if (defaultFixture) {
             checkUntexturedUVsIgnored(path);
             checkRedundantMaterialsRemoved(path);
+            checkPositionMetadata(path);
             Path glb = createGlb(path);
             try {
                 checkScene(AssimpModelLoader.load(glb));
@@ -113,6 +118,50 @@ public final class AssimpModelLoaderTest {
         } finally {
             Files.deleteIfExists(redundant);
         }
+    }
+
+    private static void checkPositionMetadata(Path gltf) throws IOException {
+        String scene = "\"scenes\": [{\"name\": \"loader-showcase\", \"nodes\": [0]}]";
+        String extras = "\"scenes\": [{\"name\": \"loader-showcase\", \"nodes\": [0], \"extras\": {" +
+                "\"DATE-OBS\": \"2025-10-09T18:19:52\", \"DSUN_OBS\": 150000000000, \"CRLN_OBS\": 37, \"CRLT_OBS\": -12, " +
+                "\"RSUN_REF\": 695700000, \"CTYPE1\": \"SOLZ\", \"CTYPE2\": \"SOLX\", \"CTYPE3\": \"SOLY\", " +
+                "\"CUNIT1\": \"m\", \"CUNIT2\": \"km\", \"CUNIT3\": \"Mm\"}}]";
+        String document = Files.readString(gltf);
+        check(document.contains(scene), "scene metadata insertion point");
+        Path positioned = Files.createTempFile("model-loader-positioned-", ".gltf");
+        Path glb = null;
+        try {
+            Files.writeString(positioned, document.replace(scene, extras));
+            checkPositionTransform(AssimpModelLoader.load(positioned));
+            glb = createGlb(positioned);
+            checkPositionTransform(AssimpModelLoader.load(glb));
+
+            Files.writeString(positioned, document.replace(scene, extras.replace("\"CRLT_OBS\": -12, ", "")));
+            try {
+                AssimpModelLoader.load(positioned);
+                throw new AssertionError("incomplete positional metadata was accepted");
+            } catch (IOException e) {
+                check(e.getMessage().contains("CRLT_OBS"), "incomplete positional metadata error");
+            }
+        } finally {
+            if (glb != null)
+                Files.deleteIfExists(glb);
+            Files.deleteIfExists(positioned);
+        }
+    }
+
+    private static void checkPositionTransform(ModelScene scene) {
+        Quat worldToObserver = Quat.createXY(Math.toRadians(-12), Math.toRadians(-37));
+        Matrix4fc transform = scene.root().transform();
+        checkColumn(transform, 0, worldToObserver.rotateInverseVector(new Vec3(0, 0, 1 / Sun.RadiusMeter)), "metre SOLZ axis");
+        checkColumn(transform, 1, worldToObserver.rotateInverseVector(new Vec3(1_000 / Sun.RadiusMeter, 0, 0)), "kilometre SOLX axis");
+        checkColumn(transform, 2, worldToObserver.rotateInverseVector(new Vec3(0, 1_000_000 / Sun.RadiusMeter, 0)), "megametre SOLY axis");
+    }
+
+    private static void checkColumn(Matrix4fc matrix, int column, Vec3 expected, String label) {
+        checkClose(matrix.get(column, 0), (float) expected.x, label + " X");
+        checkClose(matrix.get(column, 1), (float) expected.y, label + " Y");
+        checkClose(matrix.get(column, 2), (float) expected.z, label + " Z");
     }
 
     private static void checkLayer(ModelLayer layer, Path path) throws IOException {
@@ -223,6 +272,7 @@ public final class AssimpModelLoaderTest {
 
         ModelNode root = scene.root();
         check(root.name().equals("root"), "root node name");
+        check(root.transform().equals(new Matrix4f(), 0), "unpositioned root transform");
         check(root.children().size() == 2, "root child count");
         ModelNode primary = root.children().get(0);
         check(primary.name().equals("primary"), "primary node name");
