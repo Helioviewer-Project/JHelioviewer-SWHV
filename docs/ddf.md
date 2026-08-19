@@ -1,9 +1,10 @@
-\include{preamble.md}
+\include{./templates/preamble.md}
 ---
 title: SWHV CCN2 Design Document
 subtitle: ROB-SWHV(7186)-DDF2 v1.5
 subject: Space Weather HelioViewer
 date: 2018-12-05
+lot: false
 ---
 
 `id: \exec{git hash-object \file}`
