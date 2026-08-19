@@ -27,6 +27,10 @@ asset, its binary payload is about 25% smaller than the equivalent Base64 payloa
 bytes as four; the total saving depends on the amount of JSON and image data. There is no corresponding size advantage
 over a `.gltf` file accompanied by external binary resources.
 
+glTF does not inherently compress geometry data, and scientific geometry often compresses well with gzip. Both
+`.gltf` and `.glb` files are therefore good candidates for external gzip compression, either as compressed files or
+transparently over HTTP using `Content-Encoding: gzip`.
+
 The profiles below describe the interface supported by JHV today. They are intentionally more specific than the FITS
 and glTF standards themselves. Keeping that supported profile explicit gives producing projects a stable target and
 gives both sides a concrete basis for discussing future extensions.
@@ -483,6 +487,7 @@ Run it from the repository root in an environment containing Qorona, PyVista/VTK
 python extra/test/create_coconut_samples.py \
     /path/to/coconut_corona.CFmesh.xz \
     --timestamp 2025-10-09T18:19:52 \
+    --log-density-range 11.2 13.5 \
     --output-directory extra/test/data
 ```
 
@@ -495,7 +500,7 @@ conversion therefore makes the following choices explicit:
 - it resamples the native cells with Qorona's moving-least-squares machinery onto a logarithmic spherical field grid,
   then samples a 256-cubed Cartesian output volume spanning -6 to +6 solar radii;
 - it treats Qorona's density as a relative shape, assumes an additional `10^14 m^-3` normalization, stores
-  `log10(ne / m^-3)`, and clips it to `[10.9, 14.0]`;
+  `log10(ne / m^-3)`, and clips it to the configurable `--log-density-range` interval (`[11.2, 13.5]` by default);
 - it reserves `-32768` for blank voxels and writes the defined values with `BITPIX=16`, `BSCALE`, and `BZERO`;
 - it compresses the FITS image losslessly with `GZIP_2` and one xy plane per tile;
 - it traces field lines in float64 with DOPRI5, `rtol=10^-8`, and `cfl=0.125`, while glTF positions are stored as

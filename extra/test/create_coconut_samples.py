@@ -13,10 +13,10 @@ normalization.  ASSUMED_ELECTRON_DENSITY_SCALE_M3 below is therefore a producer 
 calibration recovered from the CFmesh file.  Replace it only when an appropriate model-specific
 calibration is known, and preserve the assumption in the product metadata.
 
-The fixed settings below select one high-quality reference conversion.  This script intentionally
-does not offer a separate fast mode: changing resolution, resampling, tracing, clipping, or density
-calibration changes the product and should be an explicit, reviewed source change.  Both completed
-products are reopened and validated before the script reports that they were written.
+The settings below select one high-quality reference conversion.  The density display interval is
+configurable because choosing it belongs to the producer.  Resolution, resampling, tracing, and
+density calibration remain explicit source settings rather than hidden fast/best modes.  Both
+completed products are reopened and validated before the script reports that they were written.
 
 Developed and validated with Qorona 0.4.0, PyVista, Matplotlib, and pygltflib.  Qorona's standard
 installation supplies NumPy, SciPy, Astropy, SunPy, and optional Numba acceleration for resampling
@@ -54,8 +54,7 @@ from qorona.trace import lonlat_seeds, trace_field_lines
 RSUN_REF = 695_700_000.0
 VOLUME_EXTENT = 6.0
 VOLUME_SIZE = 256
-LOG_DENSITY_MIN = 10.9
-LOG_DENSITY_MAX = 14.0
+DEFAULT_LOG_DENSITY_RANGE = (11.2, 13.5)
 BLANK = -32768
 ASSUMED_ELECTRON_DENSITY_SCALE_M3 = 1.0e14
 VOLUME_COMPRESSION = "GZIP_2"
@@ -86,6 +85,7 @@ def main() -> None:
     solution = CFmeshReader().read(args.input, show_progress=True)
     resampler = KnnMlsResampler()
     field, velocity = build_field(solution, resampler)
+    log_density_min, log_density_max = args.log_density_range
     processing = {
         "qoronaVersion": qorona.__version__,
         "source": args.input.name,
@@ -102,7 +102,16 @@ def main() -> None:
     }
 
     volume_path = args.output_directory / "coconut-corona-density-16.fits"
-    write_volume(field, world_to_sol, observer, timestamp, processing, volume_path)
+    write_volume(
+        field,
+        world_to_sol,
+        observer,
+        timestamp,
+        processing,
+        log_density_min,
+        log_density_max,
+        volume_path,
+    )
 
     scene_path = args.output_directory / "coconut-corona-scene.glb"
     write_scene(
@@ -124,7 +133,20 @@ def arguments() -> argparse.Namespace:
     parser.add_argument(
         "--output-directory", type=Path, default=Path("extra/test/data")
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--log-density-range",
+        type=float,
+        nargs=2,
+        metavar=("MIN", "MAX"),
+        default=DEFAULT_LOG_DENSITY_RANGE,
+        help="clipped display interval for log10(ne / m^-3) "
+        f"(default: {DEFAULT_LOG_DENSITY_RANGE[0]} {DEFAULT_LOG_DENSITY_RANGE[1]})",
+    )
+    args = parser.parse_args()
+    minimum, maximum = args.log_density_range
+    if not np.isfinite(minimum) or not np.isfinite(maximum) or minimum >= maximum:
+        parser.error("--log-density-range requires two finite values with MIN < MAX")
+    return args
 
 
 def normalized_utc_timestamp(value: str) -> str:
@@ -207,14 +229,16 @@ def write_volume(
     observer: dict[str, float],
     timestamp: str,
     processing: dict[str, object],
+    log_density_min: float,
+    log_density_max: float,
     output: Path,
 ) -> None:
     if field.density is None:
         raise RuntimeError("COCONUT solution has no density field")
     step = 2 * VOLUME_EXTENT / VOLUME_SIZE
     coordinates = -VOLUME_EXTENT + step * (np.arange(VOLUME_SIZE) + 0.5)
-    bscale = (LOG_DENSITY_MAX - LOG_DENSITY_MIN) / 65534
-    bzero = (LOG_DENSITY_MIN + LOG_DENSITY_MAX) / 2
+    bscale = (log_density_max - log_density_min) / 65534
+    bzero = (log_density_min + log_density_max) / 2
     stored = np.full((VOLUME_SIZE,) * 3, BLANK, dtype=np.int16)
     for z_start in range(0, VOLUME_SIZE, 8):
         z_stop = min(z_start + 8, VOLUME_SIZE)
@@ -233,7 +257,7 @@ def write_volume(
         values[valid] = np.log10(density[valid] * ASSUMED_ELECTRON_DENSITY_SCALE_M3)
         block = stored[z_start:z_stop].reshape(-1)
         block[valid] = np.rint(
-            (np.clip(values[valid], LOG_DENSITY_MIN, LOG_DENSITY_MAX) - bzero) / bscale
+            (np.clip(values[valid], log_density_min, log_density_max) - bzero) / bscale
         ).astype(np.int16)
 
     if not np.any(stored != BLANK):
@@ -276,7 +300,7 @@ def write_volume(
     )
     header["HISTORY"] = (
         f"Stored scalar is log10(ne/m^-3), clipped to "
-        f"[{LOG_DENSITY_MIN}, {LOG_DENSITY_MAX}]"
+        f"[{log_density_min}, {log_density_max}]"
     )
     write_compressed_fits_volume(output, stored, header)
     validate_fits_volume(output, stored, header)
