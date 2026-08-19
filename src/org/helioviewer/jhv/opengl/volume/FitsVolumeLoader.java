@@ -6,11 +6,10 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.nio.file.Path;
 
-import org.helioviewer.jhv.astronomy.Position;
-import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.BufferUtils;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.metadata.HeliocentricCartesianMetaData;
 import org.helioviewer.jhv.time.JHVTime;
 
 import nom.tam.fits.BasicHDU;
@@ -30,14 +29,15 @@ public final class FitsVolumeLoader {
         try (Fits fits = new Fits(source.toFile())) {
             ImageHDU hdu = findVolumeHDU(source, fits);
             Header header = hdu.getHeader();
+            FitsMetadata metadata = new FitsMetadata(source, header);
             int[] dimensions = dimensions(source, header);
-            Coordinates coordinates = readCoordinates(source, header, dimensions);
+            Coordinates coordinates = readCoordinates(metadata, dimensions);
             Samples samples = readSamples(source, hdu, dimensions);
             String name = header.getStringValue("EXTNAME", header.getStringValue("OBJECT", source.getFileName().toString()));
             String sampleUnits = header.getStringValue(Standard.BUNIT, "");
             return new VolumeData(name, coordinates.time, dimensions[0], dimensions[1], dimensions[2], coordinates.corner, coordinates.axisX,
-                    coordinates.axisY, coordinates.axisZ, sampleUnits,
-                    samples.minimum, samples.maximum, samples.format, samples.values, samples.validityMask);
+                    coordinates.axisY, coordinates.axisZ, sampleUnits, samples.minimum, samples.maximum, samples.format, samples.values,
+                    samples.validityMask);
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -69,40 +69,30 @@ public final class FitsVolumeLoader {
         return dimensions;
     }
 
-    private static Coordinates readCoordinates(Path source, Header header, int[] dimensions) throws IOException {
-        int[] componentRows = {-1, -1, -1};
-        double[] unitScale = new double[3];
+    private static Coordinates readCoordinates(FitsMetadata metadata, int[] dimensions) throws IOException {
+        HeliocentricCartesianMetaData.CartesianAxes axes = HeliocentricCartesianMetaData.cartesianAxes(metadata);
         double[] referencePixel = new double[3];
         double[] referenceValue = new double[3];
         for (int row = 0; row < 3; row++) {
-            String ctype = header.getStringValue("CTYPE" + (row + 1), "").strip();
-            int component = switch (ctype) {
-                case "SOLX" -> 0;
-                case "SOLY" -> 1;
-                case "SOLZ" -> 2;
-                default -> throw error(source, "CTYPE1, CTYPE2, and CTYPE3 must contain SOLX, SOLY, and SOLZ");
-            };
-            if (componentRows[component] >= 0)
-                throw error(source, "CTYPE1, CTYPE2, and CTYPE3 must contain SOLX, SOLY, and SOLZ exactly once");
-            componentRows[component] = row;
-            unitScale[row] = solarRadiiPerUnit(source, header, row + 1);
-            referencePixel[row] = requiredDouble(source, header, "CRPIX" + (row + 1));
-            referenceValue[row] = requiredDouble(source, header, "CRVAL" + (row + 1)) * unitScale[row];
+            referencePixel[row] = metadata.number("CRPIX" + (row + 1));
+            referenceValue[row] = metadata.number("CRVAL" + (row + 1)) * axes.scale(row);
         }
 
-        double[][] matrix = readLinearTransform(source, header, unitScale);
-        Position observer = readObserver(source, header);
-        // Position.toQuat() maps JHV's Carrington world into the observer-aligned SOL frame;
+        double[][] matrix = readLinearTransform(metadata, axes);
+        JHVTime time = HeliocentricCartesianMetaData.requiredObservationTime(metadata);
+        if (!(metadata.number("DSUN_OBS") > 0))
+            throw metadata.error("DSUN_OBS must be positive");
+        // The observer rotation maps JHV's Carrington world into the observer-aligned SOL frame;
         // its inverse therefore places the FITS heliocentric coordinates in JHV's world.
-        Quat observerRotation = observer.toQuat();
+        Quat observerRotation = HeliocentricCartesianMetaData.observerRotation(metadata, time);
         Vec3 reference = observerRotation.rotateInverseVector(new Vec3(
-                referenceValue[componentRows[0]], referenceValue[componentRows[1]], referenceValue[componentRows[2]]));
+                referenceValue[axes.sourceAxis(0)], referenceValue[axes.sourceAxis(1)], referenceValue[axes.sourceAxis(2)]));
         Vec3[] step = new Vec3[3];
         for (int pixelAxis = 0; pixelAxis < 3; pixelAxis++) {
             step[pixelAxis] = observerRotation.rotateInverseVector(new Vec3(
-                    matrix[componentRows[0]][pixelAxis],
-                    matrix[componentRows[1]][pixelAxis],
-                    matrix[componentRows[2]][pixelAxis]));
+                    matrix[axes.sourceAxis(0)][pixelAxis],
+                    matrix[axes.sourceAxis(1)][pixelAxis],
+                    matrix[axes.sourceAxis(2)][pixelAxis]));
         }
 
         Vec3 firstSample = new Vec3(
@@ -117,107 +107,51 @@ public final class FitsVolumeLoader {
                 firstSample.y - 0.5 * (step[0].y + step[1].y + step[2].y),
                 firstSample.z - 0.5 * (step[0].z + step[1].z + step[2].z));
         return new Coordinates(
-                observer.time,
+                time,
                 corner,
                 scale(step[0], dimensions[0]),
                 scale(step[1], dimensions[1]),
                 scale(step[2], dimensions[2]));
     }
 
-    private static double solarRadiiPerUnit(Path source, Header header, int axis) throws IOException {
-        String key = "CUNIT" + axis;
-        String unit = header.getStringValue(key, "").strip();
-        return switch (unit) {
-            case "solRad" -> 1;
-            case "m" -> 1 / Sun.RadiusMeter;
-            case "km" -> 1_000 / Sun.RadiusMeter;
-            case "Mm" -> 1_000_000 / Sun.RadiusMeter;
-            default -> throw error(source, key + " must be solRad, m, km, or Mm");
-        };
-    }
-
-    private static double[][] readLinearTransform(Path source, Header header, double[] unitScale) throws IOException {
-        MatrixKeywords pc = readMatrix(source, header, "PC", 1);
+    private static double[][] readLinearTransform(FitsMetadata metadata, HeliocentricCartesianMetaData.CartesianAxes axes) throws IOException {
+        MatrixKeywords pc = readMatrix(metadata, "PC", 1);
         double[][] matrix;
         if (pc.present) {
             matrix = pc.values;
             for (int row = 0; row < 3; row++) {
-                double rowScale = requiredDouble(source, header, "CDELT" + (row + 1)) * unitScale[row];
+                double rowScale = metadata.number("CDELT" + (row + 1)) * axes.scale(row);
                 for (int column = 0; column < 3; column++)
                     matrix[row][column] *= rowScale;
             }
         } else {
-            MatrixKeywords cd = readMatrix(source, header, "CD", 0);
+            MatrixKeywords cd = readMatrix(metadata, "CD", 0);
             if (cd.present) {
                 matrix = cd.values;
                 for (int row = 0; row < 3; row++)
                     for (int column = 0; column < 3; column++)
-                        matrix[row][column] *= unitScale[row];
+                        matrix[row][column] *= axes.scale(row);
             } else {
                 matrix = new double[3][3];
                 for (int axis = 0; axis < 3; axis++)
-                    matrix[axis][axis] = requiredDouble(source, header, "CDELT" + (axis + 1)) * unitScale[axis];
+                    matrix[axis][axis] = metadata.number("CDELT" + (axis + 1)) * axes.scale(axis);
             }
         }
         return matrix;
     }
 
-    private static MatrixKeywords readMatrix(Path source, Header header, String prefix, double diagonalDefault) throws IOException {
+    private static MatrixKeywords readMatrix(FitsMetadata metadata, String prefix, double diagonalDefault) throws IOException {
         boolean present = false;
         double[][] matrix = new double[3][3];
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 3; column++) {
                 String key = prefix + (row + 1) + '_' + (column + 1);
-                boolean defined = header.containsKey(key);
+                boolean defined = metadata.contains(key);
                 present |= defined;
-                matrix[row][column] = defined ? requiredDouble(source, header, key) : row == column ? diagonalDefault : 0;
+                matrix[row][column] = defined ? metadata.number(key) : row == column ? diagonalDefault : 0;
             }
         }
         return new MatrixKeywords(present, matrix);
-    }
-
-    private static Position readObserver(Path source, Header header) throws IOException {
-        JHVTime time = readObservationTime(source, header);
-        double distance = requiredDouble(source, header, "DSUN_OBS") / Sun.RadiusMeter;
-        if (!(distance > 0))
-            throw error(source, "DSUN_OBS must be positive");
-
-        // Match the observer metadata understood by SunPy's FITS-WCS mapping. JHV stores
-        // the opposite of the physical Carrington longitude as its view-rotation angle.
-        double longitude;
-        double latitude;
-        if (header.containsKey("HGLN_OBS") && header.containsKey("HGLT_OBS")) {
-            longitude = Sun.getEarth(time).lon - Math.toRadians(requiredDouble(source, header, "HGLN_OBS"));
-            latitude = Math.toRadians(requiredDouble(source, header, "HGLT_OBS"));
-        } else if (header.containsKey("CRLN_OBS") && header.containsKey("CRLT_OBS")) {
-            longitude = -Math.toRadians(requiredDouble(source, header, "CRLN_OBS"));
-            latitude = Math.toRadians(requiredDouble(source, header, "CRLT_OBS"));
-        } else {
-            throw error(source, "heliocentric Cartesian WCS requires HGLN_OBS/HGLT_OBS or CRLN_OBS/CRLT_OBS");
-        }
-        return new Position(time, distance, longitude, latitude);
-    }
-
-    private static JHVTime readObservationTime(Path source, Header header) throws IOException {
-        String value = null;
-        for (String key : new String[]{"DATE-AVG", "DATE_AVG", "DATE_OBS", "DATE-OBS"}) {
-            if (header.containsKey(key)) {
-                value = header.getStringValue(key);
-                break;
-            }
-        }
-        if (value == null)
-            throw error(source, "heliocentric Cartesian WCS requires DATE-OBS or DATE-AVG");
-        value = value.strip();
-        if (value.endsWith("Z"))
-            value = value.substring(0, value.length() - 1);
-        if (value.length() == 10)
-            value += "T00:00:00";
-        try {
-            return new JHVTime(value);
-        } catch (RuntimeException e) {
-            throw error(source, "invalid observation time: " + value);
-        }
     }
 
     private static Vec3 scale(Vec3 v, double factor) {
@@ -322,17 +256,41 @@ public final class FitsVolumeLoader {
         return new Samples(values, validityMask, minimum, maximum, format);
     }
 
-    private static double requiredDouble(Path source, Header header, String key) throws IOException {
-        if (!header.containsKey(key))
-            throw error(source, "missing required keyword: " + key);
-        double value = header.getDoubleValue(key, Double.NaN);
-        if (!Double.isFinite(value))
-            throw error(source, "invalid " + key);
-        return value;
-    }
-
     private static IOException error(Path source, String message) {
         return new IOException(source + ": " + message);
+    }
+
+    private record FitsMetadata(Path source, Header header) implements HeliocentricCartesianMetaData.Source {
+
+        @Override
+        public boolean contains(String key) {
+            return header.containsKey(key);
+        }
+
+        @Override
+        public String string(String key) throws IOException {
+            if (!contains(key))
+                throw error("missing required keyword: " + key);
+            String value = header.getStringValue(key);
+            if (value == null)
+                throw error("invalid " + key);
+            return value;
+        }
+
+        @Override
+        public double number(String key) throws IOException {
+            if (!contains(key))
+                throw error("missing required keyword: " + key);
+            double value = header.getDoubleValue(key, Double.NaN);
+            if (!Double.isFinite(value))
+                throw error("invalid " + key);
+            return value;
+        }
+
+        @Override
+        public IOException error(String message) {
+            return FitsVolumeLoader.error(source, message);
+        }
     }
 
     private record Samples(Buffer values, ByteBuffer validityMask, float minimum, float maximum, VolumeData.Format format) {}

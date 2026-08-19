@@ -9,13 +9,15 @@ import org.helioviewer.jhv.image.lut.LUT;
 import org.helioviewer.jhv.opengl.GLSLVolume;
 import org.helioviewer.jhv.opengl.volume.FitsVolumeLoader;
 import org.helioviewer.jhv.opengl.volume.VolumeData;
+import org.helioviewer.jhv.time.JHVTime;
 
 import org.json.JSONObject;
 
 public final class VolumeLayer extends AbstractLayer {
 
     private final Path path;
-    private final VolumeData data;
+    private final String name;
+    private final JHVTime time;
     private final GLSLVolume volume;
     private double opacity = 1;
     private LUT lut = LUT.gray();
@@ -24,7 +26,9 @@ public final class VolumeLayer extends AbstractLayer {
 
     public VolumeLayer(Path _path) throws IOException {
         path = _path.toAbsolutePath().normalize();
-        data = FitsVolumeLoader.load(path);
+        VolumeData data = FitsVolumeLoader.load(path);
+        name = data.name();
+        time = data.time();
         volume = new GLSLVolume(data);
         setEnabled(true);
     }
@@ -107,12 +111,12 @@ public final class VolumeLayer extends AbstractLayer {
 
     @Override
     public String getName() {
-        return data.name();
+        return name;
     }
 
     @Override
     public String getTimeString() {
-        return data.time().toString();
+        return time.toString();
     }
 
     @Override
