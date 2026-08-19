@@ -49,7 +49,8 @@ public final class AssimpModelLoader {
         if (scene == null)
             throw new IOException("Assimp could not load " + asset + ": " + Assimp.aiGetErrorString());
         try {
-            return new AssimpModelLoader(scene, asset.getParent()).convert(asset.getFileName().toString(), AssimpScenePosition.read(asset, scene.mMetaData()));
+            return new AssimpModelLoader(scene, asset.getParent()).convert(asset.getFileName().toString(),
+                    AssimpSceneMetadata.read(asset, scene.mMetaData()));
         } finally {
             Assimp.aiReleaseImport(scene);
         }
@@ -60,7 +61,7 @@ public final class AssimpModelLoader {
         assetDirectory = _assetDirectory;
     }
 
-    private ModelScene convert(String fallbackName, Matrix4f scenePosition) throws IOException {
+    private ModelScene convert(String fallbackName, AssimpSceneMetadata metadata) throws IOException {
         if ((source.mFlags() & Assimp.AI_SCENE_FLAGS_INCOMPLETE) != 0)
             throw new IOException("Assimp returned an incomplete scene");
         AINode root = source.mRootNode();
@@ -75,8 +76,8 @@ public final class AssimpModelLoader {
         List<ModelMesh> meshes = convertMeshes(materials);
         String name = source.mName().dataString();
         ModelNode rootNode = convertNode(root);
-        rootNode = new ModelNode(rootNode.name(), scenePosition.mul(rootNode.transform()), rootNode.meshIndices(), rootNode.children());
-        return new ModelScene(name.isEmpty() ? fallbackName : name, rootNode, meshes,
+        rootNode = new ModelNode(rootNode.name(), metadata.position().mul(rootNode.transform()), rootNode.meshIndices(), rootNode.children());
+        return new ModelScene(name.isEmpty() ? fallbackName : name, metadata.time(), rootNode, meshes,
                 materials.stream().map(MaterialData::material).toList(), textures);
     }
 

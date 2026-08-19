@@ -133,6 +133,8 @@ public final class AssimpModelLoaderTest {
         try {
             Files.writeString(positioned, document.replace(scene, extras));
             checkPositionTransform(AssimpModelLoader.load(positioned));
+            ModelLayer layer = new ModelLayer(positioned);
+            check(layer.getTimeString().equals("2025-10-09T18:19:52.000"), "model layer observation time");
             glb = createGlb(positioned);
             checkPositionTransform(AssimpModelLoader.load(glb));
 
@@ -151,6 +153,7 @@ public final class AssimpModelLoaderTest {
     }
 
     private static void checkPositionTransform(ModelScene scene) {
+        check(scene.time().toString().equals("2025-10-09T18:19:52.000"), "scene observation time");
         Quat worldToObserver = Quat.createXY(Math.toRadians(-12), Math.toRadians(-37));
         Matrix4fc transform = scene.root().transform();
         checkColumn(transform, 0, worldToObserver.rotateInverseVector(new Vec3(0, 0, 1 / Sun.RadiusMeter)), "metre SOLZ axis");
@@ -271,6 +274,7 @@ public final class AssimpModelLoaderTest {
         checkPixel(checker.rgba(), 1, 255, 255, 255, 255);
 
         ModelNode root = scene.root();
+        check(scene.time() == null, "unpositioned scene time");
         check(root.name().equals("root"), "root node name");
         check(root.transform().equals(new Matrix4f(), 0), "unpositioned root transform");
         check(root.children().size() == 2, "root child count");
@@ -432,11 +436,11 @@ public final class AssimpModelLoaderTest {
     private static ModelScene withMaterial(ModelScene scene, int materialIndex, ModelMaterial material) {
         ArrayList<ModelMaterial> materials = new ArrayList<>(scene.materials());
         materials.set(materialIndex, material);
-        return new ModelScene(scene.name(), scene.root(), scene.meshes(), materials, scene.textures());
+        return new ModelScene(scene.name(), scene.time(), scene.root(), scene.meshes(), materials, scene.textures());
     }
 
     private static void checkMeshRendering(ModelScene scene, MapView mv, Viewport vp, int meshIndex, int minimumPixels, String label) {
-        GLSLModel model = new GLSLModel(new ModelScene(scene.name(), selectMesh(scene.root(), meshIndex), scene.meshes(), scene.materials(),
+        GLSLModel model = new GLSLModel(new ModelScene(scene.name(), scene.time(), selectMesh(scene.root(), meshIndex), scene.meshes(), scene.materials(),
                 scene.textures()));
         try {
             model.init();

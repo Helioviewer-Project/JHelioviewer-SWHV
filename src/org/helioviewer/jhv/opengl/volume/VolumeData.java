@@ -7,9 +7,10 @@ import java.nio.ShortBuffer;
 import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.time.JHVTime;
 
-public record VolumeData(String name, int width, int height, int depth, Vec3 corner, Vec3 axisX, Vec3 axisY, Vec3 axisZ, String sampleUnits,
-                         float minimum, float maximum, Format format, Buffer samples, @Nullable ByteBuffer validityMask) {
+public record VolumeData(String name, JHVTime time, int width, int height, int depth, Vec3 corner, Vec3 axisX, Vec3 axisY, Vec3 axisZ,
+                         String sampleUnits, float minimum, float maximum, Format format, Buffer samples, @Nullable ByteBuffer validityMask) {
 
     public enum Format {R8, R16F}
 

@@ -35,7 +35,7 @@ public final class FitsVolumeLoader {
             Samples samples = readSamples(source, hdu, dimensions);
             String name = header.getStringValue("EXTNAME", header.getStringValue("OBJECT", source.getFileName().toString()));
             String sampleUnits = header.getStringValue(Standard.BUNIT, "");
-            return new VolumeData(name, dimensions[0], dimensions[1], dimensions[2], coordinates.corner, coordinates.axisX,
+            return new VolumeData(name, coordinates.time, dimensions[0], dimensions[1], dimensions[2], coordinates.corner, coordinates.axisX,
                     coordinates.axisY, coordinates.axisZ, sampleUnits,
                     samples.minimum, samples.maximum, samples.format, samples.values, samples.validityMask);
         } catch (IOException e) {
@@ -117,6 +117,7 @@ public final class FitsVolumeLoader {
                 firstSample.y - 0.5 * (step[0].y + step[1].y + step[2].y),
                 firstSample.z - 0.5 * (step[0].z + step[1].z + step[2].z));
         return new Coordinates(
+                observer.time,
                 corner,
                 scale(step[0], dimensions[0]),
                 scale(step[1], dimensions[1]),
@@ -336,7 +337,7 @@ public final class FitsVolumeLoader {
 
     private record Samples(Buffer values, ByteBuffer validityMask, float minimum, float maximum, VolumeData.Format format) {}
 
-    private record Coordinates(Vec3 corner, Vec3 axisX, Vec3 axisY, Vec3 axisZ) {}
+    private record Coordinates(JHVTime time, Vec3 corner, Vec3 axisX, Vec3 axisY, Vec3 axisZ) {}
 
     private record MatrixKeywords(boolean present, double[][] values) {}
 

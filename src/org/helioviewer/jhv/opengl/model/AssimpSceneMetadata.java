@@ -3,9 +3,12 @@ package org.helioviewer.jhv.opengl.model;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.math.Quat;
 import org.helioviewer.jhv.math.Vec3;
+import org.helioviewer.jhv.time.JHVTime;
 
 import org.joml.Matrix4f;
 import org.lwjgl.assimp.AIMetaData;
@@ -14,31 +17,59 @@ import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.system.MemoryUtil;
 
-final class AssimpScenePosition {
+final class AssimpSceneMetadata {
 
     private final Path source;
-    private final AIMetaData metadata;
+    private final @Nullable AIMetaData metadata;
+    private final @Nullable JHVTime time;
+    private final Matrix4f position;
 
-    static Matrix4f read(Path source, AIMetaData metadata) throws IOException {
-        if (metadata == null || !hasCoordinateMetadata(metadata))
-            return new Matrix4f();
-        return new AssimpScenePosition(source, metadata).transform();
+    static AssimpSceneMetadata read(Path source, @Nullable AIMetaData metadata) throws IOException {
+        return new AssimpSceneMetadata(source, metadata);
     }
 
-    private static boolean hasCoordinateMetadata(AIMetaData metadata) {
+    private AssimpSceneMetadata(Path _source, @Nullable AIMetaData _metadata) throws IOException {
+        source = _source;
+        metadata = _metadata;
+        time = readTime();
+        position = hasCoordinateMetadata() ? readPosition() : new Matrix4f();
+    }
+
+    @Nullable JHVTime time() {
+        return time;
+    }
+
+    Matrix4f position() {
+        return position;
+    }
+
+    private @Nullable JHVTime readTime() throws IOException {
+        for (String key : new String[]{"DATE-AVG", "DATE_AVG", "DATE_OBS", "DATE-OBS"}) {
+            if (find(key) == null)
+                continue;
+            String value = string(key).strip();
+            if (value.endsWith("Z"))
+                value = value.substring(0, value.length() - 1);
+            if (value.length() == 10)
+                value += "T00:00:00";
+            try {
+                return new JHVTime(value);
+            } catch (RuntimeException e) {
+                throw error("invalid " + key + ": " + value);
+            }
+        }
+        return null;
+    }
+
+    private boolean hasCoordinateMetadata() {
         for (String key : new String[]{"CTYPE1", "CTYPE2", "CTYPE3", "CUNIT1", "CUNIT2", "CUNIT3"}) {
-            if (find(metadata, key) != null)
+            if (find(key) != null)
                 return true;
         }
         return false;
     }
 
-    private AssimpScenePosition(Path _source, AIMetaData _metadata) {
-        source = _source;
-        metadata = _metadata;
-    }
-
-    private Matrix4f transform() throws IOException {
+    private Matrix4f readPosition() throws IOException {
         double carringtonLongitude = Math.toRadians(number("CRLN_OBS"));
         double observerLatitude = Math.toRadians(number("CRLT_OBS"));
         if (Math.abs(observerLatitude) > Math.PI / 2)
@@ -120,13 +151,15 @@ final class AssimpScenePosition {
     }
 
     private AIMetaDataEntry required(String key) throws IOException {
-        AIMetaDataEntry entry = find(metadata, key);
+        AIMetaDataEntry entry = find(key);
         if (entry == null)
             throw error("missing " + key + " in positional metadata");
         return entry;
     }
 
-    private static AIMetaDataEntry find(AIMetaData metadata, String key) {
+    private @Nullable AIMetaDataEntry find(String key) {
+        if (metadata == null)
+            return null;
         for (int i = 0; i < metadata.mNumProperties(); i++) {
             if (metadata.mKeys().get(i).dataString().equals(key))
                 return metadata.mValues().get(i);

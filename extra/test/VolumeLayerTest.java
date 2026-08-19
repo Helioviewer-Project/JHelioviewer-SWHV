@@ -72,7 +72,11 @@ public final class VolumeLayerTest {
         checkUnsupportedBitpix(temporaryDirectory);
         checkStandardWcs(temporaryDirectory);
 
-        render(new VolumeLayer(volume8Path), image8Path, new VolumeLayer(volume16Path), image16Path);
+        VolumeLayer layer8 = new VolumeLayer(volume8Path);
+        VolumeLayer layer16 = new VolumeLayer(volume16Path);
+        check(layer8.getTimeString().equals(OBSERVATION_TIME), "8-bit layer observation time");
+        check(layer16.getTimeString().equals(OBSERVATION_TIME), "16-bit layer observation time");
+        render(layer8, image8Path, layer16, image16Path);
         System.out.println("VolumeLayerTest passed");
         System.out.println("8-bit synthetic volume: " + volume8Path.toAbsolutePath().normalize());
         System.out.println("16-bit synthetic volume: " + volume16Path.toAbsolutePath().normalize());
@@ -135,6 +139,7 @@ public final class VolumeLayerTest {
     private static void validateVolume(VolumeData data, VolumeData.Format format, String description) {
         check(data.width() == GRID_SIZE && data.height() == GRID_SIZE && data.depth() == GRID_SIZE,
                 description + " volume dimensions");
+        check(data.time().toString().equals(OBSERVATION_TIME), description + " observation time");
         Vec3 centre = new Vec3(
                 data.corner().x + 0.5 * (data.axisX().x + data.axisY().x + data.axisZ().x),
                 data.corner().y + 0.5 * (data.axisX().y + data.axisY().y + data.axisZ().y),

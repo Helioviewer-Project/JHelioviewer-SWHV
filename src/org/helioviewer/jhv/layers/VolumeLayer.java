@@ -111,6 +111,11 @@ public final class VolumeLayer extends AbstractLayer {
     }
 
     @Override
+    public String getTimeString() {
+        return data.time().toString();
+    }
+
+    @Override
     public boolean isDeletable() {
         return true;
     }
