@@ -63,7 +63,7 @@ void main(void) {
         }
 
         enhancementFactor = 1.;
-        gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_NARROW;
+        gl_FragDepth = getDepth(hitPoint.z);
     } else {
         enhancementFactor = sqrt(radius2);
         gl_FragDepth = 1.;
@@ -78,7 +78,7 @@ void main(void) {
         if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
             discard;
         if (display.calculateDepth != 0.) // intersecting Euhforia planes
-            gl_FragDepth = 0.5 - hitPoint.z * CLIP_SCALE_WIDE;
+            gl_FragDepth = getDepth(hitPoint.z);
     }
 
     clipPlanarMasks(rotatedHitPoint.xy);
