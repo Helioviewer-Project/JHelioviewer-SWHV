@@ -47,10 +47,19 @@ abstract class J2KSource {
     final void open() throws KduException {
         if (!isClosed)
             return;
-        doOpenFamilySource();
-        jpxSrc.Open(jp2Src, false);
         isClosed = false;
-        initResolutionStateOnce();
+        try {
+            doOpenFamilySource();
+            jpxSrc.Open(jp2Src, false);
+            initResolutionStateOnce();
+        } catch (KduException | RuntimeException e) {
+            try {
+                close();
+            } catch (KduException cleanupFailure) {
+                e.addSuppressed(cleanupFailure);
+            }
+            throw e;
+        }
     }
 
     void destroy() throws KduException {}

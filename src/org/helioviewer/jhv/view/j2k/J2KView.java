@@ -57,17 +57,19 @@ public class J2KView extends BaseView {
         serial = globalSerial.incrementAndGet();
         request = _request;
 
+        J2KSource acquiredSource = null;
+        J2KReader acquiredReader = null;
         try {
             boolean isJP2 = dataUri.format() == DataUri.Format.JP2;
             switch (dataUri.format()) {
                 case JPIP -> {
                     J2KSource.Remote remote = new J2KSource.Remote();
-                    reader = new J2KReader(dataUri.uri(), remote);
-                    source = remote;
+                    source = acquiredSource = remote;
+                    reader = acquiredReader = new J2KReader(dataUri.uri(), remote);
                 }
                 case JP2, JPX -> {
                     reader = null;
-                    source = new J2KSource.Local(dataUri.file().toString(), isJP2);
+                    source = acquiredSource = new J2KSource.Local(dataUri.file().toString(), isJP2);
                 }
                 default -> throw new Exception("Unknown image type");
             }
@@ -116,6 +118,16 @@ public class J2KView extends BaseView {
 
             abolishable = reaper.register(cleanerToken, new J2KAbolisher(serial, reader, source));
         } catch (Exception e) {
+            try {
+                if (acquiredReader != null)
+                    acquiredReader.stop();
+                if (acquiredSource != null) {
+                    acquiredSource.closeWhenUnused();
+                    acquiredSource.destroy();
+                }
+            } catch (Exception cleanupFailure) {
+                e.addSuppressed(cleanupFailure);
+            }
             String msg = e instanceof KduException ? "Kakadu error" : e.getMessage();
             throw new Exception(msg + ": " + dataUri, e);
         }
