@@ -47,7 +47,6 @@ public final class SdfTextRenderer {
 
     private final GLSLTexture glslTexture = new GLSLTexture();
     private float[] textColor = Colors.WhiteFloat;
-    private int queuedVertices;
     private boolean rendering3D;
     private final BufCoord coordBuf = new BufCoord(TOTAL_BUFFER_VERTICES);
 
@@ -283,7 +282,8 @@ public final class SdfTextRenderer {
     }
 
     private void drawVertices() {
-        if (queuedVertices > 0) {
+        int vertexCount = coordBuf.getCount();
+        if (vertexCount > 0) {
             if (rendering3D)
                 GL.glDepthMask(false);
 
@@ -291,8 +291,7 @@ public final class SdfTextRenderer {
 
             glslTexture.init();
             glslTexture.setCoord(coordBuf);
-            glslTexture.renderSdfTexture(GL.TRIANGLES, textColor, unitRangeX, unitRangeY, 0, queuedVertices);
-            queuedVertices = 0;
+            glslTexture.renderSdfTexture(GL.TRIANGLES, textColor, unitRangeX, unitRangeY, 0, vertexCount);
 
             if (rendering3D)
                 GL.glDepthMask(true);
@@ -353,7 +352,7 @@ public final class SdfTextRenderer {
                 coordPut.put(xLeft, yBottom, z, 1, u0, v0); // A
                 coordPut.put(xRight, yTop, z, 1, u1, v1); // C
                 coordPut.put(xLeft, yTop, z, 1, u0, v1); // D
-                queueGlyphVertices();
+                flushIfFull();
             }
             return advance;
         }
@@ -376,15 +375,14 @@ public final class SdfTextRenderer {
                 coordPut.put(transformedA.x, transformedA.y, transformedA.z, 1, u0, v0); // A
                 coordPut.put(transformedC.x, transformedC.y, transformedC.z, 1, u1, v1); // C
                 coordPut.put(transformedD.x, transformedD.y, transformedD.z, 1, u0, v1); // D
-                queueGlyphVertices();
+                flushIfFull();
             }
             return advance;
         }
     }
 
-    private void queueGlyphVertices() {
-        queuedVertices += VERTICES_PER_QUAD;
-        if (queuedVertices >= TOTAL_BUFFER_VERTICES)
+    private void flushIfFull() {
+        if (coordBuf.getCount() >= TOTAL_BUFFER_VERTICES)
             drawVertices();
     }
 
