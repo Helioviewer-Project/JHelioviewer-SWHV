@@ -73,6 +73,11 @@ class J2KReader implements Runnable {
         signalQueue.offer(params);
     }
 
+    private synchronized void queueIfEmpty(J2KParams.Read params) {
+        if (!isAbolished)
+            signalQueue.offer(params); // newer pending work takes precedence
+    }
+
     private void initCloseSocket() {
         if (socket != null) {
             try {
@@ -209,7 +214,7 @@ class J2KReader implements Runnable {
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
                 if (singleFrame && finished && !source.isComplete(level)) {
-                    signal(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
+                    queueIfEmpty(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only
                 retries = 0;
@@ -222,7 +227,7 @@ class J2KReader implements Runnable {
                 }
 
                 if (retries++ < 13)
-                    signal(params); // signal to retry
+                    queueIfEmpty(params); // retry unless newer work is pending
                 else
                     Log.error("Retry limit reached: " + uri); // something may be terribly wrong
             }
