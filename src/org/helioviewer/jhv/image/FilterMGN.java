@@ -149,17 +149,16 @@ class FilterMGN implements ImageFilter.Algorithm {
             gaussNormAccumulate(data, width, height, weights[i], filters[i], conv, conv2, accum);
         }
 
-        float[] image = new float[size];
         ParallelRange.run(height, (from, to) -> {
             for (int y = from; y < to; y++) {
                 int rowBase = y * width;
                 int rowEnd = rowBase + width;
                 for (int i = rowBase; i < rowEnd; i++) {
-                    image[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
+                    accum[i] = accum[i] * ONE_MINUS_MIX_FACTOR + data[i] * MIX_FACTOR;
                 }
             }
         });
-        return image;
+        return accum;
     }
 
 }
