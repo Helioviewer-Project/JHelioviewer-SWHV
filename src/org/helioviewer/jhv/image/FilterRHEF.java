@@ -75,7 +75,6 @@ class FilterRHEF implements ImageFilter.Algorithm {
         for (int i = 0; i < length; i++)
             order[cursor[binOf[i]]++] = i;
 
-        float[] out = data.clone();
         ParallelRange.run(numBins, (from, to) -> {
             long[] packed = new long[0];
             for (int b = from; b < to; b++) {
@@ -112,12 +111,12 @@ class FilterRHEF implements ImageFilter.Algorithm {
                         j++;
                     float value = .5f * (i + j) * invRange;
                     for (int k = i; k <= j; k++)
-                        out[(int) packed[k]] = value;
+                        data[(int) packed[k]] = value;
                     i = j + 1;
                 }
             }
         });
-        return out;
+        return data;
     }
 
 }
