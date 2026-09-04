@@ -51,7 +51,7 @@ class FilterWOW implements ImageFilter.Algorithm {
             convolveVertical(smooth, variance, width, height, step); // Vertical pass
             // Denoise stage
             if (scale == 0) {
-                noise = (1.4826022f / SIGMA_E0) * median(detail, width, height);
+                noise = (1.4826022f / SIGMA_E0) * median(detail, smooth, width, height);
                 if (noise > NOISE_THRESH) { // avoid division by 0
                     float denoiseFactor = 1 / (3 * SIGMA_E0 * noise);
                     denoiseParallel(denoiseFactor, detail, width, height);
@@ -68,20 +68,19 @@ class FilterWOW implements ImageFilter.Algorithm {
         return output;
     }
 
-    private static float median(float[] c, int width, int height) {
+    private static float median(float[] c, float[] scratch, int width, int height) {
         int length = width * height;
-        float[] w = new float[length];
         ParallelRange.run(height, (from, to) -> {
             for (int y = from; y < to; y++) {
                 int rowBase = y * width;
                 int rowEnd = rowBase + width;
                 for (int idx = rowBase; idx < rowEnd; idx++) {
-                    w[idx] = Math.abs(c[idx]);
+                    scratch[idx] = Math.abs(c[idx]);
                 }
             }
         });
-        Arrays.parallelSort(w); // can be faster than serial quickSelect
-        return w[length / 2];
+        Arrays.parallelSort(scratch); // can be faster than serial quickSelect
+        return scratch[length / 2];
     }
 
     private static void subtractParallel(float[] base, float[] smooth, float[] detail, int width, int height) {
