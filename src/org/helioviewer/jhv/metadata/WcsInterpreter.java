@@ -84,7 +84,9 @@ final class WcsInterpreter {
 
     private static double arcsecPerUnit(String unit) {
         return switch (unit.strip().toLowerCase()) {
-            case "deg" -> 3600.;
+            // Not FITS-standard, but written in the wild: IDL-produced synoptic maps emit
+            // "degrees". Without these they reach default and the image is scaled by 1/3600.
+            case "deg", "degree", "degrees" -> 3600.;
             case "arcmin" -> 60.;
             case "mas" -> .001;
             case "rad" -> 180. * 3600. / Math.PI;
