@@ -83,31 +83,78 @@ class J2KReader implements Runnable {
         }
     }
 
-    private static String[] createMultiQuery(int numFrames, String fSiz) {
-        String[] stepQueries = new String[numFrames];
-        for (int lpi = 0; lpi < numFrames; lpi++) {
-            stepQueries[lpi] = JPIPSocket.createLayerQuery(lpi, fSiz);
-        }
-        return stepQueries;
-    }
-
     @SuppressWarnings("try")
-    private boolean readStep(J2KSource.Remote source, String query, String key, int level, int frame) throws KduException, IOException {
+    private boolean readFrame(J2KSource.Remote source, int frame, int level, String query) throws KduException, IOException {
+        String key = cacheKey[frame];
+        boolean complete;
         try (J2KSource.Use ignored = source.use()) {
             JPIPCache cache = source.cache();
             JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
             if (stream == null) {
-                JPIPResponse res = socket.request(query, cache, frame);
-                if (res.isResponseComplete()) {
-                    if (key != null)
-                        JPIPCacheManager.store(key, level, cache, frame);
-                    return true;
-                }
-                return false;
+                JPIPResponse response = socket.request(query, cache, frame);
+                complete = response.isResponseComplete();
+                if (complete && key != null)
+                    JPIPCacheManager.store(key, level, cache, frame);
+            } else {
+                cache.put(frame, stream);
+                complete = true;
             }
-            cache.put(frame, stream);
-            return true;
         }
+        if (complete)
+            source.setFrameComplete(frame, level);
+        else
+            source.setFramePartial(frame);
+        return complete;
+    }
+
+    private boolean readingInterrupted() {
+        return !signalQueue.isEmpty() || Thread.interrupted();
+    }
+
+    // Finish the selected frame before spending bandwidth on the rest of the movie.
+    private boolean readPriorityFrame(J2KParams.Read params, String size) throws KduException, IOException {
+        J2KParams.Decode decode = params.decodeParams();
+        String query = JPIPSocket.createLayerQuery(decode.frame, size);
+        while (true) {
+            boolean complete = readFrame(params.source(), decode.frame, decode.level, query);
+            if (complete)
+                params.view().refreshDecodeFromReader(decode, params.viewpoint());
+            UITimer.completionChanged();
+            if (readingInterrupted())
+                return false;
+            if (complete)
+                return true;
+        }
+    }
+
+    // Advance even after partial responses so the movie becomes usable progressively.
+    private boolean prefetchMovie(J2KParams.Read params, String size) throws KduException, IOException {
+        J2KSource.Remote source = params.source();
+        J2KParams.Decode decode = params.decodeParams();
+        String[] queries = new String[cacheKey.length];
+        for (int frame = 0; frame < queries.length; frame++)
+            queries[frame] = JPIPSocket.createLayerQuery(frame, size);
+
+        int partial = source.getPartialUntil();
+        int frame = partial < queries.length - 1 ? partial : decode.frame;
+        int remaining = queries.length;
+        while (remaining > 0) {
+            if (frame >= queries.length)
+                frame = 0;
+            if (queries[frame] == null) {
+                frame++;
+                continue;
+            }
+            if (readFrame(source, frame, decode.level, queries[frame])) {
+                queries[frame] = null;
+                remaining--;
+            }
+            UITimer.completionChanged();
+            frame++;
+            if (readingInterrupted())
+                return false;
+        }
+        return true;
     }
 
     @Override
@@ -142,60 +189,9 @@ class J2KReader implements Runnable {
                     }
                 }
 
-                // choose cache strategy
-                int numFrames = cacheKey.length;
-                boolean singleFrame = numFrames <= 1 /* one frame */ || params.priority();
-
-                // build query based on strategy
-                int currentStep;
-                String[] stepQueries;
-                String fSiz = width + "," + height;
-                if (singleFrame) {
-                    stepQueries = new String[]{JPIPSocket.createLayerQuery(frame, fSiz)};
-                    currentStep = frame;
-                } else {
-                    stepQueries = createMultiQuery(numFrames, fSiz);
-
-                    int partial = source.getPartialUntil();
-                    currentStep = partial < numFrames - 1 ? partial : frame;
-                }
-
-                // send queries until everything is complete or caching is interrupted
-                int completeSteps = 0;
-                boolean stopReading = false;
-                while (!stopReading && completeSteps < stepQueries.length) {
-                    if (currentStep >= stepQueries.length)
-                        currentStep = 0;
-
-                    // if query is already complete, go to next step
-                    if (stepQueries[currentStep] == null) {
-                        currentStep++;
-                        continue;
-                    }
-
-                    boolean downloadComplete = readStep(source, stepQueries[currentStep], cacheKey[currentStep], level, currentStep);
-                    if (downloadComplete) {
-                        // mark query as complete
-                        completeSteps++;
-                        stepQueries[currentStep] = null;
-
-                        source.setFrameComplete(currentStep, level);
-                        if (singleFrame)
-                            view.refreshDecodeFromReader(params.decodeParams(), params.viewpoint()); // refresh current image
-                    } else {
-                        source.setFramePartial(currentStep);
-                    }
-
-                    UITimer.completionChanged();
-
-                    // select next query based on strategy
-                    if (!singleFrame)
-                        currentStep++;
-                    // check whether caching has to be interrupted
-                    if (!signalQueue.isEmpty() || Thread.interrupted()) {
-                        stopReading = true;
-                    }
-                }
+                boolean singleFrame = cacheKey.length <= 1 || params.priority();
+                String size = width + "," + height;
+                boolean finished = singleFrame ? readPriorityFrame(params, size) : prefetchMovie(params, size);
 
                 view.setDownloading(false);
 
@@ -207,7 +203,7 @@ class J2KReader implements Runnable {
                     return;
                 }
                 // if single frame & not interrupted & incomplete -> signal again to go on reading
-                if (singleFrame && !stopReading && !source.isComplete(level)) {
+                if (singleFrame && finished && !source.isComplete(level)) {
                     signal(new J2KParams.Read(params.view(), params.source(), params.decodeParams(), params.viewpoint(), false));
                 }
                 // retry limit applies to consecutive failures only
