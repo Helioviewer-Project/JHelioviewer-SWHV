@@ -3,6 +3,7 @@ package org.helioviewer.jhv.view.j2k;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.gui.UITimer;
@@ -88,6 +89,10 @@ class J2KReader implements Runnable {
         String key = cacheKey[frame];
         boolean complete;
         try (J2KSource.Use ignored = source.use()) {
+            AtomicBoolean status = source.getFrameStatus(frame, level);
+            if (status != null && status.get())
+                return true;
+
             JPIPCache cache = source.cache();
             JPIPStream stream = key == null ? null : JPIPCacheManager.get(key, level);
             if (stream == null) {
