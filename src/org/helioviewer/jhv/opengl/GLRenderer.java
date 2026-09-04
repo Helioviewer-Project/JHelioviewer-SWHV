@@ -109,11 +109,9 @@ public final class GLRenderer {
         Layers.prerender();
 
         screenView = createMapView(Display.getCamera(), viewpoint);
-        if (screenView.isOrthographic()) {
-            renderScene(screenView);
+        renderScene(screenView);
+        if (screenView.isOrthographic())
             renderMiniview();
-        } else
-            renderSceneScale(screenView);
         renderFullFloatScene();
 
         ExportMovie.renderedFrame();
@@ -142,14 +140,21 @@ public final class GLRenderer {
     }
 
     static void renderScene(MapView sceneView) {
+        boolean orthographic = sceneView.isOrthographic();
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho(vp.aspect, sceneView.cameraWidth(vp), sceneView.cameraTranslationX(), sceneView.cameraTranslationY(), sceneView.viewRotation());
+            if (orthographic)
+                Transform.ortho(vp.aspect, sceneView.cameraWidth(vp), sceneView.cameraTranslationX(), sceneView.cameraTranslationY(), sceneView.viewRotation());
+            else
+                Transform.ortho2D(vp.aspect, sceneView.cameraWidth(vp), sceneView.cameraTranslationX(), sceneView.cameraTranslationY());
 
             GLSLScreenShader.setView(sceneView, vp);
-            GLSLSphereShader.render();
 
-            Layers.render(sceneView, vp);
+            if (orthographic) {
+                GLSLSphereShader.render();
+                Layers.render(sceneView, vp);
+            } else
+                Layers.renderScale(sceneView, vp);
             Annotations.render(sceneView, vp);
             Layers.renderFloat(sceneView, vp);
         }
@@ -174,19 +179,6 @@ public final class GLRenderer {
         miniview.renderBackground();
         Layers.renderMiniview(miniView, vp);
         GL.glEnable(GL.DEPTH_TEST);
-    }
-
-    static void renderSceneScale(MapView sceneView) {
-        for (Viewport vp : Display.getViewports()) {
-            GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho2D(vp.aspect, sceneView.cameraWidth(vp), sceneView.cameraTranslationX(), sceneView.cameraTranslationY());
-
-            GLSLScreenShader.setView(sceneView, vp);
-
-            Layers.renderScale(sceneView, vp);
-            Annotations.render(sceneView, vp);
-            Layers.renderFloat(sceneView, vp);
-        }
     }
 
     private static void renderFullFloatScene() {

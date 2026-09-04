@@ -43,11 +43,7 @@ public class GLGrab {
 
             capture.bindForRender();
             GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-            if (exportView.isOrthographic()) {
-                GLRenderer.renderScene(exportView);
-            } else {
-                GLRenderer.renderSceneScale(exportView);
-            }
+            GLRenderer.renderScene(exportView);
             capture.readPixels(buffer);
         } finally {
             GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
