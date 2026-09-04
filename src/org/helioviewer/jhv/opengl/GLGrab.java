@@ -50,6 +50,7 @@ public class GLGrab {
             }
             capture.readPixels(buffer);
         } finally {
+            GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
             Display.setGLSize(_x, _y, _w, _h);
             Display.reshapeAll();
         }

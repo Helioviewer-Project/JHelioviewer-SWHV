@@ -114,43 +114,39 @@ final class GLFrameCapture {
     }
 
     void readPixels(ByteBuffer buffer) {
-        try {
-            int outputSize = width * height * 3;
-            if (buffer.capacity() < outputSize)
-                throw new IllegalArgumentException("Buffer capacity " + buffer.capacity() + " is less than " + outputSize);
+        int outputSize = width * height * 3;
+        if (buffer.capacity() < outputSize)
+            throw new IllegalArgumentException("Buffer capacity " + buffer.capacity() + " is less than " + outputSize);
 
-            if (samples > 0) {
-                GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, drawFramebuffer);
-                GL.glBindFramebuffer(GL.DRAW_FRAMEBUFFER, resolveFramebuffer);
-                GL.glBlitFramebuffer(0, 0, width, height,
-                        0, 0, width, height,
-                        GL.COLOR_BUFFER_BIT, GL.NEAREST);
-            }
-
-            GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, resolveFramebuffer);
-            rgbaReadback.clear();
-            GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, rgbaReadback);
-            rgbaReadback.limit(width * height * 4);
-
-            buffer.clear();
-            for (int y = 0; y < height; y++) {
-                rgbaReadback.get(rgbaRow);
-
-                int src = 0;
-                int dst = 0;
-                for (int x = 0; x < width; x++) {
-                    rgbRow[dst++] = rgbaRow[src++];
-                    rgbRow[dst++] = rgbaRow[src++];
-                    rgbRow[dst++] = rgbaRow[src++];
-                    src++;
-                }
-
-                buffer.put(rgbRow);
-            }
-            buffer.flip();
-        } finally {
-            GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
+        if (samples > 0) {
+            GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, drawFramebuffer);
+            GL.glBindFramebuffer(GL.DRAW_FRAMEBUFFER, resolveFramebuffer);
+            GL.glBlitFramebuffer(0, 0, width, height,
+                    0, 0, width, height,
+                    GL.COLOR_BUFFER_BIT, GL.NEAREST);
         }
+
+        GL.glBindFramebuffer(GL.READ_FRAMEBUFFER, resolveFramebuffer);
+        rgbaReadback.clear();
+        GL.glReadPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, rgbaReadback);
+        rgbaReadback.limit(width * height * 4);
+
+        buffer.clear();
+        for (int y = 0; y < height; y++) {
+            rgbaReadback.get(rgbaRow);
+
+            int src = 0;
+            int dst = 0;
+            for (int x = 0; x < width; x++) {
+                rgbRow[dst++] = rgbaRow[src++];
+                rgbRow[dst++] = rgbaRow[src++];
+                rgbRow[dst++] = rgbaRow[src++];
+                src++;
+            }
+
+            buffer.put(rgbRow);
+        }
+        buffer.flip();
     }
 
     void dispose() {
