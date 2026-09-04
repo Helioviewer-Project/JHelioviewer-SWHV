@@ -3,6 +3,7 @@ package org.helioviewer.jhv.opengl;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.display.Display;
+import org.helioviewer.jhv.display.MapView;
 
 public class GLGrab {
 
@@ -38,13 +39,14 @@ public class GLGrab {
         try {
             Display.setGLSize(0, 0, w, h);
             Display.reshapeAll();
+            MapView exportView = GLRenderer.createMapView(Display.getCamera(), GLRenderer.getDisplayedViewpoint());
 
             capture.bindForRender();
             GL.glClear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-            if (GLRenderer.getMapView().isOrthographic()) {
-                GLRenderer.renderScene();
+            if (exportView.isOrthographic()) {
+                GLRenderer.renderScene(exportView);
             } else {
-                GLRenderer.renderSceneScale();
+                GLRenderer.renderSceneScale(exportView);
             }
             capture.readPixels(buffer);
         } finally {

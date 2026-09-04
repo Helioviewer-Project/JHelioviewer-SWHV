@@ -20,9 +20,9 @@ import org.helioviewer.jhv.movie.ExportMovie;
 
 public final class GLRenderer {
 
-    private static MapView mapView = createMapView(Display.getCamera(), Sun.StartEarth);
+    private static MapView screenView = createMapView(Display.getCamera(), Sun.StartEarth);
 
-    private static MapView createMapView(Camera camera, Position viewpoint) {
+    static MapView createMapView(Camera camera, Position viewpoint) {
         MapMode mode = Display.mode;
         return MapView.create(camera, viewpoint, mode, Display.gridType, createScales(mode, Display.getViewports()));
     }
@@ -54,11 +54,11 @@ public final class GLRenderer {
     }
 
     public static Position getDisplayedViewpoint() {
-        return mapView.viewpoint();
+        return screenView.viewpoint();
     }
 
     public static MapView getMapView() {
-        return mapView;
+        return screenView;
     }
 
     public static void init() {
@@ -108,12 +108,12 @@ public final class GLRenderer {
 
         Layers.prerender();
 
-        mapView = createMapView(Display.getCamera(), viewpoint);
-        if (mapView.isOrthographic()) {
-            renderScene();
+        screenView = createMapView(Display.getCamera(), viewpoint);
+        if (screenView.isOrthographic()) {
+            renderScene(screenView);
             renderMiniview();
         } else
-            renderSceneScale();
+            renderSceneScale(screenView);
         renderFullFloatScene();
 
         ExportMovie.renderedFrame();
@@ -141,18 +141,17 @@ public final class GLRenderer {
         GLSLScreenShader.dispose();
     }
 
-    static void renderScene() {
-        MapView mv = mapView;
+    static void renderScene(MapView sceneView) {
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY(), mv.viewRotation());
+            Transform.ortho(vp.aspect, sceneView.cameraWidth(vp), sceneView.cameraTranslationX(), sceneView.cameraTranslationY(), sceneView.viewRotation());
 
-            GLSLScreenShader.setView(mv, vp);
+            GLSLScreenShader.setView(sceneView, vp);
             GLSLSphereShader.render();
 
-            Layers.render(mv, vp);
-            Annotations.render(mv, vp);
-            Layers.renderFloat(mv, vp);
+            Layers.render(sceneView, vp);
+            Annotations.render(sceneView, vp);
+            Layers.renderFloat(sceneView, vp);
         }
     }
 
@@ -164,30 +163,29 @@ public final class GLRenderer {
             return;
 
         Viewport vp = miniview.getViewport();
-        MapView mv = MapView.create(Display.getMiniCamera(), mapView.viewpoint(), MapMode.Orthographic, GridType.Viewpoint, MINI_SCALES);
+        MapView miniView = MapView.create(Display.getMiniCamera(), screenView.viewpoint(), MapMode.Orthographic, GridType.Viewpoint, MINI_SCALES);
 
         GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-        Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
+        Transform.ortho2D(vp.aspect, miniView.cameraWidth(vp), miniView.cameraTranslationX(), miniView.cameraTranslationY());
 
-        GLSLScreenShader.setView(mv, vp);
+        GLSLScreenShader.setView(miniView, vp);
 
         GL.glDisable(GL.DEPTH_TEST);
         miniview.renderBackground();
-        Layers.renderMiniview(mv, vp);
+        Layers.renderMiniview(miniView, vp);
         GL.glEnable(GL.DEPTH_TEST);
     }
 
-    static void renderSceneScale() {
-        MapView mv = mapView;
+    static void renderSceneScale(MapView sceneView) {
         for (Viewport vp : Display.getViewports()) {
             GL.glViewport(vp.x, vp.yGL, vp.width, vp.height);
-            Transform.ortho2D(vp.aspect, mv.cameraWidth(vp), mv.cameraTranslationX(), mv.cameraTranslationY());
+            Transform.ortho2D(vp.aspect, sceneView.cameraWidth(vp), sceneView.cameraTranslationX(), sceneView.cameraTranslationY());
 
-            GLSLScreenShader.setView(mv, vp);
+            GLSLScreenShader.setView(sceneView, vp);
 
-            Layers.renderScale(mv, vp);
-            Annotations.render(mv, vp);
-            Layers.renderFloat(mv, vp);
+            Layers.renderScale(sceneView, vp);
+            Annotations.render(sceneView, vp);
+            Layers.renderFloat(sceneView, vp);
         }
     }
 
