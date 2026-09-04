@@ -15,7 +15,7 @@ final class GLFrameCapture {
     private final int samples;
 
     private final int resolveFramebuffer;
-    private final int resolveTexture;
+    private final int resolveColorRenderbuffer;
     private final int drawFramebuffer;
     private final int drawColorRenderbuffer;
     private final int drawDepthRenderbuffer;
@@ -28,9 +28,8 @@ final class GLFrameCapture {
         int frameHeight = Math.max(1, captureH);
         int frameSamples = Math.clamp(EXPORT_SAMPLES, 0, GL.glGetInteger(GL.MAX_SAMPLES));
         int colorInternalFormat = GL.RGB8;
-        int colorPixelFormat = GL.RGB;
         int resolveFbo = 0;
-        int resolveTex = 0;
+        int resolveColorRbo = 0;
         int drawFbo = 0;
         int drawColorRbo = 0;
         int drawDepthRbo = 0;
@@ -43,14 +42,10 @@ final class GLFrameCapture {
             resolveFbo = GL.glGenFramebuffer();
             GL.glBindFramebuffer(GL.FRAMEBUFFER, resolveFbo);
 
-            resolveTex = GL.glGenTexture();
-            GL.glBindTexture(GL.TEXTURE_2D, resolveTex);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-            GL.glTexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-            GL.glTexImage2D(GL.TEXTURE_2D, 0, colorInternalFormat, frameWidth, frameHeight, 0, colorPixelFormat, GL.UNSIGNED_BYTE, (ByteBuffer) null);
-            GL.glFramebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, resolveTex, 0);
+            resolveColorRbo = GL.glGenRenderbuffer();
+            GL.glBindRenderbuffer(GL.RENDERBUFFER, resolveColorRbo);
+            GL.glRenderbufferStorage(GL.RENDERBUFFER, colorInternalFormat, frameWidth, frameHeight);
+            GL.glFramebufferRenderbuffer(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.RENDERBUFFER, resolveColorRbo);
 
             if (frameSamples > 0) {
                 drawFbo = GL.glGenFramebuffer();
@@ -79,8 +74,8 @@ final class GLFrameCapture {
                 GL.glDeleteRenderbuffer(drawColorRbo);
             if (drawFbo != resolveFbo)
                 GL.glDeleteFramebuffer(drawFbo);
-            if (resolveTex != 0)
-                GL.glDeleteTexture(resolveTex);
+            if (resolveColorRbo != 0)
+                GL.glDeleteRenderbuffer(resolveColorRbo);
             if (resolveFbo != 0)
                 GL.glDeleteFramebuffer(resolveFbo);
             if (readback != null)
@@ -88,12 +83,11 @@ final class GLFrameCapture {
             throw e;
         } finally {
             GL.glBindRenderbuffer(GL.RENDERBUFFER, 0);
-            GL.glBindTexture(GL.TEXTURE_2D, 0);
             GL.glBindFramebuffer(GL.FRAMEBUFFER, 0);
         }
 
         resolveFramebuffer = resolveFbo;
-        resolveTexture = resolveTex;
+        resolveColorRenderbuffer = resolveColorRbo;
         drawFramebuffer = drawFbo;
         drawColorRenderbuffer = drawColorRbo;
         drawDepthRenderbuffer = drawDepthRbo;
@@ -156,8 +150,8 @@ final class GLFrameCapture {
             GL.glDeleteRenderbuffer(drawColorRenderbuffer);
         if (drawFramebuffer != resolveFramebuffer)
             GL.glDeleteFramebuffer(drawFramebuffer);
-        if (resolveTexture != 0)
-            GL.glDeleteTexture(resolveTexture);
+        if (resolveColorRenderbuffer != 0)
+            GL.glDeleteRenderbuffer(resolveColorRenderbuffer);
         if (resolveFramebuffer != 0)
             GL.glDeleteFramebuffer(resolveFramebuffer);
         if (rgbaReadback != null)
