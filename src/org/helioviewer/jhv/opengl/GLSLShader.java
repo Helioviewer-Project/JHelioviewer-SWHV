@@ -24,8 +24,6 @@ abstract class GLSLShader {
     }
 
     private int progID;
-    private int vertexID;
-    private int fragmentID;
 
     private final String vertex;
     private final String[] fragments;
@@ -36,20 +34,27 @@ abstract class GLSLShader {
     }
 
     protected final void _init() {
+        int vertexID = 0;
+        int fragmentID = 0;
         try {
-            vertexID = attachShader(GL.VERTEX_SHADER, "vertex shader " + vertex, readSource(vertex));
+            vertexID = compileShader(GL.VERTEX_SHADER, "vertex shader " + vertex, readSource(vertex));
 
             StringBuilder fragmentText = new StringBuilder();
             for (String fragment : fragments)
                 fragmentText.append(readSource(fragment));
-            fragmentID = attachShader(GL.FRAGMENT_SHADER, "fragment shader " + String.join(", ", fragments), fragmentText.toString());
+            fragmentID = compileShader(GL.FRAGMENT_SHADER, "fragment shader " + String.join(", ", fragments), fragmentText.toString());
 
-            progID = initializeProgram();
+            progID = initializeProgram(vertexID, fragmentID);
             use();
             initUniforms(progID);
         } catch (RuntimeException | Error e) {
             _dispose();
             throw e;
+        } finally {
+            if (vertexID != 0)
+                GL.glDeleteShader(vertexID);
+            if (fragmentID != 0)
+                GL.glDeleteShader(fragmentID);
         }
     }
 
@@ -64,16 +69,6 @@ abstract class GLSLShader {
     protected final void _dispose() {
         if (progID != 0) {
             GL.glUseProgram(0);
-        }
-        if (vertexID != 0) {
-            GL.glDeleteShader(vertexID);
-            vertexID = 0;
-        }
-        if (fragmentID != 0) {
-            GL.glDeleteShader(fragmentID);
-            fragmentID = 0;
-        }
-        if (progID != 0) {
             GL.glDeleteProgram(progID);
             progID = 0;
         }
@@ -89,7 +84,7 @@ abstract class GLSLShader {
         GL.glUniform1i(requiredUniform(id, texname), unit.ordinal());
     }
 
-    private static int attachShader(int shaderType, String description, String text) {
+    private static int compileShader(int shaderType, String description, String text) {
         int id = GL.glCreateShader(shaderType);
         try {
             GL.glShaderSource(id, text);
@@ -108,7 +103,7 @@ abstract class GLSLShader {
         }
     }
 
-    private int initializeProgram() {
+    private int initializeProgram(int vertexID, int fragmentID) {
         int id = GL.glCreateProgram();
         try {
             GL.glAttachShader(id, vertexID);
@@ -123,11 +118,7 @@ abstract class GLSLShader {
             }
 
             GL.glDetachShader(id, vertexID);
-            GL.glDeleteShader(vertexID);
-            vertexID = 0;
             GL.glDetachShader(id, fragmentID);
-            GL.glDeleteShader(fragmentID);
-            fragmentID = 0;
             return id;
         } catch (RuntimeException | Error e) {
             GL.glDeleteProgram(id);
