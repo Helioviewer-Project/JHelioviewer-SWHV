@@ -98,7 +98,7 @@ public class JPIPCacheManager {
 
         try {
             Integer clevel = levels.get(key);
-            if (clevel == null || clevel > level) {
+            if (clevel == null || clevel > level || !streams.containsKey(key)) {
                 JPIPStream stream = source.get(frame);
                 if (stream != null) {
                     levels.put(key, level);
