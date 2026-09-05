@@ -327,6 +327,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (mv.isLatitudinal() && evt.isCactus())
                 continue;
+            if (!evt.isCactus()) {
+                JHVPositionInformation pi = evt.getPositionInformation();
+                if (pi == null || pi.centralPoint() == null)
+                    continue;
+            }
             bindTexture(evt.getSupplier().group());
             glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
