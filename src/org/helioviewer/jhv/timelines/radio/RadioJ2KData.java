@@ -7,7 +7,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
-import java.awt.image.SampleModel;
 import java.nio.ByteBuffer;
 
 import org.helioviewer.jhv.app.Log;
@@ -113,10 +112,9 @@ class RadioJ2KData implements View.DataHandler {
         byte[] pixels = new byte[byteBuffer.remaining()];
         byteBuffer.get(byteBuffer.position(), pixels);
 
-        BufferedImage sample = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
-        SampleModel sampleModel = sample.getSampleModel().createCompatibleSampleModel(width, height);
         DataBufferByte dataBuffer = new DataBufferByte(pixels, pixels.length);
-        return new BufferedImage(colorModel, Raster.createWritableRaster(sampleModel, dataBuffer, null), false, null);
+        return new BufferedImage(colorModel,
+                Raster.createInterleavedRaster(dataBuffer, width, height, width, 1, new int[]{0}, null), false, null);
     }
 
     void requestData(TimeAxis xAxis) {
