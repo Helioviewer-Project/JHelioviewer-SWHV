@@ -346,12 +346,7 @@ void main(void) {
     }
 
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) {
-        hitPoint = vec3(viewPosition, intersectPlane(images[0].cameraDiff, viewPosition, onDisk));
-        rotatedHitPoint = rotate_vector_inverse(images[0].cameraDiff, hitPoint);
-        if (onDisk && hitPoint.z < 0.)
-            discard;
-        if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.)
-            discard;
+        rotatedHitPoint = intersectImagePlane(images[0].cameraDiff, viewPosition, onDisk, hitPoint);
     }
 
     clipPlanarMasks(rotatedHitPoint.xy);
@@ -369,12 +364,7 @@ void main(void) {
     }
 
     if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
-        diffHitPoint = vec3(viewPosition, intersectPlane(images[1].cameraDiff, viewPosition, onDisk));
-        diffRotatedHitPoint = rotate_vector_inverse(images[1].cameraDiff, diffHitPoint);
-        if (onDisk && diffHitPoint.z < 0.)
-            discard;
-        if (dot(diffRotatedHitPoint, diffRotatedHitPoint) <= 1.)
-            discard;
+        diffRotatedHitPoint = intersectImagePlane(images[1].cameraDiff, viewPosition, onDisk, diffHitPoint);
     }
 
     clipPlanarMasks(diffRotatedHitPoint.xy);

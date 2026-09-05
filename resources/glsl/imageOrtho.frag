@@ -20,13 +20,19 @@ vec2 sampleOrthoTexcoord(const vec3 world, const Image img, const float[6] PV) {
     return helioprojectiveToTexcoord(helioprojective, img, PV);
 }
 
-float intersectPlane(const vec4 quat, const vec2 viewPosition, const bool discardBackFacing) {
+vec3 intersectImagePlane(const vec4 quat, const vec2 viewPosition, const bool onDisk, out vec3 hitPoint) {
     vec3 altnormal = rotate_vector(quat, zAxis);
-    if (discardBackFacing && altnormal.z <= 0.)
+    if (onDisk && altnormal.z <= 0.)
         discard;
     if (abs(altnormal.z) < PLANE_Z_EPS)
         discard;
-    return -dot(altnormal.xy, viewPosition) / altnormal.z;
+    hitPoint = vec3(viewPosition, -dot(altnormal.xy, viewPosition) / altnormal.z);
+    vec3 rotatedHitPoint = rotate_vector_inverse(quat, hitPoint);
+    if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
+        discard;
+    if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
+        discard;
+    return rotatedHitPoint;
 }
 
 vec3 rotateOnDiskPoint(const Image img, const vec3 hitPoint) {
@@ -71,12 +77,7 @@ void main(void) {
 
     // Observer-image projections keep the existing off-limb / back-side fallback.
     if (!surfaceMapMode && rotatedHitPoint.z <= 0.) { // off-limb or back
-        hitPoint = vec3(viewPosition, intersectPlane(images[0].cameraDiff, viewPosition, onDisk));
-        rotatedHitPoint = rotate_vector_inverse(images[0].cameraDiff, hitPoint);
-        if (onDisk && hitPoint.z < 0.) // differential: off-limb behind sphere
-            discard;
-        if (dot(rotatedHitPoint, rotatedHitPoint) <= 1.) // differential: central disk
-            discard;
+        rotatedHitPoint = intersectImagePlane(images[0].cameraDiff, viewPosition, onDisk, hitPoint);
         if (display.calculateDepth != 0.) // intersecting Euhforia planes
             gl_FragDepth = getDepth(hitPoint.z);
     }
@@ -99,12 +100,7 @@ void main(void) {
         }
 
         if (!diffSurfaceMapMode && diffRotatedHitPoint.z <= 0.) {
-            diffHitPoint = vec3(viewPosition, intersectPlane(images[1].cameraDiff, viewPosition, onDisk));
-            diffRotatedHitPoint = rotate_vector_inverse(images[1].cameraDiff, diffHitPoint);
-            if (onDisk && diffHitPoint.z < 0.) // differential: off-limb behind sphere
-                discard;
-            if (dot(diffRotatedHitPoint, diffRotatedHitPoint) <= 1.) // differential: central disk
-                discard;
+            diffRotatedHitPoint = intersectImagePlane(images[1].cameraDiff, viewPosition, onDisk, diffHitPoint);
         }
 
         clipPlanarMasks(diffRotatedHitPoint.xy);
