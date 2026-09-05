@@ -229,15 +229,18 @@ final class ProjectedMap {
     }
 
     private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, byte[] color, BufVertex vexBuf) {
-        float x;
+        double edge;
         if (current.x <= 0 && previous.x >= 0)
-            x = (float) (0.5 * vp.aspect);
+            edge = 0.5;
         else if (current.x >= 0 && previous.x <= 0)
-            x = (float) (-0.5 * vp.aspect);
+            edge = -0.5;
         else
             return;
 
-        float y = (float) current.y;
+        double dx = current.x + 2 * edge - previous.x;
+        // Opposite seam endpoints have the same unwrapped X coordinate.
+        float y = (float) (dx == 0 ? current.y : previous.y + (edge - previous.x) / dx * (current.y - previous.y));
+        float x = (float) (edge * vp.aspect);
         vexBuf.putVertex(x, y, 0, 1, color);
         vexBuf.endLine();
         vexBuf.startLine(-x, y, 0, 1, color);
