@@ -43,61 +43,8 @@ public final class FastFormat {
         char[] buf = BUFFER.get();
         int charPos = 32;
 
-        if (absValue == 0) {
-            buf[--charPos] = '0';
-        } else if (absValue <= Integer.MAX_VALUE) {
-            int temp = (int) absValue;
-            while (temp >= 100) {
-                int q = temp / 100;
-                int r = temp - q * 100;
-                buf[--charPos] = DIGITS[(r << 1) + 1];
-                buf[--charPos] = DIGITS[r << 1];
-                temp = q;
-            }
-            if (temp >= 10) {
-                buf[--charPos] = DIGITS[(temp << 1) + 1];
-                buf[--charPos] = DIGITS[temp << 1];
-            } else {
-                buf[--charPos] = (char) ('0' + temp);
-            }
-        } else {
-            long temp = absValue;
-            while (temp >= 100) {
-                long q = temp / 100;
-                int r = (int) (temp - q * 100);
-                buf[--charPos] = DIGITS[(r << 1) + 1];
-                buf[--charPos] = DIGITS[r << 1];
-                temp = q;
-            }
-            if (temp >= 10) {
-                int t = (int) temp;
-                buf[--charPos] = DIGITS[(t << 1) + 1];
-                buf[--charPos] = DIGITS[t << 1];
-            } else {
-                buf[--charPos] = (char) ('0' + temp);
-            }
-        }
-
-        if (negative) {
-            buf[--charPos] = '-';
-        } else if (alwaysSign) {
-            buf[--charPos] = '+';
-        }
-
-        int len = 32 - charPos;
-        if (width <= 32) {
-            int spaces = width - len;
-            while (spaces > 0) {
-                buf[--charPos] = ' ';
-                spaces--;
-            }
-            out.append(buf, charPos, 32 - charPos);
-        } else {
-            int spaces = width - len;
-            out.repeat(' ', spaces);
-            out.append(buf, charPos, len);
-        }
-        return out;
+        charPos = writeDigits(buf, charPos, absValue);
+        return appendSignedPadded(out, buf, charPos, width, negative, alwaysSign);
     }
 
     private static StringBuilder appendRounded(StringBuilder out, double value, int scale) {
@@ -187,41 +134,50 @@ public final class FastFormat {
 
         buf[--charPos] = '.';
 
-        if (whole == 0) {
+        charPos = writeDigits(buf, charPos, whole);
+        return appendSignedPadded(out, buf, charPos, width, negative, alwaysSign);
+    }
+
+    private static int writeDigits(char[] buf, int charPos, long value) {
+        if (value == 0) {
             buf[--charPos] = '0';
-        } else if (whole <= Integer.MAX_VALUE) {
-            int tempWhole = (int) whole;
-            while (tempWhole >= 100) {
-                int q = tempWhole / 100;
-                int r = tempWhole - q * 100;
+        } else if (value <= Integer.MAX_VALUE) {
+            int temp = (int) value;
+            while (temp >= 100) {
+                int q = temp / 100;
+                int r = temp - q * 100;
                 buf[--charPos] = DIGITS[(r << 1) + 1];
                 buf[--charPos] = DIGITS[r << 1];
-                tempWhole = q;
+                temp = q;
             }
-            if (tempWhole >= 10) {
-                buf[--charPos] = DIGITS[(tempWhole << 1) + 1];
-                buf[--charPos] = DIGITS[tempWhole << 1];
+            if (temp >= 10) {
+                buf[--charPos] = DIGITS[(temp << 1) + 1];
+                buf[--charPos] = DIGITS[temp << 1];
             } else {
-                buf[--charPos] = (char) ('0' + tempWhole);
+                buf[--charPos] = (char) ('0' + temp);
             }
         } else {
-            long tempWhole = whole;
-            while (tempWhole >= 100) {
-                long q = tempWhole / 100;
-                int r = (int) (tempWhole - q * 100);
+            long temp = value;
+            while (temp >= 100) {
+                long q = temp / 100;
+                int r = (int) (temp - q * 100);
                 buf[--charPos] = DIGITS[(r << 1) + 1];
                 buf[--charPos] = DIGITS[r << 1];
-                tempWhole = q;
+                temp = q;
             }
-            if (tempWhole >= 10) {
-                int t = (int) tempWhole;
+            if (temp >= 10) {
+                int t = (int) temp;
                 buf[--charPos] = DIGITS[(t << 1) + 1];
                 buf[--charPos] = DIGITS[t << 1];
             } else {
-                buf[--charPos] = (char) ('0' + tempWhole);
+                buf[--charPos] = (char) ('0' + temp);
             }
         }
 
+        return charPos;
+    }
+
+    private static StringBuilder appendSignedPadded(StringBuilder out, char[] buf, int charPos, int width, boolean negative, boolean alwaysSign) {
         if (negative) {
             buf[--charPos] = '-';
         } else if (alwaysSign) {
