@@ -93,7 +93,10 @@ public class JHVRelatedEvents {
     }
 
     void swapEvent(JHVEvent event) {
-        events.putLast(event.getUniqueID(), event);
+        JHVEvent previous = events.putLast(event.getUniqueID(), event);
+        if (previous != null && previous.start == event.start && previous.end == event.end)
+            return;
+
         long start = Long.MAX_VALUE, end = Long.MIN_VALUE;
         for (JHVEvent evt : events.values()) {
             start = Math.min(start, evt.start);
