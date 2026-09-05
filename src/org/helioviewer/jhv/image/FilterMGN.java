@@ -101,7 +101,9 @@ class FilterMGN implements ImageFilter.Algorithm {
     private static final int K = 3;
     private static final float MIX_FACTOR = 0.97f;
     private static final float ONE_MINUS_MIX_FACTOR = 1f - MIX_FACTOR;
-    private static final float[] sigmas = {1, 4, 16, 64};
+    private static final GaussFilter[] filters = {
+            new GaussFilter(1, K), new GaussFilter(4, K), new GaussFilter(16, K), new GaussFilter(64, K)
+    };
     private static final float[] weights = {0.125f, 0.25f, 0.5f, 1f};
 
     private static void gaussNormAccumulate(float[] data, int width, int height, float weight, GaussFilter filter,
@@ -140,12 +142,7 @@ class FilterMGN implements ImageFilter.Algorithm {
         float[] conv = new float[size];
         float[] conv2 = new float[size];
 
-        GaussFilter[] filters = new GaussFilter[sigmas.length];
-        for (int i = 0; i < sigmas.length; i++) {
-            filters[i] = new GaussFilter(sigmas[i], K);
-        }
-
-        for (int i = 0; i < sigmas.length; i++) {
+        for (int i = 0; i < filters.length; i++) {
             gaussNormAccumulate(data, width, height, weights[i], filters[i], conv, conv2, accum);
         }
 
