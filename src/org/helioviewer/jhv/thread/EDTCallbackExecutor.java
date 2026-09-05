@@ -1,7 +1,6 @@
 package org.helioviewer.jhv.thread;
 
 import java.awt.EventQueue;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -17,18 +16,7 @@ record EDTCallbackExecutor(ExecutorService delegate) {
 
     private static ExecutorService createCachedPool() {
         ExecutorService service = Executors.newCachedThreadPool(new AppThread.NamedThreadFactory("Worker"));
-        Runnable shutdownHook =
-                new Runnable() {
-                    private final WeakReference<ExecutorService> executorServiceRef = new WeakReference<>(service);
-
-                    @Override
-                    public void run() {
-                        ExecutorService executorService = executorServiceRef.get();
-                        if (executorService != null)
-                            executorService.shutdown();
-                    }
-                };
-        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "JHV-ShutdownHook"));
+        Runtime.getRuntime().addShutdownHook(new Thread(service::shutdown, "JHV-ShutdownHook"));
         return service;
     }
 
