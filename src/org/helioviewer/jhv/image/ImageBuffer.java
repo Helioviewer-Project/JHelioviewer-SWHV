@@ -112,8 +112,6 @@ public final class ImageBuffer {
         private final Format inputFormat;
         private final ImageFilter filter;
         private final ImageBuffer directBuffer;
-        private final byte[] byteArray;
-        private final short[] shortArray;
         private final Buffer writeBuffer;
 
         private WriteBuffer(int _width, int _height, Format _format, ImageFilter _filter) {
@@ -124,19 +122,13 @@ public final class ImageBuffer {
 
             if (!ImageBuffer.shouldFilter(inputFormat, filter)) {
                 directBuffer = allocate(width, height, inputFormat);
-                byteArray = null;
-                shortArray = null;
                 writeBuffer = directBuffer.buffer;
             } else if (inputFormat == Format.Gray16F) {
                 directBuffer = null;
-                byteArray = null;
-                shortArray = new short[Math.multiplyExact(width, height)];
-                writeBuffer = ShortBuffer.wrap(shortArray);
+                writeBuffer = ShortBuffer.allocate(Math.multiplyExact(width, height));
             } else {
                 directBuffer = null;
-                byteArray = new byte[byteSize(width, height, inputFormat)];
-                shortArray = null;
-                writeBuffer = ByteBuffer.wrap(byteArray);
+                writeBuffer = ByteBuffer.allocate(byteSize(width, height, inputFormat));
             }
         }
 
@@ -151,19 +143,19 @@ public final class ImageBuffer {
         public WriteBuffer clearPixels() {
             if (directBuffer != null)
                 MemoryUtil.memSet(MemoryUtil.memAddress(writeBuffer), 0, directBuffer.byteSize());
-            else if (byteArray != null)
-                Arrays.fill(byteArray, (byte) 0);
+            else if (writeBuffer instanceof ByteBuffer bytes)
+                Arrays.fill(bytes.array(), (byte) 0);
             else
-                Arrays.fill(shortArray, (short) 0);
+                Arrays.fill(shortBuffer().array(), (short) 0);
             return this;
         }
 
         public ImageBuffer finish() {
             if (directBuffer != null)
                 return directBuffer;
-            return shortArray != null
-                    ? fromShorts(width, height, inputFormat, shortArray, filter)
-                    : fromBytes(width, height, inputFormat, byteArray, filter);
+            return writeBuffer instanceof ShortBuffer shorts
+                    ? fromShorts(width, height, inputFormat, shorts.array(), filter)
+                    : fromBytes(width, height, inputFormat, byteBuffer().array(), filter);
         }
 
     }
