@@ -73,15 +73,12 @@ class BandCacheMinute implements BandCache {
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
         int level = 0;
         double factor = 1;
-        double elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-        long aWidth = end - start;
-        double numElements = aWidth / elsz;
+        double millisPerSample = (double) MILLIS_PER_CHUNK / CHUNKED_SIZE;
+        long duration = end - start;
 
-        while (level < MAX_LEVEL - 1 && numElements > graphWidth) {
+        while (level < MAX_LEVEL - 1 && duration / (millisPerSample * factor) > graphWidth) {
             level++;
             factor *= FACTOR_STEP;
-            elsz = 1. * MILLIS_PER_CHUNK / CHUNKED_SIZE * factor;
-            numElements = aWidth / elsz;
         }
 
         List<List<DateValue>> ret = new ArrayList<>();
