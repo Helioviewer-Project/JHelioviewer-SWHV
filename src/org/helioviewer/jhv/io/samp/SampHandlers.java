@@ -1,5 +1,6 @@
 package org.helioviewer.jhv.io.samp;
 
+import java.awt.EventQueue;
 import java.util.Collections;
 import java.util.Map;
 
@@ -34,6 +35,10 @@ final class SampHandlers {
                 return null;
             }
         };
+    }
+
+    static AbstractMessageHandler command(String type, Runnable command) {
+        return create(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
     }
 
     static @Nullable String optionalString(Message msg, String key) {

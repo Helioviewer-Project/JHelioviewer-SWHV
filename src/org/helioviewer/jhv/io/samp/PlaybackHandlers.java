@@ -13,11 +13,11 @@ final class PlaybackHandlers {
 
     static void register(SampClient client) {
         client.addMessageHandler(playbackSetHandler());
-        client.addMessageHandler(commandHandler("jhv.playback.play", Commands::play));
-        client.addMessageHandler(commandHandler("jhv.playback.pause", Commands::pause));
-        client.addMessageHandler(commandHandler("jhv.playback.toggle", Commands::togglePlayback));
-        client.addMessageHandler(commandHandler("jhv.playback.next-frame", Commands::nextFrame));
-        client.addMessageHandler(commandHandler("jhv.playback.previous-frame", Commands::previousFrame));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.play", Commands::play));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.pause", Commands::pause));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.toggle", Commands::togglePlayback));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.next-frame", Commands::nextFrame));
+        client.addMessageHandler(SampHandlers.command("jhv.playback.previous-frame", Commands::previousFrame));
         client.addMessageHandler(SampHandlers.create("jhv.playback.seek-frame",
                 (senderId, sender, msg) -> playbackSeekFrame(msg)));
         client.addMessageHandler(SampHandlers.create("jhv.playback.seek-time",
@@ -58,10 +58,6 @@ final class PlaybackHandlers {
         } catch (RuntimeException e) {
             Log.warn("Ignoring invalid seek time value: " + time, e);
         }
-    }
-
-    private static AbstractMessageHandler commandHandler(String type, Runnable command) {
-        return SampHandlers.create(type, (senderId, sender, msg) -> EventQueue.invokeLater(command));
     }
 
     private PlaybackHandlers() {}
