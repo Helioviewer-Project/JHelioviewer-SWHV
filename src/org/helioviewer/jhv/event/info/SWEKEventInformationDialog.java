@@ -87,10 +87,7 @@ public final class SWEKEventInformationDialog extends JDialog {
         if (!relatedEvents.isEmpty())
             otherRelatedEventsPanel = createOtherRelatedEventsCollapsiblePane(relatedEvents);
 
-        allTablePanel.removeAll();
         initParameterCollapsiblePanels();
-        setCollapsiblePanels();
-
         repack();
         repaint();
     }
