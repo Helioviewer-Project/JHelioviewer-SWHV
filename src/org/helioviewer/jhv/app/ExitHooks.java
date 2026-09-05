@@ -17,8 +17,4 @@ public class ExitHooks {
         Runtime.getRuntime().addShutdownHook(finishMovieThread);
     }
 
-    public static boolean exitProgram() {
-        return true;
-    }
-
 }
