@@ -241,9 +241,12 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
             return false;
 
         EventPlotConfiguration current = null;
-        for (EventPlotConfiguration plot : eventPlots) {
-            if (plot.contains(p))
+        for (int i = eventPlots.size() - 1; i >= 0; i--) {
+            EventPlotConfiguration plot = eventPlots.get(i);
+            if (plot.contains(p)) {
                 current = plot;
+                break;
+            }
         }
 
         boolean changed = current != eventUnderMouse;
