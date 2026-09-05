@@ -131,15 +131,10 @@ public final class PunchClient {
             for (long day = TimeUtils.floorDay(start); day <= end; day += TimeUtils.DAY_IN_MILLIS)
                 listDay(found, day);
 
-            // lastKept is seeded just below the first possible in-range item so that any
-            // item with milli >= start passes the cadence check on the first iteration.
-            // Using Long.MIN_VALUE here would overflow the (item.milli - lastKept) check.
             List<DataItem> result = new ArrayList<>(found.size());
-            long lastKept = start - Math.max(1, cadence) - 1;
             for (DataItem item : found.values()) {
-                if (item.milli >= start && item.milli <= end && item.milli - lastKept >= cadence) {
+                if (result.isEmpty() || item.milli - result.getLast().milli >= cadence) {
                     result.add(item);
-                    lastKept = item.milli;
                 }
             }
             return result;
@@ -157,7 +152,8 @@ public final class PunchClient {
             while (m.find()) {
                 String file = m.group(1);
                 long milli = TimeUtils.parse(FILE_TIME, m.group(2));
-                found.put(milli, new DataItem(file, URI.create(dirUrl + file), milli));
+                if (milli >= start && milli <= end)
+                    found.put(milli, new DataItem(file, URI.create(dirUrl + file), milli));
                 matched++;
             }
             Log.info("PUNCH parsed " + matched + " files from " + dirUrl);
