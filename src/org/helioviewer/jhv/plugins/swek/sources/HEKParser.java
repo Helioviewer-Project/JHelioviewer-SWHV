@@ -48,9 +48,8 @@ class HEKParser {
         while (paramIterator.hasNext() || keys.hasNext()) {
             String key = paramIterator.hasNext() ? paramIterator.next().name() : keys.next();
             String lowKey = key.toLowerCase();
-            if (insertedKeys.contains(lowKey))
+            if (!insertedKeys.add(lowKey))
                 continue;
-            insertedKeys.add(lowKey);
 
             if (result.isNull(lowKey))
                 continue;
@@ -106,8 +105,7 @@ class HEKParser {
     }
 
     private static void parseRef(JHVEvent currentEvent, JSONObject ref) throws JSONException {
-        String url = "", type = "";
-        boolean ok = false;
+        String url = "", type = null;
 
         Iterator<String> keys = ref.keys();
         while (keys.hasNext()) {
@@ -118,25 +116,16 @@ class HEKParser {
             if (lowerKey.equals("ref_type")) {
                 String lvalue = value.toLowerCase();
                 switch (lvalue) {
-                    case "movie" -> {
-                        type = "Reference Movie";
-                        ok = true;
-                    }
-                    case "image" -> {
-                        type = "Reference Image";
-                        ok = true;
-                    }
-                    case "html" -> {
-                        type = "Reference Link";
-                        ok = true;
-                    }
+                    case "movie" -> type = "Reference Movie";
+                    case "image" -> type = "Reference Image";
+                    case "html" -> type = "Reference Link";
                     default -> {}
                 }
             } else if (lowerKey.equals("ref_url")) {
                 url = value;
             }
         }
-        if (ok) {
+        if (type != null) {
             currentEvent.addParameter(type, type, url, true, true);
         }
     }
@@ -200,31 +189,23 @@ class HEKParser {
 
     @Nullable
     private static List<HgsPoint> checkAndFixBoundingBox(List<HgsPoint> hgsBoundedBox) {
-        if (hgsBoundedBox != null) {
-            double minX = 0.0;
-            double minY = 0.0;
-            double maxX = 0.0;
-            double maxY = 0.0;
-            boolean first = true;
-            for (HgsPoint p : hgsBoundedBox) {
-                if (first) {
-                    minX = p.longitudeDeg();
-                    maxX = p.longitudeDeg();
-                    minY = p.latitudeDeg();
-                    maxY = p.latitudeDeg();
-                    first = false;
-                } else {
-                    minX = Math.min(minX, p.longitudeDeg());
-                    maxX = Math.max(maxX, p.longitudeDeg());
-                    minY = Math.min(minY, p.latitudeDeg());
-                    maxY = Math.max(maxY, p.latitudeDeg());
-                }
-            }
+        if (hgsBoundedBox == null || hgsBoundedBox.isEmpty())
+            return hgsBoundedBox;
 
-            if ((maxX - minX) > 160 && (maxY - minY) > 160) {
-                return null;
-            }
+        HgsPoint first = hgsBoundedBox.getFirst();
+        double minX = first.longitudeDeg(), maxX = minX;
+        double minY = first.latitudeDeg(), maxY = minY;
+
+        for (int i = 1; i < hgsBoundedBox.size(); i++) {
+            HgsPoint p = hgsBoundedBox.get(i);
+            minX = Math.min(minX, p.longitudeDeg());
+            maxX = Math.max(maxX, p.longitudeDeg());
+            minY = Math.min(minY, p.latitudeDeg());
+            maxY = Math.max(maxY, p.latitudeDeg());
         }
+
+        if (maxX - minX > 160 && maxY - minY > 160)
+            return null;
         return hgsBoundedBox;
     }
 
