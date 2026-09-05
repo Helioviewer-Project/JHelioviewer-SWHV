@@ -8,8 +8,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.swing.JTextField;
 import javax.swing.Popup;
@@ -24,7 +22,7 @@ import com.jidesoft.swing.JideButton;
 class TimeField extends JTextField {
 
     private final ArrayList<CalendarListener> listeners = new ArrayList<>();
-    private final Calendar calendar = new GregorianCalendar();
+    private long selectedTime = System.currentTimeMillis();
 
     private final CalendarPicker calendarPicker = new CalendarPicker();
     private final JideButton calendarButton = new JideButton(Buttons.calendar);
@@ -126,12 +124,12 @@ class TimeField extends JTextField {
 
     void setTime(long time) {
         if (time >= TimeUtils.MINIMAL_TIME.milli && time <= TimeUtils.MAXIMAL_TIME.milli)
-            calendar.setTimeInMillis(TimeUtils.floorSec(time));
+            selectedTime = TimeUtils.floorSec(time);
         setText(TimeUtils.formatShort(getTime()));
     }
 
     long getTime() {
-        return calendar.getTimeInMillis();
+        return selectedTime;
     }
 
     void addListener(CalendarListener listener) {
