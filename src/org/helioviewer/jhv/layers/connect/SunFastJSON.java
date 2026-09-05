@@ -46,7 +46,7 @@ class SunFastJSON {
             coords.add(SunJSONTypes.convertCoord(c[0], c[1], c[2]));
         }
 
-        List<byte[]> colors = new ArrayList<>(size);
+        List<byte[]> colors = new ArrayList<>(jg.colors.size());
         for (int[] c : jg.colors) {
             if (c.length != 4)
                 throw new IllegalArgumentException("Color length not 4");
