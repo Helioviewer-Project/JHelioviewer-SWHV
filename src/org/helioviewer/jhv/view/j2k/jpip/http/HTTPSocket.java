@@ -17,7 +17,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.helioviewer.jhv.app.AppInfo;
-import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.io.ProxySettings;
 
 public class HTTPSocket {
@@ -127,10 +126,10 @@ public class HTTPSocket {
             if (line.isEmpty())
                 return hdr;
 
-            String[] parts = Regex.HttpField.split(line);
-            if (parts.length != 2)
+            int separator = line.indexOf(':');
+            if (separator < 0)
                 throw new IOException("Invalid HTTP header field: " + line);
-            hdr.put(parts[0], parts[1]);
+            hdr.put(line.substring(0, separator), line.substring(separator + 1).stripLeading());
         }
     }
 

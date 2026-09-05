@@ -10,7 +10,6 @@ public class Regex {
     public static final Pattern Integer = Pattern.compile("\\d+");
 
     public static final Pattern MultiSpace = Pattern.compile("\\s+");
-    public static final Pattern HttpField = Pattern.compile(": ");
     public static final Pattern MultiCommaSpace = Pattern.compile(",+|\\s+");
 
 }
