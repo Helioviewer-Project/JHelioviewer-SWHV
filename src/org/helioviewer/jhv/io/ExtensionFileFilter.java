@@ -3,59 +3,26 @@ package org.helioviewer.jhv.io;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import javax.swing.filechooser.FileFilter;
-
 public class ExtensionFileFilter {
 
-    public static final FilenameFilter Image = new Filter(new ExtensionFilter(
-            new String[]{"jpg", "jpeg", "png", "fts", "fits", "fits.gz", "jp2", "jpx", "zip"},
-            "All supported files (\".jpg\", \".jpeg\", \".png\", \".fts\", \".fits\", \".fits.gz\", \".jp2\", \".jpx\", \".zip\")"));
-    public static final FilenameFilter Model = new Filter(new ExtensionFilter(
-            new String[]{"gltf", "glb", "gltf.gz", "glb.gz"},
-            "glTF models (\".gltf\", \".glb\", optionally gzip-compressed)"));
-    public static final FilenameFilter Timeline = new Filter(new ExtensionFilter(
-            new String[]{"json", "cdf"},
-            "All supported files (\".json\", \".cdf\")"));
-    public static final FilenameFilter JHV = new Filter(new ExtensionFilter(
-            new String[]{"jhv"},
-            "State files (\".jhv\")"));
-    /*  public static final FilenameFilter JSON = new Filter(new ExtensionFilter(
-                new String[]{"json"},
-                "JSON files (\".json\")")); */
+    public static final FilenameFilter Image = new Filter(new String[]{"jpg", "jpeg", "png", "fts", "fits", "fits.gz", "jp2", "jpx", "zip"});
+    public static final FilenameFilter Model = new Filter(new String[]{"gltf", "glb", "gltf.gz", "glb.gz"});
+    public static final FilenameFilter Timeline = new Filter(new String[]{"json", "cdf"});
+    public static final FilenameFilter JHV = new Filter(new String[]{"jhv"});
 
-    private record Filter(FileFilter filter) implements FilenameFilter {
+    private record Filter(String[] extensions) implements FilenameFilter {
         @Override
         public boolean accept(File dir, String name) {
-            return filter.accept(new File(dir, name));
-        }
-    }
-
-    private static class ExtensionFilter extends FileFilter {
-
-        private final String[] extensions;
-        private final String description;
-
-        ExtensionFilter(String[] _extensions, String _description) {
-            extensions = _extensions;
-            description = _description;
-        }
-
-        @Override
-        public boolean accept(File f) {
-            if (f.isDirectory())
+            File file = new File(dir, name);
+            if (file.isDirectory())
                 return true;
 
-            String testName = f.getName().toLowerCase();
+            String testName = file.getName().toLowerCase();
             for (String ext : extensions) {
                 if (testName.endsWith("." + ext))
                     return true;
             }
             return false;
-        }
-
-        @Override
-        public String getDescription() {
-            return description;
         }
 
     }
