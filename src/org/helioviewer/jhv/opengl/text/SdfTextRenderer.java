@@ -37,7 +37,7 @@ public final class SdfTextRenderer {
     private static final int TOTAL_BUFFER_VERTICES = QUADS_PER_BUFFER * VERTICES_PER_QUAD;
     private static final float SURFACE_EPSILON = 0.03f;
 
-    private final AtlasTexture texture;
+    private final GLTexture texture;
     private final Map<Integer, Glyph> glyphs = new HashMap<>();
     private final Map<Long, Float> kerning = new HashMap<>();
     private final Set<Integer> missingGlyphs = new HashSet<>();
@@ -61,7 +61,7 @@ public final class SdfTextRenderer {
         try {
             AtlasMetadata atlas = loadAtlas();
             validateCharset();
-            texture = new AtlasTexture(ATLAS_IMAGE, atlas.width, atlas.height);
+            texture = loadAtlasTexture(ATLAS_IMAGE, atlas.width, atlas.height);
             fontSize = atlas.size;
             unitRangeX = atlas.distanceRange / atlas.width;
             unitRangeY = atlas.distanceRange / atlas.height;
@@ -147,7 +147,7 @@ public final class SdfTextRenderer {
     }
 
     public void dispose() {
-        texture.dispose();
+        texture.delete();
         glslTexture.dispose();
     }
 
@@ -386,50 +386,39 @@ public final class SdfTextRenderer {
             drawVertices();
     }
 
-    private static final class AtlasTexture {
-        private final GLTexture texture;
+    private static GLTexture loadAtlasTexture(String resource, int expectedWidth, int expectedHeight) throws IOException {
+        ByteBuffer encoded;
+        try (InputStream input = FileUtils.getResource(resource)) {
+            byte[] bytes = input.readAllBytes();
+            encoded = MemoryUtil.memAlloc(bytes.length);
+            encoded.put(bytes).flip();
+        }
 
-        AtlasTexture(String resource, int expectedWidth, int expectedHeight) throws IOException {
-            ByteBuffer encoded;
-            try (InputStream input = FileUtils.getResource(resource)) {
-                byte[] bytes = input.readAllBytes();
-                encoded = MemoryUtil.memAlloc(bytes.length);
-                encoded.put(bytes).flip();
-            }
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.mallocInt(1);
+            IntBuffer height = stack.mallocInt(1);
+            IntBuffer ignoredChannels = stack.mallocInt(1);
+            ByteBuffer pixels = STBImage.stbi_load_from_memory(encoded, width, height, ignoredChannels, 1);
+            if (pixels == null)
+                throw new IOException("Failed to decode " + resource + ": " + STBImage.stbi_failure_reason());
 
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                IntBuffer width = stack.mallocInt(1);
-                IntBuffer height = stack.mallocInt(1);
-                IntBuffer ignoredChannels = stack.mallocInt(1);
-                ByteBuffer pixels = STBImage.stbi_load_from_memory(encoded, width, height, ignoredChannels, 1);
-                if (pixels == null)
-                    throw new IOException("Failed to decode " + resource + ": " + STBImage.stbi_failure_reason());
-
-                try {
-                    int actualWidth = width.get(0);
-                    int actualHeight = height.get(0);
-                    if (actualWidth != expectedWidth || actualHeight != expectedHeight) {
-                        throw new IOException(resource + " dimensions " + actualWidth + "x" + actualHeight + " do not match atlas JSON "
-                                + expectedWidth + "x" + expectedHeight);
-                    }
-
-                    texture = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
-                    texture.upload2D(GLTexture.Format.R8, expectedWidth, expectedHeight, GL.LINEAR_MIPMAP_LINEAR, GL.LINEAR,
-                            GL.CLAMP_TO_EDGE, GL.CLAMP_TO_EDGE, pixels);
-                } finally {
-                    STBImage.stbi_image_free(pixels);
+            try {
+                int actualWidth = width.get(0);
+                int actualHeight = height.get(0);
+                if (actualWidth != expectedWidth || actualHeight != expectedHeight) {
+                    throw new IOException(resource + " dimensions " + actualWidth + "x" + actualHeight + " do not match atlas JSON "
+                            + expectedWidth + "x" + expectedHeight);
                 }
+
+                GLTexture texture = new GLTexture(GL.TEXTURE_2D, GLTexture.Unit.THREE);
+                texture.upload2D(GLTexture.Format.R8, expectedWidth, expectedHeight, GL.LINEAR_MIPMAP_LINEAR, GL.LINEAR,
+                        GL.CLAMP_TO_EDGE, GL.CLAMP_TO_EDGE, pixels);
+                return texture;
             } finally {
-                MemoryUtil.memFree(encoded);
+                STBImage.stbi_image_free(pixels);
             }
-        }
-
-        private void bind() {
-            texture.bind();
-        }
-
-        private void dispose() {
-            texture.delete();
+        } finally {
+            MemoryUtil.memFree(encoded);
         }
     }
 }
