@@ -18,6 +18,7 @@ import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.JHVEvent;
+import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.thread.Task;
@@ -155,7 +156,9 @@ public final class SWEKEventInformationDialog extends JDialog {
         eventPanels.setLayout(new BoxLayout(eventPanels, BoxLayout.PAGE_AXIS));
         Colors.Data colors = new Colors.Data();
         for (JHVEvent relatedEvent : events) {
-            JHVRelatedEvents relatedEvents = new JHVRelatedEvents(relatedEvent, colors.getNextColor());
+            JHVRelatedEvents relatedEvents = JHVEventCache.getRelatedEvents(relatedEvent.getUniqueID());
+            if (relatedEvents == null)
+                relatedEvents = new JHVRelatedEvents(relatedEvent, colors.getNextColor());
             eventPanels.add(createEventPanel(relatedEvents, relatedEvent));
         }
         return new DataCollapsiblePanel("Other Related Events", new JScrollPane(eventPanels), false, this::repack);

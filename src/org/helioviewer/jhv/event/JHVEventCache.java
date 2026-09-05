@@ -10,6 +10,8 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -97,6 +99,11 @@ public class JHVEventCache {
             addNewRelatedEvent(event);
         }
         resolvePendingAssociations(id);
+    }
+
+    @Nullable
+    public static JHVRelatedEvents getRelatedEvents(int id) {
+        return relatedEventsById.get(id);
     }
 
     private static void resolvePendingAssociations(Integer id) {
