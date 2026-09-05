@@ -2,23 +2,14 @@ package org.helioviewer.jhv.gui.component;
 
 import java.text.ParseException;
 
-import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 
 @SuppressWarnings("serial")
-public class TerminatedFormatterFactory extends AbstractFormatterFactory {
-
-    private final TerminatedFormatter formatter;
+public class TerminatedFormatterFactory extends DefaultFormatterFactory {
 
     public TerminatedFormatterFactory(String _format, String _terminator, double _min, double _max) {
-        formatter = new TerminatedFormatter(_format, _terminator, _min, _max);
-    }
-
-    @Override
-    public AbstractFormatter getFormatter(JFormattedTextField tf) {
-        return formatter;
+        super(new TerminatedFormatter(_format, _terminator, _min, _max));
     }
 
     private static class TerminatedFormatter extends DefaultFormatter {
