@@ -39,6 +39,10 @@ public class CollapsiblePane extends JComponent implements ActionListener {
         add(managed, BorderLayout.CENTER);
     }
 
+    public boolean isExpanded() {
+        return managed.isVisible();
+    }
+
     void addHeaderComponent(JComponent component) {
         header.add(component, BorderLayout.LINE_END);
     }
