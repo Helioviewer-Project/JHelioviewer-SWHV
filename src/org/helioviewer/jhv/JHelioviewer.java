@@ -5,7 +5,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.Callable;
 
 import javax.swing.JFrame;
 
@@ -107,7 +106,7 @@ public class JHelioviewer {
             frame.setVisible(true);
             UITimer.start();
 
-            Task.submit("init", new Init(true), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
+            startInitialization(true);
         });
     }
 
@@ -119,7 +118,7 @@ public class JHelioviewer {
 
             loadPlugins(false);
 
-            Task.submit("init", new Init(false), JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
+            startInitialization(false);
         });
     }
 
@@ -135,12 +134,11 @@ public class JHelioviewer {
         }
     }
 
-    private record Init(boolean webProfilePopup) implements Callable<Void> {
-        @Override
-        public Void call() throws Exception {
+    private static void startInitialization(boolean webProfilePopup) {
+        Task.submit("init", () -> {
             AppInit.init(webProfilePopup);
             return null;
-        }
+        }, JHelioviewer::onSuccessInit, JHelioviewer::onFailureInit);
     }
 
     private static void onSuccessInit(Void ignoredResult) {
