@@ -56,7 +56,7 @@ public class ImageFilter {
 
     private static final float BDIV = 1 / 255f;
 
-    short[] apply(byte[] array, int width, int height) {
+    float[] apply(byte[] array, int width, int height) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -69,10 +69,10 @@ public class ImageFilter {
                 }
             }
         });
-        return apply(data, width, height);
+        return algorithm.filter(data, width, height);
     }
 
-    short[] apply(short[] array, int width, int height) {
+    float[] apply(short[] array, int width, int height) {
         int length = width * height;
 
         float[] data = new float[length];
@@ -85,24 +85,7 @@ public class ImageFilter {
                 }
             }
         });
-        return apply(data, width, height);
-    }
-
-    private short[] apply(float[] data, int width, int height) {
-        float[] image = algorithm.filter(data, width, height);
-        int length = width * height;
-
-        short[] out = new short[length];
-        ParallelRange.run(height, (from, to) -> {
-            for (int y = from; y < to; y++) {
-                int rowBase = y * width;
-                int rowEnd = rowBase + width;
-                for (int idx = rowBase; idx < rowEnd; idx++) {
-                    out[idx] = Float.floatToFloat16(Math.clamp(image[idx], 0f, 1f));
-                }
-            }
-        });
-        return out;
+        return algorithm.filter(data, width, height);
     }
 
 }

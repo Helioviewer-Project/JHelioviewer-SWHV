@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
 
+import org.helioviewer.jhv.thread.ParallelRange;
+
 import org.lwjgl.system.MemoryUtil;
 
 public final class ImageBuffer {
@@ -39,14 +41,30 @@ public final class ImageBuffer {
             throw new IllegalArgumentException("Gray16F image buffers must be created from half-float data");
         if (!shouldFilter(format, filter))
             return new ImageBuffer(width, height, format, allocateFrom(data));
-        return new ImageBuffer(width, height, Format.Gray16F, allocateFrom(filter.apply(data, width, height)));
+        return fromFloats(width, height, filter.apply(data, width, height));
     }
 
     public static ImageBuffer fromShorts(int width, int height, Format format, short[] data, ImageFilter filter) {
         if (format != Format.Gray16F)
             throw new IllegalArgumentException("Only Gray16F image buffers can be created from half-float data");
-        short[] out = shouldFilter(format, filter) ? filter.apply(data, width, height) : data;
-        return new ImageBuffer(width, height, format, allocateFrom(out));
+        if (!shouldFilter(format, filter))
+            return new ImageBuffer(width, height, format, allocateFrom(data));
+        return fromFloats(width, height, filter.apply(data, width, height));
+    }
+
+    private static ImageBuffer fromFloats(int width, int height, float[] data) {
+        ImageBuffer image = allocate(width, height, Format.Gray16F);
+        ShortBuffer buffer = (ShortBuffer) image.buffer;
+        ParallelRange.run(height, (from, to) -> {
+            for (int y = from; y < to; y++) {
+                int rowBase = y * width;
+                int rowEnd = rowBase + width;
+                for (int idx = rowBase; idx < rowEnd; idx++) {
+                    buffer.put(idx, Float.floatToFloat16(Math.clamp(data[idx], 0f, 1f)));
+                }
+            }
+        });
+        return image;
     }
 
     public static WriteBuffer createWriteBuffer(int width, int height, Format format, ImageFilter filter) {
