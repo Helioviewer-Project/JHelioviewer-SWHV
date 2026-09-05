@@ -3,7 +3,6 @@ package org.helioviewer.jhv.gui.component;
 import java.awt.Component;
 import java.awt.Dimension;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
@@ -47,9 +46,8 @@ public class WrappedTable extends JTable {
     public static class WrappedTextRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setText("<html><div width=" + table.getColumnModel().getColumn(column).getWidth() + ">" + value + "</div>");
-            return label;
+            String text = "<html><div width=" + table.getColumnModel().getColumn(column).getWidth() + ">" + value + "</div>";
+            return super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
         }
     }
 
