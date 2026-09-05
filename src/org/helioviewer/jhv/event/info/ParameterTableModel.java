@@ -1,18 +1,34 @@
 package org.helioviewer.jhv.event.info;
 
+import java.util.regex.Matcher;
+
+import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
+import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.event.JHVEventParameter;
 
 @SuppressWarnings("serial")
 class ParameterTableModel extends AbstractTableModel {
 
     private final JHVEventParameter[] parameters;
+    private final String[] urls;
 
     private static final int STRING_CUTOFF = 256;
 
     ParameterTableModel(JHVEventParameter[] _parameters) {
         parameters = _parameters;
+        urls = new String[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            Matcher matcher = Regex.HREF.matcher(parameters[i].getDisplayParameterValue());
+            if (matcher.find())
+                urls[i] = matcher.group(1);
+        }
+    }
+
+    @Nullable
+    String getURL(int rowIndex) {
+        return urls[rowIndex];
     }
 
     @Override
@@ -37,7 +53,7 @@ class ParameterTableModel extends AbstractTableModel {
                 return parameters[rowIndex].getParameterDisplayName();
             } else if (columnIndex == 1) {
                 String result = parameters[rowIndex].getDisplayParameterValue();
-                return result.length() > STRING_CUTOFF ? result.substring(0, STRING_CUTOFF) + "..." : result;
+                return result.length() > STRING_CUTOFF && urls[rowIndex] == null ? result.substring(0, STRING_CUTOFF) + "..." : result;
             }
         }
         return "";

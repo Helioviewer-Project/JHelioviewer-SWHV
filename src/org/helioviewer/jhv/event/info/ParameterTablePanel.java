@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 import javax.swing.JPanel;
@@ -14,7 +13,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableRowSorter;
 
-import org.helioviewer.jhv.base.Regex;
 import org.helioviewer.jhv.event.JHVEventParameter;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.component.WrappedTable;
@@ -49,11 +47,7 @@ class ParameterTablePanel extends JPanel {
                 Point p = e.getPoint();
                 int row = t.rowAtPoint(p);
                 int col = t.columnAtPoint(p);
-                if (row < 0 || col < 0) {
-                    return;
-                }
-
-                if (col == 1 && extractURL(t, col, row) != null) {
+                if (getURL(t, col, row) != null) {
                     t.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     t.setCursor(Cursor.getDefaultCursor());
@@ -72,11 +66,7 @@ class ParameterTablePanel extends JPanel {
                 Point p = e.getPoint();
                 int row = t.rowAtPoint(p);
                 int col = t.columnAtPoint(p);
-                if (row < 0 || col != 1) {
-                    return;
-                }
-
-                String url = extractURL(t, col, row);
+                String url = getURL(t, col, row);
                 if (url != null) {
                     DesktopIntegration.openURL(url);
                 }
@@ -90,13 +80,11 @@ class ParameterTablePanel extends JPanel {
     }
 
     @Nullable
-    private static String extractURL(JTable table, int col, int row) {
-        Object value = table.getValueAt(row, col);
-        if (value instanceof String str) {
-            Matcher m = Regex.HREF.matcher(str);
-            return m.find() ? m.group(1) : null;
-        }
-        return null;
+    private static String getURL(JTable table, int col, int row) {
+        if (row < 0 || col < 0 || table.convertColumnIndexToModel(col) != 1)
+            return null;
+        ParameterTableModel model = (ParameterTableModel) table.getModel();
+        return model.getURL(table.convertRowIndexToModel(row));
     }
 
 }
