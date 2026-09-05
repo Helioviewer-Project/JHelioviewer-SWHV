@@ -283,14 +283,6 @@ public final class AngleCanvas extends Canvas {
     // Keep the shared pixel scale in sync and invalidate the GL size if a monitor switch
     // changed the backing pixel ratio.
     private boolean refreshPixelScale() {
-        boolean changed = updatePixelScale();
-        if (changed)
-            invalidateGlSize();
-        return changed;
-    }
-
-    // Track the current HiDPI scale so GL sizes and UI coordinate conversion stay aligned.
-    private boolean updatePixelScale() {
         GraphicsConfiguration graphicsConfiguration = getGraphicsConfiguration();
         double scaleX = 1;
         double scaleY = 1;
@@ -305,6 +297,7 @@ public final class AngleCanvas extends Canvas {
 
         Display.pixelScale[0] = scaleX;
         Display.pixelScale[1] = scaleY;
+        invalidateGlSize();
         return true;
     }
 
