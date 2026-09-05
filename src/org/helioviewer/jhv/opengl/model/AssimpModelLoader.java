@@ -423,14 +423,8 @@ public final class AssimpModelLoader {
             if (nextEdges.size() != 2)
                 break;
 
-            int nextEdge = -1;
-            for (int candidate : nextEdges) {
-                if (!visited[candidate]) {
-                    nextEdge = candidate;
-                    break;
-                }
-            }
-            if (nextEdge == -1)
+            int nextEdge = nextEdges.get(0) == edge ? nextEdges.get(1) : nextEdges.get(0);
+            if (visited[nextEdge])
                 break;
             edge = nextEdge;
         }
