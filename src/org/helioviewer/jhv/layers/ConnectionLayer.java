@@ -93,9 +93,9 @@ public final class ConnectionLayer extends AbstractLayer implements LoadConnecti
     }
 
     private void drawConnectivity(MapView mv, Viewport vp) {
-        mv.emitMapPoints(vp, connectivity.SSW, SIZE_POINT, ORTHO_RADIUS, sswColor, connectivityBuf);
-        mv.emitMapPoints(vp, connectivity.FSW, SIZE_POINT, ORTHO_RADIUS, fswColor, connectivityBuf);
-        mv.emitMapPoints(vp, connectivity.M, SIZE_POINT, ORTHO_RADIUS, mColor, connectivityBuf);
+        mv.emitMapPoints(vp, connectivity.SSW(), SIZE_POINT, ORTHO_RADIUS, sswColor, connectivityBuf);
+        mv.emitMapPoints(vp, connectivity.FSW(), SIZE_POINT, ORTHO_RADIUS, fswColor, connectivityBuf);
+        mv.emitMapPoints(vp, connectivity.M(), SIZE_POINT, ORTHO_RADIUS, mColor, connectivityBuf);
 
         connectivityCenter.uploadAndClear(connectivityBuf);
         connectivityCenter.renderPoints(ViewportMath.getPixelFactor(vp, mv.cameraWidth(vp)));
