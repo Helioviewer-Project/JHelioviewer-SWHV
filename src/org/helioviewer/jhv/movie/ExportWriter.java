@@ -152,14 +152,15 @@ class ExportWriter {
                 .command(command);
 
         Process process = builder.start();
-        boolean finished = process.waitFor(FFMPEG_TIMEOUT_MINUTES, TimeUnit.MINUTES);
-        if (!finished) {
+        try {
+            if (!process.waitFor(FFMPEG_TIMEOUT_MINUTES, TimeUnit.MINUTES))
+                throw new Exception("FFmpeg timed out after " + FFMPEG_TIMEOUT_MINUTES + " minutes");
+            int exitCode = process.exitValue();
+            if (exitCode != 0)
+                throw new Exception("FFmpeg exit code " + exitCode);
+        } finally {
             process.destroyForcibly();
-            throw new Exception("FFmpeg timed out after " + FFMPEG_TIMEOUT_MINUTES + " minutes");
         }
-        int exitCode = process.exitValue();
-        if (exitCode != 0)
-            throw new Exception("FFmpeg exit code " + exitCode);
     }
 
     private void deleteOutputs() throws Exception {
