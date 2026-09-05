@@ -90,30 +90,30 @@ public interface UpdateViewpoint {
         }
 
         @Override
-        public Position update(JHVTime time) {
+        public Position update(JHVTime playbackTime) {
             double hciLon = 0;
-            JHVTime itime = time;
+            JHVTime ephemerisTime = playbackTime;
 
             if (controlLoad != null) {
                 PositionResponse response = controlLoad.getResponse();
                 if (response != null) {
-                    itime = new JHVTime(response.interpolateTime(time.milli, start, end));
+                    ephemerisTime = new JHVTime(response.interpolateTime(playbackTime.milli, start, end));
                     if (frame == Frame.SOLO_HCI)
-                        hciLon = Sun.getEarthHCI(itime).lon;
+                        hciLon = Sun.getEarthHCI(ephemerisTime).lon;
                 }
             }
 
-            double relLon = relativeLongitude(itime.milli);
-            return new Position(itime, distance, Sun.getEarth(itime).lon + hciLon - relLon + Math.PI / 2, Math.PI / 2);
+            double relLon = relativeLongitude(playbackTime.milli);
+            return new Position(ephemerisTime, distance, Sun.getEarth(ephemerisTime).lon + hciLon - relLon + Math.PI / 2, Math.PI / 2);
         }
 
-        private double relativeLongitude(long time) {
+        private double relativeLongitude(long playbackTime) {
             if (!relative || controlLoad == null)
                 return 0;
 
             PositionResponse response = controlLoad.getResponse();
             if (response != null) {
-                response.interpolateLatitudinal(time, start, end, lati, interpolated);
+                response.interpolateLatitudinal(playbackTime, start, end, lati, interpolated);
                 return lati[1];
             }
             return 0;
