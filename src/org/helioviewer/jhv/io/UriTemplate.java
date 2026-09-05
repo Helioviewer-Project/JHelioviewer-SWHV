@@ -20,26 +20,20 @@ public class UriTemplate {
         return v.expand(root);
     }
 
-    public interface Variables {
-        Variables set(String key, Object value);
-
-        String expand(String base);
-    }
-
     public static Variables vars() {
-        return new VariablesImpl();
+        return new Variables();
     }
 
-    private static class VariablesImpl implements Variables {
+    public static final class Variables {
         private final LinkedHashMap<String, String> vars = new LinkedHashMap<>();
 
-        @Override
+        private Variables() {}
+
         public Variables set(String key, Object value) {
             vars.put('&' + key, '=' + URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
             return this;
         }
 
-        @Override
         public String expand(String base) {
             StringBuilder builder = new StringBuilder(base);
             vars.forEach((key, value) -> builder.append(key).append(value));
