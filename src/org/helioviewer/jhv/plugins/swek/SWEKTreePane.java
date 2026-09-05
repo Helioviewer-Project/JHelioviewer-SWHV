@@ -9,7 +9,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Enumeration;
 import java.util.IdentityHashMap;
 import java.util.List;
 
@@ -93,14 +92,10 @@ final class SWEKTreePane extends JPanel {
 
     private void repaintBusyGroups() {
         boolean anyBusy = false;
-        Enumeration<?> children = ((DefaultMutableTreeNode) treeModel.getRoot()).children();
-        while (children.hasMoreElements()) {
-            Object child = children.nextElement();
-            if (child instanceof DefaultMutableTreeNode groupNode && groupNode.getUserObject() instanceof SWEKGroup group) {
-                if (SWEKDownloader.isGroupBusy(group)) {
-                    anyBusy = true;
-                    repaintGroup(groupNode);
-                }
+        for (var entry : groupNodes.entrySet()) {
+            if (SWEKDownloader.isGroupBusy(entry.getKey())) {
+                anyBusy = true;
+                repaintGroup(entry.getValue());
             }
         }
 
