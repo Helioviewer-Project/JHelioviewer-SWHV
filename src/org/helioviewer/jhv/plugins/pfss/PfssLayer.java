@@ -10,7 +10,6 @@ import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.Player;
 import org.helioviewer.jhv.opengl.GLSLLine;
-import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeListener;
 
 import org.json.JSONObject;
@@ -25,8 +24,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
     private int detail = 0;
     private boolean fixedColor = false;
     private double radius = PfssSettings.MAX_RADIUS;
-
-    private JHVTime pfssTime;
 
     public PfssLayer(JSONObject jo) {
         if (jo != null) {
@@ -78,7 +75,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
         if (readyLine.parameters().equals(parameters)) {
             glslLine.upload(readyLine.vertices());
             uploadedParameters = readyLine.parameters();
-            pfssTime = uploadedParameters.data().dateObs();
             Layers.fireTimeUpdated(this);
         }
         readyLine = null;
@@ -98,7 +94,7 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
     @Nullable
     @Override
     public String getTimeString() {
-        return pfssTime == null ? null : pfssTime.toString();
+        return uploadedParameters == null ? null : uploadedParameters.data().dateObs().toString();
     }
 
     @Override
@@ -132,7 +128,6 @@ public class PfssLayer extends AbstractLayer implements TimeListener.Range { // 
     private void clearLineWorker() {
         readyLine = null;
         uploadedParameters = null;
-        pfssTime = null;
         lineWorker.cancel();
     }
 
