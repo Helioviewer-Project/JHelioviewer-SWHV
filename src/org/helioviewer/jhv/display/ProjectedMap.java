@@ -231,21 +231,18 @@ final class ProjectedMap {
     }
 
     private static void emitHorizontalWrap(Viewport vp, Vec2 current, Vec2 previous, byte[] color, BufVertex vexBuf) {
-        float y = (float) current.y;
         float x;
-        if (current.x <= 0 && previous.x >= 0) {
+        if (current.x <= 0 && previous.x >= 0)
             x = (float) (0.5 * vp.aspect);
-            vexBuf.putVertex(x, y, 0, 1, color);
-            vexBuf.endLine();
-
-            vexBuf.startLine(-x, y, 0, 1, color);
-        } else if (current.x >= 0 && previous.x <= 0) {
+        else if (current.x >= 0 && previous.x <= 0)
             x = (float) (-0.5 * vp.aspect);
-            vexBuf.putVertex(x, y, 0, 1, color);
-            vexBuf.endLine();
+        else
+            return;
 
-            vexBuf.startLine(-x, y, 0, 1, color);
-        }
+        float y = (float) current.y;
+        vexBuf.putVertex(x, y, 0, 1, color);
+        vexBuf.endLine();
+        vexBuf.startLine(-x, y, 0, 1, color);
     }
 
     private static void startProjectedLine(Viewport vp, Vec2 projected, byte[] color, BufVertex vexBuf) {
