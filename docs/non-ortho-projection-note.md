@@ -18,8 +18,8 @@ Java display geometry is organized as follows:
 - `MapMode` selects the display mode and image shader.
 - `MapView` captures the current camera, viewpoint, grid frame, angular origins, and per-viewport scales. It dispatches
   operations to either the orthographic or projected implementation.
-- `OrthographicMap` handles 3D orthographic overlay emission and picking.
-- `ProjectedMap` handles projection, unprojection, overlay emission, and picking for `HPC`, `Latitudinal`,
+- `OrthographicView` handles 3D orthographic overlay emission and picking.
+- `ProjectedView` handles projection, unprojection, overlay emission, and picking for `HPC`, `Latitudinal`,
   `RadialWarp`, and `RectWarp`.
 - `MapScale` converts between map coordinates and normalized display coordinates. Linear scales are used for `HPC`
   and `Latitudinal`; the two warp modes share a limb-anchored Box-Cox radial scale.

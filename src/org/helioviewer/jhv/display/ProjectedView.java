@@ -11,47 +11,61 @@ import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.opengl.BufVertex;
 import org.helioviewer.jhv.wcs.WcsProjection;
 
-final class ProjectedMap {
+final class ProjectedView extends MapView {
 
-    private static Vec2 project(MapMode mode, Position viewpoint, MapScale scale,
-                                double longitudeOrigin, double latitudeOrigin, Vec3 v) {
+    ProjectedView(Camera _camera, Position _viewpoint, GridType _gridType, MapMode _mode, MapScale[] _scales) {
+        super(_camera, _viewpoint, _mode, _gridType, _scales);
+    }
+
+    @Override
+    public Vec3 mouseToSurface(Viewport vp, int x, int y) {
+        return unproject(mouseToMap(vp, x, y));
+    }
+
+    @Override
+    public Vec2 mouseToScreen(Viewport vp, int x, int y) {
+        double width = cameraWidth(vp);
+        return new Vec2(
+                ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x),
+                ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y));
+    }
+
+    private Vec2 project(MapScale scale, Vec3 v) {
         return switch (mode) {
-            case HPC -> projectHpc(viewpoint, v, scale);
-            case Latitudinal -> projectLatitudinal(longitudeOrigin, latitudeOrigin, scale, v);
-            case RadialWarp -> projectRadialWarp(viewpoint, scale, v);
-            case RectWarp -> projectRectWarp(viewpoint, scale, v);
+            case HPC -> projectHpc(v, scale);
+            case Latitudinal -> projectLatitudinal(scale, v);
+            case RadialWarp -> projectRadialWarp(scale, v);
+            case RectWarp -> projectRectWarp(scale, v);
             case Orthographic -> throw new IllegalArgumentException("Orthographic mode is not projected");
         };
     }
 
-    static Vec3 unproject(MapMode mode, Position viewpoint,
-                          double longitudeOrigin, double latitudeOrigin, Vec2 pt) {
+    private Vec3 unproject(Vec2 pt) {
         return switch (mode) {
-            case HPC -> unprojectHpc(viewpoint, pt.x, pt.y);
-            case Latitudinal -> unprojectLatitudinal(longitudeOrigin, latitudeOrigin, pt.x, pt.y);
-            case RadialWarp, RectWarp -> unprojectRadialWarp(viewpoint, pt.x, pt.y);
+            case HPC -> unprojectHpc(pt.x, pt.y);
+            case Latitudinal -> unprojectLatitudinal(pt.x, pt.y);
+            case RadialWarp, RectWarp -> unprojectRadialWarp(pt.x, pt.y);
             case Orthographic -> throw new IllegalArgumentException("Orthographic mode is not projected");
         };
     }
 
     // See docs/non-ortho-projection-note.md for the shared Java/GLSL convention.
-    private static Vec2 projectLatitudinal(double longitudeOrigin, double latitudeOrigin, MapScale scale, Vec3 v) {
+    private Vec2 projectLatitudinal(MapScale scale, Vec3 v) {
         double longitude = MathUtils.mapToMinus180To180(
-                Math.toDegrees(SphericalCoords.longitude(v) + longitudeOrigin));
-        double latitude = Math.toDegrees(SphericalCoords.latitude(v) - latitudeOrigin);
+                Math.toDegrees(SphericalCoords.longitude(v) + latiLongitudeOrigin()));
+        double latitude = Math.toDegrees(SphericalCoords.latitude(v) - latiLatitudeOrigin());
         return new Vec2(scale.toUnitX(longitude) - 0.5, scale.toUnitY(latitude) - 0.5);
     }
 
-    private static Vec3 unprojectLatitudinal(double longitudeOrigin, double latitudeOrigin,
-                                             double longitudeDeg, double latitudeDeg) {
-        double longitude = Math.toRadians(longitudeDeg) - longitudeOrigin;
-        double latitude = Math.toRadians(latitudeDeg) + latitudeOrigin;
+    private Vec3 unprojectLatitudinal(double longitudeDeg, double latitudeDeg) {
+        double longitude = Math.toRadians(longitudeDeg) - latiLongitudeOrigin();
+        double latitude = Math.toRadians(latitudeDeg) + latiLatitudeOrigin();
         return latitude < -Math.PI / 2 || latitude > Math.PI / 2
                 ? null
                 : SphericalCoords.unit(longitude, latitude);
     }
 
-    private static Vec3 unprojectRadialWarp(Position viewpoint, double angleDeg, double radius) {
+    private Vec3 unprojectRadialWarp(double angleDeg, double radius) {
         double theta = Math.toRadians(angleDeg);
         double x = PolarBasis.x(radius, theta);
         double y = PolarBasis.y(radius, theta);
@@ -61,8 +75,8 @@ final class ProjectedMap {
                 Math.atan2(y, Math.sqrt(x * x + viewpoint.distance * viewpoint.distance)));
     }
 
-    private static Vec2 projectRadialWarp(Position viewpoint, MapScale scale, Vec3 v0) {
-        Vec2 hpcXY = projectToHpcPlane(viewpoint, v0);
+    private Vec2 projectRadialWarp(MapScale scale, Vec3 v0) {
+        Vec2 hpcXY = projectToHpcPlane(v0);
         double r = Math.hypot(hpcXY.x, hpcXY.y);
         if (r == 0)
             return new Vec2(0, 0);
@@ -71,73 +85,74 @@ final class ProjectedMap {
         return new Vec2(f * hpcXY.x, f * hpcXY.y);
     }
 
-    private static Vec2 projectRectWarp(Position viewpoint, MapScale scale, Vec3 v0) {
-        Vec2 hpcXY = projectToHpcPlane(viewpoint, v0);
+    private Vec2 projectRectWarp(MapScale scale, Vec3 v0) {
+        Vec2 hpcXY = projectToHpcPlane(v0);
         double r = Math.hypot(hpcXY.x, hpcXY.y);
         double theta = PolarBasis.angle(hpcXY.x, hpcXY.y);
         return new Vec2(scale.toUnitX(Math.toDegrees(theta)) - 0.5, scale.toUnitY(r) - 0.5);
     }
 
-    private static Vec2 projectToHpcPlane(Position viewpoint, Vec3 v0) {
-        Vec3 v = toHpcViewpointSpace(viewpoint, v0);
+    private Vec2 projectToHpcPlane(Vec3 v0) {
+        Vec3 v = toHpcViewpointSpace(v0);
         double fovScale = viewpoint.distance / (viewpoint.distance - v.z);
         return new Vec2(fovScale * v.x, fovScale * v.y);
     }
 
-    private static Vec2 projectHpc(Position viewpoint, Vec3 v, MapScale scale) {
+    private Vec2 projectHpc(Vec3 v, MapScale scale) {
         // External solar points arrive in world space; HPC projection is defined in viewpoint space.
-        return projectHpcViewpointSpace(toHpcViewpointSpace(viewpoint, v), viewpoint.distance, scale);
+        return projectHpcViewpointSpace(toHpcViewpointSpace(v), viewpoint.distance, scale);
     }
 
-    private static Vec3 unprojectHpc(Position viewpoint, double longitudeDeg, double latitudeDeg) {
+    private Vec3 unprojectHpc(double longitudeDeg, double latitudeDeg) {
         return WcsProjection.helioprojectiveToWorld(viewpoint, Math.toRadians(longitudeDeg), Math.toRadians(latitudeDeg));
     }
 
-    static Vec2 projectToScreen(MapMode mode, Position viewpoint, MapScale scale,
-                                double longitudeOrigin, double latitudeOrigin, Viewport vp, Vec3 v) {
-        Vec2 pt = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, v);
+    @Override
+    public Vec2 projectToScreen(Viewport vp, Vec3 v) {
+        MapScale scale = scale(vp);
+        Vec2 pt = project(scale, v);
         return mode == MapMode.RadialWarp ? pt : new Vec2(pt.x * vp.aspect, pt.y);
     }
 
-    static void emitMapLine(MapMode mode, Position viewpoint, MapScale scale,
-                            double longitudeOrigin, double latitudeOrigin, Viewport vp,
-                            List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+    @Override
+    public void emitMapLine(Viewport vp, List<Vec3> vertices, double radius, byte[] color, BufVertex vexBuf) {
+        MapScale scale = scale(vp);
         if (vertices.isEmpty())
             return;
         if (mode == MapMode.HPC) {
-            emitHpcLine(viewpoint, scale, vp, vertices, color, vexBuf);
+            emitHpcLine(scale, vp, vertices, color, vexBuf);
             return;
         }
         if (mode == MapMode.RadialWarp) {
-            emitRadialWarpLine(viewpoint, scale, vertices, color, vexBuf);
+            emitRadialWarpLine(scale, vertices, color, vexBuf);
             return;
         }
 
-        Vec2 current = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, vertices.getFirst());
+        Vec2 current = project(scale, vertices.getFirst());
         startProjectedLine(vp, current, color, vexBuf);
         for (int i = 1; i < vertices.size(); i++) {
             Vec2 previous = current;
-            current = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, vertices.get(i));
+            current = project(scale, vertices.get(i));
             emitWrappedVertex(vp, previous, current, color, vexBuf);
         }
         vexBuf.endLine();
     }
 
-    private static void emitRadialWarpLine(Position viewpoint, MapScale scale, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
-        Vec2 current = projectRadialWarp(viewpoint, scale, vertices.getFirst());
+    private void emitRadialWarpLine(MapScale scale, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+        Vec2 current = projectRadialWarp(scale, vertices.getFirst());
         vexBuf.startLine((float) current.x, (float) current.y, 0, 1, color);
         for (int i = 1; i < vertices.size(); i++) {
-            current = projectRadialWarp(viewpoint, scale, vertices.get(i));
+            current = projectRadialWarp(scale, vertices.get(i));
             vexBuf.putVertex((float) current.x, (float) current.y, 0, 1, color);
         }
         vexBuf.endLine();
     }
 
-    private static void emitHpcLine(Position viewpoint, MapScale scale, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
+    private void emitHpcLine(MapScale scale, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
         // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
         boolean lineOpen = false;
         for (Vec3 vertex : vertices) {
-            Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
+            Vec2 current = projectVisibleHpcSurfacePoint(vertex, scale);
             if (current == null) {
                 if (lineOpen)
                     vexBuf.endLine();
@@ -155,54 +170,57 @@ final class ProjectedMap {
             vexBuf.endLine();
     }
 
-    static void emitMapPoints(MapMode mode, Position viewpoint, MapScale scale,
-                              double longitudeOrigin, double latitudeOrigin, Viewport vp,
-                              List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
+    @Override
+    public void emitMapPoints(Viewport vp, List<Vec3> vertices, double size, double radius, byte[] color, BufVertex vexBuf) {
+        MapScale scale = scale(vp);
         if (mode == MapMode.HPC) {
-            emitHpcPoints(viewpoint, scale, vp, vertices, size, color, vexBuf);
+            emitHpcPoints(scale, vp, vertices, size, color, vexBuf);
             return;
         }
 
         float pointSize = (float) size;
         if (mode == MapMode.RadialWarp) {
             for (Vec3 vertex : vertices) {
-                Vec2 pt = projectRadialWarp(viewpoint, scale, vertex);
+                Vec2 pt = projectRadialWarp(scale, vertex);
                 vexBuf.putVertex((float) pt.x, (float) pt.y, 0, pointSize, color);
             }
             return;
         }
         for (Vec3 vertex : vertices) {
-            Vec2 pt = project(mode, viewpoint, scale, longitudeOrigin, latitudeOrigin, vertex);
+            Vec2 pt = project(scale, vertex);
             vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
         }
     }
 
-    private static void emitHpcPoints(Position viewpoint, MapScale scale, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
+    private void emitHpcPoints(MapScale scale, Viewport vp, List<Vec3> vertices, double size, byte[] color, BufVertex vexBuf) {
         // Skip back-side surface points in HPC instead of projecting them through the map.
         float pointSize = (float) size;
         for (Vec3 vertex : vertices) {
-            Vec2 pt = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
+            Vec2 pt = projectVisibleHpcSurfacePoint(vertex, scale);
             if (pt != null)
                 vexBuf.putVertex((float) (pt.x * vp.aspect), (float) pt.y, 0, pointSize, color);
         }
     }
 
-    static Vec2 mouseToMap(MapMode mode, Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+    @Override
+    public Vec2 mouseToMap(Viewport vp, int x, int y) {
+        double width = cameraWidth(vp);
+        MapScale scale = scale(vp);
         if (mode == MapMode.RadialWarp)
-            return mouseToRadialWarpMap(camera, width, vp, scale, x, y);
+            return mouseToRadialWarpMap(width, vp, scale, x, y);
         return new Vec2(
                 scale.toMapX(ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x) / vp.aspect + 0.5),
                 scale.toMapY(ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y) + 0.5));
     }
 
-    private static Vec2 mouseToRadialWarpMap(Camera camera, double width, Viewport vp, MapScale scale, int x, int y) {
+    private Vec2 mouseToRadialWarpMap(double width, Viewport vp, MapScale scale, int x, int y) {
         double upX = ViewportMath.computeUpX(vp, width, camera.getTranslationX(), x);
         double upY = ViewportMath.computeUpY(vp, width, camera.getTranslationY(), y);
         double t = 2 * Math.hypot(upX, upY);
         return new Vec2(Math.toDegrees(PolarBasis.angle(upX, upY)), scale.toMapY(t));
     }
 
-    private static Vec3 toHpcViewpointSpace(Position viewpoint, Vec3 v) {
+    private Vec3 toHpcViewpointSpace(Vec3 v) {
         return viewpoint.toQuat().rotateVector(v);
     }
 
@@ -215,8 +233,8 @@ final class ProjectedMap {
                 scale.toUnitY(Math.toDegrees(latitude)) - 0.5);
     }
 
-    private static Vec2 projectVisibleHpcSurfacePoint(Position viewpoint, Vec3 vertex, MapScale scale) {
-        Vec3 view = toHpcViewpointSpace(viewpoint, vertex);
+    private Vec2 projectVisibleHpcSurfacePoint(Vec3 vertex, MapScale scale) {
+        Vec3 view = toHpcViewpointSpace(vertex);
         if (view.z < 0)
             return null;
         return projectHpcViewpointSpace(view, viewpoint.distance, scale);
@@ -254,5 +272,4 @@ final class ProjectedMap {
         vexBuf.putVertex((float) (projected.x * vp.aspect), (float) projected.y, 0, 1, color);
     }
 
-    private ProjectedMap() {}
 }
