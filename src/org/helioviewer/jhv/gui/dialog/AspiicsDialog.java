@@ -146,10 +146,8 @@ public class AspiicsDialog extends StandardDialog {
         listPane.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof String datalocation)
-                    label.setText(fileName(datalocation));
-                return label;
+                Object text = value instanceof String datalocation ? fileName(datalocation) : value;
+                return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
             }
         });
         SearchableUtils.installSearchable(listPane);
