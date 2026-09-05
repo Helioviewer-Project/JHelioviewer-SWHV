@@ -35,7 +35,7 @@ final class ZScale {
 
     // computeSigma -- Compute the root mean square deviation from the
     // mean of a flattened array.  Ignore rejected pixels.
-    private static void zComputeSigma(float[] a, short[] badpix, int npix, float[] mean, float[] sigma) {
+    private static float zComputeSigma(float[] a, short[] badpix, int npix) {
         int ngoodpix = 0;
         double sum = 0.0;
         double sumsq = 0.0;
@@ -49,25 +49,11 @@ final class ZScale {
                 sumsq = sumsq + pixval * pixval;
             }
 
-        // Compute mean and sigma
-        switch (ngoodpix) {
-            case 0 -> {
-                mean[0] = ZSINDEF;
-                sigma[0] = ZSINDEF;
-            }
-            case 1 -> {
-                mean[0] = (float) sum;
-                sigma[0] = ZSINDEF;
-            }
-            default -> {
-                mean[0] = (float) (sum / ngoodpix);
-                double temp = sumsq / (ngoodpix - 1) - (sum * sum) / (ngoodpix * (ngoodpix - 1));
-                if (temp < 0)       // possible with roundoff error
-                    sigma[0] = 0;
-                else
-                    sigma[0] = (float) Math.sqrt(temp);
-            }
-        }
+        if (ngoodpix <= 1)
+            return ZSINDEF;
+
+        double temp = sumsq / (ngoodpix - 1) - (sum * sum) / (ngoodpix * (ngoodpix - 1));
+        return temp < 0 ? 0 : (float) Math.sqrt(temp); // possible negative value with roundoff error
     }
 
     // rejectPixels -- Detect and reject pixels more than "threshold" greyscale
@@ -182,10 +168,7 @@ final class ZScale {
             // could be more efficiently computed using the matrix sums
             // accumulated when the line was fitted, but there are problems with
             // numerical stability with that approach.
-            float[] mean = {0};
-            float[] sigma = {0};
-            zComputeSigma(flat, badpix, npix, mean, sigma);
-            float threshold = sigma[0] * krej;
+            float threshold = zComputeSigma(flat, badpix, npix) * krej;
 
             // Detect and reject pixels further than ksigma from the fitted line.
             ngoodpix = zRejectPixels(sampleData, flat, xscale, badpix, npix, sumxsqr, sumxz, sumx, sumz, threshold, ngrow);
