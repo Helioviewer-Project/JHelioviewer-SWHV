@@ -9,17 +9,17 @@ import org.helioviewer.jhv.gui.component.CollapsiblePane;
 @SuppressWarnings("serial")
 class DataCollapsiblePanel extends CollapsiblePane {
 
-    private final DataCollapsiblePanelModel model;
+    private final Runnable repack;
 
-    DataCollapsiblePanel(String title, JComponent managed, boolean startExpanded, DataCollapsiblePanelModel _model) {
+    DataCollapsiblePanel(String title, JComponent managed, boolean startExpanded, Runnable _repack) {
         super(title, managed, startExpanded);
-        model = _model;
+        repack = _repack;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         super.actionPerformed(e);
-        model.repackCollapsiblePanels();
+        repack.run();
     }
 
 }

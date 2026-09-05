@@ -25,7 +25,7 @@ import org.helioviewer.jhv.thread.Task;
 // Popup displaying information about a HEK event.
 // This panel is a JDialog so it can appear above the heavyweight render surface.
 @SuppressWarnings("serial")
-public final class SWEKEventInformationDialog extends JDialog implements DataCollapsiblePanelModel.Listener {
+public final class SWEKEventInformationDialog extends JDialog {
 
     private JPanel allTablePanel;
 
@@ -37,8 +37,6 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
     private JHVEvent event;
     private final JHVRelatedEvents rEvent;
 
-    private final DataCollapsiblePanelModel model;
-
     public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
         super(MainFrame.get(), _event.getSupplier().group().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
@@ -46,9 +44,6 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
 
         event = _event;
         rEvent = revent;
-
-        model = new DataCollapsiblePanelModel();
-        model.addListener(this);
 
         initAllTablePanel();
         initParameterCollapsiblePanels();
@@ -110,10 +105,10 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
 
     private void initParameterCollapsiblePanels() {
         ParameterTablePanel standardParameterPanel = new ParameterTablePanel(event.getVisibleEventParameters());
-        standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, model);
+        standardParameters = new DataCollapsiblePanel("Standard Parameters", standardParameterPanel, true, this::repack);
 
         ParameterTablePanel allEventsPanel = new ParameterTablePanel(event.getAllEventParameters());
-        allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, model);
+        allParameters = new DataCollapsiblePanel("All Parameters", allEventsPanel, false, this::repack);
 
         List<JHVEvent> relatedEvents = rEvent.getAssociatedEvents(event);
         if (!relatedEvents.isEmpty())
@@ -155,7 +150,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
         JPanel eventPanels = new JPanel();
         eventPanels.setLayout(new BoxLayout(eventPanels, BoxLayout.PAGE_AXIS));
         relations.forEach(ev -> eventPanels.add(createEventPanel(rEvents, ev)));
-        return new DataCollapsiblePanel("Related Events", new JScrollPane(eventPanels), false, model);
+        return new DataCollapsiblePanel("Related Events", new JScrollPane(eventPanels), false, this::repack);
     }
 
     private DataCollapsiblePanel createOtherRelatedEventsCollapsiblePane(List<JHVEvent> events) {
@@ -166,7 +161,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
             JHVRelatedEvents relatedEvents = new JHVRelatedEvents(relatedEvent, colors.getNextColor());
             eventPanels.add(createEventPanel(relatedEvents, relatedEvent));
         }
-        return new DataCollapsiblePanel("Other Related Events", new JScrollPane(eventPanels), false, model);
+        return new DataCollapsiblePanel("Other Related Events", new JScrollPane(eventPanels), false, this::repack);
     }
 
     private static JPanel createEventPanel(JHVRelatedEvents rEvents, JHVEvent event) {
@@ -198,8 +193,7 @@ public final class SWEKEventInformationDialog extends JDialog implements DataCol
         return eventAndButtonPanel;
     }
 
-    @Override
-    public void repack() {
+    private void repack() {
         allTablePanel.removeAll();
         setCollapsiblePanels();
         pack();
