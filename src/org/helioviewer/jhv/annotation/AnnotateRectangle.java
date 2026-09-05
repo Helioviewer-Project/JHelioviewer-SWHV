@@ -15,12 +15,16 @@ final class AnnotateRectangle extends AbstractAnnotateable {
     private static final int SUBDIVISIONS = 24;
 
     private final List<Vec3> vertices = fixedSizeVertices(4 * SUBDIVISIONS + 1);
+    private Vec3 geometryStart;
+    private Vec3 geometryEnd;
 
     AnnotateRectangle(JSONObject jo) {
         super(jo);
     }
 
-    private void drawRectangle(MapView mv, Viewport vp, SphericalPoint start, SphericalPoint end, byte[] color, BufVertex vexBuf) {
+    private void updateGeometry(Vec3 p0, Vec3 p1) {
+        SphericalPoint start = SphericalPoint.fromCartesian(p0);
+        SphericalPoint end = SphericalPoint.fromCartesian(p1);
         double startLongitude = start.longitude();
         double startLatitude = start.latitude();
         double endLongitude = end.longitude();
@@ -52,7 +56,6 @@ final class AnnotateRectangle extends AbstractAnnotateable {
             Vec3 pc = interpolateSpherical(i / (double) SUBDIVISIONS, startLongitude, endLatitude, startLongitude, startLatitude);
             vertices.set(vertexIndex++, pc);
         }
-        mv.emitMapLine(vp, vertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override
@@ -65,9 +68,12 @@ final class AnnotateRectangle extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        SphericalPoint spherical0 = SphericalPoint.fromCartesian(p0);
-        SphericalPoint spherical1 = SphericalPoint.fromCartesian(p1);
-        drawRectangle(mv, vp, spherical0, spherical1, color, vexBuf);
+        if (p0 != geometryStart || p1 != geometryEnd) {
+            updateGeometry(p0, p1);
+            geometryStart = p0;
+            geometryEnd = p1;
+        }
+        mv.emitMapLine(vp, vertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override
