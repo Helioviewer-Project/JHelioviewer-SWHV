@@ -1,12 +1,15 @@
 package org.helioviewer.jhv.io;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import org.helioviewer.jhv.app.Commands;
 import org.helioviewer.jhv.app.Log;
@@ -62,27 +65,36 @@ public class CommandLine {
     }
 
     private static List<URI> getURIOptionValues(String param) {
-        List<String> opts = getOptionValues(param);
         List<URI> uris = new ArrayList<>();
-        for (String opt : opts) {
+        for (String value : getOptionValues(param)) {
             try {
-                URI uri = new URI(opt);
-                String scheme = uri.getScheme();
-
-                if (scheme != null && uriSchemes.contains(scheme.toLowerCase())) {
+                URI uri = resolveLocation(value);
+                if (uri != null)
                     uris.add(uri);
-                } else {
-                    Path path = Path.of(opt);
-                    if (Files.isReadable(path)) {
-                        uris.add(path.toUri()); // toUri() is correct
-                    } else
-                        Log.warn("File not found: " + opt);
-                }
             } catch (Exception e) {
                 Log.warn(e);
             }
         }
         return uris;
+    }
+
+    @Nullable
+    private static URI resolveLocation(String value) {
+        try {
+            URI uri = new URI(value);
+            String scheme = uri.getScheme();
+            if (scheme != null && uriSchemes.contains(scheme.toLowerCase()))
+                return uri;
+        } catch (URISyntaxException ignored) {
+            // The argument may still be a valid local path.
+        }
+
+        Path path = Path.of(value);
+        if (Files.isReadable(path))
+            return path.toUri();
+
+        Log.warn("File not found: " + value);
+        return null;
     }
 
     /**
@@ -93,18 +105,18 @@ public class CommandLine {
      */
     private static List<String> getOptionValues(String param) {
         List<String> values = new ArrayList<>();
-        if (arguments != null) {
-            for (int i = 0; i < arguments.length; i++) {
-                if (param.equals(arguments[i]) && arguments.length > i + 1) {
-                    String value = arguments[i + 1];
-                    if (value.startsWith("-")) {
-                        Log.warn("Missing value for command line option: " + param);
-                        continue;
-                    }
-                    values.add(value);
-                    i++; // consume option argument
-                }
+        if (arguments == null)
+            return values;
+
+        for (int i = 0; i < arguments.length; i++) {
+            if (!param.equals(arguments[i]))
+                continue;
+
+            if (i + 1 == arguments.length || arguments[i + 1].startsWith("-")) {
+                Log.warn("Missing value for command line option: " + param);
+                continue;
             }
+            values.add(arguments[++i]);
         }
         return values;
     }
