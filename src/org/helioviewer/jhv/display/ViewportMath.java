@@ -93,15 +93,13 @@ public final class ViewportMath {
     }
 
     @Nullable
-    private static Vec3 intersectPlane(Viewport vp, double width, double tx, double ty, double screenX, double screenY, Vec3 planeNormal) {
+    private static Vec3 intersectPlane(double upX, double upY, Vec3 planeNormal) {
         double denom = planeNormal.z;
         if (Math.abs(denom) < PLANE_Z_EPS)
             return null;
 
-        double up1x = computeUpX(vp, width, tx, screenX);
-        double up1y = computeUpY(vp, width, ty, screenY);
-        double zvalue = -(planeNormal.x * up1x + planeNormal.y * up1y) / denom;
-        return new Vec3(up1x, up1y, zvalue);
+        double zvalue = -(planeNormal.x * upX + planeNormal.y * upY) / denom;
+        return new Vec3(upX, upY, zvalue);
     }
 
     @Nullable
@@ -114,7 +112,9 @@ public final class ViewportMath {
     @Nullable
     static Vec3 unprojectToOutputPlane(Camera camera, Viewport vp, double width, double screenX, double screenY, Quat outputRotation) {
         Quat frameRotation = Quat.rotate(camera.getDragRotation(), outputRotation);
-        Vec3 hitPoint = intersectPlane(vp, width, camera.getTranslationX(), camera.getTranslationY(), screenX, screenY, frameRotation.rotateVector(Vec3.ZAxis));
+        double upX = computeUpX(vp, width, camera.getTranslationX(), screenX);
+        double upY = computeUpY(vp, width, camera.getTranslationY(), screenY);
+        Vec3 hitPoint = intersectPlane(upX, upY, frameRotation.rotateVector(Vec3.ZAxis));
         return hitPoint == null ? null : frameRotation.rotateInverseVector(hitPoint);
     }
 
@@ -134,13 +134,8 @@ public final class ViewportMath {
                 return currentViewHitPoint;
         }
 
-        Vec3 planeNormal = dragRotation.rotateVector(Vec3.ZAxis);
-        double denom = planeNormal.z;
-        if (Math.abs(denom) < PLANE_Z_EPS)
-            return null;
-
-        double zvalue = -(planeNormal.x * upX + planeNormal.y * upY) / denom;
-        return dragRotation.rotateInverseVector(new Vec3(upX, upY, zvalue));
+        Vec3 hitPoint = intersectPlane(upX, upY, dragRotation.rotateVector(Vec3.ZAxis));
+        return hitPoint == null ? null : dragRotation.rotateInverseVector(hitPoint);
     }
 
     private ViewportMath() {}
