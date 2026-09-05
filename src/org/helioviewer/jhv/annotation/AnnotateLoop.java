@@ -18,6 +18,9 @@ final class AnnotateLoop extends AbstractAnnotateable {
     private static final int SUBDIVISIONS = 45;
 
     private final List<Vec3> vertices = fixedSizeVertices(SUBDIVISIONS + 1);
+    private Vec3 geometryStart;
+    private Vec3 geometryEnd;
+    private boolean geometryValid;
     private double cachedHeight = Double.NaN;
     private String heightStr = null;
 
@@ -26,12 +29,12 @@ final class AnnotateLoop extends AbstractAnnotateable {
     }
 
     // Draw the loop as a semicircle whose feet are exactly bp and ep.
-    private void drawLoop(MapView mv, Viewport vp, Vec3 bp, Vec3 ep, byte[] color, BufVertex vexBuf) {
+    private boolean updateGeometry(Vec3 bp, Vec3 ep) {
         Vec3 center = new Vec3(0.5 * (bp.x + ep.x), 0.5 * (bp.y + ep.y), 0.5 * (bp.z + ep.z));
         Vec3 u = new Vec3(0.5 * (bp.x - ep.x), 0.5 * (bp.y - ep.y), 0.5 * (bp.z - ep.z));
         double centerLen = center.length();
         if (centerLen < 1e-12) // reject antipodal drawing
-            return;
+            return false;
 
         double radiusLen = u.length();
         double height = centerLen + radiusLen - Sun.Radius;
@@ -58,7 +61,7 @@ final class AnnotateLoop extends AbstractAnnotateable {
                     center.y + cosr * u.y + sinr * center.y,
                     center.z + cosr * u.z + sinr * center.z));
         }
-        mv.emitMapLine(vp, vertices, ANNOTATION_RADIUS, color, vexBuf);
+        return true;
     }
 
     @Override
@@ -71,7 +74,13 @@ final class AnnotateLoop extends AbstractAnnotateable {
         Vec3 p0 = dragged ? dragStartPoint : startPoint;
         Vec3 p1 = dragged ? dragEndPoint : endPoint;
 
-        drawLoop(mv, vp, p0, p1, color, vexBuf);
+        if (p0 != geometryStart || p1 != geometryEnd) {
+            geometryValid = updateGeometry(p0, p1);
+            geometryStart = p0;
+            geometryEnd = p1;
+        }
+        if (geometryValid)
+            mv.emitMapLine(vp, vertices, ANNOTATION_RADIUS, color, vexBuf);
     }
 
     @Override
