@@ -66,7 +66,8 @@ class PfssLine {
                     double r = Math.sqrt(x * x + y * y + z * z);
 
                     float b = lineS[idx]; // this can be index in LUT
-                    computeBrightColor(b, whiteBackground, brightColor);
+                    if (!fixedColor)
+                        computeBrightColor(b, whiteBackground, brightColor);
 
                     if (i == 0) {
                         if (fixedColor) {
