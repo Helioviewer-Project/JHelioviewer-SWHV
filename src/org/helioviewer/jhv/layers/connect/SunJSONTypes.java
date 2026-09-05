@@ -39,8 +39,8 @@ public class SunJSONTypes {
                     pointsList.add(buf.vexBuf);
                 }
             }
-            Multimaps.asMap(linesWidths).forEach((w, l) -> linesMap.put(w, new DirectBufVertex(BufVertex.join(l))));
-            pointsBuf = pointsList.isEmpty() ? null : new DirectBufVertex(BufVertex.join(pointsList));
+            Multimaps.asMap(linesWidths).forEach((w, l) -> linesMap.put(w, new DirectBufVertex(l)));
+            pointsBuf = pointsList.isEmpty() ? null : new DirectBufVertex(pointsList);
         }
 
         public JHVTime time() {

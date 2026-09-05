@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
-import java.util.List;
 
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.math.Vec3;
@@ -107,30 +106,6 @@ public class BufVertex {
 
     public ByteBuffer toBuffer() {
         return buffer.limit(byteLength());
-    }
-
-    public static BufVertex join(List<BufVertex> list) {
-        int listSize = list.size();
-        if (listSize == 0)
-            throw new IllegalArgumentException("Empty BufVertex list");
-        if (listSize == 1)
-            return list.getFirst();
-
-        int retCount = 0;
-        for (BufVertex b : list) {
-            retCount = Math.addExact(retCount, b.count);
-        }
-        BufVertex ret = new BufVertex(retCount);
-
-        int offset = 0;
-        for (BufVertex b : list) {
-            int bytes = b.byteLength();
-            System.arraycopy(b.array, 0, ret.array, offset, bytes);
-            offset += bytes;
-        }
-        ret.count = retCount;
-
-        return ret;
     }
 
 }
