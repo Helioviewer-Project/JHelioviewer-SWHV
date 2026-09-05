@@ -2,7 +2,6 @@ package org.helioviewer.jhv.movie;
 
 import java.util.ArrayList;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -39,29 +38,28 @@ public class Player {
 
     @Nullable
     private static JHVTime nextTime(AdvanceMode mode, JHVTime time,
-                                    Supplier<JHVTime> firstTime, Supplier<JHVTime> lastTime,
                                     Function<JHVTime, JHVTime> lowerTime, Function<JHVTime, JHVTime> higherTime) {
         JHVTime next = mode == AdvanceMode.SwingDown ? lowerTime.apply(time) : higherTime.apply(time);
         if (next.milli == time.milli) { // already at the edges
             switch (mode) {
                 case Loop -> {
-                    if (next.milli == lastTime.get().milli) {
-                        return firstTime.get();
+                    if (next.milli == playbackLastTime.milli) {
+                        return playbackFirstTime;
                     }
                 }
                 case Stop -> {
-                    if (next.milli == lastTime.get().milli) {
+                    if (next.milli == playbackLastTime.milli) {
                         return null;
                     }
                 }
                 case Swing -> {
-                    if (next.milli == lastTime.get().milli) {
+                    if (next.milli == playbackLastTime.milli) {
                         advanceMode = AdvanceMode.SwingDown;
                         return lowerTime.apply(next);
                     }
                 }
                 case SwingDown -> {
-                    if (next.milli == firstTime.get().milli) {
+                    if (next.milli == playbackFirstTime.milli) {
                         advanceMode = AdvanceMode.Swing;
                         return higherTime.apply(next);
                     }
@@ -136,7 +134,6 @@ public class Player {
         if (layer != null) {
             View view = layer.getView();
             JHVTime next = nextTime(advanceMode, lastTimestamp,
-                    () -> playbackFirstTime, () -> playbackLastTime,
                     time -> JHVTime.clamp(view.getLowerTime(time), playbackFirstTime, playbackLastTime),
                     time -> JHVTime.clamp(view.getHigherTime(time), playbackFirstTime, playbackLastTime));
 
@@ -151,7 +148,6 @@ public class Player {
         ImageLayer layer = Layers.getActiveImageLayer();
         if (layer != null) {
             JHVTime next = nextTime(advanceMode, lastTimestamp,
-                    () -> playbackFirstTime, () -> playbackLastTime,
                     time -> new JHVTime(Math.max(playbackFirstTime.milli, time.milli - deltaT)),
                     time -> new JHVTime(Math.min(playbackLastTime.milli, time.milli + deltaT)));
 
