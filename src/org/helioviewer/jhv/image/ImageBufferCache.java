@@ -2,7 +2,6 @@ package org.helioviewer.jhv.image;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -45,14 +44,10 @@ public final class ImageBufferCache {
     public static void reap(Set<ImageBuffer> retained) {
         cache.cleanUp();
         synchronized (retired) {
-            if (retired.isEmpty())
-                return;
-            Iterator<WeakReference<ImageBuffer>> iterator = retired.iterator();
-            while (iterator.hasNext()) {
-                ImageBuffer imageBuffer = iterator.next().get();
-                if (imageBuffer == null || (!retained.contains(imageBuffer) && imageBuffer.free()))
-                    iterator.remove();
-            }
+            retired.removeIf(reference -> {
+                ImageBuffer imageBuffer = reference.get();
+                return imageBuffer == null || (!retained.contains(imageBuffer) && imageBuffer.free());
+            });
         }
     }
 
