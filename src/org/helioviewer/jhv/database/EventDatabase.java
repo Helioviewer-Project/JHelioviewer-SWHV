@@ -36,13 +36,13 @@ public class EventDatabase {
     public static int config_hash;
 
     private static final String INSERT_EVENT = "INSERT INTO events(uid) VALUES(?)";
-    private static final String INSERT_FULL_EVENT = "INSERT INTO events(type_id, uid, start, end, archiv, data) VALUES(?,?,?,?,?,?)";
+    private static final String UPSERT_EVENT =
+            "INSERT INTO events(type_id, uid, start, end, archiv, data) VALUES(?,?,?,?,?,?) " +
+                    "ON CONFLICT(uid) DO UPDATE SET type_id=excluded.type_id, start=excluded.start, end=excluded.end, archiv=excluded.archiv, data=excluded.data RETURNING id";
     private static final String SELECT_EVENT_TYPE = "SELECT id FROM event_type WHERE name=? AND supplier=?";
     private static final String INSERT_EVENT_TYPE = "INSERT INTO event_type(name, supplier) VALUES(?,?)";
     private static final String INSERT_LINK = "INSERT INTO event_link(left_id, right_id) VALUES(?,?)";
     private static final String SELECT_EVENT_ID_FROM_UID = "SELECT id FROM events WHERE uid=?";
-    private static final String SELECT_LAST_INSERT = "SELECT last_insert_rowid()";
-    private static final String UPDATE_EVENT = "UPDATE events SET type_id=?, uid=?, start=?, end=?, archiv=?, data=? WHERE id=?";
     private static final String DELETE_DATERANGES = "DELETE FROM date_range WHERE type_id=?";
     private static final String INSERT_DATERANGE = "INSERT INTO date_range(type_id,  start, end) VALUES(?,?,?)";
     private static final String SELECT_DATERANGE = "SELECT start, end FROM date_range where type_id=? order by start, end ";
@@ -209,31 +209,21 @@ public class EventDatabase {
         int[] eventIds = new int[remoteEvents.size()];
         int typeId = findOrInsertEventTypeId(supplier);
 
-        PreparedStatement insertFullEvent = getPreparedStatement(INSERT_FULL_EVENT);
-        PreparedStatement selectLastInsert = getPreparedStatement(SELECT_LAST_INSERT);
-        PreparedStatement updateEvent = getPreparedStatement(UPDATE_EVENT);
+        PreparedStatement statement = getPreparedStatement(UPSERT_EVENT);
 
         for (int i = 0; i < remoteEvents.size(); i++) {
             SWEKHandler.RemoteEvent event2db = remoteEvents.get(i);
-            int eventId = findEventId(event2db.uid());
-
-            PreparedStatement statement = eventId == -1 ? insertFullEvent : updateEvent;
             statement.setInt(1, typeId);
             statement.setString(2, event2db.uid());
             statement.setLong(3, event2db.start());
             statement.setLong(4, event2db.end());
             statement.setLong(5, event2db.archiv());
             statement.setBytes(6, event2db.compressedJson());
-            if (eventId != -1)
-                statement.setInt(7, eventId);
-            statement.executeUpdate();
-
-            if (eventId == -1) {
-                try (ResultSet rs = selectLastInsert.executeQuery()) {
-                    if (!rs.next())
-                        throw new SQLException("Could not create event " + event2db.uid());
-                    eventId = rs.getInt(1);
-                }
+            int eventId;
+            try (ResultSet rs = statement.executeQuery()) {
+                if (!rs.next())
+                    throw new SQLException("Could not store event " + event2db.uid());
+                eventId = rs.getInt(1);
             }
 
             StringBuilder fieldString = new StringBuilder();
