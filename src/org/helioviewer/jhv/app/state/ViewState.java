@@ -161,13 +161,7 @@ public final class ViewState {
     public static ModeData readModeJson(JSONObject source) {
         ModeData current = modeData();
         MapMode projectionValue = current.projection();
-        double warpLambdaValue = current.warpLambda();
         AnnotationMode annotationModeValue = current.annotationMode();
-        boolean multiviewValue = current.multiview();
-        boolean trackingValue = current.tracking();
-        boolean refreshValue = current.refresh();
-        boolean showCoronaValue = current.showCorona();
-        boolean differentialRotationValue = current.differentialRotation();
         String projectionName = source.optString("projection", projectionValue.name());
         String annotationModeName = source.optString("annotationMode", annotationModeValue.name());
         try {
@@ -180,22 +174,15 @@ public final class ViewState {
         } catch (IllegalArgumentException e) {
             Log.warn("Ignoring invalid annotation mode state value: " + annotationModeName, e);
         }
-        multiviewValue = readBoolean(source, "multiview", multiviewValue);
-        warpLambdaValue = Math.clamp(source.optDouble("warpLambda", warpLambdaValue), -1, 1);
-        trackingValue = readBoolean(source, "tracking", trackingValue);
-        refreshValue = readBoolean(source, "refresh", refreshValue);
-        showCoronaValue = readBoolean(source, "showCorona", showCoronaValue);
-        differentialRotationValue = readBoolean(source, "differentialRotation", differentialRotationValue);
-
         return new ModeData(
                 projectionValue,
-                warpLambdaValue,
+                Math.clamp(source.optDouble("warpLambda", current.warpLambda()), -1, 1),
                 annotationModeValue,
-                multiviewValue,
-                trackingValue,
-                refreshValue,
-                showCoronaValue,
-                differentialRotationValue);
+                readBoolean(source, "multiview", current.multiview()),
+                readBoolean(source, "tracking", current.tracking()),
+                readBoolean(source, "refresh", current.refresh()),
+                readBoolean(source, "showCorona", current.showCorona()),
+                readBoolean(source, "differentialRotation", current.differentialRotation()));
     }
 
     public static void applyMode(ModeData data) {
