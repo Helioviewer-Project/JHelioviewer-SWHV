@@ -135,26 +135,24 @@ final class ProjectedMap {
 
     private static void emitHpcLine(Position viewpoint, MapScale scale, Viewport vp, List<Vec3> vertices, byte[] color, BufVertex vexBuf) {
         // HPC is a visible-hemisphere map, so hidden segments must terminate the strip.
-        Vec2 previous = null;
-        int last = vertices.size() - 1;
-        for (int i = 0; i <= last; i++) {
-            Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertices.get(i), scale);
+        boolean lineOpen = false;
+        for (Vec3 vertex : vertices) {
+            Vec2 current = projectVisibleHpcSurfacePoint(viewpoint, vertex, scale);
             if (current == null) {
-                if (previous != null)
+                if (lineOpen)
                     vexBuf.endLine();
-                previous = null;
+                lineOpen = false;
                 continue;
             }
 
-            if (i == 0 || previous == null) {
-                startProjectedLine(vp, current, color, vexBuf);
-            } else {
+            if (lineOpen)
                 emitProjectedVertex(vp, current, color, vexBuf);
-            }
-            if (i == last)
-                vexBuf.endLine();
-            previous = current;
+            else
+                startProjectedLine(vp, current, color, vexBuf);
+            lineOpen = true;
         }
+        if (lineOpen)
+            vexBuf.endLine();
     }
 
     static void emitMapPoints(MapMode mode, Position viewpoint, MapScale scale,
