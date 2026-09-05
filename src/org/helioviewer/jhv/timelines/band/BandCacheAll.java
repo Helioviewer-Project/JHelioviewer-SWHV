@@ -40,8 +40,11 @@ class BandCacheAll implements BandCache {
         float min = Float.POSITIVE_INFINITY;
         float max = Float.NEGATIVE_INFINITY;
 
-        for (DateValue dv : dateVals) {
-            if (dv.value != YAxis.BLANK && start <= dv.milli && dv.milli <= end) {
+        for (int i = firstIndexAtOrAfter(start); i < dateVals.size(); i++) {
+            DateValue dv = dateVals.get(i);
+            if (dv.milli > end)
+                break;
+            if (dv.value != YAxis.BLANK) {
                 min = Math.min(dv.value, min);
                 max = Math.max(dv.value, max);
             }
@@ -53,13 +56,16 @@ class BandCacheAll implements BandCache {
     public List<List<DateValue>> getValues(double graphWidth, long start, long end) {
         List<List<DateValue>> ret = new ArrayList<>();
         List<DateValue> list = new ArrayList<>();
-        for (DateValue dv : dateVals) {
+        for (int i = firstIndexAtOrAfter(start); i < dateVals.size(); i++) {
+            DateValue dv = dateVals.get(i);
+            if (dv.milli > end)
+                break;
             if (dv.value == YAxis.BLANK) {
                 if (!list.isEmpty()) {
                     ret.add(list);
                     list = new ArrayList<>();
                 }
-            } else if (start <= dv.milli && dv.milli <= end) {
+            } else {
                 list.add(dv);
             }
         }
@@ -73,6 +79,10 @@ class BandCacheAll implements BandCache {
         if (dateVals.isEmpty() || ts < dateVals.getFirst().milli || ts > dateVals.getLast().milli)
             return YAxis.BLANK;
 
+        return dateVals.get(firstIndexAtOrAfter(ts)).value;
+    }
+
+    private int firstIndexAtOrAfter(long ts) {
         int low = 0, high = dateVals.size();
         while (low != high) {
             int mid = (low + high) / 2;
@@ -82,7 +92,7 @@ class BandCacheAll implements BandCache {
                 high = mid;
             }
         }
-        return dateVals.get(high).value;
+        return high;
     }
 
     @Override
