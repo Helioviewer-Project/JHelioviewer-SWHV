@@ -16,7 +16,6 @@ import org.helioviewer.jhv.thread.Task;
 import org.helioviewer.jhv.time.JHVTime;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.Header;
 import nom.tam.fits.TableHDU;
@@ -106,8 +105,7 @@ class PfssLoader {
         @Override
         public Data call() throws Exception {
             try (NetClient nc = NetClient.of(uri); Fits fits = new Fits(nc.getStream())) {
-                BasicHDU<?>[] hdus = fits.read();
-                if (hdus == null || hdus.length < 2 || !(hdus[1] instanceof TableHDU<?> hdu))
+                if (!(fits.getHDU(1) instanceof TableHDU<?> hdu))
                     throw new Exception("Could not read FITS");
 
                 Header header = hdu.getHeader();
@@ -130,6 +128,11 @@ class PfssLoader {
                 if (rows % points != 0)
                     throw new Exception("Inconsistent PFSS table");
 
+                short[] columnX = (short[]) hdu.getColumn(colX);
+                short[] columnY = (short[]) hdu.getColumn(colY);
+                short[] columnZ = (short[]) hdu.getColumn(colZ);
+                short[] columnS = (short[]) hdu.getColumn(colS);
+
                 float[] lineX = new float[rows];
                 float[] lineY = new float[rows];
                 float[] lineZ = new float[rows];
@@ -140,10 +143,10 @@ class PfssLoader {
                 double sphi = Math.sin(elon);
 
                 for (int i = 0; i < rows; i++) {
-                    double x = 3 * decodeShort(((short[]) hdu.getElement(i, colX))[0]);
-                    double y = 3 * decodeShort(((short[]) hdu.getElement(i, colY))[0]);
-                    double z = 3 * decodeShort(((short[]) hdu.getElement(i, colZ))[0]);
-                    double s = decodeShort(((short[]) hdu.getElement(i, colS))[0]);
+                    double x = 3 * decodeShort(columnX[i]);
+                    double y = 3 * decodeShort(columnY[i]);
+                    double z = 3 * decodeShort(columnZ[i]);
+                    double s = decodeShort(columnS[i]);
 
                     lineX[i] = (float) (cphi * x + sphi * y);
                     lineY[i] = (float) (-sphi * x + cphi * y);
