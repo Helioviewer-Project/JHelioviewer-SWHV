@@ -7,13 +7,10 @@ import org.helioviewer.jhv.display.Viewport;
 
 final class Zoom {
 
-    private static final int FRAMES_PER_SECOND = 500;
-    private static final int MILLIS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
-
     private static final double SPEED_TOLERANCE = 0.0005;
     private static final double SPEED_LIMIT = 25;
-    private static final double ACCELERATION_LIMIT = 2;
-    private static final double VELOCITY_SMOOTHING = 0.80;
+    private static final double WHEEL_SENSITIVITY = 0.4;
+    private static final double MAX_IMPULSE = 4;
     private static final long GESTURE_TIMEOUT_MS = 1000;
 
     private double velocity = 0;
@@ -51,16 +48,9 @@ final class Zoom {
         }
         lastWheelDelta = wheel;
 
-        // Integrate wheel impulse and smooth towards the target velocity.
-        double lastVelocity = velocity;
-        double targetVelocity = lastVelocity + wheel / MILLIS_PER_FRAME;
-        velocity = lastVelocity + VELOCITY_SMOOTHING * (targetVelocity - lastVelocity);
-
-        // Clamp acceleration to avoid sudden jumps.
-        double acceleration = (velocity - lastVelocity) / MILLIS_PER_FRAME;
-        if (Math.abs(acceleration) > ACCELERATION_LIMIT) {
-            velocity = lastVelocity + ACCELERATION_LIMIT * MILLIS_PER_FRAME * Math.signum(acceleration);
-        }
+        // Limit each wheel impulse to avoid sudden jumps.
+        double impulse = Math.clamp(wheel * WHEEL_SENSITIVITY, -MAX_IMPULSE, MAX_IMPULSE);
+        velocity += impulse;
 
         // Clamp speed and snap tiny values to rest.
         double absVelocity = Math.abs(velocity);
