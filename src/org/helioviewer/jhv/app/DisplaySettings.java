@@ -8,24 +8,20 @@ public class DisplaySettings {
 
     private static boolean normalizeAIA;
     private static boolean normalizeRadius;
-    private static TimeMode timeMode;
-    private static UITheme uiTheme;
+    private static TimeMode timeMode = TimeMode.Observer;
+    private static UITheme uiTheme = UITheme.Dark;
 
     static {
         normalizeAIA = Boolean.parseBoolean(Settings.getProperty("display.normalizeAIA"));
         normalizeRadius = Boolean.parseBoolean(Settings.getProperty("display.normalizeRadius"));
 
-        TimeMode setTimeMode = TimeMode.Observer;
         try {
-            setTimeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
+            timeMode = TimeMode.valueOf(Settings.getProperty("display.time"));
         } catch (Exception ignore) {}
-        timeMode = setTimeMode;
 
-        UITheme setUITheme = UITheme.Dark;
         try {
-            setUITheme = UITheme.valueOf(Settings.getProperty("display.theme"));
+            uiTheme = UITheme.valueOf(Settings.getProperty("display.theme"));
         } catch (Exception ignore) {}
-        uiTheme = setUITheme;
     }
 
     public static boolean getNormalizeAIA() {
