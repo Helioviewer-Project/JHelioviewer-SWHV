@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -423,7 +422,8 @@ public class EventDatabase {
         }
 
         long last_timestamp = getLastEvent(typeId);
-        long lastEvent = last_timestamp == Long.MIN_VALUE ? Long.MAX_VALUE : Math.min(System.currentTimeMillis(), last_timestamp);
+        long now = System.currentTimeMillis();
+        long lastEvent = last_timestamp == Long.MIN_VALUE ? now : Math.min(now, last_timestamp);
         long invalidationDate = lastEvent - ONEWEEK * 2;
 
         PreparedStatement pstatement = getPreparedStatement(SELECT_DATERANGE);
@@ -458,13 +458,8 @@ public class EventDatabase {
 
     private record JsonEventDetails(JsonEvent event, List<JsonEvent> relatedEvents) {}
 
-    public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) {
-        try {
-            return executor.invokeAndWait(new Events2Program(start, end, type, params));
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return Collections.emptyList();
+    public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+        return executor.invokeAndWait(new Events2Program(start, end, type, params));
     }
 
     private record Events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
@@ -508,13 +503,8 @@ public class EventDatabase {
         }
     }
 
-    public static List<JHVEvent.Link> associations2Program(long start, long end, SWEKSupplier type) {
-        try {
-            return executor.invokeAndWait(new Associations2Program(start, end, type));
-        } catch (Exception e) {
-            Log.error(e);
-        }
-        return Collections.emptyList();
+    public static List<JHVEvent.Link> associations2Program(long start, long end, SWEKSupplier type) throws Exception {
+        return executor.invokeAndWait(new Associations2Program(start, end, type));
     }
 
     private record Associations2Program(long start, long end, SWEKSupplier type)
