@@ -53,14 +53,6 @@ public class EventCache {
         DisplayController.display();
     }
 
-    static void addEvent(SolarEvent event) {
-        eventGroups.addEvent(event);
-    }
-
-    static void addAssociation(SolarEvent.Link link) {
-        eventGroups.addAssociation(link);
-    }
-
     static void replaceEvents(long sequence, List<SolarEvent> events, List<SolarEvent.Link> associations) {
         boolean highlightedGroupCached = eventGroups.contains(lastHighlighted);
         eventGroups.replace(sequence, events, associations);

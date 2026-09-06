@@ -424,10 +424,6 @@ public class EventDatabase {
         return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
     }
 
-    public static List<SolarEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
-        return parseEvents(executor.invokeAndWait(new QueryEvents(start, end, type, params)), false);
-    }
-
     private record QueryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
             implements Callable<List<JsonEvent>> {
         @Override
@@ -470,10 +466,6 @@ public class EventDatabase {
             }
             return eventList;
         }
-    }
-
-    public static List<SolarEvent.Link> associations2Program(long start, long end, SWEKSupplier type) throws Exception {
-        return executor.invokeAndWait(new Associations2Program(start, end, type));
     }
 
     private record Associations2Program(long start, long end, SWEKSupplier type)
