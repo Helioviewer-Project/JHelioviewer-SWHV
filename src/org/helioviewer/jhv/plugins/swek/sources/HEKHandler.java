@@ -32,6 +32,8 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
+        // Missing pagination metadata must not turn a partial response into cached coverage.
+        boolean overmax = eventJSON.getBoolean("overmax");
         JSONArray results = eventJSON.getJSONArray("result");
         int len = results.length();
         List<SWEKHandler.RemoteEvent> event2dbList = new ArrayList<>(len);
@@ -43,15 +45,13 @@ public class HEKHandler extends SWEKHandler {
                     continue;
 
                 SWEKHandler.RemoteEvent event = parseRemoteEvent(result, supplier);
-                if (event != null) {
-                    event2dbList.add(event);
-                    acceptedUids.add(event.uid());
-                }
+                event2dbList.add(event);
+                acceptedUids.add(event.uid());
             } catch (JSONException | DateTimeException e) {
-                Log.warn("Skipping malformed HEK event at result index " + i, e);
+                throw new IOException("Malformed HEK event at result index " + i, e);
             }
         }
-        return new RemotePage(eventJSON.optBoolean("overmax", false), event2dbList, parseAssociations(eventJSON, acceptedUids));
+        return new RemotePage(overmax, event2dbList, parseAssociations(eventJSON, acceptedUids));
     }
 
     private static SWEKHandler.RemoteEvent parseRemoteEvent(JSONObject result, SWEKSupplier supplier) throws IOException {
@@ -60,13 +60,14 @@ public class HEKHandler extends SWEKHandler {
         long start = TimeUtils.parse(result.getString("event_starttime"));
         long end = TimeUtils.parse(result.getString("event_endtime"));
         if (end < start) {
-            Log.warn("Event end before start: " + result);
-            return null;
+            throw new IOException("HEK event end before start: " + result.optString("kb_archivid"));
         }
 
         String archiveDate = result.optString("kb_archivdate");
         long archiv = archiveDate.isBlank() ? start : TimeUtils.parse(archiveDate);
         String uid = result.getString("kb_archivid");
+        if (uid.isBlank())
+            throw new IOException("HEK event has an empty archive ID");
 
         ArrayList<SWEKHandler.RemoteParameter> paramList = new ArrayList<>();
         for (Map.Entry<String, String> fieldEntry : SWEKCatalog.databaseFields(supplier).entrySet()) {
@@ -113,7 +114,7 @@ public class HEKHandler extends SWEKHandler {
     }
 
     private static boolean isSupplierEvent(JSONObject result, SWEKSupplier supplier) {
-        return supplier.supplierName().equals(result.optString("frm_name"));
+        return supplier.supplierName().equals(result.getString("frm_name"));
     }
 
     private static void addGoesValue(JSONObject result) {

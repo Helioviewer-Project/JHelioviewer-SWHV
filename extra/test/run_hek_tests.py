@@ -13,9 +13,11 @@ with tempfile.TemporaryDirectory(prefix="jhv-hek-tests-") as classes:
     subprocess.run([
         "javac", "-cp", classpath, "-d", classes,
         "extra/test/HEKQueryTest.java",
+        "extra/test/HEKHandlerTest.java",
     ], cwd=root, check=True)
     for test in (
         "org.helioviewer.jhv.plugins.swek.sources.HEKQueryTest",
+        "org.helioviewer.jhv.plugins.swek.sources.HEKHandlerTest",
     ):
         subprocess.run([
             "java", "-Djava.awt.headless=true", "-Duser.timezone=UTC",
