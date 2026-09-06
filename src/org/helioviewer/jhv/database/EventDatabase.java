@@ -419,7 +419,7 @@ public class EventDatabase {
 
     public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
         JsonEventBatch batch = executor.invokeAndWait(() -> new JsonEventBatch(++batchSequence,
-                queryEvents(start, end, type, params), new Associations2Program(start, end, type).call()));
+                queryEvents(start, end, type, params), queryAssociations(start, end, type)));
         return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
     }
 
@@ -463,50 +463,46 @@ public class EventDatabase {
         return eventList;
     }
 
-    private record Associations2Program(long start, long end, SWEKSupplier type)
-            implements Callable<List<SolarEvent.Link>> {
-        @Override
-        public List<SolarEvent.Link> call() throws Exception {
-            List<SolarEvent.Link> assocList = new ArrayList<>();
-            int typeId = findEventTypeId(type);
-            if (typeId == -1)
-                return assocList;
-
-            List<SWEK.RelatedOn> parameters = new ArrayList<>();
-            for (SWEK.RelatedEvents relation : SWEKCatalog.getRelatedEvents()) {
-                if (relation.group() != type.group() || relation.relatedWith() != type.group())
-                    continue;
-                for (SWEK.RelatedOn field : relation.relatedOnList()) {
-                    parameters.add(field);
-                    if (!field.parameterFrom().equals(field.parameterWith()))
-                        parameters.add(new SWEK.RelatedOn(field.parameterWith(), field.parameterFrom()));
-                }
-            }
-            String sql = SELECT_ASSOCIATIONS + (" UNION " + SELECT_PARAMETER_ASSOCIATIONS).repeat(parameters.size()) + " ORDER BY 1,2";
-            PreparedStatement pstatement = getPreparedStatement(sql);
-            pstatement.setInt(1, typeId);
-            pstatement.setLong(2, end);
-            pstatement.setLong(3, start);
-            pstatement.setInt(4, typeId);
-            pstatement.setLong(5, end);
-            pstatement.setLong(6, start);
-            int index = 7;
-            for (SWEK.RelatedOn field : parameters) {
-                pstatement.setInt(index++, typeId);
-                pstatement.setLong(index++, end);
-                pstatement.setLong(index++, start);
-                pstatement.setString(index++, field.parameterFrom());
-                pstatement.setInt(index++, typeId);
-                pstatement.setString(index++, field.parameterWith());
-            }
-
-            try (ResultSet rs = pstatement.executeQuery()) {
-                while (rs.next()) {
-                    assocList.add(new SolarEvent.Link(rs.getInt(1), rs.getInt(2)));
-                }
-            }
+    private static List<SolarEvent.Link> queryAssociations(long start, long end, SWEKSupplier type) throws Exception {
+        List<SolarEvent.Link> assocList = new ArrayList<>();
+        int typeId = findEventTypeId(type);
+        if (typeId == -1)
             return assocList;
+
+        List<SWEK.RelatedOn> parameters = new ArrayList<>();
+        for (SWEK.RelatedEvents relation : SWEKCatalog.getRelatedEvents()) {
+            if (relation.group() != type.group() || relation.relatedWith() != type.group())
+                continue;
+            for (SWEK.RelatedOn field : relation.relatedOnList()) {
+                parameters.add(field);
+                if (!field.parameterFrom().equals(field.parameterWith()))
+                    parameters.add(new SWEK.RelatedOn(field.parameterWith(), field.parameterFrom()));
+            }
         }
+        String sql = SELECT_ASSOCIATIONS + (" UNION " + SELECT_PARAMETER_ASSOCIATIONS).repeat(parameters.size()) + " ORDER BY 1,2";
+        PreparedStatement pstatement = getPreparedStatement(sql);
+        pstatement.setInt(1, typeId);
+        pstatement.setLong(2, end);
+        pstatement.setLong(3, start);
+        pstatement.setInt(4, typeId);
+        pstatement.setLong(5, end);
+        pstatement.setLong(6, start);
+        int index = 7;
+        for (SWEK.RelatedOn field : parameters) {
+            pstatement.setInt(index++, typeId);
+            pstatement.setLong(index++, end);
+            pstatement.setLong(index++, start);
+            pstatement.setString(index++, field.parameterFrom());
+            pstatement.setInt(index++, typeId);
+            pstatement.setString(index++, field.parameterWith());
+        }
+
+        try (ResultSet rs = pstatement.executeQuery()) {
+            while (rs.next()) {
+                assocList.add(new SolarEvent.Link(rs.getInt(1), rs.getInt(2)));
+            }
+        }
+        return assocList;
     }
 
     private static List<JsonEvent> queryRelationEvents(int eventId, SWEKSupplier leftType, SWEKSupplier rightType,
