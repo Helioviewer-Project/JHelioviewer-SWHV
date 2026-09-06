@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.io;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +59,7 @@ public class JSONUtils {
     public static ByteArrayOutputStream compressJSON(JSONObject json) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFSIZ);
         try (GZIPOutputStream gz = new GZIPOutputStream(baos, BUFSIZ);
-             OutputStreamWriter out = new OutputStreamWriter(gz, StandardCharsets.UTF_8)) {
+             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(gz, StandardCharsets.UTF_8))) {
             json.write(out);
         }
         return baos;
