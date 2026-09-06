@@ -514,8 +514,7 @@ public class EventDatabase {
         if (rightTypeId == -1)
             return ret;
 
-        String sql = "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e " +
-                "LEFT JOIN event_type ON e.type_id=event_type.id WHERE e.id IN (" +
+        String sql = "SELECT e.id, e.start, e.end, e.data FROM events AS e WHERE e.id IN (" +
                 "SELECT tr.event_id " +
                 "FROM event_parameter AS tl JOIN event_parameter AS tr ON tl.value=tr.value " +
                 "WHERE tl.event_id=? AND tr.type_id=? AND tl.name=? AND tr.name=?)";
@@ -531,7 +530,7 @@ public class EventDatabase {
                 long start = rs.getLong(2);
                 long end = rs.getLong(3);
                 byte[] json = rs.getBytes(4);
-                ret.add(new JsonEvent(json, SWEKCatalog.getSupplier(rs.getString(5)), id, start, end));
+                ret.add(new JsonEvent(json, rightType, id, start, end));
             }
         }
         return ret;
