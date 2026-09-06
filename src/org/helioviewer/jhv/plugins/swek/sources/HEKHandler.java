@@ -156,11 +156,8 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end,
-                new HEKGeometry(json).position(start, supplier.isCactus()), readCMEParameters(json, supplier));
-        HEKParser.parseResult(json, currentEvent, full);
-        currentEvent.finishParams();
-        return currentEvent;
+        return new JHVEvent(supplier, id, start, end, new HEKGeometry(json).position(start, supplier.isCactus()),
+                readCMEParameters(json, supplier), HEKParser.parseResult(json, supplier, full));
     }
 
     private static JHVEvent.CMEParameters readCMEParameters(JSONObject json, SWEKSupplier supplier) {

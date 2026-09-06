@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.JHVEvent;
+import org.helioviewer.jhv.event.JHVEventMetadata;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.io.JSONUtils;
@@ -63,21 +64,19 @@ public class FHNWHandler extends SWEKHandler {
 
     @Override
     public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
-        parseResult(json, currentEvent);
-        currentEvent.finishParams();
-
-        return currentEvent;
+        JHVEventMetadata.Builder metadata = new JHVEventMetadata.Builder(supplier, true);
+        parseResult(json, metadata);
+        return new JHVEvent(supplier, id, start, end, null, JHVEvent.CMEParameters.DEFAULT, metadata.build());
     }
 
-    private static void parseResult(JSONObject result, JHVEvent currentEvent) throws JSONException {
+    private static void parseResult(JSONObject result, JHVEventMetadata.Builder metadata) throws JSONException {
         Iterator<String> keys = result.keys();
         while (keys.hasNext()) {
             String key = keys.next();
             if (!(key.equals("start_time") || key.equals("end_time"))) { // don't repeat
                 String value = result.optString(key).trim();
                 if (!value.isEmpty()) {
-                    currentEvent.addParameter(key, value, true);
+                    metadata.add(key, value);
                 }
             }
         }

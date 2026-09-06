@@ -5,8 +5,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.helioviewer.jhv.event.JHVEvent;
+import org.helioviewer.jhv.event.JHVEventMetadata;
 import org.helioviewer.jhv.event.SWEK;
+import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.math.MathUtils;
 
 import org.json.JSONArray;
@@ -17,12 +18,13 @@ class HEKParser {
 
     private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
-    static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
+    static JHVEventMetadata parseResult(JSONObject result, SWEKSupplier supplier, boolean full) throws JSONException {
+        JHVEventMetadata.Builder metadata = new JHVEventMetadata.Builder(supplier, full);
         boolean waveCM = false;
         String waveValue = null;
 
         // First iterate over parameters in the config file
-        List<SWEK.Parameter> plist = currentEvent.getSupplier().getParameterList();
+        List<SWEK.Parameter> plist = supplier.getParameterList();
         Iterator<SWEK.Parameter> paramIterator = plist.iterator();
         HashSet<String> insertedKeys = new HashSet<>();
 
@@ -37,7 +39,7 @@ class HEKParser {
                 continue;
 
             if (lowKey.equals("refs")) {
-                parseRefs(currentEvent, result.getJSONArray(key));
+                parseRefs(metadata, result.getJSONArray(key));
             } else {
                 String value = result.optString(lowKey);
                 if (lowKey.equals("rasterscan") || lowKey.equals("bound_chaincode") || lowKey.startsWith("hgc_") || lowKey.startsWith("hgs_") || lowKey.startsWith("hpc_") || lowKey.startsWith("hrc_")) {
@@ -51,7 +53,7 @@ class HEKParser {
                         if (lowKey.equals("obs_meanwavel"))
                             waveValue = value;
                         else
-                            currentEvent.addParameter(lowKey, value, full);
+                            metadata.add(lowKey, value);
                     }
                 }
             }
@@ -62,18 +64,19 @@ class HEKParser {
                 if (waveCM)
                     waveValue = formatter1.get().format(Double.parseDouble(waveValue) * (1e-2 /*m*/ * 1e9 /*nm*/)) + "nm";
             } catch (Exception ignore) {}
-            currentEvent.addParameter("obs_meanwavel", waveValue, full);
+            metadata.add("obs_meanwavel", waveValue);
         }
+        return metadata.build();
     }
 
-    private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {
+    private static void parseRefs(JHVEventMetadata.Builder metadata, JSONArray refs) throws JSONException {
         int len = refs.length();
         for (int i = 0; i < len; i++) {
-            parseRef(currentEvent, refs.getJSONObject(i));
+            parseRef(metadata, refs.getJSONObject(i));
         }
     }
 
-    private static void parseRef(JHVEvent currentEvent, JSONObject ref) throws JSONException {
+    private static void parseRef(JHVEventMetadata.Builder metadata, JSONObject ref) throws JSONException {
         String url = "", type = null;
 
         Iterator<String> keys = ref.keys();
@@ -95,7 +98,7 @@ class HEKParser {
             }
         }
         if (type != null) {
-            currentEvent.addParameter(type, type, url, true, true);
+            metadata.add(type, type, url, true);
         }
     }
 
