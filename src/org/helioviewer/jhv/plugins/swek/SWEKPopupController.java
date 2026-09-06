@@ -148,7 +148,7 @@ class SWEKPopupController implements InputMouseListener {
     public void mouseMoved(PointerEvent e) {
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
         long currentTime = viewpoint.time.milli;
-        List<ObservationGroup> activeEvents = layer.activeEvents(currentTime);
+        List<SWEKLayer.ActiveEvent> activeEvents = layer.activeEvents(currentTime);
         if (activeEvents.isEmpty()) {
             resetHover();
             return;
@@ -177,9 +177,9 @@ class SWEKPopupController implements InputMouseListener {
         }
     }
 
-    private static ObservationGroup findOrthographicEvent(List<ObservationGroup> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
-        for (ObservationGroup evtr : activeEvents) {
-            SolarEvent evt = evtr.getClosestTo(currentTime);
+    private static ObservationGroup findOrthographicEvent(List<SWEKLayer.ActiveEvent> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
+        for (SWEKLayer.ActiveEvent active : activeEvents) {
+            SolarEvent evt = active.event();
             EventGeometry pi = evt.getPositionInformation();
             if (pi == null)
                 continue;
@@ -201,16 +201,16 @@ class SWEKPopupController implements InputMouseListener {
                 double deltaY = Math.abs(hitpoint.y - pt.y);
                 double deltaZ = Math.abs(hitpoint.z - pt.z);
                 if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08)
-                    return evtr;
+                    return active.group();
             }
         }
         return null;
     }
 
-    private static ObservationGroup findProjectedEvent(List<ObservationGroup> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
+    private static ObservationGroup findProjectedEvent(List<SWEKLayer.ActiveEvent> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
         MapScale scale = mv.scale(vp);
-        for (ObservationGroup evtr : activeEvents) {
-            SolarEvent evt = evtr.getClosestTo(currentTime);
+        for (SWEKLayer.ActiveEvent active : activeEvents) {
+            SolarEvent evt = active.event();
             EventGeometry pi = evt.getPositionInformation();
             if (pi == null)
                 continue;
@@ -230,7 +230,7 @@ class SWEKPopupController implements InputMouseListener {
                 double deltaX = Math.abs(tf.x - mousePosition.x);
                 double deltaY = Math.abs(tf.y - mousePosition.y);
                 if (deltaX < 0.02 && deltaY < 0.02)
-                    return evtr;
+                    return active.group();
             }
         }
         return null;

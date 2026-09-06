@@ -43,6 +43,8 @@ import org.json.JSONObject;
 
 // has to be public for state
 public final class SWEKLayer extends AbstractLayer implements EventListener.Handle, TimeListener.Range {
+    record ActiveEvent(ObservationGroup group, SolarEvent event) {}
+
     private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {}
 
     private static final int DIVPOINTS = 10;
@@ -69,7 +71,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     private final BufCoord texBuf = new BufCoord(4 * 8);
 
     private long cachedEventsTime = Long.MIN_VALUE;
-    private List<ObservationGroup> cachedActiveEvents = List.of();
+    private List<ActiveEvent> cachedActiveEvents = List.of();
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null) {
@@ -321,11 +323,12 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         lineThick.renderLine(vp, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(MapView mv, List<ObservationGroup> evs, long currentTime) {
+    private void renderIcons(MapView mv, List<ActiveEvent> evs) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
-        for (ObservationGroup evtr : evs) {
-            SolarEvent evt = evtr.getClosestTo(currentTime);
+        for (ActiveEvent active : evs) {
+            ObservationGroup evtr = active.group();
+            SolarEvent evt = active.event();
             if (mv.isLatitudinal() && evt.isCactus())
                 continue;
             if (!evt.isCactus()) {
@@ -339,10 +342,13 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         }
     }
 
-    List<ObservationGroup> activeEvents(long time) {
+    List<ActiveEvent> activeEvents(long time) {
         if (time != cachedEventsTime) {
+            List<ActiveEvent> active = new ArrayList<>();
+            for (ObservationGroup group : EventCache.getEvents(time, time))
+                active.add(new ActiveEvent(group, group.getClosestTo(time)));
+            cachedActiveEvents = active;
             cachedEventsTime = time;
-            cachedActiveEvents = EventCache.getEvents(time, time);
         }
         return cachedActiveEvents;
     }
@@ -356,12 +362,13 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
-        List<ObservationGroup> evs = activeEvents(currentTime);
+        List<ActiveEvent> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
 
-        for (ObservationGroup evtr : evs) {
-            SolarEvent evt = evtr.getClosestTo(currentTime);
+        for (ActiveEvent active : evs) {
+            ObservationGroup evtr = active.group();
+            SolarEvent evt = active.event();
             if (evt.isCactus()) {
                 drawCactusArc(evtr, evt, currentTime);
             } else {
@@ -373,7 +380,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(mv, evs, currentTime);
+            renderIcons(mv, evs);
         }
     }
 
@@ -382,13 +389,14 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
-        List<ObservationGroup> evs = activeEvents(currentTime);
+        List<ActiveEvent> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
 
         MapScale scale = mv.scale(vp);
-        for (ObservationGroup evtr : evs) {
-            SolarEvent evt = evtr.getClosestTo(currentTime);
+        for (ActiveEvent active : evs) {
+            ObservationGroup evtr = active.group();
+            SolarEvent evt = active.event();
             if (evt.isCactus() && mv.isRectWarp()) {
                 drawCactusArcScale(vp, evtr, evt, currentTime, scale);
             } else {
@@ -400,7 +408,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         }
         renderEvents(vp);
         if (icons) {
-            renderIcons(mv, evs, currentTime);
+            renderIcons(mv, evs);
         }
     }
 
