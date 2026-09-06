@@ -4,6 +4,8 @@ import java.util.List;
 
 public class SWEK {
 
+    public enum NumericType { INTEGER, REAL }
+
     public enum Operand {
         BIGGER_OR_EQUAL(">="),
         SMALLER_OR_EQUAL("<=");
