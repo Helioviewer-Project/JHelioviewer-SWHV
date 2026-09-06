@@ -78,7 +78,7 @@ public final class SWEKEventInformationDialog extends JDialog {
     private record DatabaseCallable(SolarEvent qEvent) implements Callable<EventDatabase.EventDetails> {
         @Override
         public EventDatabase.EventDetails call() throws Exception {
-            return EventDatabase.getEventDetails(qEvent.getUniqueID(), qEvent.getSupplier());
+            return EventDatabase.getEventDetails(qEvent.getUniqueID());
         }
     }
 

@@ -249,9 +249,11 @@ public class EventDatabase {
         return events;
     }
 
-    public static EventDetails getEventDetails(int id, SWEKSupplier supplier) throws Exception {
-        JsonEventDetails details = executor.invokeAndWait(() ->
-                new JsonEventDetails(queryEvent(id), collectRelationEvents(id, supplier)));
+    public static EventDetails getEventDetails(int id) throws Exception {
+        JsonEventDetails details = executor.invokeAndWait(() -> {
+            JsonEvent event = queryEvent(id);
+            return new JsonEventDetails(event, collectRelationEvents(id, event.type()));
+        });
         return new EventDetails(parseJSON(details.event(), true), parseEvents(details.relatedEvents(), true));
     }
 
