@@ -124,7 +124,7 @@ class SWEKConfig {
                 continue;
 
             List<SWEK.Parameter> parameters = parseSupplierParameters(supplier, defaultParameters);
-            SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("db"), parameters);
+            SWEKSupplier supplierObj = new SWEKSupplier(group, supplierName, supplier.getString("supplier_display_name"), source, supplier.getString("id"), parameters);
             SWEKCatalog.add(supplierObj);
         }
         if (SWEKCatalog.getSuppliers(group).isEmpty())

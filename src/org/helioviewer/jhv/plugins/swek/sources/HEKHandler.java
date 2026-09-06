@@ -69,7 +69,7 @@ public class HEKHandler extends SWEKHandler {
             throw new IOException("HEK event has an empty archive ID");
 
         HashMap<String, Number> indexedValues = new HashMap<>();
-        for (Map.Entry<String, SWEK.NumericType> field : SWEKCatalog.databaseFields(supplier).entrySet()) {
+        for (Map.Entry<String, SWEK.NumericType> field : SWEKCatalog.indexedParameters(supplier).entrySet()) {
             String fieldName = field.getKey();
             String lfieldName = fieldName.toLowerCase();
             if (result.isNull(lfieldName))

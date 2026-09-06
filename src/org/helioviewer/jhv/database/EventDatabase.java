@@ -75,7 +75,7 @@ public class EventDatabase {
             typeId = findEventTypeId(supplier);
         }
         if (typeId == -1)
-            throw new SQLException("Could not create event type " + SWEKCatalog.key(supplier));
+            throw new SQLException("Could not create event type " + supplier.id());
         return typeId;
     }
 
@@ -83,7 +83,7 @@ public class EventDatabase {
         int typeId = -1;
         PreparedStatement pstatement = getPreparedStatement(SELECT_EVENT_TYPE);
         pstatement.setString(1, supplier.group().getName());
-        pstatement.setString(2, SWEKCatalog.key(supplier));
+        pstatement.setString(2, supplier.id());
 
         try (ResultSet rs = pstatement.executeQuery()) {
             if (rs.next()) {
@@ -96,7 +96,7 @@ public class EventDatabase {
     private static void insertEventTypeIfNotExist(SWEKSupplier eventType) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_EVENT_TYPE);
         pstatement.setString(1, eventType.group().getName());
-        pstatement.setString(2, SWEKCatalog.key(eventType));
+        pstatement.setString(2, eventType.id());
         pstatement.executeUpdate();
     }
 
@@ -209,7 +209,7 @@ public class EventDatabase {
             delete.setInt(1, eventId);
             delete.executeUpdate();
             PreparedStatement parameter = getPreparedStatement(INSERT_PARAMETER);
-            for (String field : SWEKCatalog.databaseFields(supplier).keySet()) {
+            for (String field : SWEKCatalog.indexedParameters(supplier).keySet()) {
                 Number value = event2db.indexedValues().get(field);
                 if (value == null) continue;
                 parameter.setInt(1, eventId);
@@ -454,7 +454,7 @@ public class EventDatabase {
             StringBuilder joins = new StringBuilder();
             for (int i = 0; i < params.size(); i++) {
                 SWEK.Param param = params.get(i);
-                if (SWEKCatalog.databaseFields(type).keySet().stream().noneMatch(param.name()::equalsIgnoreCase))
+                if (SWEKCatalog.indexedParameters(type).keySet().stream().noneMatch(param.name()::equalsIgnoreCase))
                     throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
                 String alias = "p" + i;
                 joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
