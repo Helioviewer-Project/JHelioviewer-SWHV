@@ -8,7 +8,7 @@
 - Improve rendering quality, performance, and memory handling
 
 ### Timeline and events
-- Correct SWEK handling of long-duration events and related events from multiple suppliers, and improve filtering, cache refresh, event details, and timeline interaction
+- Improve SWEK event loading, filtering, and display, with more reliable updates, related-event handling, and timeline interaction
 
 ### Technical
 - Document the heliocentric 3D data interface and add a COCONUT conversion example
