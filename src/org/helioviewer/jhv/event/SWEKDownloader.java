@@ -37,24 +37,24 @@ public class SWEKDownloader {
 
     private static final class SupplierRequests {
         private final SWEKSupplier supplier;
+        private final List<SWEK.Param> params;
         private final RequestCache intervals = new RequestCache();
         private final List<Worker> workers = new ArrayList<>();
         private volatile boolean cancelled;
 
         SupplierRequests(SWEKSupplier _supplier) {
             supplier = _supplier;
+            params = FilterManager.getFilters(supplier);
         }
     }
 
     private static final class Worker implements Runnable, Comparable<Worker> {
         private final SupplierRequests requests;
-        private final List<SWEK.Param> params;
         private final long start;
         private final long end;
 
-        Worker(SupplierRequests _requests, List<SWEK.Param> _params, long _start, long _end) {
+        Worker(SupplierRequests _requests, long _start, long _end) {
             requests = _requests;
-            params = _params;
             start = _start;
             end = _end;
         }
@@ -64,7 +64,7 @@ public class SWEKDownloader {
             EventDatabase.EventBatch events = null;
             try {
                 if (ensureStored() && !requests.cancelled)
-                    events = EventDatabase.loadEvents(start, end, requests.supplier, params);
+                    events = EventDatabase.loadEvents(start, end, requests.supplier, requests.params);
             } catch (Throwable t) {
                 if (!requests.cancelled && !AppThread.isInterrupted(t))
                     Log.error("Error loading SWEK", t);
@@ -202,13 +202,11 @@ public class SWEKDownloader {
     }
 
     private static void startDownloadSupplier(SupplierRequests requests, List<Interval> intervals) {
-        SWEKSupplier supplier = requests.supplier;
-        List<SWEK.Param> params = FilterManager.getFilters(supplier);
-        SWEKGroup group = supplier.group();
+        SWEKGroup group = requests.supplier.group();
         boolean started = false;
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
-                Worker worker = new Worker(requests, params, intt.start(), intt.end());
+                Worker worker = new Worker(requests, intt.start(), intt.end());
                 downloadPool.execute(worker);
                 requests.workers.add(worker);
                 started = true;
