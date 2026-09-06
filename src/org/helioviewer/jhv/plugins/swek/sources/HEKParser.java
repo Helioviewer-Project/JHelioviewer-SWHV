@@ -18,7 +18,7 @@ class HEKParser {
     private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
     static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
-        HEKGeometry geometry = new HEKGeometry();
+        HEKGeometry geometry = new HEKGeometry(result);
 
         boolean waveCM = false;
         String waveValue = null;
@@ -42,9 +42,7 @@ class HEKParser {
                 parseRefs(currentEvent, result.getJSONArray(key));
             } else {
                 String value = result.optString(lowKey);
-                if (geometry.readParameter(lowKey, value)) {
-                    // Geometry is attached after all parameters have been read.
-                } else if (lowKey.equals("rasterscan") || lowKey.equals("bound_chaincode") || lowKey.startsWith("hgc_") || lowKey.startsWith("hgs_") || lowKey.startsWith("hpc_") || lowKey.startsWith("hrc_")) {
+                if (lowKey.equals("rasterscan") || lowKey.equals("bound_chaincode") || lowKey.startsWith("hgc_") || lowKey.startsWith("hgs_") || lowKey.startsWith("hpc_") || lowKey.startsWith("hrc_")) {
                     // nothing, delete
                 } else {
                     value = value.trim();

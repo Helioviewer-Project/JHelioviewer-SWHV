@@ -16,6 +16,8 @@ import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
 
+import org.json.JSONObject;
+
 final class HEKGeometry {
 
     private record HgsPoint(double longitudeDeg, double latitudeDeg) {}
@@ -23,22 +25,18 @@ final class HEKGeometry {
     private static final Pattern POINT = Pattern.compile("\\s*POINT\\s*\\(([^()]*)\\)\\s*", Pattern.CASE_INSENSITIVE);
     private static final Pattern POLYGON = Pattern.compile("\\s*POLYGON\\s*\\(\\s*\\(([^()]*)\\)\\s*\\)\\s*", Pattern.CASE_INSENSITIVE);
 
-    private List<HgsPoint> hgsBoundedBox;
-    private List<HgsPoint> hgsBoundCC;
-    private HgsPoint hgsCentralPoint;
-    private Double hgsLongitudeDeg;
-    private Double hgsLatitudeDeg;
+    private final List<HgsPoint> hgsBoundedBox;
+    private final List<HgsPoint> hgsBoundCC;
+    private final HgsPoint hgsCentralPoint;
+    private final Double hgsLongitudeDeg;
+    private final Double hgsLatitudeDeg;
 
-    boolean readParameter(String key, String value) {
-        switch (key) {
-            case "hgs_bbox" -> hgsBoundedBox = parsePolygon(value);
-            case "hgs_boundcc" -> hgsBoundCC = parsePolygon(value);
-            case "hgs_coord" -> hgsCentralPoint = parsePoint(value);
-            case "hgs_x" -> hgsLongitudeDeg = parseNumber(value);
-            case "hgs_y" -> hgsLatitudeDeg = parseNumber(value);
-            default -> { return false; }
-        }
-        return true;
+    HEKGeometry(JSONObject result) {
+        hgsBoundedBox = result.isNull("hgs_bbox") ? null : parsePolygon(result.optString("hgs_bbox"));
+        hgsBoundCC = result.isNull("hgs_boundcc") ? null : parsePolygon(result.optString("hgs_boundcc"));
+        hgsCentralPoint = result.isNull("hgs_coord") ? null : parsePoint(result.optString("hgs_coord"));
+        hgsLongitudeDeg = result.isNull("hgs_x") ? null : parseNumber(result.optString("hgs_x"));
+        hgsLatitudeDeg = result.isNull("hgs_y") ? null : parseNumber(result.optString("hgs_y"));
     }
 
     private static List<HgsPoint> parsePolygon(String value) {
