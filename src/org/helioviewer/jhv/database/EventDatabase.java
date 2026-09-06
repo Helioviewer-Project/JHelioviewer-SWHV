@@ -412,8 +412,15 @@ public class EventDatabase {
 
     public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
+    public record EventQuery(long start, long end, SWEKSupplier supplier, List<SWEK.Param> filters) {
+        public EventQuery {
+            filters = List.copyOf(filters);
+        }
+    }
+
     // Selected IDs include rows that matched the query but could not be decoded into events.
-    public record EventBatch(long sequence, Set<Integer> selectedIds, List<SolarEvent> events, List<SolarEvent.Link> associations) {}
+    // Associations cover the supplier and inclusive time range without applying the filters.
+    public record EventBatch(long sequence, EventQuery query, Set<Integer> selectedIds, List<SolarEvent> events, List<SolarEvent.Link> associations) {}
 
     private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
@@ -422,54 +429,51 @@ public class EventDatabase {
     private record JsonEventBatch(long sequence, List<JsonEvent> events, List<SolarEvent.Link> associations) {}
 
     public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+        EventQuery query = new EventQuery(start, end, type, params);
         JsonEventBatch batch = executor.invokeAndWait(() -> new JsonEventBatch(++batchSequence,
-                new QueryEvents(start, end, type, params).call(), new Associations2Program(start, end, type).call()));
+                queryEvents(query), new Associations2Program(query.start(), query.end(), query.supplier()).call()));
         Set<Integer> selectedIds = batch.events().stream().map(JsonEvent::id).collect(Collectors.toUnmodifiableSet());
-        return new EventBatch(batch.sequence(), selectedIds, parseEvents(batch.events(), false), batch.associations());
+        return new EventBatch(batch.sequence(), query, selectedIds, parseEvents(batch.events(), false), batch.associations());
     }
 
-    private record QueryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
-            implements Callable<List<JsonEvent>> {
-        @Override
-        public List<JsonEvent> call() throws Exception {
-            List<JsonEvent> eventList = new ArrayList<>();
-            int typeId = findEventTypeId(type);
-            if (typeId == -1)
-                return eventList;
-
-            StringBuilder joins = new StringBuilder();
-            for (int i = 0; i < params.size(); i++) {
-                SWEK.Param param = params.get(i);
-                if (SWEKCatalog.indexedParameters(type).keySet().stream().noneMatch(param.name()::equalsIgnoreCase))
-                    throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
-                String alias = "p" + i;
-                joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
-                        .append(alias).append(".type_id=e.type_id AND ").append(alias).append(".name=? AND ")
-                        .append(alias).append(".value").append(param.operand().representation).append('?');
-            }
-            String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e" + joins +
-                    " WHERE e.type_id=? AND e.start<=? AND e.end>=? ORDER BY e.start, e.end";
-            PreparedStatement pstatement = getPreparedStatement(sqlt);
-            int parameterIndex = 1;
-            for (SWEK.Param param : params) {
-                pstatement.setString(parameterIndex++, param.name());
-                pstatement.setDouble(parameterIndex++, param.value());
-            }
-            pstatement.setInt(parameterIndex++, typeId);
-            pstatement.setLong(parameterIndex++, end);
-            pstatement.setLong(parameterIndex, start);
-
-            try (ResultSet rs = pstatement.executeQuery()) {
-                while (rs.next()) {
-                    int id = rs.getInt(1);
-                    long _start = rs.getLong(2);
-                    long _end = rs.getLong(3);
-                    byte[] json = rs.getBytes(4);
-                    eventList.add(new JsonEvent(json, type, id, _start, _end));
-                }
-            }
+    private static List<JsonEvent> queryEvents(EventQuery query) throws Exception {
+        List<JsonEvent> eventList = new ArrayList<>();
+        int typeId = findEventTypeId(query.supplier());
+        if (typeId == -1)
             return eventList;
+
+        StringBuilder joins = new StringBuilder();
+        for (int i = 0; i < query.filters().size(); i++) {
+            SWEK.Param param = query.filters().get(i);
+            if (SWEKCatalog.indexedParameters(query.supplier()).keySet().stream().noneMatch(param.name()::equalsIgnoreCase))
+                throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
+            String alias = "p" + i;
+            joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
+                    .append(alias).append(".type_id=e.type_id AND ").append(alias).append(".name=? AND ")
+                    .append(alias).append(".value").append(param.operand().representation).append('?');
         }
+        String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e" + joins +
+                " WHERE e.type_id=? AND e.start<=? AND e.end>=? ORDER BY e.start, e.end";
+        PreparedStatement pstatement = getPreparedStatement(sqlt);
+        int parameterIndex = 1;
+        for (SWEK.Param param : query.filters()) {
+            pstatement.setString(parameterIndex++, param.name());
+            pstatement.setDouble(parameterIndex++, param.value());
+        }
+        pstatement.setInt(parameterIndex++, typeId);
+        pstatement.setLong(parameterIndex++, query.end());
+        pstatement.setLong(parameterIndex, query.start());
+
+        try (ResultSet rs = pstatement.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                long _start = rs.getLong(2);
+                long _end = rs.getLong(3);
+                byte[] json = rs.getBytes(4);
+                eventList.add(new JsonEvent(json, query.supplier(), id, _start, _end));
+            }
+        }
+        return eventList;
     }
 
     private record Associations2Program(long start, long end, SWEKSupplier type)
