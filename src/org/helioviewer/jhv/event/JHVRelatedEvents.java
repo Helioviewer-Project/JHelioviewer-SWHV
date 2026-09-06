@@ -18,7 +18,7 @@ public class JHVRelatedEvents {
     private final LinkedHashSet<JHVEvent.Link> associations = new LinkedHashSet<>();
     private final Color color;
 
-    private Interval interval;
+    private List<Interval> intervals;
     private boolean highlighted;
 
     public JHVRelatedEvents(JHVEvent event) {
@@ -28,7 +28,7 @@ public class JHVRelatedEvents {
     public JHVRelatedEvents(JHVEvent event, Color _color) {
         color = _color;
         events.put(event.getUniqueID(), event);
-        interval = new Interval(event.start, event.end);
+        intervals = List.of(new Interval(event.start, event.end));
     }
 
     Collection<JHVEvent> getEvents() {
@@ -36,11 +36,11 @@ public class JHVRelatedEvents {
     }
 
     public long getEnd() {
-        return interval.end();
+        return intervals.getLast().end();
     }
 
     public long getStart() {
-        return interval.start();
+        return intervals.getFirst().start();
     }
 
     public Color getColor() {
@@ -73,15 +73,21 @@ public class JHVRelatedEvents {
     }
 
     boolean overlaps(long start, long end) {
-        for (JHVEvent event : events.values()) {
-            if (event.start <= end && event.end >= start)
+        for (Interval interval : intervals) {
+            if (interval.start() > end)
+                return false;
+            if (interval.end() >= start)
                 return true;
         }
         return false;
     }
 
-    // Union of actual event intervals, preserving gaps in an associated group.
     public List<Interval> getIntervals() {
+        return intervals;
+    }
+
+    // Union of actual event intervals, preserving gaps in an associated group.
+    private void updateIntervals() {
         List<Interval> sorted = new ArrayList<>();
         for (JHVEvent event : events.values())
             sorted.add(new Interval(event.start, event.end));
@@ -95,7 +101,7 @@ public class JHVRelatedEvents {
                 result.add(new Interval(previous.start(), Math.max(previous.end(), next.end())));
             }
         }
-        return result;
+        intervals = List.copyOf(result);
     }
 
     public List<JHVEvent> getAssociatedEvents(JHVEvent event) {
@@ -130,18 +136,13 @@ public class JHVRelatedEvents {
         if (previous != null && previous.start == event.start && previous.end == event.end)
             return;
 
-        long start = Long.MAX_VALUE, end = Long.MIN_VALUE;
-        for (JHVEvent evt : events.values()) {
-            start = Math.min(start, evt.start);
-            end = Math.max(end, evt.end);
-        }
-        interval = new Interval(start, end);
+        updateIntervals();
     }
 
     void merge(JHVRelatedEvents found) {
         events.putAll(found.events);
         associations.addAll(found.associations);
-        interval = new Interval(Math.min(interval.start(), found.interval.start()), Math.max(interval.end(), found.interval.end()));
+        updateIntervals();
     }
 
 }
