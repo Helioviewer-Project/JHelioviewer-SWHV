@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -116,10 +117,7 @@ final class ObservationGroups {
 
     private void merge(ObservationGroup current, ObservationGroup found) {
         if (current == found) return;
-        removeFromIndex(current);
-        removeFromIndex(found);
         current.merge(found);
-        addToIndex(current);
         for (SolarEvent foundev : found.getEvents()) {
             observationsById.get(foundev.getUniqueID()).group = current;
         }
@@ -145,8 +143,12 @@ final class ObservationGroups {
         ObservationGroup first = getObservationGroup(link.firstId());
         ObservationGroup second = getObservationGroup(link.secondId());
         if (first != null && second != null) {
-            if (first != second)
+            if (first != second) {
+                removeFromIndex(first);
+                removeFromIndex(second);
                 merge(first, second);
+                addToIndex(first);
+            }
             first.addAssociation(link);
         } else {
             if (first == null)
@@ -208,19 +210,31 @@ final class ObservationGroups {
 
     private void rebuild(ObservationGroup group, Set<Integer> removedIds, Set<SolarEvent.Link> removedLinks) {
         removeFromIndex(group);
+        // Preserve reinsertion order for groups sharing the same start time.
+        LinkedHashSet<ObservationGroup> rebuilt = new LinkedHashSet<>();
         for (SolarEvent event : group.getEvents()) {
             if (removedIds.contains(event.getUniqueID())) {
                 observationsById.remove(event.getUniqueID());
             } else {
                 ObservationGroup replacement = new ObservationGroup(event, group.getColor());
                 observationsById.get(event.getUniqueID()).group = replacement;
-                addToIndex(replacement);
+                rebuilt.add(replacement);
             }
         }
         for (SolarEvent.Link link : group.getAssociations()) {
-            if (!removedLinks.contains(link) && observationsById.containsKey(link.firstId()) && observationsById.containsKey(link.secondId()))
-                addAssociation(link);
+            if (removedLinks.contains(link))
+                continue;
+            ObservationGroup first = getObservationGroup(link.firstId()), second = getObservationGroup(link.secondId());
+            if (first == null || second == null)
+                continue;
+            if (first != second) {
+                merge(first, second);
+                rebuilt.remove(second);
+                rebuilt.addLast(first);
+            }
+            first.addAssociation(link);
         }
+        rebuilt.forEach(this::addToIndex);
     }
 
 }
