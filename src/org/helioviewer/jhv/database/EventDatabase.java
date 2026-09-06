@@ -254,7 +254,7 @@ public class EventDatabase {
         }
     }
 
-    private static List<JHVEvent> parseFullJSON(List<JsonEvent> jsonEvents) {
+    private static List<JHVEvent> parseEvents(List<JsonEvent> jsonEvents, boolean full) {
         HashSet<Integer> ids = new HashSet<>();
         List<JHVEvent> events = new ArrayList<>();
         for (int i = 0; i < jsonEvents.size(); i++) {
@@ -264,7 +264,7 @@ public class EventDatabase {
                 continue;
 
             try {
-                events.add(parseJSON(jsonEvent, true));
+                events.add(parseJSON(jsonEvent, full));
             } catch (Exception e) {
                 Log.error(e);
             }
@@ -275,7 +275,7 @@ public class EventDatabase {
     public static EventDetails getEventDetails(int id, SWEKSupplier supplier) throws Exception {
         JsonEventDetails details = executor.invokeAndWait(() ->
                 new JsonEventDetails(queryEvent(id), collectRelationEvents(id, supplier)));
-        return new EventDetails(parseJSON(details.event(), true), parseFullJSON(details.relatedEvents()));
+        return new EventDetails(parseJSON(details.event(), true), parseEvents(details.relatedEvents(), true));
     }
 
     private static JsonEvent queryEvent(int id) throws Exception {
@@ -439,14 +439,14 @@ public class EventDatabase {
     private record JsonEventDetails(JsonEvent event, List<JsonEvent> relatedEvents) {}
 
     public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
-        return executor.invokeAndWait(new Events2Program(start, end, type, params));
+        return parseEvents(executor.invokeAndWait(new QueryEvents(start, end, type, params)), false);
     }
 
-    private record Events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
-            implements Callable<List<JHVEvent>> {
+    private record QueryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
+            implements Callable<List<JsonEvent>> {
         @Override
-        public List<JHVEvent> call() throws Exception {
-            List<JHVEvent> eventList = new ArrayList<>();
+        public List<JsonEvent> call() throws Exception {
+            List<JsonEvent> eventList = new ArrayList<>();
             int typeId = findEventTypeId(type);
             if (typeId == -1)
                 return eventList;
@@ -479,11 +479,7 @@ public class EventDatabase {
                     long _start = rs.getLong(2);
                     long _end = rs.getLong(3);
                     byte[] json = rs.getBytes(4);
-                    try {
-                        eventList.add(parseJSON(new JsonEvent(json, type, id, _start, _end), false));
-                    } catch (Exception e) {
-                        Log.error(e);
-                    }
+                    eventList.add(new JsonEvent(json, type, id, _start, _end));
                 }
             }
             return eventList;
