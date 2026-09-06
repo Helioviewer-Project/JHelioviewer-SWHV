@@ -21,6 +21,7 @@ public class JHVEventParameter {
     private String parameterDisplayValue;
 
     private String parameterSimpleDisplayValue;
+    private Boolean url;
 
     public JHVEventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {
         parameterName = _parameterName.intern();
@@ -42,7 +43,7 @@ public class JHVEventParameter {
 
     public String getSimpleDisplayParameterValue() {
         if (parameterSimpleDisplayValue == null)
-            parameterSimpleDisplayValue = beautifyValue(parameterValue).intern();
+            parameterSimpleDisplayValue = beautifyValue().intern();
         return parameterSimpleDisplayValue;
     }
 
@@ -58,13 +59,20 @@ public class JHVEventParameter {
         return parameterDisplayValue;
     }
 
-    private static String beautifyValue(String value) {
+    public boolean isUrl() {
+        if (url == null)
+            url = UrlValidator.getInstance().isValid(parameterValue);
+        return url;
+    }
+
+    private String beautifyValue() {
+        String value = parameterValue;
         if (Regex.FloatingPoint.matcher(value).matches() &&
                 !Regex.Integer.matcher(value).matches()) {
             String result = numFormatter.format(Double.parseDouble(value));
             return result.contains("E0") ? result.substring(0, result.length() - 2) : result;
         } else {
-            if (UrlValidator.getInstance().isValid(value))
+            if (isUrl())
                 return "<a href=\"" + value + "\">Open URL</a>";
             return value;
         }

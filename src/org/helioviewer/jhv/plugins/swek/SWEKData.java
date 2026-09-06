@@ -13,9 +13,9 @@ class SWEKData {
 
     static List<String> visibleParameterLines(JHVEvent evt) {
         List<String> lines = new ArrayList<>();
-        for (JHVEventParameter p : evt.getSimpleVisibleEventParameters()) {
+        for (JHVEventParameter p : evt.getVisibleEventParameters()) {
             String name = p.getParameterName();
-            if (name != "event_description" && name != "event_title") { // interned
+            if (name != "event_description" && name != "event_title" && !p.isUrl()) { // interned
                 lines.add(p.getParameterDisplayName() + " : " + p.getSimpleDisplayParameterValue());
             }
         }

@@ -3,8 +3,6 @@ package org.helioviewer.jhv.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.validator.routines.UrlValidator;
-
 public class JHVEvent {
 
     public record CMEParameters(double speedKmPerSecond, double principalAngleDegree, double angularWidthDegree) {
@@ -22,7 +20,6 @@ public class JHVEvent {
 
     private JHVEventParameter[] allParameters = new JHVEventParameter[0];
     private JHVEventParameter[] visibleParameters = new JHVEventParameter[0];
-    private JHVEventParameter[] simpleVisibleParameters = new JHVEventParameter[0];
 
     private List<JHVEventParameter> allParametersArray = new ArrayList<>();
     private List<JHVEventParameter> visibleParametersArray = new ArrayList<>();
@@ -42,10 +39,6 @@ public class JHVEvent {
 
     public JHVEventParameter[] getVisibleEventParameters() {
         return visibleParameters;
-    }
-
-    public JHVEventParameter[] getSimpleVisibleEventParameters() {
-        return simpleVisibleParameters;
     }
 
     public JHVPositionInformation getPositionInformation() {
@@ -100,13 +93,6 @@ public class JHVEvent {
     public void finishParams() {
         allParameters = allParametersArray.toArray(new JHVEventParameter[0]);
         visibleParameters = visibleParametersArray.toArray(new JHVEventParameter[0]);
-
-        UrlValidator uv = UrlValidator.getInstance();
-        List<JHVEventParameter> simple = new ArrayList<>();
-        for (JHVEventParameter p : visibleParameters) {
-            if (!uv.isValid(p.getParameterValue())) simple.add(p);
-        }
-        simpleVisibleParameters = simple.toArray(new JHVEventParameter[0]);
 
         allParametersArray = null;
         visibleParametersArray = null;
