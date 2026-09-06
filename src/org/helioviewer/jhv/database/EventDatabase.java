@@ -52,6 +52,10 @@ public class EventDatabase {
                     "WHERE events.type_id=? AND events.start<=? AND events.end>=? UNION " +
                     "SELECT event_link.left_id, event_link.right_id FROM events JOIN event_link ON events.id=event_link.right_id " +
                     "WHERE events.type_id=? AND events.start<=? AND events.end>=?";
+    private static final String SELECT_PARAMETER_ASSOCIATIONS =
+            "SELECT min(a.event_id, b.event_id), max(a.event_id, b.event_id) " +
+                    "FROM events AS e JOIN event_parameter AS a ON a.event_id=e.id JOIN event_parameter AS b ON b.value=a.value " +
+                    "WHERE e.type_id=? AND e.start<=? AND e.end>=? AND a.name=? AND b.type_id=? AND b.name=? AND a.event_id!=b.event_id";
     private static final String SELECT_EVENT =
             "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e " +
                     "LEFT JOIN event_type ON e.type_id=event_type.id WHERE e.id=?";
@@ -185,13 +189,11 @@ public class EventDatabase {
     }
 
     private static void storeEvents(List<SWEKHandler.RemoteEvent> remoteEvents, SWEKSupplier supplier) throws Exception {
-        int[] eventIds = new int[remoteEvents.size()];
         int typeId = findOrInsertEventTypeId(supplier);
 
         PreparedStatement statement = getPreparedStatement(UPSERT_EVENT);
 
-        for (int i = 0; i < remoteEvents.size(); i++) {
-            SWEKHandler.RemoteEvent event2db = remoteEvents.get(i);
+        for (SWEKHandler.RemoteEvent event2db : remoteEvents) {
             statement.setInt(1, typeId);
             statement.setString(2, event2db.uid());
             statement.setLong(3, event2db.start());
@@ -217,33 +219,6 @@ public class EventDatabase {
                 parameter.setInt(3, typeId);
                 bindIndexedValue(parameter, 4, value);
                 parameter.executeUpdate();
-            }
-            eventIds[i] = eventId;
-        }
-        storeRelatedEventLinks(eventIds, supplier, typeId);
-    }
-
-    private static void storeRelatedEventLinks(int[] eventIds, SWEKSupplier type, int typeId) throws Exception {
-        SWEKGroup group = type.group();
-        for (SWEK.RelatedEvents relation : SWEKCatalog.getRelatedEvents()) {
-            if (relation.group() != group || relation.relatedWith() != group)
-                continue;
-
-            for (SWEK.RelatedOn relatedOn : relation.relatedOnList()) {
-                String sql = "INSERT INTO event_link(left_id, right_id) " +
-                        "SELECT DISTINCT min(a.event_id, b.event_id), max(a.event_id, b.event_id) " +
-                        "FROM event_parameter AS a JOIN event_parameter AS b ON a.value=b.value " +
-                        "WHERE a.type_id=? AND b.type_id=? AND a.name=? AND b.name=? AND a.event_id!=b.event_id AND (a.event_id=? OR b.event_id=?)";
-                PreparedStatement statement = getPreparedStatement(sql);
-                statement.setInt(1, typeId);
-                statement.setInt(2, typeId);
-                statement.setString(3, relatedOn.parameterFrom());
-                statement.setString(4, relatedOn.parameterWith());
-                for (int eventId : eventIds) {
-                    statement.setInt(5, eventId);
-                    statement.setInt(6, eventId);
-                    statement.executeUpdate();
-                }
             }
         }
     }
@@ -499,13 +474,33 @@ public class EventDatabase {
             if (typeId == -1)
                 return assocList;
 
-            PreparedStatement pstatement = getPreparedStatement(SELECT_ASSOCIATIONS);
+            List<SWEK.RelatedOn> parameters = new ArrayList<>();
+            for (SWEK.RelatedEvents relation : SWEKCatalog.getRelatedEvents()) {
+                if (relation.group() != type.group() || relation.relatedWith() != type.group())
+                    continue;
+                for (SWEK.RelatedOn field : relation.relatedOnList()) {
+                    parameters.add(field);
+                    if (!field.parameterFrom().equals(field.parameterWith()))
+                        parameters.add(new SWEK.RelatedOn(field.parameterWith(), field.parameterFrom()));
+                }
+            }
+            String sql = SELECT_ASSOCIATIONS + (" UNION " + SELECT_PARAMETER_ASSOCIATIONS).repeat(parameters.size()) + " ORDER BY 1,2";
+            PreparedStatement pstatement = getPreparedStatement(sql);
             pstatement.setInt(1, typeId);
             pstatement.setLong(2, end);
             pstatement.setLong(3, start);
             pstatement.setInt(4, typeId);
             pstatement.setLong(5, end);
             pstatement.setLong(6, start);
+            int index = 7;
+            for (SWEK.RelatedOn field : parameters) {
+                pstatement.setInt(index++, typeId);
+                pstatement.setLong(index++, end);
+                pstatement.setLong(index++, start);
+                pstatement.setString(index++, field.parameterFrom());
+                pstatement.setInt(index++, typeId);
+                pstatement.setString(index++, field.parameterWith());
+            }
 
             try (ResultSet rs = pstatement.executeQuery()) {
                 while (rs.next()) {
