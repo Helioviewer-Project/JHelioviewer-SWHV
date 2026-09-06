@@ -95,8 +95,8 @@ public final class HEKCatalogTest {
                 for (SWEK.Parameter parameter : supplier.getParameterList()) {
                     if (parameter.filter() == null) continue;
                     double threshold = parameter.filter().startValue();
-                    long expectedCount = page.events().stream().filter(event -> event.paramList().stream().anyMatch(p -> p.name().equals(parameter.name())
-                            && p.value() instanceof Number value && value.doubleValue() >= threshold)).count();
+                    long expectedCount = page.events().stream().filter(event -> event.indexedValues().get(parameter.name()) != null
+                            && event.indexedValues().get(parameter.name()).doubleValue() >= threshold).count();
                     check(EventDatabase.events2Program(start, end, supplier, List.of(new SWEK.Param(parameter.name(), threshold, SWEK.Operand.BIGGER_OR_EQUAL))).size()
                             == expectedCount, "configured numeric filter: " + parameter.name());
                 }

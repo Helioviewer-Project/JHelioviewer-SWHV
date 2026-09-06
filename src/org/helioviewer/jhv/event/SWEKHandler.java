@@ -10,10 +10,19 @@ import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    public record RemoteParameter(String name, Object value) {}
+    public record IndexedValues(Double goesFlux, Integer cmeSpeed, Integer noaaRegion) {
+        public Number get(String field) {
+            return switch (field.toLowerCase()) {
+                case "jhv_goesflux" -> goesFlux;
+                case "cme_radiallinvel" -> cmeSpeed;
+                case "ar_noaanum" -> noaaRegion;
+                default -> throw new IllegalArgumentException("Unknown indexed event field: " + field);
+            };
+        }
+    }
 
     public record RemoteEvent(byte[] compressedJson, long start, long end, long archiv, String uid,
-                              List<RemoteParameter> paramList) {}
+                              IndexedValues indexedValues) {}
 
     public record RemotePage(boolean overmax, List<RemoteEvent> events, List<JHVEvent.LinkRef> associations) {}
 

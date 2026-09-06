@@ -195,12 +195,11 @@ public class EventDatabase {
         }
     }
 
-    private static void bindRemoteParameter(PreparedStatement statement, int index, SWEKHandler.RemoteParameter parameter) throws SQLException {
-        switch (parameter.value()) {
+    private static void bindIndexedValue(PreparedStatement statement, int index, Number value) throws SQLException {
+        switch (value) {
             case Integer i -> statement.setInt(index, i);
-            case String s -> statement.setString(index, s);
             case Double d -> statement.setDouble(index, d);
-            default -> throw new IllegalArgumentException("Unsupported remote parameter value: " + parameter.value());
+            default -> throw new IllegalArgumentException("Unsupported indexed event value: " + value);
         }
     }
 
@@ -227,8 +226,12 @@ public class EventDatabase {
 
             StringBuilder fieldString = new StringBuilder();
             StringBuilder varString = new StringBuilder();
-            for (SWEKHandler.RemoteParameter p : event2db.paramList()) {
-                fieldString.append(',').append(p.name());
+            List<Number> values = new ArrayList<>();
+            for (String field : SWEKCatalog.databaseFields(supplier).keySet()) {
+                Number value = event2db.indexedValues().get(field);
+                if (value == null) continue;
+                values.add(value);
+                fieldString.append(',').append(field);
                 varString.append(",?");
             }
             String full_statement = "INSERT INTO " + supplier.dbName() + "(event_id" + fieldString + ") VALUES(?" + varString + ')';
@@ -236,8 +239,8 @@ public class EventDatabase {
             pstatement.setInt(1, eventId);
 
             int index = 2;
-            for (SWEKHandler.RemoteParameter p : event2db.paramList()) {
-                bindRemoteParameter(pstatement, index, p);
+            for (Number value : values) {
+                bindIndexedValue(pstatement, index, value);
                 index++;
             }
             pstatement.executeUpdate();

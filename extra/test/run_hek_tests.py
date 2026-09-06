@@ -23,6 +23,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-hek-tests-") as classes:
         "javac", "-cp", classpath, "-d", classes,
         "extra/test/HEKQueryTest.java",
         "extra/test/HEKHandlerTest.java",
+        "extra/test/HEKIndexedValuesTest.java",
         "extra/test/EventDatabaseTest.java",
         "extra/test/HEKGeometryTest.java",
         "extra/test/HEKCatalogTest.java",
@@ -31,6 +32,7 @@ with tempfile.TemporaryDirectory(prefix="jhv-hek-tests-") as classes:
     for test in (
         "org.helioviewer.jhv.plugins.swek.sources.HEKQueryTest",
         "org.helioviewer.jhv.plugins.swek.sources.HEKHandlerTest",
+        "org.helioviewer.jhv.plugins.swek.sources.HEKIndexedValuesTest",
         "org.helioviewer.jhv.event.RelatedEventsTest",
     ):
         subprocess.run([

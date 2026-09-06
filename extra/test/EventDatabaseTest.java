@@ -52,9 +52,9 @@ public final class EventDatabaseTest {
             json = output.toByteArray();
         }
         SWEKHandler.RemoteEvent first = new SWEKHandler.RemoteEvent(json, 100, 300, 100, "first",
-                List.of(new SWEKHandler.RemoteParameter("jhv_goesflux", 1e-5)));
+                new SWEKHandler.IndexedValues(1e-5, null, null));
         SWEKHandler.RemoteEvent second = new SWEKHandler.RemoteEvent(json, 200, 400, 100, "second",
-                List.of(new SWEKHandler.RemoteParameter("jhv_goesflux", 1e-6)));
+                new SWEKHandler.IndexedValues(1e-6, null, null));
         SWEKHandler.RemotePage page = new SWEKHandler.RemotePage(false, List.of(first, second),
                 List.of(new JHVEvent.LinkRef("first", "second")));
         check(EventDatabase.storeRemotePage(page, dataSupplier), "store page transaction");
@@ -63,6 +63,11 @@ public final class EventDatabaseTest {
         check(EventDatabase.events2Program(250, 250, dataSupplier,
                 List.of(new SWEK.Param("jhv_goesflux", 1e-5, SWEK.Operand.BIGGER_OR_EQUAL))).size() == 1, "SQL flux filter");
         check(EventDatabase.associations2Program(250, 250, dataSupplier).size() == 1, "association deduplication");
+        SWEKHandler.RemoteEvent cleared = new SWEKHandler.RemoteEvent(json, 100, 300, 100, "first", new SWEKHandler.IndexedValues(null, null, null));
+        check(EventDatabase.storeRemotePage(new SWEKHandler.RemotePage(false, List.of(cleared), List.of()), dataSupplier), "replace indexed value with absence");
+        check(EventDatabase.events2Program(250, 250, dataSupplier, List.of()).size() == 2, "cleared value does not remove the event");
+        check(EventDatabase.events2Program(250, 250, dataSupplier,
+                List.of(new SWEK.Param("jhv_goesflux", 1e-5, SWEK.Operand.BIGGER_OR_EQUAL))).isEmpty(), "old indexed value is not retained");
         try {
             EventDatabase.events2Program(250, 250, dataSupplier,
                     List.of(new SWEK.Param("missing_column", 1, SWEK.Operand.BIGGER_OR_EQUAL)));

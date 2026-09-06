@@ -7,7 +7,6 @@ import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.helioviewer.jhv.app.Log;
@@ -66,26 +65,26 @@ public class HEKHandler extends SWEKHandler {
         if (uid.isBlank())
             throw new IOException("HEK event has an empty archive ID");
 
-        ArrayList<SWEKHandler.RemoteParameter> paramList = new ArrayList<>();
-        for (Map.Entry<String, String> fieldEntry : SWEKCatalog.databaseFields(supplier).entrySet()) {
-            String dbType = fieldEntry.getValue();
-            String fieldName = fieldEntry.getKey();
+        Double goesFlux = null;
+        Integer cmeSpeed = null, noaaRegion = null;
+        for (String fieldName : SWEKCatalog.databaseFields(supplier).keySet()) {
             String lfieldName = fieldName.toLowerCase();
             if (result.isNull(lfieldName))
                 continue;
 
             try {
-                switch (dbType) {
-                    case "INTEGER" -> paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getInt(lfieldName)));
-                    case "TEXT" -> paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getString(lfieldName)));
-                    case "REAL" -> paramList.add(new SWEKHandler.RemoteParameter(fieldName, result.getDouble(lfieldName)));
+                switch (lfieldName) {
+                    case "jhv_goesflux" -> goesFlux = result.getDouble(lfieldName);
+                    case "cme_radiallinvel" -> cmeSpeed = result.getInt(lfieldName);
+                    case "ar_noaanum" -> noaaRegion = result.getInt(lfieldName);
+                    default -> throw new IllegalArgumentException("Unknown indexed HEK field: " + fieldName);
                 }
             } catch (JSONException e) {
                 Log.warn("Ignoring malformed HEK field " + fieldName + " in " + uid, e);
             }
         }
         try (ByteArrayOutputStream baos = JSONUtils.compressJSON(result)) {
-            return new SWEKHandler.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, paramList);
+            return new SWEKHandler.RemoteEvent(baos.toByteArray(), start, end, archiv, uid, new IndexedValues(goesFlux, cmeSpeed, noaaRegion));
         }
     }
 
