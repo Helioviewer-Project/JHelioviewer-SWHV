@@ -409,9 +409,19 @@ public class EventDatabase {
 
     public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
+    public record EventBatch(List<SolarEvent> events, List<SolarEvent.Link> associations) {}
+
     private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
     private record JsonEventDetails(JsonEvent event, List<JsonEvent> relatedEvents) {}
+
+    private record JsonEventBatch(List<JsonEvent> events, List<SolarEvent.Link> associations) {}
+
+    public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+        JsonEventBatch batch = executor.invokeAndWait(() -> new JsonEventBatch(
+                new QueryEvents(start, end, type, params).call(), new Associations2Program(start, end, type).call()));
+        return new EventBatch(parseEvents(batch.events(), false), batch.associations());
+    }
 
     public static List<SolarEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
         return parseEvents(executor.invokeAndWait(new QueryEvents(start, end, type, params)), false);

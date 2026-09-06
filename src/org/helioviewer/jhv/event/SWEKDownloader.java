@@ -26,8 +26,6 @@ public class SWEKDownloader {
             new AppThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    private record LoadedEvents(List<SolarEvent> events, List<SolarEvent.Link> associations) {}
-
     private static final class Worker implements Runnable, Comparable<Worker> {
         private final SWEKSupplier supplier;
         private final List<SWEK.Param> params;
@@ -53,16 +51,13 @@ public class SWEKDownloader {
                 if (cancelled)
                     return;
 
-                LoadedEvents events = new LoadedEvents(
-                        EventDatabase.events2Program(start, end, supplier, params),
-                        EventDatabase.associations2Program(start, end, supplier));
-                finishSuccess(events);
+                finishSuccess(EventDatabase.loadEvents(start, end, supplier, params));
             } catch (Throwable t) {
                 finishFailure(t);
             }
         }
 
-        private void finishSuccess(LoadedEvents events) {
+        private void finishSuccess(EventDatabase.EventBatch events) {
             if (!cancelled) {
                 EventQueue.invokeLater(() -> {
                     if (!cancelled)
@@ -85,7 +80,7 @@ public class SWEKDownloader {
             });
         }
 
-        private void publish(LoadedEvents events) {
+        private void publish(EventDatabase.EventBatch events) {
             events.events().forEach(EventCache::addEvent);
             events.associations().forEach(EventCache::addAssociation);
             EventCache.fireEventCacheChanged();
