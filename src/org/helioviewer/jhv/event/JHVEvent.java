@@ -3,8 +3,6 @@ package org.helioviewer.jhv.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.validator.routines.UrlValidator;
 
 public class JHVEvent {
@@ -78,23 +76,12 @@ public class JHVEvent {
         positionInformation = pi;
     }
 
-    @Nullable
-    public JHVEventParameter getParameter(String key) {
-        for (JHVEventParameter p : allParameters) {
-            if (p.getParameterName() == key) return p;
-        }
-        return null;
-    }
-
     public void addParameter(String key, String displayName, String value, boolean visible, boolean full) {
         if (allParametersArray == null)
             throw new IllegalStateException("Cannot add parameters after finishParams");
 
-        if (!visible && !full) {
-            if (!key.equals("cme_radiallinvel") && !key.equals("event_coord1") && !key.equals("cme_angularwidth")) {
-                return;
-            }
-        }
+        if (!visible && !full)
+            return;
         JHVEventParameter parameter = new JHVEventParameter(key,
                 displayName != null ? displayName : key.replace("_", " ").trim(), value);
         allParametersArray.add(parameter);
