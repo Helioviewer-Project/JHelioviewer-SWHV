@@ -18,6 +18,7 @@ import org.helioviewer.jhv.event.JHVEventListener;
 import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
+import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.timelines.TimelineLayer;
 import org.helioviewer.jhv.timelines.draw.ClickableDrawable;
 import org.helioviewer.jhv.timelines.draw.DrawConstants;
@@ -108,13 +109,18 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
             }
             int eventPosition = i;
 
-            int x0 = xMapper.toPixel(eventStart);
-            int x1 = xMapper.toPixel(eventEnd);
-            EventPlotConfiguration plot = createEventPlot(graphArea, event, x0, x1, eventPosition);
-            eventPlots.add(plot);
-            drawEvent(graphArea, plot, g, mousePosition);
-            if (plot.contains(mousePosition))
-                eventUnderMouse = plot;
+            for (Interval interval : event.getIntervals()) {
+                if (interval.end() < xAxis.start() || interval.start() > xAxis.end())
+                    continue;
+                int x0 = xMapper.toPixel(interval.start());
+                int x1 = xMapper.toPixel(interval.end());
+                long middle = interval.start() + (interval.end() - interval.start()) / 2;
+                EventPlotConfiguration plot = createEventPlot(graphArea, event, x0, x1, eventPosition, middle);
+                eventPlots.add(plot);
+                drawEvent(graphArea, plot, g, mousePosition);
+                if (plot.contains(mousePosition))
+                    eventUnderMouse = plot;
+            }
         }
 
         if (mousePosition != null) {
@@ -164,20 +170,20 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
         return false;
     }
 
-    private record EventPlotConfiguration(JHVRelatedEvents event, int x, int y, int width, int height) {
+    private record EventPlotConfiguration(JHVRelatedEvents event, int x, int y, int width, int height, long time) {
         boolean contains(Point point) {
             return containsPoint(point, x - 1, y - 1, width + 2, height + 2);
         }
     }
 
-    private static EventPlotConfiguration createEventPlot(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition) {
+    private static EventPlotConfiguration createEventPlot(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, long time) {
         int w = Math.max(x1 - x0, 1);
         if (w < 5) {
             x0 -= 5 / w;
             w = 5;
         }
         int y = graphArea.y + 6 * yPosition + DrawConstants.EVENT_OFFSET;
-        return new EventPlotConfiguration(event, x0, y, w, 3);
+        return new EventPlotConfiguration(event, x0, y, w, 3, time);
     }
 
     private static void drawEvent(Rectangle graphArea, EventPlotConfiguration plot, Graphics2D g, Point mousePosition) {
@@ -201,8 +207,7 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
         g.setColor(event.getColor());
         g.fillRect(x0, y, w, spacePerLine);
 
-        long middle = event.getStart() + (event.getEnd() - event.getStart()) / 2;
-        ImageIcon icon = SWEKIconBank.getIcon(event.getClosestTo(middle).getSupplier().group().getIconKey());
+        ImageIcon icon = SWEKIconBank.getIcon(event.getClosestTo(plot.time).getSupplier().group().getIconKey());
         g.drawImage(icon.getImage(), x0 + w / 2 - sz / 2, y + h / 2 - sz / 2, x0 + w / 2 + sz / 2, y + h / 2 + sz / 2, 0, 0, icon.getIconWidth(), icon.getIconHeight(), null);
 
         if (hl && mousePosition != null) {

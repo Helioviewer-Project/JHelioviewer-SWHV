@@ -59,10 +59,43 @@ public class JHVRelatedEvents {
     }
 
     public JHVEvent getClosestTo(long timestamp) {
+        JHVEvent closest = events.sequencedValues().getFirst();
+        long minimumDistance = Long.MAX_VALUE;
         for (JHVEvent event : events.values()) {
             if (event.start <= timestamp && timestamp <= event.end) return event;
+            long distance = timestamp < event.start ? event.start - timestamp : timestamp - event.end;
+            if (distance < minimumDistance) {
+                minimumDistance = distance;
+                closest = event;
+            }
         }
-        return events.sequencedValues().getFirst();
+        return closest;
+    }
+
+    boolean overlaps(long start, long end) {
+        for (JHVEvent event : events.values()) {
+            if (event.start <= end && event.end >= start)
+                return true;
+        }
+        return false;
+    }
+
+    // Union of actual event intervals, preserving gaps in an associated group.
+    public List<Interval> getIntervals() {
+        List<Interval> sorted = new ArrayList<>();
+        for (JHVEvent event : events.values())
+            sorted.add(new Interval(event.start, event.end));
+        sorted.sort(null);
+        List<Interval> result = new ArrayList<>();
+        for (Interval next : sorted) {
+            if (result.isEmpty() || result.getLast().end() < next.start()) {
+                result.add(next);
+            } else {
+                Interval previous = result.removeLast();
+                result.add(new Interval(previous.start(), Math.max(previous.end(), next.end())));
+            }
+        }
+        return result;
     }
 
     public List<JHVEvent> getAssociatedEvents(JHVEvent event) {

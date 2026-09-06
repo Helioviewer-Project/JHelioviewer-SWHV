@@ -173,7 +173,7 @@ public class JHVEventCache {
                 events.subMap(start - maximumGroupDuration, true, end, true);
         for (List<JHVRelatedEvents> list : relevantRange.values()) {
             for (JHVRelatedEvents event : list) {
-                if (event.getEnd() >= start)
+                if (event.getEnd() >= start && event.overlaps(start, end))
                     result.add(event);
             }
         }
