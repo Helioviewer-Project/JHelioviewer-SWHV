@@ -111,8 +111,13 @@ public final class SWEKIntegrationTest {
             for (SWEKSupplier supplier : SWEKCatalog.getSuppliers(group)) {
                 supplierCount++;
                 List<JSONObject> expected = records.get(supplier);
+                Map<String, JSONObject> expectedById = new HashMap<>();
+                for (JSONObject record : expected)
+                    check(expectedById.put(record.getJSONObject("event").getString("kb_archivid"), record) == null, "unique fixture archive ID");
                 SWEKHandler.RemotePage page = handler.read(new JSONObject().put("overmax", false).put("result", results), supplier);
                 check(page.events().size() == expected.size(), "supplier filtering: " + supplier.id());
+                check(page.events().stream().map(SWEKHandler.RemoteEvent::uid).collect(Collectors.toSet()).equals(expectedById.keySet()),
+                        "parser retains exact archive IDs: " + supplier.id());
                 check(EventDatabase.storeRemotePage(page, supplier), "store " + supplier.id());
                 check(EventDatabase.storeRemotePage(page, supplier), "idempotent store");
                 long start = page.events().stream().mapToLong(event -> event.start()).min().orElseThrow();
@@ -123,11 +128,17 @@ public final class SWEKIntegrationTest {
                 List<SolarEvent> loaded = EventDatabase.loadEvents(start, end, supplier, List.of()).events();
                 check(loaded.size() == expected.size(), "database must retain every selected event: " + supplier.id());
                 Set<Integer> ids = new HashSet<>();
+                Set<String> archiveIds = new HashSet<>();
                 for (SolarEvent event : loaded) {
                     check(ids.add(event.getUniqueID()), "unique database identity");
-                    JSONObject record = expected.stream().filter(r -> TimeUtils.parse(r.getJSONObject("event").getString("event_starttime")) == event.start
-                            && TimeUtils.parse(r.getJSONObject("event").getString("event_endtime")) == event.end).findFirst().orElseThrow();
                     SolarEvent details = EventDatabase.getEventDetails(event.getUniqueID()).event();
+                    String archiveId = Arrays.stream(details.getAllEventParameters()).filter(parameter -> parameter.getParameterName().equals("kb_archivid"))
+                            .map(EventParameter::getParameterValue).findFirst().orElseThrow();
+                    check(archiveIds.add(archiveId), "unique loaded archive ID: " + archiveId);
+                    JSONObject record = expectedById.get(archiveId);
+                    check(record != null, "unexpected loaded archive ID: " + archiveId);
+                    check(event.start == TimeUtils.parse(record.getJSONObject("event").getString("event_starttime"))
+                            && event.end == TimeUtils.parse(record.getJSONObject("event").getString("event_endtime")), "archive ID retains its event times");
                     Set<String> visibleNames = Arrays.stream(details.getVisibleEventParameters()).map(EventParameter::getParameterName).collect(Collectors.toSet());
                     long removed = Arrays.stream(details.getAllEventParameters()).map(EventParameter::getParameterName)
                             .filter(name -> Set.of("cme_radiallinvel", "event_coord1", "cme_angularwidth").contains(name) && !visibleNames.contains(name)).count();
@@ -144,6 +155,7 @@ public final class SWEKIntegrationTest {
                     }
                     eventCount++;
                 }
+                check(archiveIds.equals(expectedById.keySet()), "database retains exact archive IDs: " + supplier.id());
                 EventCacheTest.checkLoadedEvents(loaded);
                 for (SWEK.Parameter parameter : supplier.getParameterList()) {
                     if (parameter.filter() == null) continue;

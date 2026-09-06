@@ -13,8 +13,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.helioviewer.jhv.app.AppInit;
 import org.helioviewer.jhv.app.Platform;
+import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 
@@ -355,6 +357,72 @@ public final class EventCacheTest {
         check(delayedHandler.calls.get() == 2, "reactivation creates exactly one replacement request");
         checkPublicationFailure(group, start, end);
         checkSupplierCancellation(group);
+        checkPagination(group, start, end);
+    }
+
+    private static void checkPagination(SWEKGroup group, long start, long end) throws Exception {
+        PaginatedHandler handler = new PaginatedHandler();
+        SWEKSupplier supplier = supplier(group, "paginated", handler);
+        EventQueue.invokeAndWait(() -> SWEKDownloader.setSupplierActive(supplier, true));
+        try {
+            await(request(group, start, end), "second page failure finishes request");
+            check(handler.pages.equals(List.of(0, 1)), "downloader advances to the second page");
+            check(!EventDatabase.isStored(start, end, supplier), "failed second page must not complete interval coverage");
+            List<SolarEvent> partial = EventDatabase.loadEvents(start, end, supplier, List.of()).events();
+            check(partial.size() == 1, "first page was stored before the second page failed");
+            int firstId = partial.getFirst().getUniqueID();
+
+            await(request(group, start, end), "retry completes both pages");
+            check(handler.pages.equals(List.of(0, 1, 0, 1)), "retry restarts pagination and stops at the final page");
+            check(EventDatabase.isStored(start, end, supplier), "successful final page completes interval coverage");
+            List<SolarEvent> loaded = EventDatabase.loadEvents(start, end, supplier, List.of()).events();
+            check(loaded.size() == 2, "retry retains both events without duplicating the first page");
+            check(loaded.stream().filter(event -> event.getUniqueID() == firstId).count() == 1, "retried first page keeps its database identity");
+            EventQueue.invokeAndWait(() -> {
+                for (SolarEvent event : loaded)
+                    check(EventCache.getRelatedEvents(event.getUniqueID()) != null, "completed download publishes every page");
+                SWEKDownloader.requestForInterval(start, end);
+                check(!SWEKDownloader.isGroupBusy(group), "completed pages are not scheduled again");
+            });
+            check(handler.pages.size() == 4, "completed interval requires no further fetches");
+        } finally {
+            EventQueue.invokeAndWait(() -> {
+                SWEKDownloader.setSupplierActive(supplier, false);
+                SWEKDownloader.clearGroupChangedCallback();
+            });
+        }
+    }
+
+    private static final class PaginatedHandler extends SWEKHandler {
+        private final List<Integer> pages = new ArrayList<>();
+        private final byte[] json = JSONUtils.compressJSON(new JSONObject()).toByteArray();
+
+        PaginatedHandler() throws Exception {}
+
+        @Override
+        RemotePage fetchPage(SWEKSupplier supplier, long start, long end, int page) {
+            pages.add(page);
+            check(page == 0 || page == 1, "only two pages exist");
+            if (pages.size() == 2)
+                throw new IllegalStateException("deliberate second page failure");
+            RemoteEvent event = new RemoteEvent(json, start, end, start, "page-" + page, Map.of());
+            return new RemotePage(page == 0, List.of(event), List.of());
+        }
+
+        @Override
+        protected URI createURI(SWEKSupplier supplier, long start, long end, int page) {
+            throw new AssertionError("controlled pagination does not use the network");
+        }
+
+        @Override
+        protected RemotePage parseRemotePage(JSONObject json, SWEKSupplier supplier) {
+            throw new AssertionError("controlled pagination supplies pages directly");
+        }
+
+        @Override
+        public SolarEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) {
+            return new SolarEvent(supplier, id, start, end);
+        }
     }
 
     private static void checkSupplierCancellation(SWEKGroup group) throws Exception {
@@ -414,7 +482,7 @@ public final class EventCacheTest {
         }
     }
 
-    private static SWEKSupplier supplier(SWEKGroup group, String name, ControlledHandler handler) {
+    private static SWEKSupplier supplier(SWEKGroup group, String name, SWEKHandler handler) {
         SWEKSupplier supplier = new SWEKSupplier(group, name, name, new SWEK.Source("test", List.of(), handler, Map.of()), name, List.of());
         SWEKCatalog.add(supplier);
         SWEKCatalog.setRelations(List.of());
