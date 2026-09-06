@@ -13,14 +13,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableRowSorter;
 
-import org.helioviewer.jhv.event.JHVEventParameter;
+import org.helioviewer.jhv.event.EventParameter;
 import org.helioviewer.jhv.gui.DesktopIntegration;
 import org.helioviewer.jhv.gui.component.WrappedTable;
 
 @SuppressWarnings("serial")
 class ParameterTablePanel extends JPanel {
 
-    ParameterTablePanel(JHVEventParameter[] parameters) {
+    ParameterTablePanel(EventParameter[] parameters) {
         setLayout(new BorderLayout());
 
         ParameterTableModel parameterModel = new ParameterTableModel(parameters);

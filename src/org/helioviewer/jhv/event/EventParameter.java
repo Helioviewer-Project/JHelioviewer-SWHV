@@ -7,7 +7,7 @@ import org.helioviewer.jhv.base.Regex;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
-public class JHVEventParameter {
+public class EventParameter {
 
     private static final NumberFormat numFormatter = new DecimalFormat("0.###E0");
 
@@ -23,7 +23,7 @@ public class JHVEventParameter {
     private String parameterSimpleDisplayValue;
     private Boolean url;
 
-    public JHVEventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {
+    public EventParameter(String _parameterName, String _parameterDisplayName, String _parameterValue) {
         parameterName = _parameterName.intern();
         parameterDisplayName = _parameterDisplayName.intern();
         parameterValue = _parameterValue.intern();

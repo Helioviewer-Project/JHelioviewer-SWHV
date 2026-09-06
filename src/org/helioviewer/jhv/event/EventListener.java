@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.event;
 
-public class JHVEventListener {
+public class EventListener {
 
     public interface Handle {
         void cacheUpdated();

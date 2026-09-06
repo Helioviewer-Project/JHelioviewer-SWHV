@@ -6,17 +6,17 @@ import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.event.JHVEventParameter;
+import org.helioviewer.jhv.event.EventParameter;
 
 @SuppressWarnings("serial")
 class ParameterTableModel extends AbstractTableModel {
 
-    private final JHVEventParameter[] parameters;
+    private final EventParameter[] parameters;
     private final String[] urls;
 
     private static final int STRING_CUTOFF = 256;
 
-    ParameterTableModel(JHVEventParameter[] _parameters) {
+    ParameterTableModel(EventParameter[] _parameters) {
         parameters = _parameters;
         urls = new String[parameters.length];
         for (int i = 0; i < parameters.length; i++) {

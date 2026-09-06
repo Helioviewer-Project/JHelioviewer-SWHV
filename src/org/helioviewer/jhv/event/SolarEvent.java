@@ -1,6 +1,6 @@
 package org.helioviewer.jhv.event;
 
-public class JHVEvent {
+public class SolarEvent {
 
     public record CMEParameters(double speedKmPerSecond, double principalAngleDegree, double angularWidthDegree) {
         public static final CMEParameters DEFAULT = new CMEParameters(500, 0, 0);
@@ -15,16 +15,16 @@ public class JHVEvent {
     private final int id;
     private final SWEKSupplier supplier;
 
-    private final JHVEventMetadata metadata;
-    private final JHVPositionInformation positionInformation;
+    private final EventMetadata metadata;
+    private final EventGeometry positionInformation;
     private final CMEParameters cmeParameters;
 
-    public JHVEvent(SWEKSupplier supplier, int id, long start, long end) {
-        this(supplier, id, start, end, null, CMEParameters.DEFAULT, JHVEventMetadata.EMPTY);
+    public SolarEvent(SWEKSupplier supplier, int id, long start, long end) {
+        this(supplier, id, start, end, null, CMEParameters.DEFAULT, EventMetadata.EMPTY);
     }
 
-    public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end,
-                    JHVPositionInformation _positionInformation, CMEParameters _cmeParameters, JHVEventMetadata _metadata) {
+    public SolarEvent(SWEKSupplier _supplier, int _id, long _start, long _end,
+                    EventGeometry _positionInformation, CMEParameters _cmeParameters, EventMetadata _metadata) {
         metadata = _metadata;
         positionInformation = _positionInformation;
         cmeParameters = _cmeParameters;
@@ -34,15 +34,15 @@ public class JHVEvent {
         id = _id;
     }
 
-    public JHVEventParameter[] getAllEventParameters() {
+    public EventParameter[] getAllEventParameters() {
         return metadata.allParameters();
     }
 
-    public JHVEventParameter[] getVisibleEventParameters() {
+    public EventParameter[] getVisibleEventParameters() {
         return metadata.visibleParameters();
     }
 
-    public JHVPositionInformation getPositionInformation() {
+    public EventGeometry getPositionInformation() {
         return positionInformation;
     }
 

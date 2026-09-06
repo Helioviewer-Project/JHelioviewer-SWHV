@@ -3,13 +3,13 @@ package org.helioviewer.jhv.event;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.math.Vec3;
 
-public class JHVPositionInformation {
+public class EventGeometry {
 
     private final Vec3 centralPoint;
     private final float[] boundBox;
     private final Position earthPosition;
 
-    public JHVPositionInformation(Vec3 _centralPoint, float[] _boundBox, Position p) {
+    public EventGeometry(Vec3 _centralPoint, float[] _boundBox, Position p) {
         centralPoint = _centralPoint;
         boundBox = _boundBox;
         earthPosition = p;

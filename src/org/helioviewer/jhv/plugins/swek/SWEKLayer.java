@@ -15,12 +15,12 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.event.JHVEvent;
-import org.helioviewer.jhv.event.JHVEventCache;
-import org.helioviewer.jhv.event.JHVEventListener;
-import org.helioviewer.jhv.event.JHVObservationGroup;
-import org.helioviewer.jhv.event.JHVPositionInformation;
+import org.helioviewer.jhv.event.EventCache;
+import org.helioviewer.jhv.event.EventGeometry;
+import org.helioviewer.jhv.event.EventListener;
+import org.helioviewer.jhv.event.ObservationGroup;
 import org.helioviewer.jhv.event.SWEKGroup;
+import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.AbstractLayer;
 import org.helioviewer.jhv.math.MathUtils;
@@ -41,7 +41,7 @@ import org.helioviewer.jhv.time.TimeListener;
 import org.json.JSONObject;
 
 // has to be public for state
-public final class SWEKLayer extends AbstractLayer implements JHVEventListener.Handle, TimeListener.Range {
+public final class SWEKLayer extends AbstractLayer implements EventListener.Handle, TimeListener.Range {
     private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {}
 
     private static final int DIVPOINTS = 10;
@@ -68,7 +68,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private final BufCoord texBuf = new BufCoord(4 * 8);
 
     private long cachedEventsTime = Long.MIN_VALUE;
-    private List<JHVObservationGroup> cachedActiveEvents = List.of();
+    private List<ObservationGroup> cachedActiveEvents = List.of();
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null) {
@@ -129,14 +129,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         vexBuf.endLine();
     }
 
-    private static CactusArcParams cactusArcParams(JHVEvent evt, long timestamp) {
+    private static CactusArcParams cactusArcParams(SolarEvent evt, long timestamp) {
         double angularWidthDegree = evt.getCMEParameters().angularWidthDegree();
         double principalAngleDegree = evt.getCMEParameters().principalAngleDegree();
         double distSun = SWEKData.cactusDistance(evt, timestamp);
         return new CactusArcParams(angularWidthDegree, principalAngleDegree, distSun);
     }
 
-    private void drawCactusArc(JHVObservationGroup evtr, JHVEvent evt, long timestamp) {
+    private void drawCactusArc(ObservationGroup evtr, SolarEvent evt, long timestamp) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -172,8 +172,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawPolygon(MapView mv, Viewport vp, JHVObservationGroup evtr, JHVEvent evt) {
-        JHVPositionInformation pi = evt.getPositionInformation();
+    private void drawPolygon(MapView mv, Viewport vp, ObservationGroup evtr, SolarEvent evt) {
+        EventGeometry pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
@@ -231,8 +231,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord(p3, texCoord[3]);
     }
 
-    private void drawIcon(JHVObservationGroup evtr, JHVEvent evt) {
-        JHVPositionInformation pi = evt.getPositionInformation();
+    private void drawIcon(ObservationGroup evtr, SolarEvent evt) {
+        EventGeometry pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
@@ -253,8 +253,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(MapView mv, Viewport vp, JHVObservationGroup evtr, JHVEvent evt) {
-        JHVPositionInformation pi = evt.getPositionInformation();
+    private void drawIconScale(MapView mv, Viewport vp, ObservationGroup evtr, SolarEvent evt) {
+        EventGeometry pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
@@ -272,7 +272,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         vexBuf.endLine();
     }
 
-    private void drawCactusArcScale(Viewport vp, JHVObservationGroup evtr, JHVEvent evt, long timestamp, MapScale scale) {
+    private void drawCactusArcScale(Viewport vp, ObservationGroup evtr, SolarEvent evt, long timestamp, MapScale scale) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double principalAngleDegree = params.principalAngleDegree();
@@ -309,8 +309,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(Viewport vp, JHVObservationGroup mouseOverJHVEvent, int x, int y, long currentTime) {
-        GLText.drawTextFloat(vp, SWEKData.visibleParameterLines(mouseOverJHVEvent.getClosestTo(currentTime)), x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
+    private void drawText(Viewport vp, ObservationGroup mouseOverGroup, int x, int y, long currentTime) {
+        GLText.drawTextFloat(vp, SWEKData.visibleParameterLines(mouseOverGroup.getClosestTo(currentTime)), x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     private void renderEvents(Viewport vp) {
@@ -320,15 +320,15 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         lineThick.renderLine(vp, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(MapView mv, List<JHVObservationGroup> evs, long currentTime) {
+    private void renderIcons(MapView mv, List<ObservationGroup> evs, long currentTime) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
-        for (JHVObservationGroup evtr : evs) {
-            JHVEvent evt = evtr.getClosestTo(currentTime);
+        for (ObservationGroup evtr : evs) {
+            SolarEvent evt = evtr.getClosestTo(currentTime);
             if (mv.isLatitudinal() && evt.isCactus())
                 continue;
             if (!evt.isCactus()) {
-                JHVPositionInformation pi = evt.getPositionInformation();
+                EventGeometry pi = evt.getPositionInformation();
                 if (pi == null || pi.centralPoint() == null)
                     continue;
             }
@@ -338,10 +338,10 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    List<JHVObservationGroup> activeEvents(long time) {
+    List<ObservationGroup> activeEvents(long time) {
         if (time != cachedEventsTime) {
             cachedEventsTime = time;
-            cachedActiveEvents = JHVEventCache.getEvents(time, time);
+            cachedActiveEvents = EventCache.getEvents(time, time);
         }
         return cachedActiveEvents;
     }
@@ -355,12 +355,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
-        List<JHVObservationGroup> evs = activeEvents(currentTime);
+        List<ObservationGroup> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
 
-        for (JHVObservationGroup evtr : evs) {
-            JHVEvent evt = evtr.getClosestTo(currentTime);
+        for (ObservationGroup evtr : evs) {
+            SolarEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus()) {
                 drawCactusArc(evtr, evt, currentTime);
             } else {
@@ -381,13 +381,13 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
-        List<JHVObservationGroup> evs = activeEvents(currentTime);
+        List<ObservationGroup> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
 
         MapScale scale = mv.scale(vp);
-        for (JHVObservationGroup evtr : evs) {
-            JHVEvent evt = evtr.getClosestTo(currentTime);
+        for (ObservationGroup evtr : evs) {
+            SolarEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus() && mv.isRectWarp()) {
                 drawCactusArcScale(vp, evtr, evt, currentTime, scale);
             } else {
@@ -407,8 +407,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     public void renderFullFloat(Viewport vp) {
         if (!enabled)
             return;
-        if (swekContext != null && swekContext.mouseOverJHVEvent() != null) {
-            drawText(vp, swekContext.mouseOverJHVEvent(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
+        if (swekContext != null && swekContext.mouseOverGroup() != null) {
+            drawText(vp, swekContext.mouseOverGroup(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
         }
     }
 
@@ -428,14 +428,14 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         super.setEnabled(_enabled);
 
         if (enabled) {
-            JHVEventCache.registerHandler(this);
+            EventCache.registerHandler(this);
             Player.addTimeRangeListener(this);
             requestEvents(true, Player.getStartTime(), Player.getEndTime());
         } else {
             invalidateActiveEvents();
-            JHVEventCache.highlight(null);
+            EventCache.highlight(null);
             Player.removeTimeRangeListener(this);
-            JHVEventCache.unregisterHandler(this);
+            EventCache.unregisterHandler(this);
         }
         SWEKPlugin.layerStateChanged(this);
     }
@@ -463,7 +463,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (force || start < startTime || end > endTime) {
             startTime = start;
             endTime = end;
-            JHVEventCache.requestForInterval(start, end);
+            EventCache.requestForInterval(start, end);
         }
     }
 

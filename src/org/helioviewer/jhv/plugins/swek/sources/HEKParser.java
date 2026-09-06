@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.helioviewer.jhv.event.JHVEventMetadata;
+import org.helioviewer.jhv.event.EventMetadata;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.math.MathUtils;
@@ -18,8 +18,8 @@ class HEKParser {
 
     private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
-    static JHVEventMetadata parseResult(JSONObject result, SWEKSupplier supplier, boolean full) throws JSONException {
-        JHVEventMetadata.Builder metadata = new JHVEventMetadata.Builder(supplier, full);
+    static EventMetadata parseResult(JSONObject result, SWEKSupplier supplier, boolean full) throws JSONException {
+        EventMetadata.Builder metadata = new EventMetadata.Builder(supplier, full);
         boolean waveCM = false;
         String waveValue = null;
 
@@ -69,14 +69,14 @@ class HEKParser {
         return metadata.build();
     }
 
-    private static void parseRefs(JHVEventMetadata.Builder metadata, JSONArray refs) throws JSONException {
+    private static void parseRefs(EventMetadata.Builder metadata, JSONArray refs) throws JSONException {
         int len = refs.length();
         for (int i = 0; i < len; i++) {
             parseRef(metadata, refs.getJSONObject(i));
         }
     }
 
-    private static void parseRef(JHVEventMetadata.Builder metadata, JSONObject ref) throws JSONException {
+    private static void parseRef(EventMetadata.Builder metadata, JSONObject ref) throws JSONException {
         String url = "", type = null;
 
         Iterator<String> keys = ref.keys();

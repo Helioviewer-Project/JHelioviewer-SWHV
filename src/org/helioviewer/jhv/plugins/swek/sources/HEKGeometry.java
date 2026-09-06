@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.event.JHVPositionInformation;
+import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
 import org.helioviewer.jhv.time.JHVTime;
@@ -104,7 +104,7 @@ final class HEKGeometry {
     }
 
     @Nullable
-    JHVPositionInformation position(long start, boolean cactus) {
+    EventGeometry position(long start, boolean cactus) {
         List<HgsPoint> hgsBoundedBox = checkAndFixBoundingBox(this.hgsBoundedBox);
         if (hgsBoundedBox == null && hgsCentralPoint == null && (hgsLongitudeDeg == null || hgsLatitudeDeg == null) && hgsBoundCC == null)
             return null;
@@ -127,7 +127,7 @@ final class HEKGeometry {
         }
 
         Vec3 jhvCentralPoint = centralPoint != null ? hgsToJhv(centralPoint, elon) : null;
-        return new JHVPositionInformation(jhvCentralPoint, jhvBoundary, cactus ? p : null);
+        return new EventGeometry(jhvCentralPoint, jhvBoundary, cactus ? p : null);
     }
 
     private static Vec3 hgsToJhv(HgsPoint point, double elon) {

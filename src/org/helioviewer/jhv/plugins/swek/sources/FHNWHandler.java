@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.event.JHVEvent;
-import org.helioviewer.jhv.event.JHVEventMetadata;
+import org.helioviewer.jhv.event.EventMetadata;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
+import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.io.UriTemplate;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -63,13 +63,13 @@ public class FHNWHandler extends SWEKHandler {
     }
 
     @Override
-    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        JHVEventMetadata.Builder metadata = new JHVEventMetadata.Builder(supplier, true);
+    public SolarEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
+        EventMetadata.Builder metadata = new EventMetadata.Builder(supplier, true);
         parseResult(json, metadata);
-        return new JHVEvent(supplier, id, start, end, null, JHVEvent.CMEParameters.DEFAULT, metadata.build());
+        return new SolarEvent(supplier, id, start, end, null, SolarEvent.CMEParameters.DEFAULT, metadata.build());
     }
 
-    private static void parseResult(JSONObject result, JHVEventMetadata.Builder metadata) throws JSONException {
+    private static void parseResult(JSONObject result, EventMetadata.Builder metadata) throws JSONException {
         Iterator<String> keys = result.keys();
         while (keys.hasNext()) {
             String key = keys.next();

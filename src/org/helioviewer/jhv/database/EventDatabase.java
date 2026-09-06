@@ -14,12 +14,12 @@ import java.util.concurrent.Callable;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.app.Log;
-import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
+import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.thread.SingleExecutor;
@@ -166,10 +166,10 @@ public class EventDatabase {
         }
     }
 
-    private static void storeAssociations(List<JHVEvent.LinkRef> links) throws Exception {
+    private static void storeAssociations(List<SolarEvent.LinkRef> links) throws Exception {
         PreparedStatement pstatement = getPreparedStatement(INSERT_LINK);
 
-        for (JHVEvent.LinkRef link : links) {
+        for (SolarEvent.LinkRef link : links) {
             int id0 = findOrInsertEventId(link.firstUid());
             int id1 = findOrInsertEventId(link.secondUid());
             insertAssociation(pstatement, id0, id1);
@@ -248,15 +248,15 @@ public class EventDatabase {
         }
     }
 
-    private static JHVEvent parseJSON(JsonEvent jsonEvent, boolean full) throws Exception {
+    private static SolarEvent parseJSON(JsonEvent jsonEvent, boolean full) throws Exception {
         try (InputStream bais = new ByteArrayInputStream(jsonEvent.json); InputStream is = new GZIPInputStream(bais)) {
             return jsonEvent.type.source().handler().parseEventJSON(JSONUtils.get(is), jsonEvent.type, jsonEvent.id, jsonEvent.start, jsonEvent.end, full);
         }
     }
 
-    private static List<JHVEvent> parseEvents(List<JsonEvent> jsonEvents, boolean full) {
+    private static List<SolarEvent> parseEvents(List<JsonEvent> jsonEvents, boolean full) {
         HashSet<Integer> ids = new HashSet<>();
-        List<JHVEvent> events = new ArrayList<>();
+        List<SolarEvent> events = new ArrayList<>();
         for (int i = 0; i < jsonEvents.size(); i++) {
             JsonEvent jsonEvent = jsonEvents.get(i);
             jsonEvents.set(i, null);
@@ -432,13 +432,13 @@ public class EventDatabase {
         return last_timestamp;
     }
 
-    public record EventDetails(JHVEvent event, List<JHVEvent> relatedEvents) {}
+    public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
     private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
     private record JsonEventDetails(JsonEvent event, List<JsonEvent> relatedEvents) {}
 
-    public static List<JHVEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
+    public static List<SolarEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
         return parseEvents(executor.invokeAndWait(new QueryEvents(start, end, type, params)), false);
     }
 
@@ -486,15 +486,15 @@ public class EventDatabase {
         }
     }
 
-    public static List<JHVEvent.Link> associations2Program(long start, long end, SWEKSupplier type) throws Exception {
+    public static List<SolarEvent.Link> associations2Program(long start, long end, SWEKSupplier type) throws Exception {
         return executor.invokeAndWait(new Associations2Program(start, end, type));
     }
 
     private record Associations2Program(long start, long end, SWEKSupplier type)
-            implements Callable<List<JHVEvent.Link>> {
+            implements Callable<List<SolarEvent.Link>> {
         @Override
-        public List<JHVEvent.Link> call() throws Exception {
-            List<JHVEvent.Link> assocList = new ArrayList<>();
+        public List<SolarEvent.Link> call() throws Exception {
+            List<SolarEvent.Link> assocList = new ArrayList<>();
             int typeId = findEventTypeId(type);
             if (typeId == -1)
                 return assocList;
@@ -509,7 +509,7 @@ public class EventDatabase {
 
             try (ResultSet rs = pstatement.executeQuery()) {
                 while (rs.next()) {
-                    assocList.add(new JHVEvent.Link(rs.getInt(1), rs.getInt(2)));
+                    assocList.add(new SolarEvent.Link(rs.getInt(1), rs.getInt(2)));
                 }
             }
             return assocList;

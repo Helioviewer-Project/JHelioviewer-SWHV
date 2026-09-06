@@ -23,7 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import org.helioviewer.jhv.display.Display;
-import org.helioviewer.jhv.event.JHVEventCache;
+import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.timelines.TimelineLayer;
@@ -204,7 +204,7 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
 
     @Override
     public void mouseExited(MouseEvent e) {
-        JHVEventCache.highlight(null);
+        EventCache.highlight(null);
         mousePosition = null;
         if (!DrawController.getGeometry().isStacked() && DrawController.setYAxisHighlight(null)) {
             drawRequest();

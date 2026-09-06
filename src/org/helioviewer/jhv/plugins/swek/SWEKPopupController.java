@@ -10,10 +10,10 @@ import org.helioviewer.jhv.display.Display;
 import org.helioviewer.jhv.display.MapScale;
 import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
-import org.helioviewer.jhv.event.JHVEvent;
-import org.helioviewer.jhv.event.JHVEventCache;
-import org.helioviewer.jhv.event.JHVObservationGroup;
-import org.helioviewer.jhv.event.JHVPositionInformation;
+import org.helioviewer.jhv.event.EventCache;
+import org.helioviewer.jhv.event.EventGeometry;
+import org.helioviewer.jhv.event.ObservationGroup;
+import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.AwtInputAdapter;
 import org.helioviewer.jhv.gui.MainFrame;
@@ -121,10 +121,10 @@ class SWEKPopupController implements InputMouseListener {
 
     @Override
     public void mouseClicked(PointerEvent e) {
-        JHVObservationGroup mouseOverJHVEvent = swekContext.mouseOverJHVEvent();
-        if (mouseOverJHVEvent != null) {
+        ObservationGroup mouseOverGroup = swekContext.mouseOverGroup();
+        if (mouseOverGroup != null) {
             Component canvas = component();
-            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverJHVEvent, mouseOverJHVEvent.getClosestTo(swekContext.mouseOverTime()));
+            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverGroup, mouseOverGroup.getClosestTo(swekContext.mouseOverTime()));
             hekPopUp.pack();
             hekPopUp.setLocation(calcWindowPosition(canvas, AwtInputAdapter.toAwtPoint(e), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
@@ -140,7 +140,7 @@ class SWEKPopupController implements InputMouseListener {
 
     void resetHover() {
         swekContext.clearHover();
-        JHVEventCache.highlight(null);
+        EventCache.highlight(null);
         component().setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
     }
 
@@ -148,7 +148,7 @@ class SWEKPopupController implements InputMouseListener {
     public void mouseMoved(PointerEvent e) {
         Position viewpoint = GLRenderer.getDisplayedViewpoint();
         long currentTime = viewpoint.time.milli;
-        List<JHVObservationGroup> activeEvents = layer.activeEvents(currentTime);
+        List<ObservationGroup> activeEvents = layer.activeEvents(currentTime);
         if (activeEvents.isEmpty()) {
             resetHover();
             return;
@@ -159,28 +159,28 @@ class SWEKPopupController implements InputMouseListener {
 
         Viewport vp = Display.getActiveViewport();
         MapView mv = GLRenderer.getMapView();
-        JHVObservationGroup mouseOverJHVEvent = mv.isOrthographic()
+        ObservationGroup mouseOverGroup = mv.isOrthographic()
                 ? findOrthographicEvent(activeEvents, currentTime, mv.mouseToSurface(vp, mouseOverX, mouseOverY), mv.mouseToPlane(vp, mouseOverX, mouseOverY))
                 : findProjectedEvent(activeEvents, currentTime, mv, vp, mv.mouseToScreen(vp, mouseOverX, mouseOverY));
 
-        swekContext.setMouseOver(mouseOverX, mouseOverY, currentTime, mouseOverJHVEvent);
+        swekContext.setMouseOver(mouseOverX, mouseOverY, currentTime, mouseOverGroup);
         Component canvas = component();
-        JHVEventCache.highlight(mouseOverJHVEvent);
+        EventCache.highlight(mouseOverGroup);
         Cursor cursor = canvas.getCursor();
         if (helpCursor != cursor)
             lastCursor = cursor;
 
-        if (mouseOverJHVEvent != null) {
+        if (mouseOverGroup != null) {
             canvas.setCursor(helpCursor);
         } else {
             canvas.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
         }
     }
 
-    private static JHVObservationGroup findOrthographicEvent(List<JHVObservationGroup> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
-        for (JHVObservationGroup evtr : activeEvents) {
-            JHVEvent evt = evtr.getClosestTo(currentTime);
-            JHVPositionInformation pi = evt.getPositionInformation();
+    private static ObservationGroup findOrthographicEvent(List<ObservationGroup> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
+        for (ObservationGroup evtr : activeEvents) {
+            SolarEvent evt = evtr.getClosestTo(currentTime);
+            EventGeometry pi = evt.getPositionInformation();
             if (pi == null)
                 continue;
 
@@ -207,11 +207,11 @@ class SWEKPopupController implements InputMouseListener {
         return null;
     }
 
-    private static JHVObservationGroup findProjectedEvent(List<JHVObservationGroup> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
+    private static ObservationGroup findProjectedEvent(List<ObservationGroup> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
         MapScale scale = mv.scale(vp);
-        for (JHVObservationGroup evtr : activeEvents) {
-            JHVEvent evt = evtr.getClosestTo(currentTime);
-            JHVPositionInformation pi = evt.getPositionInformation();
+        for (ObservationGroup evtr : activeEvents) {
+            SolarEvent evt = evtr.getClosestTo(currentTime);
+            EventGeometry pi = evt.getPositionInformation();
             if (pi == null)
                 continue;
 

@@ -26,7 +26,7 @@ public class SWEKDownloader {
             new AppThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    private record LoadedEvents(List<JHVEvent> events, List<JHVEvent.Link> associations) {}
+    private record LoadedEvents(List<SolarEvent> events, List<SolarEvent.Link> associations) {}
 
     private static final class Worker implements Runnable, Comparable<Worker> {
         private final SWEKSupplier supplier;
@@ -86,9 +86,9 @@ public class SWEKDownloader {
         }
 
         private void publish(LoadedEvents events) {
-            events.events().forEach(JHVEventCache::addEvent);
-            events.associations().forEach(JHVEventCache::addAssociation);
-            JHVEventCache.fireEventCacheChanged();
+            events.events().forEach(EventCache::addEvent);
+            events.associations().forEach(EventCache::addAssociation);
+            EventCache.fireEventCacheChanged();
             workerFinished(this);
         }
 
@@ -162,12 +162,12 @@ public class SWEKDownloader {
         for (Worker worker : workerMap.get(supplier))
             worker.stopWorker();
         workerMap.removeAll(supplier);
-        JHVEventCache.removeSupplier(supplier, keepActive);
+        EventCache.removeSupplier(supplier, keepActive);
         updateGroupBusy(supplier.group());
     }
 
     private static void workerFailed(Worker worker) {
-        JHVEventCache.requestFailed(worker.supplier, worker.start, worker.end);
+        EventCache.requestFailed(worker.supplier, worker.start, worker.end);
         workerFinished(worker);
     }
 
@@ -177,7 +177,7 @@ public class SWEKDownloader {
     }
 
     private static void filtersChanged(SWEKSupplier supplier) {
-        if (JHVEventCache.isSupplierActive(supplier))
+        if (EventCache.isSupplierActive(supplier))
             stopDownloadSupplier(supplier, true);
     }
 

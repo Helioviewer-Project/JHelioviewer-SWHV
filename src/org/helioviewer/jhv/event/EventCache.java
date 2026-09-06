@@ -12,29 +12,29 @@ import org.helioviewer.jhv.display.DisplayController;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 
-public class JHVEventCache {
+public class EventCache {
 
     private static final double FACTOR = 0.2;
     private static final long REQUEST_REFRESH_INTERVAL = 60 * 60 * 1000L;
     private static final long FUTURE_REQUEST_MARGIN = 6 * REQUEST_REFRESH_INTERVAL;
 
-    private static final Set<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
-    private static final Set<JHVEventListener.Highlight> highlightListeners = new HashSet<>();
-    private static final JHVObservationGroups eventGroups = new JHVObservationGroups();
+    private static final Set<EventListener.Handle> cacheEventHandlers = new HashSet<>();
+    private static final Set<EventListener.Highlight> highlightListeners = new HashSet<>();
+    private static final ObservationGroups eventGroups = new ObservationGroups();
     private static final Map<SWEKSupplier, RequestCache> requestedIntervals = new HashMap<>();
 
-    private static JHVObservationGroup lastHighlighted = null;
+    private static ObservationGroup lastHighlighted = null;
 
-    public static void registerHandler(JHVEventListener.Handle handler) {
+    public static void registerHandler(EventListener.Handle handler) {
         cacheEventHandlers.add(handler);
     }
 
-    public static void unregisterHandler(JHVEventListener.Handle handler) {
+    public static void unregisterHandler(EventListener.Handle handler) {
         cacheEventHandlers.remove(handler);
     }
 
     static void fireEventCacheChanged() {
-        cacheEventHandlers.forEach(JHVEventListener.Handle::cacheUpdated);
+        cacheEventHandlers.forEach(EventListener.Handle::cacheUpdated);
     }
 
     static void requestFailed(SWEKSupplier eventType, long start, long end) {
@@ -56,7 +56,7 @@ public class JHVEventCache {
         }
     }
 
-    public static void highlight(JHVObservationGroup event) {
+    public static void highlight(ObservationGroup event) {
         if (event == lastHighlighted) return;
         boolean changed = false;
         if (event != null)
@@ -68,33 +68,33 @@ public class JHVEventCache {
             fireHighlightChanged();
     }
 
-    public static void addHighlightListener(JHVEventListener.Highlight listener) {
+    public static void addHighlightListener(EventListener.Highlight listener) {
         highlightListeners.add(listener);
     }
 
-    public static void removeHighlightListener(JHVEventListener.Highlight listener) {
+    public static void removeHighlightListener(EventListener.Highlight listener) {
         highlightListeners.remove(listener);
     }
 
     private static void fireHighlightChanged() {
-        highlightListeners.forEach(JHVEventListener.Highlight::highlightChanged);
+        highlightListeners.forEach(EventListener.Highlight::highlightChanged);
         DisplayController.display();
     }
 
-    static void addEvent(JHVEvent event) {
+    static void addEvent(SolarEvent event) {
         eventGroups.addEvent(event);
     }
 
-    static void addAssociation(JHVEvent.Link link) {
+    static void addAssociation(SolarEvent.Link link) {
         eventGroups.addAssociation(link);
     }
 
     @Nullable
-    public static JHVObservationGroup getObservationGroup(int id) {
+    public static ObservationGroup getObservationGroup(int id) {
         return eventGroups.getObservationGroup(id);
     }
 
-    public static List<JHVObservationGroup> getEvents(long start, long end) {
+    public static List<ObservationGroup> getEvents(long start, long end) {
         return eventGroups.getEvents(start, end);
     }
 

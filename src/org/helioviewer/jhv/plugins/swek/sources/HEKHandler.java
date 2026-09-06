@@ -13,11 +13,11 @@ import java.util.Set;
 
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.event.GOESLevel;
-import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
+import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -89,20 +89,20 @@ public class HEKHandler extends SWEKHandler {
         }
     }
 
-    private static List<JHVEvent.LinkRef> parseAssociations(JSONObject eventJSON, Set<String> acceptedUids) {
+    private static List<SolarEvent.LinkRef> parseAssociations(JSONObject eventJSON, Set<String> acceptedUids) {
         JSONArray associations = eventJSON.optJSONArray("association");
         if (associations == null)
             return List.of();
 
         int len = associations.length();
-        List<JHVEvent.LinkRef> links = new ArrayList<>(len);
+        List<SolarEvent.LinkRef> links = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             try {
                 JSONObject asobj = associations.getJSONObject(i);
                 String first = asobj.getString("first_ivorn");
                 String second = asobj.getString("second_ivorn");
                 if (acceptedUids.contains(first) || acceptedUids.contains(second))
-                    links.add(new JHVEvent.LinkRef(first, second));
+                    links.add(new SolarEvent.LinkRef(first, second));
             } catch (JSONException e) {
                 Log.warn("Skipping malformed HEK association at index " + i, e);
             }
@@ -155,16 +155,16 @@ public class HEKHandler extends SWEKHandler {
     }
 
     @Override
-    public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        return new JHVEvent(supplier, id, start, end, new HEKGeometry(json).position(start, supplier.isCactus()),
+    public SolarEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
+        return new SolarEvent(supplier, id, start, end, new HEKGeometry(json).position(start, supplier.isCactus()),
                 readCMEParameters(json, supplier), HEKParser.parseResult(json, supplier, full));
     }
 
-    private static JHVEvent.CMEParameters readCMEParameters(JSONObject json, SWEKSupplier supplier) {
-        JHVEvent.CMEParameters defaults = JHVEvent.CMEParameters.DEFAULT;
+    private static SolarEvent.CMEParameters readCMEParameters(JSONObject json, SWEKSupplier supplier) {
+        SolarEvent.CMEParameters defaults = SolarEvent.CMEParameters.DEFAULT;
         if (!supplier.isCactus())
             return defaults;
-        return new JHVEvent.CMEParameters(readDouble(json, "cme_radiallinvel", defaults.speedKmPerSecond()),
+        return new SolarEvent.CMEParameters(readDouble(json, "cme_radiallinvel", defaults.speedKmPerSecond()),
                 readDouble(json, "event_coord1", defaults.principalAngleDegree()), readDouble(json, "cme_angularwidth", defaults.angularWidthDegree()));
     }
 

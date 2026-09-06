@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import javax.swing.JPanel;
 
 import org.helioviewer.jhv.app.Commands;
-import org.helioviewer.jhv.event.JHVEventListener;
+import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.gui.Interfaces;
 import org.helioviewer.jhv.gui.UITimer;
 import org.helioviewer.jhv.gui.component.MoviePanel;
@@ -21,7 +21,7 @@ import org.helioviewer.jhv.timelines.TimelineLayers;
 
 import org.json.JSONObject;
 
-public final class DrawController implements Interfaces.LazyComponent, Interfaces.StatusReceiver, JHVEventListener.Highlight, TimeListener.Change {
+public final class DrawController implements Interfaces.LazyComponent, Interfaces.StatusReceiver, EventListener.Highlight, TimeListener.Change {
 
     public interface Listener {
         void drawRequest();

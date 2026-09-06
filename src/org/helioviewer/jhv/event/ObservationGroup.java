@@ -10,28 +10,28 @@ import java.util.List;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.time.Interval;
 
-public class JHVObservationGroup {
+public class ObservationGroup {
 
     private static final Colors.Data eventColors = new Colors.Data();
 
-    private final LinkedHashMap<Integer, JHVEvent> events = new LinkedHashMap<>();
-    private final LinkedHashSet<JHVEvent.Link> associations = new LinkedHashSet<>();
+    private final LinkedHashMap<Integer, SolarEvent> events = new LinkedHashMap<>();
+    private final LinkedHashSet<SolarEvent.Link> associations = new LinkedHashSet<>();
     private final Color color;
 
     private List<Interval> intervals;
     private boolean highlighted;
 
-    public JHVObservationGroup(JHVEvent event) {
+    public ObservationGroup(SolarEvent event) {
         this(event, eventColors.getNextColor());
     }
 
-    public JHVObservationGroup(JHVEvent event, Color _color) {
+    public ObservationGroup(SolarEvent event, Color _color) {
         color = _color;
         events.put(event.getUniqueID(), event);
         intervals = List.of(new Interval(event.start, event.end));
     }
 
-    Collection<JHVEvent> getEvents() {
+    Collection<SolarEvent> getEvents() {
         return events.values();
     }
 
@@ -58,10 +58,10 @@ public class JHVObservationGroup {
         return true;
     }
 
-    public JHVEvent getClosestTo(long timestamp) {
-        JHVEvent closest = events.sequencedValues().getFirst();
+    public SolarEvent getClosestTo(long timestamp) {
+        SolarEvent closest = events.sequencedValues().getFirst();
         long minimumDistance = Long.MAX_VALUE;
-        for (JHVEvent event : events.values()) {
+        for (SolarEvent event : events.values()) {
             if (event.start <= timestamp && timestamp <= event.end) return event;
             long distance = timestamp < event.start ? event.start - timestamp : timestamp - event.end;
             if (distance < minimumDistance) {
@@ -89,7 +89,7 @@ public class JHVObservationGroup {
     // Union of actual event intervals, preserving gaps in an associated group.
     private void updateIntervals() {
         List<Interval> sorted = new ArrayList<>();
-        for (JHVEvent event : events.values())
+        for (SolarEvent event : events.values())
             sorted.add(new Interval(event.start, event.end));
         sorted.sort(null);
         List<Interval> result = new ArrayList<>();
@@ -104,10 +104,10 @@ public class JHVObservationGroup {
         intervals = List.copyOf(result);
     }
 
-    public List<JHVEvent> getAssociatedEvents(JHVEvent event) {
+    public List<SolarEvent> getAssociatedEvents(SolarEvent event) {
         int id = event.getUniqueID();
-        List<JHVEvent> result = new ArrayList<>();
-        for (JHVEvent.Link link : associations) {
+        List<SolarEvent> result = new ArrayList<>();
+        for (SolarEvent.Link link : associations) {
             int target;
             if (link.firstId() == id)
                 target = link.secondId();
@@ -116,30 +116,30 @@ public class JHVObservationGroup {
             else
                 continue;
 
-            JHVEvent found = events.get(target);
+            SolarEvent found = events.get(target);
             if (found != null)
                 result.add(found);
         }
         return result;
     }
 
-    void addAssociation(JHVEvent.Link link) {
+    void addAssociation(SolarEvent.Link link) {
         associations.add(link);
     }
 
-    Collection<JHVEvent.Link> getAssociations() {
+    Collection<SolarEvent.Link> getAssociations() {
         return associations;
     }
 
-    void swapEvent(JHVEvent event) {
-        JHVEvent previous = events.putLast(event.getUniqueID(), event);
+    void swapEvent(SolarEvent event) {
+        SolarEvent previous = events.putLast(event.getUniqueID(), event);
         if (previous != null && previous.start == event.start && previous.end == event.end)
             return;
 
         updateIntervals();
     }
 
-    void merge(JHVObservationGroup found) {
+    void merge(ObservationGroup found) {
         events.putAll(found.events);
         associations.addAll(found.associations);
         updateIntervals();
