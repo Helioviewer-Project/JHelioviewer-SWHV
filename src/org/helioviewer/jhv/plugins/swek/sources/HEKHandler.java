@@ -156,9 +156,27 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     public JHVEvent parseEventJSON(JSONObject json, SWEKSupplier supplier, int id, long start, long end, boolean full) throws JSONException {
-        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end);
+        JHVEvent currentEvent = new JHVEvent(supplier, id, start, end,
+                new HEKGeometry(json).position(start, supplier.isCactus()), readCMEParameters(json, supplier));
         HEKParser.parseResult(json, currentEvent, full);
         currentEvent.finishParams();
         return currentEvent;
     }
+
+    private static JHVEvent.CMEParameters readCMEParameters(JSONObject json, SWEKSupplier supplier) {
+        JHVEvent.CMEParameters defaults = JHVEvent.CMEParameters.DEFAULT;
+        if (!supplier.isCactus())
+            return defaults;
+        return new JHVEvent.CMEParameters(readDouble(json, "cme_radiallinvel", defaults.speedKmPerSecond()),
+                readDouble(json, "event_coord1", defaults.principalAngleDegree()), readDouble(json, "cme_angularwidth", defaults.angularWidthDegree()));
+    }
+
+    private static double readDouble(JSONObject result, String parameter, double fallback) {
+        try {
+            return Double.parseDouble(result.optString(parameter).trim());
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
+
 }

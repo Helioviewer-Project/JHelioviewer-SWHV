@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import org.helioviewer.jhv.astronomy.Position;
 import org.helioviewer.jhv.astronomy.Sun;
 import org.helioviewer.jhv.base.Regex;
-import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.JHVPositionInformation;
 import org.helioviewer.jhv.math.SphericalCoords;
 import org.helioviewer.jhv.math.Vec3;
@@ -104,10 +103,11 @@ final class HEKGeometry {
         return hgsBoundedBox;
     }
 
-    void applyTo(JHVEvent currentEvent) {
+    @Nullable
+    JHVPositionInformation position(long start, boolean cactus) {
         List<HgsPoint> hgsBoundedBox = checkAndFixBoundingBox(this.hgsBoundedBox);
         if (hgsBoundedBox == null && hgsCentralPoint == null && (hgsLongitudeDeg == null || hgsLatitudeDeg == null) && hgsBoundCC == null)
-            return;
+            return null;
 
         List<HgsPoint> boundary = hgsBoundCC != null && !hgsBoundCC.isEmpty() ? hgsBoundCC : hgsBoundedBox;
         if (boundary == null) boundary = List.of();
@@ -115,7 +115,7 @@ final class HEKGeometry {
         if (centralPoint == null && hgsLongitudeDeg != null && hgsLatitudeDeg != null)
             centralPoint = point(hgsLongitudeDeg, hgsLatitudeDeg);
 
-        Position p = Sun.getEarth(new JHVTime(currentEvent.start));
+        Position p = Sun.getEarth(new JHVTime(start));
         double elon = p.lon;
 
         float[] jhvBoundary = new float[3 * boundary.size()];
@@ -127,7 +127,7 @@ final class HEKGeometry {
         }
 
         Vec3 jhvCentralPoint = centralPoint != null ? hgsToJhv(centralPoint, elon) : null;
-        currentEvent.addPositionInformation(new JHVPositionInformation(jhvCentralPoint, jhvBoundary, currentEvent.isCactus() ? p : null)); // reduce memory usage
+        return new JHVPositionInformation(jhvCentralPoint, jhvBoundary, cactus ? p : null);
     }
 
     private static Vec3 hgsToJhv(HgsPoint point, double elon) {

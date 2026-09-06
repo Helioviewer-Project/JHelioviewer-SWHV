@@ -23,10 +23,16 @@ public class JHVEvent {
 
     private List<JHVEventParameter> allParametersArray = new ArrayList<>();
     private List<JHVEventParameter> visibleParametersArray = new ArrayList<>();
-    private JHVPositionInformation positionInformation = null;
-    private CMEParameters cmeParameters = CMEParameters.DEFAULT;
+    private final JHVPositionInformation positionInformation;
+    private final CMEParameters cmeParameters;
 
-    public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end) {
+    public JHVEvent(SWEKSupplier supplier, int id, long start, long end) {
+        this(supplier, id, start, end, null, CMEParameters.DEFAULT);
+    }
+
+    public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end, JHVPositionInformation _positionInformation, CMEParameters _cmeParameters) {
+        positionInformation = _positionInformation;
+        cmeParameters = _cmeParameters;
         supplier = _supplier;
         start = _start;
         end = _end;
@@ -49,10 +55,6 @@ public class JHVEvent {
         return cmeParameters;
     }
 
-    public void setCMEParameters(CMEParameters parameters) {
-        cmeParameters = parameters;
-    }
-
     public boolean isCactus() {
         return supplier.isCactus();
     }
@@ -63,10 +65,6 @@ public class JHVEvent {
 
     public SWEKSupplier getSupplier() {
         return supplier;
-    }
-
-    public void addPositionInformation(JHVPositionInformation pi) {
-        positionInformation = pi;
     }
 
     public void addParameter(String key, String displayName, String value, boolean visible, boolean full) {

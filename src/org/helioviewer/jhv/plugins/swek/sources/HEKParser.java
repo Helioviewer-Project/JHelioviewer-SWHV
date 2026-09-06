@@ -18,15 +18,6 @@ class HEKParser {
     private static final ThreadLocal<DecimalFormat> formatter1 = ThreadLocal.withInitial(() -> MathUtils.numberFormatter("0", 1));
 
     static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
-        HEKGeometry geometry = new HEKGeometry(result);
-        if (currentEvent.isCactus()) {
-            JHVEvent.CMEParameters defaults = JHVEvent.CMEParameters.DEFAULT;
-            currentEvent.setCMEParameters(new JHVEvent.CMEParameters(
-                    readDouble(result, "cme_radiallinvel", defaults.speedKmPerSecond()),
-                    readDouble(result, "event_coord1", defaults.principalAngleDegree()),
-                    readDouble(result, "cme_angularwidth", defaults.angularWidthDegree())));
-        }
-
         boolean waveCM = false;
         String waveValue = null;
 
@@ -72,16 +63,6 @@ class HEKParser {
                     waveValue = formatter1.get().format(Double.parseDouble(waveValue) * (1e-2 /*m*/ * 1e9 /*nm*/)) + "nm";
             } catch (Exception ignore) {}
             currentEvent.addParameter("obs_meanwavel", waveValue, full);
-        }
-
-        geometry.applyTo(currentEvent);
-    }
-
-    private static double readDouble(JSONObject result, String parameter, double fallback) {
-        try {
-            return Double.parseDouble(result.optString(parameter).trim());
-        } catch (NumberFormatException e) {
-            return fallback;
         }
     }
 
