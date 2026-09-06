@@ -28,8 +28,7 @@ import org.json.JSONObject;
 public class HEKHandler extends SWEKHandler {
 
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
-    private static final String SMALLER_OR_EQUAL = URLEncoder.encode("<=", StandardCharsets.UTF_8);
-    private static final String STRING_EQUALS = URLEncoder.encode("==", StandardCharsets.UTF_8);
+    private static final String STRING_EQUALS = URLEncoder.encode("=", StandardCharsets.UTF_8);
 
     @Override
     protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
@@ -131,13 +130,13 @@ public class HEKHandler extends SWEKHandler {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
         baseURL.append("&event_type=").append(getEventAbbreviation(supplier.group().getName()));
         baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
-        baseURL.append("&param0=event_starttime&op0=").append(SMALLER_OR_EQUAL).append("&value0=").append(TimeUtils.format(end));
         String encodedSupplier = URLEncoder.encode(supplier.supplierName(), StandardCharsets.UTF_8);
-        baseURL.append("&param1=frm_name&op1=").append(STRING_EQUALS).append("&value1=").append(encodedSupplier);
+        baseURL.append("&param0=FRM_Name&op0=").append(STRING_EQUALS).append("&value0=").append(encodedSupplier);
+        // HEK's default temporal search includes events overlapping either endpoint.
         baseURL.append("&event_starttime=").append(TimeUtils.format(start));
-        long max = Math.max(System.currentTimeMillis(), end);
-        baseURL.append("&event_endtime=").append(TimeUtils.format(max));
-        baseURL.append("&page=").append(page);
+        baseURL.append("&event_endtime=").append(TimeUtils.format(end));
+        // The downloader uses zero-based offsets, whereas HEK numbers pages from one.
+        baseURL.append("&page=").append(page + 1);
         return new URI(baseURL.toString());
     }
 
