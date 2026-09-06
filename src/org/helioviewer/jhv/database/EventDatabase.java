@@ -300,7 +300,7 @@ public class EventDatabase {
                 continue;
 
             try {
-                jsonEvents.addAll(queryRelationEvents(id, supplier, relatedSupplier, eventParameter, relatedParameter));
+                jsonEvents.addAll(queryRelationEvents(id, relatedSupplier, eventParameter, relatedParameter));
             } catch (Exception e) {
                 Log.error(e);
             }
@@ -507,24 +507,23 @@ public class EventDatabase {
         return assocList;
     }
 
-    private static List<JsonEvent> queryRelationEvents(int eventId, SWEKSupplier leftType, SWEKSupplier rightType,
+    private static List<JsonEvent> queryRelationEvents(int eventId, SWEKSupplier rightType,
                                                        String leftParameter, String rightParameter) throws Exception {
         List<JsonEvent> ret = new ArrayList<>();
-        int leftTypeId = findEventTypeId(leftType), rightTypeId = findEventTypeId(rightType);
-        if (leftTypeId == -1 || rightTypeId == -1)
+        int rightTypeId = findEventTypeId(rightType);
+        if (rightTypeId == -1)
             return ret;
 
         String sql = "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e " +
                 "LEFT JOIN event_type ON e.type_id=event_type.id WHERE e.id IN (" +
                 "SELECT tr.event_id " +
                 "FROM event_parameter AS tl JOIN event_parameter AS tr ON tl.value=tr.value " +
-                "WHERE tl.event_id=? AND tl.type_id=? AND tr.type_id=? AND tl.name=? AND tr.name=?)";
+                "WHERE tl.event_id=? AND tr.type_id=? AND tl.name=? AND tr.name=?)";
         PreparedStatement statement = getPreparedStatement(sql);
         statement.setInt(1, eventId);
-        statement.setInt(2, leftTypeId);
-        statement.setInt(3, rightTypeId);
-        statement.setString(4, leftParameter);
-        statement.setString(5, rightParameter);
+        statement.setInt(2, rightTypeId);
+        statement.setString(3, leftParameter);
+        statement.setString(4, rightParameter);
 
         try (ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
