@@ -9,6 +9,10 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 public class JHVEvent {
 
+    public record CMEParameters(double speedKmPerSecond, double principalAngleDegree, double angularWidthDegree) {
+        public static final CMEParameters DEFAULT = new CMEParameters(500, 0, 0);
+    }
+
     public record Link(int firstId, int secondId) {}
 
     public record LinkRef(String firstUid, String secondUid) {}
@@ -25,6 +29,7 @@ public class JHVEvent {
     private List<JHVEventParameter> allParametersArray = new ArrayList<>();
     private List<JHVEventParameter> visibleParametersArray = new ArrayList<>();
     private JHVPositionInformation positionInformation = null;
+    private CMEParameters cmeParameters = CMEParameters.DEFAULT;
 
     public JHVEvent(SWEKSupplier _supplier, int _id, long _start, long _end) {
         supplier = _supplier;
@@ -47,6 +52,14 @@ public class JHVEvent {
 
     public JHVPositionInformation getPositionInformation() {
         return positionInformation;
+    }
+
+    public CMEParameters getCMEParameters() {
+        return cmeParameters;
+    }
+
+    public void setCMEParameters(CMEParameters parameters) {
+        cmeParameters = parameters;
     }
 
     public boolean isCactus() {

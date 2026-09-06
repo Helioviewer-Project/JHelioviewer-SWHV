@@ -19,6 +19,13 @@ class HEKParser {
 
     static void parseResult(JSONObject result, JHVEvent currentEvent, boolean full) throws JSONException {
         HEKGeometry geometry = new HEKGeometry(result);
+        if (currentEvent.isCactus()) {
+            JHVEvent.CMEParameters defaults = JHVEvent.CMEParameters.DEFAULT;
+            currentEvent.setCMEParameters(new JHVEvent.CMEParameters(
+                    readDouble(result, "cme_radiallinvel", defaults.speedKmPerSecond()),
+                    readDouble(result, "event_coord1", defaults.principalAngleDegree()),
+                    readDouble(result, "cme_angularwidth", defaults.angularWidthDegree())));
+        }
 
         boolean waveCM = false;
         String waveValue = null;
@@ -68,6 +75,14 @@ class HEKParser {
         }
 
         geometry.applyTo(currentEvent);
+    }
+
+    private static double readDouble(JSONObject result, String parameter, double fallback) {
+        try {
+            return Double.parseDouble(result.optString(parameter).trim());
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
     }
 
     private static void parseRefs(JHVEvent currentEvent, JSONArray refs) throws JSONException {

@@ -22,31 +22,8 @@ class SWEKData {
         return lines;
     }
 
-    static double readCMESpeed(JHVEvent evt) {
-        return readDouble(evt, "cme_radiallinvel", 500);
-    }
-
     static double cactusDistance(JHVEvent evt, long timestamp) {
-        return CACTUS_START_RADIUS + readCMESpeed(evt) * (timestamp - evt.start) / Sun.RadiusMeter;
-    }
-
-    static double readCMEPrincipalAngleDegree(JHVEvent evt) {
-        return readDouble(evt, "event_coord1", 0);
-    }
-
-    static double readCMEAngularWidthDegree(JHVEvent evt) {
-        return readDouble(evt, "cme_angularwidth", 0);
-    }
-
-    private static double readDouble(JHVEvent evt, String parameter, double fallback) {
-        JHVEventParameter p = evt.getParameter(parameter);
-        if (p == null)
-            return fallback;
-        try {
-            return Double.parseDouble(p.getParameterValue());
-        } catch (NumberFormatException e) {
-            return fallback;
-        }
+        return CACTUS_START_RADIUS + evt.getCMEParameters().speedKmPerSecond() * (timestamp - evt.start) / Sun.RadiusMeter;
     }
 
 }

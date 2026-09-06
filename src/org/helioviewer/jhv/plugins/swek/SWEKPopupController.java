@@ -186,7 +186,7 @@ class SWEKPopupController implements InputMouseListener {
 
             Vec3 hitpoint, pt;
             if (evt.isCactus()) {
-                double principalAngle = Math.toRadians(SWEKData.readCMEPrincipalAngleDegree(evt));
+                double principalAngle = Math.toRadians(evt.getCMEParameters().principalAngleDegree());
                 double distSun = SWEKData.cactusDistance(evt, currentTime);
                 Quat q = pi.getEarth().toQuat();
                 pt = q.rotateInverseVector(PolarBasis.vec3(distSun, principalAngle));
@@ -217,7 +217,7 @@ class SWEKPopupController implements InputMouseListener {
 
             Vec2 tf = null;
             if (mv.isRectWarp() && evt.isCactus()) {
-                double principalAngle = SWEKData.readCMEPrincipalAngleDegree(evt);
+                double principalAngle = evt.getCMEParameters().principalAngleDegree();
                 double distSun = SWEKData.cactusDistance(evt, currentTime);
                 tf = new Vec2((scale.toUnitX(principalAngle) - 0.5) * vp.aspect, scale.toUnitY(distSun) - 0.5);
             } else {

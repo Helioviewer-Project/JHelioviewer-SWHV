@@ -130,8 +130,8 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     }
 
     private static CactusArcParams cactusArcParams(JHVEvent evt, long timestamp) {
-        double angularWidthDegree = SWEKData.readCMEAngularWidthDegree(evt);
-        double principalAngleDegree = SWEKData.readCMEPrincipalAngleDegree(evt);
+        double angularWidthDegree = evt.getCMEParameters().angularWidthDegree();
+        double principalAngleDegree = evt.getCMEParameters().principalAngleDegree();
         double distSun = SWEKData.cactusDistance(evt, timestamp);
         return new CactusArcParams(angularWidthDegree, principalAngleDegree, distSun);
     }
