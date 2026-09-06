@@ -51,12 +51,12 @@ final class ObservationGroups {
         Set<ObservationGroup> affectedGroups = new HashSet<>();
         for (SolarEvent.Link link : removedLinks) {
             associationSequences.remove(link);
+            removePendingAssociation(link.firstId(), link);
+            removePendingAssociation(link.secondId(), link);
             ObservationGroup group = getObservationGroup(link.firstId());
             if (group != null && group.getAssociations().contains(link))
                 affectedGroups.add(group);
         }
-        pendingAssocs.values().forEach(links -> links.removeAll(removedLinks));
-        pendingAssocs.entrySet().removeIf(entry -> entry.getValue().isEmpty());
         for (ObservationGroup group : affectedGroups)
             rebuild(group, Set.of(), removedLinks);
 
@@ -160,6 +160,15 @@ final class ObservationGroups {
 
     private void addPendingAssociation(int id, SolarEvent.Link link) {
         pendingAssocs.computeIfAbsent(id, k -> new HashSet<>()).add(link);
+    }
+
+    private void removePendingAssociation(int id, SolarEvent.Link link) {
+        Set<SolarEvent.Link> pending = pendingAssocs.get(id);
+        if (pending == null)
+            return;
+        pending.remove(link);
+        if (pending.isEmpty())
+            pendingAssocs.remove(id);
     }
 
     List<ObservationGroup> getEvents(long start, long end) {
