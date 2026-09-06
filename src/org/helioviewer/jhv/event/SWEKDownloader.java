@@ -10,6 +10,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import org.helioviewer.jhv.app.Log;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.filter.FilterManager;
@@ -60,46 +62,34 @@ public class SWEKDownloader {
 
         @Override
         public void run() {
+            EventDatabase.EventBatch events = null;
             try {
-                if (!ensureStored()) {
-                    finishFailure(null);
-                    return;
-                }
-                if (cancelled)
-                    return;
-
-                finishSuccess(EventDatabase.loadEvents(start, end, requests.supplier, params));
+                if (ensureStored() && !cancelled)
+                    events = EventDatabase.loadEvents(start, end, requests.supplier, params);
             } catch (Throwable t) {
-                finishFailure(t);
+                if (!cancelled && !AppThread.isInterrupted(t))
+                    Log.error("Error loading SWEK", t);
             }
+            finish(events);
         }
 
-        private void finishSuccess(EventDatabase.EventBatch events) {
-            if (!cancelled) {
-                EventQueue.invokeLater(() -> {
-                    if (!cancelled)
-                        publish(events);
-                });
-            }
-        }
-
-        private void finishFailure(Throwable t) {
+        private void finish(@Nullable EventDatabase.EventBatch events) {
             if (cancelled)
                 return;
 
-            if (t != null && !AppThread.isInterrupted(t)) {
-                Log.error("Error loading SWEK", t);
-            }
-
             EventQueue.invokeLater(() -> {
-                if (!cancelled)
-                    workerFailed(this);
+                if (cancelled)
+                    return;
+                try {
+                    if (events == null)
+                        requests.intervals.removeRequestedInterval(start, end);
+                    else
+                        EventCache.replaceEvents(events.sequence(), events.events(), events.associations());
+                } finally {
+                    requests.workers.remove(this);
+                    updateGroupBusy(requests.supplier.group());
+                }
             });
-        }
-
-        private void publish(EventDatabase.EventBatch events) {
-            EventCache.replaceEvents(events.sequence(), events.events(), events.associations());
-            workerFinished(this);
         }
 
         private boolean ensureStored() throws Exception {
@@ -209,16 +199,6 @@ public class SWEKDownloader {
             activeSuppliers.remove(supplier);
         EventCache.removeSupplier(supplier);
         updateGroupBusy(supplier.group());
-    }
-
-    private static void workerFailed(Worker worker) {
-        worker.requests.intervals.removeRequestedInterval(worker.start, worker.end);
-        workerFinished(worker);
-    }
-
-    private static void workerFinished(Worker worker) {
-        worker.requests.workers.remove(worker);
-        updateGroupBusy(worker.requests.supplier.group());
     }
 
     private static void filtersChanged(SWEKSupplier supplier) {
