@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.app.Log;
@@ -410,7 +412,8 @@ public class EventDatabase {
 
     public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
-    public record EventBatch(long sequence, List<SolarEvent> events, List<SolarEvent.Link> associations) {}
+    // Selected IDs include rows that matched the query but could not be decoded into events.
+    public record EventBatch(long sequence, Set<Integer> selectedIds, List<SolarEvent> events, List<SolarEvent.Link> associations) {}
 
     private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
@@ -421,7 +424,8 @@ public class EventDatabase {
     public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
         JsonEventBatch batch = executor.invokeAndWait(() -> new JsonEventBatch(++batchSequence,
                 new QueryEvents(start, end, type, params).call(), new Associations2Program(start, end, type).call()));
-        return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
+        Set<Integer> selectedIds = batch.events().stream().map(JsonEvent::id).collect(Collectors.toUnmodifiableSet());
+        return new EventBatch(batch.sequence(), selectedIds, parseEvents(batch.events(), false), batch.associations());
     }
 
     private record QueryEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params)
