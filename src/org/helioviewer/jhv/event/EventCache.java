@@ -89,6 +89,14 @@ public class EventCache {
         eventGroups.addAssociation(link);
     }
 
+    static void replaceEvents(long sequence, List<SolarEvent> events, List<SolarEvent.Link> associations) {
+        boolean highlightedGroupCached = eventGroups.contains(lastHighlighted);
+        eventGroups.replace(sequence, events, associations);
+        if (highlightedGroupCached && !eventGroups.contains(lastHighlighted))
+            highlight(null);
+        fireEventCacheChanged();
+    }
+
     @Nullable
     public static ObservationGroup getObservationGroup(int id) {
         return eventGroups.getObservationGroup(id);

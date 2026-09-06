@@ -81,9 +81,7 @@ public class SWEKDownloader {
         }
 
         private void publish(EventDatabase.EventBatch events) {
-            events.events().forEach(EventCache::addEvent);
-            events.associations().forEach(EventCache::addAssociation);
-            EventCache.fireEventCacheChanged();
+            EventCache.replaceEvents(events.sequence(), events.events(), events.associations());
             workerFinished(this);
         }
 

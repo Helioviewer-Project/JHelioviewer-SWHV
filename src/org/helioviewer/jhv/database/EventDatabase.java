@@ -29,6 +29,7 @@ import org.helioviewer.jhv.time.RequestCache;
 public class EventDatabase {
 
     private static final SingleExecutor executor = new SingleExecutor(new AppThread.NamedThreadFactory("EventDatabase"));
+    private static long batchSequence;
 
     private static final long ONEWEEK = 1000 * 60 * 60 * 24 * 7;
     public static int config_hash;
@@ -409,18 +410,18 @@ public class EventDatabase {
 
     public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
-    public record EventBatch(List<SolarEvent> events, List<SolarEvent.Link> associations) {}
+    public record EventBatch(long sequence, List<SolarEvent> events, List<SolarEvent.Link> associations) {}
 
     private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
     private record JsonEventDetails(JsonEvent event, List<JsonEvent> relatedEvents) {}
 
-    private record JsonEventBatch(List<JsonEvent> events, List<SolarEvent.Link> associations) {}
+    private record JsonEventBatch(long sequence, List<JsonEvent> events, List<SolarEvent.Link> associations) {}
 
     public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
-        JsonEventBatch batch = executor.invokeAndWait(() -> new JsonEventBatch(
+        JsonEventBatch batch = executor.invokeAndWait(() -> new JsonEventBatch(++batchSequence,
                 new QueryEvents(start, end, type, params).call(), new Associations2Program(start, end, type).call()));
-        return new EventBatch(parseEvents(batch.events(), false), batch.associations());
+        return new EventBatch(batch.sequence(), parseEvents(batch.events(), false), batch.associations());
     }
 
     public static List<SolarEvent> events2Program(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
