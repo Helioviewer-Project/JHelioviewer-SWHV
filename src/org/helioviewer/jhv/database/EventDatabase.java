@@ -101,7 +101,7 @@ public class EventDatabase {
         StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.dbName())
                 .append(" (event_id INTEGER PRIMARY KEY ON CONFLICT REPLACE");
         SWEKCatalog.databaseFields(eventType).forEach((key, value) ->
-                createtbl.append(',').append(key).append(' ').append(value.name()));
+                createtbl.append(',').append(key).append(' ').append(switch (value) { case INTEGER -> "INTEGER"; case DECIMAL -> "REAL"; }));
         createtbl.append(", FOREIGN KEY(event_id) REFERENCES events(id))");
 
         Connection connection = pstatement.getConnection();

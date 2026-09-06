@@ -40,6 +40,16 @@ public final class SWEKCatalog {
         HashMap<SWEKSupplier, Map<String, SWEK.NumericType>> fields = new HashMap<>();
         for (SWEKSupplier supplier : suppliers.values())
             fields.put(supplier, createDatabaseFields(supplier, events));
+        for (SWEK.RelatedEvents relation : events) {
+            for (SWEKSupplier from : getSuppliers(relation.group())) {
+                for (SWEKSupplier with : getSuppliers(relation.relatedWith())) {
+                    for (SWEK.RelatedOn field : relation.relatedOnList()) {
+                        if (from.source().numericParameters().get(field.parameterFrom()) != with.source().numericParameters().get(field.parameterWith()))
+                            throw new IllegalArgumentException("Incompatible numeric types for relationship " + field + " between " + key(from) + " and " + key(with));
+                    }
+                }
+            }
+        }
         relatedEvents = List.copyOf(events);
         databaseFieldsBySupplier.clear();
         databaseFieldsBySupplier.putAll(fields);
@@ -58,24 +68,24 @@ public final class SWEKCatalog {
         for (SWEK.Parameter parameter : supplier.getParameterList()) {
             SWEK.ParameterFilter filter = parameter.filter();
             if (filter != null)
-                addDatabaseField(fields, supplier, parameter.name(), filter.dbType());
+                addDatabaseField(fields, supplier, parameter.name());
         }
         for (SWEK.RelatedEvents relation : events) {
             for (SWEK.RelatedOn field : relation.relatedOnList()) {
                 if (relation.group() == supplier.group())
-                    addDatabaseField(fields, supplier, field.parameterFrom(), field.dbType());
+                    addDatabaseField(fields, supplier, field.parameterFrom());
                 if (relation.relatedWith() == supplier.group())
-                    addDatabaseField(fields, supplier, field.parameterWith(), field.dbType());
+                    addDatabaseField(fields, supplier, field.parameterWith());
             }
         }
         return Map.copyOf(fields);
     }
 
-    private static void addDatabaseField(Map<String, SWEK.NumericType> fields, SWEKSupplier supplier, String name, String dbType) {
-        SWEK.NumericType type = SWEK.NumericType.valueOf(dbType);
-        SWEK.NumericType previous = fields.putIfAbsent(name, type);
-        if (previous != null && previous != type)
-            throw new IllegalArgumentException("Conflicting types for " + name + " in " + key(supplier) + ": " + previous + " and " + type);
+    private static void addDatabaseField(Map<String, SWEK.NumericType> fields, SWEKSupplier supplier, String name) {
+        SWEK.NumericType type = supplier.source().numericParameters().get(name);
+        if (type == null)
+            throw new IllegalArgumentException("Missing numeric definition for " + name + " in " + supplier.source().name());
+        fields.putIfAbsent(name, type);
     }
 
     public static String key(SWEKSupplier supplier) {

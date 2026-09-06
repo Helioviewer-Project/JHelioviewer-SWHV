@@ -78,7 +78,7 @@ public class HEKHandler extends SWEKHandler {
             try {
                 switch (field.getValue()) {
                     case INTEGER -> indexedValues.put(fieldName, result.getInt(lfieldName));
-                    case REAL -> indexedValues.put(fieldName, result.getDouble(lfieldName));
+                    case DECIMAL -> indexedValues.put(fieldName, result.getDouble(lfieldName));
                 }
             } catch (JSONException e) {
                 Log.warn("Ignoring malformed HEK field " + fieldName + " in " + uid, e);

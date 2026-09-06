@@ -61,12 +61,20 @@ class SWEKConfig {
     private static SWEK.Source parseSource(JSONObject obj) {
         String name = obj.getString("name");
         //if ("COMESEP".equals(name))
-        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler());
+        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new ComesepHandler(), Map.of());
         //if ("FHNW".equals(name))
-        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler());
+        //    return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new FHNWHandler(), Map.of());
         if ("HEK".equals(name))
-            return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler());
+            return new SWEK.Source(name, parseParameters(obj.getJSONArray("general_parameters")), new HEKHandler(), parseNumericParameters(obj));
         return null;
+    }
+
+    private static Map<String, SWEK.NumericType> parseNumericParameters(JSONObject source) {
+        JSONObject definitions = source.getJSONObject("numeric_parameters");
+        Map<String, SWEK.NumericType> types = new HashMap<>();
+        for (String name : definitions.keySet())
+            types.put(name, SWEK.NumericType.valueOf(definitions.getString(name).toUpperCase()));
+        return types;
     }
 
     private static List<SWEK.Parameter> parseParameters(JSONArray parameterArray) {
@@ -142,7 +150,8 @@ class SWEKConfig {
         JSONObject filter = obj.optJSONObject("filter");
         if (filter == null)
             return null;
-        return new SWEK.ParameterFilter(filter.getString("filter_type"), filter.getDouble("min"), filter.getDouble("max"), filter.getDouble("start_value"), filter.getDouble("step_size"), filter.getString("units"), filter.getString("dbtype"));
+        return new SWEK.ParameterFilter(filter.getString("filter_type"), filter.getDouble("min"), filter.getDouble("max"), filter.getDouble("start_value"),
+                filter.getDouble("step_size"), filter.getString("units"));
     }
 
     private static List<SWEK.RelatedEvents> parseRelatedEvents(JSONObject obj, Map<String, SWEKGroup> groupsByName) {
@@ -165,7 +174,7 @@ class SWEKConfig {
             JSONObject relatedOn = relatedOnArray.getJSONObject(i);
             String parameterFrom = relatedOn.getString("parameter_from").toLowerCase();
             String parameterWith = relatedOn.getString("parameter_with").toLowerCase();
-            relatedOnList.add(new SWEK.RelatedOn(parameterFrom, parameterWith, relatedOn.getString("dbtype")));
+            relatedOnList.add(new SWEK.RelatedOn(parameterFrom, parameterWith));
         }
         return relatedOnList;
     }

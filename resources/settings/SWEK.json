@@ -3,6 +3,11 @@
         {
             "name"                  : "HEK",
             "provider_name"         : "HEK",
+            "numeric_parameters"   : {
+                "jhv_goesflux"      : "decimal",
+                "cme_radiallinvel" : "decimal",
+                "ar_noaanum"       : "integer"
+            },
             "general_parameters"    : [
                 {
                     "source"                    : "HEK",
@@ -268,8 +273,7 @@
                                     "max"           : 1e-3,
                                     "start_value"   : 1e-5,
                                     "step_size"     : 0.5,
-                                    "units"         : "W/m^2",
-                                    "dbtype"        : "REAL"
+                                    "units"         : "W/m^2"
                                 }
                         }
                     ]
@@ -377,8 +381,7 @@
                             "max"           : 3000,
                             "start_value"   : 1000,
                             "step_size"     : 100,
-                            "units"         : "km/s",
-                            "dbtype"        : "REAL"
+                            "units"         : "km/s"
                         },
                     "default_visible"           : true
                 },
@@ -922,8 +925,7 @@
             "related_on"    : [
                 {
                     "parameter_from" : "ar_noaanum",
-                    "parameter_with" : "ar_noaanum",
-                    "dbtype": "INTEGER"
+                    "parameter_with" : "ar_noaanum"
                 }
             ]
         },
@@ -933,8 +935,7 @@
             "related_on"    : [
                 {
                     "parameter_from" : "ar_noaanum",
-                    "parameter_with" : "ar_noaanum",
-                    "dbtype": "INTEGER"
+                    "parameter_with" : "ar_noaanum"
                 }
             ]
         }
