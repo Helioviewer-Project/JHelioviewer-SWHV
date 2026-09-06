@@ -26,6 +26,10 @@ final class EventDatabaseThread {
             statement.setQueryTimeout(30);
             statement.executeUpdate("CREATE TABLE if not exists event_type (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, supplier TEXT, UNIQUE(name, supplier) ON CONFLICT IGNORE)");
             statement.executeUpdate("CREATE TABLE if not exists events (id INTEGER PRIMARY KEY AUTOINCREMENT, type_id INTEGER, uid TEXT, start INTEGER, end INTEGER, archiv INTEGER, data BLOB, FOREIGN KEY(type_id) REFERENCES event_type(id), UNIQUE(uid) ON CONFLICT FAIL)");
+            statement.executeUpdate("CREATE TABLE event_parameter (event_id INTEGER, name TEXT COLLATE NOCASE, type_id INTEGER NOT NULL, " +
+                    "value ANY NOT NULL CHECK(typeof(value) IN ('integer','real')), PRIMARY KEY(event_id,name), " +
+                    "FOREIGN KEY(event_id) REFERENCES events(id), FOREIGN KEY(type_id) REFERENCES event_type(id)) STRICT, WITHOUT ROWID");
+            statement.executeUpdate("CREATE INDEX parameter_value ON event_parameter(type_id,name,value,event_id)");
             statement.executeUpdate("CREATE INDEX if not exists evt_type_start ON events (type_id, start)");
             statement.executeUpdate("CREATE INDEX if not exists evt_type_end ON events (type_id, end)");
             statement.executeUpdate("CREATE TABLE if not exists event_link (left_id INTEGER, right_id INTEGER, PRIMARY KEY(left_id, right_id) ON CONFLICT IGNORE, CHECK(left_id < right_id), FOREIGN KEY(left_id) REFERENCES events(id), FOREIGN KEY(right_id) REFERENCES events(id)) WITHOUT ROWID");

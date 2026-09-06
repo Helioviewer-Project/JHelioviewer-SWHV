@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +39,8 @@ public class EventDatabase {
                     "ON CONFLICT(uid) DO UPDATE SET type_id=excluded.type_id, start=excluded.start, end=excluded.end, archiv=excluded.archiv, data=excluded.data RETURNING id";
     private static final String SELECT_EVENT_TYPE = "SELECT id FROM event_type WHERE name=? AND supplier=?";
     private static final String INSERT_EVENT_TYPE = "INSERT INTO event_type(name, supplier) VALUES(?,?)";
+    private static final String DELETE_PARAMETERS = "DELETE FROM event_parameter WHERE event_id=?";
+    private static final String INSERT_PARAMETER = "INSERT INTO event_parameter(event_id,name,type_id,value) VALUES(?,?,?,?)";
     private static final String INSERT_LINK = "INSERT INTO event_link(left_id, right_id) VALUES(?,?)";
     private static final String SELECT_EVENT_ID_FROM_UID = "SELECT id FROM events WHERE uid=?";
     private static final String DELETE_DATERANGES = "DELETE FROM date_range WHERE type_id=?";
@@ -97,26 +98,6 @@ public class EventDatabase {
         pstatement.setString(1, eventType.group().getName());
         pstatement.setString(2, SWEKCatalog.key(eventType));
         pstatement.executeUpdate();
-
-        StringBuilder createtbl = new StringBuilder("CREATE TABLE ").append(eventType.dbName())
-                .append(" (event_id INTEGER PRIMARY KEY ON CONFLICT REPLACE");
-        SWEKCatalog.databaseFields(eventType).forEach((key, value) ->
-                createtbl.append(',').append(key).append(' ').append(switch (value) { case INTEGER -> "INTEGER"; case DECIMAL -> "REAL"; }));
-        createtbl.append(", FOREIGN KEY(event_id) REFERENCES events(id))");
-
-        Connection connection = pstatement.getConnection();
-        try (Statement statement = connection.createStatement()) {
-            statement.setQueryTimeout(30);
-            statement.executeUpdate(createtbl.toString());
-            createEventTableIndexes(statement, eventType);
-        }
-        connection.commit();
-    }
-
-    private static void createEventTableIndexes(Statement statement, SWEKSupplier eventType) throws Exception {
-        String tableName = eventType.dbName();
-        for (String field : SWEKCatalog.databaseFields(eventType).keySet())
-            statement.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName + '_' + field + " ON " + tableName + " (" + field + ")");
     }
 
     private static int findOrInsertEventId(String uid) throws Exception {
@@ -224,33 +205,25 @@ public class EventDatabase {
                 eventId = rs.getInt(1);
             }
 
-            StringBuilder fieldString = new StringBuilder();
-            StringBuilder varString = new StringBuilder();
-            List<Number> values = new ArrayList<>();
+            PreparedStatement delete = getPreparedStatement(DELETE_PARAMETERS);
+            delete.setInt(1, eventId);
+            delete.executeUpdate();
+            PreparedStatement parameter = getPreparedStatement(INSERT_PARAMETER);
             for (String field : SWEKCatalog.databaseFields(supplier).keySet()) {
                 Number value = event2db.indexedValues().get(field);
                 if (value == null) continue;
-                values.add(value);
-                fieldString.append(',').append(field);
-                varString.append(",?");
+                parameter.setInt(1, eventId);
+                parameter.setString(2, field);
+                parameter.setInt(3, typeId);
+                bindIndexedValue(parameter, 4, value);
+                parameter.executeUpdate();
             }
-            String full_statement = "INSERT INTO " + supplier.dbName() + "(event_id" + fieldString + ") VALUES(?" + varString + ')';
-            PreparedStatement pstatement = getPreparedStatement(full_statement);
-            pstatement.setInt(1, eventId);
-
-            int index = 2;
-            for (Number value : values) {
-                bindIndexedValue(pstatement, index, value);
-                index++;
-            }
-            pstatement.executeUpdate();
             eventIds[i] = eventId;
         }
-        storeRelatedEventLinks(eventIds, supplier);
+        storeRelatedEventLinks(eventIds, supplier, typeId);
     }
 
-    private static void storeRelatedEventLinks(int[] eventIds, SWEKSupplier type) throws Exception {
-        String table = type.dbName();
+    private static void storeRelatedEventLinks(int[] eventIds, SWEKSupplier type, int typeId) throws Exception {
         SWEKGroup group = type.group();
         for (SWEK.RelatedEvents relation : SWEKCatalog.getRelatedEvents()) {
             if (relation.group() != group || relation.relatedWith() != group)
@@ -259,12 +232,16 @@ public class EventDatabase {
             for (SWEK.RelatedOn relatedOn : relation.relatedOnList()) {
                 String sql = "INSERT INTO event_link(left_id, right_id) " +
                         "SELECT DISTINCT min(a.event_id, b.event_id), max(a.event_id, b.event_id) " +
-                        "FROM " + table + " AS a JOIN " + table + " AS b ON a." + relatedOn.parameterFrom() + "=b." + relatedOn.parameterWith() + ' ' +
-                        "WHERE a.event_id!=b.event_id AND (a.event_id=? OR b.event_id=?)";
+                        "FROM event_parameter AS a JOIN event_parameter AS b ON a.value=b.value " +
+                        "WHERE a.type_id=? AND b.type_id=? AND a.name=? AND b.name=? AND a.event_id!=b.event_id AND (a.event_id=? OR b.event_id=?)";
                 PreparedStatement statement = getPreparedStatement(sql);
+                statement.setInt(1, typeId);
+                statement.setInt(2, typeId);
+                statement.setString(3, relatedOn.parameterFrom());
+                statement.setString(4, relatedOn.parameterWith());
                 for (int eventId : eventIds) {
-                    statement.setInt(1, eventId);
-                    statement.setInt(2, eventId);
+                    statement.setInt(5, eventId);
+                    statement.setInt(6, eventId);
                     statement.executeUpdate();
                 }
             }
@@ -474,20 +451,27 @@ public class EventDatabase {
             if (typeId == -1)
                 return eventList;
 
-            String join = "LEFT JOIN " + type.dbName() + " AS tp ON tp.event_id=e.id";
-            StringBuilder filters = new StringBuilder();
-            for (SWEK.Param p : params) {
-                filters.append("AND tp.").append(p.name()).append(p.operand().representation).append("? ");
+            StringBuilder joins = new StringBuilder();
+            for (int i = 0; i < params.size(); i++) {
+                SWEK.Param param = params.get(i);
+                if (SWEKCatalog.databaseFields(type).keySet().stream().noneMatch(param.name()::equalsIgnoreCase))
+                    throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
+                String alias = "p" + i;
+                joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
+                        .append(alias).append(".type_id=e.type_id AND ").append(alias).append(".name=? AND ")
+                        .append(alias).append(".value").append(param.operand().representation).append('?');
             }
-            String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e " + join +
-                    " WHERE e.type_id=? AND e.start<=? AND e.end>=? " + filters + " order by e.start, e.end ";
+            String sqlt = "SELECT e.id, e.start, e.end, e.data FROM events AS e" + joins +
+                    " WHERE e.type_id=? AND e.start<=? AND e.end>=? ORDER BY e.start, e.end";
             PreparedStatement pstatement = getPreparedStatement(sqlt);
-            pstatement.setInt(1, typeId);
-            pstatement.setLong(2, end);
-            pstatement.setLong(3, start);
-            int parameterIndex = 4;
-            for (SWEK.Param param : params)
+            int parameterIndex = 1;
+            for (SWEK.Param param : params) {
+                pstatement.setString(parameterIndex++, param.name());
                 pstatement.setDouble(parameterIndex++, param.value());
+            }
+            pstatement.setInt(parameterIndex++, typeId);
+            pstatement.setLong(parameterIndex++, end);
+            pstatement.setLong(parameterIndex, start);
 
             try (ResultSet rs = pstatement.executeQuery()) {
                 while (rs.next()) {
@@ -539,19 +523,23 @@ public class EventDatabase {
     private static List<JsonEvent> queryRelationEvents(int eventId, SWEKSupplier leftType, SWEKSupplier rightType,
                                                        String leftParameter, String rightParameter) throws Exception {
         List<JsonEvent> ret = new ArrayList<>();
-        if (findEventTypeId(leftType) == -1 || findEventTypeId(rightType) == -1)
+        int leftTypeId = findEventTypeId(leftType), rightTypeId = findEventTypeId(rightType);
+        if (leftTypeId == -1 || rightTypeId == -1)
             return ret;
 
         String sql = "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e " +
                 "LEFT JOIN event_type ON e.type_id=event_type.id WHERE e.id IN (" +
                 "SELECT CASE WHEN tl.event_id=? THEN tr.event_id ELSE tl.event_id END " +
-                "FROM " + leftType.dbName() + " AS tl " +
-                "JOIN " + rightType.dbName() + " AS tr ON tl." + leftParameter + "=tr." + rightParameter + ' ' +
-                "WHERE tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?))";
+                "FROM event_parameter AS tl JOIN event_parameter AS tr ON tl.value=tr.value " +
+                "WHERE tl.type_id=? AND tr.type_id=? AND tl.name=? AND tr.name=? AND tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?))";
         PreparedStatement statement = getPreparedStatement(sql);
         statement.setInt(1, eventId);
-        statement.setInt(2, eventId);
-        statement.setInt(3, eventId);
+        statement.setInt(2, leftTypeId);
+        statement.setInt(3, rightTypeId);
+        statement.setString(4, leftParameter);
+        statement.setString(5, rightParameter);
+        statement.setInt(6, eventId);
+        statement.setInt(7, eventId);
 
         try (ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
