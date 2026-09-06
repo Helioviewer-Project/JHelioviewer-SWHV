@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,6 @@ import org.helioviewer.jhv.time.Interval;
 import org.helioviewer.jhv.time.RequestCache;
 import org.helioviewer.jhv.time.TimeUtils;
 
-import com.google.common.collect.ArrayListMultimap;
-
 public class SWEKDownloader {
 
     private static final double FACTOR = 0.2;
@@ -34,16 +33,26 @@ public class SWEKDownloader {
             new AppThread.NamedThreadFactory("SWEK Download"),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    private static final class Worker implements Runnable, Comparable<Worker> {
+    private static final class SupplierRequests {
         private final SWEKSupplier supplier;
+        private final RequestCache intervals = new RequestCache();
+        private final List<Worker> workers = new ArrayList<>();
+
+        SupplierRequests(SWEKSupplier _supplier) {
+            supplier = _supplier;
+        }
+    }
+
+    private static final class Worker implements Runnable, Comparable<Worker> {
+        private final SupplierRequests requests;
         private final List<SWEK.Param> params;
         private final long start;
         private final long end;
 
         private volatile boolean cancelled;
 
-        Worker(SWEKSupplier _supplier, List<SWEK.Param> _params, long _start, long _end) {
-            supplier = _supplier;
+        Worker(SupplierRequests _requests, List<SWEK.Param> _params, long _start, long _end) {
+            requests = _requests;
             params = _params;
             start = _start;
             end = _end;
@@ -59,7 +68,7 @@ public class SWEKDownloader {
                 if (cancelled)
                     return;
 
-                finishSuccess(EventDatabase.loadEvents(start, end, supplier, params));
+                finishSuccess(EventDatabase.loadEvents(start, end, requests.supplier, params));
             } catch (Throwable t) {
                 finishFailure(t);
             }
@@ -94,12 +103,12 @@ public class SWEKDownloader {
         }
 
         private boolean ensureStored() throws Exception {
-            if (EventDatabase.isStored(start, end, supplier))
+            if (EventDatabase.isStored(start, end, requests.supplier))
                 return true;
             if (!fetchAndStoreRemote())
                 return false;
 
-            return EventDatabase.addStoredInterval(start, end, supplier);
+            return EventDatabase.addStoredInterval(start, end, requests.supplier);
         }
 
         private boolean fetchAndStoreRemote() throws Exception {
@@ -109,8 +118,8 @@ public class SWEKDownloader {
                 if (cancelled)
                     return false;
 
-                SWEKHandler.RemotePage remotePage = supplier.source().handler().fetchPage(supplier, start, end, page);
-                if (!EventDatabase.storeRemotePage(remotePage, supplier))
+                SWEKHandler.RemotePage remotePage = requests.supplier.source().handler().fetchPage(requests.supplier, start, end, page);
+                if (!EventDatabase.storeRemotePage(remotePage, requests.supplier))
                     return false;
                 overmax = remotePage.overmax();
                 page++;
@@ -129,22 +138,15 @@ public class SWEKDownloader {
         }
     }
 
-    private static final Map<SWEKSupplier, RequestCache> requestedIntervals = new HashMap<>();
-    private static final ArrayListMultimap<SWEKSupplier, Worker> workerMap = ArrayListMultimap.create();
-
-    private static void requestFailed(SWEKSupplier eventType, long start, long end) {
-        RequestCache cache = requestedIntervals.get(eventType);
-        if (cache != null)
-            cache.removeRequestedInterval(start, end);
-    }
+    private static final Map<SWEKSupplier, SupplierRequests> activeSuppliers = new HashMap<>();
 
     public static boolean isSupplierActive(SWEKSupplier supplier) {
-        return requestedIntervals.containsKey(supplier);
+        return activeSuppliers.containsKey(supplier);
     }
 
     public static void setSupplierActive(SWEKSupplier supplier, boolean active) {
         if (active) {
-            requestedIntervals.computeIfAbsent(supplier, _ -> new RequestCache());
+            activeSuppliers.computeIfAbsent(supplier, SupplierRequests::new);
             EventCache.fireEventCacheChanged();
         } else {
             stopDownloadSupplier(supplier, false);
@@ -161,10 +163,9 @@ public class SWEKDownloader {
         long deltaT = Math.max((long) ((visibleEnd - start) * FACTOR), TimeUtils.DAY_IN_MILLIS);
         long requestStart = start - deltaT;
         long requestEnd = Math.min(visibleEnd + deltaT, requestHorizon);
-        for (Map.Entry<SWEKSupplier, RequestCache> entry : requestedIntervals.entrySet()) {
-            RequestCache cache = entry.getValue();
-            if (!cache.getMissingIntervals(start, visibleEnd).isEmpty())
-                startDownloadSupplier(entry.getKey(), cache.adaptRequestCache(requestStart, requestEnd));
+        for (SupplierRequests requests : activeSuppliers.values()) {
+            if (!requests.intervals.getMissingIntervals(start, visibleEnd).isEmpty())
+                startDownloadSupplier(requests, requests.intervals.adaptRequestCache(requestStart, requestEnd));
         }
     }
 
@@ -185,8 +186,8 @@ public class SWEKDownloader {
     }
 
     public static boolean isGroupBusy(SWEKGroup group) {
-        for (SWEKSupplier supplier : workerMap.keySet()) {
-            if (supplier.group() == group)
+        for (SupplierRequests requests : activeSuppliers.values()) {
+            if (requests.supplier.group() == group && !requests.workers.isEmpty())
                 return true;
         }
         return false;
@@ -197,25 +198,27 @@ public class SWEKDownloader {
     }
 
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
-        for (Worker worker : workerMap.get(supplier))
-            worker.stopWorker();
-        workerMap.removeAll(supplier);
+        SupplierRequests requests = activeSuppliers.get(supplier);
+        if (requests != null) {
+            requests.workers.forEach(Worker::stopWorker);
+            requests.workers.clear();
+        }
         if (keepActive)
-            requestedIntervals.put(supplier, new RequestCache());
+            activeSuppliers.put(supplier, new SupplierRequests(supplier));
         else
-            requestedIntervals.remove(supplier);
+            activeSuppliers.remove(supplier);
         EventCache.removeSupplier(supplier);
         updateGroupBusy(supplier.group());
     }
 
     private static void workerFailed(Worker worker) {
-        requestFailed(worker.supplier, worker.start, worker.end);
+        worker.requests.intervals.removeRequestedInterval(worker.start, worker.end);
         workerFinished(worker);
     }
 
     private static void workerFinished(Worker worker) {
-        workerMap.remove(worker.supplier, worker);
-        updateGroupBusy(worker.supplier.group());
+        worker.requests.workers.remove(worker);
+        updateGroupBusy(worker.requests.supplier.group());
     }
 
     private static void filtersChanged(SWEKSupplier supplier) {
@@ -223,15 +226,16 @@ public class SWEKDownloader {
             stopDownloadSupplier(supplier, true);
     }
 
-    private static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
+    private static void startDownloadSupplier(SupplierRequests requests, List<Interval> intervals) {
+        SWEKSupplier supplier = requests.supplier;
         List<SWEK.Param> params = FilterManager.getFilters(supplier);
         SWEKGroup group = supplier.group();
         boolean started = false;
         for (Interval interval : intervals) {
             for (Interval intt : Interval.splitInterval(interval, 2)) {
-                Worker worker = new Worker(supplier, params, intt.start(), intt.end());
+                Worker worker = new Worker(requests, params, intt.start(), intt.end());
                 downloadPool.execute(worker);
-                workerMap.put(supplier, worker);
+                requests.workers.add(worker);
                 started = true;
             }
         }
