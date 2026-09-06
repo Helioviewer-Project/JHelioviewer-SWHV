@@ -18,10 +18,10 @@ import org.helioviewer.jhv.app.Platform;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.EventBatch;
 import org.helioviewer.jhv.event.EventCache;
+import org.helioviewer.jhv.event.EventCacheTest;
 import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.event.EventMetadata;
 import org.helioviewer.jhv.event.EventParameter;
-import org.helioviewer.jhv.event.EventCacheTest;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKGroup;
@@ -174,8 +174,8 @@ public final class SWEKIntegrationTest {
         publish.invoke(null, new EventBatch(1, List.of(first, second, third), links));
         check(layer, 150, first);
         List<SWEKLayer.ActiveEvent> active = layer.activeEvents(150);
-        EventCache.highlight(active.getFirst().group());
-        if (active != layer.activeEvents(150) || !active.getFirst().group().isHighlighted())
+        EventCache.highlight(active.getFirst().relatedEvents());
+        if (active != layer.activeEvents(150) || !active.getFirst().relatedEvents().isHighlighted())
             throw new AssertionError("highlight remains live without rebuilding selections");
         EventCache.highlight(null);
         check(layer, 200, first);
@@ -212,7 +212,7 @@ public final class SWEKIntegrationTest {
         if (active.size() != 1) throw new AssertionError("group count");
         SWEKLayer.ActiveEvent item = active.getFirst();
         SolarEvent actual = item.event();
-        if (item.group() != EventCache.getObservationGroup(expected.getUniqueID())) throw new AssertionError("group identity");
+        if (item.relatedEvents() != EventCache.getRelatedEvents(expected.getUniqueID())) throw new AssertionError("group identity");
         if (actual != expected) throw new AssertionError("selection at " + time);
     }
 
@@ -257,8 +257,8 @@ public final class SWEKIntegrationTest {
             check(SWEKCatalog.getSupplier("test") == supplier, "duplicate ID does not replace the original supplier");
             check(SWEKCatalog.getSuppliers(flare).equals(List.of(target)), "duplicate ID does not enter a group");
         }
-        List<SWEK.RelatedEvents> valid = List.of(new SWEK.RelatedEvents(activeRegion, flare, List.of(new SWEK.RelatedOn("region", "target_region"))));
-        SWEKCatalog.setRelatedEvents(valid);
+        List<SWEK.Relation> valid = List.of(new SWEK.Relation(activeRegion, flare, List.of(new SWEK.RelatedOn("region", "target_region"))));
+        SWEKCatalog.setRelations(valid);
         Map<String, SWEK.NumericType> indexed = SWEKCatalog.indexedParameters(supplier);
         check(indexed.containsKey("REGION") && indexed.get("region") == SWEK.NumericType.INTEGER, "indexed lookup preserves case-insensitive names");
         check(List.copyOf(indexed.keySet()).equals(List.of("Region")), "lookup preserves the configured spelling");
@@ -270,9 +270,9 @@ public final class SWEKIntegrationTest {
         }
         check(SWEKCatalog.indexedParameters(supplier).equals(Map.of("Region", SWEK.NumericType.INTEGER)), "filter and relationship share the source definition");
         check(SWEKCatalog.indexedParameters(target).equals(Map.of("target_region", SWEK.NumericType.INTEGER)), "target uses its own source definition");
-        expectFailure(List.of(new SWEK.RelatedEvents(activeRegion, flare, List.of(new SWEK.RelatedOn("region", "measurement")))), "Incompatible");
-        expectFailure(List.of(new SWEK.RelatedEvents(activeRegion, flare, List.of(new SWEK.RelatedOn("unknown", "target_region")))), "Missing");
-        check(SWEKCatalog.getRelatedEvents().equals(valid), "rejected declarations preserve relationships");
+        expectFailure(List.of(new SWEK.Relation(activeRegion, flare, List.of(new SWEK.RelatedOn("region", "measurement")))), "Incompatible");
+        expectFailure(List.of(new SWEK.Relation(activeRegion, flare, List.of(new SWEK.RelatedOn("unknown", "target_region")))), "Missing");
+        check(SWEKCatalog.getRelations().equals(valid), "rejected declarations preserve relationships");
         check(SWEKCatalog.indexedParameters(supplier).equals(Map.of("Region", SWEK.NumericType.INTEGER)), "rejected declarations preserve field definitions");
         try {
             new SWEK.Source("bad", List.of(), null, Map.of("value", SWEK.NumericType.INTEGER, "VALUE", SWEK.NumericType.DECIMAL));
@@ -287,9 +287,9 @@ public final class SWEKIntegrationTest {
         SWEKCatalog.clear();
     }
 
-    private static void expectFailure(List<SWEK.RelatedEvents> relations, String explanation) {
+    private static void expectFailure(List<SWEK.Relation> relations, String explanation) {
         try {
-            SWEKCatalog.setRelatedEvents(relations);
+            SWEKCatalog.setRelations(relations);
             throw new AssertionError("invalid parameter references were accepted");
         } catch (IllegalArgumentException expected) {
             check(expected.getMessage().contains(explanation), "configuration failure is explained");

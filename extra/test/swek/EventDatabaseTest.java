@@ -62,7 +62,7 @@ public final class EventDatabaseTest {
                 new SWEK.Parameter("Test_Measurement", "Measurement", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false),
                 new SWEK.Parameter("Test_Identifier", "Identifier", new SWEK.ParameterFilter("", 0, 100, 0, 1, ""), false)));
         SWEKCatalog.add(configured);
-        SWEKCatalog.setRelatedEvents(List.of());
+        SWEKCatalog.setRelations(List.of());
         boolean reload = args[0].equals("reload");
         Path timestampFile = Path.of(Directories.CACHE.getPath(), "test-timestamp.txt");
         long recent = reload ? Long.parseLong(Files.readString(timestampFile)) : System.currentTimeMillis() - 3_600_000;
@@ -83,7 +83,7 @@ public final class EventDatabaseTest {
         SWEKSupplier dataSupplier = new SWEKSupplier(supplier.group(), "test", "test", supplier.source(),
                 "test_data", supplier.getParameterList());
         SWEKCatalog.add(dataSupplier);
-        SWEKCatalog.setRelatedEvents(List.of());
+        SWEKCatalog.setRelations(List.of());
         byte[] json;
         try (ByteArrayOutputStream output = JSONUtils.compressJSON(new JSONObject().put("noposition", true).put("event_title", "test"))) {
             json = output.toByteArray();
@@ -164,7 +164,7 @@ public final class EventDatabaseTest {
         Files.createDirectories(Path.of(Directories.CACHE.getPath()));
         SWEK.Source source = new SWEK.Source("HEK", List.of(), new HEKHandler(), Map.of("speed", SWEK.NumericType.DECIMAL, "region", SWEK.NumericType.INTEGER));
         SWEKSupplier first = supplier(source, "first"), second = supplier(source, "second");
-        SWEKCatalog.setRelatedEvents(List.of());
+        SWEKCatalog.setRelations(List.of());
         SWEKHandler.RemoteEvent indexedEvent = indexedEvent("a", Map.of("speed", 12.75, "region", 42));
         check(EventDatabase.storeRemotePage(new SWEKHandler.RemotePage(false, List.of(indexedEvent, indexedEvent("missing", Map.of())),
                 List.of(new SolarEvent.LinkRef("a", "placeholder"))), first), "storeIndexed initial values and association placeholder");
@@ -225,9 +225,9 @@ public final class EventDatabaseTest {
         SWEK.Source source = new SWEK.Source("HEK", List.of(), new HEKHandler(), Map.of("ar_noaanum", SWEK.NumericType.INTEGER));
         SWEKGroup ar = new SWEKGroup("Active Region", ""), fl = new SWEKGroup("Flare", ""), ce = new SWEKGroup("Coronal Mass Ejection", "");
         SWEKSupplier first = supplier(ar, source, "first"), second = supplier(ar, source, "second"), flare = supplier(fl, source, "flare"), cme = supplier(ce, source, "cme");
-        SWEKCatalog.setRelatedEvents(List.of(
-                new SWEK.RelatedEvents(ar, ar, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum"))),
-                new SWEK.RelatedEvents(ar, fl, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum")))));
+        SWEKCatalog.setRelations(List.of(
+                new SWEK.Relation(ar, ar, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum"))),
+                new SWEK.Relation(ar, fl, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum")))));
         store(first, event("a1", 42), event("a2", 42), event("missing", null));
         store(second, event("b1", 42), event("b2", 43));
         store(flare, event("f1", 42));
@@ -265,7 +265,7 @@ public final class EventDatabaseTest {
         }
         EventDatabaseThread.getConnection().commit();
         SWEKSupplier failed = supplier(ce, source, "failed");
-        SWEKCatalog.setRelatedEvents(SWEKCatalog.getRelatedEvents());
+        SWEKCatalog.setRelations(SWEKCatalog.getRelations());
         check(!EventDatabase.storeRemotePage(new SWEKHandler.RemotePage(false, List.of(event("rollback", null), event("reject", null)), List.of()), failed), "storage failure reaches caller");
         check(EventDatabase.loadEvents(100, 200, failed, List.of()).events().isEmpty(), "failed page leaves no partial events");
         store(failed, event("rollback", null));
@@ -294,9 +294,9 @@ public final class EventDatabaseTest {
         SWEK.Source source = new SWEK.Source("HEK", List.of(), new HEKHandler(), Map.of("from", SWEK.NumericType.INTEGER, "to", SWEK.NumericType.INTEGER));
         SWEKGroup group = new SWEKGroup("Asymmetric", "");
         SWEKSupplier supplier = supplier(group, source, "asymmetric");
-        List<SWEK.RelatedEvents> relations = new ArrayList<>(SWEKCatalog.getRelatedEvents());
-        relations.add(new SWEK.RelatedEvents(group, group, List.of(new SWEK.RelatedOn("from", "to"))));
-        SWEKCatalog.setRelatedEvents(relations);
+        List<SWEK.Relation> relations = new ArrayList<>(SWEKCatalog.getRelations());
+        relations.add(new SWEK.Relation(group, group, List.of(new SWEK.RelatedOn("from", "to"))));
+        SWEKCatalog.setRelations(relations);
         store(supplier, event("left", 100, 200, Map.of("from", 7)), event("right", 300, 400, Map.of("to", 7)));
         List<SolarEvent.Link> links = EventDatabase.loadEvents(100, 400, supplier, List.of()).associations();
         check(links.size() == 1, "different parameter names match");
@@ -313,10 +313,10 @@ public final class EventDatabaseTest {
         SWEKSupplier left = supplier(leftGroup, source, "detail_left");
         SWEKSupplier sameGroup = supplier(leftGroup, source, "detail_same_group");
         SWEKSupplier right = supplier(rightGroup, source, "detail_right");
-        List<SWEK.RelatedEvents> relations = new ArrayList<>(SWEKCatalog.getRelatedEvents());
-        relations.add(new SWEK.RelatedEvents(leftGroup, rightGroup, List.of(new SWEK.RelatedOn("from", "to"))));
-        relations.add(new SWEK.RelatedEvents(leftGroup, leftGroup, List.of(new SWEK.RelatedOn("from", "to"))));
-        SWEKCatalog.setRelatedEvents(relations);
+        List<SWEK.Relation> relations = new ArrayList<>(SWEKCatalog.getRelations());
+        relations.add(new SWEK.Relation(leftGroup, rightGroup, List.of(new SWEK.RelatedOn("from", "to"))));
+        relations.add(new SWEK.Relation(leftGroup, leftGroup, List.of(new SWEK.RelatedOn("from", "to"))));
+        SWEKCatalog.setRelations(relations);
         store(left, event("detail_left", 100, 200, Map.of("from", 7)));
         store(sameGroup, event("detail_same_group", 100, 200, Map.of("to", 7)));
         store(right, event("detail_right", 100, 200, Map.of("to", 7)), event("detail_unmatched", 100, 200, Map.of("to", 8)));
@@ -352,7 +352,7 @@ public final class EventDatabaseTest {
         SWEKSupplier supplier = new SWEKSupplier(new SWEKGroup("Test", ""), "test", "Test",
                 new SWEK.Source("test", List.of(), handler, Map.of()), "test", List.of());
         SWEKCatalog.add(supplier);
-        SWEKCatalog.setRelatedEvents(List.of());
+        SWEKCatalog.setRelations(List.of());
         check(EventDatabase.storeRemotePage(new SWEKHandler.RemotePage(false,
                 List.of(decodingEvent("pause", 10), decodingEvent("malformed", 20), decodingEvent("last", 30)), List.of()), supplier), "store initial snapshot");
         ExecutorService callers = Executors.newFixedThreadPool(2);

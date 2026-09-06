@@ -129,7 +129,7 @@ public final class HEKHandlerTest {
                 new SWEK.Parameter("CME_RadialLinVel", "Speed", new SWEK.ParameterFilter("", 0, 3000, 1000, 100, ""), false)));
         SWEKSupplier spoca = new SWEKSupplier(new SWEKGroup("Coronal Hole", ""), "SPoCA", "SPoCA", source, "test_spoca", List.of());
         for (SWEKSupplier supplier : List.of(swpc, cactus, spoca)) SWEKCatalog.add(supplier);
-        SWEKCatalog.setRelatedEvents(List.of(new SWEK.RelatedEvents(activeRegion, flare, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum")))));
+        SWEKCatalog.setRelations(List.of(new SWEK.Relation(activeRegion, flare, List.of(new SWEK.RelatedOn("ar_noaanum", "ar_noaanum")))));
 
         Map<String, Number> values = read(swpc, new JSONObject().put("fl_goescls", "M1.0").put("ar_noaanum", 13664).put("cme_radiallinvel", 679));
         check(Math.abs(values.get("JHV_GOESFlux").doubleValue() - 1e-5) < 1e-12 && values.get("ar_noaanum").doubleValue() == 13664, "GOES conversion and NOAA identity");

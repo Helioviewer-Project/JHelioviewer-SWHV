@@ -29,7 +29,7 @@ public class SWEK {
 
     public record RelatedOn(String parameterFrom, String parameterWith) {}
 
-    public record RelatedEvents(SWEKGroup group, SWEKGroup relatedWith, List<RelatedOn> relatedOnList) {}
+    public record Relation(SWEKGroup group, SWEKGroup relatedWith, List<RelatedOn> relatedOnList) {}
 
     public record Source(String name, List<Parameter> generalParameters, SWEKHandler handler, Map<String, NumericType> numericParameters) {
         public Source {

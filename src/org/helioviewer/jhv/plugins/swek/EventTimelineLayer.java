@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventListener;
-import org.helioviewer.jhv.event.ObservationGroup;
+import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
@@ -33,7 +33,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
 
     private EventPlotConfiguration eventUnderMouse;
     private final List<EventPlotConfiguration> eventPlots = new ArrayList<>();
-    private List<ObservationGroup> visibleEvents = Collections.emptyList();
+    private List<RelatedEvents> visibleEvents = Collections.emptyList();
 
     EventTimelineLayer() {
         registerAndRefresh();
@@ -85,7 +85,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
 
         eventUnderMouse = null;
         eventPlots.clear();
-        List<ObservationGroup> events = visibleEvents;
+        List<RelatedEvents> events = visibleEvents;
         if (events.isEmpty()) {
             if (mousePosition != null) {
                 EventCache.highlight(null);
@@ -96,7 +96,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         ArrayList<Long> endDates = new ArrayList<>();
         TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
 
-        for (ObservationGroup event : events) {
+        for (RelatedEvents event : events) {
             long eventStart = event.getStart();
             long eventEnd = event.getEnd();
             int i = 0;
@@ -171,13 +171,13 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         return false;
     }
 
-    private record EventPlotConfiguration(ObservationGroup event, int x, int y, int width, int height, long time) {
+    private record EventPlotConfiguration(RelatedEvents event, int x, int y, int width, int height, long time) {
         boolean contains(Point point) {
             return containsPoint(point, x - 1, y - 1, width + 2, height + 2);
         }
     }
 
-    private static EventPlotConfiguration createEventPlot(Rectangle graphArea, ObservationGroup event, int x0, int x1, int yPosition, long time) {
+    private static EventPlotConfiguration createEventPlot(Rectangle graphArea, RelatedEvents event, int x0, int x1, int yPosition, long time) {
         int w = Math.max(x1 - x0, 1);
         if (w < 5) {
             x0 -= 5 / w;
@@ -188,7 +188,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
     }
 
     private static void drawEvent(Rectangle graphArea, EventPlotConfiguration plot, Graphics2D g, Point mousePosition) {
-        ObservationGroup event = plot.event;
+        RelatedEvents event = plot.event;
         int x0 = plot.x;
         int y = plot.y;
         int w = plot.width;
@@ -216,7 +216,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         }
     }
 
-    private static void drawText(Rectangle graphArea, Graphics2D g, ObservationGroup event, int y, int mouseX) {
+    private static void drawText(Rectangle graphArea, Graphics2D g, RelatedEvents event, int y, int mouseX) {
         long ts = DrawController.selectedAxis.mapper(graphArea.x, graphArea.width).toValue(mouseX);
         SolarEvent closestEvent = event.getClosestTo(ts);
         List<String> txts = SWEKData.visibleParameterLines(closestEvent);
@@ -268,7 +268,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         if (eventUnderMouse == null)
             return null;
 
-        ObservationGroup event = eventUnderMouse.event;
+        RelatedEvents event = eventUnderMouse.event;
         return (location, timestamp) -> {
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(timestamp));
             dialog.pack();

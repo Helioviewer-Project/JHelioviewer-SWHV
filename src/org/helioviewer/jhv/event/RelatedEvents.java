@@ -10,7 +10,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.time.Interval;
 
-public class ObservationGroup {
+public class RelatedEvents {
 
     private static final Colors.Data eventColors = new Colors.Data();
 
@@ -21,11 +21,11 @@ public class ObservationGroup {
     private List<Interval> intervals;
     private boolean highlighted;
 
-    public ObservationGroup(SolarEvent event) {
+    public RelatedEvents(SolarEvent event) {
         this(event, eventColors.getNextColor());
     }
 
-    public ObservationGroup(SolarEvent event, Color _color) {
+    public RelatedEvents(SolarEvent event, Color _color) {
         color = _color;
         events.put(event.getUniqueID(), event);
         intervals = List.of(new Interval(event.start, event.end));
@@ -113,18 +113,18 @@ public class ObservationGroup {
         return associations;
     }
 
-    void swapEvent(SolarEvent event) {
+    void replaceEvent(SolarEvent event) {
         SolarEvent previous = events.putLast(event.getUniqueID(), event);
         if (previous != null && previous.start == event.start && previous.end == event.end)
             return;
 
         List<Interval> updated = new ArrayList<>();
-        for (SolarEvent observation : events.values())
-            updated.add(new Interval(observation.start, observation.end));
+        for (SolarEvent member : events.values())
+            updated.add(new Interval(member.start, member.end));
         intervals = List.copyOf(Interval.merge(updated));
     }
 
-    void merge(ObservationGroup found) {
+    void merge(RelatedEvents found) {
         events.putAll(found.events);
         associations.addAll(found.associations);
         List<Interval> combined = new ArrayList<>(intervals);

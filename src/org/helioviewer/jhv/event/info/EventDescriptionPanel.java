@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.event.EventCache;
-import org.helioviewer.jhv.event.ObservationGroup;
+import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.plugins.swek.SWEKIconBank;
 import org.helioviewer.jhv.time.TimeUtils;
@@ -21,7 +21,7 @@ import org.helioviewer.jhv.time.TimeUtils;
 @SuppressWarnings("serial")
 class EventDescriptionPanel extends JPanel {
 
-    EventDescriptionPanel(ObservationGroup revent, SolarEvent event) {
+    EventDescriptionPanel(RelatedEvents related, SolarEvent event) {
         ImageIcon icon = SWEKIconBank.getIcon(event.getSupplier().group().getIconKey());
         JLabel labelIcon = new JLabel(icon);
 
@@ -34,7 +34,7 @@ class EventDescriptionPanel extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                EventCache.highlight(revent);
+                EventCache.highlight(related);
             }
 
             @Override
@@ -45,7 +45,7 @@ class EventDescriptionPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         JLabel colorLabel = new JLabel();
-        colorLabel.setBackground(revent.getColor());
+        colorLabel.setBackground(related.getColor());
         colorLabel.setOpaque(true);
 
         GridBagConstraints iconLabelConstraint = new GridBagConstraints();

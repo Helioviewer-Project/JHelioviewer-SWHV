@@ -32,7 +32,7 @@ public final class EventFilterRequestsTest {
         SWEKSupplier supplier = new SWEKSupplier(group, "test", "Test",
                 new SWEK.Source("test", List.of(), new HEKHandler(), Map.of("value", SWEK.NumericType.INTEGER)), "filter-requests", List.of(parameter));
         SWEKCatalog.add(supplier);
-        SWEKCatalog.setRelatedEvents(List.of());
+        SWEKCatalog.setRelations(List.of());
         long start = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(3), end = start + 1;
         check(EventDatabase.storeRemotePage(new SWEKHandler.RemotePage(false,
                 List.of(event("low", 1, start, end), event("high", 2, start, end)), List.of()), supplier), "store observations");

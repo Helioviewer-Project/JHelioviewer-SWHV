@@ -18,7 +18,7 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.event.EventListener;
-import org.helioviewer.jhv.event.ObservationGroup;
+import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SolarEvent;
@@ -43,7 +43,7 @@ import org.json.JSONObject;
 
 // has to be public for state
 public final class SWEKLayer extends AbstractLayer implements EventListener.Handle, TimeListener.Range {
-    record ActiveEvent(ObservationGroup group, SolarEvent event) {}
+    record ActiveEvent(RelatedEvents relatedEvents, SolarEvent event) {}
 
     private record CactusArcParams(double angularWidthDegree, double principalAngleDegree, double distSun) {}
 
@@ -139,7 +139,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         return new CactusArcParams(angularWidthDegree, principalAngleDegree, distSun);
     }
 
-    private void drawCactusArc(ObservationGroup evtr, SolarEvent evt, long timestamp) {
+    private void drawCactusArc(RelatedEvents relatedEvents, SolarEvent evt, long timestamp) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -153,8 +153,8 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         double thetaStart = principalAngle - angularWidth / 2.;
         double thetaEnd = principalAngle + angularWidth / 2.;
 
-        BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
-        byte[] color = Colors.bytes(evtr.getColor());
+        BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
+        byte[] color = Colors.bytes(relatedEvents.getColor());
 
         drawInterpolated(angularResolution, distSun, distSun, thetaStart, principalAngle, q, color, vexBuf);
         drawInterpolated(angularResolution, distSun, distSun, principalAngle, thetaEnd, q, color, vexBuf);
@@ -163,7 +163,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         drawInterpolated(lineResolution, SWEKData.CACTUS_START_RADIUS, distSun + 0.05, thetaEnd, thetaEnd, q, color, vexBuf);
 
         if (icons) {
-            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             for (float[] el : texCoord) {
                 double deltatheta = sz / distSun * (el[0] * 2 - 1);
                 double deltar = sz * (el[1] * 2 - 1);
@@ -175,7 +175,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         }
     }
 
-    private void drawPolygon(MapView mv, Viewport vp, ObservationGroup evtr, SolarEvent evt) {
+    private void drawPolygon(MapView mv, Viewport vp, RelatedEvents relatedEvents, SolarEvent evt) {
         EventGeometry pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -185,8 +185,8 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
             return;
         }
 
-        BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
-        byte[] color = Colors.bytes(evtr.getColor());
+        BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
+        byte[] color = Colors.bytes(relatedEvents.getColor());
 
         // draw bounds
         int plen = points.length / 3;
@@ -234,14 +234,14 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         texBuf.putCoord(p3, texCoord[3]);
     }
 
-    private void drawIcon(ObservationGroup evtr, SolarEvent evt) {
+    private void drawIcon(RelatedEvents relatedEvents, SolarEvent evt) {
         EventGeometry pi = evt.getPositionInformation();
         if (pi == null)
             return;
 
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
-            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImage3d(pt.x, pt.y, pt.z, sz, sz);
         }
     }
@@ -256,7 +256,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(MapView mv, Viewport vp, ObservationGroup evtr, SolarEvent evt) {
+    private void drawIconScale(MapView mv, Viewport vp, RelatedEvents relatedEvents, SolarEvent evt) {
         EventGeometry pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -264,7 +264,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         Vec3 pt = pi.centralPoint();
         if (pt != null) {
             Vec2 tf = mv.projectToScreen(vp, pt);
-            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale(tf.x, tf.y, sz, sz);
         }
     }
@@ -275,7 +275,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         vexBuf.endLine();
     }
 
-    private void drawCactusArcScale(Viewport vp, ObservationGroup evtr, SolarEvent evt, long timestamp, MapScale scale) {
+    private void drawCactusArcScale(Viewport vp, RelatedEvents relatedEvents, SolarEvent evt, long timestamp, MapScale scale) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double principalAngleDegree = params.principalAngleDegree();
@@ -284,8 +284,8 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         double thetaStart = MathUtils.mapTo0To360(principalAngleDegree - angularWidthDegree / 2.);
         double thetaEnd = MathUtils.mapTo0To360(principalAngleDegree + angularWidthDegree / 2.);
 
-        BufVertex vexBuf = evtr.isHighlighted() ? bufThick : bufEvent;
-        byte[] color = Colors.bytes(evtr.getColor());
+        BufVertex vexBuf = relatedEvents.isHighlighted() ? bufThick : bufEvent;
+        byte[] color = Colors.bytes(relatedEvents.getColor());
 
         float x = (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect);
         float y = (float) (scale.toUnitY(SWEKData.CACTUS_START_RADIUS) - 0.5);
@@ -303,7 +303,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         putLineScale(vexBuf, x, y, (float) ((scale.toUnitX(thetaStart) - 0.5) * vp.aspect), y, color);
 
         if (icons) {
-            double sz = evtr.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
+            double sz = relatedEvents.isHighlighted() ? ICON_SIZE_HIGHLIGHTED : ICON_SIZE;
             drawImageScale((scale.toUnitX(principalAngleDegree) - 0.5) * vp.aspect,
                     scale.toUnitY(distSun) - 0.5, sz, sz);
         }
@@ -312,8 +312,8 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(Viewport vp, ObservationGroup mouseOverGroup, int x, int y, long currentTime) {
-        GLText.drawTextFloat(vp, SWEKData.visibleParameterLines(mouseOverGroup.getClosestTo(currentTime)), x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
+    private void drawText(Viewport vp, RelatedEvents mouseOverEvents, int x, int y, long currentTime) {
+        GLText.drawTextFloat(vp, SWEKData.visibleParameterLines(mouseOverEvents.getClosestTo(currentTime)), x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
     private void renderEvents(Viewport vp) {
@@ -327,7 +327,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         glslTexture.setCoord(texBuf);
         int idx = 0;
         for (ActiveEvent active : evs) {
-            ObservationGroup evtr = active.group();
+            RelatedEvents relatedEvents = active.relatedEvents();
             SolarEvent evt = active.event();
             if (mv.isLatitudinal() && evt.isCactus())
                 continue;
@@ -337,7 +337,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
                     continue;
             }
             bindTexture(evt.getSupplier().group());
-            glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(evtr.getColor(), ICON_ALPHA), idx, 4);
+            glslTexture.renderTexture(GL.TRIANGLE_STRIP, Colors.floats(relatedEvents.getColor(), ICON_ALPHA), idx, 4);
             idx += 4;
         }
     }
@@ -345,8 +345,8 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     List<ActiveEvent> activeEvents(long time) {
         if (time != cachedEventsTime) {
             List<ActiveEvent> active = new ArrayList<>();
-            for (ObservationGroup group : EventCache.getEvents(time, time))
-                active.add(new ActiveEvent(group, group.getClosestTo(time)));
+            for (RelatedEvents relatedEvents : EventCache.getEvents(time, time))
+                active.add(new ActiveEvent(relatedEvents, relatedEvents.getClosestTo(time)));
             cachedActiveEvents = active;
             cachedEventsTime = time;
         }
@@ -367,14 +367,14 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
             return;
 
         for (ActiveEvent active : evs) {
-            ObservationGroup evtr = active.group();
+            RelatedEvents relatedEvents = active.relatedEvents();
             SolarEvent evt = active.event();
             if (evt.isCactus()) {
-                drawCactusArc(evtr, evt, currentTime);
+                drawCactusArc(relatedEvents, evt, currentTime);
             } else {
-                drawPolygon(mv, vp, evtr, evt);
+                drawPolygon(mv, vp, relatedEvents, evt);
                 if (icons) {
-                    drawIcon(evtr, evt);
+                    drawIcon(relatedEvents, evt);
                 }
             }
         }
@@ -395,14 +395,14 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
 
         MapScale scale = mv.scale(vp);
         for (ActiveEvent active : evs) {
-            ObservationGroup evtr = active.group();
+            RelatedEvents relatedEvents = active.relatedEvents();
             SolarEvent evt = active.event();
             if (evt.isCactus() && mv.isRectWarp()) {
-                drawCactusArcScale(vp, evtr, evt, currentTime, scale);
+                drawCactusArcScale(vp, relatedEvents, evt, currentTime, scale);
             } else {
-                drawPolygon(mv, vp, evtr, evt);
+                drawPolygon(mv, vp, relatedEvents, evt);
                 if (icons) {
-                    drawIconScale(mv, vp, evtr, evt);
+                    drawIconScale(mv, vp, relatedEvents, evt);
                 }
             }
         }
@@ -416,8 +416,8 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
     public void renderFullFloat(Viewport vp) {
         if (!enabled)
             return;
-        if (swekContext != null && swekContext.mouseOverGroup() != null) {
-            drawText(vp, swekContext.mouseOverGroup(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
+        if (swekContext != null && swekContext.mouseOverEvents() != null) {
+            drawText(vp, swekContext.mouseOverEvents(), swekContext.mouseOverX(), swekContext.mouseOverY(), swekContext.mouseOverTime());
         }
     }
 

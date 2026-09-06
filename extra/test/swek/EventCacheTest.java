@@ -37,7 +37,7 @@ public final class EventCacheTest {
     public static void checkLoadedEvents(List<SolarEvent> events) {
         EventCache.replaceEvents(new EventBatch(1, events, List.of()));
         for (SolarEvent event : events) {
-            ObservationGroup group = EventCache.getObservationGroup(event.getUniqueID());
+            RelatedEvents group = EventCache.getRelatedEvents(event.getUniqueID());
             check(EventCache.getEvents(event.start, event.start).contains(group), "loaded event visible at start");
             check(EventCache.getEvents(event.end, event.end).contains(group), "loaded event visible at end");
             check(group.getClosestTo(event.start) == event, "canvas representative");
@@ -57,13 +57,13 @@ public final class EventCacheTest {
         checkRebuiltGroupOrder();
         checkRemovalNotifications();
         checkRequestOwnership();
-        ObservationGroups groups = new ObservationGroups();
+        EventCollection groups = new EventCollection();
         SolarEvent first = new SolarEvent(null, 1, 100, 200);
         SolarEvent second = new SolarEvent(null, 2, 400, 500);
         groups.addEvent(first);
         groups.addEvent(second);
         groups.addAssociation(new SolarEvent.Link(1, 2));
-        ObservationGroup group = groups.getObservationGroup(1);
+        RelatedEvents group = groups.getRelatedEvents(1);
         check(groups.getEvents(300, 300).isEmpty(), "no phantom event in gap");
         check(groups.getEvents(200, 200).size() == 1, "inclusive end");
         check(groups.getEvents(400, 400).size() == 1, "inclusive start");
@@ -102,7 +102,7 @@ public final class EventCacheTest {
             EventListener.Handle listener = () -> {
                 check(SWEKDownloader.isSupplierActive(supplier) == expectedActive[0], "activation updated before cache notification");
                 if (!expectedActive[0])
-                    check(EventCache.getObservationGroup(301) == null, "deactivation removes observations before notification");
+                    check(EventCache.getRelatedEvents(301) == null, "deactivation removes observations before notification");
                 notifications[0]++;
             };
             EventCache.registerHandler(listener);
@@ -125,20 +125,20 @@ public final class EventCacheTest {
         SWEK.Source source = new SWEK.Source("test", List.of(), null, Map.of());
         SWEKSupplier retained = new SWEKSupplier(null, "retained", "retained", source, "order-retained", List.of());
         SWEKSupplier removed = new SWEKSupplier(null, "removed", "removed", source, "order-removed", List.of());
-        ObservationGroups groups = new ObservationGroups();
+        EventCollection groups = new EventCollection();
         for (int id = 1; id <= 7; id++)
             groups.addEvent(new SolarEvent(id == 7 ? removed : retained, id, 100, 200));
         for (SolarEvent.Link link : List.of(new SolarEvent.Link(1, 2), new SolarEvent.Link(2, 7), new SolarEvent.Link(7, 3),
                 new SolarEvent.Link(7, 4), new SolarEvent.Link(4, 5), new SolarEvent.Link(5, 6)))
             groups.addAssociation(link);
-        ObservationGroup original = groups.getObservationGroup(1);
+        RelatedEvents original = groups.getRelatedEvents(1);
         groups.addEvent(new SolarEvent(retained, 9, 100, 200));
         groups.removeSupplier(removed);
-        check(groups.getEvents(150, 150).equals(List.of(groups.getObservationGroup(9), groups.getObservationGroup(3),
-                groups.getObservationGroup(1), groups.getObservationGroup(4))), "reconstruction preserves the order of groups sharing a start time");
-        check(groups.getObservationGroup(1).getClosestTo(150).getUniqueID() == 1 && groups.getObservationGroup(4).getClosestTo(150).getUniqueID() == 4,
+        check(groups.getEvents(150, 150).equals(List.of(groups.getRelatedEvents(9), groups.getRelatedEvents(3),
+                groups.getRelatedEvents(1), groups.getRelatedEvents(4))), "reconstruction preserves the order of groups sharing a start time");
+        check(groups.getRelatedEvents(1).getClosestTo(150).getUniqueID() == 1 && groups.getRelatedEvents(4).getClosestTo(150).getUniqueID() == 4,
                 "reconstruction preserves representative-event ties");
-        check(groups.getObservationGroup(3).getColor().equals(original.getColor()), "isolated survivor retains its color");
+        check(groups.getRelatedEvents(3).getColor().equals(original.getColor()), "isolated survivor retains its color");
     }
 
     private static void checkVersionsSurviveRegrouping() {
@@ -148,25 +148,25 @@ public final class EventCacheTest {
         SolarEvent left = new SolarEvent(firstSupplier, 1, 100, 200), bridge = new SolarEvent(secondSupplier, 2, 300, 400);
         SolarEvent right = new SolarEvent(firstSupplier, 3, 500, 600);
         SolarEvent.Link firstLink = new SolarEvent.Link(1, 2), secondLink = new SolarEvent.Link(2, 3);
-        ObservationGroups groups = new ObservationGroups();
+        EventCollection groups = new EventCollection();
         groups.replace(new EventBatch(10, List.of(left, bridge, right), List.of(firstLink, secondLink)));
         groups.replace(new EventBatch(20, List.of(right), List.of(secondLink)));
         groups.replace(new EventBatch(23, List.of(bridge), List.of(firstLink)));
         SolarEvent obsoleteRight = new SolarEvent(firstSupplier, 3, 0, 1000);
         groups.replace(new EventBatch(19, List.of(obsoleteRight), List.of(secondLink)));
-        check(groups.getObservationGroup(3).getClosestTo(500) == right, "split preserves the untouched observation version");
-        check(groups.getObservationGroup(2) != groups.getObservationGroup(3), "obsolete link cannot reconnect split groups");
+        check(groups.getRelatedEvents(3).getClosestTo(500) == right, "split preserves the untouched observation version");
+        check(groups.getRelatedEvents(2) != groups.getRelatedEvents(3), "obsolete link cannot reconnect split groups");
         groups.replace(new EventBatch(25, List.of(), List.of(secondLink)));
         groups.replace(new EventBatch(22, List.of(new SolarEvent(secondSupplier, 2, 0, 1000)), List.of(firstLink, secondLink)));
-        check(groups.getObservationGroup(2).getClosestTo(300) == bridge, "merge preserves the observation version");
+        check(groups.getRelatedEvents(2).getClosestTo(300) == bridge, "merge preserves the observation version");
         groups.removeSupplier(secondSupplier);
         groups.replace(new EventBatch(19, List.of(obsoleteRight), List.of()));
-        check(groups.getObservationGroup(3).getClosestTo(500) == right, "supplier removal preserves surviving versions");
+        check(groups.getRelatedEvents(3).getClosestTo(500) == right, "supplier removal preserves surviving versions");
         groups.replace(new EventBatch(1, List.of(bridge), List.of()));
-        check(groups.getObservationGroup(2).getClosestTo(300) == bridge, "supplier removal discards removed observation versions");
+        check(groups.getRelatedEvents(2).getClosestTo(300) == bridge, "supplier removal discards removed observation versions");
         groups.addEvent(right);
         groups.replace(new EventBatch(19, List.of(obsoleteRight), List.of()));
-        check(groups.getObservationGroup(3).getClosestTo(500) == right, "direct observation replacement preserves its published version");
+        check(groups.getRelatedEvents(3).getClosestTo(500) == right, "direct observation replacement preserves its published version");
     }
 
     private static void checkAssociationReplacement() {
@@ -174,42 +174,42 @@ public final class EventCacheTest {
         SolarEvent third = new SolarEvent(null, 3, 500, 600), fourth = new SolarEvent(null, 4, 700, 800);
         SolarEvent fifth = new SolarEvent(null, 5, 900, 1000);
         SolarEvent.Link firstLink = new SolarEvent.Link(1, 2), secondLink = new SolarEvent.Link(2, 3), separateLink = new SolarEvent.Link(4, 5);
-        ObservationGroups groups = new ObservationGroups();
+        EventCollection groups = new EventCollection();
         groups.replace(new EventBatch(1, List.of(first, bridge, third, fourth, fifth), List.of(firstLink, secondLink, separateLink)));
-        ObservationGroup original = groups.getObservationGroup(1), separate = groups.getObservationGroup(4);
+        RelatedEvents original = groups.getRelatedEvents(1), separate = groups.getRelatedEvents(4);
         groups.replace(new EventBatch(3, List.of(bridge), List.of()));
-        check(groups.getObservationGroup(1) != groups.getObservationGroup(2) && groups.getObservationGroup(2) != groups.getObservationGroup(3), "removed bridge links split the group");
-        check(groups.getObservationGroup(1).getColor().equals(original.getColor()), "split retains color");
-        check(groups.getObservationGroup(4) == separate && groups.getObservationGroup(5) == separate, "other interval stays untouched");
-        check(groups.getEvents(300, 400).equals(List.of(groups.getObservationGroup(2))), "split observation remains visible");
+        check(groups.getRelatedEvents(1) != groups.getRelatedEvents(2) && groups.getRelatedEvents(2) != groups.getRelatedEvents(3), "removed bridge links split the group");
+        check(groups.getRelatedEvents(1).getColor().equals(original.getColor()), "split retains color");
+        check(groups.getRelatedEvents(4) == separate && groups.getRelatedEvents(5) == separate, "other interval stays untouched");
+        check(groups.getEvents(300, 400).equals(List.of(groups.getRelatedEvents(2))), "split observation remains visible");
         groups.replace(new EventBatch(2, List.of(first, new SolarEvent(null, 2, 0, 1000)), List.of(firstLink)));
-        check(groups.getObservationGroup(1) != groups.getObservationGroup(2), "older batch cannot restore removed link");
-        check(groups.getObservationGroup(2).getClosestTo(300) == bridge, "older batch cannot overwrite observation");
+        check(groups.getRelatedEvents(1) != groups.getRelatedEvents(2), "older batch cannot restore removed link");
+        check(groups.getRelatedEvents(2).getClosestTo(300) == bridge, "older batch cannot overwrite observation");
         groups.replace(new EventBatch(4, List.of(first, bridge), List.of(firstLink)));
-        check(groups.getObservationGroup(1) == groups.getObservationGroup(2), "newer batch can restore link");
+        check(groups.getRelatedEvents(1) == groups.getRelatedEvents(2), "newer batch can restore link");
         groups.replace(new EventBatch(6, List.of(bridge), List.of()));
         groups.replace(new EventBatch(5, List.of(fourth, fifth), List.of()));
-        check(groups.getObservationGroup(4) != groups.getObservationGroup(5), "older batch still refreshes independent observations");
+        check(groups.getRelatedEvents(4) != groups.getRelatedEvents(5), "older batch still refreshes independent observations");
 
-        ObservationGroups pending = new ObservationGroups();
+        EventCollection pending = new EventCollection();
         pending.replace(new EventBatch(5, List.of(), List.of(firstLink)));
         pending.replace(new EventBatch(4, List.of(first), List.of()));
         pending.replace(new EventBatch(6, List.of(bridge), List.of(firstLink)));
-        check(pending.getObservationGroup(1) == pending.getObservationGroup(2), "older endpoint batch preserves newer pending link");
-        ObservationGroups removedPending = new ObservationGroups();
+        check(pending.getRelatedEvents(1) == pending.getRelatedEvents(2), "older endpoint batch preserves newer pending link");
+        EventCollection removedPending = new EventCollection();
         removedPending.replace(new EventBatch(1, List.of(first), List.of(firstLink)));
         removedPending.replace(new EventBatch(3, List.of(first), List.of()));
         removedPending.replace(new EventBatch(2, List.of(bridge), List.of(firstLink)));
-        check(removedPending.getObservationGroup(1) != removedPending.getObservationGroup(2), "obsolete pending link stays removed when endpoint arrives late");
+        check(removedPending.getRelatedEvents(1) != removedPending.getRelatedEvents(2), "obsolete pending link stays removed when endpoint arrives late");
 
         SolarEvent left = new SolarEvent(null, 201, 100, 200), right = new SolarEvent(null, 202, 300, 400);
         EventCache.replaceEvents(new EventBatch(1, List.of(left, right), List.of(new SolarEvent.Link(201, 202))));
-        ObservationGroup highlighted = EventCache.getObservationGroup(201);
+        RelatedEvents highlighted = EventCache.getRelatedEvents(201);
         EventCache.highlight(highlighted);
         int[] notifications = new int[1];
         EventListener.Handle listener = () -> {
             check(!highlighted.isHighlighted(), "split clears detached highlight before cache notification");
-            check(EventCache.getObservationGroup(201) != EventCache.getObservationGroup(202), "notification sees finished split");
+            check(EventCache.getRelatedEvents(201) != EventCache.getRelatedEvents(202), "notification sees finished split");
             notifications[0]++;
         };
         EventCache.registerHandler(listener);
@@ -220,7 +220,7 @@ public final class EventCacheTest {
     }
 
     private static void checkPendingLinkRemoval() {
-        ObservationGroups groups = new ObservationGroups();
+        EventCollection groups = new EventCollection();
         SolarEvent first = new SolarEvent(null, 1, 100, 200);
         SolarEvent second = new SolarEvent(null, 2, 100, 200);
         SolarEvent third = new SolarEvent(null, 3, 100, 200);
@@ -234,10 +234,10 @@ public final class EventCacheTest {
         groups.addEvent(third);
         groups.addEvent(fourth);
         groups.addEvent(fifth);
-        check(groups.getObservationGroup(1) != groups.getObservationGroup(2), "removed links in both orientations cannot reconnect arriving endpoints");
-        check(groups.getObservationGroup(2) == groups.getObservationGroup(3), "retained pending link at a shared endpoint still resolves");
-        check(groups.getObservationGroup(4) == groups.getObservationGroup(5), "unrelated pending link still resolves");
-        check(groups.getObservationGroup(6).getAssociatedEvents(sixth).isEmpty(), "removed pending self-link stays removed");
+        check(groups.getRelatedEvents(1) != groups.getRelatedEvents(2), "removed links in both orientations cannot reconnect arriving endpoints");
+        check(groups.getRelatedEvents(2) == groups.getRelatedEvents(3), "retained pending link at a shared endpoint still resolves");
+        check(groups.getRelatedEvents(4) == groups.getRelatedEvents(5), "unrelated pending link still resolves");
+        check(groups.getRelatedEvents(6).getAssociatedEvents(sixth).isEmpty(), "removed pending self-link stays removed");
     }
 
     private static void checkRemovalNotifications() {
@@ -246,16 +246,16 @@ public final class EventCacheTest {
         SWEKSupplier supplier = new SWEKSupplier(null, "notifications", "notifications", source, "notifications", List.of());
         SolarEvent event = new SolarEvent(supplier, 100, 100, 200);
         EventCache.replaceEvents(new EventBatch(1, List.of(event), List.of()));
-        ObservationGroup group = EventCache.getObservationGroup(100);
+        RelatedEvents group = EventCache.getRelatedEvents(100);
         EventCache.highlight(group);
         int[] notifications = new int[2];
         EventListener.Highlight highlightListener = () -> {
             check(!group.isHighlighted(), "highlight cleared before notification");
-            check(EventCache.getObservationGroup(100) == group, "highlight notification precedes group removal");
+            check(EventCache.getRelatedEvents(100) == group, "highlight notification precedes group removal");
             notifications[0]++;
         };
         EventListener.Handle cacheListener = () -> {
-            check(EventCache.getObservationGroup(100) == null, "cache notification follows group removal");
+            check(EventCache.getRelatedEvents(100) == null, "cache notification follows group removal");
             notifications[1]++;
         };
         EventCache.addHighlightListener(highlightListener);
@@ -265,7 +265,7 @@ public final class EventCacheTest {
         EventCache.unregisterHandler(cacheListener);
         check(notifications[0] == 1 && notifications[1] == 1, "one notification of each kind");
 
-        ObservationGroup detached = new ObservationGroup(event);
+        RelatedEvents detached = new RelatedEvents(event);
         EventCache.highlight(detached);
         EventCache.replaceEvents(new EventBatch(1, List.of(event), List.of()));
         EventCache.removeSupplier(supplier);
@@ -281,37 +281,37 @@ public final class EventCacheTest {
         SolarEvent bridge = new SolarEvent(secondSupplier, 2, 300, 400);
         SolarEvent third = new SolarEvent(firstSupplier, 3, 500, 600);
         SolarEvent fourth = new SolarEvent(firstSupplier, 4, 700, 800);
-        ObservationGroups groups = new ObservationGroups();
+        EventCollection groups = new EventCollection();
         groups.addAssociation(new SolarEvent.Link(1, 2));
         groups.addAssociation(new SolarEvent.Link(2, 3));
         groups.addEvent(first);
         groups.addEvent(third);
-        check(groups.getObservationGroup(1) != groups.getObservationGroup(3), "missing bridge does not merge endpoints");
+        check(groups.getRelatedEvents(1) != groups.getRelatedEvents(3), "missing bridge does not merge endpoints");
         groups.addEvent(bridge);
-        ObservationGroup merged = groups.getObservationGroup(1);
-        check(merged == groups.getObservationGroup(3), "pending links resolve through bridge");
+        RelatedEvents merged = groups.getRelatedEvents(1);
+        check(merged == groups.getRelatedEvents(3), "pending links resolve through bridge");
         groups.addAssociation(new SolarEvent.Link(1, 2));
         check(merged.getAssociatedEvents(first).equals(List.of(bridge)), "duplicate link stays unique and direct");
         groups.addEvent(fourth);
         groups.addAssociation(new SolarEvent.Link(3, 4));
         groups.addAssociation(new SolarEvent.Link(2, 5));
 
-        ObservationGroups independent = new ObservationGroups();
+        EventCollection independent = new EventCollection();
         independent.addEvent(first);
-        check(independent.getObservationGroup(2) == null && independent.getObservationGroup(1) != merged, "collections have independent membership");
+        check(independent.getRelatedEvents(2) == null && independent.getRelatedEvents(1) != merged, "collections have independent membership");
 
         groups.removeSupplier(secondSupplier);
-        check(groups.getObservationGroup(2) == null, "supplier observation removed");
-        check(groups.getObservationGroup(1) != groups.getObservationGroup(3), "removing bridge splits group");
-        check(groups.getObservationGroup(3) == groups.getObservationGroup(4), "surviving association retained");
-        check(groups.getObservationGroup(1).getColor().equals(merged.getColor()), "split preserves color");
+        check(groups.getRelatedEvents(2) == null, "supplier observation removed");
+        check(groups.getRelatedEvents(1) != groups.getRelatedEvents(3), "removing bridge splits group");
+        check(groups.getRelatedEvents(3) == groups.getRelatedEvents(4), "surviving association retained");
+        check(groups.getRelatedEvents(1).getColor().equals(merged.getColor()), "split preserves color");
         check(groups.getEvents(300, 400).isEmpty(), "removed bridge absent from time index");
         groups.addEvent(new SolarEvent(firstSupplier, 5, 900, 1000));
         groups.addEvent(bridge);
-        check(groups.getObservationGroup(2) != groups.getObservationGroup(5), "removed pending link cannot reconnect reloaded observation");
+        check(groups.getRelatedEvents(2) != groups.getRelatedEvents(5), "removed pending link cannot reconnect reloaded observation");
         groups.removeSupplier(firstSupplier);
-        check(groups.getEvents(0, 1000).equals(List.of(groups.getObservationGroup(2))), "removal leaves only the other supplier");
-        check(independent.getObservationGroup(1).getClosestTo(100) == first, "removal does not affect another collection");
+        check(groups.getEvents(0, 1000).equals(List.of(groups.getRelatedEvents(2))), "removal leaves only the other supplier");
+        check(independent.getRelatedEvents(1).getClosestTo(100) == first, "removal does not affect another collection");
     }
 
     private static void checkDownloads() throws Exception {
@@ -417,7 +417,7 @@ public final class EventCacheTest {
     private static SWEKSupplier supplier(SWEKGroup group, String name, ControlledHandler handler) {
         SWEKSupplier supplier = new SWEKSupplier(group, name, name, new SWEK.Source("test", List.of(), handler, Map.of()), name, List.of());
         SWEKCatalog.add(supplier);
-        SWEKCatalog.setRelatedEvents(List.of());
+        SWEKCatalog.setRelations(List.of());
         return supplier;
     }
 

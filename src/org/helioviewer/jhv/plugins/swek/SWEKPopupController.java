@@ -12,7 +12,7 @@ import org.helioviewer.jhv.display.MapView;
 import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventGeometry;
-import org.helioviewer.jhv.event.ObservationGroup;
+import org.helioviewer.jhv.event.RelatedEvents;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.AwtInputAdapter;
@@ -121,10 +121,10 @@ class SWEKPopupController implements InputMouseListener {
 
     @Override
     public void mouseClicked(PointerEvent e) {
-        ObservationGroup mouseOverGroup = swekContext.mouseOverGroup();
-        if (mouseOverGroup != null) {
+        RelatedEvents mouseOverEvents = swekContext.mouseOverEvents();
+        if (mouseOverEvents != null) {
             Component canvas = component();
-            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverGroup, mouseOverGroup.getClosestTo(swekContext.mouseOverTime()));
+            SWEKEventInformationDialog hekPopUp = new SWEKEventInformationDialog(mouseOverEvents, mouseOverEvents.getClosestTo(swekContext.mouseOverTime()));
             hekPopUp.pack();
             hekPopUp.setLocation(calcWindowPosition(canvas, AwtInputAdapter.toAwtPoint(e), hekPopUp.getWidth(), hekPopUp.getHeight()));
             hekPopUp.setVisible(true);
@@ -159,25 +159,25 @@ class SWEKPopupController implements InputMouseListener {
 
         Viewport vp = Display.getActiveViewport();
         MapView mv = GLRenderer.getMapView();
-        ObservationGroup mouseOverGroup = mv.isOrthographic()
+        RelatedEvents mouseOverEvents = mv.isOrthographic()
                 ? findOrthographicEvent(activeEvents, currentTime, mv.mouseToSurface(vp, mouseOverX, mouseOverY), mv.mouseToPlane(vp, mouseOverX, mouseOverY))
                 : findProjectedEvent(activeEvents, currentTime, mv, vp, mv.mouseToScreen(vp, mouseOverX, mouseOverY));
 
-        swekContext.setMouseOver(mouseOverX, mouseOverY, currentTime, mouseOverGroup);
+        swekContext.setMouseOver(mouseOverX, mouseOverY, currentTime, mouseOverEvents);
         Component canvas = component();
-        EventCache.highlight(mouseOverGroup);
+        EventCache.highlight(mouseOverEvents);
         Cursor cursor = canvas.getCursor();
         if (helpCursor != cursor)
             lastCursor = cursor;
 
-        if (mouseOverGroup != null) {
+        if (mouseOverEvents != null) {
             canvas.setCursor(helpCursor);
         } else {
             canvas.setCursor(lastCursor != null ? lastCursor : Cursor.getDefaultCursor());
         }
     }
 
-    private static ObservationGroup findOrthographicEvent(List<SWEKLayer.ActiveEvent> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
+    private static RelatedEvents findOrthographicEvent(List<SWEKLayer.ActiveEvent> activeEvents, long currentTime, Vec3 sphereHitpoint, Vec3 planeHitpoint) {
         for (SWEKLayer.ActiveEvent active : activeEvents) {
             SolarEvent evt = active.event();
             EventGeometry pi = evt.getPositionInformation();
@@ -201,13 +201,13 @@ class SWEKPopupController implements InputMouseListener {
                 double deltaY = Math.abs(hitpoint.y - pt.y);
                 double deltaZ = Math.abs(hitpoint.z - pt.z);
                 if (deltaX < 0.08 && deltaZ < 0.08 && deltaY < 0.08)
-                    return active.group();
+                    return active.relatedEvents();
             }
         }
         return null;
     }
 
-    private static ObservationGroup findProjectedEvent(List<SWEKLayer.ActiveEvent> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
+    private static RelatedEvents findProjectedEvent(List<SWEKLayer.ActiveEvent> activeEvents, long currentTime, MapView mv, Viewport vp, Vec2 mousePosition) {
         MapScale scale = mv.scale(vp);
         for (SWEKLayer.ActiveEvent active : activeEvents) {
             SolarEvent evt = active.event();
@@ -230,7 +230,7 @@ class SWEKPopupController implements InputMouseListener {
                 double deltaX = Math.abs(tf.x - mousePosition.x);
                 double deltaY = Math.abs(tf.y - mousePosition.y);
                 if (deltaX < 0.02 && deltaY < 0.02)
-                    return active.group();
+                    return active.relatedEvents();
             }
         }
         return null;

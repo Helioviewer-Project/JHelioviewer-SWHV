@@ -12,9 +12,9 @@ public class EventCache {
 
     private static final Set<EventListener.Handle> cacheEventHandlers = new HashSet<>();
     private static final Set<EventListener.Highlight> highlightListeners = new HashSet<>();
-    private static final ObservationGroups eventGroups = new ObservationGroups();
+    private static final EventCollection eventCollection = new EventCollection();
 
-    private static ObservationGroup lastHighlighted = null;
+    private static RelatedEvents lastHighlighted = null;
 
     public static void registerHandler(EventListener.Handle handler) {
         cacheEventHandlers.add(handler);
@@ -28,7 +28,7 @@ public class EventCache {
         cacheEventHandlers.forEach(EventListener.Handle::cacheUpdated);
     }
 
-    public static void highlight(ObservationGroup event) {
+    public static void highlight(RelatedEvents event) {
         if (event == lastHighlighted) return;
         boolean changed = false;
         if (event != null)
@@ -54,27 +54,27 @@ public class EventCache {
     }
 
     static void replaceEvents(EventBatch batch) {
-        boolean highlightedGroupCached = eventGroups.contains(lastHighlighted);
-        eventGroups.replace(batch);
-        if (highlightedGroupCached && !eventGroups.contains(lastHighlighted))
+        boolean highlightCached = eventCollection.contains(lastHighlighted);
+        eventCollection.replace(batch);
+        if (highlightCached && !eventCollection.contains(lastHighlighted))
             highlight(null);
         fireEventCacheChanged();
     }
 
     @Nullable
-    public static ObservationGroup getObservationGroup(int id) {
-        return eventGroups.getObservationGroup(id);
+    public static RelatedEvents getRelatedEvents(int id) {
+        return eventCollection.getRelatedEvents(id);
     }
 
-    public static List<ObservationGroup> getEvents(long start, long end) {
-        return eventGroups.getEvents(start, end);
+    public static List<RelatedEvents> getEvents(long start, long end) {
+        return eventCollection.getEvents(start, end);
     }
 
     static void removeSupplier(SWEKSupplier supplier) {
         if (lastHighlighted != null && lastHighlighted.getEvents().stream().anyMatch(event ->
-                event.getSupplier() == supplier && eventGroups.getObservationGroup(event.getUniqueID()) == lastHighlighted))
+                event.getSupplier() == supplier && eventCollection.getRelatedEvents(event.getUniqueID()) == lastHighlighted))
             highlight(null);
-        eventGroups.removeSupplier(supplier);
+        eventCollection.removeSupplier(supplier);
         fireEventCacheChanged();
     }
 

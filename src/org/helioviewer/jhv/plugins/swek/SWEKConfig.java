@@ -38,7 +38,7 @@ class SWEKConfig {
             List<SWEKGroup> groups = new ArrayList<>();
 
             parseGroups(jo, sources, groupsByName, groups);
-            SWEKCatalog.setRelatedEvents(parseRelatedEvents(jo, groupsByName));
+            SWEKCatalog.setRelations(parseRelations(jo, groupsByName));
             return groups;
         } catch (Exception e) {
             Log.error(e);
@@ -154,17 +154,17 @@ class SWEKConfig {
                 filter.getDouble("step_size"), filter.getString("units"));
     }
 
-    private static List<SWEK.RelatedEvents> parseRelatedEvents(JSONObject obj, Map<String, SWEKGroup> groupsByName) {
-        JSONArray relatedEventsArray = obj.getJSONArray("related_events");
-        List<SWEK.RelatedEvents> relatedEventsList = new ArrayList<>(relatedEventsArray.length());
-        for (int i = 0; i < relatedEventsArray.length(); i++) {
-            JSONObject relatedEvent = relatedEventsArray.getJSONObject(i);
-            SWEKGroup group = groupsByName.get(relatedEvent.getString("event_name"));
-            SWEKGroup relatedWith = groupsByName.get(relatedEvent.getString("related_with"));
+    private static List<SWEK.Relation> parseRelations(JSONObject obj, Map<String, SWEKGroup> groupsByName) {
+        JSONArray relationsArray = obj.getJSONArray("related_events");
+        List<SWEK.Relation> relations = new ArrayList<>(relationsArray.length());
+        for (int i = 0; i < relationsArray.length(); i++) {
+            JSONObject relation = relationsArray.getJSONObject(i);
+            SWEKGroup group = groupsByName.get(relation.getString("event_name"));
+            SWEKGroup relatedWith = groupsByName.get(relation.getString("related_with"));
             if (group != null && relatedWith != null)
-                relatedEventsList.add(new SWEK.RelatedEvents(group, relatedWith, parseRelatedOnList(relatedEvent)));
+                relations.add(new SWEK.Relation(group, relatedWith, parseRelatedOnList(relation)));
         }
-        return relatedEventsList;
+        return relations;
     }
 
     private static List<SWEK.RelatedOn> parseRelatedOnList(JSONObject obj) {
