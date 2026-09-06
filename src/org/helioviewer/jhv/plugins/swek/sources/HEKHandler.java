@@ -65,8 +65,8 @@ public class HEKHandler extends SWEKHandler {
         if (uid.isBlank())
             throw new IOException("HEK event has an empty archive ID");
 
-        Double goesFlux = null;
-        Integer cmeSpeed = null, noaaRegion = null;
+        Double goesFlux = null, cmeSpeed = null;
+        Integer noaaRegion = null;
         for (String fieldName : SWEKCatalog.databaseFields(supplier).keySet()) {
             String lfieldName = fieldName.toLowerCase();
             if (result.isNull(lfieldName))
@@ -75,7 +75,7 @@ public class HEKHandler extends SWEKHandler {
             try {
                 switch (lfieldName) {
                     case "jhv_goesflux" -> goesFlux = result.getDouble(lfieldName);
-                    case "cme_radiallinvel" -> cmeSpeed = result.getInt(lfieldName);
+                    case "cme_radiallinvel" -> cmeSpeed = result.getDouble(lfieldName);
                     case "ar_noaanum" -> noaaRegion = result.getInt(lfieldName);
                     default -> throw new IllegalArgumentException("Unknown indexed HEK field: " + fieldName);
                 }

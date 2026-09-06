@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 public abstract class SWEKHandler {
 
-    public record IndexedValues(Double goesFlux, Integer cmeSpeed, Integer noaaRegion) {
+    public record IndexedValues(Double goesFlux, Double cmeSpeed, Integer noaaRegion) {
         public Number get(String field) {
             return switch (field.toLowerCase()) {
                 case "jhv_goesflux" -> goesFlux;

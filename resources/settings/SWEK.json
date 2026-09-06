@@ -378,7 +378,7 @@
                             "start_value"   : 1000,
                             "step_size"     : 100,
                             "units"         : "km/s",
-                            "dbtype"        : "INTEGER"
+                            "dbtype"        : "REAL"
                         },
                     "default_visible"           : true
                 },
