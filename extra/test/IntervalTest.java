@@ -1,205 +1,34 @@
-package org.helioviewer.base.interval;
+package org.helioviewer.jhv.time;
 
-import static org.junit.Assert.assertTrue;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.Vector;
+public final class IntervalTest {
 
-import org.junit.Test;
-
-public class IntervalTest {
-    public class TestEvent extends Interval<Integer> {
-
-        public TestEvent(Integer start, Integer end) {
-            super(new Interval<Integer>(start, end));
-        }
-
-        public String toString() {
-            return "<TestEvent " + super.toString() + ">";
-        }
-
+    public static void main(String[] args) {
+        check(merge().isEmpty(), "empty coverage");
+        check(merge(new Interval(5, 5)).equals(List.of(new Interval(5, 5))), "point interval survives");
+        check(merge(new Interval(20, 30), new Interval(0, 10), new Interval(10, 20), new Interval(5, 15), new Interval(0, 10))
+                .equals(List.of(new Interval(0, 30))), "unsorted, touching, overlapping and duplicate intervals form one union");
+        check(merge(new Interval(10, 20), new Interval(-10, -5), new Interval(0, 0), new Interval(11, 12))
+                .equals(List.of(new Interval(-10, -5), new Interval(0, 0), new Interval(10, 20))), "gaps and isolated points survive nested intervals");
+        check(merge(new Interval(0, Long.MAX_VALUE), new Interval(Long.MIN_VALUE, 0))
+                .equals(List.of(new Interval(Long.MIN_VALUE, Long.MAX_VALUE))), "endpoint merging does not require arithmetic that can overflow");
+        RequestCache cache = new RequestCache();
+        cache.adaptRequestCache(10, 20);
+        cache.adaptRequestCache(20, 30);
+        check(cache.getAllRequestIntervals().equals(List.of(new Interval(10, 30))), "request cache merges touching coverage");
+        cache.removeRequestedInterval(15, 25);
+        check(cache.getAllRequestIntervals().equals(List.of(new Interval(10, 15), new Interval(25, 30))), "subtraction preserves the remaining coverage");
+        check(cache.getMissingIntervals(10, 30).equals(List.of(new Interval(15, 25))), "removed coverage is requestable again");
+        System.out.println("IntervalTest passed");
     }
 
-    // BASED ON THIS CONFIGURATION
-
-    //
-    // [ I1 ] [ I6 ]
-    // [ I2 ] [ I5 ]
-    // [ I3 ]
-    // [ I4 ]
-
-    // Interval<Date> I1 = new Interval<Date>(new Date(1273506656), new
-    // Date(1273507656));
-
-    TestEvent I1 = new TestEvent(0, 90);
-    TestEvent I2 = new TestEvent(10, 40);
-    TestEvent I3 = new TestEvent(20, 70);
-    TestEvent I4 = new TestEvent(30, 60);
-    TestEvent I5 = new TestEvent(50, 80);
-    TestEvent I6 = new TestEvent(1000, 2000);
-
-    @Test
-    public void testOverlaps() {
-        assertTrue(I1.overlaps(I1));
-        assertTrue(I1.overlaps(I2));
-        assertTrue(I1.overlaps(I3));
-        assertTrue(I1.overlaps(I4));
-        assertTrue(I1.overlaps(I5));
-        assertTrue(!I1.overlaps(I6));
-
-        assertTrue(I2.overlaps(I1));
-        assertTrue(I2.overlaps(I2));
-        assertTrue(I2.overlaps(I3));
-        assertTrue(I2.overlaps(I4));
-        assertTrue(!I2.overlaps(I5));
-        assertTrue(!I2.overlaps(I6));
-
-        assertTrue(I3.overlaps(I1));
-        assertTrue(I3.overlaps(I2));
-        assertTrue(I3.overlaps(I3));
-        assertTrue(I3.overlaps(I4));
-        assertTrue(I3.overlaps(I5));
-        assertTrue(!I3.overlaps(I6));
-
-        assertTrue(I4.overlaps(I1));
-        assertTrue(I4.overlaps(I2));
-        assertTrue(I4.overlaps(I3));
-        assertTrue(I4.overlaps(I4));
-        assertTrue(I4.overlaps(I5));
-        assertTrue(!I4.overlaps(I6));
-
-        assertTrue(I5.overlaps(I1));
-        assertTrue(!I5.overlaps(I2));
-        assertTrue(I5.overlaps(I3));
-        assertTrue(I5.overlaps(I4));
-        assertTrue(I5.overlaps(I5));
-        assertTrue(!I5.overlaps(I6));
-
+    private static List<Interval> merge(Interval... intervals) {
+        return Interval.merge(new ArrayList<>(List.of(intervals)));
     }
 
-    @Test
-    public void testContainsInterval() {
-        assertTrue(I1.contains(I2));
-        assertTrue(I1.contains(I3));
-        assertTrue(I1.contains(I4));
-        assertTrue(I1.contains(I5));
-
-        assertTrue(!I2.contains(I1));
-        assertTrue(!I2.contains(I3));
-        assertTrue(!I2.contains(I4));
-        assertTrue(!I2.contains(I5));
-
-        assertTrue(!I3.contains(I1));
-        assertTrue(!I3.contains(I2));
-        assertTrue(I3.contains(I4));
-        assertTrue(!I3.contains(I5));
-
-        assertTrue(!I4.contains(I1));
-        assertTrue(!I4.contains(I2));
-        assertTrue(!I4.contains(I3));
-        assertTrue(!I4.contains(I5));
-
-        assertTrue(!I5.contains(I1));
-        assertTrue(!I5.contains(I2));
-        assertTrue(!I5.contains(I3));
-        assertTrue(!I5.contains(I4));
+    private static void check(boolean condition, String message) {
+        if (!condition) throw new AssertionError(message);
     }
-
-    @Test
-    public void testContainsLong() {
-        assertTrue(I1.containsPoint(0)); // start inclusive
-        assertTrue(!I1.containsPoint(90)); // end exclusive
-        assertTrue(I1.containsPoint(5));
-        assertTrue(!I1.containsPoint(-1));
-        assertTrue(!I1.containsPoint(1000000000));
-
-    }
-
-    @Test
-    public void testExclude() {
-        TestEvent A = new TestEvent(0, 100);
-        TestEvent B = new TestEvent(10, 100);
-        TestEvent C = new TestEvent(110, 120);
-        TestEvent D = new TestEvent(0, 110);
-        TestEvent E = new TestEvent(10, 20);
-
-        Vector<Interval<Integer>> resultAB = new Vector<Interval<Integer>>();
-        resultAB.add(new Interval<Integer>(0, 10));
-        assertTrue(A.exclude(B).equals(resultAB));
-
-        Vector<Interval<Integer>> resultAC = new Vector<Interval<Integer>>();
-        resultAC.add(new Interval<Integer>(0, 100));
-        assertTrue(A.exclude(C).equals(resultAC));
-
-        Vector<Interval<Integer>> resultCB = new Vector<Interval<Integer>>();
-        resultCB.add(new Interval<Integer>(110, 120));
-        assertTrue(C.exclude(B).equals(resultCB));
-
-        Vector<Interval<Integer>> resultDA = new Vector<Interval<Integer>>();
-        resultDA.add(new Interval<Integer>(100, 110));
-        assertTrue(D.exclude(A).equals(resultDA));
-
-        Vector<Interval<Integer>> resultAE = new Vector<Interval<Integer>>();
-        resultAE.add(new Interval<Integer>(0, 10));
-        resultAE.add(new Interval<Integer>(20, 100));
-        assertTrue(A.exclude(E).equals(resultAE));
-
-        assertTrue(A.exclude(A).size() == 0);
-
-    }
-
-    @Test
-    public void testExpand() {
-        Interval<Integer> A = new Interval<Integer>(0, 100);
-        System.out.println(A.expand(new Interval<Integer>(10, 20)));
-        assertTrue(A.expand(new Interval<Integer>(0, 100)).equals(new Interval<Integer>(0, 100)));
-        assertTrue(A.expand(new Interval<Integer>(10, 20)).equals(new Interval<Integer>(0, 100)));
-        assertTrue(A.expand(new Interval<Integer>(10, 10)).equals(new Interval<Integer>(0, 100)));
-        assertTrue(A.expand(new Interval<Integer>(10, 100)).equals(new Interval<Integer>(0, 100)));
-        assertTrue(A.expand(new Interval<Integer>(0, 90)).equals(new Interval<Integer>(0, 100)));
-        assertTrue(A.expand(new Interval<Integer>(-10, 0)).equals(new Interval<Integer>(-10, 100)));
-        assertTrue(A.expand(new Interval<Integer>(-10, 110)).equals(new Interval<Integer>(-10, 110)));
-        assertTrue(A.expand(new Interval<Integer>(100, 110)).equals(new Interval<Integer>(0, 110)));
-        assertTrue(A.expand(new Interval<Integer>(90, 110)).equals(new Interval<Integer>(0, 110)));
-    }
-    /*
-     * Test public void testStuff() { assertTrue((new
-     * IntervalBucket<Integer,IntegerEvent>(0,100)).equals(new
-     * IntervalBucket<Integer,IntegerEvent>(0,100))); assertTrue(!(new
-     * IntervalBucket<Integer,IntegerEvent>(0,100)).equals(new
-     * IntervalBucket<Integer,IntegerEvent>(0,10)));
-     * 
-     * }
-     * 
-     * @Test public void testAddItems() {
-     * IntervalBucket<Integer,SimpleInterval<Integer>> I = new
-     * IntervalBucket<Integer,SimpleInterval<Integer>>(10,20); I.addItem(new
-     * SimpleInterval<Integer>(10,10)); I.addItem(new
-     * SimpleInterval<Integer>(11,11)); I.addItem(new
-     * SimpleInterval<Integer>(12,12)); I.addItem(new
-     * SimpleInterval<Integer>(20,20));
-     * 
-     * IntervalBucket<Integer,SimpleInterval<Integer>> resA = new
-     * IntervalBucket<Integer,SimpleInterval<Integer>>(10,20); resA.addItem(new
-     * SimpleInterval<Integer>(10,10)); resA.addItem(new
-     * SimpleInterval<Integer>(11,11)); resA.addItem(new
-     * SimpleInterval<Integer>(12,12)); resA.addItem(new
-     * SimpleInterval<Integer>(20,20));
-     * 
-     * IntervalBucket<Integer,SimpleInterval<Integer>> resB = new
-     * IntervalBucket<Integer,SimpleInterval<Integer>>(10,20); resB.addItem(new
-     * SimpleInterval<Integer>(10,10)); resB.addItem(new
-     * SimpleInterval<Integer>(11,11)); resB.addItem(new
-     * SimpleInterval<Integer>(12,12));
-     * 
-     * IntervalBucket<Integer,SimpleInterval<Integer>> resC = new
-     * IntervalBucket<Integer,SimpleInterval<Integer>>(10,20); resC.addItem(new
-     * SimpleInterval<Integer>(11,11)); resC.addItem(new
-     * SimpleInterval<Integer>(12,12)); resC.addItem(new
-     * SimpleInterval<Integer>(20,20));
-     * 
-     * assertTrue(I.equals(resA)); assertTrue(I.equals(resB));
-     * assertTrue(!I.equals(resC));
-     * 
-     * }
-     */
 }

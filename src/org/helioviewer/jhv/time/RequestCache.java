@@ -47,29 +47,7 @@ public class RequestCache {
 
     private void updateRequestCache(long start, long end) {
         cache.add(new Interval(start, end));
-        cache = merge(cache);
-    }
-
-    private static List<Interval> merge(List<Interval> intervals) {
-        int size = intervals.size(); // cannot be null
-        if (size <= 1)
-            return intervals;
-
-        intervals.sort(null);
-
-        List<Interval> result = new ArrayList<>();
-        Interval prev = intervals.getFirst();
-        for (int i = 1; i < size; i++) {
-            Interval curr = intervals.get(i);
-            if (prev.end() >= curr.start()) {
-                prev = new Interval(prev.start(), Math.max(prev.end(), curr.end()));
-            } else {
-                result.add(prev);
-                prev = curr;
-            }
-        }
-        result.add(prev);
-        return result;
+        cache = Interval.merge(cache);
     }
 
     private static List<Interval> subtract(List<Interval> intervals, Interval removed) {

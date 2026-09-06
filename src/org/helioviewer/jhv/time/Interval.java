@@ -28,6 +28,30 @@ public record Interval(long start, long end) implements Comparable<Interval> {
         return intervals;
     }
 
+    // Merges overlapping or touching intervals, preserving gaps. Sorts the input list when needed.
+    // For zero or one interval, returns the input list itself.
+    public static List<Interval> merge(List<Interval> intervals) {
+        int size = intervals.size();
+        if (size <= 1)
+            return intervals;
+
+        intervals.sort(null);
+
+        List<Interval> result = new ArrayList<>();
+        Interval prev = intervals.getFirst();
+        for (int i = 1; i < size; i++) {
+            Interval curr = intervals.get(i);
+            if (prev.end() >= curr.start()) {
+                prev = new Interval(prev.start(), Math.max(prev.end(), curr.end()));
+            } else {
+                result.add(prev);
+                prev = curr;
+            }
+        }
+        result.add(prev);
+        return result;
+    }
+
     @Override
     public int compareTo(@Nonnull Interval o) {
         int cmp = Long.compare(start, o.start);
