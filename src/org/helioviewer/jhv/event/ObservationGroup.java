@@ -87,10 +87,7 @@ public class ObservationGroup {
     }
 
     // Union of actual event intervals, preserving gaps in an associated group.
-    private void updateIntervals() {
-        List<Interval> sorted = new ArrayList<>();
-        for (SolarEvent event : events.values())
-            sorted.add(new Interval(event.start, event.end));
+    private void updateIntervals(List<Interval> sorted) {
         sorted.sort(null);
         List<Interval> result = new ArrayList<>();
         for (Interval next : sorted) {
@@ -136,13 +133,18 @@ public class ObservationGroup {
         if (previous != null && previous.start == event.start && previous.end == event.end)
             return;
 
-        updateIntervals();
+        List<Interval> updated = new ArrayList<>();
+        for (SolarEvent observation : events.values())
+            updated.add(new Interval(observation.start, observation.end));
+        updateIntervals(updated);
     }
 
     void merge(ObservationGroup found) {
         events.putAll(found.events);
         associations.addAll(found.associations);
-        updateIntervals();
+        List<Interval> combined = new ArrayList<>(intervals);
+        combined.addAll(found.intervals);
+        updateIntervals(combined);
     }
 
 }
