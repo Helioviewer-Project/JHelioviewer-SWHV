@@ -516,17 +516,15 @@ public class EventDatabase {
 
         String sql = "SELECT e.id, e.start, e.end, e.data, event_type.supplier FROM events AS e " +
                 "LEFT JOIN event_type ON e.type_id=event_type.id WHERE e.id IN (" +
-                "SELECT CASE WHEN tl.event_id=? THEN tr.event_id ELSE tl.event_id END " +
+                "SELECT tr.event_id " +
                 "FROM event_parameter AS tl JOIN event_parameter AS tr ON tl.value=tr.value " +
-                "WHERE tl.type_id=? AND tr.type_id=? AND tl.name=? AND tr.name=? AND tl.event_id!=tr.event_id AND (tl.event_id=? OR tr.event_id=?))";
+                "WHERE tl.event_id=? AND tl.type_id=? AND tr.type_id=? AND tl.name=? AND tr.name=?)";
         PreparedStatement statement = getPreparedStatement(sql);
         statement.setInt(1, eventId);
         statement.setInt(2, leftTypeId);
         statement.setInt(3, rightTypeId);
         statement.setString(4, leftParameter);
         statement.setString(5, rightParameter);
-        statement.setInt(6, eventId);
-        statement.setInt(7, eventId);
 
         try (ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
