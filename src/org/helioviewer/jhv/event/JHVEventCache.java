@@ -20,10 +20,10 @@ public class JHVEventCache {
 
     private static final Set<JHVEventListener.Handle> cacheEventHandlers = new HashSet<>();
     private static final Set<JHVEventListener.Highlight> highlightListeners = new HashSet<>();
-    private static final JHVEventGroups eventGroups = new JHVEventGroups();
+    private static final JHVObservationGroups eventGroups = new JHVObservationGroups();
     private static final Map<SWEKSupplier, RequestCache> requestedIntervals = new HashMap<>();
 
-    private static JHVRelatedEvents lastHighlighted = null;
+    private static JHVObservationGroup lastHighlighted = null;
 
     public static void registerHandler(JHVEventListener.Handle handler) {
         cacheEventHandlers.add(handler);
@@ -56,7 +56,7 @@ public class JHVEventCache {
         }
     }
 
-    public static void highlight(JHVRelatedEvents event) {
+    public static void highlight(JHVObservationGroup event) {
         if (event == lastHighlighted) return;
         boolean changed = false;
         if (event != null)
@@ -90,11 +90,11 @@ public class JHVEventCache {
     }
 
     @Nullable
-    public static JHVRelatedEvents getRelatedEvents(int id) {
-        return eventGroups.getRelatedEvents(id);
+    public static JHVObservationGroup getObservationGroup(int id) {
+        return eventGroups.getObservationGroup(id);
     }
 
-    public static List<JHVRelatedEvents> getEvents(long start, long end) {
+    public static List<JHVObservationGroup> getEvents(long start, long end) {
         return eventGroups.getEvents(start, end);
     }
 
@@ -121,7 +121,7 @@ public class JHVEventCache {
         else
             requestedIntervals.remove(supplier);
         if (lastHighlighted != null && lastHighlighted.getEvents().stream().anyMatch(event ->
-                event.getSupplier() == supplier && eventGroups.getRelatedEvents(event.getUniqueID()) == lastHighlighted))
+                event.getSupplier() == supplier && eventGroups.getObservationGroup(event.getUniqueID()) == lastHighlighted))
             highlight(null);
         eventGroups.removeSupplier(supplier);
         fireEventCacheChanged();

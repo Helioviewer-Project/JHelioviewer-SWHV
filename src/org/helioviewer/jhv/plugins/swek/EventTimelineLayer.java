@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.event.JHVEventListener;
-import org.helioviewer.jhv.event.JHVRelatedEvents;
+import org.helioviewer.jhv.event.JHVObservationGroup;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
 import org.helioviewer.jhv.time.Interval;
@@ -32,7 +32,7 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
 
     private EventPlotConfiguration eventUnderMouse;
     private final List<EventPlotConfiguration> eventPlots = new ArrayList<>();
-    private List<JHVRelatedEvents> visibleEvents = Collections.emptyList();
+    private List<JHVObservationGroup> visibleEvents = Collections.emptyList();
 
     EventTimelineLayer() {
         registerAndRefresh();
@@ -84,7 +84,7 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
 
         eventUnderMouse = null;
         eventPlots.clear();
-        List<JHVRelatedEvents> events = visibleEvents;
+        List<JHVObservationGroup> events = visibleEvents;
         if (events.isEmpty()) {
             if (mousePosition != null) {
                 JHVEventCache.highlight(null);
@@ -95,7 +95,7 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
         ArrayList<Long> endDates = new ArrayList<>();
         TimeAxis.Mapper xMapper = xAxis.mapper(graphArea.x, graphArea.width);
 
-        for (JHVRelatedEvents event : events) {
+        for (JHVObservationGroup event : events) {
             long eventStart = event.getStart();
             long eventEnd = event.getEnd();
             int i = 0;
@@ -170,13 +170,13 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
         return false;
     }
 
-    private record EventPlotConfiguration(JHVRelatedEvents event, int x, int y, int width, int height, long time) {
+    private record EventPlotConfiguration(JHVObservationGroup event, int x, int y, int width, int height, long time) {
         boolean contains(Point point) {
             return containsPoint(point, x - 1, y - 1, width + 2, height + 2);
         }
     }
 
-    private static EventPlotConfiguration createEventPlot(Rectangle graphArea, JHVRelatedEvents event, int x0, int x1, int yPosition, long time) {
+    private static EventPlotConfiguration createEventPlot(Rectangle graphArea, JHVObservationGroup event, int x0, int x1, int yPosition, long time) {
         int w = Math.max(x1 - x0, 1);
         if (w < 5) {
             x0 -= 5 / w;
@@ -187,7 +187,7 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
     }
 
     private static void drawEvent(Rectangle graphArea, EventPlotConfiguration plot, Graphics2D g, Point mousePosition) {
-        JHVRelatedEvents event = plot.event;
+        JHVObservationGroup event = plot.event;
         int x0 = plot.x;
         int y = plot.y;
         int w = plot.width;
@@ -215,7 +215,7 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
         }
     }
 
-    private static void drawText(Rectangle graphArea, Graphics2D g, JHVRelatedEvents event, int y, int mouseX) {
+    private static void drawText(Rectangle graphArea, Graphics2D g, JHVObservationGroup event, int y, int mouseX) {
         long ts = DrawController.selectedAxis.mapper(graphArea.x, graphArea.width).toValue(mouseX);
         JHVEvent closestEvent = event.getClosestTo(ts);
         List<String> txts = SWEKData.visibleParameterLines(closestEvent);
@@ -267,7 +267,7 @@ public final class EventTimelineLayer extends TimelineLayer implements JHVEventL
         if (eventUnderMouse == null)
             return null;
 
-        JHVRelatedEvents event = eventUnderMouse.event;
+        JHVObservationGroup event = eventUnderMouse.event;
         return (location, timestamp) -> {
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(event, event.getClosestTo(timestamp));
             dialog.pack();

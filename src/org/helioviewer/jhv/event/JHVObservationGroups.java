@@ -12,16 +12,16 @@ import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
-final class JHVEventGroups {
+final class JHVObservationGroups {
 
-    private final NavigableMap<Long, List<JHVRelatedEvents>> events = new TreeMap<>();
-    private final Map<Integer, JHVRelatedEvents> relatedEventsById = new HashMap<>();
+    private final NavigableMap<Long, List<JHVObservationGroup>> events = new TreeMap<>();
+    private final Map<Integer, JHVObservationGroup> relatedEventsById = new HashMap<>();
     private final Map<Integer, Set<JHVEvent.Link>> pendingAssocs = new HashMap<>();
     private long maximumGroupDuration;
 
     void addEvent(JHVEvent event) {
         Integer id = event.getUniqueID();
-        JHVRelatedEvents relatedEvents = relatedEventsById.get(id);
+        JHVObservationGroup relatedEvents = relatedEventsById.get(id);
         if (relatedEvents != null) {
             removeFromIndex(relatedEvents);
             relatedEvents.swapEvent(event);
@@ -33,7 +33,7 @@ final class JHVEventGroups {
     }
 
     @Nullable
-    JHVRelatedEvents getRelatedEvents(int id) {
+    JHVObservationGroup getObservationGroup(int id) {
         return relatedEventsById.get(id);
     }
 
@@ -44,15 +44,15 @@ final class JHVEventGroups {
     }
 
     private void addNewRelatedEvent(JHVEvent event) {
-        addNewRelatedEvent(event, new JHVRelatedEvents(event));
+        addNewRelatedEvent(event, new JHVObservationGroup(event));
     }
 
-    private void addNewRelatedEvent(JHVEvent event, JHVRelatedEvents relatedEvents) {
+    private void addNewRelatedEvent(JHVEvent event, JHVObservationGroup relatedEvents) {
         addToIndex(relatedEvents);
         relatedEventsById.put(event.getUniqueID(), relatedEvents);
     }
 
-    private void merge(JHVRelatedEvents current, JHVRelatedEvents found) {
+    private void merge(JHVObservationGroup current, JHVObservationGroup found) {
         if (current == found) return;
         removeFromIndex(current);
         removeFromIndex(found);
@@ -63,13 +63,13 @@ final class JHVEventGroups {
         }
     }
 
-    private void addToIndex(JHVRelatedEvents event) {
+    private void addToIndex(JHVObservationGroup event) {
         events.computeIfAbsent(event.getStart(), _ -> new ArrayList<>()).add(event);
         maximumGroupDuration = Math.max(maximumGroupDuration, event.getEnd() - event.getStart());
     }
 
-    private void removeFromIndex(JHVRelatedEvents event) {
-        List<JHVRelatedEvents> list = events.get(event.getStart());
+    private void removeFromIndex(JHVObservationGroup event) {
+        List<JHVObservationGroup> list = events.get(event.getStart());
         if (list == null)
             return;
 
@@ -79,8 +79,8 @@ final class JHVEventGroups {
     }
 
     void addAssociation(JHVEvent.Link link) {
-        JHVRelatedEvents first = relatedEventsById.get(link.firstId());
-        JHVRelatedEvents second = relatedEventsById.get(link.secondId());
+        JHVObservationGroup first = relatedEventsById.get(link.firstId());
+        JHVObservationGroup second = relatedEventsById.get(link.secondId());
         if (first != null && second != null) {
             if (first != second)
                 merge(first, second);
@@ -97,13 +97,13 @@ final class JHVEventGroups {
         pendingAssocs.computeIfAbsent(id, k -> new HashSet<>()).add(link);
     }
 
-    List<JHVRelatedEvents> getEvents(long start, long end) {
+    List<JHVObservationGroup> getEvents(long start, long end) {
         if (events.isEmpty()) return Collections.emptyList();
-        List<JHVRelatedEvents> result = new ArrayList<>();
-        NavigableMap<Long, List<JHVRelatedEvents>> relevantRange =
+        List<JHVObservationGroup> result = new ArrayList<>();
+        NavigableMap<Long, List<JHVObservationGroup>> relevantRange =
                 events.subMap(start - maximumGroupDuration, true, end, true);
-        for (List<JHVRelatedEvents> list : relevantRange.values()) {
-            for (JHVRelatedEvents event : list) {
+        for (List<JHVObservationGroup> list : relevantRange.values()) {
+            for (JHVObservationGroup event : list) {
                 if (event.getEnd() >= start && event.overlaps(start, end))
                     result.add(event);
             }
@@ -112,10 +112,10 @@ final class JHVEventGroups {
     }
 
     void removeSupplier(SWEKSupplier supplier) {
-        Set<JHVRelatedEvents> affectedGroups = new HashSet<>();
+        Set<JHVObservationGroup> affectedGroups = new HashSet<>();
         Set<Integer> removedIds = new HashSet<>();
-        for (List<JHVRelatedEvents> groups : events.values()) {
-            for (JHVRelatedEvents group : groups) {
+        for (List<JHVObservationGroup> groups : events.values()) {
+            for (JHVObservationGroup group : groups) {
                 for (JHVEvent event : group.getEvents()) {
                     if (event.getSupplier() == supplier) {
                         affectedGroups.add(group);
@@ -132,24 +132,24 @@ final class JHVEventGroups {
                 removedIds.contains(link.firstId()) || removedIds.contains(link.secondId())));
         pendingAssocs.entrySet().removeIf(entry -> entry.getValue().isEmpty());
 
-        for (JHVRelatedEvents group : affectedGroups)
+        for (JHVObservationGroup group : affectedGroups)
             rebuildWithout(group, supplier);
 
         maximumGroupDuration = 0;
-        for (List<JHVRelatedEvents> groups : events.values()) {
-            for (JHVRelatedEvents group : groups)
+        for (List<JHVObservationGroup> groups : events.values()) {
+            for (JHVObservationGroup group : groups)
                 maximumGroupDuration = Math.max(maximumGroupDuration, group.getEnd() - group.getStart());
         }
     }
 
-    private void rebuildWithout(JHVRelatedEvents group, SWEKSupplier supplier) {
+    private void rebuildWithout(JHVObservationGroup group, SWEKSupplier supplier) {
         removeFromIndex(group);
         for (JHVEvent event : group.getEvents())
             relatedEventsById.remove(event.getUniqueID());
 
         for (JHVEvent event : group.getEvents()) {
             if (event.getSupplier() != supplier)
-                addNewRelatedEvent(event, new JHVRelatedEvents(event, group.getColor()));
+                addNewRelatedEvent(event, new JHVObservationGroup(event, group.getColor()));
         }
         for (JHVEvent.Link link : group.getAssociations()) {
             if (relatedEventsById.containsKey(link.firstId()) && relatedEventsById.containsKey(link.secondId()))

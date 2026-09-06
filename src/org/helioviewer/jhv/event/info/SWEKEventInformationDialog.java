@@ -19,7 +19,7 @@ import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.JHVEventCache;
-import org.helioviewer.jhv.event.JHVRelatedEvents;
+import org.helioviewer.jhv.event.JHVObservationGroup;
 import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.thread.Task;
 
@@ -36,9 +36,9 @@ public final class SWEKEventInformationDialog extends JDialog {
     private DataCollapsiblePanel otherRelatedEventsPanel;
 
     private JHVEvent event;
-    private final JHVRelatedEvents rEvent;
+    private final JHVObservationGroup rEvent;
 
-    public SWEKEventInformationDialog(JHVRelatedEvents revent, JHVEvent _event) {
+    public SWEKEventInformationDialog(JHVObservationGroup revent, JHVEvent _event) {
         super(MainFrame.get(), _event.getSupplier().group().getName());
         setType(Window.Type.UTILITY); // avoids tab on macOS when Prefer tabs is always
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -144,7 +144,7 @@ public final class SWEKEventInformationDialog extends JDialog {
         }
     }
 
-    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(JHVRelatedEvents rEvents, List<JHVEvent> relations) {
+    private DataCollapsiblePanel createRelatedEventsCollapsiblePane(JHVObservationGroup rEvents, List<JHVEvent> relations) {
         JPanel eventPanels = new JPanel();
         eventPanels.setLayout(new BoxLayout(eventPanels, BoxLayout.PAGE_AXIS));
         relations.forEach(ev -> eventPanels.add(createEventPanel(rEvents, ev)));
@@ -156,15 +156,15 @@ public final class SWEKEventInformationDialog extends JDialog {
         eventPanels.setLayout(new BoxLayout(eventPanels, BoxLayout.PAGE_AXIS));
         Colors.Data colors = new Colors.Data();
         for (JHVEvent relatedEvent : events) {
-            JHVRelatedEvents relatedEvents = JHVEventCache.getRelatedEvents(relatedEvent.getUniqueID());
+            JHVObservationGroup relatedEvents = JHVEventCache.getObservationGroup(relatedEvent.getUniqueID());
             if (relatedEvents == null)
-                relatedEvents = new JHVRelatedEvents(relatedEvent, colors.getNextColor());
+                relatedEvents = new JHVObservationGroup(relatedEvent, colors.getNextColor());
             eventPanels.add(createEventPanel(relatedEvents, relatedEvent));
         }
         return new DataCollapsiblePanel("Other Related Events", new JScrollPane(eventPanels), false, this::repack);
     }
 
-    private static JPanel createEventPanel(JHVRelatedEvents rEvents, JHVEvent event) {
+    private static JPanel createEventPanel(JHVObservationGroup rEvents, JHVEvent event) {
         JButton detailsButton = new JButton("Details");
         detailsButton.addActionListener(e -> {
             SWEKEventInformationDialog dialog = new SWEKEventInformationDialog(rEvents, event);

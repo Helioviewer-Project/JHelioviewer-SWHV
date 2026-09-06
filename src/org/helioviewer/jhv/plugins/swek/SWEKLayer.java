@@ -18,8 +18,8 @@ import org.helioviewer.jhv.display.Viewport;
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.JHVEventCache;
 import org.helioviewer.jhv.event.JHVEventListener;
+import org.helioviewer.jhv.event.JHVObservationGroup;
 import org.helioviewer.jhv.event.JHVPositionInformation;
-import org.helioviewer.jhv.event.JHVRelatedEvents;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
 import org.helioviewer.jhv.layers.AbstractLayer;
@@ -68,7 +68,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private final BufCoord texBuf = new BufCoord(4 * 8);
 
     private long cachedEventsTime = Long.MIN_VALUE;
-    private List<JHVRelatedEvents> cachedActiveEvents = List.of();
+    private List<JHVObservationGroup> cachedActiveEvents = List.of();
 
     public SWEKLayer(JSONObject jo) {
         if (jo != null) {
@@ -136,7 +136,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         return new CactusArcParams(angularWidthDegree, principalAngleDegree, distSun);
     }
 
-    private void drawCactusArc(JHVRelatedEvents evtr, JHVEvent evt, long timestamp) {
+    private void drawCactusArc(JHVObservationGroup evtr, JHVEvent evt, long timestamp) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double angularWidth = Math.toRadians(angularWidthDegree);
@@ -172,7 +172,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    private void drawPolygon(MapView mv, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawPolygon(MapView mv, Viewport vp, JHVObservationGroup evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -231,7 +231,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord(p3, texCoord[3]);
     }
 
-    private void drawIcon(JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIcon(JHVObservationGroup evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -253,7 +253,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         texBuf.putCoord((float) (theta + width2), (float) (r + height2), 0, 1, texCoord[3]);
     }
 
-    private void drawIconScale(MapView mv, Viewport vp, JHVRelatedEvents evtr, JHVEvent evt) {
+    private void drawIconScale(MapView mv, Viewport vp, JHVObservationGroup evtr, JHVEvent evt) {
         JHVPositionInformation pi = evt.getPositionInformation();
         if (pi == null)
             return;
@@ -272,7 +272,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         vexBuf.endLine();
     }
 
-    private void drawCactusArcScale(Viewport vp, JHVRelatedEvents evtr, JHVEvent evt, long timestamp, MapScale scale) {
+    private void drawCactusArcScale(Viewport vp, JHVObservationGroup evtr, JHVEvent evt, long timestamp, MapScale scale) {
         CactusArcParams params = cactusArcParams(evt, timestamp);
         double angularWidthDegree = params.angularWidthDegree();
         double principalAngleDegree = params.principalAngleDegree();
@@ -309,7 +309,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
     private static final int MOUSE_OFFSET_X = 25;
     private static final int MOUSE_OFFSET_Y = 25;
 
-    private void drawText(Viewport vp, JHVRelatedEvents mouseOverJHVEvent, int x, int y, long currentTime) {
+    private void drawText(Viewport vp, JHVObservationGroup mouseOverJHVEvent, int x, int y, long currentTime) {
         GLText.drawTextFloat(vp, SWEKData.visibleParameterLines(mouseOverJHVEvent.getClosestTo(currentTime)), x + MOUSE_OFFSET_X, y + MOUSE_OFFSET_Y);
     }
 
@@ -320,10 +320,10 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         lineThick.renderLine(vp, LINEWIDTH_HIGHLIGHT);
     }
 
-    private void renderIcons(MapView mv, List<JHVRelatedEvents> evs, long currentTime) {
+    private void renderIcons(MapView mv, List<JHVObservationGroup> evs, long currentTime) {
         glslTexture.setCoord(texBuf);
         int idx = 0;
-        for (JHVRelatedEvents evtr : evs) {
+        for (JHVObservationGroup evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (mv.isLatitudinal() && evt.isCactus())
                 continue;
@@ -338,7 +338,7 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         }
     }
 
-    List<JHVRelatedEvents> activeEvents(long time) {
+    List<JHVObservationGroup> activeEvents(long time) {
         if (time != cachedEventsTime) {
             cachedEventsTime = time;
             cachedActiveEvents = JHVEventCache.getEvents(time, time);
@@ -355,11 +355,11 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
-        List<JHVRelatedEvents> evs = activeEvents(currentTime);
+        List<JHVObservationGroup> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
 
-        for (JHVRelatedEvents evtr : evs) {
+        for (JHVObservationGroup evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus()) {
                 drawCactusArc(evtr, evt, currentTime);
@@ -381,12 +381,12 @@ public final class SWEKLayer extends AbstractLayer implements JHVEventListener.H
         if (!isVisible[vp.idx])
             return;
         long currentTime = mv.viewpoint().time.milli;
-        List<JHVRelatedEvents> evs = activeEvents(currentTime);
+        List<JHVObservationGroup> evs = activeEvents(currentTime);
         if (evs.isEmpty())
             return;
 
         MapScale scale = mv.scale(vp);
-        for (JHVRelatedEvents evtr : evs) {
+        for (JHVObservationGroup evtr : evs) {
             JHVEvent evt = evtr.getClosestTo(currentTime);
             if (evt.isCactus() && mv.isRectWarp()) {
                 drawCactusArcScale(vp, evtr, evt, currentTime, scale);

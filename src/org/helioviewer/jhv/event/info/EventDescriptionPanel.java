@@ -14,14 +14,14 @@ import javax.swing.JTextArea;
 
 import org.helioviewer.jhv.event.JHVEvent;
 import org.helioviewer.jhv.event.JHVEventCache;
-import org.helioviewer.jhv.event.JHVRelatedEvents;
+import org.helioviewer.jhv.event.JHVObservationGroup;
 import org.helioviewer.jhv.plugins.swek.SWEKIconBank;
 import org.helioviewer.jhv.time.TimeUtils;
 
 @SuppressWarnings("serial")
 class EventDescriptionPanel extends JPanel {
 
-    EventDescriptionPanel(JHVRelatedEvents revent, JHVEvent event) {
+    EventDescriptionPanel(JHVObservationGroup revent, JHVEvent event) {
         ImageIcon icon = SWEKIconBank.getIcon(event.getSupplier().group().getIconKey());
         JLabel labelIcon = new JLabel(icon);
 

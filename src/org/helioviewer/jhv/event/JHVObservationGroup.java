@@ -10,7 +10,7 @@ import java.util.List;
 import org.helioviewer.jhv.base.Colors;
 import org.helioviewer.jhv.time.Interval;
 
-public class JHVRelatedEvents {
+public class JHVObservationGroup {
 
     private static final Colors.Data eventColors = new Colors.Data();
 
@@ -21,11 +21,11 @@ public class JHVRelatedEvents {
     private List<Interval> intervals;
     private boolean highlighted;
 
-    public JHVRelatedEvents(JHVEvent event) {
+    public JHVObservationGroup(JHVEvent event) {
         this(event, eventColors.getNextColor());
     }
 
-    public JHVRelatedEvents(JHVEvent event, Color _color) {
+    public JHVObservationGroup(JHVEvent event, Color _color) {
         color = _color;
         events.put(event.getUniqueID(), event);
         intervals = List.of(new Interval(event.start, event.end));
@@ -139,7 +139,7 @@ public class JHVRelatedEvents {
         updateIntervals();
     }
 
-    void merge(JHVRelatedEvents found) {
+    void merge(JHVObservationGroup found) {
         events.putAll(found.events);
         associations.addAll(found.associations);
         updateIntervals();

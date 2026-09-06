@@ -2,17 +2,17 @@ package org.helioviewer.jhv.plugins.swek;
 
 import javax.annotation.Nullable;
 
-import org.helioviewer.jhv.event.JHVRelatedEvents;
+import org.helioviewer.jhv.event.JHVObservationGroup;
 
 final class SWEKContext {
 
-    private JHVRelatedEvents mouseOverJHVEvent;
+    private JHVObservationGroup mouseOverJHVEvent;
     private int mouseOverX;
     private int mouseOverY;
     private long mouseOverTime;
 
     @Nullable
-    JHVRelatedEvents mouseOverJHVEvent() {
+    JHVObservationGroup mouseOverJHVEvent() {
         return mouseOverJHVEvent;
     }
 
@@ -32,7 +32,7 @@ final class SWEKContext {
         mouseOverJHVEvent = null;
     }
 
-    void setMouseOver(int x, int y, long time, @Nullable JHVRelatedEvents event) {
+    void setMouseOver(int x, int y, long time, @Nullable JHVObservationGroup event) {
         mouseOverX = x;
         mouseOverY = y;
         mouseOverTime = time;
