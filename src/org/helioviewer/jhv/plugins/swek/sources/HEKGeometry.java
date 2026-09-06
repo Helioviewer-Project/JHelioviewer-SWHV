@@ -2,6 +2,8 @@ package org.helioviewer.jhv.plugins.swek.sources;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -18,6 +20,9 @@ final class HEKGeometry {
 
     private record HgsPoint(double longitudeDeg, double latitudeDeg) {}
 
+    private static final Pattern POINT = Pattern.compile("\\s*POINT\\s*\\(([^()]*)\\)\\s*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern POLYGON = Pattern.compile("\\s*POLYGON\\s*\\(\\s*\\(([^()]*)\\)\\s*\\)\\s*", Pattern.CASE_INSENSITIVE);
+
     private List<HgsPoint> hgsBoundedBox;
     private List<HgsPoint> hgsBoundCC;
     private HgsPoint hgsCentralPoint;
@@ -29,48 +34,54 @@ final class HEKGeometry {
             case "hgs_bbox" -> hgsBoundedBox = parsePolygon(value);
             case "hgs_boundcc" -> hgsBoundCC = parsePolygon(value);
             case "hgs_coord" -> hgsCentralPoint = parsePoint(value);
-            case "hgs_x" -> hgsLongitudeDeg = Double.valueOf(value);
-            case "hgs_y" -> hgsLatitudeDeg = Double.valueOf(value);
+            case "hgs_x" -> hgsLongitudeDeg = parseNumber(value);
+            case "hgs_y" -> hgsLatitudeDeg = parseNumber(value);
             default -> { return false; }
         }
         return true;
     }
 
     private static List<HgsPoint> parsePolygon(String value) {
-        List<HgsPoint> polygonPoints = new ArrayList<>();
-        if (containsIgnoreCase(value, "polygon")) {
-            String coordinatesString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
-            String coordinates = coordinatesString.substring(coordinatesString.indexOf('(') + 1, coordinatesString.lastIndexOf(')'));
-
-            for (String coordinate : coordinates.split(",")) {
-                HgsPoint tempPoint = parseCoordinates(coordinate);
-                if (tempPoint != null) {
-                    polygonPoints.add(tempPoint);
-                }
-            }
+        Matcher matcher = POLYGON.matcher(value);
+        if (!matcher.matches()) return List.of();
+        List<HgsPoint> points = new ArrayList<>();
+        for (String coordinate : matcher.group(1).split(",", -1)) {
+            HgsPoint point = parseCoordinates(coordinate);
+            // Dropping a bad vertex would invent an edge between its neighbors.
+            if (point == null) return List.of();
+            points.add(point);
         }
-        return polygonPoints;
+        if (points.size() < 4) return List.of();
+        HgsPoint first = points.getFirst(), last = points.getLast();
+        if (first.longitudeDeg() != last.longitudeDeg() || first.latitudeDeg() != last.latitudeDeg()) return List.of();
+        return points;
     }
 
     @Nullable
     private static HgsPoint parsePoint(String value) {
-        if (containsIgnoreCase(value, "point")) {
-            return parseCoordinates(value.substring(value.indexOf('(') + 1, value.indexOf(')')));
-        }
-        return null;
+        Matcher matcher = POINT.matcher(value);
+        return matcher.matches() ? parseCoordinates(matcher.group(1)) : null;
     }
 
     @Nullable
     private static HgsPoint parseCoordinates(String value) {
         String[] parts = Regex.MultiSpace.split(value.trim(), 3);
-        if (parts.length < 2)
-            return null;
+        return parts.length == 2 ? point(parseNumber(parts[0]), parseNumber(parts[1])) : null;
+    }
 
+    @Nullable
+    private static Double parseNumber(String value) {
         try {
-            return new HgsPoint(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
+            double number = Double.parseDouble(value);
+            return Double.isFinite(number) ? number : null;
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    @Nullable
+    private static HgsPoint point(Double longitude, Double latitude) {
+        return longitude != null && latitude != null && Math.abs(latitude) <= 90 ? new HgsPoint(longitude, latitude) : null;
     }
 
     @Nullable
@@ -104,7 +115,7 @@ final class HEKGeometry {
         if (boundary == null) boundary = List.of();
         HgsPoint centralPoint = hgsCentralPoint;
         if (centralPoint == null && hgsLongitudeDeg != null && hgsLatitudeDeg != null)
-            centralPoint = new HgsPoint(hgsLongitudeDeg, hgsLatitudeDeg);
+            centralPoint = point(hgsLongitudeDeg, hgsLatitudeDeg);
 
         Position p = Sun.getEarth(new JHVTime(currentEvent.start));
         double elon = p.lon;
@@ -123,15 +134,6 @@ final class HEKGeometry {
 
     private static Vec3 hgsToJhv(HgsPoint point, double elon) {
         return SphericalCoords.unit(Math.toRadians(point.longitudeDeg()) - elon, Math.toRadians(point.latitudeDeg()));
-    }
-
-    private static boolean containsIgnoreCase(String value, String token) {
-        int limit = value.length() - token.length();
-        for (int i = 0; i <= limit; i++) {
-            if (value.regionMatches(true, i, token, 0, token.length()))
-                return true;
-        }
-        return false;
     }
 
 }
