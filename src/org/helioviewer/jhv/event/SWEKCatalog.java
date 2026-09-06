@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.event;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public final class SWEKCatalog {
                     addIndexedParameter(fields, supplier, field.parameterWith());
             }
         }
-        return Map.copyOf(fields);
+        return Collections.unmodifiableMap(fields);
     }
 
     private static void addIndexedParameter(Map<String, SWEK.NumericType> fields, SWEKSupplier supplier, String name) {

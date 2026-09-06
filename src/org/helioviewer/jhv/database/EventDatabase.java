@@ -432,7 +432,7 @@ public class EventDatabase {
         StringBuilder joins = new StringBuilder();
         for (int i = 0; i < params.size(); i++) {
             SWEK.Param param = params.get(i);
-            if (SWEKCatalog.indexedParameters(type).keySet().stream().noneMatch(param.name()::equalsIgnoreCase))
+            if (!SWEKCatalog.indexedParameters(type).containsKey(param.name()))
                 throw new IllegalArgumentException("Unknown indexed parameter: " + param.name());
             String alias = "p" + i;
             joins.append(" JOIN event_parameter ").append(alias).append(" ON ").append(alias).append(".event_id=e.id AND ")
