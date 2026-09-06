@@ -22,7 +22,10 @@ final class ObservationGroups {
     private long maximumGroupDuration;
 
     // A decoded observation supplies its complete incident-link set for this snapshot.
-    void replace(long sequence, List<SolarEvent> observations, List<SolarEvent.Link> associations) {
+    void replace(EventBatch batch) {
+        long sequence = batch.sequence();
+        List<SolarEvent> observations = batch.events();
+        List<SolarEvent.Link> associations = batch.associations();
         Set<Integer> refreshedIds = new HashSet<>();
         for (SolarEvent event : observations) {
             if (eventSequences.getOrDefault(event.getUniqueID(), 0L) <= sequence)

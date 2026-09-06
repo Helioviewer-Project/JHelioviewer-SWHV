@@ -61,7 +61,7 @@ public class SWEKDownloader {
 
         @Override
         public void run() {
-            EventDatabase.EventBatch events = null;
+            EventBatch events = null;
             try {
                 if (ensureStored() && !requests.cancelled)
                     events = EventDatabase.loadEvents(start, end, requests.supplier, requests.params);
@@ -72,7 +72,7 @@ public class SWEKDownloader {
             finish(events);
         }
 
-        private void finish(@Nullable EventDatabase.EventBatch events) {
+        private void finish(@Nullable EventBatch events) {
             if (requests.cancelled)
                 return;
 
@@ -83,7 +83,7 @@ public class SWEKDownloader {
                     if (events == null)
                         requests.intervals.removeRequestedInterval(start, end);
                     else
-                        EventCache.replaceEvents(events.sequence(), events.events(), events.associations());
+                        EventCache.replaceEvents(events);
                 } finally {
                     requests.workers.remove(this);
                     updateGroupBusy(requests.supplier.group());

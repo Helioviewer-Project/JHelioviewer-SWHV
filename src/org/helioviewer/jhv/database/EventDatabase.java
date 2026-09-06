@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import org.helioviewer.jhv.app.Log;
+import org.helioviewer.jhv.event.EventBatch;
 import org.helioviewer.jhv.event.SWEK;
 import org.helioviewer.jhv.event.SWEKCatalog;
 import org.helioviewer.jhv.event.SWEKGroup;
@@ -412,16 +413,6 @@ public class EventDatabase {
 
     public record EventDetails(SolarEvent event, List<SolarEvent> relatedEvents) {}
 
-    public record EventQuery(long start, long end, SWEKSupplier supplier, List<SWEK.Param> filters) {
-        public EventQuery {
-            filters = List.copyOf(filters);
-        }
-    }
-
-    // Selected IDs include rows that matched the query but could not be decoded into events.
-    // Associations cover the supplier and inclusive time range without applying the filters.
-    public record EventBatch(long sequence, EventQuery query, Set<Integer> selectedIds, List<SolarEvent> events, List<SolarEvent.Link> associations) {}
-
     private record JsonEvent(byte[] json, SWEKSupplier type, int id, long start, long end) {}
 
     private record JsonEventDetails(JsonEvent event, List<JsonEvent> relatedEvents) {}
@@ -429,14 +420,14 @@ public class EventDatabase {
     private record JsonEventBatch(long sequence, List<JsonEvent> events, List<SolarEvent.Link> associations) {}
 
     public static EventBatch loadEvents(long start, long end, SWEKSupplier type, List<SWEK.Param> params) throws Exception {
-        EventQuery query = new EventQuery(start, end, type, params);
+        EventBatch.Query query = new EventBatch.Query(start, end, type, params);
         JsonEventBatch batch = executor.invokeAndWait(() -> new JsonEventBatch(++batchSequence,
                 queryEvents(query), new Associations2Program(query.start(), query.end(), query.supplier()).call()));
         Set<Integer> selectedIds = batch.events().stream().map(JsonEvent::id).collect(Collectors.toUnmodifiableSet());
         return new EventBatch(batch.sequence(), query, selectedIds, parseEvents(batch.events(), false), batch.associations());
     }
 
-    private static List<JsonEvent> queryEvents(EventQuery query) throws Exception {
+    private static List<JsonEvent> queryEvents(EventBatch.Query query) throws Exception {
         List<JsonEvent> eventList = new ArrayList<>();
         int typeId = findEventTypeId(query.supplier());
         if (typeId == -1)

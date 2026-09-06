@@ -53,9 +53,9 @@ public class EventCache {
         DisplayController.display();
     }
 
-    static void replaceEvents(long sequence, List<SolarEvent> events, List<SolarEvent.Link> associations) {
+    static void replaceEvents(EventBatch batch) {
         boolean highlightedGroupCached = eventGroups.contains(lastHighlighted);
-        eventGroups.replace(sequence, events, associations);
+        eventGroups.replace(batch);
         if (highlightedGroupCached && !eventGroups.contains(lastHighlighted))
             highlight(null);
         fireEventCacheChanged();
