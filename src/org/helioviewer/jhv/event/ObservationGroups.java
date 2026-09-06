@@ -14,10 +14,18 @@ import javax.annotation.Nullable;
 
 final class ObservationGroups {
 
+    private static final class ObservationEntry {
+        private ObservationGroup group;
+        private long sequence;
+
+        ObservationEntry(ObservationGroup _group) {
+            group = _group;
+        }
+    }
+
     private final NavigableMap<Long, List<ObservationGroup>> events = new TreeMap<>();
-    private final Map<Integer, ObservationGroup> relatedEventsById = new HashMap<>();
+    private final Map<Integer, ObservationEntry> observationsById = new HashMap<>();
     private final Map<Integer, Set<SolarEvent.Link>> pendingAssocs = new HashMap<>();
-    private final Map<Integer, Long> eventSequences = new HashMap<>();
     private final Map<SolarEvent.Link, Long> associationSequences = new HashMap<>();
     private long maximumGroupDuration;
 
@@ -28,7 +36,7 @@ final class ObservationGroups {
         List<SolarEvent.Link> associations = batch.associations();
         Set<Integer> refreshedIds = new HashSet<>();
         for (SolarEvent event : observations) {
-            if (eventSequences.getOrDefault(event.getUniqueID(), 0L) <= sequence)
+            if (getSequence(event.getUniqueID()) <= sequence)
                 refreshedIds.add(event.getUniqueID());
         }
         Set<SolarEvent.Link> currentLinks = new HashSet<>(associations);
@@ -42,7 +50,7 @@ final class ObservationGroups {
         Set<ObservationGroup> affectedGroups = new HashSet<>();
         for (SolarEvent.Link link : removedLinks) {
             associationSequences.remove(link);
-            ObservationGroup group = relatedEventsById.get(link.firstId());
+            ObservationGroup group = getObservationGroup(link.firstId());
             if (group != null && group.getAssociations().contains(link))
                 affectedGroups.add(group);
         }
@@ -53,12 +61,12 @@ final class ObservationGroups {
 
         for (SolarEvent event : observations) {
             if (refreshedIds.contains(event.getUniqueID())) {
-                eventSequences.put(event.getUniqueID(), sequence);
                 addEvent(event);
+                observationsById.get(event.getUniqueID()).sequence = sequence;
             }
         }
         for (SolarEvent.Link link : associations) {
-            if (eventSequences.getOrDefault(link.firstId(), 0L) <= sequence && eventSequences.getOrDefault(link.secondId(), 0L) <= sequence
+            if (getSequence(link.firstId()) <= sequence && getSequence(link.secondId()) <= sequence
                     && associationSequences.getOrDefault(link, 0L) <= sequence) {
                 associationSequences.put(link, sequence);
                 addAssociation(link);
@@ -67,12 +75,12 @@ final class ObservationGroups {
     }
 
     boolean contains(ObservationGroup group) {
-        return group != null && group.getEvents().stream().anyMatch(event -> relatedEventsById.get(event.getUniqueID()) == group);
+        return group != null && group.getEvents().stream().anyMatch(event -> getObservationGroup(event.getUniqueID()) == group);
     }
 
     void addEvent(SolarEvent event) {
         Integer id = event.getUniqueID();
-        ObservationGroup relatedEvents = relatedEventsById.get(id);
+        ObservationGroup relatedEvents = getObservationGroup(id);
         if (relatedEvents != null) {
             removeFromIndex(relatedEvents);
             relatedEvents.swapEvent(event);
@@ -85,7 +93,13 @@ final class ObservationGroups {
 
     @Nullable
     ObservationGroup getObservationGroup(int id) {
-        return relatedEventsById.get(id);
+        ObservationEntry entry = observationsById.get(id);
+        return entry == null ? null : entry.group;
+    }
+
+    private long getSequence(int id) {
+        ObservationEntry entry = observationsById.get(id);
+        return entry == null ? 0 : entry.sequence;
     }
 
     private void resolvePendingAssociations(Integer id) {
@@ -95,12 +109,9 @@ final class ObservationGroups {
     }
 
     private void addNewRelatedEvent(SolarEvent event) {
-        addNewRelatedEvent(event, new ObservationGroup(event));
-    }
-
-    private void addNewRelatedEvent(SolarEvent event, ObservationGroup relatedEvents) {
-        addToIndex(relatedEvents);
-        relatedEventsById.put(event.getUniqueID(), relatedEvents);
+        ObservationGroup group = new ObservationGroup(event);
+        addToIndex(group);
+        observationsById.put(event.getUniqueID(), new ObservationEntry(group));
     }
 
     private void merge(ObservationGroup current, ObservationGroup found) {
@@ -110,7 +121,7 @@ final class ObservationGroups {
         current.merge(found);
         addToIndex(current);
         for (SolarEvent foundev : found.getEvents()) {
-            relatedEventsById.put(foundev.getUniqueID(), current);
+            observationsById.get(foundev.getUniqueID()).group = current;
         }
     }
 
@@ -131,8 +142,8 @@ final class ObservationGroups {
 
     void addAssociation(SolarEvent.Link link) {
         associationSequences.putIfAbsent(link, 0L);
-        ObservationGroup first = relatedEventsById.get(link.firstId());
-        ObservationGroup second = relatedEventsById.get(link.secondId());
+        ObservationGroup first = getObservationGroup(link.firstId());
+        ObservationGroup second = getObservationGroup(link.secondId());
         if (first != null && second != null) {
             if (first != second)
                 merge(first, second);
@@ -183,7 +194,6 @@ final class ObservationGroups {
         pendingAssocs.values().forEach(links -> links.removeIf(link ->
                 removedIds.contains(link.firstId()) || removedIds.contains(link.secondId())));
         pendingAssocs.entrySet().removeIf(entry -> entry.getValue().isEmpty());
-        removedIds.forEach(eventSequences::remove);
         associationSequences.keySet().removeIf(link -> removedIds.contains(link.firstId()) || removedIds.contains(link.secondId()));
 
         for (ObservationGroup group : affectedGroups)
@@ -198,15 +208,17 @@ final class ObservationGroups {
 
     private void rebuild(ObservationGroup group, Set<Integer> removedIds, Set<SolarEvent.Link> removedLinks) {
         removeFromIndex(group);
-        for (SolarEvent event : group.getEvents())
-            relatedEventsById.remove(event.getUniqueID());
-
         for (SolarEvent event : group.getEvents()) {
-            if (!removedIds.contains(event.getUniqueID()))
-                addNewRelatedEvent(event, new ObservationGroup(event, group.getColor()));
+            if (removedIds.contains(event.getUniqueID())) {
+                observationsById.remove(event.getUniqueID());
+            } else {
+                ObservationGroup replacement = new ObservationGroup(event, group.getColor());
+                observationsById.get(event.getUniqueID()).group = replacement;
+                addToIndex(replacement);
+            }
         }
         for (SolarEvent.Link link : group.getAssociations()) {
-            if (!removedLinks.contains(link) && relatedEventsById.containsKey(link.firstId()) && relatedEventsById.containsKey(link.secondId()))
+            if (!removedLinks.contains(link) && observationsById.containsKey(link.firstId()) && observationsById.containsKey(link.secondId()))
                 addAssociation(link);
         }
     }
