@@ -41,6 +41,7 @@ class SWEKConfig {
             SWEKCatalog.setRelations(parseRelations(jo, groupsByName));
             return groups;
         } catch (Exception e) {
+            SWEKCatalog.clear();
             Log.error(e);
             return List.of();
         }
@@ -100,13 +101,8 @@ class SWEKConfig {
 
     private static void parseGroups(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {
         JSONArray eventJSONArray = obj.getJSONArray("events_types");
-        for (int i = 0; i < eventJSONArray.length(); i++) {
-            try {
-                addGroup(eventJSONArray.getJSONObject(i), sources, groupsByName, groups);
-            } catch (Exception e) { // allow continuing when a source is disabled
-                Log.error(e);
-            }
-        }
+        for (int i = 0; i < eventJSONArray.length(); i++)
+            addGroup(eventJSONArray.getJSONObject(i), sources, groupsByName, groups);
     }
 
     private static void addGroup(JSONObject obj, Map<String, SWEK.Source> sources, Map<String, SWEKGroup> groupsByName, List<SWEKGroup> groups) {

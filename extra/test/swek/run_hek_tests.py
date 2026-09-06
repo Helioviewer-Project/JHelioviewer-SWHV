@@ -2,6 +2,7 @@
 """Compile and run the offline event regressions after `ant compile` (JDK 25)."""
 
 import gzip
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -28,15 +29,29 @@ with tempfile.TemporaryDirectory(prefix="jhv-event-tests-") as workspace:
         *("extra/test/swek/" + name + ".java" for name in tests),
     ], cwd=root, check=True)
 
-    def run(name, *args, cache=None):
+    def run(name, *args, cache=None, resources=None):
         home = work / (cache or name)
         home.mkdir(exist_ok=True)
         subprocess.run([
             "java", "--enable-native-access=ALL-UNNAMED", "-Djava.awt.headless=true",
             "-Duser.timezone=UTC", "-Duser.language=en", "-Duser.country=US", "-Duser.home=" + str(home),
-            "-cp", str(classes) + os.pathsep + classpath,
+            "-cp", os.pathsep.join([str(resources or classes), str(classes), classpath]),
             "org.helioviewer.jhv." + tests[name] + "." + name, *args,
         ], cwd=root, check=True)
+
+    for scenario in ("duplicate-supplier", "missing-definition", "disabled-source"):
+        config = json.loads((root / "resources/settings/SWEK.json").read_text())
+        suppliers = config["events_types"][0]["suppliers"]
+        if scenario == "duplicate-supplier":
+            suppliers[1]["id"] = suppliers[0]["id"]
+        elif scenario == "missing-definition":
+            del config["sources"][0]["numeric_parameters"]["ar_noaanum"]
+        else:
+            suppliers[0]["source"] = "COMESEP"
+        resources = work / scenario
+        (resources / "settings").mkdir(parents=True)
+        (resources / "settings/SWEK.json").write_text(json.dumps(config))
+        run("SWEKIntegrationTest", "config-" + scenario, cache=scenario, resources=resources)
 
     for name in tests:
         if name == "EventDatabaseTest":

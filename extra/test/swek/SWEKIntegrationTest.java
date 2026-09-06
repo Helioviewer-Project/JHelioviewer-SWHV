@@ -1,6 +1,7 @@
 package org.helioviewer.jhv.plugins.swek;
 
 import java.awt.EventQueue;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +30,8 @@ import org.helioviewer.jhv.event.SWEKHandler;
 import org.helioviewer.jhv.event.SWEKSupplier;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.io.Directories;
+import org.helioviewer.jhv.io.FileUtils;
+import org.helioviewer.jhv.io.JSONUtils;
 import org.helioviewer.jhv.plugins.swek.sources.HEKHandler;
 import org.helioviewer.jhv.time.TimeUtils;
 
@@ -41,12 +44,40 @@ public final class SWEKIntegrationTest {
         Platform.init();
         Directories.createPersistentDirs();
         Directories.createCacheDirs();
+        if (args[0].startsWith("config-")) {
+            checkConfigLoad(args[0]);
+            System.out.println(args[0] + " passed");
+            return;
+        }
         AppInit.loadSpice();
         checkCatalogDefinitions();
         checkLabels();
         checkActiveEvents();
         checkCapturedCatalog(args);
         System.out.println("SWEKIntegrationTest passed");
+    }
+
+    private static void checkConfigLoad(String scenario) throws Exception {
+        List<SWEKGroup> groups = SWEKConfig.load();
+        boolean disabledSource = scenario.equals("config-disabled-source");
+        check(groups.size() == (disabledSource ? 11 : 0), "configuration must load completely or return no groups");
+        try (InputStream in = FileUtils.getResource("/settings/SWEK.json")) {
+            JSONObject config = JSONUtils.get(in);
+            for (Object value : config.getJSONArray("events_types")) {
+                JSONObject group = (JSONObject) value;
+                for (Object entry : group.getJSONArray("suppliers")) {
+                    JSONObject definition = (JSONObject) entry;
+                    SWEKSupplier supplier = SWEKCatalog.getSupplier(definition.getString("id"));
+                    boolean expected = disabledSource && definition.getString("source").equals("HEK");
+                    check((supplier != null) == expected, "supplier registration after " + scenario + ": " + definition.getString("id"));
+                    if (supplier != null)
+                        check(groups.contains(supplier.group()), "registered supplier must belong to a returned group");
+                }
+            }
+        }
+        check(disabledSource || SWEKCatalog.getRelations().isEmpty(), "failed configuration must leave no relations");
+        if (disabledSource)
+            check(!SWEKCatalog.getRelations().isEmpty(), "disabled sources must not discard enabled groups' relations");
     }
 
     private static final class Handler extends HEKHandler {
