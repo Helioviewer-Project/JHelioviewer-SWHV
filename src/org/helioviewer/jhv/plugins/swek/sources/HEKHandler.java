@@ -3,8 +3,6 @@ package org.helioviewer.jhv.plugins.swek.sources;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,7 +26,6 @@ import org.json.JSONObject;
 public class HEKHandler extends SWEKHandler {
 
     private static final String BASE_URL = "https://www.lmsal.com/hek/her?";
-    private static final String STRING_EQUALS = URLEncoder.encode("=", StandardCharsets.UTF_8);
 
     @Override
     protected RemotePage parseRemotePage(JSONObject eventJSON, SWEKSupplier supplier) throws Exception {
@@ -131,8 +128,7 @@ public class HEKHandler extends SWEKHandler {
         StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
         baseURL.append("&event_type=").append(getEventAbbreviation(supplier.group().getName()));
         baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
-        String encodedSupplier = URLEncoder.encode(supplier.supplierName(), StandardCharsets.UTF_8);
-        baseURL.append("&param0=FRM_Name&op0=").append(STRING_EQUALS).append("&value0=").append(encodedSupplier);
+        // HEK's supplier predicate excludes CACTus records. Filter the returned records locally instead.
         // HEK's default temporal search includes events overlapping either endpoint.
         baseURL.append("&event_starttime=").append(TimeUtils.format(start));
         baseURL.append("&event_endtime=").append(TimeUtils.format(end));

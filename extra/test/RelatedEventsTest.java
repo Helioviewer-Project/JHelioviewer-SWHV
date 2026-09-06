@@ -6,6 +6,17 @@ import org.helioviewer.jhv.time.Interval;
 
 public final class RelatedEventsTest {
 
+    public static void checkLoadedEvents(List<JHVEvent> events) {
+        events.forEach(JHVEventCache::addEvent);
+        for (JHVEvent event : events) {
+            JHVRelatedEvents group = JHVEventCache.getRelatedEvents(event.getUniqueID());
+            check(JHVEventCache.getEvents(event.start, event.start).contains(group), "loaded event visible at start");
+            check(JHVEventCache.getEvents(event.end, event.end).contains(group), "loaded event visible at end");
+            check(group.getClosestTo(event.start) == event, "canvas representative");
+            check(group.getIntervals().equals(List.of(new Interval(event.start, event.end))), "singleton timeline interval");
+        }
+    }
+
     public static void main(String[] args) {
         JHVEvent first = new JHVEvent(null, 1, 100, 200);
         JHVEvent second = new JHVEvent(null, 2, 400, 500);
