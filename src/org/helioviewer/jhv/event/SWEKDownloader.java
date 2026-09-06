@@ -39,6 +39,7 @@ public class SWEKDownloader {
         private final SWEKSupplier supplier;
         private final RequestCache intervals = new RequestCache();
         private final List<Worker> workers = new ArrayList<>();
+        private volatile boolean cancelled;
 
         SupplierRequests(SWEKSupplier _supplier) {
             supplier = _supplier;
@@ -51,8 +52,6 @@ public class SWEKDownloader {
         private final long start;
         private final long end;
 
-        private volatile boolean cancelled;
-
         Worker(SupplierRequests _requests, List<SWEK.Param> _params, long _start, long _end) {
             requests = _requests;
             params = _params;
@@ -64,21 +63,21 @@ public class SWEKDownloader {
         public void run() {
             EventDatabase.EventBatch events = null;
             try {
-                if (ensureStored() && !cancelled)
+                if (ensureStored() && !requests.cancelled)
                     events = EventDatabase.loadEvents(start, end, requests.supplier, params);
             } catch (Throwable t) {
-                if (!cancelled && !AppThread.isInterrupted(t))
+                if (!requests.cancelled && !AppThread.isInterrupted(t))
                     Log.error("Error loading SWEK", t);
             }
             finish(events);
         }
 
         private void finish(@Nullable EventDatabase.EventBatch events) {
-            if (cancelled)
+            if (requests.cancelled)
                 return;
 
             EventQueue.invokeLater(() -> {
-                if (cancelled)
+                if (requests.cancelled)
                     return;
                 try {
                     if (events == null)
@@ -105,7 +104,7 @@ public class SWEKDownloader {
             int page = 0;
             boolean overmax = true;
             while (overmax) {
-                if (cancelled)
+                if (requests.cancelled)
                     return false;
 
                 SWEKHandler.RemotePage remotePage = requests.supplier.source().handler().fetchPage(requests.supplier, start, end, page);
@@ -114,12 +113,7 @@ public class SWEKDownloader {
                 overmax = remotePage.overmax();
                 page++;
             }
-            return !cancelled;
-        }
-
-        void stopWorker() {
-            cancelled = true;
-            downloadPool.remove(this);
+            return !requests.cancelled;
         }
 
         @Override
@@ -190,7 +184,8 @@ public class SWEKDownloader {
     private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         SupplierRequests requests = activeSuppliers.get(supplier);
         if (requests != null) {
-            requests.workers.forEach(Worker::stopWorker);
+            requests.cancelled = true;
+            requests.workers.forEach(downloadPool::remove);
             requests.workers.clear();
         }
         if (keepActive)
