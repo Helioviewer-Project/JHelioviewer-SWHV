@@ -80,7 +80,7 @@ final class EventCollection {
     }
 
     void addEvent(SolarEvent event) {
-        Integer id = event.getUniqueID();
+        int id = event.getUniqueID();
         RelatedEvents relatedEvents = getRelatedEvents(id);
         if (relatedEvents != null) {
             removeFromIndex(relatedEvents);
@@ -103,7 +103,7 @@ final class EventCollection {
         return entry == null ? 0 : entry.snapshotSequence;
     }
 
-    private void resolvePendingAssociations(Integer id) {
+    private void resolvePendingAssociations(int id) {
         Set<SolarEvent.Link> pending = pendingLinks.remove(id);
         if (pending != null)
             pending.forEach(this::addAssociation);

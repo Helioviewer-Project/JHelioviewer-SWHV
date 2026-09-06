@@ -130,16 +130,12 @@ public class HEKHandler extends SWEKHandler {
 
     @Override
     protected URI createURI(SWEKSupplier supplier, long start, long end, int page) throws Exception {
-        StringBuilder baseURL = new StringBuilder(BASE_URL + "cmd=search&type=column");
-        baseURL.append("&event_type=").append(getEventAbbreviation(supplier.group().getName()));
-        baseURL.append("&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2");
-        // HEK's supplier predicate excludes CACTus records. Filter the returned records locally instead.
-        // HEK's default temporal search includes events overlapping either endpoint.
-        baseURL.append("&event_starttime=").append(TimeUtils.format(start));
-        baseURL.append("&event_endtime=").append(TimeUtils.format(end));
-        // The downloader uses zero-based offsets, whereas HEK numbers pages from one.
-        baseURL.append("&page=").append(page + 1);
-        return new URI(baseURL.toString());
+        // HEK's supplier predicate is known to omit CACTus records. Query by event type and filter all suppliers locally.
+        // The time bounds select overlapping events, including events that began before the requested start time.
+        // Convert the downloader's zero-based page index to HEK's one-based page number.
+        return new URI(BASE_URL + "cmd=search&type=column&event_type=" + getEventAbbreviation(supplier.group().getName())
+                + "&event_coordsys=helioprojective&x1=-3600&x2=3600&y1=-3600&y2=3600&cosec=2"
+                + "&event_starttime=" + TimeUtils.format(start) + "&event_endtime=" + TimeUtils.format(end) + "&page=" + (page + 1));
     }
 
     private static String getEventAbbreviation(String eventType) {

@@ -182,14 +182,6 @@ public class EventDatabase {
         }
     }
 
-    private static void bindIndexedValue(PreparedStatement statement, int index, Number value) throws SQLException {
-        switch (value) {
-            case Integer i -> statement.setInt(index, i);
-            case Double d -> statement.setDouble(index, d);
-            default -> throw new IllegalArgumentException("Unsupported indexed event value: " + value);
-        }
-    }
-
     private static void storeEvents(List<SWEKHandler.RemoteEvent> remoteEvents, SWEKSupplier supplier) throws Exception {
         int typeId = findOrInsertEventTypeId(supplier);
 
@@ -219,7 +211,11 @@ public class EventDatabase {
                 parameter.setInt(1, eventId);
                 parameter.setString(2, field);
                 parameter.setInt(3, typeId);
-                bindIndexedValue(parameter, 4, value);
+                switch (value) {
+                    case Integer i -> parameter.setInt(4, i);
+                    case Double d -> parameter.setDouble(4, d);
+                    default -> throw new IllegalArgumentException("Unsupported indexed event value: " + value);
+                }
                 parameter.executeUpdate();
             }
         }
@@ -465,15 +461,10 @@ public class EventDatabase {
         return eventList;
     }
 
-    private static List<SolarEvent.Link> queryAssociations(long start, long end, SWEKSupplier type) throws Exception {
-        List<SolarEvent.Link> links = new ArrayList<>();
-        int typeId = findEventTypeId(type);
-        if (typeId == -1)
-            return links;
-
+    private static List<SWEK.RelatedOn> associationParameters(SWEKGroup group) {
         List<SWEK.RelatedOn> parameters = new ArrayList<>();
         for (SWEK.Relation relation : SWEKCatalog.getRelations()) {
-            if (relation.group() != type.group() || relation.relatedWith() != type.group())
+            if (relation.group() != group || relation.relatedWith() != group)
                 continue;
             for (SWEK.RelatedOn field : relation.relatedOnList()) {
                 parameters.add(field);
@@ -481,6 +472,16 @@ public class EventDatabase {
                     parameters.add(new SWEK.RelatedOn(field.parameterWith(), field.parameterFrom()));
             }
         }
+        return parameters;
+    }
+
+    private static List<SolarEvent.Link> queryAssociations(long start, long end, SWEKSupplier type) throws Exception {
+        List<SolarEvent.Link> links = new ArrayList<>();
+        int typeId = findEventTypeId(type);
+        if (typeId == -1)
+            return links;
+
+        List<SWEK.RelatedOn> parameters = associationParameters(type.group());
         String sql = SELECT_ASSOCIATIONS + (" UNION " + SELECT_PARAMETER_ASSOCIATIONS).repeat(parameters.size()) + " ORDER BY 1,2";
         PreparedStatement pstatement = getPreparedStatement(sql);
         pstatement.setInt(1, typeId);
@@ -508,7 +509,7 @@ public class EventDatabase {
     }
 
     private static List<StoredEvent> queryRelationEvents(int eventId, SWEKSupplier rightType,
-                                                       String leftParameter, String rightParameter) throws Exception {
+                                                         String leftParameter, String rightParameter) throws Exception {
         List<StoredEvent> ret = new ArrayList<>();
         int rightTypeId = findEventTypeId(rightType);
         if (rightTypeId == -1)

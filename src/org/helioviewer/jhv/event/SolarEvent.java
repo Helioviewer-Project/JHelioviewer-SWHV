@@ -24,7 +24,7 @@ public class SolarEvent {
     }
 
     public SolarEvent(SWEKSupplier _supplier, int _id, long _start, long _end,
-                    EventGeometry _positionInformation, CMEParameters _cmeParameters, EventMetadata _metadata) {
+                      EventGeometry _positionInformation, CMEParameters _cmeParameters, EventMetadata _metadata) {
         metadata = _metadata;
         positionInformation = _positionInformation;
         cmeParameters = _cmeParameters;

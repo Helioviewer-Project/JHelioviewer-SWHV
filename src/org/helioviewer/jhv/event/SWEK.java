@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 public class SWEK {
 
-    public enum NumericType { INTEGER, DECIMAL }
+    public enum NumericType {INTEGER, DECIMAL}
 
     public enum Operand {
         BIGGER_OR_EQUAL(">="),
