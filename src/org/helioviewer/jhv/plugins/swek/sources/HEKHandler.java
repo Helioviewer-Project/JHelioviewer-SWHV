@@ -78,7 +78,12 @@ public class HEKHandler extends SWEKHandler {
             try {
                 switch (field.getValue()) {
                     case INTEGER -> indexedValues.put(fieldName, result.getInt(lfieldName));
-                    case DECIMAL -> indexedValues.put(fieldName, result.getDouble(lfieldName));
+                    case DECIMAL -> {
+                        double value = result.getDouble(lfieldName);
+                        if (!Double.isFinite(value))
+                            throw new JSONException("Nonfinite numeric value: " + result.get(lfieldName));
+                        indexedValues.put(fieldName, value);
+                    }
                 }
             } catch (JSONException e) {
                 Log.warn("Ignoring malformed HEK field " + fieldName + " in " + uid, e);
