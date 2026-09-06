@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public final class SWEKCatalog {
 
     private static final HashMap<String, SWEKSupplier> suppliers = new HashMap<>();
     private static final HashMap<SWEKGroup, List<SWEKSupplier>> suppliersByGroup = new HashMap<>();
     private static final HashMap<SWEKSupplier, Map<String, SWEK.NumericType>> databaseFieldsBySupplier = new HashMap<>();
-    private static final HashMap<SWEKGroup, Map<String, SWEK.NumericType>> relationDatabaseFieldsByGroup = new HashMap<>();
     private static List<SWEK.RelatedEvents> relatedEvents = List.of();
 
     private SWEKCatalog() {
@@ -25,7 +25,6 @@ public final class SWEKCatalog {
         suppliers.clear();
         suppliersByGroup.clear();
         databaseFieldsBySupplier.clear();
-        relationDatabaseFieldsByGroup.clear();
         relatedEvents = List.of();
     }
 
@@ -38,54 +37,45 @@ public final class SWEKCatalog {
     }
 
     public static void setRelatedEvents(List<SWEK.RelatedEvents> events) {
-        relatedEvents = events;
-        updateDatabaseFields();
+        HashMap<SWEKSupplier, Map<String, SWEK.NumericType>> fields = new HashMap<>();
+        for (SWEKSupplier supplier : suppliers.values())
+            fields.put(supplier, createDatabaseFields(supplier, events));
+        relatedEvents = List.copyOf(events);
+        databaseFieldsBySupplier.clear();
+        databaseFieldsBySupplier.putAll(fields);
     }
 
     public static List<SWEK.RelatedEvents> getRelatedEvents() {
         return relatedEvents;
     }
 
-    private static Map<String, SWEK.NumericType> relationDatabaseFields(SWEKGroup group) {
-        return relationDatabaseFieldsByGroup.getOrDefault(group, Map.of());
-    }
-
     public static Map<String, SWEK.NumericType> databaseFields(SWEKSupplier supplier) {
         return databaseFieldsBySupplier.getOrDefault(supplier, Map.of());
     }
 
-    private static void updateDatabaseFields() {
-        relationDatabaseFieldsByGroup.clear();
-        databaseFieldsBySupplier.clear();
-
-        for (SWEKSupplier supplier : suppliers.values()) {
-            relationDatabaseFieldsByGroup.computeIfAbsent(supplier.group(), SWEKCatalog::createRelationDatabaseFields);
-            databaseFieldsBySupplier.put(supplier, createDatabaseFields(supplier));
+    private static Map<String, SWEK.NumericType> createDatabaseFields(SWEKSupplier supplier, List<SWEK.RelatedEvents> events) {
+        Map<String, SWEK.NumericType> fields = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (SWEK.Parameter parameter : supplier.getParameterList()) {
+            SWEK.ParameterFilter filter = parameter.filter();
+            if (filter != null)
+                addDatabaseField(fields, supplier, parameter.name(), filter.dbType());
         }
-    }
-
-    private static Map<String, SWEK.NumericType> createRelationDatabaseFields(SWEKGroup group) {
-        HashMap<String, SWEK.NumericType> fields = new HashMap<>();
-        for (SWEK.RelatedEvents re : relatedEvents) {
-            if (re.group() == group) {
-                re.relatedOnList().forEach(swon -> fields.put(swon.parameterFrom().intern(), SWEK.NumericType.valueOf(swon.dbType())));
-            }
-            if (re.relatedWith() == group) {
-                re.relatedOnList().forEach(swon -> fields.put(swon.parameterWith().intern(), SWEK.NumericType.valueOf(swon.dbType())));
+        for (SWEK.RelatedEvents relation : events) {
+            for (SWEK.RelatedOn field : relation.relatedOnList()) {
+                if (relation.group() == supplier.group())
+                    addDatabaseField(fields, supplier, field.parameterFrom(), field.dbType());
+                if (relation.relatedWith() == supplier.group())
+                    addDatabaseField(fields, supplier, field.parameterWith(), field.dbType());
             }
         }
         return Map.copyOf(fields);
     }
 
-    private static Map<String, SWEK.NumericType> createDatabaseFields(SWEKSupplier supplier) {
-        HashMap<String, SWEK.NumericType> fields = new HashMap<>();
-        for (SWEK.Parameter p : supplier.getParameterList()) {
-            SWEK.ParameterFilter pf = p.filter();
-            if (pf != null)
-                fields.put(p.name().intern(), SWEK.NumericType.valueOf(pf.dbType()));
-        }
-        fields.putAll(relationDatabaseFields(supplier.group()));
-        return Map.copyOf(fields);
+    private static void addDatabaseField(Map<String, SWEK.NumericType> fields, SWEKSupplier supplier, String name, String dbType) {
+        SWEK.NumericType type = SWEK.NumericType.valueOf(dbType);
+        SWEK.NumericType previous = fields.putIfAbsent(name, type);
+        if (previous != null && previous != type)
+            throw new IllegalArgumentException("Conflicting types for " + name + " in " + key(supplier) + ": " + previous + " and " + type);
     }
 
     public static String key(SWEKSupplier supplier) {
