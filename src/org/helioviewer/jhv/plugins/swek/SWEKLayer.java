@@ -19,6 +19,7 @@ import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventGeometry;
 import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.event.ObservationGroup;
+import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SWEKGroup;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.image.nio.NativeImageFactory;
@@ -463,7 +464,7 @@ public final class SWEKLayer extends AbstractLayer implements EventListener.Hand
         if (force || start < startTime || end > endTime) {
             startTime = start;
             endTime = end;
-            EventCache.requestForInterval(start, end);
+            SWEKDownloader.requestForInterval(start, end);
         }
     }
 

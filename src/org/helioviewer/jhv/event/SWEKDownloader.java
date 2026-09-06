@@ -1,7 +1,9 @@
 package org.helioviewer.jhv.event;
 
 import java.awt.EventQueue;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,10 +14,16 @@ import org.helioviewer.jhv.database.EventDatabase;
 import org.helioviewer.jhv.event.filter.FilterManager;
 import org.helioviewer.jhv.thread.AppThread;
 import org.helioviewer.jhv.time.Interval;
+import org.helioviewer.jhv.time.RequestCache;
+import org.helioviewer.jhv.time.TimeUtils;
 
 import com.google.common.collect.ArrayListMultimap;
 
 public class SWEKDownloader {
+
+    private static final double FACTOR = 0.2;
+    private static final long REQUEST_REFRESH_INTERVAL = 60 * 60 * 1000L;
+    private static final long FUTURE_REQUEST_MARGIN = 6 * REQUEST_REFRESH_INTERVAL;
 
     private static final int NUMBER_THREADS = 8;
     private static final FilterManager.Listener filterListener = SWEKDownloader::filtersChanged;
@@ -121,7 +129,44 @@ public class SWEKDownloader {
         }
     }
 
+    private static final Map<SWEKSupplier, RequestCache> requestedIntervals = new HashMap<>();
     private static final ArrayListMultimap<SWEKSupplier, Worker> workerMap = ArrayListMultimap.create();
+
+    private static void requestFailed(SWEKSupplier eventType, long start, long end) {
+        RequestCache cache = requestedIntervals.get(eventType);
+        if (cache != null)
+            cache.removeRequestedInterval(start, end);
+    }
+
+    public static boolean isSupplierActive(SWEKSupplier supplier) {
+        return requestedIntervals.containsKey(supplier);
+    }
+
+    public static void setSupplierActive(SWEKSupplier supplier, boolean active) {
+        if (active) {
+            requestedIntervals.computeIfAbsent(supplier, _ -> new RequestCache());
+            EventCache.fireEventCacheChanged();
+        } else {
+            stopDownloadSupplier(supplier, false);
+        }
+    }
+
+    public static void requestForInterval(long start, long end) {
+        long now = System.currentTimeMillis();
+        long requestHorizon = now / REQUEST_REFRESH_INTERVAL * REQUEST_REFRESH_INTERVAL + FUTURE_REQUEST_MARGIN;
+        long visibleEnd = Math.min(end, requestHorizon);
+        if (start >= visibleEnd)
+            return;
+
+        long deltaT = Math.max((long) ((visibleEnd - start) * FACTOR), TimeUtils.DAY_IN_MILLIS);
+        long requestStart = start - deltaT;
+        long requestEnd = Math.min(visibleEnd + deltaT, requestHorizon);
+        for (Map.Entry<SWEKSupplier, RequestCache> entry : requestedIntervals.entrySet()) {
+            RequestCache cache = entry.getValue();
+            if (!cache.getMissingIntervals(start, visibleEnd).isEmpty())
+                startDownloadSupplier(entry.getKey(), cache.adaptRequestCache(requestStart, requestEnd));
+        }
+    }
 
     public static void installFilterListener() {
         FilterManager.addListener(filterListener);
@@ -151,16 +196,20 @@ public class SWEKDownloader {
         EventQueue.invokeLater(() -> groupChanged.accept(group));
     }
 
-    static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
+    private static void stopDownloadSupplier(SWEKSupplier supplier, boolean keepActive) {
         for (Worker worker : workerMap.get(supplier))
             worker.stopWorker();
         workerMap.removeAll(supplier);
-        EventCache.removeSupplier(supplier, keepActive);
+        if (keepActive)
+            requestedIntervals.put(supplier, new RequestCache());
+        else
+            requestedIntervals.remove(supplier);
+        EventCache.removeSupplier(supplier);
         updateGroupBusy(supplier.group());
     }
 
     private static void workerFailed(Worker worker) {
-        EventCache.requestFailed(worker.supplier, worker.start, worker.end);
+        requestFailed(worker.supplier, worker.start, worker.end);
         workerFinished(worker);
     }
 
@@ -170,11 +219,11 @@ public class SWEKDownloader {
     }
 
     private static void filtersChanged(SWEKSupplier supplier) {
-        if (EventCache.isSupplierActive(supplier))
+        if (isSupplierActive(supplier))
             stopDownloadSupplier(supplier, true);
     }
 
-    static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
+    private static void startDownloadSupplier(SWEKSupplier supplier, List<Interval> intervals) {
         List<SWEK.Param> params = FilterManager.getFilters(supplier);
         SWEKGroup group = supplier.group();
         boolean started = false;

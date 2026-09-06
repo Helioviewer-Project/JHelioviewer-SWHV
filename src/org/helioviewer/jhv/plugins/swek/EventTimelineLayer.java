@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import org.helioviewer.jhv.event.EventCache;
 import org.helioviewer.jhv.event.EventListener;
 import org.helioviewer.jhv.event.ObservationGroup;
+import org.helioviewer.jhv.event.SWEKDownloader;
 import org.helioviewer.jhv.event.SolarEvent;
 import org.helioviewer.jhv.event.info.SWEKEventInformationDialog;
 import org.helioviewer.jhv.gui.UIGlobals;
@@ -49,7 +50,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
     @Override
     public void fetchData(TimeAxis selectedAxis) {
         visibleEvents = EventCache.getEvents(selectedAxis.start(), selectedAxis.end());
-        EventCache.requestForInterval(selectedAxis.start(), selectedAxis.end());
+        SWEKDownloader.requestForInterval(selectedAxis.start(), selectedAxis.end());
     }
 
     @Override
@@ -73,7 +74,7 @@ public final class EventTimelineLayer extends TimelineLayer implements EventList
         if (!enabled) return;
         TimeAxis xAxis = DrawController.selectedAxis;
         visibleEvents = EventCache.getEvents(xAxis.start(), xAxis.end());
-        EventCache.requestForInterval(xAxis.start(), xAxis.end());
+        SWEKDownloader.requestForInterval(xAxis.start(), xAxis.end());
         DrawController.drawRequest();
     }
 
