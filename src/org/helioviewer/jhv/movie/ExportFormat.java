@@ -7,9 +7,9 @@ public enum ExportFormat {
             "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709:fullrange=on")),
     H264HQ("H.264 better", ".mp4", List.of("-c:v", "libx264", "-profile:v", "high", "-crf", "17", "-preset", "medium",
             "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709:fullrange=on")),
-    H265("H.265", ".mp4", List.of("-c:v", "libx265", "-tag:v", "hvc1", "-crf", "28", "-preset", "fast",
+    H265("H.265", ".mp4", List.of("-c:v", "libx265", "-tag:v", "hvc1", "-crf", "23", "-preset", "fast",
             "-x265-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709:range=full")),
-    H265HQ("H.265 better", ".mp4", List.of("-c:v", "libx265", "-tag:v", "hvc1", "-crf", "22", "-preset", "medium",
+    H265HQ("H.265 better", ".mp4", List.of("-c:v", "libx265", "-tag:v", "hvc1", "-crf", "17", "-preset", "medium",
             "-x265-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709:range=full")),
     PNG("PNG series", "-%04d.png", List.of("-r", "1"));
 

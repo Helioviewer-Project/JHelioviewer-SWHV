@@ -94,7 +94,7 @@ class ExportWriter {
             "-color_trc", "bt709",
             "-colorspace", "bt709",
             "-color_range", "2",
-            "-tune", "animation",
+            "-tune", "psnr",
             "-movflags", "+faststart",
             "-movflags", "+write_colr" // may be useless
     );
