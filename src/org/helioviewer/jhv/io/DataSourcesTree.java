@@ -2,11 +2,11 @@ package org.helioviewer.jhv.io;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.function.Consumer;
+import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -14,7 +14,6 @@ import javax.swing.text.Position;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -60,7 +59,7 @@ public final class DataSourcesTree extends JTree {
     private final DefaultMutableTreeNode nodeRoot;
     private final HashMap<String, DefaultMutableTreeNode> nodes = new HashMap<>();
 
-    public DataSourcesTree(Consumer<SourceItem> activationHandler) {
+    public DataSourcesTree(Runnable activationHandler) {
         nodeRoot = new DefaultMutableTreeNode("Datasets");
 
         for (String serverName : DataSources.getServers()) {
@@ -79,15 +78,15 @@ public final class DataSourcesTree extends JTree {
             defaultRenderer.setLeafIcon(null);
         }
 
-        setSelectionModel(new OneLeafTreeSelectionModel());
+        getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         ToolTipManager.sharedInstance().registerComponent(this);
         com.jidesoft.swing.SearchableUtils.installSearchable(this).setRecursive(true);
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2 && getItemAt(e) instanceof SourceItem item)
-                    activationHandler.accept(item);
+                if (e.getClickCount() == 2 && getItemAt(e) instanceof SourceItem)
+                    activationHandler.run();
             }
         });
     }
@@ -128,7 +127,7 @@ public final class DataSourcesTree extends JTree {
         SourceItem defaultItem = parser.getDefault();
         if (defaultItem != null)
             setSelectedItem(defaultItem.server, defaultItem.sourceId);
-        return getSelectedItem();
+        return defaultItem;
     }
 
     public void setSelectedItem(String server, int sourceId) {
@@ -144,12 +143,18 @@ public final class DataSourcesTree extends JTree {
         }
     }
 
-    @Nullable
-    public SourceItem getSelectedItem() {
-        Object obj = getLastSelectedPathComponent();
-        if (obj instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof SourceItem item)
-            return item;
-        return null; // only on source load error
+    public List<SourceItem> getSelectedItems() {
+        TreePath[] paths = getSelectionPaths();
+        if (paths == null)
+            return List.of();
+
+        List<SourceItem> items = new ArrayList<>();
+        for (TreePath path : paths) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+            if (node.getUserObject() instanceof SourceItem item)
+                items.add(item);
+        }
+        return List.copyOf(items);
     }
 
     @Nullable
@@ -160,48 +165,6 @@ public final class DataSourcesTree extends JTree {
 
         Item item = getItemAt(e);
         return item == null ? null : item.description;
-    }
-
-    private static class OneLeafTreeSelectionModel extends DefaultTreeSelectionModel {
-
-        private TreePath selectedPath;
-
-        OneLeafTreeSelectionModel() {
-            setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        }
-
-        private void setSelectionPathInternal(@Nonnull TreePath path) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-            if (node.isLeaf() && node.getUserObject() instanceof SourceItem) {
-                super.setSelectionPath(path);
-                selectedPath = path;
-            }
-        }
-
-        @Override
-        public void setSelectionPath(TreePath path) {
-            if (path == null)
-                return;
-            setSelectionPathInternal(path);
-        }
-
-        @Override
-        public void addSelectionPath(TreePath path) {
-            if (path == null)
-                return;
-            setSelectionPathInternal(path);
-        }
-
-        @Override
-        public void resetRowSelection() {
-            super.resetRowSelection();
-            if (selectedPath != null && selection == null)
-                selection = new TreePath[]{selectedPath};
-        }
-
-        @Override
-        public void clearSelection() {}
-
     }
 
 }

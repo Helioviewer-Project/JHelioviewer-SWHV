@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -25,8 +26,9 @@ import org.helioviewer.jhv.gui.MainFrame;
 import org.helioviewer.jhv.gui.dialog.ImageDialog;
 import org.helioviewer.jhv.gui.time.TimeSelectorPanel;
 import org.helioviewer.jhv.io.APIRequest;
-import org.helioviewer.jhv.layers.ImageLayers;
+import org.helioviewer.jhv.io.DataSourcesTree;
 import org.helioviewer.jhv.layers.ImageLayer;
+import org.helioviewer.jhv.layers.ImageLayers;
 import org.helioviewer.jhv.layers.Layers;
 import org.helioviewer.jhv.movie.ExportMovie;
 import org.helioviewer.jhv.movie.Player;
@@ -232,14 +234,17 @@ public class MoviePanel extends JPanel implements ImageDialog.Handler, Player.St
     }
 
     @Override
-    public void loadDataset(String server, int sourceId) {
+    public void loadDatasets(List<DataSourcesTree.SourceItem> items) {
         ImageLayer target = layerToReplace;
         layerToReplace = null;
         if (checkSanity()) {
             long start = getStartTime();
             long end = samplingPanel.isSingleFrame() ? start : getEndTime();
-            ImageLayer imageLayer = target == null ? ImageLayer.create(null) : target;
-            imageLayer.load(new APIRequest(server, sourceId, start, end, getCadence()));
+            int cadence = getCadence();
+            for (DataSourcesTree.SourceItem item : items) {
+                ImageLayer imageLayer = target == null ? ImageLayer.create(null) : target;
+                imageLayer.load(new APIRequest(item.server, item.sourceId, start, end, cadence));
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
@@ -14,6 +15,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeSelectionModel;
 
 import org.helioviewer.jhv.gui.ComponentUtils;
 import org.helioviewer.jhv.gui.DesktopIntegration;
@@ -33,7 +35,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     public interface Handler {
         void setDefaultTimeRange(long start, long end);
 
-        void loadDataset(String server, int sourceId);
+        void loadDatasets(List<DataSourcesTree.SourceItem> items);
     }
 
     private final Handler handler;
@@ -43,9 +45,7 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
-            if (item != null)
-                loadDataset(item);
+            loadSelectedDatasets();
         }
     };
     private final JButton actionButton = new JButton(load);
@@ -53,11 +53,12 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     public ImageDialog(Handler _handler) {
         super(MainFrame.get(), "New Image Layer", false);
         handler = _handler;
-        sourcesTree = new DataSourcesTree(this::loadDataset);
+        sourcesTree = new DataSourcesTree(this::loadSelectedDatasets);
         sourcesTree.addTreeSelectionListener(e -> selectionChanged());
-        availabilityButton.setEnabled(false);
+        selectionChanged();
         availabilityButton.addActionListener(e -> {
-            String url = getAvailabilityURL(sourcesTree.getSelectedItem());
+            List<DataSourcesTree.SourceItem> items = sourcesTree.getSelectedItems();
+            String url = items.size() == 1 ? getAvailabilityURL(items.getFirst()) : null;
             if (url != null)
                 DesktopIntegration.openURL(url);
         });
@@ -106,6 +107,9 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     public void showDialog(boolean changeMode) {
         setTitle(changeMode ? "Change Dataset" : "New Image Layer");
         actionButton.setText(changeMode ? "Change" : "Add");
+        sourcesTree.getSelectionModel().setSelectionMode(
+                changeMode ? TreeSelectionModel.SINGLE_TREE_SELECTION : TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        selectionChanged();
         if (!isVisible()) {
             pack();
             JPanel layersPanel = MainFrame.getLayersPanel();
@@ -123,9 +127,13 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
     }
 
     private void selectionChanged() {
-        DataSourcesTree.SourceItem item = sourcesTree.getSelectedItem();
+        List<DataSourcesTree.SourceItem> items = sourcesTree.getSelectedItems();
+        DataSourcesTree.SourceItem item = items.size() == 1 ? items.getFirst() : null;
+        load.setEnabled(!items.isEmpty());
         availabilityButton.setEnabled(getAvailabilityURL(item) != null);
-        datasetExtent.setText(item == null ? null : "<div style='text-align:center'>Extent: " + TimeUtils.formatShort(item.start) + " - " + TimeUtils.formatShort(item.end) + "</div>");
+        String text = item != null ? "Extent: " + TimeUtils.formatShort(item.start) + " - " + TimeUtils.formatShort(item.end)
+                : items.isEmpty() ? "" : items.size() + " datasets selected";
+        datasetExtent.setText("<div style='text-align:center'>" + text + "</div>");
     }
 
     @Nullable
@@ -144,8 +152,11 @@ public final class ImageDialog extends StandardDialog implements DataSources.Lis
             handler.setDefaultTimeRange(item.end - 2 * TimeUtils.DAY_IN_MILLIS, item.end);
     }
 
-    private void loadDataset(DataSourcesTree.SourceItem item) {
+    private void loadSelectedDatasets() {
+        List<DataSourcesTree.SourceItem> items = sourcesTree.getSelectedItems();
+        if (items.isEmpty())
+            return;
         setVisible(false);
-        handler.loadDataset(item.server, item.sourceId);
+        handler.loadDatasets(items);
     }
 }
