@@ -116,7 +116,6 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
     }
 
     private void redrawGraph(GraphGeometry geometry) {
-        Rectangle graphArea = geometry.area();
         Rectangle graphSize = geometry.size();
         double sx = Display.pixelScale[0], sy = Display.pixelScale[1];
         int width = (int) (sx * graphSize.getWidth() + .5);
@@ -132,16 +131,13 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
         fullG.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         fullG.setTransform(AffineTransform.getScaleInstance(sx, sy));
 
-        Graphics2D plotG = (Graphics2D) fullG.create();
-        plotG.setFont(DrawConstants.font);
-        TimeAxis xAxis = DrawController.selectedAxis;
-        drawLayers(plotG, graphArea, xAxis, mousePosition, geometry);
-
-        plotG.dispose();
+        drawChart(fullG, geometry, DrawController.selectedAxis);
         fullG.dispose();
     }
 
-    private void drawLayers(Graphics2D g, Rectangle graphArea, TimeAxis timeAxis, Point mousePosition, GraphGeometry geometry) {
+    private void drawChart(Graphics2D g, GraphGeometry geometry, TimeAxis timeAxis) {
+        Rectangle graphArea = geometry.area();
+        g.setFont(DrawConstants.font);
         // Radio fills its plot area. Put the grid over it, then paint foreground data.
         for (TimelineLayer layer : layers) {
             if (layer instanceof RadioData && layer.isEnabled()) {
@@ -178,7 +174,6 @@ final class ChartDrawGraphPane extends JComponent implements MouseInputListener,
                 layer.draw(g, area, timeAxis, mousePosition);
             }
         }
-        g.setClip(graphArea);
     }
 
     private static void drawBackground(Graphics2D g, int width, int height) {

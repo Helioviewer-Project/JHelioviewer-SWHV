@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.lang.instrument.Instrumentation;
@@ -127,8 +126,7 @@ public final class TimelineDataTest {
     }
 
     private static Method chartDrawMethod(Object chart) throws Exception {
-        Method draw = chart.getClass().getDeclaredMethod("drawLayers", Graphics2D.class, Rectangle.class,
-                TimeAxis.class, Point.class, GraphGeometry.class);
+        Method draw = chart.getClass().getDeclaredMethod("drawChart", Graphics2D.class, GraphGeometry.class, TimeAxis.class);
         draw.setAccessible(true);
         return draw;
     }
@@ -168,7 +166,7 @@ public final class TimelineDataTest {
                         Graphics2D g = image.createGraphics();
                         try {
                             g.scale(scale, scale);
-                            draw.invoke(chart, g, geometry.area(), time, null, geometry);
+                            draw.invoke(chart, g, geometry, time);
                         } finally {
                             g.dispose();
                         }
@@ -336,7 +334,7 @@ public final class TimelineDataTest {
                             graphics.fillRect(0, 0, 1200, 700);
                             long paintStart = System.nanoTime();
                             long allocatedPaint = allocations.getCurrentThreadAllocatedBytes();
-                            drawChart.invoke(chart, graphics, geometry.area(), new TimeAxis(start, end), null, geometry);
+                            drawChart.invoke(chart, graphics, geometry, new TimeAxis(start, end));
                             long painted = System.nanoTime();
                             long allocatedPainted = allocations.getCurrentThreadAllocatedBytes();
                             if (run >= WARMUP_RUNS) {
