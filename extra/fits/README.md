@@ -70,13 +70,13 @@ all combinations of 1/2/4-byte Rice encoding and byte/short/int output, and heap
 It also compares complete compressed FITS files with their uncompressed reference through JHV's FITS loader.
 Individual failures are reported without skipping subsequent cases. Any failure gives a nonzero exit status.
 
-Small quantized cases have fixed expected values and run against both FastRice and nom-tam's decoder. They pin
+Small quantized cases have fixed expected values and run through both JHV's provider selection and nom-tam's decoder. They pin
 the existing 1.22 reconstruction behavior: no dithering, both dither modes, nulls and zeros followed by ordinary
 pixels, and double precision. Changes to upstream behavior therefore require review even when both decoders
 agree. In particular, the legacy dither-2 zero marker is a compatibility check, not a claim about the FITS standard.
 
-The expanded suite currently exposes JHV's existing failure to honor Rice `BYTEPIX` independently of the output
-type, including `m13_rice.fits`. These failures are not skipped or treated as successful tests.
+FastRice handles short output with `BYTEPIX=2`. Other encoded widths use upstream short decoding, and other
+output types use the upstream provider. The width matrix and `m13_rice.fits` check this fallback behavior.
 
 To check a candidate nom-tam JAR without replacing the bundled library:
 

@@ -65,6 +65,15 @@ public final class FastRiceVerifier {
         ICompressorControl control = CompressorProvider.findCompressorControl(null, Compression.ZCMPTYPE_RICE_1, short.class);
         if (control == null || !control.getClass().getName().contains("FastRiceProvider"))
             throw new AssertionError("FastRiceProvider is not active through ServiceLoader: " + control);
+        FastRiceProvider provider = new FastRiceProvider();
+        for (Class<?> type : List.of(byte.class, int.class, float.class, double.class)) {
+            String quantization = type == float.class || type == double.class ? Compression.ZQUANTIZ_SUBTRACTIVE_DITHER_1 : null;
+            if (provider.createCompressorControl(quantization, Compression.ZCMPTYPE_RICE_1, type) != null)
+                throw new AssertionError("FastRice must delegate " + type.getName());
+            ICompressorControl fallback = control(type, quantization);
+            if (fallback.getClass().getName().contains("FastRiceProvider"))
+                throw new AssertionError("upstream fallback was not selected for " + type.getName());
+        }
     }
 
     private interface Check { void run() throws Exception; }
@@ -304,7 +313,7 @@ public final class FastRiceVerifier {
         double r4 = 1144108930.0 / 2147483647;
         for (Class<?> type : List.of(float.class, double.class)) {
             for (boolean upstream : new boolean[]{false, true}) {
-                String label = (upstream ? "upstream " : "FastRice ") + type.getName();
+                String label = (upstream ? "upstream " : "JHV provider ") + type.getName();
                 run(label + " no dither", () -> verifyKnownValues(type, upstream, false, false,
                         new int[]{0, 1, 2}, new double[]{11, 13, 15}));
                 run(label + " fractional precision", () -> verifyKnownValues(type, upstream, true, false,
@@ -402,9 +411,9 @@ public final class FastRiceVerifier {
     }
 
     private static ICompressorControl control(Class<?> baseType, String quantAlgorithm) {
-        ICompressorControl control = new FastRiceProvider().createCompressorControl(quantAlgorithm, Compression.ZCMPTYPE_RICE_1, baseType);
+        ICompressorControl control = CompressorProvider.findCompressorControl(quantAlgorithm, Compression.ZCMPTYPE_RICE_1, baseType);
         if (control == null)
-            throw new AssertionError("No FastRice control for " + baseType.getName());
+            throw new AssertionError("No compressor control for " + baseType.getName());
         return control;
     }
 
