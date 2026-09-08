@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -45,13 +46,14 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
     private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Timelines");
     private final DefaultTreeModel treeModel = new DefaultTreeModel(root);
     private final JTree tree = new JTree(treeModel);
+    private final JCheckBox fullResolution = new JCheckBox("Full resolution");
     private final AbstractAction load = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             List<BandType> bandTypes = selectedBandTypes();
             if (bandTypes.isEmpty())
                 return;
-            layers.addBands(bandTypes);
+            layers.addBands(bandTypes, fullResolution.isSelected());
             setVisible(false);
         }
     };
@@ -109,6 +111,8 @@ public final class TimelineDialog extends StandardDialog implements Interfaces.S
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         content.add(scrollPane);
+        fullResolution.setToolTipText("Load original HAPI samples without one-minute rebinning.");
+        content.add(fullResolution, BorderLayout.PAGE_END);
         return content;
     }
 
