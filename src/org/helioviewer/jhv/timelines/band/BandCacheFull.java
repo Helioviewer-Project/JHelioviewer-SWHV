@@ -9,7 +9,7 @@ import org.helioviewer.jhv.timelines.draw.YAxis;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-class BandCacheAll implements BandCache {
+class BandCacheFull implements BandCache {
 
     private final List<DateValue> dateVals = new ArrayList<>();
 

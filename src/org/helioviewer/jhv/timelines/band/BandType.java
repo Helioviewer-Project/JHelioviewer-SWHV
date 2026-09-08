@@ -23,7 +23,6 @@ public class BandType {
     private final double min;
     private final double max;
     private final String scale;
-    private final CacheType cacheType;
     private final boolean isXRSB;
     private final List<String> groups;
 
@@ -62,7 +61,6 @@ public class BandType {
         }
 
         scale = jo.optString("scale", "linear");
-        cacheType = CacheType.parse(jo.optString("bandCacheType", "BandCacheMinute"));
         groups = parseGroups(jo.optJSONArray("groups"));
         predefinedEntries = parsePredefinedEntries(jo.optJSONArray("predefined"));
 
@@ -83,10 +81,6 @@ public class BandType {
 
     String getName() {
         return name;
-    }
-
-    boolean cacheAllValues() {
-        return cacheType == CacheType.ALL;
     }
 
     String getScale() {
@@ -228,14 +222,6 @@ public class BandType {
         for (int i = 0; i < result.length; i++)
             result[i] = new WarningLevel(xWarnLabels[i], xWarnValues[i], null);
         return result;
-    }
-
-    private enum CacheType {
-        ALL, MINUTE;
-
-        static CacheType parse(String value) {
-            return "BandCacheAll".equals(value) ? ALL : MINUTE;
-        }
     }
 
     private enum PlotType {

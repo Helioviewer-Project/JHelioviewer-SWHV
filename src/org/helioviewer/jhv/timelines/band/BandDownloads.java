@@ -3,7 +3,6 @@ package org.helioviewer.jhv.timelines.band;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ final class BandDownloads {
         final RequestKey key;
         final String title;
         final HashMap<BandType, Band> subscribers = new HashMap<>();
-        final HashSet<BandType> requestedTypes = new HashSet<>();
+        final HashMap<BandType, Boolean> requestedResolutions = new HashMap<>();
         Future<List<BandData>> future;
 
         Download(RequestKey _key, String _title) {
@@ -57,7 +56,7 @@ final class BandDownloads {
         BandReaderHapi.DatasetRef dataset = BandReaderHapi.dataset(baseUrl);
         for (Interval interval : intervals) {
             RequestKey key = new RequestKey(dataset.key(), interval);
-            Download download = findActiveDownload(key, band.getBandType());
+            Download download = findActiveDownload(key, band.getBandType(), band.isFullResolution());
             if (download == null) {
                 download = pendingDownloads.computeIfAbsent(key,
                         ignored -> new Download(key, dataset.title()));
@@ -94,9 +93,10 @@ final class BandDownloads {
                 || activeDownloads.stream().anyMatch(download -> download.subscribers.containsValue(band));
     }
 
-    private static Download findActiveDownload(RequestKey key, BandType type) {
+    private static Download findActiveDownload(RequestKey key, BandType type, boolean fullResolution) {
         for (Download download : activeDownloads) {
-            if (download.key.equals(key) && download.requestedTypes.contains(type))
+            Boolean resolution = download.requestedResolutions.get(type);
+            if (download.key.equals(key) && resolution != null && resolution == fullResolution)
                 return download;
         }
         return null;
@@ -119,13 +119,12 @@ final class BandDownloads {
         List<Download> downloads = List.copyOf(pendingDownloads.values());
         pendingDownloads.clear();
         for (Download download : downloads) {
-            List<BandType> types = List.copyOf(download.subscribers.keySet());
             Interval interval = download.key.interval;
-            download.requestedTypes.addAll(types);
+            download.subscribers.forEach((type, band) -> download.requestedResolutions.put(type, band.isFullResolution()));
             activeDownloads.add(download);
             try {
                 Callable<List<BandData>> request =
-                        BandReaderHapi.dataRequest(types, interval.start(), interval.end());
+                        BandReaderHapi.dataRequest(download.requestedResolutions, interval.start(), interval.end());
                 download.future = Task.submit(downloadPool, request,
                         data -> acceptData(download, data),
                         t -> downloadFailed(download, t));

@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,19 +69,18 @@ public class BandReaderHapi {
         return new DatasetRef(dataset.requestUrl, dataset.title);
     }
 
-    static Callable<List<BandData>> dataRequest(List<BandType> types, long start, long end) {
-        if (types.isEmpty())
+    static Callable<List<BandData>> dataRequest(Map<BandType, Boolean> resolutions, long start, long end) {
+        if (resolutions.isEmpty())
             throw new IllegalArgumentException("No HAPI parameters requested");
 
-        Dataset dataset = findDataset(types.getFirst().getBaseUrl());
-        HashSet<BandType> requestedTypes = new HashSet<>(types);
+        Dataset dataset = findDataset(resolutions.keySet().iterator().next().getBaseUrl());
         List<DatasetParameter> parameters = dataset.parameters.stream()
-                .filter(parameter -> requestedTypes.contains(parameter.type))
+                .filter(parameter -> resolutions.containsKey(parameter.type))
                 .toList();
-        if (parameters.size() != requestedTypes.size())
+        if (parameters.size() != resolutions.size())
             throw new IllegalArgumentException("HAPI parameters do not belong to one dataset");
 
-        RequestSchema schema = createRequestSchema(dataset, parameters);
+        RequestSchema schema = createRequestSchema(dataset, parameters, resolutions);
         return () -> getHapiStream(dataset, schema, start, end);
     }
 
@@ -196,7 +194,7 @@ public class BandReaderHapi {
 
     private record RequestSchema(String url, HapiTableReader tableReader, List<BandDecoder> decoders) {}
 
-    private record BandDecoder(BandType type, int valueColumn) {}
+    private record BandDecoder(BandType type, int valueColumn, boolean rebin) {}
 
     private static Catalog getCatalog(String server) throws Exception {
         String urlCatalog = server + "catalog";
@@ -297,14 +295,14 @@ public class BandReaderHapi {
         return new Dataset(version, title, requestUrl, params[0], parameters, start, stop);
     }
 
-    private static RequestSchema createRequestSchema(Dataset dataset, List<DatasetParameter> parameters) {
+    private static RequestSchema createRequestSchema(Dataset dataset, List<DatasetParameter> parameters, Map<BandType, Boolean> resolutions) {
         List<HapiParam> hapiParameters = new ArrayList<>(parameters.size() + 1);
         hapiParameters.add(dataset.timeParameter);
         List<BandDecoder> decoders = new ArrayList<>(parameters.size());
         List<String> parameterNames = new ArrayList<>(parameters.size());
         int valueColumn = ParamReader.createReader(dataset.timeParameter).getColumnCount();
         for (DatasetParameter parameter : parameters) {
-            decoders.add(new BandDecoder(parameter.type, valueColumn));
+            decoders.add(new BandDecoder(parameter.type, valueColumn, !parameter.type.isBarPlot() && !resolutions.get(parameter.type)));
             hapiParameters.add(parameter.hapiParameter);
             parameterNames.add(parameter.hapiParameter.getName());
             valueColumn += ParamReader.createReader(parameter.hapiParameter).getColumnCount();
@@ -404,7 +402,7 @@ public class BandReaderHapi {
             int valueColumn = 0;
             for (int i = 0; i < parameterIndex; i++)
                 valueColumn += ParamReader.createReader(params[i]).getColumnCount();
-            BandDecoder decoder = new BandDecoder(type, valueColumn);
+            BandDecoder decoder = new BandDecoder(type, valueColumn, !type.isBarPlot());
 
             return readBands(List.of(decoder), new HapiTableReader(params), in, (byte) overread1[0], fmt);
         }
@@ -447,12 +445,12 @@ public class BandReaderHapi {
         }
 
         DatesValues raw = new DatesValues(dates, values);
-        DatesValues rebinned = decoders.stream().anyMatch(decoder -> !decoder.type.isBarPlot())
+        DatesValues rebinned = decoders.stream().anyMatch(BandDecoder::rebin)
                 ? raw.rebin()
                 : raw;
         List<BandData> result = new ArrayList<>(decoders.size());
         for (int i = 0; i < decoders.size(); i++) {
-            DatesValues data = decoders.get(i).type.isBarPlot() ? raw : rebinned;
+            DatesValues data = decoders.get(i).rebin ? rebinned : raw;
             result.add(new BandData(decoders.get(i).type, data.dates(), data.values()[i]));
         }
         return result;

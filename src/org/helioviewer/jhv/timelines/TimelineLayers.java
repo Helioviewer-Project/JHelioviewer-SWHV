@@ -66,17 +66,21 @@ public class TimelineLayers extends AbstractTableModel {
             fireTableRowsUpdated(firstRow, lastRow);
     }
 
-    private Band getOrCreateBand(BandType bandType) {
+    private Band getOrCreateBand(BandType bandType, boolean fullResolution) {
         Band band = findBand(layers, bandType);
-        return band == null ? new Band(bandType) : band;
+        return band == null ? new Band(bandType, fullResolution) : band;
     }
 
     public List<Band> addBands(List<BandType> bandTypes) {
+        return addBands(bandTypes, false);
+    }
+
+    public List<Band> addBands(List<BandType> bandTypes, boolean fullResolution) {
         int firstRow = layers.size();
         ArrayList<Band> bands = new ArrayList<>(bandTypes.size());
         ArrayList<Band> added = new ArrayList<>();
         for (BandType bandType : bandTypes) {
-            Band band = getOrCreateBand(bandType);
+            Band band = getOrCreateBand(bandType, fullResolution);
             bands.add(band);
             if (containsLayer(layers, band))
                 continue;

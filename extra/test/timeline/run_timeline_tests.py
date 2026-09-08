@@ -20,7 +20,8 @@ with tempfile.TemporaryDirectory(prefix="jhv-timeline-tests-") as classes:
         str(root / "extra/test/timeline/TimelineDataTest.java"),
     ], check=True)
     subprocess.run([
-        "java", "-Djava.awt.headless=true", "-cp", os.pathsep.join([classes, classpath]),
+        "java", "-Djava.awt.headless=true", "-Duser.timezone=UTC", "-Duser.home=" + classes,
+        "-cp", os.pathsep.join([classes, classpath]),
         "org.helioviewer.jhv.timelines.band.TimelineDataTest",
         *(["--benchmark"] if args.benchmark else []),
     ], check=True)
