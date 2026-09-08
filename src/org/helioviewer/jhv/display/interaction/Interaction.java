@@ -32,6 +32,8 @@ public final class Interaction {
     private Mode mode = Mode.ROTATE;
     @Nullable
     private Type activeDrag;
+    @Nullable
+    private Viewport dragViewport;
 
     public Interaction() {
         Camera camera = Display.getCamera();
@@ -63,14 +65,15 @@ public final class Interaction {
         zoom.zoom(vp, e.preciseWheelRotation());
     }
 
-    public void mouseDragged(PointerEvent e, Viewport vp) {
+    public void mouseDragged(PointerEvent e) {
         if (activeDrag != null)
-            activeDrag.mouseDragged(e, vp);
+            activeDrag.mouseDragged(e, dragViewport);
     }
 
     public void mouseReleased() {
         Type drag = activeDrag;
         activeDrag = null;
+        dragViewport = null;
         if (drag != null)
             drag.mouseReleased();
     }
@@ -84,6 +87,7 @@ public final class Interaction {
 
     public void mousePressed(PointerEvent e, Viewport vp) {
         mouseReleased();
+        dragViewport = vp;
         activeDrag = e.shiftDown() ? interactionAnnotate : getType();
         activeDrag.mousePressed(e, vp);
     }

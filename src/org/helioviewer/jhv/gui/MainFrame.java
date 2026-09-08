@@ -236,6 +236,7 @@ public final class MainFrame {
         canvas.addMouseMotionListener(awtInputAdapter);
         canvas.addMouseWheelListener(awtInputAdapter);
         canvas.addKeyListener(awtInputAdapter);
+        canvas.addFocusListener(awtInputAdapter);
         renderHost.attachCanvas(canvas);
         // Force ANGLE surface/context creation immediately instead of waiting for the next UI event.
         canvas.requestRender();

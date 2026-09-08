@@ -40,8 +40,8 @@ public final class InputController {
     }
 
     public static void mouseDragged(PointerEvent e) {
-        Viewport vp = Display.setActiveViewport(e.x(), e.y());
-        interaction.mouseDragged(e, vp);
+        Display.setActiveViewport(e.x(), e.y());
+        interaction.mouseDragged(e);
         mouseListeners.forEach(listener -> listener.mouseDragged(e));
     }
 
@@ -57,6 +57,10 @@ public final class InputController {
 
     public static void keyPressed(KeyInputEvent e) {
         interaction.keyPressed(e);
+    }
+
+    public static void focusLost() {
+        interaction.mouseReleased();
     }
 
     private static final HashSet<InputMouseListener> mouseListeners = new HashSet<>();
